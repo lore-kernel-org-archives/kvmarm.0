@@ -1,71 +1,66 @@
-Return-Path: <SRS0=G53S=WZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=3tuy=W2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 384BCC3A59F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 18:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DA8C3A5A7
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Aug 2019 08:35:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E61D920828
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 18:18:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="UHnlYSmT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E61D920828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 6A94C2397E
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Aug 2019 08:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A94C2397E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0B274A593;
-	Thu, 29 Aug 2019 14:18:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A0E4A578;
+	Fri, 30 Aug 2019 04:35:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rzBLmtTLdAY6; Thu, 29 Aug 2019 14:18:23 -0400 (EDT)
+	with ESMTP id Tz-BQl10-jLG; Fri, 30 Aug 2019 04:35:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB604A581;
-	Thu, 29 Aug 2019 14:18:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AAE14A57C;
+	Fri, 30 Aug 2019 04:35:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11EA04A55F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 14:18:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 671F34A56E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Aug 2019 04:35:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bxe5ha4cBw4p for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Aug 2019 14:18:21 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 154074A531
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 14:18:21 -0400 (EDT)
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net
- [73.47.72.35])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 781A62339E;
- Thu, 29 Aug 2019 18:18:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1567102700;
- bh=LUbZq5RNgQvDztv0DBqWpD+rrSm6QAldMQFxXL2DynQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UHnlYSmTTAPOsDWMjFV4CoWajhA2LZRocJPp1ZU1Q+8731NMy5z8+9THQxHCoVioD
- eZqtN46iWA+JeiGFq9JTHStnMynMHNc9n3UltiWbHxxSvlxG1spg635LMbRUgNI4Kg
- 9TKV+9gjcm5NPFEyjqjtfsbuGR/TfiXdj1LTUwPs=
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 15/15] KVM: arm/arm64: Only skip MMIO insn once
-Date: Thu, 29 Aug 2019 14:18:02 -0400
-Message-Id: <20190829181802.9619-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181802.9619-1-sashal@kernel.org>
-References: <20190829181802.9619-1-sashal@kernel.org>
+ with ESMTP id 0pUCkaHGZptQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Aug 2019 04:35:18 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6650D4A524
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Aug 2019 04:35:18 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE18D344;
+ Fri, 30 Aug 2019 01:35:17 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 689183F718;
+ Fri, 30 Aug 2019 01:35:16 -0700 (PDT)
+Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
+To: Andrew Jones <drjones@redhat.com>
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-2-steven.price@arm.com>
+ <20190829171548.xfk7i2bwnwl4w2po@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <22fc60f0-e3d5-900d-c067-007c39485ba9@arm.com>
+Date: Fri, 30 Aug 2019 09:35:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190829171548.xfk7i2bwnwl4w2po@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,58 +77,197 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Jones <drjones@redhat.com>
+On 29/08/2019 18:15, Andrew Jones wrote:
+> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
+>> Introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+>>
+>> This only adds the details about "Stolen Time" as the details of "Live
+>> Physical Time" have not been fully agreed.
+>>
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on time that the host
+>> kernel has stolen from the guest.
+>>
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
+>>  1 file changed, 100 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..1ceb118694e7
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+>> @@ -0,0 +1,100 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
+>> +
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
+>> +support for AArch64 guests:
+>> +
+>> +https://developer.arm.com/docs/den0057/a
+>> +
+>> +KVM/arm64 implements the stolen time part of this specification by providing
+>> +some hypervisor service calls to support a paravirtualized guest obtaining a
+>> +view of the amount of time stolen from its execution.
+>> +
+>> +Two new SMCCC compatible hypercalls are defined:
+>> +
+>> +PV_FEATURES 0xC5000020
+>> +PV_TIME_ST  0xC5000022
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+>> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+>> +mechanism before calling it.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              (V)CPU. On failure:
+> 
+> Why the () around the V in VCPU?
 
-[ Upstream commit 2113c5f62b7423e4a72b890bd479704aa85c81ba ]
+There's nothing preventing the same mechanism being used without the
+virtualisation of CPUs. For example a hypervisor like Jailhouse could
+implement this interface even though there the CPU isn't being
+virtualised but is being handed over to the guest. Equally it is
+possible for firmware to provide the same mechanism (using the SMC64
+calling convention).
 
-If after an MMIO exit to userspace a VCPU is immediately run with an
-immediate_exit request, such as when a signal is delivered or an MMIO
-emulation completion is needed, then the VCPU completes the MMIO
-emulation and immediately returns to userspace. As the exit_reason
-does not get changed from KVM_EXIT_MMIO in these cases we have to
-be careful not to complete the MMIO emulation again, when the VCPU is
-eventually run again, because the emulation does an instruction skip
-(and doing too many skips would be a waste of guest code :-) We need
-to use additional VCPU state to track if the emulation is complete.
-As luck would have it, we already have 'mmio_needed', which even
-appears to be used in this way by other architectures already.
+Admittedly that's a little confusing here because the rest of this
+document is talking about KVM's implementation and normal hypervisors.
+So I'll drop the brackets.
 
-Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/arm/kvm/mmio.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>> +with inner and outer write back caching attributes, in the inner shareable
+>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>> +meaningfully filled by the hypervisor (see structure below).
+>> +
+>> +PV_TIME_ST returns the structure for the calling VCPU.
+> 
+> The above sentence seems redundant here.
 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index ae61e2ea7255b..d2efc033ef8b4 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -98,6 +98,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	unsigned int len;
- 	int mask;
- 
-+	/* Detect an already handled MMIO return */
-+	if (unlikely(!vcpu->mmio_needed))
-+		return 0;
-+
-+	vcpu->mmio_needed = 0;
-+
- 	if (!run->mmio.is_write) {
- 		len = run->mmio.len;
- 		if (len > sizeof(unsigned long))
-@@ -206,6 +212,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
-+	vcpu->mmio_needed	= 1;
- 
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
--- 
-2.20.1
+It is an important detail that each VCPU must use PV_TIME_ST to fetch
+the address of the structure for that VCPU. E.g. It could have been
+implemented so that the hypercall took a VCPU number. So while redundant
+I do feel it's worth pointing this out explicitly.
+
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>> +  Attributes  |      4      |      4      | Must be 0
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>> +will be present within a reserved region of the normal memory given to the
+>> +guest. The guest should not attempt to write into this memory. There is a
+>> +structure per VCPU of the guest.
+>> +
+>> +User space interface
+>> +====================
+>> +
+>> +User space can request that KVM provide the paravirtualized time interface to
+>> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
+>> +
+>> +    struct kvm_create_device pvtime_device = {
+>> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
+>> +            .attr = 0,
+>> +            .flags = 0,
+>> +    };
+>> +
+>> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+> 
+> The ioctl doesn't return the fd. If the ioctl returns zero the fd will be
+> in pvtime_device.fd.
+
+Good catch - I'm not sure quite why I wrote that. Anyway I've agreed to
+change the interface to operate on the VCPU device instead so this text
+is rewritten completely.
+
+>> +
+>> +Creation of the device should be done after creating the vCPUs of the virtual
+>> +machine.
+> 
+> Or else what? Will an error be reported in that case?
+
+This is now enforced by calling the ioctl on the VCPU device, so it's
+impossible to do in the wrong order.
+
+>> +
+>> +The IPA of the structures must be given to KVM. This is the base address
+>> +of an array of stolen time structures (one for each VCPU). The base address
+>> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
+>> +multiple of PAGE_SIZE.
+>> +
+>> +The memory for these structures should be added to the guest in the usual
+>> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
+> 
+> Above it says the guest shouldn't attempt to write the memory. Should
+> KVM_MEM_READONLY be used with KVM_SET_USER_MEMORY_REGION for it?
+
+That is optional - the specification states the guest must not attempt
+to write to it - so marking it read-only for the guest should work fine
+with a conforming guest. But it's not required.
+
+>> +
+>> +For example:
+>> +
+>> +    struct kvm_dev_arm_st_region region = {
+>> +            .gpa = <IPA of guest base address>,
+>> +            .size = <size in bytes>
+>> +    };
+>> +
+>> +    struct kvm_device_attr st_base = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+> 
+> This is KVM_DEV_ARM_PV_TIME_REGION in the code.
+
+Gah - I obviously missed that when I refactored to define the region
+rather than just the base address. Anyway this has all changed (again)
+because each VCPU has its own base address so the size is no longer
+necessary.
+
+Thanks for the review,
+
+Steve
+
+>> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
+>> +            .addr = (u64)&region
+>> +    };
+>> +
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+>> -- 
+>> 2.20.1
+>>
+> 
+> Thanks,
+> drew 
+> 
 
 _______________________________________________
 kvmarm mailing list
