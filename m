@@ -6,53 +6,59 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4625FC3A59B
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Sep 2019 08:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE15C3A59B
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Sep 2019 08:34:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C30E122CF7
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Sep 2019 08:01:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C30E122CF7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0454521874
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Sep 2019 08:34:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0454521874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43A0F4A4C1;
-	Mon,  2 Sep 2019 04:01:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A6844A52E;
+	Mon,  2 Sep 2019 04:34:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L5OncEk7Z51y; Mon,  2 Sep 2019 04:01:04 -0400 (EDT)
+	with ESMTP id hPB8uQ7Mcv3x; Mon,  2 Sep 2019 04:34:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 163B54A4E5;
-	Mon,  2 Sep 2019 04:01:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D01D4A521;
+	Mon,  2 Sep 2019 04:34:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF5D4A4C1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Sep 2019 04:01:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C7F14A4EE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Sep 2019 04:34:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aIIrq16goB6y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Sep 2019 04:00:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 647A34A4C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Sep 2019 04:00:57 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E19D728;
- Mon,  2 Sep 2019 01:00:56 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73D583F71A;
- Mon,  2 Sep 2019 01:00:56 -0700 (PDT)
-Date: Mon, 2 Sep 2019 10:00:55 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
+ with ESMTP id LuIx8Z9f4X11 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Sep 2019 04:34:08 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 320C04A4DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Sep 2019 04:34:08 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5E2C237E79;
+ Mon,  2 Sep 2019 08:34:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC9681000337;
+ Mon,  2 Sep 2019 08:34:05 +0000 (UTC)
+Date: Mon, 2 Sep 2019 10:34:03 +0200
+From: Andrew Jones <drjones@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH 0/3] arm64: KVM: Kiss hyp_alternate_select() goodbye
-Message-ID: <20190902080055.GA4320@e113682-lin.lund.arm.com>
+Message-ID: <20190902083403.ujiilcurhzrbc4ph@kamzik.brq.redhat.com>
 References: <20190901211237.11673-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
 In-Reply-To: <20190901211237.11673-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Mon, 02 Sep 2019 08:34:07 +0000 (UTC)
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,11 +90,25 @@ On Sun, Sep 01, 2019 at 10:12:34PM +0100, Marc Zyngier wrote:
 > has_vhe().
 > 
 > So off it goes.
+> 
+> Marc Zyngier (3):
+>   arm64: KVM: Drop hyp_alternate_select for checking for
+>     ARM64_WORKAROUND_834220
+>   arm64: KVM: Replace hyp_alternate_select with has_vhe()
+>   arm64: KVM: Kill hyp_alternate_select()
+> 
+>  arch/arm64/include/asm/kvm_hyp.h | 24 ---------------------
+>  arch/arm64/kvm/hyp/switch.c      | 17 ++-------------
+>  arch/arm64/kvm/hyp/tlb.c         | 36 +++++++++++++++++++-------------
+>  3 files changed, 24 insertions(+), 53 deletions(-)
+> 
+> -- 
+> 2.20.1
+>
 
-I'm not sure I want to kiss hyp_alternate_select() at all, but away it
-must go!
+Yay! The 'func()(...)' stuff always gave me cross-eyes.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
