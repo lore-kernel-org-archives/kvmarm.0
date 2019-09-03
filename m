@@ -2,69 +2,67 @@ Return-Path: <SRS0=67XK=W6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06193C3A5A5
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 06:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5EFC3A5A7
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 08:04:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 860982173E
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 06:37:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 860982173E
+	by mail.kernel.org (Postfix) with ESMTP id D1C5F22CF8
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 08:04:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C5F22CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D807F4A586;
-	Tue,  3 Sep 2019 02:37:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 345444A521;
+	Tue,  3 Sep 2019 04:04:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 58z6lHotRtm4; Tue,  3 Sep 2019 02:37:29 -0400 (EDT)
+	with ESMTP id ecjTBq4qb20k; Tue,  3 Sep 2019 04:03:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4A44A588;
-	Tue,  3 Sep 2019 02:37:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B62A64A568;
+	Tue,  3 Sep 2019 04:03:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1F7A4A521
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 02:37:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79CC94A568
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 04:03:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OlfjzBuZMUhN for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Sep 2019 02:37:27 -0400 (EDT)
+ with ESMTP id SpRDkKYrKWuh for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Sep 2019 04:03:55 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5A914A4AA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 02:37:27 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ADC7F4A521
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 04:03:55 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A54827E422;
- Tue,  3 Sep 2019 06:37:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A129106E28C;
+ Tue,  3 Sep 2019 08:03:54 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B68EA1001284;
- Tue,  3 Sep 2019 06:37:23 +0000 (UTC)
-Date: Tue, 3 Sep 2019 08:37:21 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 37E9B60BE0;
+ Tue,  3 Sep 2019 08:03:51 +0000 (UTC)
+Date: Tue, 3 Sep 2019 10:03:48 +0200
 From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 02/16] arm/arm64: psci: Don't run C
- code without stack or vectors
-Message-ID: <20190903063721.hzyz7kshwoqnuj5l@kamzik.brq.redhat.com>
-References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
- <1566999511-24916-3-git-send-email-alexandru.elisei@arm.com>
- <20190828144522.qkmckjcmrdayfq7r@kamzik.brq.redhat.com>
- <a2da5efd-b466-3fc2-f8a3-eb9a852f2fdc@arm.com>
- <1ed80409-aaf2-162f-b84a-3c9d88cd8bc8@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v4 00/10] arm64: Stolen time support
+Message-ID: <20190903080348.5whavgrjki7zrtmd@kamzik.brq.redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <1ed80409-aaf2-162f-b84a-3c9d88cd8bc8@arm.com>
+In-Reply-To: <20190830084255.55113-1-steven.price@arm.com>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 03 Sep 2019 06:37:26 +0000 (UTC)
-Cc: kvm@vger.kernel.org, maz@kernel.org, andre.przywara@arm.com,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Tue, 03 Sep 2019 08:03:55 +0000 (UTC)
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,104 +79,368 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 02, 2019 at 03:55:48PM +0100, Alexandru Elisei wrote:
-> On 8/28/19 4:14 PM, Alexandru Elisei wrote:
+On Fri, Aug 30, 2019 at 09:42:45AM +0100, Steven Price wrote:
+> This series add support for paravirtualized time for arm64 guests and
+> KVM hosts following the specification in Arm's document DEN 0057A:
 > 
-> > On 8/28/19 3:45 PM, Andrew Jones wrote:
-> >> On Wed, Aug 28, 2019 at 02:38:17PM +0100, Alexandru Elisei wrote:
-> >>> The psci test performs a series of CPU_ON/CPU_OFF cycles for CPU 1. This is
-> >>> done by setting the entry point for the CPU_ON call to the physical address
-> >>> of the C function cpu_psci_cpu_die.
-> >>>
-> >>> The compiler is well within its rights to use the stack when generating
-> >>> code for cpu_psci_cpu_die.  However, because no stack initialization has
-> >>> been done, the stack pointer is zero, as set by KVM when creating the VCPU.
-> >>> This causes a data abort without a change in exception level. The VBAR_EL1
-> >>> register is also zero (the KVM reset value for VBAR_EL1), the MMU is off,
-> >>> and we end up trying to fetch instructions from address 0x200.
-> >>>
-> >>> At this point, a stage 2 instruction abort is generated which is taken to
-> >>> KVM. KVM interprets this as an instruction fetch from an I/O region, and
-> >>> injects a prefetch abort into the guest. Prefetch abort is a synchronous
-> >>> exception, and on guest return the VCPU PC will be set to VBAR_EL1 + 0x200,
-> >>> which is...  0x200. The VCPU ends up in an infinite loop causing a prefetch
-> >>> abort while fetching the instruction to service the said abort.
-> >>>
-> >>> cpu_psci_cpu_die is basically a wrapper over the HVC instruction, so
-> >>> provide an assembly implementation for the function which will serve as the
-> >>> entry point for CPU_ON.
-> >>>
-> >>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >>> ---
-> >>>  arm/cstart.S   | 7 +++++++
-> >>>  arm/cstart64.S | 7 +++++++
-> >>>  arm/psci.c     | 5 +++--
-> >>>  3 files changed, 17 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/arm/cstart.S b/arm/cstart.S
-> >>> index 114726feab82..5d4fe4b1570b 100644
-> >>> --- a/arm/cstart.S
-> >>> +++ b/arm/cstart.S
-> >>> @@ -7,6 +7,7 @@
-> >>>   */
-> >>>  #define __ASSEMBLY__
-> >>>  #include <auxinfo.h>
-> >>> +#include <linux/psci.h>
-> >>>  #include <asm/thread_info.h>
-> >>>  #include <asm/asm-offsets.h>
-> >>>  #include <asm/ptrace.h>
-> >>> @@ -138,6 +139,12 @@ secondary_entry:
-> >>>  	blx	r0
-> >>>  	b	do_idle
-> >>>  
-> >>> +.global asm_cpu_psci_cpu_die
-> >>> +asm_cpu_psci_cpu_die:
-> >>> +	ldr	r0, =PSCI_0_2_FN_CPU_OFF
-> >>> +	hvc	#0
-> >>> +	b	halt
-> >> Shouldn't we load PSCI_POWER_STATE_TYPE_POWER_DOWN into r1 and
-> >> zero out r2 and r3, as cpu_psci_cpu_die() does? And maybe we
-> >> should just do a 'b .' here instead of 'b halt' in order to
-> >> avoid confusion as to how we ended up in halt(), if the psci
-> >> invocation were to ever fail.
-> > Not really, I'm not really sure where the extra parameter in cpu_psci_cpu_die
-> > comes from. I have looked at ARM DEN 0022D, section 5.1.3, and the CPU_OFFcall
-> > has exactly one parameter, the function id. I've also looked at how KVM handles
-> > this call, and it doesn't use anything else other than the function id. Please
-> > correct me if I missed something.
+> https://developer.arm.com/docs/den0057/a
 > 
-> Did some digging, apparently the power state parameter was required for the very
-> first version of PSCI. ARM DEN 0022D states that it has been removed in PSCIv0.2:
+> It implements support for stolen time, allowing the guest to
+> identify time when it is forcibly not executing.
 > 
-> "7.3 Changes in PSCIv0.2 from first proposal
+> It doesn't implement support for Live Physical Time (LPT) as there are
+> some concerns about the overheads and approach in the above
+> specification, and I expect an updated version of the specification to
+> be released soon with just the stolen time parts.
 > 
-> [..]
+> NOTE: Patches 8 and 9 will conflict with Mark Rutland's series[1] cleaning
+> up the SMCCC conduit. I do feel that the addition of an _invoke() call
+> makes a number of call sites cleaner and it should be possible to
+> integrate both this and Mark's other cleanups.
 > 
-> Removed power_state parameter for CPU_OFF."
+> [1] https://lore.kernel.org/linux-arm-kernel/20190809132245.43505-1-mark.rutland@arm.com/
 > 
-> The kvm-unit-tests implementation of psci uses fixed function ids (as opposed to
-> first psci version, where the ids were taken from the DT), so I think that we
-> can drop the PSCI_POWER_STATE_TYPE_POWER_DOWN parameter in cpu_psci_cpu_die
-> altogether. What do you think?
+> Also available as a git tree:
+> git://linux-arm.org/linux-sp.git stolen_time/v4
+> 
+> Changes from v3:
+> https://lore.kernel.org/lkml/20190821153656.33429-1-steven.price@arm.com/
+>  * There's no longer a PV_TIME device, instead there are attributes on
+>    the VCPU. This allows the stolen time structures to be places
+>    arbitrarily by user space (subject to 64 byte alignment).
+>  * Split documentation between information on the hypercalls and the
+>    attributes on the VCPU
+>  * Fixed the type of SMCCC functions to return long not int
+> 
+> Changes from v2:
+> https://lore.kernel.org/lkml/20190819140436.12207-1-steven.price@arm.com/
+>  * Switched from using gfn_to_hva_cache to a new macro kvm_put_guest()
+>    that can provide the single-copy atomicity required (on arm64). This
+>    macro is added in patch 4.
+>  * Tidied up the locking for kvm_update_stolen_time().
+>    pagefault_disable() was unnecessary and the caller didn't need to
+>    take kvm->srcu as the function does it itself.
+>  * Removed struct kvm_arch_pvtime from the arm implementation, replaced
+>    instead with inline static functions which are empty for arm.
+>  * Fixed a few checkpatch --strict warnings.
+> 
+> Changes from v1:
+> https://lore.kernel.org/lkml/20190802145017.42543-1-steven.price@arm.com/
+>  * Host kernel no longer allocates the stolen time structure, instead it
+>    is allocated by user space. This means the save/restore functionality
+>    can be removed.
+>  * Refactored the code so arm has stub implementations and to avoid
+>    initcall
+>  * Rebased to pick up Documentation/{virt->virtual} change
+>  * Bunch of typo fixes
+> 
+> Christoffer Dall (1):
+>   KVM: arm/arm64: Factor out hypercall handling from PSCI code
+> 
+> Steven Price (9):
+>   KVM: arm64: Document PV-time interface
+>   KVM: arm64: Implement PV_FEATURES call
+>   KVM: Implement kvm_put_guest()
+>   KVM: arm64: Support stolen time reporting via shared structure
+>   KVM: Allow kvm_device_ops to be const
+>   KVM: arm64: Provide VCPU attributes for stolen time
+>   arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+>   arm/arm64: Make use of the SMCCC 1.1 wrapper
+>   arm64: Retrieve stolen time as paravirtualized guest
+> 
+>  Documentation/virt/kvm/arm/pvtime.txt   |  64 ++++++++++
+>  Documentation/virt/kvm/devices/vcpu.txt |  14 +++
+>  arch/arm/include/asm/kvm_host.h         |  26 +++++
+>  arch/arm/kvm/Makefile                   |   2 +-
+>  arch/arm/kvm/handle_exit.c              |   2 +-
+>  arch/arm/mm/proc-v7-bugs.c              |  13 +--
+>  arch/arm64/include/asm/kvm_host.h       |  30 ++++-
+>  arch/arm64/include/asm/paravirt.h       |   9 +-
+>  arch/arm64/include/asm/pvclock-abi.h    |  17 +++
+>  arch/arm64/include/uapi/asm/kvm.h       |   2 +
+>  arch/arm64/kernel/cpu_errata.c          |  80 +++++--------
+>  arch/arm64/kernel/paravirt.c            | 148 ++++++++++++++++++++++++
+>  arch/arm64/kernel/time.c                |   3 +
+>  arch/arm64/kvm/Kconfig                  |   1 +
+>  arch/arm64/kvm/Makefile                 |   2 +
+>  arch/arm64/kvm/guest.c                  |   9 ++
+>  arch/arm64/kvm/handle_exit.c            |   4 +-
+>  include/kvm/arm_hypercalls.h            |  43 +++++++
+>  include/kvm/arm_psci.h                  |   2 +-
+>  include/linux/arm-smccc.h               |  58 ++++++++++
+>  include/linux/cpuhotplug.h              |   1 +
+>  include/linux/kvm_host.h                |  26 ++++-
+>  include/linux/kvm_types.h               |   2 +
+>  include/uapi/linux/kvm.h                |   2 +
+>  virt/kvm/arm/arm.c                      |  11 ++
+>  virt/kvm/arm/hypercalls.c               |  68 +++++++++++
+>  virt/kvm/arm/psci.c                     |  84 +-------------
+>  virt/kvm/arm/pvtime.c                   | 124 ++++++++++++++++++++
+>  virt/kvm/kvm_main.c                     |   6 +-
+>  29 files changed, 699 insertions(+), 154 deletions(-)
+>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+>  create mode 100644 include/kvm/arm_hypercalls.h
+>  create mode 100644 virt/kvm/arm/hypercalls.c
+>  create mode 100644 virt/kvm/arm/pvtime.c
+> 
+> -- 
+> 2.20.1
+>
 
-Sounds good to me. Thanks for the digging.
+Hi Steven,
 
+I had some fun testing this series with the KVM selftests framework. It
+looks like it works to me, so you may add
+
+Tested-by: Andrew Jones <drjones@redhat.com>
+
+if you like. And below is the test I came up with.
+
+Thanks,
 drew
 
-> 
-> Thanks,
-> Alex
-> > As for zero'ing the extra registers, this is not part of the SMC calling
-> > convention, this is just something that the C code for psci does. The SMC
-> > calling convention states that registers 0-3 will be modified after the call, so
-> > having 4 arguments to the psci_invoke function will tell the compiler to
-> > save/restore the registers in the caller.
-> >
-> > As for doing 'b .' instead of branching to halt, that's a good idea, I'll do
-> > that. But it will only be useful if the last CPU_OFF call fails.
-> >
-> > Thanks,
-> > Alex
+
+From: Andrew Jones <drjones@redhat.com>
+Date: Tue, 3 Sep 2019 03:45:08 -0400
+Subject: [PATCH] selftests: kvm: aarch64 stolen-time test
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/stolen-time.c       | 208 ++++++++++++++++++
+ 2 files changed, 209 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/stolen-time.c
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index ba7849751989..3151264039ad 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -28,6 +28,7 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+ 
++TEST_GEN_PROGS_aarch64 += aarch64/stolen-time
+ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+diff --git a/tools/testing/selftests/kvm/aarch64/stolen-time.c b/tools/testing/selftests/kvm/aarch64/stolen-time.c
+new file mode 100644
+index 000000000000..36df2f6baa17
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/stolen-time.c
+@@ -0,0 +1,208 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * AArch64 PV stolen time test
++ *
++ * Copyright (C) 2019, Red Hat, Inc.
++ */
++#define _GNU_SOURCE
++#include <stdio.h>
++#include <time.h>
++#include <sched.h>
++#include <pthread.h>
++#include <sys/syscall.h>
++#include "kvm_util.h"
++
++#define ST_IPA_BASE		(1 << 30)
++#define MIN_STOLEN_TIME		200000
++
++struct st_time {
++	uint32_t rev;
++	uint32_t attr;
++	uint64_t st_time;
++};
++
++static uint64_t st_ipa_offset[4];
++static uint64_t guest_stolen_time[4];
++
++static void guest_code(void)
++{
++	struct st_time *st_time;
++	uint64_t cpu;
++	int64_t ipa;
++	int32_t ret;
++
++	asm volatile("mrs %0, mpidr_el1" : "=r" (cpu));
++	cpu &= 0x3;
++
++	asm volatile(
++		"mov	x0, %1\n"
++		"mov	x1, %2\n"
++		"hvc	#0\n"
++		"mov	%0, x0\n"
++	: "=r" (ret) : "r" (0x80000001), "r" (0xc5000020) :
++	  "x0", "x1", "x2", "x3");
++
++	GUEST_ASSERT(ret == 0);
++
++	asm volatile(
++		"mov	x0, %1\n"
++		"mov	x1, %2\n"
++		"hvc	#0\n"
++		"mov	%0, x0\n"
++	: "=r" (ret) : "r" (0xc5000020), "r" (0xc5000022) :
++	  "x0", "x1", "x2", "x3");
++
++	GUEST_ASSERT(ret == 0);
++
++	asm volatile(
++		"mov	x0, %1\n"
++		"hvc	#0\n"
++		"mov	%0, x0\n"
++	: "=r" (ipa) : "r" (0xc5000022) :
++	  "x0", "x1", "x2", "x3");
++
++	GUEST_ASSERT(ipa == ST_IPA_BASE + st_ipa_offset[cpu]);
++
++	st_time = (struct st_time *)ipa;
++	GUEST_ASSERT(st_time->rev == 0);
++	GUEST_ASSERT(st_time->attr == 0);
++
++	guest_stolen_time[cpu] = st_time->st_time;
++	GUEST_SYNC(0);
++
++	guest_stolen_time[cpu] = st_time->st_time;
++	GUEST_DONE();
++}
++
++static long get_run_delay(void)
++{
++	char path[64];
++	long val[2];
++	FILE *fp;
++
++	sprintf(path, "/proc/%ld/schedstat", syscall(SYS_gettid));
++	fp = fopen(path, "r");
++	fscanf(fp, "%ld %ld ", &val[0], &val[1]);
++	fclose(fp);
++
++	return val[1];
++}
++
++static void *steal_time(void *arg)
++{
++	uint64_t nsecs_per_sec = 1000000000ul;
++	uint64_t sec, nsec;
++	struct timespec ts;
++
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	sec = ts.tv_sec;
++	nsec = ts.tv_nsec + MIN_STOLEN_TIME;
++	if (nsec > nsecs_per_sec) {
++		sec += 1;
++		nsec -= nsecs_per_sec;
++	}
++
++	while (1) {
++		clock_gettime(CLOCK_MONOTONIC, &ts);
++		if (ts.tv_sec > sec || (ts.tv_sec == sec && ts.tv_nsec >= nsec))
++			break;
++	}
++
++	return NULL;
++}
++
++static void run_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
++{
++	struct ucall uc;
++
++	vcpu_ioctl(vm, vcpuid, KVM_RUN, NULL);
++
++	switch (get_ucall(vm, vcpuid, &uc)) {
++	case UCALL_SYNC:
++	case UCALL_DONE:
++		break;
++	case UCALL_ABORT:
++		TEST_ASSERT(false, "%s at %s:%d", (const char *)uc.args[0],
++			    __FILE__, uc.args[1]);
++	default:
++		TEST_ASSERT(false, "Unexpected exit: %s",
++			    exit_reason_str(vcpu_state(vm, vcpuid)->exit_reason));
++	}
++}
++
++int main(int ac, char **av)
++{
++	struct kvm_device_attr dev = {
++		.group = KVM_ARM_VCPU_PVTIME_CTRL,
++		.attr = KVM_ARM_VCPU_PVTIME_SET_IPA,
++	};
++	uint64_t pvtime_memslot_size;
++	struct kvm_vm *vm;
++	pthread_attr_t attr;
++	pthread_t thread;
++	cpu_set_t cpuset;
++	long stolen_time;
++	int i;
++
++	CPU_ZERO(&cpuset);
++	CPU_SET(0, &cpuset);
++	pthread_attr_init(&attr);
++	pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
++	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
++
++	pvtime_memslot_size = 64 * 1024; /* one maximum-sized host page */
++
++	/* create a one-vcpu guest and the pvtime memslot */
++	vm = vm_create_default(0, 0, guest_code);
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_IPA_BASE, 1,
++				    16 /* vm uses 4k pages */, 0);
++	virt_map(vm, ST_IPA_BASE, ST_IPA_BASE, pvtime_memslot_size, 0);
++	ucall_init(vm, UCALL_MMIO, NULL);
++
++	/* add 3 more vcpus */
++	for (i = 1; i < 4; ++i) {
++		vm_vcpu_add_default(vm, i, guest_code);
++		st_ipa_offset[i] = i * 64;
++		sync_global_to_guest(vm, st_ipa_offset[i]);
++	}
++
++	/* add pvtime to each vcpu */
++	for (i = 0; i < 4; ++i) {
++		uint64_t st_ipa = ST_IPA_BASE + st_ipa_offset[i];
++		dev.addr = (uint64_t)&st_ipa;
++		vcpu_ioctl(vm, i, KVM_HAS_DEVICE_ATTR, &dev);
++		vcpu_ioctl(vm, i, KVM_SET_DEVICE_ATTR, &dev);
++	}
++
++	/* run the tests on each vcpu */
++	for (i = 0; i < 4; ++i) {
++		/* first vcpu run */
++		run_vcpu(vm, i);
++		sync_global_from_guest(vm, guest_stolen_time[i]);
++		TEST_ASSERT(guest_stolen_time[i] == 0, "Expected stolen_time = 0");
++
++		/* steal time from the vcpu */
++		stolen_time = get_run_delay();
++		pthread_create(&thread, &attr, steal_time, NULL);
++		pthread_yield();
++		pthread_join(thread, NULL);
++		stolen_time = get_run_delay() - stolen_time;
++		TEST_ASSERT(stolen_time >= MIN_STOLEN_TIME,
++			    "Expected stolen time >= %ld, got %ld",
++			    MIN_STOLEN_TIME, stolen_time);
++
++		/* run vcpu again and check the stolen time */
++		run_vcpu(vm, i);
++		sync_global_from_guest(vm, guest_stolen_time[i]);
++		TEST_ASSERT(guest_stolen_time[i] >= stolen_time,
++			    "Expected stolen_time >= %ld, got %ld",
++			    stolen_time, guest_stolen_time[i]);
++
++		printf("CPU%d: %ld", i, guest_stolen_time[i]);
++		if (stolen_time == guest_stolen_time[i])
++			printf(" (BONUS: guest stolen_time even exactly matches run_delay)");
++		printf("\n");
++	}
++
++	return 0;
++}
+-- 
+2.18.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
