@@ -2,84 +2,56 @@ Return-Path: <SRS0=67XK=W6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E5FC3A5A2
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 11:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 294DEC3A5A2
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 15:58:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DB00E22CF7
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 11:34:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wDvVk5e0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB00E22CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id ACC9D22CF8
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 15:58:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC9D22CF8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324104A4F5;
-	Tue,  3 Sep 2019 07:34:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3CD04A535;
+	Tue,  3 Sep 2019 11:58:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 54KuD9QDUzkc; Tue,  3 Sep 2019 07:34:02 -0400 (EDT)
+	with ESMTP id Rb2P58K3X-mM; Tue,  3 Sep 2019 11:57:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2E1B4A554;
-	Tue,  3 Sep 2019 07:34:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D5784A597;
+	Tue,  3 Sep 2019 11:57:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9CD14A4FE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 07:34:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 353434A535
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 11:57:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BIE8AoiQdkph for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Sep 2019 07:33:59 -0400 (EDT)
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
- [209.85.210.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B572C4A4F5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 07:33:59 -0400 (EDT)
-Received: by mail-ot1-f66.google.com with SMTP id n7so8959310otk.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Sep 2019 04:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XtxHXKLfW5QJwBGA+RR9lcAadfuUNqWWH2+7dJcY6l8=;
- b=wDvVk5e0nozBCiHVpIJ1ag0McMj21a4LnQhk0VwHhzsl21zYG3/FYXtHN/gUQR/qwI
- DQ4nXwRjv+5mKj4QwJcpR0ZAN3IhvqFizCBzmL1ZNU0hnKclsxK56/VuG73N2ZAtpxSA
- 0Qj1vwhiPppNFvUDzZ7vZbEa7IYHFa0HjqZktvpweEF6+6yOecujjcAGJ30EBIat4pIQ
- y64j6SBsRT3rCskUD0jU9xXYh6EcT1sftyeldRF4iEeAibREHceCb3sJKew1Hc0qEPWh
- I+FPgFDTiENXz/Xu+DWTL5cinxcSaGb7hgdzGTRAJwjPSGaskJrTfLTWUWrBW4DO8yZs
- xS/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XtxHXKLfW5QJwBGA+RR9lcAadfuUNqWWH2+7dJcY6l8=;
- b=Ogl8t9v32FcPxbU2cEHWJi79QT8KhY+vRF7OQhQkP5BpLpEsTzp3pZvSbbRu04fauw
- sPkLCKcd+YSLXxHgC/MpMjRoRZ1mklkIoTPOi5JfHGhKyIpj2VLo8goCGDA+9mW7HtC6
- m8UIpQ9lC05qk/S2ZQZO13NAwiyvEcw+8JDQcZjfQg0OmCFUmdtFA6pZ6SzlBtNQ4xkS
- fOoccPwwbScKRr5g8NLFC5l7uJNuEBkh+a1UBAu0rQpq40PrWg1NoAam4Qbgm9vQLZhS
- WHn770+53bcgixf/SX+uH0ViE38Ji2HQq315B3RZfiYd3ibA6VLHodfbWi6QPiBwCt4M
- WYhA==
-X-Gm-Message-State: APjAAAUO5U79msm6Bu2a0Pf0e3Z+E+a/ayNYF07/DgthFKjlZe7FvXbx
- G6c45PCClu6uw4kJWXVKo3dm3f5JHutKos1X1eJcgg==
-X-Google-Smtp-Source: APXvYqyoKS7/0TF1tdmLXrX9ofvDMLr2r/p8mHmpyBd5yntAm033XmhU1CGaf4hTCyzl8TYx1jaWNrydF4XT7x42HGQ=
-X-Received: by 2002:a9d:5e10:: with SMTP id d16mr28380255oti.91.1567510439153; 
- Tue, 03 Sep 2019 04:33:59 -0700 (PDT)
+ with ESMTP id 6vUse9J-e1c1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Sep 2019 11:57:56 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA404A52D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 11:57:56 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3474C344;
+ Tue,  3 Sep 2019 08:57:56 -0700 (PDT)
+Received: from filthy-habits.cambridge.arm.com
+ (filthy-habits.cambridge.arm.com [10.1.197.61])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D4C6C3F246;
+ Tue,  3 Sep 2019 08:57:54 -0700 (PDT)
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
+ driven by vcpu_load/put
+Date: Tue,  3 Sep 2019 16:57:47 +0100
+Message-Id: <20190903155747.219802-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190818140710.23920-1-maz@kernel.org>
-In-Reply-To: <20190818140710.23920-1-maz@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Sep 2019 12:33:48 +0100
-Message-ID: <CAFEAcA-25Cm9ZgSkgXDomEs7jt4sn4z3GeXLt4hvU4P1D0vJCA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Allow more than 256 vcpus for
- KVM_IRQ_LINE
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
- kvmarm@lists.cs.columbia.edu,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: Andre Przywara <Andre.Przywara@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,78 +68,281 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 18 Aug 2019 at 15:07, Marc Zyngier <maz@kernel.org> wrote:
->
-> While parts of the VGIC support a large number of vcpus (we
-> bravely allow up to 512), other parts are more limited.
->
-> One of these limits is visible in the KVM_IRQ_LINE ioctl, which
-> only allows 256 vcpus to be signalled when using the CPU or PPI
-> types. Unfortunately, we've cornered ourselves badly by allocating
-> all the bits in the irq field.
->
-> Since the irq_type subfield (8 bit wide) is currently only taking
-> the values 0, 1 and 2 (and we have been careful not to allow anything
-> else), let's reduce this field to only 4 bits, and allocate the
-> remaining 4 bits to a vcpu2_index, which acts as a multiplier:
->
->   vcpu_id = 256 * vcpu2_index + vcpu_index
->
-> With that, and a new capability (KVM_CAP_ARM_IRQ_LINE_LAYOUT_2)
-> allowing this to be discovered, it becomes possible to inject
-> PPIs to up to 4096 vcpus. But please just don't.
->
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+When the VHE code was reworked, a lot of the vgic stuff was moved around,
+but the GICv4 residency code did stay untouched, meaning that we come
+in and out of residency on each flush/sync, which is obviously suboptimal.
 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b617..85518bfb2a99 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -753,8 +753,8 @@ in-kernel irqchip (GIC), and for in-kernel irqchip can tell the GIC to
->  use PPIs designated for specific cpus.  The irq field is interpreted
->  like this:
->
-> -  bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
-> -  field: | irq_type  | vcpu_index |     irq_id     |
-> +  bits:  |  31 ... 28  | 27 ... 24 | 23  ... 16 | 15 ... 0 |
-> +  field: | vcpu2_index | irq_type  | vcpu_index |  irq_id  |
->
->  The irq_type field has the following values:
->  - irq_type[0]: out-of-kernel GIC: irq_id 0 is IRQ, irq_id 1 is FIQ
-> @@ -766,6 +766,10 @@ The irq_type field has the following values:
->
->  In both cases, level is used to assert/deassert the line.
->
-> +When KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 is supported, the target vcpu is
-> +identified as (256 * vcpu2_index + vcpu_index). Otherwise, vcpu2_index
-> +must be zero.
-> +
->  struct kvm_irq_level {
->         union {
->                 __u32 irq;     /* GSI */
+To address this, let's move things around a bit:
 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 35a069815baf..c1385911de69 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         int r;
->         switch (ext) {
->         case KVM_CAP_IRQCHIP:
-> +       case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
->                 r = vgic_present;
->                 break;
+- Residency entry (flush) moves to vcpu_load
+- Residency exit (sync) moves to vcpu_put
+- On blocking (entry to WFI), we "put"
+- On unblocking (exit from WFI, we "load"
 
-Shouldn't we be advertising the capability always, not just if
-the VGIC is present? The KVM_IRQ_LINE ioctl can be used for
-directly signalling IRQs to vCPUs even if we're using an
-out-of-kernel irqchip model.
+Because these can nest (load/block/put/load/unblock/put, for example),
+we now have per-VPE tracking of the residency state.
 
-The general principle of the API change/extension looks OK to me.
+Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
+gets set to true when blocking because of a WFI. This allows a finer
+control of the doorbell, which now also gets disabled as soon as
+it gets signaled.
 
-thanks
--- PMM
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ drivers/irqchip/irq-gic-v4.c       |  7 +++-
+ include/kvm/arm_vgic.h             |  4 +--
+ include/linux/irqchip/arm-gic-v4.h |  2 ++
+ virt/kvm/arm/arm.c                 | 12 ++++---
+ virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
+ virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
+ virt/kvm/arm/vgic/vgic.c           |  4 ---
+ virt/kvm/arm/vgic/vgic.h           |  2 --
+ 8 files changed, 48 insertions(+), 42 deletions(-)
+
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 563e87ed0766..45969927cc81 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
+ int its_schedule_vpe(struct its_vpe *vpe, bool on)
+ {
+ 	struct its_cmd_info info;
++	int ret;
+ 
+ 	WARN_ON(preemptible());
+ 
+ 	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
+ 
+-	return its_send_vpe_cmd(vpe, &info);
++	ret = its_send_vpe_cmd(vpe, &info);
++	if (!ret)
++		vpe->resident = on;
++
++	return ret;
+ }
+ 
+ int its_invall_vpe(struct its_vpe *vpe)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index af4f09c02bf1..4dc58d7a0010 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+ 				 struct kvm_kernel_irq_routing_entry *irq_entry);
+ 
+-void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
+-void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
++int vgic_v4_load(struct kvm_vcpu *vcpu);
++int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+ 
+ #endif /* __KVM_ARM_VGIC_H */
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index e6b155713b47..ab1396afe08a 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -35,6 +35,8 @@ struct its_vpe {
+ 	/* Doorbell interrupt */
+ 	int			irq;
+ 	irq_hw_number_t		vpe_db_lpi;
++	/* VPE resident */
++	bool			resident;
+ 	/* VPE proxy mapping */
+ 	int			vpe_proxy_event;
+ 	/*
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 35a069815baf..4e69268621b6 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -321,20 +321,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * If we're about to block (most likely because we've just hit a
+ 	 * WFI), we need to sync back the state of the GIC CPU interface
+-	 * so that we have the lastest PMR and group enables. This ensures
++	 * so that we have the latest PMR and group enables. This ensures
+ 	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
+ 	 * whether we have pending interrupts.
++	 *
++	 * For the same reason, we want to tell GICv4 that we need
++	 * doorbells to be signalled, should an interrupt become pending.
+ 	 */
+ 	preempt_disable();
+ 	kvm_vgic_vmcr_sync(vcpu);
++	vgic_v4_put(vcpu, true);
+ 	preempt_enable();
+-
+-	kvm_vgic_v4_enable_doorbell(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+-	kvm_vgic_v4_disable_doorbell(vcpu);
++	preempt_disable();
++	vgic_v4_load(vcpu);
++	preempt_enable();
+ }
+ 
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 8d69f007dd0c..48307a9eb1d8 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+ 
+ 	if (has_vhe())
+ 		__vgic_v3_activate_traps(vcpu);
++
++	WARN_ON(vgic_v4_load(vcpu));
+ }
+ 
+ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+@@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+ 
+ void vgic_v3_put(struct kvm_vcpu *vcpu)
+ {
++	WARN_ON(vgic_v4_put(vcpu, false));
++
+ 	vgic_v3_vmcr_sync(vcpu);
+ 
+ 	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 477af6aebb97..3a8a28854b13 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+ {
+ 	struct kvm_vcpu *vcpu = info;
+ 
++	/* We got the message, no need to fire again */
++	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
++		disable_irq_nosync(irq);
++
+ 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+ 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+@@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
+ 	its_vm->vpes = NULL;
+ }
+ 
+-int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
++int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
+ {
+-	if (!vgic_supports_direct_msis(vcpu->kvm))
++	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++	struct irq_desc *desc = irq_to_desc(vpe->irq);
++
++	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+ 		return 0;
+ 
+-	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
++	/*
++	 * If blocking, a doorbell is required. Undo the nested
++	 * disable_irq() calls...
++	 */
++	while (need_db && irqd_irq_disabled(&desc->irq_data))
++		enable_irq(vpe->irq);
++
++	return its_schedule_vpe(vpe, false);
+ }
+ 
+-int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
++int vgic_v4_load(struct kvm_vcpu *vcpu)
+ {
+-	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
++	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+ 	int err;
+ 
+-	if (!vgic_supports_direct_msis(vcpu->kvm))
++	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
+ 		return 0;
+ 
+ 	/*
+@@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
+ 	 * turns into a VMOVP command at the ITS level.
+ 	 */
+-	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
++	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
+ 	if (err)
+ 		return err;
+ 
+-	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
++	/* Disabled the doorbell, as we're about to enter the guest */
++	disable_irq(vpe->irq);
++
++	err = its_schedule_vpe(vpe, true);
+ 	if (err)
+ 		return err;
+ 
+@@ -226,9 +243,7 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	 * Now that the VPE is resident, let's get rid of a potential
+ 	 * doorbell interrupt that would still be pending.
+ 	 */
+-	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
+-
+-	return err;
++	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
+ }
+ 
+ static struct vgic_its *vgic_get_its(struct kvm *kvm,
+@@ -335,21 +350,3 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 	mutex_unlock(&its->its_lock);
+ 	return ret;
+ }
+-
+-void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
+-{
+-	if (vgic_supports_direct_msis(vcpu->kvm)) {
+-		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+-		if (irq)
+-			enable_irq(irq);
+-	}
+-}
+-
+-void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
+-{
+-	if (vgic_supports_direct_msis(vcpu->kvm)) {
+-		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+-		if (irq)
+-			disable_irq(irq);
+-	}
+-}
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 45a870cb63f5..99b02ca730a8 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -857,8 +857,6 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 
+-	WARN_ON(vgic_v4_sync_hwstate(vcpu));
+-
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+ 		return;
+@@ -882,8 +880,6 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+ /* Flush our emulation state into the GIC hardware before entering the guest. */
+ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
+-	WARN_ON(vgic_v4_flush_hwstate(vcpu));
+-
+ 	/*
+ 	 * If there are no virtual interrupts active or pending for this
+ 	 * VCPU, then there is no work to do and we can bail out without
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 83066a81b16a..c7fefd6b1c80 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -316,7 +316,5 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
+ bool vgic_supports_direct_msis(struct kvm *kvm);
+ int vgic_v4_init(struct kvm *kvm);
+ void vgic_v4_teardown(struct kvm *kvm);
+-int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
+-int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
+ 
+ #endif
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
