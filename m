@@ -1,57 +1,66 @@
-Return-Path: <SRS0=67XK=W6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HtNg=W7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294DEC3A5A2
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 15:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 122E2C3A5A7
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 13:55:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACC9D22CF8
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Sep 2019 15:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC9D22CF8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 892FB22CED
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 13:55:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892FB22CED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3CD04A535;
-	Tue,  3 Sep 2019 11:58:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2F34A5B2;
+	Wed,  4 Sep 2019 09:55:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rb2P58K3X-mM; Tue,  3 Sep 2019 11:57:59 -0400 (EDT)
+	with ESMTP id k1VNf1xKpqoF; Wed,  4 Sep 2019 09:55:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D5784A597;
-	Tue,  3 Sep 2019 11:57:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 399BB4A5A7;
+	Wed,  4 Sep 2019 09:55:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 353434A535
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 11:57:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7984A557
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 09:55:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6vUse9J-e1c1 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Sep 2019 11:57:56 -0400 (EDT)
+ with ESMTP id W+y1wBE1PB3I for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Sep 2019 09:55:19 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA404A52D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Sep 2019 11:57:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DB9A4A500
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 09:55:19 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3474C344;
- Tue,  3 Sep 2019 08:57:56 -0700 (PDT)
-Received: from filthy-habits.cambridge.arm.com
- (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D4C6C3F246;
- Tue,  3 Sep 2019 08:57:54 -0700 (PDT)
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
- driven by vcpu_load/put
-Date: Tue,  3 Sep 2019 16:57:47 +0100
-Message-Id: <20190903155747.219802-1-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5E6D1570;
+ Wed,  4 Sep 2019 06:55:18 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA1DB3F59C;
+ Wed,  4 Sep 2019 06:55:16 -0700 (PDT)
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+To: Andrew Jones <drjones@redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
+ <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+ <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
+ <20190902125254.3w6lnvcbs7sfhjz7@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <118ceeea-5501-05b6-7232-e66a175d5fae@arm.com>
+Date: Wed, 4 Sep 2019 14:55:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Cc: Andre Przywara <Andre.Przywara@arm.com>
+In-Reply-To: <20190902125254.3w6lnvcbs7sfhjz7@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,281 +77,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When the VHE code was reworked, a lot of the vgic stuff was moved around,
-but the GICv4 residency code did stay untouched, meaning that we come
-in and out of residency on each flush/sync, which is obviously suboptimal.
+On 02/09/2019 13:52, Andrew Jones wrote:
+> On Fri, Aug 30, 2019 at 04:25:08PM +0100, Steven Price wrote:
+>> On 30/08/2019 15:47, Andrew Jones wrote:
+>>> On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+[...]
+>>>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>>>> +                              PV-time feature is supported by the hypervisor.
+>>>> +
+>>>> +PV_TIME_ST
+>>>> +    Function ID:  (uint32)  : 0xC5000022
+>>>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>>>> +                              VCPU. On failure:
+>>>> +                              NOT_SUPPORTED (-1)
+>>>> +
+>>>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>>>> +with inner and outer write back caching attributes, in the inner shareable
+>>>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>>>> +meaningfully filled by the hypervisor (see structure below).
+>>>> +
+>>>> +PV_TIME_ST returns the structure for the calling VCPU.
+>>>> +
+>>>> +Stolen Time
+>>>> +-----------
+>>>> +
+>>>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>>>> +
+>>>> +  Field       | Byte Length | Byte Offset | Description
+>>>> +  ----------- | ----------- | ----------- | --------------------------
+>>>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>>>> +  Attributes  |      4      |      4      | Must be 0
+>>>
+>>> The above fields don't appear to be exposed to userspace in anyway. How
+>>> will we handle migration from one KVM with one version of the structure
+>>> to another?
+>>
+>> Interesting question. User space does have access to them now it is
+>> providing the memory, but it's not exactly an easy method. In particular
+>> user space has no (simple) way of probing the kernel's supported version.
+>>
+>> I guess one solution would be to add an extra attribute on the VCPU
+>> which would provide the revision information. The current kernel would
+>> then reject any revision other than 0, but this could then be extended
+>> to support other revision numbers in the future.
+>>
+>> Although there's some logic in saying we could add the extra attribute
+>> when(/if) there is a new version. Future kernels would then be expected
+>> to use the current version unless user space explicitly set the new
+>> attribute.
+>>
+>> Do you feel this is something that needs to be addressed now, or can it
+>> be deferred until another version is proposed?
+> 
+> Assuming we'll want userspace to have the option of choosing version=0,
+> and that we're fine with version=0 being the implicit choice, when nothing
+> is selected, then I guess it can be left as is for now. If, OTOH, we just
+> want migration to fail when attempting to migrate to another host with
+> an incompatible stolen-time structure (i.e. version=0 is not selectable
+> on hosts that implement later versions), then we should expose the version
+> in some way now. Perhaps a VCPU's "PV config" should be described in a
+> set of pseudo registers?
 
-To address this, let's move things around a bit:
+I wouldn't have thought making migration fail if/when the host upgrades
+to a new version would be particularly helpful - we'd want to provide
+backwards compatibility. In particular for the suspend/resume case (I
+want to be able to save my VM to disk, upgrade the host kernel and then
+resume the VM).
 
-- Residency entry (flush) moves to vcpu_load
-- Residency exit (sync) moves to vcpu_put
-- On blocking (entry to WFI), we "put"
-- On unblocking (exit from WFI, we "load"
+The only potential issue I see is the implicit "version=0 if not
+specified". That seems solvable by rejecting setting the stolen time
+base address if no version has been specified and the host kernel
+doesn't support version=0.
 
-Because these can nest (load/block/put/load/unblock/put, for example),
-we now have per-VPE tracking of the residency state.
+>>
+>>>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>>>> +              |             |             | nanoseconds indicating how
+>>>> +              |             |             | much time this VCPU thread
+>>>> +              |             |             | was involuntarily not
+>>>> +              |             |             | running on a physical CPU.
+>>>> +
+>>>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>>>> +will be present within a reserved region of the normal memory given to the
+>>>> +guest. The guest should not attempt to write into this memory. There is a
+>>>> +structure per VCPU of the guest.
+>>>
+>>> Should we provide a recommendation as to how that reserved memory is
+>>> provided? One memslot divided into NR_VCPUS subregions? Should the
+>>> reserved region be described to the guest kernel with DT/ACPI? Or
+>>> should userspace ensure the region is not within any DT/ACPI described
+>>> regions?
+>>
+>> I'm open to providing a recommendation, but I'm not entirely sure I know
+>> enough here to provide one.
+>>
+>> There is an obvious efficiency argument for minimizing memslots with the
+>> current code. But if someone has a reason for using multiple memslots
+>> then that's probably a good argument for implementing a memslot-caching
+>> kvm_put_user() rather than to be dis-recommended.
+> 
+> Actually even if a single memslot is used for all the PV structures for
+> all VCPUs, but it's separate from the slot(s) used for main memory, then
+> we'll likely see performance issues with memslot searches (even though
+> it's a binary search). This is because memslots already have caching. The
+> last used slot is stored in the memslots' lru_slot member (the "lru" name
+> is confusing, but it means "last used" somehow). This means we could get
+> thrashing on that slot cache if we're searching for the PV structure
+> memslot on each vcpu load after searching for the main memory slot on each
+> page fault.
 
-Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
-gets set to true when blocking because of a WFI. This allows a finer
-control of the doorbell, which now also gets disabled as soon as
-it gets signaled.
+True - a dedicated memslot for stolen time wouldn't be great if a VM is
+needing to fault pages (which would obviously be in a different
+memslot). I don't have a good idea of the overhead of missing in the
+lru_slot cache. The main reason I stopped using a dedicated cache was
+because I discovered that my initial implementation using
+kvm_write_guest_offset_cached() (which wasn't single-copy atomic safe)
+was actually failing to use the cache because the buffer crossed a page
+boundary (see __kvm_gfn_to_hva_cache_init()). So switching away from the
+"_cached" variant was actually avoiding the extra walks of the memslots.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- drivers/irqchip/irq-gic-v4.c       |  7 +++-
- include/kvm/arm_vgic.h             |  4 +--
- include/linux/irqchip/arm-gic-v4.h |  2 ++
- virt/kvm/arm/arm.c                 | 12 ++++---
- virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
- virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
- virt/kvm/arm/vgic/vgic.c           |  4 ---
- virt/kvm/arm/vgic/vgic.h           |  2 --
- 8 files changed, 48 insertions(+), 42 deletions(-)
+I can look at reintroducing the caching for kvm_put_guest().
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 563e87ed0766..45969927cc81 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
- int its_schedule_vpe(struct its_vpe *vpe, bool on)
- {
- 	struct its_cmd_info info;
-+	int ret;
- 
- 	WARN_ON(preemptible());
- 
- 	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
- 
--	return its_send_vpe_cmd(vpe, &info);
-+	ret = its_send_vpe_cmd(vpe, &info);
-+	if (!ret)
-+		vpe->resident = on;
-+
-+	return ret;
- }
- 
- int its_invall_vpe(struct its_vpe *vpe)
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index af4f09c02bf1..4dc58d7a0010 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
- int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
- 				 struct kvm_kernel_irq_routing_entry *irq_entry);
- 
--void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
--void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
-+int vgic_v4_load(struct kvm_vcpu *vcpu);
-+int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
- 
- #endif /* __KVM_ARM_VGIC_H */
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index e6b155713b47..ab1396afe08a 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -35,6 +35,8 @@ struct its_vpe {
- 	/* Doorbell interrupt */
- 	int			irq;
- 	irq_hw_number_t		vpe_db_lpi;
-+	/* VPE resident */
-+	bool			resident;
- 	/* VPE proxy mapping */
- 	int			vpe_proxy_event;
- 	/*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 35a069815baf..4e69268621b6 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -321,20 +321,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
- 	/*
- 	 * If we're about to block (most likely because we've just hit a
- 	 * WFI), we need to sync back the state of the GIC CPU interface
--	 * so that we have the lastest PMR and group enables. This ensures
-+	 * so that we have the latest PMR and group enables. This ensures
- 	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
- 	 * whether we have pending interrupts.
-+	 *
-+	 * For the same reason, we want to tell GICv4 that we need
-+	 * doorbells to be signalled, should an interrupt become pending.
- 	 */
- 	preempt_disable();
- 	kvm_vgic_vmcr_sync(vcpu);
-+	vgic_v4_put(vcpu, true);
- 	preempt_enable();
--
--	kvm_vgic_v4_enable_doorbell(vcpu);
- }
- 
- void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- {
--	kvm_vgic_v4_disable_doorbell(vcpu);
-+	preempt_disable();
-+	vgic_v4_load(vcpu);
-+	preempt_enable();
- }
- 
- int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 8d69f007dd0c..48307a9eb1d8 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 
- 	if (has_vhe())
- 		__vgic_v3_activate_traps(vcpu);
-+
-+	WARN_ON(vgic_v4_load(vcpu));
- }
- 
- void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
-@@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
- 
- void vgic_v3_put(struct kvm_vcpu *vcpu)
- {
-+	WARN_ON(vgic_v4_put(vcpu, false));
-+
- 	vgic_v3_vmcr_sync(vcpu);
- 
- 	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 477af6aebb97..3a8a28854b13 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- {
- 	struct kvm_vcpu *vcpu = info;
- 
-+	/* We got the message, no need to fire again */
-+	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
-+		disable_irq_nosync(irq);
-+
- 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
- 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
- 	kvm_vcpu_kick(vcpu);
-@@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
--int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
-+int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
- {
--	if (!vgic_supports_direct_msis(vcpu->kvm))
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	struct irq_desc *desc = irq_to_desc(vpe->irq);
-+
-+	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
-+	/*
-+	 * If blocking, a doorbell is required. Undo the nested
-+	 * disable_irq() calls...
-+	 */
-+	while (need_db && irqd_irq_disabled(&desc->irq_data))
-+		enable_irq(vpe->irq);
-+
-+	return its_schedule_vpe(vpe, false);
- }
- 
--int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
-+int vgic_v4_load(struct kvm_vcpu *vcpu)
- {
--	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 	int err;
- 
--	if (!vgic_supports_direct_msis(vcpu->kvm))
-+	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
- 		return 0;
- 
- 	/*
-@@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
- 	 * turns into a VMOVP command at the ITS level.
- 	 */
--	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
-+	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
- 	if (err)
- 		return err;
- 
--	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
-+	/* Disabled the doorbell, as we're about to enter the guest */
-+	disable_irq(vpe->irq);
-+
-+	err = its_schedule_vpe(vpe, true);
- 	if (err)
- 		return err;
- 
-@@ -226,9 +243,7 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * Now that the VPE is resident, let's get rid of a potential
- 	 * doorbell interrupt that would still be pending.
- 	 */
--	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
--
--	return err;
-+	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
- }
- 
- static struct vgic_its *vgic_get_its(struct kvm *kvm,
-@@ -335,21 +350,3 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 	mutex_unlock(&its->its_lock);
- 	return ret;
- }
--
--void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
--{
--	if (vgic_supports_direct_msis(vcpu->kvm)) {
--		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
--		if (irq)
--			enable_irq(irq);
--	}
--}
--
--void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
--{
--	if (vgic_supports_direct_msis(vcpu->kvm)) {
--		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
--		if (irq)
--			disable_irq(irq);
--	}
--}
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 45a870cb63f5..99b02ca730a8 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -857,8 +857,6 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 
--	WARN_ON(vgic_v4_sync_hwstate(vcpu));
--
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
- 		return;
-@@ -882,8 +880,6 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
- /* Flush our emulation state into the GIC hardware before entering the guest. */
- void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- {
--	WARN_ON(vgic_v4_flush_hwstate(vcpu));
--
- 	/*
- 	 * If there are no virtual interrupts active or pending for this
- 	 * VCPU, then there is no work to do and we can bail out without
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 83066a81b16a..c7fefd6b1c80 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -316,7 +316,5 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
--int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
--int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
- 
- #endif
--- 
-2.20.1
+>>
+>> My assumption (and testing) has been with a single memslot divided into
+>> NR_VCPUS (or more accurately the number of VCPUs in the VM) subregions.
+>>
+>> For testing DT I've tested both methods: an explicit reserved region or
+>> just ensuring it's not in any DT described region. Both seem reasonable,
+>> but it might be easier to integrate into existing migration mechanisms
+>> if it's simply a reserved region (then the memory block of the guest is
+>> just as it always was).
+>>
+>> For ACPI the situation should be similar, but my testing has been with DT.
+> 
+> I also can't think of any reason why we'd have to describe it in DT/ACPI,
+> but I get this feeling that if we don't, then we'll hit some issue that
+> will make us wish we had...
 
+Without knowing why we need it it's hard to justify what should go in
+the bindings. But the idea of having the hypercalls is that the
+description is returned via hypercalls rather than explicitly in
+DT/ACPI. In theory we wouldn't need the hypercalls if it was fully
+described in DT/ACPI.
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
