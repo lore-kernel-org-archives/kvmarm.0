@@ -2,64 +2,67 @@ Return-Path: <SRS0=HtNg=W7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5A4C3A5A8
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 15:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FF3C3A5A8
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 15:07:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04F1122CF7
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 15:05:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F1122CF7
+	by mail.kernel.org (Postfix) with ESMTP id 9AC8722CE3
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Sep 2019 15:07:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AC8722CE3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AACC4A584;
-	Wed,  4 Sep 2019 11:05:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0071D4A5B3;
+	Wed,  4 Sep 2019 11:07:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gTOaHQh4htDM; Wed,  4 Sep 2019 11:05:22 -0400 (EDT)
+	with ESMTP id vz6uK9tuPk9q; Wed,  4 Sep 2019 11:07:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B1E04A5A9;
-	Wed,  4 Sep 2019 11:05:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 863DF4A5A2;
+	Wed,  4 Sep 2019 11:07:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FB884A551
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 11:05:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6005C4A584
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 11:07:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7Qfpqnu4YpP for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Sep 2019 11:05:19 -0400 (EDT)
+ with ESMTP id UIJCwnoVyWCt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Sep 2019 11:07:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D95E24A533
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 11:05:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8D054A535
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 11:07:42 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65F2C28;
- Wed,  4 Sep 2019 08:05:19 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9ED8628;
+ Wed,  4 Sep 2019 08:07:42 -0700 (PDT)
 Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 230793F59C;
- Wed,  4 Sep 2019 08:05:13 -0700 (PDT)
-Subject: Re: [PATCH v4 02/10] KVM: arm/arm64: Factor out hypercall handling
- from PSCI code
-To: kbuild test robot <lkp@intel.com>
-References: <20190830084255.55113-3-steven.price@arm.com>
- <201909021437.rO6o0mHc%lkp@intel.com>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B2783F246;
+ Wed,  4 Sep 2019 08:07:40 -0700 (PDT)
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+To: Andrew Jones <drjones@redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
+ <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+ <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
+ <20190902125254.3w6lnvcbs7sfhjz7@kamzik.brq.redhat.com>
+ <118ceeea-5501-05b6-7232-e66a175d5fae@arm.com>
+ <20190904142250.ohnkunb5ocwbnx6z@kamzik.brq.redhat.com>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <78c2cce6-19ae-302c-6e5a-3798f658c8e2@arm.com>
-Date: Wed, 4 Sep 2019 16:05:11 +0100
+Message-ID: <9ebbfde3-d592-b9c5-4456-a28a2f6e9125@arm.com>
+Date: Wed, 4 Sep 2019 16:07:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <201909021437.rO6o0mHc%lkp@intel.com>
+In-Reply-To: <20190904142250.ohnkunb5ocwbnx6z@kamzik.brq.redhat.com>
 Content-Language: en-GB
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, kbuild-all@01.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,54 +79,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 02/09/2019 08:06, kbuild test robot wrote:
-> Hi Steven,
+On 04/09/2019 15:22, Andrew Jones wrote:
+> On Wed, Sep 04, 2019 at 02:55:15PM +0100, Steven Price wrote:
+>> On 02/09/2019 13:52, Andrew Jones wrote:
+>>> On Fri, Aug 30, 2019 at 04:25:08PM +0100, Steven Price wrote:
+>>>> On 30/08/2019 15:47, Andrew Jones wrote:
+>>>>> On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+>> [...]
+>>>>>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>>>>>> +                              PV-time feature is supported by the hypervisor.
+>>>>>> +
+>>>>>> +PV_TIME_ST
+>>>>>> +    Function ID:  (uint32)  : 0xC5000022
+>>>>>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>>>>>> +                              VCPU. On failure:
+>>>>>> +                              NOT_SUPPORTED (-1)
+>>>>>> +
+>>>>>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>>>>>> +with inner and outer write back caching attributes, in the inner shareable
+>>>>>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>>>>>> +meaningfully filled by the hypervisor (see structure below).
+>>>>>> +
+>>>>>> +PV_TIME_ST returns the structure for the calling VCPU.
+>>>>>> +
+>>>>>> +Stolen Time
+>>>>>> +-----------
+>>>>>> +
+>>>>>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>>>>>> +
+>>>>>> +  Field       | Byte Length | Byte Offset | Description
+>>>>>> +  ----------- | ----------- | ----------- | --------------------------
+>>>>>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>>>>>> +  Attributes  |      4      |      4      | Must be 0
+>>>>>
+>>>>> The above fields don't appear to be exposed to userspace in anyway. How
+>>>>> will we handle migration from one KVM with one version of the structure
+>>>>> to another?
+>>>>
+>>>> Interesting question. User space does have access to them now it is
+>>>> providing the memory, but it's not exactly an easy method. In particular
+>>>> user space has no (simple) way of probing the kernel's supported version.
+>>>>
+>>>> I guess one solution would be to add an extra attribute on the VCPU
+>>>> which would provide the revision information. The current kernel would
+>>>> then reject any revision other than 0, but this could then be extended
+>>>> to support other revision numbers in the future.
+>>>>
+>>>> Although there's some logic in saying we could add the extra attribute
+>>>> when(/if) there is a new version. Future kernels would then be expected
+>>>> to use the current version unless user space explicitly set the new
+>>>> attribute.
+>>>>
+>>>> Do you feel this is something that needs to be addressed now, or can it
+>>>> be deferred until another version is proposed?
+>>>
+>>> Assuming we'll want userspace to have the option of choosing version=0,
+>>> and that we're fine with version=0 being the implicit choice, when nothing
+>>> is selected, then I guess it can be left as is for now. If, OTOH, we just
+>>> want migration to fail when attempting to migrate to another host with
+>>> an incompatible stolen-time structure (i.e. version=0 is not selectable
+>>> on hosts that implement later versions), then we should expose the version
+>>> in some way now. Perhaps a VCPU's "PV config" should be described in a
+>>> set of pseudo registers?
+>>
+>> I wouldn't have thought making migration fail if/when the host upgrades
+>> to a new version would be particularly helpful - we'd want to provide
+>> backwards compatibility. In particular for the suspend/resume case (I
+>> want to be able to save my VM to disk, upgrade the host kernel and then
+>> resume the VM).
+>>
+>> The only potential issue I see is the implicit "version=0 if not
+>> specified". That seems solvable by rejecting setting the stolen time
+>> base address if no version has been specified and the host kernel
+>> doesn't support version=0.
 > 
-> Thank you for the patch! Yet something to improve:
-> 
-> [auto build test ERROR on linus/master]
-> [cannot apply to v5.3-rc6 next-20190830]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Steven-Price/arm64-Stolen-time-support/20190901-185152
-> config: i386-randconfig-a002-201935 (attached as .config)
-> compiler: gcc-7 (Debian 7.4.0-11) 7.4.0
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
-> 
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
-> 
-> All error/warnings (new ones prefixed by >>):
-> 
->    In file included from include/kvm/arm_hypercalls.h:7:0,
->                     from <command-line>:0:
->>> arch/x86/include/asm/kvm_emulate.h:349:22: error: 'NR_VCPU_REGS' undeclared here (not in a function)
->      unsigned long _regs[NR_VCPU_REGS];
->                          ^~~~~~~~~~~~
+> I think that's the same failure I was trying avoid by failing the
+> migration instead. Maybe it's equivalent to fail at this vcpu-ioctl
+> time though?
 
-This is because x86's asm/kvm_emulate.h can't be included by itself (and
-doesn't even exist on other architectures). This new header file doesn't
-make sense to include on x86, so I'll squash in the following to prevent
-building the header file except on arm/arm64.
+Yes this is effectively the same failure. But since we require the
+vcpu-ioctl to enable stolen time this gives an appropriate place to
+fail. Indeed this is the failure if migrating from a host with these
+patches to one running an existing kernel with no stolen time support.
 
 Steve
-
-----8<----
-diff --git a/include/Kbuild b/include/Kbuild
-index c38f0d46b267..f775ea28716e 100644
---- a/include/Kbuild
-+++ b/include/Kbuild
-@@ -67,6 +67,8 @@ header-test-			+= keys/big_key-type.h
- header-test-			+= keys/request_key_auth-type.h
- header-test-			+= keys/trusted.h
- header-test-			+= kvm/arm_arch_timer.h
-+header-test-$(CONFIG_ARM)	+= kvm/arm_hypercalls.h
-+header-test-$(CONFIG_ARM64)	+= kvm/arm_hypercalls.h
- header-test-			+= kvm/arm_pmu.h
- header-test-$(CONFIG_ARM)	+= kvm/arm_psci.h
- header-test-$(CONFIG_ARM64)	+= kvm/arm_psci.h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
