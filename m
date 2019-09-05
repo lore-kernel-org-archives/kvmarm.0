@@ -2,64 +2,66 @@ Return-Path: <SRS0=E5f7=XA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671E9C3A5A5
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DA9C3A5A5
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:22:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EC47B21848
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:20:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC47B21848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 41D4C20820
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:22:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D4C20820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6DE4A52C;
-	Thu,  5 Sep 2019 05:20:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE26C4A52C;
+	Thu,  5 Sep 2019 05:22:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sPVLfabhJskb; Thu,  5 Sep 2019 05:20:46 -0400 (EDT)
+	with ESMTP id MIRYhispB6gX; Thu,  5 Sep 2019 05:22:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 306454A554;
-	Thu,  5 Sep 2019 05:20:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72DF44A554;
+	Thu,  5 Sep 2019 05:22:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BE954A4E1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:20:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCA1E4A52C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:22:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ALA9ZBbUeza8 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Sep 2019 05:20:43 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E306F4A4CD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:20:42 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6C28300BEAD;
- Thu,  5 Sep 2019 09:20:41 +0000 (UTC)
-Received: from localhost (ovpn-117-222.ams2.redhat.com [10.36.117.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3589119C6A;
- Thu,  5 Sep 2019 09:20:41 +0000 (UTC)
-Date: Thu, 5 Sep 2019 10:20:39 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Heinrich Schuchardt <xypron.glpk@gmx.de>
+ with ESMTP id CyR96tsCXKOf for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Sep 2019 05:22:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F235A4A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:22:25 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A5AE91576;
+ Thu,  5 Sep 2019 02:22:25 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 394383F67D;
+ Thu,  5 Sep 2019 02:22:25 -0700 (PDT)
+Date: Thu, 5 Sep 2019 11:22:23 +0200
+From: Christoffer Dall <christoffer.dall@arm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: [PATCH 1/1] KVM: inject data abort if instruction cannot be
  decoded
-Message-ID: <20190905092039.GG32415@stefanha-x1.localdomain>
+Message-ID: <20190905092223.GC4320@e113682-lin.lund.arm.com>
 References: <20190904180736.29009-1-xypron.glpk@gmx.de>
+ <86r24vrwyh.wl-maz@kernel.org>
+ <CAFEAcA-mc6cLmRGdGNOBR0PC1f_VBjvTdAL6xYtKjApx3NoPgQ@mail.gmail.com>
+ <86mufjrup7.wl-maz@kernel.org>
+ <CAFEAcA9qkqkOTqSVrhTpt-NkZSNXomSBNiWo_D6Kr=QKYRRf=w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190904180736.29009-1-xypron.glpk@gmx.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 05 Sep 2019 09:20:41 +0000 (UTC)
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9qkqkOTqSVrhTpt-NkZSNXomSBNiWo_D6Kr=QKYRRf=w@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+ Marc Zyngier <maz@kernel.org>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Heinrich Schuchardt <xypron.glpk@gmx.de>, kvmarm@lists.cs.columbia.edu,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,90 +73,196 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============7489422261612821076=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Thu, Sep 05, 2019 at 09:56:44AM +0100, Peter Maydell wrote:
+> On Thu, 5 Sep 2019 at 09:52, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 05 Sep 2019 09:16:54 +0100,
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > This is true, but the problem is that barfing out to userspace
+> > > makes it harder to debug the guest because it means that
+> > > the VM is immediately destroyed, whereas AIUI if we
+> > > inject some kind of exception then (assuming you're set up
+> > > to do kernel-debug via gdbstub) you can actually examine
+> > > the offending guest code with a debugger because at least
+> > > your VM is still around to inspect...
+> >
+> > To Christoffer's point, I find the benefit a bit dubious. Yes, you get
+> > an exception, but the instruction that caused it may be completely
+> > legal (store with post-increment, for example), leading to an even
+> > more puzzled developer (that exception should never have been
+> > delivered the first place).
+> 
+> Right, but the combination of "host kernel prints a message
+> about an unsupported load/store insn" and "within-guest debug
+> dump/stack trace/etc" is much more useful than just having
+> "host kernel prints message" and "QEMU exits"; and it requires
+> about 3 lines of code change...
+> 
+> > I'm far more in favour of dumping the state of the access in the run
+> > structure (much like we do for a MMIO access) and let userspace do
+> > something about it (such as dumping information on the console or
+> > breaking). It could even inject an exception *if* the user has asked
+> > for it.
+> 
+> ...whereas this requires agreement on a kernel-userspace API,
+> larger changes in the kernel, somebody to implement the userspace
+> side of things, and the user to update both the kernel and QEMU.
+> It's hard for me to see that the benefit here over the 3-line
+> approach really outweighs the extra effort needed. In practice
+> saying "we should do this" is saying "we're going to do nothing",
+> based on the historical record.
+> 
 
---===============7489422261612821076==
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="E69HUUNAyIJqGpVn"
-Content-Disposition: inline
+How about something like the following (completely untested, liable for
+ABI discussions etc. etc., but for illustration purposes).
+
+I think it raises the question (and likely many other) of whether we can
+break the existing 'ABI' and change behavior for missing ISV
+retrospectively for legacy user space when the issue has occurred?
+   
+Someone might have written code that reacts to the -ENOSYS, so I've
+taken the conservative approach for this for the time being.
 
 
---E69HUUNAyIJqGpVn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 8a37c8e89777..19a92c49039c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -76,6 +76,14 @@ struct kvm_arch {
+ 
+ 	/* Mandated version of PSCI */
+ 	u32 psci_version;
++
++	/*
++	 * If we encounter a data abort without valid instruction syndrome
++	 * information, report this to user space.  User space can (and
++	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
++	 * supported.
++	 */
++	bool return_nisv_io_abort_to_user;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f656169db8c3..019bc560edc1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -83,6 +83,14 @@ struct kvm_arch {
+ 
+ 	/* Mandated version of PSCI */
+ 	u32 psci_version;
++
++	/*
++	 * If we encounter a data abort without valid instruction syndrome
++	 * information, report this to user space.  User space can (and
++	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
++	 * supported.
++	 */
++	bool return_nisv_io_abort_to_user;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d5359e..a4dd004d0db9 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
+ #define KVM_EXIT_S390_STSI        25
+ #define KVM_EXIT_IOAPIC_EOI       26
+ #define KVM_EXIT_HYPERV           27
++#define KVM_EXIT_ARM_NISV         28
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -996,6 +997,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+ #define KVM_CAP_PMU_EVENT_FILTER 173
++#define KVM_CAP_ARM_NISV_TO_USER 174
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 35a069815baf..2ce94bd9d4a9 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -98,6 +98,26 @@ int kvm_arch_check_processor_compat(void)
+ 	return 0;
+ }
+ 
++int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
++			    struct kvm_enable_cap *cap)
++{
++	int r;
++
++	if (cap->flags)
++		return -EINVAL;
++
++	switch (cap->cap) {
++	case KVM_CAP_ARM_NISV_TO_USER:
++		r = 0;
++		kvm->arch.return_nisv_io_abort_to_user = true;
++		break;
++	default:
++		r = -EINVAL;
++		break;
++	}
++
++	return r;
++}
+ 
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+@@ -196,6 +216,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_VCPU_EVENTS:
++	case KVM_CAP_ARM_NISV_TO_USER:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+@@ -673,6 +694,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+ 		if (ret)
+ 			return ret;
++	} else if (run->exit_reason == KVM_EXIT_ARM_NISV) {
++		kvm_inject_undefined(vcpu);
+ 	}
+ 
+ 	if (run->immediate_exit)
+diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+index 6af5c91337f2..62e6ef47a6de 100644
+--- a/virt/kvm/arm/mmio.c
++++ b/virt/kvm/arm/mmio.c
+@@ -167,8 +167,15 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		if (ret)
+ 			return ret;
+ 	} else {
+-		kvm_err("load/store instruction decoding not implemented\n");
+-		return -ENOSYS;
++		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
++			run->exit_reason = KVM_EXIT_ARM_NISV;
++			run->mmio.phys_addr = fault_ipa;
++			vcpu->stat.mmio_exit_user++;
++			return 0;
++		} else {
++			kvm_info("encountered data abort without syndrome info\n");
++			return -ENOSYS;
++		}
+ 	}
+ 
+ 	rt = vcpu->arch.mmio_decode.rt;
 
-On Wed, Sep 04, 2019 at 08:07:36PM +0200, Heinrich Schuchardt wrote:
-> If an application tries to access memory that is not mapped, an error
-> ENOSYS, "load/store instruction decoding not implemented" may occur.
-> QEMU will hang with a register dump.
->=20
-> Instead create a data abort that can be handled gracefully by the
-> application running in the virtual environment.
->=20
-> Now the virtual machine can react to the event in the most appropriate
-> way - by recovering, by writing an informative log, or by rebooting.
->=20
-> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
-> ---
->  virt/kvm/arm/mmio.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> index a8a6a0c883f1..0cbed7d6a0f4 100644
-> --- a/virt/kvm/arm/mmio.c
-> +++ b/virt/kvm/arm/mmio.c
-> @@ -161,8 +161,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_ru=
-n *run,
->  		if (ret)
->  			return ret;
->  	} else {
-> -		kvm_err("load/store instruction decoding not implemented\n");
-> -		return -ENOSYS;
-> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		return 1;
 
-I see this more as a temporary debugging hack than something to merge.
+Thanks,
 
-It sounds like in your case the guest environment provided good
-debugging information and you preferred it over debugging this from the
-host side.  That's fine, but allowing the guest to continue running in
-the general case makes it much harder to track down the root cause of a
-problem because many guest CPU instructions may be executed after the
-original problem occurs.  Other guest software may fail silently in
-weird ways.  IMO it's best to fail early.
-
-Stefan
-
---E69HUUNAyIJqGpVn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1w02cACgkQnKSrs4Gr
-c8iE9ggAkVjIf2fI/kBs4N9RcmSgCefJV12cMWzxOU0i+Z3Z6eMCCf3aDRvN5Znu
-AO5aNxnimfSJ/yP1Zp1qZjeSdPpsMs5ox3CXdHmNOAEtzTb5tC4NeSvVeP1MaCi8
-LzpKOB7uZpZVulFwf9vuWcMww/LBIP0AwJSQ9MWUJncQ3UMZd3vNXXfD8QlnECVd
-alfe2r6hsp3ijEdkLLx92pNOl3/sgeFiK7WRQ07hrQHh2jJ9h2kZslsEZHeEsaj5
-CLuPe76KL4o25UFhS17Cg3hTsROX2BBgYub5uY+K02b54bVY2X3ypNE80H91ip+k
-VKuTCZk89Bpnyb3Shu6NIhJskSO1PA==
-=tj/0
------END PGP SIGNATURE-----
-
---E69HUUNAyIJqGpVn--
-
---===============7489422261612821076==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+    Christoffer
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7489422261612821076==--
