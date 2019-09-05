@@ -2,67 +2,64 @@ Return-Path: <SRS0=E5f7=XA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B811DC3A5A5
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671E9C3A5A5
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:20:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 62A4921848
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:15:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62A4921848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id EC47B21848
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 09:20:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC47B21848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1E554A4E8;
-	Thu,  5 Sep 2019 05:15:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6DE4A52C;
+	Thu,  5 Sep 2019 05:20:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IWCeeDmF-YoA; Thu,  5 Sep 2019 05:15:56 -0400 (EDT)
+	with ESMTP id sPVLfabhJskb; Thu,  5 Sep 2019 05:20:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA1BF4A533;
-	Thu,  5 Sep 2019 05:15:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 306454A554;
+	Thu,  5 Sep 2019 05:20:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B5554A4E8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:15:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BE954A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:20:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tySEaEXy+m4X for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Sep 2019 05:15:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E22C74A417
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:15:53 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89DE9360;
- Thu,  5 Sep 2019 02:15:53 -0700 (PDT)
-Received: from big-swifty.misterjones.org (unknown [10.1.27.38])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1612E3F67D;
- Thu,  5 Sep 2019 02:15:50 -0700 (PDT)
-Date: Thu, 05 Sep 2019 10:15:49 +0100
-Message-ID: <86k1anrtmi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Peter Maydell <peter.maydell@linaro.org>
+ with ESMTP id ALA9ZBbUeza8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Sep 2019 05:20:43 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E306F4A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 05:20:42 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D6C28300BEAD;
+ Thu,  5 Sep 2019 09:20:41 +0000 (UTC)
+Received: from localhost (ovpn-117-222.ams2.redhat.com [10.36.117.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3589119C6A;
+ Thu,  5 Sep 2019 09:20:41 +0000 (UTC)
+Date: Thu, 5 Sep 2019 10:20:39 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>
 Subject: Re: [PATCH 1/1] KVM: inject data abort if instruction cannot be
  decoded
-In-Reply-To: <CAFEAcA9qkqkOTqSVrhTpt-NkZSNXomSBNiWo_D6Kr=QKYRRf=w@mail.gmail.com>
+Message-ID: <20190905092039.GG32415@stefanha-x1.localdomain>
 References: <20190904180736.29009-1-xypron.glpk@gmx.de>
- <86r24vrwyh.wl-maz@kernel.org>
- <CAFEAcA-mc6cLmRGdGNOBR0PC1f_VBjvTdAL6xYtKjApx3NoPgQ@mail.gmail.com>
- <86mufjrup7.wl-maz@kernel.org>
- <CAFEAcA9qkqkOTqSVrhTpt-NkZSNXomSBNiWo_D6Kr=QKYRRf=w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-Organization: Approximate
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Cc: =?UTF-8?B?IkRhbmllbCBQIC4gQmVycmFuZ8OpIg==?= <berrange@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>
+MIME-Version: 1.0
+In-Reply-To: <20190904180736.29009-1-xypron.glpk@gmx.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 05 Sep 2019 09:20:41 +0000 (UTC)
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,67 +71,90 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============7489422261612821076=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 05 Sep 2019 09:56:44 +0100,
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> 
-> On Thu, 5 Sep 2019 at 09:52, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Thu, 05 Sep 2019 09:16:54 +0100,
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > This is true, but the problem is that barfing out to userspace
-> > > makes it harder to debug the guest because it means that
-> > > the VM is immediately destroyed, whereas AIUI if we
-> > > inject some kind of exception then (assuming you're set up
-> > > to do kernel-debug via gdbstub) you can actually examine
-> > > the offending guest code with a debugger because at least
-> > > your VM is still around to inspect...
-> >
-> > To Christoffer's point, I find the benefit a bit dubious. Yes, you get
-> > an exception, but the instruction that caused it may be completely
-> > legal (store with post-increment, for example), leading to an even
-> > more puzzled developer (that exception should never have been
-> > delivered the first place).
-> 
-> Right, but the combination of "host kernel prints a message
-> about an unsupported load/store insn" and "within-guest debug
-> dump/stack trace/etc" is much more useful than just having
-> "host kernel prints message" and "QEMU exits"; and it requires
-> about 3 lines of code change...
 
-Which is wrong, and creates a new behaviour that isn't specified
-anywhere.
+--===============7489422261612821076==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="E69HUUNAyIJqGpVn"
+Content-Disposition: inline
 
-> 
-> > I'm far more in favour of dumping the state of the access in the run
-> > structure (much like we do for a MMIO access) and let userspace do
-> > something about it (such as dumping information on the console or
-> > breaking). It could even inject an exception *if* the user has asked
-> > for it.
-> 
-> ...whereas this requires agreement on a kernel-userspace API,
-> larger changes in the kernel, somebody to implement the userspace
-> side of things, and the user to update both the kernel and QEMU.
-> It's hard for me to see that the benefit here over the 3-line
-> approach really outweighs the extra effort needed.
 
-3 lines that already require the host kernel to be updated, and create
-a legacy that we'll never be able to get rid of.
+--E69HUUNAyIJqGpVn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> In practice saying "we should do this" is saying "we're going to do
-> nothing", based on the historical record.
+On Wed, Sep 04, 2019 at 08:07:36PM +0200, Heinrich Schuchardt wrote:
+> If an application tries to access memory that is not mapped, an error
+> ENOSYS, "load/store instruction decoding not implemented" may occur.
+> QEMU will hang with a register dump.
+>=20
+> Instead create a data abort that can be handled gracefully by the
+> application running in the virtual environment.
+>=20
+> Now the virtual machine can react to the event in the most appropriate
+> way - by recovering, by writing an informative log, or by rebooting.
+>=20
+> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+> ---
+>  virt/kvm/arm/mmio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+> index a8a6a0c883f1..0cbed7d6a0f4 100644
+> --- a/virt/kvm/arm/mmio.c
+> +++ b/virt/kvm/arm/mmio.c
+> @@ -161,8 +161,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_ru=
+n *run,
+>  		if (ret)
+>  			return ret;
+>  	} else {
+> -		kvm_err("load/store instruction decoding not implemented\n");
+> -		return -ENOSYS;
+> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +		return 1;
 
-Thanks for the vote of confidence...
+I see this more as a temporary debugging hack than something to merge.
 
-	M.
+It sounds like in your case the guest environment provided good
+debugging information and you preferred it over debugging this from the
+host side.  That's fine, but allowing the guest to continue running in
+the general case makes it much harder to track down the root cause of a
+problem because many guest CPU instructions may be executed after the
+original problem occurs.  Other guest software may fail silently in
+weird ways.  IMO it's best to fail early.
 
--- 
-Jazz is not dead, it just smells funny.
+Stefan
+
+--E69HUUNAyIJqGpVn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1w02cACgkQnKSrs4Gr
+c8iE9ggAkVjIf2fI/kBs4N9RcmSgCefJV12cMWzxOU0i+Z3Z6eMCCf3aDRvN5Znu
+AO5aNxnimfSJ/yP1Zp1qZjeSdPpsMs5ox3CXdHmNOAEtzTb5tC4NeSvVeP1MaCi8
+LzpKOB7uZpZVulFwf9vuWcMww/LBIP0AwJSQ9MWUJncQ3UMZd3vNXXfD8QlnECVd
+alfe2r6hsp3ijEdkLLx92pNOl3/sgeFiK7WRQ07hrQHh2jJ9h2kZslsEZHeEsaj5
+CLuPe76KL4o25UFhS17Cg3hTsROX2BBgYub5uY+K02b54bVY2X3ypNE80H91ip+k
+VKuTCZk89Bpnyb3Shu6NIhJskSO1PA==
+=tj/0
+-----END PGP SIGNATURE-----
+
+--E69HUUNAyIJqGpVn--
+
+--===============7489422261612821076==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7489422261612821076==--
