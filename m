@@ -2,90 +2,60 @@ Return-Path: <SRS0=E5f7=XA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 333B8C3A5A5
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 07:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A23C3A5A5
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 08:04:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 90AA22082E
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 07:22:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="dFPK7v0e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90AA22082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	by mail.kernel.org (Postfix) with ESMTP id AC5C5217D7
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 08:04:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC5C5217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6C4D4A581;
-	Thu,  5 Sep 2019 03:22:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F8DF4A500;
+	Thu,  5 Sep 2019 04:04:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmx.net
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GJGI3T5peXHD; Thu,  5 Sep 2019 03:22:45 -0400 (EDT)
+	with ESMTP id yzHSdssYqZS5; Thu,  5 Sep 2019 04:04:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70CAF4A535;
-	Thu,  5 Sep 2019 03:22:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2920E4A558;
+	Thu,  5 Sep 2019 04:04:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5156A4A4C1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 14:08:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 725A54A558
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 04:04:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5fet6ipWo+uW for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Sep 2019 14:08:02 -0400 (EDT)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00C344A49F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Sep 2019 14:08:01 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1567620473;
- bh=uSFdeY18J73GEbur7/f5eGY33e2+gZfGIbg70oqM+2E=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
- b=dFPK7v0eikK//IWvKaPDuTF8vPd9O/aKmO1DDSUY2K3IC2bxnVQ5PIk2EJhGM27kR
- +lY+G9BNhgaiYDLaUrJX9F/2f1aIQsTNuq3ya5rD0AT7g8CjigqFQwromeihBXHSXC
- O/uuMoGto9MJPLXCEM44QVkN4nCV3sTM8MJWrjW4=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from localhost.localdomain ([84.118.159.3]) by mail.gmx.com
- (mrgmx004 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 1MhlGk-1ij1B310yG-00dqYX; Wed, 04 Sep 2019 20:07:53 +0200
-From: Heinrich Schuchardt <xypron.glpk@gmx.de>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/1] KVM: inject data abort if instruction cannot be decoded
-Date: Wed,  4 Sep 2019 20:07:36 +0200
-Message-Id: <20190904180736.29009-1-xypron.glpk@gmx.de>
-X-Mailer: git-send-email 2.23.0.rc1
-MIME-Version: 1.0
-X-Provags-ID: V03:K1:abXNHvOQi/p7CEIzoPWMQ9XFYpp4Z25ZscYRNbtDcb67ZH0vqAE
- CCaWYLtBMzVUoZZj3DLLIFWRozpR+tYvr63KEw05ujxgzzI7iN0g+dgjei45TpxWlugdsiF
- hLqcNFs7qc6B5xKFTZBxgoGdWkp6vsuL+qhmsf9GozxhZ5IUyUHXZk7+SsU37eCbQpoyn4O
- c/fcxp1MYFQRPvj2y1OVw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JozR6u9JImk=:9BlOOIijgEVJQxytK0x9tx
- ffPR1NDnISmrIyzczzP11cywtaAFP9aCT0RxToSFNkToJSnm4aAHE/S7sSOhgAIyxz/MiIr75
- KcPkdb6fnx23AA/KWNlaSRurYgMgazJ/6IuexrQBTdxaFm90ZlBzRLL3K8ywN/CV7JZtvH6z7
- aFhqnENeGY04kiL4Zvg4gvZ4OW0XCYjI/FqU9AbtXKdBObedSvwR72zNEd05U37t9+x8zKk6j
- LTJizGn7PHI8EuNOQLdKg0IXFjG8dPDYe8z7wgn2qlKGBjBeAawjfNp3Epb6kUw9213ZNGLMo
- fh1gBhdrooRdaj1tEiGAhterenwoPCIM9X+VRYi8DAQbb70yGSicPAYEljE/k+/rJofxOuT+q
- CxwkoHsuZ4mqi5+NhnaTJl4e36SNg28WzHRxDYOvL2igXBERcU6bsBTitDCccbufyP+5dPxOQ
- uPyjZfdAVfzt20K85FboUwnZkpWJ8PAiIrQaJZXInThEl1hlhcQZBHzYzyhU5Hr0vT7U4bguC
- Jk1d4iShpWENsqgl5/YyR1EpmrUUZyiBRo01uDGlt9hLy/RC6f3F7rSjihjY1zPvYJb9r26zl
- sjKm0HwdyniWypblwzX1tidPLcBPHVc7xLlAQB9Amxfrap8J5aIaJV9ncupkKh9lDp1SMA7bi
- bbFb7ydvnEj9BvWA7m7P9G3rJBACZN+IByS9r2paS2gmJORze++SF7xMJ4CapGqMPhm0Uh0+m
- NWRh4c0s58AB0LRR0FnqR0vIkZjw58tSrhrZpQ+i3HGvS9U73dI9u74NpBU/UtPNAl1M2oC33
- lU0fo9l6DRWSvRYhpvM+2DLbV2udzosMeRZaicEkLQuVPBWNFtqfE6GjW4KVEbg3EftIIKjKR
- 0gT3EfIIZdht5LApSOvcoT70CR06LPLNQ0o3DEzr2ake3RZ2x6ItWyyJD2cf+MIMsBa7xKluS
- cRnSMqgtb9PkRlVbNFar+V/OJ3yKgF04Ay4K/3PiP3AygXGBXLaN2SaDOnbm+6BsN8XXZNLGJ
- wEJbpsOVJ8RM0sLV8X2HpOgJy77cP3gLkngJ3OQ0+ziAetElq+4QoVGQHvzzIc37WuWuUj672
- HV4zT7/BsxTmuoCUoNd2qwOf/vWbcWNHRuTTY+ujEDs0+SybO+LhCZ8r+WlBFZgejj7NXq+RE
- cgxieGDxbNjHstwJ68ra7rk37gfXEY/CDV3xk1cGtH89pLOT4mYhLPJ/CAin64ctNsznLUIXM
- 81exZsNAov/vsxqph
-X-Mailman-Approved-At: Thu, 05 Sep 2019 03:22:44 -0400
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org,
- Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id JebuZwcOlLIH for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Sep 2019 04:04:01 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 249D64A500
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 04:04:01 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94B5928;
+ Thu,  5 Sep 2019 01:04:00 -0700 (PDT)
+Received: from big-swifty.misterjones.org (unknown [10.1.27.38])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5AA793F67D;
+ Thu,  5 Sep 2019 01:03:58 -0700 (PDT)
+Date: Thu, 05 Sep 2019 09:03:50 +0100
+Message-ID: <86r24vrwyh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Subject: Re: [PATCH 1/1] KVM: inject data abort if instruction cannot be
+ decoded
+In-Reply-To: <20190904180736.29009-1-xypron.glpk@gmx.de>
+References: <20190904180736.29009-1-xypron.glpk@gmx.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: =?UTF-8?B?IkRhbmllbCBQIC4gQmVycmFuZ8OpIg==?= <berrange@redhat.com>,
+ linux-kernel@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,39 +72,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If an application tries to access memory that is not mapped, an error
-ENOSYS, "load/store instruction decoding not implemented" may occur.
-QEMU will hang with a register dump.
+[Please use my kernel.org address. My arm.com address will disappear shortly]
 
-Instead create a data abort that can be handled gracefully by the
-application running in the virtual environment.
+On Wed, 04 Sep 2019 19:07:36 +0100,
+Heinrich Schuchardt <xypron.glpk@gmx.de> wrote:
+> 
+> If an application tries to access memory that is not mapped, an error
+> ENOSYS, "load/store instruction decoding not implemented" may occur.
+> QEMU will hang with a register dump.
+> 
+> Instead create a data abort that can be handled gracefully by the
+> application running in the virtual environment.
+> 
+> Now the virtual machine can react to the event in the most appropriate
+> way - by recovering, by writing an informative log, or by rebooting.
+> 
+> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+> ---
+>  virt/kvm/arm/mmio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+> index a8a6a0c883f1..0cbed7d6a0f4 100644
+> --- a/virt/kvm/arm/mmio.c
+> +++ b/virt/kvm/arm/mmio.c
+> @@ -161,8 +161,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  		if (ret)
+>  			return ret;
+>  	} else {
+> -		kvm_err("load/store instruction decoding not implemented\n");
+> -		return -ENOSYS;
+> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +		return 1;
 
-Now the virtual machine can react to the event in the most appropriate
-way - by recovering, by writing an informative log, or by rebooting.
+How can you tell that the access would fault? You have no idea at that
+stage (the kernel doesn't know about the MMIO ranges that userspace
+handles). All you know is that you're faced with a memory access that
+you cannot emulate in the kernel. Injecting a data abort at that stage
+is not something that the architecture allows.
 
-Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
----
- virt/kvm/arm/mmio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+If you want to address this, consider forwarding the access to
+userspace. You'll only need an instruction decoder (supporting T1, T2,
+A32 and A64) and a S1 page table walker (one per page table format,
+all three of them) to emulate the access (having taken care of
+stopping all the other vcpus to make sure there is no concurrent
+modification of the page tables). You'll then be able to return the
+result of the access back to the kernel.
 
-diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-index a8a6a0c883f1..0cbed7d6a0f4 100644
---- a/virt/kvm/arm/mmio.c
-+++ b/virt/kvm/arm/mmio.c
-@@ -161,8 +161,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		if (ret)
- 			return ret;
- 	} else {
--		kvm_err("load/store instruction decoding not implemented\n");
--		return -ENOSYS;
-+		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		return 1;
- 	}
+Of course, the best thing would be to actually fix the guest so that
+it doesn't use non-emulatable MMIO accesses. In general, that the sign
+of a bug in low-level accessors.
 
- 	rt = vcpu->arch.mmio_decode.rt;
---
-2.23.0.rc1
+	M.
 
+-- 
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
