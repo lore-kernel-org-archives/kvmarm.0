@@ -2,61 +2,61 @@ Return-Path: <SRS0=E5f7=XA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94466C3A5A5
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 13:26:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B58C7C43331
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 16:03:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 91995206CD
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 13:26:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91995206CD
+	by mail.kernel.org (Postfix) with ESMTP id 06EC7206DE
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 16:03:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06EC7206DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00DEB4A589;
-	Thu,  5 Sep 2019 09:26:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 761F94A580;
+	Thu,  5 Sep 2019 12:02:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tJNni+2+XH6X; Thu,  5 Sep 2019 09:26:32 -0400 (EDT)
+	with ESMTP id y1xWDYftbdrc; Thu,  5 Sep 2019 12:02:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 709F44A527;
-	Thu,  5 Sep 2019 09:26:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E7E94A557;
+	Thu,  5 Sep 2019 12:02:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 973C94A527
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 09:26:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5470D4A520
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 12:02:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BwhGDjYO5CvJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Sep 2019 09:26:29 -0400 (EDT)
+ with ESMTP id lV3rhCQq+cxE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Sep 2019 12:02:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09CCE4A526
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 09:26:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D92D44A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 12:02:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A069028;
- Thu,  5 Sep 2019 06:26:28 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 7F54B3F67D; Thu,  5 Sep 2019 06:26:27 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
- driven by vcpu_load/put
-To: Andrew Murray <andrew.murray@arm.com>
-References: <20190903155747.219802-1-maz@kernel.org>
- <20190905130410.GA9720@e119886-lin.cambridge.arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 577AE28;
+ Thu,  5 Sep 2019 09:02:54 -0700 (PDT)
+Received: from filthy-habits.cambridge.arm.com
+ (filthy-habits.cambridge.arm.com [10.1.197.61])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB2923F67D;
+ Thu,  5 Sep 2019 09:02:52 -0700 (PDT)
 From: Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <28777048-c34c-b2b3-468f-233b068e057a@kernel.org>
-Date: Thu, 5 Sep 2019 14:26:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To: Peter Maydell <peter.maydell@linaro.org>,
+ James Morse <james.morse@arm.com>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+ Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v2] KVM: arm/arm64: vgic: Allow more than 256 vcpus for
+ KVM_IRQ_LINE
+Date: Thu,  5 Sep 2019 17:02:45 +0100
+Message-Id: <20190905160245.20746-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190905130410.GA9720@e119886-lin.cambridge.arm.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,290 +68,108 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 05/09/2019 14:04, Andrew Murray wrote:
-> Hi Marc,
-> 
-> Some feedback below, but mostly questions to aid my understanding...
-> 
-> On Tue, Sep 03, 2019 at 04:57:47PM +0100, Marc Zyngier wrote:
->> When the VHE code was reworked, a lot of the vgic stuff was moved around,
->> but the GICv4 residency code did stay untouched, meaning that we come
->> in and out of residency on each flush/sync, which is obviously suboptimal.
->>
->> To address this, let's move things around a bit:
->>
->> - Residency entry (flush) moves to vcpu_load
->> - Residency exit (sync) moves to vcpu_put
->> - On blocking (entry to WFI), we "put"
->> - On unblocking (exit from WFI, we "load"
->>
->> Because these can nest (load/block/put/load/unblock/put, for example),
->> we now have per-VPE tracking of the residency state.
->>
->> Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
->> gets set to true when blocking because of a WFI. This allows a finer
->> control of the doorbell, which now also gets disabled as soon as
->> it gets signaled.
->>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  drivers/irqchip/irq-gic-v4.c       |  7 +++-
->>  include/kvm/arm_vgic.h             |  4 +--
->>  include/linux/irqchip/arm-gic-v4.h |  2 ++
->>  virt/kvm/arm/arm.c                 | 12 ++++---
->>  virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
->>  virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
->>  virt/kvm/arm/vgic/vgic.c           |  4 ---
->>  virt/kvm/arm/vgic/vgic.h           |  2 --
->>  8 files changed, 48 insertions(+), 42 deletions(-)
->>
->> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
->> index 563e87ed0766..45969927cc81 100644
->> --- a/drivers/irqchip/irq-gic-v4.c
->> +++ b/drivers/irqchip/irq-gic-v4.c
->> @@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
->>  int its_schedule_vpe(struct its_vpe *vpe, bool on)
->>  {
->>  	struct its_cmd_info info;
->> +	int ret;
->>  
->>  	WARN_ON(preemptible());
->>  
->>  	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
->>  
->> -	return its_send_vpe_cmd(vpe, &info);
->> +	ret = its_send_vpe_cmd(vpe, &info);
->> +	if (!ret)
->> +		vpe->resident = on;
->> +
-> 
-> We make an assumption here that its_schedule_vpe is the only caller of
-> its_send_vpe_cmd where we may pass SCHEDULE_VPE. I guess this is currently
-> the case.
-
-It is, and it is intended to stay that way.
-
-> Why do we also set the residency flag for DESCHEDULE_VPE?
-
-We don't.
-
-> And by residency we mean that interrupts are delivered to VM, instead of
-> doorbell?
-
-Interrupts are always delivered to the VPE, whether it is resident or
-not. Residency is defined as the VPE that is currently programmed in the
-redistributor (by virtue of programming the VPROPBASER and VPENDBASER
-registers).
-
-> 
->> +	return ret;
->>  }
->>  
->>  int its_invall_vpe(struct its_vpe *vpe)
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index af4f09c02bf1..4dc58d7a0010 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
->>  int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
->>  				 struct kvm_kernel_irq_routing_entry *irq_entry);
->>  
->> -void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
->> -void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
->> +int vgic_v4_load(struct kvm_vcpu *vcpu);
->> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
->>  
->>  #endif /* __KVM_ARM_VGIC_H */
->> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
->> index e6b155713b47..ab1396afe08a 100644
->> --- a/include/linux/irqchip/arm-gic-v4.h
->> +++ b/include/linux/irqchip/arm-gic-v4.h
->> @@ -35,6 +35,8 @@ struct its_vpe {
->>  	/* Doorbell interrupt */
->>  	int			irq;
->>  	irq_hw_number_t		vpe_db_lpi;
->> +	/* VPE resident */
->> +	bool			resident;
->>  	/* VPE proxy mapping */
->>  	int			vpe_proxy_event;
->>  	/*
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 35a069815baf..4e69268621b6 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -321,20 +321,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
->>  	/*
->>  	 * If we're about to block (most likely because we've just hit a
->>  	 * WFI), we need to sync back the state of the GIC CPU interface
->> -	 * so that we have the lastest PMR and group enables. This ensures
->> +	 * so that we have the latest PMR and group enables. This ensures
->>  	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
->>  	 * whether we have pending interrupts.
->> +	 *
->> +	 * For the same reason, we want to tell GICv4 that we need
->> +	 * doorbells to be signalled, should an interrupt become pending.
-> 
-> As I understand, and as indicated by removal of kvm_vgic_v4_enable_doorbell
-> below, we've now abstracted enabling the doorbell behind the concept of a
-> v4_put.
-> 
-> Why then, do we break that abstraction by adding this comment? Surely we just
-> want to indicate that we're done with ITS for now - do whatever you need to do.
-
-Well, I don't think you can realistically pretend that KVM doesn't know
-about the intricacies of GICv4. They are intimately linked.
-
-> This would have made more sense to me if the comment above was removed in this
-> patch rather than added.
-
-I disagree. The very reason we to a put on GICv4 is to get a doorbell.
-If we didn't need one, we'd just let schedule() do a non
-doorbell-generating vcpu_put.
-
->>  	 */
->>  	preempt_disable();
->>  	kvm_vgic_vmcr_sync(vcpu);
->> +	vgic_v4_put(vcpu, true);
->>  	preempt_enable();
->> -
->> -	kvm_vgic_v4_enable_doorbell(vcpu);
->>  }
->>  
->>  void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
->>  {
->> -	kvm_vgic_v4_disable_doorbell(vcpu);
->> +	preempt_disable();
->> +	vgic_v4_load(vcpu);
->> +	preempt_enable();
->>  }
->>  
->>  int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->> index 8d69f007dd0c..48307a9eb1d8 100644
->> --- a/virt/kvm/arm/vgic/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->> @@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
->>  
->>  	if (has_vhe())
->>  		__vgic_v3_activate_traps(vcpu);
->> +
->> +	WARN_ON(vgic_v4_load(vcpu));
->>  }
->>  
->>  void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
->> @@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
->>  
->>  void vgic_v3_put(struct kvm_vcpu *vcpu)
->>  {
->> +	WARN_ON(vgic_v4_put(vcpu, false));
->> +
->>  	vgic_v3_vmcr_sync(vcpu);
->>  
->>  	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
->> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->> index 477af6aebb97..3a8a28854b13 100644
->> --- a/virt/kvm/arm/vgic/vgic-v4.c
->> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->> @@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
->>  {
->>  	struct kvm_vcpu *vcpu = info;
->>  
->> +	/* We got the message, no need to fire again */
->> +	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
->> +		disable_irq_nosync(irq);
->> +
->>  	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
->>  	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->>  	kvm_vcpu_kick(vcpu);
-> 
-> This is because the doorbell will fire each time any guest device interrupts,
-> however we only need to tell the guest just once that something has happened
-> right?
-
-Not for any guest interrupt. Only for VLPIs. And yes, there is no need
-to get multiple doorbells. Once you got one, you know you're runnable
-and don't need to be told another 50k times...
-
-> 
->> @@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
->>  	its_vm->vpes = NULL;
->>  }
->>  
->> -int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
->> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
->>  {
->> -	if (!vgic_supports_direct_msis(vcpu->kvm))
->> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->> +	struct irq_desc *desc = irq_to_desc(vpe->irq);
->> +
->> +	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
->>  		return 0;
-> 
-> Are we using !vpe->resident to avoid pointlessly doing work we've
-> already done?
-
-And also to avoid corrupting the state that we've saved by re-reading
-what could potentially be an invalid state.
-
-> 
->>  
->> -	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
->> +	/*
->> +	 * If blocking, a doorbell is required. Undo the nested
->> +	 * disable_irq() calls...
->> +	 */
->> +	while (need_db && irqd_irq_disabled(&desc->irq_data))
->> +		enable_irq(vpe->irq);
->> +
->> +	return its_schedule_vpe(vpe, false);
->>  }
->>  
->> -int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
->> +int vgic_v4_load(struct kvm_vcpu *vcpu)
->>  {
->> -	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
->> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->>  	int err;
->>  
->> -	if (!vgic_supports_direct_msis(vcpu->kvm))
->> +	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
->>  		return 0;
->>  
->>  	/*
->> @@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
->>  	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
->>  	 * turns into a VMOVP command at the ITS level.
->>  	 */
->> -	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
->> +	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
->>  	if (err)
->>  		return err;
->>  
->> -	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
->> +	/* Disabled the doorbell, as we're about to enter the guest */
->> +	disable_irq(vpe->irq);
->> +
->> +	err = its_schedule_vpe(vpe, true);
->>  	if (err)
->>  		return err;
-> 
-> Given that the doorbell corresponds with vpe residency, it could make sense
-> to add a helper here that calls its_schedule_vpe and [disable,enable]_irq.
-> Though I see that vgic_v3_put calls vgic_v4_put with need_db=false. I wonder
-> what effect setting that to true would be for vgic_v3_put? Could it be known
-> that v3 won't set need_db to true?
-
-There is no doorbells for GICv3.
-
-	M.
--- 
-Jazz is not dead, it just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+V2hpbGUgcGFydHMgb2YgdGhlIFZHSUMgc3VwcG9ydCBhIGxhcmdlIG51bWJlciBvZiB2Y3B1cyAo
+d2UKYnJhdmVseSBhbGxvdyB1cCB0byA1MTIpLCBvdGhlciBwYXJ0cyBhcmUgbW9yZSBsaW1pdGVk
+LgoKT25lIG9mIHRoZXNlIGxpbWl0cyBpcyB2aXNpYmxlIGluIHRoZSBLVk1fSVJRX0xJTkUgaW9j
+dGwsIHdoaWNoCm9ubHkgYWxsb3dzIDI1NiB2Y3B1cyB0byBiZSBzaWduYWxsZWQgd2hlbiB1c2lu
+ZyB0aGUgQ1BVIG9yIFBQSQp0eXBlcy4gVW5mb3J0dW5hdGVseSwgd2UndmUgY29ybmVyZWQgb3Vy
+c2VsdmVzIGJhZGx5IGJ5IGFsbG9jYXRpbmcKYWxsIHRoZSBiaXRzIGluIHRoZSBpcnEgZmllbGQu
+CgpTaW5jZSB0aGUgaXJxX3R5cGUgc3ViZmllbGQgKDggYml0IHdpZGUpIGlzIGN1cnJlbnRseSBv
+bmx5IHRha2luZwp0aGUgdmFsdWVzIDAsIDEgYW5kIDIgKGFuZCB3ZSBoYXZlIGJlZW4gY2FyZWZ1
+bCBub3QgdG8gYWxsb3cgYW55dGhpbmcKZWxzZSksIGxldCdzIHJlZHVjZSB0aGlzIGZpZWxkIHRv
+IG9ubHkgNCBiaXRzLCBhbmQgYWxsb2NhdGUgdGhlCnJlbWFpbmluZyA0IGJpdHMgdG8gYSB2Y3B1
+Ml9pbmRleCwgd2hpY2ggYWN0cyBhcyBhIG11bHRpcGxpZXI6CgogIHZjcHVfaWQgPSAyNTYgKiB2
+Y3B1Ml9pbmRleCArIHZjcHVfaW5kZXgKCldpdGggdGhhdCwgYW5kIGEgbmV3IGNhcGFiaWxpdHkg
+KEtWTV9DQVBfQVJNX0lSUV9MSU5FX0xBWU9VVF8yKQphbGxvd2luZyB0aGlzIHRvIGJlIGRpc2Nv
+dmVyZWQsIGl0IGJlY29tZXMgcG9zc2libGUgdG8gaW5qZWN0ClBQSXMgdG8gdXAgdG8gNDA5NiB2
+Y3B1cy4gQnV0IHBsZWFzZSBqdXN0IGRvbid0LgoKV2hpbHN0IHdlJ3JlIHRoZXJlLCBhZGQgYSBj
+bGFyaWZpY2F0aW9uIGFib3V0IHRoZSB1c2Ugb2YgS1ZNX0lSUV9MSU5FCm9uIGFybSwgd2hpY2gg
+aXMgbm90IGNvbXBsZXRlbHkgY29uZGl0aW9ubmVkIGJ5IEtWTV9DQVBfSVJRQ0hJUC4KClJlcG9y
+dGVkLWJ5OiBaZW5naHVpIFl1IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KUmV2aWV3ZWQtYnk6IEVy
+aWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6IFplbmdodWkgWXUg
+PHl1emVuZ2h1aUBodWF3ZWkuY29tPgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBr
+ZXJuZWwub3JnPgotLS0KKiBGcm9tIHYxIChodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIwMTkw
+ODE4MTQwNzEwLjIzOTIwLTEtbWF6QGtlcm5lbC5vcmcpCiAgLSBBbHdheXMgc2F5IHRoYXQgd2Ug
+c3VwcG9ydCB0aGUgbmV3IGxheW91dCwgbm8gbWF0dGVyIHdoZXRoZXIKICAgIHdlIGhhdmUgYW4g
+aW4ta2VybmVsIGlycWNoaXAgb3Igbm90CiAgLSBDbGFyaWZ5IHVzZSBvZiBLVk1fSVJRX0xJTkUg
+d3J0IEtWTV9DQVBfSVJRQ0hJUAogIC0gQ29sbGVjdGVkIFJCcwoKIERvY3VtZW50YXRpb24vdmly
+dC9rdm0vYXBpLnR4dCAgICB8IDEyICsrKysrKysrKystLQogYXJjaC9hcm0vaW5jbHVkZS91YXBp
+L2FzbS9rdm0uaCAgIHwgIDQgKysrLQogYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5o
+IHwgIDQgKysrLQogaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oICAgICAgICAgIHwgIDEgKwogdmly
+dC9rdm0vYXJtL2FybS5jICAgICAgICAgICAgICAgIHwgIDIgKysKIDUgZmlsZXMgY2hhbmdlZCwg
+MTkgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9Eb2N1bWVudGF0
+aW9uL3ZpcnQva3ZtL2FwaS50eHQgYi9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS50eHQKaW5k
+ZXggMmQwNjc3NjdiNjE3Li4yNTkzMWNhMWNiMzggMTAwNjQ0Ci0tLSBhL0RvY3VtZW50YXRpb24v
+dmlydC9rdm0vYXBpLnR4dAorKysgYi9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS50eHQKQEAg
+LTc1Myw4ICs3NTMsOCBAQCBpbi1rZXJuZWwgaXJxY2hpcCAoR0lDKSwgYW5kIGZvciBpbi1rZXJu
+ZWwgaXJxY2hpcCBjYW4gdGVsbCB0aGUgR0lDIHRvCiB1c2UgUFBJcyBkZXNpZ25hdGVkIGZvciBz
+cGVjaWZpYyBjcHVzLiAgVGhlIGlycSBmaWVsZCBpcyBpbnRlcnByZXRlZAogbGlrZSB0aGlzOgog
+Ci0gwqBiaXRzOiAgfCAzMSAuLi4gMjQgfCAyMyAgLi4uIDE2IHwgMTUgICAgLi4uICAgIDAgfAot
+ICBmaWVsZDogfCBpcnFfdHlwZSAgfCB2Y3B1X2luZGV4IHwgICAgIGlycV9pZCAgICAgfAorIMKg
+Yml0czogIHwgIDMxIC4uLiAyOCAgfCAyNyAuLi4gMjQgfCAyMyAgLi4uIDE2IHwgMTUgLi4uIDAg
+fAorICBmaWVsZDogfCB2Y3B1Ml9pbmRleCB8IGlycV90eXBlICB8IHZjcHVfaW5kZXggfCAgaXJx
+X2lkICB8CiAKIFRoZSBpcnFfdHlwZSBmaWVsZCBoYXMgdGhlIGZvbGxvd2luZyB2YWx1ZXM6CiAt
+IGlycV90eXBlWzBdOiBvdXQtb2Yta2VybmVsIEdJQzogaXJxX2lkIDAgaXMgSVJRLCBpcnFfaWQg
+MSBpcyBGSVEKQEAgLTc2Niw2ICs3NjYsMTQgQEAgVGhlIGlycV90eXBlIGZpZWxkIGhhcyB0aGUg
+Zm9sbG93aW5nIHZhbHVlczoKIAogSW4gYm90aCBjYXNlcywgbGV2ZWwgaXMgdXNlZCB0byBhc3Nl
+cnQvZGVhc3NlcnQgdGhlIGxpbmUuCiAKK1doZW4gS1ZNX0NBUF9BUk1fSVJRX0xJTkVfTEFZT1VU
+XzIgaXMgc3VwcG9ydGVkLCB0aGUgdGFyZ2V0IHZjcHUgaXMKK2lkZW50aWZpZWQgYXMgKDI1NiAq
+IHZjcHUyX2luZGV4ICsgdmNwdV9pbmRleCkuIE90aGVyd2lzZSwgdmNwdTJfaW5kZXgKK211c3Qg
+YmUgemVyby4KKworTm90ZSB0aGF0IG9uIGFybS9hcm02NCwgdGhlIEtWTV9DQVBfSVJRQ0hJUCBj
+YXBhYmlsaXR5IG9ubHkgY29uZGl0aW9ucworaW5qZWN0aW9uIG9mIGludGVycnVwdHMgZm9yIHRo
+ZSBpbi1rZXJuZWwgaXJxY2hpcC4gS1ZNX0lSUV9MSU5FIGNhbiBhbHdheXMKK2JlIHVzZWQgZm9y
+IGEgdXNlcnNwYWNlIGludGVycnVwdCBjb250cm9sbGVyLgorCiBzdHJ1Y3Qga3ZtX2lycV9sZXZl
+bCB7CiAJdW5pb24gewogCQlfX3UzMiBpcnE7ICAgICAvKiBHU0kgKi8KZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtL2luY2x1ZGUvdWFwaS9hc20va3ZtLmggYi9hcmNoL2FybS9pbmNsdWRlL3VhcGkvYXNt
+L2t2bS5oCmluZGV4IGE0MjE3YzFhNWQwMS4uMjc2OTM2MGYxOTVjIDEwMDY0NAotLS0gYS9hcmNo
+L2FybS9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCisrKyBiL2FyY2gvYXJtL2luY2x1ZGUvdWFwaS9h
+c20va3ZtLmgKQEAgLTI2Niw4ICsyNjYsMTAgQEAgc3RydWN0IGt2bV92Y3B1X2V2ZW50cyB7CiAj
+ZGVmaW5lICAgS1ZNX0RFVl9BUk1fSVRTX0NUUkxfUkVTRVQJCTQKIAogLyogS1ZNX0lSUV9MSU5F
+IGlycSBmaWVsZCBpbmRleCB2YWx1ZXMgKi8KKyNkZWZpbmUgS1ZNX0FSTV9JUlFfVkNQVTJfU0hJ
+RlQJCTI4CisjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFUyX01BU0sJCTB4ZgogI2RlZmluZSBLVk1f
+QVJNX0lSUV9UWVBFX1NISUZUCQkyNAotI2RlZmluZSBLVk1fQVJNX0lSUV9UWVBFX01BU0sJCTB4
+ZmYKKyNkZWZpbmUgS1ZNX0FSTV9JUlFfVFlQRV9NQVNLCQkweGYKICNkZWZpbmUgS1ZNX0FSTV9J
+UlFfVkNQVV9TSElGVAkJMTYKICNkZWZpbmUgS1ZNX0FSTV9JUlFfVkNQVV9NQVNLCQkweGZmCiAj
+ZGVmaW5lIEtWTV9BUk1fSVJRX05VTV9TSElGVAkJMApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9p
+bmNsdWRlL3VhcGkvYXNtL2t2bS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5o
+CmluZGV4IDlhNTA3NzE2YWUyZi4uNjdjMjFmOWJkYmFkIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0
+L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNt
+L2t2bS5oCkBAIC0zMjUsOCArMzI1LDEwIEBAIHN0cnVjdCBrdm1fdmNwdV9ldmVudHMgewogI2Rl
+ZmluZSAgIEtWTV9BUk1fVkNQVV9USU1FUl9JUlFfUFRJTUVSCQkxCiAKIC8qIEtWTV9JUlFfTElO
+RSBpcnEgZmllbGQgaW5kZXggdmFsdWVzICovCisjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFUyX1NI
+SUZUCQkyOAorI2RlZmluZSBLVk1fQVJNX0lSUV9WQ1BVMl9NQVNLCQkweGYKICNkZWZpbmUgS1ZN
+X0FSTV9JUlFfVFlQRV9TSElGVAkJMjQKLSNkZWZpbmUgS1ZNX0FSTV9JUlFfVFlQRV9NQVNLCQkw
+eGZmCisjZGVmaW5lIEtWTV9BUk1fSVJRX1RZUEVfTUFTSwkJMHhmCiAjZGVmaW5lIEtWTV9BUk1f
+SVJRX1ZDUFVfU0hJRlQJCTE2CiAjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFVfTUFTSwkJMHhmZgog
+I2RlZmluZSBLVk1fQVJNX0lSUV9OVU1fU0hJRlQJCTAKZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFw
+aS9saW51eC9rdm0uaCBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAppbmRleCA1ZTNmMTJkNTM1
+OWUuLjU0MTRiNjU4OGZiYiAxMDA2NDQKLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCisr
+KyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaApAQCAtOTk2LDYgKzk5Niw3IEBAIHN0cnVjdCBr
+dm1fcHBjX3Jlc2l6ZV9ocHQgewogI2RlZmluZSBLVk1fQ0FQX0FSTV9QVFJBVVRIX0FERFJFU1Mg
+MTcxCiAjZGVmaW5lIEtWTV9DQVBfQVJNX1BUUkFVVEhfR0VORVJJQyAxNzIKICNkZWZpbmUgS1ZN
+X0NBUF9QTVVfRVZFTlRfRklMVEVSIDE3MworI2RlZmluZSBLVk1fQ0FQX0FSTV9JUlFfTElORV9M
+QVlPVVRfMiAxNzQKIAogI2lmZGVmIEtWTV9DQVBfSVJRX1JPVVRJTkcKIApkaWZmIC0tZ2l0IGEv
+dmlydC9rdm0vYXJtL2FybS5jIGIvdmlydC9rdm0vYXJtL2FybS5jCmluZGV4IDM1YTA2OTgxNWJh
+Zi4uODZjNmFhMWNiNThlIDEwMDY0NAotLS0gYS92aXJ0L2t2bS9hcm0vYXJtLmMKKysrIGIvdmly
+dC9rdm0vYXJtL2FybS5jCkBAIC0xOTYsNiArMTk2LDcgQEAgaW50IGt2bV92bV9pb2N0bF9jaGVj
+a19leHRlbnNpb24oc3RydWN0IGt2bSAqa3ZtLCBsb25nIGV4dCkKIAljYXNlIEtWTV9DQVBfTVBf
+U1RBVEU6CiAJY2FzZSBLVk1fQ0FQX0lNTUVESUFURV9FWElUOgogCWNhc2UgS1ZNX0NBUF9WQ1BV
+X0VWRU5UUzoKKwljYXNlIEtWTV9DQVBfQVJNX0lSUV9MSU5FX0xBWU9VVF8yOgogCQlyID0gMTsK
+IAkJYnJlYWs7CiAJY2FzZSBLVk1fQ0FQX0FSTV9TRVRfREVWSUNFX0FERFI6CkBAIC04ODgsNiAr
+ODg5LDcgQEAgaW50IGt2bV92bV9pb2N0bF9pcnFfbGluZShzdHJ1Y3Qga3ZtICprdm0sIHN0cnVj
+dCBrdm1faXJxX2xldmVsICppcnFfbGV2ZWwsCiAKIAlpcnFfdHlwZSA9IChpcnEgPj4gS1ZNX0FS
+TV9JUlFfVFlQRV9TSElGVCkgJiBLVk1fQVJNX0lSUV9UWVBFX01BU0s7CiAJdmNwdV9pZHggPSAo
+aXJxID4+IEtWTV9BUk1fSVJRX1ZDUFVfU0hJRlQpICYgS1ZNX0FSTV9JUlFfVkNQVV9NQVNLOwor
+CXZjcHVfaWR4ICs9ICgoaXJxID4+IEtWTV9BUk1fSVJRX1ZDUFUyX1NISUZUKSAmIEtWTV9BUk1f
+SVJRX1ZDUFUyX01BU0spICogKEtWTV9BUk1fSVJRX1ZDUFVfTUFTSyArIDEpOwogCWlycV9udW0g
+PSAoaXJxID4+IEtWTV9BUk1fSVJRX05VTV9TSElGVCkgJiBLVk1fQVJNX0lSUV9OVU1fTUFTSzsK
+IAogCXRyYWNlX2t2bV9pcnFfbGluZShpcnFfdHlwZSwgdmNwdV9pZHgsIGlycV9udW0sIGlycV9s
+ZXZlbC0+bGV2ZWwpOwotLSAKMi4yMC4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
+bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
+dm1hcm0K
