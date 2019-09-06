@@ -1,55 +1,65 @@
-Return-Path: <SRS0=E5f7=XA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=tFZo=XB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B6DC43331
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 17:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD81C43331
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Sep 2019 06:30:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB20D20693
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Sep 2019 17:21:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB20D20693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 598452082C
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Sep 2019 06:30:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598452082C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 342284A579;
-	Thu,  5 Sep 2019 13:21:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B0C24A551;
+	Fri,  6 Sep 2019 02:30:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oMP9d9ziCr9d; Thu,  5 Sep 2019 13:21:30 -0400 (EDT)
+	with ESMTP id xs0ZHWYwi5HV; Fri,  6 Sep 2019 02:30:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6E44A4F6;
-	Thu,  5 Sep 2019 13:21:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67E5A4A55F;
+	Fri,  6 Sep 2019 02:30:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D91284A4F6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 13:21:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A3EB4A55F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Sep 2019 02:30:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ocV5K+1VXpji for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Sep 2019 13:21:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 393544A4E5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Sep 2019 13:21:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1EE5337;
- Thu,  5 Sep 2019 10:21:26 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 100D33F718;
- Thu,  5 Sep 2019 10:21:25 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests] arm: gic: enable GIC MMIO tests for GICv3 as
- well
-Date: Thu,  5 Sep 2019 18:21:14 +0100
-Message-Id: <20190905172114.215380-1-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id SPnP9exazRbU for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Sep 2019 02:30:07 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A4284A551
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Sep 2019 02:30:07 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6BADE87521E;
+ Fri,  6 Sep 2019 06:30:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 297944106;
+ Fri,  6 Sep 2019 06:30:05 +0000 (UTC)
+Date: Fri, 6 Sep 2019 08:30:02 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvm-unit-tests] arm: prevent compiler from using
+ unaligned accesses
+Message-ID: <20190906063002.xiterzugydfycrlu@kamzik.brq.redhat.com>
+References: <20190905171502.215183-1-andre.przywara@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20190905171502.215183-1-andre.przywara@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 06 Sep 2019 06:30:06 +0000 (UTC)
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -62,119 +72,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-So far the GIC MMIO tests were only enabled for a GICv2 guest. Modern
-machines tend to have a GICv3-only GIC, so can't run those guests.
-It turns out that most GIC distributor registers we test in the unit
-tests are actually the same in GICv3, so we can just enable those tests
-for GICv3 guests as well.
-The only exception is the CPU number in the TYPER register, which we
-just protect against running on a GICv3 guest.
+On Thu, Sep 05, 2019 at 06:15:02PM +0100, Andre Przywara wrote:
+> The ARM architecture requires all accesses to device memory to be
+> naturally aligned[1][2]. Normal memory does not have this strict
+> requirement, and in fact many systems do ignore unaligned accesses
+> (by the means of clearing the A bit in SCTLR and accessing normal
+> memory). So the default behaviour of GCC assumes that unaligned accesses
+> are fine, at least if happening on the stack.
+> 
+> Now kvm-unit-tests runs some C code with the MMU off, which degrades the
+> whole system memory to device memory. Now every unaligned access will
+> fault, regardless of the A bit.
+> In fact there is at least one place in lib/printf.c where GCC merges
+> two consecutive char* accesses into one "strh" instruction, writing to
+> a potentially unaligned address.
+> This can be reproduced by configuring kvm-unit-tests for kvmtool, but
+> running it on QEMU, which triggers an early printf that exercises this
+> particular code path.
+> 
+> Add the -mstrict-align compiler option to the arm64 CFLAGS to fix this
+> problem. Also add the respective -mno-unaligned-access flag for arm.
+> 
+> Thanks to Alexandru for helping debugging this.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> 
+> [1] ARMv8 ARM DDI 0487E.a, B2.5.2
+> [2] ARMv7 ARM DDI 0406C.d, A3.2.1
+> ---
+>  arm/Makefile.arm   | 1 +
+>  arm/Makefile.arm64 | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+> index a625267..43b4be1 100644
+> --- a/arm/Makefile.arm
+> +++ b/arm/Makefile.arm
+> @@ -12,6 +12,7 @@ KEEP_FRAME_POINTER := y
+>  
+>  CFLAGS += $(machine)
+>  CFLAGS += -mcpu=$(PROCESSOR)
+> +CFLAGS += -mno-unaligned-access
+>  
+>  arch_LDFLAGS = -Ttext=40010000
+>  
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 02c24e8..35de5ea 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -7,6 +7,7 @@ bits = 64
+>  ldarch = elf64-littleaarch64
+>  
+>  arch_LDFLAGS = -pie -n
+> +CFLAGS += -mstrict-align
+>  
+>  define arch_elf_check =
+>  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+> -- 
+> 2.17.1
+>
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c         | 13 +++++++++++--
- arm/unittests.cfg | 16 +++++++++++-----
- lib/arm/asm/gic.h |  2 ++
- 3 files changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index ed5642e..bd3c027 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -6,6 +6,7 @@
-  *   + MMIO access tests
-  * GICv3
-  *   + test sending/receiving IPIs
-+ *   + MMIO access tests
-  *
-  * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-  *
-@@ -483,7 +484,14 @@ static void gic_test_mmio(void)
- 		idreg = gic_dist_base + GICD_ICPIDR2;
- 		break;
- 	case 0x3:
--		report_abort("GICv3 MMIO tests NYI");
-+		/*
-+		 * We only test generic registers or those affecting
-+		 * SPIs, so don't need to consider the SGI base in
-+		 * the redistributor here.
-+		 */
-+		gic_dist_base = gicv3_dist_base();
-+		idreg = gic_dist_base + GICD_PIDR2;
-+		break;
- 	default:
- 		report_abort("GIC version %d not supported", gic_version());
- 	}
-@@ -492,7 +500,8 @@ static void gic_test_mmio(void)
- 	nr_irqs = GICD_TYPER_IRQS(reg);
- 	report_info("number of implemented SPIs: %d", nr_irqs - GIC_FIRST_SPI);
- 
--	test_typer_v2(reg);
-+	if (gic_version() == 0x2)
-+		test_typer_v2(reg);
- 
- 	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
- 
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 6d3df92..3fd5b04 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -86,22 +86,28 @@ smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
- extra_params = -machine gic-version=2 -append 'ipi'
- groups = gic
- 
--[gicv2-mmio]
-+[gicv2-max-mmio]
- file = gic.flat
- smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
- extra_params = -machine gic-version=2 -append 'mmio'
- groups = gic
- 
--[gicv2-mmio-up]
-+[gicv3-max-mmio]
-+file = gic.flat
-+smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'mmio'
-+groups = gic
-+
-+[gic-mmio-up]
- file = gic.flat
- smp = 1
--extra_params = -machine gic-version=2 -append 'mmio'
-+extra_params = -append 'mmio'
- groups = gic
- 
--[gicv2-mmio-3p]
-+[gic-mmio-3p]
- file = gic.flat
- smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
--extra_params = -machine gic-version=2 -append 'mmio'
-+extra_params = -append 'mmio'
- groups = gic
- 
- [gicv3-ipi]
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..ffed025 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -23,6 +23,8 @@
- #define GICD_ITARGETSR			0x0800
- #define GICD_SGIR			0x0f00
- #define GICD_ICPIDR2			0x0fe8
-+/* only in GICv3 */
-+#define GICD_PIDR2			0xffe8
- 
- #define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
- #define GICD_INT_EN_SET_SGI		0x0000ffff
--- 
-2.17.1
-
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
