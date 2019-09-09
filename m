@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1BEC4740C
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 13:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D35C4740C
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 13:49:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8D51221920
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 13:49:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D51221920
+	by mail.kernel.org (Postfix) with ESMTP id C592821924
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 13:49:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C592821924
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45DE74A554;
-	Mon,  9 Sep 2019 09:49:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BE644A5CD;
+	Mon,  9 Sep 2019 09:49:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KTq0TbPbpcud; Mon,  9 Sep 2019 09:49:05 -0400 (EDT)
+	with ESMTP id 7ivaqT8hMdI2; Mon,  9 Sep 2019 09:49:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17E6A4A5CE;
-	Mon,  9 Sep 2019 09:49:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB1A4A5E3;
+	Mon,  9 Sep 2019 09:49:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BA214A523
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 09:49:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A254A51D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 09:49:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zb+5x4wAmogx for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Sep 2019 09:49:02 -0400 (EDT)
+ with ESMTP id lYxsj5gp9fsP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Sep 2019 09:49:03 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD044A554
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 09:49:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4854A523
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 09:49:03 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04A201650;
- Mon,  9 Sep 2019 06:49:01 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C6971688;
+ Mon,  9 Sep 2019 06:49:03 -0700 (PDT)
 Received: from localhost.localdomain (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE2F13F59C;
- Mon,  9 Sep 2019 06:48:58 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 587723F59C;
+ Mon,  9 Sep 2019 06:49:01 -0700 (PDT)
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 04/17] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
- translation cache on specific commands
-Date: Mon,  9 Sep 2019 14:47:54 +0100
-Message-Id: <20190909134807.27978-5-maz@kernel.org>
+Subject: [PATCH 05/17] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
+ translation cache on disabling LPIs
+Date: Mon,  9 Sep 2019 14:47:55 +0100
+Message-Id: <20190909134807.27978-6-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190909134807.27978-1-maz@kernel.org>
 References: <20190909134807.27978-1-maz@kernel.org>
@@ -70,70 +70,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The LPI translation cache needs to be discarded when an ITS command
-may affect the translation of an LPI (DISCARD, MAPC and MAPD with V=0)
-or the routing of an LPI to a redistributor with disabled LPIs (MOVI,
-MOVALL).
-
-We decide to perform a full invalidation of the cache, irrespective
-of the LPI that is affected. Commands are supposed to be rare enough
-that it doesn't matter.
+If a vcpu disables LPIs at its redistributor level, we need to make sure
+we won't pend more interrupts. For this, we need to invalidate the LPI
+translation cache.
 
 Tested-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index cc6b5e49a312..09a179820816 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -722,6 +722,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
- 		 * don't bother here since we clear the ITTE anyway and the
- 		 * pending state is a property of the ITTE struct.
- 		 */
-+		vgic_its_invalidate_cache(kvm);
-+
- 		its_free_ite(kvm, ite);
- 		return 0;
- 	}
-@@ -757,6 +759,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
- 	ite->collection = collection;
- 	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index c45e2d7e942f..fdcfb7ae4491 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -192,8 +192,10 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
  
-+	vgic_its_invalidate_cache(kvm);
-+
- 	return update_affinity(ite->irq, vcpu);
- }
+ 	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
  
-@@ -985,6 +989,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
- 	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
- 		its_free_ite(kvm, ite);
+-	if (was_enabled && !vgic_cpu->lpis_enabled)
++	if (was_enabled && !vgic_cpu->lpis_enabled) {
+ 		vgic_flush_pending_lpis(vcpu);
++		vgic_its_invalidate_cache(vcpu->kvm);
++	}
  
-+	vgic_its_invalidate_cache(kvm);
-+
- 	list_del(&device->dev_list);
- 	kfree(device);
- }
-@@ -1090,6 +1096,7 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
- 
- 	if (!valid) {
- 		vgic_its_free_collection(its, coll_id);
-+		vgic_its_invalidate_cache(kvm);
- 	} else {
- 		collection = find_collection(its, coll_id);
- 
-@@ -1238,6 +1245,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 		vgic_put_irq(kvm, irq);
- 	}
- 
-+	vgic_its_invalidate_cache(kvm);
-+
- 	kfree(intids);
- 	return 0;
- }
+ 	if (!was_enabled && vgic_cpu->lpis_enabled)
+ 		vgic_enable_lpis(vcpu);
 -- 
 2.20.1
 
