@@ -2,59 +2,84 @@ Return-Path: <SRS0=3K2b=XE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C97C4740C
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 15:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0B4C4740C
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 15:56:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DE0762196E
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 15:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0762196E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AB58E20863
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Sep 2019 15:56:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IjGuVdyh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB58E20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C464A4F7;
-	Mon,  9 Sep 2019 11:16:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 093A14A528;
+	Mon,  9 Sep 2019 11:56:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yGptsfUlKajw; Mon,  9 Sep 2019 11:16:37 -0400 (EDT)
+	with ESMTP id 0ez5gXxb-aVN; Mon,  9 Sep 2019 11:56:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E9554A52D;
-	Mon,  9 Sep 2019 11:16:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C57704A531;
+	Mon,  9 Sep 2019 11:56:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BA7F4A52D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 11:16:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E21D64A52D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 11:56:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wBOv0Vfzpewt for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Sep 2019 11:16:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0AF34A4F7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 11:16:34 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A152169E;
- Mon,  9 Sep 2019 08:16:34 -0700 (PDT)
-Received: from localhost (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 978C43F59C;
- Mon,  9 Sep 2019 08:16:33 -0700 (PDT)
-Date: Mon, 9 Sep 2019 17:16:31 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: Allow user injection of external
- data aborts
-Message-ID: <20190909151631.GA26449@lvm>
+ with ESMTP id Yc3-2BUeaQ78 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Sep 2019 11:56:34 -0400 (EDT)
+Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com
+ [209.85.210.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA6714A521
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Sep 2019 11:56:34 -0400 (EDT)
+Received: by mail-ot1-f65.google.com with SMTP id 67so12923755oto.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Sep 2019 08:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kQKpAgCR0aWCUsHchRbJumhQq4BDu43empvLhB4T6fI=;
+ b=IjGuVdyhihsn0b2oYLNf4y7K69+X5aGEmAFSdm+1q0Kll52046kdiPV2LPXnxRzqTk
+ foFxeVH98++bVgffBOr5uA0D8e72l42msAAIgxqS250eBsUVorYHMEiCb5QbU7KhvetI
+ CIoYbFPIZVSUAdWVOSO4QJKBdRNBCOMG37mqOCKwdYP7ujjVSP2XNi/wftjSqM46UKsF
+ PcHNNrEbbA2V+dozh6tkDwaB3/vc2yK1mFnvw5MQAmJf14oKrmatelLOZFDK/ihq5ilB
+ w5cI5ClKRiFHrc+O95zu9WVvBymSNNT/jZaMHVC6dNkeDRahg6RN0fM7/nd7UOxdpTVH
+ hj5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kQKpAgCR0aWCUsHchRbJumhQq4BDu43empvLhB4T6fI=;
+ b=oWaYfEA389DbgBtx3BP+EnpqvkiDNwrmQTZmyEImfYqvXKdBTo5lwZfTI7om5qd9Dm
+ YbrpdfH1kMPiaF1z4Qh3qMDfcJOnBMfXyfXPpmv8tziB23JoJy7ruxVPy/095ST+mm7o
+ 6ptYLClLfTFPFRhh1oPedi/+WVDFbOlKvK9ChiURE5frbHbdUKL+Opvu3L5uoircc6lV
+ 8JOh9p6VAICG81bU1cLOt//JAXDE2ri2dW5QH/BEaCPwk8vMPymAdPutX860c0qzeNno
+ xlbQ5Z5JOtrLLrl9rLsjCWt+Y4T170hX5508/eU8bEJ7vGNilfafEd6/1TwuqtrKQQs4
+ LWtw==
+X-Gm-Message-State: APjAAAXkJitrAIufimBOl7URIWFBrRqCML1Z5bu+qOOEWfU3X9dKK2/r
+ +FTptT7MXbkkFmlM4xpiua7Ciyd5/8SFtOEqeDIQBw==
+X-Google-Smtp-Source: APXvYqzbc9c18AQCh76zKydtjHclhprX3nwiBJCVCBrHjfBy36NDDmORyT9T+dl4742NmvQzsZpn5WqNHStM991/rRg=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr20660650oti.135.1568044594249; 
+ Mon, 09 Sep 2019 08:56:34 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190909121337.27287-1-christoffer.dall@arm.com>
  <20190909121337.27287-3-christoffer.dall@arm.com>
  <CAFEAcA8WcQNJV27q5WJ-SMhOyjFZyh1Pz7H7duK6zW1wiAvqKQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8WcQNJV27q5WJ-SMhOyjFZyh1Pz7H7duK6zW1wiAvqKQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ <20190909151631.GA26449@lvm>
+In-Reply-To: <20190909151631.GA26449@lvm>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Sep 2019 16:56:23 +0100
+Message-ID: <CAFEAcA-F3YLEQgKAvfbyGGYdzs_wYPz+QMuxk4qZd_oeU-_PBA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: arm/arm64: Allow user injection of external data
+ aborts
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Marc Zyngier <maz@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
  Heinrich Schuchardt <xypron.glpk@gmx.de>, kvmarm@lists.cs.columbia.edu,
  arm-mail-list <linux-arm-kernel@lists.infradead.org>
@@ -74,124 +99,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 09, 2019 at 01:32:46PM +0100, Peter Maydell wrote:
-> On Mon, 9 Sep 2019 at 13:13, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> >
-> > In some scenarios, such as buggy guest or incorrect configuration of the
-> > VMM and firmware description data, userspace will detect a memory access
-> > to a portion of the IPA, which is not mapped to any MMIO region.
-> >
-> > For this purpose, the appropriate action is to inject an external abort
-> > to the guest.  The kernel already has functionality to inject an
-> > external abort, but we need to wire up a signal from user space that
-> > lets user space tell the kernel to do this.
-> >
-> > It turns out, we already have the set event functionality which we can
-> > perfectly reuse for this.
-> >
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  Documentation/virt/kvm/api.txt    | 15 ++++++++++++++-
-> >  arch/arm/include/uapi/asm/kvm.h   |  3 ++-
-> >  arch/arm/kvm/guest.c              |  3 +++
-> >  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
-> >  arch/arm64/kvm/guest.c            |  3 +++
-> >  arch/arm64/kvm/inject_fault.c     |  4 ++--
-> >  include/uapi/linux/kvm.h          |  1 +
-> >  virt/kvm/arm/arm.c                |  1 +
-> >  8 files changed, 28 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> > index 02501333f746..edd6cdc470ca 100644
-> > --- a/Documentation/virt/kvm/api.txt
-> > +++ b/Documentation/virt/kvm/api.txt
-> > @@ -955,6 +955,8 @@ The following bits are defined in the flags field:
-> >
-> >  ARM/ARM64:
-> >
-> > +User space may need to inject several types of events to the guest.
-> > +
-> >  If the guest accesses a device that is being emulated by the host kernel in
-> >  such a way that a real device would generate a physical SError, KVM may make
-> >  a virtual SError pending for that VCPU. This system error interrupt remains
-> > @@ -989,12 +991,23 @@ Specifying exception.has_esr on a system that does not support it will return
-> >  -EINVAL. Setting anything other than the lower 24bits of exception.serror_esr
-> >  will return -EINVAL.
-> >
-> > +If the guest performed an access to I/O memory which could not be handled by
-> > +user space, for example because of missing instruction syndrome decode
-> > +information or because there is no device mapped at the accessed IPA, then
-> > +user space can ask the kernel to inject an external abort using the address
-> > +from the exiting fault on the VCPU. It is a programming error to set
-> > +ext_dabt_pending at the same time as any of the serror fields, or to set
-> > +ext_dabt_pending on an exit which was not either KVM_EXIT_MMIO or
-> > +KVM_EXIT_ARM_NISV. This feature is only available if the system supports
-> > +KVM_CAP_ARM_INJECT_EXT_DABT;
-> > +
-> >  struct kvm_vcpu_events {
-> >         struct {
-> >                 __u8 serror_pending;
-> >                 __u8 serror_has_esr;
-> > +               __u8 ext_dabt_pending;
-> >                 /* Align it to 8 bytes */
-> > -               __u8 pad[6];
-> > +               __u8 pad[5];
-> >                 __u64 serror_esr;
-> >         } exception;
-> >         __u32 reserved[12];
-> 
-> This API seems to be missing support for userspace to specify
-> whether the ESR_ELx for the guest should have the EA bit set
-> (and more generally other syndrome/fault status bits). I think
-> if we have an API for "KVM_EXIT_MMIO but the access failed"
-> then it should either (a) be architecture agnostic, since
-> pretty much any architecture might have a concept of "access
-> gave some bus-error-type failure" and it would be nice if userspace
-> didn't have to special case them all in arch-specific code,
-> or (b) have the same flexibility for specifying exactly what
-> kind of fault as the architecture does. This sort of seems to
-> fall between two stools. (My ideal for KVM_EXIT_MMIO faults
-> would be a generic API which included space for optional
-> arch-specific info, which for Arm would pretty much just be
-> the EA bit.)
+On Mon, 9 Sep 2019 at 16:16, Christoffer Dall <christoffer.dall@arm.com> wrote:
+>
+> On Mon, Sep 09, 2019 at 01:32:46PM +0100, Peter Maydell wrote:
+> > This API seems to be missing support for userspace to specify
+> > whether the ESR_ELx for the guest should have the EA bit set
+> > (and more generally other syndrome/fault status bits). I think
+> > if we have an API for "KVM_EXIT_MMIO but the access failed"
+> > then it should either (a) be architecture agnostic, since
+> > pretty much any architecture might have a concept of "access
+> > gave some bus-error-type failure" and it would be nice if userspace
+> > didn't have to special case them all in arch-specific code,
+> > or (b) have the same flexibility for specifying exactly what
+> > kind of fault as the architecture does. This sort of seems to
+> > fall between two stools. (My ideal for KVM_EXIT_MMIO faults
+> > would be a generic API which included space for optional
+> > arch-specific info, which for Arm would pretty much just be
+> > the EA bit.)
+>
+> I'm not sure I understand exactly what would be improved by making this
+> either more architecture speific or more architecture generic.  The
+> EA bit will always be set, that's why the field is called
+> 'ext_dabt_pending'.
 
-I'm not sure I understand exactly what would be improved by making this
-either more architecture speific or more architecture generic.  The
-EA bit will always be set, that's why the field is called
-'ext_dabt_pending'.
+ESR_EL1.EA doesn't mean "this is an external abort". It means
+"given that this is an external abort as indicated by ESR_EL1.DFSC,
+specify the external abort type". Traditionally this is 0 for
+an AXI bus Decode error ("interconnect says there's nothing there")
+and 1 for a Slave error ("there's something there but it told us
+to go away"), though architecturally it's specified as impdef
+because not everybody uses AXI. In QEMU we track the difference
+between these two things and for TCG will raise external aborts
+with the correct EA bit value.
 
-I thought as per the previous discussion, that we were specifically
-trying to avoid userspace emulating the exception in detail, so I
-designed this to provide the minimal effort API for userspace.
+> I thought as per the previous discussion, that we were specifically
+> trying to avoid userspace emulating the exception in detail, so I
+> designed this to provide the minimal effort API for userspace.
+>
+> Since we already have an architecture specific ioctl, kvm_vcpu_events, I
+> don't think we're painting ourselves into a corner by using that.  Is a
+> natural consequence of what you're saying not that we should try to make
+> that whole call architecture generic?
+>
+> Unless we already have specific examples of how other architectures
+> would want to use something like this, and given the impact of this
+> patch, I'm not sure it's worth trying to speculate about that.
 
-Since we already have an architecture specific ioctl, kvm_vcpu_events, I
-don't think we're painting ourselves into a corner by using that.  Is a
-natural consequence of what you're saying not that we should try to make
-that whole call architecture generic?
+In QEMU, use of a generic API would look something like
+this in kvm-all.c:
 
-Unless we already have specific examples of how other architectures
-would want to use something like this, and given the impact of this
-patch, I'm not sure it's worth trying to speculate about that.
+        case KVM_EXIT_MMIO:
+            DPRINTF("handle_mmio\n");
+            /* Called outside BQL */
+            MemTxResult res;
 
-> 
-> As and when we support nested virtualization, any suggestions
-> on how this API would extend to support userspace saying
-> "deliver fault to guest EL1" vs "deliver fault to guest EL2" ?
-> 
+            res = address_space_rw(&address_space_memory,
+                                   run->mmio.phys_addr, attrs,
+                                   run->mmio.data,
+                                   run->mmio.len,
+                                   run->mmio.is_write);
+            if (res != MEMTX_OK) {
+                /* tell the kernel the access failed, eg
+                 * by updating the kvm_run struct to say so
+                 */
+            } else {
+                /* access passed, we have updated the kvm_run
+                 * struct's mmio subfield, proceed as usual
+                 */
+            }
+            ret = 0;
+            break;
 
-If we took one of the supported exits from a VM with nested virt
-support, it means that you either had a fault from the guest hypervisor,
-or a fault from a nested guest where the guest hypervisor has set up a
-virtual stage 2 mapping to a hole in the VM's IPA space.  In the former
-case, the exception would be delivered back to guest hypervisor, and in
-the latter case the target depends on the guest hypervisor's
-configuration of the virtual HCR_EL2(.TEA), which the kernel should
-respect when handling the KVM_SET_VCPU_EVENTS ioctl.
+[this is exactly the current QEMU code except that today
+we throw away the 'res' that tells us if the transaction
+succeeded because we have no way to report it to KVM and
+effectively always RAZ/WI the access.]
 
+This is nice because you don't need anything here that has to do
+"bail out to architecture specific handling of anything",
+you just say "nope, the access failed", and let the kernel handle
+that however the CPU would handle it. It just immediately works
+for all architectures on the userspace side (assuming the kernel
+defaults to not actually trying to report an abort to the guest
+if nobody's implemented that on the kernel side, which is exactly
+what happens today where there's no way to report the error for
+any architecture).
+The downside is that you lose the ability to be more specific about
+architecture-specific fine distinctions like decode errors vs slave
+errors, though.
 
-Thanks,
+Or you could have an arm-specific API that does care about
+fine details like the EA bit (and maybe also other ESR_ELx
+fields); that has the downside that userspace needs to
+make the handling of error returns from "handle this MMIO
+access" architecture specific, but you get architecture-specific
+benefits as a result. (Preferably the architecture-specific
+APIs should at least be basically the same, eg same ioctl
+or same bit of the kvm_run struct being updated with some parts
+being arch-specific data, rather than 3 different mechanisms.)
 
-    Christoffer
+Having an API that is architecture specific but doesn't actually
+let you define any of the architecture-specific aspects of
+what the abort might imply seems like the worst of both worlds.
+If all we can say is "this aborted" then we might as well have
+the API be generic.
+
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
