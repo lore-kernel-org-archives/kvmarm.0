@@ -2,88 +2,110 @@ Return-Path: <SRS0=7IkQ=XF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA53C49ED9
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Sep 2019 17:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED90C49ED7
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Sep 2019 18:15:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BC8D2089F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Sep 2019 17:09:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC8D2089F
+	by mail.kernel.org (Postfix) with ESMTP id AA26321019
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Sep 2019 18:15:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA26321019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B6614A599;
-	Tue, 10 Sep 2019 13:09:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C6D24A52D;
+	Tue, 10 Sep 2019 14:15:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DvjhbdiuklOC; Tue, 10 Sep 2019 13:09:27 -0400 (EDT)
+	with ESMTP id RTInu4G3wZy0; Tue, 10 Sep 2019 14:15:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B99E4A5E3;
-	Tue, 10 Sep 2019 13:09:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CB74A52C;
+	Tue, 10 Sep 2019 14:15:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAA954A5E0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 13:09:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 828864A52C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 14:15:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CLKVrxleu9zm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Sep 2019 13:09:24 -0400 (EDT)
+ with ESMTP id xgf4kEp4Rv0L for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Sep 2019 14:15:23 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A98CC4A599
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 13:09:24 -0400 (EDT)
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 872714A49F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 14:15:23 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC27DC015C30
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 17:09:23 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f10so121058wmh.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 10:09:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=N6OgVWm3LipI6S2dhNRtI34S9LNNCSkrvYxcJwqfZsI=;
- b=CXlvqFMqSIjWqFdRIJJ9I3UwGVJxHZq2/K8PHZKQv0IV0/jajnxyvM5gxqv0OcvW8c
- dIHY0+HW7FOOVmI9bXCqlPOMErNrZqCZigrS2yDX8ZDcMRs2YRDFQA+pBppz1rWT5eeL
- ngplQj0L3vzaFkIMCpLCPfpl1heWGO2HFCaM5CxBHcP0PhSKvmU/u2faFaKBm93zopjj
- 7U7dNT2HuTnjc5eN6Ufx2pZPNvBEd0hsxaeWrX9TLpT8EE4tVQ5JLtpIyCM+LJfKQKXZ
- nfpNwj3BnH6DFxffevkKWjUw3mkIGewcdNmbVp4teA7fTEmp3DGja9d8FrsKY0TleOMp
- wAaQ==
-X-Gm-Message-State: APjAAAVrkUPrP+Yy8nYjaQQlnE85TJtTUaIfypMmdPc9+Dt9v7g9egcF
- OmxD0DSu7FSm2n1Ci+Nqpdd7mjqW6R7j8uiRpLQ0ViOWU1IEqwmzsmlrGKKi/dnYny9hPMj3ejf
- CJvE82hBKeyRsLgsSnxRC95OI
-X-Received: by 2002:a7b:c922:: with SMTP id h2mr436532wml.63.1568135362534;
- Tue, 10 Sep 2019 10:09:22 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxYTqc0EPZJui9RRlRkbko3iJmJuc0qI4AmciigJIrk+NreoBnAJ7W6d/VwZU9kBdxQPOnWqg==
-X-Received: by 2002:a7b:c922:: with SMTP id h2mr436510wml.63.1568135362307;
- Tue, 10 Sep 2019 10:09:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1435:25df:c911:3338?
- ([2001:b07:6468:f312:1435:25df:c911:3338])
- by smtp.gmail.com with ESMTPSA id q25sm383779wmq.27.2019.09.10.10.09.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Sep 2019 10:09:21 -0700 (PDT)
-Subject: Re: [PATCH 00/17] KVM/arm updates for 5.4
-To: Marc Zyngier <maz@kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>
-References: <20190909134807.27978-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A254C300413C;
+ Tue, 10 Sep 2019 18:15:22 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-98.ams2.redhat.com [10.36.117.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D92416012C;
+ Tue, 10 Sep 2019 18:15:20 +0000 (UTC)
+Subject: Re: [PATCH kvm-unit-tests] arm: prevent compiler from using unaligned
+ accesses
+To: Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>
+References: <20190905171502.215183-1-andre.przywara@arm.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <3d822288-2517-0667-dfad-45f77a918738@redhat.com>
-Date: Tue, 10 Sep 2019 19:09:21 +0200
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <d41649bc-5061-3c65-146c-d7dff3f086e7@redhat.com>
+Date: Tue, 10 Sep 2019 20:15:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190909134807.27978-1-maz@kernel.org>
+In-Reply-To: <20190905171502.215183-1-andre.przywara@arm.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 18:15:22 +0000 (UTC)
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,12 +122,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/09/19 15:47, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.4
+On 05/09/2019 19.15, Andre Przywara wrote:
+> The ARM architecture requires all accesses to device memory to be
+> naturally aligned[1][2]. Normal memory does not have this strict
+> requirement, and in fact many systems do ignore unaligned accesses
+> (by the means of clearing the A bit in SCTLR and accessing normal
+> memory). So the default behaviour of GCC assumes that unaligned accesses
+> are fine, at least if happening on the stack.
+> 
+> Now kvm-unit-tests runs some C code with the MMU off, which degrades the
+> whole system memory to device memory. Now every unaligned access will
+> fault, regardless of the A bit.
+> In fact there is at least one place in lib/printf.c where GCC merges
+> two consecutive char* accesses into one "strh" instruction, writing to
+> a potentially unaligned address.
+> This can be reproduced by configuring kvm-unit-tests for kvmtool, but
+> running it on QEMU, which triggers an early printf that exercises this
+> particular code path.
+> 
+> Add the -mstrict-align compiler option to the arm64 CFLAGS to fix this
+> problem. Also add the respective -mno-unaligned-access flag for arm.
+> 
+> Thanks to Alexandru for helping debugging this.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> 
+> [1] ARMv8 ARM DDI 0487E.a, B2.5.2
+> [2] ARMv7 ARM DDI 0406C.d, A3.2.1
+> ---
+>  arm/Makefile.arm   | 1 +
+>  arm/Makefile.arm64 | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+> index a625267..43b4be1 100644
+> --- a/arm/Makefile.arm
+> +++ b/arm/Makefile.arm
+> @@ -12,6 +12,7 @@ KEEP_FRAME_POINTER := y
+>  
+>  CFLAGS += $(machine)
+>  CFLAGS += -mcpu=$(PROCESSOR)
+> +CFLAGS += -mno-unaligned-access
+>  
+>  arch_LDFLAGS = -Ttext=40010000
+>  
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 02c24e8..35de5ea 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -7,6 +7,7 @@ bits = 64
+>  ldarch = elf64-littleaarch64
+>  
+>  arch_LDFLAGS = -pie -n
+> +CFLAGS += -mstrict-align
 
-Pulled, thanks.
+Instead of adding it to both, Makefile.arm and Makefile.arm64, you could
+also simply add it to Makefile.common instead.
 
-Paolo
+ Thomas
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
