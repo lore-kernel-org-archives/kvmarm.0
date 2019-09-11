@@ -2,81 +2,61 @@ Return-Path: <SRS0=E7bu=XG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9361C4740A
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 04:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41096ECDE27
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:16:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A43F21A4C
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 04:27:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="Hs+rUzHv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A43F21A4C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=socionext.com
+	by mail.kernel.org (Postfix) with ESMTP id BEC6C2085B
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC6C2085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7F384A5F0;
-	Wed, 11 Sep 2019 00:27:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 253E74A5DC;
+	Wed, 11 Sep 2019 04:16:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@nifty.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fUG04VdQ8Pn3; Wed, 11 Sep 2019 00:27:44 -0400 (EDT)
+	with ESMTP id FcBcA6VkREz5; Wed, 11 Sep 2019 04:16:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F1C4A5E5;
-	Wed, 11 Sep 2019 00:27:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E00034A5DD;
+	Wed, 11 Sep 2019 04:16:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 428384A529
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 00:27:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B31AA4A522
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:16:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SGaNKHPNJjyw for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Sep 2019 00:27:41 -0400 (EDT)
-Received: from conssluserg-06.nifty.com (conssluserg-06.nifty.com
- [210.131.2.91])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B0F94A500
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 00:27:41 -0400 (EDT)
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com
- [209.85.221.171]) (authenticated)
- by conssluserg-06.nifty.com with ESMTP id x8B4RYcV023396
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 13:27:35 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com x8B4RYcV023396
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
- s=dec2015msa; t=1568176055;
- bh=2bJShX4Ff3PHK48gMEQzP3cEPpqbzfOY7VjrtVo5UdE=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=Hs+rUzHvcvyixmd4WHBymTPg9eM8TpjwUJ4vFyDVkUagWGjFfo6xJO3TNLLOECcA2
- 8TH0W6loMI2+LzBH7C605ynFFMC2F2gI45BKaNhtOz/7LWgN539M79Ztbbz5plvDXf
- DbnWn24NDIR08VdXE8cd5pIKq6i+vo3K+UtJf2lyAwYHMJBKywvf9pwVhdzzp55reQ
- rv9WMwPpA4rIDguE1ZVDSINae+++fzo7xyd27gWzOy567gshnqNw2YNmRs7n5HUplr
- H1XLV9mI+WxV2Y6wMgheXjKbwJJZ9PP9Y2XfP8D+mw2ltPYiB6MuZBH5ozMyqMPTLa
- G4cuVSLNech7w==
-X-Nifty-SrcIP: [209.85.221.171]
-Received: by mail-vk1-f171.google.com with SMTP id b25so4066096vkk.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 21:27:35 -0700 (PDT)
-X-Gm-Message-State: APjAAAWWSEfXhLF0le3mwj6Z11ovfgPePeIf2r8y37X90q0rYAioLl4I
- 4u92WPVFU8b1kcFmdgOVdvoXwEsO9GbOnmJvO5E=
-X-Google-Smtp-Source: APXvYqxcC7v9qXKkiFdYOioajynW6ENkts6eVJhzv73g0b3GlVu6ohGHdS3vnp8EInycfekShhmHhrgynXloMMplkJc=
-X-Received: by 2002:a1f:2343:: with SMTP id j64mr12520866vkj.84.1568176054022; 
- Tue, 10 Sep 2019 21:27:34 -0700 (PDT)
+ with ESMTP id 0rAfH++wsV3g for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Sep 2019 04:16:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6918F4A445
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:16:09 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D13EF1000;
+ Wed, 11 Sep 2019 01:16:08 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E57173F67D;
+ Wed, 11 Sep 2019 01:16:07 -0700 (PDT)
+Date: Wed, 11 Sep 2019 09:16:04 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests] arm: prevent compiler from using
+ unaligned accesses
+Message-ID: <20190911091604.380c6df9@donnerap.cambridge.arm.com>
+In-Reply-To: <d41649bc-5061-3c65-146c-d7dff3f086e7@redhat.com>
+References: <20190905171502.215183-1-andre.przywara@arm.com>
+ <d41649bc-5061-3c65-146c-d7dff3f086e7@redhat.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-References: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
- <1568169216-12632-2-git-send-email-yuzenghui@huawei.com>
-In-Reply-To: <1568169216-12632-2-git-send-email-yuzenghui@huawei.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 11 Sep 2019 13:26:58 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARPo6VgzXn5kfrL7MWRtBoNf83yCM0r8jZ0iURU_to_BA@mail.gmail.com>
-Message-ID: <CAK7LNARPo6VgzXn5kfrL7MWRtBoNf83yCM0r8jZ0iURU_to_BA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Use the appropriate
- TRACE_INCLUDE_PATH
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: maz@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,51 +73,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 11, 2019 at 11:35 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->
-> Commit 49dfe94fe5ad ("KVM: arm/arm64: Fix TRACE_INCLUDE_PATH") fixes
-> TRACE_INCLUDE_PATH to the correct relative path to the define_trace.h
-> and explains why did the old one work.
->
-> The same fix should be applied to virt/kvm/arm/vgic/trace.h.
->
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+On Tue, 10 Sep 2019 20:15:19 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Please feel free to replace the Cc: with my:
+Hi,
 
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> On 05/09/2019 19.15, Andre Przywara wrote:
+> > The ARM architecture requires all accesses to device memory to be
+> > naturally aligned[1][2]. Normal memory does not have this strict
+> > requirement, and in fact many systems do ignore unaligned accesses
+> > (by the means of clearing the A bit in SCTLR and accessing normal
+> > memory). So the default behaviour of GCC assumes that unaligned accesses
+> > are fine, at least if happening on the stack.
+> > 
+> > Now kvm-unit-tests runs some C code with the MMU off, which degrades the
+> > whole system memory to device memory. Now every unaligned access will
+> > fault, regardless of the A bit.
+> > In fact there is at least one place in lib/printf.c where GCC merges
+> > two consecutive char* accesses into one "strh" instruction, writing to
+> > a potentially unaligned address.
+> > This can be reproduced by configuring kvm-unit-tests for kvmtool, but
+> > running it on QEMU, which triggers an early printf that exercises this
+> > particular code path.
+> > 
+> > Add the -mstrict-align compiler option to the arm64 CFLAGS to fix this
+> > problem. Also add the respective -mno-unaligned-access flag for arm.
+> > 
+> > Thanks to Alexandru for helping debugging this.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > 
+> > [1] ARMv8 ARM DDI 0487E.a, B2.5.2
+> > [2] ARMv7 ARM DDI 0406C.d, A3.2.1
+> > ---
+> >  arm/Makefile.arm   | 1 +
+> >  arm/Makefile.arm64 | 1 +
+> >  2 files changed, 2 insertions(+)
+> > 
+> > diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+> > index a625267..43b4be1 100644
+> > --- a/arm/Makefile.arm
+> > +++ b/arm/Makefile.arm
+> > @@ -12,6 +12,7 @@ KEEP_FRAME_POINTER := y
+> >  
+> >  CFLAGS += $(machine)
+> >  CFLAGS += -mcpu=$(PROCESSOR)
+> > +CFLAGS += -mno-unaligned-access
+> >  
+> >  arch_LDFLAGS = -Ttext=40010000
+> >  
+> > diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> > index 02c24e8..35de5ea 100644
+> > --- a/arm/Makefile.arm64
+> > +++ b/arm/Makefile.arm64
+> > @@ -7,6 +7,7 @@ bits = 64
+> >  ldarch = elf64-littleaarch64
+> >  
+> >  arch_LDFLAGS = -pie -n
+> > +CFLAGS += -mstrict-align  
+> 
+> Instead of adding it to both, Makefile.arm and Makefile.arm64, you could
+> also simply add it to Makefile.common instead.
 
+But the arguments are not the same (admittedly against intuition)?
+I thought about defining arch_CFLAGS in both files, then adding that to Makefile.common, but didn't see the advantage over this straightforward approach here.
 
-Thanks.
-
-
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  virt/kvm/arm/vgic/trace.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
-> index 55fed77a9f73..4fd4f6db181b 100644
-> --- a/virt/kvm/arm/vgic/trace.h
-> +++ b/virt/kvm/arm/vgic/trace.h
-> @@ -30,7 +30,7 @@ TRACE_EVENT(vgic_update_irq_pending,
->  #endif /* _TRACE_VGIC_H */
->
->  #undef TRACE_INCLUDE_PATH
-> -#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm/vgic
-> +#define TRACE_INCLUDE_PATH ../../virt/kvm/arm/vgic
->  #undef TRACE_INCLUDE_FILE
->  #define TRACE_INCLUDE_FILE trace
->
-> --
-> 2.19.1
->
->
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Andre.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
