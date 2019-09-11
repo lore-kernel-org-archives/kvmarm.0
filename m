@@ -2,59 +2,61 @@ Return-Path: <SRS0=E7bu=XG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5B8ECDE28
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0165EECDE27
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 09:21:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B46E6206CD
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:31:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B46E6206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8A5032089F
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 09:21:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A5032089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3034D4A5F0;
-	Wed, 11 Sep 2019 04:31:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5E04A5AC;
+	Wed, 11 Sep 2019 05:21:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pt2jlu-drKxO; Wed, 11 Sep 2019 04:31:31 -0400 (EDT)
+	with ESMTP id R3JgiNXUYwvB; Wed, 11 Sep 2019 05:21:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C244A5DD;
-	Wed, 11 Sep 2019 04:31:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7E294A5BF;
+	Wed, 11 Sep 2019 05:21:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7EB74A5DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:31:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BEE44A5A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 05:21:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rqO4A5nGK3eA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Sep 2019 04:31:28 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C17FD4A5DC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:31:28 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E3E21000;
- Wed, 11 Sep 2019 01:31:28 -0700 (PDT)
-Received: from big-swifty.misterjones.org (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E8103F67D;
- Wed, 11 Sep 2019 01:31:25 -0700 (PDT)
-Date: Wed, 11 Sep 2019 09:31:24 +0100
-Message-ID: <86h85js083.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id v2iEj8AO1LAK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Sep 2019 05:21:25 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D503B4A524
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 05:21:24 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E6267DBB613FD0A61D59;
+ Wed, 11 Sep 2019 17:21:21 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Wed, 11 Sep 2019
+ 17:21:13 +0800
 Subject: Re: [PATCH 2/2] KVM: arm/arm64: Print the EC hex value with its exact
  width
-In-Reply-To: <1568169216-12632-3-git-send-email-yuzenghui@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
  <1568169216-12632-3-git-send-email-yuzenghui@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-Organization: Approximate
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+ <86h85js083.wl-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <e013e828-5e61-8c07-510f-6cb4c59367cf@huawei.com>
+Date: Wed, 11 Sep 2019 17:19:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
+MIME-Version: 1.0
+In-Reply-To: <86h85js083.wl-maz@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -68,49 +70,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 11 Sep 2019 03:33:36 +0100,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> EC is the bits [31:26] of ESR_ELx on arm64 (HSR on arm). Print the
-> hex value with its exact width (8).
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  virt/kvm/arm/trace.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-> index 204d210d01c2..022b0a060034 100644
-> --- a/virt/kvm/arm/trace.h
-> +++ b/virt/kvm/arm/trace.h
-> @@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
->  		__entry->vcpu_pc		= vcpu_pc;
->  	),
->  
-> -	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
-> +	TP_printk("%s: HSR_EC: 0x%02x (%s), PC: 0x%08lx",
->  		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
->  		  __entry->esr_ec,
->  		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
+Hi Marc,
 
-Although you're right that 8 bits ought to be enough, this is a change
-to the output of the tracepoint, which userspace could (does?) parse.
-I'm thus reluctant to change anything there, knowing that we don't
-lose any information, and just print two extra zeroes.
+On 2019/9/11 16:31, Marc Zyngier wrote:
+> On Wed, 11 Sep 2019 03:33:36 +0100,
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>
+>> EC is the bits [31:26] of ESR_ELx on arm64 (HSR on arm). Print the
+>> hex value with its exact width (8).
+>>
+>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>> ---
+>>   virt/kvm/arm/trace.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+>> index 204d210d01c2..022b0a060034 100644
+>> --- a/virt/kvm/arm/trace.h
+>> +++ b/virt/kvm/arm/trace.h
+>> @@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
+>>   		__entry->vcpu_pc		= vcpu_pc;
+>>   	),
+>>   
+>> -	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
+>> +	TP_printk("%s: HSR_EC: 0x%02x (%s), PC: 0x%08lx",
+>>   		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
+>>   		  __entry->esr_ec,
+>>   		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
+> 
+> Although you're right that 8 bits ought to be enough, this is a change
+> to the output of the tracepoint, which userspace could (does?) parse.
 
-Am I missing anything?
+Well-written userspace tools should only parse the low 8 bits (if they
+do parse). But even if the high bits are parsed, they're always 0.
+So I don't think this change will have a bad impact on userspace.
+
+> I'm thus reluctant to change anything there, knowing that we don't
+> lose any information, and just print two extra zeroes.
+
+Anyway this is not a fix, feel free to ignore it if you're worried about
+that there might be some issues ;)
+
+> Am I missing anything?
+
+No.
+
 
 Thanks,
+zenghui
 
-	M.
-
--- 
-Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
