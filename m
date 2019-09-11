@@ -2,110 +2,61 @@ Return-Path: <SRS0=E7bu=XG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C30ECDE27
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5B8ECDE28
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:31:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA36E2085B
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:24:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA36E2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id B46E6206CD
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 08:31:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B46E6206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 584DA4A5F3;
-	Wed, 11 Sep 2019 04:24:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3034D4A5F0;
+	Wed, 11 Sep 2019 04:31:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bLl+wbX9MGIV; Wed, 11 Sep 2019 04:24:10 -0400 (EDT)
+	with ESMTP id pt2jlu-drKxO; Wed, 11 Sep 2019 04:31:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F2804A5DD;
-	Wed, 11 Sep 2019 04:24:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C244A5DD;
+	Wed, 11 Sep 2019 04:31:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7EC4A5DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:24:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7EB74A5DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:31:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id igDwh0j+LQra for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Sep 2019 04:24:08 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4A514A5DC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:24:07 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 34C76302C086;
- Wed, 11 Sep 2019 08:24:07 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-192.ams2.redhat.com [10.36.116.192])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A3561001944;
- Wed, 11 Sep 2019 08:24:05 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests] arm: prevent compiler from using unaligned
- accesses
-To: Andre Przywara <andre.przywara@arm.com>, Andrew Jones <drjones@redhat.com>
-References: <20190905171502.215183-1-andre.przywara@arm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <31cf01a6-6c0c-6857-7b43-cb26cd151c63@redhat.com>
-Date: Wed, 11 Sep 2019 10:24:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190905171502.215183-1-andre.przywara@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 11 Sep 2019 08:24:07 +0000 (UTC)
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+ with ESMTP id rqO4A5nGK3eA for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Sep 2019 04:31:28 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C17FD4A5DC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 04:31:28 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E3E21000;
+ Wed, 11 Sep 2019 01:31:28 -0700 (PDT)
+Received: from big-swifty.misterjones.org (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E8103F67D;
+ Wed, 11 Sep 2019 01:31:25 -0700 (PDT)
+Date: Wed, 11 Sep 2019 09:31:24 +0100
+Message-ID: <86h85js083.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm/arm64: Print the EC hex value with its exact
+ width
+In-Reply-To: <1568169216-12632-3-git-send-email-yuzenghui@huawei.com>
+References: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
+ <1568169216-12632-3-git-send-email-yuzenghui@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: Approximate
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,66 +73,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 05/09/2019 19.15, Andre Przywara wrote:
-> The ARM architecture requires all accesses to device memory to be
-> naturally aligned[1][2]. Normal memory does not have this strict
-> requirement, and in fact many systems do ignore unaligned accesses
-> (by the means of clearing the A bit in SCTLR and accessing normal
-> memory). So the default behaviour of GCC assumes that unaligned accesses
-> are fine, at least if happening on the stack.
+On Wed, 11 Sep 2019 03:33:36 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Now kvm-unit-tests runs some C code with the MMU off, which degrades the
-> whole system memory to device memory. Now every unaligned access will
-> fault, regardless of the A bit.
-> In fact there is at least one place in lib/printf.c where GCC merges
-> two consecutive char* accesses into one "strh" instruction, writing to
-> a potentially unaligned address.
-> This can be reproduced by configuring kvm-unit-tests for kvmtool, but
-> running it on QEMU, which triggers an early printf that exercises this
-> particular code path.
+> EC is the bits [31:26] of ESR_ELx on arm64 (HSR on arm). Print the
+> hex value with its exact width (8).
 > 
-> Add the -mstrict-align compiler option to the arm64 CFLAGS to fix this
-> problem. Also add the respective -mno-unaligned-access flag for arm.
-> 
-> Thanks to Alexandru for helping debugging this.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> 
-> [1] ARMv8 ARM DDI 0487E.a, B2.5.2
-> [2] ARMv7 ARM DDI 0406C.d, A3.2.1
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 > ---
->  arm/Makefile.arm   | 1 +
->  arm/Makefile.arm64 | 1 +
->  2 files changed, 2 insertions(+)
+>  virt/kvm/arm/trace.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> index a625267..43b4be1 100644
-> --- a/arm/Makefile.arm
-> +++ b/arm/Makefile.arm
-> @@ -12,6 +12,7 @@ KEEP_FRAME_POINTER := y
+> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+> index 204d210d01c2..022b0a060034 100644
+> --- a/virt/kvm/arm/trace.h
+> +++ b/virt/kvm/arm/trace.h
+> @@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
+>  		__entry->vcpu_pc		= vcpu_pc;
+>  	),
 >  
->  CFLAGS += $(machine)
->  CFLAGS += -mcpu=$(PROCESSOR)
-> +CFLAGS += -mno-unaligned-access
->  
->  arch_LDFLAGS = -Ttext=40010000
->  
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 02c24e8..35de5ea 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -7,6 +7,7 @@ bits = 64
->  ldarch = elf64-littleaarch64
->  
->  arch_LDFLAGS = -pie -n
-> +CFLAGS += -mstrict-align
->  
->  define arch_elf_check =
->  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
-> 
+> -	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
+> +	TP_printk("%s: HSR_EC: 0x%02x (%s), PC: 0x%08lx",
+>  		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
+>  		  __entry->esr_ec,
+>  		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
 
-FWIW (after finally reading the patch properly ;-)) :
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Although you're right that 8 bits ought to be enough, this is a change
+to the output of the tracepoint, which userspace could (does?) parse.
+I'm thus reluctant to change anything there, knowing that we don't
+lose any information, and just print two extra zeroes.
+
+Am I missing anything?
+
+Thanks,
+
+	M.
+
+-- 
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
