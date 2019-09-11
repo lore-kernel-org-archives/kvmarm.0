@@ -2,61 +2,81 @@ Return-Path: <SRS0=E7bu=XG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A7DC5AE5C
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 02:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9361C4740A
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 04:27:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84C3C222BF
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 02:35:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C3C222BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 4A43F21A4C
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Sep 2019 04:27:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="Hs+rUzHv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A43F21A4C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=socionext.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 387AC4A5DF;
-	Tue, 10 Sep 2019 22:35:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7F384A5F0;
+	Wed, 11 Sep 2019 00:27:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@nifty.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qNfaKVVLSTmi; Tue, 10 Sep 2019 22:35:16 -0400 (EDT)
+	with ESMTP id fUG04VdQ8Pn3; Wed, 11 Sep 2019 00:27:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29DF14A601;
-	Tue, 10 Sep 2019 22:35:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F1C4A5E5;
+	Wed, 11 Sep 2019 00:27:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A28554A5DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 22:35:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 428384A529
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 00:27:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hhyPRAdDcJox for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Sep 2019 22:35:11 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A37DA4A5E5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 22:35:11 -0400 (EDT)
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id D20B835A5F6E36408028;
- Wed, 11 Sep 2019 10:35:06 +0800 (CST)
-Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 11 Sep 2019 10:34:59 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <maz@kernel.org>, <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>, 
- <suzuki.poulose@arm.com>
-Subject: [PATCH 2/2] KVM: arm/arm64: Print the EC hex value with its exact
- width
-Date: Wed, 11 Sep 2019 02:33:36 +0000
-Message-ID: <1568169216-12632-3-git-send-email-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.6.4.windows.1
-In-Reply-To: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
-References: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
+ with ESMTP id SGaNKHPNJjyw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Sep 2019 00:27:41 -0400 (EDT)
+Received: from conssluserg-06.nifty.com (conssluserg-06.nifty.com
+ [210.131.2.91])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B0F94A500
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 00:27:41 -0400 (EDT)
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com
+ [209.85.221.171]) (authenticated)
+ by conssluserg-06.nifty.com with ESMTP id x8B4RYcV023396
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Sep 2019 13:27:35 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-06.nifty.com x8B4RYcV023396
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+ s=dec2015msa; t=1568176055;
+ bh=2bJShX4Ff3PHK48gMEQzP3cEPpqbzfOY7VjrtVo5UdE=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=Hs+rUzHvcvyixmd4WHBymTPg9eM8TpjwUJ4vFyDVkUagWGjFfo6xJO3TNLLOECcA2
+ 8TH0W6loMI2+LzBH7C605ynFFMC2F2gI45BKaNhtOz/7LWgN539M79Ztbbz5plvDXf
+ DbnWn24NDIR08VdXE8cd5pIKq6i+vo3K+UtJf2lyAwYHMJBKywvf9pwVhdzzp55reQ
+ rv9WMwPpA4rIDguE1ZVDSINae+++fzo7xyd27gWzOy567gshnqNw2YNmRs7n5HUplr
+ H1XLV9mI+WxV2Y6wMgheXjKbwJJZ9PP9Y2XfP8D+mw2ltPYiB6MuZBH5ozMyqMPTLa
+ G4cuVSLNech7w==
+X-Nifty-SrcIP: [209.85.221.171]
+Received: by mail-vk1-f171.google.com with SMTP id b25so4066096vkk.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Sep 2019 21:27:35 -0700 (PDT)
+X-Gm-Message-State: APjAAAWWSEfXhLF0le3mwj6Z11ovfgPePeIf2r8y37X90q0rYAioLl4I
+ 4u92WPVFU8b1kcFmdgOVdvoXwEsO9GbOnmJvO5E=
+X-Google-Smtp-Source: APXvYqxcC7v9qXKkiFdYOioajynW6ENkts6eVJhzv73g0b3GlVu6ohGHdS3vnp8EInycfekShhmHhrgynXloMMplkJc=
+X-Received: by 2002:a1f:2343:: with SMTP id j64mr12520866vkj.84.1568176054022; 
+ Tue, 10 Sep 2019 21:27:34 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+References: <1568169216-12632-1-git-send-email-yuzenghui@huawei.com>
+ <1568169216-12632-2-git-send-email-yuzenghui@huawei.com>
+In-Reply-To: <1568169216-12632-2-git-send-email-yuzenghui@huawei.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 11 Sep 2019 13:26:58 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARPo6VgzXn5kfrL7MWRtBoNf83yCM0r8jZ0iURU_to_BA@mail.gmail.com>
+Message-ID: <CAK7LNARPo6VgzXn5kfrL7MWRtBoNf83yCM0r8jZ0iURU_to_BA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: vgic: Use the appropriate
+ TRACE_INCLUDE_PATH
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: maz@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,31 +93,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-EC is the bits [31:26] of ESR_ELx on arm64 (HSR on arm). Print the
-hex value with its exact width (8).
+On Wed, Sep 11, 2019 at 11:35 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
+>
+> Commit 49dfe94fe5ad ("KVM: arm/arm64: Fix TRACE_INCLUDE_PATH") fixes
+> TRACE_INCLUDE_PATH to the correct relative path to the define_trace.h
+> and explains why did the old one work.
+>
+> The same fix should be applied to virt/kvm/arm/vgic/trace.h.
+>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
- virt/kvm/arm/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please feel free to replace the Cc: with my:
 
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-index 204d210d01c2..022b0a060034 100644
---- a/virt/kvm/arm/trace.h
-+++ b/virt/kvm/arm/trace.h
-@@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
- 		__entry->vcpu_pc		= vcpu_pc;
- 	),
- 
--	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
-+	TP_printk("%s: HSR_EC: 0x%02x (%s), PC: 0x%08lx",
- 		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
- 		  __entry->esr_ec,
- 		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+Thanks.
+
+
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>  virt/kvm/arm/vgic/trace.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
+> index 55fed77a9f73..4fd4f6db181b 100644
+> --- a/virt/kvm/arm/vgic/trace.h
+> +++ b/virt/kvm/arm/vgic/trace.h
+> @@ -30,7 +30,7 @@ TRACE_EVENT(vgic_update_irq_pending,
+>  #endif /* _TRACE_VGIC_H */
+>
+>  #undef TRACE_INCLUDE_PATH
+> -#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm/vgic
+> +#define TRACE_INCLUDE_PATH ../../virt/kvm/arm/vgic
+>  #undef TRACE_INCLUDE_FILE
+>  #define TRACE_INCLUDE_FILE trace
+>
+> --
+> 2.19.1
+>
+>
+
+
 -- 
-2.19.1
-
-
+Best Regards
+Masahiro Yamada
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
