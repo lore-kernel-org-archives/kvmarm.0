@@ -2,81 +2,82 @@ Return-Path: <SRS0=dbzw=XI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDBBC49ED7
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BE4C4CEC5
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 24E1E214AF
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E1E214AF
+	by mail.kernel.org (Postfix) with ESMTP id 04603214AF
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04603214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 933B54A654;
-	Fri, 13 Sep 2019 03:28:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8677E4A673;
+	Fri, 13 Sep 2019 03:28:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EgbKqzg+VOD3; Fri, 13 Sep 2019 03:28:10 -0400 (EDT)
+	with ESMTP id 3wCJP9jfjgSP; Fri, 13 Sep 2019 03:28:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76EE14A66E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F3AF4A682;
 	Fri, 13 Sep 2019 03:28:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB6AD4A653
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B29C44A653
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MgZdU4a48Iqg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Sep 2019 07:31:54 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
- [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B36E84A64C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:54 -0400 (EDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8CBRdjw130491
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:52 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2uyjnwx0r9-1
+ with ESMTP id jriElNr9PwgH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Sep 2019 08:02:43 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
+ [148.163.158.5])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C50BC4A58C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:43 -0400 (EDT)
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8CBwbiI004433
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:43 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2uymbh37kk-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:52 -0400
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:42 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <kvmarm@lists.cs.columbia.edu> from <frankja@linux.ibm.com>;
- Thu, 12 Sep 2019 12:31:50 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Thu, 12 Sep 2019 13:02:40 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Sep 2019 12:31:44 +0100
+ Thu, 12 Sep 2019 13:02:34 +0100
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8CBVh2G61407464
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x8CC2XSN38469942
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Sep 2019 11:31:43 GMT
+ Thu, 12 Sep 2019 12:02:33 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7CA18AE7E9;
- Thu, 12 Sep 2019 11:31:43 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id B8AB4AE9DF;
+ Thu, 12 Sep 2019 11:36:50 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3B734AE0A4;
- Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 5C3C7AE9D8;
+ Thu, 12 Sep 2019 11:36:49 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.92.148])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
-Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+ Thu, 12 Sep 2019 11:36:49 +0000 (GMT)
+Subject: Re: [PATCH 05/13] KVM: Refactor error handling for setting memory
+ region
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
  James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
  <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
 References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
- <20190911185038.24341-5-sean.j.christopherson@intel.com>
+ <20190911185038.24341-6-sean.j.christopherson@intel.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
@@ -121,24 +122,24 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 12 Sep 2019 13:31:41 +0200
+Date: Thu, 12 Sep 2019 13:36:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
+In-Reply-To: <20190911185038.24341-6-sean.j.christopherson@intel.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19091211-0008-0000-0000-00000314C2BB
+x-cbid: 19091212-0016-0000-0000-000002AA674A
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091211-0009-0000-0000-00004A3331EB
-Message-Id: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
+x-cbparentid: 19091212-0017-0000-0000-0000330AF860
+Message-Id: <9773a72d-2a58-fbb1-ed2b-82af0bb5f49a@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-09-12_05:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=556 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120123
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=948 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120129
 X-Mailman-Approved-At: Fri, 13 Sep 2019 03:28:09 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
@@ -157,19 +158,19 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1331037112009746321=="
+Content-Type: multipart/mixed; boundary="===============4477727313591178294=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---===============1331037112009746321==
+--===============4477727313591178294==
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI"
+ boundary="Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
-Content-Type: multipart/mixed; boundary="UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK";
+--Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe
+Content-Type: multipart/mixed; boundary="6J8eeynfSebyZsyGavbEUWKxUSMvfibQv";
  protected-headers="v1"
 From: Janosch Frank <frankja@linux.ibm.com>
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -185,67 +186,181 @@ Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
  kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Message-ID: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
-Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+Message-ID: <9773a72d-2a58-fbb1-ed2b-82af0bb5f49a@linux.ibm.com>
+Subject: Re: [PATCH 05/13] KVM: Refactor error handling for setting memory
+ region
 References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
- <20190911185038.24341-5-sean.j.christopherson@intel.com>
-In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
+ <20190911185038.24341-6-sean.j.christopherson@intel.com>
+In-Reply-To: <20190911185038.24341-6-sean.j.christopherson@intel.com>
 
---UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK
+--6J8eeynfSebyZsyGavbEUWKxUSMvfibQv
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/11/19 8:50 PM, Sean Christopherson wrote:
-> Remove kvm_arch_create_memslot() now that all arch implementations are
-> effectively nops.  Explicitly free an allocated-but-unused dirty bitmap=
-
-> instead of relying on kvm_free_memslot() now that setting a memslot can=
-
-> no longer fail after arch code has allocated memory.  In practice
-> this was already true, e.g. architectures that allocated memory via
-> kvm_arch_create_memslot() never failed kvm_arch_prepare_memory_region()=
-
-> and vice versa, but removing kvm_arch_create_memslot() eliminates the
-> potential for future code to stealthily change behavior.
->=20
-> Eliminating the error path's reliance on kvm_free_memslot() paves the
-> way for simplify kvm_free_memslot(), i.e. dropping its @dont param.
+> Replace a big pile o' gotos with returns to make it more obvious what
+> error code is being returned, and to prepare for refactoring the
+> functional, i.e. post-checks, portion of __kvm_set_memory_region().
 >=20
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Please either split or adopt the patch title to include the freeing.
-I'd go for splitting.
+Definitely necessary
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  virt/kvm/kvm_main.c | 40 ++++++++++++++++++----------------------
+>  1 file changed, 18 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ea8f2f37096f..8306ce3345a6 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -929,34 +929,33 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> =20
+>  	r =3D check_memory_region_flags(mem);
+>  	if (r)
+> -		goto out;
+> +		return r;
+> =20
+> -	r =3D -EINVAL;
+>  	as_id =3D mem->slot >> 16;
+>  	id =3D (u16)mem->slot;
+> =20
+>  	/* General sanity checks */
+>  	if (mem->memory_size & (PAGE_SIZE - 1))
+> -		goto out;
+> +		return -EINVAL;
+>  	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
+> -		goto out;
+> +		return -EINVAL;
+>  	/* We can read the guest memory with __xxx_user() later on. */
+>  	if ((id < KVM_USER_MEM_SLOTS) &&
+>  	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
+>  	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+>  			mem->memory_size)))
+> -		goto out;
+> +		return -EINVAL;
+>  	if (as_id >=3D KVM_ADDRESS_SPACE_NUM || id >=3D KVM_MEM_SLOTS_NUM)
+> -		goto out;
+> +		return -EINVAL;
+>  	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+> -		goto out;
+> +		return -EINVAL;
+> =20
+>  	slot =3D id_to_memslot(__kvm_memslots(kvm, as_id), id);
+>  	base_gfn =3D mem->guest_phys_addr >> PAGE_SHIFT;
+>  	npages =3D mem->memory_size >> PAGE_SHIFT;
+> =20
+>  	if (npages > KVM_MEM_MAX_NR_PAGES)
+> -		goto out;
+> +		return -EINVAL;
+> =20
+>  	new =3D old =3D *slot;
+> =20
+> @@ -973,20 +972,18 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  			if ((new.userspace_addr !=3D old.userspace_addr) ||
+>  			    (npages !=3D old.npages) ||
+>  			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
+> -				goto out;
+> +				return -EINVAL;
+> =20
+>  			if (base_gfn !=3D old.base_gfn)
+>  				change =3D KVM_MR_MOVE;
+>  			else if (new.flags !=3D old.flags)
+>  				change =3D KVM_MR_FLAGS_ONLY;
+> -			else { /* Nothing to change. */
+> -				r =3D 0;
+> -				goto out;
+> -			}
+> +			else /* Nothing to change. */
+> +				return 0;
+>  		}
+>  	} else {
+>  		if (!old.npages)
+> -			goto out;
+> +			return -EINVAL;
+> =20
+>  		change =3D KVM_MR_DELETE;
+>  		new.base_gfn =3D 0;
+> @@ -995,29 +992,29 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> =20
+>  	if ((change =3D=3D KVM_MR_CREATE) || (change =3D=3D KVM_MR_MOVE)) {
+>  		/* Check for overlaps */
+> -		r =3D -EEXIST;
+>  		kvm_for_each_memslot(slot, __kvm_memslots(kvm, as_id)) {
+>  			if (slot->id =3D=3D id)
+>  				continue;
+>  			if (!((base_gfn + npages <=3D slot->base_gfn) ||
+>  			      (base_gfn >=3D slot->base_gfn + slot->npages)))
+> -				goto out;
+> +				return -EEXIST;
+>  		}
+>  	}
+> =20
+> -	r =3D -ENOMEM;
+> -
+>  	/* Allocate/free page dirty bitmap as needed */
+>  	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
+>  		new.dirty_bitmap =3D NULL;
+>  	else if (!new.dirty_bitmap) {
+> -		if (kvm_create_dirty_bitmap(&new) < 0)
+> -			goto out;
+> +		r =3D kvm_create_dirty_bitmap(&new);
+> +		if (r)
+> +			return r;
+>  	}
+> =20
+>  	slots =3D kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+> -	if (!slots)
+> +	if (!slots) {
+> +		r =3D -ENOMEM;
+>  		goto out_bitmap;
+> +	}
+>  	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots)=
+);
+> =20
+>  	if ((change =3D=3D KVM_MR_DELETE) || (change =3D=3D KVM_MR_MOVE)) {
+> @@ -1068,7 +1065,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  out_bitmap:
+>  	if (new.dirty_bitmap && !old.dirty_bitmap)
+>  		kvm_destroy_dirty_bitmap(&new);
+> -out:
+>  	return r;
+>  }
+>  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+>=20
 
 
---UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK--
 
---VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
+--6J8eeynfSebyZsyGavbEUWKxUSMvfibQv--
+
+--Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl16LJ0ACgkQ41TmuOI4
-ufjw+RAAo+nTA45D/UJQFOtUY4vNWKZfGI7LFIZsBH6EvGMFdMDJOuJzlnd8qPAY
-jEb7EEQ6a8ypWQ+inQtsEQ27SX2+gsIP/nsrU54fhu32Wx9uX0y3wHRWPXOv346i
-Aqo8/NpulFkq1SSmQ/v2ikX1Bzqn/28FQ47hI21vbGt/Do97PUk8Mv1VUnKheMjJ
-hqq7m7CyFHAdbLFxwrhuKuPKblVyZVASaTJ7Z7xQ2wdmHaS9kpsedJlTAxD3ot/d
-o05LlRmLUIRH/u+yLEk+innoWRJuQ6gwVytMwEKer2kO+Yu8jsm9lXv52CYO7fZ9
-B+pOzIfMaupMDGUBIsO93SZCvxZGELnzKoDjD9bZSOwFB/1wqrMpOvkTL28tRVrp
-Ia6ytDOW8shEzxv20xTK8bnFuPlPMwdm84GPpW/en/turzk/Ab7OQiKvVtpAHWLM
-CZsUdz4QEXeNeEjlZJesUcSnqsdviG/LCL7KqX8Ti6NDKI5g5rsu1bulD+7zQufB
-4RbQd5jRQ77MDN+RRz2+8nUXThL0Pp67iMmOfhlvViBShiDuwiKpJ7qnVf+Vze1F
-VPzyxUAFaq7VFQn39tiQW3wnFfDLZzGg9kl9XPJDLoUeaqEiVpo4GiPvSnqebgsR
-MbM+Vn7FjJU4VeUxFONIoTmoBmHyK8SkMZgnHmOvesUCuOnPk9k=
-=oNBi
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl16LdAACgkQ41TmuOI4
+ufiqdRAAk7Fq5LoAJLqJFxnCihIQRlcl8vo542WY/o9SIjSW82ULb9ja3jx/IZOo
+zXJt4+l9ZwKB3cwu3Z9pkvcu+D7PgbVSHyCAraimR8rk/TznU4esmSGNZX//BmaX
+AfSdajjNFNRXP+HsOlR0OVsvX6JBWQqfikSvqUv+GGzhOOB5TT7QIlNGTUFJhTuj
+DWsP4KnnRlxI8a6Tz0mXfcJLDABMu2Ypl8IjtEkAS57byfjVuy1fP3/WtiWW8QST
+2BeoiY5FQH/syqW0oXYO6Ov2rlS2gKMPwaL5nQwuHrOxd+A1qZv9rX7NU1P3+eZq
++Xutlm/mQHajvO6FfiuUf2pG/YuwfCyhX/ENMcmohw5TO1sdZDcY/BSHop0UYv+F
+8RkUxxstxRot67kTQvjZ1p60Tz/SYmxszldFM2noNPjzitbwUoiHrLl9Ti1MeMJ3
+QXb1ZCuTA8/F138tNGVL52JIOrsbIqvdLoc1/4qxJPLYbHzF/HMSqJ0nHl8tFa5Y
+D9N8xdr1pdQoHKNVLDVI8b5Jt5yMaeN4WrBqOFxTVme6XCxGu2eNRxyNWZbA2+Z3
+nDkoU2HaEDH3QbH2LuZy9wDTHlPb1dnO3XatbDqCf32/gsChlKjuEcKOcNnBVntM
+Izb7sxZStgMuHCrkgWweUjFkyR93+8JboW1iJKcFYtR1FWfffyU=
+=pPrb
 -----END PGP SIGNATURE-----
 
---VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI--
+--Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe--
 
 
---===============1331037112009746321==
+--===============4477727313591178294==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -256,5 +371,5 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============1331037112009746321==--
+--===============4477727313591178294==--
 
