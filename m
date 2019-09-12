@@ -2,96 +2,150 @@ Return-Path: <SRS0=dbzw=XI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 197EBC49ED7
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDBBC49ED7
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA1620830
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:13:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="u15oBIN8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA1620830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 24E1E214AF
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E1E214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AB824A67A;
-	Fri, 13 Sep 2019 03:13:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 933B54A654;
+	Fri, 13 Sep 2019 03:28:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JPYXyzadV9fL; Fri, 13 Sep 2019 03:13:29 -0400 (EDT)
+	with ESMTP id EgbKqzg+VOD3; Fri, 13 Sep 2019 03:28:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DAE54A66B;
-	Fri, 13 Sep 2019 03:13:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76EE14A66E;
+	Fri, 13 Sep 2019 03:28:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CDA4A669
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Sep 2019 03:13:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB6AD4A653
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1Ke1gt5iUoFo for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Sep 2019 03:13:26 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50D314A5A9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Sep 2019 03:13:26 -0400 (EDT)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com
- [209.85.128.54])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 02E51214DA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Sep 2019 07:13:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1568358805;
- bh=Y9/DSawRiw7HkV7LtyD5C99WKwn1uJtmvAOU+zwccO4=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=u15oBIN8ZtiTSNSv6Z/kEOoMpILX5r0aDdSzkaZp9hK4h1fxdbN3mv8qlxmupDjc5
- QVAacKw2pRuUh6MDbjcdYE0w1YBaj6L8X1u7VJ+BR1Z42Y9xEvk5FKr5NaO+Zq/utB
- yQEOs7bTKcHIsr3UELybtnbdEjzi3jRvybLMNLrQ=
-Received: by mail-wm1-f54.google.com with SMTP id 7so1522704wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Sep 2019 00:13:24 -0700 (PDT)
-X-Gm-Message-State: APjAAAXkMbI8JQ4tKOdd48KOlG/N1fxFkfaOHTFL55ir96rHl2hgDads
- 4WLqjEKuJMH2u/GdyfjNPGtAGf8H6G8vvN1ET5w=
-X-Google-Smtp-Source: APXvYqxi0Jghii/qEM7O0Qi1P6dXAzbAe3ZmdcsQpaqA78muEW6iWtmDNae/AhMUGSjE0UlZ/D7znbTkhEE5NdpUEf4=
-X-Received: by 2002:a05:600c:2256:: with SMTP id
- a22mr2082602wmm.79.1568358803393; 
- Fri, 13 Sep 2019 00:13:23 -0700 (PDT)
+ with ESMTP id MgZdU4a48Iqg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Sep 2019 07:31:54 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
+ [148.163.156.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B36E84A64C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:54 -0400 (EDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8CBRdjw130491
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:52 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uyjnwx0r9-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 07:31:52 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <kvmarm@lists.cs.columbia.edu> from <frankja@linux.ibm.com>;
+ Thu, 12 Sep 2019 12:31:50 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 12 Sep 2019 12:31:44 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8CBVh2G61407464
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Sep 2019 11:31:43 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7CA18AE7E9;
+ Thu, 12 Sep 2019 11:31:43 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3B734AE0A4;
+ Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.92.148])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 12 Sep 2019 11:31:42 +0000 (GMT)
+Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
+ <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-5-sean.j.christopherson@intel.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 12 Sep 2019 13:31:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190321163623.20219-12-julien.grall@arm.com>
- <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
- <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
- <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
- <20190619091219.GB7767@fuggles.cambridge.arm.com>
- <CAJF2gTTmFq3yYa9UrdZRAFwJgC=KmKTe2_NFy_UZBUQovqQJPg@mail.gmail.com>
- <20190619123939.GF7767@fuggles.cambridge.arm.com>
- <CAJF2gTSiiiewTLwVAXvPLO7rTSUw1rg8VtFLzANdP2S2EEbTjg@mail.gmail.com>
- <20190624104006.lvm32nahemaqklxc@willie-the-truck>
- <CAJF2gTSC1sGgmiTCgzKUTdPyUZ3LG4H7N8YbMyWr-E+eifGuYg@mail.gmail.com>
- <20190912140256.fwbutgmadpjbjnab@willie-the-truck>
- <CAJF2gTT2c45HRfATF+=zs-HNToFAKgq1inKRmJMV3uPYBo4iVg@mail.gmail.com>
-In-Reply-To: <CAJF2gTT2c45HRfATF+=zs-HNToFAKgq1inKRmJMV3uPYBo4iVg@mail.gmail.com>
-From: Guo Ren <guoren@kernel.org>
-Date: Fri, 13 Sep 2019 15:13:10 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTTsHCsSpf1ncVb=ZJS2d=r+AdDi2=5z-REVS=uUg9138A@mail.gmail.com>
-Message-ID: <CAJF2gTTsHCsSpf1ncVb=ZJS2d=r+AdDi2=5z-REVS=uUg9138A@mail.gmail.com>
-Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
- separate file
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Palmer Dabbelt <palmer@sifive.com>, Will Deacon <will.deacon@arm.com>,
- Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
- gary@garyguo.net, linux-riscv@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, Mike Rapoport <rppt@linux.ibm.com>,
- Christoph Hellwig <hch@infradead.org>, aou@eecs.berkeley.edu,
- Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, linux-arm-kernel@lists.infradead.org,
- Anup Patel <anup.Patel@wdc.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- iommu@lists.linux-foundation.org
+In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19091211-0008-0000-0000-00000314C2BB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091211-0009-0000-0000-00004A3331EB
+Message-Id: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-12_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=556 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120123
+X-Mailman-Approved-At: Fri, 13 Sep 2019 03:28:09 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,174 +157,95 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1110305693905173118=="
+Content-Type: multipart/mixed; boundary="===============1331037112009746321=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============1110305693905173118==
-Content-Type: multipart/alternative; boundary="0000000000005b52a7059269fda0"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--===============1331037112009746321==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI"
 
---0000000000005b52a7059269fda0
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
+Content-Type: multipart/mixed; boundary="UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK";
+ protected-headers="v1"
+From: Janosch Frank <frankja@linux.ibm.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
+ <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
+ James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>,
+ Suzuki K Pouloze <suzuki.poulose@arm.com>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Message-ID: <b669c7f0-34b8-49b8-2ff8-c062bb8b2f5f@linux.ibm.com>
+Subject: Re: [PATCH 04/13] KVM: Drop kvm_arch_create_memslot()
+References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
+ <20190911185038.24341-5-sean.j.christopherson@intel.com>
+In-Reply-To: <20190911185038.24341-5-sean.j.christopherson@intel.com>
+
+--UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Another idea is seperate remote TLB invalidate into two instructions:
+On 9/11/19 8:50 PM, Sean Christopherson wrote:
+> Remove kvm_arch_create_memslot() now that all arch implementations are
+> effectively nops.  Explicitly free an allocated-but-unused dirty bitmap=
 
- - sfence.vma.b.asyc
- - sfence.vma.b.barrier // wait all async TLB invalidate operations
-finished for all harts.
+> instead of relying on kvm_free_memslot() now that setting a memslot can=
 
-(I remember who mentioned me separate them into two instructions after
-session. Anup? Is the idea right ?)
+> no longer fail after arch code has allocated memory.  In practice
+> this was already true, e.g. architectures that allocated memory via
+> kvm_arch_create_memslot() never failed kvm_arch_prepare_memory_region()=
 
-Actually, I never consider asyc TLB invalidate before, because current our
-light iommu did not need it.
+> and vice versa, but removing kvm_arch_create_memslot() eliminates the
+> potential for future code to stealthily change behavior.
+>=20
+> Eliminating the error path's reliance on kvm_free_memslot() paves the
+> way for simplify kvm_free_memslot(), i.e. dropping its @dont param.
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Thx all people attend the session :) Let's continue the talk.
+Please either split or adopt the patch title to include the freeing.
+I'd go for splitting.
 
 
-Guo Ren <guoren@kernel.org> =E4=BA=8E 2019=E5=B9=B49=E6=9C=8812=E6=97=A5=E5=
-=91=A8=E5=9B=9B 22:59=E5=86=99=E9=81=93=EF=BC=9A
+--UU4cv3zIJan03aUPjGzvFvmBPuZejgoHK--
 
-> Thx Will for reply.
->
-> On Thu, Sep 12, 2019 at 3:03 PM Will Deacon <will@kernel.org> wrote:
-> >
-> > On Sun, Sep 08, 2019 at 07:52:55AM +0800, Guo Ren wrote:
-> > > On Mon, Jun 24, 2019 at 6:40 PM Will Deacon <will@kernel.org> wrote:
-> > > > > I'll keep my system use the same ASID for SMP + IOMMU :P
-> > > >
-> > > > You will want a separate allocator for that:
-> > > >
-> > > >
-> https://lkml.kernel.org/r/20190610184714.6786-2-jean-philippe.brucker@arm=
-.com
-> > >
-> > > Yes, it is hard to maintain ASID between IOMMU and CPUMMU or differen=
-t
-> > > system, because it's difficult to synchronize the IO_ASID when the CP=
-U
-> > > ASID is rollover.
-> > > But we could still use hardware broadcast TLB invalidation instructio=
-n
-> > > to uniformly manage the ASID and IO_ASID, or OTHER_ASID in our IOMMU.
-> >
-> > That's probably a bad idea, because you'll likely stall execution on th=
-e
-> > CPU until the IOTLB has completed invalidation. In the case of ATS, I
-> think
-> > an endpoint ATC is permitted to take over a minute to respond. In
-> reality, I
-> > suspect the worst you'll ever see would be in the msec range, but that'=
-s
-> > still an unacceptable period of time to hold a CPU.
-> Just as I've said in the session that IOTLB invalidate delay is
-> another topic, My main proposal is to introduce stage1.pgd and
-> stage2.pgd as address space identifiers between different TLB systems
-> based on vmid, asid. My last part of sildes will show you how to
-> translate stage1/2.pgd to as/vmid in PCI ATS system and the method
-> could work with SMMU-v3 and intel Vt-d. (It's regret for me there is
-> no time to show you the whole slides.)
->
-> In our light IOMMU implementation, there's no IOTLB invalidate delay
-> problem. Becasue IOMMU is very close to CPU MMU and interconnect's
-> delay is the same with SMP CPUs MMU (no PCI, VM supported).
->
-> To solve the problem, we could define a async mode in sfence.vma.b to
-> slove the problem and finished with per_cpu_irq/exception.
->
-> --
-> Best Regards
->  Guo Ren
->
-> ML: https://lore.kernel.org/linux-csky/
->
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---0000000000005b52a7059269fda0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-----BEGIN PGP SIGNATURE-----
 
-<div dir=3D"auto"><div>Another idea is seperate remote TLB invalidate into =
-two instructions:<div dir=3D"auto"><br></div><div dir=3D"auto">=C2=A0- sfen=
-ce.vma.b.asyc</div><div dir=3D"auto">=C2=A0- sfence.vma.b.barrier  // wait =
-all async TLB invalidate operations finished for all harts.</div><div dir=
-=3D"auto"><br></div><div dir=3D"auto">(I remember who mentioned me separate=
- them into two instructions after session. Anup? Is the idea right ?)=C2=A0=
-</div><div dir=3D"auto"><br></div><div dir=3D"auto">Actually,  I never cons=
-ider asyc TLB invalidate before,  because current our light iommu did not n=
-eed it.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Thx all people a=
-ttend the session :)  Let&#39;s continue the talk.=C2=A0</div><br><br><div =
-class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Guo Ren &lt;<a =
-href=3D"mailto:guoren@kernel.org">guoren@kernel.org</a>&gt; =E4=BA=8E 2019=
-=E5=B9=B49=E6=9C=8812=E6=97=A5=E5=91=A8=E5=9B=9B 22:59=E5=86=99=E9=81=93=EF=
-=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
-x;border-left:1px #ccc solid;padding-left:1ex">Thx Will for reply.<br>
-<br>
-On Thu, Sep 12, 2019 at 3:03 PM Will Deacon &lt;<a href=3D"mailto:will@kern=
-el.org" target=3D"_blank" rel=3D"noreferrer">will@kernel.org</a>&gt; wrote:=
-<br>
-&gt;<br>
-&gt; On Sun, Sep 08, 2019 at 07:52:55AM +0800, Guo Ren wrote:<br>
-&gt; &gt; On Mon, Jun 24, 2019 at 6:40 PM Will Deacon &lt;<a href=3D"mailto=
-:will@kernel.org" target=3D"_blank" rel=3D"noreferrer">will@kernel.org</a>&=
-gt; wrote:<br>
-&gt; &gt; &gt; &gt; I&#39;ll keep my system use the same ASID for SMP + IOM=
-MU :P<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; You will want a separate allocator for that:<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; <a href=3D"https://lkml.kernel.org/r/20190610184714.6786-2-j=
-ean-philippe.brucker@arm.com" rel=3D"noreferrer noreferrer" target=3D"_blan=
-k">https://lkml.kernel.org/r/20190610184714.6786-2-jean-philippe.brucker@ar=
-m.com</a><br>
-&gt; &gt;<br>
-&gt; &gt; Yes, it is hard to maintain ASID between IOMMU and CPUMMU or diff=
-erent<br>
-&gt; &gt; system, because it&#39;s difficult to synchronize the IO_ASID whe=
-n the CPU<br>
-&gt; &gt; ASID is rollover.<br>
-&gt; &gt; But we could still use hardware broadcast TLB invalidation instru=
-ction<br>
-&gt; &gt; to uniformly manage the ASID and IO_ASID, or OTHER_ASID in our IO=
-MMU.<br>
-&gt;<br>
-&gt; That&#39;s probably a bad idea, because you&#39;ll likely stall execut=
-ion on the<br>
-&gt; CPU until the IOTLB has completed invalidation. In the case of ATS, I =
-think<br>
-&gt; an endpoint ATC is permitted to take over a minute to respond. In real=
-ity, I<br>
-&gt; suspect the worst you&#39;ll ever see would be in the msec range, but =
-that&#39;s<br>
-&gt; still an unacceptable period of time to hold a CPU.<br>
-Just as I&#39;ve said in the session that IOTLB invalidate delay is<br>
-another topic, My main proposal is to introduce stage1.pgd and<br>
-stage2.pgd as address space identifiers between different TLB systems<br>
-based on vmid, asid. My last part of sildes will show you how to<br>
-translate stage1/2.pgd to as/vmid in PCI ATS system and the method<br>
-could work with SMMU-v3 and intel Vt-d. (It&#39;s regret for me there is<br=
->
-no time to show you the whole slides.)<br>
-<br>
-In our light IOMMU implementation, there&#39;s no IOTLB invalidate delay<br=
->
-problem. Becasue IOMMU is very close to CPU MMU and interconnect&#39;s<br>
-delay is the same with SMP CPUs MMU (no PCI, VM supported).<br>
-<br>
-To solve the problem, we could define a async mode in sfence.vma.b to<br>
-slove the problem and finished with per_cpu_irq/exception.<br>
-<br>
--- <br>
-Best Regards<br>
-=C2=A0Guo Ren<br>
-<br>
-ML: <a href=3D"https://lore.kernel.org/linux-csky/" rel=3D"noreferrer noref=
-errer" target=3D"_blank">https://lore.kernel.org/linux-csky/</a><br>
-</blockquote></div></div></div>
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl16LJ0ACgkQ41TmuOI4
+ufjw+RAAo+nTA45D/UJQFOtUY4vNWKZfGI7LFIZsBH6EvGMFdMDJOuJzlnd8qPAY
+jEb7EEQ6a8ypWQ+inQtsEQ27SX2+gsIP/nsrU54fhu32Wx9uX0y3wHRWPXOv346i
+Aqo8/NpulFkq1SSmQ/v2ikX1Bzqn/28FQ47hI21vbGt/Do97PUk8Mv1VUnKheMjJ
+hqq7m7CyFHAdbLFxwrhuKuPKblVyZVASaTJ7Z7xQ2wdmHaS9kpsedJlTAxD3ot/d
+o05LlRmLUIRH/u+yLEk+innoWRJuQ6gwVytMwEKer2kO+Yu8jsm9lXv52CYO7fZ9
+B+pOzIfMaupMDGUBIsO93SZCvxZGELnzKoDjD9bZSOwFB/1wqrMpOvkTL28tRVrp
+Ia6ytDOW8shEzxv20xTK8bnFuPlPMwdm84GPpW/en/turzk/Ab7OQiKvVtpAHWLM
+CZsUdz4QEXeNeEjlZJesUcSnqsdviG/LCL7KqX8Ti6NDKI5g5rsu1bulD+7zQufB
+4RbQd5jRQ77MDN+RRz2+8nUXThL0Pp67iMmOfhlvViBShiDuwiKpJ7qnVf+Vze1F
+VPzyxUAFaq7VFQn39tiQW3wnFfDLZzGg9kl9XPJDLoUeaqEiVpo4GiPvSnqebgsR
+MbM+Vn7FjJU4VeUxFONIoTmoBmHyK8SkMZgnHmOvesUCuOnPk9k=
+=oNBi
+-----END PGP SIGNATURE-----
 
---0000000000005b52a7059269fda0--
+--VFaGAeTCeRXorJeO4VEs9GCOZpf5lhFaI--
 
---===============1110305693905173118==
+
+--===============1331037112009746321==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -281,4 +256,5 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============1110305693905173118==--
+--===============1331037112009746321==--
+
