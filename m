@@ -1,152 +1,97 @@
-Return-Path: <SRS0=dbzw=XI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=nXD4=XJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BE4C4CEC5
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 180B3C49ED6
+	for <kvmarm@archiver.kernel.org>; Sat, 14 Sep 2019 08:50:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04603214AF
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Sep 2019 07:28:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04603214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 84BD620717
+	for <kvmarm@archiver.kernel.org>; Sat, 14 Sep 2019 08:50:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="RxfSgu5H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84BD620717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8677E4A673;
-	Fri, 13 Sep 2019 03:28:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F5E84A557;
+	Sat, 14 Sep 2019 04:50:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3wCJP9jfjgSP; Fri, 13 Sep 2019 03:28:11 -0400 (EDT)
+	with ESMTP id JrItjEv1i4Nc; Sat, 14 Sep 2019 04:50:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F3AF4A682;
-	Fri, 13 Sep 2019 03:28:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D395D4A66B;
+	Sat, 14 Sep 2019 04:50:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B29C44A653
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FFD4A531
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Sep 2019 04:50:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jriElNr9PwgH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Sep 2019 08:02:43 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C50BC4A58C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:43 -0400 (EDT)
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8CBwbiI004433
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:43 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2uymbh37kk-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Sep 2019 08:02:42 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <frankja@linux.ibm.com>;
- Thu, 12 Sep 2019 13:02:40 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Sep 2019 13:02:34 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8CC2XSN38469942
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Sep 2019 12:02:33 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B8AB4AE9DF;
- Thu, 12 Sep 2019 11:36:50 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5C3C7AE9D8;
- Thu, 12 Sep 2019 11:36:49 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.92.148])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Sep 2019 11:36:49 +0000 (GMT)
-Subject: Re: [PATCH 05/13] KVM: Refactor error handling for setting memory
- region
-To: Sean Christopherson <sean.j.christopherson@intel.com>,
- James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
-References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
- <20190911185038.24341-6-sean.j.christopherson@intel.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 12 Sep 2019 13:36:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id AJvl9bZnzEs0 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Sep 2019 04:49:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07FFA4A66B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Sep 2019 04:49:55 -0400 (EDT)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com
+ [209.85.221.44])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A9E1820717
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Sep 2019 08:49:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1568450994;
+ bh=J9o3/Ce1+YLaWOJS+1y9FmaoiXDLsFcat/B4OJD07xQ=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=RxfSgu5Hw2DrWyBoVbDdNSt2Ok1l0HPZkDoIAfVd3MlQhTnhrd+PGF+KRT99kyT3t
+ 4OPt+Hz5Y+lJTpMUHX3i052lOdojgiP4B6aUCHou3Z7QmK557VZCJQU82lYlYa16PZ
+ gw3iMOpieSQO90Rk0eu15z8tSDIhfl/qEDoKs+es=
+Received: by mail-wr1-f44.google.com with SMTP id q17so29496330wrx.10
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Sep 2019 01:49:54 -0700 (PDT)
+X-Gm-Message-State: APjAAAXRfPVW2CRJhWs86VA73BFD7wCfR7Wb4hjKJH8QL7oZQ8QKDZFv
+ CpHdJHFR9jK/gwPGU/lRFgJ25nBZY1ADSDPWmgk=
+X-Google-Smtp-Source: APXvYqxg6MtzWsHNFmLRbH0IHgwRMp+vQZNFO479wjLXexAnH2ZbcUXa06WI/GBB3zidLYAHo44uDXvnrwuUeLiSDAI=
+X-Received: by 2002:adf:fe0f:: with SMTP id n15mr5204507wrr.343.1568450992705; 
+ Sat, 14 Sep 2019 01:49:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190911185038.24341-6-sean.j.christopherson@intel.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19091212-0016-0000-0000-000002AA674A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091212-0017-0000-0000-0000330AF860
-Message-Id: <9773a72d-2a58-fbb1-ed2b-82af0bb5f49a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-12_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=948 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120129
-X-Mailman-Approved-At: Fri, 13 Sep 2019 03:28:09 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+References: <20190321163623.20219-12-julien.grall@arm.com>
+ <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
+ <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
+ <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
+ <20190619091219.GB7767@fuggles.cambridge.arm.com>
+ <CAJF2gTTmFq3yYa9UrdZRAFwJgC=KmKTe2_NFy_UZBUQovqQJPg@mail.gmail.com>
+ <20190619123939.GF7767@fuggles.cambridge.arm.com>
+ <CAJF2gTSiiiewTLwVAXvPLO7rTSUw1rg8VtFLzANdP2S2EEbTjg@mail.gmail.com>
+ <20190624104006.lvm32nahemaqklxc@willie-the-truck>
+ <CAJF2gTSC1sGgmiTCgzKUTdPyUZ3LG4H7N8YbMyWr-E+eifGuYg@mail.gmail.com>
+ <20190912140256.fwbutgmadpjbjnab@willie-the-truck>
+ <CAJF2gTT2c45HRfATF+=zs-HNToFAKgq1inKRmJMV3uPYBo4iVg@mail.gmail.com>
+ <CAJF2gTTsHCsSpf1ncVb=ZJS2d=r+AdDi2=5z-REVS=uUg9138A@mail.gmail.com>
+In-Reply-To: <CAJF2gTTsHCsSpf1ncVb=ZJS2d=r+AdDi2=5z-REVS=uUg9138A@mail.gmail.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Sat, 14 Sep 2019 16:49:40 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTTKFwRN6vG3+fQK8BRFskeURjv-Ziv_qb7nc9MSKw0bLA@mail.gmail.com>
+Message-ID: <CAJF2gTTKFwRN6vG3+fQK8BRFskeURjv-Ziv_qb7nc9MSKw0bLA@mail.gmail.com>
+Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
+ separate file
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Palmer Dabbelt <palmer@sifive.com>, Will Deacon <will.deacon@arm.com>,
+ Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
+ gary@garyguo.net, linux-riscv@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, Mike Rapoport <rppt@linux.ibm.com>,
+ Christoph Hellwig <hch@infradead.org>, aou@eecs.berkeley.edu,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, linux-arm-kernel@lists.infradead.org,
+ Anup Patel <anup.Patel@wdc.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ iommu@lists.linux-foundation.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -158,218 +103,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4477727313591178294=="
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---===============4477727313591178294==
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe
-Content-Type: multipart/mixed; boundary="6J8eeynfSebyZsyGavbEUWKxUSMvfibQv";
- protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Sean Christopherson <sean.j.christopherson@intel.com>,
- James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
- James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>,
- Suzuki K Pouloze <suzuki.poulose@arm.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
-Message-ID: <9773a72d-2a58-fbb1-ed2b-82af0bb5f49a@linux.ibm.com>
-Subject: Re: [PATCH 05/13] KVM: Refactor error handling for setting memory
- region
-References: <20190911185038.24341-1-sean.j.christopherson@intel.com>
- <20190911185038.24341-6-sean.j.christopherson@intel.com>
-In-Reply-To: <20190911185038.24341-6-sean.j.christopherson@intel.com>
-
---6J8eeynfSebyZsyGavbEUWKxUSMvfibQv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/11/19 8:50 PM, Sean Christopherson wrote:
-> Replace a big pile o' gotos with returns to make it more obvious what
-> error code is being returned, and to prepare for refactoring the
-> functional, i.e. post-checks, portion of __kvm_set_memory_region().
->=20
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-Definitely necessary
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-
-> ---
->  virt/kvm/kvm_main.c | 40 ++++++++++++++++++----------------------
->  1 file changed, 18 insertions(+), 22 deletions(-)
->=20
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index ea8f2f37096f..8306ce3345a6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -929,34 +929,33 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> =20
->  	r =3D check_memory_region_flags(mem);
->  	if (r)
-> -		goto out;
-> +		return r;
-> =20
-> -	r =3D -EINVAL;
->  	as_id =3D mem->slot >> 16;
->  	id =3D (u16)mem->slot;
-> =20
->  	/* General sanity checks */
->  	if (mem->memory_size & (PAGE_SIZE - 1))
-> -		goto out;
-> +		return -EINVAL;
->  	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
-> -		goto out;
-> +		return -EINVAL;
->  	/* We can read the guest memory with __xxx_user() later on. */
->  	if ((id < KVM_USER_MEM_SLOTS) &&
->  	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
->  	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
->  			mem->memory_size)))
-> -		goto out;
-> +		return -EINVAL;
->  	if (as_id >=3D KVM_ADDRESS_SPACE_NUM || id >=3D KVM_MEM_SLOTS_NUM)
-> -		goto out;
-> +		return -EINVAL;
->  	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-> -		goto out;
-> +		return -EINVAL;
-> =20
->  	slot =3D id_to_memslot(__kvm_memslots(kvm, as_id), id);
->  	base_gfn =3D mem->guest_phys_addr >> PAGE_SHIFT;
->  	npages =3D mem->memory_size >> PAGE_SHIFT;
-> =20
->  	if (npages > KVM_MEM_MAX_NR_PAGES)
-> -		goto out;
-> +		return -EINVAL;
-> =20
->  	new =3D old =3D *slot;
-> =20
-> @@ -973,20 +972,18 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  			if ((new.userspace_addr !=3D old.userspace_addr) ||
->  			    (npages !=3D old.npages) ||
->  			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
-> -				goto out;
-> +				return -EINVAL;
-> =20
->  			if (base_gfn !=3D old.base_gfn)
->  				change =3D KVM_MR_MOVE;
->  			else if (new.flags !=3D old.flags)
->  				change =3D KVM_MR_FLAGS_ONLY;
-> -			else { /* Nothing to change. */
-> -				r =3D 0;
-> -				goto out;
-> -			}
-> +			else /* Nothing to change. */
-> +				return 0;
->  		}
->  	} else {
->  		if (!old.npages)
-> -			goto out;
-> +			return -EINVAL;
-> =20
->  		change =3D KVM_MR_DELETE;
->  		new.base_gfn =3D 0;
-> @@ -995,29 +992,29 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> =20
->  	if ((change =3D=3D KVM_MR_CREATE) || (change =3D=3D KVM_MR_MOVE)) {
->  		/* Check for overlaps */
-> -		r =3D -EEXIST;
->  		kvm_for_each_memslot(slot, __kvm_memslots(kvm, as_id)) {
->  			if (slot->id =3D=3D id)
->  				continue;
->  			if (!((base_gfn + npages <=3D slot->base_gfn) ||
->  			      (base_gfn >=3D slot->base_gfn + slot->npages)))
-> -				goto out;
-> +				return -EEXIST;
->  		}
->  	}
-> =20
-> -	r =3D -ENOMEM;
-> -
->  	/* Allocate/free page dirty bitmap as needed */
->  	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
->  		new.dirty_bitmap =3D NULL;
->  	else if (!new.dirty_bitmap) {
-> -		if (kvm_create_dirty_bitmap(&new) < 0)
-> -			goto out;
-> +		r =3D kvm_create_dirty_bitmap(&new);
-> +		if (r)
-> +			return r;
->  	}
-> =20
->  	slots =3D kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> -	if (!slots)
-> +	if (!slots) {
-> +		r =3D -ENOMEM;
->  		goto out_bitmap;
-> +	}
->  	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots)=
-);
-> =20
->  	if ((change =3D=3D KVM_MR_DELETE) || (change =3D=3D KVM_MR_MOVE)) {
-> @@ -1068,7 +1065,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  out_bitmap:
->  	if (new.dirty_bitmap && !old.dirty_bitmap)
->  		kvm_destroy_dirty_bitmap(&new);
-> -out:
->  	return r;
->  }
->  EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
->=20
-
-
-
---6J8eeynfSebyZsyGavbEUWKxUSMvfibQv--
-
---Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl16LdAACgkQ41TmuOI4
-ufiqdRAAk7Fq5LoAJLqJFxnCihIQRlcl8vo542WY/o9SIjSW82ULb9ja3jx/IZOo
-zXJt4+l9ZwKB3cwu3Z9pkvcu+D7PgbVSHyCAraimR8rk/TznU4esmSGNZX//BmaX
-AfSdajjNFNRXP+HsOlR0OVsvX6JBWQqfikSvqUv+GGzhOOB5TT7QIlNGTUFJhTuj
-DWsP4KnnRlxI8a6Tz0mXfcJLDABMu2Ypl8IjtEkAS57byfjVuy1fP3/WtiWW8QST
-2BeoiY5FQH/syqW0oXYO6Ov2rlS2gKMPwaL5nQwuHrOxd+A1qZv9rX7NU1P3+eZq
-+Xutlm/mQHajvO6FfiuUf2pG/YuwfCyhX/ENMcmohw5TO1sdZDcY/BSHop0UYv+F
-8RkUxxstxRot67kTQvjZ1p60Tz/SYmxszldFM2noNPjzitbwUoiHrLl9Ti1MeMJ3
-QXb1ZCuTA8/F138tNGVL52JIOrsbIqvdLoc1/4qxJPLYbHzF/HMSqJ0nHl8tFa5Y
-D9N8xdr1pdQoHKNVLDVI8b5Jt5yMaeN4WrBqOFxTVme6XCxGu2eNRxyNWZbA2+Z3
-nDkoU2HaEDH3QbH2LuZy9wDTHlPb1dnO3XatbDqCf32/gsChlKjuEcKOcNnBVntM
-Izb7sxZStgMuHCrkgWweUjFkyR93+8JboW1iJKcFYtR1FWfffyU=
-=pPrb
------END PGP SIGNATURE-----
-
---Bm0JecVlrjrc0FKCyusctXhutbwL6ZTpe--
-
-
---===============4477727313591178294==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4477727313591178294==--
-
+SGVyZSBpcyB0aGUgcHJlc2VudGF0aW9uLCBhbnkgY29tbWVudHMgaXMgd2VsY29tZS4KCmh0dHBz
+Oi8vZG9jcy5nb29nbGUuY29tL3ByZXNlbnRhdGlvbi9kLzFzYzI5NUp6blZBZkRJUGllQXF6amN5
+VWtjSG5ORlFzSzhGRnFkb0NZODU0L2VkaXQ/dXNwPXNoYXJpbmcKCk9uIEZyaSwgU2VwIDEzLCAy
+MDE5IGF0IDM6MTMgUE0gR3VvIFJlbiA8Z3VvcmVuQGtlcm5lbC5vcmc+IHdyb3RlOgo+Cj4gQW5v
+dGhlciBpZGVhIGlzIHNlcGVyYXRlIHJlbW90ZSBUTEIgaW52YWxpZGF0ZSBpbnRvIHR3byBpbnN0
+cnVjdGlvbnM6Cj4KPiAgLSBzZmVuY2Uudm1hLmIuYXN5Ywo+ICAtIHNmZW5jZS52bWEuYi5iYXJy
+aWVyIC8vIHdhaXQgYWxsIGFzeW5jIFRMQiBpbnZhbGlkYXRlIG9wZXJhdGlvbnMgZmluaXNoZWQg
+Zm9yIGFsbCBoYXJ0cy4KPgo+IChJIHJlbWVtYmVyIHdobyBtZW50aW9uZWQgbWUgc2VwYXJhdGUg
+dGhlbSBpbnRvIHR3byBpbnN0cnVjdGlvbnMgYWZ0ZXIgc2Vzc2lvbi4gQW51cD8gSXMgdGhlIGlk
+ZWEgcmlnaHQgPykKPgo+IEFjdHVhbGx5LCBJIG5ldmVyIGNvbnNpZGVyIGFzeWMgVExCIGludmFs
+aWRhdGUgYmVmb3JlLCBiZWNhdXNlIGN1cnJlbnQgb3VyIGxpZ2h0IGlvbW11IGRpZCBub3QgbmVl
+ZCBpdC4KPgo+IFRoeCBhbGwgcGVvcGxlIGF0dGVuZCB0aGUgc2Vzc2lvbiA6KSBMZXQncyBjb250
+aW51ZSB0aGUgdGFsay4KPgo+Cj4gR3VvIFJlbiA8Z3VvcmVuQGtlcm5lbC5vcmc+IOS6jiAyMDE5
+5bm0OeaciDEy5pel5ZGo5ZubIDIyOjU55YaZ6YGT77yaCj4+Cj4+IFRoeCBXaWxsIGZvciByZXBs
+eS4KPj4KPj4gT24gVGh1LCBTZXAgMTIsIDIwMTkgYXQgMzowMyBQTSBXaWxsIERlYWNvbiA8d2ls
+bEBrZXJuZWwub3JnPiB3cm90ZToKPj4gPgo+PiA+IE9uIFN1biwgU2VwIDA4LCAyMDE5IGF0IDA3
+OjUyOjU1QU0gKzA4MDAsIEd1byBSZW4gd3JvdGU6Cj4+ID4gPiBPbiBNb24sIEp1biAyNCwgMjAx
+OSBhdCA2OjQwIFBNIFdpbGwgRGVhY29uIDx3aWxsQGtlcm5lbC5vcmc+IHdyb3RlOgo+PiA+ID4g
+PiA+IEknbGwga2VlcCBteSBzeXN0ZW0gdXNlIHRoZSBzYW1lIEFTSUQgZm9yIFNNUCArIElPTU1V
+IDpQCj4+ID4gPiA+Cj4+ID4gPiA+IFlvdSB3aWxsIHdhbnQgYSBzZXBhcmF0ZSBhbGxvY2F0b3Ig
+Zm9yIHRoYXQ6Cj4+ID4gPiA+Cj4+ID4gPiA+IGh0dHBzOi8vbGttbC5rZXJuZWwub3JnL3IvMjAx
+OTA2MTAxODQ3MTQuNjc4Ni0yLWplYW4tcGhpbGlwcGUuYnJ1Y2tlckBhcm0uY29tCj4+ID4gPgo+
+PiA+ID4gWWVzLCBpdCBpcyBoYXJkIHRvIG1haW50YWluIEFTSUQgYmV0d2VlbiBJT01NVSBhbmQg
+Q1BVTU1VIG9yIGRpZmZlcmVudAo+PiA+ID4gc3lzdGVtLCBiZWNhdXNlIGl0J3MgZGlmZmljdWx0
+IHRvIHN5bmNocm9uaXplIHRoZSBJT19BU0lEIHdoZW4gdGhlIENQVQo+PiA+ID4gQVNJRCBpcyBy
+b2xsb3Zlci4KPj4gPiA+IEJ1dCB3ZSBjb3VsZCBzdGlsbCB1c2UgaGFyZHdhcmUgYnJvYWRjYXN0
+IFRMQiBpbnZhbGlkYXRpb24gaW5zdHJ1Y3Rpb24KPj4gPiA+IHRvIHVuaWZvcm1seSBtYW5hZ2Ug
+dGhlIEFTSUQgYW5kIElPX0FTSUQsIG9yIE9USEVSX0FTSUQgaW4gb3VyIElPTU1VLgo+PiA+Cj4+
+ID4gVGhhdCdzIHByb2JhYmx5IGEgYmFkIGlkZWEsIGJlY2F1c2UgeW91J2xsIGxpa2VseSBzdGFs
+bCBleGVjdXRpb24gb24gdGhlCj4+ID4gQ1BVIHVudGlsIHRoZSBJT1RMQiBoYXMgY29tcGxldGVk
+IGludmFsaWRhdGlvbi4gSW4gdGhlIGNhc2Ugb2YgQVRTLCBJIHRoaW5rCj4+ID4gYW4gZW5kcG9p
+bnQgQVRDIGlzIHBlcm1pdHRlZCB0byB0YWtlIG92ZXIgYSBtaW51dGUgdG8gcmVzcG9uZC4gSW4g
+cmVhbGl0eSwgSQo+PiA+IHN1c3BlY3QgdGhlIHdvcnN0IHlvdSdsbCBldmVyIHNlZSB3b3VsZCBi
+ZSBpbiB0aGUgbXNlYyByYW5nZSwgYnV0IHRoYXQncwo+PiA+IHN0aWxsIGFuIHVuYWNjZXB0YWJs
+ZSBwZXJpb2Qgb2YgdGltZSB0byBob2xkIGEgQ1BVLgo+PiBKdXN0IGFzIEkndmUgc2FpZCBpbiB0
+aGUgc2Vzc2lvbiB0aGF0IElPVExCIGludmFsaWRhdGUgZGVsYXkgaXMKPj4gYW5vdGhlciB0b3Bp
+YywgTXkgbWFpbiBwcm9wb3NhbCBpcyB0byBpbnRyb2R1Y2Ugc3RhZ2UxLnBnZCBhbmQKPj4gc3Rh
+Z2UyLnBnZCBhcyBhZGRyZXNzIHNwYWNlIGlkZW50aWZpZXJzIGJldHdlZW4gZGlmZmVyZW50IFRM
+QiBzeXN0ZW1zCj4+IGJhc2VkIG9uIHZtaWQsIGFzaWQuIE15IGxhc3QgcGFydCBvZiBzaWxkZXMg
+d2lsbCBzaG93IHlvdSBob3cgdG8KPj4gdHJhbnNsYXRlIHN0YWdlMS8yLnBnZCB0byBhcy92bWlk
+IGluIFBDSSBBVFMgc3lzdGVtIGFuZCB0aGUgbWV0aG9kCj4+IGNvdWxkIHdvcmsgd2l0aCBTTU1V
+LXYzIGFuZCBpbnRlbCBWdC1kLiAoSXQncyByZWdyZXQgZm9yIG1lIHRoZXJlIGlzCj4+IG5vIHRp
+bWUgdG8gc2hvdyB5b3UgdGhlIHdob2xlIHNsaWRlcy4pCj4+Cj4+IEluIG91ciBsaWdodCBJT01N
+VSBpbXBsZW1lbnRhdGlvbiwgdGhlcmUncyBubyBJT1RMQiBpbnZhbGlkYXRlIGRlbGF5Cj4+IHBy
+b2JsZW0uIEJlY2FzdWUgSU9NTVUgaXMgdmVyeSBjbG9zZSB0byBDUFUgTU1VIGFuZCBpbnRlcmNv
+bm5lY3Qncwo+PiBkZWxheSBpcyB0aGUgc2FtZSB3aXRoIFNNUCBDUFVzIE1NVSAobm8gUENJLCBW
+TSBzdXBwb3J0ZWQpLgo+Pgo+PiBUbyBzb2x2ZSB0aGUgcHJvYmxlbSwgd2UgY291bGQgZGVmaW5l
+IGEgYXN5bmMgbW9kZSBpbiBzZmVuY2Uudm1hLmIgdG8KPj4gc2xvdmUgdGhlIHByb2JsZW0gYW5k
+IGZpbmlzaGVkIHdpdGggcGVyX2NwdV9pcnEvZXhjZXB0aW9uLgo+Pgo+PiAtLQo+PiBCZXN0IFJl
+Z2FyZHMKPj4gIEd1byBSZW4KPj4KPj4gTUw6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4
+LWNza3kvCgoKCi0tIApCZXN0IFJlZ2FyZHMKIEd1byBSZW4KCk1MOiBodHRwczovL2xvcmUua2Vy
+bmVsLm9yZy9saW51eC1jc2t5LwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
