@@ -3,58 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE128C4CECD
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Sep 2019 09:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 358B6C4CECD
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Sep 2019 10:20:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B5CD21897
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Sep 2019 09:36:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B5CD21897
+	by mail.kernel.org (Postfix) with ESMTP id B3257214AF
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Sep 2019 10:20:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3257214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E70154A692;
-	Tue, 17 Sep 2019 05:36:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C1534A5C3;
+	Tue, 17 Sep 2019 06:20:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cjKX9NDhGyWG; Tue, 17 Sep 2019 05:36:42 -0400 (EDT)
+	with ESMTP id ELExA7aZC0iE; Tue, 17 Sep 2019 06:20:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 797A94A5DB;
-	Tue, 17 Sep 2019 05:36:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B05E54A5E7;
+	Tue, 17 Sep 2019 06:20:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED34A4A5CD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Sep 2019 05:36:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62E8B4A5DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Sep 2019 06:20:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id shNGW0NZ0PPJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Sep 2019 05:36:39 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C8CB4A5C5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Sep 2019 05:36:38 -0400 (EDT)
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id CF0FBFB81ECA658B20C5;
- Tue, 17 Sep 2019 17:36:34 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
- 17:36:26 +0800
+ with ESMTP id d1LR-uULL6lz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Sep 2019 06:20:19 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 343554A5C3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Sep 2019 06:20:19 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 00CEA4084370D507D9D1;
+ Tue, 17 Sep 2019 18:20:16 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
+ 18:20:09 +0800
 Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
  driven by vcpu_load/put
+From: Zenghui Yu <yuzenghui@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
 References: <20190903155747.219802-1-maz@kernel.org>
  <5ab75fec-6014-e3b4-92a3-63d5015814c1@huawei.com>
  <07ddb304-9a7a-64a3-386a-96eea4516346@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <dcc5a10b-c9ca-f833-4a60-e5d3726fa0b9@huawei.com>
-Date: Tue, 17 Sep 2019 17:31:40 +0800
+ <dcc5a10b-c9ca-f833-4a60-e5d3726fa0b9@huawei.com>
+Message-ID: <3b2d4a15-5658-f50f-0214-1da708cd4923@huawei.com>
+Date: Tue, 17 Sep 2019 18:17:36 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
  Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <07ddb304-9a7a-64a3-386a-96eea4516346@kernel.org>
+In-Reply-To: <dcc5a10b-c9ca-f833-4a60-e5d3726fa0b9@huawei.com>
 Content-Language: en-US
 X-Originating-IP: [10.184.12.158]
 X-CFilter-Loop: Reflected
@@ -70,233 +71,152 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-On 2019/9/17 16:35, Marc Zyngier wrote:
-> Hi Zenghui,
-> 
-> On 17/09/2019 09:10, Zenghui Yu wrote:
->> Hi Marc,
->>
->> I've run this patch on my box and got the following messages:
->>
->> ---8<
->>
->> [ 2258.490030] BUG: sleeping function called from invalid context at
->> kernel/irq/manage.c:138
->> [ 2258.490034] in_atomic(): 1, irqs_disabled(): 0, pid: 59278, name: CPU
->> 0/KVM
->> [ 2258.490039] CPU: 32 PID: 59278 Comm: CPU 0/KVM Kdump: loaded Tainted:
->> G        W         5.3.0+ #26
->> [ 2258.490041] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58
->> 10/29/2018
->> [ 2258.490043] Call trace:
->> [ 2258.490056]  dump_backtrace+0x0/0x188
->> [ 2258.490060]  show_stack+0x24/0x30
->> [ 2258.490066]  dump_stack+0xb0/0xf4
->> [ 2258.490072]  ___might_sleep+0x10c/0x130
->> [ 2258.490074]  __might_sleep+0x58/0x90
->> [ 2258.490078]  synchronize_irq+0x58/0xd8
->> [ 2258.490079]  disable_irq+0x2c/0x38
->> [ 2258.490083]  vgic_v4_load+0x9c/0xc0
->> [ 2258.490084]  vgic_v3_load+0x94/0x170
->> [ 2258.490088]  kvm_vgic_load+0x3c/0x60
->> [ 2258.490092]  kvm_arch_vcpu_load+0xd4/0x1d0
->> [ 2258.490095]  vcpu_load+0x50/0x70
->> [ 2258.490097]  kvm_arch_vcpu_ioctl_run+0x94/0x978
->> [ 2258.490098]  kvm_vcpu_ioctl+0x3d8/0xa28
->> [ 2258.490104]  do_vfs_ioctl+0xc4/0x8e8
->> [ 2258.490106]  ksys_ioctl+0x8c/0xa0
->> [ 2258.490108]  __arm64_sys_ioctl+0x28/0x58
->> [ 2258.490112]  el0_svc_common.constprop.0+0x7c/0x188
->> [ 2258.490114]  el0_svc_handler+0x34/0xb8
->> [ 2258.490117]  el0_svc+0x8/0xc
->> [ 2259.497070] BUG: sleeping function called from invalid context at
->> kernel/irq/manage.c:138
-> 
-> Thanks for reporting this.
-> 
-> [...]
-> 
->> The logic of disabling the doorbell interrupt in vgic_v4_load() might
->> need a fix?
-> 
-> The logic itself looks OK, but doing a full blown disable_irq() is both
-> counter productive (if we race against a doorbell, there is not much we
-> can do about it and waiting for it to end is pointless) and wrong
-> (despite the comment that this can be called in IRQ context, it is
-> pretty unsafe to do so).
-> 
-> Can you try turning it into a disable_irq_nosync() and let me know if
-> that helps?
-
-Yes, the above BUG messages disappear with disable_irq_nosync().
-
-But this time I got the following WARNING:
-
-
-[  921.004322] ======================================================
-[  921.010489] WARNING: possible circular locking dependency detected
-[  921.016657] 5.3.0+ #27 Not tainted
-[  921.020132] ------------------------------------------------------
-[  921.026299] CPU 1/KVM/816 is trying to acquire lock:
-[  921.031250] ffff002fb42b35b0 (&irq_desc_lock_class){-.-.}, at: 
-__irq_get_desc_lock+0x60/0xa0
-[  921.039684]
-                but task is already holding lock:
-[  921.045503] ffff002fbbb07258 (&rq->lock){-.-.}, at: __schedule+0xd4/0x988
-[  921.052283]
-                which lock already depends on the new lock.
-
-[  921.060445]
-                the existing dependency chain (in reverse order) is:
-[  921.067913]
-                -> #3 (&rq->lock){-.-.}:
-[  921.072955]        lock_acquire+0xd4/0x268
-[  921.077041]        _raw_spin_lock+0x44/0x58
-[  921.081212]        task_fork_fair+0x54/0x160
-[  921.085471]        sched_fork+0xfc/0x238
-[  921.089383]        copy_process+0x474/0x1738
-[  921.093639]        _do_fork+0x70/0x6e0
-[  921.097376]        kernel_thread+0x70/0x98
-[  921.101459]        rest_init+0x34/0x278
-[  921.105286]        arch_call_rest_init+0x14/0x1c
-[  921.109891]        start_kernel+0x548/0x574
-[  921.114060]
-                -> #2 (&p->pi_lock){-.-.}:
-[  921.119275]        lock_acquire+0xd4/0x268
-[  921.123360]        _raw_spin_lock_irqsave+0x60/0x80
-[  921.128225]        try_to_wake_up+0x60/0xbf0
-[  921.132483]        wake_up_process+0x28/0x38
-[  921.136739]        __up.isra.0+0x58/0x68
-[  921.140649]        up+0x64/0x80
-[  921.143777]        __up_console_sem+0x60/0xa8
-[  921.148121]        console_unlock+0x31c/0x5f0
-[  921.152465]        vprintk_emit+0x28c/0x438
-[  921.156637]        dev_vprintk_emit+0x1d8/0x218
-[  921.161157]        dev_printk_emit+0x84/0xa8
-[  921.165414]        __dev_printk+0x78/0xa0
-[  921.169411]        _dev_info+0x7c/0xa0
-[  921.173148]        hub_port_init+0xa5c/0xb68
-[  921.177405]        hub_port_connect+0x2f0/0xa08
-[  921.181923]        port_event+0x548/0x828
-[  921.185920]        hub_event+0x20c/0x418
-[  921.189831]        process_one_work+0x24c/0x700
-[  921.194349]        worker_thread+0x4c/0x448
-[  921.198519]        kthread+0x130/0x138
-[  921.202256]        ret_from_fork+0x10/0x18
-[  921.206338]
-                -> #1 ((console_sem).lock){-.-.}:
-[  921.212160]        lock_acquire+0xd4/0x268
-[  921.216244]        _raw_spin_lock_irqsave+0x60/0x80
-[  921.221110]        down_trylock+0x20/0x50
-[  921.225106]        __down_trylock_console_sem+0x50/0xe0
-[  921.230320]        console_trylock+0x20/0x88
-[  921.234577]        vprintk_emit+0x18c/0x438
-[  921.238747]        vprintk_default+0x54/0x90
-[  921.243004]        vprintk_func+0xe4/0x268
-[  921.247087]        printk+0x74/0x94
-[  921.250564]        show_interrupts+0x4dc/0x4f8
-[  921.254997]        seq_read+0x2b4/0x4e0
-[  921.258820]        proc_reg_read+0x94/0xe8
-[  921.262905]        __vfs_read+0x48/0x80
-[  921.266729]        vfs_read+0xa0/0x160
-[  921.270465]        ksys_read+0x74/0xf8
-[  921.274202]        __arm64_sys_read+0x24/0x30
-[  921.278547]        el0_svc_common.constprop.0+0x80/0x1b8
-[  921.283846]        el0_svc_handler+0x34/0xb8
-[  921.288102]        el0_svc+0x8/0xc
-[  921.291491]
-                -> #0 (&irq_desc_lock_class){-.-.}:
-[  921.297486]        check_prev_add+0xac/0x9f8
-[  921.301743]        __lock_acquire+0x1164/0x12b8
-[  921.306260]        lock_acquire+0xd4/0x268
-[  921.310344]        _raw_spin_lock_irqsave+0x60/0x80
-[  921.315209]        __irq_get_desc_lock+0x60/0xa0
-[  921.319814]        irq_set_vcpu_affinity+0x48/0xc8
-[  921.324592]        its_schedule_vpe+0x68/0xb0
-[  921.328937]        vgic_v4_put+0x80/0xa8
-[  921.332846]        vgic_v3_put+0x24/0xf0
-[  921.336756]        kvm_vgic_put+0x3c/0x60
-[  921.340754]        kvm_arch_vcpu_put+0x38/0x60
-[  921.345184]        kvm_sched_out+0x38/0x48
-[  921.349267]        __schedule+0x5a4/0x988
-[  921.353263]        schedule+0x40/0xc8
-[  921.356912]        kvm_arch_vcpu_ioctl_run+0x130/0xb08
-[  921.362037]        kvm_vcpu_ioctl+0x3e0/0xb08
-[  921.366381]        do_vfs_ioctl+0xc4/0x890
-[  921.370464]        ksys_ioctl+0x8c/0xa0
-[  921.374287]        __arm64_sys_ioctl+0x28/0x38
-[  921.378717]        el0_svc_common.constprop.0+0x80/0x1b8
-[  921.384016]        el0_svc_handler+0x34/0xb8
-[  921.388272]        el0_svc+0x8/0xc
-[  921.391660]
-                other info that might help us debug this:
-
-[  921.399649] Chain exists of:
-                  &irq_desc_lock_class --> &p->pi_lock --> &rq->lock
-
-[  921.409984]  Possible unsafe locking scenario:
-
-[  921.415889]        CPU0                    CPU1
-[  921.420405]        ----                    ----
-[  921.424921]   lock(&rq->lock);
-[  921.427962]                                lock(&p->pi_lock);
-[  921.433694]                                lock(&rq->lock);
-[  921.439253]   lock(&irq_desc_lock_class);
-[  921.443249]
-                 *** DEADLOCK ***
-
-[  921.449155] 2 locks held by CPU 1/KVM/816:
-[  921.453237]  #0: ffff002fa3862aa8 (&vcpu->mutex){+.+.}, at: 
-kvm_vcpu_ioctl+0x80/0xb08
-[  921.461055]  #1: ffff002fbbb07258 (&rq->lock){-.-.}, at: 
-__schedule+0xd4/0x988
-[  921.468265]
-                stack backtrace:
-[  921.472610] CPU: 24 PID: 816 Comm: CPU 1/KVM Kdump: loaded Not 
-tainted 5.3.0+ #27
-[  921.480165] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
-10/29/2018
-[  921.487372] Call trace:
-[  921.489806]  dump_backtrace+0x0/0x188
-[  921.493455]  show_stack+0x24/0x30
-[  921.496757]  dump_stack+0xcc/0x134
-[  921.500146]  print_circular_bug.isra.20+0x204/0x2d8
-[  921.505011]  check_noncircular+0x130/0x1c0
-[  921.509094]  check_prev_add+0xac/0x9f8
-[  921.512829]  __lock_acquire+0x1164/0x12b8
-[  921.516825]  lock_acquire+0xd4/0x268
-[  921.520388]  _raw_spin_lock_irqsave+0x60/0x80
-[  921.524732]  __irq_get_desc_lock+0x60/0xa0
-[  921.528815]  irq_set_vcpu_affinity+0x48/0xc8
-[  921.533071]  its_schedule_vpe+0x68/0xb0
-[  921.536894]  vgic_v4_put+0x80/0xa8
-[  921.540282]  vgic_v3_put+0x24/0xf0
-[  921.543671]  kvm_vgic_put+0x3c/0x60
-[  921.547147]  kvm_arch_vcpu_put+0x38/0x60
-[  921.551057]  kvm_sched_out+0x38/0x48
-[  921.554618]  __schedule+0x5a4/0x988
-[  921.558094]  schedule+0x40/0xc8
-[  921.561222]  kvm_arch_vcpu_ioctl_run+0x130/0xb08
-[  921.565826]  kvm_vcpu_ioctl+0x3e0/0xb08
-[  921.569649]  do_vfs_ioctl+0xc4/0x890
-[  921.573211]  ksys_ioctl+0x8c/0xa0
-[  921.576513]  __arm64_sys_ioctl+0x28/0x38
-[  921.580423]  el0_svc_common.constprop.0+0x80/0x1b8
-[  921.585201]  el0_svc_handler+0x34/0xb8
-[  921.588937]  el0_svc+0x8/0xc
-
-
-
-Thanks,
-zenghui
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMTkvOS8xNyAxNzozMSwgWmVuZ2h1aSBZdSB3cm90ZToKPiAKPiBCdXQg
+dGhpcyB0aW1lIEkgZ290IHRoZSBmb2xsb3dpbmcgV0FSTklORzoKClBsZWFzZSBpZ25vcmUgaXQu
+IEkgdGhpbmsgdGhpcyBpcyBtb3N0bHkgY2F1c2VkIGJ5IG15IGxvY2FsIGJ1Z2d5CnBhdGNoLi4u
+IFNvcnJ5IGZvciB0aGUgbm9pc2UuCgoKWmVuZ2h1aQoKPiAKPiBbwqAgOTIxLjAwNDMyMl0gPT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cj4gW8Kg
+IDkyMS4wMTA0ODldIFdBUk5JTkc6IHBvc3NpYmxlIGNpcmN1bGFyIGxvY2tpbmcgZGVwZW5kZW5j
+eSBkZXRlY3RlZAo+IFvCoCA5MjEuMDE2NjU3XSA1LjMuMCsgIzI3IE5vdCB0YWludGVkCj4gW8Kg
+IDkyMS4wMjAxMzJdIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQo+IFvCoCA5MjEuMDI2Mjk5XSBDUFUgMS9LVk0vODE2IGlzIHRyeWluZyB0byBh
+Y3F1aXJlIGxvY2s6Cj4gW8KgIDkyMS4wMzEyNTBdIGZmZmYwMDJmYjQyYjM1YjAgKCZpcnFfZGVz
+Y19sb2NrX2NsYXNzKXstLi0ufSwgYXQ6IAo+IF9faXJxX2dldF9kZXNjX2xvY2srMHg2MC8weGEw
+Cj4gW8KgIDkyMS4wMzk2ODRdCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnV0IHRh
+c2sgaXMgYWxyZWFkeSBob2xkaW5nIGxvY2s6Cj4gW8KgIDkyMS4wNDU1MDNdIGZmZmYwMDJmYmJi
+MDcyNTggKCZycS0+bG9jayl7LS4tLn0sIGF0OiAKPiBfX3NjaGVkdWxlKzB4ZDQvMHg5ODgKPiBb
+wqAgOTIxLjA1MjI4M10KPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3aGljaCBsb2Nr
+IGFscmVhZHkgZGVwZW5kcyBvbiB0aGUgbmV3IGxvY2suCj4gCj4gW8KgIDkyMS4wNjA0NDVdCj4g
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGhlIGV4aXN0aW5nIGRlcGVuZGVuY3kgY2hh
+aW4gKGluIHJldmVyc2Ugb3JkZXIpIGlzOgo+IFvCoCA5MjEuMDY3OTEzXQo+ICDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIC0+ICMzICgmcnEtPmxvY2spey0uLS59Ogo+IFvCoCA5MjEuMDcy
+OTU1XcKgwqDCoMKgwqDCoMKgIGxvY2tfYWNxdWlyZSsweGQ0LzB4MjY4Cj4gW8KgIDkyMS4wNzcw
+NDFdwqDCoMKgwqDCoMKgwqAgX3Jhd19zcGluX2xvY2srMHg0NC8weDU4Cj4gW8KgIDkyMS4wODEy
+MTJdwqDCoMKgwqDCoMKgwqAgdGFza19mb3JrX2ZhaXIrMHg1NC8weDE2MAo+IFvCoCA5MjEuMDg1
+NDcxXcKgwqDCoMKgwqDCoMKgIHNjaGVkX2ZvcmsrMHhmYy8weDIzOAo+IFvCoCA5MjEuMDg5Mzgz
+XcKgwqDCoMKgwqDCoMKgIGNvcHlfcHJvY2VzcysweDQ3NC8weDE3MzgKPiBbwqAgOTIxLjA5MzYz
+OV3CoMKgwqDCoMKgwqDCoCBfZG9fZm9yaysweDcwLzB4NmUwCj4gW8KgIDkyMS4wOTczNzZdwqDC
+oMKgwqDCoMKgwqAga2VybmVsX3RocmVhZCsweDcwLzB4OTgKPiBbwqAgOTIxLjEwMTQ1OV3CoMKg
+wqDCoMKgwqDCoCByZXN0X2luaXQrMHgzNC8weDI3OAo+IFvCoCA5MjEuMTA1Mjg2XcKgwqDCoMKg
+wqDCoMKgIGFyY2hfY2FsbF9yZXN0X2luaXQrMHgxNC8weDFjCj4gW8KgIDkyMS4xMDk4OTFdwqDC
+oMKgwqDCoMKgwqAgc3RhcnRfa2VybmVsKzB4NTQ4LzB4NTc0Cj4gW8KgIDkyMS4xMTQwNjBdCj4g
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLT4gIzIgKCZwLT5waV9sb2NrKXstLi0ufToK
+PiBbwqAgOTIxLjExOTI3NV3CoMKgwqDCoMKgwqDCoCBsb2NrX2FjcXVpcmUrMHhkNC8weDI2OAo+
+IFvCoCA5MjEuMTIzMzYwXcKgwqDCoMKgwqDCoMKgIF9yYXdfc3Bpbl9sb2NrX2lycXNhdmUrMHg2
+MC8weDgwCj4gW8KgIDkyMS4xMjgyMjVdwqDCoMKgwqDCoMKgwqAgdHJ5X3RvX3dha2VfdXArMHg2
+MC8weGJmMAo+IFvCoCA5MjEuMTMyNDgzXcKgwqDCoMKgwqDCoMKgIHdha2VfdXBfcHJvY2Vzcysw
+eDI4LzB4MzgKPiBbwqAgOTIxLjEzNjczOV3CoMKgwqDCoMKgwqDCoCBfX3VwLmlzcmEuMCsweDU4
+LzB4NjgKPiBbwqAgOTIxLjE0MDY0OV3CoMKgwqDCoMKgwqDCoCB1cCsweDY0LzB4ODAKPiBbwqAg
+OTIxLjE0Mzc3N13CoMKgwqDCoMKgwqDCoCBfX3VwX2NvbnNvbGVfc2VtKzB4NjAvMHhhOAo+IFvC
+oCA5MjEuMTQ4MTIxXcKgwqDCoMKgwqDCoMKgIGNvbnNvbGVfdW5sb2NrKzB4MzFjLzB4NWYwCj4g
+W8KgIDkyMS4xNTI0NjVdwqDCoMKgwqDCoMKgwqAgdnByaW50a19lbWl0KzB4MjhjLzB4NDM4Cj4g
+W8KgIDkyMS4xNTY2MzddwqDCoMKgwqDCoMKgwqAgZGV2X3ZwcmludGtfZW1pdCsweDFkOC8weDIx
+OAo+IFvCoCA5MjEuMTYxMTU3XcKgwqDCoMKgwqDCoMKgIGRldl9wcmludGtfZW1pdCsweDg0LzB4
+YTgKPiBbwqAgOTIxLjE2NTQxNF3CoMKgwqDCoMKgwqDCoCBfX2Rldl9wcmludGsrMHg3OC8weGEw
+Cj4gW8KgIDkyMS4xNjk0MTFdwqDCoMKgwqDCoMKgwqAgX2Rldl9pbmZvKzB4N2MvMHhhMAo+IFvC
+oCA5MjEuMTczMTQ4XcKgwqDCoMKgwqDCoMKgIGh1Yl9wb3J0X2luaXQrMHhhNWMvMHhiNjgKPiBb
+wqAgOTIxLjE3NzQwNV3CoMKgwqDCoMKgwqDCoCBodWJfcG9ydF9jb25uZWN0KzB4MmYwLzB4YTA4
+Cj4gW8KgIDkyMS4xODE5MjNdwqDCoMKgwqDCoMKgwqAgcG9ydF9ldmVudCsweDU0OC8weDgyOAo+
+IFvCoCA5MjEuMTg1OTIwXcKgwqDCoMKgwqDCoMKgIGh1Yl9ldmVudCsweDIwYy8weDQxOAo+IFvC
+oCA5MjEuMTg5ODMxXcKgwqDCoMKgwqDCoMKgIHByb2Nlc3Nfb25lX3dvcmsrMHgyNGMvMHg3MDAK
+PiBbwqAgOTIxLjE5NDM0OV3CoMKgwqDCoMKgwqDCoCB3b3JrZXJfdGhyZWFkKzB4NGMvMHg0NDgK
+PiBbwqAgOTIxLjE5ODUxOV3CoMKgwqDCoMKgwqDCoCBrdGhyZWFkKzB4MTMwLzB4MTM4Cj4gW8Kg
+IDkyMS4yMDIyNTZdwqDCoMKgwqDCoMKgwqAgcmV0X2Zyb21fZm9yaysweDEwLzB4MTgKPiBbwqAg
+OTIxLjIwNjMzOF0KPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtPiAjMSAoKGNvbnNv
+bGVfc2VtKS5sb2NrKXstLi0ufToKPiBbwqAgOTIxLjIxMjE2MF3CoMKgwqDCoMKgwqDCoCBsb2Nr
+X2FjcXVpcmUrMHhkNC8weDI2OAo+IFvCoCA5MjEuMjE2MjQ0XcKgwqDCoMKgwqDCoMKgIF9yYXdf
+c3Bpbl9sb2NrX2lycXNhdmUrMHg2MC8weDgwCj4gW8KgIDkyMS4yMjExMTBdwqDCoMKgwqDCoMKg
+wqAgZG93bl90cnlsb2NrKzB4MjAvMHg1MAo+IFvCoCA5MjEuMjI1MTA2XcKgwqDCoMKgwqDCoMKg
+IF9fZG93bl90cnlsb2NrX2NvbnNvbGVfc2VtKzB4NTAvMHhlMAo+IFvCoCA5MjEuMjMwMzIwXcKg
+wqDCoMKgwqDCoMKgIGNvbnNvbGVfdHJ5bG9jaysweDIwLzB4ODgKPiBbwqAgOTIxLjIzNDU3N13C
+oMKgwqDCoMKgwqDCoCB2cHJpbnRrX2VtaXQrMHgxOGMvMHg0MzgKPiBbwqAgOTIxLjIzODc0N13C
+oMKgwqDCoMKgwqDCoCB2cHJpbnRrX2RlZmF1bHQrMHg1NC8weDkwCj4gW8KgIDkyMS4yNDMwMDRd
+wqDCoMKgwqDCoMKgwqAgdnByaW50a19mdW5jKzB4ZTQvMHgyNjgKPiBbwqAgOTIxLjI0NzA4N13C
+oMKgwqDCoMKgwqDCoCBwcmludGsrMHg3NC8weDk0Cj4gW8KgIDkyMS4yNTA1NjRdwqDCoMKgwqDC
+oMKgwqAgc2hvd19pbnRlcnJ1cHRzKzB4NGRjLzB4NGY4Cj4gW8KgIDkyMS4yNTQ5OTddwqDCoMKg
+wqDCoMKgwqAgc2VxX3JlYWQrMHgyYjQvMHg0ZTAKPiBbwqAgOTIxLjI1ODgyMF3CoMKgwqDCoMKg
+wqDCoCBwcm9jX3JlZ19yZWFkKzB4OTQvMHhlOAo+IFvCoCA5MjEuMjYyOTA1XcKgwqDCoMKgwqDC
+oMKgIF9fdmZzX3JlYWQrMHg0OC8weDgwCj4gW8KgIDkyMS4yNjY3MjldwqDCoMKgwqDCoMKgwqAg
+dmZzX3JlYWQrMHhhMC8weDE2MAo+IFvCoCA5MjEuMjcwNDY1XcKgwqDCoMKgwqDCoMKgIGtzeXNf
+cmVhZCsweDc0LzB4ZjgKPiBbwqAgOTIxLjI3NDIwMl3CoMKgwqDCoMKgwqDCoCBfX2FybTY0X3N5
+c19yZWFkKzB4MjQvMHgzMAo+IFvCoCA5MjEuMjc4NTQ3XcKgwqDCoMKgwqDCoMKgIGVsMF9zdmNf
+Y29tbW9uLmNvbnN0cHJvcC4wKzB4ODAvMHgxYjgKPiBbwqAgOTIxLjI4Mzg0Nl3CoMKgwqDCoMKg
+wqDCoCBlbDBfc3ZjX2hhbmRsZXIrMHgzNC8weGI4Cj4gW8KgIDkyMS4yODgxMDJdwqDCoMKgwqDC
+oMKgwqAgZWwwX3N2YysweDgvMHhjCj4gW8KgIDkyMS4yOTE0OTFdCj4gIMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgLT4gIzAgKCZpcnFfZGVzY19sb2NrX2NsYXNzKXstLi0ufToKPiBbwqAg
+OTIxLjI5NzQ4Nl3CoMKgwqDCoMKgwqDCoCBjaGVja19wcmV2X2FkZCsweGFjLzB4OWY4Cj4gW8Kg
+IDkyMS4zMDE3NDNdwqDCoMKgwqDCoMKgwqAgX19sb2NrX2FjcXVpcmUrMHgxMTY0LzB4MTJiOAo+
+IFvCoCA5MjEuMzA2MjYwXcKgwqDCoMKgwqDCoMKgIGxvY2tfYWNxdWlyZSsweGQ0LzB4MjY4Cj4g
+W8KgIDkyMS4zMTAzNDRdwqDCoMKgwqDCoMKgwqAgX3Jhd19zcGluX2xvY2tfaXJxc2F2ZSsweDYw
+LzB4ODAKPiBbwqAgOTIxLjMxNTIwOV3CoMKgwqDCoMKgwqDCoCBfX2lycV9nZXRfZGVzY19sb2Nr
+KzB4NjAvMHhhMAo+IFvCoCA5MjEuMzE5ODE0XcKgwqDCoMKgwqDCoMKgIGlycV9zZXRfdmNwdV9h
+ZmZpbml0eSsweDQ4LzB4YzgKPiBbwqAgOTIxLjMyNDU5Ml3CoMKgwqDCoMKgwqDCoCBpdHNfc2No
+ZWR1bGVfdnBlKzB4NjgvMHhiMAo+IFvCoCA5MjEuMzI4OTM3XcKgwqDCoMKgwqDCoMKgIHZnaWNf
+djRfcHV0KzB4ODAvMHhhOAo+IFvCoCA5MjEuMzMyODQ2XcKgwqDCoMKgwqDCoMKgIHZnaWNfdjNf
+cHV0KzB4MjQvMHhmMAo+IFvCoCA5MjEuMzM2NzU2XcKgwqDCoMKgwqDCoMKgIGt2bV92Z2ljX3B1
+dCsweDNjLzB4NjAKPiBbwqAgOTIxLjM0MDc1NF3CoMKgwqDCoMKgwqDCoCBrdm1fYXJjaF92Y3B1
+X3B1dCsweDM4LzB4NjAKPiBbwqAgOTIxLjM0NTE4NF3CoMKgwqDCoMKgwqDCoCBrdm1fc2NoZWRf
+b3V0KzB4MzgvMHg0OAo+IFvCoCA5MjEuMzQ5MjY3XcKgwqDCoMKgwqDCoMKgIF9fc2NoZWR1bGUr
+MHg1YTQvMHg5ODgKPiBbwqAgOTIxLjM1MzI2M13CoMKgwqDCoMKgwqDCoCBzY2hlZHVsZSsweDQw
+LzB4YzgKPiBbwqAgOTIxLjM1NjkxMl3CoMKgwqDCoMKgwqDCoCBrdm1fYXJjaF92Y3B1X2lvY3Rs
+X3J1bisweDEzMC8weGIwOAo+IFvCoCA5MjEuMzYyMDM3XcKgwqDCoMKgwqDCoMKgIGt2bV92Y3B1
+X2lvY3RsKzB4M2UwLzB4YjA4Cj4gW8KgIDkyMS4zNjYzODFdwqDCoMKgwqDCoMKgwqAgZG9fdmZz
+X2lvY3RsKzB4YzQvMHg4OTAKPiBbwqAgOTIxLjM3MDQ2NF3CoMKgwqDCoMKgwqDCoCBrc3lzX2lv
+Y3RsKzB4OGMvMHhhMAo+IFvCoCA5MjEuMzc0Mjg3XcKgwqDCoMKgwqDCoMKgIF9fYXJtNjRfc3lz
+X2lvY3RsKzB4MjgvMHgzOAo+IFvCoCA5MjEuMzc4NzE3XcKgwqDCoMKgwqDCoMKgIGVsMF9zdmNf
+Y29tbW9uLmNvbnN0cHJvcC4wKzB4ODAvMHgxYjgKPiBbwqAgOTIxLjM4NDAxNl3CoMKgwqDCoMKg
+wqDCoCBlbDBfc3ZjX2hhbmRsZXIrMHgzNC8weGI4Cj4gW8KgIDkyMS4zODgyNzJdwqDCoMKgwqDC
+oMKgwqAgZWwwX3N2YysweDgvMHhjCj4gW8KgIDkyMS4zOTE2NjBdCj4gIMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgb3RoZXIgaW5mbyB0aGF0IG1pZ2h0IGhlbHAgdXMgZGVidWcgdGhpczoK
+PiAKPiBbwqAgOTIxLjM5OTY0OV0gQ2hhaW4gZXhpc3RzIG9mOgo+ICDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCAmaXJxX2Rlc2NfbG9ja19jbGFzcyAtLT4gJnAtPnBpX2xvY2sgLS0+
+ICZycS0+bG9jawo+IAo+IFvCoCA5MjEuNDA5OTg0XcKgIFBvc3NpYmxlIHVuc2FmZSBsb2NraW5n
+IHNjZW5hcmlvOgo+IAo+IFvCoCA5MjEuNDE1ODg5XcKgwqDCoMKgwqDCoMKgIENQVTDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBDUFUxCj4gW8KgIDkyMS40MjA0MDVdwqDC
+oMKgwqDCoMKgwqAgLS0tLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0t
+LS0KPiBbwqAgOTIxLjQyNDkyMV3CoMKgIGxvY2soJnJxLT5sb2NrKTsKPiBbwqAgOTIxLjQyNzk2
+Ml3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBsb2NrKCZwLT5waV9sb2NrKTsKPiBbwqAgOTIxLjQzMzY5NF3CoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsb2NrKCZy
+cS0+bG9jayk7Cj4gW8KgIDkyMS40MzkyNTNdwqDCoCBsb2NrKCZpcnFfZGVzY19sb2NrX2NsYXNz
+KTsKPiBbwqAgOTIxLjQ0MzI0OV0KPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICoq
+KiBERUFETE9DSyAqKioKPiAKPiBbwqAgOTIxLjQ0OTE1NV0gMiBsb2NrcyBoZWxkIGJ5IENQVSAx
+L0tWTS84MTY6Cj4gW8KgIDkyMS40NTMyMzddwqAgIzA6IGZmZmYwMDJmYTM4NjJhYTggKCZ2Y3B1
+LT5tdXRleCl7Ky4rLn0sIGF0OiAKPiBrdm1fdmNwdV9pb2N0bCsweDgwLzB4YjA4Cj4gW8KgIDky
+MS40NjEwNTVdwqAgIzE6IGZmZmYwMDJmYmJiMDcyNTggKCZycS0+bG9jayl7LS4tLn0sIGF0OiAK
+PiBfX3NjaGVkdWxlKzB4ZDQvMHg5ODgKPiBbwqAgOTIxLjQ2ODI2NV0KPiAgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBzdGFjayBiYWNrdHJhY2U6Cj4gW8KgIDkyMS40NzI2MTBdIENQVTog
+MjQgUElEOiA4MTYgQ29tbTogQ1BVIDEvS1ZNIEtkdW1wOiBsb2FkZWQgTm90IAo+IHRhaW50ZWQg
+NS4zLjArICMyNwo+IFvCoCA5MjEuNDgwMTY1XSBIYXJkd2FyZSBuYW1lOiBIdWF3ZWkgVGFpU2hh
+biAyMjgwIC9CQzExU1BDRCwgQklPUyAxLjU4IAo+IDEwLzI5LzIwMTgKPiBbwqAgOTIxLjQ4NzM3
+Ml0gQ2FsbCB0cmFjZToKPiBbwqAgOTIxLjQ4OTgwNl3CoCBkdW1wX2JhY2t0cmFjZSsweDAvMHgx
+ODgKPiBbwqAgOTIxLjQ5MzQ1NV3CoCBzaG93X3N0YWNrKzB4MjQvMHgzMAo+IFvCoCA5MjEuNDk2
+NzU3XcKgIGR1bXBfc3RhY2srMHhjYy8weDEzNAo+IFvCoCA5MjEuNTAwMTQ2XcKgIHByaW50X2Np
+cmN1bGFyX2J1Zy5pc3JhLjIwKzB4MjA0LzB4MmQ4Cj4gW8KgIDkyMS41MDUwMTFdwqAgY2hlY2tf
+bm9uY2lyY3VsYXIrMHgxMzAvMHgxYzAKPiBbwqAgOTIxLjUwOTA5NF3CoCBjaGVja19wcmV2X2Fk
+ZCsweGFjLzB4OWY4Cj4gW8KgIDkyMS41MTI4MjldwqAgX19sb2NrX2FjcXVpcmUrMHgxMTY0LzB4
+MTJiOAo+IFvCoCA5MjEuNTE2ODI1XcKgIGxvY2tfYWNxdWlyZSsweGQ0LzB4MjY4Cj4gW8KgIDky
+MS41MjAzODhdwqAgX3Jhd19zcGluX2xvY2tfaXJxc2F2ZSsweDYwLzB4ODAKPiBbwqAgOTIxLjUy
+NDczMl3CoCBfX2lycV9nZXRfZGVzY19sb2NrKzB4NjAvMHhhMAo+IFvCoCA5MjEuNTI4ODE1XcKg
+IGlycV9zZXRfdmNwdV9hZmZpbml0eSsweDQ4LzB4YzgKPiBbwqAgOTIxLjUzMzA3MV3CoCBpdHNf
+c2NoZWR1bGVfdnBlKzB4NjgvMHhiMAo+IFvCoCA5MjEuNTM2ODk0XcKgIHZnaWNfdjRfcHV0KzB4
+ODAvMHhhOAo+IFvCoCA5MjEuNTQwMjgyXcKgIHZnaWNfdjNfcHV0KzB4MjQvMHhmMAo+IFvCoCA5
+MjEuNTQzNjcxXcKgIGt2bV92Z2ljX3B1dCsweDNjLzB4NjAKPiBbwqAgOTIxLjU0NzE0N13CoCBr
+dm1fYXJjaF92Y3B1X3B1dCsweDM4LzB4NjAKPiBbwqAgOTIxLjU1MTA1N13CoCBrdm1fc2NoZWRf
+b3V0KzB4MzgvMHg0OAo+IFvCoCA5MjEuNTU0NjE4XcKgIF9fc2NoZWR1bGUrMHg1YTQvMHg5ODgK
+PiBbwqAgOTIxLjU1ODA5NF3CoCBzY2hlZHVsZSsweDQwLzB4YzgKPiBbwqAgOTIxLjU2MTIyMl3C
+oCBrdm1fYXJjaF92Y3B1X2lvY3RsX3J1bisweDEzMC8weGIwOAo+IFvCoCA5MjEuNTY1ODI2XcKg
+IGt2bV92Y3B1X2lvY3RsKzB4M2UwLzB4YjA4Cj4gW8KgIDkyMS41Njk2NDldwqAgZG9fdmZzX2lv
+Y3RsKzB4YzQvMHg4OTAKPiBbwqAgOTIxLjU3MzIxMV3CoCBrc3lzX2lvY3RsKzB4OGMvMHhhMAo+
+IFvCoCA5MjEuNTc2NTEzXcKgIF9fYXJtNjRfc3lzX2lvY3RsKzB4MjgvMHgzOAo+IFvCoCA5MjEu
+NTgwNDIzXcKgIGVsMF9zdmNfY29tbW9uLmNvbnN0cHJvcC4wKzB4ODAvMHgxYjgKPiBbwqAgOTIx
+LjU4NTIwMV3CoCBlbDBfc3ZjX2hhbmRsZXIrMHgzNC8weGI4Cj4gW8KgIDkyMS41ODg5MzddwqAg
+ZWwwX3N2YysweDgvMHhjCj4gCj4gCj4gCj4gVGhhbmtzLAo+IHplbmdodWkKPiAKPiAKPiAuCgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
+bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
+b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
