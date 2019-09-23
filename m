@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9D8C4CEC4
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E87C4CED0
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:27:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF3C220665
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF3C220665
+	by mail.kernel.org (Postfix) with ESMTP id E37A521D7B
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:27:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37A521D7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79BB44A685;
-	Mon, 23 Sep 2019 14:27:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D4AA4A5A6;
+	Mon, 23 Sep 2019 14:27:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DHD7kQOxO1jl; Mon, 23 Sep 2019 14:27:50 -0400 (EDT)
+	with ESMTP id C3eh7OWu3f9Y; Mon, 23 Sep 2019 14:27:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 515FE4A612;
-	Mon, 23 Sep 2019 14:27:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9ED4A5ED;
+	Mon, 23 Sep 2019 14:27:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F24A4A5A6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:27:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BBF64A5EE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:27:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PQZTNeIT6G0i for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Sep 2019 14:27:48 -0400 (EDT)
+ with ESMTP id ECi3yk1wmUWt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Sep 2019 14:27:51 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D5944A679
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:27:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1A664A5A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:27:50 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC17F1C14;
- Mon, 23 Sep 2019 11:27:47 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABD331DCB;
+ Mon, 23 Sep 2019 11:27:50 -0700 (PDT)
 Received: from big-swifty.lan (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 581D23F694;
- Mon, 23 Sep 2019 11:27:45 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 388113F694;
+ Mon, 23 Sep 2019 11:27:48 -0700 (PDT)
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 21/35] irqchip/gic-v4.1: Advertise support v4.1 to KVM
-Date: Mon, 23 Sep 2019 19:25:52 +0100
-Message-Id: <20190923182606.32100-22-maz@kernel.org>
+Subject: [PATCH 22/35] irqchip/gic-v4.1: Map the ITS SGIR register page
+Date: Mon, 23 Sep 2019 19:25:53 +0100
+Message-Id: <20190923182606.32100-23-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190923182606.32100-1-maz@kernel.org>
 References: <20190923182606.32100-1-maz@kernel.org>
@@ -69,68 +69,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Tell KVM that we support v4.1. Nothing uses this information so far.
+One of the new features of GICv4.1 is to allow virtual SGIs to be
+directly signaled to a VPE. For that, the ITS has grown a new
+64kB page containing only a single register that is used to
+signal a SGI to a given VPE.
+
+Add a second mapping covering this new 64kB range, and take this
+opportunity to limit the original mapping to 64kB, which is enough
+to cover the span of the ITS registers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c       | 9 ++++++++-
- drivers/irqchip/irq-gic-v3.c           | 1 +
- include/linux/irqchip/arm-gic-common.h | 2 ++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 34595a7fcccb..633cb10ec64b 100644
+index 633cb10ec64b..88933b3fd61d 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -4573,6 +4573,7 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	struct device_node *of_node;
- 	struct its_node *its;
- 	bool has_v4 = false;
-+	bool has_v4_1 = false;
+@@ -97,6 +97,7 @@ struct its_node {
+ 	struct mutex		dev_alloc_lock;
+ 	struct list_head	entry;
+ 	void __iomem		*base;
++	void __iomem		*sgir_base;
+ 	phys_addr_t		phys_base;
+ 	struct its_cmd_block	*cmd_base;
+ 	struct its_cmd_block	*cmd_write;
+@@ -4159,7 +4160,7 @@ static int __init its_probe_one(struct resource *res,
+ 	struct page *page;
  	int err;
  
- 	gic_rdists = rdists;
-@@ -4593,8 +4594,14 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	if (err)
- 		return err;
+-	its_base = ioremap(res->start, resource_size(res));
++	its_base = ioremap(res->start, SZ_64K);
+ 	if (!its_base) {
+ 		pr_warn("ITS@%pa: Unable to map ITS registers\n", &res->start);
+ 		return -ENOMEM;
+@@ -4210,6 +4211,13 @@ static int __init its_probe_one(struct resource *res,
  
--	list_for_each_entry(its, &its_nodes, entry)
-+	list_for_each_entry(its, &its_nodes, entry) {
- 		has_v4 |= is_v4(its);
-+		has_v4_1 |= is_v4_1(its);
-+	}
+ 		if (is_v4_1(its)) {
+ 			u32 svpet = FIELD_GET(GITS_TYPER_SVPET, typer);
 +
-+	/* Don't bother with inconsistent systems */
-+	if (WARN_ON(!has_v4_1 && rdists->has_rvpeid))
-+		rdists->has_rvpeid = false;
++			its->sgir_base = ioremap(res->start + SZ_128K, SZ_64K);
++			if (!its->sgir_base) {
++				err = -ENOMEM;
++				goto out_free_its;
++			}
++
+ 			its->mpidr = readl_relaxed(its_base + GITS_MPIDR);
  
- 	if (has_v4 & rdists->has_vlpis) {
- 		if (its_init_vpe_domain() ||
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index fb6360161d6c..47b9522516fe 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -1737,6 +1737,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
- 		gic_v3_kvm_info.vcpu = r;
- 
- 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
-+	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
- 	gic_set_kvm_info(&gic_v3_kvm_info);
- }
- 
-diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-index b9850f5f1906..fa8c0455c352 100644
---- a/include/linux/irqchip/arm-gic-common.h
-+++ b/include/linux/irqchip/arm-gic-common.h
-@@ -32,6 +32,8 @@ struct gic_kvm_info {
- 	struct resource vctrl;
- 	/* vlpi support */
- 	bool		has_v4;
-+	/* rvpeid support */
-+	bool		has_v4_1;
- };
- 
- const struct gic_kvm_info *gic_get_kvm_info(void);
+ 			pr_info("ITS@%pa: Using GICv4.1 mode %08x %08x\n",
+@@ -4223,7 +4231,7 @@ static int __init its_probe_one(struct resource *res,
+ 				get_order(ITS_CMD_QUEUE_SZ));
+ 	if (!page) {
+ 		err = -ENOMEM;
+-		goto out_free_its;
++		goto out_unmap_sgir;
+ 	}
+ 	its->cmd_base = (void *)page_address(page);
+ 	its->cmd_write = its->cmd_base;
+@@ -4290,6 +4298,9 @@ static int __init its_probe_one(struct resource *res,
+ 	its_free_tables(its);
+ out_free_cmd:
+ 	free_pages((unsigned long)its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
++out_unmap_sgir:
++	if (its->sgir_base)
++		iounmap(its->sgir_base);
+ out_free_its:
+ 	kfree(its);
+ out_unmap:
 -- 
 2.20.1
 
