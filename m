@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70CDAC4CED0
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD981C4CECF
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:26:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 35DB120665
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35DB120665
+	by mail.kernel.org (Postfix) with ESMTP id 6F25620665
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Sep 2019 18:26:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F25620665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1EE94A657;
-	Mon, 23 Sep 2019 14:26:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 297064A676;
+	Mon, 23 Sep 2019 14:26:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Pn-5P6BWEOFp; Mon, 23 Sep 2019 14:26:41 -0400 (EDT)
+	with ESMTP id s9QDaJGHmsGV; Mon, 23 Sep 2019 14:26:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E3D4A668;
-	Mon, 23 Sep 2019 14:26:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0ADC4A5ED;
+	Mon, 23 Sep 2019 14:26:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4C5D4A319
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:26:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEDA64A650
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:26:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zyJPiDvG5phZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Sep 2019 14:26:39 -0400 (EDT)
+ with ESMTP id z3gADznRsFE2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Sep 2019 14:26:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F1B4A5C2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:26:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB674A5AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:26:43 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D1D015A2;
- Mon, 23 Sep 2019 11:26:39 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E3DF15AB;
+ Mon, 23 Sep 2019 11:26:43 -0700 (PDT)
 Received: from big-swifty.lan (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85FEC3F694;
- Mon, 23 Sep 2019 11:26:36 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC8DD3F694;
+ Mon, 23 Sep 2019 11:26:39 -0700 (PDT)
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 03/35] irqchip/gic-v3-its: Allow LPI invalidation via the
- DirectLPI interface
-Date: Mon, 23 Sep 2019 19:25:34 +0100
-Message-Id: <20190923182606.32100-4-maz@kernel.org>
+Subject: [PATCH 04/35] irqchip/gic-v3: Detect GICv4.1 supporting RVPEID
+Date: Mon, 23 Sep 2019 19:25:35 +0100
+Message-Id: <20190923182606.32100-5-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190923182606.32100-1-maz@kernel.org>
 References: <20190923182606.32100-1-maz@kernel.org>
@@ -70,112 +69,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We currently don't make much use of the DirectLPI feature, and it would
-be beneficial to do this more, if only because it becomes a mandatory
-feature for GICv4.1.
+GICv4.1 supports the RVPEID ("Residency per vPE ID"), which allows for
+a much efficient way of making virtual CPUs resident (to allow direct
+injection of interrupts).
+
+The functionnality needs to be discovered on each and every redistributor
+in the system, and disabled if the settings are inconsistent.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 51 +++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 14 deletions(-)
+ drivers/irqchip/irq-gic-v3.c       | 21 ++++++++++++++++++---
+ include/linux/irqchip/arm-gic-v3.h |  2 ++
+ 2 files changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 58cb233cf138..c94eb287393b 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -175,6 +175,12 @@ static DEFINE_IDA(its_vpeid_ida);
- #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
- #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
- 
-+static inline u32 its_get_event_id(struct irq_data *d)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+	return d->hwirq - its_dev->event_map.lpi_base;
-+}
-+
- static struct its_collection *dev_event_to_col(struct its_device *its_dev,
- 					       u32 event)
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 422664ac5f53..0b545e2c3498 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -849,8 +849,21 @@ static int __gic_update_rdist_properties(struct redist_region *region,
+ 					 void __iomem *ptr)
  {
-@@ -183,6 +189,13 @@ static struct its_collection *dev_event_to_col(struct its_device *its_dev,
- 	return its->collections + its_dev->event_map.col_map[event];
+ 	u64 typer = gic_read_typer(ptr + GICR_TYPER);
++
+ 	gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
+-	gic_data.rdists.has_direct_lpi &= !!(typer & GICR_TYPER_DirectLPIS);
++
++	/* RVPEID implies some form of DirectLPI, no matter what the doc says... :-/ */
++	gic_data.rdists.has_rvpeid &= !!(typer & GICR_TYPER_RVPEID);
++	gic_data.rdists.has_direct_lpi &= (!!(typer & GICR_TYPER_DirectLPIS) |
++					   gic_data.rdists.has_rvpeid);
++
++	/* Detect non-sensical configurations */
++	if (WARN_ON_ONCE(gic_data.rdists.has_rvpeid && !gic_data.rdists.has_vlpis)) {
++		gic_data.rdists.has_direct_lpi = false;
++		gic_data.rdists.has_vlpis = false;
++		gic_data.rdists.has_rvpeid = false;
++	}
++
+ 	gic_data.ppi_nr = min(GICR_TYPER_NR_PPIS(typer), gic_data.ppi_nr);
+ 
+ 	return 1;
+@@ -863,9 +876,10 @@ static void gic_update_rdist_properties(void)
+ 	if (WARN_ON(gic_data.ppi_nr == UINT_MAX))
+ 		gic_data.ppi_nr = 0;
+ 	pr_info("%d PPIs implemented\n", gic_data.ppi_nr);
+-	pr_info("%sVLPI support, %sdirect LPI support\n",
++	pr_info("%sVLPI support, %sdirect LPI support, %sRVPEID support\n",
+ 		!gic_data.rdists.has_vlpis ? "no " : "",
+-		!gic_data.rdists.has_direct_lpi ? "no " : "");
++		!gic_data.rdists.has_direct_lpi ? "no " : "",
++		!gic_data.rdists.has_rvpeid ? "no " : "");
  }
  
-+static struct its_collection *irq_to_col(struct irq_data *d)
-+{
-+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+
-+	return dev_event_to_col(its_dev, its_get_event_id(d));
-+}
-+
- static struct its_collection *valid_col(struct its_collection *col)
- {
- 	if (WARN_ON_ONCE(col->target_address & GENMASK_ULL(15, 0)))
-@@ -1031,12 +1044,6 @@ static void its_send_vinvall(struct its_node *its, struct its_vpe *vpe)
-  * irqchip functions - assumes MSI, mostly.
-  */
+ /* Check whether it's single security state view */
+@@ -1546,6 +1560,7 @@ static int __init gic_init_bases(void __iomem *dist_base,
+ 						 &gic_data);
+ 	irq_domain_update_bus_token(gic_data.domain, DOMAIN_BUS_WIRED);
+ 	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
++	gic_data.rdists.has_rvpeid = true;
+ 	gic_data.rdists.has_vlpis = true;
+ 	gic_data.rdists.has_direct_lpi = true;
  
--static inline u32 its_get_event_id(struct irq_data *d)
--{
--	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
--	return d->hwirq - its_dev->event_map.lpi_base;
--}
--
- static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
- {
- 	irq_hw_number_t hwirq;
-@@ -1081,12 +1088,28 @@ static void wait_for_syncr(void __iomem *rdbase)
- 		cpu_relax();
- }
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 5cc10cf7cb3e..b34e0c113697 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -234,6 +234,7 @@
+ #define GICR_TYPER_VLPIS		(1U << 1)
+ #define GICR_TYPER_DirectLPIS		(1U << 3)
+ #define GICR_TYPER_LAST			(1U << 4)
++#define GICR_TYPER_RVPEID		(1U << 7)
  
-+static void direct_lpi_inv(struct irq_data *d)
-+{
-+	struct its_collection *col;
-+	void __iomem *rdbase;
-+
-+	/* Target the redistributor this LPI is currently routed to */
-+	col = irq_to_col(d);
-+	rdbase = per_cpu_ptr(gic_rdists->rdist, col->col_id)->rd_base;
-+	gic_write_lpir(d->hwirq, rdbase + GICR_INVLPIR);
-+
-+	wait_for_syncr(rdbase);
-+}
-+
- static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
- {
- 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ #define GIC_V3_REDIST_SIZE		0x20000
  
- 	lpi_write_config(d, clr, set);
--	its_send_inv(its_dev, its_get_event_id(d));
-+	if (gic_rdists->has_direct_lpi && !irqd_is_forwarded_to_vcpu(d))
-+		direct_lpi_inv(d);
-+	else
-+		its_send_inv(its_dev, its_get_event_id(d));
- }
+@@ -613,6 +614,7 @@ struct rdists {
+ 	u64			flags;
+ 	u32			gicd_typer;
+ 	bool			has_vlpis;
++	bool			has_rvpeid;
+ 	bool			has_direct_lpi;
+ };
  
- static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
-@@ -2912,15 +2935,15 @@ static void its_vpe_send_cmd(struct its_vpe *vpe,
- 
- static void its_vpe_send_inv(struct irq_data *d)
- {
--	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
--
- 	if (gic_rdists->has_direct_lpi) {
--		void __iomem *rdbase;
--
--		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
--		gic_write_lpir(vpe->vpe_db_lpi, rdbase + GICR_INVLPIR);
--		wait_for_syncr(rdbase);
-+		/*
-+		 * Don't mess about. Generating the invalidation is easily
-+		 * done by using the parent irq_data, just like below.
-+		 */
-+		direct_lpi_inv(d->parent_data);
- 	} else {
-+		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+
- 		its_vpe_send_cmd(vpe, its_send_inv);
- 	}
- }
 -- 
 2.20.1
 
