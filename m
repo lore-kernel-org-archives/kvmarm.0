@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20150C4320D
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 900F5C432C2
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:23:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D0AA020665
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:23:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AA020665
+	by mail.kernel.org (Postfix) with ESMTP id 500C2217D9
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:23:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500C2217D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A2794A650;
-	Tue, 24 Sep 2019 11:23:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E20D84A68F;
+	Tue, 24 Sep 2019 11:23:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UT2XvcmmKGDe; Tue, 24 Sep 2019 11:23:40 -0400 (EDT)
+	with ESMTP id QqqZzfUT05ks; Tue, 24 Sep 2019 11:23:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAAD24A6CC;
-	Tue, 24 Sep 2019 11:23:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5D1E4A6C2;
+	Tue, 24 Sep 2019 11:23:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E71D4A6A5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:23:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 567DD4A64A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:23:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 99MzbqiMlFIg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Sep 2019 11:23:36 -0400 (EDT)
+ with ESMTP id 8Vj76D8APqjk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Sep 2019 11:23:40 -0400 (EDT)
 Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FF774A6CA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:23:34 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 619AEE0D577D65100598;
- Tue, 24 Sep 2019 23:23:32 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D0B74A650
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:23:37 -0400 (EDT)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 6C35B257579530C63335;
+ Tue, 24 Sep 2019 23:23:27 +0800 (CST)
 Received: from linux-Bxxcye.huawei.com (10.175.104.222) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
  14.3.439.0; Tue, 24 Sep 2019 23:23:21 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>,
  <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 11/12] arm/kvm: handle guest exit of hypercall
-Date: Tue, 24 Sep 2019 23:21:50 +0800
-Message-ID: <1569338511-3572-12-git-send-email-guoheyi@huawei.com>
+Subject: [RFC PATCH 10/12] arm/sdei: check KVM cap and enable SDEI
+Date: Tue, 24 Sep 2019 23:21:49 +0800
+Message-ID: <1569338511-3572-11-git-send-email-guoheyi@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
 References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
@@ -71,8 +71,8 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add support to handle guest exit of hypercall, and forward to SDEI
-dispatcher if SDEI is enabled and it is an SDEI request.
+Check KVM hypercall forward capability and enable it, and set global
+flag "sdei_enabled" to true if everything works well.
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
@@ -81,51 +81,65 @@ Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: James Morse <james.morse@arm.com>
 ---
- target/arm/kvm.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ target/arm/sdei.c | 17 +++++++++++++++++
+ target/arm/sdei.h |  2 ++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b2eaa50..97a67b1 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -30,6 +30,7 @@
- #include "hw/boards.h"
- #include "hw/irq.h"
- #include "qemu/log.h"
-+#include "sdei.h"
+diff --git a/target/arm/sdei.c b/target/arm/sdei.c
+index efdb681..000545e 100644
+--- a/target/arm/sdei.c
++++ b/target/arm/sdei.c
+@@ -43,6 +43,7 @@
+ #define TYPE_QEMU_SDEI "qemu_sdei"
+ #define QEMU_SDEI(obj) OBJECT_CHECK(QemuSDEState, (obj), TYPE_QEMU_SDEI)
  
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_LAST_INFO
-@@ -668,6 +669,19 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
++bool sdei_enabled;
+ static QemuSDEState *sde_state;
+ 
+ typedef struct QemuSDEIBindNotifyEntry {
+@@ -1465,6 +1466,7 @@ static const VMStateDescription vmstate_sde_state = {
+ static void sdei_initfn(Object *obj)
+ {
+     QemuSDEState *s = QEMU_SDEI(obj);
++    KVMState *kvm = KVM_STATE(current_machine->accelerator);
+ 
+     if (sde_state) {
+         error_report("Only one SDEI dispatcher is allowed!");
+@@ -1474,6 +1476,21 @@ static void sdei_initfn(Object *obj)
+ 
+     qemu_sde_init(s);
+     qemu_register_reset(qemu_sde_reset, s);
++
++    if (kvm_check_extension(kvm, KVM_CAP_FORWARD_HYPERCALL)) {
++        int ret;
++        ret = kvm_vm_enable_cap(kvm, KVM_CAP_FORWARD_HYPERCALL, 0,
++                                KVM_CAP_FORWARD_HYPERCALL_EXCL_PSCI);
++        if (ret < 0) {
++            error_report("Enable hypercall forwarding failed: %s",
++                         strerror(-ret));
++            abort();
++        }
++        sdei_enabled = true;
++        info_report("qemu sdei enabled");
++    } else {
++        info_report("KVM does not support forwarding hypercall.");
++    }
  }
  
+ static void qemu_sde_class_init(ObjectClass *klass, void *data)
+diff --git a/target/arm/sdei.h b/target/arm/sdei.h
+index feaaf1a..95e7d8d 100644
+--- a/target/arm/sdei.h
++++ b/target/arm/sdei.h
+@@ -29,6 +29,8 @@
  
-+static void kvm_arm_handle_hypercall(CPUState *cs, struct kvm_run *run)
-+{
-+    uint32_t func_id = run->hypercall.args[0];
+ #define SDEI_MAX_REQ        SDEI_1_0_FN(0x12)
+ 
++extern bool sdei_enabled;
 +
-+    if (sdei_enabled &&
-+        func_id >= SDEI_1_0_FN_BASE && func_id <= SDEI_MAX_REQ) {
-+        sdei_handle_request(cs, run);
-+    } else {
-+        run->hypercall.args[0] = -1;
-+    }
-+}
-+
-+
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
- {
-     int ret = 0;
-@@ -678,6 +692,9 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-             ret = EXCP_DEBUG;
-         } /* otherwise return to guest */
-         break;
-+    case KVM_EXIT_HYPERCALL:
-+        kvm_arm_handle_hypercall(cs, run);
-+        break;
-     default:
-         qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-                       __func__, run->exit_reason);
+ void sdei_handle_request(CPUState *cs, struct kvm_run *run);
+ 
+ /*
 -- 
 1.8.3.1
 
