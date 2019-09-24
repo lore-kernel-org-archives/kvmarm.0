@@ -2,92 +2,84 @@ Return-Path: <SRS0=oENQ=XT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C420DC432C1
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20819C432C1
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:39:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4342720665
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:36:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7QiniTc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4342720665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 9EF51207FD
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 15:39:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF51207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B57C24A53F;
-	Tue, 24 Sep 2019 11:36:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 254A34A681;
+	Tue, 24 Sep 2019 11:39:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jBxhnjl5JyRU; Tue, 24 Sep 2019 11:36:40 -0400 (EDT)
+	with ESMTP id f5+J7-P3jN-e; Tue, 24 Sep 2019 11:39:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D7F94A610;
-	Tue, 24 Sep 2019 11:36:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1CB04A567;
+	Tue, 24 Sep 2019 11:39:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC9E74A51F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:36:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3634A567
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:39:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 12zdoSpbUxom for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Sep 2019 14:36:35 -0400 (EDT)
-Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com
- [209.85.160.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF44A4A4FE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 14:36:35 -0400 (EDT)
-Received: by mail-qt1-f195.google.com with SMTP id u22so18323545qtq.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Sep 2019 11:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=YabcjeTFAAe5ZMdv64YzXMDO2i14GHKKmFFTyjQnKMA=;
- b=X7QiniTcJBk0fRmbeQkNylmFzYAw5Kc2QhnJf8bnNv1S0+mnP3sreyhHsjF2G2D1/o
- cWux4wEU5yZGEU9z7iDp0jzXnarBK+0l5AJhE9r2aG378Gq6/RzW/sm6uaKiSG+H7TFE
- wpv9m4E6pS0/i8F5o6l4tpAAlbWAm6V1YIRhmq5032hcEWdbopA/b4QzFmeivm/fZA7B
- UqhHvFBl1UVJxXwdtaN4oaGRg3nqONIQZHTGONuDDKGzFKvMh2n2RyosmsE+vyhAmUop
- 0Ew9zYBVM6pWlT7ZeJD0KzD0iHUchtcFfga140cV/hfb5SttclrWyErFVM+JZXc+93jF
- ZC3w==
+ with ESMTP id MAzO4yUAxk9N for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Sep 2019 11:39:26 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3167F4A53F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 11:39:26 -0400 (EDT)
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4EB598830A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 15:39:25 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id e13so2359926qto.18
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 08:39:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=YabcjeTFAAe5ZMdv64YzXMDO2i14GHKKmFFTyjQnKMA=;
- b=iB2yrUy9/8uX7ha9Y9n7vJdIG7eYEF2xEwEotOweEwW61QjRFHloMk7T1yY/OjUymb
- XIyggu8L4lXIMruAuW/E3FF91vz9GRgHheQGH2nu6opqsOr1bHmPD57s3UcLZhEFvQA3
- 3uCssh3vlNSGyDjTaPGuaXEWwXQurBPMsYXExCX4HKoYTLIZsEZLyujoXlnI+WbePhTH
- EUg1v6+nWLCNkrLuJ+9myUWUwUT965/3l/3J7ZXJIIORIjLr1zUuFOyDhOHV0MHrHJOu
- 87Dxf4eNESw+QebVlU4/BhKVTl7Hg30dOlOsoz/kCBOITWUVHY+tQGY31HtmDqk6WoVH
- exiQ==
-X-Gm-Message-State: APjAAAW0JxB+0peNpCUhTtxIlI253ULXpTFkyuf0s0Ofez9SnHS1eRty
- 57oR5hXAo2UPl+rpzEuS0g==
-X-Google-Smtp-Source: APXvYqy2fdEcXIWBoYXcRLxg+LPDS82nD9cShWd1OI3O5iWFeP629CE1bNoD9ZFsdCpJHcyEa9v21g==
-X-Received: by 2002:ac8:1c54:: with SMTP id j20mr1516904qtk.302.1569263795365; 
- Mon, 23 Sep 2019 11:36:35 -0700 (PDT)
-Received: from gabell (nat-pool-bos-t.redhat.com. [66.187.233.206])
- by smtp.gmail.com with ESMTPSA id 22sm5126837qkj.0.2019.09.23.11.36.34
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 23 Sep 2019 11:36:34 -0700 (PDT)
-Date: Mon, 23 Sep 2019 14:36:29 -0400
-From: Masayoshi Mizuma <msys.mizuma@gmail.com>
-To: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Subject: Re: [Qemu-devel] [RFC QEMU v2 1/2] arm/virt: Initialize generic
- timer scale factor dynamically
-Message-ID: <20190923183628.4jj5yougeksylqrt@gabell>
-References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
- <1543352837-21529-2-git-send-email-bijan.mottahedeh@oracle.com>
+ :mime-version:content-disposition:in-reply-to;
+ bh=PTQQeXWO5vPTU6tigUaFPHUuGjp5uZ3Hgvq/mbe0/q8=;
+ b=ZROi1/Zm7ORbBxGaVBi6yGJpedRsBoEcfkVSqoi4CqTInknxadEPVaC47KJ8yIfdDT
+ 2kNyFc6X7xeEcogRBNQKDqsnnZw8tj89nJiO4EGxZngsOZYx7XpQptUcfYF8DAmLc7yT
+ DrK5y5NGU//kPr8HxOxAMe2/HRUieHXBuA4Um0OfwXH/zpJP4hTTxWPX196YPjAVCWJn
+ QrVhNRNDnHd0zNWc8wfPKTnLTVlr0XnQJbqi0JSlhsIZqDf6bfFk9pZwKSRIO1mW52Ld
+ qUFXEVTCQUqYHzR/MEQRYfEbtIPQwHyNavg+QLQmASxxAAg5eigouqpPXLJ7dF48i9sY
+ eTnQ==
+X-Gm-Message-State: APjAAAU8LiM2uLiftIYPDYP4kbYno4pkG62poCHORHiu9t7QE8dz61nu
+ fhjyN9ULMcaY3X/0fdKtrOZtPirAA2bLSCed1SX9qSJNFrtSJo7pCfH6Qu5jwpG2My3c0+Xc4Er
+ Fs1jnz6VMxSCk/L3Rr3tOKj/L
+X-Received: by 2002:ac8:342a:: with SMTP id u39mr3465214qtb.7.1569339564628;
+ Tue, 24 Sep 2019 08:39:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqznlDhsLQpyIFK6nRFjbhudaZrRRV3OOlTnkVZlvYzC4PZu5ddm6L574qRzPyehnZUU6ffx+Q==
+X-Received: by 2002:ac8:342a:: with SMTP id u39mr3465181qtb.7.1569339564339;
+ Tue, 24 Sep 2019 08:39:24 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+ by smtp.gmail.com with ESMTPSA id v5sm1448122qtk.66.2019.09.24.08.39.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 08:39:23 -0700 (PDT)
+Date: Tue, 24 Sep 2019 11:39:17 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC PATCH 01/12] linux-headers: import arm_sdei.h
+Message-ID: <20190924113640-mutt-send-email-mst@kernel.org>
+References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ <1569338511-3572-2-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <1543352837-21529-2-git-send-email-bijan.mottahedeh@oracle.com>
-User-Agent: NeoMutt/20180716
-X-Mailman-Approved-At: Tue, 24 Sep 2019 11:36:39 -0400
-Cc: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1569338511-3572-2-git-send-email-guoheyi@huawei.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Dave Martin <Dave.Martin@arm.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,195 +96,116 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-This issue remains on the latest qemu, right?
-Let me add some comments for the patch.
-
-On Tue, Nov 27, 2018 at 01:07:16PM -0800, Bijan Mottahedeh wrote:
-> Initialize the generic timer scale factor based on the counter frequency
-> register cntfrq_el0, and default to the current static value if necessary.
-> Always use the default value for TCG.
+On Tue, Sep 24, 2019 at 11:21:40PM +0800, Heyi Guo wrote:
+> Import Linux header file include/uapi/linux/arm_sdei.h from kernel
+> v5.3 release.
 > 
-> Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+> This is to prepare for qemu SDEI emulation.
+> 
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+
+Some issues with this.  First linux-headers is for linux as a host.
+This is for linux as a guest, so belongs in include/standard-headers.
+
+Second, please add to scripts/update-linux-headers.sh in a 1st patch,
+then add the file in the second patch.
+
+
+
 > ---
->  hw/arm/virt.c          | 17 +++++++++++++++++
->  target/arm/helper.c    | 19 ++++++++++++++++---
->  target/arm/internals.h |  8 ++++++--
->  target/arm/kvm64.c     |  1 +
->  4 files changed, 40 insertions(+), 5 deletions(-)
+>  linux-headers/linux/arm_sdei.h | 73 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+>  create mode 100644 linux-headers/linux/arm_sdei.h
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 281ddcd..792d223 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -59,6 +59,7 @@
->  #include "qapi/visitor.h"
->  #include "standard-headers/linux/input.h"
->  #include "hw/arm/smmuv3.h"
-> +#include "target/arm/internals.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1710,6 +1711,21 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->      return NULL;
->  }
->  
-> +static void set_system_clock_scale(void)
-> +{
-> +    unsigned long cntfrq_el0 = 0;
+> diff --git a/linux-headers/linux/arm_sdei.h b/linux-headers/linux/arm_sdei.h
+> new file mode 100644
+> index 0000000..af0630b
+> --- /dev/null
+> +++ b/linux-headers/linux/arm_sdei.h
+> @@ -0,0 +1,73 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/* Copyright (C) 2017 Arm Ltd. */
+> +#ifndef _UAPI_LINUX_ARM_SDEI_H
+> +#define _UAPI_LINUX_ARM_SDEI_H
 > +
-> +#ifdef  CONFIG_KVM
-> +    asm volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
-> +#endif
+> +#define SDEI_1_0_FN_BASE			0xC4000020
+> +#define SDEI_1_0_MASK				0xFFFFFFE0
+> +#define SDEI_1_0_FN(n)				(SDEI_1_0_FN_BASE + (n))
 > +
-> +    if (cntfrq_el0 == 0) {
-> +        cntfrq_el0 = GTIMER_SCALE_DEF;
-> +    }
+> +#define SDEI_1_0_FN_SDEI_VERSION			SDEI_1_0_FN(0x00)
+> +#define SDEI_1_0_FN_SDEI_EVENT_REGISTER			SDEI_1_0_FN(0x01)
+> +#define SDEI_1_0_FN_SDEI_EVENT_ENABLE			SDEI_1_0_FN(0x02)
+> +#define SDEI_1_0_FN_SDEI_EVENT_DISABLE			SDEI_1_0_FN(0x03)
+> +#define SDEI_1_0_FN_SDEI_EVENT_CONTEXT			SDEI_1_0_FN(0x04)
+> +#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE			SDEI_1_0_FN(0x05)
+> +#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME	SDEI_1_0_FN(0x06)
+> +#define SDEI_1_0_FN_SDEI_EVENT_UNREGISTER		SDEI_1_0_FN(0x07)
+> +#define SDEI_1_0_FN_SDEI_EVENT_STATUS			SDEI_1_0_FN(0x08)
+> +#define SDEI_1_0_FN_SDEI_EVENT_GET_INFO			SDEI_1_0_FN(0x09)
+> +#define SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET		SDEI_1_0_FN(0x0A)
+> +#define SDEI_1_0_FN_SDEI_PE_MASK			SDEI_1_0_FN(0x0B)
+> +#define SDEI_1_0_FN_SDEI_PE_UNMASK			SDEI_1_0_FN(0x0C)
+> +#define SDEI_1_0_FN_SDEI_INTERRUPT_BIND			SDEI_1_0_FN(0x0D)
+> +#define SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE		SDEI_1_0_FN(0x0E)
+> +#define SDEI_1_0_FN_SDEI_PRIVATE_RESET			SDEI_1_0_FN(0x11)
+> +#define SDEI_1_0_FN_SDEI_SHARED_RESET			SDEI_1_0_FN(0x12)
 > +
-> +    system_clock_scale = NANOSECONDS_PER_SECOND / (int)cntfrq_el0;
-> +}
+> +#define SDEI_VERSION_MAJOR_SHIFT			48
+> +#define SDEI_VERSION_MAJOR_MASK				0x7fff
+> +#define SDEI_VERSION_MINOR_SHIFT			32
+> +#define SDEI_VERSION_MINOR_MASK				0xffff
+> +#define SDEI_VERSION_VENDOR_SHIFT			0
+> +#define SDEI_VERSION_VENDOR_MASK			0xffffffff
 > +
->  static void virt_machine_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -1736,6 +1752,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->      assert(!mc->get_hotplug_handler);
->      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
->      hc->plug = virt_machine_device_plug_cb;
-> +    set_system_clock_scale();
->  }
->  
->  static const TypeInfo virt_machine_info = {
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 66afb08..6330586 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -18,6 +18,7 @@
->  #include "sysemu/kvm.h"
->  #include "fpu/softfloat.h"
->  #include "qemu/range.h"
-> +#include "hw/arm/arm.h"
-
-arm.h is renamed to boot.h, so:
-
-#include "hw/arm/boot.h"
-
->  
->  #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
->  
-> @@ -1614,6 +1615,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
->      return CP_ACCESS_OK;
->  }
->  
-> +static void gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    assert(GTIMER_SCALE);
-> +    assert(ri->fieldoffset);
+> +#define SDEI_VERSION_MAJOR(x)	(x>>SDEI_VERSION_MAJOR_SHIFT & SDEI_VERSION_MAJOR_MASK)
+> +#define SDEI_VERSION_MINOR(x)	(x>>SDEI_VERSION_MINOR_SHIFT & SDEI_VERSION_MINOR_MASK)
+> +#define SDEI_VERSION_VENDOR(x)	(x>>SDEI_VERSION_VENDOR_SHIFT & SDEI_VERSION_VENDOR_MASK)
 > +
-> +    if (cpreg_field_is_64bit(ri)) {
-> +        CPREG_FIELD64(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-> +    } else {
-> +        CPREG_FIELD32(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-> +    }
-> +}
+> +/* SDEI return values */
+> +#define SDEI_SUCCESS		0
+> +#define SDEI_NOT_SUPPORTED	-1
+> +#define SDEI_INVALID_PARAMETERS	-2
+> +#define SDEI_DENIED		-3
+> +#define SDEI_PENDING		-5
+> +#define SDEI_OUT_OF_RESOURCE	-10
 > +
->  static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
->                                          bool isread)
->  {
-> @@ -1709,7 +1722,7 @@ static CPAccessResult gt_stimer_access(CPUARMState *env,
->      }
->  }
->  
-> -static uint64_t gt_get_countervalue(CPUARMState *env)
-> +uint64_t gt_get_countervalue(CPUARMState *env)
->  {
->      return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / GTIMER_SCALE;
->  }
-> @@ -1996,7 +2009,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
->        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
->        .access = PL1_RW | PL0_R, .accessfn = gt_cntfrq_access,
->        .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
-> -      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
-> +      .resetfn = gt_cntfrq_reset,
-
-Build error is here on the target aarch64-linux-user, like as:
-
-/home/foo/qemu/target/arm/helper.c:2901:18: error: 'gt_cntfrq_reset' undeclared here (not in a function); did you mean 'g_timer_reset'?
-       .resetfn = gt_cntfrq_reset,
-                  ^~~~~~~~~~~~~~~
-
-The issue doesn't affect to aarch64-linux-user, right?
-If so:
-
-#ifdef CONFIG_LINUX_USER
-      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
-#else
-      .resetfn = gt_cntfrq_reset,
-#endif
-
->      },
->      /* overall control: mostly access permissions */
->      { .name = "CNTKCTL", .state = ARM_CP_STATE_BOTH,
-> @@ -2187,7 +2200,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
->        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
->        .type = ARM_CP_CONST, .access = PL0_R /* no PL1_RW in linux-user */,
->        .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
-> -      .resetvalue = NANOSECONDS_PER_SECOND / GTIMER_SCALE,
-> +      .resetfn = gt_cntfrq_reset,
-
-Same as above.
-
->      },
->      { .name = "CNTVCT_EL0", .state = ARM_CP_STATE_AA64,
->        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 2,
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index dc93577..b66a1fa 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -52,9 +52,13 @@ static inline bool excp_is_internal(int excp)
->  }
->  
->  /* Scale factor for generic timers, ie number of ns per tick.
-> - * This gives a 62.5MHz timer.
-> + * Calculated dynamically based on CNTFRQ with a default value
-> + * that gives a 62.5MHZ timer.
->   */
-> -#define GTIMER_SCALE 16
-> +#define GTIMER_SCALE        system_clock_scale
-> +#define GTIMER_SCALE_DEF    16
-
-I think extern for system_clock_scale should be added here,
-otherwise the build error happens.
-If the issue doesn't affect to aarch64-linux-user, how about the following?
-
-#ifndef CONFIG_LINUX_USER
-extern int system_clock_scale;
-#define GTIMER_SCALE        system_clock_scale
-#define GTIMER_SCALE_DEF    16
-#else
-#define GTIMER_SCALE        16
-#endif
-
+> +/* EVENT_REGISTER flags */
+> +#define SDEI_EVENT_REGISTER_RM_ANY	0
+> +#define SDEI_EVENT_REGISTER_RM_PE	1
 > +
-> +uint64_t gt_get_countervalue(CPUARMState *);
->  
->  /* Bit definitions for the v7M CONTROL register */
->  FIELD(V7M_CONTROL, NPRIV, 0, 1)
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index e0b8246..5d1c394 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -485,6 +485,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->      set_feature(&features, ARM_FEATURE_NEON);
->      set_feature(&features, ARM_FEATURE_AARCH64);
->      set_feature(&features, ARM_FEATURE_PMU);
-> +    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
->  
->      ahcf->features = features;
-
-Thanks,
-Masa
+> +/* EVENT_STATUS return value bits */
+> +#define SDEI_EVENT_STATUS_RUNNING	2
+> +#define SDEI_EVENT_STATUS_ENABLED	1
+> +#define SDEI_EVENT_STATUS_REGISTERED	0
+> +
+> +/* EVENT_COMPLETE status values */
+> +#define SDEI_EV_HANDLED	0
+> +#define SDEI_EV_FAILED	1
+> +
+> +/* GET_INFO values */
+> +#define SDEI_EVENT_INFO_EV_TYPE			0
+> +#define SDEI_EVENT_INFO_EV_SIGNALED		1
+> +#define SDEI_EVENT_INFO_EV_PRIORITY		2
+> +#define SDEI_EVENT_INFO_EV_ROUTING_MODE		3
+> +#define SDEI_EVENT_INFO_EV_ROUTING_AFF		4
+> +
+> +/* and their results */
+> +#define SDEI_EVENT_TYPE_PRIVATE			0
+> +#define SDEI_EVENT_TYPE_SHARED			1
+> +#define SDEI_EVENT_PRIORITY_NORMAL		0
+> +#define SDEI_EVENT_PRIORITY_CRITICAL		1
+> +
+> +#endif /* _UAPI_LINUX_ARM_SDEI_H */
+> -- 
+> 1.8.3.1
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
