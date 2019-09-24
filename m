@@ -4,54 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF3AC432C1
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 10:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD92C432C1
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 10:49:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C810D2146E
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 10:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C810D2146E
+	by mail.kernel.org (Postfix) with ESMTP id 7C5CB214AF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Sep 2019 10:49:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C5CB214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31BFE4A647;
-	Tue, 24 Sep 2019 06:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E474A67E;
+	Tue, 24 Sep 2019 06:49:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uK6VLFXh49up; Tue, 24 Sep 2019 06:24:19 -0400 (EDT)
+	with ESMTP id mAPf-5hvynMl; Tue, 24 Sep 2019 06:49:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFC1F4A65B;
-	Tue, 24 Sep 2019 06:24:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A60834A65B;
+	Tue, 24 Sep 2019 06:49:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73EE94A5EE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 06:24:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8930A4A5EE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 06:49:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qby61gomVkJ5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Sep 2019 06:24:17 -0400 (EDT)
+ with ESMTP id 7-o-+u50Htft for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Sep 2019 06:49:06 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC2C44A1FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 06:24:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 426354A5CB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Sep 2019 06:49:06 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6662E142F;
- Tue, 24 Sep 2019 03:24:16 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC5CF142F;
+ Tue, 24 Sep 2019 03:49:05 -0700 (PDT)
 Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D19463F67D;
- Tue, 24 Sep 2019 03:24:15 -0700 (PDT)
-Date: Tue, 24 Sep 2019 11:24:14 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5507B3F67D;
+ Tue, 24 Sep 2019 03:49:05 -0700 (PDT)
+Date: Tue, 24 Sep 2019 11:49:03 +0100
 From: Andrew Murray <andrew.murray@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 04/35] irqchip/gic-v3: Detect GICv4.1 supporting RVPEID
-Message-ID: <20190924102413.GN9720@e119886-lin.cambridge.arm.com>
+Subject: Re: [PATCH 05/35] irqchip/gic-v3: Add GICv4.1 VPEID size discovery
+Message-ID: <20190924104903.GO9720@e119886-lin.cambridge.arm.com>
 References: <20190923182606.32100-1-maz@kernel.org>
- <20190923182606.32100-5-maz@kernel.org>
+ <20190923182606.32100-6-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20190923182606.32100-5-maz@kernel.org>
+In-Reply-To: <20190923182606.32100-6-maz@kernel.org>
 User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org,
@@ -72,105 +71,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 23, 2019 at 07:25:35PM +0100, Marc Zyngier wrote:
-> GICv4.1 supports the RVPEID ("Residency per vPE ID"), which allows for
-> a much efficient way of making virtual CPUs resident (to allow direct
-> injection of interrupts).
-> 
-> The functionnality needs to be discovered on each and every redistributor
-> in the system, and disabled if the settings are inconsistent.
+On Mon, Sep 23, 2019 at 07:25:36PM +0100, Marc Zyngier wrote:
+> While GICv4.0 mandates 16 bit worth of VPEIDs, GICv4.1 allows smaller
+
+s/VPEIDs/vPEIDs/
+
+> implementations to be built. Add the required glue to dynamically
+> compute the limit.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  drivers/irqchip/irq-gic-v3.c       | 21 ++++++++++++++++++---
->  include/linux/irqchip/arm-gic-v3.h |  2 ++
->  2 files changed, 20 insertions(+), 3 deletions(-)
+>  drivers/irqchip/irq-gic-v3-its.c   | 11 ++++++++++-
+>  drivers/irqchip/irq-gic-v3.c       |  3 +++
+>  include/linux/irqchip/arm-gic-v3.h |  5 +++++
+>  3 files changed, 18 insertions(+), 1 deletion(-)
 > 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index c94eb287393b..17b77a0b9d97 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -119,7 +119,16 @@ struct its_node {
+>  #define ITS_ITT_ALIGN		SZ_256
+>  
+>  /* The maximum number of VPEID bits supported by VLPI commands */
+> -#define ITS_MAX_VPEID_BITS	(16)
+> +#define ITS_MAX_VPEID_BITS						\
+> +	({								\
+> +		int nvpeid = 16;					\
+> +		if (gic_rdists->has_rvpeid &&				\
+
+We use rvpeid as a way of determining if this is a GICv4.1, are there any
+other means of determining this? If we use it in this way, is there any
+benefit to having a has_gicv4_1 type of flag instead?
+
+Also for 'insane' configurations we set has_rvpeid to false, thus preventing
+this feature. Does it make sense to do that?
+
+GICD_TYPER2 is reserved in GICv4, however I understand this reads as RES0,
+can we just rely on that instead? (We read it below anyway).
+
+> +		    gic_rdists->gicd_typer2 & GICD_TYPER2_VIL)		\
+> +			nvpeid = 1 + (gic_rdists->gicd_typer2 &		\
+> +				      GICD_TYPER2_VID);			\
+> +									\
+> +		nvpeid;							\
+> +	})
+>  #define ITS_MAX_VPEID		(1 << (ITS_MAX_VPEID_BITS))
+>  
+>  /* Convert page order to size in bytes */
 > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 422664ac5f53..0b545e2c3498 100644
+> index 0b545e2c3498..fb6360161d6c 100644
 > --- a/drivers/irqchip/irq-gic-v3.c
 > +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -849,8 +849,21 @@ static int __gic_update_rdist_properties(struct redist_region *region,
->  					 void __iomem *ptr)
->  {
->  	u64 typer = gic_read_typer(ptr + GICR_TYPER);
-> +
->  	gic_data.rdists.has_vlpis &= !!(typer & GICR_TYPER_VLPIS);
-> -	gic_data.rdists.has_direct_lpi &= !!(typer & GICR_TYPER_DirectLPIS);
-> +
-> +	/* RVPEID implies some form of DirectLPI, no matter what the doc says... :-/ */
-
-I think the doc says, RVPEID is *always* 1 for GICv4.1 (and presumably beyond)
-and when RVPEID==1 then DirectLPI is *always* 0 - but that's OK because for
-GICv4.1 support for direct LPIs is mandatory.
-
-> +	gic_data.rdists.has_rvpeid &= !!(typer & GICR_TYPER_RVPEID);
-> +	gic_data.rdists.has_direct_lpi &= (!!(typer & GICR_TYPER_DirectLPIS) |
-> +					   gic_data.rdists.has_rvpeid);
-> +
-> +	/* Detect non-sensical configurations */
-> +	if (WARN_ON_ONCE(gic_data.rdists.has_rvpeid && !gic_data.rdists.has_vlpis)) {
-
-How feasible is the following suitation? All the redistributors in the system has
-vlpis=0, and only the first redistributor has rvpeid=1 (with the remaining ones
-rvpeid=0). If we evaluate this WARN_ON_ONCE on each call to
-__gic_update_rdist_properties we end up without direct LPI support, however if we
-evaluated this after iterating through all the redistributors then we'd end up
-with direct LPI support and a non-essential WARN.
-
-Should we do the WARN after iterating through all the redistributors once we
-know what the final values of these flags will be, perhaps in
-gic_update_rdist_properties?
-
-> +		gic_data.rdists.has_direct_lpi = false;
-> +		gic_data.rdists.has_vlpis = false;
-> +		gic_data.rdists.has_rvpeid = false;
-> +	}
-> +
->  	gic_data.ppi_nr = min(GICR_TYPER_NR_PPIS(typer), gic_data.ppi_nr);
+> @@ -1556,6 +1556,9 @@ static int __init gic_init_bases(void __iomem *dist_base,
 >  
->  	return 1;
-> @@ -863,9 +876,10 @@ static void gic_update_rdist_properties(void)
->  	if (WARN_ON(gic_data.ppi_nr == UINT_MAX))
->  		gic_data.ppi_nr = 0;
->  	pr_info("%d PPIs implemented\n", gic_data.ppi_nr);
-> -	pr_info("%sVLPI support, %sdirect LPI support\n",
-> +	pr_info("%sVLPI support, %sdirect LPI support, %sRVPEID support\n",
->  		!gic_data.rdists.has_vlpis ? "no " : "",
-> -		!gic_data.rdists.has_direct_lpi ? "no " : "");
-> +		!gic_data.rdists.has_direct_lpi ? "no " : "",
-> +		!gic_data.rdists.has_rvpeid ? "no " : "");
->  }
->  
->  /* Check whether it's single security state view */
-> @@ -1546,6 +1560,7 @@ static int __init gic_init_bases(void __iomem *dist_base,
+>  	pr_info("%d SPIs implemented\n", GIC_LINE_NR - 32);
+>  	pr_info("%d Extended SPIs implemented\n", GIC_ESPI_NR);
+> +
+> +	gic_data.rdists.gicd_typer2 = readl_relaxed(gic_data.dist_base + GICD_TYPER2);
+> +
+>  	gic_data.domain = irq_domain_create_tree(handle, &gic_irq_domain_ops,
 >  						 &gic_data);
 >  	irq_domain_update_bus_token(gic_data.domain, DOMAIN_BUS_WIRED);
->  	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
-> +	gic_data.rdists.has_rvpeid = true;
->  	gic_data.rdists.has_vlpis = true;
->  	gic_data.rdists.has_direct_lpi = true;
->  
 > diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 5cc10cf7cb3e..b34e0c113697 100644
+> index b34e0c113697..71730b9def0c 100644
 > --- a/include/linux/irqchip/arm-gic-v3.h
 > +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -234,6 +234,7 @@
->  #define GICR_TYPER_VLPIS		(1U << 1)
->  #define GICR_TYPER_DirectLPIS		(1U << 3)
->  #define GICR_TYPER_LAST			(1U << 4)
-> +#define GICR_TYPER_RVPEID		(1U << 7)
+> @@ -13,6 +13,7 @@
+>  #define GICD_CTLR			0x0000
+>  #define GICD_TYPER			0x0004
+>  #define GICD_IIDR			0x0008
+> +#define GICD_TYPER2			0x000C
+>  #define GICD_STATUSR			0x0010
+>  #define GICD_SETSPI_NSR			0x0040
+>  #define GICD_CLRSPI_NSR			0x0048
+> @@ -89,6 +90,9 @@
+>  #define GICD_TYPER_ESPIS(typer)						\
+>  	(((typer) & GICD_TYPER_ESPI) ? GICD_TYPER_SPIS((typer) >> 27) : 0)
 >  
->  #define GIC_V3_REDIST_SIZE		0x20000
+> +#define GICD_TYPER2_VIL			(1U << 7)
+> +#define GICD_TYPER2_VID			GENMASK(4, 0)
+
+Given that the 4th bit is reserved for future expansion and values greater
+than 0xF are reserved, is there value in changing this to GENMASK(3, 0)?
+
+> +
+>  #define GICD_IROUTER_SPI_MODE_ONE	(0U << 31)
+>  #define GICD_IROUTER_SPI_MODE_ANY	(1U << 31)
 >  
-> @@ -613,6 +614,7 @@ struct rdists {
+> @@ -613,6 +617,7 @@ struct rdists {
+>  	void			*prop_table_va;
 >  	u64			flags;
 >  	u32			gicd_typer;
+> +	u32			gicd_typer2;
 >  	bool			has_vlpis;
-> +	bool			has_rvpeid;
+>  	bool			has_rvpeid;
 >  	bool			has_direct_lpi;
->  };
->  
 > -- 
 > 2.20.1
 > 
