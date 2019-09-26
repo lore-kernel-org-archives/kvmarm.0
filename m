@@ -2,63 +2,62 @@ Return-Path: <SRS0=1Ej7=XV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFFB1C352AA
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F86BC4360C
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:48:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A3C35222C8
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3C35222C8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C7799222C5
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:48:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7799222C5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C3964A749;
-	Thu, 26 Sep 2019 09:06:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30AED4A74B;
+	Thu, 26 Sep 2019 09:48:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id N5krYUQOUR3N; Thu, 26 Sep 2019 09:06:25 -0400 (EDT)
+	with ESMTP id GD0yNTk61vgM; Thu, 26 Sep 2019 09:48:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C24014A747;
-	Thu, 26 Sep 2019 09:06:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2C874A732;
+	Thu, 26 Sep 2019 09:48:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 721F94A64D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F41634A72F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 09:48:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rChWX2UtBWDg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Sep 2019 07:42:33 -0400 (EDT)
+ with ESMTP id InYmJfZb2k+i for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Sep 2019 09:47:59 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD884A657
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 346514A72D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 09:47:59 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8992A1596;
- Thu, 26 Sep 2019 04:42:33 -0700 (PDT)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
- [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 00ECF3F67D;
- Thu, 26 Sep 2019 04:42:28 -0700 (PDT)
-From: Jianyong Wu <jianyong.wu@arm.com>
-To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
- maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
- Will.Deacon@arm.com, suzuki.poulose@arm.com
-Subject: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
- arch-independent.
-Date: Thu, 26 Sep 2019 19:42:09 +0800
-Message-Id: <20190926114212.5322-3-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190926114212.5322-1-jianyong.wu@arm.com>
-References: <20190926114212.5322-1-jianyong.wu@arm.com>
-X-Mailman-Approved-At: Thu, 26 Sep 2019 09:06:20 -0400
-Cc: justin.he@arm.com, kvm@vger.kernel.org, jianyong.wu@arm.com,
- linux-kernel@vger.kernel.org, nd@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB0AA142F;
+ Thu, 26 Sep 2019 06:47:58 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ E33B33F534; Thu, 26 Sep 2019 06:47:56 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: Allow reporting non-ISV data aborts
+ to userspace
+To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
+References: <20190909121337.27287-1-christoffer.dall@arm.com>
+ <20190909121337.27287-2-christoffer.dall@arm.com>
+From: Marc Zyngier <maz@kernel.org>
+Organization: Approximate
+Message-ID: <d2a4f534-15c5-c95f-a703-08979a307747@kernel.org>
+Date: Thu, 26 Sep 2019 14:47:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20190909121337.27287-2-christoffer.dall@arm.com>
+Content-Language: en-US
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Heinrich Schuchardt <xypron.glpk@gmx.de>,
+ Stefan Hajnoczi <stefanha@redhat.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,288 +69,303 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently, ptp_kvm modules implementation is only for x86 which includs
-large part of arch-specific code.  This patch move all of those code
-into new arch related file in the same directory.
+On 09/09/2019 13:13, Christoffer Dall wrote:
+> For a long time, if a guest accessed memory outside of a memslot using
+> any of the load/store instructions in the architecture which doesn't
+> supply decoding information in the ESR_EL2 (the ISV bit is not set), the
+> kernel would print the following message and terminate the VM as a
+> result of returning -ENOSYS to userspace:
+> 
+>   load/store instruction decoding not implemented
+> 
+> The reason behind this message is that KVM assumes that all accesses
+> outside a memslot is an MMIO access which should be handled by
+> userspace, and we originally expected to eventually implement some sort
+> of decoding of load/store instructions where the ISV bit was not set.
+> 
+> However, it turns out that many of the instructions which don't provide
+> decoding information on abort are not safe to use for MMIO accesses, and
+> the remaining few that would potentially make sense to use on MMIO
+> accesses, such as those with register writeback, are not used in
+> practice.  It also turns out that fetching an instruction from guest
+> memory can be a pretty horrible affair, involving stopping all CPUs on
+> SMP systems, handling multiple corner cases of address translation in
+> software, and more.  It doesn't appear likely that we'll ever implement
+> this in the kernel.
+> 
+> What is much more common is that a user has misconfigured his/her guest
+> and is actually not accessing an MMIO region, but just hitting some
+> random hole in the IPA space.  In this scenario, the error message above
+> is almost misleading and has led to a great deal of confusion over the
+> years.
+> 
+> It is, nevertheless, ABI to userspace, and we therefore need to
+> introduce a new capability that userspace explicitly enables to change
+> behavior.
+> 
+> This patch introduces KVM_CAP_ARM_NISV_TO_USER (NISV meaning Non-ISV)
+> which does exactly that, and introduces a new exit reason to report the
+> event to userspace.  User space can then emulate an exception to the
+> guest, restart the guest, suspend the guest, or take any other
+> appropriate action as per the policy of the running system.
+> 
+> Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+>  Documentation/virt/kvm/api.txt       | 29 ++++++++++++++++++++++++++++
+>  arch/arm/include/asm/kvm_arm.h       |  2 ++
+>  arch/arm/include/asm/kvm_emulate.h   |  5 +++++
+>  arch/arm/include/asm/kvm_host.h      |  8 ++++++++
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+>  arch/arm64/include/asm/kvm_host.h    |  8 ++++++++
+>  include/uapi/linux/kvm.h             |  7 +++++++
+>  virt/kvm/arm/arm.c                   | 21 ++++++++++++++++++++
+>  virt/kvm/arm/mmio.c                  | 11 +++++++++--
+>  9 files changed, 94 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+> index 2d067767b617..02501333f746 100644
+> --- a/Documentation/virt/kvm/api.txt
+> +++ b/Documentation/virt/kvm/api.txt
+> @@ -4453,6 +4453,35 @@ Hyper-V SynIC state change. Notification is used to remap SynIC
+>  event/message pages and to enable/disable SynIC messages/events processing
+>  in userspace.
+>  
+> +		/* KVM_EXIT_ARM_NISV */
+> +		struct {
+> +			__u64 esr_iss;
+> +			__u64 fault_ipa;
+> +		} arm_nisv;
+> +
+> +Used on arm and arm64 systems. If a guest accesses memory not in a memslot,
+> +KVM will typically return to userspace and ask it to do MMIO emulation on its
+> +behalf. However, for certain classes of instructions, no instruction decode
+> +(direction, length of memory access) is provided, and fetching and decoding
+> +the instruction from the VM is overly complicated to live in the kernel.
+> +
+> +Historically, when this situation occurred, KVM would print a warning and kill
+> +the VM. KVM assumed that if the guest accessed non-memslot memory, it was
+> +trying to do I/O, which just couldn't be emulated, and the warning message was
+> +phrased accordingly. However, what happened more often was that a guest bug
+> +caused access outside the guest memory areas which should lead to a more
+> +mearningful warning message and an external abort in the guest, if the access
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
----
- drivers/ptp/Makefile                 |  1 +
- drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
- drivers/ptp/ptp_kvm_x86.c            | 87 ++++++++++++++++++++++++++++
- include/asm-generic/ptp_kvm.h        | 12 ++++
- 4 files changed, 118 insertions(+), 59 deletions(-)
- rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
- create mode 100644 drivers/ptp/ptp_kvm_x86.c
- create mode 100644 include/asm-generic/ptp_kvm.h
+meaningful?
 
-diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-index 677d1d178a3e..8f27ba302e31 100644
---- a/drivers/ptp/Makefile
-+++ b/drivers/ptp/Makefile
-@@ -4,6 +4,7 @@
- #
- 
- ptp-y					:= ptp_clock.o ptp_chardev.o ptp_sysfs.o
-+ptp_kvm-y				:= ptp_kvm_$(ARCH).o kvm_ptp.o
- obj-$(CONFIG_PTP_1588_CLOCK)		+= ptp.o
- obj-$(CONFIG_PTP_1588_CLOCK_DTE)	+= ptp_dte.o
- obj-$(CONFIG_PTP_1588_CLOCK_IXP46X)	+= ptp_ixp46x.o
-diff --git a/drivers/ptp/ptp_kvm.c b/drivers/ptp/kvm_ptp.c
-similarity index 63%
-rename from drivers/ptp/ptp_kvm.c
-rename to drivers/ptp/kvm_ptp.c
-index fc7d0b77e118..d8f215186904 100644
---- a/drivers/ptp/ptp_kvm.c
-+++ b/drivers/ptp/kvm_ptp.c
-@@ -8,12 +8,12 @@
- #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-+#include <linux/slab.h>
- #include <linux/module.h>
- #include <uapi/linux/kvm_para.h>
- #include <asm/kvm_para.h>
--#include <asm/pvclock.h>
--#include <asm/kvmclock.h>
- #include <uapi/asm/kvm_para.h>
-+#include <asm-generic/ptp_kvm.h>
- 
- #include <linux/ptp_clock_kernel.h>
- 
-@@ -24,56 +24,29 @@ struct kvm_ptp_clock {
- 
- DEFINE_SPINLOCK(kvm_ptp_lock);
- 
--static struct pvclock_vsyscall_time_info *hv_clock;
--
--static struct kvm_clock_pairing clock_pair;
--static phys_addr_t clock_pair_gpa;
--
- static int ptp_kvm_get_time_fn(ktime_t *device_time,
- 			       struct system_counterval_t *system_counter,
- 			       void *ctx)
- {
--	unsigned long ret;
-+	unsigned long ret, cycle;
- 	struct timespec64 tspec;
--	unsigned version;
--	int cpu;
--	struct pvclock_vcpu_time_info *src;
-+	struct clocksource *cs;
- 
- 	spin_lock(&kvm_ptp_lock);
- 
- 	preempt_disable_notrace();
--	cpu = smp_processor_id();
--	src = &hv_clock[cpu].pvti;
--
--	do {
--		/*
--		 * We are using a TSC value read in the hosts
--		 * kvm_hc_clock_pairing handling.
--		 * So any changes to tsc_to_system_mul
--		 * and tsc_shift or any other pvclock
--		 * data invalidate that measurement.
--		 */
--		version = pvclock_read_begin(src);
--
--		ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING,
--				     clock_pair_gpa,
--				     KVM_CLOCK_PAIRING_WALLCLOCK);
--		if (ret != 0) {
--			pr_err_ratelimited("clock pairing hypercall ret %lu\n", ret);
--			spin_unlock(&kvm_ptp_lock);
--			preempt_enable_notrace();
--			return -EOPNOTSUPP;
--		}
--
--		tspec.tv_sec = clock_pair.sec;
--		tspec.tv_nsec = clock_pair.nsec;
--		ret = __pvclock_read_cycles(src, clock_pair.tsc);
--	} while (pvclock_read_retry(src, version));
-+	ret = kvm_arch_ptp_get_clock_fn(&cycle, &tspec, &cs);
-+	if (ret != 0) {
-+		pr_err_ratelimited("clock pairing hypercall ret %lu\n", ret);
-+		spin_unlock(&kvm_ptp_lock);
-+		preempt_enable_notrace();
-+		return -EOPNOTSUPP;
-+	}
- 
- 	preempt_enable_notrace();
- 
--	system_counter->cycles = ret;
--	system_counter->cs = &kvm_clock;
-+	system_counter->cycles = cycle;
-+	system_counter->cs = cs;
- 
- 	*device_time = timespec64_to_ktime(tspec);
- 
-@@ -116,17 +89,13 @@ static int ptp_kvm_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
- 
- 	spin_lock(&kvm_ptp_lock);
- 
--	ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING,
--			     clock_pair_gpa,
--			     KVM_CLOCK_PAIRING_WALLCLOCK);
-+	ret = kvm_arch_ptp_get_clock(&tspec);
- 	if (ret != 0) {
- 		pr_err_ratelimited("clock offset hypercall ret %lu\n", ret);
- 		spin_unlock(&kvm_ptp_lock);
- 		return -EOPNOTSUPP;
- 	}
- 
--	tspec.tv_sec = clock_pair.sec;
--	tspec.tv_nsec = clock_pair.nsec;
- 	spin_unlock(&kvm_ptp_lock);
- 
- 	memcpy(ts, &tspec, sizeof(struct timespec64));
-@@ -166,21 +135,11 @@ static void __exit ptp_kvm_exit(void)
- 
- static int __init ptp_kvm_init(void)
- {
--	long ret;
--
--	if (!kvm_para_available())
--		return -ENODEV;
--
--	clock_pair_gpa = slow_virt_to_phys(&clock_pair);
--	hv_clock = pvclock_get_pvti_cpu0_va();
-+	int ret;
- 
--	if (!hv_clock)
--		return -ENODEV;
--
--	ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING, clock_pair_gpa,
--			KVM_CLOCK_PAIRING_WALLCLOCK);
--	if (ret == -KVM_ENOSYS || ret == -KVM_EOPNOTSUPP)
--		return -ENODEV;
-+	ret = kvm_arch_ptp_init();
-+	if (!ret)
-+		return -EOPNOTSUPP;
- 
- 	kvm_ptp_clock.caps = ptp_kvm_caps;
- 
-diff --git a/drivers/ptp/ptp_kvm_x86.c b/drivers/ptp/ptp_kvm_x86.c
-new file mode 100644
-index 000000000000..a52cf1c2990c
---- /dev/null
-+++ b/drivers/ptp/ptp_kvm_x86.c
-@@ -0,0 +1,87 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Virtual PTP 1588 clock for use with KVM guests
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ */
-+
-+#include <asm/pvclock.h>
-+#include <asm/kvmclock.h>
-+#include <linux/module.h>
-+#include <uapi/asm/kvm_para.h>
-+#include <uapi/linux/kvm_para.h>
-+#include <linux/ptp_clock_kernel.h>
-+
-+phys_addr_t clock_pair_gpa;
-+struct kvm_clock_pairing clock_pair;
-+struct pvclock_vsyscall_time_info *hv_clock;
-+
-+int kvm_arch_ptp_init(void)
-+{
-+	int ret;
-+
-+	if (!kvm_para_available())
-+		return -ENODEV;
-+
-+	clock_pair_gpa = slow_virt_to_phys(&clock_pair);
-+	hv_clock = pvclock_get_pvti_cpu0_va();
-+	if (!hv_clock)
-+		return -ENODEV;
-+
-+	ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING, clock_pair_gpa,
-+			     KVM_CLOCK_PAIRING_WALLCLOCK);
-+	if (ret == -KVM_ENOSYS || ret == -KVM_EOPNOTSUPP)
-+		return -ENODEV;
-+
-+	return 0;
-+}
-+
-+int kvm_arch_ptp_get_clock(struct timespec64 *ts)
-+{
-+	long ret;
-+
-+	ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING,
-+			     clock_pair_gpa,
-+			     KVM_CLOCK_PAIRING_WALLCLOCK);
-+	if (ret != 0)
-+		return -EOPNOTSUPP;
-+
-+	ts->tv_sec = clock_pair.sec;
-+	ts->tv_nsec = clock_pair.nsec;
-+
-+	return 0;
-+}
-+
-+int kvm_arch_ptp_get_clock_fn(unsigned long *cycle, struct timespec64 *tspec,
-+			      struct clocksource **cs)
-+{
-+	unsigned long ret;
-+	unsigned int version;
-+	int cpu;
-+	struct pvclock_vcpu_time_info *src;
-+
-+	cpu = smp_processor_id();
-+	src = &hv_clock[cpu].pvti;
-+
-+	do {
-+		/*
-+		 * We are using a TSC value read in the hosts
-+		 * kvm_hc_clock_pairing handling.
-+		 * So any changes to tsc_to_system_mul
-+		 * and tsc_shift or any other pvclock
-+		 * data invalidate that measurement.
-+		 */
-+		version = pvclock_read_begin(src);
-+
-+		ret = kvm_hypercall2(KVM_HC_CLOCK_PAIRING,
-+				     clock_pair_gpa,
-+				     KVM_CLOCK_PAIRING_WALLCLOCK);
-+		tspec->tv_sec = clock_pair.sec;
-+		tspec->tv_nsec = clock_pair.nsec;
-+		*cycle = __pvclock_read_cycles(src, clock_pair.tsc);
-+	} while (pvclock_read_retry(src, version));
-+
-+	*cs = &kvm_clock;
-+
-+	return 0;
-+}
-diff --git a/include/asm-generic/ptp_kvm.h b/include/asm-generic/ptp_kvm.h
-new file mode 100644
-index 000000000000..208e842bfa64
---- /dev/null
-+++ b/include/asm-generic/ptp_kvm.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ *  Virtual PTP 1588 clock for use with KVM guests
-+ *
-+ *  Copyright (C) 2019 ARM Ltd.
-+ *  All Rights Reserved
-+ */
-+
-+int kvm_arch_ptp_init(void);
-+int kvm_arch_ptp_get_clock(struct timespec64 *ts);
-+int kvm_arch_ptp_get_clock_fn(long *cycle,
-+		struct timespec64 *tspec, void *cs);
+> +did not fall within an I/O window.
+> +
+> +Userspace implementations can query for KVM_CAP_ARM_NISV_TO_USER, and enable
+> +this capability at VM creation. Once this is done, these types of errors will
+> +instead return to userspace with KVM_EXIT_ARM_NISV, with the valid bits from
+> +the HSR (arm) and ESR_EL2 (arm64) in the esr_iss field, and the faulting IPA
+> +in the fault_ipa field. Userspace can either fix up the access if it's
+> +actually an I/O access by decoding the instruction from guest memory (if it's
+> +very brave) and continue executing the guest, or it can decide to suspend,
+> +dump, or restart the guest.
+> +
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+> index 0125aa059d5b..ce61b3b0058d 100644
+> --- a/arch/arm/include/asm/kvm_arm.h
+> +++ b/arch/arm/include/asm/kvm_arm.h
+> @@ -162,6 +162,8 @@
+>  #define HSR_ISV		(_AC(1, UL) << HSR_ISV_SHIFT)
+>  #define HSR_SRT_SHIFT	(16)
+>  #define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
+> +#define HSR_CM		(1 << 8)
+> +#define HSR_WNR		(1 << 6)
+
+I think we already have that one (bizarrely placed after HSR_SSE).
+
+>  #define HSR_FSC		(0x3f)
+>  #define HSR_FSC_TYPE	(0x3c)
+>  #define HSR_SSE		(1 << 21)
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 40002416efec..e8ef349c04b4 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -167,6 +167,11 @@ static inline bool kvm_vcpu_dabt_isvalid(struct kvm_vcpu *vcpu)
+>  	return kvm_vcpu_get_hsr(vcpu) & HSR_ISV;
+>  }
+>  
+> +static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_vcpu_get_hsr(vcpu) & (HSR_CM | HSR_WNR | HSR_FSC);
+> +}
+> +
+>  static inline bool kvm_vcpu_dabt_iswrite(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_get_hsr(vcpu) & HSR_WNR;
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 8a37c8e89777..19a92c49039c 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -76,6 +76,14 @@ struct kvm_arch {
+>  
+>  	/* Mandated version of PSCI */
+>  	u32 psci_version;
+> +
+> +	/*
+> +	 * If we encounter a data abort without valid instruction syndrome
+> +	 * information, report this to user space.  User space can (and
+> +	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+> +	 * supported.
+> +	 */
+> +	bool return_nisv_io_abort_to_user;
+>  };
+>  
+>  #define KVM_NR_MEM_OBJS     40
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index d69c1efc63e7..a3c967988e1d 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -258,6 +258,11 @@ static inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
+>  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_ISV);
+>  }
+>  
+> +static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_vcpu_get_hsr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
+> +}
+> +
+>  static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
+>  {
+>  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f656169db8c3..019bc560edc1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -83,6 +83,14 @@ struct kvm_arch {
+>  
+>  	/* Mandated version of PSCI */
+>  	u32 psci_version;
+> +
+> +	/*
+> +	 * If we encounter a data abort without valid instruction syndrome
+> +	 * information, report this to user space.  User space can (and
+> +	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+> +	 * supported.
+> +	 */
+> +	bool return_nisv_io_abort_to_user;
+>  };
+>  
+>  #define KVM_NR_MEM_OBJS     40
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5e3f12d5359e..dd79235b6435 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
+>  #define KVM_EXIT_S390_STSI        25
+>  #define KVM_EXIT_IOAPIC_EOI       26
+>  #define KVM_EXIT_HYPERV           27
+> +#define KVM_EXIT_ARM_NISV         28
+>  
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -392,6 +393,11 @@ struct kvm_run {
+>  		} eoi;
+>  		/* KVM_EXIT_HYPERV */
+>  		struct kvm_hyperv_exit hyperv;
+> +		/* KVM_EXIT_ARM_NISV */
+> +		struct {
+> +			__u64 esr_iss;
+> +			__u64 fault_ipa;
+> +		} arm_nisv;
+>  		/* Fix the size of the union. */
+>  		char padding[256];
+>  	};
+> @@ -996,6 +1002,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+>  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+>  #define KVM_CAP_PMU_EVENT_FILTER 173
+> +#define KVM_CAP_ARM_NISV_TO_USER 174
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 35a069815baf..7153504bb106 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -98,6 +98,26 @@ int kvm_arch_check_processor_compat(void)
+>  	return 0;
+>  }
+>  
+> +int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> +			    struct kvm_enable_cap *cap)
+> +{
+> +	int r;
+> +
+> +	if (cap->flags)
+> +		return -EINVAL;
+> +
+> +	switch (cap->cap) {
+> +	case KVM_CAP_ARM_NISV_TO_USER:
+> +		r = 0;
+> +		kvm->arch.return_nisv_io_abort_to_user = true;
+> +		break;
+> +	default:
+> +		r = -EINVAL;
+> +		break;
+> +	}
+> +
+> +	return r;
+> +}
+>  
+>  /**
+>   * kvm_arch_init_vm - initializes a VM data structure
+> @@ -196,6 +216,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_MP_STATE:
+>  	case KVM_CAP_IMMEDIATE_EXIT:
+>  	case KVM_CAP_VCPU_EVENTS:
+> +	case KVM_CAP_ARM_NISV_TO_USER:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+> index 6af5c91337f2..7b92e2744fa7 100644
+> --- a/virt/kvm/arm/mmio.c
+> +++ b/virt/kvm/arm/mmio.c
+> @@ -167,8 +167,15 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  		if (ret)
+>  			return ret;
+>  	} else {
+> -		kvm_err("load/store instruction decoding not implemented\n");
+> -		return -ENOSYS;
+> +		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
+> +			run->exit_reason = KVM_EXIT_ARM_NISV;
+> +			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
+> +			run->arm_nisv.fault_ipa = fault_ipa;
+> +			return 0;
+> +		} else {
+> +			kvm_info("Encountered data abort outside memslots with no valid syndrome info\n");
+
+Nit: you could lose the else clause, making this line a bit shorter.
+
+More importantly, I'd like this to become a rate-limited output, just to
+keep things sane. How about kvm_pr_unimpl()?
+
+> +			return -ENOSYS;
+> +		}
+>  	}
+>  
+>  	rt = vcpu->arch.mmio_decode.rt;
+> 
+
+Other than this collection of nits, this looks pretty good, and I'd
+really like to take this patch in 5.5.
+
+Thanks,
+
+	M.
 -- 
-2.17.1
-
+Jazz is not dead, it just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
