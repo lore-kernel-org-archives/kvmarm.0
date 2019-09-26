@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B980FC4360C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F48C352A9
 	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:06:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7396F222C3
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7396F222C3
+	by mail.kernel.org (Postfix) with ESMTP id 27401222BE
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 13:06:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27401222BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BF354A732;
-	Thu, 26 Sep 2019 09:06:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 196F24A72D;
+	Thu, 26 Sep 2019 09:06:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3YNnAwMK2u-X; Thu, 26 Sep 2019 09:06:29 -0400 (EDT)
+	with ESMTP id U7kwSfAlW-qE; Thu, 26 Sep 2019 09:06:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13BBE4A74F;
-	Thu, 26 Sep 2019 09:06:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2C1F4A74C;
+	Thu, 26 Sep 2019 09:06:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5634A6F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD024A64D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wU-UqJaSkT9Y for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Sep 2019 07:42:49 -0400 (EDT)
+ with ESMTP id mXZowG6fpVp7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Sep 2019 07:42:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4814A657
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1E154A657
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 07:42:43 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D9BF142F;
- Thu, 26 Sep 2019 04:42:48 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86AC61570;
+ Thu, 26 Sep 2019 04:42:43 -0700 (PDT)
 Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
  [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EC5613F67D;
- Thu, 26 Sep 2019 04:42:43 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EE8633F67D;
+ Thu, 26 Sep 2019 04:42:38 -0700 (PDT)
 From: Jianyong Wu <jianyong.wu@arm.com>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
  maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
  Will.Deacon@arm.com, suzuki.poulose@arm.com
-Subject: [RFC PATCH v4 5/5] kvm: arm64: Add capability check extension for
- ptp_kvm
-Date: Thu, 26 Sep 2019 19:42:12 +0800
-Message-Id: <20190926114212.5322-6-jianyong.wu@arm.com>
+Subject: [RFC PATCH v4 4/5] ptp: arm64: Enable ptp_kvm for arm64
+Date: Thu, 26 Sep 2019 19:42:11 +0800
+Message-Id: <20190926114212.5322-5-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190926114212.5322-1-jianyong.wu@arm.com>
 References: <20190926114212.5322-1-jianyong.wu@arm.com>
@@ -75,41 +75,251 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let userspace check if there is kvm ptp service in host.
-before VMs migrate to a another host, VMM may check if this
-cap is available to determine the migration behaviour.
+Currently in arm64 virtualization environment, there is no mechanism to
+keep time sync between guest and host. Time in guest will drift compared
+with host after boot up as they may both use third party time sources
+to correct their time respectively. The time deviation will be in order
+of milliseconds but some scenarios ask for higher time precision, like
+in cloud envirenment, we want all the VMs running in the host aquire the
+same level accuracy from host clock.
+
+Use of kvm ptp clock, which choose the host clock source clock as a
+reference clock to sync time clock between guest and host has been adopted
+by x86 which makes the time sync order from milliseconds to nanoseconds.
+
+This patch enable kvm ptp on arm64 and we get the similar clock drift as
+found with x86 with kvm ptp.
+
+Test result comparison between with kvm ptp and without it in arm64 are
+as follows. This test derived from the result of command 'chronyc
+sources'. we should take more cure of the last sample column which shows
+the offset between the local clock and the source at the last measurement.
+
+no kvm ptp in guest:
+MS Name/IP address   Stratum Poll Reach LastRx Last sample
+========================================================================
+^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   21ms
+^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   21ms
+
+in host:
+MS Name/IP address   Stratum Poll Reach LastRx Last sample
+========================================================================
+^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   18ms
+^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   18ms
+^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   18ms
+^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   17ms
+^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   17ms
+
+The dns1.synet.edu.cn is the network reference clock for guest and
+120.25.115.20 is the network reference clock for host. we can't get the
+clock error between guest and host directly, but a roughly estimated value
+will be in order of hundreds of us to ms.
+
+with kvm ptp in guest:
+chrony has been disabled in host to remove the disturb by network clock.
+
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+========================================================================
+* PHC0                    0   3   377     8     -7ns[   +1ns] +/-    3ns
+* PHC0                    0   3   377     8     +1ns[  +16ns] +/-    3ns
+* PHC0                    0   3   377     6     -4ns[   -0ns] +/-    6ns
+* PHC0                    0   3   377     6     -8ns[  -12ns] +/-    5ns
+* PHC0                    0   3   377     5     +2ns[   +4ns] +/-    4ns
+* PHC0                    0   3   377    13     +2ns[   +4ns] +/-    4ns
+* PHC0                    0   3   377    12     -4ns[   -6ns] +/-    4ns
+* PHC0                    0   3   377    11     -8ns[  -11ns] +/-    6ns
+* PHC0                    0   3   377    10    -14ns[  -20ns] +/-    4ns
+* PHC0                    0   3   377     8     +4ns[   +5ns] +/-    4ns
+
+The PHC0 is the ptp clock which choose the host clock as its source
+clock. So we can be sure to say that the clock error between host and guest
+is in order of ns.
 
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
 ---
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/arm/arm.c       | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/clocksource/arm_arch_timer.c | 28 +++++++++++
+ drivers/ptp/Kconfig                  |  2 +-
+ drivers/ptp/kvm_ptp.c                |  4 +-
+ drivers/ptp/ptp_kvm_arm64.c          | 73 ++++++++++++++++++++++++++++
+ include/asm-generic/ptp_kvm.h        |  2 +-
+ 5 files changed, 106 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..a0bff6002bd9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_KVM_PTP 173
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index 07e57a49d1e8..7a99673e4149 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -1633,4 +1633,32 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
+ 	return arch_timer_common_init();
+ }
+ TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
++
++#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
++#include <linux/arm-smccc.h>
++int kvm_arch_ptp_get_clock_fn(long *cycle, struct timespec64 *ts,
++			      struct clocksource **cs)
++{
++	u64 t1, t2;
++	struct arm_smccc_res hvc_res;
++	ktime_t ktime_overall;
++
++	t1 = sched_clock();
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, &hvc_res);
++	t2 = sched_clock();
++	t2 -= t1;
++	t2 /= 2;
++	if ((long)(hvc_res.a0) < 0)
++		return -EOPNOTSUPP;
++
++	ktime_overall = hvc_res.a0 << 32 | hvc_res.a1;
++	*ts = ktime_to_timespec64(ktime_overall);
++	timespec64_add_ns(ts, t2);
++	*cycle = hvc_res.a2 << 32 | hvc_res.a3;
++	*cs = &clocksource_counter;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_clock_fn);
++#endif
+ #endif
+diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+index 9b8fee5178e8..3c31ff8eb05f 100644
+--- a/drivers/ptp/Kconfig
++++ b/drivers/ptp/Kconfig
+@@ -110,7 +110,7 @@ config PTP_1588_CLOCK_PCH
+ config PTP_1588_CLOCK_KVM
+ 	tristate "KVM virtual PTP clock"
+ 	depends on PTP_1588_CLOCK
+-	depends on KVM_GUEST && X86
++	depends on KVM_GUEST && X86 || ARM64 && ARM_ARCH_TIMER
+ 	default y
+ 	help
+ 	  This driver adds support for using kvm infrastructure as a PTP
+diff --git a/drivers/ptp/kvm_ptp.c b/drivers/ptp/kvm_ptp.c
+index d8f215186904..b467e1674a71 100644
+--- a/drivers/ptp/kvm_ptp.c
++++ b/drivers/ptp/kvm_ptp.c
+@@ -22,6 +22,8 @@ struct kvm_ptp_clock {
+ 	struct ptp_clock_info caps;
+ };
  
- #ifdef KVM_CAP_IRQ_ROUTING
++//extern int kvm_arch_ptp_get_clock_fn(long *cycle, struct timespec64 *ts,
++//			      struct clocksource **cs)
+ DEFINE_SPINLOCK(kvm_ptp_lock);
  
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..80999985160b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -201,6 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_VCPU_EVENTS:
-+	case KVM_CAP_ARM_KVM_PTP:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+ static int ptp_kvm_get_time_fn(ktime_t *device_time,
+@@ -138,7 +140,7 @@ static int __init ptp_kvm_init(void)
+ 	int ret;
+ 
+ 	ret = kvm_arch_ptp_init();
+-	if (!ret)
++	if (ret)
+ 		return -EOPNOTSUPP;
+ 
+ 	kvm_ptp_clock.caps = ptp_kvm_caps;
+diff --git a/drivers/ptp/ptp_kvm_arm64.c b/drivers/ptp/ptp_kvm_arm64.c
+new file mode 100644
+index 000000000000..e0c993847293
+--- /dev/null
++++ b/drivers/ptp/ptp_kvm_arm64.c
+@@ -0,0 +1,73 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ *  Virtual PTP 1588 clock for use with KVM guests
++ *  Copyright (C) 2019 ARM Ltd.
++ *  All Rights Reserved
++ */
++
++#include <linux/kernel.h>
++#include <linux/err.h>
++#include <asm/hypervisor.h>
++#include <linux/module.h>
++#include <linux/psci.h>
++#include <linux/arm-smccc.h>
++#include <linux/timecounter.h>
++#include <linux/sched/clock.h>
++#include <asm/arch_timer.h>
++
++struct system_counterval_t ptp_sc;
++
++/*
++ * as trap call cause delay, this function will return the delay in nanosecond
++ */
++static u64 arm_smccc_1_1_invoke_delay(u32 id, struct arm_smccc_res *res)
++{
++	u64 t1, t2;
++
++	t1 = sched_clock();
++	arm_smccc_1_1_invoke(id, res);
++	t2 = sched_clock();
++	t2 -= t1;
++	t2 /= 2;
++
++	return t2;
++}
++
++int kvm_arch_ptp_init(void)
++{
++	struct arm_smccc_res hvc_res;
++
++	arm_smccc_1_1_invoke_delay(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
++					&hvc_res);
++	if ((long)(hvc_res.a0) < 0)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++int kvm_arch_ptp_get_clock_generic(struct timespec64 *ts,
++				   struct arm_smccc_res *hvc_res)
++{
++	u64 ns;
++	ktime_t ktime_overall;
++
++	ns = arm_smccc_1_1_invoke_delay(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
++					hvc_res);
++	if ((long)(hvc_res->a0) < 0)
++		return -EOPNOTSUPP;
++
++	ktime_overall = hvc_res->a0 << 32 | hvc_res->a1;
++	*ts = ktime_to_timespec64(ktime_overall);
++	timespec64_add_ns(ts, ns);
++
++	return 0;
++}
++
++int kvm_arch_ptp_get_clock(struct timespec64 *ts)
++{
++	struct arm_smccc_res hvc_res;
++
++	kvm_arch_ptp_get_clock_generic(ts, &hvc_res);
++
++	return 0;
++}
+diff --git a/include/asm-generic/ptp_kvm.h b/include/asm-generic/ptp_kvm.h
+index 208e842bfa64..829d76bdb905 100644
+--- a/include/asm-generic/ptp_kvm.h
++++ b/include/asm-generic/ptp_kvm.h
+@@ -8,5 +8,5 @@
+ 
+ int kvm_arch_ptp_init(void);
+ int kvm_arch_ptp_get_clock(struct timespec64 *ts);
+-int kvm_arch_ptp_get_clock_fn(long *cycle,
++int kvm_arch_ptp_get_clock_fn(unsigned long *cycle,
+ 		struct timespec64 *tspec, void *cs);
 -- 
 2.17.1
 
