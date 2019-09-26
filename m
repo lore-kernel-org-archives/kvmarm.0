@@ -2,60 +2,62 @@ Return-Path: <SRS0=1Ej7=XV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3307C4360C
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 15:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C0BBC4360C
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 15:57:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5149621D6C
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 15:34:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5149621D6C
+	by mail.kernel.org (Postfix) with ESMTP id 284D9222C6
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Sep 2019 15:57:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 284D9222C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDE544A715;
-	Thu, 26 Sep 2019 11:34:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DFB64A738;
+	Thu, 26 Sep 2019 11:57:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PuuTbnli3cSN; Thu, 26 Sep 2019 11:34:19 -0400 (EDT)
+	with ESMTP id SOxsB-cAmErS; Thu, 26 Sep 2019 11:57:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66E4F4A716;
-	Thu, 26 Sep 2019 11:34:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A1B4A73A;
+	Thu, 26 Sep 2019 11:57:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37BD84A714
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 11:34:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 446184A736
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 11:57:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B7znh0VEtsnm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Sep 2019 11:34:17 -0400 (EDT)
+ with ESMTP id zrIRnjGPDrOx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Sep 2019 11:57:35 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF5D14A712
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 11:34:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CFE5E4A734
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Sep 2019 11:57:35 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7860E28;
- Thu, 26 Sep 2019 08:34:16 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4889828;
+ Thu, 26 Sep 2019 08:57:35 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 702483F534; Thu, 26 Sep 2019 08:34:15 -0700 (PDT)
-Subject: Re: [PATCH 03/35] irqchip/gic-v3-its: Allow LPI invalidation via the
- DirectLPI interface
+ 79F5E3F534; Thu, 26 Sep 2019 08:57:34 -0700 (PDT)
+Subject: Re: [PATCH 10/35] irqchip/gic-v4.1: VPE table (aka GICR_VPROPBASER)
+ allocation
 To: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
 References: <20190923182606.32100-1-maz@kernel.org>
- <20190923182606.32100-4-maz@kernel.org>
- <92ff82ca-ebcb-8f5f-5063-313f65bbc5e3@huawei.com>
+ <20190923182606.32100-11-maz@kernel.org>
+ <155660c2-7f30-e188-ca8d-c37fabea6d97@huawei.com>
+ <6f4ccdfd-4b63-04cb-e7c0-f069e620127f@kernel.org>
+ <14111988-74c9-12c3-1322-1580ff6ba11f@huawei.com>
 From: Marc Zyngier <maz@kernel.org>
 Organization: Approximate
-Message-ID: <fe2a5258-4a48-28d9-9cd5-793358ceb4eb@kernel.org>
-Date: Thu, 26 Sep 2019 16:34:14 +0100
+Message-ID: <c4d63ccd-b5b2-007f-6174-1a9d20f3669d@kernel.org>
+Date: Thu, 26 Sep 2019 16:57:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <92ff82ca-ebcb-8f5f-5063-313f65bbc5e3@huawei.com>
+In-Reply-To: <14111988-74c9-12c3-1322-1580ff6ba11f@huawei.com>
 Content-Language: en-US
 Cc: Thomas Gleixner <tglx@linutronix.de>,
  Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
@@ -76,145 +78,218 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-On 26/09/2019 15:57, Zenghui Yu wrote:
+On 26/09/2019 16:19, Zenghui Yu wrote:
 > Hi Marc,
 > 
-> I get one kernel panic with this patch on D05.
+> Two more questions below.
+> 
+> On 2019/9/25 22:41, Marc Zyngier wrote:
+>> On 25/09/2019 14:04, Zenghui Yu wrote:
+>>> Hi Marc,
+>>>
+>>> Some questions about this patch, mostly to confirm that I would
+>>> understand things here correctly.
+>>>
+>>> On 2019/9/24 2:25, Marc Zyngier wrote:
+>>>> GICv4.1 defines a new VPE table that is potentially shared between
+>>>> both the ITSs and the redistributors, following complicated affinity
+>>>> rules.
+>>>>
+>>>> To make things more confusing, the programming of this table at
+>>>> the redistributor level is reusing the GICv4.0 GICR_VPROPBASER register
+>>>> for something completely different.
+>>>>
+>>>> The code flow is somewhat complexified by the need to respect the
+>>>> affinities required by the HW, meaning that tables can either be
+>>>> inherited from a previously discovered ITS or redistributor.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>>> ---
+>>>
+>>> [...]
+>>>
+>>>> @@ -1962,6 +1965,65 @@ static bool its_parse_indirect_baser(struct its_node *its,
+>>>>    	return indirect;
+>>>>    }
+>>>>    
+>>>> +static u32 compute_common_aff(u64 val)
+>>>> +{
+>>>> +	u32 aff, clpiaff;
+>>>> +
+>>>> +	aff = FIELD_GET(GICR_TYPER_AFFINITY, val);
+>>>> +	clpiaff = FIELD_GET(GICR_TYPER_COMMON_LPI_AFF, val);
+>>>> +
+>>>> +	return aff & ~(GENMASK(31, 0) >> (clpiaff * 8));
+>>>> +}
+>>>> +
+>>>> +static u32 compute_its_aff(struct its_node *its)
+>>>> +{
+>>>> +	u64 val;
+>>>> +	u32 svpet;
+>>>> +
+>>>> +	/*
+>>>> +	 * Reencode the ITS SVPET and MPIDR as a GICR_TYPER, and compute
+>>>> +	 * the resulting affinity. We then use that to see if this match
+>>>> +	 * our own affinity.
+>>>> +	 */
+>>>> +	svpet = FIELD_GET(GITS_TYPER_SVPET, its->typer);
+> 
+> The spec says, ITS does not share vPE table with Redistributors when
+> SVPET==0.  It seems that we miss this rule and simply regard SVPET as
+> GICR_TYPER_COMMON_LPI_AFF here.  Am I wrong?
 
-Ah, surprise! I haven't had time to test this on a D05 yet, such in a
-hurry to push the damn thing out of the building...
+Correct. I missed the case where the ITS doesn't share anything. That's
+pretty unlikely though (you loose all the benefit of v4.1, and I don't
+really see how you'd make it work reliably).
 
 > 
-> (I don't have the GICv4.1 board at the moment. I have to wait for the
->   appropriate HW to do more tests.)
-> 
-> On 2019/9/24 2:25, Marc Zyngier wrote:
->> We currently don't make much use of the DirectLPI feature, and it would
->> be beneficial to do this more, if only because it becomes a mandatory
->> feature for GICv4.1.
+>>>> +	val  = FIELD_PREP(GICR_TYPER_COMMON_LPI_AFF, svpet);
+>>>> +	val |= FIELD_PREP(GICR_TYPER_AFFINITY, its->mpidr);
+>>>> +	return compute_common_aff(val);
+>>>> +}
+>>>> +
+>>>> +static struct its_node *find_sibbling_its(struct its_node *cur_its)
+>>>> +{
+>>>> +	struct its_node *its;
+>>>> +	u32 aff;
+>>>> +
+>>>> +	if (!FIELD_GET(GITS_TYPER_SVPET, cur_its->typer))
+>>>> +		return NULL;
+>>>> +
+>>>> +	aff = compute_its_aff(cur_its);
+>>>> +
+>>>> +	list_for_each_entry(its, &its_nodes, entry) {
+>>>> +		u64 baser;
+>>>> +
+>>>> +		if (!is_v4_1(its) || its == cur_its)
+>>>> +			continue;
+>>>> +
+>>>> +		if (!FIELD_GET(GITS_TYPER_SVPET, its->typer))
+>>>> +			continue;
+>>>> +
+>>>> +		if (aff != compute_its_aff(its))
+>>>> +			continue;
+>>>> +
+>>>> +		/* GICv4.1 guarantees that the vPE table is GITS_BASER2 */
+>>>> +		baser = its->tables[2].val;
+>>>> +		if (!(baser & GITS_BASER_VALID))
+>>>> +			continue;
+>>>> +
+>>>> +		return its;
+>>>> +	}
+>>>> +
+>>>> +	return NULL;
+>>>> +}
+>>>> +
+>>>>    static void its_free_tables(struct its_node *its)
+>>>>    {
+>>>>    	int i;
+>>>> @@ -2004,6 +2066,15 @@ static int its_alloc_tables(struct its_node *its)
+>>>>    			break;
+>>>>    
+>>>>    		case GITS_BASER_TYPE_VCPU:
+>>>> +			if (is_v4_1(its)) {
+>>>> +				struct its_node *sibbling;
+>>>> +
+>>>> +				if ((sibbling = find_sibbling_its(its))) {
+>>>> +					its->tables[2] = sibbling->tables[2];
+>>>
+>>> This means thst the vPE table is shared between ITSs which are under the
+>>> same affinity group?
 >>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>   drivers/irqchip/irq-gic-v3-its.c | 51 +++++++++++++++++++++++---------
->>   1 file changed, 37 insertions(+), 14 deletions(-)
+>> That's indeed what this is trying to do...
 >>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index 58cb233cf138..c94eb287393b 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -175,6 +175,12 @@ static DEFINE_IDA(its_vpeid_ida);
->>   #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
->>   #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
->>   
->> +static inline u32 its_get_event_id(struct irq_data *d)
->> +{
->> +	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
->> +	return d->hwirq - its_dev->event_map.lpi_base;
->> +}
->> +
->>   static struct its_collection *dev_event_to_col(struct its_device *its_dev,
->>   					       u32 event)
->>   {
->> @@ -183,6 +189,13 @@ static struct its_collection *dev_event_to_col(struct its_device *its_dev,
->>   	return its->collections + its_dev->event_map.col_map[event];
->>   }
->>   
->> +static struct its_collection *irq_to_col(struct irq_data *d)
->> +{
->> +	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
->> +
->> +	return dev_event_to_col(its_dev, its_get_event_id(d));
->> +}
->> +
+>>> Don't we need to set GITS_BASER (by its_setup_baser()) here to tell this
+>>> ITS where the vPE table lacates?
+>>
+>> Absolutely. This is a bug. I didn't spot it as my model only has a
+>> single ITS.
+>>
+>>>
+>>>> +					continue;
+>>>> +				}
+>>>> +			}
+>>>> +
+>>>>    			indirect = its_parse_indirect_baser(its, baser,
+>>>>    							    psz, &order,
+>>>>    							    ITS_MAX_VPEID_BITS);
+>>>> @@ -2025,6 +2096,212 @@ static int its_alloc_tables(struct its_node *its)
+>>>>    	return 0;
+>>>>    }
+>>>>    
+>>>> +static u64 inherit_vpe_l1_table_from_its(void)
+>>>> +{
+>>>> +	struct its_node *its;
+>>>> +	u64 val;
+>>>> +	u32 aff;
+>>>> +
+>>>> +	val = gic_read_typer(gic_data_rdist_rd_base() + GICR_TYPER);
+>>>> +	aff = compute_common_aff(val);
+>>>> +
+>>>> +	list_for_each_entry(its, &its_nodes, entry) {
+>>>> +		u64 baser;
+>>>> +
+>>>> +		if (!is_v4_1(its))
+>>>> +			continue;
+>>>> +
+>>>> +		if (!FIELD_GET(GITS_TYPER_SVPET, its->typer))
+>>>> +			continue;
+>>>> +
+>>>> +		if (aff != compute_its_aff(its))
+>>>> +			continue;
+>>>> +
+>>>> +		/* GICv4.1 guarantees that the vPE table is GITS_BASER2 */
+>>>> +		baser = its->tables[2].val;
+>>>> +		if (!(baser & GITS_BASER_VALID))
+>>>> +			continue;
+>>>> +
+>>>> +		/* We have a winner! */
+>>>> +		val  = GICR_VPROPBASER_4_1_VALID;
+>>>> +		if (baser & GITS_BASER_INDIRECT)
+>>>> +			val |= GICR_VPROPBASER_4_1_INDIRECT;
+>>>> +		val |= FIELD_PREP(GICR_VPROPBASER_4_1_PAGE_SIZE,
+>>>> +				  FIELD_GET(GITS_BASER_PAGE_SIZE_MASK, baser));
+>>>> +		val |= FIELD_PREP(GICR_VPROPBASER_4_1_ADDR,
+>>>> +				  GITS_BASER_ADDR_48_to_52(baser) >> 12);
+>>>
+>>> I remember the spec says,
+>>> GITS_BASER2 "points to" the ITS *vPE table*, which provides mappings
+>>> from the vPEID to target Redistributor and associated vpt address.
+>>> In GICv4.1 GICR_VPROPBASER "points to" the *vPE Configuration table*,
+>>> which stores the locations of each vPE's LPI configuration and pending
+>>> table.
+>>>
+>>> And the code here says, if we can find an ITS (which is under the same
+>>> CommonLPIAff group with this Redistributor) has already been probed and
+>>> allocated an vPE table, then use this vPE table as this Redist's vPE
+>>> Configuration table.
+>>> So I infer that in GICv4.1, *vPE table* and *vPE Configuration table*
+>>> are actually the same concept?  And this table is shared between ITSs
+>>> and Redists which are under the same affinity group?
+>>> Please fix me if I have any misunderstanding.
+>>
+>> Indeed. The whole idea is that ITSs and RDs can share a vPE table if
+>> they are in the same affinity group (such as a socket, for example).
+>> This is what is missing from v4.0 where the ITS knows about vPEs, but
+>> doesn't know about residency. With that in place, the HW is able to do a
+>> lot more for us.
 > 
-> irq_to_col uses device's event_map and col_map to get the target
-> collection, yes it works well with device's LPI.
-> But direct_lpi_inv also pass doorbells to it...
+> Thanks for your education!
 > 
-> We don't allocate doorbells for any devices, instead for each vPE.
+> I really want to know *how* does GICv4.1 ITS know about the vPE
+> residency (in hardware level)?
 
-Hmm. Yes, you're right. It looks like I've been carried away on this
-one. I'll have a look.
+Hey, I'm a SW guy, I don't design the hardware! ;-)
 
-> 
-> And see below,
-> 
->>   static struct its_collection *valid_col(struct its_collection *col)
->>   {
->>   	if (WARN_ON_ONCE(col->target_address & GENMASK_ULL(15, 0)))
->> @@ -1031,12 +1044,6 @@ static void its_send_vinvall(struct its_node *its, struct its_vpe *vpe)
->>    * irqchip functions - assumes MSI, mostly.
->>    */
->>   
->> -static inline u32 its_get_event_id(struct irq_data *d)
->> -{
->> -	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
->> -	return d->hwirq - its_dev->event_map.lpi_base;
->> -}
->> -
->>   static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
->>   {
->>   	irq_hw_number_t hwirq;
->> @@ -1081,12 +1088,28 @@ static void wait_for_syncr(void __iomem *rdbase)
->>   		cpu_relax();
->>   }
->>   
->> +static void direct_lpi_inv(struct irq_data *d)
->> +{
->> +	struct its_collection *col;
->> +	void __iomem *rdbase;
->> +
->> +	/* Target the redistributor this LPI is currently routed to */
->> +	col = irq_to_col(d);
->> +	rdbase = per_cpu_ptr(gic_rdists->rdist, col->col_id)->rd_base;
->> +	gic_write_lpir(d->hwirq, rdbase + GICR_INVLPIR);
->> +
->> +	wait_for_syncr(rdbase);
->> +}
->> +
->>   static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
->>   {
->>   	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
->>   
->>   	lpi_write_config(d, clr, set);
->> -	its_send_inv(its_dev, its_get_event_id(d));
->> +	if (gic_rdists->has_direct_lpi && !irqd_is_forwarded_to_vcpu(d))
->> +		direct_lpi_inv(d);
->> +	else
->> +		its_send_inv(its_dev, its_get_event_id(d));
->>   }
->>   
->>   static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
->> @@ -2912,15 +2935,15 @@ static void its_vpe_send_cmd(struct its_vpe *vpe,
->>   
->>   static void its_vpe_send_inv(struct irq_data *d)
->>   {
->> -	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->> -
->>   	if (gic_rdists->has_direct_lpi) {
->> -		void __iomem *rdbase;
->> -
->> -		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
->> -		gic_write_lpir(vpe->vpe_db_lpi, rdbase + GICR_INVLPIR);
->> -		wait_for_syncr(rdbase);
->> +		/*
->> +		 * Don't mess about. Generating the invalidation is easily
->> +		 * done by using the parent irq_data, just like below.
->> +		 */
->> +		direct_lpi_inv(d->parent_data);
-> 
-> "GICv4-vpe"'s parent is "GICv3", not "ITS".  What do we expect with
-> irq_data_get_irq_chip_data(parent's irq_data)?
+> I can understand that Redistributor can easily achieve it by
+> VPENDBASER's Valid and vPEID field.  And it's necessary for ITS to
+> know the residency so that it can determine whether it's appropriate
+> to trigger default doorbell for vPE.  But I have no knowledge about
+> how can it be achieved in hardware details.
 
-Yup, terrible mix up. d->parent_data comes from the fact that we want to
-invalidate the LPI and not d->hwirq (which is the VPEID). But doing so,
-we also confuse direct_lpi_inv(), which expects to find meaningful data
-(the its_dev) as chip data (and the irq_to_col doesn't help either).
-
-To sum it up, the whole thing is busted, I'll have a brown paper bag,
-thank you very much... :-(. Let me work on a fix.
+My take is that the RD and the ITS can communicate over the shared
+table, hence my remark above about SVPET==0. But as I said, I'm not a HW
+guy.
 
 Thanks,
 
