@@ -6,20 +6,20 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06940C4360C
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A660C352AB
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:43:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A2712146E
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01099217D9
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:43:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="cz+U7PaC";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="cz+U7PaC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A2712146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="WkjJKGtp";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="WkjJKGtp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01099217D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FE154A744;
-	Fri, 27 Sep 2019 06:43:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 823FB4A748;
+	Fri, 27 Sep 2019 06:43:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@armh.onmicrosoft.com
@@ -27,37 +27,37 @@ Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lyW6BlkhFHsV; Fri, 27 Sep 2019 06:43:43 -0400 (EDT)
+	with ESMTP id cwSOJw8DY0Tu; Fri, 27 Sep 2019 06:43:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B8A4A73C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDBB44A745;
 	Fri, 27 Sep 2019 06:43:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57E844A6A4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:11:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FF334A728
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:14:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id weX+xDpDDZAR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Sep 2019 06:10:34 -0400 (EDT)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com
- (mail-eopbgr130075.outbound.protection.outlook.com [40.107.13.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 903A04A71E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:10:34 -0400 (EDT)
+ with ESMTP id 1CSbAW8gfHGY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Sep 2019 06:14:49 -0400 (EDT)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com
+ (mail-eopbgr70045.outbound.protection.outlook.com [40.107.7.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 858D24A71E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:14:49 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6mCgbSjpcicQutl8OZMW12/8vRt7tLcsTSj+sJ5NLIc=;
- b=cz+U7PaCmtkxbpmCy4mu8fba667EP1PNGZAU0ymegRmioqscJvfejbxNaVb6WKxh0Gp3n6SNB0xB8XqqjeL6tyozrDgaF7MBzFyEIQbu4m3nB0o+5knE2VEkOB1KO50Yo0cDbIvAVREJM+T/AMMDJYNW/yxg1JDtr5np43yCMsY=
-Received: from DB7PR08CA0048.eurprd08.prod.outlook.com (2603:10a6:10:26::25)
- by DB6PR0802MB2582.eurprd08.prod.outlook.com (2603:10a6:4:a2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2284.25; Fri, 27 Sep
- 2019 10:10:31 +0000
-Received: from VE1EUR03FT038.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e09::202) by DB7PR08CA0048.outlook.office365.com
- (2603:10a6:10:26::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2305.15 via Frontend
- Transport; Fri, 27 Sep 2019 10:10:31 +0000
+ bh=Ae2gF2Swg9uwp0X/Fea/eKeMEPpP3YEBWTiwK95iYjc=;
+ b=WkjJKGtpXmRLuMMtdysdV/T9BGEOcuxILw8dJgc4g5BrqjT4b8WzBkMd8lbjcxz497rg3CTo+WlLs0Erovv5t+KTyMDcVYxYfBWKl4PE6xh10fZtao5VomzOxmKkB3fobkxTy7EpPEeiM33rbKcn41Q3Q4UVuIP6zl3RfSLq8+4=
+Received: from VI1PR08CA0165.eurprd08.prod.outlook.com (2603:10a6:800:d1::19)
+ by AM6PR08MB5254.eurprd08.prod.outlook.com (2603:10a6:20b:d6::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2284.23; Fri, 27 Sep
+ 2019 10:14:45 +0000
+Received: from DB5EUR03FT021.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::205) by VI1PR08CA0165.outlook.office365.com
+ (2603:10a6:800:d1::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2305.17 via Frontend
+ Transport; Fri, 27 Sep 2019 10:14:44 +0000
 Authentication-Results: spf=temperror (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; lists.cs.columbia.edu; dkim=pass (signature was
  verified) header.d=armh.onmicrosoft.com;lists.cs.columbia.edu; dmarc=none
@@ -65,45 +65,45 @@ Authentication-Results: spf=temperror (sender IP is 63.35.35.123)
 Received-SPF: TempError (protection.outlook.com: error in processing during
  lookup of arm.com: DNS Timeout)
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- VE1EUR03FT038.mail.protection.outlook.com (10.152.19.112) with
+ DB5EUR03FT021.mail.protection.outlook.com (10.152.20.238) with
  Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2305.15 via Frontend Transport; Fri, 27 Sep 2019 10:10:29 +0000
-Received: ("Tessian outbound 0cf06bf5c60e:v33");
- Fri, 27 Sep 2019 10:10:17 +0000
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.15 via Frontend Transport; Fri, 27 Sep 2019 10:14:43 +0000
+Received: ("Tessian outbound 3fba803f6da3:v33");
+ Fri, 27 Sep 2019 10:14:30 +0000
 X-CR-MTA-TID: 64aa7808
-Received: from 711ae29de496.4 (ip-172-16-0-2.eu-west-1.compute.internal
- [104.47.4.53]) by 64aa7808-outbound-1.mta.getcheckrecipient.com id
- 7D7C44AC-D6DA-4185-A205-6ED37E819C1E.1; 
- Fri, 27 Sep 2019 10:10:12 +0000
-Received: from EUR02-AM5-obe.outbound.protection.outlook.com
- (mail-am5eur02lp2053.outbound.protection.outlook.com [104.47.4.53])
- by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 711ae29de496.4
+Received: from 335722af9282.4 (ip-172-16-0-2.eu-west-1.compute.internal
+ [104.47.14.59]) by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ 942D3DAB-609D-4273-9071-B272EDB697AB.1; 
+ Fri, 27 Sep 2019 10:14:25 +0000
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+ (mail-vi1eur04lp2059.outbound.protection.outlook.com [104.47.14.59])
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 335722af9282.4
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384);
- Fri, 27 Sep 2019 10:10:12 +0000
+ Fri, 27 Sep 2019 10:14:25 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aS7UdA97NUUjXgNdb0+0lzOFUnEWglZv93v7fIGnkWiwAJHhkO2Y9N8D2DFV5g677FN33+BnAJ6Yc8u7UZDC/92LL25GWk51cDPu0Oe7J6BDn/NRQwn4ZylyaA9b+sPeshITnsE5fNPgS17Ch1L73r58xDu+RtbX/A7+Xthhz2dj5VrCP5eqqRTUgMwVKIvDA80EUqePCJgnPa7uaVNdyt4MTR8924QUfUfvnGye95qaUNKp+1vr3xAAH4Q5Jq04ONz/OnMGALE1s4oEGhFctIxxf+bFdW8da57d4/h2gn/kfsexGAFBk38Wqwd7QL+O+uOwHjfOw4VTV5F6eTC8NA==
+ b=FBQnLgUc+e6tol24I/TqgNVa4e4/LDRIIZLAUtUtbbnTd5c+LOJ5f0Wafxc6yzzUzVPBoMUgK12mrhdB4xS0N4YoAjElYLOz8kKYUVk43cvgZYd4CAJ4WBxBMmK91P1asSeE7o2xv86kFQ32mERrwmLJNJg8jiRqLURfxBvQ4bf0WDL6d0hjbEGtzBnvsGoax96DR+w4di3PnKlsXMQjweoMOunLYO2Gbz4zLVv1c+6R8Wq+b6YOGay0l1Pz+ViYcOPAY3YKYWTpYD3sFhnWshblvbCQ5R9Ccd+2iptODeDtt5aDDOzIBvzVxdQGc4kQ4qnXQec/jj1ozu0xD9Qw/A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6mCgbSjpcicQutl8OZMW12/8vRt7tLcsTSj+sJ5NLIc=;
- b=le34nx5eJmYP1hsCwwqsWDZ95M8HCCbOy1/MH7NyHXH8ymvajg/YMDV1Csk/t2qEi5XBKivkGTR1yEDr0Rk991zy72cTmSetfOoPvjIVB3VG+zAdeFScbwCIiQ9lUEYEnE9zbvTw/ZHmfqID0CrNr7RsdiDIYi/J7Jfppv5e0mwZsvpUAohrDoY8ci/biTxGrMaofZJQJoP2uYFMpX/LFkx0SWuR6twjsnS9hViKgzKWmJoWNcwc/xzaBXzIzTT7GR8aQPXIBc48pyU8O5O/e5rlsuHRyhn04sB195qRhffbP7ZIiagu7JQy+RNM1eBnTFsxaOrqgX1QGLXtzmbNgA==
+ bh=Ae2gF2Swg9uwp0X/Fea/eKeMEPpP3YEBWTiwK95iYjc=;
+ b=YU+SsWHmxl3oUAKiSJgQr5F0xpHJjR0mP9u2o0jGAssKnpChWCBIN0sMtLIbDwaU9fACg3N7XNXl+KM7sbscfshxyzjOTeVEDuuIPpe1sIWvRr2Z+ltYTtPgDoDnsTJKyqknIJw3VCTIWHdeqOCANh1bYGlZxUqrarklOoSZtdFbkmECLMNxJQu5mzI3WX7g2aoEXEZWN18puDOlI2XJdIkRp1laBxjKVvXGqThNrv3u6zrtuYyfMDzHmKpM4ntOkaH5yumRY1mwaS9wpefEb3kqAo74s4cx5m+9tu/Be7XqjWtzkyN3R+ieCoFjiGrXWgkRI9Ihlu62GE1xhjLodg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6mCgbSjpcicQutl8OZMW12/8vRt7tLcsTSj+sJ5NLIc=;
- b=cz+U7PaCmtkxbpmCy4mu8fba667EP1PNGZAU0ymegRmioqscJvfejbxNaVb6WKxh0Gp3n6SNB0xB8XqqjeL6tyozrDgaF7MBzFyEIQbu4m3nB0o+5knE2VEkOB1KO50Yo0cDbIvAVREJM+T/AMMDJYNW/yxg1JDtr5np43yCMsY=
+ bh=Ae2gF2Swg9uwp0X/Fea/eKeMEPpP3YEBWTiwK95iYjc=;
+ b=WkjJKGtpXmRLuMMtdysdV/T9BGEOcuxILw8dJgc4g5BrqjT4b8WzBkMd8lbjcxz497rg3CTo+WlLs0Erovv5t+KTyMDcVYxYfBWKl4PE6xh10fZtao5VomzOxmKkB3fobkxTy7EpPEeiM33rbKcn41Q3Q4UVuIP6zl3RfSLq8+4=
 Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com (10.168.146.150) by
- HE1PR0801MB2041.eurprd08.prod.outlook.com (10.168.98.15) with Microsoft SMTP
+ HE1PR0801MB1627.eurprd08.prod.outlook.com (10.168.146.13) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.21; Fri, 27 Sep 2019 10:10:10 +0000
+ 15.20.2305.17; Fri, 27 Sep 2019 10:14:20 +0000
 Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com
  ([fe80::4d35:2b8f:1786:84cd]) by HE1PR0801MB1676.eurprd08.prod.outlook.com
  ([fe80::4d35:2b8f:1786:84cd%3]) with mapi id 15.20.2284.028; Fri, 27 Sep 2019
- 10:10:10 +0000
+ 10:14:20 +0000
 From: "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>
 To: Suzuki Poulose <Suzuki.Poulose@arm.com>, "netdev@vger.kernel.org"
  <netdev@vger.kernel.org>, "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
@@ -117,70 +117,70 @@ Subject: RE: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
  arch-independent.
 Thread-Topic: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
  arch-independent.
-Thread-Index: AQHVdF+Ft3UnKFEitUOtlQstSNDglqc97ZgAgAFgLEA=
-Date: Fri, 27 Sep 2019 10:10:10 +0000
-Message-ID: <HE1PR0801MB167630F7B983A7F9DBB473DFF4810@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+Thread-Index: AQHVdF+Ft3UnKFEitUOtlQstSNDglqc97ZgAgAFgLECAAAGAgIAAAEGA
+Date: Fri, 27 Sep 2019 10:14:20 +0000
+Message-ID: <HE1PR0801MB1676139461D06C2E421FA7BAF4810@HE1PR0801MB1676.eurprd08.prod.outlook.com>
 References: <20190926114212.5322-1-jianyong.wu@arm.com>
  <20190926114212.5322-3-jianyong.wu@arm.com>
  <2f338b57-b0b2-e439-6089-72e5f5e4f017@arm.com>
-In-Reply-To: <2f338b57-b0b2-e439-6089-72e5f5e4f017@arm.com>
+ <HE1PR0801MB167630F7B983A7F9DBB473DFF4810@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <4337dcf0-bd60-4db8-6c9f-cd718b89d2a4@arm.com>
+In-Reply-To: <4337dcf0-bd60-4db8-6c9f-cd718b89d2a4@arm.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ts-tracking-id: c71b3542-34ef-4996-a434-864809ac6f26.1
+x-ts-tracking-id: cf23ba1a-bbd7-4b56-9a4d-63540697cb1e.1
 x-checkrecipientchecked: true
 Authentication-Results-Original: spf=none (sender IP is )
  smtp.mailfrom=Jianyong.Wu@arm.com; 
 x-originating-ip: [113.29.88.7]
 x-ms-publictraffictype: Email
-X-MS-Office365-Filtering-Correlation-Id: 6ace8ebf-53e7-46ab-0d18-08d74332ecc6
+X-MS-Office365-Filtering-Correlation-Id: b4e17a8f-62e2-4594-62c1-08d74333842c
 X-MS-Office365-Filtering-HT: Tenant
-X-Microsoft-Antispam-Untrusted: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
- SRVR:HE1PR0801MB2041; 
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB2041:|HE1PR0801MB2041:|DB6PR0802MB2582:
+X-MS-TrafficTypeDiagnostic: HE1PR0801MB1627:|HE1PR0801MB1627:|AM6PR08MB5254:
 x-ms-exchange-transport-forked: True
-X-Microsoft-Antispam-PRVS: <DB6PR0802MB258205F951A174B3D4C7D2DAF4810@DB6PR0802MB2582.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <AM6PR08MB52543E8B2AA238E5C8DDC56AF4810@AM6PR08MB5254.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
 x-ms-oob-tlc-oobclassifiers: OLM:7691;OLM:7691;
 x-forefront-prvs: 0173C6D4D5
 X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;
- SFS:(10009020)(4636009)(39860400002)(366004)(346002)(376002)(396003)(136003)(13464003)(189003)(199004)(2906002)(52536014)(486006)(66556008)(9686003)(66476007)(64756008)(55016002)(66446008)(6246003)(11346002)(8936002)(446003)(71200400001)(71190400001)(2201001)(6436002)(86362001)(229853002)(476003)(7416002)(76116006)(66946007)(25786009)(2501003)(99286004)(478600001)(81166006)(81156014)(305945005)(74316002)(8676002)(76176011)(7736002)(14444005)(316002)(5660300002)(6116002)(186003)(14454004)(3846002)(256004)(66066001)(33656002)(102836004)(55236004)(54906003)(4326008)(6636002)(26005)(7696005)(110136005)(53546011)(6506007)(921003)(1121003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:HE1PR0801MB2041;
+ SFS:(10009020)(4636009)(346002)(39860400002)(376002)(136003)(396003)(366004)(13464003)(189003)(199004)(71190400001)(6246003)(55236004)(6436002)(71200400001)(53546011)(102836004)(26005)(7416002)(186003)(6506007)(81166006)(81156014)(2501003)(52536014)(5660300002)(8936002)(8676002)(74316002)(66476007)(6636002)(66946007)(64756008)(66556008)(229853002)(476003)(11346002)(305945005)(76116006)(76176011)(54906003)(110136005)(478600001)(316002)(14444005)(256004)(14454004)(7736002)(66446008)(486006)(25786009)(66066001)(86362001)(99286004)(6116002)(2906002)(33656002)(3846002)(446003)(4326008)(55016002)(7696005)(2201001)(9686003)(921003)(1121003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:HE1PR0801MB1627;
  H:HE1PR0801MB1676.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
 received-spf: None (protection.outlook.com: arm.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info-Original: 5df0i9w/dswQaqAUYzAkZQBp+Ivm1KJ3FqRsVlaEzcrkC/4pABljERNh0E4deM6Vai9nFtyXM9K+ddd/DiCRnr0Aoz0uP8//OdTh/n1Ai+xDOnCfAN12Ad7lbx1HzIoN2shOYy3r2vUDW8p7EcqWc8RyNNPqp5qoJ0ZKI3m5eYIw1T2KdGM/I6T2QaJdefDe79oFwgIiltOZOZKGg2AgLpanym+lfSC9IkiEgnc92St3LEtS76P29Zlk/Zo2l1PwgTTdI93k+BAQVuE00uXv/zPToLJ7ZyGGWdcALcK51BZO4J2svqNQbqigETFw4Yqhls1JhQ+QLnAY+gIrXQF5pXvDXkwYD542g5dyOhg4t7YVXcRCa+wRSNo1jy+YbTrvpn82BgcsDmE/93COc/SFhzNYeYOuOefwNlyGddkMcE4=
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: 3rtQeFkR11YtJNa7B8rr2pVOz1j1KNiPoMmWTcnoopAGKt5FPU5Skq3UtG322E5jABVXaHVqx1+dCoHUyxOA3CCnQu0r9RLrT2fx0OC3+ZCdpec4NF+DkGPVzLL3N36H7mbBC/mMCDCM9rMG2E0jtjKUKxTEqMoJh8jj/6SRicyVItbP1SCu5lr/6M9Vn375sKswLhVOBH2dG3O1gaQylddrctiVuUGRIzMMBwktNunEHlg7bMWoPsTi58F7Mbwa3vzvfVyWPkyXk0BZH/VdOm9uoddB+450xDCwLQzttQX2scDzsnwvtuaWWZOTsO1DuVexj2LIv8zSvFL+nPC7KFVeBjKN2cOSFyAItAq41/qP/qNWJ6bUKAra18wDeU3stqIVBYmmr5Lxq1Yc206rBOQhZ5j4gfcx9vDaWrF50B0=
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB2041
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1627
 Original-Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Jianyong.Wu@arm.com; 
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT038.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT021.eop-EUR03.prod.protection.outlook.com
 X-Forefront-Antispam-Report: CIP:63.35.35.123; IPV:CAL; SCL:-1; CTRY:IE;
  EFV:NLI; SFV:NSPM;
- SFS:(10009020)(4636009)(136003)(39860400002)(376002)(346002)(396003)(189003)(199004)(13464003)(76176011)(336012)(2486003)(55016002)(14444005)(33656002)(126002)(305945005)(11346002)(2906002)(81166006)(110136005)(74316002)(50466002)(36906005)(63350400001)(436003)(7736002)(316002)(446003)(476003)(2501003)(8676002)(4326008)(229853002)(22756006)(76130400001)(486006)(2201001)(356004)(186003)(81156014)(8936002)(70206006)(26005)(66066001)(7696005)(53546011)(6506007)(25786009)(47776003)(99286004)(3846002)(14454004)(70586007)(54906003)(52536014)(478600001)(102836004)(6116002)(86362001)(6636002)(5660300002)(9686003)(26826003)(6246003)(23676004)(921003)(1121003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DB6PR0802MB2582;
+ SFS:(10009020)(4636009)(376002)(39860400002)(136003)(346002)(396003)(13464003)(189003)(199004)(76130400001)(53546011)(102836004)(356004)(81166006)(6506007)(99286004)(22756006)(2486003)(7696005)(6116002)(76176011)(33656002)(50466002)(2201001)(66066001)(74316002)(47776003)(316002)(305945005)(23676004)(2501003)(7736002)(3846002)(2906002)(6636002)(63350400001)(478600001)(14454004)(436003)(446003)(8936002)(336012)(86362001)(110136005)(486006)(126002)(11346002)(52536014)(25786009)(476003)(9686003)(4326008)(55016002)(54906003)(5660300002)(6246003)(70206006)(229853002)(8676002)(70586007)(186003)(26005)(26826003)(14444005)(81156014)(921003)(1121003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:AM6PR08MB5254;
  H:64aa7808-outbound-1.mta.getcheckrecipient.com; FPR:; SPF:TempError; LANG:en;
  PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; MX:1; A:1; 
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 348b2373-ee90-4782-1798-08d74332e155
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 872ef3cd-1b83-4a22-c404-08d743337660
 X-Microsoft-Antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(710020)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB6PR0802MB2582; 
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(710020)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
+ SRVR:AM6PR08MB5254; 
 NoDisclaimer: True
 X-Forefront-PRVS: 0173C6D4D5
-X-Microsoft-Antispam-Message-Info: PPkUN8PTpMtDdOu2fpxUjBSLy1XwqCTRsB/oNTHBvQXqNsz7vNSAyccH+csiQtQN+mbZ/VNYJA9Kya22pQf4ZjggxPARMSqOPDzs+TTu/+9ZATeUt9ZJtcHzxeoTSIJrccO/oIudD4micTaW8IrV39dsXPq3GdN34er2g3jkpE48tsXOdbKh5C022mvBxLMyGS8k2FDkk+6E2v+mhUWE2mN8pb/1xBOE3M54OHKEJR1dVRnMiRMnGVr8PqsPlPH/EAN6yx5vxKFI2sEorraTK6J69Bcbc86Sb8fJOpnHG/5CXXakHUmpaD1F/fFWEuEQ9XMq8ZSL4L3R1fcPU2XI3Hr/V/p7MzBkonyUKYHwiRfsPMco6HUIwh+O9DDzowGUNnfSVcgp2AUuOMrSMHs7UTy1qjaFi8pvPsfHKp012AY=
+X-Microsoft-Antispam-Message-Info: Fj8Zc0tPhwuFCXyfYFHao5oxjHuL60iJDJpwaGiVgJswi9VpoSakhjt6Q6wulkuXFMbzgOUMJprZYoV4s/qcx9LZyiOE4cTtueQDNHMEhWDegOfpcHkg3fPq4ewsXF6vpUOnFA5E3c7H4NnAG1/bgMdXnUVb7ePtVtzX5RPhRnddq7fQQHhIN55P/SLlGIRIg3jQRXgE/9i6zzD9AHGAw/1PrhlbRlS9yHlZiypdz09HTzmYWRx4DLQIdXEmsUYpt1Mnip2sojQNsPW9MXdda0J4QD3NmERkM02o3NWAghEMeHT+QF3QN1yf0RQgJ1h8LvejYlR+VsE4A/MXxnD4Hce8IQgLQfIIhEVSjbFypTIN0QTWIe/XzN3HmEJb8AOOU6/BhLznPpg388IKutVn6wWv3rAr1R3ODH87YXN1bdI=
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2019 10:10:29.5049 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ace8ebf-53e7-46ab-0d18-08d74332ecc6
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2019 10:14:43.5618 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4e17a8f-62e2-4594-62c1-08d74333842c
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
  Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0802MB2582
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5254
 X-Mailman-Approved-At: Fri, 27 Sep 2019 06:43:42 -0400
 Cc: "Justin He \(Arm Technology China\)" <Justin.He@arm.com>,
  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -207,7 +207,7 @@ Hi Suzuki,
 
 > -----Original Message-----
 > From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Sent: Thursday, September 26, 2019 9:06 PM
+> Sent: Friday, September 27, 2019 6:12 PM
 > To: Jianyong Wu (Arm Technology China) <Jianyong.Wu@arm.com>;
 > netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
 > tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
@@ -221,36 +221,63 @@ Hi Suzuki,
 > Subject: Re: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
 > arch-independent.
 > 
-> Hi Jianyong,
 > 
-> On 26/09/2019 12:42, Jianyong Wu wrote:
-> > Currently, ptp_kvm modules implementation is only for x86 which
-> > includs large part of arch-specific code.  This patch move all of
-> > those code into new arch related file in the same directory.
+> 
+> On 27/09/2019 11:10, Jianyong Wu (Arm Technology China) wrote:
+> > Hi Suzuki,
 > >
-> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> > ---
-> >   drivers/ptp/Makefile                 |  1 +
-> >   drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
-> >   drivers/ptp/ptp_kvm_x86.c            | 87
-> ++++++++++++++++++++++++++++
-> >   include/asm-generic/ptp_kvm.h        | 12 ++++
-> >   4 files changed, 118 insertions(+), 59 deletions(-)
-> >   rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
+> >> -----Original Message-----
+> >> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >> Sent: Thursday, September 26, 2019 9:06 PM
+> >> To: Jianyong Wu (Arm Technology China) <Jianyong.Wu@arm.com>;
+> >> netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> >> tglx@linutronix.de; pbonzini@redhat.com;
+> >> sean.j.christopherson@intel.com; maz@kernel.org;
+> >> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
+> Will
+> >> Deacon <Will.Deacon@arm.com>
+> >> Cc: linux-kernel@vger.kernel.org;
+> >> linux-arm-kernel@lists.infradead.org;
+> >> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
+> >> <Steve.Capper@arm.com>; Kaly Xin (Arm Technology China)
+> >> <Kaly.Xin@arm.com>; Justin He (Arm Technology China)
+> >> <Justin.He@arm.com>; nd <nd@arm.com>
+> >> Subject: Re: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to
+> >> make it arch-independent.
+> >>
+> >> Hi Jianyong,
+> >>
+> >> On 26/09/2019 12:42, Jianyong Wu wrote:
+> >>> Currently, ptp_kvm modules implementation is only for x86 which
+> >>> includs large part of arch-specific code.  This patch move all of
+> >>> those code into new arch related file in the same directory.
+> >>>
+> >>> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> >>> ---
+> >>>    drivers/ptp/Makefile                 |  1 +
+> >>>    drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
+> >>>    drivers/ptp/ptp_kvm_x86.c            | 87
+> >> ++++++++++++++++++++++++++++
+> >>>    include/asm-generic/ptp_kvm.h        | 12 ++++
+> >>>    4 files changed, 118 insertions(+), 59 deletions(-)
+> >>>    rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
+> >>
+> >> minor nit: Could we not skip renaming the file ? Given you are
+> >> following the
+> >> ptp_kvm_* for the arch specific files and the header files, wouldn't
+> >> it be good to keep ptp_kvm.c ?
+> >>
+> > If the module name ptp_kvm.ko is the same with its dependent object
+> > file ptp_kvm.o, warning will be given by compiler, So I change the
+> ptp_kvm.c to kvm_ptp.c to avoid that conflict.
 > 
-> minor nit: Could we not skip renaming the file ? Given you are following the
-> ptp_kvm_* for the arch specific files and the header files, wouldn't it be
-> good to keep ptp_kvm.c ?
-> 
-If the module name ptp_kvm.ko is the same with its dependent object file ptp_kvm.o, warning will be given by compiler, 
-So I change the ptp_kvm.c to kvm_ptp.c to avoid that conflict.
+> Hmm, ok. How about ptp_kvm_common.c instead of kvm_ptp.c ?
+
+Yeah, it's a better name, I will change it next version.
 
 Thanks
 Jianyong Wu
-
-> Rest looks fine.
 > 
-> Cheers
 > Suzuki
 _______________________________________________
 kvmarm mailing list
