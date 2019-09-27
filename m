@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A73C32774
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74695C352AD
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:42:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F3FC520673
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:42:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FC520673
+	by mail.kernel.org (Postfix) with ESMTP id 2B9A820673
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Sep 2019 10:42:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9A820673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACB8C4A744;
-	Fri, 27 Sep 2019 06:42:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A134A748;
+	Fri, 27 Sep 2019 06:42:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2NAmN0JVEbn7; Fri, 27 Sep 2019 06:42:40 -0400 (EDT)
+	with ESMTP id ilYXbYds3ZjX; Fri, 27 Sep 2019 06:42:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A574A746;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AC984A76A;
 	Fri, 27 Sep 2019 06:42:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA6B24A73A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:42:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 833B64A741
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:42:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wz4ciHCgLP9d for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Sep 2019 06:42:37 -0400 (EDT)
+ with ESMTP id hN4CKbLnX3wZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Sep 2019 06:42:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4858C4A72A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:42:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D4634A731
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 06:42:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F31D31596;
- Fri, 27 Sep 2019 03:42:36 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3290142F;
+ Fri, 27 Sep 2019 03:42:37 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 32BE43F534;
- Fri, 27 Sep 2019 03:42:36 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 32E2C3F534;
+ Fri, 27 Sep 2019 03:42:37 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH 3/6] arm: timer: Split variable output data
+Subject: [kvm-unit-tests PATCH 4/6] arm: selftest: Split variable output data
  from test name
-Date: Fri, 27 Sep 2019 11:42:24 +0100
-Message-Id: <20190927104227.253466-4-andre.przywara@arm.com>
+Date: Fri, 27 Sep 2019 11:42:25 +0100
+Message-Id: <20190927104227.253466-5-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190927104227.253466-1-andre.przywara@arm.com>
 References: <20190927104227.253466-1-andre.przywara@arm.com>
@@ -78,23 +78,33 @@ and put diagnostic output on a separate line using the INFO: tag.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/timer.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arm/selftest.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arm/timer.c b/arm/timer.c
-index f2f6019..0b808d5 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -249,7 +249,8 @@ static void test_timer(struct timer_info *info)
- 	local_irq_enable();
- 	left = info->read_tval();
- 	report("interrupt received after TVAL/WFI", info->irq_received);
--	report("timer has expired (%d)", left < 0, left);
-+	report("timer has expired", left < 0);
-+	report_info("TVAL is %d ticks", left);
- }
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 28a17f7..a0c1ab8 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -43,13 +43,16 @@ static void check_setup(int argc, char **argv)
+ 			phys_addr_t memsize = PHYS_END - PHYS_OFFSET;
+ 			phys_addr_t expected = ((phys_addr_t)val)*1024*1024;
  
- static void test_vtimer(void)
+-			report("size = %" PRIu64 " MB", memsize == expected,
+-							memsize/1024/1024);
++			report("memory size matches expectation",
++			       memsize == expected);
++			report_info("found %" PRIu64 " MB", memsize/1024/1024);
+ 			++nr_tests;
+ 
+ 		} else if (strcmp(argv[i], "smp") == 0) {
+ 
+-			report("nr_cpus = %d", nr_cpus == (int)val, nr_cpus);
++			report("number of CPUs matches expectation",
++			       nr_cpus == (int)val);
++			report_info("found %d CPUs", nr_cpus);
+ 			++nr_tests;
+ 		}
+ 
 -- 
 2.17.1
 
