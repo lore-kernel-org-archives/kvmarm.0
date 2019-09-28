@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4C4C4360C
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Sep 2019 02:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1098C4360C
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Sep 2019 03:08:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DFEA420869
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Sep 2019 02:24:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFEA420869
+	by mail.kernel.org (Postfix) with ESMTP id 1C86920872
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Sep 2019 03:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C86920872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87DB24A6CD;
-	Fri, 27 Sep 2019 22:24:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5882D4A72A;
+	Fri, 27 Sep 2019 23:08:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B8Jpdbn539NF; Fri, 27 Sep 2019 22:24:27 -0400 (EDT)
+	with ESMTP id 3Q4ywDZ8Sxtv; Fri, 27 Sep 2019 23:08:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71D224A752;
-	Fri, 27 Sep 2019 22:24:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 302EC4A773;
+	Fri, 27 Sep 2019 23:08:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C10D4A6B2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 22:24:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 704254A703
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 23:08:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d32M2cREbb5n for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Sep 2019 22:24:24 -0400 (EDT)
+ with ESMTP id ynBGhTDM+0OB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Sep 2019 23:08:44 -0400 (EDT)
 Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 791524A6A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 22:24:24 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 6D27871ACCD5290A275B;
- Sat, 28 Sep 2019 10:24:21 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Sat, 28 Sep 2019
- 10:24:11 +0800
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC5064A702
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Sep 2019 23:08:44 -0400 (EDT)
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 9C14E220DCCF11C7AA3F;
+ Sat, 28 Sep 2019 11:08:40 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Sat, 28 Sep 2019
+ 11:08:31 +0800
 Subject: Re: [PATCH 24/35] irqchip/gic-v4.1: Add initial SGI configuration
+From: Zenghui Yu <yuzenghui@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
 References: <20190923182606.32100-1-maz@kernel.org>
  <20190923182606.32100-25-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <4ad002e2-1b3c-3420-98a5-0bedf067cfd9@huawei.com>
-Date: Sat, 28 Sep 2019 10:20:56 +0800
+ <4ad002e2-1b3c-3420-98a5-0bedf067cfd9@huawei.com>
+Message-ID: <c94061be-d029-69c8-d34f-4d21081d5aba@huawei.com>
+Date: Sat, 28 Sep 2019 11:07:45 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
  Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <20190923182606.32100-25-maz@kernel.org>
+In-Reply-To: <4ad002e2-1b3c-3420-98a5-0bedf067cfd9@huawei.com>
 Content-Language: en-US
 X-Originating-IP: [10.184.12.158]
 X-CFilter-Loop: Reflected
@@ -70,108 +71,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 2019/9/24 2:25, Marc Zyngier wrote:
-> The GICv4.1 ITS has yet another new command (VSGI) which allows
-> a VPE-targeted SGI to be configured (or have its pending state
-> cleared). Add support for this command and plumb it into the
-> activate irqdomain callback so that it is ready to be used.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   drivers/irqchip/irq-gic-v3-its.c   | 88 ++++++++++++++++++++++++++++++
->   include/linux/irqchip/arm-gic-v3.h |  3 +-
->   2 files changed, 90 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 69c26be709be..5234b9eef8ad 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-
-[...]
-
-> @@ -3574,6 +3628,38 @@ static struct irq_chip its_vpe_4_1_irq_chip = {
->   	.irq_set_vcpu_affinity	= its_vpe_4_1_set_vcpu_affinity,
->   };
->   
-> +static struct its_node *find_4_1_its(void)
-> +{
-> +	static struct its_node *its = NULL;
-> +
-> +	if (!its) {
-> +		list_for_each_entry(its, &its_nodes, entry) {
-> +			if (is_v4_1(its))
-> +				return its;
-> +		}
-> +
-> +		/* Oops? */
-> +		its = NULL;
-> +	}
-> +
-> +	return its;
-> +}
-> +
-> +static void its_configure_sgi(struct irq_data *d, bool clear)
-> +{
-> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> +	struct its_cmd_desc desc;
-> +
-> +	desc.its_vsgi_cmd.vpe = vpe;
-> +	desc.its_vsgi_cmd.sgi = d->hwirq;
-> +	desc.its_vsgi_cmd.priority = vpe->sgi_config[d->hwirq].priority;
-> +	desc.its_vsgi_cmd.enable = vpe->sgi_config[d->hwirq].enabled;
-> +	desc.its_vsgi_cmd.group = vpe->sgi_config[d->hwirq].group;
-> +	desc.its_vsgi_cmd.clear = clear;
-> +
-> +	its_send_single_vcommand(find_4_1_its(), its_build_vsgi_cmd, &desc);
-
-I can't follow the logic in find_4_1_its().  We simply use the first ITS
-with GICv4.1 support, but what if the vPE is not mapped on this ITS?
-We will fail the valid_vpe() check when building this command and will
-have no effect on HW in the end?
-
-
-Thanks,
-zenghui
-
-> +}
-> +
->   static int its_sgi_set_affinity(struct irq_data *d,
->   				const struct cpumask *mask_val,
->   				bool force)
-> @@ -3619,6 +3705,8 @@ static void its_sgi_irq_domain_free(struct irq_domain *domain,
->   static int its_sgi_irq_domain_activate(struct irq_domain *domain,
->   				       struct irq_data *d, bool reserve)
->   {
-> +	/* Write out the initial SGI configuration */
-> +	its_configure_sgi(d, false);
->   	return 0;
->   }
->   
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 5f3278cbf247..c73176d3ab2b 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -497,8 +497,9 @@
->   #define GITS_CMD_VMAPTI			GITS_CMD_GICv4(GITS_CMD_MAPTI)
->   #define GITS_CMD_VMOVI			GITS_CMD_GICv4(GITS_CMD_MOVI)
->   #define GITS_CMD_VSYNC			GITS_CMD_GICv4(GITS_CMD_SYNC)
-> -/* VMOVP and INVDB are the odd ones, as they dont have a physical counterpart */
-> +/* VMOVP, VSGI and INVDB are the odd ones, as they dont have a physical counterpart */
->   #define GITS_CMD_VMOVP			GITS_CMD_GICv4(2)
-> +#define GITS_CMD_VSGI			GITS_CMD_GICv4(3)
->   #define GITS_CMD_INVDB			GITS_CMD_GICv4(0xe)
->   
->   /*
-> 
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAxOS85LzI4IDEwOjIwLCBaZW5naHVpIFl1IHdyb3RlOgo+IEhpIE1hcmMsCj4gCj4gT24g
+MjAxOS85LzI0IDI6MjUsIE1hcmMgWnluZ2llciB3cm90ZToKPj4gVGhlIEdJQ3Y0LjEgSVRTIGhh
+cyB5ZXQgYW5vdGhlciBuZXcgY29tbWFuZCAoVlNHSSkgd2hpY2ggYWxsb3dzCj4+IGEgVlBFLXRh
+cmdldGVkIFNHSSB0byBiZSBjb25maWd1cmVkIChvciBoYXZlIGl0cyBwZW5kaW5nIHN0YXRlCj4+
+IGNsZWFyZWQpLiBBZGQgc3VwcG9ydCBmb3IgdGhpcyBjb21tYW5kIGFuZCBwbHVtYiBpdCBpbnRv
+IHRoZQo+PiBhY3RpdmF0ZSBpcnFkb21haW4gY2FsbGJhY2sgc28gdGhhdCBpdCBpcyByZWFkeSB0
+byBiZSB1c2VkLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwu
+b3JnPgo+PiAtLS0KPj4gwqAgZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmPCoMKgIHwg
+ODggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+IMKgIGluY2x1ZGUvbGludXgvaXJx
+Y2hpcC9hcm0tZ2ljLXYzLmggfMKgIDMgKy0KPj4gwqAgMiBmaWxlcyBjaGFuZ2VkLCA5MCBpbnNl
+cnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lycWNo
+aXAvaXJxLWdpYy12My1pdHMuYyAKPj4gYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMu
+Ywo+PiBpbmRleCA2OWMyNmJlNzA5YmUuLjUyMzRiOWVlZjhhZCAxMDA2NDQKPj4gLS0tIGEvZHJp
+dmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPj4gKysrIGIvZHJpdmVycy9pcnFjaGlwL2ly
+cS1naWMtdjMtaXRzLmMKPiAKPiBbLi4uXQo+IAo+PiBAQCAtMzU3NCw2ICszNjI4LDM4IEBAIHN0
+YXRpYyBzdHJ1Y3QgaXJxX2NoaXAgaXRzX3ZwZV80XzFfaXJxX2NoaXAgPSB7Cj4+IMKgwqDCoMKg
+wqAgLmlycV9zZXRfdmNwdV9hZmZpbml0ecKgwqDCoCA9IGl0c192cGVfNF8xX3NldF92Y3B1X2Fm
+ZmluaXR5LAo+PiDCoCB9Owo+PiArc3RhdGljIHN0cnVjdCBpdHNfbm9kZSAqZmluZF80XzFfaXRz
+KHZvaWQpCj4+ICt7Cj4+ICvCoMKgwqAgc3RhdGljIHN0cnVjdCBpdHNfbm9kZSAqaXRzID0gTlVM
+TDsKPj4gKwo+PiArwqDCoMKgIGlmICghaXRzKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBsaXN0X2Zv
+cl9lYWNoX2VudHJ5KGl0cywgJml0c19ub2RlcywgZW50cnkpIHsKPj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgaWYgKGlzX3Y0XzEoaXRzKSkKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCByZXR1cm4gaXRzOwo+PiArwqDCoMKgwqDCoMKgwqAgfQo+PiArCj4+ICvCoMKgwqDCoMKg
+wqDCoCAvKiBPb3BzPyAqLwo+PiArwqDCoMKgwqDCoMKgwqAgaXRzID0gTlVMTDsKPj4gK8KgwqDC
+oCB9Cj4+ICsKPj4gK8KgwqDCoCByZXR1cm4gaXRzOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgdm9p
+ZCBpdHNfY29uZmlndXJlX3NnaShzdHJ1Y3QgaXJxX2RhdGEgKmQsIGJvb2wgY2xlYXIpCj4+ICt7
+Cj4+ICvCoMKgwqAgc3RydWN0IGl0c192cGUgKnZwZSA9IGlycV9kYXRhX2dldF9pcnFfY2hpcF9k
+YXRhKGQpOwo+PiArwqDCoMKgIHN0cnVjdCBpdHNfY21kX2Rlc2MgZGVzYzsKPj4gKwo+PiArwqDC
+oMKgIGRlc2MuaXRzX3ZzZ2lfY21kLnZwZSA9IHZwZTsKPj4gK8KgwqDCoCBkZXNjLml0c192c2dp
+X2NtZC5zZ2kgPSBkLT5od2lycTsKPj4gK8KgwqDCoCBkZXNjLml0c192c2dpX2NtZC5wcmlvcml0
+eSA9IHZwZS0+c2dpX2NvbmZpZ1tkLT5od2lycV0ucHJpb3JpdHk7Cj4+ICvCoMKgwqAgZGVzYy5p
+dHNfdnNnaV9jbWQuZW5hYmxlID0gdnBlLT5zZ2lfY29uZmlnW2QtPmh3aXJxXS5lbmFibGVkOwo+
+PiArwqDCoMKgIGRlc2MuaXRzX3ZzZ2lfY21kLmdyb3VwID0gdnBlLT5zZ2lfY29uZmlnW2QtPmh3
+aXJxXS5ncm91cDsKPj4gK8KgwqDCoCBkZXNjLml0c192c2dpX2NtZC5jbGVhciA9IGNsZWFyOwo+
+PiArCj4+ICvCoMKgwqAgaXRzX3NlbmRfc2luZ2xlX3Zjb21tYW5kKGZpbmRfNF8xX2l0cygpLCBp
+dHNfYnVpbGRfdnNnaV9jbWQsICZkZXNjKTsKPiAKPiBJIGNhbid0IGZvbGxvdyB0aGUgbG9naWMg
+aW4gZmluZF80XzFfaXRzKCkuwqAgV2Ugc2ltcGx5IHVzZSB0aGUgZmlyc3QgSVRTCj4gd2l0aCBH
+SUN2NC4xIHN1cHBvcnQsIGJ1dCB3aGF0IGlmIHRoZSB2UEUgaXMgbm90IG1hcHBlZCBvbiB0aGlz
+IElUUz8KPiBXZSB3aWxsIGZhaWwgdGhlIHZhbGlkX3ZwZSgpIGNoZWNrIHdoZW4gYnVpbGRpbmcg
+dGhpcyBjb21tYW5kIGFuZCB3aWxsCj4gaGF2ZSBubyBlZmZlY3Qgb24gSFcgaW4gdGhlIGVuZD8K
+CkkgZ3Vlc3MgSSBmaW5kIHRoZSBhbnN3ZXIgaW4gcGF0Y2gjMzEgKCJFYWdlcmx5IHZtYXAgdlBF
+cyIpLgoKSSBtaXNzZWQgdGhlIGltcG9ydGFudCBwb2ludCBpbiBHSUN2NC4xIHRoYXQgd2UgaGF2
+ZSB0byBtYXAgdlBFcyBhdCBhbGwKdGltZXMgZm9yIFZTR0kgZGVsaXZlcnksIGFuZCB3ZSBjdXJy
+ZW50bHkgY2hvb3NlIHRvIG1hcCB2UEVzIG9uIGFsbCBJVFNzCndoZW4gcmVxdWVzdGluZyBwZXIg
+dlBFIGlycSAoaW5zdGVhZCBvZiBtYXBwaW5nIHRoZW0gb24gZGVtYW5kLCBiZWZvcmUKbWFwcGlu
+ZyBWTFBJLCB3aGljaCBjb3VsZCBoYXBwZW4gYXQgYSBwcmV0dHkgbGF0ZSBzdGFnZSkuClNvIGl0
+J3MgT0sgdG8gdXNlIHRoZSBmaXJzdCBHSUN2NC4xIElUUyB3aGVuIGNvbmZpZ3VyaW5nIFZTR0kg
+Zm9yIHRoaXMKc3BlY2lmaWVkIHZQRSwgZ2l2ZW4gdGhhdCBpdCBpcyBhbHJlYWR5IG1hcHBlZCBv
+biBhbGwgSVRTcy4KCgpUaGFua3MsCnplbmdodWkKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
