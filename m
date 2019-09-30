@@ -2,83 +2,84 @@ Return-Path: <SRS0=6KZ/=XZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4EEFA372C
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Sep 2019 13:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EABC32792
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Sep 2019 13:19:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1708920842
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Sep 2019 13:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6028F20842
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Sep 2019 13:19:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nq8irpzk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1708920842
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PO3eOfC/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6028F20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63DBC4A7DB;
-	Mon, 30 Sep 2019 09:15:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DED0E4A736;
+	Mon, 30 Sep 2019 09:19:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k+ux8K4vmy8k; Mon, 30 Sep 2019 09:15:46 -0400 (EDT)
+	with ESMTP id 0-DmXTTmN4R0; Mon, 30 Sep 2019 09:19:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E9E4A728;
-	Mon, 30 Sep 2019 09:15:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3104A770;
+	Mon, 30 Sep 2019 09:19:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F15F4A704
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 09:15:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F9B44A736
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 09:19:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YymvN9DNCM4B for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Sep 2019 09:15:44 -0400 (EDT)
+ with ESMTP id 1m3Z2b06gFst for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Sep 2019 09:19:26 -0400 (EDT)
 Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com
  [209.85.167.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A25334A6FD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 09:15:44 -0400 (EDT)
-Received: by mail-oi1-f195.google.com with SMTP id k20so11064487oih.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 06:15:44 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89CA64A6A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 09:19:26 -0400 (EDT)
+Received: by mail-oi1-f195.google.com with SMTP id x3so11080272oig.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Sep 2019 06:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jVVEvUCK/emC3iUCb0l7K7+9YIBMzhWZQM52MAW23W0=;
- b=Nq8irpzkOOU/Qk+FAEiw7mFJD3ED6x3p7RuFi3tcphxcKOTzPLv1rLkbm2e+p0opFz
- 0UEW0u32jfZzOUrbWh7ydkm94WJv0uuQzjFwAZrAYAfHa4BcvIXQbG8wzssg1Wn+V9un
- 5/Ls5khPQVF728b7aVK8k8i4+cX7AXRrKLpgq7i7uYatXGLbyH2K5LuLFeFrEb7JU0Jf
- ru05sDSWcbXopIAvYSzdORMVbxEvtThAiCDRA7uPHKSD6ACGCANYwf4lwbwx802aIrHI
- 2Z2UWOgHCOIeV/nBlEQ3NQhTTdKCLVo8wWA3Digito5OsA120xeodDO9NfrEAlc7SnI+
- yv3w==
+ :cc; bh=tvF2rhjIU40oHZTkD8AiJlAuhk6N45ACdpW2yo/HLqU=;
+ b=PO3eOfC/q3wl/KRr0kWCAelNHERyjJNf3sYliZiXHahyxh4ZRx2ySTuhPxn1dLYQtz
+ Ye7DkO0wnQTjwjmUaxO8t8JgHdk/PerRiFSCyrNFh5SbjlOxqUbk17JiIevIdEtWEmqn
+ D+03S22BPz+8zeYwZv2Bei/nLUk1RNyudNjaeErSn+O9FIlqczoufsYOsZOoGm5F3MtH
+ oAOfw9c/il8g2OxXfN5HbM+5V+PC16ESN+8dUaf3o354nFgG9uXH+SoowTtN6gelXjGF
+ 2f7a0ilmT8oGOJV2PKIB+OsJ1h0c3lxdDtGuZ78Fa7qJuhxDICK5hsWj3CFXe07wW8IK
+ nuJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jVVEvUCK/emC3iUCb0l7K7+9YIBMzhWZQM52MAW23W0=;
- b=TXRI2DacitYQRS7rZHgjvdok5hd7ck0Wx0DwBjHioif6Hm6RlmVGDiSzWmdBDmZ6bm
- iOQzkPN3mm2i0xWb/lyf4QQoyf7Ezx3FPw9lUaaM19tTZ5WDwAE5rYBzu18kTnxR+otx
- S6B1mWHHPZ84QkVyXmT4BcbFK0bB5V7zxc5D8ms6wxjqg94A2k8vdI51VzRwQTltUnIH
- d6RWZCBQ3R3rIX+xMSvtY/FU5TRIm/CIAVHwU/uiDviKGk2LK+IJLnq6rfC+M0wU5Z49
- xLwadQCe9+buVxekWcVjzK6WbZUBGV+VJacxtlcoisR427V/5n3a8OpFuosHECYINY59
- SykQ==
-X-Gm-Message-State: APjAAAWecd1/R5tuRJXNcxEZ9hPzwtSWq3Z6nqiJhp+nnJSS8NTICF6r
- JXYrxxCtrpCWAXkQjnVT5VmJP/Ub5VSeBIeURi52ww==
-X-Google-Smtp-Source: APXvYqwR/uvkoTEDQ6kjF9B5yRo9oWxbFNBjwD4EdIfTijDBaNwNgNDAKLYvIDj2ndcXMo57HW8oLx6+SCdOlzvOr+o=
-X-Received: by 2002:aca:53d4:: with SMTP id
- h203mr17266374oib.146.1569849344040; 
- Mon, 30 Sep 2019 06:15:44 -0700 (PDT)
+ bh=tvF2rhjIU40oHZTkD8AiJlAuhk6N45ACdpW2yo/HLqU=;
+ b=jIsKZk/NsiOe5mEvDqDKUlJCTFzoPyTn1gxmtClayvGY/j08QYAgk6vyBy08N99FaC
+ nOA294UxxEcU5TTi3ejIWaVhOHlgE/YsTgJRuD9sTnUeMblbSw1IZ/NG7k0XxWmG2abJ
+ 7bRw64On4i9BmJXRL3TfHcOPEsSxF5BzaAhWktpJgeeiBa+XgT7CYFeDJwjY+TSlA9pC
+ G5nI6G0WzlW08dIjLzBbDVgMd0fOGADEpTOfrjIoBWZZiGLc+AvaIbAgNv97mvZdJ/0h
+ 5QupVs8l0TPMYrETn8sETODIqlpW4BoUTGuZ263zRrTWtWBN/UMWc2oOSF+abcDvP3M0
+ Q8cw==
+X-Gm-Message-State: APjAAAXoeYMfHMa4hT3FGvAFVOmYDBG4ySvxsuOT4ieCQn43+TJSwZk/
+ Fm8f2xIy0e/FHLVsAL/iRpIl8UrbyjTU1uXupyapOA==
+X-Google-Smtp-Source: APXvYqxkDA2j7mElW4UnsVMO8OvEuYOnFf4j7HG8KejxC44MOi2OBa9meGhMJ+mXVoFqHVS5fsi1jnMYUOeVkuK8Ih4=
+X-Received: by 2002:aca:b48a:: with SMTP id d132mr18336111oif.98.1569849565968; 
+ Mon, 30 Sep 2019 06:19:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
-In-Reply-To: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
+In-Reply-To: <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Sep 2019 14:15:33 +0100
-Message-ID: <CAFEAcA_ztr0_Bu9d__dSr9oH75s2DSd5=6NZvVMrxuDTxf31mw@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/12] Add SDEI support for arm64
+Date: Mon, 30 Sep 2019 14:19:15 +0100
+Message-ID: <CAFEAcA9ZHs=GdJ-_Ap1PWdgDjSDBnnRqG1UkMGx_FiqCJ5ZyGw@mail.gmail.com>
+Subject: Re: [RFC PATCH 07/12] arm/sdei: override qemu_irq handler when
+ binding interrupt
 To: Heyi Guo <guoheyi@huawei.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
- qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu,
+ qemu-arm <qemu-arm@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
  arm-mail-list <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -98,17 +99,64 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, 24 Sep 2019 at 16:23, Heyi Guo <guoheyi@huawei.com> wrote:
 >
-> As promised, this is the first RFC patch set for arm64 SDEI support.
+> Override qemu_irq handler to support trigger SDEI event transparently
+> after guest binds interrupt to SDEI event. We don't have good way to
+> get GIC device and to guarantee SDEI device is initialized after GIC,
+> so we search GIC in system bus when the first SDEI request happens or
+> in VMSTATE post_load().
+>
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
 
-Hi; for the benefit of possible reviewers who aren't familiar
-with every corner of the arm ecosystem, could you provide a
-summary of:
- * what is SDEI ?
- * what do KVM and QEMU want/need to do with it ?
- * what is this patchset trying to solve ?
 
-That would provide some useful context for trying to
-review the patchset.
+> +static void override_qemu_irq(QemuSDEState *s, int32_t event, uint32_t intid)
+> +{
+> +    qemu_irq irq;
+> +    QemuSDE *sde;
+> +    CPUState *cs;
+> +    int cpu;
+> +
+> +    /* SPI */
+> +    if (intid >= GIC_INTERNAL) {
+> +        cs = arm_get_cpu_by_id(0);
+> +        irq = qdev_get_gpio_in(s->gic_dev,
+> +                               gic_int_to_irq(s->num_irq, intid, 0));
+> +        if (irq) {
+> +            qemu_irq_intercept_in(&irq, qemu_sdei_irq_handler, 1);
+> +        }
+
+I'm not sure what this code is trying to do, but
+qemu_irq_intercept_in() is a function for internal use
+by the qtest testing infrastructure, so it shouldn't be
+used in 'real' QEMU code.
+
+> +        sde = get_sde_no_check(s, event, cs);
+> +        sde->irq = irq;
+> +        put_sde(sde, cs);
+> +        return;
+> +    }
+
+> @@ -1042,6 +1152,17 @@ void sdei_handle_request(CPUState *cs, struct kvm_run *run)
+>          return;
+>      }
+>
+> +    if (!sde_state->gic_dev) {
+> +        /* Search for ARM GIC device */
+> +        qbus_walk_children(sysbus_get_default(), dev_walkerfn,
+> +                           NULL, NULL, NULL, sde_state);
+> +        if (!sde_state->gic_dev) {
+> +            error_report("Cannot find ARM GIC device!");
+> +            run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
+> +            return;
+> +        }
+> +    }
+
+Walking through the qbus tree looking for particular devices
+isn't really something I'd recommend either.
 
 thanks
 -- PMM
