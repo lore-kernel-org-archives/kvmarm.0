@@ -1,62 +1,59 @@
-Return-Path: <SRS0=C9Vx=X2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=EOTz=X3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92251C352AA
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Oct 2019 17:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D95ECE58D
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Oct 2019 14:50:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A27721906
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Oct 2019 17:21:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A27721906
+	by mail.kernel.org (Postfix) with ESMTP id 032AA21D82
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Oct 2019 14:50:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032AA21D82
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A46344A6CB;
-	Tue,  1 Oct 2019 13:21:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C2C4A951;
+	Wed,  2 Oct 2019 10:50:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UPJGrz-i34uS; Tue,  1 Oct 2019 13:21:54 -0400 (EDT)
+	with ESMTP id HPS0nlqBkhOq; Wed,  2 Oct 2019 10:50:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49CE04A5C5;
-	Tue,  1 Oct 2019 13:21:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EABBF4A8EB;
+	Wed,  2 Oct 2019 10:50:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6584B4A676
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Oct 2019 13:21:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDD414A8CD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Oct 2019 10:50:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BnoSWW9IC8BB for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Oct 2019 13:21:51 -0400 (EDT)
+ with ESMTP id TTGPrUPIcVvh for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Oct 2019 10:50:52 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F374A530
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Oct 2019 13:21:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A2DD4A8BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Oct 2019 10:50:52 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AFFF2337;
- Tue,  1 Oct 2019 10:21:50 -0700 (PDT)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AFAB93F706;
- Tue,  1 Oct 2019 10:21:44 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Allow reporting non-ISV data aborts
- to userspace
-To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
-References: <20190909121337.27287-1-christoffer.dall@arm.com>
- <20190909121337.27287-2-christoffer.dall@arm.com>
-From: James Morse <james.morse@arm.com>
-Message-ID: <875463bb-caa7-f959-2ffa-7ae8eca04aff@arm.com>
-Date: Tue, 1 Oct 2019 18:21:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02FCD28;
+ Wed,  2 Oct 2019 07:50:52 -0700 (PDT)
+Received: from e112269-lin.arm.com (e112269-lin.cambridge.arm.com
+ [10.1.196.133])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F37553F706;
+ Wed,  2 Oct 2019 07:50:49 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v5 00/10] arm64: Stolen time support
+Date: Wed,  2 Oct 2019 15:50:27 +0100
+Message-Id: <20191002145037.51630-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190909121337.27287-2-christoffer.dall@arm.com>
-Content-Language: en-GB
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-doc@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Steven Price <steven.price@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,99 +70,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Christoffer,
+This series add support for paravirtualized time for arm64 guests and
+KVM hosts following the specification in Arm's document DEN 0057A:
 
-On 09/09/2019 13:13, Christoffer Dall wrote:
-> For a long time, if a guest accessed memory outside of a memslot using
-> any of the load/store instructions in the architecture which doesn't
-> supply decoding information in the ESR_EL2 (the ISV bit is not set), the
-> kernel would print the following message and terminate the VM as a
-> result of returning -ENOSYS to userspace:
-> 
->   load/store instruction decoding not implemented
-> 
-> The reason behind this message is that KVM assumes that all accesses
-> outside a memslot is an MMIO access which should be handled by
-> userspace, and we originally expected to eventually implement some sort
-> of decoding of load/store instructions where the ISV bit was not set.
+https://developer.arm.com/docs/den0057/a
 
-> However, it turns out that many of the instructions which don't provide
-> decoding information on abort are not safe to use for MMIO accesses, and
-> the remaining few that would potentially make sense to use on MMIO
-> accesses, such as those with register writeback, are not used in
-> practice.  It also turns out that fetching an instruction from guest
-> memory can be a pretty horrible affair, involving stopping all CPUs on
-> SMP systems, handling multiple corner cases of address translation in
-> software, and more.  It doesn't appear likely that we'll ever implement
-> this in the kernel.
+It implements support for stolen time, allowing the guest to
+identify time when it is forcibly not executing.
 
-> What is much more common is that a user has misconfigured his/her guest
-> and is actually not accessing an MMIO region, but just hitting some
-> random hole in the IPA space.  In this scenario, the error message above
-> is almost misleading and has led to a great deal of confusion over the
-> years.
-> 
-> It is, nevertheless, ABI to userspace, and we therefore need to
-> introduce a new capability that userspace explicitly enables to change
-> behavior.
-> 
-> This patch introduces KVM_CAP_ARM_NISV_TO_USER (NISV meaning Non-ISV)
-> which does exactly that, and introduces a new exit reason to report the
-> event to userspace.  User space can then emulate an exception to the
-> guest, restart the guest, suspend the guest, or take any other
-> appropriate action as per the policy of the running system.
+Note that Live Physical Time (LPT) which was previously part of the
+above specification has now been removed.
 
+Also available as a git tree:
+git://linux-arm.org/linux-sp.git stolen_time/v5
 
+Changes from v4:
+https://lore.kernel.org/kvm/20190830084255.55113-1-steven.price@arm.com/
+ * Rebased to v5.4-rc1
+ * Renamed KVM_ARM_VCPU_PVTIME_SET_IPA to remove _SET as it is used for
+   both set/get operations
+ * Added kvm/arm_hypercalls.h to header-test-$(CONFIG_ARM{,64}) as it is
+   only buildable on arm/arm64
+ * Documented no-steal-acc kernel parameter
 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b617..02501333f746 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -4453,6 +4453,35 @@ Hyper-V SynIC state change. Notification is used to remap SynIC
->  event/message pages and to enable/disable SynIC messages/events processing
->  in userspace.
->  
-> +		/* KVM_EXIT_ARM_NISV */
-> +		struct {
-> +			__u64 esr_iss;
-> +			__u64 fault_ipa;
-> +		} arm_nisv;
-> +
-> +Used on arm and arm64 systems. If a guest accesses memory not in a memslot,
-> +KVM will typically return to userspace and ask it to do MMIO emulation on its
-> +behalf. However, for certain classes of instructions, no instruction decode
-> +(direction, length of memory access) is provided, and fetching and decoding
-> +the instruction from the VM is overly complicated to live in the kernel.
-> +
-> +Historically, when this situation occurred, KVM would print a warning and kill
-> +the VM. KVM assumed that if the guest accessed non-memslot memory, it was
-> +trying to do I/O, which just couldn't be emulated, and the warning message was
-> +phrased accordingly. However, what happened more often was that a guest bug
-> +caused access outside the guest memory areas which should lead to a more
-> +mearningful warning message and an external abort in the guest, if the access
-> +did not fall within an I/O window.
-> +
-> +Userspace implementations can query for KVM_CAP_ARM_NISV_TO_USER, and enable
-> +this capability at VM creation. Once this is done, these types of errors will
-> +instead return to userspace with KVM_EXIT_ARM_NISV, with the valid bits from
-> +the HSR (arm) and ESR_EL2 (arm64) in the esr_iss field, and the faulting IPA
-> +in the fault_ipa field. Userspace can either fix up the access if it's
-> +actually an I/O access by decoding the instruction from guest memory (if it's
-> +very brave) and continue executing the guest, or it can decide to suspend,
-> +dump, or restart the guest.
+Changes from v3:
+https://lore.kernel.org/lkml/20190821153656.33429-1-steven.price@arm.com/
+ * There's no longer a PV_TIME device, instead there are attributes on
+   the VCPU. This allows the stolen time structures to be places
+   arbitrarily by user space (subject to 64 byte alignment).
+ * Split documentation between information on the hypercalls and the
+   attributes on the VCPU
+ * Fixed the type of SMCCC functions to return long not int
 
-Should we document which parts of instruction-emulation the VMM has to do?
+Changes from v2:
+https://lore.kernel.org/lkml/20190819140436.12207-1-steven.price@arm.com/
+ * Switched from using gfn_to_hva_cache to a new macro kvm_put_guest()
+   that can provide the single-copy atomicity required (on arm64). This
+   macro is added in patch 4.
+ * Tidied up the locking for kvm_update_stolen_time().
+   pagefault_disable() was unnecessary and the caller didn't need to
+   take kvm->srcu as the function does it itself.
+ * Removed struct kvm_arch_pvtime from the arm implementation, replaced
+   instead with inline static functions which are empty for arm.
+ * Fixed a few checkpatch --strict warnings.
 
-For KVM_EXIT_MMIO, kvm looks after updating registers and advancing the PC and SS state
-machine.
+Changes from v1:
+https://lore.kernel.org/lkml/20190802145017.42543-1-steven.price@arm.com/
+ * Host kernel no longer allocates the stolen time structure, instead it
+   is allocated by user space. This means the save/restore functionality
+   can be removed.
+ * Refactored the code so arm has stub implementations and to avoid
+   initcall
+ * Rebased to pick up Documentation/{virt->virtual} change
+ * Bunch of typo fixes
 
-I can't see a kvm_skip_instr() in here, so the VMM has to do all of that stuff, including
-any register post-increment, which is the reason we need the instruction in the first place.
+Christoffer Dall (1):
+  KVM: arm/arm64: Factor out hypercall handling from PSCI code
 
+Steven Price (9):
+  KVM: arm64: Document PV-time interface
+  KVM: arm64: Implement PV_FEATURES call
+  KVM: Implement kvm_put_guest()
+  KVM: arm64: Support stolen time reporting via shared structure
+  KVM: Allow kvm_device_ops to be const
+  KVM: arm64: Provide VCPU attributes for stolen time
+  arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+  arm/arm64: Make use of the SMCCC 1.1 wrapper
+  arm64: Retrieve stolen time as paravirtualized guest
 
-Thanks,
+ .../admin-guide/kernel-parameters.txt         |   6 +-
+ Documentation/virt/kvm/arm/pvtime.txt         |  65 ++++++++
+ Documentation/virt/kvm/devices/vcpu.txt       |  14 ++
+ arch/arm/include/asm/kvm_host.h               |  26 +++
+ arch/arm/kvm/Makefile                         |   2 +-
+ arch/arm/kvm/handle_exit.c                    |   2 +-
+ arch/arm/mm/proc-v7-bugs.c                    |  13 +-
+ arch/arm64/include/asm/kvm_host.h             |  30 +++-
+ arch/arm64/include/asm/paravirt.h             |   9 +-
+ arch/arm64/include/asm/pvclock-abi.h          |  17 ++
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kernel/cpu_errata.c                |  80 ++++------
+ arch/arm64/kernel/paravirt.c                  | 148 ++++++++++++++++++
+ arch/arm64/kernel/time.c                      |   3 +
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/Makefile                       |   2 +
+ arch/arm64/kvm/guest.c                        |   9 ++
+ arch/arm64/kvm/handle_exit.c                  |   4 +-
+ include/Kbuild                                |   2 +
+ include/kvm/arm_hypercalls.h                  |  43 +++++
+ include/kvm/arm_psci.h                        |   2 +-
+ include/linux/arm-smccc.h                     |  58 +++++++
+ include/linux/cpuhotplug.h                    |   1 +
+ include/linux/kvm_host.h                      |  26 ++-
+ include/linux/kvm_types.h                     |   2 +
+ include/uapi/linux/kvm.h                      |   2 +
+ virt/kvm/arm/arm.c                            |  11 ++
+ virt/kvm/arm/hypercalls.c                     |  68 ++++++++
+ virt/kvm/arm/psci.c                           |  84 +---------
+ virt/kvm/arm/pvtime.c                         | 124 +++++++++++++++
+ virt/kvm/kvm_main.c                           |   6 +-
+ 31 files changed, 705 insertions(+), 157 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+ create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+ create mode 100644 include/kvm/arm_hypercalls.h
+ create mode 100644 virt/kvm/arm/hypercalls.c
+ create mode 100644 virt/kvm/arm/pvtime.c
 
-James
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
