@@ -2,68 +2,60 @@ Return-Path: <SRS0=Brgg=X4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 176F5C10F14
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 13:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DF0C10F14
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 17:24:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C84CF2053B
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 13:23:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84CF2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 18C7920830
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 17:24:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C7920830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 701344A785;
-	Thu,  3 Oct 2019 09:23:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A264A782;
+	Thu,  3 Oct 2019 13:24:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4kF3MMzKU4LW; Thu,  3 Oct 2019 09:23:29 -0400 (EDT)
+	with ESMTP id C24-DOEduq4I; Thu,  3 Oct 2019 13:24:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64CA14A782;
-	Thu,  3 Oct 2019 09:23:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AA084A764;
+	Thu,  3 Oct 2019 13:24:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFDBD4A782
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 09:23:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFE7A4A764
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 13:24:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Cnn4m-SVaKnQ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Oct 2019 09:23:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C45524A752
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 09:23:26 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 238833C919;
- Thu,  3 Oct 2019 13:23:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 093B510013A7;
- Thu,  3 Oct 2019 13:23:23 +0000 (UTC)
-Date: Thu, 3 Oct 2019 15:23:21 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v5 06/10] KVM: Allow kvm_device_ops to be const
-Message-ID: <20191003132321.jd7wtkbcdmyx7gnv@kamzik.brq.redhat.com>
-References: <20191002145037.51630-1-steven.price@arm.com>
- <20191002145037.51630-7-steven.price@arm.com>
+ with ESMTP id UaaFD2JbuaWX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Oct 2019 13:24:20 -0400 (EDT)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C08274A758
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 13:24:20 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1iG4ps-0003xB-EA; Thu, 03 Oct 2019 19:24:16 +0200
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: pmu: Fix cycle counter truncation on counter stop
+Date: Thu,  3 Oct 2019 18:24:00 +0100
+Message-Id: <20191003172400.21157-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191002145037.51630-7-steven.price@arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 03 Oct 2019 13:23:26 +0000 (UTC)
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, suzuki.poulose@arm.com,
+ james.morse@arm.com, andrew.murray@arm.com, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,20 +72,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Oct 02, 2019 at 03:50:33PM +0100, Steven Price wrote:
-> Currently a kvm_device_ops structure cannot be const without triggering
-> compiler warnings. However the structure doesn't need to be written to
-> and, by marking it const, it can be read-only in memory. Add some more
-> const keywords to allow this.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  include/linux/kvm_host.h | 4 ++--
->  virt/kvm/kvm_main.c      | 6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
->
+When a counter is disabled, its value is sampled before the event
+is being disabled, and the value written back in the shadow register.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+In that process, the value gets truncated to 32bit, which is adequate
+for any counter but the cycle counter, which can be configured to
+hold a 64bit value. This obviously results in a corrupted counter,
+and things like "perf record -e cycles" not working at all when
+run in a guest...
+
+Make the truncation conditional on the counter not being 64bit.
+
+Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+Cc: Andrew Murray <andrew.murray@arm.com>
+Reported-by: Julien Thierry Julien Thierry <julien.thierry.kdev@gmail.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/pmu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 362a01886bab..d716aef2bae9 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -206,9 +206,11 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+ 		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
+ 		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
+ 	} else {
++		if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
++			counter = lower_32_bits(counter);
+ 		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+ 		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+-		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
++		__vcpu_sys_reg(vcpu, reg) = counter;
+ 	}
+ 
+ 	kvm_pmu_release_perf_event(pmc);
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
