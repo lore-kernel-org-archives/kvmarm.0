@@ -1,61 +1,62 @@
-Return-Path: <SRS0=EOTz=X3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Brgg=X4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B11FC35280
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Oct 2019 14:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE707C32792
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:09:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1751F21D7B
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Oct 2019 14:51:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1751F21D7B
+	by mail.kernel.org (Postfix) with ESMTP id 32A8A218DE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:09:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A8A218DE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3DA94A8A6;
-	Wed,  2 Oct 2019 10:51:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 973334A78D;
+	Thu,  3 Oct 2019 07:09:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IqjxxtVQ93NV; Wed,  2 Oct 2019 10:51:19 -0400 (EDT)
+	with ESMTP id ZrVgBURE7Hsl; Thu,  3 Oct 2019 07:09:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9571B4A961;
-	Wed,  2 Oct 2019 10:51:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A83F4A789;
+	Thu,  3 Oct 2019 07:09:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AD224A9B7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Oct 2019 10:51:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 411C24A789
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:09:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PUCKQAV9mY4r for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Oct 2019 10:51:15 -0400 (EDT)
+ with ESMTP id FD31d6gCPlBf for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Oct 2019 07:09:35 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFAF04A8E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Oct 2019 10:51:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8414A76F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:09:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8327B1597;
- Wed,  2 Oct 2019 07:51:14 -0700 (PDT)
-Received: from e112269-lin.arm.com (e112269-lin.cambridge.arm.com
- [10.1.196.133])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8166A3F706;
- Wed,  2 Oct 2019 07:51:12 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v5 10/10] arm64: Retrieve stolen time as paravirtualized guest
-Date: Wed,  2 Oct 2019 15:50:37 +0100
-Message-Id: <20191002145037.51630-11-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191002145037.51630-1-steven.price@arm.com>
-References: <20191002145037.51630-1-steven.price@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B4371000;
+ Thu,  3 Oct 2019 04:09:34 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37C223F706;
+ Thu,  3 Oct 2019 04:09:33 -0700 (PDT)
+Subject: Re: [PATCH 4/5] arm64: KVM: Prevent speculative S1 PTW when restoring
+ vcpu context
+To: Marc Zyngier <maz@kernel.org>
+References: <20190925111941.88103-1-maz@kernel.org>
+ <20190925111941.88103-5-maz@kernel.org>
+From: James Morse <james.morse@arm.com>
+Message-ID: <0d52783d-2cff-0d2e-8421-74f815b90c47@arm.com>
+Date: Thu, 3 Oct 2019 12:09:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, linux-doc@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>, Steven Price <steven.price@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20190925111941.88103-5-maz@kernel.org>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,262 +73,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Enable paravirtualization features when running under a hypervisor
-supporting the PV_TIME_ST hypercall.
+Hi Marc,
 
-For each (v)CPU, we ask the hypervisor for the location of a shared
-page which the hypervisor will use to report stolen time to us. We set
-pv_time_ops to the stolen time function which simply reads the stolen
-value from the shared page for a VCPU. We guarantee single-copy
-atomicity using READ_ONCE which means we can also read the stolen
-time for another VCPU than the currently running one while it is
-potentially being updated by the hypervisor.
+On 25/09/2019 12:19, Marc Zyngier wrote:
+> When handling erratum 1319367, we must ensure that the page table
+> walker cannot parse the S1 page tables while the guest is in an
+> inconsistent state. This is done as follows:
+> 
+> On guest entry:
+> - TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> - all system registers are restored, except for TCR_EL1 and SCTLR_EL1
+> - stage-2 is restored
+> - SCTLR_EL1 and TCR_EL1 are restored
+> 
+> On guest exit:
+> - SCTLR_EL1.M and TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> - stage-2 is disabled
+> - All host system registers are restored
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- .../admin-guide/kernel-parameters.txt         |   6 +-
- arch/arm64/include/asm/paravirt.h             |   9 +-
- arch/arm64/kernel/paravirt.c                  | 148 ++++++++++++++++++
- arch/arm64/kernel/time.c                      |   3 +
- include/linux/cpuhotplug.h                    |   1 +
- 5 files changed, 163 insertions(+), 4 deletions(-)
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index e6adb90c12ae..4df47d013bec 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -156,6 +170,23 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+>  {
+>  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+>  
+> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> +		u64 val;
+> +
+> +		/*
+> +		 * Set the TCR and SCTLR registers in the exact opposite
+> +		 * sequence as __activate_traps_nvhe (first prevent walks,
+> +		 * then force the MMU on). A generous sprinkling of isb()
+> +		 * ensure that things happen in this exact order.
+> +		 */
+> +		val = read_sysreg_el1(SYS_TCR);
+> +		write_sysreg_el1(val | TCR_EPD1_MASK | TCR_EPD0_MASK, SYS_TCR);
+> +		isb();
+> +		val = read_sysreg_el1(SYS_SCTLR);
+> +		write_sysreg_el1(val | SCTLR_ELx_M, SYS_SCTLR);
+> +		isb();
+> +	}
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index c7ac2f3ac99f..346b1c7a4afb 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3083,9 +3083,9 @@
- 			[X86,PV_OPS] Disable paravirtualized VMware scheduler
- 			clock and use the default one.
- 
--	no-steal-acc	[X86,KVM] Disable paravirtualized steal time accounting.
--			steal time is computed, but won't influence scheduler
--			behaviour
-+	no-steal-acc	[X86,KVM,ARM64] Disable paravirtualized steal time
-+			accounting. steal time is computed, but won't
-+			influence scheduler behaviour
- 
- 	nolapic		[X86-32,APIC] Do not enable or use the local APIC.
- 
-diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-index 799d9dd6f7cc..125c26c42902 100644
---- a/arch/arm64/include/asm/paravirt.h
-+++ b/arch/arm64/include/asm/paravirt.h
-@@ -21,6 +21,13 @@ static inline u64 paravirt_steal_clock(int cpu)
- {
- 	return pv_ops.time.steal_clock(cpu);
- }
--#endif
-+
-+int __init kvm_guest_init(void);
-+
-+#else
-+
-+#define kvm_guest_init()
-+
-+#endif // CONFIG_PARAVIRT
- 
- #endif
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index 4cfed91fe256..5bf3be7ccf7e 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -6,13 +6,161 @@
-  * Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-  */
- 
-+#define pr_fmt(fmt) "kvmarm-pv: " fmt
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/cpuhotplug.h>
- #include <linux/export.h>
-+#include <linux/io.h>
- #include <linux/jump_label.h>
-+#include <linux/printk.h>
-+#include <linux/psci.h>
-+#include <linux/reboot.h>
-+#include <linux/slab.h>
- #include <linux/types.h>
-+
- #include <asm/paravirt.h>
-+#include <asm/pvclock-abi.h>
-+#include <asm/smp_plat.h>
- 
- struct static_key paravirt_steal_enabled;
- struct static_key paravirt_steal_rq_enabled;
- 
- struct paravirt_patch_template pv_ops;
- EXPORT_SYMBOL_GPL(pv_ops);
-+
-+struct kvmarm_stolen_time_region {
-+	struct pvclock_vcpu_stolen_time *kaddr;
-+};
-+
-+static DEFINE_PER_CPU(struct kvmarm_stolen_time_region, stolen_time_region);
-+
-+static bool steal_acc = true;
-+static int __init parse_no_stealacc(char *arg)
-+{
-+	steal_acc = false;
-+	return 0;
-+}
-+
-+early_param("no-steal-acc", parse_no_stealacc);
-+
-+/* return stolen time in ns by asking the hypervisor */
-+static u64 kvm_steal_clock(int cpu)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+
-+	reg = per_cpu_ptr(&stolen_time_region, cpu);
-+	if (!reg->kaddr) {
-+		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
-+			     cpu);
-+		return 0;
-+	}
-+
-+	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
-+}
-+
-+static int disable_stolen_time_current_cpu(void)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+
-+	reg = this_cpu_ptr(&stolen_time_region);
-+	if (!reg->kaddr)
-+		return 0;
-+
-+	memunmap(reg->kaddr);
-+	memset(reg, 0, sizeof(*reg));
-+
-+	return 0;
-+}
-+
-+static int stolen_time_dying_cpu(unsigned int cpu)
-+{
-+	return disable_stolen_time_current_cpu();
-+}
-+
-+static int init_stolen_time_cpu(unsigned int cpu)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+	struct arm_smccc_res res;
-+
-+	reg = this_cpu_ptr(&stolen_time_region);
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_ST, &res);
-+
-+	if ((long)res.a0 < 0)
-+		return -EINVAL;
-+
-+	reg->kaddr = memremap(res.a0,
-+			      sizeof(struct pvclock_vcpu_stolen_time),
-+			      MEMREMAP_WB);
-+
-+	if (!reg->kaddr) {
-+		pr_warn("Failed to map stolen time data structure\n");
-+		return -ENOMEM;
-+	}
-+
-+	if (le32_to_cpu(reg->kaddr->revision) != 0 ||
-+	    le32_to_cpu(reg->kaddr->attributes) != 0) {
-+		pr_warn("Unexpected revision or attributes in stolen time data\n");
-+		return -ENXIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvm_arm_init_stolen_time(void)
-+{
-+	int ret;
-+
-+	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
-+				"hypervisor/kvmarm/pv:starting",
-+				init_stolen_time_cpu, stolen_time_dying_cpu);
-+	if (ret < 0)
-+		return ret;
-+	return 0;
-+}
-+
-+static bool has_kvm_steal_clock(void)
-+{
-+	struct arm_smccc_res res;
-+
-+	/* To detect the presence of PV time support we require SMCCC 1.1+ */
-+	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-+			     ARM_SMCCC_HV_PV_FEATURES, &res);
-+
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_FEATURES,
-+			     ARM_SMCCC_HV_PV_TIME_ST, &res);
-+
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return false;
-+
-+	return true;
-+}
-+
-+int __init kvm_guest_init(void)
-+{
-+	int ret;
-+
-+	if (!has_kvm_steal_clock())
-+		return 0;
-+
-+	ret = kvm_arm_init_stolen_time();
-+	if (ret)
-+		return ret;
-+
-+	pv_ops.time.steal_clock = kvm_steal_clock;
-+
-+	static_key_slow_inc(&paravirt_steal_enabled);
-+	if (steal_acc)
-+		static_key_slow_inc(&paravirt_steal_rq_enabled);
-+
-+	pr_info("using stolen time PV\n");
-+
-+	return 0;
-+}
-diff --git a/arch/arm64/kernel/time.c b/arch/arm64/kernel/time.c
-index 0b2946414dc9..a52aea14c6ec 100644
---- a/arch/arm64/kernel/time.c
-+++ b/arch/arm64/kernel/time.c
-@@ -30,6 +30,7 @@
- 
- #include <asm/thread_info.h>
- #include <asm/stacktrace.h>
-+#include <asm/paravirt.h>
- 
- unsigned long profile_pc(struct pt_regs *regs)
- {
-@@ -65,4 +66,6 @@ void __init time_init(void)
- 
- 	/* Calibrate the delay loop directly */
- 	lpj_fine = arch_timer_rate / HZ;
-+
-+	kvm_guest_init();
- }
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 068793a619ca..89d75edb5750 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -136,6 +136,7 @@ enum cpuhp_state {
- 	/* Must be the last timer callback */
- 	CPUHP_AP_DUMMY_TIMER_STARTING,
- 	CPUHP_AP_ARM_XEN_STARTING,
-+	CPUHP_AP_ARM_KVMPV_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_STARTING,
- 	CPUHP_AP_ARM64_ISNDEP_STARTING,
- 	CPUHP_AP_SMPCFD_DYING,
--- 
-2.20.1
+We are exiting the guest, and heading back to the host.
+This change forces stage-1 off. Stage-2 is still enabled, but its about to be disabled and
+have the host VMID restore in __deactivate_vm(). All good so far.
 
+Then we hit __sysreg_restore_state_nvhe() for the host, which calls
+__sysreg_restore_el1_state()...
+
+
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 7ddbc849b580..adabdceacc10 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -117,12 +117,22 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+>  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> +
+> +	/* Must only be done for guest registers, hence the context test */
+> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367) &&
+> +	    !ctxt->__hyp_running_vcpu) {
+> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1] |
+> +				 TCR_EPD1_MASK | TCR_EPD0_MASK,	SYS_TCR);
+> +		isb();
+> +	} else {
+
+... which will come in here.
+
+> +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+
+This reverses what we did in __deactivate_traps_nvhe(), but we haven't restored the host
+TTBRs yet. I don't think the vttbr_el2 write has been sync'd either.
+
+A speculative AT at this point could see the TCR EPDx bits clear, but the guest's TTBR
+values. It may also see the guest-VMID.
+
+
+I think the change to this function needs splitting up. Restore of guest state needs to be
+as you have it here, before the guest TTBRs are written.
+
+Restore of the host state needs to only clear the EPDx bits after the TTBRs are written,
+and sync'd.
+
+
+Assuming I'm making sense ... with that:
+Reviewed-by: James Morse <james.morse@arm.com>
+
+for the series.
+
+
+> +	}
+> +
+>  	write_sysreg(ctxt->sys_regs[ACTLR_EL1],		actlr_el1);
+>  	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	SYS_CPACR);
+>  	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	SYS_TTBR0);
+>  	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	SYS_TTBR1);
+> -	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+>  	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	SYS_ESR);
+>  	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	SYS_AFSR0);
+>  	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	SYS_AFSR1);
+
+
+Thanks,
+
+James
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
