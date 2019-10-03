@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33146C10F14
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7110C32792
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:11:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E59DA21D81
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:10:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59DA21D81
+	by mail.kernel.org (Postfix) with ESMTP id 7683B218DE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:11:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7683B218DE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1454A78D;
-	Thu,  3 Oct 2019 07:10:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF8604A799;
+	Thu,  3 Oct 2019 07:11:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 375BLenFZZvn; Thu,  3 Oct 2019 07:10:28 -0400 (EDT)
+	with ESMTP id YZl9ucJkylx9; Thu,  3 Oct 2019 07:11:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 898574A791;
-	Thu,  3 Oct 2019 07:10:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D214A791;
+	Thu,  3 Oct 2019 07:11:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C55F24A78D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:10:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B07044A78D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:11:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RsotZT-sov3j for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Oct 2019 07:10:26 -0400 (EDT)
+ with ESMTP id tuBetKB2Rzrx for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Oct 2019 07:11:03 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF8F44A789
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:10:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E4D4A789
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:11:03 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 649C31000;
- Thu,  3 Oct 2019 04:10:26 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 426411000;
+ Thu,  3 Oct 2019 04:11:03 -0700 (PDT)
 Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4658B3F706;
- Thu,  3 Oct 2019 04:10:25 -0700 (PDT)
-Subject: Re: [PATCH 3/5] arm64: KVM: Disable EL1 PTW when invalidating S2 TLBs
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 245143F706;
+ Thu,  3 Oct 2019 04:11:02 -0700 (PDT)
+Subject: Re: [PATCH 5/5] arm64: Enable and document ARM errata 1319367 and
+ 1319537
 To: Marc Zyngier <maz@kernel.org>
 References: <20190925111941.88103-1-maz@kernel.org>
- <20190925111941.88103-4-maz@kernel.org>
+ <20190925111941.88103-6-maz@kernel.org>
 From: James Morse <james.morse@arm.com>
-Message-ID: <030bbc8c-2304-5941-afc0-53f5a66fb143@arm.com>
-Date: Thu, 3 Oct 2019 12:10:23 +0100
+Message-ID: <6d41efac-3606-328a-0a18-f86ed070932c@arm.com>
+Date: Thu, 3 Oct 2019 12:11:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190925111941.88103-4-maz@kernel.org>
+In-Reply-To: <20190925111941.88103-6-maz@kernel.org>
 Content-Language: en-GB
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -75,70 +76,35 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 25/09/2019 12:19, Marc Zyngier wrote:
-> When erratum 1319367 is being worked around, special care must
-> be taken not to allow the page table walker to populate TLBs
-> while we have the stage-2 translation enabled (which would otherwise
-> result in a bizare mix of the host S1 and the guest S2).
+> Now that everything is in place, let's get the ball rolling
+> by allowing the corresponding config option to be selected.
+> Also add the required information to silicon_arrata.rst.
+
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 3adcec05b1f6..c50cd4f83bc4 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -523,6 +523,16 @@ config ARM64_ERRATUM_1286807
+>  	  invalidated has been observed by other observers. The
+>  	  workaround repeats the TLBI+DSB operation.
+>  
+> +config ARM64_ERRATUM_1319367
+> +	bool "Cortex-A57/A72: Speculative AT instruction using out-of-context translation regime could cause subsequent request to generate an incorrect translation"
+> +	default y
+> +	help
+> +	  This option adds work arounds for ARM Cortex-A57 erratum 1319537
+> +	  and A72 erratum 1319367
+> +
+> +	  Cortex-A57 and A72 cores could end-up with corrupted TLBs by
+> +	  speculating an AT instruction during a guest context switch.
+> +
+>  	  If unsure, say Y.
+>  
+>  config ARM64_ERRATUM_1463225
 > 
-> We enforce this by setting TCR_EL1.EPD{0,1} before restoring the S2
-> configuration, and clear the same bits after having disabled S2.
 
+Nit: You pinched someone elses "If unsure, say Y."!
 
-Some comment Nits...
-
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index eb0efc5557f3..4ef0bf0d76a6 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -63,6 +63,22 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
->  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
->  						  struct tlb_inv_context *cxt)
->  {
-> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
-> +		u64 val;
-> +
-> +		/*
-> +		 * For CPUs that are affected by ARM 1319367, we need to
-> +		 * avoid a host Stage-1 walk while we have the guest's
-
-> +		 * Stage-2 set in the VTTBR in order to invalidate TLBs.
-
-Isn't HCR_EL2.VM==0 for all this? I think its the VMID that matters here:
-| ... have the guest's VMID set in VTTBR ...
-
-?
-
-
-> +		 * We're guaranteed that the S1 MMU is enabled, so we can
-> +		 * simply set the EPD bits to avoid any further TLB fill.
-> +		 */
-> +		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
-> +		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
-> +		write_sysreg_el1(val, SYS_TCR);
-> +		isb();
-> +	}
-> +
->  	__load_guest_stage2(kvm);
->  	isb();
->  }
-> @@ -100,6 +116,13 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
->  						 struct tlb_inv_context *cxt)
->  {
->  	write_sysreg(0, vttbr_el2);
-> +
-> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
-> +		/* Ensure stage-2 is actually disabled */
-
-| Ensure the host's VMID has been written
-
-?
-
-
-> +		isb();
-> +		/* Restore the host's TCR_EL1 */
-> +		write_sysreg_el1(cxt->tcr, SYS_TCR);
-> +	}
->  }
 
 
 Thanks,
