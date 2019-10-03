@@ -2,61 +2,55 @@ Return-Path: <SRS0=Brgg=X4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7110C32792
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B3BC4CED1
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:32:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7683B218DE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:11:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7683B218DE
+	by mail.kernel.org (Postfix) with ESMTP id 717122086A
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Oct 2019 11:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717122086A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF8604A799;
-	Thu,  3 Oct 2019 07:11:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBDD14A775;
+	Thu,  3 Oct 2019 07:32:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YZl9ucJkylx9; Thu,  3 Oct 2019 07:11:05 -0400 (EDT)
+	with ESMTP id 2hYaSuAvnUx3; Thu,  3 Oct 2019 07:32:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D214A791;
-	Thu,  3 Oct 2019 07:11:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D81834A78D;
+	Thu,  3 Oct 2019 07:32:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B07044A78D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:11:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21ABA4A76A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:32:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tuBetKB2Rzrx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Oct 2019 07:11:03 -0400 (EDT)
+ with ESMTP id hRyct2jBcPgt for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Oct 2019 07:32:35 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E4D4A789
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:11:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 012F44A763
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Oct 2019 07:32:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 426411000;
- Thu,  3 Oct 2019 04:11:03 -0700 (PDT)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 245143F706;
- Thu,  3 Oct 2019 04:11:02 -0700 (PDT)
-Subject: Re: [PATCH 5/5] arm64: Enable and document ARM errata 1319367 and
- 1319537
-To: Marc Zyngier <maz@kernel.org>
-References: <20190925111941.88103-1-maz@kernel.org>
- <20190925111941.88103-6-maz@kernel.org>
-From: James Morse <james.morse@arm.com>
-Message-ID: <6d41efac-3606-328a-0a18-f86ed070932c@arm.com>
-Date: Thu, 3 Oct 2019 12:11:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 73465337;
+ Thu,  3 Oct 2019 04:32:34 -0700 (PDT)
+Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com
+ [10.1.196.63])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 65BED3F706;
+ Thu,  3 Oct 2019 04:32:33 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests PATCH v2 0/3] arm64: Add code generation test
+Date: Thu,  3 Oct 2019 12:32:14 +0100
+Message-Id: <20191003113217.25464-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190925111941.88103-6-maz@kernel.org>
-Content-Language: en-GB
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: pbonzini@redhat.com, andre.przywara@arm.com, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,43 +67,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Add a test to check if KVM honors the CTR_EL0.{IDC, DIC} bits that it
+advertises to the guests. Full details are in patch #3.
 
-On 25/09/2019 12:19, Marc Zyngier wrote:
-> Now that everything is in place, let's get the ball rolling
-> by allowing the corresponding config option to be selected.
-> Also add the required information to silicon_arrata.rst.
+Changes in v2:
+* Gathered Reviewed-by tags.
+* Fixed typo s/group/groups in #3.
 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 3adcec05b1f6..c50cd4f83bc4 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -523,6 +523,16 @@ config ARM64_ERRATUM_1286807
->  	  invalidated has been observed by other observers. The
->  	  workaround repeats the TLBI+DSB operation.
->  
-> +config ARM64_ERRATUM_1319367
-> +	bool "Cortex-A57/A72: Speculative AT instruction using out-of-context translation regime could cause subsequent request to generate an incorrect translation"
-> +	default y
-> +	help
-> +	  This option adds work arounds for ARM Cortex-A57 erratum 1319537
-> +	  and A72 erratum 1319367
-> +
-> +	  Cortex-A57 and A72 cores could end-up with corrupted TLBs by
-> +	  speculating an AT instruction during a guest context switch.
-> +
->  	  If unsure, say Y.
->  
->  config ARM64_ERRATUM_1463225
-> 
+Alexandru Elisei (3):
+  lib: arm64: Add missing ISB in flush_tlb_page
+  lib: arm/arm64: Add function to clear the PTE_USER bit
+  arm64: Add cache code generation test
 
-Nit: You pinched someone elses "If unsure, say Y."!
+ arm/Makefile.arm64    |   1 +
+ lib/arm/asm/mmu-api.h |   1 +
+ lib/arm64/asm/mmu.h   |   1 +
+ lib/arm/mmu.c         |  15 ++++++
+ arm/cache.c           | 122 ++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg     |   6 +++
+ 6 files changed, 146 insertions(+)
+ create mode 100644 arm/cache.c
 
+-- 
+2.20.1
 
-
-Thanks,
-
-James
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
