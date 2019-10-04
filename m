@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34751ECE58B
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 14:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECEAC4360C
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 14:18:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E8A9E222C5
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 14:18:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A9E222C5
+	by mail.kernel.org (Postfix) with ESMTP id 4F3DC2133F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 14:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3DC2133F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0B704A6B3;
-	Fri,  4 Oct 2019 10:18:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B9F4A6A4;
+	Fri,  4 Oct 2019 10:18:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6orLNqvLaNLE; Fri,  4 Oct 2019 10:18:46 -0400 (EDT)
+	with ESMTP id q4EOeyHRyW9U; Fri,  4 Oct 2019 10:18:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ED5D4A6BB;
-	Fri,  4 Oct 2019 10:18:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86C7A4A6D9;
+	Fri,  4 Oct 2019 10:18:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB23F4A68E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 10:18:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84BA84A685
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 10:18:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 15ZTQqmSFKdv for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Oct 2019 10:18:43 -0400 (EDT)
+ with ESMTP id KDheics4Bp5S for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Oct 2019 10:18:45 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6A574A672
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 10:18:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD6D84A663
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 10:18:44 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 873781597;
- Fri,  4 Oct 2019 07:18:43 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87F7D15AB;
+ Fri,  4 Oct 2019 07:18:44 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BAB483F68E;
- Fri,  4 Oct 2019 07:18:42 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB0783F68E;
+ Fri,  4 Oct 2019 07:18:43 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 5/6] arm: selftest: Make MPIDR output stable
-Date: Fri,  4 Oct 2019 15:18:28 +0100
-Message-Id: <20191004141829.87135-6-andre.przywara@arm.com>
+Subject: [kvm-unit-tests PATCH v2 6/6] arm: Add missing test name prefix calls
+Date: Fri,  4 Oct 2019 15:18:29 +0100
+Message-Id: <20191004141829.87135-7-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191004141829.87135-1-andre.przywara@arm.com>
 References: <20191004141829.87135-1-andre.przywara@arm.com>
@@ -68,64 +68,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At the moment the smp selftest outputs one line for each vCPU, with the
-CPU number and its MPIDR printed in the same test result line.
-For automated test frameworks this has the problem of including variable
-output in the test name, also the number of tests varies, depending on the
-number of vCPUs.
+When running the unit tests in TAP mode (./run_tests.sh -t), every single
+test result is printed. This works fine for most tests which use the
+reporting prefix feature to indicate the actual test name.
+However psci and pci were missing those names, so the reporting left
+people scratching their head what was actually tested:
+...
+ok 74 - invalid-function
+ok 75 - affinity-info-on
+ok 76 - affinity-info-off
+ok 77 - cpu-on
 
-Fix this by only generating a single line of output for the SMP test,
-which summarises the result. We use two cpumasks, to let each vCPU report
-its result and completion of the test (code stolen from the GIC test).
-
-For informational purposes we keep the one line per CPU, but prefix it
-with an INFO: tag, so that frameworks can ignore it.
+Push a "psci" prefix before running those tests to make those report
+lines more descriptive.
+While at it, do the same for pci, even though it is less ambigious there.
+Also the GIC ITARGETSR test was missing a report_prefix_pop().
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/selftest.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ arm/gic.c      | 2 ++
+ arm/pci-test.c | 2 ++
+ arm/psci.c     | 2 ++
+ 3 files changed, 6 insertions(+)
 
-diff --git a/arm/selftest.c b/arm/selftest.c
-index a0c1ab8..e9dc5c0 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -17,6 +17,8 @@
- #include <asm/smp.h>
- #include <asm/barrier.h>
+diff --git a/arm/gic.c b/arm/gic.c
+index 02d2928..adb6aa4 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -480,6 +480,8 @@ static void test_targets(int nr_irqs)
+ 	test_byte_access(targetsptr + GIC_FIRST_SPI, pattern, cpu_mask);
  
-+static cpumask_t ready, valid;
+ 	writel(orig_targets, targetsptr + GIC_FIRST_SPI);
 +
- static void __user_psci_system_off(void)
- {
- 	psci_system_off();
-@@ -341,8 +343,11 @@ static void cpu_report(void *data __unused)
- 	uint64_t mpidr = get_mpidr();
- 	int cpu = smp_processor_id();
- 
--	report("CPU(%3d) mpidr=%010" PRIx64,
--		mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
-+	if (mpidr_to_cpu(mpidr) == cpu)
-+		cpumask_set_cpu(smp_processor_id(), &valid);
-+	smp_wmb();		/* Paired with rmb in main(). */
-+	cpumask_set_cpu(smp_processor_id(), &ready);
-+	report_info("CPU%3d: MPIDR=%010" PRIx64, cpu, mpidr);
++	report_prefix_pop();
  }
  
- int main(int argc, char **argv)
-@@ -371,6 +376,11 @@ int main(int argc, char **argv)
+ static void gic_test_mmio(void)
+diff --git a/arm/pci-test.c b/arm/pci-test.c
+index cf128ac..7c3836e 100644
+--- a/arm/pci-test.c
++++ b/arm/pci-test.c
+@@ -19,6 +19,8 @@ int main(void)
+ 		return report_summary();
+ 	}
  
- 		report("PSCI version", psci_check());
- 		on_cpus(cpu_report, NULL);
-+		while (!cpumask_full(&ready))
-+			cpu_relax();
-+		smp_rmb();		/* Paired with wmb in cpu_report(). */
-+		report("MPIDR test on all CPUs", cpumask_full(&valid));
-+		report_info("%d CPUs reported back", nr_cpus);
++	report_prefix_push("pci");
++
+ 	pci_print();
  
- 	} else {
- 		printf("Unknown subtest\n");
+ 	ret = pci_testdev();
+diff --git a/arm/psci.c b/arm/psci.c
+index 5cb4d5c..536c9b7 100644
+--- a/arm/psci.c
++++ b/arm/psci.c
+@@ -126,6 +126,8 @@ int main(void)
+ {
+ 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+ 
++	report_prefix_push("psci");
++
+ 	if (nr_cpus < 2) {
+ 		report_skip("At least 2 cpus required");
+ 		goto done;
 -- 
 2.17.1
 
