@@ -6,54 +6,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8EEC4360C
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 08:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B86C47404
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 09:00:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A9C8A2070B
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 08:56:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9C8A2070B
+	by mail.kernel.org (Postfix) with ESMTP id 0F55F2070B
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Oct 2019 09:00:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F55F2070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EADBC4A65E;
-	Fri,  4 Oct 2019 04:56:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 931CB4A5A9;
+	Fri,  4 Oct 2019 05:00:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UwqGWefK9khm; Fri,  4 Oct 2019 04:55:59 -0400 (EDT)
+	with ESMTP id xey0EG28s5N9; Fri,  4 Oct 2019 05:00:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C272F4A5BD;
-	Fri,  4 Oct 2019 04:55:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5567D4A659;
+	Fri,  4 Oct 2019 05:00:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 516D14A5A9
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 04:55:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA0804A654
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 05:00:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e67pLpy0ntCC for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Oct 2019 04:55:58 -0400 (EDT)
+ with ESMTP id sWWAqqX4ZNTP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Oct 2019 05:00:19 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C5774A590
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 04:55:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A3584A5A9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Oct 2019 05:00:18 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F5621597;
- Fri,  4 Oct 2019 01:55:57 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 046B13F739;
- Fri,  4 Oct 2019 01:55:56 -0700 (PDT)
-Date: Fri, 4 Oct 2019 09:55:55 +0100
-From: Andrew Murray <andrew.murray@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: pmu: Fix cycle counter truncation on counter
- stop
-Message-ID: <20191004085554.GQ42880@e119886-lin.cambridge.arm.com>
-References: <20191003172400.21157-1-maz@kernel.org>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DBED1597;
+ Fri,  4 Oct 2019 02:00:18 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80D243F739;
+ Fri,  4 Oct 2019 02:00:16 -0700 (PDT)
+Subject: Re: [PATCH v5 01/10] KVM: arm64: Document PV-time interface
+To: Andrew Jones <drjones@redhat.com>
+References: <20191002145037.51630-1-steven.price@arm.com>
+ <20191002145037.51630-2-steven.price@arm.com>
+ <20191003121903.vty3gikjrqxffgch@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <666d133c-031d-efe0-9f7d-1711dcf576ef@arm.com>
+Date: Fri, 4 Oct 2019 10:00:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191003172400.21157-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20191003121903.vty3gikjrqxffgch@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,76 +75,171 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 03, 2019 at 06:24:00PM +0100, Marc Zyngier wrote:
-> When a counter is disabled, its value is sampled before the event
-> is being disabled, and the value written back in the shadow register.
+On 03/10/2019 13:19, Andrew Jones wrote:
+> On Wed, Oct 02, 2019 at 03:50:28PM +0100, Steven Price wrote:
+>> Introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+>>
+>> This only adds the details about "Stolen Time" as the details of "Live
+>> Physical Time" have not been fully agreed.
+>>
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on time that the host
+>> kernel has stolen from the guest.
+>>
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virt/kvm/arm/pvtime.txt   | 65 +++++++++++++++++++++++++
+>>  Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
+>>  2 files changed, 79 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..fa15c12eec91
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvtime.txt
 > 
-> In that process, the value gets truncated to 32bit, which is adequate
+> Maybe use .rst instead of .txt?
 
-Doh, that shouldn't have happened.
+Fair point - I guess .rst is the way of the future!
 
-> for any counter but the cycle counter, which can be configured to
-> hold a 64bit value. This obviously results in a corrupted counter,
-> and things like "perf record -e cycles" not working at all when
-> run in a guest...
+>> @@ -0,0 +1,65 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
+>> +
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
 > 
-> Make the truncation conditional on the counter not being 64bit.
+> s/defined/defines/ ?
 > 
-> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
-> Cc: Andrew Murray <andrew.murray@arm.com>
-> Reported-by: Julien Thierry Julien Thierry <julien.thierry.kdev@gmail.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/arm/pmu.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>> +support for AArch64 guests:
+>> +
+>> +https://developer.arm.com/docs/den0057/a
+>> +
+>> +KVM/arm64 implements the stolen time part of this specification by providing
+>> +some hypervisor service calls to support a paravirtualized guest obtaining a
+>> +view of the amount of time stolen from its execution.
+>> +
+>> +Two new SMCCC compatible hypercalls are defined:
+>> +
+>> +PV_FEATURES 0xC5000020
 > 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 362a01886bab..d716aef2bae9 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -206,9 +206,11 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
->  		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
->  		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
->  	} else {
-> +		if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> +			counter = lower_32_bits(counter);
->  		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
->  		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
-> -		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
-> +		__vcpu_sys_reg(vcpu, reg) = counter;
+> The spec calls this PV_TIME_FEATURES.
+> 
+>> +PV_TIME_ST  0xC5000022
+> 
+> This is 0xC5000021 in the spec.
 
-The other uses of lower_32_bits look OK to me.
+This is somewhat embarrassing. Apparently when I was reviewing the new
+specification I didn't notice these (subtle) changes. Thanks for
+pointing it out to me! I'll update the code to match.
 
-Reviewed-by: Andrew Murray <andrew.murray@arm.com>
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+>> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+>> +mechanism before calling it.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : The function to query for support.
+>> +                              Currently only PV_TIME_ST is supported.
+> 
+> The spec calls this PV_call_id, but maybe PV_func_id would have been better.
 
-As a side note, I'm not convinced that the implementation (or perhaps the
-use of) kvm_pmu_idx_is_64bit is correct:
+I guess they are generally called "hypercalls" not "hyperfunctions" - so
+I'll match the spec here.
 
-static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-{
-        return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-                __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-}
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
+> 
+> This is an int64 in the spec.
 
-We shouldn't truncate the value of a cycle counter to 32 bits just because
-_PMCR_LC is unset. We should only be interested in _PMCR_LC when setting
-the sample_period.
+True - although the values easily fit in int32 too! But I'll update to
+be consistent with the spec.
 
-If you agree this is wrong, I'll spin a change.
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              VCPU. On failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>> +with inner and outer write back caching attributes, in the inner shareable
+>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>> +meaningfully filled by the hypervisor (see structure below).
+>> +
+>> +PV_TIME_ST returns the structure for the calling VCPU.
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+> 
+> The spec version is 1.0 and Table 1 says "For implementations compliant
+> with this revision of the specification...". So I think this description
+> should be "Must be 0 for version 1.0".
 
-Though unsetting _PMCR_LC is deprecated so I can't imagine this causes any
-issue.
+Will update.
 
 Thanks,
 
-Andrew Murray
+Steve
 
->  	}
->  
->  	kvm_pmu_release_perf_event(pmc);
-> -- 
-> 2.20.1
+>> +  Attributes  |      4      |      4      | Must be 0
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>> +will be present within a reserved region of the normal memory given to the
+>> +guest. The guest should not attempt to write into this memory. There is a
+>> +structure per VCPU of the guest.
+>> +
+>> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
+>> +section "3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL".
+>> +
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+>> index 2b5dab16c4f2..6f3bd64a05b0 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.txt
+>> +++ b/Documentation/virt/kvm/devices/vcpu.txt
+>> @@ -60,3 +60,17 @@ time to use the number provided for a given timer, overwriting any previously
+>>  configured values on other VCPUs.  Userspace should configure the interrupt
+>>  numbers on at least one VCPU after creating all VCPUs and before running any
+>>  VCPUs.
+>> +
+>> +3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+>> +Architectures: ARM64
+>> +
+>> +3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
+>> +Parameters: 64-bit base address
+>> +Returns: -ENXIO:  Stolen time not implemented
+>> +         -EEXIST: Base address already set for this VCPU
+>> +         -EINVAL: Base address not 64 byte aligned
+>> +
+>> +Specifies the base address of the stolen time structure for this VCPU. The
+>> +base address must be 64 byte aligned and exist within a valid guest memory
+>> +region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+>> +including the layout of the stolen time structure.
+>> -- 
+>> 2.20.1
+>>
 > 
+> Thanks,
+> drew 
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
