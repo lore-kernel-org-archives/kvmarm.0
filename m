@@ -2,70 +2,173 @@ Return-Path: <SRS0=MuL5=YA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E77ECE58E
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Oct 2019 17:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DEAC47404
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Oct 2019 21:35:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DE9CC206BB
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Oct 2019 17:17:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9CC206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B9ECA20835
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Oct 2019 21:35:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fk6hrgHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9ECA20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 431A24A8A7;
-	Mon,  7 Oct 2019 13:17:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ECBF4A8B4;
+	Mon,  7 Oct 2019 17:35:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b+H1MzMQ54O9; Mon,  7 Oct 2019 13:17:45 -0400 (EDT)
+	with ESMTP id nfSqWQljwZ0l; Mon,  7 Oct 2019 17:35:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B32EA4A82E;
-	Mon,  7 Oct 2019 13:17:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3A2D4A85B;
+	Mon,  7 Oct 2019 17:35:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 038C64A82E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Oct 2019 13:17:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F1F4A85B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Oct 2019 17:35:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dwJrwU-yY3qM for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Oct 2019 13:17:42 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 613C14A82A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Oct 2019 13:17:42 -0400 (EDT)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why)
- by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
- (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1iHWdf-0006c7-Lx; Mon, 07 Oct 2019 19:17:39 +0200
-Date: Mon, 7 Oct 2019 18:17:38 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: pmu: Reset sample period on overflow
- handling
-Message-ID: <20191007181738.1b39ded9@why>
-In-Reply-To: <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
-References: <20191006104636.11194-1-maz@kernel.org>
- <20191006104636.11194-4-maz@kernel.org>
- <20191007094325.GX42880@e119886-lin.cambridge.arm.com>
- <86sgo4zv9a.wl-maz@kernel.org>
- <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id aLNDE26FBkaU for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Oct 2019 17:35:07 -0400 (EDT)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D0904A850
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Oct 2019 17:35:07 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id r5so16919214wrm.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Oct 2019 14:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OyhiovIjMKJKHgMLTz6N4LKz78G59FFqcnuV5MZGZ7g=;
+ b=Fk6hrgHG5+4gYmqh2EQwYt6qgt8bw2Hb/iXh84INWDNGXyRGp6r+hmbZI7yLL6nW1v
+ NFGOB9pmhu+EPNoUtgYDplbnfh4CpO8YmsvdBacR/leipEW0hBizAKlxuTSSNJKUHF9q
+ wu7gEkXi5G/SHSeURMidHt3XIUnW3e25+P2g6lbrQcmOkNaPHy7vOVFG/5+znHXUsfB5
+ EcFI1ZYnSypBy2aMBQ5hpN6QOQG2gPB7UvgoX2mxV9EzT6G2vDXWbpAPUb51zkZElRxY
+ i4hzpkD16MLuFqs99TuYmW6Xs0fW9oT4pAwAulULffpgcQ0rNXkiK3ztsqw4jB9NpxN5
+ kmEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=OyhiovIjMKJKHgMLTz6N4LKz78G59FFqcnuV5MZGZ7g=;
+ b=qJVm6HXyd7PVHQ0NTuqvn3CdcIkoFj0OuNj6hCS3ZyuWVnTTPCj25DqZsfKFUBnd/B
+ KlJRT8LcWEZAvWn3PqXYrBdkCtxy85SHyAp41WlZFQm78ppYW/CY7G+N0f3tMt7Bcm9e
+ vcsMji0sXOT0DUUQVhCg2uS63jCwCbVafmV5z04NC1WCayLDN6b9zE8ouXlOsTNg8GFT
+ 9noubpMIcZD1ol8gt9Nu1H8v0H1V41qjTAbr+/Mr6otVgnxyQ4omVV6Hk1n8VMe9iu1e
+ ECQRHU6VbsoI4ZXCTfzFUBrc24PbY2bIHlac2qhRk0nGAuH1CfNTIKpW3+Ox1yJhNj+Y
+ rsNQ==
+X-Gm-Message-State: APjAAAX3xri5Hu8mRvWP6MoscKdiRMQwNvnlW0nrZdi1n5825YdpbhRw
+ KuTKXsyh8xKrsITJK3kxQMU=
+X-Google-Smtp-Source: APXvYqxixmzgMnwhcFlpG5MIPu2a/Xxj3oqukzbAtE+PBBuzn+jVii6DIxIkfpt8Rab8+J68yofhww==
+X-Received: by 2002:adf:df0d:: with SMTP id y13mr26056785wrl.342.1570484106216; 
+ Mon, 07 Oct 2019 14:35:06 -0700 (PDT)
+Received: from [10.67.50.53] ([192.19.223.252])
+ by smtp.googlemail.com with ESMTPSA id o4sm33715301wre.91.2019.10.07.14.34.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 07 Oct 2019 14:35:05 -0700 (PDT)
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Arnd Bergmann <arnd@arndb.de>
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <CACRpkdbqW2kJNdPi6JPupaHA_qRTWG-MsUxeCz0c38MRujOSSA@mail.gmail.com>
+ <0ba50ae2-be09-f633-ab1f-860e8b053882@broadcom.com>
+ <CAK8P3a2QBQrBU+bBBL20kR+qJfmspCNjiw05jHTa-q6EDfodMg@mail.gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
+ 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
+ M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
+Message-ID: <fbdc3788-3a24-2885-b61b-8480e8464a51@gmail.com>
+Date: Mon, 7 Oct 2019 14:34:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, mark.rutland@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, james.morse@arm.com,
- suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <CAK8P3a2QBQrBU+bBBL20kR+qJfmspCNjiw05jHTa-q6EDfodMg@mail.gmail.com>
+Content-Language: en-US
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>, David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Florian Fainelli <f.fainelli@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Philippe Ombredanne <pombredanne@nexb.com>, Jinbum Park <jinb.park7@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Dmitry Vyukov <dvyukov@google.com>,
+ Nicolas Pitre <nico@fluxnic.net>, Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Rob Landley <rob@landley.net>, philip@cog.systems,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,192 +185,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 7 Oct 2019 14:04:58 +0100
-Andrew Murray <andrew.murray@arm.com> wrote:
-
-> On Mon, Oct 07, 2019 at 11:48:33AM +0100, Marc Zyngier wrote:
-> > On Mon, 07 Oct 2019 10:43:27 +0100,
-> > Andrew Murray <andrew.murray@arm.com> wrote:  
-> > > 
-> > > On Sun, Oct 06, 2019 at 11:46:36AM +0100, maz@kernel.org wrote:  
-> > > > From: Marc Zyngier <maz@kernel.org>
-> > > > 
-> > > > The PMU emulation code uses the perf event sample period to trigger
-> > > > the overflow detection. This works fine  for the *first* overflow
-> > > > handling  
-> > > 
-> > > Although, even though the first overflow is timed correctly, the value
-> > > the guest reads may be wrong...
-> > > 
-> > > Assuming a Linux guest with the arm_pmu.c driver, if I recall correctly
-> > > this writes the -remainingperiod to the counter upon stopping/starting.
-> > > In the case of a perf_event that is pinned to a task, this will happen
-> > > upon every context switch of that task. If the counter was getting close
-> > > to overflow before the context switch, then the value written to the
-> > > guest counter will be very high and thus the sample_period written in KVM
-> > > will be very low...
-> > > 
-> > > The best scenario is when the host handles the overflow, the guest
-> > > handles its overflow and rewrites the guest counter (resulting in a new
-> > > host perf_event) - all before the first host perf_event fires again. This
-> > > is clearly the assumption the code makes.
-> > > 
-> > > Or - the host handles its overflow and kicks the guest, but the guest
-> > > doesn't respond in time, so we end up endlessly and pointlessly kicking it
-> > > for each host overflow - thus resulting in the large difference between number
-> > > of interrupts between host and guest. This isn't ideal, because when the
-> > > guest does read its counter, the value isn't correct (because it overflowed
-> > > a zillion times at a value less than the arrchitected max).
-> > > 
-> > > Worse still is when the sample_period is so small, the host doesn't
-> > > even keep up.  
-> > 
-> > Well, there are plenty of ways to make this code go mad. The
-> > overarching reason is that we abuse the notion of sampling period to
-> > generate interrupts, while what we'd really like is something that
-> > says "call be back in that many events", rather than the sampling
-> > period which doesn't match the architecture.
-> > 
-> > Yes, small values will results in large drifts. Nothing we can do
-> > about it.
-> >   
-> > >   
-> > > > , but results in a huge number of interrupts on the host,
-> > > > unrelated to the number of interrupts handled in the guest (a x20
-> > > > factor is pretty common for the cycle counter). On a slow system
-> > > > (such as a SW model), this can result in the guest only making
-> > > > forward progress at a glacial pace.
-> > > > 
-> > > > It turns out that the clue is in the name. The sample period is
-> > > > exactly that: a period. And once the an overflow has occured,
-> > > > the following period should be the full width of the associated
-> > > > counter, instead of whatever the guest had initially programed.
-> > > > 
-> > > > Reset the sample period to the architected value in the overflow
-> > > > handler, which now results in a number of host interrupts that is
-> > > > much closer to the number of interrupts in the guest.  
-> > > 
-> > > This seems a reasonable pragmatic approach - though of course you will end
-> > > up counting slightly slower due to the host interrupt latency. But that's
-> > > better than the status quo.  
-> > 
-> > Slower than what?
-> >   
+On 7/18/19 12:51 AM, Arnd Bergmann wrote:
+> On Thu, Jul 11, 2019 at 7:00 PM Florian Fainelli
+> <florian.fainelli@broadcom.com> wrote:
+>> On 7/2/19 2:06 PM, Linus Walleij wrote:
 > 
-> Slower than the guest should expect. Assuming a cycle counter (with LC) is
-> initially programmed to 0, you'd target a guest interrupt period of 2^64 x cycle
-> period...
-
-What is exactly what is expected, isn't it?
-
-> But I'm wrong in saying that you end up counting slightly slower - as you're
-> not restarting the perf counter or changing the value so there should be no change
-> in the interrupt period to the guest.
+>>
+>> Great, thanks a lot for taking a look. FYI, I will be on holiday from
+>> July 19th till August 12th, if you think you have more feedback between
+>> now and then, I can try to pick it up and submit a v7 with that feedback
+>> addressed, or it will happen when I return, or you can pick it up if you
+>> refer, all options are possible!
+>>
+>> @Arnd, should we squash your patches in as well?
 > 
-> I was considering the case where the kernel perf event is recreated in the
-> overflow handler, in which case unless you consider the time elapsed between the
-> event firing and changing the sample_period then you end up with a larger period.
-
-The only thing that changes is the point at which the next period will
-end, matching the expected overflow.
-
-> > > 
-> > > It may be possible with perf to have a single-fire counter (this mitigates
-> > > against my third scenario but you still end up with a loss of precision) -
-> > > See PERF_EVENT_IOC_REFRESH.  
-> > 
-> > Unfortunately, that's a userspace interface, not something that's
-> > available to the kernel at large...  
+> Yes, please do. I don't remember if I sent you all of them already,
+> here is the list of patches that I have applied locally on top of your
+> series to get a clean randconfig build:
 > 
-> The mechanism to change the value of event->event_limit is only available via
-> ioctl, though I was implying that an in-kernel mechansim could be provided.
-> This would be trivial. (But it doesn't help, as I don't think you could create
-> another perf kernel event in that context).
->  
-> >   
-> > > Ideally the PERF_EVENT_IOC_REFRESH type of functionality could be updated
-> > > to reload to a different value after the first hit.  
-> > 
-> > Which is what I was hinting at above. I'd like a way to reload the
-> > next period on each expiration, much like a timer.
-> >   
-> > > 
-> > > This problem also exists on arch/x86/kvm/pmu.c (though I'm not sure what
-> > > their PMU drivers do with respect to the value they write).
-> > >   
-> > > > 
-> > > > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  virt/kvm/arm/pmu.c | 12 ++++++++++++
-> > > >  1 file changed, 12 insertions(+)
-> > > > 
-> > > > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > > > index c30c3a74fc7f..3ca4761fc0f5 100644
-> > > > --- a/virt/kvm/arm/pmu.c
-> > > > +++ b/virt/kvm/arm/pmu.c
-> > > > @@ -444,6 +444,18 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> > > >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-> > > >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> > > >  	int idx = pmc->idx;
-> > > > +	u64 val, period;
-> > > > +
-> > > > +	/* Start by resetting the sample period to the architectural limit */
-> > > > +	val = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> > > > +
-> > > > +	if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))  
-> > > 
-> > > This is correct, because in this case we *do* care about _PMCR_LC.
-> > >   
-> > > > +		period = (-val) & GENMASK(63, 0);
-> > > > +	else
-> > > > +		period = (-val) & GENMASK(31, 0);
-> > > > +
-> > > > +	pmc->perf_event->attr.sample_period = period;
-> > > > +	pmc->perf_event->hw.sample_period = period;  
-> > > 
-> > > I'm not sure about the above line - does direct manipulation of sample_period
-> > > work on a running perf event? As far as I can tell this is already done in the
-> > > kernel with __perf_event_period - however this also does other stuff (such as
-> > > disable and re-enable the event).  
-> > 
-> > I'm not sure you could do that in the handler, which is run in atomic
-> > context. It doesn't look like anything bad happens when updating the
-> > sample period directly (the whole thing has stopped getting crazy),
-> > but I'd really like someone who understands the perf internals to help
-> > here (hence Mark being on cc).  
-> 
-> I suspect this is working lazily - when you want to change the underlying pmu
-> period, you need to write the new period to the host PMU counters. This is done
-> in armpmu_start. __perf_event_period would normally stop and then start the
-> PMU to achieve this (hence the PERF_EF_RELOAD flag). Your code doesn't do this.
+> 123c3262f872 KASAN: push back KASAN_STACK to clang-10
 
-And yet I don't get these extra interrupts, so something must be
-happening.
+This one seems to have received some feedback, not sure if it was
+addressed or not in a subsequent patch?
 
-> However, the perf counter set up in KVM is always pinned to the guest process
-> and thus when switching to/from this task the counter are stopped and started.
-> Therefore I suspect the sample_period you change goes into effect at this point
-> in time. So it probably stops going crazy - but not immediately.
+> d63dd9e2afd9 [HACK] ARM: disable KASAN+XIP_KERNEL
 
-Fair enough. I wonder if we can tell perf to always stop the event
-before calling the handler, and resume it on return from the handler.
+That one has been squashed, we could always lift the XIP_KERNEL
+restriction later once someone with suitable hardware confirms it works.
 
-> I think the underlying counter also gets reset to the new period just before it
-> calls perf_event_overflow (see armv8pmu_handle_irq) - so worse case you'll wait
-> until it overflows for the second time.
-> 
-> In any case this is still better than the status quo.
+> 879eb3c22240 kasan: increase 32-bit stack frame warning limit
 
-Well, I'd still like to have something that is in line with the perf
-usage model... It's been broken forever, so I guess it can wait another
-few weeks to be correctly solved.
+That one should be pushed separately.
 
-Thanks,
+> 053555034bdf kasan: disable CONFIG_KASAN_STACK with clang on arm32
 
-	M.
+This one I did not take based on Linus' feedback that is breaks booting
+on his RealView board.
+
+> 6c1a78a448c2 ARM: fix kasan link failures
+
+This one was squashed relevant and will be sent out as v7.
 -- 
-Jazz is not dead. It just smells funny...
+Florian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
