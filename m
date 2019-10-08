@@ -2,62 +2,109 @@ Return-Path: <SRS0=tYEe=YB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 969C1C4360C
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2CFC10F14
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 09:33:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 21F0920673
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:35:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F0920673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9C9CF206BB
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 09:33:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BkRMuuut"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C9CF206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E044A8E6;
-	Tue,  8 Oct 2019 04:35:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 064964A90F;
+	Tue,  8 Oct 2019 05:33:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8j4Kw97r+dTp; Tue,  8 Oct 2019 04:35:02 -0400 (EDT)
+	with ESMTP id 9Z3Ji7Rx+h70; Tue,  8 Oct 2019 05:33:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3184A8FC;
-	Tue,  8 Oct 2019 04:35:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E70EA4A862;
+	Tue,  8 Oct 2019 05:33:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1A44A8E6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:35:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BAA84A8FC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:47:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gmqluVwhhlkN for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Oct 2019 04:34:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7F14A88B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:34:59 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E9FC1570;
- Tue,  8 Oct 2019 01:34:59 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D62C43F6C4;
- Tue,  8 Oct 2019 01:34:58 -0700 (PDT)
-Date: Tue, 8 Oct 2019 10:34:57 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: Allow user injection of external
- data aborts
-Message-ID: <20191008083457.GC4153@e113682-lin.lund.arm.com>
-References: <20190909121337.27287-1-christoffer.dall@arm.com>
- <20190909121337.27287-3-christoffer.dall@arm.com>
- <35eae9fa-b9f7-e5ca-b95f-d1d14216d6ee@kernel.org>
+ with ESMTP id 0eswweT7iNgi for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Oct 2019 04:47:18 -0400 (EDT)
+Received: from mail-lj1-f196.google.com (mail-lj1-f196.google.com
+ [209.85.208.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 705E04A8F2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:47:18 -0400 (EDT)
+Received: by mail-lj1-f196.google.com with SMTP id y23so16608796lje.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Oct 2019 01:47:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=l8gpydJYA0YDgp2JmqFlI7k3M5woSWANVYThPnzBSyg=;
+ b=BkRMuuut74Tg4ql3czpGBiGETKQ47t0yfFGj9qUtoNECtFLrPq7patqxRQTIKUPosJ
+ e5ij5XG6gLCR9aH2tMBlyg4nicWRgSUUeguPdBLCGj5e+fmO4WBOWHqbIrjN23GcV9X+
+ 9UiM5zuZ8kUOjmbmakyLfk3DNm7gDqehMEcBVhaBie4GaVJqRz5rpcUAluJLllJOF3Mf
+ +y7BzcB/eQ1ZrGH8gN2u8Rxxi+fzSaghOC5xViRMArZNRSxn2csNz/W1bUfwb6lH8tnt
+ yTgKoyASrJ8JwI3YQxZpWYMIBXyHXAIoXg2BD9qf9M9BjKJeDzu0rw7W+YgoKaSJzGqP
+ eNYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=l8gpydJYA0YDgp2JmqFlI7k3M5woSWANVYThPnzBSyg=;
+ b=EY9UWQL58xx4b+8Yk9u5ebd8r1jaTeZ6J1hT53Bf3fEV1cNXDjl+SjXsDG9Mtcub/I
+ l7BveAhJzpDkP5te0AWJBamSjmjrLOoK5GYT7ymuwhn+aQhi7u6oCQHDKavGVcYA+pLi
+ qCS0acxNgyXLULFmLyTzKXlKa7GiOTI9WMfgrLK+UKuF964DU+FbNnZcFMm28uM06ZOg
+ dys/5gcqDF3xqD4NEO/TO4fqBVPp/6grE5nSoXyB0DpJhz3xAvfnAg49tzOfmVpmkp/l
+ xgpnmrtRVYagIHKGdSJ8srrehEwdit86keXaFdRbbBgSrC6OfiGyklVvszZ2/t4A5Pfj
+ rhoA==
+X-Gm-Message-State: APjAAAVfGzEhQiAP47otr/CjvvlnEZFm3nq6frAie45SfVV8yheS1Tpv
+ dF6+m83w+7d0Z0Lsrq6qPeUAwfcxxhDQzzluRt98nA==
+X-Google-Smtp-Source: APXvYqxbNM71HM7CPR6QRsIgEbU3UU9U/CSiMXaA2SIbIfrQl+rWLBRuuYXoBIaSEvilchXKRH21ww7tus0XXj0qkXw=
+X-Received: by 2002:a2e:63da:: with SMTP id s87mr20899729lje.79.1570524436968; 
+ Tue, 08 Oct 2019 01:47:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <35eae9fa-b9f7-e5ca-b95f-d1d14216d6ee@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <CACRpkdbqW2kJNdPi6JPupaHA_qRTWG-MsUxeCz0c38MRujOSSA@mail.gmail.com>
+ <0ba50ae2-be09-f633-ab1f-860e8b053882@broadcom.com>
+ <CAK8P3a2QBQrBU+bBBL20kR+qJfmspCNjiw05jHTa-q6EDfodMg@mail.gmail.com>
+ <fbdc3788-3a24-2885-b61b-8480e8464a51@gmail.com>
+ <CAK8P3a1E_1=_+eJXvcFMLd=a=YW_WGwjm3nzRZV7SzzZqovzRw@mail.gmail.com>
+In-Reply-To: <CAK8P3a1E_1=_+eJXvcFMLd=a=YW_WGwjm3nzRZV7SzzZqovzRw@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 8 Oct 2019 10:47:05 +0200
+Message-ID: <CACRpkdbuwn-YBYd324OsfC4efBU_1pfnyS+N=+3DmrYOEKKFJw@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Arnd Bergmann <arnd@arndb.de>
+X-Mailman-Approved-At: Tue, 08 Oct 2019 05:33:11 -0400
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Florian Fainelli <f.fainelli@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, philip@cog.systems,
+ Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Nicolas Pitre <nico@fluxnic.net>, Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Rob Landley <rob@landley.net>, Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,207 +121,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 26, 2019 at 03:09:11PM +0100, Marc Zyngier wrote:
-> On 09/09/2019 13:13, Christoffer Dall wrote:
-> > In some scenarios, such as buggy guest or incorrect configuration of the
-> > VMM and firmware description data, userspace will detect a memory access
-> > to a portion of the IPA, which is not mapped to any MMIO region.
-> > 
-> > For this purpose, the appropriate action is to inject an external abort
-> > to the guest.  The kernel already has functionality to inject an
-> > external abort, but we need to wire up a signal from user space that
-> > lets user space tell the kernel to do this.
-> > 
-> > It turns out, we already have the set event functionality which we can
-> > perfectly reuse for this.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  Documentation/virt/kvm/api.txt    | 15 ++++++++++++++-
-> >  arch/arm/include/uapi/asm/kvm.h   |  3 ++-
-> >  arch/arm/kvm/guest.c              |  3 +++
-> >  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
-> >  arch/arm64/kvm/guest.c            |  3 +++
-> >  arch/arm64/kvm/inject_fault.c     |  4 ++--
-> >  include/uapi/linux/kvm.h          |  1 +
-> >  virt/kvm/arm/arm.c                |  1 +
-> >  8 files changed, 28 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> > index 02501333f746..edd6cdc470ca 100644
-> > --- a/Documentation/virt/kvm/api.txt
-> > +++ b/Documentation/virt/kvm/api.txt
-> > @@ -955,6 +955,8 @@ The following bits are defined in the flags field:
-> >  
-> >  ARM/ARM64:
-> >  
-> > +User space may need to inject several types of events to the guest.
-> > +
-> >  If the guest accesses a device that is being emulated by the host kernel in
-> >  such a way that a real device would generate a physical SError, KVM may make
-> >  a virtual SError pending for that VCPU. This system error interrupt remains
-> > @@ -989,12 +991,23 @@ Specifying exception.has_esr on a system that does not support it will return
-> >  -EINVAL. Setting anything other than the lower 24bits of exception.serror_esr
-> >  will return -EINVAL.
-> >  
-> > +If the guest performed an access to I/O memory which could not be handled by
-> > +user space, for example because of missing instruction syndrome decode
-> > +information or because there is no device mapped at the accessed IPA, then
-> > +user space can ask the kernel to inject an external abort using the address
-> > +from the exiting fault on the VCPU. It is a programming error to set
-> > +ext_dabt_pending at the same time as any of the serror fields, or to set
-> > +ext_dabt_pending on an exit which was not either KVM_EXIT_MMIO or
-> 
-> ... on *re-entry from* an exit?
-> 
-> > +KVM_EXIT_ARM_NISV. This feature is only available if the system supports
-> > +KVM_CAP_ARM_INJECT_EXT_DABT;
-> 
-> s/;/./
-> 
-> Can we add some wording to the fact that this is only a helper for the
-> most common case? Most of the ARM exceptions can otherwise be
-> constructed/injected using the SET_ONE_REG API.
-> 
-> > +
-> >  struct kvm_vcpu_events {
-> >  	struct {
-> >  		__u8 serror_pending;
-> >  		__u8 serror_has_esr;
-> > +		__u8 ext_dabt_pending;
-> >  		/* Align it to 8 bytes */
-> > -		__u8 pad[6];
-> > +		__u8 pad[5];
-> >  		__u64 serror_esr;
-> >  	} exception;
-> >  	__u32 reserved[12];
-> > diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-> > index a4217c1a5d01..d2449a5bf8d5 100644
-> > --- a/arch/arm/include/uapi/asm/kvm.h
-> > +++ b/arch/arm/include/uapi/asm/kvm.h
-> > @@ -131,8 +131,9 @@ struct kvm_vcpu_events {
-> >  	struct {
-> >  		__u8 serror_pending;
-> >  		__u8 serror_has_esr;
-> > +		__u8 ext_dabt_pending;
-> >  		/* Align it to 8 bytes */
-> > -		__u8 pad[6];
-> > +		__u8 pad[5];
-> >  		__u64 serror_esr;
-> >  	} exception;
-> >  	__u32 reserved[12];
-> > diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-> > index 684cf64b4033..4154c5589501 100644
-> > --- a/arch/arm/kvm/guest.c
-> > +++ b/arch/arm/kvm/guest.c
-> > @@ -263,11 +263,14 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> >  {
-> >  	bool serror_pending = events->exception.serror_pending;
-> >  	bool has_esr = events->exception.serror_has_esr;
-> > +	bool has_ext_dabt_pending = events->exception.ext_dabt_pending;
-> >  
-> >  	if (serror_pending && has_esr)
-> >  		return -EINVAL;
-> >  	else if (serror_pending)
-> >  		kvm_inject_vabt(vcpu);
-> > +	else if (has_ext_dabt_pending)
-> > +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> >  
-> >  	return 0;
-> >  }
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index 9a507716ae2f..7729efdb1c0c 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -164,8 +164,9 @@ struct kvm_vcpu_events {
-> >  	struct {
-> >  		__u8 serror_pending;
-> >  		__u8 serror_has_esr;
-> > +		__u8 ext_dabt_pending;
-> >  		/* Align it to 8 bytes */
-> > -		__u8 pad[6];
-> > +		__u8 pad[5];
-> >  		__u64 serror_esr;
-> >  	} exception;
-> >  	__u32 reserved[12];
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index dfd626447482..10e6e2144dca 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -720,6 +720,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> >  {
-> >  	bool serror_pending = events->exception.serror_pending;
-> >  	bool has_esr = events->exception.serror_has_esr;
-> > +	bool has_ext_dabt_pending = events->exception.ext_dabt_pending;
-> >  
-> >  	if (serror_pending && has_esr) {
-> >  		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
-> > @@ -731,6 +732,8 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> >  			return -EINVAL;
-> >  	} else if (serror_pending) {
-> >  		kvm_inject_vabt(vcpu);
-> > +	} else if (has_ext_dabt_pending) {
-> > +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> >  	}
-> >  
-> >  	return 0;
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > index a9d25a305af5..ccdb6a051ab2 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -109,7 +109,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
-> >  
-> >  /**
-> >   * kvm_inject_dabt - inject a data abort into the guest
-> > - * @vcpu: The VCPU to receive the undefined exception
-> > + * @vcpu: The VCPU to receive the data abort
-> >   * @addr: The address to report in the DFAR
-> >   *
-> >   * It is assumed that this code is called from the VCPU thread and that the
-> > @@ -125,7 +125,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> >  
-> >  /**
-> >   * kvm_inject_pabt - inject a prefetch abort into the guest
-> > - * @vcpu: The VCPU to receive the undefined exception
-> > + * @vcpu: The VCPU to receive the prefetch abort
-> >   * @addr: The address to report in the DFAR
-> >   *
-> >   * It is assumed that this code is called from the VCPU thread and that the
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index dd79235b6435..a80ee820e700 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1003,6 +1003,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-> >  #define KVM_CAP_PMU_EVENT_FILTER 173
-> >  #define KVM_CAP_ARM_NISV_TO_USER 174
-> > +#define KVM_CAP_ARM_INJECT_EXT_DABT 175
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 7153504bb106..56a97dd9b292 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -217,6 +217,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_IMMEDIATE_EXIT:
-> >  	case KVM_CAP_VCPU_EVENTS:
-> >  	case KVM_CAP_ARM_NISV_TO_USER:
-> > +	case KVM_CAP_ARM_INJECT_EXT_DABT:
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-> > 
-> 
-> Otherwise looks good to me. If you respin the series, and unless anyone
-> shouts, I'll queue it. No hurry though, I'm going to take slow(er) the
-> following two weeks.
-> 
+On Tue, Oct 8, 2019 at 12:10 AM Arnd Bergmann <arnd@arndb.de> wrote:
+> On Mon, Oct 7, 2019 at 11:35 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
 
-Thanks, I've tried to come with a wording for the above, you can have a
-look in v2.
+> > > 053555034bdf kasan: disable CONFIG_KASAN_STACK with clang on arm32
+> >
+> > This one I did not take based on Linus' feedback that is breaks booting
+> > on his RealView board.
+>
+> That likely means that there is still a bigger problem somewhere.
 
-    Christoffer
+I will try to look into it. I got pretty puzzled by this, it makes no sense.
+
+One possible problem is that some of the test chips on the RealViews
+are not that stable, especially with caches. The plan is to test in QEMU
+and hardware in parallel.
+
+Yours,
+Linus Walleij
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
