@@ -2,62 +2,62 @@ Return-Path: <SRS0=tYEe=YB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C784ECE58E
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 969C1C4360C
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:35:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BA581206C2
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:16:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA581206C2
+	by mail.kernel.org (Postfix) with ESMTP id 21F0920673
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:35:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F0920673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1025E4A90A;
-	Tue,  8 Oct 2019 04:16:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E044A8E6;
+	Tue,  8 Oct 2019 04:35:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G4tiz1sTFRly; Tue,  8 Oct 2019 04:16:30 -0400 (EDT)
+	with ESMTP id 8j4Kw97r+dTp; Tue,  8 Oct 2019 04:35:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEA624A692;
-	Tue,  8 Oct 2019 04:16:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3184A8FC;
+	Tue,  8 Oct 2019 04:35:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCDCF4A8CF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:16:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1A44A8E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:35:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M2vS10U30J+r for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Oct 2019 04:16:28 -0400 (EDT)
+ with ESMTP id gmqluVwhhlkN for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Oct 2019 04:34:59 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 717BC4A4AA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:16:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7F14A88B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:34:59 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB871570;
- Tue,  8 Oct 2019 01:16:28 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E9FC1570;
+ Tue,  8 Oct 2019 01:34:59 -0700 (PDT)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A69163F6C4;
- Tue,  8 Oct 2019 01:16:27 -0700 (PDT)
-Date: Tue, 8 Oct 2019 10:16:26 +0200
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D62C43F6C4;
+ Tue,  8 Oct 2019 01:34:58 -0700 (PDT)
+Date: Tue, 8 Oct 2019 10:34:57 +0200
 From: Christoffer Dall <christoffer.dall@arm.com>
-To: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Allow reporting non-ISV data aborts
- to userspace
-Message-ID: <20191008081626.GB4153@e113682-lin.lund.arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm/arm64: Allow user injection of external
+ data aborts
+Message-ID: <20191008083457.GC4153@e113682-lin.lund.arm.com>
 References: <20190909121337.27287-1-christoffer.dall@arm.com>
- <20190909121337.27287-2-christoffer.dall@arm.com>
- <875463bb-caa7-f959-2ffa-7ae8eca04aff@arm.com>
+ <20190909121337.27287-3-christoffer.dall@arm.com>
+ <35eae9fa-b9f7-e5ca-b95f-d1d14216d6ee@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <875463bb-caa7-f959-2ffa-7ae8eca04aff@arm.com>
+In-Reply-To: <35eae9fa-b9f7-e5ca-b95f-d1d14216d6ee@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>, kvmarm@lists.cs.columbia.edu
+ Heinrich Schuchardt <xypron.glpk@gmx.de>,
+ Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,102 +74,205 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Oct 01, 2019 at 06:21:43PM +0100, James Morse wrote:
-> Hi Christoffer,
-> 
+On Thu, Sep 26, 2019 at 03:09:11PM +0100, Marc Zyngier wrote:
 > On 09/09/2019 13:13, Christoffer Dall wrote:
-> > For a long time, if a guest accessed memory outside of a memslot using
-> > any of the load/store instructions in the architecture which doesn't
-> > supply decoding information in the ESR_EL2 (the ISV bit is not set), the
-> > kernel would print the following message and terminate the VM as a
-> > result of returning -ENOSYS to userspace:
+> > In some scenarios, such as buggy guest or incorrect configuration of the
+> > VMM and firmware description data, userspace will detect a memory access
+> > to a portion of the IPA, which is not mapped to any MMIO region.
 > > 
-> >   load/store instruction decoding not implemented
+> > For this purpose, the appropriate action is to inject an external abort
+> > to the guest.  The kernel already has functionality to inject an
+> > external abort, but we need to wire up a signal from user space that
+> > lets user space tell the kernel to do this.
 > > 
-> > The reason behind this message is that KVM assumes that all accesses
-> > outside a memslot is an MMIO access which should be handled by
-> > userspace, and we originally expected to eventually implement some sort
-> > of decoding of load/store instructions where the ISV bit was not set.
-> 
-> > However, it turns out that many of the instructions which don't provide
-> > decoding information on abort are not safe to use for MMIO accesses, and
-> > the remaining few that would potentially make sense to use on MMIO
-> > accesses, such as those with register writeback, are not used in
-> > practice.  It also turns out that fetching an instruction from guest
-> > memory can be a pretty horrible affair, involving stopping all CPUs on
-> > SMP systems, handling multiple corner cases of address translation in
-> > software, and more.  It doesn't appear likely that we'll ever implement
-> > this in the kernel.
-> 
-> > What is much more common is that a user has misconfigured his/her guest
-> > and is actually not accessing an MMIO region, but just hitting some
-> > random hole in the IPA space.  In this scenario, the error message above
-> > is almost misleading and has led to a great deal of confusion over the
-> > years.
+> > It turns out, we already have the set event functionality which we can
+> > perfectly reuse for this.
 > > 
-> > It is, nevertheless, ABI to userspace, and we therefore need to
-> > introduce a new capability that userspace explicitly enables to change
-> > behavior.
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > ---
+> >  Documentation/virt/kvm/api.txt    | 15 ++++++++++++++-
+> >  arch/arm/include/uapi/asm/kvm.h   |  3 ++-
+> >  arch/arm/kvm/guest.c              |  3 +++
+> >  arch/arm64/include/uapi/asm/kvm.h |  3 ++-
+> >  arch/arm64/kvm/guest.c            |  3 +++
+> >  arch/arm64/kvm/inject_fault.c     |  4 ++--
+> >  include/uapi/linux/kvm.h          |  1 +
+> >  virt/kvm/arm/arm.c                |  1 +
+> >  8 files changed, 28 insertions(+), 5 deletions(-)
 > > 
-> > This patch introduces KVM_CAP_ARM_NISV_TO_USER (NISV meaning Non-ISV)
-> > which does exactly that, and introduces a new exit reason to report the
-> > event to userspace.  User space can then emulate an exception to the
-> > guest, restart the guest, suspend the guest, or take any other
-> > appropriate action as per the policy of the running system.
-> 
-> 
-> 
 > > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> > index 2d067767b617..02501333f746 100644
+> > index 02501333f746..edd6cdc470ca 100644
 > > --- a/Documentation/virt/kvm/api.txt
 > > +++ b/Documentation/virt/kvm/api.txt
-> > @@ -4453,6 +4453,35 @@ Hyper-V SynIC state change. Notification is used to remap SynIC
-> >  event/message pages and to enable/disable SynIC messages/events processing
-> >  in userspace.
+> > @@ -955,6 +955,8 @@ The following bits are defined in the flags field:
 > >  
-> > +		/* KVM_EXIT_ARM_NISV */
-> > +		struct {
-> > +			__u64 esr_iss;
-> > +			__u64 fault_ipa;
-> > +		} arm_nisv;
+> >  ARM/ARM64:
+> >  
+> > +User space may need to inject several types of events to the guest.
 > > +
-> > +Used on arm and arm64 systems. If a guest accesses memory not in a memslot,
-> > +KVM will typically return to userspace and ask it to do MMIO emulation on its
-> > +behalf. However, for certain classes of instructions, no instruction decode
-> > +(direction, length of memory access) is provided, and fetching and decoding
-> > +the instruction from the VM is overly complicated to live in the kernel.
+> >  If the guest accesses a device that is being emulated by the host kernel in
+> >  such a way that a real device would generate a physical SError, KVM may make
+> >  a virtual SError pending for that VCPU. This system error interrupt remains
+> > @@ -989,12 +991,23 @@ Specifying exception.has_esr on a system that does not support it will return
+> >  -EINVAL. Setting anything other than the lower 24bits of exception.serror_esr
+> >  will return -EINVAL.
+> >  
+> > +If the guest performed an access to I/O memory which could not be handled by
+> > +user space, for example because of missing instruction syndrome decode
+> > +information or because there is no device mapped at the accessed IPA, then
+> > +user space can ask the kernel to inject an external abort using the address
+> > +from the exiting fault on the VCPU. It is a programming error to set
+> > +ext_dabt_pending at the same time as any of the serror fields, or to set
+> > +ext_dabt_pending on an exit which was not either KVM_EXIT_MMIO or
+> 
+> ... on *re-entry from* an exit?
+> 
+> > +KVM_EXIT_ARM_NISV. This feature is only available if the system supports
+> > +KVM_CAP_ARM_INJECT_EXT_DABT;
+> 
+> s/;/./
+> 
+> Can we add some wording to the fact that this is only a helper for the
+> most common case? Most of the ARM exceptions can otherwise be
+> constructed/injected using the SET_ONE_REG API.
+> 
 > > +
-> > +Historically, when this situation occurred, KVM would print a warning and kill
-> > +the VM. KVM assumed that if the guest accessed non-memslot memory, it was
-> > +trying to do I/O, which just couldn't be emulated, and the warning message was
-> > +phrased accordingly. However, what happened more often was that a guest bug
-> > +caused access outside the guest memory areas which should lead to a more
-> > +mearningful warning message and an external abort in the guest, if the access
-> > +did not fall within an I/O window.
-> > +
-> > +Userspace implementations can query for KVM_CAP_ARM_NISV_TO_USER, and enable
-> > +this capability at VM creation. Once this is done, these types of errors will
-> > +instead return to userspace with KVM_EXIT_ARM_NISV, with the valid bits from
-> > +the HSR (arm) and ESR_EL2 (arm64) in the esr_iss field, and the faulting IPA
-> > +in the fault_ipa field. Userspace can either fix up the access if it's
-> > +actually an I/O access by decoding the instruction from guest memory (if it's
-> > +very brave) and continue executing the guest, or it can decide to suspend,
-> > +dump, or restart the guest.
+> >  struct kvm_vcpu_events {
+> >  	struct {
+> >  		__u8 serror_pending;
+> >  		__u8 serror_has_esr;
+> > +		__u8 ext_dabt_pending;
+> >  		/* Align it to 8 bytes */
+> > -		__u8 pad[6];
+> > +		__u8 pad[5];
+> >  		__u64 serror_esr;
+> >  	} exception;
+> >  	__u32 reserved[12];
+> > diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> > index a4217c1a5d01..d2449a5bf8d5 100644
+> > --- a/arch/arm/include/uapi/asm/kvm.h
+> > +++ b/arch/arm/include/uapi/asm/kvm.h
+> > @@ -131,8 +131,9 @@ struct kvm_vcpu_events {
+> >  	struct {
+> >  		__u8 serror_pending;
+> >  		__u8 serror_has_esr;
+> > +		__u8 ext_dabt_pending;
+> >  		/* Align it to 8 bytes */
+> > -		__u8 pad[6];
+> > +		__u8 pad[5];
+> >  		__u64 serror_esr;
+> >  	} exception;
+> >  	__u32 reserved[12];
+> > diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+> > index 684cf64b4033..4154c5589501 100644
+> > --- a/arch/arm/kvm/guest.c
+> > +++ b/arch/arm/kvm/guest.c
+> > @@ -263,11 +263,14 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  {
+> >  	bool serror_pending = events->exception.serror_pending;
+> >  	bool has_esr = events->exception.serror_has_esr;
+> > +	bool has_ext_dabt_pending = events->exception.ext_dabt_pending;
+> >  
+> >  	if (serror_pending && has_esr)
+> >  		return -EINVAL;
+> >  	else if (serror_pending)
+> >  		kvm_inject_vabt(vcpu);
+> > +	else if (has_ext_dabt_pending)
+> > +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> >  
+> >  	return 0;
+> >  }
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 9a507716ae2f..7729efdb1c0c 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -164,8 +164,9 @@ struct kvm_vcpu_events {
+> >  	struct {
+> >  		__u8 serror_pending;
+> >  		__u8 serror_has_esr;
+> > +		__u8 ext_dabt_pending;
+> >  		/* Align it to 8 bytes */
+> > -		__u8 pad[6];
+> > +		__u8 pad[5];
+> >  		__u64 serror_esr;
+> >  	} exception;
+> >  	__u32 reserved[12];
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index dfd626447482..10e6e2144dca 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -720,6 +720,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  {
+> >  	bool serror_pending = events->exception.serror_pending;
+> >  	bool has_esr = events->exception.serror_has_esr;
+> > +	bool has_ext_dabt_pending = events->exception.ext_dabt_pending;
+> >  
+> >  	if (serror_pending && has_esr) {
+> >  		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
+> > @@ -731,6 +732,8 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  			return -EINVAL;
+> >  	} else if (serror_pending) {
+> >  		kvm_inject_vabt(vcpu);
+> > +	} else if (has_ext_dabt_pending) {
+> > +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> >  	}
+> >  
+> >  	return 0;
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index a9d25a305af5..ccdb6a051ab2 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -109,7 +109,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> >  
+> >  /**
+> >   * kvm_inject_dabt - inject a data abort into the guest
+> > - * @vcpu: The VCPU to receive the undefined exception
+> > + * @vcpu: The VCPU to receive the data abort
+> >   * @addr: The address to report in the DFAR
+> >   *
+> >   * It is assumed that this code is called from the VCPU thread and that the
+> > @@ -125,7 +125,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >  
+> >  /**
+> >   * kvm_inject_pabt - inject a prefetch abort into the guest
+> > - * @vcpu: The VCPU to receive the undefined exception
+> > + * @vcpu: The VCPU to receive the prefetch abort
+> >   * @addr: The address to report in the DFAR
+> >   *
+> >   * It is assumed that this code is called from the VCPU thread and that the
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index dd79235b6435..a80ee820e700 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1003,6 +1003,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+> >  #define KVM_CAP_PMU_EVENT_FILTER 173
+> >  #define KVM_CAP_ARM_NISV_TO_USER 174
+> > +#define KVM_CAP_ARM_INJECT_EXT_DABT 175
+> >  
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >  
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index 7153504bb106..56a97dd9b292 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -217,6 +217,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  	case KVM_CAP_IMMEDIATE_EXIT:
+> >  	case KVM_CAP_VCPU_EVENTS:
+> >  	case KVM_CAP_ARM_NISV_TO_USER:
+> > +	case KVM_CAP_ARM_INJECT_EXT_DABT:
+> >  		r = 1;
+> >  		break;
+> >  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+> > 
 > 
-> Should we document which parts of instruction-emulation the VMM has to do?
+> Otherwise looks good to me. If you respin the series, and unless anyone
+> shouts, I'll queue it. No hurry though, I'm going to take slow(er) the
+> following two weeks.
 > 
-> For KVM_EXIT_MMIO, kvm looks after updating registers and advancing the PC and SS state
-> machine.
-> 
-> I can't see a kvm_skip_instr() in here, so the VMM has to do all of that stuff, including
-> any register post-increment, which is the reason we need the instruction in the first place.
 
-I'll clarify that in this case, KVM will not do anything, including not
-advanding the PC.  As for what user space would actually have to do, I'd
-prefer not trying to put that in English here, because chances are that
-I'll be wrong.
-
-Thank,
+Thanks, I've tried to come with a wording for the above, you can have a
+look in v2.
 
     Christoffer
 _______________________________________________
