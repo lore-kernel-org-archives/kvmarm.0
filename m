@@ -2,62 +2,62 @@ Return-Path: <SRS0=tYEe=YB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36AD1C4360C
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C784ECE58E
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:16:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AA9CB206B6
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:14:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA9CB206B6
+	by mail.kernel.org (Postfix) with ESMTP id BA581206C2
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 08:16:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA581206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 128A24A8FD;
-	Tue,  8 Oct 2019 04:14:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1025E4A90A;
+	Tue,  8 Oct 2019 04:16:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fs7riPex7kNv; Tue,  8 Oct 2019 04:14:53 -0400 (EDT)
+	with ESMTP id G4tiz1sTFRly; Tue,  8 Oct 2019 04:16:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7892F4A904;
-	Tue,  8 Oct 2019 04:14:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEA624A692;
+	Tue,  8 Oct 2019 04:16:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2D94A8FD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:14:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCDCF4A8CF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:16:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2H1oBeZMvf2r for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Oct 2019 04:14:50 -0400 (EDT)
+ with ESMTP id M2vS10U30J+r for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Oct 2019 04:16:28 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F52A4A8E9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:14:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 717BC4A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 04:16:28 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C797B1570;
- Tue,  8 Oct 2019 01:14:49 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB871570;
+ Tue,  8 Oct 2019 01:16:28 -0700 (PDT)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A4C43F6C4;
- Tue,  8 Oct 2019 01:14:49 -0700 (PDT)
-Date: Tue, 8 Oct 2019 10:14:48 +0200
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A69163F6C4;
+ Tue,  8 Oct 2019 01:16:27 -0700 (PDT)
+Date: Tue, 8 Oct 2019 10:16:26 +0200
 From: Christoffer Dall <christoffer.dall@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
 Subject: Re: [PATCH 1/2] KVM: arm/arm64: Allow reporting non-ISV data aborts
  to userspace
-Message-ID: <20191008081107.GA4153@e113682-lin.lund.arm.com>
+Message-ID: <20191008081626.GB4153@e113682-lin.lund.arm.com>
 References: <20190909121337.27287-1-christoffer.dall@arm.com>
  <20190909121337.27287-2-christoffer.dall@arm.com>
- <d2a4f534-15c5-c95f-a703-08979a307747@kernel.org>
+ <875463bb-caa7-f959-2ffa-7ae8eca04aff@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <d2a4f534-15c5-c95f-a703-08979a307747@kernel.org>
+In-Reply-To: <875463bb-caa7-f959-2ffa-7ae8eca04aff@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Heinrich Schuchardt <xypron.glpk@gmx.de>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,7 +74,9 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
+On Tue, Oct 01, 2019 at 06:21:43PM +0100, James Morse wrote:
+> Hi Christoffer,
+> 
 > On 09/09/2019 13:13, Christoffer Dall wrote:
 > > For a long time, if a guest accessed memory outside of a memslot using
 > > any of the load/store instructions in the architecture which doesn't
@@ -88,7 +90,7 @@ On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
 > > outside a memslot is an MMIO access which should be handled by
 > > userspace, and we originally expected to eventually implement some sort
 > > of decoding of load/store instructions where the ISV bit was not set.
-> > 
+> 
 > > However, it turns out that many of the instructions which don't provide
 > > decoding information on abort are not safe to use for MMIO accesses, and
 > > the remaining few that would potentially make sense to use on MMIO
@@ -98,7 +100,7 @@ On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
 > > SMP systems, handling multiple corner cases of address translation in
 > > software, and more.  It doesn't appear likely that we'll ever implement
 > > this in the kernel.
-> > 
+> 
 > > What is much more common is that a user has misconfigured his/her guest
 > > and is actually not accessing an MMIO region, but just hitting some
 > > random hole in the IPA space.  In this scenario, the error message above
@@ -114,21 +116,9 @@ On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
 > > event to userspace.  User space can then emulate an exception to the
 > > guest, restart the guest, suspend the guest, or take any other
 > > appropriate action as per the policy of the running system.
-> > 
-> > Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  Documentation/virt/kvm/api.txt       | 29 ++++++++++++++++++++++++++++
-> >  arch/arm/include/asm/kvm_arm.h       |  2 ++
-> >  arch/arm/include/asm/kvm_emulate.h   |  5 +++++
-> >  arch/arm/include/asm/kvm_host.h      |  8 ++++++++
-> >  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
-> >  arch/arm64/include/asm/kvm_host.h    |  8 ++++++++
-> >  include/uapi/linux/kvm.h             |  7 +++++++
-> >  virt/kvm/arm/arm.c                   | 21 ++++++++++++++++++++
-> >  virt/kvm/arm/mmio.c                  | 11 +++++++++--
-> >  9 files changed, 94 insertions(+), 2 deletions(-)
-> > 
+> 
+> 
+> 
 > > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
 > > index 2d067767b617..02501333f746 100644
 > > --- a/Documentation/virt/kvm/api.txt
@@ -155,9 +145,6 @@ On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
 > > +phrased accordingly. However, what happened more often was that a guest bug
 > > +caused access outside the guest memory areas which should lead to a more
 > > +mearningful warning message and an external abort in the guest, if the access
-> 
-> meaningful?
-> 
 > > +did not fall within an I/O window.
 > > +
 > > +Userspace implementations can query for KVM_CAP_ARM_NISV_TO_USER, and enable
@@ -168,208 +155,21 @@ On Thu, Sep 26, 2019 at 02:47:55PM +0100, Marc Zyngier wrote:
 > > +actually an I/O access by decoding the instruction from guest memory (if it's
 > > +very brave) and continue executing the guest, or it can decide to suspend,
 > > +dump, or restart the guest.
-> > +
-> >  		/* Fix the size of the union. */
-> >  		char padding[256];
-> >  	};
-> > diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-> > index 0125aa059d5b..ce61b3b0058d 100644
-> > --- a/arch/arm/include/asm/kvm_arm.h
-> > +++ b/arch/arm/include/asm/kvm_arm.h
-> > @@ -162,6 +162,8 @@
-> >  #define HSR_ISV		(_AC(1, UL) << HSR_ISV_SHIFT)
-> >  #define HSR_SRT_SHIFT	(16)
-> >  #define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
-> > +#define HSR_CM		(1 << 8)
-> > +#define HSR_WNR		(1 << 6)
 > 
-> I think we already have that one (bizarrely placed after HSR_SSE).
+> Should we document which parts of instruction-emulation the VMM has to do?
 > 
+> For KVM_EXIT_MMIO, kvm looks after updating registers and advancing the PC and SS state
+> machine.
+> 
+> I can't see a kvm_skip_instr() in here, so the VMM has to do all of that stuff, including
+> any register post-increment, which is the reason we need the instruction in the first place.
 
-Hey, at least the bit definitions were the same.
+I'll clarify that in this case, KVM will not do anything, including not
+advanding the PC.  As for what user space would actually have to do, I'd
+prefer not trying to put that in English here, because chances are that
+I'll be wrong.
 
-> >  #define HSR_FSC		(0x3f)
-> >  #define HSR_FSC_TYPE	(0x3c)
-> >  #define HSR_SSE		(1 << 21)
-> > diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> > index 40002416efec..e8ef349c04b4 100644
-> > --- a/arch/arm/include/asm/kvm_emulate.h
-> > +++ b/arch/arm/include/asm/kvm_emulate.h
-> > @@ -167,6 +167,11 @@ static inline bool kvm_vcpu_dabt_isvalid(struct kvm_vcpu *vcpu)
-> >  	return kvm_vcpu_get_hsr(vcpu) & HSR_ISV;
-> >  }
-> >  
-> > +static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
-> > +{
-> > +	return kvm_vcpu_get_hsr(vcpu) & (HSR_CM | HSR_WNR | HSR_FSC);
-> > +}
-> > +
-> >  static inline bool kvm_vcpu_dabt_iswrite(struct kvm_vcpu *vcpu)
-> >  {
-> >  	return kvm_vcpu_get_hsr(vcpu) & HSR_WNR;
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index 8a37c8e89777..19a92c49039c 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -76,6 +76,14 @@ struct kvm_arch {
-> >  
-> >  	/* Mandated version of PSCI */
-> >  	u32 psci_version;
-> > +
-> > +	/*
-> > +	 * If we encounter a data abort without valid instruction syndrome
-> > +	 * information, report this to user space.  User space can (and
-> > +	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
-> > +	 * supported.
-> > +	 */
-> > +	bool return_nisv_io_abort_to_user;
-> >  };
-> >  
-> >  #define KVM_NR_MEM_OBJS     40
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index d69c1efc63e7..a3c967988e1d 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -258,6 +258,11 @@ static inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
-> >  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_ISV);
-> >  }
-> >  
-> > +static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
-> > +{
-> > +	return kvm_vcpu_get_hsr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
-> > +}
-> > +
-> >  static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
-> >  {
-> >  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index f656169db8c3..019bc560edc1 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -83,6 +83,14 @@ struct kvm_arch {
-> >  
-> >  	/* Mandated version of PSCI */
-> >  	u32 psci_version;
-> > +
-> > +	/*
-> > +	 * If we encounter a data abort without valid instruction syndrome
-> > +	 * information, report this to user space.  User space can (and
-> > +	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
-> > +	 * supported.
-> > +	 */
-> > +	bool return_nisv_io_abort_to_user;
-> >  };
-> >  
-> >  #define KVM_NR_MEM_OBJS     40
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 5e3f12d5359e..dd79235b6435 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
-> >  #define KVM_EXIT_S390_STSI        25
-> >  #define KVM_EXIT_IOAPIC_EOI       26
-> >  #define KVM_EXIT_HYPERV           27
-> > +#define KVM_EXIT_ARM_NISV         28
-> >  
-> >  /* For KVM_EXIT_INTERNAL_ERROR */
-> >  /* Emulate instruction failed. */
-> > @@ -392,6 +393,11 @@ struct kvm_run {
-> >  		} eoi;
-> >  		/* KVM_EXIT_HYPERV */
-> >  		struct kvm_hyperv_exit hyperv;
-> > +		/* KVM_EXIT_ARM_NISV */
-> > +		struct {
-> > +			__u64 esr_iss;
-> > +			__u64 fault_ipa;
-> > +		} arm_nisv;
-> >  		/* Fix the size of the union. */
-> >  		char padding[256];
-> >  	};
-> > @@ -996,6 +1002,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
-> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-> >  #define KVM_CAP_PMU_EVENT_FILTER 173
-> > +#define KVM_CAP_ARM_NISV_TO_USER 174
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 35a069815baf..7153504bb106 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -98,6 +98,26 @@ int kvm_arch_check_processor_compat(void)
-> >  	return 0;
-> >  }
-> >  
-> > +int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > +			    struct kvm_enable_cap *cap)
-> > +{
-> > +	int r;
-> > +
-> > +	if (cap->flags)
-> > +		return -EINVAL;
-> > +
-> > +	switch (cap->cap) {
-> > +	case KVM_CAP_ARM_NISV_TO_USER:
-> > +		r = 0;
-> > +		kvm->arch.return_nisv_io_abort_to_user = true;
-> > +		break;
-> > +	default:
-> > +		r = -EINVAL;
-> > +		break;
-> > +	}
-> > +
-> > +	return r;
-> > +}
-> >  
-> >  /**
-> >   * kvm_arch_init_vm - initializes a VM data structure
-> > @@ -196,6 +216,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_MP_STATE:
-> >  	case KVM_CAP_IMMEDIATE_EXIT:
-> >  	case KVM_CAP_VCPU_EVENTS:
-> > +	case KVM_CAP_ARM_NISV_TO_USER:
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-> > diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> > index 6af5c91337f2..7b92e2744fa7 100644
-> > --- a/virt/kvm/arm/mmio.c
-> > +++ b/virt/kvm/arm/mmio.c
-> > @@ -167,8 +167,15 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >  		if (ret)
-> >  			return ret;
-> >  	} else {
-> > -		kvm_err("load/store instruction decoding not implemented\n");
-> > -		return -ENOSYS;
-> > +		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
-> > +			run->exit_reason = KVM_EXIT_ARM_NISV;
-> > +			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
-> > +			run->arm_nisv.fault_ipa = fault_ipa;
-> > +			return 0;
-> > +		} else {
-> > +			kvm_info("Encountered data abort outside memslots with no valid syndrome info\n");
-> 
-> Nit: you could lose the else clause, making this line a bit shorter.
-> 
-> More importantly, I'd like this to become a rate-limited output, just to
-> keep things sane. How about kvm_pr_unimpl()?
-> 
-
-Yes, I also got rid of 'Encountered' which doesn't seem to add much.
-
-> > +			return -ENOSYS;
-> > +		}
-> >  	}
-> >  
-> >  	rt = vcpu->arch.mmio_decode.rt;
-> > 
-> 
-> Other than this collection of nits, this looks pretty good, and I'd
-> really like to take this patch in 5.5.
-> 
-
-Thanks,
+Thank,
 
     Christoffer
 _______________________________________________
