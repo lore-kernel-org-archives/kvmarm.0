@@ -2,55 +2,52 @@ Return-Path: <SRS0=tYEe=YB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC1BECE58C
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1FFC35280
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0EAE72070B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EAE72070B
+	by mail.kernel.org (Postfix) with ESMTP id 3442020815
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3442020815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADC544A907;
-	Tue,  8 Oct 2019 12:01:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1BCA4A8C9;
+	Tue,  8 Oct 2019 12:02:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fN9XDuSfeXVD; Tue,  8 Oct 2019 12:01:58 -0400 (EDT)
+	with ESMTP id aEphK4Vw+Rnp; Tue,  8 Oct 2019 12:01:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E5054A8DC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1F804A8EE;
 	Tue,  8 Oct 2019 12:01:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F7BB4A8C8
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5051C4A8CB
  for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 12:01:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3u5Ho5VhRK2S for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 9DIpqWF1Wp3q for <kvmarm@lists.cs.columbia.edu>;
  Tue,  8 Oct 2019 12:01:55 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DFE74A832
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DFC14A81C
  for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Oct 2019 12:01:55 -0400 (EDT)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iHrvt-0001rs-Gx; Tue, 08 Oct 2019 18:01:53 +0200
+ id 1iHrvs-0001rs-DQ; Tue, 08 Oct 2019 18:01:52 +0200
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 2/5] arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64
- systems
-Date: Tue,  8 Oct 2019 17:01:25 +0100
-Message-Id: <20191008160128.8872-3-maz@kernel.org>
+Subject: [PATCH v2 0/5] KVM: arm64: Assorted PMU emulation fixes
+Date: Tue,  8 Oct 2019 17:01:23 +0100
+Message-Id: <20191008160128.8872-1-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191008160128.8872-1-maz@kernel.org>
-References: <20191008160128.8872-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
@@ -77,41 +74,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Of PMCR_EL0.LC, the ARMv8 ARM says:
+I recently came across a number of PMU emulation bugs, all which can
+result in unexpected behaviours in an unsuspecting guest. The first
+two patches already have been discussed on the list, but I'm including
+them here as part of a slightly longer series.
 
-	"In an AArch64 only implementation, this field is RES 1."
+The third patch is new as of v2, and fixes a bug preventing chained
+events from ever being used.
 
-So be it.
+The fourth patch is also new as of v2, and is an arm64 PMU change for
+which I clearly don't know what I'm doing. I'd appreciate some
+guidance from Will or Mark.
 
-Fixes: ab9468340d2bc ("arm64: KVM: Add access handler for PMCR register")
-Reviewed-by: Andrew Murray <andrew.murray@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+The last patch fixes an issue that has been here from day one, where
+we confuse architectural overflow of a counter and perf sampling
+period, and uses patch #4 to fix the issue.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2071260a275b..46822afc57e0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -632,6 +632,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	 */
- 	val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
- 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-+	if (!system_supports_32bit_el0())
-+		val |= ARMV8_PMU_PMCR_LC;
- 	__vcpu_sys_reg(vcpu, r->reg) = val;
- }
- 
-@@ -682,6 +684,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
-+		if (!system_supports_32bit_el0())
-+			val |= ARMV8_PMU_PMCR_LC;
- 		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- 		kvm_pmu_handle_pmcr(vcpu, val);
- 		kvm_vcpu_pmu_restore_guest(vcpu);
+I'l planning to send patches 1 through to 3 as fixes shortly, but I
+expect the last two patches to require more discussions.
+
+Marc Zyngier (5):
+  KVM: arm64: pmu: Fix cycle counter truncation
+  arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64 systems
+  KVM: arm64: pmu: Set the CHAINED attribute before creating the
+    in-kernel event
+  arm64: perf: Add reload-on-overflow capability
+  KVM: arm64: pmu: Reset sample period on overflow handling
+
+ arch/arm64/include/asm/perf_event.h |  4 +++
+ arch/arm64/kernel/perf_event.c      |  8 ++++-
+ arch/arm64/kvm/sys_regs.c           |  4 +++
+ virt/kvm/arm/pmu.c                  | 45 +++++++++++++++++++----------
+ 4 files changed, 45 insertions(+), 16 deletions(-)
+
 -- 
 2.20.1
 
