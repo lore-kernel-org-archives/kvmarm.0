@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0E4ECE596
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 17:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1CEC47404
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 17:24:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 878D520B7C
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 17:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A311521920
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 17:24:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2K95rJMe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 878D520B7C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbeWUKDK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A311521920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FCA84A8A8;
-	Wed,  9 Oct 2019 13:24:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BE0D4A87C;
+	Wed,  9 Oct 2019 13:24:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4EfRCk5Fdak4; Wed,  9 Oct 2019 13:24:05 -0400 (EDT)
+	with ESMTP id On1XZ3r4Jiq0; Wed,  9 Oct 2019 13:24:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ED954A8B7;
-	Wed,  9 Oct 2019 13:24:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C42A4A8B0;
+	Wed,  9 Oct 2019 13:24:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7646B4A885
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 13:24:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15E5C4A885
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 13:24:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w+5DHIm7I-e5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Oct 2019 13:24:04 -0400 (EDT)
+ with ESMTP id WDXBZQ0vKVEa for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Oct 2019 13:24:22 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CA5F4A87C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 13:24:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E041D4A87C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 13:24:21 -0400 (EDT)
 Received: from sasha-vm.mshome.net (unknown [167.220.2.234])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 78752206BB;
- Wed,  9 Oct 2019 17:24:03 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 110C2218DE;
+ Wed,  9 Oct 2019 17:24:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1570641843;
+ s=default; t=1570641861;
  bh=BnNP/S94t0ycyVIws48GAEBsgOMeY35JYl69u3+93fc=;
  h=From:To:Cc:Subject:Date:From;
- b=2K95rJMeoMxMEN3j4dvRQ/3zglAiNfgn35uBRtZzX3SsdVnZKSiXnq25C9eM/ZU12
- oT1pYff8dT66YjCYyPeppFpiO9kkKpNfN2tJH40dAQeOzRcP1IUIQ1zvnlpOD0O68X
- Lgk/1E6he3a7wrJwuDhUGnh7zcJsMR85AwtRq+W4=
+ b=SbeWUKDKwKqsp4Ni7++f16Zn6d/zQS8tkfkfeoMYWc8RfgjohPsV2jLfjmtbr8kLg
+ sS7C/qBVtSVk9hywa/1C/kF7owDIALeYAy6NwpSDSxIVeAi4v/8qKsgxHE8kKC5gfX
+ jvEluiNnT8vNbNXX6V8mDKPYCMOzW5VRIEp7qRPg=
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 01/26] KVM: arm/arm64: vgic: Use the appropriate
+Subject: [PATCH AUTOSEL 4.14 01/21] KVM: arm/arm64: vgic: Use the appropriate
  TRACE_INCLUDE_PATH
-Date: Wed,  9 Oct 2019 13:05:33 -0400
-Message-Id: <20191009170558.32517-1-sashal@kernel.org>
+Date: Wed,  9 Oct 2019 13:05:54 -0400
+Message-Id: <20191009170615.32750-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 X-stable: review
