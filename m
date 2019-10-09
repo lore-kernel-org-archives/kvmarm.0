@@ -2,63 +2,62 @@ Return-Path: <SRS0=o2N9=YC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5086ECE58D
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 13:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BB4ECE58E
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 13:42:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 52AD5206B6
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 13:06:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52AD5206B6
+	by mail.kernel.org (Postfix) with ESMTP id CD915218AC
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Oct 2019 13:42:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD915218AC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C56534A883;
-	Wed,  9 Oct 2019 09:06:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2637A4A8C2;
+	Wed,  9 Oct 2019 09:42:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HjJDF6gK5-bF; Wed,  9 Oct 2019 09:06:55 -0400 (EDT)
+	with ESMTP id OzQkpAD54-Vz; Wed,  9 Oct 2019 09:42:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC2794A88B;
-	Wed,  9 Oct 2019 09:06:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 152904A8B7;
+	Wed,  9 Oct 2019 09:42:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE3AB4A883
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 09:06:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34B9B4A8B7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 09:42:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fPgdZDFTLMOD for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Oct 2019 09:06:49 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 689E94A874
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 09:06:49 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 3FCCB19A5915D8434BA4;
- Wed,  9 Oct 2019 21:06:44 +0800 (CST)
+ with ESMTP id qJ3tJiHVlSE6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Oct 2019 09:42:19 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E12FF4A8B6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Oct 2019 09:42:17 -0400 (EDT)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id E295C36A5D818A856480;
+ Wed,  9 Oct 2019 21:42:13 +0800 (CST)
 Received: from [127.0.0.1] (10.133.216.73) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Wed, 9 Oct 2019
- 21:06:34 +0800
-Subject: Re: [RFC PATCH 07/12] arm/sdei: override qemu_irq handler when
- binding interrupt
+ 21:42:03 +0800
+Subject: Re: [RFC PATCH 00/12] Add SDEI support for arm64
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
- <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
- <CAFEAcA9ZHs=GdJ-_Ap1PWdgDjSDBnnRqG1UkMGx_FiqCJ5ZyGw@mail.gmail.com>
+ <CAFEAcA_ztr0_Bu9d__dSr9oH75s2DSd5=6NZvVMrxuDTxf31mw@mail.gmail.com>
 From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <0aa6638c-1155-6446-114b-29d335367007@huawei.com>
-Date: Wed, 9 Oct 2019 21:06:33 +0800
+Message-ID: <84e1a629-bdd3-faaf-e12f-17930945adf4@huawei.com>
+Date: Wed, 9 Oct 2019 21:42:02 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
  Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9ZHs=GdJ-_Ap1PWdgDjSDBnnRqG1UkMGx_FiqCJ5ZyGw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_ztr0_Bu9d__dSr9oH75s2DSd5=6NZvVMrxuDTxf31mw@mail.gmail.com>
 X-Originating-IP: [10.133.216.73]
 X-CFilter-Loop: Reflected
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
- qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu,
+Cc: Marc
+ Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Dave Martin <Dave.Martin@arm.com>, qemu-arm <qemu-arm@nongnu.org>,
+ kvmarm@lists.cs.columbia.edu,
  arm-mail-list <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -76,79 +75,65 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Peter,
 
-Thanks for your comments. I will explain SDEI in another mail and please 
-provide your suggestions for such situation.
+
+On 2019/9/30 21:15, Peter Maydell wrote:
+> On Tue, 24 Sep 2019 at 16:23, Heyi Guo <guoheyi@huawei.com> wrote:
+>> As promised, this is the first RFC patch set for arm64 SDEI support.
+> Hi; for the benefit of possible reviewers who aren't familiar
+> with every corner of the arm ecosystem, could you provide a
+> summary of:
+>   * what is SDEI ?
+SDEI is for ARM "Software Delegated Exception Interface". AS ARM64 
+doesn't have native non-maskable interrupt (NMI), we can rely on higher 
+privileged software to change the pc of lower privileged software on 
+certain events occur, to emulate NMI mechanism, and SDEI is the standard 
+interfaces between the two levels of privileged software. It is based on 
+SMC/HVC calls.
+
+In virtualization situation, guest OS is the lower privileged software 
+and hypervisor is the higher one. Major interfaces provided by SDEI include:
+1. interrupt bind: guest OS can request to bind an interrupt to an SDEI 
+event.
+2. register: guest OS can request to register a handler to an SDEI 
+event, so hypervisor will change pc of guest to this handler when 
+certain event occurs.
+3. complete: guest OS notifies hypervisor that it has completed the 
+event handling, so hypervisor will restore the context of guest when it 
+is interrupted.
+>   * what do KVM and QEMU want/need to do with it ?
+KVM is supposed to pass SMC/HVC calls to qemu, and qemu will serve the 
+SDEI requests after parsing SMC/HVC calls. qemu also takes the 
+responsibility to trigger the events. If an interrupt is requested to be 
+bound to an event, qemu should not inject the interrupt to guest any 
+more; instead, it should save the context of VCPU and change the PC to 
+event handler which is registered by guest, and then return to guest.
+
+To make the conversion of interrupt to SDEI event transparent to other 
+modules in qemu, we used qemu_irq and qemu_irq_intercept_in() to 
+override the default irq handler with SDEI event trigger. I saw 
+qemu_irq_intercept_in() should be only used in qemu MST, but it seemed 
+fit to override interrupt injection with event trigger after guest 
+requests to bind interrupt to SDEI event.
+>   * what is this patchset trying to solve ?
+This patchset is trying to implement the whole SDEI framework in qemu 
+with KVM enabled, including all SDEI v1.0 interfaces, as well as event 
+trigger conduit from other qemu devices after interrupt binding.
+
+I will also provide the above context in the cover letter of v2 RFC.
+
+Thanks,
 
 Heyi
 
-
-On 2019/9/30 21:19, Peter Maydell wrote:
-> On Tue, 24 Sep 2019 at 16:23, Heyi Guo <guoheyi@huawei.com> wrote:
->> Override qemu_irq handler to support trigger SDEI event transparently
->> after guest binds interrupt to SDEI event. We don't have good way to
->> get GIC device and to guarantee SDEI device is initialized after GIC,
->> so we search GIC in system bus when the first SDEI request happens or
->> in VMSTATE post_load().
->>
->> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Dave Martin <Dave.Martin@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: James Morse <james.morse@arm.com>
 >
->> +static void override_qemu_irq(QemuSDEState *s, int32_t event, uint32_t intid)
->> +{
->> +    qemu_irq irq;
->> +    QemuSDE *sde;
->> +    CPUState *cs;
->> +    int cpu;
->> +
->> +    /* SPI */
->> +    if (intid >= GIC_INTERNAL) {
->> +        cs = arm_get_cpu_by_id(0);
->> +        irq = qdev_get_gpio_in(s->gic_dev,
->> +                               gic_int_to_irq(s->num_irq, intid, 0));
->> +        if (irq) {
->> +            qemu_irq_intercept_in(&irq, qemu_sdei_irq_handler, 1);
->> +        }
-> I'm not sure what this code is trying to do, but
-> qemu_irq_intercept_in() is a function for internal use
-> by the qtest testing infrastructure, so it shouldn't be
-> used in 'real' QEMU code.
->
->> +        sde = get_sde_no_check(s, event, cs);
->> +        sde->irq = irq;
->> +        put_sde(sde, cs);
->> +        return;
->> +    }
->> @@ -1042,6 +1152,17 @@ void sdei_handle_request(CPUState *cs, struct kvm_run *run)
->>           return;
->>       }
->>
->> +    if (!sde_state->gic_dev) {
->> +        /* Search for ARM GIC device */
->> +        qbus_walk_children(sysbus_get_default(), dev_walkerfn,
->> +                           NULL, NULL, NULL, sde_state);
->> +        if (!sde_state->gic_dev) {
->> +            error_report("Cannot find ARM GIC device!");
->> +            run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
->> +            return;
->> +        }
->> +    }
-> Walking through the qbus tree looking for particular devices
-> isn't really something I'd recommend either.
+> That would provide some useful context for trying to
+> review the patchset.
 >
 > thanks
 > -- PMM
 >
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
->
+> .
 >
 
 
