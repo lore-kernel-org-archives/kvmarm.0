@@ -2,57 +2,68 @@ Return-Path: <SRS0=GvsF=YE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9847EC47404
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C11ECE58C
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:28:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5CB1C21D71
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:07:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CB1C21D71
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 09141214E0
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:28:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09141214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCEFF4A8BF;
-	Fri, 11 Oct 2019 07:07:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B3CE4A8B5;
+	Fri, 11 Oct 2019 07:28:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xFEuLvQeU6Bc; Fri, 11 Oct 2019 07:07:28 -0400 (EDT)
+	with ESMTP id CzKTdEeCjf6h; Fri, 11 Oct 2019 07:28:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758F74A8D1;
-	Fri, 11 Oct 2019 07:07:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E91724A8A1;
+	Fri, 11 Oct 2019 07:28:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 981204A8B0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:07:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E15E4A84A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:28:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3KZv70zhmLgm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Oct 2019 07:07:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 428594A873
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:07:25 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EFAA51570;
- Fri, 11 Oct 2019 04:07:24 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 655803F703;
- Fri, 11 Oct 2019 04:07:24 -0700 (PDT)
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [kvmtool v3 5/5] arm: Inject external data aborts when accessing
- holes in the memory map
-Date: Fri, 11 Oct 2019 13:07:09 +0200
-Message-Id: <20191011110709.2764-6-christoffer.dall@arm.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20191011110709.2764-1-christoffer.dall@arm.com>
-References: <20191011110709.2764-1-christoffer.dall@arm.com>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-arm-kernel@lists.infradead.org
+ with ESMTP id AQNXehzMKpMr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Oct 2019 07:28:52 -0400 (EDT)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4980A4A829
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:28:52 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why)
+ by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+ (Exim 4.80) (envelope-from <maz@kernel.org>)
+ id 1iIt6H-00052y-N4; Fri, 11 Oct 2019 13:28:49 +0200
+Date: Fri, 11 Oct 2019 12:28:48 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: pmu: Reset sample period on overflow
+ handling
+Message-ID: <20191011122848.748da6f6@why>
+In-Reply-To: <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
+References: <20191008160128.8872-1-maz@kernel.org>
+ <20191008160128.8872-6-maz@kernel.org>
+ <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
+ mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,135 +75,162 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Occasionally guests will attempt to access parts of the guest memory map
-where there is... nothing at all.  Until now, we've handled this by
-either forcefully killing the guest, or silently (unless a debug option
-was enabled) ignoring the access.  Neither is very helpful to a user,
-who is most likely running either a broken or misconfigured guest.
+On Tue, 8 Oct 2019 23:42:22 +0100
+Andrew Murray <andrew.murray@arm.com> wrote:
 
-A more appropriate action is to inject an external abort to the guest.
-Luckily, with KVM_CAP_ARM_INJECT_EXT_DABT, we can use the set event
-mechanism and ask KVM to do this for us.
+> On Tue, Oct 08, 2019 at 05:01:28PM +0100, Marc Zyngier wrote:
+> > The PMU emulation code uses the perf event sample period to trigger
+> > the overflow detection. This works fine  for the *first* overflow
+> > handling, but results in a huge number of interrupts on the host,
+> > unrelated to the number of interrupts handled in the guest (a x20
+> > factor is pretty common for the cycle counter). On a slow system
+> > (such as a SW model), this can result in the guest only making
+> > forward progress at a glacial pace.
+> > 
+> > It turns out that the clue is in the name. The sample period is
+> > exactly that: a period. And once the an overflow has occured,
+> > the following period should be the full width of the associated
+> > counter, instead of whatever the guest had initially programed.
+> > 
+> > Reset the sample period to the architected value in the overflow
+> > handler, which now results in a number of host interrupts that is
+> > much closer to the number of interrupts in the guest.
+> > 
+> > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/arm/pmu.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> > 
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 25a483a04beb..8b524d74c68a 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -442,6 +442,20 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> >  	int idx = pmc->idx;
+> > +	u64 period;
+> > +
+> > +	/*
+> > +	 * Reset the sample period to the architectural limit,
+> > +	 * i.e. the point where the counter overflows.
+> > +	 */
+> > +	period = -(local64_read(&pmc->perf_event->count));
+> > +
+> > +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> > +		period &= GENMASK(31, 0);
+> > +
+> > +	local64_set(&pmc->perf_event->hw.period_left, 0);
+> > +	pmc->perf_event->attr.sample_period = period;
+> > +	pmc->perf_event->hw.sample_period = period;  
+> 
+> I believe that above, you are reducing the period by the amount period_left
+> would have been - they cancel each other out.
 
-So we add an architecture specific hook to handle accesses to MMIO
-regions which cannot be found, and allow them to return if the invalid
-access was handled or not.
+That's not what I see happening, having put some traces:
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- arm/include/arm-common/kvm-cpu-arch.h | 16 ++++++++++++++++
- arm/kvm-cpu.c                         |  2 +-
- mips/include/kvm/kvm-cpu-arch.h       |  5 +++++
- mmio.c                                |  3 ++-
- powerpc/include/kvm/kvm-cpu-arch.h    |  5 +++++
- x86/include/kvm/kvm-cpu-arch.h        |  5 +++++
- 6 files changed, 34 insertions(+), 2 deletions(-)
+ kvm_pmu_perf_overflow: count = 308 left = 129
+ kvm_pmu_perf_overflow: count = 409 left = 47
+ kvm_pmu_perf_overflow: count = 585 left = 223
+ kvm_pmu_perf_overflow: count = 775 left = 413
+ kvm_pmu_perf_overflow: count = 1368 left = 986
+ kvm_pmu_perf_overflow: count = 2086 left = 1716
+ kvm_pmu_perf_overflow: count = 958 left = 584
+ kvm_pmu_perf_overflow: count = 1907 left = 1551
+ kvm_pmu_perf_overflow: count = 7292 left = 6932
 
-diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
-index 923d2c4..33defa2 100644
---- a/arm/include/arm-common/kvm-cpu-arch.h
-+++ b/arm/include/arm-common/kvm-cpu-arch.h
-@@ -57,6 +57,22 @@ static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
- 	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
- }
- 
-+static inline bool kvm_cpu__mmio_not_found(struct kvm_cpu *vcpu, u64 phys_addr)
-+{
-+	struct kvm_vcpu_events events = {
-+		.exception.ext_dabt_pending = 1,
-+	};
-+	int err;
-+
-+	if (!kvm__supports_extension(vcpu->kvm, KVM_CAP_ARM_INJECT_EXT_DABT))
-+		return false;
-+
-+	err = ioctl(vcpu->vcpu_fd, KVM_SET_VCPU_EVENTS, &events);
-+	if (err)
-+		die("failed to inject external abort");
-+	return true;
-+}
-+
- unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu);
- 
- #endif /* ARM_COMMON__KVM_CPU_ARCH_H */
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 25bd3ed..321a3e4 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -142,7 +142,7 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
- 
- 		if (!arm_addr_in_ioport_region(phys_addr) &&
- 		    !kvm__mmio_exists(vcpu, phys_addr))
--			die("Guest accessed memory outside RAM and IO ranges");
-+			return kvm_cpu__mmio_not_found(vcpu, phys_addr);
- 
- 		/*
- 		 * We cannot fetch and decode instructions from a KVM guest,
-diff --git a/mips/include/kvm/kvm-cpu-arch.h b/mips/include/kvm/kvm-cpu-arch.h
-index 45e69f6..512ab34 100644
---- a/mips/include/kvm/kvm-cpu-arch.h
-+++ b/mips/include/kvm/kvm-cpu-arch.h
-@@ -40,4 +40,9 @@ static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8
- 	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
- }
- 
-+static inline bool kvm_cpu__mmio_not_found(struct kvm_cpu *vcpu, u64 phys_addr)
-+{
-+	return false;
-+}
-+
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/mmio.c b/mmio.c
-index 2ab7fa7..d6df303 100644
---- a/mmio.c
-+++ b/mmio.c
-@@ -130,7 +130,8 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
- 	if (mmio)
- 		mmio->mmio_fn(vcpu, phys_addr, data, len, is_write, mmio->ptr);
- 	else {
--		if (vcpu->kvm->cfg.mmio_debug)
-+		if (!kvm_cpu__mmio_not_found(vcpu, phys_addr) &&
-+		    vcpu->kvm->cfg.mmio_debug)
- 			fprintf(stderr,	"Warning: Ignoring MMIO %s at %016llx (length %u)\n",
- 				to_direction(is_write),
- 				(unsigned long long)phys_addr, len);
-diff --git a/powerpc/include/kvm/kvm-cpu-arch.h b/powerpc/include/kvm/kvm-cpu-arch.h
-index a69e0cc..64b69b1 100644
---- a/powerpc/include/kvm/kvm-cpu-arch.h
-+++ b/powerpc/include/kvm/kvm-cpu-arch.h
-@@ -76,4 +76,9 @@ static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port, void *dat
- 
- bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
- 
-+static inline bool kvm_cpu__mmio_not_found(struct kvm_cpu *vcpu, u64 phys_addr)
-+{
-+	return false;
-+}
-+
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/x86/include/kvm/kvm-cpu-arch.h b/x86/include/kvm/kvm-cpu-arch.h
-index 05e5bb6..10cbe6e 100644
---- a/x86/include/kvm/kvm-cpu-arch.h
-+++ b/x86/include/kvm/kvm-cpu-arch.h
-@@ -47,4 +47,9 @@ static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8
- 	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
- }
- 
-+static inline bool kvm_cpu__mmio_not_found(struct kvm_cpu *vcpu, u64 phys_addr)
-+{
-+	return false;
-+}
-+
- #endif /* KVM__KVM_CPU_ARCH_H */
+although I've now moved the stop/start calls inside the overflow
+handler so that I don't have to mess with the PMU backend.
+
+> Given that kvm_pmu_perf_overflow is now always called between a
+> cpu_pmu->pmu.stop and a cpu_pmu->pmu.start, it means armpmu_event_update
+> has been called prior to this function, and armpmu_event_set_period will
+> be called after...
+> 
+> Therefore, I think the above could be reduced to:
+> 
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	u64 period = GENMASK(63, 0);
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> +		period = GENMASK(31, 0);
+> +
+> +	pmc->perf_event->attr.sample_period = period;
+> +	pmc->perf_event->hw.sample_period = period;
+> 
+> This is because armpmu_event_set_period takes into account the overflow
+> and the counter wrapping via the "if (unlikely(left <= 0)) {" block.
+
+I think that's an oversimplification. As shown above, the counter has
+moved forward, and there is a delta to be accounted for.
+
+> Though this code confuses me easily, so I may be talking rubbish.
+
+Same here! ;-)
+
+> 
+> >  
+> >  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
+> >  
+> > @@ -557,6 +571,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  	attr.exclude_host = 1; /* Don't count host events */
+> >  	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
+> >  		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+> > +	attr.config1 = PERF_ATTR_CFG1_RELOAD_EVENT;  
+> 
+> I'm not sure that this flag, or patch 4 is really needed. As the perf
+> events created by KVM are pinned to the task and exclude_(host,hv) are set -
+> I think the perf event is not active at this point. Therefore if you change
+> the sample period, you can wait until the perf event gets scheduled back in
+> (when you return to the guest) where it's call to pmu.start will result in
+> armpmu_event_set_period being called. In other words the pmu.start and
+> pmu.stop you add in patch 4 is effectively being done for you by perf when
+> the KVM task is switched out.
+> 
+> I'd be interested to see if the following works:
+> 
+> +	WARN_ON(pmc->perf_event->state == PERF_EVENT_STATE_ACTIVE)
+> +
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	u64 period = GENMASK(63, 0);
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> +		period = GENMASK(31, 0);
+> +
+> +	pmc->perf_event->attr.sample_period = period;
+> +	pmc->perf_event->hw.sample_period = period;
+> 
+> >  
+> >  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> >    
+
+The warning fires, which is expected: for event to be inactive, you
+need to have the vcpu being scheduled out. When the PMU interrupt
+fires, it is bound to preempt the vcpu itself, and the event is of
+course still active.
+
+> What about ARM 32 bit support for this?
+
+What about it? 32bit KVM/arm doesn't support the PMU at all. A 32bit
+guest on a 64bit host could use the PMU just fine (it is just that
+32bit Linux doesn't have a PMUv3 driver -- I had patches for that, but
+they never made it upstream).
+
+Thanks,
+
+	M.
 -- 
-2.18.0
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
