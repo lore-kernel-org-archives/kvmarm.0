@@ -4,51 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BF7ECE58C
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 12:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3B4ECE58C
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 13:00:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 163952247A
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 12:59:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 163952247A
+	by mail.kernel.org (Postfix) with ESMTP id EDCAD222C5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 13:00:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDCAD222C5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D6D4A8E6;
-	Fri, 11 Oct 2019 08:59:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A77C14A87D;
+	Fri, 11 Oct 2019 09:00:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AFhMdOK3mktT; Fri, 11 Oct 2019 08:59:57 -0400 (EDT)
+	with ESMTP id 8yPKuoq51KWy; Fri, 11 Oct 2019 08:59:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A2374A893;
-	Fri, 11 Oct 2019 08:59:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B376C4A893;
+	Fri, 11 Oct 2019 08:59:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A1C4A905
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 08:59:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44A434A8D2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 08:59:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QbEGVc0-6G2W for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Oct 2019 08:59:54 -0400 (EDT)
+ with ESMTP id H6lpt3x-NUXb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Oct 2019 08:59:57 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A4D24A8E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 08:59:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A92084A885
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 08:59:56 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DD1628;
- Fri, 11 Oct 2019 05:59:54 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 660BB1000;
+ Fri, 11 Oct 2019 05:59:56 -0700 (PDT)
 Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com
  [10.1.194.43])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2A3B13F6C4;
- Fri, 11 Oct 2019 05:59:52 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 63D5F3F6C4;
+ Fri, 11 Oct 2019 05:59:54 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v6 07/10] KVM: arm64: Provide VCPU attributes for stolen time
-Date: Fri, 11 Oct 2019 13:59:27 +0100
-Message-Id: <20191011125930.40834-8-steven.price@arm.com>
+Subject: [PATCH v6 08/10] arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+Date: Fri, 11 Oct 2019 13:59:28 +0100
+Message-Id: <20191011125930.40834-9-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191011125930.40834-1-steven.price@arm.com>
 References: <20191011125930.40834-1-steven.price@arm.com>
@@ -73,167 +72,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow user space to inform the KVM host where in the physical memory
-map the paravirtualized time structures should be located.
+SMCCC 1.1 calls may use either HVC or SMC depending on the PSCI
+conduit. Rather than coding this in every call site provide a macro
+which uses the correct instruction. The macro also handles the case
+where no PSCI conduit is configured returning a not supported error
+in res, along with returning the conduit used for the call.
 
-User space can set an attribute on the VCPU providing the IPA base
-address of the stolen time structure for that VCPU. This must be
-repeated for every VCPU in the VM.
-
-The address is given in terms of the physical address visible to
-the guest and must be 64 byte aligned. The guest will discover the
-address via a hypercall.
+This allow us to remove some duplicated code and will be useful later
+when adding paravirtualized time hypervisor calls.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
+Acked-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  7 +++++
- arch/arm64/include/uapi/asm/kvm.h |  2 ++
- arch/arm64/kvm/guest.c            |  9 ++++++
- include/uapi/linux/kvm.h          |  2 ++
- virt/kvm/arm/pvtime.c             | 47 +++++++++++++++++++++++++++++++
- 5 files changed, 67 insertions(+)
+ include/linux/arm-smccc.h | 44 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1697e63f6dd8..6af16b29a41f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -489,6 +489,13 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
- int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 5daf0e2adf47..fd84a9bfb455 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -303,6 +303,50 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+ #define SMCCC_RET_NOT_SUPPORTED			-1
+ #define SMCCC_RET_NOT_REQUIRED			-2
  
-+int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
++/* Like arm_smccc_1_1* but always returns SMCCC_RET_NOT_SUPPORTED.
++ * Used when the PSCI conduit is not defined. The empty asm statement
++ * avoids compiler warnings about unused variables.
++ */
++#define __fail_smccc_1_1(...)						\
++	do {								\
++		__declare_args(__count_args(__VA_ARGS__), __VA_ARGS__);	\
++		asm ("" __constraints(__count_args(__VA_ARGS__)));	\
++		if (___res)						\
++			___res->a0 = SMCCC_RET_NOT_SUPPORTED;		\
++	} while (0)
 +
- static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
- {
- 	vcpu_arch->steal.base = GPA_INVALID;
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 67c21f9bdbad..cff1ba12c768 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -323,6 +323,8 @@ struct kvm_vcpu_events {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define KVM_ARM_VCPU_PVTIME_CTRL	2
-+#define   KVM_ARM_VCPU_PVTIME_IPA	0
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_VCPU2_SHIFT		28
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd626447482..d3ac9d2fd405 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -858,6 +858,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_set_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -878,6 +881,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_get_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -898,6 +904,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_has_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52641d8ca9e8..a540c8357049 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1227,6 +1227,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
- 	KVM_DEV_TYPE_XIVE,
- #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
-+	KVM_DEV_TYPE_ARM_PV_TIME,
-+#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
- 	KVM_DEV_TYPE_MAX,
- };
- 
-diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-index a90f1b4ebd13..9dc466861e1e 100644
---- a/virt/kvm/arm/pvtime.c
-+++ b/virt/kvm/arm/pvtime.c
-@@ -2,7 +2,9 @@
- // Copyright (C) 2019 Arm Ltd.
- 
- #include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
- 
-+#include <asm/kvm_mmu.h>
- #include <asm/pvclock-abi.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -75,3 +77,48 @@ long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
- 
- 	return vcpu->arch.steal.base;
- }
++/*
++ * arm_smccc_1_1_invoke() - make an SMCCC v1.1 compliant call
++ *
++ * This is a variadic macro taking one to eight source arguments, and
++ * an optional return structure.
++ *
++ * @a0-a7: arguments passed in registers 0 to 7
++ * @res: result values from registers 0 to 3
++ *
++ * This macro will make either an HVC call or an SMC call depending on the
++ * current PSCI conduit. If no valid conduit is available then -1
++ * (SMCCC_RET_NOT_SUPPORTED) is returned in @res.a0 (if supplied).
++ *
++ * The return value also provides the conduit that was used.
++ */
++#define arm_smccc_1_1_invoke(...) ({					\
++		int method = psci_ops.conduit;				\
++		switch (method) {					\
++		case PSCI_CONDUIT_HVC:					\
++			arm_smccc_1_1_hvc(__VA_ARGS__);			\
++			break;						\
++		case PSCI_CONDUIT_SMC:					\
++			arm_smccc_1_1_smc(__VA_ARGS__);			\
++			break;						\
++		default:						\
++			__fail_smccc_1_1(__VA_ARGS__);			\
++			method = PSCI_CONDUIT_NONE;			\
++			break;						\
++		}							\
++		method;							\
++	})
 +
-+int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	u64 __user *user = (u64 __user *)attr->addr;
-+	u64 ipa;
-+
-+	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+		return -ENXIO;
-+
-+	if (get_user(ipa, user))
-+		return -EFAULT;
-+	if (!IS_ALIGNED(ipa, 64))
-+		return -EINVAL;
-+	if (vcpu->arch.steal.base != GPA_INVALID)
-+		return -EEXIST;
-+	vcpu->arch.steal.base = ipa;
-+	return 0;
-+}
-+
-+int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	u64 __user *user = (u64 __user *)attr->addr;
-+	u64 ipa;
-+
-+	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+		return -ENXIO;
-+
-+	ipa = vcpu->arch.steal.base;
-+
-+	if (put_user(ipa, user))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_PVTIME_IPA:
-+		return 0;
-+	}
-+	return -ENXIO;
-+}
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
 -- 
 2.20.1
 
