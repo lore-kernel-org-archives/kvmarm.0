@@ -2,68 +2,149 @@ Return-Path: <SRS0=GvsF=YE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C11ECE58C
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54C1C47404
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:37:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09141214E0
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:28:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09141214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1187A2190F
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Oct 2019 11:37:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="KoOnCTIp";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="rTRSY+uY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1187A2190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B3CE4A8B5;
-	Fri, 11 Oct 2019 07:28:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E0DB4A894;
+	Fri, 11 Oct 2019 07:37:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@marvell.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@marvell.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CzKTdEeCjf6h; Fri, 11 Oct 2019 07:28:54 -0400 (EDT)
+	with ESMTP id MCCPUvz8aPrj; Fri, 11 Oct 2019 07:37:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E91724A8A1;
-	Fri, 11 Oct 2019 07:28:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 167744A8A8;
+	Fri, 11 Oct 2019 07:37:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E15E4A84A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:28:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3714A893
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 06:35:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AQNXehzMKpMr for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Oct 2019 07:28:52 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4980A4A829
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 07:28:52 -0400 (EDT)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why)
- by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
- (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1iIt6H-00052y-N4; Fri, 11 Oct 2019 13:28:49 +0200
-Date: Fri, 11 Oct 2019 12:28:48 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: pmu: Reset sample period on overflow
- handling
-Message-ID: <20191011122848.748da6f6@why>
-In-Reply-To: <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
-References: <20191008160128.8872-1-maz@kernel.org>
- <20191008160128.8872-6-maz@kernel.org>
- <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id 36rApMUJYg9J for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Oct 2019 06:35:33 -0400 (EDT)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com
+ [67.231.148.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C0744A85A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Oct 2019 06:35:33 -0400 (EDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+ by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ x9BAYviA014967; Fri, 11 Oct 2019 03:35:26 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pfpt0818;
+ bh=bkYjBV1QKokm4GNxTf8VfP7hR+HIUHvjLL+Wvx1iDSo=;
+ b=KoOnCTIp4GGjhjpz7cPoz//xobT6M7fevg/2PPzEdT/3QV8J+3PHieH0NCEqSfMFh373
+ K+BaVuU+w+UKOQ0kghTRG9IJdW9k5OQwYE5hsgTyczJfV+jDebloptPJcpETMt6NJXm/
+ 74lMsF5/0gcC61ExR4qwS6ZvOQw2sE4d0AWUdNKhS+LSkszwrkM2C3kj83pzB7RQlePo
+ jNvpu9osAqTOi64tIi3lekvvratAQZKGjKfyVe1Q8msZGIRMZA7bOO8BNI9aRYg9SVOA
+ CZRsyQapq1M77K636R2viwjC4p5XTxmmeFzG8ratI7ZP6Sln+YraGqArQI5OuKwHlq3e RQ== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+ by mx0a-0016f401.pphosted.com with ESMTP id 2vjj6v181k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Fri, 11 Oct 2019 03:35:26 -0700
+Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Fri, 11 Oct
+ 2019 03:35:24 -0700
+Received: from NAM01-SN1-obe.outbound.protection.outlook.com (104.47.32.56) by
+ SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server
+ (TLS) id
+ 15.0.1367.3 via Frontend Transport; Fri, 11 Oct 2019 03:35:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=isJ/SICOlEw4CIlynb5cHsGbTCbHEPiQFQTr01SkD7bEQbslTjY9K5becwq+IBVOxtBlswuLKy0BSzWEetSWnGaHth+OjPbOCInjGoxvo/R4wggjfAlkS92VUSzE0AlgXIKveXDeqc607j2+8S50EmtWbcKQYrGDQQKXCYUfri56SSu1EqC3fjRWeCxPrMSzL7JjAKU1IZij/NHb1jTI+7ZTK1cNaoh8DDh7Nhj/EDZBnMkFFnVA0ZUuh9Zi+EnJdgAdVZEKc/qgrOr/s9q4av7Jlus0sLVTLF7kC827AQ6PadxuibtZE9JcS9GviGRm2t4XZavlDnB+kg3pRbFM5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bkYjBV1QKokm4GNxTf8VfP7hR+HIUHvjLL+Wvx1iDSo=;
+ b=fFCrieO0zRdFDRUwc+zYqIubqhVcLMYt+DbBAjPmyq70lyNZtFS2KSmwV/utfxoqkXlyJyI45oB2J/umpEHQrBKFM5b7eUzqGfKGdbdt4vAq536H/e+lM1yoBcFPeKVn/B7AtJWjDF8sucg3Vh39vHB0lTlwdpnA+FJpJrsOnNbIqas5gR7HB85OdKWbwrXhJlLyZ9vmBuH/uYbiDJ+UR80vxk7a1DjIqN82vvySS6phXl1s0TzREiaa6x42O8mhL1TcpXgSBslCNUBg5S4Hd18XRQXEI1ProFBp96SGcHnidStia9aIUQpVY+R3HdP3eHyxK+pXrh6M7KBroUyADw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bkYjBV1QKokm4GNxTf8VfP7hR+HIUHvjLL+Wvx1iDSo=;
+ b=rTRSY+uYUkI+h7w9wLu55koV3g1+Rfv13QomZKF3s7k/XQtCDdRNyfPDnrwyLkjO+KU2O/8cptXAZxzF/TrOtAd6+vBDDm1JSFCcirtfNpaoiGcyTsz6zcJjMt0JFfz/7ZnBrALL+6J5uRcqpYl2aEp1aaAy7+s+XWSgEYyOz6g=
+Received: from CY4PR1801MB1895.namprd18.prod.outlook.com (10.171.254.153) by
+ CY4PR1801MB2006.namprd18.prod.outlook.com (10.165.89.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Fri, 11 Oct 2019 10:35:23 +0000
+Received: from CY4PR1801MB1895.namprd18.prod.outlook.com
+ ([fe80::95d8:1a9a:a3b4:616b]) by CY4PR1801MB1895.namprd18.prod.outlook.com
+ ([fe80::95d8:1a9a:a3b4:616b%7]) with mapi id 15.20.2347.016; Fri, 11 Oct 2019
+ 10:35:23 +0000
+From: Jayachandran Chandrasekharan Nair <jnair@marvell.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Marc Zyngier <maz@kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu"
+ <kvmarm@lists.cs.columbia.edu>
+Subject: [PATCH 1/2] arm64: Workaround for Cavium ThunderX2 erratum 219
+Thread-Topic: [PATCH 1/2] arm64: Workaround for Cavium ThunderX2 erratum 219
+Thread-Index: AQHVgB+W9r2gQmeWGUKCgsdm1RtG0g==
+Date: Fri, 11 Oct 2019 10:35:22 +0000
+Message-ID: <1570790105-31829-2-git-send-email-jnair@marvell.com>
+References: <1570790105-31829-1-git-send-email-jnair@marvell.com>
+In-Reply-To: <1570790105-31829-1-git-send-email-jnair@marvell.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BYAPR04CA0015.namprd04.prod.outlook.com
+ (2603:10b6:a03:40::28) To CY4PR1801MB1895.namprd18.prod.outlook.com
+ (2603:10b6:910:79::25)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 1.8.3.1
+x-originating-ip: [199.233.59.128]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d6da6c9f-0a95-40e8-9168-08d74e36b87d
+x-ms-traffictypediagnostic: CY4PR1801MB2006:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CY4PR1801MB20066D09C06E91A295880EB9A6970@CY4PR1801MB2006.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3173;
+x-forefront-prvs: 0187F3EA14
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(136003)(396003)(39860400002)(366004)(346002)(199004)(189003)(2616005)(4326008)(14454004)(305945005)(8676002)(11346002)(6486002)(76176011)(316002)(6436002)(8936002)(81166006)(5660300002)(446003)(102836004)(81156014)(386003)(26005)(52116002)(66066001)(6116002)(2906002)(7736002)(2501003)(99286004)(476003)(4720700003)(256004)(7416002)(478600001)(3846002)(64756008)(66446008)(2171002)(66476007)(66556008)(110136005)(6506007)(486006)(71190400001)(66946007)(186003)(54906003)(25786009)(86362001)(2201001)(71200400001)(50226002)(36756003)(6512007)(14444005);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR1801MB2006;
+ H:CY4PR1801MB1895.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: cmOc+pK9sLFXuQMCjNau38/xP9N1PSQx4RwebeH7HJUz42rbQR9GJx1cosRA3gSqduD6AiVjuWGhjsDaObCEy7pVt2V81+49uWz4qfgvEgddBpKx8141OtKGOHCdmqkMf7F5rSOG64QYDwPGCk085wf7G5aHCWAuV16MJJTciQzyIOLI25kUzuAB01cj9APBk4pnZ/y3kuilPVmmaXNXm85ApS51rWxdd9TyAQaSYso4cxK6hNQnL9y7b63cazBazewDBSPKHoRGRggjA9vk7isBlyw2D8e4oLjiA+eXdlTzKqhLdhQfvs3w3OHYizbk1Bwxt/sg1TYcsZRs6LTb161kBLcr1hViZYOGKLsvt6p9y+SU8JXYJ8ur/JUa2YaesGbgPFLP1GyDHOby1uq0yNeYct49V7Hceoku+bOm+Lk=
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
- mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6da6c9f-0a95-40e8-9168-08d74e36b87d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Oct 2019 10:35:22.9530 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Yjp4pv2Hd64iufZ+/d+1uKiXcKusgWBBC261LoZP+x6j2jN6dNktx/WpyQl/8L7Xkr8KUZn8l4aXrs6eC+7cmA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1801MB2006
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-10-11_07:2019-10-10,2019-10-11 signatures=0
+X-Mailman-Approved-At: Fri, 11 Oct 2019 07:37:53 -0400
+Cc: Tomasz Nowicki <tnowicki@marvell.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ Jayachandran Chandrasekharan Nair <jnair@marvell.com>,
+ Robert Richter <rrichter@marvell.com>, "stable@kernel.org" <stable@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,157 +161,131 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 8 Oct 2019 23:42:22 +0100
-Andrew Murray <andrew.murray@arm.com> wrote:
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-> On Tue, Oct 08, 2019 at 05:01:28PM +0100, Marc Zyngier wrote:
-> > The PMU emulation code uses the perf event sample period to trigger
-> > the overflow detection. This works fine  for the *first* overflow
-> > handling, but results in a huge number of interrupts on the host,
-> > unrelated to the number of interrupts handled in the guest (a x20
-> > factor is pretty common for the cycle counter). On a slow system
-> > (such as a SW model), this can result in the guest only making
-> > forward progress at a glacial pace.
-> > 
-> > It turns out that the clue is in the name. The sample period is
-> > exactly that: a period. And once the an overflow has occured,
-> > the following period should be the full width of the associated
-> > counter, instead of whatever the guest had initially programed.
-> > 
-> > Reset the sample period to the architected value in the overflow
-> > handler, which now results in a number of host interrupts that is
-> > much closer to the number of interrupts in the guest.
-> > 
-> > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  virt/kvm/arm/pmu.c | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> > 
-> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > index 25a483a04beb..8b524d74c68a 100644
-> > --- a/virt/kvm/arm/pmu.c
-> > +++ b/virt/kvm/arm/pmu.c
-> > @@ -442,6 +442,20 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-> >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> >  	int idx = pmc->idx;
-> > +	u64 period;
-> > +
-> > +	/*
-> > +	 * Reset the sample period to the architectural limit,
-> > +	 * i.e. the point where the counter overflows.
-> > +	 */
-> > +	period = -(local64_read(&pmc->perf_event->count));
-> > +
-> > +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> > +		period &= GENMASK(31, 0);
-> > +
-> > +	local64_set(&pmc->perf_event->hw.period_left, 0);
-> > +	pmc->perf_event->attr.sample_period = period;
-> > +	pmc->perf_event->hw.sample_period = period;  
-> 
-> I believe that above, you are reducing the period by the amount period_left
-> would have been - they cancel each other out.
+A prefetch, load or store instruction after a TTBR change but before the
+corresponding context synchronization barrier can cause a spurious Data
+Abort on Cavium ThunderX2.
 
-That's not what I see happening, having put some traces:
+An optimization introduced in commit c7b9adaf85f818 ("arm64: entry: Add
+exception trampoline page for exceptions from EL0") for prefetching
+trampoline vectors ends up triggering this issue when KPTI is enabled.
 
- kvm_pmu_perf_overflow: count = 308 left = 129
- kvm_pmu_perf_overflow: count = 409 left = 47
- kvm_pmu_perf_overflow: count = 585 left = 223
- kvm_pmu_perf_overflow: count = 775 left = 413
- kvm_pmu_perf_overflow: count = 1368 left = 986
- kvm_pmu_perf_overflow: count = 2086 left = 1716
- kvm_pmu_perf_overflow: count = 958 left = 584
- kvm_pmu_perf_overflow: count = 1907 left = 1551
- kvm_pmu_perf_overflow: count = 7292 left = 6932
+Workaround is to turn off the prefetch for ThunderX2 where it does not
+have an advantage.
 
-although I've now moved the stop/start calls inside the overflow
-handler so that I don't have to mess with the PMU backend.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+[Updated commit message and erratum information - jnair]
+Signed-off-by: Jayachandran Chandrasekharan Nair <jnair@marvell.com>
+Cc: stable@kernel.org
+---
+ Documentation/arm64/silicon-errata.rst |  2 ++
+ arch/arm64/Kconfig                     | 12 ++++++++++++
+ arch/arm64/include/asm/cpucaps.h       |  3 ++-
+ arch/arm64/kernel/cpu_errata.c         | 15 +++++++++++++++
+ arch/arm64/kernel/entry.S              |  2 ++
+ 5 files changed, 33 insertions(+), 1 deletion(-)
 
-> Given that kvm_pmu_perf_overflow is now always called between a
-> cpu_pmu->pmu.stop and a cpu_pmu->pmu.start, it means armpmu_event_update
-> has been called prior to this function, and armpmu_event_set_period will
-> be called after...
-> 
-> Therefore, I think the above could be reduced to:
-> 
-> +	/*
-> +	 * Reset the sample period to the architectural limit,
-> +	 * i.e. the point where the counter overflows.
-> +	 */
-> +	u64 period = GENMASK(63, 0);
-> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> +		period = GENMASK(31, 0);
-> +
-> +	pmc->perf_event->attr.sample_period = period;
-> +	pmc->perf_event->hw.sample_period = period;
-> 
-> This is because armpmu_event_set_period takes into account the overflow
-> and the counter wrapping via the "if (unlikely(left <= 0)) {" block.
-
-I think that's an oversimplification. As shown above, the counter has
-moved forward, and there is a delta to be accounted for.
-
-> Though this code confuses me easily, so I may be talking rubbish.
-
-Same here! ;-)
-
-> 
-> >  
-> >  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
-> >  
-> > @@ -557,6 +571,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  	attr.exclude_host = 1; /* Don't count host events */
-> >  	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
-> >  		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
-> > +	attr.config1 = PERF_ATTR_CFG1_RELOAD_EVENT;  
-> 
-> I'm not sure that this flag, or patch 4 is really needed. As the perf
-> events created by KVM are pinned to the task and exclude_(host,hv) are set -
-> I think the perf event is not active at this point. Therefore if you change
-> the sample period, you can wait until the perf event gets scheduled back in
-> (when you return to the guest) where it's call to pmu.start will result in
-> armpmu_event_set_period being called. In other words the pmu.start and
-> pmu.stop you add in patch 4 is effectively being done for you by perf when
-> the KVM task is switched out.
-> 
-> I'd be interested to see if the following works:
-> 
-> +	WARN_ON(pmc->perf_event->state == PERF_EVENT_STATE_ACTIVE)
-> +
-> +	/*
-> +	 * Reset the sample period to the architectural limit,
-> +	 * i.e. the point where the counter overflows.
-> +	 */
-> +	u64 period = GENMASK(63, 0);
-> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> +		period = GENMASK(31, 0);
-> +
-> +	pmc->perf_event->attr.sample_period = period;
-> +	pmc->perf_event->hw.sample_period = period;
-> 
-> >  
-> >  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> >    
-
-The warning fires, which is expected: for event to be inactive, you
-need to have the vcpu being scheduled out. When the PMU interrupt
-fires, it is bound to preempt the vcpu itself, and the event is of
-course still active.
-
-> What about ARM 32 bit support for this?
-
-What about it? 32bit KVM/arm doesn't support the PMU at all. A 32bit
-guest on a 64bit host could use the PMU just fine (it is just that
-32bit Linux doesn't have a PMUv3 driver -- I had patches for that, but
-they never made it upstream).
-
-Thanks,
-
-	M.
+diff --git a/Documentation/arm64/silicon-errata.rst b/Documentation/arm64/silicon-errata.rst
+index 17ea3fecddaa..ab7ed2fd072f 100644
+--- a/Documentation/arm64/silicon-errata.rst
++++ b/Documentation/arm64/silicon-errata.rst
+@@ -107,6 +107,8 @@ stable kernels.
+ +----------------+-----------------+-----------------+-----------------------------+
+ | Cavium         | ThunderX2 SMMUv3| #126            | N/A                         |
+ +----------------+-----------------+-----------------+-----------------------------+
++| Cavium         | ThunderX2 Core  | #219            | CAVIUM_TX2_ERRATUM_219      |
+++----------------+-----------------+-----------------+-----------------------------+
+ +----------------+-----------------+-----------------+-----------------------------+
+ | Freescale/NXP  | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585         |
+ +----------------+-----------------+-----------------+-----------------------------+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 41a9b4257b72..d2c7c9b22dae 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -617,6 +617,18 @@ config CAVIUM_ERRATUM_30115
+ 
+ 	  If unsure, say Y.
+ 
++config CAVIUM_TX2_ERRATUM_219
++	bool "Cavium ThunderX2 erratum 219: PRFM between TTBR change and ISB fails"
++	default y
++	help
++	  On Cavium ThunderX2, a load/store/prefetch instruction after a
++	  change to TTBR and before the corresponding context synchronization
++	  operation can cause a spurious Data Abort to be delivered to any
++	  hardware thread in the CPU core.
++
++	  Workaround is to drop the optimization which does this. If unsure
++	  say Y
++
+ config QCOM_FALKOR_ERRATUM_1003
+ 	bool "Falkor E1003: Incorrect translation due to ASID change"
+ 	default y
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index f19fe4b9acc4..a0666dcff72a 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -52,7 +52,8 @@
+ #define ARM64_HAS_IRQ_PRIO_MASKING		42
+ #define ARM64_HAS_DCPODP			43
+ #define ARM64_WORKAROUND_1463225		44
++#define ARM64_WORKAROUND_CAVIUM_TX2_219		45
+ 
+-#define ARM64_NCAPS				45
++#define ARM64_NCAPS				46
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 1e43ba5c79b7..1bbb89d0379a 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -712,6 +712,14 @@ static const struct midr_range erratum_1418040_list[] = {
+ };
+ #endif
+ 
++#ifdef CONFIG_CAVIUM_TX2_ERRATUM_219
++static const struct midr_range tx2_family_cpus[] = {
++	MIDR_ALL_VERSIONS(MIDR_BRCM_VULCAN),
++	MIDR_ALL_VERSIONS(MIDR_CAVIUM_THUNDERX2),
++	{},
++};
++#endif
++
+ const struct arm64_cpu_capabilities arm64_errata[] = {
+ #ifdef CONFIG_ARM64_WORKAROUND_CLEAN_CACHE
+ 	{
+@@ -851,6 +859,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+ 		.matches = has_cortex_a76_erratum_1463225,
+ 	},
++#endif
++#ifdef CONFIG_CAVIUM_TX2_ERRATUM_219
++	{
++		.desc = "ThunderX2 erratum 219",
++		.capability = ARM64_WORKAROUND_CAVIUM_TX2_219,
++		ERRATA_MIDR_RANGE_LIST(tx2_family_cpus),
++	},
+ #endif
+ 	{
+ 	}
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index 84a822748c84..c282e6570a5b 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -1070,7 +1070,9 @@ alternative_insn isb, nop, ARM64_WORKAROUND_QCOM_FALKOR_E1003
+ #else
+ 	ldr	x30, =vectors
+ #endif
++alternative_if_not ARM64_WORKAROUND_CAVIUM_TX2_219
+ 	prfm	plil1strm, [x30, #(1b - tramp_vectors)]
++alternative_else_nop_endif
+ 	msr	vbar_el1, x30
+ 	add	x30, x30, #(1b - tramp_vectors)
+ 	isb
 -- 
-Jazz is not dead. It just smells funny...
+2.17.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
