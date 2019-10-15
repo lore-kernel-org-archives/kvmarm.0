@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE37FA372A
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09945FA3733
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B1DB2214E0
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1DB2214E0
+	by mail.kernel.org (Postfix) with ESMTP id BC9422082C
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC9422082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CCAD4AA05;
-	Thu, 17 Oct 2019 06:29:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 759174A88B;
+	Thu, 17 Oct 2019 06:29:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id swkKWh5j7Dt5; Thu, 17 Oct 2019 06:29:24 -0400 (EDT)
+	with ESMTP id JXEpDF9gQmsz; Thu, 17 Oct 2019 06:29:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FFB84AA45;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 616554AA4C;
 	Thu, 17 Oct 2019 06:29:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B32914A9D3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 90DE34A9BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zAbOx6hmpNbJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Oct 2019 06:48:59 -0400 (EDT)
+ with ESMTP id Xwtm13YWYs4i for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Oct 2019 06:49:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F32F84A9D2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:48:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C66B4A9BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:09 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1C1E1000;
- Tue, 15 Oct 2019 03:48:58 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13C541000;
+ Tue, 15 Oct 2019 03:49:09 -0700 (PDT)
 Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
  [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CC5393F68E;
- Tue, 15 Oct 2019 03:48:53 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4B0163F68E;
+ Tue, 15 Oct 2019 03:49:04 -0700 (PDT)
 From: Jianyong Wu <jianyong.wu@arm.com>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
  maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
  will@kernel.org, suzuki.poulose@arm.com
-Subject: [PATCH v5 1/6] psci: Export psci_ops.conduit symbol as modules will
- use it.
-Date: Tue, 15 Oct 2019 18:48:17 +0800
-Message-Id: <20191015104822.13890-2-jianyong.wu@arm.com>
+Subject: [PATCH v5 3/6] timekeeping: Add clocksource to system_time_snapshot
+Date: Tue, 15 Oct 2019 18:48:19 +0800
+Message-Id: <20191015104822.13890-4-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191015104822.13890-1-jianyong.wu@arm.com>
 References: <20191015104822.13890-1-jianyong.wu@arm.com>
@@ -75,58 +75,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If arm_smccc_1_1_invoke used in modules, psci_ops.conduit should
-be export.
+Sometimes, we need check current clocksource outside of
+timekeeping area. Add clocksource to system_time_snapshot then
+we can get clocksource as well as system time.
 
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- drivers/firmware/psci/psci.c | 6 ++++++
- include/linux/arm-smccc.h    | 2 +-
- include/linux/psci.h         | 1 +
- 3 files changed, 8 insertions(+), 1 deletion(-)
+ include/linux/timekeeping.h | 35 ++++++++++++++++++-----------------
+ kernel/time/timekeeping.c   |  7 ++++---
+ 2 files changed, 22 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index f82ccd39a913..35c4eaab1451 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -212,6 +212,12 @@ static unsigned long psci_migrate_info_up_cpu(void)
- 			      0, 0, 0);
- }
+diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
+index a8ab0f143ac4..964c14fbbf69 100644
+--- a/include/linux/timekeeping.h
++++ b/include/linux/timekeeping.h
+@@ -194,23 +194,6 @@ extern bool timekeeping_rtc_skipresume(void);
  
-+enum psci_conduit psci_get_conduit(void)
-+{
-+	return psci_ops.conduit;
-+}
-+EXPORT_SYMBOL(psci_get_conduit);
-+
- static void set_conduit(enum psci_conduit conduit)
- {
- 	switch (conduit) {
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 552cbd49abe8..a6e4d3e3d10a 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -357,7 +357,7 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
-  * The return value also provides the conduit that was used.
-  */
- #define arm_smccc_1_1_invoke(...) ({					\
--		int method = psci_ops.conduit;				\
-+		int method = psci_get_conduit();			\
- 		switch (method) {					\
- 		case PSCI_CONDUIT_HVC:					\
- 			arm_smccc_1_1_hvc(__VA_ARGS__);			\
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index a8a15613c157..e5cedc986049 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -42,6 +42,7 @@ struct psci_operations {
- 	enum smccc_version smccc_version;
+ extern void timekeeping_inject_sleeptime64(const struct timespec64 *delta);
+ 
+-/*
+- * struct system_time_snapshot - simultaneous raw/real time capture with
+- *	counter value
+- * @cycles:	Clocksource counter value to produce the system times
+- * @real:	Realtime system time
+- * @raw:	Monotonic raw system time
+- * @clock_was_set_seq:	The sequence number of clock was set events
+- * @cs_was_changed_seq:	The sequence number of clocksource change events
+- */
+-struct system_time_snapshot {
+-	u64		cycles;
+-	ktime_t		real;
+-	ktime_t		raw;
+-	unsigned int	clock_was_set_seq;
+-	u8		cs_was_changed_seq;
+-};
+-
+ /*
+  * struct system_device_crosststamp - system/device cross-timestamp
+  *	(syncronized capture)
+@@ -236,6 +219,24 @@ struct system_counterval_t {
+ 	struct clocksource	*cs;
  };
  
-+extern enum psci_conduit psci_get_conduit(void);
- extern struct psci_operations psci_ops;
++/*
++ * struct system_time_snapshot - simultaneous raw/real time capture with
++ *	counter value
++ * @sc:		Contains clocksource and clocksource counter value to produce
++ * 	the system times
++ * @real:	Realtime system time
++ * @raw:	Monotonic raw system time
++ * @clock_was_set_seq:	The sequence number of clock was set events
++ * @cs_was_changed_seq:	The sequence number of clocksource change events
++ */
++struct system_time_snapshot {
++	struct system_counterval_t sc;
++	ktime_t		real;
++	ktime_t		raw;
++	unsigned int	clock_was_set_seq;
++	u8		cs_was_changed_seq;
++};
++
+ /*
+  * Get cross timestamp between system clock and device clock
+  */
+diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+index 44b726bab4bd..66ff089605b3 100644
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -983,7 +983,8 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
+ 		nsec_raw  = timekeeping_cycles_to_ns(&tk->tkr_raw, now);
+ 	} while (read_seqcount_retry(&tk_core.seq, seq));
  
- #if defined(CONFIG_ARM_PSCI_FW)
+-	systime_snapshot->cycles = now;
++	systime_snapshot->sc.cycles = now;
++	systime_snapshot->sc.cs = tk->tkr_mono.clock;
+ 	systime_snapshot->real = ktime_add_ns(base_real, nsec_real);
+ 	systime_snapshot->raw = ktime_add_ns(base_raw, nsec_raw);
+ }
+@@ -1189,12 +1190,12 @@ int get_device_system_crosststamp(int (*get_time_fn)
+ 		 * clocksource change
+ 		 */
+ 		if (!history_begin ||
+-		    !cycle_between(history_begin->cycles,
++		    !cycle_between(history_begin->sc.cycles,
+ 				   system_counterval.cycles, cycles) ||
+ 		    history_begin->cs_was_changed_seq != cs_was_changed_seq)
+ 			return -EINVAL;
+ 		partial_history_cycles = cycles - system_counterval.cycles;
+-		total_history_cycles = cycles - history_begin->cycles;
++		total_history_cycles = cycles - history_begin->sc.cycles;
+ 		discontinuity =
+ 			history_begin->clock_was_set_seq != clock_was_set_seq;
+ 
 -- 
 2.17.1
 
