@@ -4,53 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09945FA3733
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B818BFA3738
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC9422082C
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC9422082C
+	by mail.kernel.org (Postfix) with ESMTP id 7AC9A21835
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Oct 2019 10:29:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC9A21835
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 759174A88B;
-	Thu, 17 Oct 2019 06:29:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21AEF4AA49;
+	Thu, 17 Oct 2019 06:29:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JXEpDF9gQmsz; Thu, 17 Oct 2019 06:29:25 -0400 (EDT)
+	with ESMTP id dOvoWEcbJAQa; Thu, 17 Oct 2019 06:29:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 616554AA4C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A39D4AA44;
 	Thu, 17 Oct 2019 06:29:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90DE34A9BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 763AA4A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xwtm13YWYs4i for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Oct 2019 06:49:09 -0400 (EDT)
+ with ESMTP id Y0OZf1dHmfee for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Oct 2019 06:49:25 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C66B4A9BD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56D3C4A8D3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Oct 2019 06:49:25 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13C541000;
- Tue, 15 Oct 2019 03:49:09 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1742D28;
+ Tue, 15 Oct 2019 03:49:25 -0700 (PDT)
 Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
  [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4B0163F68E;
- Tue, 15 Oct 2019 03:49:04 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 240B03F68E;
+ Tue, 15 Oct 2019 03:49:19 -0700 (PDT)
 From: Jianyong Wu <jianyong.wu@arm.com>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
  maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
  will@kernel.org, suzuki.poulose@arm.com
-Subject: [PATCH v5 3/6] timekeeping: Add clocksource to system_time_snapshot
-Date: Tue, 15 Oct 2019 18:48:19 +0800
-Message-Id: <20191015104822.13890-4-jianyong.wu@arm.com>
+Subject: [PATCH v5 6/6] kvm: arm64: Add capability check extension for ptp_kvm
+Date: Tue, 15 Oct 2019 18:48:22 +0800
+Message-Id: <20191015104822.13890-7-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191015104822.13890-1-jianyong.wu@arm.com>
 References: <20191015104822.13890-1-jianyong.wu@arm.com>
@@ -75,99 +74,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Sometimes, we need check current clocksource outside of
-timekeeping area. Add clocksource to system_time_snapshot then
-we can get clocksource as well as system time.
+Let userspace check if there is kvm ptp service in host.
+before VMs migrate to a another host, VMM may check if this
+cap is available to determine the migration behaviour.
 
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Marc Zyngier <maz@kernel.org>
 ---
- include/linux/timekeeping.h | 35 ++++++++++++++++++-----------------
- kernel/time/timekeeping.c   |  7 ++++---
- 2 files changed, 22 insertions(+), 20 deletions(-)
+ include/uapi/linux/kvm.h | 1 +
+ virt/kvm/arm/arm.c       | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-index a8ab0f143ac4..964c14fbbf69 100644
---- a/include/linux/timekeeping.h
-+++ b/include/linux/timekeeping.h
-@@ -194,23 +194,6 @@ extern bool timekeeping_rtc_skipresume(void);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2fe12b40d503..a0bff6002bd9 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_SVE 170
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
++#define KVM_CAP_ARM_KVM_PTP 173
  
- extern void timekeeping_inject_sleeptime64(const struct timespec64 *delta);
+ #ifdef KVM_CAP_IRQ_ROUTING
  
--/*
-- * struct system_time_snapshot - simultaneous raw/real time capture with
-- *	counter value
-- * @cycles:	Clocksource counter value to produce the system times
-- * @real:	Realtime system time
-- * @raw:	Monotonic raw system time
-- * @clock_was_set_seq:	The sequence number of clock was set events
-- * @cs_was_changed_seq:	The sequence number of clocksource change events
-- */
--struct system_time_snapshot {
--	u64		cycles;
--	ktime_t		real;
--	ktime_t		raw;
--	unsigned int	clock_was_set_seq;
--	u8		cs_was_changed_seq;
--};
--
- /*
-  * struct system_device_crosststamp - system/device cross-timestamp
-  *	(syncronized capture)
-@@ -236,6 +219,24 @@ struct system_counterval_t {
- 	struct clocksource	*cs;
- };
- 
-+/*
-+ * struct system_time_snapshot - simultaneous raw/real time capture with
-+ *	counter value
-+ * @sc:		Contains clocksource and clocksource counter value to produce
-+ * 	the system times
-+ * @real:	Realtime system time
-+ * @raw:	Monotonic raw system time
-+ * @clock_was_set_seq:	The sequence number of clock was set events
-+ * @cs_was_changed_seq:	The sequence number of clocksource change events
-+ */
-+struct system_time_snapshot {
-+	struct system_counterval_t sc;
-+	ktime_t		real;
-+	ktime_t		raw;
-+	unsigned int	clock_was_set_seq;
-+	u8		cs_was_changed_seq;
-+};
-+
- /*
-  * Get cross timestamp between system clock and device clock
-  */
-diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index 44b726bab4bd..66ff089605b3 100644
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -983,7 +983,8 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
- 		nsec_raw  = timekeeping_cycles_to_ns(&tk->tkr_raw, now);
- 	} while (read_seqcount_retry(&tk_core.seq, seq));
- 
--	systime_snapshot->cycles = now;
-+	systime_snapshot->sc.cycles = now;
-+	systime_snapshot->sc.cs = tk->tkr_mono.clock;
- 	systime_snapshot->real = ktime_add_ns(base_real, nsec_real);
- 	systime_snapshot->raw = ktime_add_ns(base_raw, nsec_raw);
- }
-@@ -1189,12 +1190,12 @@ int get_device_system_crosststamp(int (*get_time_fn)
- 		 * clocksource change
- 		 */
- 		if (!history_begin ||
--		    !cycle_between(history_begin->cycles,
-+		    !cycle_between(history_begin->sc.cycles,
- 				   system_counterval.cycles, cycles) ||
- 		    history_begin->cs_was_changed_seq != cs_was_changed_seq)
- 			return -EINVAL;
- 		partial_history_cycles = cycles - system_counterval.cycles;
--		total_history_cycles = cycles - history_begin->cycles;
-+		total_history_cycles = cycles - history_begin->sc.cycles;
- 		discontinuity =
- 			history_begin->clock_was_set_seq != clock_was_set_seq;
- 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index bd5c55916d0d..80999985160b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -201,6 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_VCPU_EVENTS:
++	case KVM_CAP_ARM_KVM_PTP:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
 -- 
 2.17.1
 
