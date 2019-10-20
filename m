@@ -2,68 +2,67 @@ Return-Path: <SRS0=jJ2v=YN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B171ECA9EA0
-	for <kvmarm@archiver.kernel.org>; Sun, 20 Oct 2019 10:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86187CA9EA0
+	for <kvmarm@archiver.kernel.org>; Sun, 20 Oct 2019 10:25:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C0262190F
-	for <kvmarm@archiver.kernel.org>; Sun, 20 Oct 2019 10:11:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRCCWvsk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0262190F
+	by mail.kernel.org (Postfix) with ESMTP id 08D89218BA
+	for <kvmarm@archiver.kernel.org>; Sun, 20 Oct 2019 10:25:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D89218BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 277684AC1D;
-	Sun, 20 Oct 2019 06:11:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7EB4AA46;
+	Sun, 20 Oct 2019 06:25:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H4pCgmhgfPO2; Sun, 20 Oct 2019 06:11:49 -0400 (EDT)
+	with ESMTP id yAUJqf9YyNmC; Sun, 20 Oct 2019 06:25:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0FD4AC1F;
-	Sun, 20 Oct 2019 06:11:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CDD14AC09;
+	Sun, 20 Oct 2019 06:25:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37BB54AC0E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 20 Oct 2019 06:11:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63FE84AA46
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 20 Oct 2019 06:25:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tZRWTzJeb4nO for <kvmarm@lists.cs.columbia.edu>;
- Sun, 20 Oct 2019 06:11:47 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3688F4A9B1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 20 Oct 2019 06:11:47 -0400 (EDT)
-Received: from big-swifty.lan (78.163-31-62.static.virginmediabusiness.co.uk
- [62.31.163.78])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3B37D2190F;
- Sun, 20 Oct 2019 10:11:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1571566306;
- bh=om3Cj3Gh8W38m+op9WkaTNAgw+rHdyTrhOQkkaQCz40=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=mRCCWvskMmuSgZrasQVj9s6NTQm49gUlfviEBCz4nKzWyEJ9yPX/sPN13N05vxt12
- 3QKIlNPSs0zoMYczKpfjNsS43TeVOlvm13dCuIcXCz1URXTcGVQTc3lZYW59N2L4Eo
- //Y/+847gu1WQSofWjKIGbKX4UnT5AAKXiVhmeC4=
+ with ESMTP id FBE1zs38b36m for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 20 Oct 2019 06:25:32 -0400 (EDT)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 407D14AA12
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 20 Oct 2019 06:25:32 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=big-swifty.misterjones.org)
+ by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+ (Exim 4.80) (envelope-from <maz@kernel.org>)
+ id 1iM8Ot-0002G3-V4; Sun, 20 Oct 2019 12:25:29 +0200
+Date: Sun, 20 Oct 2019 11:25:24 +0100
+Message-ID: <865zkjzpbf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 4/4] KVM: arm64: pmu: Reset sample period on overflow handling
-Date: Sun, 20 Oct 2019 11:11:29 +0100
-Message-Id: <20191020101129.2612-5-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191020101129.2612-1-maz@kernel.org>
-References: <20191020101129.2612-1-maz@kernel.org>
-MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+To: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v3 0/2] Improve handling of stage 2 aborts without
+ instruction decode
+In-Reply-To: <20191011110709.2764-1-christoffer.dall@arm.com>
+References: <20191011110709.2764-1-christoffer.dall@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, graf@amazon.com, berrange@redhat.com,
+ xypron.glpk@gmx.de, stefanha@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: =?UTF-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
+ Heinrich Schuchardt <xypron.glpk@gmx.de>,
+ Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -81,80 +80,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The PMU emulation code uses the perf event sample period to trigger
-the overflow detection. This works fine  for the *first* overflow
-handling, but results in a huge number of interrupts on the host,
-unrelated to the number of interrupts handled in the guest (a x20
-factor is pretty common for the cycle counter). On a slow system
-(such as a SW model), this can result in the guest only making
-forward progress at a glacial pace.
+Hi Christoffer,
 
-It turns out that the clue is in the name. The sample period is
-exactly that: a period. And once the an overflow has occured,
-the following period should be the full width of the associated
-counter, instead of whatever the guest had initially programed.
+On Fri, 11 Oct 2019 12:07:04 +0100,
+Christoffer Dall <christoffer.dall@arm.com> wrote:
+> 
+> When a guest accesses memory outside the memory slots, KVM usually
+> bounces the access back to userspace with KVM_EXIT_MMIO.  However, on
+> arm/arm64 systems, certain load/store instructions did not provide
+> decoding info for the hypervisor to emulate the instruction, and in this
+> case KVM has rather rudely returned -ENOSYS and printed a not overly
+> helpful error message:
+> 
+>   load/store instruction decoding not implemented
+> 
+> This patch series improves the error message and allows userspace to be
+> notified of this event instead of receiving -ENOSYS, and also allows
+> userspace to ask KVM to inject an external abort to the guest, which it
+> can use for any memory access that it either cannot handle.
+> 
+> One remaining case which this patch set does not address is if the guest
+> accesses an in-kernel emulated device, such as the VGIC, but using a
+> load/store instruction which doesn't provide decode info.  With these
+> patches, this will return to userspace for it to handle, but there's no
+> way for userspace to return the decoding information to KVM and have KVM
+> complete the access to the in-kernel emulated device.  I have no plans
+> to address this limitation.
 
-Reset the sample period to the architected value in the overflow
-handler, which now results in a number of host interrupts that is
-much closer to the number of interrupts in the guest.
+You had some pending comments on patch 2, and you seem to indicate
+that you would respin the series. Do you have plans to do so in the
+coming days? I'd like to put that series into -next, but I can either
+wait for your respin, or queue it as it is and apply fixes on top.
 
-Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
-Reviewed-by: Andrew Murray <andrew.murray@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/pmu.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Please let me know what you prefer.
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index f291d4ac3519..8731dfeced8b 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -8,6 +8,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/perf_event.h>
-+#include <linux/perf/arm_pmu.h>
- #include <linux/uaccess.h>
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
-@@ -442,8 +443,25 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 				  struct pt_regs *regs)
- {
- 	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-+	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
- 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
- 	int idx = pmc->idx;
-+	u64 period;
-+
-+	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
-+
-+	/*
-+	 * Reset the sample period to the architectural limit,
-+	 * i.e. the point where the counter overflows.
-+	 */
-+	period = -(local64_read(&perf_event->count));
-+
-+	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-+		period &= GENMASK(31, 0);
-+
-+	local64_set(&perf_event->hw.period_left, 0);
-+	perf_event->attr.sample_period = period;
-+	perf_event->hw.sample_period = period;
- 
- 	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
- 
-@@ -451,6 +469,8 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
- 		kvm_vcpu_kick(vcpu);
- 	}
-+
-+	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
- }
- 
- /**
+Thanks,
+
+	M.
+
 -- 
-2.20.1
-
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
