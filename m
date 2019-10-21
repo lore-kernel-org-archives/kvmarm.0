@@ -4,50 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832BBCA9EB7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD61ACA9EB0
 	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 15:29:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3DADD20882
+	by mail.kernel.org (Postfix) with ESMTP id 7DCDD2089C
 	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 15:29:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DADD20882
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DCDD2089C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E78B84A9D5;
-	Mon, 21 Oct 2019 11:29:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32F394AC10;
+	Mon, 21 Oct 2019 11:29:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hVEb417DNojd; Mon, 21 Oct 2019 11:29:20 -0400 (EDT)
+	with ESMTP id bZq0gMTxqsx2; Mon, 21 Oct 2019 11:29:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B2F4AC30;
-	Mon, 21 Oct 2019 11:29:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF0424AC22;
+	Mon, 21 Oct 2019 11:29:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B59994A9E4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 11:29:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FB4A4AC10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 11:29:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z0AgkSZP7Cuf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Oct 2019 11:29:16 -0400 (EDT)
+ with ESMTP id gnAovoUsMmZJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Oct 2019 11:29:19 -0400 (EDT)
 Received: from foss.arm.com (unknown [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BE764A9FB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 11:29:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0C334AA03
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 11:29:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6CBFA15A1;
- Mon, 21 Oct 2019 08:28:49 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE20416F8;
+ Mon, 21 Oct 2019 08:28:53 -0700 (PDT)
 Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com
  [10.1.194.43])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A2983F71F;
- Mon, 21 Oct 2019 08:28:47 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DAF493F71F;
+ Mon, 21 Oct 2019 08:28:51 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v7 07/10] KVM: arm64: Provide VCPU attributes for stolen time
-Date: Mon, 21 Oct 2019 16:28:20 +0100
-Message-Id: <20191021152823.14882-8-steven.price@arm.com>
+Subject: [PATCH v7 09/10] arm/arm64: Make use of the SMCCC 1.1 wrapper
+Date: Mon, 21 Oct 2019 16:28:22 +0100
+Message-Id: <20191021152823.14882-10-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191021152823.14882-1-steven.price@arm.com>
 References: <20191021152823.14882-1-steven.price@arm.com>
@@ -72,179 +73,180 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow user space to inform the KVM host where in the physical memory
-map the paravirtualized time structures should be located.
+Rather than directly choosing which function to use based on
+psci_ops.conduit, use the new arm_smccc_1_1 wrapper instead.
 
-User space can set an attribute on the VCPU providing the IPA base
-address of the stolen time structure for that VCPU. This must be
-repeated for every VCPU in the VM.
+In some cases we still need to do some operations based on the
+conduit, but the code duplication is removed.
 
-The address is given in terms of the physical address visible to
-the guest and must be 64 byte aligned. The guest will discover the
-address via a hypercall.
+No functional change.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  7 ++++
- arch/arm64/include/uapi/asm/kvm.h |  2 ++
- arch/arm64/kvm/guest.c            |  9 +++++
- include/uapi/linux/kvm.h          |  2 ++
- virt/kvm/arm/pvtime.c             | 59 +++++++++++++++++++++++++++++++
- 5 files changed, 79 insertions(+)
+ arch/arm/mm/proc-v7-bugs.c     | 13 +++---
+ arch/arm64/kernel/cpu_errata.c | 81 ++++++++++++----------------------
+ 2 files changed, 34 insertions(+), 60 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 75ef37f79633..eb1f33af45aa 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -490,6 +490,13 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/mm/proc-v7-bugs.c b/arch/arm/mm/proc-v7-bugs.c
+index 54d87506d3b5..7c90b4c615a5 100644
+--- a/arch/arm/mm/proc-v7-bugs.c
++++ b/arch/arm/mm/proc-v7-bugs.c
+@@ -74,12 +74,13 @@ static void cpu_v7_spectre_init(void)
+ 	case ARM_CPU_PART_CORTEX_A72: {
+ 		struct arm_smccc_res res;
  
-+int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
++		arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++				     ARM_SMCCC_ARCH_WORKAROUND_1, &res);
++		if ((int)res.a0 != 0)
++			return;
 +
- static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
- {
- 	vcpu_arch->steal.base = GPA_INVALID;
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 67c21f9bdbad..cff1ba12c768 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -323,6 +323,8 @@ struct kvm_vcpu_events {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define KVM_ARM_VCPU_PVTIME_CTRL	2
-+#define   KVM_ARM_VCPU_PVTIME_IPA	0
+ 		switch (arm_smccc_1_1_get_conduit()) {
+ 		case SMCCC_CONDUIT_HVC:
+-			arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+-			if ((int)res.a0 != 0)
+-				break;
+ 			per_cpu(harden_branch_predictor_fn, cpu) =
+ 				call_hvc_arch_workaround_1;
+ 			cpu_do_switch_mm = cpu_v7_hvc_switch_mm;
+@@ -87,10 +88,6 @@ static void cpu_v7_spectre_init(void)
+ 			break;
  
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_VCPU2_SHIFT		28
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd626447482..d3ac9d2fd405 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -858,6 +858,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_set_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -878,6 +881,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_get_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -898,6 +904,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_TIMER_CTRL:
- 		ret = kvm_arm_timer_has_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_PVTIME_CTRL:
-+		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52641d8ca9e8..a540c8357049 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1227,6 +1227,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
- 	KVM_DEV_TYPE_XIVE,
- #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
-+	KVM_DEV_TYPE_ARM_PV_TIME,
-+#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
- 	KVM_DEV_TYPE_MAX,
- };
+ 		case SMCCC_CONDUIT_SMC:
+-			arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-					  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+-			if ((int)res.a0 != 0)
+-				break;
+ 			per_cpu(harden_branch_predictor_fn, cpu) =
+ 				call_smc_arch_workaround_1;
+ 			cpu_do_switch_mm = cpu_v7_smc_switch_mm;
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index 9c0b011eee20..401246e095e7 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -209,40 +209,31 @@ static int detect_harden_bp_fw(void)
+ 	struct arm_smccc_res res;
+ 	u32 midr = read_cpuid_id();
  
-diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-index b90b3a7bea85..1e0f4c284888 100644
---- a/virt/kvm/arm/pvtime.c
-+++ b/virt/kvm/arm/pvtime.c
-@@ -2,7 +2,9 @@
- // Copyright (C) 2019 Arm Ltd.
- 
- #include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
- 
-+#include <asm/kvm_mmu.h>
- #include <asm/pvclock-abi.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -70,3 +72,60 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 
- 	return base;
- }
++	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++			     ARM_SMCCC_ARCH_WORKAROUND_1, &res);
 +
-+int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	u64 __user *user = (u64 __user *)attr->addr;
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 ipa;
-+	int ret = 0;
-+	int idx;
-+
-+	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+		return -ENXIO;
-+
-+	if (get_user(ipa, user))
-+		return -EFAULT;
-+	if (!IS_ALIGNED(ipa, 64))
-+		return -EINVAL;
-+	if (vcpu->arch.steal.base != GPA_INVALID)
-+		return -EEXIST;
-+
-+	/* Check the address is in a valid memslot */
-+	idx = srcu_read_lock(&kvm->srcu);
-+	if (kvm_is_error_hva(gfn_to_hva(kvm, ipa >> PAGE_SHIFT)))
-+		ret = -EINVAL;
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	if (!ret)
-+		vcpu->arch.steal.base = ipa;
-+
-+	return ret;
-+}
-+
-+int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	u64 __user *user = (u64 __user *)attr->addr;
-+	u64 ipa;
-+
-+	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+		return -ENXIO;
-+
-+	ipa = vcpu->arch.steal.base;
-+
-+	if (put_user(ipa, user))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_PVTIME_IPA:
++	switch ((int)res.a0) {
++	case 1:
++		/* Firmware says we're just fine */
 +		return 0;
++	case 0:
++		break;
++	default:
++		return -1;
 +	}
-+	return -ENXIO;
-+}
++
+ 	switch (arm_smccc_1_1_get_conduit()) {
+ 	case SMCCC_CONDUIT_HVC:
+-		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+-		switch ((int)res.a0) {
+-		case 1:
+-			/* Firmware says we're just fine */
+-			return 0;
+-		case 0:
+-			cb = call_hvc_arch_workaround_1;
+-			/* This is a guest, no need to patch KVM vectors */
+-			smccc_start = NULL;
+-			smccc_end = NULL;
+-			break;
+-		default:
+-			return -1;
+-		}
++		cb = call_hvc_arch_workaround_1;
++		/* This is a guest, no need to patch KVM vectors */
++		smccc_start = NULL;
++		smccc_end = NULL;
+ 		break;
+ 
+ 	case SMCCC_CONDUIT_SMC:
+-		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-				  ARM_SMCCC_ARCH_WORKAROUND_1, &res);
+-		switch ((int)res.a0) {
+-		case 1:
+-			/* Firmware says we're just fine */
+-			return 0;
+-		case 0:
+-			cb = call_smc_arch_workaround_1;
+-			smccc_start = __smccc_workaround_1_smc_start;
+-			smccc_end = __smccc_workaround_1_smc_end;
+-			break;
+-		default:
+-			return -1;
+-		}
++		cb = call_smc_arch_workaround_1;
++		smccc_start = __smccc_workaround_1_smc_start;
++		smccc_end = __smccc_workaround_1_smc_end;
+ 		break;
+ 
+ 	default:
+@@ -332,6 +323,8 @@ void __init arm64_enable_wa2_handling(struct alt_instr *alt,
+ 
+ void arm64_set_ssbd_mitigation(bool state)
+ {
++	int conduit;
++
+ 	if (!IS_ENABLED(CONFIG_ARM64_SSBD)) {
+ 		pr_info_once("SSBD disabled by kernel configuration\n");
+ 		return;
+@@ -345,19 +338,10 @@ void arm64_set_ssbd_mitigation(bool state)
+ 		return;
+ 	}
+ 
+-	switch (arm_smccc_1_1_get_conduit()) {
+-	case SMCCC_CONDUIT_HVC:
+-		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_WORKAROUND_2, state, NULL);
+-		break;
+-
+-	case SMCCC_CONDUIT_SMC:
+-		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, state, NULL);
+-		break;
++	conduit = arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_WORKAROUND_2, state,
++				       NULL);
+ 
+-	default:
+-		WARN_ON_ONCE(1);
+-		break;
+-	}
++	WARN_ON_ONCE(conduit == SMCCC_CONDUIT_NONE);
+ }
+ 
+ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+@@ -367,6 +351,7 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+ 	bool required = true;
+ 	s32 val;
+ 	bool this_cpu_safe = false;
++	int conduit;
+ 
+ 	WARN_ON(scope != SCOPE_LOCAL_CPU || preemptible());
+ 
+@@ -384,18 +369,10 @@ static bool has_ssbd_mitigation(const struct arm64_cpu_capabilities *entry,
+ 		goto out_printmsg;
+ 	}
+ 
+-	switch (arm_smccc_1_1_get_conduit()) {
+-	case SMCCC_CONDUIT_HVC:
+-		arm_smccc_1_1_hvc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+-		break;
++	conduit = arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++				       ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+ 
+-	case SMCCC_CONDUIT_SMC:
+-		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+-				  ARM_SMCCC_ARCH_WORKAROUND_2, &res);
+-		break;
+-
+-	default:
++	if (conduit == SMCCC_CONDUIT_NONE) {
+ 		ssbd_state = ARM64_SSBD_UNKNOWN;
+ 		if (!this_cpu_safe)
+ 			__ssb_safe = false;
 -- 
 2.20.1
 
