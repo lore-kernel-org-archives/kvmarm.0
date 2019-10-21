@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D68CA9EB7
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF6FCA9EB7
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 10:22:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 41DA92089C
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 10:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41DA92089C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTP id BA9892084C
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 10:22:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA9892084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7931B4A81C;
-	Mon, 21 Oct 2019 06:06:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20A564A98B;
+	Mon, 21 Oct 2019 06:22:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 21RlU+M930t7; Mon, 21 Oct 2019 06:06:12 -0400 (EDT)
+	with ESMTP id ug3YjE2VNKg3; Mon, 21 Oct 2019 06:22:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6834A9A1;
-	Mon, 21 Oct 2019 06:06:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B8CA4A9A9;
+	Mon, 21 Oct 2019 06:22:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 50A9B4AC18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 01:01:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60F644A98B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 06:22:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CDHQo9VBERbN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Oct 2019 01:01:25 -0400 (EDT)
-Received: from mx1.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C7F74AC14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 01:01:25 -0400 (EDT)
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx1.suse.de (Postfix) with ESMTP id BB36EB236;
- Mon, 21 Oct 2019 05:01:23 +0000 (UTC)
-Subject: Re: [PATCH v6 10/10] arm64: Retrieve stolen time as paravirtualized
- guest
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
+ with ESMTP id jNBWl7wd2Mo8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Oct 2019 06:22:23 -0400 (EDT)
+Received: from foss.arm.com (unknown [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF444A8BA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 06:22:23 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 480B7CA3;
+ Mon, 21 Oct 2019 03:22:03 -0700 (PDT)
+Received: from [10.1.194.43] (e112269-lin.cambridge.arm.com [10.1.194.43])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDC833F718;
+ Mon, 21 Oct 2019 03:22:00 -0700 (PDT)
+Subject: Re: [PATCH v6 05/10] KVM: arm64: Support stolen time reporting via
+ shared structure
+To: Marc Zyngier <maz@kernel.org>
 References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-11-steven.price@arm.com> <86a79wzdhk.wl-maz@kernel.org>
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <237a3457-bcb3-c9b7-11ef-241b7ccc370e@suse.com>
-Date: Mon, 21 Oct 2019 07:01:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191011125930.40834-6-steven.price@arm.com> <86eez9yoog.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <1bb10eb5-0fe8-57c9-3b67-9b3661a73d29@arm.com>
+Date: Mon, 21 Oct 2019 11:21:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <86a79wzdhk.wl-maz@kernel.org>
-Content-Language: en-US
-X-Mailman-Approved-At: Mon, 21 Oct 2019 06:06:11 -0400
+In-Reply-To: <86eez9yoog.wl-maz@kernel.org>
+Content-Language: en-GB
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,250 +71,353 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 19.10.19 22:28, Marc Zyngier wrote:
-> On Fri, 11 Oct 2019 13:59:30 +0100,
+On 19/10/2019 12:12, Marc Zyngier wrote:
+> On Fri, 11 Oct 2019 13:59:25 +0100,
 > Steven Price <steven.price@arm.com> wrote:
 >>
->> Enable paravirtualization features when running under a hypervisor
->> supporting the PV_TIME_ST hypercall.
+>> Implement the service call for configuring a shared structure between a
+>> VCPU and the hypervisor in which the hypervisor can write the time
+>> stolen from the VCPU's execution time by other tasks on the host.
 >>
->> For each (v)CPU, we ask the hypervisor for the location of a shared
->> page which the hypervisor will use to report stolen time to us. We set
->> pv_time_ops to the stolen time function which simply reads the stolen
->> value from the shared page for a VCPU. We guarantee single-copy
->> atomicity using READ_ONCE which means we can also read the stolen
->> time for another VCPU than the currently running one while it is
->> potentially being updated by the hypervisor.
+>> User space allocates memory which is placed at an IPA also chosen by user
+>> space. The hypervisor then updates the shared structure using
+>> kvm_put_guest() to ensure single copy atomicity of the 64-bit value
+>> reporting the stolen time in nanoseconds.
+>>
+>> Whenever stolen time is enabled by the guest, the stolen time counter is
+>> reset.
+>>
+>> The stolen time itself is retrieved from the sched_info structure
+>> maintained by the Linux scheduler code. We enable SCHEDSTATS when
+>> selecting KVM Kconfig to ensure this value is meaningful.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   .../admin-guide/kernel-parameters.txt         |   6 +-
->>   arch/arm64/include/asm/paravirt.h             |   9 +-
->>   arch/arm64/kernel/paravirt.c                  | 148 ++++++++++++++++++
->>   arch/arm64/kernel/time.c                      |   3 +
->>   include/linux/cpuhotplug.h                    |   1 +
->>   5 files changed, 163 insertions(+), 4 deletions(-)
+>>  arch/arm/include/asm/kvm_host.h   | 20 +++++++++++
+>>  arch/arm64/include/asm/kvm_host.h | 21 +++++++++++-
+>>  arch/arm64/kvm/Kconfig            |  1 +
+>>  include/linux/kvm_types.h         |  2 ++
+>>  virt/kvm/arm/arm.c                | 11 ++++++
+>>  virt/kvm/arm/hypercalls.c         |  3 ++
+>>  virt/kvm/arm/pvtime.c             | 56 +++++++++++++++++++++++++++++++
+>>  7 files changed, 113 insertions(+), 1 deletion(-)
 >>
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->> index c7ac2f3ac99f..346b1c7a4afb 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -3083,9 +3083,9 @@
->>   			[X86,PV_OPS] Disable paravirtualized VMware scheduler
->>   			clock and use the default one.
->>   
->> -	no-steal-acc	[X86,KVM] Disable paravirtualized steal time accounting.
->> -			steal time is computed, but won't influence scheduler
->> -			behaviour
->> +	no-steal-acc	[X86,KVM,ARM64] Disable paravirtualized steal time
->> +			accounting. steal time is computed, but won't
->> +			influence scheduler behaviour
->>   
->>   	nolapic		[X86-32,APIC] Do not enable or use the local APIC.
->>   
->> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
->> index 799d9dd6f7cc..125c26c42902 100644
->> --- a/arch/arm64/include/asm/paravirt.h
->> +++ b/arch/arm64/include/asm/paravirt.h
->> @@ -21,6 +21,13 @@ static inline u64 paravirt_steal_clock(int cpu)
->>   {
->>   	return pv_ops.time.steal_clock(cpu);
->>   }
->> -#endif
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index 5a0c3569ebde..5c401482d62d 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -39,6 +39,7 @@
+>>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+>>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+>> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>>  
+>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>  
+>> @@ -329,6 +330,25 @@ static inline long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+>>  	return SMCCC_RET_NOT_SUPPORTED;
+>>  }
+>>  
+>> +static inline long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return SMCCC_RET_NOT_SUPPORTED;
+>> +}
 >> +
->> +int __init kvm_guest_init(void);
+>> +static inline int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
+>> +{
+>> +	return -ENOTSUPP;
+>> +}
 >> +
->> +#else
+>> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+>> +{
+>> +}
 >> +
->> +#define kvm_guest_init()
+>> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
+>> +{
+>> +	return false;
+>> +}
 >> +
->> +#endif // CONFIG_PARAVIRT
->>   
->>   #endif
->> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
->> index 4cfed91fe256..de73dbec238c 100644
->> --- a/arch/arm64/kernel/paravirt.c
->> +++ b/arch/arm64/kernel/paravirt.c
->> @@ -6,13 +6,161 @@
->>    * Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
->>    */
->>   
->> +#define pr_fmt(fmt) "kvmarm-pv: " fmt
->> +
->> +#include <linux/arm-smccc.h>
->> +#include <linux/cpuhotplug.h>
->>   #include <linux/export.h>
->> +#include <linux/io.h>
->>   #include <linux/jump_label.h>
->> +#include <linux/printk.h>
->> +#include <linux/psci.h>
->> +#include <linux/reboot.h>
->> +#include <linux/slab.h>
->>   #include <linux/types.h>
->> +
->>   #include <asm/paravirt.h>
->> +#include <asm/pvclock-abi.h>
->> +#include <asm/smp_plat.h>
->>   
->>   struct static_key paravirt_steal_enabled;
->>   struct static_key paravirt_steal_rq_enabled;
->>   
->>   struct paravirt_patch_template pv_ops;
->>   EXPORT_SYMBOL_GPL(pv_ops);
->> +
->> +struct kvmarm_stolen_time_region {
->> +	struct pvclock_vcpu_stolen_time *kaddr;
+>>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+>>  
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 93b46d9526d0..1697e63f6dd8 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -44,6 +44,7 @@
+>>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+>>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+>> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>>  
+>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>  
+>> @@ -338,8 +339,14 @@ struct kvm_vcpu_arch {
+>>  	/* True when deferrable sysregs are loaded on the physical CPU,
+>>  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+>>  	bool sysregs_loaded_on_cpu;
+>> -};
+>>  
+>> +	/* Guest PV state */
+>> +	struct {
+>> +		u64 steal;
+>> +		u64 last_steal;
+>> +		gpa_t base;
+>> +	} steal;
 >> +};
+> 
+> nit: Please keep an empty line at the end of the structure.
+> 
+>>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>>  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
+>>  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
+>> @@ -479,6 +486,18 @@ int kvm_perf_init(void);
+>>  int kvm_perf_teardown(void);
+>>  
+>>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
+>> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
+>> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
 >> +
->> +static DEFINE_PER_CPU(struct kvmarm_stolen_time_region, stolen_time_region);
->> +
->> +static bool steal_acc = true;
->> +static int __init parse_no_stealacc(char *arg)
+>> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
 >> +{
->> +	steal_acc = false;
->> +	return 0;
+>> +	vcpu_arch->steal.base = GPA_INVALID;
 >> +}
 >> +
->> +early_param("no-steal-acc", parse_no_stealacc);
->> +
->> +/* return stolen time in ns by asking the hypervisor */
->> +static u64 kvm_steal_clock(int cpu)
-> 
-> This isn't KVM specific.
-> 
+>> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
 >> +{
->> +	struct kvmarm_stolen_time_region *reg;
+>> +	return (vcpu_arch->steal.base != GPA_INVALID);
+>> +}
+>>  
+>>  void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+>>  
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index a67121d419a2..d8b88e40d223 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -39,6 +39,7 @@ config KVM
+>>  	select IRQ_BYPASS_MANAGER
+>>  	select HAVE_KVM_IRQ_BYPASS
+>>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>> +	select SCHEDSTATS
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
+>>  	  We don't support KVM with 16K page tables yet, due to the multiple
+>> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+>> index bde5374ae021..1c88e69db3d9 100644
+>> --- a/include/linux/kvm_types.h
+>> +++ b/include/linux/kvm_types.h
+>> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
+>>  typedef u64            gpa_t;
+>>  typedef u64            gfn_t;
+>>  
+>> +#define GPA_INVALID	(~(gpa_t)0)
 >> +
->> +	reg = per_cpu_ptr(&stolen_time_region, cpu);
->> +	if (!reg->kaddr) {
->> +		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
->> +			     cpu);
->> +		return 0;
+>>  typedef unsigned long  hva_t;
+>>  typedef u64            hpa_t;
+>>  typedef u64            hfn_t;
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 86c6aa1cb58e..5d3059aeadb1 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -40,6 +40,10 @@
+>>  #include <asm/kvm_coproc.h>
+>>  #include <asm/sections.h>
+>>  
+>> +#include <kvm/arm_hypercalls.h>
+>> +#include <kvm/arm_pmu.h>
+>> +#include <kvm/arm_psci.h>
+>> +
+>>  #ifdef REQUIRES_VIRT
+>>  __asm__(".arch_extension	virt");
+>>  #endif
+>> @@ -351,6 +355,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>>  
+>>  	kvm_arm_reset_debug_ptr(vcpu);
+>>  
+>> +	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
+>> +
+>>  	return kvm_vgic_vcpu_init(vcpu);
+>>  }
+>>  
+>> @@ -380,6 +386,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>  	kvm_vcpu_load_sysregs(vcpu);
+>>  	kvm_arch_vcpu_load_fp(vcpu);
+>>  	kvm_vcpu_pmu_restore_guest(vcpu);
+>> +	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+>> +		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+>>  
+>>  	if (single_task_running())
+>>  		vcpu_clear_wfe_traps(vcpu);
+>> @@ -645,6 +653,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>>  		 * that a VCPU sees new virtual interrupts.
+>>  		 */
+>>  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+>> +
+>> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
+>> +			kvm_update_stolen_time(vcpu, false);
+>>  	}
+>>  }
+>>  
+>> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+>> index 97ea8b133e77..5c333a64390e 100644
+>> --- a/virt/kvm/arm/hypercalls.c
+>> +++ b/virt/kvm/arm/hypercalls.c
+>> @@ -56,6 +56,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+>>  		val = kvm_hypercall_pv_features(vcpu);
+>>  		break;
+>> +	case ARM_SMCCC_HV_PV_TIME_ST:
+>> +		val = kvm_hypercall_stolen_time(vcpu);
+>> +		break;
+>>  	default:
+>>  		return kvm_psci_call(vcpu);
+>>  	}
+>> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+>> index 8d0fad671dcf..a90f1b4ebd13 100644
+>> --- a/virt/kvm/arm/pvtime.c
+>> +++ b/virt/kvm/arm/pvtime.c
+>> @@ -3,8 +3,45 @@
+>>  
+>>  #include <linux/arm-smccc.h>
+>>  
+>> +#include <asm/pvclock-abi.h>
+>> +
+>>  #include <kvm/arm_hypercalls.h>
+>>  
+>> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	u64 steal;
+>> +	u64 steal_le;
+> 
+> This should be __le64.
+> 
+>> +	u64 offset;
+>> +	int idx;
+>> +	u64 base = vcpu->arch.steal.base;
+>> +
+>> +	if (base == GPA_INVALID)
+>> +		return -ENOTSUPP;
+>> +
+>> +	/* Let's do the local bookkeeping */
+>> +	steal = vcpu->arch.steal.steal;
+>> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
+>> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+>> +	vcpu->arch.steal.steal = steal;
+>> +
+>> +	steal_le = cpu_to_le64(steal);
+>> +	idx = srcu_read_lock(&kvm->srcu);
+>> +	if (init) {
+>> +		struct pvclock_vcpu_stolen_time init_values = {
+>> +			.revision = 0,
+>> +			.attributes = 0
+> 
+> nit: 0 is the default initialiser.
+> 
+>> +		};
+>> +		kvm_write_guest(kvm, base, &init_values,
+>> +				sizeof(init_values));
 >> +	}
->> +
->> +	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
->> +}
->> +
->> +static int disable_stolen_time_current_cpu(void)
->> +{
->> +	struct kvmarm_stolen_time_region *reg;
->> +
->> +	reg = this_cpu_ptr(&stolen_time_region);
->> +	if (!reg->kaddr)
->> +		return 0;
->> +
->> +	memunmap(reg->kaddr);
->> +	memset(reg, 0, sizeof(*reg));
+> 
+> I'm not convinced by this init phase right in the middle of the normal
+> path. It looks ugly, and it'd be better if moved out of line. I'd
+> suggest:
+> 
+> static void kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+> {
+> 	struct pvclock_vcpu_stolen_time init_values = { };
+> 
+> 	vcpu->arch.steal.steal = 0;
+> 	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> 
+> 	idx = srcu_read_lock(&kvm->srcu);
+> 	kvm_write_guest(kvm, base, &init_values, sizeof(init_values));
+> 	srcu_read_unlock(&kvm->srcu, idx);
+> }
+> 
+> and change the two callers accordingly. Or even better, move this code
+> to the hypercall handling function, because that's where it actually
+> belongs.
+
+Ok, it does add a little bit of duplicated code. But it also gets rid of
+the boolean argument that I never liked. As you suggest I might as well
+move this into kvm_hypercall_stolen_time().
+
+>> +	offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
+>> +	kvm_put_guest(kvm, base + offset, steal_le, u64);
+>> +	srcu_read_unlock(&kvm->srcu, idx);
 >> +
 >> +	return 0;
 >> +}
 >> +
->> +static int stolen_time_dying_cpu(unsigned int cpu)
->> +{
->> +	return disable_stolen_time_current_cpu();
->> +}
+>>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+>>  {
+>>  	u32 feature = smccc_get_arg1(vcpu);
+>> @@ -12,6 +49,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+>>  
+>>  	switch (feature) {
+>>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+>> +	case ARM_SMCCC_HV_PV_TIME_ST:
+>>  		val = SMCCC_RET_SUCCESS;
+>>  		break;
+>>  	}
+>> @@ -19,3 +57,21 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+>>  	return val;
+>>  }
+>>  
+>> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
 > 
-> You can merge these two functions, as there is no other caller.
-> 
->> +
->> +static int init_stolen_time_cpu(unsigned int cpu)
->> +{
->> +	struct kvmarm_stolen_time_region *reg;
->> +	struct arm_smccc_res res;
->> +
->> +	reg = this_cpu_ptr(&stolen_time_region);
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_ST, &res);
->> +
->> +	if ((long)res.a0 < 0)
->> +		return -EINVAL;
-> 
-> I'd rather you check an actual error code, just in case the memory map
-> starts growing to a point where we have 64bit (I)PAs...
-> 
->> +
->> +	reg->kaddr = memremap(res.a0,
->> +			      sizeof(struct pvclock_vcpu_stolen_time),
->> +			      MEMREMAP_WB);
->> +
->> +	if (!reg->kaddr) {
->> +		pr_warn("Failed to map stolen time data structure\n");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	if (le32_to_cpu(reg->kaddr->revision) != 0 ||
->> +	    le32_to_cpu(reg->kaddr->attributes) != 0) {
->> +		pr_warn("Unexpected revision or attributes in stolen time data\n");
-> 
-> WARN_ONCE instead? You probably don't want to scream for each and
-> every CPU that boots...
-> 
->> +		return -ENXIO;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int kvm_arm_init_stolen_time(void)
->> +{
->> +	int ret;
->> +
->> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
->> +				"hypervisor/kvmarm/pv:starting",
->> +				init_stolen_time_cpu, stolen_time_dying_cpu);
->> +	if (ret < 0)
->> +		return ret;
->> +	return 0;
->> +}
->> +
->> +static bool has_kvm_steal_clock(void)
-> 
-> This is not KVM specific either.
-> 
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	/* To detect the presence of PV time support we require SMCCC 1.1+ */
->> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
->> +		return false;
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
->> +			     ARM_SMCCC_HV_PV_TIME_FEATURES, &res);
->> +
->> +	if (res.a0 != SMCCC_RET_SUCCESS)
->> +		return false;
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_FEATURES,
->> +			     ARM_SMCCC_HV_PV_TIME_ST, &res);
->> +
->> +	if (res.a0 != SMCCC_RET_SUCCESS)
->> +		return false;
->> +
->> +	return true;
-> 
-> 	return (res.a0 == SMCCC_RET_SUCCESS);
-> 
->> +}
->> +
->> +int __init kvm_guest_init(void)
-> 
-> How about something like pv_time_init() instead? In the guest, this is
-> no way KVM specific, and I still hope for this to work on things like
-> Xen/HyperV/VMware (yeah, I'm foolishly optimistic). All the references
-> to KVM should go, and be replaced by something more generic (after
-> all, you're only implementing the spec, so feel free to call it
-> den0057_* if you really want).
+> Why long? If that's a base address, then it is either a phys_addr_t or
+> a gpa_t. I'd suggest you move the error check to the caller.
 
-Xen guests already have the needed functionality. On ARM this just needs
-to be hooked up.
+This is a bit more tricky. It's a long because that's the declared type
+of the SMCCC return in kvm_hvc_call_handler(). I can't (easily) move the
+code into kvm_hvc_call_handler() because that is compiled for arm (as
+well as arm64) and we don't have the definitions for stolen time there.
+The best option I could come up with is to have a dummy stub for arm and
+use generic types for this function.
 
+This means we need a type which can contain both a gpa_t and the
+SMCCC_RET_NOT_SUPPORTED error code.
 
-Juergen
+I'm open to alternative suggestions on how to make this work.
+
+Thanks,
+
+Steve
+
+>> +{
+>> +	int err;
+>> +
+>> +	/*
+>> +	 * Start counting stolen time from the time the guest requests
+>> +	 * the feature enabled.
+>> +	 */
+>> +	vcpu->arch.steal.steal = 0;
+>> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+>> +
+>> +	err = kvm_update_stolen_time(vcpu, true);
+>> +
+>> +	if (err)
+>> +		return SMCCC_RET_NOT_SUPPORTED;
+>> +
+>> +	return vcpu->arch.steal.base;
+>> +}
+>> -- 
+>> 2.20.1
+>>
+>>
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
