@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FE1CA9EB7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B42CA9EB0
 	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 00:35:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5269214B2
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 00:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5269214B2
+	by mail.kernel.org (Postfix) with ESMTP id B4A6C21928
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 00:35:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A6C21928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 458844A9DA;
-	Mon, 21 Oct 2019 20:35:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62CD34A99D;
+	Mon, 21 Oct 2019 20:35:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id n0fvbQmF4IlT; Mon, 21 Oct 2019 20:35:44 -0400 (EDT)
+	with ESMTP id lRYmda5qxR5L; Mon, 21 Oct 2019 20:35:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0084A9EF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D4D4A9D7;
 	Mon, 21 Oct 2019 20:35:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 631D64A9CB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1A8E4A9E0
  for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 20:35:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dyzrrc2NO97P for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id azR2zN6jg6bP for <kvmarm@lists.cs.columbia.edu>;
  Mon, 21 Oct 2019 20:35:41 -0400 (EDT)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E6FF4A99D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A129F4A9B5
  for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 20:35:41 -0400 (EDT)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,19 +41,19 @@ Received: from orsmga004.jf.intel.com ([10.7.209.38])
  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  21 Oct 2019 17:35:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="348897201"
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="348897207"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
- by orsmga004.jf.intel.com with ESMTP; 21 Oct 2019 17:35:38 -0700
+ by orsmga004.jf.intel.com with ESMTP; 21 Oct 2019 17:35:39 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v2 02/15] KVM: Don't free new memslot if allocation of said
- memslot fails
-Date: Mon, 21 Oct 2019 17:35:24 -0700
-Message-Id: <20191022003537.13013-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 04/15] KVM: x86: Allocate memslot resources during
+ prepare_memory_region()
+Date: Mon, 21 Oct 2019 17:35:26 -0700
+Message-Id: <20191022003537.13013-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022003537.13013-1-sean.j.christopherson@intel.com>
 References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
@@ -82,34 +82,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The two implementations of kvm_arch_create_memslot() in x86 and PPC are
-both good citizens and free up all local resources if creation fails.
-Return immediately (via a superfluous goto) instead of calling
-kvm_free_memslot().
-
-Note, the call to kvm_free_memslot() is effectively an expensive nop in
-this case as there are no resources to be freed.
+Allocate the various metadata structures associated with a memslot
+during during kvm_arch_prepare_memory_region(), which paves the way for
+removing kvm_arch_create_memslot() altogether.  Moving x86's memory
+allocation only changes the order of kernel memory allocations between
+x86 and common KVM code.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9afd706dc038..2cb38b2148cb 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1014,7 +1014,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		new.userspace_addr = mem->userspace_addr;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f26f8be4e621..fa80f07ba501 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9601,6 +9601,12 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
  
- 		if (kvm_arch_create_memslot(kvm, &new, npages))
--			goto out_free;
-+			goto out;
- 	}
+ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    unsigned long npages)
++{
++	return 0;
++}
++
++static int kvm_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
++			      unsigned long npages)
+ {
+ 	int i;
  
- 	/* Allocate page dirty bitmap if needed */
+@@ -9678,6 +9684,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				const struct kvm_userspace_memory_region *mem,
+ 				enum kvm_mr_change change)
+ {
++	if (change == KVM_MR_CREATE)
++		return kvm_create_memslot(kvm, memslot,
++					  mem->memory_size >> PAGE_SHIFT);
+ 	return 0;
+ }
+ 
 -- 
 2.22.0
 
