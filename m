@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC248CA9EAF
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 01:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8753C47E49
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 02:00:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8C3AB2166E
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 01:59:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C3AB2166E
+	by mail.kernel.org (Postfix) with ESMTP id A9FAD22478
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 02:00:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FAD22478
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4769C4AC30;
-	Mon, 21 Oct 2019 21:59:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6577C4A9FA;
+	Mon, 21 Oct 2019 22:00:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iD-06BhnVnVN; Mon, 21 Oct 2019 21:59:57 -0400 (EDT)
+	with ESMTP id 8uRHmjVymvLj; Mon, 21 Oct 2019 22:00:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E46254AC1F;
-	Mon, 21 Oct 2019 21:59:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FEF44AC43;
+	Mon, 21 Oct 2019 21:59:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 538754A98E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1860B4AC17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qIPeDAnyCR8e for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Oct 2019 21:59:47 -0400 (EDT)
+ with ESMTP id lW6vDL9hvChs for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Oct 2019 21:59:50 -0400 (EDT)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 124834A9DB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4101A4AA10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:45 -0400 (EDT)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Oct 2019 18:59:42 -0700
+ 21 Oct 2019 18:59:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="196293810"
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="196293822"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
- by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:42 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:44 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 15/45] KVM: PPC: Move kvm_vcpu_init() invocation to common code
-Date: Mon, 21 Oct 2019 18:58:55 -0700
-Message-Id: <20191022015925.31916-16-sean.j.christopherson@intel.com>
+Subject: [PATCH 18/45] KVM: PPC: Drop kvm_arch_vcpu_free()
+Date: Mon, 21 Oct 2019 18:58:58 -0700
+Message-Id: <20191022015925.31916-19-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
@@ -81,295 +81,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the kvm_cpu_{un}init() calls to common PPC code as an intermediate
-step towards removing kvm_cpu_{un}init() altogether.
-
-No functional change intended.
+Remove the superfluous kvm_arch_vcpu_free() as it is no longer called
+from commmon KVM code.  Note, kvm_arch_vcpu_destroy() *is* called from
+common code, i.e. choosing which function to whack is not completely
+arbitrary.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/include/asm/kvm_ppc.h |  3 +--
- arch/powerpc/kvm/book3s.c          |  5 ++---
- arch/powerpc/kvm/book3s_hv.c       | 17 ++++++-----------
- arch/powerpc/kvm/book3s_pr.c       | 13 +++----------
- arch/powerpc/kvm/booke.c           |  5 ++---
- arch/powerpc/kvm/e500.c            | 16 +++-------------
- arch/powerpc/kvm/e500mc.c          |  8 ++------
- arch/powerpc/kvm/powerpc.c         | 10 +++++++++-
- 8 files changed, 28 insertions(+), 49 deletions(-)
+ arch/powerpc/kvm/powerpc.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index a7795339df92..d84f273ea574 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -119,8 +119,7 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
- 			enum xlate_instdata xlid, enum xlate_readwrite xlrw,
- 			struct kvmppc_pte *pte);
- 
--extern int kvmppc_core_vcpu_create(struct kvm *kvm, struct kvm_vcpu *vcpu,
--				   unsigned int id);
-+extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
- extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
- extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
- extern int kvmppc_core_check_processor_compat(void);
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 241ae3e114d2..fd049ede2487 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -814,10 +814,9 @@ void kvmppc_decrementer_func(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_kick(vcpu);
- }
- 
--int kvmppc_core_vcpu_create(struct kvm *kvm, struct kvm_vcpu *vcpu,
--			    unsigned int id)
-+int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
- {
--	return kvm->arch.kvm_ops->vcpu_create(kvm, vcpu, id);
-+	return kvm->arch.kvm_ops->vcpu_create(vcpu);
- }
- 
- void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 103a7599c2d1..ecc0895fd76f 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2257,16 +2257,16 @@ static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
- }
- #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
- 
--static int kvmppc_core_vcpu_create_hv(struct kvm *kvm, struct kvm_vcpu *vcpu,
--				      unsigned int id)
-+static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
- {
- 	int err;
- 	int core;
- 	struct kvmppc_vcore *vcore;
-+	struct kvm *kvm;
-+	unsigned int id;
- 
--	err = kvm_vcpu_init(vcpu, kvm, id);
--	if (err)
--		return err;
-+	kvm = vcpu->kvm;
-+	id = vcpu->vcpu_id;
- 
- 	vcpu->arch.shared = &vcpu->arch.shregs;
- #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
-@@ -2348,7 +2348,7 @@ static int kvmppc_core_vcpu_create_hv(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	mutex_unlock(&kvm->lock);
- 
- 	if (!vcore)
--		goto uninit_vcpu;
-+		return err;
- 
- 	spin_lock(&vcore->lock);
- 	++vcore->num_threads;
-@@ -2364,10 +2364,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	debugfs_vcpu_init(vcpu, id);
- 
- 	return 0;
--
--uninit_vcpu:
--	kvm_vcpu_uninit(vcpu);
--	return err;
- }
- 
- static int kvmhv_set_smt_mode(struct kvm *kvm, unsigned long smt_mode,
-@@ -2421,7 +2417,6 @@ static void kvmppc_core_vcpu_free_hv(struct kvm_vcpu *vcpu)
- 	unpin_vpa(vcpu->kvm, &vcpu->arch.slb_shadow);
- 	unpin_vpa(vcpu->kvm, &vcpu->arch.vpa);
- 	spin_unlock(&vcpu->arch.vpa_update_lock);
--	kvm_vcpu_uninit(vcpu);
- }
- 
- static int kvmppc_core_check_requests_hv(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-index a933ba60bc7c..12f23f0c4ece 100644
---- a/arch/powerpc/kvm/book3s_pr.c
-+++ b/arch/powerpc/kvm/book3s_pr.c
-@@ -1708,22 +1708,17 @@ static int kvmppc_set_one_reg_pr(struct kvm_vcpu *vcpu, u64 id,
- 	return r;
- }
- 
--static int kvmppc_core_vcpu_create_pr(struct kvm *kvm, struct kvm_vcpu *vcpu,
--				      unsigned int id)
-+static int kvmppc_core_vcpu_create_pr(struct kvm_vcpu *vcpu)
- {
- 	struct kvmppc_vcpu_book3s *vcpu_book3s;
- 	unsigned long p;
- 	int err;
- 
--	err = kvm_vcpu_init(vcpu, kvm, id);
--	if (err)
--		return err;
--
- 	err = -ENOMEM;
- 
- 	vcpu_book3s = vzalloc(sizeof(struct kvmppc_vcpu_book3s));
- 	if (!vcpu_book3s)
--		goto uninit_vcpu;
-+		goto out;
- 	vcpu->arch.book3s = vcpu_book3s;
- 
- #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
-@@ -1777,8 +1772,7 @@ static int kvmppc_core_vcpu_create_pr(struct kvm *kvm, struct kvm_vcpu *vcpu,
- free_vcpu3s:
- #endif
- 	vfree(vcpu_book3s);
--uninit_vcpu:
--	kvm_vcpu_uninit(vcpu);
-+out:
- 	return err;
- }
- 
-@@ -1787,7 +1781,6 @@ static void kvmppc_core_vcpu_free_pr(struct kvm_vcpu *vcpu)
- 	struct kvmppc_vcpu_book3s *vcpu_book3s = to_book3s(vcpu);
- 
- 	free_page((unsigned long)vcpu->arch.shared & PAGE_MASK);
--	kvm_vcpu_uninit(vcpu);
- #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
- 	kfree(vcpu->arch.shadow_vcpu);
- #endif
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 047c9f707704..dd7440e50c7a 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -2114,10 +2114,9 @@ int kvmppc_core_init_vm(struct kvm *kvm)
- 	return kvm->arch.kvm_ops->init_vm(kvm);
- }
- 
--int kvmppc_core_vcpu_create(struct kvm *kvm, struct kvm_vcpu *vcpu,
--			    unsigned int id)
-+int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu)
- {
--	return kvm->arch.kvm_ops->vcpu_create(kvm, vcpu, id);
-+	return kvm->arch.kvm_ops->vcpu_create(vcpu);
- }
- 
- void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-index 96d9cde3d2e3..942bfaa2d1d0 100644
---- a/arch/powerpc/kvm/e500.c
-+++ b/arch/powerpc/kvm/e500.c
-@@ -433,8 +433,7 @@ static int kvmppc_set_one_reg_e500(struct kvm_vcpu *vcpu, u64 id,
- 	return r;
- }
- 
--static int kvmppc_core_vcpu_create_e500(struct kvm *kvm, struct kvm_vcpu *vcpu,
--					unsigned int id)
-+static int kvmppc_core_vcpu_create_e500(struct kvm_vcpu *vcpu)
- {
- 	struct kvmppc_vcpu_e500 *vcpu_e500;
- 	int err;
-@@ -442,14 +441,8 @@ static int kvmppc_core_vcpu_create_e500(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	BUILD_BUG_ON(offsetof(struct kvmppc_vcpu_e500, vcpu) != 0);
- 	vcpu_e500 = to_e500(vcpu);
- 
--	err = kvm_vcpu_init(vcpu, kvm, id);
--	if (err)
--		return err;
--
--	if (kvmppc_e500_id_table_alloc(vcpu_e500) == NULL) {
--		err = -ENOMEM;
--		goto uninit_vcpu;
--	}
-+	if (kvmppc_e500_id_table_alloc(vcpu_e500) == NULL)
-+		return -ENOMEM;
- 
- 	err = kvmppc_e500_tlb_init(vcpu_e500);
- 	if (err)
-@@ -467,8 +460,6 @@ static int kvmppc_core_vcpu_create_e500(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	kvmppc_e500_tlb_uninit(vcpu_e500);
- uninit_id:
- 	kvmppc_e500_id_table_free(vcpu_e500);
--uninit_vcpu:
--	kvm_vcpu_uninit(vcpu);
- 	return err;
- }
- 
-@@ -479,7 +470,6 @@ static void kvmppc_core_vcpu_free_e500(struct kvm_vcpu *vcpu)
- 	free_page((unsigned long)vcpu->arch.shared);
- 	kvmppc_e500_tlb_uninit(vcpu_e500);
- 	kvmppc_e500_id_table_free(vcpu_e500);
--	kvm_vcpu_uninit(vcpu);
- }
- 
- static int kvmppc_core_init_vm_e500(struct kvm *kvm)
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index f2902e612150..3b37957fbfe5 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -301,8 +301,7 @@ static int kvmppc_set_one_reg_e500mc(struct kvm_vcpu *vcpu, u64 id,
- 	return r;
- }
- 
--static int kvmppc_core_vcpu_create_e500mc(struct kvm *kvm, struct kvm_vcpu *vcpu,
--					  unsigned int id)
-+static int kvmppc_core_vcpu_create_e500mc(struct kvm_vcpu *vcpu)
- {
- 	struct kvmppc_vcpu_e500 *vcpu_e500;
- 	int err;
-@@ -319,7 +318,7 @@ static int kvmppc_core_vcpu_create_e500mc(struct kvm *kvm, struct kvm_vcpu *vcpu
- 
- 	err = kvmppc_e500_tlb_init(vcpu_e500);
- 	if (err)
--		goto uninit_vcpu;
-+		return err;
- 
- 	vcpu->arch.shared = (void *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
- 	if (!vcpu->arch.shared) {
-@@ -331,8 +330,6 @@ static int kvmppc_core_vcpu_create_e500mc(struct kvm *kvm, struct kvm_vcpu *vcpu
- 
- uninit_tlb:
- 	kvmppc_e500_tlb_uninit(vcpu_e500);
--uninit_vcpu:
--	kvm_vcpu_uninit(vcpu);
- 	return err;
- }
- 
-@@ -342,7 +339,6 @@ static void kvmppc_core_vcpu_free_e500mc(struct kvm_vcpu *vcpu)
- 
- 	free_page((unsigned long)vcpu->arch.shared);
- 	kvmppc_e500_tlb_uninit(vcpu_e500);
--	kvm_vcpu_uninit(vcpu);
- }
- 
- static int kvmppc_core_init_vm_e500mc(struct kvm *kvm)
 diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 1d9997ad2795..2bc5e9f592aa 100644
+index 2bc5e9f592aa..2cdc443cc09b 100644
 --- a/arch/powerpc/kvm/powerpc.c
 +++ b/arch/powerpc/kvm/powerpc.c
-@@ -725,14 +725,20 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id)
- 	if (!vcpu)
- 		return ERR_PTR(-ENOMEM);
+@@ -473,7 +473,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ #endif
  
--	err = kvmppc_core_vcpu_create(kvm, vcpu, id);
-+	err = kvm_vcpu_init(vcpu, kvm, id);
- 	if (err)
- 		goto free_vcpu;
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+-		kvm_arch_vcpu_free(vcpu);
++		kvm_arch_vcpu_destroy(vcpu);
  
-+	err = kvmppc_core_vcpu_create(vcpu);
-+	if (err)
-+		goto uninit_vcpu;
-+
- 	vcpu->arch.wqp = &vcpu->wq;
- 	kvmppc_create_vcpu_debugfs(vcpu, id);
- 	return vcpu;
+ 	mutex_lock(&kvm->lock);
+ 	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
+@@ -748,7 +748,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ {
+ }
  
-+uninit_vcpu:
-+	kvm_vcpu_uninit(vcpu);
- free_vcpu:
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- 	return ERR_PTR(err);
-@@ -766,6 +772,8 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 
- 	kvmppc_core_vcpu_free(vcpu);
- 
-+	kvm_vcpu_uninit(vcpu);
-+
+-void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
++void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	/* Make sure we're not using the vcpu anymore */
+ 	hrtimer_cancel(&vcpu->arch.dec_timer);
+@@ -777,11 +777,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
  	kmem_cache_free(kvm_vcpu_cache, vcpu);
  }
  
+-void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+-{
+-	kvm_arch_vcpu_free(vcpu);
+-}
+-
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ {
+ 	return kvmppc_core_pending_dec(vcpu);
 -- 
 2.22.0
 
