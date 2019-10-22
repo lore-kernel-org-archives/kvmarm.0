@@ -2,64 +2,96 @@ Return-Path: <SRS0=LXG2=YP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EA0CA9EA0
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 12:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1821CA9EB7
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 467AC21783
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 12:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 467AC21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 719C921872
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719C921872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7DF84A9A1;
-	Tue, 22 Oct 2019 08:44:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E294A95D;
+	Tue, 22 Oct 2019 09:59:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PrjNlfKGwfyr; Tue, 22 Oct 2019 08:44:53 -0400 (EDT)
+	with ESMTP id o2baxMGCJlcK; Tue, 22 Oct 2019 09:59:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8196C4A98B;
-	Tue, 22 Oct 2019 08:44:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C044A987;
+	Tue, 22 Oct 2019 09:59:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D21B4A989
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 08:44:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 996484A981
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 09:59:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1-e0l807gJXc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Oct 2019 08:44:51 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E143A4A960
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 08:44:50 -0400 (EDT)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1iMtWo-0006QL-Cu; Tue, 22 Oct 2019 14:44:46 +0200
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] irqchip/gic-v3-its: Use the exact ITSList for VMOVP
-X-PHP-Originating-Script: 0:main.inc
+ with ESMTP id sIDIryZfp1lI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Oct 2019 09:59:28 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60D0B4A95D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 09:59:28 -0400 (EDT)
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4FF92C057F20
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 13:59:27 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z5so4486683wma.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 06:59:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Dlx0qR6qGoizUuI3jCS47jEOZVwYOv8dJ62/TjyH9Xs=;
+ b=VzhoNOZ5S54KQgwmRC3dU2aMKeyjeMo9GH/WaLk6dVc1YotepGpGGE41X7mZxtU+6k
+ sxCPWhd2AGw55w+l1A+Al3j8RIUXJ6QwfgdhOhrK7AeERX7hAfFA4ivary0rNiCHNvY6
+ /Sc8RZCHTj2+5oLwnSQeiy4gbtCi+tlZUwvJA+5AvY1gKMZYN+0MIcA4Xco533kHM4ys
+ E2V6l0fk2wh98gsD/ZFqDepYdyWpbIL26Aoean86cRHje5pixT4N7zQyoajZvc/Vrjg0
+ E5kqLVoT2Z0UK9psrUGX10Qm77bsJew7/G8SWHNutswV0EbJyg4s6BXO127RfuiFnq5E
+ zy9g==
+X-Gm-Message-State: APjAAAV+EM3PKwgbhsJ/+rYBVcRA1KSgx07E/gRcX4y7RI5MTAxqgpCj
+ ydNSwEbONsdE0ZFWJtVODGHl3eOEuHsNV2gygyZssrTsNF/Vvp88Poxc3Opuk5Db1we7miymeym
+ obfE+z8svu7Xes8RucTg7n4rR
+X-Received: by 2002:adf:9ec7:: with SMTP id b7mr3690745wrf.221.1571752765741; 
+ Tue, 22 Oct 2019 06:59:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzzdoYw58nkYxoG/VDS1/LYhdqcebVxQ/IRP7wL/K4uxfwmYmVxn6Yd5KXoTPuPOxmY6ROAMw==
+X-Received: by 2002:adf:9ec7:: with SMTP id b7mr3690694wrf.221.1571752765319; 
+ Tue, 22 Oct 2019 06:59:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19?
+ ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
+ by smtp.gmail.com with ESMTPSA id l14sm2833445wrr.37.2019.10.22.06.59.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 22 Oct 2019 06:59:24 -0700 (PDT)
+Subject: Re: [PATCH v2 00/15] KVM: Dynamically size memslot arrays
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
+ <rkrcmar@redhat.com>, Marc Zyngier <maz@kernel.org>
+References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <15624ac3-6a43-29c8-8d07-23779454f9e6@redhat.com>
+Date: Tue, 22 Oct 2019 15:59:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Date: Tue, 22 Oct 2019 13:44:46 +0100
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <1571742366-21008-1-git-send-email-yuzenghui@huawei.com>
-References: <1571742366-21008-1-git-send-email-yuzenghui@huawei.com>
-Message-ID: <34e9236f057b22d49f40146b21f81282@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, tglx@linutronix.de,
- jason@lakedaemon.net, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, wanghaibin.wang@huawei.com,
- jiayanlei@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: jason@lakedaemon.net, jiayanlei@huawei.com, tglx@linutronix.de,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+Content-Language: en-US
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,120 +103,80 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
+On 22/10/19 02:35, Sean Christopherson wrote:
+> The end goal of this series is to dynamically size the memslot array so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+> the memory footprint from 90k to ~2.6k bytes.
+> 
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 12/13 and 13/13.  Patches 1-11
+> clean up the memslot code, which has gotten quite crusy, especially
+> __kvm_set_memory_region().  The clean up is likely not strictly necessary
+> to switch to dynamic sizing, but I didn't have a remotely reasonable
+> level of confidence in the correctness of the dynamic sizing without first
+> doing the clean up.
+> 
+> Testing, especially non-x86 platforms, would be greatly appreciated.  The
+> non-x86 changes are for all intents and purposes untested, e.g. I compile
+> tested pieces of the code by copying them into x86, but that's it.  In
+> theory, the vast majority of the functional changes are arch agnostic, in
+> theory...
+> 
+> v2:
+>   - Split "Drop kvm_arch_create_memslot()" into three patches to move
+>     minor functional changes to standalone patches [Janosch].
+>   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
+>   - Collect an Acked-by and a Reviewed-by
+> 
+> Sean Christopherson (15):
+>   KVM: Reinstall old memslots if arch preparation fails
+>   KVM: Don't free new memslot if allocation of said memslot fails
+>   KVM: PPC: Move memslot memory allocation into prepare_memory_region()
+>   KVM: x86: Allocate memslot resources during prepare_memory_region()
+>   KVM: Drop kvm_arch_create_memslot()
+>   KVM: Explicitly free allocated-but-unused dirty bitmap
+>   KVM: Refactor error handling for setting memory region
+>   KVM: Move setting of memslot into helper routine
+>   KVM: Move memslot deletion to helper function
+>   KVM: Simplify kvm_free_memslot() and all its descendents
+>   KVM: Clean up local variable usage in __kvm_set_memory_region()
+>   KVM: Provide common implementation for generic dirty log functions
+>   KVM: Ensure validity of memslot with respect to kvm_get_dirty_log()
+>   KVM: Terminate memslot walks via used_slots
+>   KVM: Dynamically size memslot array based on number of used slots
+> 
+>  arch/mips/include/asm/kvm_host.h      |   2 +-
+>  arch/mips/kvm/mips.c                  |  68 +---
+>  arch/powerpc/include/asm/kvm_ppc.h    |  14 +-
+>  arch/powerpc/kvm/book3s.c             |  22 +-
+>  arch/powerpc/kvm/book3s_hv.c          |  36 +-
+>  arch/powerpc/kvm/book3s_pr.c          |  20 +-
+>  arch/powerpc/kvm/booke.c              |  17 +-
+>  arch/powerpc/kvm/powerpc.c            |  13 +-
+>  arch/s390/include/asm/kvm_host.h      |   2 +-
+>  arch/s390/kvm/kvm-s390.c              |  21 +-
+>  arch/x86/include/asm/kvm_page_track.h |   3 +-
+>  arch/x86/kvm/page_track.c             |  15 +-
+>  arch/x86/kvm/x86.c                    | 100 ++---
+>  include/linux/kvm_host.h              |  48 +--
+>  virt/kvm/arm/arm.c                    |  47 +--
+>  virt/kvm/arm/mmu.c                    |  18 +-
+>  virt/kvm/kvm_main.c                   | 546 ++++++++++++++++----------
+>  17 files changed, 467 insertions(+), 525 deletions(-)
+> 
 
-On 2019-10-22 12:06, Zenghui Yu wrote:
-> On a system without Single VMOVP support (say GITS_TYPER.VMOVP == 0),
-> we will map vPEs only on ITSs that will actually control interrupts
-> for the given VM.  And when moving a vPE, the VMOVP command will be
-> issued only for those ITSs.
->
-> But when issuing VMOVPs we seemed fail to present the exact ITSList
-> to ITSs who are actually included in the synchronization operation.
-> The its_list_map we're currently using includes all ITSs in the 
-> system,
-> even though some of them don't have the corrsponding vPE mapping at 
-> all.
->
-> Introduce get_its_list() to get the per-VM its_list_map, to indicate
-> which ITSs have vPE mappings for the given VM, and use this map as
-> the expected ITSList when building VMOVP.
->
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->
-> I haven't seen any broken with the current its_list_map, but behavior
-> might differ between implementations.  Let's do what the spec expects
-> us to do and try not to confuse the implementation.  Or is there any
-> points I've missed?
-
-No, I think you're right, and this is just an oversight on my part:
-for example, we seem to do the right thing when handling a guest 
-invall,
-where we scan the ITS nodes and only emit a vinvall on an ITS that
-has VLPI mapped in.
-
-I don't think this is likely to cause any harm (after all, a DISCARD 
-and
-a VMOVP could race at any time), but it is certainly a performance gain
-not to throw extra commands at unsuspecting ITSs. So thanks for 
-spotting this.
-
-A couple of comments below:
-
->
->  drivers/irqchip/irq-gic-v3-its.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index c81da27044bf..eebee588ea30 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -175,6 +175,19 @@ static DEFINE_IDA(its_vpeid_ida);
->  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
->  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + 
-> SZ_128K)
->
-> +static inline u16 get_its_list(struct its_vm *vm)
-
-Please drop the inline, the compiler will do it for you.
-
-> +{
-> +	struct its_node *its;
-> +	unsigned long its_list;
-> +
-> +	list_for_each_entry(its, &its_nodes, entry) {
-
-You probably want to skip non v4 ITSs, as they don't have a list_nr 
-associated
-to them (and you'd probably end-up hitting ITS #0 for no good reason).
-
-> +		if (vm->vlpi_count[its->list_nr])
-> +			set_bit(its->list_nr, &its_list);
-
-We don't need to be atomic here, so __set_bit would be just as fine.
-
-> +	}
-> +
-> +	return (u16)its_list;
-> +}
-> +
->  static struct its_collection *dev_event_to_col(struct its_device 
-> *its_dev,
->  					       u32 event)
->  {
-> @@ -982,7 +995,6 @@ static void its_send_vmovp(struct its_vpe *vpe)
->  	int col_id = vpe->col_idx;
->
->  	desc.its_vmovp_cmd.vpe = vpe;
-> -	desc.its_vmovp_cmd.its_list = (u16)its_list_map;
-
-Careful here, you're leaving the its_list field uninitialized, and it
-really should be 0 when GITS_TYPER.VMOVP == 1 (i.e. when its_list_map
-is zero). Just initialize the whole descriptor to zero.
->
->  	if (!its_list_map) {
->  		its = list_first_entry(&its_nodes, struct its_node, entry);
-> @@ -1003,6 +1015,7 @@ static void its_send_vmovp(struct its_vpe *vpe)
->  	raw_spin_lock_irqsave(&vmovp_lock, flags);
->
->  	desc.its_vmovp_cmd.seq_num = vmovp_seq_num++;
-> +	desc.its_vmovp_cmd.its_list = get_its_list(vpe->its_vm);
->
->  	/* Emit VMOVPs */
->  	list_for_each_entry(its, &its_nodes, entry) {
+Christian, Marc, Paul, can you help testing patches 1-13?
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
