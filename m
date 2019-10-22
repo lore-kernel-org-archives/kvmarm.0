@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5BCCA9EB7
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 02:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D294CA9EAF
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 02:00:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1362A2084C
+	by mail.kernel.org (Postfix) with ESMTP id CCF962173B
 	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 02:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1362A2084C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCF962173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A914AA10;
-	Mon, 21 Oct 2019 22:00:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 824994AC42;
+	Mon, 21 Oct 2019 22:00:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q+Y7vv2yS2qY; Mon, 21 Oct 2019 22:00:19 -0400 (EDT)
+	with ESMTP id JSmgMxeMgWqK; Mon, 21 Oct 2019 22:00:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBF124AC5B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D600F4AC8D;
 	Mon, 21 Oct 2019 22:00:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 624034AC3F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CD2B4A9C8
  for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 22:00:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GQZJ4vIJf1Jy for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id u+4VSbJz5xEu for <kvmarm@lists.cs.columbia.edu>;
  Mon, 21 Oct 2019 22:00:06 -0400 (EDT)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 492D24AC31
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 796834AC6B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 21:59:56 -0400 (EDT)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Oct 2019 18:59:57 -0700
+ 21 Oct 2019 18:59:56 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="196293886"
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="196293883"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
- by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:56 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:55 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 34/45] KVM: MIPS: Move .vcpu_setup() call to
+Subject: [PATCH 33/45] KVM: x86: Move guts of kvm_arch_vcpu_setup() into
  kvm_arch_vcpu_create()
-Date: Mon, 21 Oct 2019 18:59:14 -0700
-Message-Id: <20191022015925.31916-35-sean.j.christopherson@intel.com>
+Date: Mon, 21 Oct 2019 18:59:13 -0700
+Message-Id: <20191022015925.31916-34-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
@@ -84,48 +84,45 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Fold setup() into create() now that the two are called back-to-back by
 common KVM code.  This paves the way for removing kvm_arch_vcpu_setup().
-Note, there is no unwind function associated with kvm_arch_vcpu_setup(),
-i.e. no teardown path that also needs to be moved.
-
-No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/mips/kvm/mips.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 92c9321b3f95..b3a4435af66b 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -386,8 +386,15 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.last_sched_cpu = -1;
- 	vcpu->arch.last_exec_cpu = -1;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4d0cc3c9432f..dbb939bd4949 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9021,11 +9021,12 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
  
-+	/* Initial guest state */
-+	err = kvm_mips_callbacks->vcpu_setup(vcpu);
-+	if (err)
-+		goto out_free_commpage;
-+
- 	return 0;
- 
-+out_free_commpage:
-+	kfree(vcpu->arch.kseg0_commpage);
- out_free_gebase:
- 	kfree(gebase);
- out:
-@@ -1237,10 +1244,9 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--/* Initial guest state */
- int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
  {
--	return kvm_mips_callbacks->vcpu_setup(vcpu);
-+	return 0;
+-	return kvm_x86_ops->vcpu_create(vcpu);
+-}
++	int ret;
++
++	ret = kvm_x86_ops->vcpu_create(vcpu);
++	if (ret)
++		return ret;
+ 
+-int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+-{
+ 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+ 	kvm_vcpu_mtrr_init(vcpu);
+@@ -9036,6 +9037,11 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
- static void kvm_mips_set_c0_status(void)
++int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++
+ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ {
+ 	struct msr_data msr;
 -- 
 2.22.0
 
