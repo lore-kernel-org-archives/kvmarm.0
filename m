@@ -1,88 +1,71 @@
-Return-Path: <SRS0=mQ94=YO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=LXG2=YP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82964CA9EAF
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 20:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FE1CA9EB7
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 00:35:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F0F9E2067B
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Oct 2019 20:21:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IJE0YtQ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F9E2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	by mail.kernel.org (Postfix) with ESMTP id D5269214B2
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 00:35:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5269214B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 619544A9EE;
-	Mon, 21 Oct 2019 16:21:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 458844A9DA;
+	Mon, 21 Oct 2019 20:35:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QUtZSbnMt39f; Mon, 21 Oct 2019 16:21:25 -0400 (EDT)
+	with ESMTP id n0fvbQmF4IlT; Mon, 21 Oct 2019 20:35:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5330E4A947;
-	Mon, 21 Oct 2019 16:21:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0084A9EF;
+	Mon, 21 Oct 2019 20:35:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23A854A854
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 16:21:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 631D64A9CB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 20:35:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3v1jIzUHWli7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Oct 2019 16:21:23 -0400 (EDT)
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02B174A80E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 16:21:22 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1571689282; x=1603225282;
- h=subject:to:cc:references:from:message-id:date:
- mime-version:in-reply-to:content-transfer-encoding;
- bh=//AVD64BG2EXBrwZcTZzGcKkjD8j4/kb8bB+DMg9IjA=;
- b=IJE0YtQ21++KkqMkOGzew5EOikZV5QSNAK+5DqgEX2u6AsQVchwFxMjJ
- 7HdrHqBXDzFPcLU3oOqzCtKsRpIhBBWQjSgq3Z1oxJISS9QsW+RermiYa
- TkUoNVVPTy6AdhAavXGCuBb3XOpt7xQ9V0yAEMpxSFa+ifbOsZbTgrvlE U=;
-X-IronPort-AV: E=Sophos;i="5.67,324,1566864000"; d="scan'208";a="425612074"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-1d-f273de60.us-east-1.amazon.com) ([10.124.125.6])
- by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
- 21 Oct 2019 20:21:21 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
- by email-inbound-relay-1d-f273de60.us-east-1.amazon.com (Postfix) with ESMTPS
- id D30B5A243E; Mon, 21 Oct 2019 20:21:17 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 21 Oct 2019 20:21:17 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.8) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 21 Oct 2019 20:21:12 +0000
-Subject: Re: [PATCH v3 2/2] KVM: arm/arm64: Allow user injection of external
- data aborts
-To: Christoffer Dall <christoffer.dall@arm.com>, <kvmarm@lists.cs.columbia.edu>
-References: <20191011110709.2764-1-christoffer.dall@arm.com>
- <20191011110709.2764-3-christoffer.dall@arm.com>
-From: Alexander Graf <graf@amazon.com>
-Message-ID: <26fb84dc-17c8-355e-b88b-e6e0b332998b@amazon.com>
-Date: Mon, 21 Oct 2019 22:21:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
+ with ESMTP id dyzrrc2NO97P for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Oct 2019 20:35:41 -0400 (EDT)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E6FF4A99D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Oct 2019 20:35:41 -0400 (EDT)
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Oct 2019 17:35:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; d="scan'208";a="348897201"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+ by orsmga004.jf.intel.com with ESMTP; 21 Oct 2019 17:35:38 -0700
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+ Marc Zyngier <maz@kernel.org>
+Subject: [PATCH v2 02/15] KVM: Don't free new memslot if allocation of said
+ memslot fails
+Date: Mon, 21 Oct 2019 17:35:24 -0700
+Message-Id: <20191022003537.13013-3-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191011110709.2764-3-christoffer.dall@arm.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.8]
-X-ClientProxiedBy: EX13D29UWC002.ant.amazon.com (10.43.162.254) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Heinrich
- Schuchardt <xypron.glpk@gmx.de>, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,43 +77,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+The two implementations of kvm_arch_create_memslot() in x86 and PPC are
+both good citizens and free up all local resources if creation fails.
+Return immediately (via a superfluous goto) instead of calling
+kvm_free_memslot().
 
+Note, the call to kvm_free_memslot() is effectively an expensive nop in
+this case as there are no resources to be freed.
 
-On 11.10.19 13:07, Christoffer Dall wrote:
-> In some scenarios, such as buggy guest or incorrect configuration of the
-> VMM and firmware description data, userspace will detect a memory access
-> to a portion of the IPA, which is not mapped to any MMIO region.
-> 
-> For this purpose, the appropriate action is to inject an external abort
-> to the guest.  The kernel already has functionality to inject an
-> external abort, but we need to wire up a signal from user space that
-> lets user space tell the kernel to do this.
-> 
-> It turns out, we already have the set event functionality which we can
-> perfectly reuse for this.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+No functional change intended.
 
-Reviewed-by: Alexander Graf <graf@amazon.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9afd706dc038..2cb38b2148cb 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1014,7 +1014,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		new.userspace_addr = mem->userspace_addr;
+ 
+ 		if (kvm_arch_create_memslot(kvm, &new, npages))
+-			goto out_free;
++			goto out;
+ 	}
+ 
+ 	/* Allocate page dirty bitmap if needed */
+-- 
+2.22.0
 
 _______________________________________________
 kvmarm mailing list
