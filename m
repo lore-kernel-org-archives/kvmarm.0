@@ -2,94 +2,93 @@ Return-Path: <SRS0=LXG2=YP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1821CA9EB7
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B9FCA9EA0
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 14:04:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 719C921872
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 13:59:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719C921872
+	by mail.kernel.org (Postfix) with ESMTP id E8B3A21783
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Oct 2019 14:04:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8B3A21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E294A95D;
-	Tue, 22 Oct 2019 09:59:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C3604A990;
+	Tue, 22 Oct 2019 10:04:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o2baxMGCJlcK; Tue, 22 Oct 2019 09:59:30 -0400 (EDT)
+	with ESMTP id L0xlb0jJMEQE; Tue, 22 Oct 2019 10:04:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C044A987;
-	Tue, 22 Oct 2019 09:59:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6254A96B;
+	Tue, 22 Oct 2019 10:04:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 996484A981
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 09:59:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 370684A96B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 10:04:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sIDIryZfp1lI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Oct 2019 09:59:28 -0400 (EDT)
+ with ESMTP id YJiGiIimkfqg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Oct 2019 10:04:22 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60D0B4A95D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 09:59:28 -0400 (EDT)
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45DDB4A960
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 10:04:22 -0400 (EDT)
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4FF92C057F20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 13:59:27 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id z5so4486683wma.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 06:59:27 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7068C5117D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 14:04:21 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id i10so1124694wrp.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Oct 2019 07:04:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Dlx0qR6qGoizUuI3jCS47jEOZVwYOv8dJ62/TjyH9Xs=;
- b=VzhoNOZ5S54KQgwmRC3dU2aMKeyjeMo9GH/WaLk6dVc1YotepGpGGE41X7mZxtU+6k
- sxCPWhd2AGw55w+l1A+Al3j8RIUXJ6QwfgdhOhrK7AeERX7hAfFA4ivary0rNiCHNvY6
- /Sc8RZCHTj2+5oLwnSQeiy4gbtCi+tlZUwvJA+5AvY1gKMZYN+0MIcA4Xco533kHM4ys
- E2V6l0fk2wh98gsD/ZFqDepYdyWpbIL26Aoean86cRHje5pixT4N7zQyoajZvc/Vrjg0
- E5kqLVoT2Z0UK9psrUGX10Qm77bsJew7/G8SWHNutswV0EbJyg4s6BXO127RfuiFnq5E
- zy9g==
-X-Gm-Message-State: APjAAAV+EM3PKwgbhsJ/+rYBVcRA1KSgx07E/gRcX4y7RI5MTAxqgpCj
- ydNSwEbONsdE0ZFWJtVODGHl3eOEuHsNV2gygyZssrTsNF/Vvp88Poxc3Opuk5Db1we7miymeym
- obfE+z8svu7Xes8RucTg7n4rR
-X-Received: by 2002:adf:9ec7:: with SMTP id b7mr3690745wrf.221.1571752765741; 
- Tue, 22 Oct 2019 06:59:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzzdoYw58nkYxoG/VDS1/LYhdqcebVxQ/IRP7wL/K4uxfwmYmVxn6Yd5KXoTPuPOxmY6ROAMw==
-X-Received: by 2002:adf:9ec7:: with SMTP id b7mr3690694wrf.221.1571752765319; 
- Tue, 22 Oct 2019 06:59:25 -0700 (PDT)
+ bh=cI7ihz+0OXiuq2sxX+N5cJBmKtQum9zSe4e7C6PdS6E=;
+ b=NlOzXLpcEPzvDeLlgu8P16M7P+8uhfebTa2nnJaziMJ39W7unMLy8IJiZwGoYQJM38
+ ZYzHd262InqFKOtsdei9lHArvq42XzqVLz4HvMXJlqGjxEoxK70HC+W+CV3vRn4541cy
+ CUKT/xiVX3gGmq/UKK0RbLQ9eA0CxwgYjmAzU34I3bdrkDEiScly9PuaG71+5RpthFjf
+ Zs0MT1FifzBUCyjFaeP2Mrrv7xRq+KZdrhuNooZayYMzXNBlC+VBZJYLz8MJumagm7e8
+ UErQMYzzESah74/IPw2B4kI1IE4pxQWwjLmvKqsV4BlSab+JSpzgPKB6GFj0DgNupyE6
+ f3pg==
+X-Gm-Message-State: APjAAAU9S9I4vK5eovFPzBFMD+FBkRR/4VFgtCKRE5zl7jtdYRSeE7G+
+ 7u1Rtiy7ZC53CIMD5SSZAHJiWTs0DX+uoGOP6QFozVrW5Pinz62HzdSGrphRTxsSUYjDPlL9zUE
+ Uf+qKh624pYF+NGbDvkpoEKC5
+X-Received: by 2002:a1c:4c02:: with SMTP id z2mr1302169wmf.78.1571753060071;
+ Tue, 22 Oct 2019 07:04:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzBB+WAq2KC5VOJdeNtgubd6CTAxDm0c28bIfc4NXYNFYsicJIJc7CEyPBTiO7yZbxm83G9Ow==
+X-Received: by 2002:a1c:4c02:: with SMTP id z2mr1302127wmf.78.1571753059747;
+ Tue, 22 Oct 2019 07:04:19 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19?
  ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
- by smtp.gmail.com with ESMTPSA id l14sm2833445wrr.37.2019.10.22.06.59.23
+ by smtp.gmail.com with ESMTPSA id p17sm14939972wrn.4.2019.10.22.07.04.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 22 Oct 2019 06:59:24 -0700 (PDT)
-Subject: Re: [PATCH v2 00/15] KVM: Dynamically size memslot arrays
+ Tue, 22 Oct 2019 07:04:19 -0700 (PDT)
+Subject: Re: [PATCH v2 14/15] KVM: Terminate memslot walks via used_slots
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
  James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
  <rkrcmar@redhat.com>, Marc Zyngier <maz@kernel.org>
 References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+ <20191022003537.13013-15-sean.j.christopherson@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <15624ac3-6a43-29c8-8d07-23779454f9e6@redhat.com>
-Date: Tue, 22 Oct 2019 15:59:23 +0200
+Message-ID: <642f73ee-9425-0149-f4f4-f56be9ae5713@redhat.com>
+Date: Tue, 22 Oct 2019 16:04:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20191022003537.13013-15-sean.j.christopherson@intel.com>
 Content-Language: en-US
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
  kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -109,74 +108,37 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 22/10/19 02:35, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
-> the memory footprint from 90k to ~2.6k bytes.
-> 
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 12/13 and 13/13.  Patches 1-11
-> clean up the memslot code, which has gotten quite crusy, especially
-> __kvm_set_memory_region().  The clean up is likely not strictly necessary
-> to switch to dynamic sizing, but I didn't have a remotely reasonable
-> level of confidence in the correctness of the dynamic sizing without first
-> doing the clean up.
-> 
-> Testing, especially non-x86 platforms, would be greatly appreciated.  The
-> non-x86 changes are for all intents and purposes untested, e.g. I compile
-> tested pieces of the code by copying them into x86, but that's it.  In
-> theory, the vast majority of the functional changes are arch agnostic, in
-> theory...
-> 
-> v2:
->   - Split "Drop kvm_arch_create_memslot()" into three patches to move
->     minor functional changes to standalone patches [Janosch].
->   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
->   - Collect an Acked-by and a Reviewed-by
-> 
-> Sean Christopherson (15):
->   KVM: Reinstall old memslots if arch preparation fails
->   KVM: Don't free new memslot if allocation of said memslot fails
->   KVM: PPC: Move memslot memory allocation into prepare_memory_region()
->   KVM: x86: Allocate memslot resources during prepare_memory_region()
->   KVM: Drop kvm_arch_create_memslot()
->   KVM: Explicitly free allocated-but-unused dirty bitmap
->   KVM: Refactor error handling for setting memory region
->   KVM: Move setting of memslot into helper routine
->   KVM: Move memslot deletion to helper function
->   KVM: Simplify kvm_free_memslot() and all its descendents
->   KVM: Clean up local variable usage in __kvm_set_memory_region()
->   KVM: Provide common implementation for generic dirty log functions
->   KVM: Ensure validity of memslot with respect to kvm_get_dirty_log()
->   KVM: Terminate memslot walks via used_slots
->   KVM: Dynamically size memslot array based on number of used slots
-> 
->  arch/mips/include/asm/kvm_host.h      |   2 +-
->  arch/mips/kvm/mips.c                  |  68 +---
->  arch/powerpc/include/asm/kvm_ppc.h    |  14 +-
->  arch/powerpc/kvm/book3s.c             |  22 +-
->  arch/powerpc/kvm/book3s_hv.c          |  36 +-
->  arch/powerpc/kvm/book3s_pr.c          |  20 +-
->  arch/powerpc/kvm/booke.c              |  17 +-
->  arch/powerpc/kvm/powerpc.c            |  13 +-
->  arch/s390/include/asm/kvm_host.h      |   2 +-
->  arch/s390/kvm/kvm-s390.c              |  21 +-
->  arch/x86/include/asm/kvm_page_track.h |   3 +-
->  arch/x86/kvm/page_track.c             |  15 +-
->  arch/x86/kvm/x86.c                    | 100 ++---
->  include/linux/kvm_host.h              |  48 +--
->  virt/kvm/arm/arm.c                    |  47 +--
->  virt/kvm/arm/mmu.c                    |  18 +-
->  virt/kvm/kvm_main.c                   | 546 ++++++++++++++++----------
->  17 files changed, 467 insertions(+), 525 deletions(-)
-> 
+> +static inline int kvm_shift_memslots_forward(struct kvm_memslots *slots,
+> +					     struct kvm_memory_slot *new)
+> +{
+> +	struct kvm_memory_slot *mslots = slots->memslots;
+> +	int i;
+> +
+> +	if (WARN_ON_ONCE(slots->id_to_index[new->id] == -1) ||
+> +	    WARN_ON_ONCE(!slots->used_slots))
+> +		return -1;
+> +
+> +	for (i = slots->id_to_index[new->id]; i < slots->used_slots - 1; i++) {
+> +		if (new->base_gfn > mslots[i + 1].base_gfn)
+> +			break;
+> +
+> +		WARN_ON_ONCE(new->base_gfn == mslots[i + 1].base_gfn);
+> +
+> +		/* Shift the next memslot forward one and update its index. */
+> +		mslots[i] = mslots[i + 1];
+> +		slots->id_to_index[mslots[i].id] = i;
+> +	}
+> +	return i;
+> +}
+> +
+> +static inline int kvm_shift_memslots_back(struct kvm_memslots *slots,
+> +					  struct kvm_memory_slot *new,
+> +					  int start)
 
-Christian, Marc, Paul, can you help testing patches 1-13?
+This new implementation of the insertion sort loses the comments that
+were there in the old one.  Please keep them as function comments.
 
-Thanks,
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
