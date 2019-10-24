@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9273BCA9EBE
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Oct 2019 12:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9835FCA9EAF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Oct 2019 12:25:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4C0BB21872
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Oct 2019 12:25:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C0BB21872
+	by mail.kernel.org (Postfix) with ESMTP id 5A72E2166E
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Oct 2019 12:25:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A72E2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03D274A838;
-	Thu, 24 Oct 2019 08:25:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 132F34A87C;
+	Thu, 24 Oct 2019 08:25:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nnrUfvoISghP; Thu, 24 Oct 2019 08:25:13 -0400 (EDT)
+	with ESMTP id mMzkYRg3NIzF; Thu, 24 Oct 2019 08:25:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7DB84A8BA;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D401B4A8C0;
 	Thu, 24 Oct 2019 08:25:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 995304A523
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Oct 2019 06:27:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B684A523
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Oct 2019 06:27:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zX0qSXtpgtXR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Oct 2019 06:27:55 -0400 (EDT)
-Received: from out30-44.freemail.mail.aliyun.com
- (out30-44.freemail.mail.aliyun.com [115.124.30.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A2FA4A5D5
+ with ESMTP id eK75cRTCHl7u for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Oct 2019 06:27:56 -0400 (EDT)
+Received: from out4436.biz.mail.alibaba.com (out4436.biz.mail.alibaba.com
+ [47.88.44.36])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C87EC4A60D
  for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Oct 2019 06:27:55 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R171e4; CH=green; DM=||false|;
- FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04395; MF=shannon.zhao@linux.alibaba.com;
- NM=1; PH=DS; RN=8; SR=0; TI=SMTPD_---0Tg2twD8_1571912871; 
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R211e4; CH=green; DM=||false|;
+ FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01419; MF=shannon.zhao@linux.alibaba.com;
+ NM=1; PH=DS; RN=8; SR=0; TI=SMTPD_---0Tg31GPL_1571912867; 
 Received: from localhost(mailfrom:shannon.zhao@linux.alibaba.com
- fp:SMTPD_---0Tg2twD8_1571912871) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 24 Oct 2019 18:27:52 +0800
+ fp:SMTPD_---0Tg31GPL_1571912867) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 24 Oct 2019 18:27:49 +0800
 From: Shannon Zhao <shannon.zhao@linux.alibaba.com>
 To: kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
  suzuki.poulose@arm.com, christoffer.dall@arm.com
-Subject: [PATCH RFC 5/7] KVM: arch_timer: Add hyp uninitialize function
-Date: Thu, 24 Oct 2019 18:27:48 +0800
-Message-Id: <1571912870-18471-6-git-send-email-shannon.zhao@linux.alibaba.com>
+Subject: [PATCH RFC 3/7] KVM: vgic: make vgic parameters work well for module
+Date: Thu, 24 Oct 2019 18:27:46 +0800
+Message-Id: <1571912870-18471-4-git-send-email-shannon.zhao@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571912870-18471-1-git-send-email-shannon.zhao@linux.alibaba.com>
 References: <1571912870-18471-1-git-send-email-shannon.zhao@linux.alibaba.com>
@@ -71,63 +71,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When KVM ARM exits, it needs to cleanup arch_timer setup by kvm_timer_hyp_init.
-
 Signed-off-by: Shannon Zhao <shannon.zhao@linux.alibaba.com>
 ---
- include/kvm/arm_arch_timer.h |  1 +
- virt/kvm/arm/arch_timer.c    | 13 +++++++++++++
- virt/kvm/arm/arm.c           |  1 +
- 3 files changed, 15 insertions(+)
+ virt/kvm/arm/vgic/vgic-v3.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index d120e6c..3cb3a01 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -68,6 +68,7 @@ struct arch_timer_cpu {
- };
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 8d69f00..228cfeb 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -548,6 +548,12 @@ int vgic_v3_map_resources(struct kvm *kvm)
  
- int kvm_timer_hyp_init(bool);
-+void kvm_timer_hyp_uninit(void);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index f5a5d51..7dafa97 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -991,6 +991,19 @@ int kvm_timer_hyp_init(bool has_gic)
- 	return err;
- }
+ DEFINE_STATIC_KEY_FALSE(vgic_v3_cpuif_trap);
  
-+void kvm_timer_hyp_uninit(void)
-+{
-+	struct arch_timer_kvm_info *info = arch_timer_get_kvm_info();
-+
-+	cpuhp_remove_state(CPUHP_AP_KVM_ARM_TIMER_STARTING);
-+	if (info->physical_irq > 0) {
-+		on_each_cpu(disable_percpu_irq, (void *)host_ptimer_irq, 1);
-+		free_percpu_irq(host_ptimer_irq, kvm_get_running_vcpus());
-+	}
-+	on_each_cpu(disable_percpu_irq, (void *)host_vtimer_irq, 1);
-+	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
-+}
-+
- void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
++#ifdef MODULE
++module_param_named(vgic_v3_group0_trap, group0_trap, bool, S_IRUGO);
++module_param_named(vgic_v3_group1_trap, group1_trap, bool, S_IRUGO);
++module_param_named(vgic_v3_common_trap, common_trap, bool, S_IRUGO);
++module_param_named(vgic_v4_enable, gicv4_enable, bool, S_IRUGO);
++#else
+ static int __init early_group0_trap_cfg(char *buf)
  {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 0c60074..feb6649 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1724,6 +1724,7 @@ int kvm_arch_init(void *opaque)
- void kvm_arch_exit(void)
- {
- 	kvm_perf_teardown();
-+	kvm_timer_hyp_uninit();
- 	kvm_vgic_hyp_uninit();
- 	hyp_cpu_pm_exit();
+ 	return strtobool(buf, &group0_trap);
+@@ -571,6 +577,7 @@ static int __init early_gicv4_enable(char *buf)
+ 	return strtobool(buf, &gicv4_enable);
  }
+ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
++#endif
+ 
+ /**
+  * vgic_v3_probe - probe for a VGICv3 compatible interrupt controller
 -- 
 1.8.3.1
 
