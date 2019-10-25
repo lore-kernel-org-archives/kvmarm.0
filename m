@@ -2,64 +2,52 @@ Return-Path: <SRS0=vP85=YS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A02EFCA9EBD
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265B0CA9EA0
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:51:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 30E0521D82
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:28:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E0521D82
+	by mail.kernel.org (Postfix) with ESMTP id 9270520679
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:51:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9270520679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E4A4A5CE;
-	Fri, 25 Oct 2019 09:28:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 140A14A5C8;
+	Fri, 25 Oct 2019 09:51:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sk37SQR0u8fU; Fri, 25 Oct 2019 09:28:05 -0400 (EDT)
+	with ESMTP id pBTPmPcDYexy; Fri, 25 Oct 2019 09:51:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758164A5C8;
-	Fri, 25 Oct 2019 09:28:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 161444A5D5;
+	Fri, 25 Oct 2019 09:51:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A824A5C8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:28:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E6D4A5C8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:51:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2k+w9U0XaREk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Oct 2019 09:28:03 -0400 (EDT)
+ with ESMTP id m6xKGRKVz08Q for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Oct 2019 09:51:48 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A67D4A51F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:28:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C304A50F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:51:48 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B79EE28;
- Fri, 25 Oct 2019 06:28:02 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD06228;
+ Fri, 25 Oct 2019 06:51:47 -0700 (PDT)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 476EF3F718;
- Fri, 25 Oct 2019 06:28:02 -0700 (PDT)
-Date: Fri, 25 Oct 2019 15:28:01 +0200
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7023F71A;
+ Fri, 25 Oct 2019 06:51:47 -0700 (PDT)
 From: Christoffer Dall <christoffer.dall@arm.com>
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-Message-ID: <20191025132801.GK2652@e113682-lin.lund.arm.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- James Hogan <jhogan@kernel.org>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, David Hildenbrand <david@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is supported
+Date: Fri, 25 Oct 2019 15:51:44 +0200
+Message-Id: <20191025135144.8805-1-christoffer.dall@arm.com>
+X-Mailer: git-send-email 2.18.0
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,41 +59,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
-> the memory footprint from 90k to ~2.6k bytes.
-> 
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
-> clean up the memslot code, which has gotten quite crusty, especially
-> __kvm_set_memory_region().  The clean up is likely not strictly necessary
-> to switch to dynamic sizing, but I didn't have a remotely reasonable
-> level of confidence in the correctness of the dynamic sizing without first
-> doing the clean up.
-> 
-> Christoffer, I added your Tested-by to the patches that I was confident
-> would be fully tested based on the desription of what you tested.  Let me
-> know if you disagree with any of 'em.
-> 
-The only testing I've done of patch 9 would be via the vm_free part of
-kvm selftest, so not sure how valid that is, but sure.
+On CPUs that support S2FWB (Armv8.4+), KVM configures the stage 2 page
+tables to override the memory attributes of memory accesses, regardless
+of the stage 1 page table configurations, and also when the stage 1 MMU
+is turned off.  This results in all memory accesses to RAM being
+cacheable, including during early boot of the guest.
 
-Looks fine otherwise.
+On CPUs without this feature, memory accesses were non-cacheable during
+boot until the guest turned on the stage 1 MMU, and we had to detect
+when the guest turned on the MMU, such that we could invalidate all cache
+entries and ensure a consistent view of memory with the MMU turned on.
+When the guest turned on the caches, we would call stage2_flush_vm()
+from kvm_toggle_cache().
 
+However, stage2_flush_vm() walks all the stage 2 tables, and calls
+__kvm_flush-dcache_pte, which on a system with S2FWD does ... absolutely
+nothing.
 
-Thanks,
+We can avoid that whole song and dance, and simply not set TVM when
+creating a VM on a systme that has S2FWB.
 
-    Christoffer
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+I was only able to test this on the model with cache modeling enabled,
+but even removing TVM from HCR_EL2 without having FWB also worked with
+that setup, so the testing of this has been light.  It seems like it
+should obviously work, but it would be good if someone with access to
+appropriate hardware could give this a spin.
+
+ arch/arm64/include/asm/kvm_emulate.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d69c1efc63e7..41820c3e70b8 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -53,8 +53,10 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		/* trap error record accesses */
+ 		vcpu->arch.hcr_el2 |= HCR_TERR;
+ 	}
+-	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
++	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
++		vcpu->arch.hcr_el2 &= ~HCR_TVM;
+ 		vcpu->arch.hcr_el2 |= HCR_FWB;
++	}
+ 
+ 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+-- 
+2.18.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
