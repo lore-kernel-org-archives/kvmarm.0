@@ -2,61 +2,60 @@ Return-Path: <SRS0=vP85=YS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DE8CA9EBE
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 09:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0E4CA9EBC
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 10:12:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6A7AA21929
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 09:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7AA21929
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 5F2FA20679
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 10:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2FA20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6514A5A8;
-	Fri, 25 Oct 2019 05:08:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B88964A5C6;
+	Fri, 25 Oct 2019 06:12:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rnY78678rAuz; Fri, 25 Oct 2019 05:08:09 -0400 (EDT)
+	with ESMTP id k+nW4XSZgQes; Fri, 25 Oct 2019 06:12:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D64C04A5BD;
-	Fri, 25 Oct 2019 05:08:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C7004A5C8;
+	Fri, 25 Oct 2019 06:12:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 194C44A5A8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 05:08:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76F0E4A5C5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 06:12:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dg3EZu5Yhr-h for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Oct 2019 05:08:07 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3262B4A51D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 05:08:07 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 718267F90D984722DF34;
- Fri, 25 Oct 2019 17:08:03 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Fri, 25 Oct 2019
- 17:07:55 +0800
-Subject: Re: [PATCH v2] irqchip/gic-v3-its: Use the exact ITSList for VMOVP
-To: Marc Zyngier <maz@kernel.org>
-References: <1571802386-2680-1-git-send-email-yuzenghui@huawei.com>
- <0f99f6a4ea567f53d38fb3bc0e6f59e4@www.loen.fr>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <6bc4a648-4308-3ff8-8e73-d90040e74c99@huawei.com>
-Date: Fri, 25 Oct 2019 17:06:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ with ESMTP id KYQvWkE+1Fqt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Oct 2019 06:12:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E71104A53F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 06:12:32 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F65028;
+ Fri, 25 Oct 2019 03:12:32 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 026823F6C4;
+ Fri, 25 Oct 2019 03:12:31 -0700 (PDT)
+Date: Fri, 25 Oct 2019 12:12:30 +0200
+From: Christoffer Dall <christoffer.dall@arm.com>
+To: Shannon Zhao <shannon.zhao@linux.alibaba.com>
+Subject: Re: [PATCH RFC 0/7] Support KVM being compiled as a kernel module on
+ arm64
+Message-ID: <20191025101230.GJ2652@e113682-lin.lund.arm.com>
+References: <1571912870-18471-1-git-send-email-shannon.zhao@linux.alibaba.com>
+ <8cbd81d6-4ab8-9d2a-5162-8782201cd13d@arm.com>
+ <c17e8b0f32902a0811cc6a4ed71e607e@www.loen.fr>
+ <18653462-38dc-cce1-d0a1-2a7e891163da@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <0f99f6a4ea567f53d38fb3bc0e6f59e4@www.loen.fr>
-Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: jason@lakedaemon.net, jiayanlei@huawei.com,
- LKML <linux-kernel@vger.kernel.org>, tglx@linutronix.de,
+Content-Disposition: inline
+In-Reply-To: <18653462-38dc-cce1-d0a1-2a7e891163da@linux.alibaba.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -69,34 +68,101 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAxOS8xMC8yNSAxNjoyNCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDIwMTktMTAtMjMg
-MDQ6NDYsIFplbmdodWkgWXUgd3JvdGU6Cj4+IE9uIGEgc3lzdGVtIHdpdGhvdXQgU2luZ2xlIFZN
-T1ZQIHN1cHBvcnQgKHNheSBHSVRTX1RZUEVSLlZNT1ZQID09IDApLAo+PiB3ZSB3aWxsIG1hcCB2
-UEVzIG9ubHkgb24gSVRTcyB0aGF0IHdpbGwgYWN0dWFsbHkgY29udHJvbCBpbnRlcnJ1cHRzCj4+
-IGZvciB0aGUgZ2l2ZW4gVk0uwqAgQW5kIHdoZW4gbW92aW5nIGEgdlBFLCB0aGUgVk1PVlAgY29t
-bWFuZCB3aWxsIGJlCj4+IGlzc3VlZCBvbmx5IGZvciB0aG9zZSBJVFNzLgo+Pgo+PiBCdXQgd2hl
-biBpc3N1aW5nIFZNT1ZQcyB3ZSBzZWVtZWQgZmFpbCB0byBwcmVzZW50IHRoZSBleGFjdCBJVFNM
-aXN0Cj4+IHRvIElUU3Mgd2hvIGFyZSBhY3R1YWxseSBpbmNsdWRlZCBpbiB0aGUgc3luY2hyb25p
-emF0aW9uIG9wZXJhdGlvbi4KPj4gVGhlIGl0c19saXN0X21hcCB3ZSdyZSBjdXJyZW50bHkgdXNp
-bmcgaW5jbHVkZXMgYWxsIElUU3MgaW4gdGhlIHN5c3RlbSwKPj4gZXZlbiB0aG91Z2ggc29tZSBv
-ZiB0aGVtIGRvbid0IGhhdmUgdGhlIGNvcnJlc3BvbmRpbmcgdlBFIG1hcHBpbmcgYXQgYWxsLgo+
-Pgo+PiBJbnRyb2R1Y2UgZ2V0X2l0c19saXN0KCkgdG8gZ2V0IHRoZSBwZXItVk0gaXRzX2xpc3Rf
-bWFwLCB0byBpbmRpY2F0ZQo+PiB3aGljaCBJVFNzIGhhdmUgdlBFIG1hcHBpbmdzIGZvciB0aGUg
-Z2l2ZW4gVk0sIGFuZCB1c2UgdGhpcyBtYXAgYXMKPj4gdGhlIGV4cGVjdGVkIElUU0xpc3Qgd2hl
-biBidWlsZGluZyBWTU9WUC4gVGhpcyBpcyBob3BlZnVsbHkgYSBwZXJmb3JtYW5jZQo+PiBnYWlu
-IG5vdCB0byBkbyBzb21lIHN5bmNocm9uaXphdGlvbiB3aXRoIHRob3NlIHVuc3VzcGVjdGluZyBJ
-VFNzLgo+PiBBbmQgaW5pdGlhbGl6ZSB0aGUgd2hvbGUgY29tbWFuZCBkZXNjcmlwdG9yIHRvIHpl
-cm8gYXQgYmVnaW5uaW5nLCBzaW5jZQo+PiB0aGUgc2VxX251bSBhbmQgaXRzX2xpc3Qgc2hvdWxk
-IGJlIFJFUzAgd2hlbiBHSVRTX1RZUEVSLlZNT1ZQID09IDEuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6
-IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+IAo+IEkndmUgYXBwbGllZCB0aGlz
-IGFzIGEgZml4IGZvciA1LjQuIEluIHRoZSBmdXR1cmUsIHBsZWFzZSBjYyBMS01MIG9uIGFsbAo+
-IElSUS1yZWxhdGVkIHBhdGNoZXMgKGFzIGRvY3VtZW50ZWQgaW4gTUFJTlRBSU5FUlMpLgoKSSBn
-b3QgaXQsIHRoYW5rcy4KCgpaZW5naHVpCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+On Fri, Oct 25, 2019 at 10:48:46AM +0800, Shannon Zhao wrote:
+> 
+> 
+> On 2019/10/24 21:41, Marc Zyngier wrote:
+> > On 2019-10-24 11:58, James Morse wrote:
+> > > Hi Shannon,
+> > > 
+> > > On 24/10/2019 11:27, Shannon Zhao wrote:
+> > > > Curently KVM ARM64 doesn't support to compile as a kernel module. It's
+> > > > useful to compile KVM as a module.
+> > > 
+> > > > For example, it could reload kvm without rebooting host machine.
+> > > 
+> > > What problem does this solve?
+> > > 
+> > > KVM has some funny requirements that aren't normal for a module. On
+> > > v8.0 hardware it must
+> > > have an idmap. Modules don't usually expect their code to be
+> > > physically contiguous, but
+> > > KVM does. KVM influences they way some of the irqchip stuff is set up
+> > > during early boot
+> > > (EOI mode ... not that I understand it).
+> > 
+> > We change the EOImode solely based on how we were booted (EL2 or not).
+> > KVM doesn't directly influences that (it comes in the picture much
+> > later).
+> > 
+> > > (I think KVM-as-a-module on x86 is an artifact of how it was developed)
+> > > 
+> > > 
+> > > > This patchset support this feature while there are some limitations
+> > > > to be solved. But I just send it out as RFC to get more suggestion and
+> > > > comments.
+> > > 
+> > > > Curently it only supports for VHE system due to the hyp code section
+> > > > address variables like __hyp_text_start.
+> > > 
+> > > We still need to support !VHE systems, and we need to do it with a
+> > > single image.
+> > > 
+> > > 
+> > > > Also it can't call
+> > > > kvm_update_va_mask when loading kvm module and kernel panic with below
+> > > > errors. So I make kern_hyp_va into a nop funtion.
+> > > 
+> > > Making this work for the single-Image on v8.0 is going to be a
+> > > tremendous amount of work.
+> > > What is the payoff?
+> > 
+> > I can only agree. !VHE is something we're going to support for the
+> > foreseeable
+> > future (which is roughly equivalent to "forever"), and modules have
+> > properties
+> > that are fundamentally incompatible with the way KVM works with !VHE.
+> > 
+> Yes, with this patchset we still support !VHE system with built-in KVM.
+> While for VHE system we could support kernel module and check at module init
+> to avoid wrong usage of kvm module on !VHE systems.
+> 
+> > If the only purpose of this work is to be able to swap KVM implementations
+> > in a development environment, then it really isn't worth the effort.
+> > 
+> Making KVM as a kernel module has many advantages both for development and
+> real use environment. For example, we can backport and update KVM codes
+> independently and don't need to recompile kernel. Also making KVM as a
+> kernel module is a basic for kvm hot upgrade feature without shutdown VMs
+> and hosts. This is very important for Cloud Service Provider to provides
+> non-stop services for its customers.
+> 
+But KVM on arm64 is pretty intertwined with the rest of the kernel, and
+things like the arch timers, for example, really depend on the exact
+semantics of how the rest of the kernel changes.  I fear that you'd end
+up back-porting patches that depend on changes to irqchip and timers in
+the core code, and you'll get even more oddly-defined behavior in the
+wild.
+
+How would you manage that, and how would the end result be a more stable
+environment than what you have today?
+
+Also, I'm curious if you expect to find more bugs in the hypervisor
+itself than in the rest of the kernel, because it's only in the former
+case you can avoid a reboot of the host, and all things considered this
+would appear to only help in a small fraction of the cases where you
+have to patch things?
+
+
+Thanks,
+
+    Christoffer
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
