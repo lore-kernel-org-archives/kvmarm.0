@@ -2,67 +2,64 @@ Return-Path: <SRS0=vP85=YS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FB2CA9EBC
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 10:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02EFCA9EBD
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:28:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B1AB02084C
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 10:43:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1AB02084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 30E0521D82
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 13:28:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E0521D82
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A8264A52E;
-	Fri, 25 Oct 2019 06:43:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E4A4A5CE;
+	Fri, 25 Oct 2019 09:28:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id t+-5J+KntaOo; Fri, 25 Oct 2019 06:43:18 -0400 (EDT)
+	with ESMTP id sk37SQR0u8fU; Fri, 25 Oct 2019 09:28:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 002F44A51F;
-	Fri, 25 Oct 2019 06:43:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758164A5C8;
+	Fri, 25 Oct 2019 09:28:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21DDF4A4C0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 06:43:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A824A5C8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:28:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d0ndBFClUqi2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Oct 2019 06:43:16 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBCFE4A4A4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 06:43:15 -0400 (EDT)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1iNx3o-00039M-NY; Fri, 25 Oct 2019 12:43:12 +0200
-To: Shannon Zhao <shannon.zhao@linux.alibaba.com>
-Subject: Re: [PATCH RFC 0/7] Support KVM being compiled as a kernel module on
- arm64
-X-PHP-Originating-Script: 0:main.inc
+ with ESMTP id 2k+w9U0XaREk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Oct 2019 09:28:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A67D4A51F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 09:28:03 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B79EE28;
+ Fri, 25 Oct 2019 06:28:02 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 476EF3F718;
+ Fri, 25 Oct 2019 06:28:02 -0700 (PDT)
+Date: Fri, 25 Oct 2019 15:28:01 +0200
+From: Christoffer Dall <christoffer.dall@arm.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
+Message-ID: <20191025132801.GK2652@e113682-lin.lund.arm.com>
+References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Date: Fri, 25 Oct 2019 11:43:12 +0100
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <18653462-38dc-cce1-d0a1-2a7e891163da@linux.alibaba.com>
-References: <1571912870-18471-1-git-send-email-shannon.zhao@linux.alibaba.com>
- <8cbd81d6-4ab8-9d2a-5162-8782201cd13d@arm.com>
- <c17e8b0f32902a0811cc6a4ed71e607e@www.loen.fr>
- <18653462-38dc-cce1-d0a1-2a7e891163da@linux.alibaba.com>
-Message-ID: <66e983b383d9f99df0007a717e084fe6@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: shannon.zhao@linux.alibaba.com, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com, christoffer.dall@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ James Hogan <jhogan@kernel.org>, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, David Hildenbrand <david@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,109 +71,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019-10-25 03:48, Shannon Zhao wrote:
-> On 2019/10/24 21:41, Marc Zyngier wrote:
->> On 2019-10-24 11:58, James Morse wrote:
->>> Hi Shannon,
->>>
->>> On 24/10/2019 11:27, Shannon Zhao wrote:
->>>> Curently KVM ARM64 doesn't support to compile as a kernel module. 
->>>> It's
->>>> useful to compile KVM as a module.
->>>
->>>> For example, it could reload kvm without rebooting host machine.
->>>
->>> What problem does this solve?
->>>
->>> KVM has some funny requirements that aren't normal for a module. On
->>> v8.0 hardware it must
->>> have an idmap. Modules don't usually expect their code to be
->>> physically contiguous, but
->>> KVM does. KVM influences they way some of the irqchip stuff is set 
->>> up
->>> during early boot
->>> (EOI mode ... not that I understand it).
->> We change the EOImode solely based on how we were booted (EL2 or 
->> not).
->> KVM doesn't directly influences that (it comes in the picture much
->> later).
->>
->>> (I think KVM-as-a-module on x86 is an artifact of how it was 
->>> developed)
->>>
->>>
->>>> This patchset support this feature while there are some 
->>>> limitations
->>>> to be solved. But I just send it out as RFC to get more suggestion 
->>>> and
->>>> comments.
->>>
->>>> Curently it only supports for VHE system due to the hyp code 
->>>> section
->>>> address variables like __hyp_text_start.
->>>
->>> We still need to support !VHE systems, and we need to do it with a
->>> single image.
->>>
->>>
->>>> Also it can't call
->>>> kvm_update_va_mask when loading kvm module and kernel panic with 
->>>> below
->>>> errors. So I make kern_hyp_va into a nop funtion.
->>>
->>> Making this work for the single-Image on v8.0 is going to be a
->>> tremendous amount of work.
->>> What is the payoff?
->> I can only agree. !VHE is something we're going to support for the 
->> foreseeable
->> future (which is roughly equivalent to "forever"), and modules have 
->> properties
->> that are fundamentally incompatible with the way KVM works with 
->> !VHE.
->
-> Yes, with this patchset we still support !VHE system with built-in 
-> KVM. While for VHE system we could support kernel module and check at 
-> module init to avoid wrong usage of kvm module on !VHE systems.
+On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
+> The end goal of this series is to dynamically size the memslot array so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+> the memory footprint from 90k to ~2.6k bytes.
+> 
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
+> clean up the memslot code, which has gotten quite crusty, especially
+> __kvm_set_memory_region().  The clean up is likely not strictly necessary
+> to switch to dynamic sizing, but I didn't have a remotely reasonable
+> level of confidence in the correctness of the dynamic sizing without first
+> doing the clean up.
+> 
+> Christoffer, I added your Tested-by to the patches that I was confident
+> would be fully tested based on the desription of what you tested.  Let me
+> know if you disagree with any of 'em.
+> 
+The only testing I've done of patch 9 would be via the vm_free part of
+kvm selftest, so not sure how valid that is, but sure.
 
-How do you reconcile this with the need to have a single kernel image 
-that
-is full-featured on all architecture revisions? In your view of the 
-world,
-it is OK to have a VHE-specific kernel that won't have KVM on a v8.0 
-system.
- From my point of view, this simply isn't acceptable.
+Looks fine otherwise.
 
->> If the only purpose of this work is to be able to swap KVM 
->> implementations
->> in a development environment, then it really isn't worth the effort.
->
-> Making KVM as a kernel module has many advantages both for 
-> development and real use environment. For example, we can backport and 
-> update KVM codes independently and don't need to recompile kernel. Also 
-> making KVM as a kernel module is a basic for kvm hot upgrade feature 
-> without shutdown VMs and hosts. This is very important for Cloud 
-> Service Provider to provides non-stop services for its customers.
 
-The goal is certainly commendable.
+Thanks,
 
-But pretending that KVM is fully independent from the rest of the 
-kernel is
-an intellectual fallacy. Most of the issues that affect KVM at any 
-given time
-are actually core kernel issues that cannot be solved by just updating 
-the
-KVM module. You need to update the whole thing, not just the tiny bit 
-that
-switches between host and guests.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+    Christoffer
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
