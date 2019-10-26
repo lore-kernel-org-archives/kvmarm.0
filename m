@@ -1,77 +1,71 @@
-Return-Path: <SRS0=vP85=YS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=MurP=YT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B48ECA9EA0
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 16:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A74CCA9EBD
+	for <kvmarm@archiver.kernel.org>; Sat, 26 Oct 2019 10:20:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D167321D81
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Oct 2019 16:30:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D167321D81
+	by mail.kernel.org (Postfix) with ESMTP id B6ADE2070B
+	for <kvmarm@archiver.kernel.org>; Sat, 26 Oct 2019 10:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6ADE2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 760F04A5ED;
-	Fri, 25 Oct 2019 12:30:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 111CB4A651;
+	Sat, 26 Oct 2019 06:20:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gbdbDe7gKSMq; Fri, 25 Oct 2019 12:30:46 -0400 (EDT)
+	with ESMTP id ShMo8FeGX-sP; Sat, 26 Oct 2019 06:20:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DDA94A5C4;
-	Fri, 25 Oct 2019 12:30:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 029934A534;
+	Sat, 26 Oct 2019 06:20:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 506494A5C4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 12:30:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE2ED4A4E8
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Oct 2019 06:20:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D4deQcqBRSm4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Oct 2019 12:30:43 -0400 (EDT)
+ with ESMTP id lqd07A32Snlg for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 26 Oct 2019 06:20:42 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 314784A52E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Oct 2019 12:30:43 -0400 (EDT)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1iO2Tk-0008W8-Nd; Fri, 25 Oct 2019 18:30:20 +0200
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-X-PHP-Originating-Script: 0:main.inc
-MIME-Version: 1.0
-Date: Fri, 25 Oct 2019 17:30:20 +0100
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E7B74A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Oct 2019 06:20:42 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=big-swifty.misterjones.org)
+ by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+ (Exim 4.80) (envelope-from <maz@kernel.org>)
+ id 1iOJBU-0003Pg-TZ; Sat, 26 Oct 2019 12:20:37 +0200
+Date: Sat, 26 Oct 2019 11:20:35 +0100
+Message-ID: <8636ffzu30.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
-Message-ID: <2fc05685467a01c2f1c2afeacefb2f68@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org,
- paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
- pbonzini@redhat.com, rkrcmar@redhat.com, david@redhat.com, cohuck@redhat.com,
- vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
- joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- christoffer.dall@arm.com
+To: James Morse <james.morse@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 4/5] arm64: KVM: Prevent speculative S1 PTW when
+ restoring vcpu context
+In-Reply-To: <151fc868-6709-3017-e34d-649ec0e1812c@arm.com>
+References: <20191019095521.31722-1-maz@kernel.org>
+ <20191019095521.31722-5-maz@kernel.org>
+ <151fc868-6709-3017-e34d-649ec0e1812c@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, mark.rutland@arm.com,
+ suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- James Hogan <jhogan@kernel.org>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Joerg Roedel <joro@8bytes.org>,
- David Hildenbrand <david@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,46 +77,105 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019-10-25 00:07, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array 
-> so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number 
-> of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
-> address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
-> reduces
-> the memory footprint from 90k to ~2.6k bytes.
->
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 
-> 1-13
-> clean up the memslot code, which has gotten quite crusty, especially
-> __kvm_set_memory_region().  The clean up is likely not strictly 
-> necessary
-> to switch to dynamic sizing, but I didn't have a remotely reasonable
-> level of confidence in the correctness of the dynamic sizing without 
-> first
-> doing the clean up.
+On Thu, 24 Oct 2019 17:10:44 +0100,
+James Morse <james.morse@arm.com> wrote:
 
-I've finally found time to test this on a garden variety of arm64 
-boxes,
-and nothing caught fire. It surely must be doing something right!
+Hi James,
 
-FWIW:
+> Hi Marc,
+> 
+> On 19/10/2019 10:55, Marc Zyngier wrote:
+> > When handling erratum 1319367, we must ensure that the page table
+> > walker cannot parse the S1 page tables while the guest is in an
+> > inconsistent state. This is done as follows:
+> > 
+> > On guest entry:
+> > - TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> > - all system registers are restored, except for TCR_EL1 and SCTLR_EL1
+> > - stage-2 is restored
+> > - SCTLR_EL1 and TCR_EL1 are restored
+> > 
+> > On guest exit:
+> > - SCTLR_EL1.M and TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> > - stage-2 is disabled
+> > - All host system registers are restored
+> 
+> Reviewed-by: James Morse <james.morse@arm.com>
+> 
+> (whitespace nit below)
+> 
+> 
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 69e10b29cbd0..5765b17c38c7 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -118,6 +118,20 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> >  	}
+> >  
+> >  	write_sysreg(val, cptr_el2);
+> > +
+> > +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> > +		struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> > +
+> > +		isb();
+> > +		/*
+> > +		 * At this stage, and thanks to the above isb(), S2 is
+> > +		 * configured and enabled. We can now restore the guest's S1
+> > +		 * configuration: SCTLR, and only then TCR.
+> > +		 */
+> 
+> (note for my future self: because the guest may have had M=0 and rubbish in the TTBRs)
+> 
+> > +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +		isb();
+> > +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+> > +	}
+> >  }
+> >  
+> 
+> 
+> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > index 7ddbc849b580..fb97547bfa79 100644
+> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > @@ -117,12 +117,26 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> >  {
+> >  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+> >  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> > -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +
+> > +	if (!cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> > +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+> > +	} else	if (!ctxt->__hyp_running_vcpu) {
+> > +		/*
+> > +		 * Must only be done for guest registers, hence the context
+> > +		 * test. We'recoming from the host, so SCTLR.M is already
+> 
+> (Nit: We'recoming?)
 
-Tested-by: Marc Zyngier <maz@kernel.org>
+Well spotted, now fixed. And thanks for the reviewing, much appreciated.
 
-         M.
+Catalin, Will: given that this series conflicts with the workaround for
+erratum 1542419, do you mind taking it via the arm64 tree?
+
+To make things a bit simpler, I've updated the series with James' tags at
+[1], and pushed out a resolution of the merge with arm64/for-next/core [2].
+
+Thanks,
+
+	M.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/erratum-1319367
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/erratum-1319367-resolved
+
 -- 
-Jazz is not dead. It just smells funny...
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
