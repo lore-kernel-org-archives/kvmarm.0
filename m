@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0A7CA9EAF
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0531CA9EAF
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83BDC222C1
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4817222BD
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OV3dt2ux"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83BDC222C1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNhxUkok"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4817222BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6714AC85;
-	Sun, 27 Oct 2019 10:43:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CD764A7FD;
+	Sun, 27 Oct 2019 10:43:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QX20kAo-RjEA; Sun, 27 Oct 2019 10:43:41 -0400 (EDT)
+	with ESMTP id cBKflRkzkfv2; Sun, 27 Oct 2019 10:43:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15C2B4A944;
-	Sun, 27 Oct 2019 10:43:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DEFD4A521;
+	Sun, 27 Oct 2019 10:43:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F7B94A551
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:43:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E40C34A5A8
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:43:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cLipVzktlPnh for <kvmarm@lists.cs.columbia.edu>;
- Sun, 27 Oct 2019 10:43:39 -0400 (EDT)
+ with ESMTP id IyXlXC63k86q for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 27 Oct 2019 10:43:49 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 129BD4A50F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:43:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2D274A521
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:43:48 -0400 (EDT)
 Received: from localhost.localdomain (82-132-239-15.dab.02.net [82.132.239.15])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D3C25214AF;
- Sun, 27 Oct 2019 14:43:29 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 34C6F21E6F;
+ Sun, 27 Oct 2019 14:43:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1572187418;
- bh=vb7tXsiKtk7C1d0EnILqFVVoK9y3ZGFerTetWrUIH0s=;
+ s=default; t=1572187428;
+ bh=Zi3SgTZHLNbskJxSF49qTEustzLeR71mUmIkhQYy9qk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=OV3dt2uxlj28ZGDi4PdCfmIeZGtmQCQUwK8AG8ubLsTDz4XOBf6erpQfdTIfls8jN
- KIm2KSHIbXciIeB6jI5hdBMxNxs4bQInDJpb6ZZ9O6xSAQbMP2cbk42Pt/HZkTbtdM
- KES5S+27qrjmJY/qba8y6fGtcUKQM/NLxNNOWuJg=
+ b=SNhxUkokfKoP+8W407lcxfDMIBSGo5QL47MpJFZ4yq9CZUDpfKQ+HykFonzPA1j4R
+ Wa875V3d66ikzI3/DO20IwoZ+viU8jUn4qOEYbCavkRevsTBgqnqOR+eQXPyyw9tYq
+ zzM3jvgJ2KR7N2cnihslBo7o8cBi1Q/yKHFWiBRk=
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 06/36] irqchip/gic-v3-its: Kill its->device_ids and use
- TYPER copy instead
-Date: Sun, 27 Oct 2019 14:42:04 +0000
-Message-Id: <20191027144234.8395-7-maz@kernel.org>
+Subject: [PATCH v2 07/36] irqchip/gic-v3-its: Add get_vlpi_map() helper
+Date: Sun, 27 Oct 2019 14:42:05 +0000
+Message-Id: <20191027144234.8395-8-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191027144234.8395-1-maz@kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
@@ -81,122 +80,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we have a copy of TYPER in the ITS structure, rely on this
-to provide the same service as its->device_ids, which gets axed.
-Errata workarounds are now updating the cached fields instead of
-requiring a separate field in the ITS structure.
+Obtaining the mapping information for a VLPI is something quite common,
+and the GICv4.1 code is going to make even more use of it. Expose it as
+a separate helper.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 24 +++++++++++++-----------
- include/linux/irqchip/arm-gic-v3.h |  2 +-
- 2 files changed, 14 insertions(+), 12 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 3b046181ddfc..6c91c7feadf3 100644
+index 6c91c7feadf3..94c9c2e9f917 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -109,7 +109,6 @@ struct its_node {
- 	struct list_head	its_device_list;
- 	u64			flags;
- 	unsigned long		list_nr;
--	u32			device_ids;
- 	int			numa_node;
- 	unsigned int		msi_domain_flags;
- 	u32			pre_its_base; /* for Socionext Synquacer */
-@@ -117,6 +116,7 @@ struct its_node {
- };
+@@ -1045,20 +1045,26 @@ static void its_send_vinvall(struct its_node *its, struct its_vpe *vpe)
+ /*
+  * irqchip functions - assumes MSI, mostly.
+  */
++static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
++{
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++
++	if (!irqd_is_forwarded_to_vcpu(d))
++		return NULL;
++
++	return &its_dev->event_map.vlpi_maps[event];
++}
  
- #define is_v4(its)		(!!((its)->typer & GITS_TYPER_VLPIS))
-+#define device_ids(its)		(FIELD_GET(GITS_TYPER_DEVBITS, (its)->typer) + 1)
- 
- #define ITS_ITT_ALIGN		SZ_256
- 
-@@ -1938,9 +1938,9 @@ static bool its_parse_indirect_baser(struct its_node *its,
- 	if (new_order >= MAX_ORDER) {
- 		new_order = MAX_ORDER - 1;
- 		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
--		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
-+		pr_warn("ITS@%pa: %s Table too large, reduce ids %llu->%u\n",
- 			&its->phys_base, its_base_type_string[type],
--			its->device_ids, ids);
-+			device_ids(its), ids);
- 	}
- 
- 	*order = new_order;
-@@ -1986,7 +1986,7 @@ static int its_alloc_tables(struct its_node *its)
- 		case GITS_BASER_TYPE_DEVICE:
- 			indirect = its_parse_indirect_baser(its, baser,
- 							    psz, &order,
--							    its->device_ids);
-+							    device_ids(its));
- 			break;
- 
- 		case GITS_BASER_TYPE_VCPU:
-@@ -2377,7 +2377,7 @@ static bool its_alloc_device_table(struct its_node *its, u32 dev_id)
- 
- 	/* Don't allow device id that exceeds ITS hardware limit */
- 	if (!baser)
--		return (ilog2(dev_id) < its->device_ids);
-+		return (ilog2(dev_id) < device_ids(its));
- 
- 	return its_alloc_table_entry(its, baser, dev_id);
- }
-@@ -3229,8 +3229,9 @@ static bool __maybe_unused its_enable_quirk_cavium_22375(void *data)
+ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
  {
- 	struct its_node *its = data;
++	struct its_vlpi_map *map = get_vlpi_map(d);
+ 	irq_hw_number_t hwirq;
+ 	void *va;
+ 	u8 *cfg;
  
--	/* erratum 22375: only alloc 8MB table size */
--	its->device_ids = 0x14;		/* 20 bits, 8MB */
-+	/* erratum 22375: only alloc 8MB table size (20 bits) */
-+	its->typer &= ~GITS_TYPER_DEVBITS;
-+	its->typer |= FIELD_PREP(GITS_TYPER_DEVBITS, 20 - 1);
- 	its->flags |= ITS_FLAGS_WORKAROUND_CAVIUM_22375;
+-	if (irqd_is_forwarded_to_vcpu(d)) {
+-		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+-		u32 event = its_get_event_id(d);
+-		struct its_vlpi_map *map;
+-
+-		va = page_address(its_dev->event_map.vm->vprop_page);
+-		map = &its_dev->event_map.vlpi_maps[event];
++	if (map) {
++		va = page_address(map->vm->vprop_page);
+ 		hwirq = map->vintid;
  
- 	return true;
-@@ -3285,8 +3286,10 @@ static bool __maybe_unused its_enable_quirk_socionext_synquacer(void *data)
- 		its->get_msi_base = its_irq_get_msi_base_pre_its;
+ 		/* Remember the updated property */
+@@ -1351,19 +1357,18 @@ static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
+ static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
+ {
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+-	u32 event = its_get_event_id(d);
++	struct its_vlpi_map *map = get_vlpi_map(d);
+ 	int ret = 0;
  
- 		ids = ilog2(pre_its_window[1]) - 2;
--		if (its->device_ids > ids)
--			its->device_ids = ids;
-+		if (device_ids(its) > ids) {
-+			its->typer &= ~GITS_TYPER_DEVBITS;
-+			its->typer |= FIELD_PREP(GITS_TYPER_DEVBITS, ids - 1);
-+		}
+ 	mutex_lock(&its_dev->event_map.vlpi_lock);
  
- 		/* the pre-ITS breaks isolation, so disable MSI remapping */
- 		its->msi_domain_flags &= ~IRQ_DOMAIN_FLAG_MSI_REMAP;
-@@ -3519,7 +3522,7 @@ static int its_init_vpe_domain(void)
+-	if (!its_dev->event_map.vm ||
+-	    !its_dev->event_map.vlpi_maps[event].vm) {
++	if (!its_dev->event_map.vm || !map->vm) {
+ 		ret = -EINVAL;
+ 		goto out;
  	}
  
- 	/* Use the last possible DevID */
--	devid = GENMASK(its->device_ids - 1, 0);
-+	devid = GENMASK(device_ids(its) - 1, 0);
- 	vpe_proxy.dev = its_create_device(its, devid, entries, false);
- 	if (!vpe_proxy.dev) {
- 		kfree(vpe_proxy.vpes);
-@@ -3620,7 +3623,6 @@ static int __init its_probe_one(struct resource *res,
- 	its->typer = typer;
- 	its->base = its_base;
- 	its->phys_base = res->start;
--	its->device_ids = GITS_TYPER_DEVBITS(typer);
- 	if (is_v4(its)) {
- 		if (!(typer & GITS_TYPER_VMOVP)) {
- 			err = its_compute_its_list_map(res, its_base);
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 4bce7a904075..b6514e8893bf 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -337,7 +337,7 @@
- #define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
- #define GITS_TYPER_IDBITS_SHIFT		8
- #define GITS_TYPER_DEVBITS_SHIFT	13
--#define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
-+#define GITS_TYPER_DEVBITS		GENMASK_ULL(17, 13)
- #define GITS_TYPER_PTA			(1UL << 19)
- #define GITS_TYPER_HCC_SHIFT		24
- #define GITS_TYPER_HCC(r)		(((r) >> GITS_TYPER_HCC_SHIFT) & 0xff)
+ 	/* Copy our mapping information to the incoming request */
+-	*info->map = its_dev->event_map.vlpi_maps[event];
++	*info->map = *map;
+ 
+ out:
+ 	mutex_unlock(&its_dev->event_map.vlpi_lock);
 -- 
 2.20.1
 
