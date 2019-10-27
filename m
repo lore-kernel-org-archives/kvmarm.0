@@ -4,59 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CCF0CA9EAF
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCACCA9EBC
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CB95B21850
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC4EA21D80
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1v8UzLC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB95B21850
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyQ3KDW0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4EA21D80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 830FB4A591;
-	Sun, 27 Oct 2019 10:45:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75C224AC9B;
+	Sun, 27 Oct 2019 10:45:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BTXg63hS3ORo; Sun, 27 Oct 2019 10:45:19 -0400 (EDT)
+	with ESMTP id Wx5OJ8w9jzHC; Sun, 27 Oct 2019 10:45:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A8B84A50F;
-	Sun, 27 Oct 2019 10:45:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D1A84AC7B;
+	Sun, 27 Oct 2019 10:45:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4A8C4A50F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A59024AC65
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nfl50Ub-HnWF for <kvmarm@lists.cs.columbia.edu>;
- Sun, 27 Oct 2019 10:45:16 -0400 (EDT)
+ with ESMTP id evordDPOkavb for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 27 Oct 2019 10:45:22 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C6A64A4CD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89B454A50F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:22 -0400 (EDT)
 Received: from localhost.localdomain (82-132-239-15.dab.02.net [82.132.239.15])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 267A5214AF;
- Sun, 27 Oct 2019 14:45:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 79AE321D7F;
+ Sun, 27 Oct 2019 14:45:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1572187515;
- bh=7WADeKBaB4arR8SftPdnUH6Zgraeo0sOTstc86e4hTw=;
+ s=default; t=1572187521;
+ bh=FzgKMCYjRYf3HWs4mtVHwQgc+VtCzxmMq/IIStKY2AI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=V1v8UzLCqO0MdDSA4+Q2KaRcrzQnVzPnV316gLeJzeXQAU4GGsryQOWzB+Rm6YQhN
- mSZsiHY1cbtErphVcLFlu/AUFtUHNkWzSiaOztcyHnuuqmrTnhlUo0BQug28vWRhXr
- frtWk0osTXX3Jf2EXD1jyMsN7PEZrJDjrn9j0Uis=
+ b=NyQ3KDW0gBq7sUEWrJ5I2NQvlvsBZ3fZdZJxciE9qFFJ+w7YnFIagcgXHmQOLIRBl
+ IOv4UPcFUFUN6opfivFoKBiJaazY5I+CAY8lNobjZ16YggGa2g51E6IAaoP9wJQ5LU
+ J7xyZT1i7OJ/D77pDnOZW+CREGTA1qxDma6EQ4xI=
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 20/36] irqchip/gic-v4.1: Suppress per-VLPI doorbell
-Date: Sun, 27 Oct 2019 14:42:18 +0000
-Message-Id: <20191027144234.8395-21-maz@kernel.org>
+Subject: [PATCH v2 21/36] irqchip/gic-v4.1: Allow direct invalidation of VLPIs
+Date: Sun, 27 Oct 2019 14:42:19 +0000
+Message-Id: <20191027144234.8395-22-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191027144234.8395-1-maz@kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
@@ -80,50 +81,117 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since GICv4.1 gives us a per-VPE doorbell, avoid programming anything
-else on VMOVI/VMAPI/VMAPTI and on any other action that would have
-otherwise resulted in a per-VLPI doorbell to be programmed.
+Just like for INVALL, GICv4.1 has grown a VPE-aware INVLPI register.
+Let's plumb it in and make use of the DirectLPI code in that case.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 53 ++++++++++++++++++++----------
+ include/linux/irqchip/arm-gic-v3.h |  1 +
+ 2 files changed, 36 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 10bd156aa042..75c4d1a6f20d 100644
+index 75c4d1a6f20d..df259e202482 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -691,7 +691,7 @@ static struct its_vpe *its_build_vmapti_cmd(struct its_node *its,
- {
- 	u32 db;
+@@ -203,11 +203,26 @@ static struct its_collection *dev_event_to_col(struct its_device *its_dev,
+ 	return its->collections + its_dev->event_map.col_map[event];
+ }
  
--	if (desc->its_vmapti_cmd.db_enabled)
-+	if (!is_v4_1(its) && desc->its_vmapti_cmd.db_enabled)
- 		db = desc->its_vmapti_cmd.vpe->vpe_db_lpi;
- 	else
- 		db = 1023;
-@@ -714,7 +714,7 @@ static struct its_vpe *its_build_vmovi_cmd(struct its_node *its,
+-static struct its_collection *irq_to_col(struct irq_data *d)
++static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
  {
- 	u32 db;
- 
--	if (desc->its_vmovi_cmd.db_enabled)
-+	if (!is_v4_1(its) && desc->its_vmovi_cmd.db_enabled)
- 		db = desc->its_vmovi_cmd.vpe->vpe_db_lpi;
- 	else
- 		db = 1023;
-@@ -1227,6 +1227,13 @@ static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
  	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
- 	u32 event = its_get_event_id(d);
- 
-+	/*
-+	 * GICv4.1 does away with the per-LPI nonsense, nothing to do
-+	 * here.
-+	 */
-+	if (is_v4_1(its_dev->its))
-+		return;
++	u32 event = its_get_event_id(d);
 +
- 	if (its_dev->event_map.vlpi_maps[event].db_enabled == enable)
- 		return;
++	if (!irqd_is_forwarded_to_vcpu(d))
++		return NULL;
+ 
+-	return dev_event_to_col(its_dev, its_get_event_id(d));
++	return &its_dev->event_map.vlpi_maps[event];
++}
++
++static int irq_to_cpuid(struct irq_data *d)
++{
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	struct its_vlpi_map *map = get_vlpi_map(d);
++
++	if (map)
++		return map->vpe->col_idx;
++
++	return its_dev->event_map.col_map[its_get_event_id(d)];
+ }
+ 
+ static struct its_collection *valid_col(struct its_collection *col)
+@@ -1147,17 +1162,6 @@ static void its_send_invdb(struct its_node *its, struct its_vpe *vpe)
+ /*
+  * irqchip functions - assumes MSI, mostly.
+  */
+-static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
+-{
+-	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+-	u32 event = its_get_event_id(d);
+-
+-	if (!irqd_is_forwarded_to_vcpu(d))
+-		return NULL;
+-
+-	return &its_dev->event_map.vlpi_maps[event];
+-}
+-
+ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
+ {
+ 	struct its_vlpi_map *map = get_vlpi_map(d);
+@@ -1200,13 +1204,25 @@ static void wait_for_syncr(void __iomem *rdbase)
+ 
+ static void direct_lpi_inv(struct irq_data *d)
+ {
+-	struct its_collection *col;
++	struct its_vlpi_map *map = get_vlpi_map(d);
+ 	void __iomem *rdbase;
++	u64 val;
++
++	if (map) {
++		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++
++		WARN_ON(!is_v4_1(its_dev->its));
++
++		val  = GICR_INVLPIR_V;
++		val |= FIELD_PREP(GICR_INVLPIR_VPEID, map->vpe->vpe_id);
++		val |= FIELD_PREP(GICR_INVLPIR_INTID, map->vintid);
++	} else {
++		val = d->hwirq;
++	}
+ 
+ 	/* Target the redistributor this LPI is currently routed to */
+-	col = irq_to_col(d);
+-	rdbase = per_cpu_ptr(gic_rdists->rdist, col->col_id)->rd_base;
+-	gic_write_lpir(d->hwirq, rdbase + GICR_INVLPIR);
++	rdbase = per_cpu_ptr(gic_rdists->rdist, irq_to_cpuid(d))->rd_base;
++	gic_write_lpir(val, rdbase + GICR_INVLPIR);
+ 
+ 	wait_for_syncr(rdbase);
+ }
+@@ -1216,7 +1232,8 @@ static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+ 
+ 	lpi_write_config(d, clr, set);
+-	if (gic_rdists->has_direct_lpi && !irqd_is_forwarded_to_vcpu(d))
++	if (gic_rdists->has_direct_lpi &&
++	    (is_v4_1(its_dev->its) || !irqd_is_forwarded_to_vcpu(d)))
+ 		direct_lpi_inv(d);
+ 	else
+ 		its_send_inv(its_dev, its_get_event_id(d));
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index b69f60792554..5f3278cbf247 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -247,6 +247,7 @@
+ #define GICR_TYPER_COMMON_LPI_AFF	GENMASK_ULL(25, 24)
+ #define GICR_TYPER_AFFINITY		GENMASK_ULL(63, 32)
+ 
++#define GICR_INVLPIR_INTID		GENMASK_ULL(31, 0)
+ #define GICR_INVLPIR_VPEID		GENMASK_ULL(47, 32)
+ #define GICR_INVLPIR_V			GENMASK_ULL(63, 63)
  
 -- 
 2.20.1
