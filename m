@@ -2,95 +2,66 @@ Return-Path: <SRS0=uKin=YU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E96CA9EBC
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 08:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07167CA9EAF
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09B2420873
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 08:20:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B2420873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 7413221D7F
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:43:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lY2qHe/i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7413221D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 835BE4A49C;
-	Sun, 27 Oct 2019 04:20:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB91E4A830;
+	Sun, 27 Oct 2019 10:43:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iFkmyQTKfqwk; Sun, 27 Oct 2019 04:20:12 -0400 (EDT)
+	with ESMTP id 9mxcg6rH2B-q; Sun, 27 Oct 2019 10:43:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D0624A51D;
-	Sun, 27 Oct 2019 04:20:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38AB54AC66;
+	Sun, 27 Oct 2019 10:43:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2968B4A4BE
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 04:20:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 277764A830
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:42:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QJZ+V3PAXCPQ for <kvmarm@lists.cs.columbia.edu>;
- Sun, 27 Oct 2019 04:20:10 -0400 (EDT)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EAD44A49C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 04:20:10 -0400 (EDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9R8CXsp096943; Sun, 27 Oct 2019 04:20:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vvgy24um5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 27 Oct 2019 04:19:59 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9R8Chbv097267;
- Sun, 27 Oct 2019 04:19:59 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vvgy24uky-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 27 Oct 2019 04:19:59 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9R8Gse5015131;
- Sun, 27 Oct 2019 08:19:58 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma04wdc.us.ibm.com with ESMTP id 2vvds6gxpk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 27 Oct 2019 08:19:58 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9R8JvEr24248630
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 27 Oct 2019 08:19:57 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A73706E050;
- Sun, 27 Oct 2019 08:19:57 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE2FB6E04E;
- Sun, 27 Oct 2019 08:19:55 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.36.74])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Sun, 27 Oct 2019 08:19:55 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: [PATCH] KVM: arm/arm64: show halt poll counters in debugfs
-Date: Sun, 27 Oct 2019 09:19:50 +0100
-Message-Id: <1572164390-5851-1-git-send-email-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-27_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=567 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910270086
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 4aRjEL4FoXor for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 27 Oct 2019 10:42:58 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D33474A54B
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:42:57 -0400 (EDT)
+Received: from localhost.localdomain (82-132-239-15.dab.02.net [82.132.239.15])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3EC9C214AF;
+ Sun, 27 Oct 2019 14:42:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1572187376;
+ bh=Z87iQ8r/Zs8QcHm3AWQm907d97xyGfDqeydhOv6+qW0=;
+ h=From:To:Cc:Subject:Date:From;
+ b=lY2qHe/iLt950wPLoFxO3l+pqV07HyjzDcZOOSGPuoTg2qpjUodwg/p6vq6ZV82E3
+ LDg8F45yQf1Twd30WPOHlGJduXqVa/X584wgbYFmqF2MASA/VH0UREfNpM7BS3JJGI
+ ymIEj8EX9q/MBXSmohYdvehoXOJDBx/N6trlOwM8=
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/36] irqchip/gic-v4: GICv4.1 architecture support
+Date: Sun, 27 Oct 2019 14:41:58 +0000
+Message-Id: <20191027144234.8395-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
+ Jayachandran C <jnair@marvell.com>, Thomas Gleixner <tglx@linutronix.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,54 +73,123 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ARM/ARM64 has counters halt_successful_poll, halt_attempted_poll,
-halt_poll_invalid, and halt_wakeup but never exposed those in debugfs.
+This rather long series expands the existing GICv4 support to deal with the
+new GICv4.1 architecture, which comes with a set of major improvements
+compared to v4.0:
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
-This patch is untested
- arch/arm/kvm/guest.c   | 4 ++++
- arch/arm64/kvm/guest.c | 4 ++++
- 2 files changed, 8 insertions(+)
+- One architectural doorbell per vcpu, instead of one doorbell per VLPI
 
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64..6696464 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -21,6 +21,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd6264..260ea31 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -34,6 +34,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
+- Doorbell entirely managed by the HW, with an "at most once" delivery
+  guarantee per non-residency phase and only when requested by the
+  hypervisor
+
+- A shared memory scheme between ITSs and redistributors, allowing for an
+  optimised residency sequence (the use of VMOVP becomes less frequent)
+
+- Support for direct virtual SGI delivery (the injection path still involves
+  the hypervisor), at the cost of losing the active state on SGIs. It
+  shouldn't be a big deal, but some guest operating systems might notice
+  (Linux definitely won't care)
+
+On the other hand, public documentation is not available yet, so that's a
+bit annoying...
+
+The series is roughly organised in 5 parts:
+
+(1) A bunch of reworks to make the checking of some features more
+    straightforward,
+(2) VPE table allocation, new flavours of VMAPP/VMOVP commands
+(3) v4.1 doorbell management
+(4) Virtual SGI support
+(5) Plumbing of virtual SGIs in KVM
+
+Notes:
+
+  - This series has uncovered a behaviour that looks like a HW bug on
+    the Cavium ThunderX (aka TX1) platform (see patch #10). I'd very
+    much welcome some clarification from the Marvell/Cavium folks on
+    Cc, as well as an official erratum number if this happens to be an
+    actual bug
+
+  - I plan to take the first seven patches into 5.5 in order to reduce
+    the size of the backlog:
+
+    * patch #1 and #3 are good performance optimisations
+    * patches #4 through to #7 are nice cleanups
+
+    Do shout if you see any issue with this.
+
+* From v1:
+  - A bunch of minor reworks after Zenghui Yu's review
+  - A workaround for what looks like a new and unexpected TX1 bug
+  - A subtle reorder of the series so that some patches can go in early
+
+Marc Zyngier (36):
+  KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by
+    vcpu_load/put
+  irqchip/gic-v3-its: Factor out wait_for_syncr primitive
+  irqchip/gic-v3-its: Allow LPI invalidation via the DirectLPI interface
+  irqchip/gic-v3-its: Make is_v4 use a TYPER copy
+  irqchip/gic-v3-its: Kill its->ite_size and use TYPER copy instead
+  irqchip/gic-v3-its: Kill its->device_ids and use TYPER copy instead
+  irqchip/gic-v3-its: Add get_vlpi_map() helper
+  irqchip/gic-v3: Detect GICv4.1 supporting RVPEID
+  irqchip/gic-v3: Add GICv4.1 VPEID size discovery
+  irqchip/gic-v3: Workaround Cavium TX1 erratum when reading GICD_TYPER2
+  irqchip/gic-v4.1: VPE table (aka GICR_VPROPBASER) allocation
+  irqchip/gic-v4.1: Implement the v4.1 flavour of VMAPP
+  irqchip/gic-v4.1: Don't use the VPE proxy if RVPEID is set
+  irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP
+  irqchip/gic-v4.1: Plumb skeletal VPE irqchip
+  irqchip/gic-v4.1: Add mask/unmask doorbell callbacks
+  irqchip/gic-v4.1: Add VPE residency callback
+  irqchip/gic-v4.1: Add VPE eviction callback
+  irqchip/gic-v4.1: Add VPE INVALL callback
+  irqchip/gic-v4.1: Suppress per-VLPI doorbell
+  irqchip/gic-v4.1: Allow direct invalidation of VLPIs
+  irqchip/gic-v4.1: Advertise support v4.1 to KVM
+  irqchip/gic-v4.1: Map the ITS SGIR register page
+  irqchip/gic-v4.1: Plumb skeletal VSGI irqchip
+  irqchip/gic-v4.1: Add initial SGI configuration
+  irqchip/gic-v4.1: Plumb mask/unmask SGI callbacks
+  irqchip/gic-v4.1: Plumb get/set_irqchip_state SGI callbacks
+  irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI callbacks
+  irqchip/gic-v4.1: Move doorbell management to the GICv4 abstraction
+    layer
+  irqchip/gic-v4.1: Add VSGI allocation/teardown
+  irqchip/gic-v4.1: Add VSGI property setup
+  irqchip/gic-v4.1: Eagerly vmap vPEs
+  KVM: arm64: GICv4.1: Let doorbells be auto-enabled
+  KVM: arm64: GICv4.1: Add direct injection capability to SGI registers
+  KVM: arm64: GICv4.1: Configure SGIs as HW interrupts
+  KVM: arm64: GICv4.1: Expose HW-based SGIs in debugfs
+
+ arch/arm/include/asm/arch_gicv3.h      |    2 +
+ arch/arm64/include/asm/arch_gicv3.h    |    1 +
+ drivers/irqchip/irq-gic-v3-its.c       | 1102 +++++++++++++++++++++---
+ drivers/irqchip/irq-gic-v3.c           |   46 +-
+ drivers/irqchip/irq-gic-v4.c           |  143 ++-
+ include/kvm/arm_vgic.h                 |    5 +-
+ include/linux/irqchip/arm-gic-common.h |    2 +
+ include/linux/irqchip/arm-gic-v3.h     |   75 +-
+ include/linux/irqchip/arm-gic-v4.h     |   45 +-
+ virt/kvm/arm/arm.c                     |   12 +-
+ virt/kvm/arm/vgic/vgic-debug.c         |   14 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c       |   15 +-
+ virt/kvm/arm/vgic/vgic-mmio.c          |   88 +-
+ virt/kvm/arm/vgic/vgic-v3.c            |    5 +
+ virt/kvm/arm/vgic/vgic-v4.c            |  106 ++-
+ virt/kvm/arm/vgic/vgic.c               |    4 -
+ virt/kvm/arm/vgic/vgic.h               |    2 -
+ 17 files changed, 1492 insertions(+), 175 deletions(-)
+
 -- 
-1.8.3.1
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
