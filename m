@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC10CA9EAF
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BD2CA9EAF
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1D68D222BD
-	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B15E214AF
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Oct 2019 14:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXov28pe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D68D222BD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="atHehoOB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B15E214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6E524A597;
-	Sun, 27 Oct 2019 10:44:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20C984AC81;
+	Sun, 27 Oct 2019 10:45:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vpaogQF8yUZ1; Sun, 27 Oct 2019 10:44:57 -0400 (EDT)
+	with ESMTP id kQFPaArXK90v; Sun, 27 Oct 2019 10:45:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3ADB4AC65;
-	Sun, 27 Oct 2019 10:44:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E78594A5BD;
+	Sun, 27 Oct 2019 10:45:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64FE44AC86
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:44:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E45864A5BD
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hV1rY6vaQQTR for <kvmarm@lists.cs.columbia.edu>;
- Sun, 27 Oct 2019 10:44:55 -0400 (EDT)
+ with ESMTP id kIc-Ln1+c8Oj for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 27 Oct 2019 10:45:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A24B4AC65
- for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:44:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7A584A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Oct 2019 10:45:01 -0400 (EDT)
 Received: from localhost.localdomain (82-132-239-15.dab.02.net [82.132.239.15])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 98D7521D7F;
- Sun, 27 Oct 2019 14:44:49 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A002621E6F;
+ Sun, 27 Oct 2019 14:44:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1572187494;
- bh=eJ5elfNt9kSk/t4uztnAcka0aHLuBmFWPvPCbMpqtMk=;
+ s=default; t=1572187501;
+ bh=H3GAI5vLVjtZJ1aQlZsIHRQHBYBwQ2NuourT2ApKXvM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=pXov28peb4WjkjuX67J7eAIECXPKuSWa6p2Z4T8X+xiNtBc8FTdkoIIUu7cOJ+YLH
- 4sThy+poCnLrhEkF9wVuN3odojl6p9P6MXRt5jwTpn8BlrJ25v6DwVbzS8uiVJRqnp
- MFuw9MMp1DQpE5RnnnBndCNnhNoSV1W8OgIf4IEw=
+ b=atHehoOBYndYpOWXv2VccG2C/Os7y7E0HQ2js6n4bCydxMuiTRvl+joyzst4XNgPO
+ WOBdjfmmuve/nvXVXb3makrzdD49iQ2O2dZCks6o/C5DqGgMy/xKyKFaKdBhME3Smi
+ xMtgQBV0MtSUulPn05Ev/ghPANxcb9NiyQahDmYA=
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 17/36] irqchip/gic-v4.1: Add VPE residency callback
-Date: Sun, 27 Oct 2019 14:42:15 +0000
-Message-Id: <20191027144234.8395-18-maz@kernel.org>
+Subject: [PATCH v2 18/36] irqchip/gic-v4.1: Add VPE eviction callback
+Date: Sun, 27 Oct 2019 14:42:16 +0000
+Message-Id: <20191027144234.8395-19-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191027144234.8395-1-maz@kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
@@ -81,87 +81,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Making a VPE resident on GICv4.1 is pretty simple, as it is just a
-single write to the local redistributor. We just need extra information
-about which groups to enable, which the KVM code will have to provide.
+When descheduling a VPE, special care must be taken to tell the GIC
+about whether we want to receive a doorbell or not. This is a
+major improvement on GICv4.0, where the doorbell had to be separately
+enabled/disabled.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 17 +++++++++++++++++
- include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
- include/linux/irqchip/arm-gic-v4.h |  5 +++++
- 3 files changed, 31 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c | 53 +++++++++++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 3c34bef70bdd..d45e9b4e5622 100644
+index d45e9b4e5622..f7effd453729 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3466,12 +3466,29 @@ static void its_vpe_4_1_unmask_irq(struct irq_data *d)
- 	its_vpe_4_1_send_inv(d);
+@@ -2487,7 +2487,7 @@ static int __init allocate_lpi_tables(void)
+ 	return 0;
  }
  
-+static void its_vpe_4_1_schedule(struct its_vpe *vpe,
-+				 struct its_cmd_info *info)
+-static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
++static u64 its_clear_vpend_valid(void __iomem *vlpi_base, u64 clr, u64 set)
+ {
+ 	u32 count = 1000000;	/* 1s! */
+ 	bool clean;
+@@ -2495,6 +2495,8 @@ static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
+ 
+ 	val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
+ 	val &= ~GICR_VPENDBASER_Valid;
++	val &= ~clr;
++	val |= set;
+ 	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+ 
+ 	do {
+@@ -2507,6 +2509,11 @@ static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
+ 		}
+ 	} while (!clean && count);
+ 
++	if (unlikely(val & GICR_VPENDBASER_Dirty)) {
++		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
++		val |= GICR_VPENDBASER_PendingLast;
++	}
++
+ 	return val;
+ }
+ 
+@@ -2615,7 +2622,7 @@ static void its_cpu_init_lpis(void)
+ 		 * ancient programming gets left in and has possibility of
+ 		 * corrupting memory.
+ 		 */
+-		val = its_clear_vpend_valid(vlpi_base);
++		val = its_clear_vpend_valid(vlpi_base, 0, 0);
+ 		WARN_ON(val & GICR_VPENDBASER_Dirty);
+ 	}
+ 
+@@ -3293,16 +3300,10 @@ static void its_vpe_deschedule(struct its_vpe *vpe)
+ 	void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
+ 	u64 val;
+ 
+-	val = its_clear_vpend_valid(vlpi_base);
++	val = its_clear_vpend_valid(vlpi_base, 0, 0);
+ 
+-	if (unlikely(val & GICR_VPENDBASER_Dirty)) {
+-		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
+-		vpe->idai = false;
+-		vpe->pending_last = true;
+-	} else {
+-		vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
+-		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
+-	}
++	vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
++	vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
+ }
+ 
+ static void its_vpe_invall(struct its_vpe *vpe)
+@@ -3481,6 +3482,35 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
+ 	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+ }
+ 
++static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
++				   struct its_cmd_info *info)
 +{
 +	void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
-+	u64 val = 0;
++	u64 val;
 +
-+	/* Schedule the VPE */
-+	val |= GICR_VPENDBASER_Valid;
-+	val |= info->g0en ? GICR_VPENDBASER_4_1_VGRP0EN : 0;
-+	val |= info->g1en ? GICR_VPENDBASER_4_1_VGRP1EN : 0;
-+	val |= FIELD_PREP(GICR_VPENDBASER_4_1_VPEID, vpe->vpe_id);
-+
-+	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
++	if (info->req_db) {
++		/*
++		 * vPE is going to block: make the vPE non-resident with
++		 * PendingLast clear and DB set. The GIC guarantees that if
++		 * we read-back PendingLast clear, then a doorbell will be
++		 * delivered when an interrupt comes.
++		 */
++		val = its_clear_vpend_valid(vlpi_base,
++					    GICR_VPENDBASER_PendingLast,
++					    GICR_VPENDBASER_4_1_DB);
++		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
++	} else {
++		/*
++		 * We're not blocking, so just make the vPE non-resident
++		 * with PendingLast set, indicating that we'll be back.
++		 */
++		val = its_clear_vpend_valid(vlpi_base,
++					    0,
++					    GICR_VPENDBASER_PendingLast);
++		vpe->pending_last = true;
++	}
 +}
 +
  static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
  {
-+	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
- 	struct its_cmd_info *info = vcpu_info;
- 
- 	switch (info->cmd_type) {
- 	case SCHEDULE_VPE:
-+		its_vpe_4_1_schedule(vpe, info);
+ 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+@@ -3492,6 +3522,7 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
  		return 0;
  
  	case DESCHEDULE_VPE:
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 8157737053e4..6fd89d77b2b2 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -327,6 +327,15 @@
- #define GICR_VPENDBASER_IDAI		(1ULL << 62)
- #define GICR_VPENDBASER_Valid		(1ULL << 63)
++		its_vpe_4_1_deschedule(vpe, info);
+ 		return 0;
  
-+/*
-+ * GICv4.1 VPENDBASER, used for VPE residency. On top of these fields,
-+ * also use the above Valid, PendingLast and Dirty.
-+ */
-+#define GICR_VPENDBASER_4_1_DB		(1ULL << 62)
-+#define GICR_VPENDBASER_4_1_VGRP0EN	(1ULL << 59)
-+#define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
-+#define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
-+
- /*
-  * ITS registers, offsets from ITS_base
-  */
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 6213ced6f199..edbaa37fd3f1 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -98,6 +98,11 @@ struct its_cmd_info {
- 	union {
- 		struct its_vlpi_map	*map;
- 		u8			config;
-+		bool			req_db;
-+		struct {
-+			bool		g0en;
-+			bool		g1en;
-+		};
- 	};
- };
- 
+ 	case INVALL_VPE:
 -- 
 2.20.1
 
