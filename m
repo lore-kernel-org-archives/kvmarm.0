@@ -2,64 +2,61 @@ Return-Path: <SRS0=Hg88=YV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A4DCA9EA0
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 09:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9A4CA9EBC
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 10:32:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9D20620B7C
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 09:40:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D20620B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 95F3620659
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 10:32:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F3620659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0CF4A4A3;
-	Mon, 28 Oct 2019 05:40:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3EB4A4FF;
+	Mon, 28 Oct 2019 06:32:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Lcby4wpCqZ+3; Mon, 28 Oct 2019 05:40:56 -0400 (EDT)
+	with ESMTP id 75gkoXk2hSJR; Mon, 28 Oct 2019 06:32:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374534A4A0;
-	Mon, 28 Oct 2019 05:40:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C11BC4A534;
+	Mon, 28 Oct 2019 06:32:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4324A4A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 05:40:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61CCE4A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 06:32:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TvKiBV-bxoxM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Oct 2019 05:40:53 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 617CB4A49F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 05:40:53 -0400 (EDT)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AE982872D7297DD92591;
- Mon, 28 Oct 2019 17:40:50 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Mon, 28 Oct 2019
- 17:40:44 +0800
-Subject: Re: [PATCH v2 05/36] irqchip/gic-v3-its: Kill its->ite_size and use
- TYPER copy instead
-To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-References: <20191027144234.8395-1-maz@kernel.org>
- <20191027144234.8395-6-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <e1930273-ee1f-6b17-5c7a-01bafc8b9482@huawei.com>
-Date: Mon, 28 Oct 2019 17:40:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id KZ9gNrOK7aMY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Oct 2019 06:32:21 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC7B4A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 06:32:21 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C568F1F1;
+ Mon, 28 Oct 2019 03:32:20 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.197.42])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ 8A0AC3F71E; Mon, 28 Oct 2019 03:32:19 -0700 (PDT)
+Date: Mon, 28 Oct 2019 10:32:17 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 4/5] arm64: KVM: Prevent speculative S1 PTW when
+ restoring vcpu context
+Message-ID: <20191028103217.GB16739@arrakis.emea.arm.com>
+References: <20191019095521.31722-1-maz@kernel.org>
+ <20191019095521.31722-5-maz@kernel.org>
+ <151fc868-6709-3017-e34d-649ec0e1812c@arm.com>
+ <8636ffzu30.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191027144234.8395-6-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
- Jayachandran C <jnair@marvell.com>, Thomas Gleixner <tglx@linutronix.de>
+Content-Disposition: inline
+In-Reply-To: <8636ffzu30.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,21 +68,25 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019/10/27 22:42, Marc Zyngier wrote:
-> Now that we have a copy of TYPER in the ITS structure, rely on this
-> to provide the same service as its->ite_size, which gets axed.
-> Errata workarounds are now updating the cached fields instead of
-> requiring a separate field in the ITS structure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Sat, Oct 26, 2019 at 11:20:35AM +0100, Marc Zyngier wrote:
+> Catalin, Will: given that this series conflicts with the workaround for
+> erratum 1542419, do you mind taking it via the arm64 tree?
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+I assume you target 5.5 with this workaround.
 
+I don't mind merging it but if you want to queue it, we already have a
+stable for-next/neoverse-n1-stale-instr branch with 1542419 (I'll push a
+fixup on top soon for a clang warning). The other issue is that we get a
+conflict with mainline due to the tx2 erratum. If it gets too
+complicated, I'll also merge for-next/fixes into for-next/core.
+
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
