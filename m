@@ -4,55 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4872CCA9EC0
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 15:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BF0CA9EC1
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 15:12:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF63620873
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 15:07:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF63620873
+	by mail.kernel.org (Postfix) with ESMTP id 326E920830
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Oct 2019 15:12:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326E920830
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 157094A7FE;
-	Mon, 28 Oct 2019 11:07:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A688D4AC80;
+	Mon, 28 Oct 2019 11:12:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E6ZwmFEntmWT; Mon, 28 Oct 2019 11:06:59 -0400 (EDT)
+	with ESMTP id b8HQnlYKbBef; Mon, 28 Oct 2019 11:12:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C44974A97E;
-	Mon, 28 Oct 2019 11:06:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 120704A902;
+	Mon, 28 Oct 2019 11:12:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E777B4A7FE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 11:06:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E264A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 11:12:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aKffWs2nbj5Q for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Oct 2019 11:06:57 -0400 (EDT)
+ with ESMTP id Clzvvl6W4hb2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Oct 2019 11:12:41 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2384A5A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 11:06:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC054A49F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 11:12:41 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA8721F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 08:06:56 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2013F1F1;
+ Mon, 28 Oct 2019 08:12:41 -0700 (PDT)
 Received: from [10.1.196.63] (unknown [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF5723F6C4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Oct 2019 08:06:56 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7AE5B3F6C4;
+ Mon, 28 Oct 2019 08:12:40 -0700 (PDT)
 Subject: Re: [PATCH v2] KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is
  supported
-To: kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
 References: <20191028130541.30536-1-christoffer.dall@arm.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4acc3bac-120d-6ee9-f0fd-92c43c575d3f@arm.com>
-Date: Mon, 28 Oct 2019 15:06:55 +0000
+Message-ID: <0c3291a7-18dc-1ae5-e706-8b04c9ab8a9e@arm.com>
+Date: Mon, 28 Oct 2019 15:12:39 +0000
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
 In-Reply-To: <20191028130541.30536-1-christoffer.dall@arm.com>
 Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,6 +71,9 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi,
+
+Resending this email, because I replied only to the kvmarm list by accident,
+instead of replying to everyone involved.
 
 On 10/28/19 1:05 PM, Christoffer Dall wrote:
 > On CPUs that support S2FWB (Armv8.4+), KVM configures the stage 2 page
@@ -147,11 +151,11 @@ On 10/28/19 1:05 PM, Christoffer Dall wrote:
 > +		 */
 > +		vcpu->arch.hcr_el2 &= ~HCR_TVM;
 
-Don't we want here to set the bit here, so we're consistent with the previous
-behaviour and the comment? Because with this patch, we never set HCR_EL2.TVM...
+Don't we want to set the bit here, so we're consistent with the previous behaviour and the comment? Because with this patch, we never set HCR_EL2.TVM...
 
 Thanks,
 Alex
+
 > +	}
 >  
 >  	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
