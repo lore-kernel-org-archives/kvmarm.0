@@ -4,50 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D81CA9EC3
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 09:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2675CA9EAE
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 09:23:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D76102083E
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 09:04:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76102083E
+	by mail.kernel.org (Postfix) with ESMTP id 3EA1520830
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 09:23:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA1520830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32CB34A52E;
-	Tue, 29 Oct 2019 05:04:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B507B4A955;
+	Tue, 29 Oct 2019 05:23:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kG9rjH4C1B6I; Tue, 29 Oct 2019 05:04:44 -0400 (EDT)
+	with ESMTP id 8XbsLipB3pfa; Tue, 29 Oct 2019 05:23:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9384A535;
-	Tue, 29 Oct 2019 05:04:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0284A4A4;
+	Tue, 29 Oct 2019 05:23:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EFCB34A4F6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 05:04:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC7A4A4F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 05:23:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kyqGQkdvLyGy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Oct 2019 05:04:41 -0400 (EDT)
+ with ESMTP id yGQ1Co3ryv1Q for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Oct 2019 05:23:42 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFFC84A483
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 05:04:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3DD14A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 05:23:42 -0400 (EDT)
 Received: from [91.217.168.176] (helo=big-swifty.misterjones.org)
  by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
  (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1iPNQZ-0005PR-7S; Tue, 29 Oct 2019 10:04:35 +0100
-Date: Tue, 29 Oct 2019 09:04:34 +0000
-Message-ID: <86o8xzylb1.wl-maz@kernel.org>
+ id 1iPNj0-0005iM-ET; Tue, 29 Oct 2019 10:23:38 +0100
+Date: Tue, 29 Oct 2019 09:23:37 +0000
+Message-ID: <86mudjykfa.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: vgic: Fix some comments typo
-In-Reply-To: <20191029071919.177-3-yuzenghui@huawei.com>
+Subject: Re: [PATCH 3/3] KVM: arm/arm64: vgic: Don't rely on the wrong pending
+ table
+In-Reply-To: <20191029071919.177-4-yuzenghui@huawei.com>
 References: <20191029071919.177-1-yuzenghui@huawei.com>
- <20191029071919.177-3-yuzenghui@huawei.com>
+ <20191029071919.177-4-yuzenghui@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,36 +79,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-On Tue, 29 Oct 2019 07:19:18 +0000,
+On Tue, 29 Oct 2019 07:19:19 +0000,
 Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> s/vgic_its_save_pending_tables/vgic_v3_save_pending_tables/
-> s/then/the/
+> It's possible that two LPIs locate in the same "byte_offset" but target
+> two different vcpus, where their pending status are indicated by two
+> different pending tables.  In such a scenario, using last_byte_offset
+> optimization will lead KVM relying on the wrong pending table entry.
+> Let us use last_ptr instead, which can be treated as a byte index into
+> a pending table and also, can be vcpu specific.
 > 
 > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 > ---
->  include/kvm/arm_vgic.h      | 2 +-
->  virt/kvm/arm/vgic/vgic-v3.c | 2 +-
->  virt/kvm/arm/vgic/vgic-v4.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 0fb240ec0a2a..01f8b3739a09 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -240,7 +240,7 @@ struct vgic_dist {
->  	 * Contains the attributes and gpa of the LPI configuration table.
->  	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
->  	 * one address across all redistributors.
-> -	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
-> +	 * GICv3 spec "LPI Configuration tables"
+> If this patch has done the right thing, we can even add the:
+> 
+> Fixes: 280771252c1b ("KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES")
+> 
+> But to be honest, I'm not clear about what has this patch actually fixed.
+> Pending tables should contain all zeros before we flush vgic_irq's pending
+> status into guest's RAM (thinking that guest should never write anything
+> into it). So the pending table entry we've read from the guest memory
+> seems always be zero. And we will always do the right thing even if we
+> rely on the wrong pending table entry.
+> 
+> I think I must have some misunderstanding here... Please fix me.
 
-Why the change here? Pointing to the chapter in the spec is pretty
-helpful, given that it is 800 pages long (although it should mention
-what revision of the spec this refers to). For example, it should say
-something like "IHI 0069E 6.1.1 ...".
+I think you're spot on, and it is the code needs fixing, not you! The
+problem is that we only read a byte once, irrespective of the vcpu the
+interrupts is routed to. If we switch to another vcpu for the same
+byte offset, we must reload it.
+
+This can be done by either checking the vcpu, or by tracking the guest
+address that we read from (just like you do here).
+
+A small comment below:
+
+>  virt/kvm/arm/vgic/vgic-v3.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 5ef93e5041e1..7cd2e2f81513 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -363,8 +363,8 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>  int vgic_v3_save_pending_tables(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> -	int last_byte_offset = -1;
+>  	struct vgic_irq *irq;
+> +	gpa_t last_ptr = -1;
+
+This should be written as
+
+     gpa_t last_ptr = ~(gpa_t)0;
+
+>  	int ret;
+>  	u8 val;
+>  
+> @@ -384,11 +384,11 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>  		bit_nr = irq->intid % BITS_PER_BYTE;
+>  		ptr = pendbase + byte_offset;
+>  
+> -		if (byte_offset != last_byte_offset) {
+> +		if (ptr != last_ptr) {
+>  			ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+>  			if (ret)
+>  				return ret;
+> -			last_byte_offset = byte_offset;
+> +			last_ptr = ptr;
+>  		}
+>  
+>  		stored = val & (1U << bit_nr);
+
+Otherwise, this looks good to me (no need to respin for the above
+nit).
+
+Eric, can I get an Ack from you, since you write this code?
 
 Thanks,
 
