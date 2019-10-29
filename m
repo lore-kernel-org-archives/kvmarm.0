@@ -2,68 +2,64 @@ Return-Path: <SRS0=yVTD=YW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFE3CA9EC3
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 13:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 771F3CA9EAE
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 13:31:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6BB0520679
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 13:22:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BB0520679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0027620578
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 13:31:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0027620578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF494A4A4;
-	Tue, 29 Oct 2019 09:22:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 769424A597;
+	Tue, 29 Oct 2019 09:31:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6Wm7BW0FJYGv; Tue, 29 Oct 2019 09:22:42 -0400 (EDT)
+	with ESMTP id lpQdcLc+Lnbe; Tue, 29 Oct 2019 09:31:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8174A4A9;
-	Tue, 29 Oct 2019 09:22:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BB6A4A94E;
+	Tue, 29 Oct 2019 09:31:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 265184A4A9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 09:22:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFD2F4A8E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 09:31:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FtFwQ6xK2BVp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Oct 2019 09:22:40 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2D554A4A4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 09:22:39 -0400 (EDT)
-Received: from [91.217.168.176] (helo=big-swifty.misterjones.org)
- by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
- (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1iPRSC-0000w6-GP; Tue, 29 Oct 2019 14:22:32 +0100
-Date: Tue, 29 Oct 2019 13:22:30 +0000
-Message-ID: <86k18ny9d5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: vgic: Fix some comments typo
-In-Reply-To: <7055e836-cdad-1cfa-66f3-fba88dad5f5b@huawei.com>
+ with ESMTP id jCxxz7xjUURV for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Oct 2019 09:31:36 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81DC94A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 09:31:36 -0400 (EDT)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id B145089EF28F21D4DC20;
+ Tue, 29 Oct 2019 21:31:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Tue, 29 Oct 2019
+ 21:31:19 +0800
+Subject: Re: [PATCH 3/3] KVM: arm/arm64: vgic: Don't rely on the wrong pending
+ table
+To: Auger Eric <eric.auger@redhat.com>, Marc Zyngier <maz@kernel.org>
 References: <20191029071919.177-1-yuzenghui@huawei.com>
- <20191029071919.177-3-yuzenghui@huawei.com>
- <86o8xzylb1.wl-maz@kernel.org>
- <7055e836-cdad-1cfa-66f3-fba88dad5f5b@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 91.217.168.176
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, eric.auger@redhat.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ <20191029071919.177-4-yuzenghui@huawei.com> <86mudjykfa.wl-maz@kernel.org>
+ <f8a30e65-7077-301a-1558-7fc504b5e891@huawei.com>
+ <e2141f6a-c530-46d5-d5d9-26806b02d55b@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <01638947-ce47-2e09-68f0-a95eb6e9b2d0@huawei.com>
+Date: Tue, 29 Oct 2019 21:31:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <e2141f6a-c530-46d5-d5d9-26806b02d55b@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,64 +71,32 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 29 Oct 2019 12:45:15 +0000,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> On 2019/10/29 17:04, Marc Zyngier wrote:
-> > Hi Zenghui,
-> > 
-> > On Tue, 29 Oct 2019 07:19:18 +0000,
-> > Zenghui Yu <yuzenghui@huawei.com> wrote:
-> >> 
-> >> s/vgic_its_save_pending_tables/vgic_v3_save_pending_tables/
-> >> s/then/the/
-> >> 
-> >> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> >> ---
-> >>   include/kvm/arm_vgic.h      | 2 +-
-> >>   virt/kvm/arm/vgic/vgic-v3.c | 2 +-
-> >>   virt/kvm/arm/vgic/vgic-v4.c | 2 +-
-> >>   3 files changed, 3 insertions(+), 3 deletions(-)
-> >> 
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 0fb240ec0a2a..01f8b3739a09 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -240,7 +240,7 @@ struct vgic_dist {
-> >>   	 * Contains the attributes and gpa of the LPI configuration table.
-> >>   	 * Since we report GICR_TYPER.CommonLPIAff as 0b00, we can share
-> >>   	 * one address across all redistributors.
-> >> -	 * GICv3 spec: 6.1.2 "LPI Configuration tables"
-> >> +	 * GICv3 spec "LPI Configuration tables"
-> 
-> Ah, this part shouldn't have been in this patch, as the description in
-> the commit message.
-> (And I remember the reason is just that, it it "6.1.1" in IHI 0069E but
-> "6.1.2" in some older versions.)
-> 
-> > 
-> > Why the change here? Pointing to the chapter in the spec is pretty
-> > helpful, given that it is 800 pages long (although it should mention
-> > what revision of the spec this refers to). For example, it should say
-> > something like "IHI 0069E 6.1.1 ...".
-> 
-> Yes, I agreed with you.  Marc, please feel free to drop this part,
-> or I can resend it with your suggestion.
-
-No need, I'll fix it up locally.
-
-Thanks,
-
-	M.
-
--- 
-Jazz is not dead, it just smells funny.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgRXJpYywKCk9uIDIwMTkvMTAvMjkgMjA6NDksIEF1Z2VyIEVyaWMgd3JvdGU6Cj4gT24gMTAv
+MjkvMTkgMToyNyBQTSwgWmVuZ2h1aSBZdSB3cm90ZToKPj4gb2theSwgdGhlIHJlbWFpbmluZyBx
+dWVzdGlvbiBpcyB0aGF0IGluIHZnaWNfdjNfc2F2ZV9wZW5kaW5nX3RhYmxlcygpOgo+Pgo+PiAg
+wqDCoMKgwqBzdG9yZWQgPSB2YWwgJiAoMVUgPDwgYml0X25yKTsKPj4gIMKgwqDCoMKgaWYgKHN0
+b3JlZCA9PSBpcnEtPnBlbmRpbmdfbGF0Y2gpCj4+ICDCoMKgwqDCoMKgwqDCoCBjb250aW51ZTsK
+Pj4KPj4gIMKgwqDCoMKgaWYgKGlycS0+cGVuZGluZ19sYXRjaCkKPj4gIMKgwqDCoMKgwqDCoMKg
+IHZhbCB8PSAxIDw8IGJpdF9ucjsKPj4gIMKgwqDCoMKgZWxzZQo+PiAgwqDCoMKgwqDCoMKgwqAg
+dmFsICY9IH4oMSA8PCBiaXRfbnIpOwo+Pgo+PiBEbyB3ZSByZWFsbHkgaGF2ZSBhIHNjZW5hcmlv
+IHdoZXJlIGlycS0+cGVuZGluZ19sYXRjaD09ZmFsc2UgYW5kCj4+IHN0b3JlZD09dHJ1ZSAoY29y
+cmVzcG9uZHMgdG8gdGhlIGFib3ZlICJlbHNlIikgYW5kIHRoZW4gd2UgY2xlYXIKPj4gcGVuZGlu
+ZyBzdGF0dXMgb2YgdGhpcyBMUEkgaW4gZ3Vlc3QgbWVtb3J5Pwo+PiBJIGNhbiBub3QgdGhpbmsg
+b3V0IG9uZSBub3cuCj4gCj4gaWYgeW91IHNhdmUsIHJlc3RvcmUgYW5kIHNhdmUgYWdhaW4uIE9u
+IHRoZSAxc3Qgc2F2ZSB0aGUgTFBJIG1heSBiZQo+IHBlbmRpbmcsIGl0IGdldHMgc3RvcmVkLiBP
+biB0aGUgc2Vjb25kIHNhdmUgdGhlIExQSSBtYXkgYmUgbm90IHBlbmRpbmcKPiBhbnltb3JlPwoK
+SSBhc3N1bWUgeW91IG1lYW4gdGhlICJyZXN0b3JlIiBieSB2Z2ljX2l0c19yZXN0b3JlX2l0ZSgp
+LgoKV2hpbGUgcmVzdG9yaW5nIGEgTFBJLCB3ZSB3aWxsIHN5bmMgdGhlIHBlbmRpbmcgc3RhdHVz
+IGZyb20gZ3Vlc3QKcGVuZGluZyB0YWJsZSAoaW50byB0aGUgc29mdHdhcmUgcGVuZGluZ19sYXRj
+aCksIGFuZCBjbGVhciB0aGUKY29ycmVzcG9uZGluZyBiaXQgaW4gZ3Vlc3QgbWVtb3J5LgpTZWUg
+dmdpY192M19scGlfc3luY19wZW5kaW5nX3N0YXR1cygpLgoKU28gb24gdGhlIHNlY29uZCBzYXZl
+LCB0aGUgTFBJIGNhbiBiZSBub3QgcGVuZGluZywgdGhlIGd1ZXN0IHBlbmRpbmcKdGFibGUgd2ls
+bCBhbHNvIGluZGljYXRlIG5vdCBwZW5kaW5nLgoKClRoYW5rcywKWmVuZ2h1aQoKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
