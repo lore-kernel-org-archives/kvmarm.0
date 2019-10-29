@@ -2,83 +2,64 @@ Return-Path: <SRS0=yVTD=YW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF222CA9EC3
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 12:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D820CCA9EAE
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 12:30:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 78C98214B2
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 12:29:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQb4u8cs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C98214B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 91601214B2
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Oct 2019 12:30:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91601214B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D67594A5BD;
-	Tue, 29 Oct 2019 08:29:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F09334A957;
+	Tue, 29 Oct 2019 08:30:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1BSzophLpDzC; Tue, 29 Oct 2019 08:29:45 -0400 (EDT)
+	with ESMTP id XaRJY98KUdYB; Tue, 29 Oct 2019 08:30:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B60424A7FD;
-	Tue, 29 Oct 2019 08:29:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEFB24A59D;
+	Tue, 29 Oct 2019 08:30:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 387C14A557
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 08:29:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A4D804A586
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 08:30:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jkmP--D6zsYL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Oct 2019 08:29:44 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A89B4A542
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 08:29:44 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572352183;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=isE3WXtq6TdHNbe0eCrSyqXMPps4oLg4qOCvldTLLWc=;
- b=PQb4u8csqYgokGPJ+pAuNvs0jtrNIiVUznhmHMewx/W62qsi3ddwbsN2Gwy7kOojZrXRG4
- XIrFAybkOz6+qghRwJUnYdpal0/ZmrNXaVkH+mAMtO7V/U0WIuMUrvO9XXkvMKtBReL6es
- i5UjvELgbWAMHPMBDDX7zjgXtlVnw80=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-5xRQ-dLzNiCOO_F_zL5VZg-1; Tue, 29 Oct 2019 08:29:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21D0A801E64;
- Tue, 29 Oct 2019 12:29:38 +0000 (UTC)
-Received: from [10.36.118.15] (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6906960C4B;
- Tue, 29 Oct 2019 12:29:34 +0000 (UTC)
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: vgic: Remove the declaration of
- kvm_send_userspace_msi()
-To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+ with ESMTP id Rz33edNt0aX8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Oct 2019 08:30:45 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 725004A557
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Oct 2019 08:30:45 -0400 (EDT)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 836A69BEE590D4A6CFA9;
+ Tue, 29 Oct 2019 20:30:41 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Tue, 29 Oct 2019
+ 20:30:32 +0800
+Subject: Re: [PATCH 3/3] KVM: arm/arm64: vgic: Don't rely on the wrong pending
+ table
+To: Auger Eric <eric.auger@redhat.com>, <maz@kernel.org>,
+ <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
+ <suzuki.poulose@arm.com>
 References: <20191029071919.177-1-yuzenghui@huawei.com>
- <20191029071919.177-2-yuzenghui@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a38976ea-8c10-6fde-67a8-a25aa13c964e@redhat.com>
-Date: Tue, 29 Oct 2019 13:29:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ <20191029071919.177-4-yuzenghui@huawei.com>
+ <5e4d1a2f-7107-efe3-9dde-626662e31ac5@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <825b87df-618f-7f2d-0fe9-4cec240c88bf@huawei.com>
+Date: Tue, 29 Oct 2019 20:30:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191029071919.177-2-yuzenghui@huawei.com>
+In-Reply-To: <5e4d1a2f-7107-efe3-9dde-626662e31ac5@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 5xRQ-dLzNiCOO_F_zL5VZg-1
-X-Mimecast-Spam-Score: 0
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -92,45 +73,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-On 10/29/19 8:19 AM, Zenghui Yu wrote:
-> The callsite of kvm_send_userspace_msi() is currently arch agnostic.
-> There seems no reason to keep an extra declaration of it in arm_vgic.h
-> (we already have one in include/linux/kvm_host.h).
+On 2019/10/29 20:17, Auger Eric wrote:
+> Hi Zenghui, Marc,
 > 
-> Remove it.
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  include/kvm/arm_vgic.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index af4f09c02bf1..0fb240ec0a2a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -378,8 +378,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
->  	return kvm_vgic_global_state.max_gic_vcpus;
->  }
->  
-> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
-> -
->  /**
->   * kvm_vgic_setup_default_irq_routing:
->   * Setup a default flat gsi routing table mapping all SPIs
-> 
+> On 10/29/19 8:19 AM, Zenghui Yu wrote:
+>> It's possible that two LPIs locate in the same "byte_offset" but target
+>> two different vcpus, where their pending status are indicated by two
+>> different pending tables.  In such a scenario, using last_byte_offset
+>> optimization will lead KVM relying on the wrong pending table entry.
+>> Let us use last_ptr instead, which can be treated as a byte index into
+>> a pending table and also, can be vcpu specific.
+>>
+>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>> ---
+>>
+>> If this patch has done the right thing, we can even add the:
+>>
+>> Fixes: 280771252c1b ("KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES")
+>>
+>> But to be honest, I'm not clear about what has this patch actually fixed.
+>> Pending tables should contain all zeros before we flush vgic_irq's pending
+>> status into guest's RAM (thinking that guest should never write anything
+>> into it). So the pending table entry we've read from the guest memory
+>> seems always be zero. And we will always do the right thing even if we
+>> rely on the wrong pending table entry.
+>>
+>> I think I must have some misunderstanding here... Please fix me.
+>>
+>>   virt/kvm/arm/vgic/vgic-v3.c | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>> index 5ef93e5041e1..7cd2e2f81513 100644
+>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>> @@ -363,8 +363,8 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>   int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>   {
+>>   	struct vgic_dist *dist = &kvm->arch.vgic;
+>> -	int last_byte_offset = -1;
+>>   	struct vgic_irq *irq;
+>> +	gpa_t last_ptr = -1;
+>>   	int ret;
+>>   	u8 val;
+>>   
+>> @@ -384,11 +384,11 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>   		bit_nr = irq->intid % BITS_PER_BYTE;
+>>   		ptr = pendbase + byte_offset;
+>>   
+>> -		if (byte_offset != last_byte_offset) {
+>> +		if (ptr != last_ptr) {
+>>   			ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+>>   			if (ret)
+>>   				return ret;
+>> -			last_byte_offset = byte_offset;
+>> +			last_ptr = ptr;
+>>   		}
+>>   
+>>   		stored = val & (1U << bit_nr);
+>>
+> Acked-by: Eric Auger <eric.auger@redhat.com>
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Thanks Eric,
 
-Thanks
 
-Eric
+Zenghui
 
 _______________________________________________
 kvmarm mailing list
