@@ -2,57 +2,58 @@ Return-Path: <SRS0=oLPE=YY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01441CA9EC3
-	for <kvmarm@archiver.kernel.org>; Thu, 31 Oct 2019 03:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3C4CA9EC3
+	for <kvmarm@archiver.kernel.org>; Thu, 31 Oct 2019 06:33:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 91B6020862
-	for <kvmarm@archiver.kernel.org>; Thu, 31 Oct 2019 03:55:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B6020862
+	by mail.kernel.org (Postfix) with ESMTP id 148272087F
+	for <kvmarm@archiver.kernel.org>; Thu, 31 Oct 2019 06:33:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148272087F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E955C4A95D;
-	Wed, 30 Oct 2019 23:55:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53EBB4A542;
+	Thu, 31 Oct 2019 02:33:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HGB2ZtuzbqtV; Wed, 30 Oct 2019 23:55:02 -0400 (EDT)
+	with ESMTP id vKg9ppgq7FYa; Thu, 31 Oct 2019 02:33:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 011A24AC99;
-	Wed, 30 Oct 2019 23:55:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 339E54A59B;
+	Thu, 31 Oct 2019 02:33:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9413D4A98A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Oct 2019 23:55:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 169874A52E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Oct 2019 02:33:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KbYNOoNZEW43 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Oct 2019 23:54:59 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E4064A95D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Oct 2019 23:54:59 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E474E66945FD4F9B65A5;
- Thu, 31 Oct 2019 11:54:55 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Thu, 31 Oct 2019
- 11:54:48 +0800
-Subject: Re: [PATCH v2 07/36] irqchip/gic-v3-its: Add get_vlpi_map() helper
+ with ESMTP id QSrup+WqDSzI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Oct 2019 02:33:38 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A9B24A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Oct 2019 02:33:37 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id D5BE744129F9C179275F;
+ Thu, 31 Oct 2019 14:33:33 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 31 Oct 2019
+ 14:33:24 +0800
+Subject: Re: [PATCH v2 06/36] irqchip/gic-v3-its: Kill its->device_ids and use
+ TYPER copy instead
 To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
- <20191027144234.8395-8-maz@kernel.org>
+ <20191027144234.8395-7-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <38730b06-caaa-efb2-e4bb-aef58138d3b7@huawei.com>
-Date: Thu, 31 Oct 2019 11:54:47 +0800
+Message-ID: <603e60d8-b2a5-74a4-6d32-8277aa0e39c1@huawei.com>
+Date: Thu, 31 Oct 2019 14:33:23 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191027144234.8395-8-maz@kernel.org>
+In-Reply-To: <20191027144234.8395-7-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
@@ -75,14 +76,59 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Marc,
+
 On 2019/10/27 22:42, Marc Zyngier wrote:
-> Obtaining the mapping information for a VLPI is something quite common,
-> and the GICv4.1 code is going to make even more use of it. Expose it as
-> a separate helper.
+> Now that we have a copy of TYPER in the ITS structure, rely on this
+> to provide the same service as its->device_ids, which gets axed.
+> Errata workarounds are now updating the cached fields instead of
+> requiring a separate field in the ITS structure.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+
+> ---
+>   drivers/irqchip/irq-gic-v3-its.c   | 24 +++++++++++++-----------
+>   include/linux/irqchip/arm-gic-v3.h |  2 +-
+>   2 files changed, 14 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 3b046181ddfc..6c91c7feadf3 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -109,7 +109,6 @@ struct its_node {
+>   	struct list_head	its_device_list;
+>   	u64			flags;
+>   	unsigned long		list_nr;
+> -	u32			device_ids;
+>   	int			numa_node;
+>   	unsigned int		msi_domain_flags;
+>   	u32			pre_its_base; /* for Socionext Synquacer */
+> @@ -117,6 +116,7 @@ struct its_node {
+>   };
+>   
+>   #define is_v4(its)		(!!((its)->typer & GITS_TYPER_VLPIS))
+> +#define device_ids(its)		(FIELD_GET(GITS_TYPER_DEVBITS, (its)->typer) + 1)
+>   
+>   #define ITS_ITT_ALIGN		SZ_256
+>   
+> @@ -1938,9 +1938,9 @@ static bool its_parse_indirect_baser(struct its_node *its,
+>   	if (new_order >= MAX_ORDER) {
+>   		new_order = MAX_ORDER - 1;
+>   		ids = ilog2(PAGE_ORDER_TO_SIZE(new_order) / (int)esz);
+> -		pr_warn("ITS@%pa: %s Table too large, reduce ids %u->%u\n",
+> +		pr_warn("ITS@%pa: %s Table too large, reduce ids %llu->%u\n",
+>   			&its->phys_base, its_base_type_string[type],
+> -			its->device_ids, ids);
+> +			device_ids(its), ids);
+
+But this pr_warn() looks a bit odd. The table type is chosen from
+its_base_type_string[], but ids is always Devbits (+1)?
+
+
+Thanks,
+Zenghui
 
 _______________________________________________
 kvmarm mailing list
