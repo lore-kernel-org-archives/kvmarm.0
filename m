@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A92DCA9ECF
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6E7CA9ECF
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:39:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C51B2218AC
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:34:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51B2218AC
+	by mail.kernel.org (Postfix) with ESMTP id 3840521855
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3840521855
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 208914ACCF;
-	Fri,  1 Nov 2019 07:34:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD1B4ACF2;
+	Fri,  1 Nov 2019 07:39:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JA2nN2gdmAnU; Fri,  1 Nov 2019 07:34:18 -0400 (EDT)
+	with ESMTP id cplyVaZaVVLR; Fri,  1 Nov 2019 07:39:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 101564ACD7;
-	Fri,  1 Nov 2019 07:34:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6084ACDB;
+	Fri,  1 Nov 2019 07:39:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EE144ACC7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:34:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4888A4ACD3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:39:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yDdDcHFCx706 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Nov 2019 07:34:15 -0400 (EDT)
+ with ESMTP id nbvA2Ojg1Liv for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Nov 2019 07:39:23 -0400 (EDT)
 Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECC034ACB8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:34:14 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 3D92B4FD5A32E4402DF8;
- Fri,  1 Nov 2019 19:34:11 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Fri, 1 Nov 2019
- 19:34:04 +0800
-Subject: Re: [PATCH v2 17/36] irqchip/gic-v4.1: Add VPE residency callback
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0766E4AC97
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:39:23 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 3A91BCA2CF7AFE3DFF34;
+ Fri,  1 Nov 2019 19:39:19 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Fri, 1 Nov 2019
+ 19:39:12 +0800
+Subject: Re: [PATCH v2 18/36] irqchip/gic-v4.1: Add VPE eviction callback
 To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
- <20191027144234.8395-18-maz@kernel.org>
+ <20191027144234.8395-19-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <4c435f89-e9c4-2bac-a524-256819258d87@huawei.com>
-Date: Fri, 1 Nov 2019 19:34:02 +0800
+Message-ID: <c63d6373-6907-d745-b425-44c386d880de@huawei.com>
+Date: Fri, 1 Nov 2019 19:39:10 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191027144234.8395-18-maz@kernel.org>
+In-Reply-To: <20191027144234.8395-19-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
@@ -78,9 +78,10 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 2019/10/27 22:42, Marc Zyngier wrote:
-> Making a VPE resident on GICv4.1 is pretty simple, as it is just a
-> single write to the local redistributor. We just need extra information
-> about which groups to enable, which the KVM code will have to provide.
+> When descheduling a VPE, special care must be taken to tell the GIC
+> about whether we want to receive a doorbell or not. This is a
+> major improvement on GICv4.0, where the doorbell had to be separately
+> enabled/disabled.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
