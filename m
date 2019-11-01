@@ -2,58 +2,57 @@ Return-Path: <SRS0=K73f=YZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BE0CA9ECF
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E5CCA9ED0
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:14:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 844F8217D9
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:10:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 844F8217D9
+	by mail.kernel.org (Postfix) with ESMTP id C8E852080F
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Nov 2019 11:14:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E852080F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 000D14ACF0;
-	Fri,  1 Nov 2019 07:10:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DCD64ACE9;
+	Fri,  1 Nov 2019 07:14:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b4Pbo0g80Ifl; Fri,  1 Nov 2019 07:10:57 -0400 (EDT)
+	with ESMTP id 2KdoKIIOIFHF; Fri,  1 Nov 2019 07:13:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAED34ACEC;
-	Fri,  1 Nov 2019 07:10:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80ED54ACD0;
+	Fri,  1 Nov 2019 07:13:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17EF64ACEA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:10:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CE1A4ACD0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:13:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F0JYkS3xvyBe for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Nov 2019 07:10:56 -0400 (EDT)
+ with ESMTP id WhC66Vd57J44 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Nov 2019 07:13:57 -0400 (EDT)
 Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C79134A369
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:10:55 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id B7F6864B63363F51DE27;
- Fri,  1 Nov 2019 19:10:52 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Fri, 1 Nov 2019
- 19:10:46 +0800
-Subject: Re: [PATCH v2 14/36] irqchip/gic-v4.1: Implement the v4.1 flavour of
- VMOVP
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46F774A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Nov 2019 07:13:57 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 45A7A34AB79BE287020A;
+ Fri,  1 Nov 2019 19:13:54 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 1 Nov 2019
+ 19:13:47 +0800
+Subject: Re: [PATCH v2 15/36] irqchip/gic-v4.1: Plumb skeletal VPE irqchip
 To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
 References: <20191027144234.8395-1-maz@kernel.org>
- <20191027144234.8395-15-maz@kernel.org>
+ <20191027144234.8395-16-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <287222d4-5506-d252-c76a-88ecbcf84c87@huawei.com>
-Date: Fri, 1 Nov 2019 19:10:44 +0800
+Message-ID: <21c993cc-4c92-b70c-3c73-c254bd707870@huawei.com>
+Date: Fri, 1 Nov 2019 19:13:46 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191027144234.8395-15-maz@kernel.org>
+In-Reply-To: <20191027144234.8395-16-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
@@ -79,19 +78,10 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 2019/10/27 22:42, Marc Zyngier wrote:
-> With GICv4.1, VMOVP is extended to allow a default doorbell to be
-> specified, as well as a validity bit for this doorbell. As an added
-> bonus, VMOPVP isn't required anymore of moving a VPE between
-         ^^^^^^
-VMOVP
-
-> redistributors that share the same affinity.
-> 
-> Let's add this support to the VMOVP builder, and make sure we don't
-> issuer the command if we don't really need to.
-
-issue
-
+> Just like for GICv4.0, each VPE has its own doorbell interrupt, and
+> thus an irqchip that manages them. Since the doorbell management is
+> quite different on GICv4.1, let's introduce an almost empty irqchip
+> the will get populated over the next new patches.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
