@@ -2,54 +2,62 @@ Return-Path: <SRS0=4x2k=Y7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F02AFC5DF61
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Nov 2019 09:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4548C5DF60
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Nov 2019 16:04:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 74D762084D
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Nov 2019 09:55:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74D762084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
+	by mail.kernel.org (Postfix) with ESMTP id 68EFF218AE
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Nov 2019 16:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EFF218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD7B4ACB1;
-	Thu,  7 Nov 2019 04:55:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD92D4AC9E;
+	Thu,  7 Nov 2019 11:04:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j24k37+Ppl4g; Thu,  7 Nov 2019 04:55:11 -0500 (EST)
+	with ESMTP id LZlsrxuH8onQ; Thu,  7 Nov 2019 11:04:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C082B4A7FD;
-	Thu,  7 Nov 2019 04:55:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B863F4ACA0;
+	Thu,  7 Nov 2019 11:04:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A5E04A598
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Nov 2019 04:55:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B78D84ACA0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Nov 2019 11:04:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8JIc1NByDSy0 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Nov 2019 04:55:09 -0500 (EST)
-Received: from Galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E98C4A4BE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Nov 2019 04:55:09 -0500 (EST)
-Received: from localhost ([127.0.0.1] helo=flow.W.breakpoint.cc)
- by Galois.linutronix.de with esmtp (Exim 4.80)
- (envelope-from <bigeasy@linutronix.de>)
- id 1iSeVN-0002eW-GK; Thu, 07 Nov 2019 10:55:05 +0100
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm/arm64: Let the timer expire in hardirq context on RT
-Date: Thu,  7 Nov 2019 10:54:24 +0100
-Message-Id: <20191107095424.16647-1-bigeasy@linutronix.de>
-X-Mailer: git-send-email 2.24.0
-MIME-Version: 1.0
-Cc: Marc Zyngier <maz@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Julien Grall <julien.grall@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ with ESMTP id JuL-jUt9Kuxt for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Nov 2019 11:04:24 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93E4A4AC9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Nov 2019 11:04:24 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1iSkGk-0008Bm-JL; Thu, 07 Nov 2019 17:04:22 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 1/2] KVM: vgic-v4: Track the number of VLPIs per vcpu
+Date: Thu,  7 Nov 2019 16:04:11 +0000
+Message-Id: <20191107160412.30301-2-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191107160412.30301-1-maz@kernel.org>
+References: <20191107160412.30301-1-maz@kernel.org>
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,53 +74,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Thomas Gleixner <tglx@linutronix.de>
+In order to find out whether a vcpu is likely to be the target of
+VLPIs (and to further optimize the way we deal with those), let's
+track the number of VLPIs a vcpu can receive.
 
-The timers are canceled from an preempt-notifier which is invoked with
-disabled preemption which is not allowed on PREEMPT_RT.
-The timer callback is short so in could be invoked in hard-IRQ context
-on -RT.
+This gets implemented with an atomic variable that gets incremented
+or decremented on map, unmap and move of a VLPI.
 
-Let the timer expire on hard-IRQ context even on -RT.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Julien Grall <julien.grall@arm.com>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/arch_timer.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/linux/irqchip/arm-gic-v4.h | 2 ++
+ virt/kvm/arm/vgic/vgic-init.c      | 1 +
+ virt/kvm/arm/vgic/vgic-its.c       | 3 +++
+ virt/kvm/arm/vgic/vgic-v4.c        | 2 ++
+ 4 files changed, 8 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index e2bb5bd602270..f182b23803457 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -80,7 +80,7 @@ static inline bool userspace_irqchip(struct kvm *kvm)
- static void soft_timer_start(struct hrtimer *hrt, u64 ns)
- {
- 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
--		      HRTIMER_MODE_ABS);
-+		      HRTIMER_MODE_ABS_HARD);
- }
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index ab1396afe08a..5dbcfc65f21e 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -32,6 +32,8 @@ struct its_vm {
+ struct its_vpe {
+ 	struct page 		*vpt_page;
+ 	struct its_vm		*its_vm;
++	/* per-vPE VLPI tracking */
++	atomic_t		vlpi_count;
+ 	/* Doorbell interrupt */
+ 	int			irq;
+ 	irq_hw_number_t		vpe_db_lpi;
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 6f50c429196d..b3c5de48064c 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -203,6 +203,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
  
- static void soft_timer_cancel(struct hrtimer *hrt)
-@@ -697,11 +697,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
- 	ptimer->cntvoff = 0;
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ 	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
++	atomic_set(&vgic_cpu->vgic_v3.its_vpe.vlpi_count, 0);
  
--	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
+ 	/*
+ 	 * Enable and configure all SGIs to be edge-triggered and
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 2be6b66b3856..98c7360d9fb7 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -360,7 +360,10 @@ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ 		if (ret)
+ 			return ret;
  
--	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
--	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	vtimer->hrtimer.function = kvm_hrtimer_expire;
- 	ptimer->hrtimer.function = kvm_hrtimer_expire;
++		if (map.vpe)
++			atomic_dec(&map.vpe->vlpi_count);
+ 		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++		atomic_inc(&map.vpe->vlpi_count);
  
+ 		ret = its_map_vlpi(irq->host_irq, &map);
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 7e1f3202968a..7e227033ab8e 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -309,6 +309,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ 
+ 	irq->hw		= true;
+ 	irq->host_irq	= virq;
++	atomic_inc(&map.vpe->vlpi_count);
+ 
+ out:
+ 	mutex_unlock(&its->its_lock);
+@@ -342,6 +343,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 
+ 	WARN_ON(!(irq->hw && irq->host_irq == virq));
+ 	if (irq->hw) {
++		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+ 		irq->hw = false;
+ 		ret = its_unmap_vlpi(virq);
+ 	}
 -- 
-2.24.0
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
