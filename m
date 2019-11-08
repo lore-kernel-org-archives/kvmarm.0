@@ -2,61 +2,53 @@ Return-Path: <SRS0=fmje=ZA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C4FC5DF60
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Nov 2019 17:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10752FA372C
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Nov 2019 17:50:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3EAD6207FA
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Nov 2019 17:28:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EAD6207FA
+	by mail.kernel.org (Postfix) with ESMTP id 9D96421D7F
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Nov 2019 17:50:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D96421D7F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 907654AED1;
-	Fri,  8 Nov 2019 12:28:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 271D14ACB0;
+	Fri,  8 Nov 2019 12:50:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9+to1tzVilOe; Fri,  8 Nov 2019 12:28:45 -0500 (EST)
+	with ESMTP id z225YIC586rT; Fri,  8 Nov 2019 12:50:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5052D4ACC1;
-	Fri,  8 Nov 2019 12:28:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB4EE4AECC;
+	Fri,  8 Nov 2019 12:50:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0143E4ACC1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Nov 2019 12:28:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7FC14AEC7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Nov 2019 12:50:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X3wfO47QiPvx for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Nov 2019 12:28:42 -0500 (EST)
+ with ESMTP id 1bCgGP3drWxK for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Nov 2019 12:49:59 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 899914ACB7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Nov 2019 12:28:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2D24ACB0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Nov 2019 12:49:59 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D278A31B;
- Fri,  8 Nov 2019 09:28:41 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A0F63F6C4;
- Fri,  8 Nov 2019 09:28:40 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 01/17] arm: gic: Enable GIC MMIO tests for
- GICv3 as well
-To: Andre Przywara <andre.przywara@arm.com>, Andrew Jones
- <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-2-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <cc2a6815-89f7-4a3a-1d7f-9b834c064486@arm.com>
-Date: Fri, 8 Nov 2019 17:28:38 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191108144240.204202-2-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1522431B;
+ Fri,  8 Nov 2019 09:49:59 -0800 (PST)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D1ED93F719;
+ Fri,  8 Nov 2019 09:49:57 -0800 (PST)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: [PATCH 0/3] kvm: arm: VGIC: Fix interrupt group enablement
+Date: Fri,  8 Nov 2019 17:49:49 +0000
+Message-Id: <20191108174952.740-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,115 +60,91 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQW5kcmUsCgpPbiAxMS84LzE5IDI6NDIgUE0sIEFuZHJlIFByenl3YXJhIHdyb3RlOgo+IFNv
-IGZhciB0aGUgR0lDIE1NSU8gdGVzdHMgd2VyZSBvbmx5IGVuYWJsZWQgZm9yIGEgR0lDdjIgZ3Vl
-c3QuIE1vZGVybgo+IG1hY2hpbmVzIHRlbmQgdG8gaGF2ZSBhIEdJQ3YzLW9ubHkgR0lDLCBzbyBj
-YW4ndCBydW4gdGhvc2UgdGVzdHMuCj4gSXQgdHVybnMgb3V0IHRoYXQgbW9zdCBHSUMgZGlzdHJp
-YnV0b3IgcmVnaXN0ZXJzIHdlIHRlc3QgaW4gdGhlIHVuaXQKPiB0ZXN0cyBhcmUgYWN0dWFsbHkg
-dGhlIHNhbWUgaW4gR0lDdjMsIHNvIHdlIGNhbiBqdXN0IGVuYWJsZSB0aG9zZSB0ZXN0cwo+IGZv
-ciBHSUN2MyBndWVzdHMgYXMgd2VsbC4KPiBUaGUgb25seSBleGNlcHRpb24gaXMgdGhlIENQVSBu
-dW1iZXIgaW4gdGhlIFRZUEVSIHJlZ2lzdGVyLCB3aGljaCBpcwo+IG9ubHkgdmFsaWQgaW4gdGhl
-IEdJQ3YyIGNvbXBhdCBtb2RlIChBUkU9MCksIHdoaWNoIEtWTSBkb2VzIG5vdCBzdXBwb3J0Lgo+
-IFNvIHdlIHByb3RlY3QgdGhpcyB0ZXN0IGFnYWluc3QgcnVubmluZyBvbiBhIEdJQ3YzIGd1ZXN0
-Lgo+Cj4gU2lnbmVkLW9mZi1ieTogQW5kcmUgUHJ6eXdhcmEgPGFuZHJlLnByenl3YXJhQGFybS5j
-b20+Cj4gLS0tCj4gIGFybS9naWMuYyAgICAgICAgICAgIHwgMTMgKysrKysrKysrKystLQo+ICBh
-cm0vdW5pdHRlc3RzLmNmZyAgICB8IDI2ICsrKysrKysrKysrKysrKysrKysrKystLS0tCj4gIGxp
-Yi9hcm0vYXNtL2dpYy12My5oIHwgIDIgKysKPiAgMyBmaWxlcyBjaGFuZ2VkLCAzNSBpbnNlcnRp
-b25zKCspLCA2IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL2FybS9naWMuYyBiL2FybS9n
-aWMuYwo+IGluZGV4IGFkYjZhYTQuLjA0YjMzMzcgMTAwNjQ0Cj4gLS0tIGEvYXJtL2dpYy5jCj4g
-KysrIGIvYXJtL2dpYy5jCj4gQEAgLTYsNiArNiw3IEBACj4gICAqICAgKyBNTUlPIGFjY2VzcyB0
-ZXN0cwo+ICAgKiBHSUN2Mwo+ICAgKiAgICsgdGVzdCBzZW5kaW5nL3JlY2VpdmluZyBJUElzCj4g
-KyAqICAgKyBNTUlPIGFjY2VzcyB0ZXN0cwo+ICAgKgo+ICAgKiBDb3B5cmlnaHQgKEMpIDIwMTYs
-IFJlZCBIYXQgSW5jLCBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0LmNvbT4KPiAgICoKPiBA
-QCAtNDk2LDcgKzQ5NywxNCBAQCBzdGF0aWMgdm9pZCBnaWNfdGVzdF9tbWlvKHZvaWQpCj4gIAkJ
-aWRyZWcgPSBnaWNfZGlzdF9iYXNlICsgR0lDRF9JQ1BJRFIyOwo+ICAJCWJyZWFrOwo+ICAJY2Fz
-ZSAweDM6Cj4gLQkJcmVwb3J0X2Fib3J0KCJHSUN2MyBNTUlPIHRlc3RzIE5ZSSIpOwo+ICsJCS8q
-Cj4gKwkJICogV2Ugb25seSB0ZXN0IGdlbmVyaWMgcmVnaXN0ZXJzIG9yIHRob3NlIGFmZmVjdGlu
-Zwo+ICsJCSAqIFNQSXMsIHNvIGRvbid0IG5lZWQgdG8gY29uc2lkZXIgdGhlIFNHSSBiYXNlIGlu
-Cj4gKwkJICogdGhlIHJlZGlzdHJpYnV0b3IgaGVyZS4KPiArCQkgKi8KPiArCQlnaWNfZGlzdF9i
-YXNlID0gZ2ljdjNfZGlzdF9iYXNlKCk7Cj4gKwkJaWRyZWcgPSBnaWNfZGlzdF9iYXNlICsgR0lD
-RF9QSURSMjsKPiArCQlicmVhazsKPiAgCWRlZmF1bHQ6Cj4gIAkJcmVwb3J0X2Fib3J0KCJHSUMg
-dmVyc2lvbiAlZCBub3Qgc3VwcG9ydGVkIiwgZ2ljX3ZlcnNpb24oKSk7Cj4gIAl9Cj4gQEAgLTUw
-NSw3ICs1MTMsOCBAQCBzdGF0aWMgdm9pZCBnaWNfdGVzdF9tbWlvKHZvaWQpCj4gIAlucl9pcnFz
-ID0gR0lDRF9UWVBFUl9JUlFTKHJlZyk7Cj4gIAlyZXBvcnRfaW5mbygibnVtYmVyIG9mIGltcGxl
-bWVudGVkIFNQSXM6ICVkIiwgbnJfaXJxcyAtIEdJQ19GSVJTVF9TUEkpOwo+ICAKPiAtCXRlc3Rf
-dHlwZXJfdjIocmVnKTsKPiArCWlmIChnaWNfdmVyc2lvbigpID09IDB4MikKPiArCQl0ZXN0X3R5
-cGVyX3YyKHJlZyk7Cj4gIAo+ICAJcmVwb3J0X2luZm8oIklJRFI6IDB4JTA4eCIsIHJlYWRsKGdp
-Y19kaXN0X2Jhc2UgKyBHSUNEX0lJRFIpKTsKCk1vcmUgY29udGV4dDoKCkBAIC00ODksMzAgKzQ5
-MCwzOCBAQCBzdGF0aWMgdm9pZCBnaWNfdGVzdF9tbWlvKHZvaWQpCsKgwqDCoMKgwqDCoMKgIHUz
-MiByZWc7CsKgwqDCoMKgwqDCoMKgIGludCBucl9pcnFzOwrCoMKgwqDCoMKgwqDCoCB2b2lkICpn
-aWNfZGlzdF9iYXNlLCAqaWRyZWc7CsKgCsKgwqDCoMKgwqDCoMKgIHN3aXRjaChnaWNfdmVyc2lv
-bigpKSB7CsKgwqDCoMKgwqDCoMKgIGNhc2UgMHgyOgrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgZ2ljX2Rpc3RfYmFzZSA9IGdpY3YyX2Rpc3RfYmFzZSgpOwrCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaWRyZWcgPSBnaWNfZGlzdF9iYXNlICsgR0lDRF9JQ1BJRFIyOwrCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7CsKgwqDCoMKgwqDCoMKgIGNhc2UgMHgz
-OgotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXBvcnRfYWJvcnQoIkdJQ3YzIE1NSU8g
-dGVzdHMgTllJIik7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qCivCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBXZSBvbmx5IHRlc3QgZ2VuZXJpYyByZWdpc3RlcnMgb3Ig
-dGhvc2UgYWZmZWN0aW5nCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBTUElzLCBz
-byBkb24ndCBuZWVkIHRvIGNvbnNpZGVyIHRoZSBTR0kgYmFzZSBpbgorwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgICogdGhlIHJlZGlzdHJpYnV0b3IgaGVyZS4KK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCAqLworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnaWNfZGlz
-dF9iYXNlID0gZ2ljdjNfZGlzdF9iYXNlKCk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGlkcmVnID0gZ2ljX2Rpc3RfYmFzZSArIEdJQ0RfUElEUjI7CivCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIGJyZWFrOwrCoMKgwqDCoMKgwqDCoCBkZWZhdWx0OgrCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgcmVwb3J0X2Fib3J0KCJHSUMgdmVyc2lvbiAlZCBub3Qgc3VwcG9ydGVk
-IiwgZ2ljX3ZlcnNpb24oKSk7CsKgwqDCoMKgwqDCoMKgIH0KwqAKwqDCoMKgwqDCoMKgwqAgcmVn
-ID0gcmVhZGwoZ2ljX2Rpc3RfYmFzZSArIEdJQ0RfVFlQRVIpOwrCoMKgwqDCoMKgwqDCoCBucl9p
-cnFzID0gR0lDRF9UWVBFUl9JUlFTKHJlZyk7CsKgwqDCoMKgwqDCoMKgIHJlcG9ydF9pbmZvKCJu
-dW1iZXIgb2YgaW1wbGVtZW50ZWQgU1BJczogJWQiLCBucl9pcnFzIC0gR0lDX0ZJUlNUX1NQSSk7
-CsKgCi3CoMKgwqDCoMKgwqAgdGVzdF90eXBlcl92MihyZWcpOworwqDCoMKgwqDCoMKgIGlmIChn
-aWNfdmVyc2lvbigpID09IDB4MikKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdGVzdF90
-eXBlcl92MihyZWcpOwrCoArCoMKgwqDCoMKgwqDCoCByZXBvcnRfaW5mbygiSUlEUjogMHglMDh4
-IiwgcmVhZGwoZ2ljX2Rpc3RfYmFzZSArIEdJQ0RfSUlEUikpOwrCoArCoMKgwqDCoMKgwqDCoCBy
-ZXBvcnQoIkdJQ0RfVFlQRVIgaXMgcmVhZC1vbmx5IiwKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCB0ZXN0X3JlYWRvbmx5XzMyKGdpY19kaXN0X2Jhc2UgKyBHSUNEX1RZUEVSLCBmYWxzZSkp
-OwrCoMKgwqDCoMKgwqDCoCByZXBvcnQoIkdJQ0RfSUlEUiBpcyByZWFkLW9ubHkiLArCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHRlc3RfcmVhZG9ubHlfMzIoZ2ljX2Rpc3RfYmFzZSArIEdJ
-Q0RfSUlEUiwgZmFsc2UpKTsKwqAKwqDCoMKgwqDCoMKgwqAgcmVnID0gcmVhZGwoaWRyZWcpOwrC
-oMKgwqDCoMKgwqDCoCByZXBvcnQoIklDUElEUjIgaXMgcmVhZC1vbmx5IiwgdGVzdF9yZWFkb25s
-eV8zMihpZHJlZywgZmFsc2UpKTsKCkluIHRoZSBjYXNlIG9mIEdJQ3YzLCB0aGUgcmVnaXN0ZXIg
-aXMgR0lDRF9QSURSMiwgbm90IElDUElEUjIuIFlvdSBjYW4gcHJvYmFibHkKdXNlIGEgZGlmZmVy
-ZW50IHZhcmlhYmxlIHRvIHN0b3JlIHRoZSBpZGVudGlmaWNhdGlvbiByZWdpc3RlciBuYW1lLgoK
-PiAgCj4gZGlmZiAtLWdpdCBhL2FybS91bml0dGVzdHMuY2ZnIGIvYXJtL3VuaXR0ZXN0cy5jZmcK
-PiBpbmRleCBkYWViNWEwLi4xMmFjMTQyIDEwMDY0NAo+IC0tLSBhL2FybS91bml0dGVzdHMuY2Zn
-Cj4gKysrIGIvYXJtL3VuaXR0ZXN0cy5jZmcKPiBAQCAtODYsMjggKzg2LDQ2IEBAIHNtcCA9ICQo
-KCgkTUFYX1NNUCA8IDgpPyRNQVhfU01QOjgpKQo+ICBleHRyYV9wYXJhbXMgPSAtbWFjaGluZSBn
-aWMtdmVyc2lvbj0yIC1hcHBlbmQgJ2lwaScKPiAgZ3JvdXBzID0gZ2ljCj4gIAo+IC1bZ2ljdjIt
-bW1pb10KPiArW2dpY3YzLWlwaV0KPiArZmlsZSA9IGdpYy5mbGF0Cj4gK3NtcCA9ICRNQVhfU01Q
-Cj4gK2V4dHJhX3BhcmFtcyA9IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTMgLWFwcGVuZCAnaXBpJwo+
-ICtncm91cHMgPSBnaWMKPiArCj4gK1tnaWN2Mi1tYXgtbW1pb10KClRoZSByZW5hbWluZyBpcyBu
-b3QgbWVudGlvbmVkIGluIHRoZSBjb21taXQgbWVzc2FnZS4gSWYgeW91IHdhbnQgdG8gcmVuYW1l
-IHRoZXNlCnRlc3RzLCBjYW4geW91IHJlbmFtZSB0aGVtIHRvIGdpY3t2Mix2M30tbW1pby1tYXgg
-c28gdGhleSdyZSBjb25zaXN0ZW50IHdpdGggdGhlCm90aGVyIHRlc3QgbmFtZXM/CgpUaGFua3Ms
-CkFsZXgKPiAgZmlsZSA9IGdpYy5mbGF0Cj4gIHNtcCA9ICQoKCgkTUFYX1NNUCA8IDgpPyRNQVhf
-U01QOjgpKQo+ICBleHRyYV9wYXJhbXMgPSAtbWFjaGluZSBnaWMtdmVyc2lvbj0yIC1hcHBlbmQg
-J21taW8nCj4gIGdyb3VwcyA9IGdpYwo+ICAKPiArW2dpY3YzLW1heC1tbWlvXQo+ICtmaWxlID0g
-Z2ljLmZsYXQKPiArc21wID0gJE1BWF9TTVAKPiArZXh0cmFfcGFyYW1zID0gLW1hY2hpbmUgZ2lj
-LXZlcnNpb249MyAtYXBwZW5kICdtbWlvJwo+ICtncm91cHMgPSBnaWMKPiArCj4gIFtnaWN2Mi1t
-bWlvLXVwXQo+ICBmaWxlID0gZ2ljLmZsYXQKPiAgc21wID0gMQo+ICBleHRyYV9wYXJhbXMgPSAt
-bWFjaGluZSBnaWMtdmVyc2lvbj0yIC1hcHBlbmQgJ21taW8nCj4gIGdyb3VwcyA9IGdpYwo+ICAK
-PiArW2dpY3YzLW1taW8tdXBdCj4gK2ZpbGUgPSBnaWMuZmxhdAo+ICtzbXAgPSAxCj4gK2V4dHJh
-X3BhcmFtcyA9IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTMgLWFwcGVuZCAnbW1pbycKPiArZ3JvdXBz
-ID0gZ2ljCj4gKwo+ICBbZ2ljdjItbW1pby0zcF0KPiAgZmlsZSA9IGdpYy5mbGF0Cj4gIHNtcCA9
-ICQoKCgkTUFYX1NNUCA8IDMpPyRNQVhfU01QOjMpKQo+ICBleHRyYV9wYXJhbXMgPSAtbWFjaGlu
-ZSBnaWMtdmVyc2lvbj0yIC1hcHBlbmQgJ21taW8nCj4gIGdyb3VwcyA9IGdpYwo+ICAKPiAtW2dp
-Y3YzLWlwaV0KPiArW2dpY3YzLW1taW8tM3BdCj4gIGZpbGUgPSBnaWMuZmxhdAo+IC1zbXAgPSAk
-TUFYX1NNUAo+IC1leHRyYV9wYXJhbXMgPSAtbWFjaGluZSBnaWMtdmVyc2lvbj0zIC1hcHBlbmQg
-J2lwaScKPiArc21wID0gJCgoKCRNQVhfU01QIDwgMyk/JE1BWF9TTVA6MykpCj4gK2V4dHJhX3Bh
-cmFtcyA9IC1tYWNoaW5lIGdpYy12ZXJzaW9uPTIgLWFwcGVuZCAnbW1pbycKPiAgZ3JvdXBzID0g
-Z2ljCj4gIAo+ICBbZ2ljdjItYWN0aXZlXQo+IGRpZmYgLS1naXQgYS9saWIvYXJtL2FzbS9naWMt
-djMuaCBiL2xpYi9hcm0vYXNtL2dpYy12My5oCj4gaW5kZXggMzQ3YmUyZi4uZWQ2YTVhZCAxMDA2
-NDQKPiAtLS0gYS9saWIvYXJtL2FzbS9naWMtdjMuaAo+ICsrKyBiL2xpYi9hcm0vYXNtL2dpYy12
-My5oCj4gQEAgLTIzLDYgKzIzLDggQEAKPiAgI2RlZmluZSBHSUNEX0NUTFJfRU5BQkxFX0cxQQkJ
-KDFVIDw8IDEpCj4gICNkZWZpbmUgR0lDRF9DVExSX0VOQUJMRV9HMQkJKDFVIDw8IDApCj4gIAo+
-ICsjZGVmaW5lIEdJQ0RfUElEUjIJCQkweGZmZTgKPiArCj4gIC8qIFJlLURpc3RyaWJ1dG9yIHJl
-Z2lzdGVycywgb2Zmc2V0cyBmcm9tIFJEX2Jhc2UgKi8KPiAgI2RlZmluZSBHSUNSX1RZUEVSCQkJ
-MHgwMDA4Cj4gIApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+In KVM we emulate an ARM Generic Interrupt Controller with a "single
+security state", which (unlike most GICs found in silicon) provides
+a non-secure operating system with *two* interrupt groups.
+Since on bare metal we typically have only one group available, Linux
+does not actually care about the groups and will just use the one
+provided.
+
+However we claim to support the GIC architecture, and actually have code
+to support two groups, so we should aim to support this properly.
+
+As Marc pointed out recently, we don't honour the separate group enable
+bits in the GICD_CTLR register, so a guest can't separately enable or
+disable the two groups.
+
+Fixing this unfortunately requires more than just to provide storage for
+a second bit: So far we were treating the "groupX enable bit" as a
+global distributor enable bit, preventing interrupts from being entered
+into the list registers at all if the whole thing was disabled.
+Now with two separate bits we might need to block one IRQ, while needing
+to forward another one, so this neat trick does not work anymore.
+
+Instead we slightly remodel our "interrupt forwarding" mechanism, to
+actually get closer to the architecture: Before adding a pending IRQ to
+the ap_list, we check whether its configured interrupt group is enabled.
+If it's not, we don't add it to the ap_list (yet). Now when later this
+group gets enabled, we need to rescan all (pending) IRQs, to add them to
+the ap_list and forward them to the guest. This is not really cheap, but
+fortunately wouldn't happen too often, so we refrain from employing any
+super clever algorithm, at least for now.
+Another solution would be to introduce a "disabled_group_list", where
+pending, but group-disabled IRQs go to, let me know if I should explore
+this further.
+
+Patch 1 prepares the VGIC code to provide storage for the two enable
+bits, also extends the MMIO handling to deal with the two bits.
+For this patch we still block the "other" group, as we need the
+rescanning algorithm in patch 2 to allow enabling of any group later on.
+Patch 3 then enables the functionality, when everything is ready.
+The split-up is mostly for review purposes, since I expect some
+discussion about patch 2. Happy to merge the three into one once we
+agreed on the approach.
+
+There is a corresponding kvm-unit-test series to test the FIQ
+functionality, since Linux itself won't use this.
+This has been tested with Linux (for regressions) and with
+kvm-unit-tests, on a GICv2/arm, GICv2/arm64 and GICv3/arm64 machine.
+
+The kvm-unit-tests patches can be found here:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2019-November/037853.html
+or in the following repo:
+https://github.com/Andre-ARM/kvm-unit-tests/commits/gic-group0
+
+This series here can also be found at:
+git://linux-arm.org/linux-ap.git
+
+Based on kvmarm/next, commit cd7056ae34af.
+
+Please have a look!
+
+Cheers,
+Andre
+
+Andre Przywara (3):
+  kvm: arm: VGIC: Prepare for handling two interrupt groups
+  kvm: arm: VGIC: Scan all IRQs when interrupt group gets enabled
+  kvm: arm: VGIC: Enable proper Group0 handling
+
+ include/kvm/arm_vgic.h           |   7 +-
+ virt/kvm/arm/vgic/vgic-debug.c   |   2 +-
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  23 +++---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  22 +++---
+ virt/kvm/arm/vgic/vgic.c         | 130 ++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic.h         |   3 +
+ 6 files changed, 162 insertions(+), 25 deletions(-)
+
+-- 
+2.17.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
