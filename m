@@ -2,62 +2,87 @@ Return-Path: <SRS0=CLkw=ZE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BF4C43331
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Nov 2019 17:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C43DC43331
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Nov 2019 17:56:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5373C214E0
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Nov 2019 17:30:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5373C214E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B4F3621783
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Nov 2019 17:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4F3621783
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEF784B100;
-	Tue, 12 Nov 2019 12:30:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24A1E4B18D;
+	Tue, 12 Nov 2019 12:56:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cpD0xH4NtU7r; Tue, 12 Nov 2019 12:30:52 -0500 (EST)
+	with ESMTP id MLS1QqS881vk; Tue, 12 Nov 2019 12:56:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 576394B11A;
-	Tue, 12 Nov 2019 12:30:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828DC4B198;
+	Tue, 12 Nov 2019 12:56:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC6AA4B104
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Nov 2019 12:30:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B8B14B18D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Nov 2019 12:56:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AaL4vBDBIKLW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Nov 2019 12:30:50 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F2EF4B100
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Nov 2019 12:30:50 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDF2F30E;
- Tue, 12 Nov 2019 09:30:49 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E910E3F534;
- Tue, 12 Nov 2019 09:30:48 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 14/17] arm: gic: Prepare for receiving GIC
- group 0 interrupts via FIQs
-To: Andre Przywara <andre.przywara@arm.com>, Andrew Jones
- <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-15-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <228de8c4-fd3a-73c6-9d76-5e4d9c0f25c5@arm.com>
-Date: Tue, 12 Nov 2019 17:30:47 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191108144240.204202-15-andre.przywara@arm.com>
+ with ESMTP id v8P9f9ftIu7v for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Nov 2019 12:56:46 -0500 (EST)
+Received: from huawei.com (lhrrgout.huawei.com [185.176.76.210])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 108704A8E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Nov 2019 12:56:46 -0500 (EST)
+Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
+ by Forcepoint Email with ESMTP id 79329346A0164073D0EC;
+ Tue, 12 Nov 2019 17:56:44 +0000 (GMT)
+Received: from lhreml709-chm.china.huawei.com (10.201.108.58) by
+ lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Tue, 12 Nov 2019 17:56:44 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml709-chm.china.huawei.com (10.201.108.58) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 12 Nov 2019 17:56:43 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Tue, 12 Nov 2019 17:56:43 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com"
+ <jacob.jun.pan@linux.intel.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+ "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>
+Subject: RE: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+Thread-Topic: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+Thread-Index: AQHVN/CfwyE8ogH9wk6QxsmMIq08eqeIHQ3QgAALuICAABiYUIAABvsAgAAPlwCAADsPwA==
+Date: Tue, 12 Nov 2019 17:56:43 +0000
+Message-ID: <9f0a9d341b01419eb566731339b3fbd2@huawei.com>
+References: <20190711135625.20684-1-eric.auger@redhat.com>
+ <f5b4b97b197d4bab8f3703eba2e966c4@huawei.com>
+ <ebaded3e-8a5c-73dd-b3f7-7533a6e80146@redhat.com>
+ <76d9dc0274414887b04e11b9b6bda257@huawei.com>
+ <b0a9f107-2e89-1418-d6f4-3e6f5ac0b330@redhat.com> 
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "vincent.stehle@arm.com" <vincent.stehle@arm.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "marc.zyngier@arm.com" <marc.zyngier@arm.com>, Linuxarm <linuxarm@huawei.com>,
+ "tina.zhang@intel.com" <tina.zhang@intel.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,230 +99,355 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi Eric,
 
-On 11/8/19 2:42 PM, Andre Przywara wrote:
-> To differentiate between the two interrupt groups, we will configure
-> group 0 to be delivered as FIQs, while group 1 interrupts still use the
-> IRQ "pin".
-> For this we need to teach kvm-unit-tests to deal with FIQs, also need to
-> tell the VGIC to deliver FIQs. This requires some bits here and there to
-> be set, which are annoyingly different between GICv2 and GICv3.
->
-> Add the required code in the GIC library to easily enable FIQ delivery
-> later on, in gic.c.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  lib/arm/asm/arch_gicv3.h   |  7 +++++++
->  lib/arm/asm/gic-v2.h       |  7 ++++++-
->  lib/arm/asm/processor.h    | 10 ++++++++++
->  lib/arm/gic-v2.c           | 34 +++++++++++++++++++++++++++++++++-
->  lib/arm64/asm/arch_gicv3.h |  9 +++++++++
->  lib/arm64/asm/processor.h  | 10 ++++++++++
->  lib/arm64/processor.c      |  2 ++
->  7 files changed, 77 insertions(+), 2 deletions(-)
->
-> diff --git a/lib/arm/asm/arch_gicv3.h b/lib/arm/asm/arch_gicv3.h
-> index 163008d..33fd75c 100644
-> --- a/lib/arm/asm/arch_gicv3.h
-> +++ b/lib/arm/asm/arch_gicv3.h
-> @@ -20,6 +20,7 @@
->  #define ICC_EOIR0			__ACCESS_CP15(c12, 0,  c8, 1)
->  #define ICC_IAR1			__ACCESS_CP15(c12, 0, c12, 0)
->  #define ICC_EOIR1			__ACCESS_CP15(c12, 0, c12, 1)
-> +#define ICC_IGRPEN0			__ACCESS_CP15(c12, 0, c12, 6)
->  #define ICC_IGRPEN1			__ACCESS_CP15(c12, 0, c12, 7)
->  
->  static inline void gicv3_write_pmr(u32 val)
-> @@ -54,6 +55,12 @@ static inline void gicv3_write_eoir(u32 irq, int group)
->  	isb();
->  }
->  
-> +static inline void gicv3_write_grpen0(u32 val)
-> +{
-> +	write_sysreg(val, ICC_IGRPEN0);
-> +	isb();
-> +}
-> +
->  static inline void gicv3_write_grpen1(u32 val)
->  {
->  	write_sysreg(val, ICC_IGRPEN1);
-> diff --git a/lib/arm/asm/gic-v2.h b/lib/arm/asm/gic-v2.h
-> index b57ee35..ed083ea 100644
-> --- a/lib/arm/asm/gic-v2.h
-> +++ b/lib/arm/asm/gic-v2.h
-> @@ -14,7 +14,10 @@
->  
->  #define GICD_ENABLE			0x1
->  
-> -#define GICC_ENABLE			0x1
-> +#define GICC_GRP0_ENABLE		0x1
-> +#define GICC_GRP1_ENABLE		0x2
-> +#define GICC_ACKCTL			0x4
-> +#define GICC_FIQEN			0x8
->  #define GICC_IAR_INT_ID_MASK		0x3ff
->  
->  #ifndef __ASSEMBLY__
-> @@ -32,6 +35,8 @@ extern struct gicv2_data gicv2_data;
->  
->  extern int gicv2_init(void);
->  extern void gicv2_enable_defaults(void);
-> +extern void gicv2_enable_group1(bool enable);
-> +extern void gicv2_enable_fiq(bool enable);
->  extern u32 gicv2_read_iar(int group);
->  extern u32 gicv2_iar_irqnr(u32 iar);
->  extern void gicv2_write_eoir(u32 irqstat, int group);
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index a8c4628..6b5dd1e 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -35,6 +35,16 @@ static inline unsigned long current_cpsr(void)
->  
->  #define current_mode() (current_cpsr() & MODE_MASK)
->  
-> +static inline void local_fiq_enable(void)
-> +{
-> +	asm volatile("cpsie f" : : : "memory", "cc");
-> +}
-> +
-> +static inline void local_fiq_disable(void)
-> +{
-> +	asm volatile("cpsid f" : : : "memory", "cc");
-> +}
-> +
->  static inline void local_irq_enable(void)
->  {
->  	asm volatile("cpsie i" : : : "memory", "cc");
-> diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
-> index d2af01e..360aaa3 100644
-> --- a/lib/arm/gic-v2.c
-> +++ b/lib/arm/gic-v2.c
-> @@ -23,7 +23,39 @@ void gicv2_enable_defaults(void)
->  	writel(GICD_ENABLE, dist + GICD_CTLR);
->  
->  	writel(GICC_INT_PRI_THRESHOLD, cpu_base + GICC_PMR);
-> -	writel(GICC_ENABLE, cpu_base + GICC_CTLR);
-> +	writel(GICC_GRP0_ENABLE, cpu_base + GICC_CTLR);
-> +}
-> +
-> +void gicv2_enable_fiq(bool enable)
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: 12 November 2019 14:21
+> To: 'Auger Eric' <eric.auger@redhat.com>; eric.auger.pro@gmail.com;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
+> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+> yi.l.liu@intel.com; jean-philippe.brucker@arm.com; will.deacon@arm.com;
+> robin.murphy@arm.com
+> Cc: kevin.tian@intel.com; vincent.stehle@arm.com; ashok.raj@intel.com;
+> marc.zyngier@arm.com; tina.zhang@intel.com; Linuxarm
+> <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
+> Subject: RE: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+> 
+[...]
+> > >>> I am trying to get this running on one of our platform that has smmuv3
+> dual
+> > >>> stage support. I am seeing some issues with this when an ixgbe vf dev is
+> > >>> made pass-through and is behind a vSMMUv3 in Guest.
+> > >>>
+> > >>> Kernel used : https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> > >>> Qemu: https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
+> > >>>
+> > >>> And this is my Qemu cmd line,
+> > >>>
+> > >>> ./qemu-system-aarch64
+> > >>> -machine virt,kernel_irqchip=on,gic-version=3,iommu=smmuv3 -cpu host
+> \
+> > >>> -kernel Image \
+> > >>> -drive if=none,file=ubuntu,id=fs \
+> > >>> -device virtio-blk-device,drive=fs \
+> > >>> -device vfio-pci,host=0000:01:10.1 \
+> > >>> -bios QEMU_EFI.fd \
+> > >>> -net none \
+> > >>> -m 4G \
+> > >>> -nographic -D -d -enable-kvm \
+> > >>> -append "console=ttyAMA0 root=/dev/vda rw acpi=force"
+> > >>>
+> > >>> The basic ping from Guest works fine,
+> > >>> root@ubuntu:~# ping 10.202.225.185
+> > >>> PING 10.202.225.185 (10.202.225.185) 56(84) bytes of data.
+> > >>> 64 bytes from 10.202.225.185: icmp_seq=2 ttl=64 time=0.207 ms
+> > >>> 64 bytes from 10.202.225.185: icmp_seq=3 ttl=64 time=0.203 ms
+> > >>> ...
+> > >>>
+> > >>> But if I increase ping packet size,
+> > >>>
+> > >>> root@ubuntu:~# ping -s 1024 10.202.225.185
+> > >>> PING 10.202.225.185 (10.202.225.185) 1024(1052) bytes of data.
+> > >>> 1032 bytes from 10.202.225.185: icmp_seq=22 ttl=64 time=0.292 ms
+> > >>> 1032 bytes from 10.202.225.185: icmp_seq=23 ttl=64 time=0.207 ms
+> > >>> From 10.202.225.169 icmp_seq=66 Destination Host Unreachable
+> > >>> From 10.202.225.169 icmp_seq=67 Destination Host Unreachable
+> > >>> From 10.202.225.169 icmp_seq=68 Destination Host Unreachable
+> > >>> From 10.202.225.169 icmp_seq=69 Destination Host Unreachable
+> > >>>
+> > >>> And from Host kernel I get,
+> > >>> [  819.970742] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets
+> detected
+> > >>> [  824.002707] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
+> detected
+> > >>> [  828.034683] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
+> detected
+> > >>> [  830.050673] ixgbe 0000:01:00.1 enp1s0f1: 4 Spoofed packets
+> detected
+> > >>> [  832.066659] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
+> detected
+> > >>> [  834.082640] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets
+> detected
+> > >>>
+> > >>> Also noted that iperf cannot work as it fails to establish the connection
+> > with
+> > >> iperf
+> > >>> server.
+> > >>>
+> > >>> Please find attached the trace logs(vfio*, smmuv3*) from Qemu for your
+> > >> reference.
+> > >>> I haven't debugged this further yet and thought of checking with you if
+> this
+> > is
+> > >>> something you have seen already or not. Or maybe I am missing
+> something
+> > >> here?
+> > >>
+> > >> Please can you try to edit and modify hw/vfio/common.c, function
+> > >> vfio_iommu_unmap_notify
+> > >>
+> > >>
+> > >> /*
+> > >>     if (size <= 0x10000) {
+> > >>         ustruct.info.cache = IOMMU_CACHE_INV_TYPE_IOTLB;
+> > >>         ustruct.info.granularity = IOMMU_INV_GRANU_ADDR;
+> > >>         ustruct.info.addr_info.flags =
+> > IOMMU_INV_ADDR_FLAGS_ARCHID;
+> > >>         if (iotlb->leaf) {
+> > >>             ustruct.info.addr_info.flags |=
+> > >> IOMMU_INV_ADDR_FLAGS_LEAF;
+> > >>         }
+> > >>         ustruct.info.addr_info.archid = iotlb->arch_id;
+> > >>         ustruct.info.addr_info.addr = start;
+> > >>         ustruct.info.addr_info.granule_size = size;
+> > >>         ustruct.info.addr_info.nb_granules = 1;
+> > >>         trace_vfio_iommu_addr_inv_iotlb(iotlb->arch_id, start, size, 1,
+> > >>                                         iotlb->leaf);
+> > >>     } else {
+> > >> */
+> > >>         ustruct.info.cache = IOMMU_CACHE_INV_TYPE_IOTLB;
+> > >>         ustruct.info.granularity = IOMMU_INV_GRANU_PASID;
+> > >>         ustruct.info.pasid_info.archid = iotlb->arch_id;
+> > >>         ustruct.info.pasid_info.flags =
+> > IOMMU_INV_PASID_FLAGS_ARCHID;
+> > >>         trace_vfio_iommu_asid_inv_iotlb(iotlb->arch_id);
+> > >> //    }
+> > >>
+> > >> This modification leads to invalidate the whole asid each time we get a
+> > >> guest TLBI instead of invalidating the single IOVA (TLBI). On my end, I
+> > >> saw this was the cause of such kind of issues. Please let me know if it
+> > >> fixes your perf issues
+> > >
+> > > Yes, this seems to fix the issue.
+> > >
+> > > root@ubuntu:~# iperf -c 10.202.225.185
+> > > ------------------------------------------------------------
+> > > Client connecting to 10.202.225.185, TCP port 5001
+> > > TCP window size: 85.0 KByte (default)
+> > > ------------------------------------------------------------
+> > > [  3] local 10.202.225.169 port 47996 connected with 10.202.225.185 port
+> > 5001
+> > > [ ID] Interval       Transfer     Bandwidth
+> > > [  3]  0.0-10.0 sec  2.27 GBytes  1.95 Gbits/sec
+> > > root@ubuntu:~#
+> > >
+> > > But the performance seems to be very poor as this is a 10Gbps interface(Of
+> > course
+> > > invalidating the whole asid may not be very helpful). It is interesting that
+> why
+> > the
+> > > single iova invalidation is not working.
+> > >
+> > >  and then we may discuss further about the test
+> > >> configuration.
+> > >
+> > > Sure. Please let me know.
+> >
+> > I reported that issue earlier on the ML. I have not been able to find
+> > any integration issue in the kernel/qemu code but maybe I am too blind
+> > now as I wrote it ;-) When I get a guest stage1 TLBI I cascade it down
+> > to the physical IOMMU. I also pass the LEAF flag.
+> 
+> Ok.
+> 
+> > As you are an expert of the SMMUv3 PMU, if your implementation has any
+> > and you have cycles to look at this, it would be helpful to run it and
+> > see if something weird gets highlighted.
+> 
+> :). Sure. I will give it a try and report back if anything suspicious.
 
-This is unexpected - the function to enable the delivery of FIQs is called
-gicv2_enable_fiq, but the function to enable the delivery of IRQs is called
-gicv2_enable_group1. How about we rename this one to gicv2_enable_group0 and we
-state that by convention group 0 interrupts will be delivered as FIQs, so it
-matches the behaviour of GICv3?
+I just noted that CMDQ_OP_TLBI_NH_VA is missing the vmid filed which seems
+to be the cause for single IOVA TLBI not working properly.
 
-It's also a bit strange that a function with 'enable' in the name actually has the
-opposite behaviour based on a parameter. How about we split it into two functions
-without a parameter, one called gicv2_enable_group0 and the other
-gicv2_disable_group0? Same for gicv2_enable_group1 -> gicv2_enable_group1 +
-gicv2_disable_group1.
+I had this fix in arm-smmuv3.c,
 
-Also, have you considered adding similar functions for gicv3
-(gicv3_{enable,disable}_group1 and gicv3_{enable,disable}_group0) so we're
-consistent across both gic versions?
+@@ -947,6 +947,7 @@ static int arm_smmu_cmdq_build_cmd(u64 *cmd, struct arm_smmu_cmdq_ent *ent)
+		cmd[1] |= FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
+		break;
+	case CMDQ_OP_TLBI_NH_VA:
++		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
+		cmd[0] |= FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
+		cmd[1] |= FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
+		cmd[1] |= ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
+
+
+With this, your original qemu branch is working. 
+
+root@ubuntu:~# iperf -c 10.202.225.185
+------------------------------------------------------------
+Client connecting to 10.202.225.185, TCP port 5001 TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 10.202.225.169 port 44894 connected with 10.202.225.185 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  3.21 GBytes  2.76 Gbits/sec
+
+Could you please check this...
+
+I also have a rebase of your patches on top of 5.4-rc5. This has some optimizations
+From Will such as batched TLBI inv. Please find it here,
+
+https://github.com/hisilicon/kernel-dev/tree/private-vSMMUv3-v9-v5.4-rc5
+
+This gives me a better performance with iperf,
+
+root@ubuntu:~# iperf -c 10.202.225.185
+------------------------------------------------------------
+Client connecting to 10.202.225.185, TCP port 5001 TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 10.202.225.169 port 55450 connected with 10.202.225.185 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  4.91 GBytes  4.22 Gbits/sec root@ubuntu:~#
+
+If possible please check this branch as well.
 
 Thanks,
-Alex
-> +{
-> +	void *cpu_base = gicv2_cpu_base();
-> +	u32 reg = readl(cpu_base + GICC_CTLR);
-> +
-> +	if (enable) {
-> +		reg |= GICC_GRP0_ENABLE;
-> +		reg |= GICC_FIQEN;
-> +	} else {
-> +		reg &= ~GICC_GRP0_ENABLE;
-> +		reg &= ~GICC_FIQEN;
-> +	}
-> +
-> +	writel(reg, cpu_base + GICC_CTLR);
-> +}
-> +
-> +void gicv2_enable_group1(bool enable)
-> +{
-> +	void *cpu_base = gicv2_cpu_base();
-> +	u32 reg = readl(cpu_base + GICC_CTLR);
-> +
-> +	if (enable) {
-> +		reg |= GICC_GRP1_ENABLE;
-> +		reg |= GICC_ACKCTL;
-> +	} else {
-> +		reg &= ~GICC_GRP1_ENABLE;
-> +		reg &= ~GICC_ACKCTL;
-> +	}
-> +
-> +	writel(reg, cpu_base + GICC_CTLR);
->  }
->  
->  u32 gicv2_read_iar(int group)
-> diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
-> index 972b97e..6938bc5 100644
-> --- a/lib/arm64/asm/arch_gicv3.h
-> +++ b/lib/arm64/asm/arch_gicv3.h
-> @@ -14,8 +14,11 @@
->  #define ICC_IAR0_EL1			sys_reg(3, 0, 12, 8, 0)
->  #define ICC_EOIR0_EL1			sys_reg(3, 0, 12, 8, 1)
->  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
-> +#define ICC_IAR0_EL1			sys_reg(3, 0, 12, 8, 0)
->  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-> +#define ICC_EOIR0_EL1			sys_reg(3, 0, 12, 8, 1)
->  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
-> +#define ICC_GRPEN0_EL1			sys_reg(3, 0, 12, 12, 6)
->  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
->  
->  #ifndef __ASSEMBLY__
-> @@ -64,6 +67,12 @@ static inline void gicv3_write_eoir(u32 irq, int group)
->  	isb();
->  }
->  
-> +static inline void gicv3_write_grpen0(u32 val)
-> +{
-> +	asm volatile("msr_s " xstr(ICC_GRPEN0_EL1) ", %0" : : "r" ((u64)val));
-> +	isb();
-> +}
-> +
->  static inline void gicv3_write_grpen1(u32 val)
->  {
->  	asm volatile("msr_s " xstr(ICC_GRPEN1_EL1) ", %0" : : "r" ((u64)val));
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 1d9223f..69086e9 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -68,6 +68,16 @@ static inline unsigned long current_level(void)
->  	return el & 0xc;
->  }
->  
-> +static inline void local_fiq_enable(void)
-> +{
-> +	asm volatile("msr daifclr, #1" : : : "memory");
-> +}
-> +
-> +static inline void local_fiq_disable(void)
-> +{
-> +	asm volatile("msr daifset, #1" : : : "memory");
-> +}
-> +
->  static inline void local_irq_enable(void)
->  {
->  	asm volatile("msr daifclr, #2" : : : "memory");
-> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> index 2a024e3..8d7b921 100644
-> --- a/lib/arm64/processor.c
-> +++ b/lib/arm64/processor.c
-> @@ -190,8 +190,10 @@ void vector_handlers_default_init(vector_fn *handlers)
->  {
->  	handlers[EL1H_SYNC]	= default_vector_sync_handler;
->  	handlers[EL1H_IRQ]	= default_vector_irq_handler;
-> +	handlers[EL1H_FIQ]	= default_vector_irq_handler;
->  	handlers[EL0_SYNC_64]	= default_vector_sync_handler;
->  	handlers[EL0_IRQ_64]	= default_vector_irq_handler;
-> +	handlers[EL0_FIQ_64]	= default_vector_irq_handler;
->  }
->  
->  /* Needed to compile with -Wmissing-prototypes */
+Shameer
+
+> Thanks,
+> Shameer
+> 
+> 
+> > Thanks
+> >
+> > Eric
+> > >
+> > > Cheers,
+> > > Shameer
+> > >
+> > >> Thanks
+> > >>
+> > >> Eric
+> > >>
+> > >>
+> > >>
+> > >>>
+> > >>> Please let me know.
+> > >>>
+> > >>> Thanks,
+> > >>> Shameer
+> > >>>
+> > >>>> Best Regards
+> > >>>>
+> > >>>> Eric
+> > >>>>
+> > >>>> This series can be found at:
+> > >>>> https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> > >>>>
+> > >>>> It series includes Tina's patch steming from
+> > >>>> [1] "[RFC PATCH v2 1/3] vfio: Use capability chains to handle device
+> > >>>> specific irq" plus patches originally contributed by Yi.
+> > >>>>
+> > >>>> History:
+> > >>>>
+> > >>>> v8 -> v9:
+> > >>>> - introduce specific irq framework
+> > >>>> - single fault region
+> > >>>> - iommu_unregister_device_fault_handler failure case not handled
+> > >>>>   yet.
+> > >>>>
+> > >>>> v7 -> v8:
+> > >>>> - rebase on top of v5.2-rc1 and especially
+> > >>>>   8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain
+> pointer
+> > >>>> - dynamic alloc of s1_cfg/s2_cfg
+> > >>>> - __arm_smmu_tlb_inv_asid/s1_range_nosync
+> > >>>> - check there is no HW MSI regions
+> > >>>> - asid invalidation using pasid extended struct (change in the uapi)
+> > >>>> - add s1_live/s2_live checks
+> > >>>> - move check about support of nested stages in domain finalise
+> > >>>> - fixes in error reporting according to the discussion with Robin
+> > >>>> - reordered the patches to have first iommu/smmuv3 patches and then
+> > >>>>   VFIO patches
+> > >>>>
+> > >>>> v6 -> v7:
+> > >>>> - removed device handle from bind/unbind_guest_msi
+> > >>>> - added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+> > >>>>   enforcement"
+> > >>>> - added few uapi comments as suggested by Jean, Jacop and Alex
+> > >>>>
+> > >>>> v5 -> v6:
+> > >>>> - Fix compilation issue when CONFIG_IOMMU_API is unset
+> > >>>>
+> > >>>> v4 -> v5:
+> > >>>> - fix bug reported by Vincent: fault handler unregistration now happens
+> in
+> > >>>>   vfio_pci_release
+> > >>>> - IOMMU_FAULT_PERM_* moved outside of struct definition + small
+> > >>>>   uapi changes suggested by Kean-Philippe (except fetch_addr)
+> > >>>> - iommu: introduce device fault report API: removed the PRI part.
+> > >>>> - see individual logs for more details
+> > >>>> - reset the ste abort flag on detach
+> > >>>>
+> > >>>> v3 -> v4:
+> > >>>> - took into account Alex, jean-Philippe and Robin's comments on v3
+> > >>>> - rework of the smmuv3 driver integration
+> > >>>> - add tear down ops for msi binding and PASID table binding
+> > >>>> - fix S1 fault propagation
+> > >>>> - put fault reporting patches at the beginning of the series following
+> > >>>>   Jean-Philippe's request
+> > >>>> - update of the cache invalidate and fault API uapis
+> > >>>> - VFIO fault reporting rework with 2 separate regions and one
+> mmappable
+> > >>>>   segment for the fault queue
+> > >>>> - moved to PATCH
+> > >>>>
+> > >>>> v2 -> v3:
+> > >>>> - When registering the S1 MSI binding we now store the device handle.
+> > This
+> > >>>>   addresses Robin's comment about discimination of devices beonging
+> > to
+> > >>>>   different S1 groups and using different physical MSI doorbells.
+> > >>>> - Change the fault reporting API: use
+> VFIO_PCI_DMA_FAULT_IRQ_INDEX
+> > to
+> > >>>>   set the eventfd and expose the faults through an mmappable fault
+> > region
+> > >>>>
+> > >>>> v1 -> v2:
+> > >>>> - Added the fault reporting capability
+> > >>>> - asid properly passed on invalidation (fix assignment of multiple
+> > >>>>   devices)
+> > >>>> - see individual change logs for more info
+> > >>>>
+> > >>>>
+> > >>>> Eric Auger (8):
+> > >>>>   vfio: VFIO_IOMMU_SET_MSI_BINDING
+> > >>>>   vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
+> > >>>>   vfio/pci: Register an iommu fault handler
+> > >>>>   vfio/pci: Allow to mmap the fault queue
+> > >>>>   vfio: Add new IRQ for DMA fault reporting
+> > >>>>   vfio/pci: Add framework for custom interrupt indices
+> > >>>>   vfio/pci: Register and allow DMA FAULT IRQ signaling
+> > >>>>   vfio: Document nested stage control
+> > >>>>
+> > >>>> Liu, Yi L (2):
+> > >>>>   vfio: VFIO_IOMMU_SET_PASID_TABLE
+> > >>>>   vfio: VFIO_IOMMU_CACHE_INVALIDATE
+> > >>>>
+> > >>>> Tina Zhang (1):
+> > >>>>   vfio: Use capability chains to handle device specific irq
+> > >>>>
+> > >>>>  Documentation/vfio.txt              |  77 ++++++++
+> > >>>>  drivers/vfio/pci/vfio_pci.c         | 283
+> > >> ++++++++++++++++++++++++++--
+> > >>>>  drivers/vfio/pci/vfio_pci_intrs.c   |  62 ++++++
+> > >>>>  drivers/vfio/pci/vfio_pci_private.h |  24 +++
+> > >>>>  drivers/vfio/pci/vfio_pci_rdwr.c    |  45 +++++
+> > >>>>  drivers/vfio/vfio_iommu_type1.c     | 166 ++++++++++++++++
+> > >>>>  include/uapi/linux/vfio.h           | 109 ++++++++++-
+> > >>>>  7 files changed, 747 insertions(+), 19 deletions(-)
+> > >>>>
+> > >>>> --
+> > >>>> 2.20.1
+> > >>>>
+> > >>>> _______________________________________________
+> > >>>> kvmarm mailing list
+> > >>>> kvmarm@lists.cs.columbia.edu
+> > >>>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> > >
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
