@@ -2,86 +2,187 @@ Return-Path: <SRS0=MyuK=ZH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8365FC43215
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Nov 2019 08:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3DAC432C3
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Nov 2019 08:24:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4178A20729
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Nov 2019 08:15:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4178A20729
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+	by mail.kernel.org (Postfix) with ESMTP id 56C412072B
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Nov 2019 08:24:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="hlJSNoML";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="hlJSNoML"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C412072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE3C74AF10;
-	Fri, 15 Nov 2019 03:15:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E05184AECE;
+	Fri, 15 Nov 2019 03:24:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QlWIyGDEMHK6; Fri, 15 Nov 2019 03:15:39 -0500 (EST)
+	with ESMTP id VxsYsdnrrFAV; Fri, 15 Nov 2019 03:24:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4021D4AF0C;
-	Fri, 15 Nov 2019 03:15:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE37F4AEDD;
+	Fri, 15 Nov 2019 03:24:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D124AEC7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Nov 2019 02:09:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E94834AEC8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Nov 2019 03:24:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QseWK7cn4M22 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Nov 2019 02:09:06 -0500 (EST)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de
- [85.220.165.71])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DB2B4AEC5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Nov 2019 02:09:06 -0500 (EST)
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
- by metis.ext.pengutronix.de with esmtps
- (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mfe@pengutronix.de>)
- id 1iVViy-0003Na-GI; Fri, 15 Nov 2019 08:08:56 +0100
-Received: from mfe by pty.hi.pengutronix.de with local (Exim 4.89)
- (envelope-from <mfe@pengutronix.de>)
- id 1iVVik-0008Gw-CK; Fri, 15 Nov 2019 08:08:42 +0100
-Date: Fri, 15 Nov 2019 08:08:42 +0100
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH v6 0/6] KASan for arm
-Message-ID: <20191115070842.2x7psp243nfo76co@pengutronix.de>
-References: <20190617221134.9930-1-f.fainelli@gmail.com>
- <20191114181243.q37rxoo3seds6oxy@pengutronix.de>
- <7322163f-e08e-a6b7-b143-e9d59917ee5b@gmail.com>
+ with ESMTP id wm-phdmAx0r0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Nov 2019 03:24:44 -0500 (EST)
+Received: from EUR03-VE1-obe.outbound.protection.outlook.com
+ (mail-eopbgr50059.outbound.protection.outlook.com [40.107.5.59])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DC5A4AEAA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Nov 2019 03:24:44 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KqONU9aIxyPtotpVZqCYAhzJULEraZFes6JCG8txzZs=;
+ b=hlJSNoMLnNJpyym+QB8FBKB2pBYZwsqecWw0YNqGF9hjLLl1yq8jgKd89OLOqS9o6ObFNxjmc9j44CGg8pPDLdAuhsA3KEsqXxyR32T4DLoDzOiKxUh1Ld7orOcVxid8sCK9AochL2BSqccYvtI+UVz5eIyfcj7HIkdOdh9tWpg=
+Received: from HE1PR0802CA0009.eurprd08.prod.outlook.com (2603:10a6:3:bd::19)
+ by DB6PR0802MB2549.eurprd08.prod.outlook.com (2603:10a6:4:a0::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2451.22; Fri, 15 Nov
+ 2019 08:24:42 +0000
+Received: from DB5EUR03FT037.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::202) by HE1PR0802CA0009.outlook.office365.com
+ (2603:10a6:3:bd::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2451.22 via Frontend
+ Transport; Fri, 15 Nov 2019 08:24:42 +0000
+Authentication-Results: spf=fail (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; lists.cs.columbia.edu; dkim=pass (signature was
+ verified) header.d=armh.onmicrosoft.com;lists.cs.columbia.edu; dmarc=none
+ action=none header.from=arm.com;
+Received-SPF: Fail (protection.outlook.com: domain of arm.com does not
+ designate 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT037.mail.protection.outlook.com (10.152.20.215) with
+ Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23 via Frontend Transport; Fri, 15 Nov 2019 08:24:41 +0000
+Received: ("Tessian outbound 3fba803f6da3:v33");
+ Fri, 15 Nov 2019 08:24:39 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from de50c3b770ee.2 (cr-mta-lb-1.cr-mta-net [104.47.6.54])
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ D7401C03-0FEA-4BBB-B8B7-D77B23F631F7.1; 
+ Fri, 15 Nov 2019 08:24:34 +0000
+Received: from EUR02-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur02lp2054.outbound.protection.outlook.com [104.47.6.54])
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id de50c3b770ee.2
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Fri, 15 Nov 2019 08:24:34 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JFG+r2n8zfADuoUg9Ph7IkzLi7et3xzqZfemxf8fUweGofHXrYt7NsTklTDDPXM6s/71MSZ1Dhxzb2NkqNLq+Qj79h+6hR7Rwcjr+TDAJmJmjypeq/z4Tj+8hTSlTWCC5ClOrL+9Wno03LxOSJFmXDyc2SedGN1L1dakfXdI49EGaELHlk0WnRa0ctwr+dEswb4R5JyAeSkN3JvTSZJKRprGJFKc9BL+c87vF8XNNytZf3V6y2n1XoU2oMTLVpl5U86TlzYqYpb7jloaWYaGPQnHxZdLZcJUJ0dQs9e6GHtcxXXTKasKZ71Z45uOutA5R0A7ATWKhP6NKeEkLN98Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KqONU9aIxyPtotpVZqCYAhzJULEraZFes6JCG8txzZs=;
+ b=Pv+J2L7iUg+1jK4bs+NbdOTbj6EyVeA3axuVzEjA89dXh3+GLd2L+DAcXTsHsnyeoMI0oKbgAYcFvDTfC6p1QqOsKgXi2Jj9rt7sYKD/cHhX90+MFIs/FVw8enlMbgvMEtTU9C5yMKDp78fwnU85VRcuMvcKQc+WVpS7cOZgICNQvmGFF/OIuEbiFOkKlo6tGwJdz056H9QeyHxkfL6+rnLDactPSl2shaqKVOnpsb0IwtiSShj4MzpwDIhADago9bWkVeCuEQYjVwPlR492ggzH9mLHOPQ2ez6H0QqbSx40XAvARAOvErY138nGpCi/kuOultQQPbNrYgo299Abuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KqONU9aIxyPtotpVZqCYAhzJULEraZFes6JCG8txzZs=;
+ b=hlJSNoMLnNJpyym+QB8FBKB2pBYZwsqecWw0YNqGF9hjLLl1yq8jgKd89OLOqS9o6ObFNxjmc9j44CGg8pPDLdAuhsA3KEsqXxyR32T4DLoDzOiKxUh1Ld7orOcVxid8sCK9AochL2BSqccYvtI+UVz5eIyfcj7HIkdOdh9tWpg=
+Received: from VI1PR0801MB1677.eurprd08.prod.outlook.com (10.168.64.21) by
+ VI1PR0801MB1807.eurprd08.prod.outlook.com (10.168.61.137) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.20; Fri, 15 Nov 2019 08:24:32 +0000
+Received: from VI1PR0801MB1677.eurprd08.prod.outlook.com
+ ([fe80::dc15:dc7b:57ad:d978]) by VI1PR0801MB1677.eurprd08.prod.outlook.com
+ ([fe80::dc15:dc7b:57ad:d978%8]) with mapi id 15.20.2451.027; Fri, 15 Nov 2019
+ 08:24:32 +0000
+From: "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Subject: RE: [RFC PATCH v7 4/7] time: Add mechanism to recognize clocksource
+ in time_get_snapshot
+Thread-Topic: [RFC PATCH v7 4/7] time: Add mechanism to recognize clocksource
+ in time_get_snapshot
+Thread-Index: AQHVmuUeY8KwMfywA063cJuUDSewUaeKtyGAgAEslGA=
+Date: Fri, 15 Nov 2019 08:24:32 +0000
+Message-ID: <VI1PR0801MB16770B5FEF32B82E7B81251EF4700@VI1PR0801MB1677.eurprd08.prod.outlook.com>
+References: <20191114121358.6684-1-jianyong.wu@arm.com>
+ <20191114121358.6684-5-jianyong.wu@arm.com>
+ <alpine.DEB.2.21.1911141507010.2507@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1911141507010.2507@nanos.tec.linutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: 62d86767-0af9-4fac-8287-f19c350689aa.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=Jianyong.Wu@arm.com; 
+x-originating-ip: [113.29.88.7]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 1a68c049-91f1-45d6-587e-08d769a54348
+X-MS-TrafficTypeDiagnostic: VI1PR0801MB1807:|VI1PR0801MB1807:|DB6PR0802MB2549:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <DB6PR0802MB25496641C5BAE41C323B7211F4700@DB6PR0802MB2549.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
+x-forefront-prvs: 02229A4115
+X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(136003)(396003)(39860400002)(346002)(376002)(199004)(189003)(13464003)(256004)(71190400001)(11346002)(6916009)(446003)(14454004)(66066001)(5660300002)(74316002)(305945005)(2906002)(7736002)(476003)(76176011)(53546011)(52536014)(6506007)(55236004)(186003)(7696005)(7416002)(486006)(102836004)(26005)(54906003)(25786009)(66946007)(316002)(478600001)(66556008)(99286004)(86362001)(64756008)(76116006)(66476007)(4326008)(66446008)(6436002)(8936002)(3846002)(6116002)(33656002)(229853002)(8676002)(9686003)(55016002)(81156014)(6246003)(71200400001)(81166006);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:VI1PR0801MB1807;
+ H:VI1PR0801MB1677.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: arm.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: 7YZGu0/rggLm+5fBgbCPoUnGwI4YbjkzrrbbjrNg9Ms5rkjolWuev1X1jNt85OaUhLdBANQLAYs018Qzxp7WhHEFkGIRUnwIPSKw52QxuyL4iCXmr3INnXKPqbfwhEbjn3bh23lvjnjIMD1h1DCZZ75Yec0tF2IITrSb1Pgm1FkuQsU3279MOobfNaJIYhqF/yY2reFBKvrgByFWugbp14iFBrnymuCHiQHnDdvCjXztZhpHzAjA9/G3joYkPw+E97OLpHwAED0/k/Qwusc5p2QnsiRzaH4HkmD4gQAePYE0/WxPFkWRUE5Er8R/57DwLF2c/vvT03FGQqcRtYao3zAJDYq1wC2creDvvcPpTkNNeTa8bFveHq8ExYLIrmK1sJ12lVfkQlZ2C7qeFEc+CHN+QdFBqANo3NZsWmueTqrroW7NICH7nKJTOJvG3XNK
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <7322163f-e08e-a6b7-b143-e9d59917ee5b@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-IRC: #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 07:52:54 up 181 days, 13:11, 128 users,  load average: 0.02, 0.03,
- 0.00
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de);
- SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvmarm@lists.cs.columbia.edu
-X-Mailman-Approved-At: Fri, 15 Nov 2019 03:15:36 -0500
-Cc: alexandre.belloni@bootlin.com, mhocko@suse.com, catalin.marinas@arm.com,
- dhowells@redhat.com, yamada.masahiro@socionext.com, ryabinin.a.a@gmail.com,
- glider@google.com, kvmarm@lists.cs.columbia.edu, corbet@lwn.net,
- liuwenliang@huawei.com, daniel.lezcano@linaro.org, linux@armlinux.org.uk,
- kasan-dev@googlegroups.com, geert@linux-m68k.org, dvyukov@google.com,
- bcm-kernel-feedback-list@broadcom.com, keescook@chromium.org, arnd@arndb.de,
- marc.zyngier@arm.com, andre.przywara@arm.com, pombredanne@nexb.com,
- jinb.park7@gmail.com, tglx@linutronix.de, kernel@pengutronix.de,
- linux-arm-kernel@lists.infradead.org, nico@fluxnic.net,
- gregkh@linuxfoundation.org, ard.biesheuvel@linaro.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, rob@landley.net,
- philip@cog.systems, akpm@linux-foundation.org, thgarnie@google.com,
- kirill.shutemov@linux.intel.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0801MB1807
+Original-Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Jianyong.Wu@arm.com; 
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT037.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123; IPV:CAL; SCL:-1; CTRY:IE;
+ EFV:NLI; SFV:NSPM;
+ SFS:(10009020)(4636009)(136003)(396003)(346002)(39860400002)(376002)(1110001)(339900001)(199004)(189003)(13464003)(316002)(74316002)(55016002)(22756006)(70206006)(70586007)(2906002)(356004)(11346002)(476003)(86362001)(446003)(7696005)(6862004)(229853002)(4326008)(9686003)(54906003)(76176011)(6246003)(305945005)(186003)(25786009)(102836004)(99286004)(47776003)(26826003)(478600001)(105606002)(7736002)(6506007)(53546011)(66066001)(26005)(33656002)(50466002)(46406003)(8746002)(8936002)(81166006)(486006)(336012)(3846002)(6116002)(23726003)(5660300002)(81156014)(97756001)(8676002)(52536014)(76130400001)(14454004)(126002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DB6PR0802MB2549;
+ H:64aa7808-outbound-1.mta.getcheckrecipient.com; FPR:; SPF:Fail; LANG:en;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; A:1; MX:1; 
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 9dabf6fb-8949-47c2-550f-08d769a53dd2
+NoDisclaimer: True
+X-Forefront-PRVS: 02229A4115
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fMdhqHb/V+ZWk9FiDJAJ0BJCUW5fkpqAW0dTgfOXputMl6eWuFLCIZPQPU95xNm666uYYNWqWIJzf0RCFA+rxudQN+cgvwEOCCl9pFuUG/wbLzshNGieObAdpLfKKC/X+5nwp9FPNmmzyhAQqr4UtmWPTVahLRyM8Ca3xWEdcyfc97Qapcq0oIpZSCLDUzd/WNcOn8/mxuzoclWGcGxiWPC9w/nsAdNj9Rj1i/0QcEOCZAAmBnU1lh8ctECYvQr2OsvAeR/Em84JNRRByK6B0C0dwADwj3pKCpXOYZ45SdV7yeZB9sloh8dOzU73xW6DKz7bnjhUM3Gr3Z5jMPu/xKBPsLHZj7Kofp5NvuEbw3oCCEPCRObxlC9lHrLC7akKa86iMuCM5RDksuedXe+LeAQzbrJ5phh61jsojT7WZCRKzm/+a4B9YGZC40sRwN3b
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2019 08:24:41.4969 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a68c049-91f1-45d6-587e-08d769a54348
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0802MB2549
+Cc: "Justin He \(Arm Technology China\)" <Justin.He@arm.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "maz@kernel.org" <maz@kernel.org>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ "john.stultz@linaro.org" <john.stultz@linaro.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, nd <nd@arm.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,87 +199,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Florian,
+Hi tglx,
 
-On 19-11-14 15:01, Florian Fainelli wrote:
-> Hello Marco,
+> -----Original Message-----
+> From: Thomas Gleixner <tglx@linutronix.de>
+> Sent: Thursday, November 14, 2019 10:19 PM
+> To: Jianyong Wu (Arm Technology China) <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> pbonzini@redhat.com; sean.j.christopherson@intel.com; maz@kernel.org;
+> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
+> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; linux-
+> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
+> <Steve.Capper@arm.com>; Kaly Xin (Arm Technology China)
+> <Kaly.Xin@arm.com>; Justin He (Arm Technology China)
+> <Justin.He@arm.com>; nd <nd@arm.com>
+> Subject: Re: [RFC PATCH v7 4/7] time: Add mechanism to recognize
+> clocksource in time_get_snapshot
 > 
-> On 11/14/19 10:12 AM, Marco Felsch wrote:
-> > Hi Florian,
-> > 
-> > first of all, many thanks for your work on this series =) I picked your
-> > and Arnd patches to make it compilable. Now it's compiling but my imx6q
-> > board didn't boot anymore. I debugged the code and found that the branch
-> > to 'start_kernel' won't be reached
-> > 
-> > 8<------- arch/arm/kernel/head-common.S -------
-> > ....
-> > 
-> > #ifdef CONFIG_KASAN
-> >         bl      kasan_early_init
-> > #endif
-> > 	mov     lr, #0
-> > 	b       start_kernel
-> > ENDPROC(__mmap_switched)
-> > 
-> > ....
-> > 8<----------------------------------------------
-> > 
-> > Now, I found also that 'KASAN_SHADOW_OFFSET' isn't set due to missing
-> > 'CONFIG_KASAN_SHADOW_OFFSET' and so no '-fasan-shadow-offset=xxxxx' is
-> > added. Can that be the reason why my board isn't booted anymore?
+> On Thu, 14 Nov 2019, Jianyong Wu wrote:
+> > From: Thomas Gleixner <tglx@linutronix.de> In some scenario like
+> > return device time to ptp_kvm guest, we need identify the current
+> > clocksource outside core time code.
+> > A mechanism added to recognize the current clocksource by export
+> > clocksource id in time_get_snapshot.
 > 
-> The latest that I have is here, though not yet submitted since I needed
-> to solve one issue on a specific platform with a lot of memory:
+> Can you please replace that with the following:
 > 
-> https://github.com/ffainelli/linux/pull/new/kasan-v7
-
-Thanks for that hint, I will try this series too :) I read that you
-wanna prepare a v7 but didn't found it ^^
-
-> Can you share your branch as well? I did not pick all of Arnd's patches
-> since some appeared to be seemingly independent from KASan on ARM. This
-> is the KASAN related options that are set in my configuration:
-
-Of course I will push it to github and inform you shortly.
-
-> grep KASAN build/linux-custom/.config
-> CONFIG_HAVE_ARCH_KASAN=y
-> CONFIG_CC_HAS_KASAN_GENERIC=y
-> CONFIG_KASAN=y
-> CONFIG_KASAN_GENERIC=y
-> CONFIG_KASAN_OUTLINE=y
-> # CONFIG_KASAN_INLINE is not set
-> CONFIG_KASAN_STACK=1
-> CONFIG_TEST_KASAN=m
-
-My config is:
-
-CONFIG_HAVE_ARCH_KASAN=y
-CONFIG_CC_HAS_KASAN_GENERIC=y
-CONFIG_KASAN=y
-CONFIG_KASAN_GENERIC=y
-CONFIG_KASAN_OUTLINE=y
-# CONFIG_KASAN_INLINE is not set
-CONFIG_KASAN_STACK=1
-# CONFIG_TEST_KASAN is not set
-
-> are you using something different by any chance?
-
-Unfortunately not.
-
-Regards,
-  Marco
-
-> -- 
-> Florian
+>  System time snapshots are not conveying information about the current
+> clocksource which was used, but callers like the PTP KVM guest
+> implementation have the requirement to evaluate the clocksource type to
+> select the appropriate mechanism.
+> 
+>  Introduce a clocksource id field in struct clocksource which is by default  set
+> to CSID_GENERIC (0). Clocksource implementations can set that field to  a
+> value which allows to identify the clocksource.
+> 
+>  Store the clocksource id of the current clocksource in the
+> system_time_snapshot so callers can evaluate which clocksource was used
+> to  take the snapshot and act accordingly.
 > 
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Ok, really better.
+
+> > diff --git a/include/linux/clocksource_ids.h
+> > b/include/linux/clocksource_ids.h new file mode 100644 index
+> > 000000000000..93bec8426c44
+> > --- /dev/null
+> > +++ b/include/linux/clocksource_ids.h
+> > @@ -0,0 +1,13 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */ #ifndef
+> > +_LINUX_CLOCKSOURCE_IDS_H #define _LINUX_CLOCKSOURCE_IDS_H
+> > +
+> > +/* Enum to give clocksources a unique identifier */ enum
+> > +clocksource_ids {
+> > +	CSID_GENERIC		= 0,
+> > +	CSID_ARM_ARCH_COUNTER,
+> 
+> This should only add the infrastructure with just CSID_GENERIC in place.
+> 
+> The ARM_ARCH variant needs to come in a seperate patch which adds the
+> enum and uses it in the corresponding driver. Seperate means a patch doing
+> only that and nothing else, i.e. not hidden in some other patch which actually
+> makes use of it.
+> 
+
+Yeah, this patch should be arch independent and "CSID_ARM_ARCH_COUNTER" should be in an
+Separate patch.
+
+Thanks
+Jianyong
+
+Thanks
+> Thanks,
+> 
+> 	tglx
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
