@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14320C432C0
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 069FBC432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CAC722067D
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC722067D
+	by mail.kernel.org (Postfix) with ESMTP id BB47A2067D
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB47A2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 848714A7FF;
-	Wed, 20 Nov 2019 11:49:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 642904AED1;
+	Wed, 20 Nov 2019 11:49:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cyPe0hwoII-p; Wed, 20 Nov 2019 11:49:46 -0500 (EST)
+	with ESMTP id 8b+1-U7vCAe3; Wed, 20 Nov 2019 11:49:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68C5F4AEC0;
-	Wed, 20 Nov 2019 11:49:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8461C4AED5;
+	Wed, 20 Nov 2019 11:49:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 316574AEBA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 66ADC4AEAB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dMZwZEzUiv8H for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:49:44 -0500 (EST)
+ with ESMTP id 0em0kNCfjZsO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:49:55 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0BD444A7FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DD924AE8F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:55 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4L-0007RI-OR; Wed, 20 Nov 2019 17:43:05 +0100
+ id 1iXT4O-0007RI-8K; Wed, 20 Nov 2019 17:43:08 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 14/22] KVM: arm/arm64: Show halt poll counters in debugfs
-Date: Wed, 20 Nov 2019 16:42:28 +0000
-Message-Id: <20191120164236.29359-15-maz@kernel.org>
+Subject: [PATCH 17/22] KVM: arm/arm64: vgic: Remove the declaration of
+ kvm_send_userspace_msi()
+Date: Wed, 20 Nov 2019 16:42:31 +0000
+Message-Id: <20191120164236.29359-18-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -86,49 +87,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
 
-ARM/ARM64 has counters halt_successful_poll, halt_attempted_poll,
-halt_poll_invalid, and halt_wakeup but never exposed those in debugfs.
+The callsite of kvm_send_userspace_msi() is currently arch agnostic.
+There seems no reason to keep an extra declaration of it in arm_vgic.h
+(we already have one in include/linux/kvm_host.h).
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Remove it.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/1572164390-5851-1-git-send-email-borntraeger@de.ibm.com
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Link: https://lore.kernel.org/r/20191029071919.177-2-yuzenghui@huawei.com
 ---
- arch/arm/kvm/guest.c   | 4 ++++
- arch/arm64/kvm/guest.c | 4 ++++
- 2 files changed, 8 insertions(+)
+ include/kvm/arm_vgic.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64b4033..66964642cd42 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -21,6 +21,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4dc58d7a0010..f66a02dac8b0 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -378,8 +378,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
+ 	return kvm_vgic_global_state.max_gic_vcpus;
+ }
  
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd626447482..260ea3158682 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -34,6 +34,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
+-int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+-
+ /**
+  * kvm_vgic_setup_default_irq_routing:
+  * Setup a default flat gsi routing table mapping all SPIs
 -- 
 2.20.1
 
