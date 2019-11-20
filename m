@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7102BC432C0
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D51EC432C3
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:51:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 34CF82088F
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:51:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34CF82088F
+	by mail.kernel.org (Postfix) with ESMTP id 016972071F
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016972071F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E19E44AEC4;
-	Wed, 20 Nov 2019 11:51:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81ACB4AEE3;
+	Wed, 20 Nov 2019 11:51:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wZ2--g1nMhsL; Wed, 20 Nov 2019 11:51:10 -0500 (EST)
+	with ESMTP id f-JReDdwy84v; Wed, 20 Nov 2019 11:51:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AD3D4AEE3;
-	Wed, 20 Nov 2019 11:51:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 994854AEF1;
+	Wed, 20 Nov 2019 11:51:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F6184AEC4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:51:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CA944AEC6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:51:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M2ARb8cHdhpe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:51:08 -0500 (EST)
+ with ESMTP id NaOZX2U17hkU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:51:27 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35C8C4AEED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:51:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1147E4AC87
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:51:27 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4N-0007RI-DE; Wed, 20 Nov 2019 17:43:07 +0100
+ id 1iXT4P-0007RI-Tj; Wed, 20 Nov 2019 17:43:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 16/22] KVM: arm64: vgic-v4: Move the GICv4 residency flow to
- be driven by vcpu_load/put
-Date: Wed, 20 Nov 2019 16:42:30 +0000
-Message-Id: <20191120164236.29359-17-maz@kernel.org>
+Subject: [PATCH 19/22] KVM: arm/arm64: vgic: Don't rely on the wrong pending
+ table
+Date: Wed, 20 Nov 2019 16:42:33 +0000
+Message-Id: <20191120164236.29359-20-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -60,12 +60,12 @@ X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
  tglx@linutronix.de, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com,
  julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+ kvmarm@lists.cs.columbia.edu, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, stable@vger.kernel.org,
  Steven Price <steven.price@arm.com>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org,
@@ -87,279 +87,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When the VHE code was reworked, a lot of the vgic stuff was moved around,
-but the GICv4 residency code did stay untouched, meaning that we come
-in and out of residency on each flush/sync, which is obviously suboptimal.
+From: Zenghui Yu <yuzenghui@huawei.com>
 
-To address this, let's move things around a bit:
+It's possible that two LPIs locate in the same "byte_offset" but target
+two different vcpus, where their pending status are indicated by two
+different pending tables.  In such a scenario, using last_byte_offset
+optimization will lead KVM relying on the wrong pending table entry.
+Let us use last_ptr instead, which can be treated as a byte index into
+a pending table and also, can be vcpu specific.
 
-- Residency entry (flush) moves to vcpu_load
-- Residency exit (sync) moves to vcpu_put
-- On blocking (entry to WFI), we "put"
-- On unblocking (exit from WFI), we "load"
-
-Because these can nest (load/block/put/load/unblock/put, for example),
-we now have per-VPE tracking of the residency state.
-
-Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
-gets set to true when blocking because of a WFI. This allows a finer
-control of the doorbell, which now also gets disabled as soon as
-it gets signaled.
-
+Fixes: 280771252c1b ("KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES")
+Cc: stable@vger.kernel.org
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20191027144234.8395-2-maz@kernel.org
+Acked-by: Eric Auger <eric.auger@redhat.com>
+Link: https://lore.kernel.org/r/20191029071919.177-4-yuzenghui@huawei.com
 ---
- drivers/irqchip/irq-gic-v4.c       |  7 +++-
- include/kvm/arm_vgic.h             |  4 +--
- include/linux/irqchip/arm-gic-v4.h |  2 ++
- virt/kvm/arm/arm.c                 | 12 ++++---
- virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
- virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
- virt/kvm/arm/vgic/vgic.c           |  4 ---
- virt/kvm/arm/vgic/vgic.h           |  2 --
- 8 files changed, 48 insertions(+), 42 deletions(-)
+ virt/kvm/arm/vgic/vgic-v3.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 563e87ed0766..45969927cc81 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
- int its_schedule_vpe(struct its_vpe *vpe, bool on)
- {
- 	struct its_cmd_info info;
-+	int ret;
- 
- 	WARN_ON(preemptible());
- 
- 	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
- 
--	return its_send_vpe_cmd(vpe, &info);
-+	ret = its_send_vpe_cmd(vpe, &info);
-+	if (!ret)
-+		vpe->resident = on;
-+
-+	return ret;
- }
- 
- int its_invall_vpe(struct its_vpe *vpe)
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index af4f09c02bf1..4dc58d7a0010 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
- int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
- 				 struct kvm_kernel_irq_routing_entry *irq_entry);
- 
--void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
--void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
-+int vgic_v4_load(struct kvm_vcpu *vcpu);
-+int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
- 
- #endif /* __KVM_ARM_VGIC_H */
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index e6b155713b47..ab1396afe08a 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -35,6 +35,8 @@ struct its_vpe {
- 	/* Doorbell interrupt */
- 	int			irq;
- 	irq_hw_number_t		vpe_db_lpi;
-+	/* VPE resident */
-+	bool			resident;
- 	/* VPE proxy mapping */
- 	int			vpe_proxy_event;
- 	/*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 86c6aa1cb58e..bd2afcf9a13f 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -322,20 +322,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
- 	/*
- 	 * If we're about to block (most likely because we've just hit a
- 	 * WFI), we need to sync back the state of the GIC CPU interface
--	 * so that we have the lastest PMR and group enables. This ensures
-+	 * so that we have the latest PMR and group enables. This ensures
- 	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
- 	 * whether we have pending interrupts.
-+	 *
-+	 * For the same reason, we want to tell GICv4 that we need
-+	 * doorbells to be signalled, should an interrupt become pending.
- 	 */
- 	preempt_disable();
- 	kvm_vgic_vmcr_sync(vcpu);
-+	vgic_v4_put(vcpu, true);
- 	preempt_enable();
--
--	kvm_vgic_v4_enable_doorbell(vcpu);
- }
- 
- void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- {
--	kvm_vgic_v4_disable_doorbell(vcpu);
-+	preempt_disable();
-+	vgic_v4_load(vcpu);
-+	preempt_enable();
- }
- 
- int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 8d69f007dd0c..48307a9eb1d8 100644
+index e69c538a24ca..f45635a6f0ec 100644
 --- a/virt/kvm/arm/vgic/vgic-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 
- 	if (has_vhe())
- 		__vgic_v3_activate_traps(vcpu);
-+
-+	WARN_ON(vgic_v4_load(vcpu));
- }
- 
- void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
-@@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
- 
- void vgic_v3_put(struct kvm_vcpu *vcpu)
+@@ -363,8 +363,8 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+ int vgic_v3_save_pending_tables(struct kvm *kvm)
  {
-+	WARN_ON(vgic_v4_put(vcpu, false));
-+
- 	vgic_v3_vmcr_sync(vcpu);
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+-	int last_byte_offset = -1;
+ 	struct vgic_irq *irq;
++	gpa_t last_ptr = ~(gpa_t)0;
+ 	int ret;
+ 	u8 val;
  
- 	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 477af6aebb97..7e1f3202968a 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- {
- 	struct kvm_vcpu *vcpu = info;
+@@ -384,11 +384,11 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 		bit_nr = irq->intid % BITS_PER_BYTE;
+ 		ptr = pendbase + byte_offset;
  
-+	/* We got the message, no need to fire again */
-+	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
-+		disable_irq_nosync(irq);
-+
- 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
- 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
- 	kvm_vcpu_kick(vcpu);
-@@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
+-		if (byte_offset != last_byte_offset) {
++		if (ptr != last_ptr) {
+ 			ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+ 			if (ret)
+ 				return ret;
+-			last_byte_offset = byte_offset;
++			last_ptr = ptr;
+ 		}
  
--int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
-+int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
- {
--	if (!vgic_supports_direct_msis(vcpu->kvm))
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	struct irq_desc *desc = irq_to_desc(vpe->irq);
-+
-+	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
-+	/*
-+	 * If blocking, a doorbell is required. Undo the nested
-+	 * disable_irq() calls...
-+	 */
-+	while (need_db && irqd_irq_disabled(&desc->irq_data))
-+		enable_irq(vpe->irq);
-+
-+	return its_schedule_vpe(vpe, false);
- }
- 
--int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
-+int vgic_v4_load(struct kvm_vcpu *vcpu)
- {
--	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 	int err;
- 
--	if (!vgic_supports_direct_msis(vcpu->kvm))
-+	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
- 		return 0;
- 
- 	/*
-@@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
- 	 * turns into a VMOVP command at the ITS level.
- 	 */
--	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
-+	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
- 	if (err)
- 		return err;
- 
--	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
-+	/* Disabled the doorbell, as we're about to enter the guest */
-+	disable_irq_nosync(vpe->irq);
-+
-+	err = its_schedule_vpe(vpe, true);
- 	if (err)
- 		return err;
- 
-@@ -226,9 +243,7 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * Now that the VPE is resident, let's get rid of a potential
- 	 * doorbell interrupt that would still be pending.
- 	 */
--	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
--
--	return err;
-+	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
- }
- 
- static struct vgic_its *vgic_get_its(struct kvm *kvm,
-@@ -335,21 +350,3 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 	mutex_unlock(&its->its_lock);
- 	return ret;
- }
--
--void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
--{
--	if (vgic_supports_direct_msis(vcpu->kvm)) {
--		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
--		if (irq)
--			enable_irq(irq);
--	}
--}
--
--void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
--{
--	if (vgic_supports_direct_msis(vcpu->kvm)) {
--		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
--		if (irq)
--			disable_irq(irq);
--	}
--}
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 45a870cb63f5..99b02ca730a8 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -857,8 +857,6 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 
--	WARN_ON(vgic_v4_sync_hwstate(vcpu));
--
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
- 		return;
-@@ -882,8 +880,6 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
- /* Flush our emulation state into the GIC hardware before entering the guest. */
- void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- {
--	WARN_ON(vgic_v4_flush_hwstate(vcpu));
--
- 	/*
- 	 * If there are no virtual interrupts active or pending for this
- 	 * VCPU, then there is no work to do and we can bail out without
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 83066a81b16a..c7fefd6b1c80 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -316,7 +316,5 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
--int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
--int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
- 
- #endif
+ 		stored = val & (1U << bit_nr);
 -- 
 2.20.1
 
