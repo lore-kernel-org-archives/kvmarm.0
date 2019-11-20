@@ -1,66 +1,64 @@
-Return-Path: <SRS0=mm64=ZL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=7egO=ZM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 858F3C43215
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Nov 2019 14:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB4BC432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 03:44:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 071F4222A9
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Nov 2019 14:32:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071F4222A9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 10BEA2244A
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 03:44:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10BEA2244A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 669E94AEAF;
-	Tue, 19 Nov 2019 09:32:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF2F4A5A6;
+	Tue, 19 Nov 2019 22:44:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q0zqXjgrIaYq; Tue, 19 Nov 2019 09:32:52 -0500 (EST)
+	with ESMTP id GFT806q9j-bM; Tue, 19 Nov 2019 22:44:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9EA4AC87;
-	Tue, 19 Nov 2019 09:32:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 808A64A8E8;
+	Tue, 19 Nov 2019 22:44:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 357974A610
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Nov 2019 09:32:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CAE04A5BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Nov 2019 22:44:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UfJcDN7sKwkJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Nov 2019 09:32:49 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E403C4A5C3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Nov 2019 09:32:48 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E00930E;
- Tue, 19 Nov 2019 06:32:48 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A036D3F6C4;
- Tue, 19 Nov 2019 06:32:47 -0800 (PST)
-Date: Tue, 19 Nov 2019 14:32:43 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/3] kvm: arm: VGIC: Scan all IRQs when interrupt group
- gets enabled
-Message-ID: <20191119143243.28378f8d@donnerap.cambridge.arm.com>
-In-Reply-To: <4245ee82a03c9403f8e4ff815f032709@www.loen.fr>
-References: <20191108174952.740-1-andre.przywara@arm.com>
- <20191108174952.740-3-andre.przywara@arm.com>
- <20191110142914.6ffdfdfa@why>
- <20191112093658.08f248c5@donnerap.cambridge.arm.com>
- <9ddab86ca3959acbb8b7aad24be5f1ad@www.loen.fr>
- <20191118141216.352a3a0a@donnerap.cambridge.arm.com>
- <4245ee82a03c9403f8e4ff815f032709@www.loen.fr>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+ with ESMTP id 13QAYyRWMkc1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Nov 2019 22:44:51 -0500 (EST)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E6E44A5A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Nov 2019 22:44:51 -0500 (EST)
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Nov 2019 19:44:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,220,1571727600"; d="scan'208";a="204597622"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.41])
+ by fmsmga008.fm.intel.com with ESMTP; 19 Nov 2019 19:44:48 -0800
+Date: Tue, 19 Nov 2019 19:44:48 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: Memory regions and VMAs across architectures
+Message-ID: <20191120034448.GC25890@linux.intel.com>
+References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
 MIME-Version: 1.0
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20191108111920.GD17608@e113682-lin.lund.arm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, borntraeger@de.ibm.com,
+ Ard Biesheuvel <ard.biesheuvel@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,96 +75,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 19 Nov 2019 09:40:40 +0000
-Marc Zyngier <maz@kernel.org> wrote:
-
-Hi Marc,
-
-[ ... ]
-
-> >>
-> >> I think that could work. One queue for each group, holding pending,
-> >> enabled, group-disabled interrupts. Pending, disabled interrupts are
-> >> not queued anywhere, just like today.
-> >>
-> >> The only snag is per-cpu interrupts. On which queue do they live?
-> >> Do you have per-CPU queues? or a global one?  
-> >
-> > Yes, the idea was to have a per-VCPU "grp_dis_list" in addition to
-> > the ap_list, reusing the ap_list list_head in struct vgic_irq.
-> > vgic_queue_irq_unlock() would put them into *one* of those two lists,
-> > depending on their group-enabled status. When a group gets enabled, 
-> > we
-> > just have to transfer the IRQs from grp_dis_list to ap_list.
-> >
-> > But fleshing this out I was wondering if it couldn't be much simpler:
-> > We ignore the group-enabled status most of the time, except in
-> > vgic_flush_lr_state(). So group-disabled IRQs *would go* to the
-> > ap_list (when they are otherwise pending|active and enabled), but
-> > would be skipped when eventually populating the LRs.
-> > vgic_prune_ap_list would also not touch them, so they would stay in
-> > the ap_list (unless removed for other reasons).
-> >
-> > That might raise some eyebrows (because we keep IRQs in the ap_list
-> > which are not ready), but would require only minimal changes and 
-> > avoid
-> > all kind of nasty/racy code to be added. The only downside I see is
-> > that the ap_list could potentially be much longer, but we could 
-> > change
-> > the sorting algorithm if needed to keep group-disabled IRQs at the
-> > end, at which point it wouldn't really matter.
-> >
-> > Do you see any problem with that approach? Alex seemed to remember
-> > that you had an objection against a very similar (if not identical)
-> > idea before.  
+On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
+> Hi,
 > 
-> My main worry with this is that it causes overhead on the fast path.
-> Disabled interrupts (for whichever reason they are disabled) shouldn't
-> have to be evaluated on the fast path.
+> I had a look at our relatively complicated logic in
+> kvm_arch_prepare_memory_region(), and was wondering if there was room to
+> unify some of this handling between architectures.
 > 
-> Take for example kvm_vgic_vcpu_pending_irq(), which we evaluate pretty
-> often (each time a vcpu wakes up). Do we want to scan a bunch of
-> group-disabled interrupts there? No.
+> (If you haven't seen our implementation, you can find it in
+> virt/kvm/arm/mmu.c, and it has lovely ASCII art!)
 > 
-> At the end of the day, what we're looking at is a list of disabled,
-> pending interrupts. They can be disabled for multiple reasons
-> (group is disabled, or interrupt itself is disabled). But they should
-> *not* end-up on the AP list, because that list has a precise semantic.
+> I then had a look at the x86 code, but that doesn't actually do anything
+> when creating memory regions, which makes me wonder why the arhitectures
+> differ in this aspect.
 > 
-> Your suggestion to add the group-disabled interrupts to the AP list
-> may be a cool hack, but it is mostly a hack that opens the whole thing
-> to a bunch of corner cases. Let's not do that.
+> The reason we added the logic that we have for arm/arm64 is that we
+> don't really want to take faults for I/O accesses.  I'm not actually
+> sure if this is a corretness thing, or an optimization effort, and the
+> original commit message doesn't really explain.  Ard, you wrote that
+> code, do you recall the details?
+> 
+> In any case, what we do is to check for each VMA backing a memslot, we
+> check if the memslot flags and vma flags are a reasonable match, and we
+> try to detect I/O mappings by looking for the VM_PFNMAP flag on the VMA
+> and pre-populate stage 2 page tables (our equivalent of EPT/NPT/...).
+> However, there are some things which are not clear to me:
+> 
+> First, what prevents user space from messing around with the VMAs after
+> kvm_arch_prepare_memory_region() completes?  If nothing, then what is
+> the value of the cheks we perform wrt. to VMAs?
 
-I understand what you are saying, and I had similar gripes. It was just too tempting to not give it a try ;-)
- 
-> >> >> And if a group has
-> >> >> been disabled, how do you retire these interrupts from the AP   
-> >> list?  
-> >> >
-> >> > This is done above: we kick the respective VCPU and rely on
-> >> > vgic_prune_ap_list() to remove them (that uses   
-> >> vgic_target_oracle(),  
-> >> > which in turn checks vgic_irq_is_grp_enabled()).  
-> >>
-> >> But what if the CPU isn't running? Kicking it isn't going to do 
-> >> much,
-> >> is it?  
-> >
-> > Not directly, but in either approach that would be handled similar to
-> > disabled interrupts: once the VCPU runs, they would *not* end up in
-> > LRs (because we check the oracle before), and would be cleaned up in
-> > prune() once the guest exits (at least for the original approach).  
-> 
-> I lost track of the original approach already :-/
-> 
-> Try and build the above suggestion. It should follow the same flow as
-> the enabled, group-enabled interrupts, just with a different list.
+Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
+the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
+the VMAs from being invalidated while the stage 2 tables are populated,
+e.g. prevents racing with the mmu notifier.  The VMAs could be modified
+after prepare_memory_region(), but the mmu notifier will ensure they are
+unmapped from stage2 prior the the host change taking effect.  So I think
+you're safe (famous last words).
 
-OK, will do.
+> Second, why would arm/arm64 need special handling for I/O mappings
+> compared to other architectures, and how is this dealt with for
+> x86/s390/power/... ?
 
-Thanks!
+As Ard mentioned, it looks like an optimization.  The "passthrough"
+part from the changelog implies that VM_PFNMAP memory regions are exclusive
+to the guest.  Mapping the entire thing would be a nice boot optimization
+as it would save taking page faults on every page of the MMIO region.
 
-Andre.
+As for how this is different from other archs... at least on x86, VM_PFNMAP
+isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
+pages may actually trigger allocation, and remapping the addresses could be
+flat out wrong.
+
+
+  commit 8eef91239e57d2e932e7470879c9a504d5494ebb
+  Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+  Date:   Fri Oct 10 17:00:32 2014 +0200
+
+    arm/arm64: KVM: map MMIO regions at creation time
+
+    There is really no point in faulting in memory regions page by page
+    if they are not backed by demand paged system RAM but by a linear
+    passthrough mapping of a host MMIO region. So instead, detect such
+    regions at setup time and install the mappings for the backing all
+    at once.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
