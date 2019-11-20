@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7060DC432C0
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C41C432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3260F20885
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3260F20885
+	by mail.kernel.org (Postfix) with ESMTP id 565E920885
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565E920885
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA434A7FF;
-	Wed, 20 Nov 2019 11:50:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10AEC4AC87;
+	Wed, 20 Nov 2019 11:50:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id clt68Iju6Cts; Wed, 20 Nov 2019 11:50:12 -0500 (EST)
+	with ESMTP id Yb7-R9aNcxGM; Wed, 20 Nov 2019 11:50:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3ECA4AEAB;
-	Wed, 20 Nov 2019 11:50:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CA64AE93;
+	Wed, 20 Nov 2019 11:50:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9168B4AEAB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC7E4AC87
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RrPcQxrLUvM5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:50:10 -0500 (EST)
+ with ESMTP id zTIq2Nx1QB7r for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:50:22 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 644844A7FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 675E24A956
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:22 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4S-0007RI-Ee; Wed, 20 Nov 2019 17:43:12 +0100
+ id 1iXT4M-0007RI-IG; Wed, 20 Nov 2019 17:43:06 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 22/22] KVM: arm64: Opportunistically turn off WFI trapping
- when using direct LPI injection
-Date: Wed, 20 Nov 2019 16:42:36 +0000
-Message-Id: <20191120164236.29359-23-maz@kernel.org>
+Subject: [PATCH 15/22] KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is
+ supported
+Date: Wed, 20 Nov 2019 16:42:29 +0000
+Message-Id: <20191120164236.29359-16-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -87,91 +87,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Just like we do for WFE trapping, it can be useful to turn off
-WFI trapping when the physical CPU is not oversubscribed (that
-is, the vcpu is the only runnable process on this CPU) *and*
-that we're using direct injection of interrupts.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-The conditions are reevaluated on each vcpu_load(), ensuring that
-we don't switch to this mode on a busy system.
+On CPUs that support S2FWB (Armv8.4+), KVM configures the stage 2 page
+tables to override the memory attributes of memory accesses, regardless
+of the stage 1 page table configurations, and also when the stage 1 MMU
+is turned off.  This results in all memory accesses to RAM being
+cacheable, including during early boot of the guest.
 
-On a GICv4 system, this has the effect of reducing the generation
-of doorbell interrupts to zero when the right conditions are
-met, which is a huge improvement over the current situation
-(where the doorbells are screaming if the CPU ever hits a
-blocking WFI).
+On CPUs without this feature, memory accesses were non-cacheable during
+boot until the guest turned on the stage 1 MMU, and we had to detect
+when the guest turned on the MMU, such that we could invalidate all cache
+entries and ensure a consistent view of memory with the MMU turned on.
+When the guest turned on the caches, we would call stage2_flush_vm()
+from kvm_toggle_cache().
 
+However, stage2_flush_vm() walks all the stage 2 tables, and calls
+__kvm_flush-dcache_pte, which on a system with S2FWB does ... absolutely
+nothing.
+
+We can avoid that whole song and dance, and simply not set TVM when
+creating a VM on a system that has S2FWB.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Link: https://lore.kernel.org/r/20191107160412.30301-3-maz@kernel.org
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Link: https://lore.kernel.org/r/20191028130541.30536-1-christoffer.dall@arm.com
 ---
- arch/arm/include/asm/kvm_emulate.h   | 4 ++--
- arch/arm64/include/asm/kvm_emulate.h | 9 +++++++--
- virt/kvm/arm/arm.c                   | 4 ++--
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h     |  3 +--
+ arch/arm64/include/asm/kvm_emulate.h | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 40002416efec..023c01cad2b1 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -95,12 +95,12 @@ static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
- 	return (unsigned long *)&vcpu->arch.hcr;
- }
- 
--static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr &= ~HCR_TWE;
- }
- 
--static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr |= HCR_TWE;
- }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index ddf9d762ac62..6e5d839f42b5 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -61,7 +61,6 @@
+  * RW:		64bit by default, can be overridden for 32bit VMs
+  * TAC:		Trap ACTLR
+  * TSC:		Trap SMC
+- * TVM:		Trap VM ops (until M+C set in SCTLR_EL1)
+  * TSW:		Trap cache operations by set/way
+  * TWE:		Trap WFE
+  * TWI:		Trap WFI
+@@ -74,7 +73,7 @@
+  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+-			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
++			 HCR_BSU_IS | HCR_FB | HCR_TAC | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 6e92f6c7b1e4..5a542d801f07 100644
+index d69c1efc63e7..6e92f6c7b1e4 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -87,14 +87,19 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- 	return (unsigned long *)&vcpu->arch.hcr_el2;
- }
+@@ -53,8 +53,18 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		/* trap error record accesses */
+ 		vcpu->arch.hcr_el2 |= HCR_TERR;
+ 	}
+-	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
++
++	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+ 		vcpu->arch.hcr_el2 |= HCR_FWB;
++	} else {
++		/*
++		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
++		 * get set in SCTLR_EL1 such that we can detect when the guest
++		 * MMU gets turned on and do the necessary cache maintenance
++		 * then.
++		 */
++		vcpu->arch.hcr_el2 |= HCR_TVM;
++	}
  
--static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count))
-+		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-+	else
-+		vcpu->arch.hcr_el2 |= HCR_TWI;
- }
- 
--static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 |= HCR_TWE;
-+	vcpu->arch.hcr_el2 |= HCR_TWI;
- }
- 
- static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd2afcf9a13f..dac96e355f69 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -386,9 +386,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	kvm_vcpu_pmu_restore_guest(vcpu);
- 
- 	if (single_task_running())
--		vcpu_clear_wfe_traps(vcpu);
-+		vcpu_clear_wfx_traps(vcpu);
- 	else
--		vcpu_set_wfe_traps(vcpu);
-+		vcpu_set_wfx_traps(vcpu);
- 
- 	vcpu_ptrauth_setup_lazy(vcpu);
- }
+ 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
 -- 
 2.20.1
 
