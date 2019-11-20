@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C41C432C0
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5507C432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 565E920885
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565E920885
+	by mail.kernel.org (Postfix) with ESMTP id 8373B20885
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8373B20885
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10AEC4AC87;
-	Wed, 20 Nov 2019 11:50:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 185404AEC0;
+	Wed, 20 Nov 2019 11:50:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yb7-R9aNcxGM; Wed, 20 Nov 2019 11:50:24 -0500 (EST)
+	with ESMTP id bwrZDbYkYeC2; Wed, 20 Nov 2019 11:50:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CA64AE93;
-	Wed, 20 Nov 2019 11:50:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 133A24A956;
+	Wed, 20 Nov 2019 11:50:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC7E4AC87
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 640384A956
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zTIq2Nx1QB7r for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:50:22 -0500 (EST)
+ with ESMTP id GSgra52INFk5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:50:33 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 675E24A956
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DFE54A7FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:33 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4M-0007RI-IG; Wed, 20 Nov 2019 17:43:06 +0100
+ id 1iXT4Q-0007RI-Pi; Wed, 20 Nov 2019 17:43:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 15/22] KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is
- supported
-Date: Wed, 20 Nov 2019 16:42:29 +0000
-Message-Id: <20191120164236.29359-16-maz@kernel.org>
+Subject: [PATCH 20/22] KVM: arm/arm64: Let the timer expire in hardirq context
+ on RT
+Date: Wed, 20 Nov 2019 16:42:34 +0000
+Message-Id: <20191120164236.29359-21-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -87,82 +87,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Thomas Gleixner <tglx@linutronix.de>
 
-On CPUs that support S2FWB (Armv8.4+), KVM configures the stage 2 page
-tables to override the memory attributes of memory accesses, regardless
-of the stage 1 page table configurations, and also when the stage 1 MMU
-is turned off.  This results in all memory accesses to RAM being
-cacheable, including during early boot of the guest.
+The timers are canceled from an preempt-notifier which is invoked with
+disabled preemption which is not allowed on PREEMPT_RT.
+The timer callback is short so in could be invoked in hard-IRQ context
+on -RT.
 
-On CPUs without this feature, memory accesses were non-cacheable during
-boot until the guest turned on the stage 1 MMU, and we had to detect
-when the guest turned on the MMU, such that we could invalidate all cache
-entries and ensure a consistent view of memory with the MMU turned on.
-When the guest turned on the caches, we would call stage2_flush_vm()
-from kvm_toggle_cache().
+Let the timer expire on hard-IRQ context even on -RT.
 
-However, stage2_flush_vm() walks all the stage 2 tables, and calls
-__kvm_flush-dcache_pte, which on a system with S2FWB does ... absolutely
-nothing.
-
-We can avoid that whole song and dance, and simply not set TVM when
-creating a VM on a system that has S2FWB.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-Link: https://lore.kernel.org/r/20191028130541.30536-1-christoffer.dall@arm.com
+Tested-by: Julien Grall <julien.grall@arm.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20191107095424.16647-1-bigeasy@linutronix.de
 ---
- arch/arm64/include/asm/kvm_arm.h     |  3 +--
- arch/arm64/include/asm/kvm_emulate.h | 12 +++++++++++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ virt/kvm/arm/arch_timer.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index ddf9d762ac62..6e5d839f42b5 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -61,7 +61,6 @@
-  * RW:		64bit by default, can be overridden for 32bit VMs
-  * TAC:		Trap ACTLR
-  * TSC:		Trap SMC
-- * TVM:		Trap VM ops (until M+C set in SCTLR_EL1)
-  * TSW:		Trap cache operations by set/way
-  * TWE:		Trap WFE
-  * TWI:		Trap WFI
-@@ -74,7 +73,7 @@
-  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
--			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
-+			 HCR_BSU_IS | HCR_FB | HCR_TAC | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d69c1efc63e7..6e92f6c7b1e4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -53,8 +53,18 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 		/* trap error record accesses */
- 		vcpu->arch.hcr_el2 |= HCR_TERR;
- 	}
--	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-+
-+	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
- 		vcpu->arch.hcr_el2 |= HCR_FWB;
-+	} else {
-+		/*
-+		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
-+		 * get set in SCTLR_EL1 such that we can detect when the guest
-+		 * MMU gets turned on and do the necessary cache maintenance
-+		 * then.
-+		 */
-+		vcpu->arch.hcr_el2 |= HCR_TVM;
-+	}
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index e2bb5bd60227..f182b2380345 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -80,7 +80,7 @@ static inline bool userspace_irqchip(struct kvm *kvm)
+ static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+ {
+ 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+-		      HRTIMER_MODE_ABS);
++		      HRTIMER_MODE_ABS_HARD);
+ }
  
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+ static void soft_timer_cancel(struct hrtimer *hrt)
+@@ -697,11 +697,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+ 	ptimer->cntvoff = 0;
+ 
+-	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
++	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+ 	timer->bg_timer.function = kvm_bg_timer_expire;
+ 
+-	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+-	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
++	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
++	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+ 	vtimer->hrtimer.function = kvm_hrtimer_expire;
+ 	ptimer->hrtimer.function = kvm_hrtimer_expire;
+ 
 -- 
 2.20.1
 
