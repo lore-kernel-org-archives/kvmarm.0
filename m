@@ -2,52 +2,54 @@ Return-Path: <SRS0=7egO=ZM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8419EC432C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7BF4C43215
 	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 481C52088F
+	by mail.kernel.org (Postfix) with ESMTP id AACB92089D
 	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481C52088F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AACB92089D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 018664AECF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E724AEFB;
 	Wed, 20 Nov 2019 11:43:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G5n5uGxSEf28; Wed, 20 Nov 2019 11:43:13 -0500 (EST)
+	with ESMTP id gFU7a1GWVqiq; Wed, 20 Nov 2019 11:43:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CACD4AED3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 949A44AED6;
 	Wed, 20 Nov 2019 11:43:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5E534AE89
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8C0A4AEB9
  for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KSX-EBuduq+Z for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id S+0QR7VY5o+u for <kvmarm@lists.cs.columbia.edu>;
  Wed, 20 Nov 2019 11:43:08 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5305D4AEB9
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5083D4AEAF
  for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:08 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT49-0007RI-KJ; Wed, 20 Nov 2019 17:42:53 +0100
+ id 1iXT4C-0007RI-58; Wed, 20 Nov 2019 17:42:56 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [GIT PULL] KVM/arm updates for 5.5
-Date: Wed, 20 Nov 2019 16:42:14 +0000
-Message-Id: <20191120164236.29359-1-maz@kernel.org>
+Subject: [PATCH 03/22] KVM: arm64: Document PV-time interface
+Date: Wed, 20 Nov 2019 16:42:17 +0000
+Message-Id: <20191120164236.29359-4-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
+References: <20191120164236.29359-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
@@ -84,141 +86,141 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Paolo, Radim,
+From: Steven Price <steven.price@arm.com>
 
-Here's the bulk of KVM/arm updates for 5.5. On the menu, two new features:
-- Stolen time is finally exposed to guests. Yay!
-- We can report (and potentially emulate) instructions that KVM cannot
-  handle in kernel space to userspace. Yay again!
+Introduce a paravirtualization interface for KVM/arm64 based on the
+"Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
 
-Apart from that, a fairly mundane bag of perf optimization, cleanup and
-bug fixes.
+This only adds the details about "Stolen Time" as the details of "Live
+Physical Time" have not been fully agreed.
 
-Note that this series is based on a shared branch with the arm64 tree,
-avoiding a potential delicate merge.
+User space can specify a reserved area of memory for the guest and
+inform KVM to populate the memory with information on time that the host
+kernel has stolen from the guest.
 
-Please pull,
+A hypercall interface is provided for the guest to interrogate the
+hypervisor's support for this interface and the location of the shared
+memory structures.
 
-	M.
-
-The following changes since commit e6ea46511b1ae8c4491904c79411fcd29139af14:
-
-  firmware: arm_sdei: use common SMCCC_CONDUIT_* (2019-10-14 10:55:14 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.5
-
-for you to fetch changes up to cd7056ae34af0e9424da97bbc7d2b38246ba8a2c:
-
-  Merge remote-tracking branch 'kvmarm/misc-5.5' into kvmarm/next (2019-11-08 11:27:29 +0000)
-
-----------------------------------------------------------------
-KVM/arm updates for Linux 5.5:
-
-- Allow non-ISV data aborts to be reported to userspace
-- Allow injection of data aborts from userspace
-- Expose stolen time to guests
-- GICv4 performance improvements
-- vgic ITS emulation fixes
-- Simplify FWB handling
-- Enable halt pool counters
-- Make the emulated timer PREEMPT_RT compliant
-
-----------------------------------------------------------------
-Christian Borntraeger (1):
-      KVM: arm/arm64: Show halt poll counters in debugfs
-
-Christoffer Dall (4):
-      KVM: arm/arm64: Allow reporting non-ISV data aborts to userspace
-      KVM: arm/arm64: Allow user injection of external data aborts
-      KVM: arm/arm64: Factor out hypercall handling from PSCI code
-      KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is supported
-
-Marc Zyngier (6):
-      Merge remote-tracking branch 'arm64/for-next/smccc-conduit-cleanup' into kvm-arm64/stolen-time
-      Merge remote-tracking branch 'kvmarm/kvm-arm64/stolen-time' into kvmarm-master/next
-      KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put
-      KVM: vgic-v4: Track the number of VLPIs per vcpu
-      KVM: arm64: Opportunistically turn off WFI trapping when using direct LPI injection
-      Merge remote-tracking branch 'kvmarm/misc-5.5' into kvmarm/next
-
-Steven Price (10):
-      KVM: arm64: Document PV-time interface
-      KVM: arm64: Implement PV_TIME_FEATURES call
-      KVM: Implement kvm_put_guest()
-      KVM: arm64: Support stolen time reporting via shared structure
-      KVM: Allow kvm_device_ops to be const
-      KVM: arm64: Provide VCPU attributes for stolen time
-      arm/arm64: Provide a wrapper for SMCCC 1.1 calls
-      arm/arm64: Make use of the SMCCC 1.1 wrapper
-      arm64: Retrieve stolen time as paravirtualized guest
-      KVM: arm64: Select TASK_DELAY_ACCT+TASKSTATS rather than SCHEDSTATS
-
-Thomas Gleixner (1):
-      KVM: arm/arm64: Let the timer expire in hardirq context on RT
-
-Zenghui Yu (3):
-      KVM: arm/arm64: vgic: Remove the declaration of kvm_send_userspace_msi()
-      KVM: arm/arm64: vgic: Fix some comments typo
-      KVM: arm/arm64: vgic: Don't rely on the wrong pending table
-
- Documentation/admin-guide/kernel-parameters.txt |   6 +-
- Documentation/virt/kvm/api.txt                  |  55 +++++++++-
- Documentation/virt/kvm/arm/pvtime.rst           |  80 ++++++++++++++
- Documentation/virt/kvm/devices/vcpu.txt         |  14 +++
- arch/arm/include/asm/kvm_arm.h                  |   1 +
- arch/arm/include/asm/kvm_emulate.h              |   9 +-
- arch/arm/include/asm/kvm_host.h                 |  33 ++++++
- arch/arm/include/uapi/asm/kvm.h                 |   3 +-
- arch/arm/kvm/Makefile                           |   2 +-
- arch/arm/kvm/guest.c                            |  14 +++
- arch/arm/kvm/handle_exit.c                      |   2 +-
- arch/arm/mm/proc-v7-bugs.c                      |  13 +--
- arch/arm64/include/asm/kvm_arm.h                |   3 +-
- arch/arm64/include/asm/kvm_emulate.h            |  26 ++++-
- arch/arm64/include/asm/kvm_host.h               |  37 +++++++
- arch/arm64/include/asm/paravirt.h               |   9 +-
- arch/arm64/include/asm/pvclock-abi.h            |  17 +++
- arch/arm64/include/uapi/asm/kvm.h               |   5 +-
- arch/arm64/kernel/cpu_errata.c                  |  81 +++++---------
- arch/arm64/kernel/paravirt.c                    | 140 ++++++++++++++++++++++++
- arch/arm64/kernel/time.c                        |   3 +
- arch/arm64/kvm/Kconfig                          |   4 +
- arch/arm64/kvm/Makefile                         |   2 +
- arch/arm64/kvm/guest.c                          |  23 ++++
- arch/arm64/kvm/handle_exit.c                    |   4 +-
- arch/arm64/kvm/inject_fault.c                   |   4 +-
- drivers/irqchip/irq-gic-v4.c                    |   7 +-
- include/Kbuild                                  |   2 +
- include/kvm/arm_hypercalls.h                    |  43 ++++++++
- include/kvm/arm_psci.h                          |   2 +-
- include/kvm/arm_vgic.h                          |   8 +-
- include/linux/arm-smccc.h                       |  59 ++++++++++
- include/linux/cpuhotplug.h                      |   1 +
- include/linux/irqchip/arm-gic-v4.h              |   4 +
- include/linux/kvm_host.h                        |  26 ++++-
- include/linux/kvm_types.h                       |   2 +
- include/uapi/linux/kvm.h                        |  10 ++
- virt/kvm/arm/arch_timer.c                       |   8 +-
- virt/kvm/arm/arm.c                              |  49 ++++++++-
- virt/kvm/arm/hypercalls.c                       |  71 ++++++++++++
- virt/kvm/arm/mmio.c                             |   9 +-
- virt/kvm/arm/psci.c                             |  84 +-------------
- virt/kvm/arm/pvtime.c                           | 131 ++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-init.c                   |   1 +
- virt/kvm/arm/vgic/vgic-its.c                    |   3 +
- virt/kvm/arm/vgic/vgic-v3.c                     |  12 +-
- virt/kvm/arm/vgic/vgic-v4.c                     |  59 +++++-----
- virt/kvm/arm/vgic/vgic.c                        |   4 -
- virt/kvm/arm/vgic/vgic.h                        |   2 -
- virt/kvm/kvm_main.c                             |   6 +-
- 50 files changed, 968 insertions(+), 225 deletions(-)
+Signed-off-by: Steven Price <steven.price@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/arm/pvtime.rst   | 80 +++++++++++++++++++++++++
+ Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
+ 2 files changed, 94 insertions(+)
  create mode 100644 Documentation/virt/kvm/arm/pvtime.rst
- create mode 100644 arch/arm64/include/asm/pvclock-abi.h
- create mode 100644 include/kvm/arm_hypercalls.h
- create mode 100644 virt/kvm/arm/hypercalls.c
- create mode 100644 virt/kvm/arm/pvtime.c
+
+diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
+new file mode 100644
+index 000000000000..2357dd2d8655
+--- /dev/null
++++ b/Documentation/virt/kvm/arm/pvtime.rst
+@@ -0,0 +1,80 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++Paravirtualized time support for arm64
++======================================
++
++Arm specification DEN0057/A defines a standard for paravirtualised time
++support for AArch64 guests:
++
++https://developer.arm.com/docs/den0057/a
++
++KVM/arm64 implements the stolen time part of this specification by providing
++some hypervisor service calls to support a paravirtualized guest obtaining a
++view of the amount of time stolen from its execution.
++
++Two new SMCCC compatible hypercalls are defined:
++
++* PV_TIME_FEATURES: 0xC5000020
++* PV_TIME_ST:       0xC5000021
++
++These are only available in the SMC64/HVC64 calling convention as
++paravirtualized time is not available to 32 bit Arm guests. The existence of
++the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
++mechanism before calling it.
++
++PV_TIME_FEATURES
++    ============= ========    ==========
++    Function ID:  (uint32)    0xC5000020
++    PV_call_id:   (uint32)    The function to query for support.
++                              Currently only PV_TIME_ST is supported.
++    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
++                              PV-time feature is supported by the hypervisor.
++    ============= ========    ==========
++
++PV_TIME_ST
++    ============= ========    ==========
++    Function ID:  (uint32)    0xC5000021
++    Return value: (int64)     IPA of the stolen time data structure for this
++                              VCPU. On failure:
++                              NOT_SUPPORTED (-1)
++    ============= ========    ==========
++
++The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
++with inner and outer write back caching attributes, in the inner shareable
++domain. A total of 16 bytes from the IPA returned are guaranteed to be
++meaningfully filled by the hypervisor (see structure below).
++
++PV_TIME_ST returns the structure for the calling VCPU.
++
++Stolen Time
++-----------
++
++The structure pointed to by the PV_TIME_ST hypercall is as follows:
++
+++-------------+-------------+-------------+----------------------------+
++| Field       | Byte Length | Byte Offset | Description                |
+++=============+=============+=============+============================+
++| Revision    |      4      |      0      | Must be 0 for version 1.0  |
+++-------------+-------------+-------------+----------------------------+
++| Attributes  |      4      |      4      | Must be 0                  |
+++-------------+-------------+-------------+----------------------------+
++| Stolen time |      8      |      8      | Stolen time in unsigned    |
++|             |             |             | nanoseconds indicating how |
++|             |             |             | much time this VCPU thread |
++|             |             |             | was involuntarily not      |
++|             |             |             | running on a physical CPU. |
+++-------------+-------------+-------------+----------------------------+
++
++All values in the structure are stored little-endian.
++
++The structure will be updated by the hypervisor prior to scheduling a VCPU. It
++will be present within a reserved region of the normal memory given to the
++guest. The guest should not attempt to write into this memory. There is a
++structure per VCPU of the guest.
++
++It is advisable that one or more 64k pages are set aside for the purpose of
++these structures and not used for other purposes, this enables the guest to map
++the region using 64k pages and avoids conflicting attributes with other memory.
++
++For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
++section "3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL".
+diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+index 2b5dab16c4f2..6f3bd64a05b0 100644
+--- a/Documentation/virt/kvm/devices/vcpu.txt
++++ b/Documentation/virt/kvm/devices/vcpu.txt
+@@ -60,3 +60,17 @@ time to use the number provided for a given timer, overwriting any previously
+ configured values on other VCPUs.  Userspace should configure the interrupt
+ numbers on at least one VCPU after creating all VCPUs and before running any
+ VCPUs.
++
++3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
++Architectures: ARM64
++
++3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_IPA
++Parameters: 64-bit base address
++Returns: -ENXIO:  Stolen time not implemented
++         -EEXIST: Base address already set for this VCPU
++         -EINVAL: Base address not 64 byte aligned
++
++Specifies the base address of the stolen time structure for this VCPU. The
++base address must be 64 byte aligned and exist within a valid guest memory
++region. See Documentation/virt/kvm/arm/pvtime.txt for more information
++including the layout of the stolen time structure.
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
