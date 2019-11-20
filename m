@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3160DC432C3
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C330DC432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E90252089D
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E90252089D
+	by mail.kernel.org (Postfix) with ESMTP id 8380820898
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8380820898
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A514AED9;
-	Wed, 20 Nov 2019 11:43:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BE8D4AEC7;
+	Wed, 20 Nov 2019 11:43:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9UpuAmZrPDfI; Wed, 20 Nov 2019 11:43:19 -0500 (EST)
+	with ESMTP id muZp4ugzbdfq; Wed, 20 Nov 2019 11:43:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F16E04AEBB;
-	Wed, 20 Nov 2019 11:43:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B7D04AEEF;
+	Wed, 20 Nov 2019 11:43:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B0734AEC0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 043084AEF2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mS3pTM-S001m for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:43:10 -0500 (EST)
+ with ESMTP id THOKSRyl+Sbb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:43:12 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1269C4AE89
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 681B24AECB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:11 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4B-0007RI-BX; Wed, 20 Nov 2019 17:42:55 +0100
+ id 1iXT4F-0007RI-Qz; Wed, 20 Nov 2019 17:42:59 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 02/22] KVM: arm/arm64: Allow user injection of external data
- aborts
-Date: Wed, 20 Nov 2019 16:42:16 +0000
-Message-Id: <20191120164236.29359-3-maz@kernel.org>
+Subject: [PATCH 07/22] KVM: arm64: Support stolen time reporting via shared
+ structure
+Date: Wed, 20 Nov 2019 16:42:21 +0000
+Message-Id: <20191120164236.29359-8-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -87,226 +87,285 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Steven Price <steven.price@arm.com>
 
-In some scenarios, such as buggy guest or incorrect configuration of the
-VMM and firmware description data, userspace will detect a memory access
-to a portion of the IPA, which is not mapped to any MMIO region.
+Implement the service call for configuring a shared structure between a
+VCPU and the hypervisor in which the hypervisor can write the time
+stolen from the VCPU's execution time by other tasks on the host.
 
-For this purpose, the appropriate action is to inject an external abort
-to the guest.  The kernel already has functionality to inject an
-external abort, but we need to wire up a signal from user space that
-lets user space tell the kernel to do this.
+User space allocates memory which is placed at an IPA also chosen by user
+space. The hypervisor then updates the shared structure using
+kvm_put_guest() to ensure single copy atomicity of the 64-bit value
+reporting the stolen time in nanoseconds.
 
-It turns out, we already have the set event functionality which we can
-perfectly reuse for this.
+Whenever stolen time is enabled by the guest, the stolen time counter is
+reset.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+The stolen time itself is retrieved from the sched_info structure
+maintained by the Linux scheduler code. We enable SCHEDSTATS when
+selecting KVM Kconfig to ensure this value is meaningful.
+
+Signed-off-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- Documentation/virt/kvm/api.txt    | 22 +++++++++++++++++++++-
- arch/arm/include/uapi/asm/kvm.h   |  3 ++-
- arch/arm/kvm/guest.c              | 10 ++++++++++
- arch/arm64/include/uapi/asm/kvm.h |  3 ++-
- arch/arm64/kvm/guest.c            | 10 ++++++++++
- arch/arm64/kvm/inject_fault.c     |  4 ++--
- include/uapi/linux/kvm.h          |  1 +
- virt/kvm/arm/arm.c                |  1 +
- 8 files changed, 49 insertions(+), 5 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 19 +++++++++++
+ arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++
+ arch/arm64/kvm/Kconfig            |  1 +
+ include/linux/kvm_types.h         |  2 ++
+ virt/kvm/arm/arm.c                | 11 +++++++
+ virt/kvm/arm/hypercalls.c         |  6 ++++
+ virt/kvm/arm/pvtime.c             | 52 +++++++++++++++++++++++++++++++
+ 7 files changed, 111 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-index 7403f15657c2..bd29d44af32b 100644
---- a/Documentation/virt/kvm/api.txt
-+++ b/Documentation/virt/kvm/api.txt
-@@ -1002,12 +1002,18 @@ Specifying exception.has_esr on a system that does not support it will return
- -EINVAL. Setting anything other than the lower 24bits of exception.serror_esr
- will return -EINVAL.
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 5a0c3569ebde..5a077f85813f 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -39,6 +39,7 @@
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+ #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
++#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
  
-+It is not possible to read back a pending external abort (injected via
-+KVM_SET_VCPU_EVENTS or otherwise) because such an exception is always delivered
-+directly to the virtual CPU).
-+
-+
- struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
-+		__u8 ext_dabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[6];
-+		__u8 pad[5];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-@@ -1051,9 +1057,23 @@ contain a valid state and shall be written into the VCPU.
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
  
- ARM/ARM64:
- 
-+User space may need to inject several types of events to the guest.
-+
- Set the pending SError exception state for this VCPU. It is not possible to
- 'cancel' an Serror that has been made pending.
- 
-+If the guest performed an access to I/O memory which could not be handled by
-+userspace, for example because of missing instruction syndrome decode
-+information or because there is no device mapped at the accessed IPA, then
-+userspace can ask the kernel to inject an external abort using the address
-+from the exiting fault on the VCPU. It is a programming error to set
-+ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
-+KVM_EXIT_ARM_NISV. This feature is only available if the system supports
-+KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
-+how userspace reports accesses for the above cases to guests, across different
-+userspace implementations. Nevertheless, userspace can still emulate all Arm
-+exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
-+
- See KVM_GET_VCPU_EVENTS for the data structure.
- 
- 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 2769360f195c..03cd7c19a683 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -131,8 +131,9 @@ struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
-+		__u8 ext_dabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[6];
-+		__u8 pad[5];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64b4033..735f9b007e58 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -255,6 +255,12 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- {
- 	events->exception.serror_pending = !!(*vcpu_hcr(vcpu) & HCR_VA);
- 
-+	/*
-+	 * We never return a pending ext_dabt here because we deliver it to
-+	 * the virtual CPU directly when setting the event and it's no longer
-+	 * 'pending' at this point.
-+	 */
-+
- 	return 0;
+@@ -329,6 +330,24 @@ static inline long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ 	return SMCCC_RET_NOT_SUPPORTED;
  }
  
-@@ -263,12 +269,16 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- {
- 	bool serror_pending = events->exception.serror_pending;
- 	bool has_esr = events->exception.serror_has_esr;
-+	bool ext_dabt_pending = events->exception.ext_dabt_pending;
- 
- 	if (serror_pending && has_esr)
- 		return -EINVAL;
- 	else if (serror_pending)
- 		kvm_inject_vabt(vcpu);
- 
-+	if (ext_dabt_pending)
-+		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++static inline gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
++{
++	return GPA_INVALID;
++}
 +
- 	return 0;
- }
- 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 67c21f9bdbad..d49c17a80491 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -164,8 +164,9 @@ struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
-+		__u8 ext_dabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[6];
-+		__u8 pad[5];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd626447482..ca613a44c6ec 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -712,6 +712,12 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 	if (events->exception.serror_pending && events->exception.serror_has_esr)
- 		events->exception.serror_esr = vcpu_get_vsesr(vcpu);
- 
-+	/*
-+	 * We never return a pending ext_dabt here because we deliver it to
-+	 * the virtual CPU directly when setting the event and it's no longer
-+	 * 'pending' at this point.
-+	 */
++static inline void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
++{
++}
 +
- 	return 0;
- }
- 
-@@ -720,6 +726,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- {
- 	bool serror_pending = events->exception.serror_pending;
- 	bool has_esr = events->exception.serror_has_esr;
-+	bool ext_dabt_pending = events->exception.ext_dabt_pending;
- 
- 	if (serror_pending && has_esr) {
- 		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
-@@ -733,6 +740,9 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 		kvm_inject_vabt(vcpu);
- 	}
- 
-+	if (ext_dabt_pending)
-+		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
++{
++}
 +
- 	return 0;
- }
++static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
++{
++	return false;
++}
++
+ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
  
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index a9d25a305af5..ccdb6a051ab2 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -109,7 +109,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 93b46d9526d0..75ef37f79633 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -44,6 +44,7 @@
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+ #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
++#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
  
- /**
-  * kvm_inject_dabt - inject a data abort into the guest
-- * @vcpu: The VCPU to receive the undefined exception
-+ * @vcpu: The VCPU to receive the data abort
-  * @addr: The address to report in the DFAR
-  *
-  * It is assumed that this code is called from the VCPU thread and that the
-@@ -125,7 +125,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
  
- /**
-  * kvm_inject_pabt - inject a prefetch abort into the guest
-- * @vcpu: The VCPU to receive the undefined exception
-+ * @vcpu: The VCPU to receive the prefetch abort
-  * @addr: The address to report in the DFAR
-  *
-  * It is assumed that this code is called from the VCPU thread and that the
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 7336ee8d98d7..65db5a4257ec 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1007,6 +1007,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
- #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
- #define KVM_CAP_ARM_NISV_TO_USER 176
-+#define KVM_CAP_ARM_INJECT_EXT_DABT 177
+@@ -338,6 +339,13 @@ struct kvm_vcpu_arch {
+ 	/* True when deferrable sysregs are loaded on the physical CPU,
+ 	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+ 	bool sysregs_loaded_on_cpu;
++
++	/* Guest PV state */
++	struct {
++		u64 steal;
++		u64 last_steal;
++		gpa_t base;
++	} steal;
+ };
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+@@ -479,6 +487,18 @@ int kvm_perf_init(void);
+ int kvm_perf_teardown(void);
  
+ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
++gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
++void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
++
++static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
++{
++	vcpu_arch->steal.base = GPA_INVALID;
++}
++
++static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
++{
++	return (vcpu_arch->steal.base != GPA_INVALID);
++}
+ 
+ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+ 
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index a67121d419a2..d8b88e40d223 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -39,6 +39,7 @@ config KVM
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
++	select SCHEDSTATS
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index bde5374ae021..1c88e69db3d9 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
+ typedef u64            gpa_t;
+ typedef u64            gfn_t;
+ 
++#define GPA_INVALID	(~(gpa_t)0)
++
+ typedef unsigned long  hva_t;
+ typedef u64            hpa_t;
+ typedef u64            hfn_t;
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index e6d56f60e4b6..12064780f1d8 100644
+index 86c6aa1cb58e..2aba375dfd13 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_EVENTS:
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
-+	case KVM_CAP_ARM_INJECT_EXT_DABT:
- 		r = 1;
+@@ -40,6 +40,10 @@
+ #include <asm/kvm_coproc.h>
+ #include <asm/sections.h>
+ 
++#include <kvm/arm_hypercalls.h>
++#include <kvm/arm_pmu.h>
++#include <kvm/arm_psci.h>
++
+ #ifdef REQUIRES_VIRT
+ __asm__(".arch_extension	virt");
+ #endif
+@@ -351,6 +355,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_arm_reset_debug_ptr(vcpu);
+ 
++	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
++
+ 	return kvm_vgic_vcpu_init(vcpu);
+ }
+ 
+@@ -380,6 +386,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_vcpu_load_sysregs(vcpu);
+ 	kvm_arch_vcpu_load_fp(vcpu);
+ 	kvm_vcpu_pmu_restore_guest(vcpu);
++	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
++		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+ 
+ 	if (single_task_running())
+ 		vcpu_clear_wfe_traps(vcpu);
+@@ -645,6 +653,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		 * that a VCPU sees new virtual interrupts.
+ 		 */
+ 		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
++
++		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
++			kvm_update_stolen_time(vcpu);
+ 	}
+ }
+ 
+diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+index 97ea8b133e77..550dfa3e53cd 100644
+--- a/virt/kvm/arm/hypercalls.c
++++ b/virt/kvm/arm/hypercalls.c
+@@ -14,6 +14,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	u32 func_id = smccc_get_function(vcpu);
+ 	long val = SMCCC_RET_NOT_SUPPORTED;
+ 	u32 feature;
++	gpa_t gpa;
+ 
+ 	switch (func_id) {
+ 	case ARM_SMCCC_VERSION_FUNC_ID:
+@@ -56,6 +57,11 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+ 		val = kvm_hypercall_pv_features(vcpu);
  		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
++	case ARM_SMCCC_HV_PV_TIME_ST:
++		gpa = kvm_init_stolen_time(vcpu);
++		if (gpa != GPA_INVALID)
++			val = gpa;
++		break;
+ 	default:
+ 		return kvm_psci_call(vcpu);
+ 	}
+diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+index 9fc69fc2d683..b90b3a7bea85 100644
+--- a/virt/kvm/arm/pvtime.c
++++ b/virt/kvm/arm/pvtime.c
+@@ -3,8 +3,35 @@
+ 
+ #include <linux/arm-smccc.h>
+ 
++#include <asm/pvclock-abi.h>
++
+ #include <kvm/arm_hypercalls.h>
+ 
++void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++	u64 steal;
++	__le64 steal_le;
++	u64 offset;
++	int idx;
++	u64 base = vcpu->arch.steal.base;
++
++	if (base == GPA_INVALID)
++		return;
++
++	/* Let's do the local bookkeeping */
++	steal = vcpu->arch.steal.steal;
++	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
++	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
++	vcpu->arch.steal.steal = steal;
++
++	steal_le = cpu_to_le64(steal);
++	idx = srcu_read_lock(&kvm->srcu);
++	offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
++	kvm_put_guest(kvm, base + offset, steal_le, u64);
++	srcu_read_unlock(&kvm->srcu, idx);
++}
++
+ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ {
+ 	u32 feature = smccc_get_arg1(vcpu);
+@@ -12,9 +39,34 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ 
+ 	switch (feature) {
+ 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
++	case ARM_SMCCC_HV_PV_TIME_ST:
+ 		val = SMCCC_RET_SUCCESS;
+ 		break;
+ 	}
+ 
+ 	return val;
+ }
++
++gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
++{
++	struct pvclock_vcpu_stolen_time init_values = {};
++	struct kvm *kvm = vcpu->kvm;
++	u64 base = vcpu->arch.steal.base;
++	int idx;
++
++	if (base == GPA_INVALID)
++		return base;
++
++	/*
++	 * Start counting stolen time from the time the guest requests
++	 * the feature enabled.
++	 */
++	vcpu->arch.steal.steal = 0;
++	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
++
++	idx = srcu_read_lock(&kvm->srcu);
++	kvm_write_guest(kvm, base, &init_values, sizeof(init_values));
++	srcu_read_unlock(&kvm->srcu, idx);
++
++	return base;
++}
 -- 
 2.20.1
 
