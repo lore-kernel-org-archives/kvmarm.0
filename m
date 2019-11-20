@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 667C0C43141
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4140C432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2A61220895
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A61220895
+	by mail.kernel.org (Postfix) with ESMTP id B5A1920895
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5A1920895
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4F604AF00;
-	Wed, 20 Nov 2019 11:43:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437234AECC;
+	Wed, 20 Nov 2019 11:43:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id n7qQLMix8MhT; Wed, 20 Nov 2019 11:43:15 -0500 (EST)
+	with ESMTP id 9lYJej-QG+sm; Wed, 20 Nov 2019 11:43:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEE054AED8;
-	Wed, 20 Nov 2019 11:43:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D549C4AED1;
+	Wed, 20 Nov 2019 11:43:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D680D4AE89
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C15B64AEB9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q9zMkhwc-+ei for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:43:08 -0500 (EST)
+ with ESMTP id J11wSybIENRG for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:43:09 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5447B4AEBB
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 753684AEBD
  for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:08 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4D-0007RI-74; Wed, 20 Nov 2019 17:42:57 +0100
+ id 1iXT4A-0007RI-GB; Wed, 20 Nov 2019 17:42:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 04/22] KVM: arm/arm64: Factor out hypercall handling from PSCI
- code
-Date: Wed, 20 Nov 2019 16:42:18 +0000
-Message-Id: <20191120164236.29359-5-maz@kernel.org>
+Subject: [PATCH 01/22] KVM: arm/arm64: Allow reporting non-ISV data aborts to
+ userspace
+Date: Wed, 20 Nov 2019 16:42:15 +0000
+Message-Id: <20191120164236.29359-2-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -89,348 +89,278 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-We currently intertwine the KVM PSCI implementation with the general
-dispatch of hypercall handling, which makes perfect sense because PSCI
-is the only category of hypercalls we support.
+For a long time, if a guest accessed memory outside of a memslot using
+any of the load/store instructions in the architecture which doesn't
+supply decoding information in the ESR_EL2 (the ISV bit is not set), the
+kernel would print the following message and terminate the VM as a
+result of returning -ENOSYS to userspace:
 
-However, as we are about to support additional hypercalls, factor out
-this functionality into a separate hypercall handler file.
+  load/store instruction decoding not implemented
 
+The reason behind this message is that KVM assumes that all accesses
+outside a memslot is an MMIO access which should be handled by
+userspace, and we originally expected to eventually implement some sort
+of decoding of load/store instructions where the ISV bit was not set.
+
+However, it turns out that many of the instructions which don't provide
+decoding information on abort are not safe to use for MMIO accesses, and
+the remaining few that would potentially make sense to use on MMIO
+accesses, such as those with register writeback, are not used in
+practice.  It also turns out that fetching an instruction from guest
+memory can be a pretty horrible affair, involving stopping all CPUs on
+SMP systems, handling multiple corner cases of address translation in
+software, and more.  It doesn't appear likely that we'll ever implement
+this in the kernel.
+
+What is much more common is that a user has misconfigured his/her guest
+and is actually not accessing an MMIO region, but just hitting some
+random hole in the IPA space.  In this scenario, the error message above
+is almost misleading and has led to a great deal of confusion over the
+years.
+
+It is, nevertheless, ABI to userspace, and we therefore need to
+introduce a new capability that userspace explicitly enables to change
+behavior.
+
+This patch introduces KVM_CAP_ARM_NISV_TO_USER (NISV meaning Non-ISV)
+which does exactly that, and introduces a new exit reason to report the
+event to userspace.  User space can then emulate an exception to the
+guest, restart the guest, suspend the guest, or take any other
+appropriate action as per the policy of the running system.
+
+Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[steven.price@arm.com: rebased]
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm/kvm/Makefile        |  2 +-
- arch/arm/kvm/handle_exit.c   |  2 +-
- arch/arm64/kvm/Makefile      |  1 +
- arch/arm64/kvm/handle_exit.c |  4 +-
- include/Kbuild               |  2 +
- include/kvm/arm_hypercalls.h | 43 ++++++++++++++++++
- include/kvm/arm_psci.h       |  2 +-
- virt/kvm/arm/hypercalls.c    | 59 +++++++++++++++++++++++++
- virt/kvm/arm/psci.c          | 84 +-----------------------------------
- 9 files changed, 112 insertions(+), 87 deletions(-)
- create mode 100644 include/kvm/arm_hypercalls.h
- create mode 100644 virt/kvm/arm/hypercalls.c
+ Documentation/virt/kvm/api.txt       | 33 ++++++++++++++++++++++++++++
+ arch/arm/include/asm/kvm_arm.h       |  1 +
+ arch/arm/include/asm/kvm_emulate.h   |  5 +++++
+ arch/arm/include/asm/kvm_host.h      |  8 +++++++
+ arch/arm64/include/asm/kvm_emulate.h |  5 +++++
+ arch/arm64/include/asm/kvm_host.h    |  8 +++++++
+ include/uapi/linux/kvm.h             |  7 ++++++
+ virt/kvm/arm/arm.c                   | 21 ++++++++++++++++++
+ virt/kvm/arm/mmio.c                  |  9 +++++++-
+ 9 files changed, 96 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index b76b75bd9e00..e442d82821df 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -24,7 +24,7 @@ obj-y += kvm-arm.o init.o interrupts.o
- obj-y += handle_exit.o guest.o emulate.o reset.o
- obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
- obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
--obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
-+obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o $(KVM)/arm/hypercalls.o
- obj-y += $(KVM)/arm/aarch32.o
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index 4833904d32a5..7403f15657c2 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -4468,6 +4468,39 @@ Hyper-V SynIC state change. Notification is used to remap SynIC
+ event/message pages and to enable/disable SynIC messages/events processing
+ in userspace.
  
- obj-y += $(KVM)/arm/vgic/vgic.o
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index 2a6a1394d26e..e58a89d2f13f 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -9,7 +9,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_mmu.h>
--#include <kvm/arm_psci.h>
-+#include <kvm/arm_hypercalls.h>
- #include <trace/events/kvm.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 3ac1a64d2fb9..73dce4d47d47 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
- 
- kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
- kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 706cca23f0d2..aacfc55de44c 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -11,8 +11,6 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
--#include <kvm/arm_psci.h>
--
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
-@@ -22,6 +20,8 @@
- #include <asm/debug-monitors.h>
- #include <asm/traps.h>
- 
-+#include <kvm/arm_hypercalls.h>
++		/* KVM_EXIT_ARM_NISV */
++		struct {
++			__u64 esr_iss;
++			__u64 fault_ipa;
++		} arm_nisv;
 +
- #define CREATE_TRACE_POINTS
- #include "trace.h"
- 
-diff --git a/include/Kbuild b/include/Kbuild
-index ffba79483cc5..e8154f8bcac5 100644
---- a/include/Kbuild
-+++ b/include/Kbuild
-@@ -67,6 +67,8 @@ header-test-			+= keys/big_key-type.h
- header-test-			+= keys/request_key_auth-type.h
- header-test-			+= keys/trusted.h
- header-test-			+= kvm/arm_arch_timer.h
-+header-test-$(CONFIG_ARM)	+= kvm/arm_hypercalls.h
-+header-test-$(CONFIG_ARM64)	+= kvm/arm_hypercalls.h
- header-test-			+= kvm/arm_pmu.h
- header-test-$(CONFIG_ARM)	+= kvm/arm_psci.h
- header-test-$(CONFIG_ARM64)	+= kvm/arm_psci.h
-diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-new file mode 100644
-index 000000000000..0e2509d27910
---- /dev/null
-+++ b/include/kvm/arm_hypercalls.h
-@@ -0,0 +1,43 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2019 Arm Ltd. */
++Used on arm and arm64 systems. If a guest accesses memory not in a memslot,
++KVM will typically return to userspace and ask it to do MMIO emulation on its
++behalf. However, for certain classes of instructions, no instruction decode
++(direction, length of memory access) is provided, and fetching and decoding
++the instruction from the VM is overly complicated to live in the kernel.
 +
-+#ifndef __KVM_ARM_HYPERCALLS_H
-+#define __KVM_ARM_HYPERCALLS_H
++Historically, when this situation occurred, KVM would print a warning and kill
++the VM. KVM assumed that if the guest accessed non-memslot memory, it was
++trying to do I/O, which just couldn't be emulated, and the warning message was
++phrased accordingly. However, what happened more often was that a guest bug
++caused access outside the guest memory areas which should lead to a more
++meaningful warning message and an external abort in the guest, if the access
++did not fall within an I/O window.
 +
-+#include <asm/kvm_emulate.h>
++Userspace implementations can query for KVM_CAP_ARM_NISV_TO_USER, and enable
++this capability at VM creation. Once this is done, these types of errors will
++instead return to userspace with KVM_EXIT_ARM_NISV, with the valid bits from
++the HSR (arm) and ESR_EL2 (arm64) in the esr_iss field, and the faulting IPA
++in the fault_ipa field. Userspace can either fix up the access if it's
++actually an I/O access by decoding the instruction from guest memory (if it's
++very brave) and continue executing the guest, or it can decide to suspend,
++dump, or restart the guest.
 +
-+int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
++Note that KVM does not skip the faulting instruction as it does for
++KVM_EXIT_MMIO, but userspace has to emulate any change to the processing state
++if it decides to decode and emulate the instruction.
 +
-+static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 0);
-+}
-+
-+static inline unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 1);
-+}
-+
-+static inline unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 2);
-+}
-+
-+static inline unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 3);
-+}
-+
-+static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
-+				    unsigned long a0,
-+				    unsigned long a1,
-+				    unsigned long a2,
-+				    unsigned long a3)
-+{
-+	vcpu_set_reg(vcpu, 0, a0);
-+	vcpu_set_reg(vcpu, 1, a1);
-+	vcpu_set_reg(vcpu, 2, a2);
-+	vcpu_set_reg(vcpu, 3, a3);
-+}
-+
-+#endif
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 632e78bdef4d..5b58bd2fe088 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -40,7 +40,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index 0125aa059d5b..9c04bd810d07 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -162,6 +162,7 @@
+ #define HSR_ISV		(_AC(1, UL) << HSR_ISV_SHIFT)
+ #define HSR_SRT_SHIFT	(16)
+ #define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
++#define HSR_CM		(1 << 8)
+ #define HSR_FSC		(0x3f)
+ #define HSR_FSC_TYPE	(0x3c)
+ #define HSR_SSE		(1 << 21)
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 40002416efec..e8ef349c04b4 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -167,6 +167,11 @@ static inline bool kvm_vcpu_dabt_isvalid(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_ISV;
  }
  
- 
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-+int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
- struct kvm_one_reg;
- 
-diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-new file mode 100644
-index 000000000000..f875241bd030
---- /dev/null
-+++ b/virt/kvm/arm/hypercalls.c
-@@ -0,0 +1,59 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2019 Arm Ltd.
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_emulate.h>
-+
-+#include <kvm/arm_hypercalls.h>
-+#include <kvm/arm_psci.h>
-+
-+int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
++static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
 +{
-+	u32 func_id = smccc_get_function(vcpu);
-+	u32 val = SMCCC_RET_NOT_SUPPORTED;
-+	u32 feature;
++	return kvm_vcpu_get_hsr(vcpu) & (HSR_CM | HSR_WNR | HSR_FSC);
++}
 +
-+	switch (func_id) {
-+	case ARM_SMCCC_VERSION_FUNC_ID:
-+		val = ARM_SMCCC_VERSION_1_1;
-+		break;
-+	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-+		feature = smccc_get_arg1(vcpu);
-+		switch (feature) {
-+		case ARM_SMCCC_ARCH_WORKAROUND_1:
-+			switch (kvm_arm_harden_branch_predictor()) {
-+			case KVM_BP_HARDEN_UNKNOWN:
-+				break;
-+			case KVM_BP_HARDEN_WA_NEEDED:
-+				val = SMCCC_RET_SUCCESS;
-+				break;
-+			case KVM_BP_HARDEN_NOT_REQUIRED:
-+				val = SMCCC_RET_NOT_REQUIRED;
-+				break;
-+			}
-+			break;
-+		case ARM_SMCCC_ARCH_WORKAROUND_2:
-+			switch (kvm_arm_have_ssbd()) {
-+			case KVM_SSBD_FORCE_DISABLE:
-+			case KVM_SSBD_UNKNOWN:
-+				break;
-+			case KVM_SSBD_KERNEL:
-+				val = SMCCC_RET_SUCCESS;
-+				break;
-+			case KVM_SSBD_FORCE_ENABLE:
-+			case KVM_SSBD_MITIGATED:
-+				val = SMCCC_RET_NOT_REQUIRED;
-+				break;
-+			}
-+			break;
-+		}
+ static inline bool kvm_vcpu_dabt_iswrite(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_WNR;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 8a37c8e89777..19a92c49039c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -76,6 +76,14 @@ struct kvm_arch {
+ 
+ 	/* Mandated version of PSCI */
+ 	u32 psci_version;
++
++	/*
++	 * If we encounter a data abort without valid instruction syndrome
++	 * information, report this to user space.  User space can (and
++	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
++	 * supported.
++	 */
++	bool return_nisv_io_abort_to_user;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index d69c1efc63e7..a3c967988e1d 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -258,6 +258,11 @@ static inline bool kvm_vcpu_dabt_isvalid(const struct kvm_vcpu *vcpu)
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_ISV);
+ }
+ 
++static inline unsigned long kvm_vcpu_dabt_iss_nisv_sanitized(const struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_get_hsr(vcpu) & (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC);
++}
++
+ static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
+ {
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f656169db8c3..019bc560edc1 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -83,6 +83,14 @@ struct kvm_arch {
+ 
+ 	/* Mandated version of PSCI */
+ 	u32 psci_version;
++
++	/*
++	 * If we encounter a data abort without valid instruction syndrome
++	 * information, report this to user space.  User space can (and
++	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
++	 * supported.
++	 */
++	bool return_nisv_io_abort_to_user;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52641d8ca9e8..7336ee8d98d7 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -235,6 +235,7 @@ struct kvm_hyperv_exit {
+ #define KVM_EXIT_S390_STSI        25
+ #define KVM_EXIT_IOAPIC_EOI       26
+ #define KVM_EXIT_HYPERV           27
++#define KVM_EXIT_ARM_NISV         28
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -394,6 +395,11 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
++		/* KVM_EXIT_ARM_NISV */
++		struct {
++			__u64 esr_iss;
++			__u64 fault_ipa;
++		} arm_nisv;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -1000,6 +1006,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PMU_EVENT_FILTER 173
+ #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+ #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
++#define KVM_CAP_ARM_NISV_TO_USER 176
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 86c6aa1cb58e..e6d56f60e4b6 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -98,6 +98,26 @@ int kvm_arch_check_processor_compat(void)
+ 	return 0;
+ }
+ 
++int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
++			    struct kvm_enable_cap *cap)
++{
++	int r;
++
++	if (cap->flags)
++		return -EINVAL;
++
++	switch (cap->cap) {
++	case KVM_CAP_ARM_NISV_TO_USER:
++		r = 0;
++		kvm->arch.return_nisv_io_abort_to_user = true;
 +		break;
 +	default:
-+		return kvm_psci_call(vcpu);
++		r = -EINVAL;
++		break;
 +	}
 +
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
-+	return 1;
++	return r;
 +}
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 87927f7e1ee7..17e2bdd4b76f 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -15,6 +15,7 @@
- #include <asm/kvm_host.h>
  
- #include <kvm/arm_psci.h>
-+#include <kvm/arm_hypercalls.h>
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+@@ -197,6 +217,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_VCPU_EVENTS:
+ 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
++	case KVM_CAP_ARM_NISV_TO_USER:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+index 6af5c91337f2..70d3b449692c 100644
+--- a/virt/kvm/arm/mmio.c
++++ b/virt/kvm/arm/mmio.c
+@@ -167,7 +167,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		if (ret)
+ 			return ret;
+ 	} else {
+-		kvm_err("load/store instruction decoding not implemented\n");
++		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
++			run->exit_reason = KVM_EXIT_ARM_NISV;
++			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
++			run->arm_nisv.fault_ipa = fault_ipa;
++			return 0;
++		}
++
++		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
+ 		return -ENOSYS;
+ 	}
  
- /*
-  * This is an implementation of the Power State Coordination Interface
-@@ -23,38 +24,6 @@
- 
- #define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
- 
--static u32 smccc_get_function(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 0);
--}
--
--static unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 1);
--}
--
--static unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 2);
--}
--
--static unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 3);
--}
--
--static void smccc_set_retval(struct kvm_vcpu *vcpu,
--			     unsigned long a0,
--			     unsigned long a1,
--			     unsigned long a2,
--			     unsigned long a3)
--{
--	vcpu_set_reg(vcpu, 0, a0);
--	vcpu_set_reg(vcpu, 1, a1);
--	vcpu_set_reg(vcpu, 2, a2);
--	vcpu_set_reg(vcpu, 3, a3);
--}
--
- static unsigned long psci_affinity_mask(unsigned long affinity_level)
- {
- 	if (affinity_level <= 3)
-@@ -373,7 +342,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
-  * Errors:
-  * -EINVAL: Unrecognized PSCI function
-  */
--static int kvm_psci_call(struct kvm_vcpu *vcpu)
-+int kvm_psci_call(struct kvm_vcpu *vcpu)
- {
- 	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
- 	case KVM_ARM_PSCI_1_0:
-@@ -387,55 +356,6 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
- 	};
- }
- 
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
--{
--	u32 func_id = smccc_get_function(vcpu);
--	u32 val = SMCCC_RET_NOT_SUPPORTED;
--	u32 feature;
--
--	switch (func_id) {
--	case ARM_SMCCC_VERSION_FUNC_ID:
--		val = ARM_SMCCC_VERSION_1_1;
--		break;
--	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
--		feature = smccc_get_arg1(vcpu);
--		switch(feature) {
--		case ARM_SMCCC_ARCH_WORKAROUND_1:
--			switch (kvm_arm_harden_branch_predictor()) {
--			case KVM_BP_HARDEN_UNKNOWN:
--				break;
--			case KVM_BP_HARDEN_WA_NEEDED:
--				val = SMCCC_RET_SUCCESS;
--				break;
--			case KVM_BP_HARDEN_NOT_REQUIRED:
--				val = SMCCC_RET_NOT_REQUIRED;
--				break;
--			}
--			break;
--		case ARM_SMCCC_ARCH_WORKAROUND_2:
--			switch (kvm_arm_have_ssbd()) {
--			case KVM_SSBD_FORCE_DISABLE:
--			case KVM_SSBD_UNKNOWN:
--				break;
--			case KVM_SSBD_KERNEL:
--				val = SMCCC_RET_SUCCESS;
--				break;
--			case KVM_SSBD_FORCE_ENABLE:
--			case KVM_SSBD_MITIGATED:
--				val = SMCCC_RET_NOT_REQUIRED;
--				break;
--			}
--			break;
--		}
--		break;
--	default:
--		return kvm_psci_call(vcpu);
--	}
--
--	smccc_set_retval(vcpu, val, 0, 0, 0);
--	return 1;
--}
--
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
- 	return 3;		/* PSCI version and two workaround registers */
 -- 
 2.20.1
 
