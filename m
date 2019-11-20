@@ -2,65 +2,74 @@ Return-Path: <SRS0=7egO=ZM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBDAC432C3
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 15:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AA0C43215
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EC3B720714
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 15:28:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3B720714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id F299D2088F
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F299D2088F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39BDB4AEA4;
-	Wed, 20 Nov 2019 10:28:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5C94AEBE;
+	Wed, 20 Nov 2019 11:43:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uFemaMMfG-jM; Wed, 20 Nov 2019 10:28:13 -0500 (EST)
+	with ESMTP id hAG9BJrXm6JG; Wed, 20 Nov 2019 11:43:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC294AEA9;
-	Wed, 20 Nov 2019 10:28:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A92B4AEBB;
+	Wed, 20 Nov 2019 11:43:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91A424AEA4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 10:28:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75EF14A7FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DfVS1f--KffM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 10:28:10 -0500 (EST)
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF8714A7FD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 10:28:09 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Nov 2019 07:28:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,222,1571727600"; d="scan'208";a="237773796"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.41])
- by fmsmga002.fm.intel.com with ESMTP; 20 Nov 2019 07:28:07 -0800
-Date: Wed, 20 Nov 2019 07:28:07 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: Memory regions and VMAs across architectures
-Message-ID: <20191120152807.GA32572@linux.intel.com>
-References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
- <20191120034448.GC25890@linux.intel.com>
- <20191120115216.GL8317@e113682-lin.lund.arm.com>
+ with ESMTP id g14b0p4dl0y7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:43:08 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F50E4AE89
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:43:08 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1iXT4E-0007RI-Vl; Wed, 20 Nov 2019 17:42:59 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH 06/22] KVM: Implement kvm_put_guest()
+Date: Wed, 20 Nov 2019 16:42:20 +0000
+Message-Id: <20191120164236.29359-7-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
+References: <20191120164236.29359-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191120115216.GL8317@e113682-lin.lund.arm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, borntraeger@de.ibm.com,
- Ard Biesheuvel <ard.biesheuvel@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com,
+ drjones@redhat.com, borntraeger@de.ibm.com, christoffer.dall@arm.com,
+ eric.auger@redhat.com, xypron.glpk@gmx.de, julien.grall@arm.com,
+ mark.rutland@arm.com, bigeasy@linutronix.de, steven.price@arm.com,
+ tglx@linutronix.de, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Steven Price <steven.price@arm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,87 +86,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 20, 2019 at 12:52:16PM +0100, Christoffer Dall wrote:
-> On Tue, Nov 19, 2019 at 07:44:48PM -0800, Sean Christopherson wrote:
-> > On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
-> > > First, what prevents user space from messing around with the VMAs after
-> > > kvm_arch_prepare_memory_region() completes?  If nothing, then what is
-> > > the value of the cheks we perform wrt. to VMAs?
-> > 
-> > Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
-> > the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
-> > the VMAs from being invalidated while the stage 2 tables are populated,
-> > e.g. prevents racing with the mmu notifier.  The VMAs could be modified
-> > after prepare_memory_region(), but the mmu notifier will ensure they are
-> > unmapped from stage2 prior the the host change taking effect.  So I think
-> > you're safe (famous last words).
-> > 
-> 
-> So we for example check:
-> 
-> 	writeable = !(memslot->falgs & KVM_MEM_READONLY);
-> 	if (writeable && !(vma->vm_flags & VM_WRITE))
-> 		return -EPERM;
-> 
-> And yes, user space can then unmap the VMAs and MMU notifiers will
-> unmap the stage 2 entries, but user space can then create a new
-> read-only VMA covering the area of the memslot and the fault-handling
-> path will have to deal with this same check later.Only, the fault
-> handling path, via gfn_to_pfn_prot(), returns an address based on an
-> entirely different set of mechanics, than our prepare_memory_region,
-> which I think indicates we are doing something wrong somewhere, and we
-> should have a common path for faulting things in, for I/O, both if we do
-> this up-front or if we do this at fault time.
+From: Steven Price <steven.price@arm.com>
 
-Unconditionally interpreting vm_pgoff as a physical address does not seem
-correct.  There are cases where that might be correct, e.g. if the backing
-(virtual) file is a flat representation of the address space, which appears
-to be the case on some architectures, e.g. for PCI handling.  But even then
-there should be some confirmation that the VMA is actually associated with
-such a file, otherwise KVM is at the mercy of userspace to do the right
-thing (unless there are other guarantees on arm I am unaware of).
+kvm_put_guest() is analogous to put_user() - it writes a single value to
+the guest physical address. The implementation is built upon put_user()
+and so it has the same single copy atomic properties.
 
-> > > Second, why would arm/arm64 need special handling for I/O mappings
-> > > compared to other architectures, and how is this dealt with for
-> > > x86/s390/power/... ?
-> > 
-> > As Ard mentioned, it looks like an optimization.  The "passthrough"
-> > part from the changelog implies that VM_PFNMAP memory regions are exclusive
-> > to the guest.  Mapping the entire thing would be a nice boot optimization
-> > as it would save taking page faults on every page of the MMIO region.
-> > 
-> > As for how this is different from other archs... at least on x86, VM_PFNMAP
-> > isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
-> > pages may actually trigger allocation, and remapping the addresses could be
-> > flat out wrong.
-> 
-> What does VM_PFNMAP mean on x86?  I didn't think we were relying on
-> anything architecture specific in their meaning in the arm code, and I
-> thought the VM_PFNMAP was a generic mm flag with generic mm meaning,
-> but I could be wrong here?
+Signed-off-by: Steven Price <steven.price@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ include/linux/kvm_host.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-No, you're correct, VM_PFNMAP is a generic flag that state the VMA doesn't
-have an associated struct page and is being managed directly by something
-other than the core mmu.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 719fc3e15ea4..9907e45f8875 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -746,6 +746,28 @@ int kvm_write_guest_offset_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+ 				  unsigned long len);
+ int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+ 			      gpa_t gpa, unsigned long len);
++
++#define __kvm_put_guest(kvm, gfn, offset, value, type)			\
++({									\
++	unsigned long __addr = gfn_to_hva(kvm, gfn);			\
++	type __user *__uaddr = (type __user *)(__addr + offset);	\
++	int __ret = -EFAULT;						\
++									\
++	if (!kvm_is_error_hva(__addr))					\
++		__ret = put_user(value, __uaddr);			\
++	if (!__ret)							\
++		mark_page_dirty(kvm, gfn);				\
++	__ret;								\
++})
++
++#define kvm_put_guest(kvm, gpa, value, type)				\
++({									\
++	gpa_t __gpa = gpa;						\
++	struct kvm *__kvm = kvm;					\
++	__kvm_put_guest(__kvm, __gpa >> PAGE_SHIFT,			\
++			offset_in_page(__gpa), (value), type);		\
++})
++
+ int kvm_clear_guest_page(struct kvm *kvm, gfn_t gfn, int offset, int len);
+ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
+ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
+-- 
+2.20.1
 
-But not having a struct page doesn't guarantee that the PFN is backed by
-MMIO, or that it is exclusive to the guest (although in practice this is
-probably the case 99.9999% of the time).  E.g. x86 supports having guest
-memory backed by regular ram that is hidden from the host kernel via
-'mem=', which will show up as VM_PFNMAP.
-
-> Is there any valid semantics for creating a memslot backed by a
-> VM_PFNMAP on x86, and if so, what are those?
-> 
-> Similarly, if you do map a device region straight to the guest on x86,
-> how is that handled?  (A pointer to the right place in the myriad of EPT
-> and shadow code in x86 would be much appreciated.)
-
-There is no special handling in x86 for VM_PFNMAP memory, we rely on KVM's
-generic __gfn_to_pfn_memslot() to retrieve the PFN on demand, and use
-mmu_notifier_seq to ensure the stale PFNs (invalidated in the host) aren't
-inserted into the guest page tables.  Effectively the same thing arm does,
-sans the prepare_memory_region() shenanigans.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
