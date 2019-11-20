@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 069FBC432C0
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7060DC432C0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB47A2067D
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:49:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB47A2067D
+	by mail.kernel.org (Postfix) with ESMTP id 3260F20885
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Nov 2019 16:50:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3260F20885
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 642904AED1;
-	Wed, 20 Nov 2019 11:49:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA434A7FF;
+	Wed, 20 Nov 2019 11:50:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8b+1-U7vCAe3; Wed, 20 Nov 2019 11:49:57 -0500 (EST)
+	with ESMTP id clt68Iju6Cts; Wed, 20 Nov 2019 11:50:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8461C4AED5;
-	Wed, 20 Nov 2019 11:49:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3ECA4AEAB;
+	Wed, 20 Nov 2019 11:50:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66ADC4AEAB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9168B4AEAB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0em0kNCfjZsO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Nov 2019 11:49:55 -0500 (EST)
+ with ESMTP id RrPcQxrLUvM5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Nov 2019 11:50:10 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DD924AE8F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:49:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 644844A7FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Nov 2019 11:50:10 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iXT4O-0007RI-8K; Wed, 20 Nov 2019 17:43:08 +0100
+ id 1iXT4S-0007RI-Ee; Wed, 20 Nov 2019 17:43:12 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 17/22] KVM: arm/arm64: vgic: Remove the declaration of
- kvm_send_userspace_msi()
-Date: Wed, 20 Nov 2019 16:42:31 +0000
-Message-Id: <20191120164236.29359-18-maz@kernel.org>
+Subject: [PATCH 22/22] KVM: arm64: Opportunistically turn off WFI trapping
+ when using direct LPI injection
+Date: Wed, 20 Nov 2019 16:42:36 +0000
+Message-Id: <20191120164236.29359-23-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -87,35 +87,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+Just like we do for WFE trapping, it can be useful to turn off
+WFI trapping when the physical CPU is not oversubscribed (that
+is, the vcpu is the only runnable process on this CPU) *and*
+that we're using direct injection of interrupts.
 
-The callsite of kvm_send_userspace_msi() is currently arch agnostic.
-There seems no reason to keep an extra declaration of it in arm_vgic.h
-(we already have one in include/linux/kvm_host.h).
+The conditions are reevaluated on each vcpu_load(), ensuring that
+we don't switch to this mode on a busy system.
 
-Remove it.
+On a GICv4 system, this has the effect of reducing the generation
+of doorbell interrupts to zero when the right conditions are
+met, which is a huge improvement over the current situation
+(where the doorbells are screaming if the CPU ever hits a
+blocking WFI).
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20191029071919.177-2-yuzenghui@huawei.com
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Link: https://lore.kernel.org/r/20191107160412.30301-3-maz@kernel.org
 ---
- include/kvm/arm_vgic.h | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   | 4 ++--
+ arch/arm64/include/asm/kvm_emulate.h | 9 +++++++--
+ virt/kvm/arm/arm.c                   | 4 ++--
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4dc58d7a0010..f66a02dac8b0 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -378,8 +378,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
- 	return kvm_vgic_global_state.max_gic_vcpus;
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 40002416efec..023c01cad2b1 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -95,12 +95,12 @@ static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr;
  }
  
--int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
--
- /**
-  * kvm_vgic_setup_default_irq_routing:
-  * Setup a default flat gsi routing table mapping all SPIs
+-static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr &= ~HCR_TWE;
+ }
+ 
+-static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr |= HCR_TWE;
+ }
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 6e92f6c7b1e4..5a542d801f07 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -87,14 +87,19 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
+ 
+-static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
++	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count))
++		vcpu->arch.hcr_el2 &= ~HCR_TWI;
++	else
++		vcpu->arch.hcr_el2 |= HCR_TWI;
+ }
+ 
+-static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 |= HCR_TWE;
++	vcpu->arch.hcr_el2 |= HCR_TWI;
+ }
+ 
+ static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index bd2afcf9a13f..dac96e355f69 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -386,9 +386,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_vcpu_pmu_restore_guest(vcpu);
+ 
+ 	if (single_task_running())
+-		vcpu_clear_wfe_traps(vcpu);
++		vcpu_clear_wfx_traps(vcpu);
+ 	else
+-		vcpu_set_wfe_traps(vcpu);
++		vcpu_set_wfx_traps(vcpu);
+ 
+ 	vcpu_ptrauth_setup_lazy(vcpu);
+ }
 -- 
 2.20.1
 
