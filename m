@@ -1,62 +1,88 @@
-Return-Path: <SRS0=5lJd=ZN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=LttP=ZO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24193C432C3
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Nov 2019 09:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5749DC432C0
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Nov 2019 07:34:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A571A20715
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Nov 2019 09:40:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A571A20715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id BE5A820708
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Nov 2019 07:34:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iMxHXeZL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE5A820708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F464ACF8;
-	Thu, 21 Nov 2019 04:40:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E37354AEC0;
+	Fri, 22 Nov 2019 02:34:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o-Jj3wkvmeFo; Thu, 21 Nov 2019 04:40:07 -0500 (EST)
+	with ESMTP id NdCNhPI8rJ5o; Fri, 22 Nov 2019 02:34:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF2A44AEA2;
-	Thu, 21 Nov 2019 04:40:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F55B4AEAA;
+	Fri, 22 Nov 2019 02:34:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFCF24ACF4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 04:40:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91F824ACB8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 15:17:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id umSuT-EGis5v for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Nov 2019 04:40:05 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C6BF4A5A8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 04:40:05 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E87E3DA7;
- Thu, 21 Nov 2019 01:40:04 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C8603F52E;
- Thu, 21 Nov 2019 01:40:04 -0800 (PST)
-Date: Thu, 21 Nov 2019 10:40:03 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: Memory regions and VMAs across architectures
-Message-ID: <20191121094003.GB22554@e113682-lin.lund.arm.com>
-References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
- <20191120034448.GC25890@linux.intel.com>
- <20191120115216.GL8317@e113682-lin.lund.arm.com>
- <20191120152807.GA32572@linux.intel.com>
+ with ESMTP id mwz+JvbhsHEG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Nov 2019 15:17:15 -0500 (EST)
+Received: from mail-lj1-f194.google.com (mail-lj1-f194.google.com
+ [209.85.208.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8904E4A591
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 15:17:15 -0500 (EST)
+Received: by mail-lj1-f194.google.com with SMTP id q2so4699174ljg.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 12:17:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=5mgJC093r+n2ha3eZi7CwoIqJtWi8hIhxEacvrOtxLY=;
+ b=iMxHXeZLSN/opBP6eW8zqafc22N90TicVceZhG/xZQGRqcViUrmu4dLLk7ju3Ykmhv
+ F0CaqPyd9Pr/Me0m7qq6XuNQD7e7wJpZz2RU9D4IgupgQtBxcr8gIo4gdHdCbLpSzuCc
+ 3YkDB05rIa39+jfbZqmTB4FlaU3+ycSQsYD64=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=5mgJC093r+n2ha3eZi7CwoIqJtWi8hIhxEacvrOtxLY=;
+ b=gXf4rTNtQ2MJm/qLbyhQDMzLfBijxJcUnBZdgOTTpjf0OKZ+G1mtnqmHDU29Vznidf
+ wOk+U6BPkHV9lSAQ13/U7IzgWm+6PEMow+vM3QC8f21ME2KQ0d4ZxjBC3f60wTyzjtR5
+ e6IIF2KzmC5r4GMrWdAfGLMvJfIasm74SpkKeAet/riAbF/rXOjDKv1yR7lNW/XUMN9F
+ GjhzS4ge2LyGqiHaiPupljCsRL0VuJt5FllXmG4XDBpRS0nC+tHhG44vnnSxxQ3o4a+e
+ uNwG4+NBegjipdxAP7ynmKdnMNzPlFVsZq9I6iOeg5rN7Lx4ToLCLTp2kF8fLtORBtt0
+ pl4A==
+X-Gm-Message-State: APjAAAXRDPpHJGbyd5jgiu8uhPLdBvwN2oZtNlLDz9ul3G4qz6IUAfpG
+ R8BxDKow9C+jbby+7Rc1XfMmbdg4sFI=
+X-Google-Smtp-Source: APXvYqybkPnqnlzLvuzgcnV5S0dsVl+AsGQwWmR1OByhInMcPq7HRsGfKOjAnQAU2Ng/PESwPAe8cA==
+X-Received: by 2002:a2e:8e27:: with SMTP id r7mr9542942ljk.101.1574367433881; 
+ Thu, 21 Nov 2019 12:17:13 -0800 (PST)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com.
+ [209.85.208.180])
+ by smtp.gmail.com with ESMTPSA id j8sm1778408lja.32.2019.11.21.12.17.12
+ for <kvmarm@lists.cs.columbia.edu>
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 Nov 2019 12:17:13 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id g3so4654355ljl.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Nov 2019 12:17:12 -0800 (PST)
+X-Received: by 2002:a2e:3805:: with SMTP id f5mr8951812lja.220.1574367432482; 
+ Thu, 21 Nov 2019 12:17:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191120152807.GA32572@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, borntraeger@de.ibm.com,
- Ard Biesheuvel <ard.biesheuvel@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Daniel Verkamp <dverkamp@chromium.org>
+Date: Thu, 21 Nov 2019 12:16:45 -0800
+X-Gmail-Original-Message-ID: <CABVzXA=DGxc4eE0RQX=tGu3QAYQ0RmEL7Y=WZYWBr355zEp_vA@mail.gmail.com>
+Message-ID: <CABVzXA=DGxc4eE0RQX=tGu3QAYQ0RmEL7Y=WZYWBr355zEp_vA@mail.gmail.com>
+Subject: KVM_COMPAT support on aarch64
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+X-Mailman-Approved-At: Fri, 22 Nov 2019 02:34:33 -0500
+Cc: Dylan Reid <dgreid@chromium.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,92 +99,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 20, 2019 at 07:28:07AM -0800, Sean Christopherson wrote:
-> On Wed, Nov 20, 2019 at 12:52:16PM +0100, Christoffer Dall wrote:
-> > On Tue, Nov 19, 2019 at 07:44:48PM -0800, Sean Christopherson wrote:
-> > > On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
-> > > > First, what prevents user space from messing around with the VMAs after
-> > > > kvm_arch_prepare_memory_region() completes?  If nothing, then what is
-> > > > the value of the cheks we perform wrt. to VMAs?
-> > > 
-> > > Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
-> > > the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
-> > > the VMAs from being invalidated while the stage 2 tables are populated,
-> > > e.g. prevents racing with the mmu notifier.  The VMAs could be modified
-> > > after prepare_memory_region(), but the mmu notifier will ensure they are
-> > > unmapped from stage2 prior the the host change taking effect.  So I think
-> > > you're safe (famous last words).
-> > > 
-> > 
-> > So we for example check:
-> > 
-> > 	writeable = !(memslot->falgs & KVM_MEM_READONLY);
-> > 	if (writeable && !(vma->vm_flags & VM_WRITE))
-> > 		return -EPERM;
-> > 
-> > And yes, user space can then unmap the VMAs and MMU notifiers will
-> > unmap the stage 2 entries, but user space can then create a new
-> > read-only VMA covering the area of the memslot and the fault-handling
-> > path will have to deal with this same check later.Only, the fault
-> > handling path, via gfn_to_pfn_prot(), returns an address based on an
-> > entirely different set of mechanics, than our prepare_memory_region,
-> > which I think indicates we are doing something wrong somewhere, and we
-> > should have a common path for faulting things in, for I/O, both if we do
-> > this up-front or if we do this at fault time.
-> 
-> Unconditionally interpreting vm_pgoff as a physical address does not seem
-> correct.  There are cases where that might be correct, e.g. if the backing
-> (virtual) file is a flat representation of the address space, which appears
-> to be the case on some architectures, e.g. for PCI handling.  But even then
-> there should be some confirmation that the VMA is actually associated with
-> such a file, otherwise KVM is at the mercy of userspace to do the right
-> thing (unless there are other guarantees on arm I am unaware of).
-> 
-> > > > Second, why would arm/arm64 need special handling for I/O mappings
-> > > > compared to other architectures, and how is this dealt with for
-> > > > x86/s390/power/... ?
-> > > 
-> > > As Ard mentioned, it looks like an optimization.  The "passthrough"
-> > > part from the changelog implies that VM_PFNMAP memory regions are exclusive
-> > > to the guest.  Mapping the entire thing would be a nice boot optimization
-> > > as it would save taking page faults on every page of the MMIO region.
-> > > 
-> > > As for how this is different from other archs... at least on x86, VM_PFNMAP
-> > > isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
-> > > pages may actually trigger allocation, and remapping the addresses could be
-> > > flat out wrong.
-> > 
-> > What does VM_PFNMAP mean on x86?  I didn't think we were relying on
-> > anything architecture specific in their meaning in the arm code, and I
-> > thought the VM_PFNMAP was a generic mm flag with generic mm meaning,
-> > but I could be wrong here?
-> 
-> No, you're correct, VM_PFNMAP is a generic flag that state the VMA doesn't
-> have an associated struct page and is being managed directly by something
-> other than the core mmu.
-> 
-> But not having a struct page doesn't guarantee that the PFN is backed by
-> MMIO, or that it is exclusive to the guest (although in practice this is
-> probably the case 99.9999% of the time).  E.g. x86 supports having guest
-> memory backed by regular ram that is hidden from the host kernel via
-> 'mem=', which will show up as VM_PFNMAP.
-> 
-> > Is there any valid semantics for creating a memslot backed by a
-> > VM_PFNMAP on x86, and if so, what are those?
-> > 
-> > Similarly, if you do map a device region straight to the guest on x86,
-> > how is that handled?  (A pointer to the right place in the myriad of EPT
-> > and shadow code in x86 would be much appreciated.)
-> 
-> There is no special handling in x86 for VM_PFNMAP memory, we rely on KVM's
-> generic __gfn_to_pfn_memslot() to retrieve the PFN on demand, and use
-> mmu_notifier_seq to ensure the stale PFNs (invalidated in the host) aren't
-> inserted into the guest page tables.  Effectively the same thing arm does,
-> sans the prepare_memory_region() shenanigans.
+Hi Marc,
 
-Thanks Sean, I'll have a look at reworking said shenanigans ;)
+I noticed that in recent kernels (4.19 in our case), KVM no longer
+works for 32-bit processes running on arm64 machines. We
+(Crostini/crosvm, Linux VM support on Chromebooks) use this KVM_COMPAT
+on all arm64-based Chromebooks that support VMs, since our entire
+userspace (including crosvm) is 32-bit.
 
-    Christoffer
+I found this commit (KVM: arm64: Prevent KVM_COMPAT from being
+selected): https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=37b65db85f9b2fc98267eee4a18d7506492e6e8c
+
+Is there any particular reason the compat ioctl is disabled (e.g.
+actual bugs/breakage), or would it be possible to re-enable KVM_COMPAT
+for ARM64?
+
+In my brief testing with a 4.19-stable-based kernel on a new arm64
+board, everything seems to work fine with the commit above reverted.
+
+Thanks,
+-- Daniel
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
