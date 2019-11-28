@@ -2,85 +2,95 @@ Return-Path: <SRS0=76eI=ZU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6D2C432C0
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 18:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94188C432C0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 19:23:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4F1B821739
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 18:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10F9221771
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 19:23:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ceO8/vrD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F1B821739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="lnQ4ubIa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F9221771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E062B4AEAF;
-	Thu, 28 Nov 2019 13:07:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E5364AEBC;
+	Thu, 28 Nov 2019 14:23:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@amazon.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JHpLQIZISoTn; Thu, 28 Nov 2019 13:06:59 -0500 (EST)
+	with ESMTP id A8g-fUekir00; Thu, 28 Nov 2019 14:23:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0184AEB1;
-	Thu, 28 Nov 2019 13:06:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 492454AEAB;
+	Thu, 28 Nov 2019 14:23:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12FA14AEAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Nov 2019 13:06:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EFCE4A7FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Nov 2019 13:30:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zZurjpCwidDW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Nov 2019 13:06:58 -0500 (EST)
-Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com
- [209.85.210.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13BB84AEA4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Nov 2019 13:06:58 -0500 (EST)
-Received: by mail-ot1-f65.google.com with SMTP id c19so22835573otr.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Nov 2019 10:06:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MJ/sPAYYo/qIT6Ymk401e7KF1FY+ovzNTYrgqfqtAao=;
- b=ceO8/vrDQ2qOydIvWROnG21GPOQXjsjM2lcssYAr/Un9ibzuSQx2OcRLffVjR3zPzA
- euVSLuH5Lz548pvc9MxMZAkFhKWeWv4h5o/Qdb6InyGjX9x53JeE00vsuWbI1TzId9Bd
- xlFrw5neBnwiXTkXrSzSBveIjG4mJ24IzgNFoxMwc4Ma7gPjF0c5+UuxFCZyFGpBn15Z
- IqthMaHfqKFC15Ac8mS7MIm+UmVOVg3AYRCDKwKk8yFFdn7/44wsPLdVKHshOb3snQir
- 4dLhMUOs1e7xN0WDxanGDSIVELGf/bfAW9dlSECX5lLdhb5rZ0GejbmQ5TtGyoMtwSMY
- NLQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MJ/sPAYYo/qIT6Ymk401e7KF1FY+ovzNTYrgqfqtAao=;
- b=jQtDD4nMrNnvQWkGOEemiPWo4y6yqyHGGov3AWVsrWJ1T5QnSH79L1qmGmr3PkUr5w
- KgQWL+gwKyUjBcW1ja3wM/V94irOSjZJm8b8ryGv0I8PwNKnP+7stN1Xe7F2Rv3cDM36
- ma8WLJ8YZVW/gkADW/6Q3DyyrBEO049hc57YWQDAyJG/RgqCKdUV5lTnqDqgiiFk7qtX
- BR228jQ/4fjUiL/1gxy8pkeTsDmjS4m9LuBd2Y9DWcDp/2PvCJlLQ3S/lJJkIZ72f11z
- Gdhe91rPbm7DzcfQYVGK740Lo0+fyN1IB3Cj3pemWsSuL+n2vzHeUhxBLguGnMAjk5W8
- T5IQ==
-X-Gm-Message-State: APjAAAVteVRXV5vq9m3onzgB7olVstXAGKO7MCjIsYKDe2seDLY4OFJW
- +FCb5fk0GsHIXqPp2B5iwVDm3wqAPmccB1wg1AjK2g==
-X-Google-Smtp-Source: APXvYqxKt6orc45dUEB80sWtPH3EOZaBWL5mcL78hz6t2FcSeKfkc4eWV9sd8pVJf+Hx1HeefjCsanKuSB6IJOjlkFk=
-X-Received: by 2002:a9d:12d2:: with SMTP id g76mr8682308otg.232.1574964417343; 
- Thu, 28 Nov 2019 10:06:57 -0800 (PST)
+ with ESMTP id WQbEtLo-kAVB for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Nov 2019 13:30:48 -0500 (EST)
+Received: from smtp-fw-9101.amazon.com (smtp-fw-9101.amazon.com
+ [207.171.184.25])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28EEA4A7F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Nov 2019 13:30:48 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+ t=1574965849; x=1606501849;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-id:mime-version: content-transfer-encoding;
+ bh=YmvDKDae6K6GLbl+oWNmnzof6XHtLau20RExutHZUN0=;
+ b=lnQ4ubIaXPDHzp0MzTVxbjpOaenPaevsJGUoKHmJmK6OG2fLsupk/3zt
+ 291Rfs1GGlii3rhbm24LSRZiC8e7t8hVbduypUEx7MW5Ei8CD+Gb2+Wvl
+ wxcDRhXfSkRMk6csxNbDnrRFh8/q66+XgXtIzhyzeCXmWLIn/IIKeKZXA M=;
+IronPort-SDR: 3wzWyfK1I+PdPFfr1PuKgOFC9g15z/SeIIaxhknZaXOZ1f/8xBc3m/LAhzSVcX+GG7jScWhYSo
+ cZ73fthAIMPQ==
+X-IronPort-AV: E=Sophos;i="5.69,254,1571702400"; 
+   d="scan'208";a="2054927"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
+ email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.47.23.38])
+ by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP;
+ 28 Nov 2019 18:30:37 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+ by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS
+ id AB2B222639F; Thu, 28 Nov 2019 18:30:36 +0000 (UTC)
+Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 28 Nov 2019 18:30:27 +0000
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 28 Nov 2019 18:30:27 +0000
+Received: from EX13D20UWC001.ant.amazon.com ([10.43.162.244]) by
+ EX13D20UWC001.ant.amazon.com ([10.43.162.244]) with mapi id 15.00.1367.000;
+ Thu, 28 Nov 2019 18:30:27 +0000
+From: "Graf (AWS), Alexander" <graf@amazon.de>
+To: "drjones@redhat.com" <drjones@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests] arm/arm64: PL031: Fix check_rtc_irq
+Thread-Topic: [PATCH kvm-unit-tests] arm/arm64: PL031: Fix check_rtc_irq
+Thread-Index: AQHVpgRfU2CAtVWY9kOuYtk+vjuC16eg2hIA
+Date: Thu, 28 Nov 2019 18:30:27 +0000
+Message-ID: <94CC1391-FCAF-4889-A234-911C66D6D334@amazon.de>
+References: <20191128155515.19013-1-drjones@redhat.com>
+In-Reply-To: <20191128155515.19013-1-drjones@redhat.com>
+Accept-Language: en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-ID: <CAC2895EC2160A46972AFA411FF05A7F@amazon.com>
 MIME-Version: 1.0
-References: <20191128161718.24361-1-maz@kernel.org>
- <20191128161718.24361-4-maz@kernel.org>
- <CAFEAcA_MED0Rtqo1=HNnn7v_zQZGDsoJVsbXAsdhb_sAjvJ40Q@mail.gmail.com>
- <241a27adc76f3f6dcc96c3ef993660f7@www.loen.fr>
-In-Reply-To: <241a27adc76f3f6dcc96c3ef993660f7@www.loen.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 28 Nov 2019 18:06:46 +0000
-Message-ID: <CAFEAcA9yryMgAgNbbST4ThT_ozpBUm=Lj5C33ZBP_Q8OYiV_=Q@mail.gmail.com>
-Subject: Re: [PATCH 3/3] target/arm: Handle trapping to EL2 of AArch32 VMRS
- instructions
-To: Marc Zyngier <maz@kernel.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+X-Mailman-Approved-At: Thu, 28 Nov 2019 14:23:35 -0500
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,70 +102,40 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 28 Nov 2019 at 17:49, Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Peter,
->
-> Thanks for having a look at this.
->
-> On 2019-11-28 16:43, Peter Maydell wrote:
-> > On Thu, 28 Nov 2019 at 16:17, Marc Zyngier <maz@kernel.org> wrote:
-> >>
-> >> HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
-> >> EL2, and that HCR_EL2.TID0 does the same for reads of FPSID.
-> >> In order to handle this, introduce a new TCG helper function that
-> >> checks for these control bits before executing the VMRC instruction.
-> >>
-> >> Tested with a hacked-up version of KVM/arm64 that sets the control
-> >> bits for 32bit guests.
-> >>
-> >> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-> > Since the syndrome value depends only on these two things,
-> > you might as well generate the full syndrome value at
-> > translate time rather than doing it at runtime; then
-> > you only need to pass one thing through to the helper rather
-> > than two.
->
-> OK. This means that the register check in check_hcr_el2_trap
-> will need to extract the register value from the syndrome.
-> Not a big deal, but maybe slightly less readable.
-
-Oops, I hadn't noticed that we were switching on reg.
-Yeah, you might as well leave it as is. (We could have
-a separate helper for each of TID0 and TID3 but that
-seems like overkill.)
-
-> On a vaguely tangential subject, how are conditional instructions
-> JIT-ed? I could perfectly imagine a conditional VMRS instruction,
-> but none of the code I looked at seem to care about it. Or is
-> that done before the access itself is actually emitted?
-
-Arm conditional instructions are handled at a pretty
-high level in the decode, because they all work the same way.
-In disas_arm_insn() we have:
-
-    if (cond != 0xe) {
-        /* if not always execute, we generate a conditional jump to
-           next instruction */
-        arm_skip_unless(s, cond);
-    }
-
-and there's something similar in thumb_tr_translate_insn()
-which puts in a branch based on the thumb condexec bits.
-The target of the branch is a label whose position is
-set either in arm_post_translate_insn() after the code for the
-insn is emitted, or in arm_tr_tb_stop() if the insn is
-the last in the TB (always true for branch or trap insns).
-
-thanks
--- PMM
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+DQoNCj4gQW0gMjguMTEuMjAxOSB1bSAxNzo1NiBzY2hyaWViICJkcmpvbmVzQHJlZGhhdC5jb20i
+IDxkcmpvbmVzQHJlZGhhdC5jb20+Og0KPiANCj4g77u/U2luY2UgUUVNVSBjb21taXQgODNhZDk1
+OTU3YzdlICgicGwwMzE6IEV4cG9zZSBSVENJQ1IgYXMgcHJvcGVyIFdDDQo+IHJlZ2lzdGVyIikg
+dGhlIFBMMDMxIHRlc3QgZ2V0cyBpbnRvIGFuIGluZmluaXRlIGxvb3AuIE5vdyB3ZSBtdXN0DQo+
+IHdyaXRlIGJpdCB6ZXJvIG9mIFJUQ0lDUiB0byBjbGVhciB0aGUgSVJRIHN0YXR1cy4gQmVmb3Jl
+LCB3cml0aW5nDQo+IGFueXRoaW5nIHRvIFJUQ0lDUiB3b3VsZCB3b3JrLiBBcyAnMScgaXMgYSBt
+ZW1iZXIgb2YgJ2FueXRoaW5nJw0KPiB3cml0aW5nIGl0IHNob3VsZCB3b3JrIGZvciBvbGQgUUVN
+VSBhcyB3ZWxsLg0KPiANCj4gQ2M6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+DQo+
+IFNpZ25lZC1vZmYtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPg0KDQpSZXZp
+ZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4NCg0KU29ycnkgZm9yIGlu
+dHJvZHVjaW5nIGEgdGVzdCBjYXNlIG9uIGNvZGUgdGhhdCBJIHRoZW4gbW9kaWZ5LCB3aXRob3V0
+IHVwZGF0aW5nIHRoZSB0ZXN0IGNhc2UgYXMgd2VsbCA6KQ0KDQpBbGV4DQoNCg0KPiAtLS0NCj4g
+YXJtL3BsMDMxLmMgfCA0ICsrLS0NCj4gMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcm0vcGwwMzEuYyBiL2FybS9wbDAz
+MS5jDQo+IGluZGV4IDFmNjNlZjEzOTk0Zi4uM2I3NWZkNjUzZTk2IDEwMDY0NA0KPiAtLS0gYS9h
+cm0vcGwwMzEuYw0KPiArKysgYi9hcm0vcGwwMzEuYw0KPiBAQCAtMTQzLDggKzE0Myw4IEBAIHN0
+YXRpYyB2b2lkIGlycV9oYW5kbGVyKHN0cnVjdCBwdF9yZWdzICpyZWdzKQ0KPiAgICAgICAgcmVw
+b3J0KHJlYWRsKCZwbDAzMS0+cmlzKSA9PSAxLCAiICBSVEMgUklTID09IDEiKTsNCj4gICAgICAg
+IHJlcG9ydChyZWFkbCgmcGwwMzEtPm1pcykgPT0gMSwgIiAgUlRDIE1JUyA9PSAxIik7DQo+IA0K
+PiAtICAgICAgICAvKiBXcml0aW5nIGFueSB2YWx1ZSBzaG91bGQgY2xlYXIgSVJRIHN0YXR1cyAq
+Lw0KPiAtICAgICAgICB3cml0ZWwoMHg4MDAwMDAwMFVMTCwgJnBsMDMxLT5pY3IpOw0KPiArICAg
+ICAgICAvKiBXcml0aW5nIG9uZSB0byBiaXQgemVybyBzaG91bGQgY2xlYXIgSVJRIHN0YXR1cyAq
+Lw0KPiArICAgICAgICB3cml0ZWwoMSwgJnBsMDMxLT5pY3IpOw0KPiANCj4gICAgICAgIHJlcG9y
+dChyZWFkbCgmcGwwMzEtPnJpcykgPT0gMCwgIiAgUlRDIFJJUyA9PSAwIik7DQo+ICAgICAgICBy
+ZXBvcnQocmVhZGwoJnBsMDMxLT5taXMpID09IDAsICIgIFJUQyBNSVMgPT0gMCIpOw0KPiAtLSAN
+Cj4gMi4yMS4wDQo+IA0KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgK
+S3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFu
+IFNjaGxhZWdlciwgUmFsZiBIZXJicmljaApFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
+bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
+IDIzNyA4NzkKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
+Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
