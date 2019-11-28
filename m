@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F40AC432C3
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 03:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A27C432C0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 03:09:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EEAC0206EC
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 03:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAC0206EC
+	by mail.kernel.org (Postfix) with ESMTP id 8976A206EC
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Nov 2019 03:09:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8976A206EC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232924A52C;
-	Wed, 27 Nov 2019 22:09:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43D0C4ACE6;
+	Wed, 27 Nov 2019 22:09:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YL07sKp9m4wR; Wed, 27 Nov 2019 22:09:26 -0500 (EST)
+	with ESMTP id OMEsgXboPArU; Wed, 27 Nov 2019 22:09:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F1A34AC88;
-	Wed, 27 Nov 2019 22:09:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FC744A597;
+	Wed, 27 Nov 2019 22:09:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 522624A52C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Nov 2019 22:09:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6E2D4A598
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Nov 2019 22:09:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1ET4ryT-ZzJn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Nov 2019 22:09:22 -0500 (EST)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02C2D4A51F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Nov 2019 22:09:21 -0500 (EST)
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id CCF043E07834170A7368;
- Thu, 28 Nov 2019 11:09:18 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 28 Nov 2019
- 11:09:08 +0800
+ with ESMTP id zRBdph1uMrQB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Nov 2019 22:09:50 -0500 (EST)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD0C34A51F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Nov 2019 22:09:49 -0500 (EST)
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 856BAF4DD1C48B2C5754;
+ Thu, 28 Nov 2019 11:09:46 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Thu, 28 Nov 2019
+ 11:09:39 +0800
 From: linmiaohe <linmiaohe@huawei.com>
 To: <maz@kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
  <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
@@ -48,10 +48,10 @@ To: <maz@kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
  <catalin.marinas@arm.com>, <eric.auger@redhat.com>,
  <gregkh@linuxfoundation.org>, <will@kernel.org>, <andre.przywara@arm.com>,
  <tglx@linutronix.de>
-Subject: [PATCH] KVM: vgic: Use warpper function to lock/unlock all vcpus in
- kvm_vgic_create()
-Date: Thu, 28 Nov 2019 11:09:11 +0800
-Message-ID: <1574910551-14351-1-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH] KVM: arm64: get rid of var ret and out jump label in
+ kvm_arch_vcpu_ioctl_set_guest_debug()
+Date: Thu, 28 Nov 2019 11:09:42 +0800
+Message-ID: <1574910582-14405-1-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 X-Originating-IP: [10.175.105.18]
@@ -76,54 +76,44 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-Use warpper function lock_all_vcpus()/unlock_all_vcpus()
-in kvm_vgic_create() to remove duplicated code dealing
-with locking and unlocking all vcpus in a vm.
-
+The var ret and out jump label is not really needed. Clean them
+up.
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- virt/kvm/arm/vgic/vgic-init.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/guest.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index b3c5de48064c..53e3969dfb52 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -70,7 +70,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
-  */
- int kvm_vgic_create(struct kvm *kvm, u32 type)
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 2fff06114a8f..3b836c91609e 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -834,14 +834,10 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 					struct kvm_guest_debug *dbg)
  {
--	int i, vcpu_lock_idx = -1, ret;
-+	int i, ret;
- 	struct kvm_vcpu *vcpu;
+-	int ret = 0;
+-
+ 	trace_kvm_set_guest_debug(vcpu, dbg->control);
  
- 	if (irqchip_in_kernel(kvm))
-@@ -92,11 +92,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	 * that no other VCPUs are run while we create the vgic.
- 	 */
- 	ret = -EBUSY;
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (!mutex_trylock(&vcpu->mutex))
--			goto out_unlock;
--		vcpu_lock_idx = i;
+-	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK) {
+-		ret = -EINVAL;
+-		goto out;
 -	}
-+	if (!lock_all_vcpus(kvm))
-+		return ret;
++	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK)
++		return -EINVAL;
  
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (vcpu->arch.has_run_once)
-@@ -125,10 +122,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+ 	if (dbg->control & KVM_GUESTDBG_ENABLE) {
+ 		vcpu->guest_debug = dbg->control;
+@@ -856,8 +852,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 		vcpu->guest_debug = 0;
+ 	}
  
- out_unlock:
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&vcpu->mutex);
--	}
-+	unlock_all_vcpus(kvm);
- 	return ret;
+-out:
+-	return ret;
++	return 0;
  }
  
+ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
 -- 
 2.19.1
 
