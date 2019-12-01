@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EF0C43215
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB73C432C3
 	for <kvmarm@archiver.kernel.org>; Sun,  1 Dec 2019 12:20:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 193BF206F0
+	by mail.kernel.org (Postfix) with ESMTP id 704D020715
 	for <kvmarm@archiver.kernel.org>; Sun,  1 Dec 2019 12:20:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193BF206F0
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 704D020715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3FF94AEC0;
-	Sun,  1 Dec 2019 07:20:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 248254ACD5;
+	Sun,  1 Dec 2019 07:20:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EDCHlpQuldsy; Sun,  1 Dec 2019 07:20:54 -0500 (EST)
+	with ESMTP id ywUsEnNhR5ND; Sun,  1 Dec 2019 07:20:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4AC14AEDE;
-	Sun,  1 Dec 2019 07:20:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CABEB4AEDC;
+	Sun,  1 Dec 2019 07:20:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE56F4AC65
- for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Dec 2019 07:20:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E23A4AECF
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Dec 2019 07:20:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1H8BPxRsvtkS for <kvmarm@lists.cs.columbia.edu>;
- Sun,  1 Dec 2019 07:20:49 -0500 (EST)
+ with ESMTP id GqtQy9vejUR3 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  1 Dec 2019 07:20:50 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ED854A98A
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 929334AC80
  for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Dec 2019 07:20:49 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1ibODY-0007WK-09; Sun, 01 Dec 2019 13:20:48 +0100
+ id 1ibODX-0007WK-Hy; Sun, 01 Dec 2019 13:20:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/5] target/arm: Handle AArch32 CP15 trapping via HSTR_EL2
-Date: Sun,  1 Dec 2019 12:20:17 +0000
-Message-Id: <20191201122018.25808-5-maz@kernel.org>
+Subject: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+Date: Sun,  1 Dec 2019 12:20:16 +0000
+Message-Id: <20191201122018.25808-4-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191201122018.25808-1-maz@kernel.org>
 References: <20191201122018.25808-1-maz@kernel.org>
@@ -75,130 +76,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HSTR_EL2 offers a way to trap ranges of CP15 system register
-accesses to EL2, and it looks like this register is completely
-ignored by QEMU.
+HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
+EL2, and HCR_EL2.TID0 does the same for reads of FPSID.
+In order to handle this, introduce a new TCG helper function that
+checks for these control bits before executing the VMRC instruction.
 
-To avoid adding extra .accessfn filters all over the place (which
-would have a direct performance impact), let's add a new TB flag
-that gets set whenever HSTR_EL2 is non-zero and that QEMU translates
-a context where this trap has a chance to apply, and only generate
-the extra access check if the hypervisor is actively using this feature.
+Tested with a hacked-up version of KVM/arm64 that sets the control
+bits for 32bit guests.
 
-Tested with a hand-crafted KVM guest accessing CBAR.
-
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- target/arm/cpu.h       |  2 ++
- target/arm/helper.c    |  6 ++++++
- target/arm/op_helper.c | 21 +++++++++++++++++++++
- target/arm/translate.c |  3 ++-
- target/arm/translate.h |  2 ++
- 5 files changed, 33 insertions(+), 1 deletion(-)
+ target/arm/helper-a64.h        |  2 ++
+ target/arm/translate-vfp.inc.c | 18 +++++++++++++++---
+ target/arm/vfp_helper.c        | 29 +++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 83a809d4ba..cebb3511a5 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3215,6 +3215,8 @@ FIELD(TBFLAG_A32, NS, 6, 1)
- FIELD(TBFLAG_A32, VFPEN, 7, 1)          /* Partially cached, minus FPEXC. */
- FIELD(TBFLAG_A32, CONDEXEC, 8, 8)       /* Not cached. */
- FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
-+FIELD(TBFLAG_A32, HSTR_ACTIVE, 17, 1)
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index a915c1247f..0af44dc814 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -102,3 +102,5 @@ DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
 +
- /* For M profile only, set if FPCCR.LSPACT is set */
- FIELD(TBFLAG_A32, LSPACT, 18, 1)        /* Not cached. */
- /* For M profile only, set if we must create a new FP context */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 93ecab27c0..0ba08d550a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11283,6 +11283,12 @@ static uint32_t rebuild_hflags_a32(CPUARMState *env, int fp_el,
-     if (arm_el_is_aa64(env, 1)) {
-         flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
-     }
++DEF_HELPER_3(check_hcr_el2_trap, void, env, i32, i32)
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 85c5ef897b..bf90ac0e5b 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -761,13 +761,25 @@ static bool trans_VMSR_VMRS(DisasContext *s, arg_VMSR_VMRS *a)
+     if (a->l) {
+         /* VMRS, move VFP special register to gp register */
+         switch (a->reg) {
++        case ARM_VFP_MVFR0:
++        case ARM_VFP_MVFR1:
++        case ARM_VFP_MVFR2:
+         case ARM_VFP_FPSID:
++            if (s->current_el == 1) {
++                TCGv_i32 tcg_reg, tcg_rt;
 +
-+    if (arm_current_el(env) < 2 && env->cp15.hstr_el2 &&
-+        (arm_hcr_el2_eff(env) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-+        flags = FIELD_DP32(flags, TBFLAG_A32, HSTR_ACTIVE, 1);
-+    }
-+
-     return rebuild_hflags_common_32(env, fp_el, mmu_idx, flags);
++                gen_set_condexec(s);
++                gen_set_pc_im(s, s->pc_curr);
++                tcg_reg = tcg_const_i32(a->reg);
++                tcg_rt = tcg_const_i32(a->rt);
++                gen_helper_check_hcr_el2_trap(cpu_env, tcg_rt, tcg_reg);
++                tcg_temp_free_i32(tcg_reg);
++                tcg_temp_free_i32(tcg_rt);
++            }
++            /* fall through */
+         case ARM_VFP_FPEXC:
+         case ARM_VFP_FPINST:
+         case ARM_VFP_FPINST2:
+-        case ARM_VFP_MVFR0:
+-        case ARM_VFP_MVFR1:
+-        case ARM_VFP_MVFR2:
+             tmp = load_cpu_field(vfp.xregs[a->reg]);
+             break;
+         case ARM_VFP_FPSCR:
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 9710ef1c3e..0ae7d4f34a 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -1322,4 +1322,33 @@ float64 HELPER(frint64_d)(float64 f, void *fpst)
+     return frint_d(f, fpst, 64);
  }
  
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index b529d6c1bf..681c5f3681 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -603,6 +603,26 @@ void HELPER(access_check_cp_reg)(CPUARMState *env, void *rip, uint32_t syndrome,
-         raise_exception(env, EXCP_UDEF, syndrome, exception_target_el(env));
-     }
- 
-+    /* Check for an EL2 trap due to HSTR_EL2. We expect EL0 accesses
-+     * to sysregs non accessible at EL0 to have UNDEF-ed already.
-+     */
-+    if (!env->aarch64 && arm_current_el(env) < 2 && ri->cp == 15 &&
-+        (arm_hcr_el2_eff(env) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-+        uint32_t mask = 1 << ri->crn;
++void HELPER(check_hcr_el2_trap)(CPUARMState *env, uint32_t rt, uint32_t reg)
++{
++    uint32_t syndrome;
 +
-+        if (ri->type & ARM_CP_64BIT) {
-+            mask = 1 << ri->crm;
++    switch (reg) {
++    case ARM_VFP_MVFR0:
++    case ARM_VFP_MVFR1:
++    case ARM_VFP_MVFR2:
++        if (!(arm_hcr_el2_eff(env) & HCR_TID3)) {
++            return;
 +        }
-+
-+        /* T4 and T14 are RES0 */
-+        mask &= ~((1 << 4) | (1 << 14));
-+
-+        if (env->cp15.hstr_el2 & mask) {
-+            target_el = 2;
-+            goto exept;
++        break;
++    case ARM_VFP_FPSID:
++        if (!(arm_hcr_el2_eff(env) & HCR_TID0)) {
++            return;
 +        }
++        break;
++    default:
++        g_assert_not_reached();
 +    }
 +
-     if (!ri->accessfn) {
-         return;
-     }
-@@ -652,6 +672,7 @@ void HELPER(access_check_cp_reg)(CPUARMState *env, void *rip, uint32_t syndrome,
-         g_assert_not_reached();
-     }
- 
-+exept:
-     raise_exception(env, EXCP_UDEF, syndrome, target_el);
- }
- 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 4d5d4bd888..f162be8434 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -6897,7 +6897,7 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
-             return 1;
-         }
- 
--        if (ri->accessfn ||
-+        if (s->hstr_active || ri->accessfn ||
-             (arm_dc_feature(s, ARM_FEATURE_XSCALE) && cpnum < 14)) {
-             /* Emit code to perform further access permissions checks at
-              * runtime; this may result in an exception.
-@@ -10843,6 +10843,7 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-                                !arm_el_is_aa64(env, 3);
-     dc->thumb = FIELD_EX32(tb_flags, TBFLAG_A32, THUMB);
-     dc->sctlr_b = FIELD_EX32(tb_flags, TBFLAG_A32, SCTLR_B);
-+    dc->hstr_active = FIELD_EX32(tb_flags, TBFLAG_A32, HSTR_ACTIVE);
-     dc->be_data = FIELD_EX32(tb_flags, TBFLAG_ANY, BE_DATA) ? MO_BE : MO_LE;
-     condexec = FIELD_EX32(tb_flags, TBFLAG_A32, CONDEXEC);
-     dc->condexec_mask = (condexec & 0xf) << 1;
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index dd24f91f26..b837b7fcbf 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -77,6 +77,8 @@ typedef struct DisasContext {
-     bool pauth_active;
-     /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
-     bool bt;
-+    /* True if any CP15 access is trapped by HSTR_EL2 */
-+    bool hstr_active;
-     /*
-      * >= 0, a copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.
-      *  < 0, set by the current instruction.
++    syndrome = ((EC_FPIDTRAP << ARM_EL_EC_SHIFT)
++                | ARM_EL_IL
++                | (1 << 24) | (0xe << 20) | (7 << 14)
++                | (reg << 10) | (rt << 5) | 1);
++
++    raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
++}
++
+ #endif
 -- 
 2.20.1
 
