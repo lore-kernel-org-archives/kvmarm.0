@@ -1,81 +1,64 @@
-Return-Path: <SRS0=6x6p=ZW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6G1U=ZX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DF5C432C0
-	for <kvmarm@archiver.kernel.org>; Sat, 30 Nov 2019 09:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B53C432C0
+	for <kvmarm@archiver.kernel.org>; Sun,  1 Dec 2019 12:20:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2D48A20732
-	for <kvmarm@archiver.kernel.org>; Sat, 30 Nov 2019 09:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D48A20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 0B22B2073C
+	for <kvmarm@archiver.kernel.org>; Sun,  1 Dec 2019 12:20:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B22B2073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9FF4AED0;
-	Sat, 30 Nov 2019 04:29:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A4584A968;
+	Sun,  1 Dec 2019 07:20:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kCjhg4cBIp6k; Sat, 30 Nov 2019 04:29:53 -0500 (EST)
+	with ESMTP id sC1pUl3wOqBy; Sun,  1 Dec 2019 07:20:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 893D54AED2;
-	Sat, 30 Nov 2019 04:29:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48ABE4AEC6;
+	Sun,  1 Dec 2019 07:20:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3702C4AED0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Nov 2019 04:29:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A69EC4AEB8
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Dec 2019 07:20:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UIyF4ne7ZT5H for <kvmarm@lists.cs.columbia.edu>;
- Sat, 30 Nov 2019 04:29:50 -0500 (EST)
-Received: from huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DCEE4ACC4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Nov 2019 04:29:50 -0500 (EST)
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id 8AF326C3FE04F1522288;
- Sat, 30 Nov 2019 17:29:45 +0800 (CST)
-Received: from dggeme766-chm.china.huawei.com (10.3.19.112) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 30 Nov 2019 17:29:44 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme766-chm.china.huawei.com (10.3.19.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Sat, 30 Nov 2019 17:29:45 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Sat, 30 Nov 2019 17:29:44 +0800
-From: linmiaohe <linmiaohe@huawei.com>
-To: "maz@kernel.org" <maz@kernel.org>, "james.morse@arm.com"
- <james.morse@arm.com>, "julien.thierry.kdev@gmail.com"
- <julien.thierry.kdev@gmail.com>, "suzuki.poulose@arm.com"
- <suzuki.poulose@arm.com>, "christoffer.dall@arm.com"
- <christoffer.dall@arm.com>, "catalin.marinas@arm.com"
- <catalin.marinas@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "will@kernel.org"
- <will@kernel.org>, "andre.przywara@arm.com" <andre.przywara@arm.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>
-Subject: Re: [PATCH] KVM: arm: fix missing free_percpu_irq in
- kvm_timer_hyp_init()
-Thread-Topic: [PATCH] KVM: arm: fix missing free_percpu_irq in
- kvm_timer_hyp_init()
-Thread-Index: AdWnUfxPfkqh2LUwSkWjIhnvKAeisg==
-Date: Sat, 30 Nov 2019 09:29:44 +0000
-Message-ID: <c7c89488701c4340be6ec8de468c30ea@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.184.189.20]
+ with ESMTP id Q1qn6Rk1lkKS for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  1 Dec 2019 07:20:49 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9009A4AC65
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Dec 2019 07:20:49 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ibODW-0007WK-JM; Sun, 01 Dec 2019 13:20:46 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/5] target/arm: Honor HCR_EL2.TID2 trapping requirements
+Date: Sun,  1 Dec 2019 12:20:14 +0000
+Message-Id: <20191201122018.25808-2-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191201122018.25808-1-maz@kernel.org>
+References: <20191201122018.25808-1-maz@kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+ peter.maydell@linaro.org, richard.henderson@linaro.org,
+ edgar.iglesias@xilinx.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ Richard Henderson <richard.henderson@linaro.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,75 +75,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-friendly ping ...
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> When host_ptimer_irq request irq resource failed, we forget to release the host_vtimer_irq resource already requested.
-> Fix this missing irq release and other similar scenario.
->
-> Fixes: 9e01dc76be6a ("KVM: arm/arm64: arch_timer: Assign the phys timer on VHE systems")
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  virt/kvm/arm/arch_timer.c | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
->
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c index f182b2380345..73867f97040c 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -935,7 +935,7 @@ int kvm_timer_hyp_init(bool has_gic)
->  					    kvm_get_running_vcpus());
->  		if (err) {
->  			kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
-> -			goto out_free_irq;
-> +			goto out_free_vtimer_irq;
->  		}
->  
->  		static_branch_enable(&has_gic_active_state);
-> @@ -960,7 +960,7 @@ int kvm_timer_hyp_init(bool has_gic)
->  		if (err) {
->  			kvm_err("kvm_arch_timer: can't request ptimer interrupt %d (%d)\n",
->  				host_ptimer_irq, err);
-> -			return err;
-> +			goto out_disable_gic_state;
->  		}
->  
->  		if (has_gic) {
-> @@ -968,7 +968,7 @@ int kvm_timer_hyp_init(bool has_gic)
->  						    kvm_get_running_vcpus());
->  			if (err) {
->  				kvm_err("kvm_arch_timer: error setting vcpu affinity\n");
-> -				goto out_free_irq;
-> +				goto out_free_ptimer_irq;
->  			}
->  		}
->  
-> @@ -977,15 +977,22 @@ int kvm_timer_hyp_init(bool has_gic)
->  		kvm_err("kvm_arch_timer: invalid physical timer IRQ: %d\n",
->  			info->physical_irq);
->  		err = -ENODEV;
-> -		goto out_free_irq;
-> +		goto out_disable_gic_state;
->  	}
->  
->  	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
->  			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
->  			  kvm_timer_dying_cpu);
->  	return 0;
-> -out_free_irq:
-> +
-> +out_free_ptimer_irq:
-> +	free_percpu_irq(host_ptimer_irq, kvm_get_running_vcpus());
-> +out_disable_gic_state:
-> +	if (has_gic)
-> +		static_branch_disable(&has_gic_active_state);
-> +out_free_vtimer_irq:
->  	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
-> +
->  	return err;
->  }
->  
-> --
-> 2.19.1
+HCR_EL2.TID2 mandates that access from EL1 to CTR_EL0, CCSIDR_EL1,
+CCSIDR2_EL1, CLIDR_EL1, CSSELR_EL1 are trapped to EL2, and QEMU
+completely ignores it, making it impossible for hypervisors to
+virtualize the cache hierarchy.
+
+Do the right thing by trapping to EL2 if HCR_EL2.TID2 is set.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ target/arm/helper.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0bf8f53d4b..1e546096b8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1910,6 +1910,17 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+     raw_write(env, ri, value);
+ }
+ 
++static CPAccessResult access_aa64_tid2(CPUARMState *env,
++                                       const ARMCPRegInfo *ri,
++                                       bool isread)
++{
++    if (arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_TID2)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++
++    return CP_ACCESS_OK;
++}
++
+ static uint64_t ccsidr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -2110,10 +2121,14 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .writefn = pmintenclr_write },
+     { .name = "CCSIDR", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 0,
+-      .access = PL1_R, .readfn = ccsidr_read, .type = ARM_CP_NO_RAW },
++      .access = PL1_R,
++      .accessfn = access_aa64_tid2,
++      .readfn = ccsidr_read, .type = ARM_CP_NO_RAW },
+     { .name = "CSSELR", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 2, .opc2 = 0,
+-      .access = PL1_RW, .writefn = csselr_write, .resetvalue = 0,
++      .access = PL1_RW,
++      .accessfn = access_aa64_tid2,
++      .writefn = csselr_write, .resetvalue = 0,
+       .bank_fieldoffsets = { offsetof(CPUARMState, cp15.csselr_s),
+                              offsetof(CPUARMState, cp15.csselr_ns) } },
+     /* Auxiliary ID register: this actually has an IMPDEF value but for now
+@@ -5204,6 +5219,11 @@ static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInfo *ri,
+     if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
+         return CP_ACCESS_TRAP;
+     }
++
++    if (arm_current_el(env) < 2 && arm_hcr_el2_eff(env) & HCR_TID2) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++
+     return CP_ACCESS_OK;
+ }
+ 
+@@ -6184,7 +6204,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         ARMCPRegInfo clidr = {
+             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
+             .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
+-            .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = cpu->clidr
++            .access = PL1_R, .type = ARM_CP_CONST,
++            .accessfn = access_aa64_tid2,
++            .resetvalue = cpu->clidr
+         };
+         define_one_arm_cp_reg(cpu, &clidr);
+         define_arm_cp_regs(cpu, v7_cp_reginfo);
+@@ -6717,7 +6739,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             /* These are common to v8 and pre-v8 */
+             { .name = "CTR",
+               .cp = 15, .crn = 0, .crm = 0, .opc1 = 0, .opc2 = 1,
+-              .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = cpu->ctr },
++              .access = PL1_R, .accessfn = ctr_el0_access,
++              .type = ARM_CP_CONST, .resetvalue = cpu->ctr },
+             { .name = "CTR_EL0", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 3, .opc2 = 1, .crn = 0, .crm = 0,
+               .access = PL0_R, .accessfn = ctr_el0_access,
+-- 
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
