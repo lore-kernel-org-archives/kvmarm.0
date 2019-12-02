@@ -6,85 +6,86 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39CB7C432C0
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Dec 2019 15:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0CBC432C0
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Dec 2019 15:23:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AECD82070B
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Dec 2019 15:10:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CF9820833
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Dec 2019 15:23:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IX7OPS9C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AECD82070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kso3PZ6Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CF9820833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1238E4AEF0;
-	Mon,  2 Dec 2019 10:10:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F41AE4AEF0;
+	Mon,  2 Dec 2019 10:23:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oNYYHZK7XlfC; Mon,  2 Dec 2019 10:10:54 -0500 (EST)
+	with ESMTP id cW1t+LTRWhsc; Mon,  2 Dec 2019 10:23:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2800E4AEC0;
-	Mon,  2 Dec 2019 10:10:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB9A14AE9E;
+	Mon,  2 Dec 2019 10:23:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 503974AC7C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Dec 2019 10:10:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C9BF4AE9E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Dec 2019 10:22:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PgmIpGwwAYTh for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Dec 2019 10:10:52 -0500 (EST)
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com
- [209.85.215.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A4604AC65
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Dec 2019 10:10:52 -0500 (EST)
-Received: by mail-pg1-f195.google.com with SMTP id x8so4736660pgk.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Dec 2019 07:10:52 -0800 (PST)
+ with ESMTP id oTDV3ulcKXFl for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Dec 2019 10:22:57 -0500 (EST)
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com
+ [209.85.214.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 028AF4AC7C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Dec 2019 10:22:56 -0500 (EST)
+Received: by mail-pl1-f194.google.com with SMTP id bd4so55556plb.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Dec 2019 07:22:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4LtuvHrdNM3HYoKVotRcdu6O8PoEJJHbSkOX1onLScg=;
- b=IX7OPS9Clnw4llEJZqi7INbxDS0rEcux4JiGrblm5PhpInJtKTgkT50zkp//bE+oLC
- OeWaGig9S2GAI58JCAUIn2UdDrR/xu+mw44AmaH6k5DTcRLjhjvqZRVJUChRNjjEZkzn
- 3IqNMCEt74TDktQx8uhrpMBBQajBSWtrttmIuq0LFFn4a7BsNuDoEPNit1UUI+78qF+F
- 0elDP3x/Q9/Socdenx6tXnBltLiX3bd9hsAtm625MW5d10eHmb/crGuN9e5f0l7chEci
- nQ4Mddud01muL/QuvW2OR7aUxIV3SjWhipjSxPX8/no0mGmps77yCUIiX6NrnMiw0CmE
- NXeQ==
+ bh=ldcnmnooKILtDx94So09EDIGm9UD4WSVWcIJ2KkcoWY=;
+ b=kso3PZ6QOqgPPWy19VBduikUfsO0OwOXqex0XEGSzCDHmerQGHcvxHijOjqS2yOaxI
+ pKMnFxy/K3jKZG2yKHGttNpcBKphxTik//M5ttZSk+6R0+5gmqY+zP+6JOOXPod+Qwir
+ 0ribSVkhVY2ZUQIBsfwYYM3TJBnetkubaQjcsYxcLdG9tcPFb2zLWmz1AQKGlUf0lZYb
+ D0UU7YVLJoK4neCl3BSQq54pRj0YQ7zFpuAd7H4Se0s1AA24qJVgE+tCF+i8xAFNWJV5
+ 7xrbKVn73VNJm47Y6jfQ7gMWxn45GwNSbkPtq1uCSPuC8zswKknDufkwIkynLE2oUc6k
+ BX2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=4LtuvHrdNM3HYoKVotRcdu6O8PoEJJHbSkOX1onLScg=;
- b=QwT4drDHITE5VY1p433uIGsAN/x45lamvkfemK/BX453uxuNEWRyUypWvfdcL+y92T
- uVypS11lfl4xG6P4aEuAuwlItXrjGsY7lpK4uMhSMP1QemJGo6nFt3l5W5pXJazR3rJv
- OxDVbLJPJcCcBss6LBL15ZLC6m0LLJFHG2Wokagdacxw2l5NAfCuG7IYHk96Gvz7WzcB
- FMK7qee9QPNmP3VtJwwXEXhVmCvGtJ/J+vIrAHcOtc/m6Jn+58wxI2g5SmdG9woRrte3
- ZlCJNcSjqhYz5ouhi7teWKeYYMWzx3MhtAIsyfWgFU0DlBodc7EJoBq0HzEI+Epegl5S
- hL+w==
-X-Gm-Message-State: APjAAAUrJZ6zRC6ls45XWS+WqjRU0a8GoXXyvtYR+V1eZruep+jRMflF
- x+yCE95cWQ8ai9pm/sn5i5BAtA==
-X-Google-Smtp-Source: APXvYqySd6q9PH4r5aJ4ooh2RxYENLiGwUlVlCK/pdU6t/wznrt1TM7FA0lPL8tHok7wS6Z1EqU4Kw==
-X-Received: by 2002:a63:5c59:: with SMTP id n25mr12346348pgm.415.1575299451314; 
- Mon, 02 Dec 2019 07:10:51 -0800 (PST)
+ bh=ldcnmnooKILtDx94So09EDIGm9UD4WSVWcIJ2KkcoWY=;
+ b=VDKiiTLENU3SrVw5KpWfoWjdYQ4MdCXvM/DgoeKWzUyejD3n7VFsSHhrIkMappg06l
+ gAortYkNps5I9HScE7JBuJMcutm6QNMSXiA2z+r6j/SBHVjeF8yylqg3aUed9T2LrCwK
+ iVxLFySXs+s74PsJ1RzaxLv3JOoXFgAToN/5tSf46Uf0zbeyzfY+T0XmKaDRWJg9n5JD
+ Wv+kNcORvjkOxFXa2b2BQ5feSrJcDjzFkfHrhIIEX0iPLIe/7fITVg1uPxjLRtlbFXK0
+ U1hkahlAJVy2pTbhfDFio/Pa0SXpZyPb4/9RxOateNg+gmjQFOveOaGTyRRK7s7ADk0v
+ HDnA==
+X-Gm-Message-State: APjAAAU6xw+3/mySuVYNnHwCRoWiIWkK9WaXMfmaSz9tuu1lRD09ruuI
+ vi2tpKIsaPrwWhZCrHHwRp/9pQ==
+X-Google-Smtp-Source: APXvYqxnH+PBf5it+wzYONc/94C4UzYEocuz275/VrRDVchl/OTFzUEjp+7NsTjQjuH4Co7JEzmgwg==
+X-Received: by 2002:a17:902:bb8c:: with SMTP id
+ m12mr5261981pls.320.1575300175851; 
+ Mon, 02 Dec 2019 07:22:55 -0800 (PST)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id w131sm13325568pfc.16.2019.12.02.07.10.49
+ by smtp.gmail.com with ESMTPSA id e4sm6810026pfj.125.2019.12.02.07.22.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Dec 2019 07:10:50 -0800 (PST)
-Subject: Re: [PATCH v2 1/5] target/arm: Honor HCR_EL2.TID2 trapping
+ Mon, 02 Dec 2019 07:22:55 -0800 (PST)
+Subject: Re: [PATCH v2 2/5] target/arm: Honor HCR_EL2.TID1 trapping
  requirements
 To: Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
 References: <20191201122018.25808-1-maz@kernel.org>
- <20191201122018.25808-2-maz@kernel.org>
+ <20191201122018.25808-3-maz@kernel.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <78a7047a-bc8e-0a90-db9c-7f3a0d3d60d8@linaro.org>
-Date: Mon, 2 Dec 2019 07:10:48 -0800
+Message-ID: <091eee4b-dd8f-477d-438e-699dc3c587af@linaro.org>
+Date: Mon, 2 Dec 2019 07:22:53 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191201122018.25808-2-maz@kernel.org>
+In-Reply-To: <20191201122018.25808-3-maz@kernel.org>
 Content-Language: en-US
 Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
  kvmarm@lists.cs.columbia.edu
@@ -105,22 +106,25 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 12/1/19 12:20 PM, Marc Zyngier wrote:
-> HCR_EL2.TID2 mandates that access from EL1 to CTR_EL0, CCSIDR_EL1,
-> CCSIDR2_EL1, CLIDR_EL1, CSSELR_EL1 are trapped to EL2, and QEMU
-> completely ignores it, making it impossible for hypervisors to
-> virtualize the cache hierarchy.
+> HCR_EL2.TID1 mandates that access from EL1 to REVIDR_EL1, AIDR_EL1
+> (and their 32bit equivalents) as well as TCMTR, TLBTR are trapped
+> to EL2. QEMU ignores it, making it harder for a hypervisor to
+> virtualize the HW (though to be fair, no known hypervisor actually
+> cares).
 > 
-> Do the right thing by trapping to EL2 if HCR_EL2.TID2 is set.
+> Do the right thing by trapping to EL2 if HCR_EL2.TID1 is set.
 > 
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  target/arm/helper.c | 31 +++++++++++++++++++++++++++----
->  1 file changed, 27 insertions(+), 4 deletions(-)
+>  target/arm/helper.c | 36 ++++++++++++++++++++++++++++++++----
+>  1 file changed, 32 insertions(+), 4 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
