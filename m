@@ -2,70 +2,62 @@ Return-Path: <SRS0=eeW8=Z4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CF9C43603
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 15:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B0CC43603
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBC0A24659
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 15:35:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC0A24659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2C8602173E
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8602173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54AF04AED2;
-	Fri,  6 Dec 2019 10:35:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E73C4AF09;
+	Fri,  6 Dec 2019 10:48:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id olIA-kS25KN8; Fri,  6 Dec 2019 10:35:08 -0500 (EST)
+	with ESMTP id UqDHJ8v0VGFg; Fri,  6 Dec 2019 10:48:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F7764AED0;
-	Fri,  6 Dec 2019 10:35:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4C64AF08;
+	Fri,  6 Dec 2019 10:48:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AFDD4AECD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 10:35:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 563614AF08
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 10:48:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id giZBdw3oy-gv for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Dec 2019 10:35:05 -0500 (EST)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D546E4AECC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 10:35:05 -0500 (EST)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1idFdH-0005W9-6Z; Fri, 06 Dec 2019 16:35:03 +0100
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [RFC 2/3] KVM: arm64: pmu: Fix chained =?UTF-8?Q?SW=5FINCR=20?=
- =?UTF-8?Q?counters?=
-X-PHP-Originating-Script: 0:main.inc
-MIME-Version: 1.0
-Date: Fri, 06 Dec 2019 15:35:03 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <20191206152141.GN18399@e119886-lin.cambridge.arm.com>
+ with ESMTP id RJcdxgXIXb2A for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Dec 2019 10:48:42 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA954AECC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 10:48:42 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29A7231B;
+ Fri,  6 Dec 2019 07:48:42 -0800 (PST)
+Received: from localhost (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 956AF3F718;
+ Fri,  6 Dec 2019 07:48:41 -0800 (PST)
+Date: Fri, 6 Dec 2019 15:48:39 +0000
+From: Andrew Murray <andrew.murray@arm.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC 2/3] KVM: arm64: pmu: Fix chained SW_INCR counters
+Message-ID: <20191206154839.GO18399@e119886-lin.cambridge.arm.com>
 References: <20191204204426.9628-1-eric.auger@redhat.com>
  <20191204204426.9628-3-eric.auger@redhat.com>
  <561ac6df385e977cc51d51a8ab28ee49@www.loen.fr>
  <2b30c1ca-3bc0-9f73-4bea-ee42bb74cbac@redhat.com>
  <15507faca89a980056df7119e105e82a@www.loen.fr>
- <20191206152141.GN18399@e119886-lin.cambridge.arm.com>
-Message-ID: <ea510414e337a4cab8ed9df737959368@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, eric.auger@redhat.com,
- eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- drjones@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com
+ <145cdd1c-266c-6252-9688-e9e4c6809dfd@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <145cdd1c-266c-6252-9688-e9e4c6809dfd@redhat.com>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,126 +69,258 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAxOS0xMi0wNiAxNToyMSwgQW5kcmV3IE11cnJheSB3cm90ZToKPiBPbiBUaHUsIERlYyAw
-NSwgMjAxOSBhdCAwMjo1MjoyNlBNICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IE9uIDIw
-MTktMTItMDUgMTQ6MDYsIEF1Z2VyIEVyaWMgd3JvdGU6Cj4+ID4gSGkgTWFyYywKPj4gPgo+PiA+
-IE9uIDEyLzUvMTkgMTA6NDMgQU0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4gPiA+IEhpIEVyaWMs
-Cj4+ID4gPgo+PiA+ID4gT24gMjAxOS0xMi0wNCAyMDo0NCwgRXJpYyBBdWdlciB3cm90ZToKPj4g
-PiA+ID4gQXQgdGhlIG1vbWVudCBhIFNXX0lOQ1IgY291bnRlciBhbHdheXMgb3ZlcmZsb3dzIG9u
-IDMyLWJpdAo+PiA+ID4gPiBib3VuZGFyeSwgaW5kZXBlbmRlbnRseSBvbiB3aGV0aGVyIHRoZSBu
-KzF0aCBjb3VudGVyIGlzCj4+ID4gPiA+IHByb2dyYW1tZWQgYXMgQ0hBSU4uCj4+ID4gPiA+Cj4+
-ID4gPiA+IENoZWNrIHdoZXRoZXIgdGhlIFNXX0lOQ1IgY291bnRlciBpcyBhIDY0YiBjb3VudGVy
-IGFuZCBpZiBzbywKPj4gPiA+ID4gaW1wbGVtZW50IHRoZSA2NGIgbG9naWMuCj4+ID4gPiA+Cj4+
-ID4gPiA+IEZpeGVzOiA4MGYzOTNhMjNiZTYgKCJLVk06IGFybS9hcm02NDogU3VwcG9ydCBjaGFp
-bmVkIFBNVQo+PiA+ID4gPiBjb3VudGVycyIpCj4+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IEVyaWMg
-QXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KPj4gPiA+ID4gLS0tCj4+ID4gPiA+IMKgdmly
-dC9rdm0vYXJtL3BtdS5jIHwgMTYgKysrKysrKysrKysrKysrLQo+PiA+ID4gPiDCoDEgZmlsZSBj
-aGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4+ID4gPiA+Cj4+ID4gPiA+
-IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vcG11LmMgYi92aXJ0L2t2bS9hcm0vcG11LmMKPj4g
-PiA+ID4gaW5kZXggYzNmOGIwNTk4ODFlLi43YWI0NzdkYjJmNzUgMTAwNjQ0Cj4+ID4gPiA+IC0t
-LSBhL3ZpcnQva3ZtL2FybS9wbXUuYwo+PiA+ID4gPiArKysgYi92aXJ0L2t2bS9hcm0vcG11LmMK
-Pj4gPiA+ID4gQEAgLTQ5MSw2ICs0OTEsOCBAQCB2b2lkIGt2bV9wbXVfc29mdHdhcmVfaW5jcmVt
-ZW50KHN0cnVjdCAKPj4ga3ZtX3ZjcHUKPj4gPiA+ID4gKnZjcHUsIHU2NCB2YWwpCj4+ID4gPiA+
-Cj4+ID4gPiA+IMKgwqDCoMKgIGVuYWJsZSA9IF9fdmNwdV9zeXNfcmVnKHZjcHUsIFBNQ05URU5T
-RVRfRUwwKTsKPj4gPiA+ID4gwqDCoMKgwqAgZm9yIChpID0gMDsgaSA8IEFSTVY4X1BNVV9DWUNM
-RV9JRFg7IGkrKykgewo+PiA+ID4gPiArwqDCoMKgwqDCoMKgwqAgYm9vbCBjaGFpbmVkID0gdGVz
-dF9iaXQoaSA+PiAxLCAKPj4gdmNwdS0+YXJjaC5wbXUuY2hhaW5lZCk7Cj4+ID4gPiA+ICsKPj4g
-PiA+Cj4+ID4gPiBJJ2QgcmF0aGVyIHlvdSB1c2Uga3ZtX3BtdV9wbWNfaXNfY2hhaW5lZCgpIHJh
-dGhlciB0aGFuIAo+PiBvcGVuLWNvZGluZwo+PiA+ID4gdGhpcy4gQnV0IHNlZSBiZWxvdzoKPj4g
-PiA+Cj4+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqAgaWYgKCEodmFsICYgQklUKGkpKSkKPj4gPiA+
-ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOwo+PiA+ID4gPiDCoMKgwqDCoMKg
-wqDCoMKgIHR5cGUgPSBfX3ZjcHVfc3lzX3JlZyh2Y3B1LCBQTUVWVFlQRVIwX0VMMCArIGkpCj4+
-ID4gPiA+IEBAIC01MDAsOCArNTAyLDIwIEBAIHZvaWQga3ZtX3BtdV9zb2Z0d2FyZV9pbmNyZW1l
-bnQoc3RydWN0Cj4+ID4gPiA+IGt2bV92Y3B1Cj4+ID4gPiA+ICp2Y3B1LCB1NjQgdmFsKQo+PiA+
-ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmVnID0gX192Y3B1X3N5c19yZWcodmNwdSwg
-UE1FVkNOVFIwX0VMMCArIGkpICsgCj4+IDE7Cj4+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCByZWcgPSBsb3dlcl8zMl9iaXRzKHJlZyk7Cj4+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBfX3ZjcHVfc3lzX3JlZyh2Y3B1LCBQTUVWQ05UUjBfRUwwICsgaSkgPSByZWc7Cj4+
-ID4gPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmICghcmVnKQo+PiA+ID4gPiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBpZiAocmVnKSAvKiBubyBvdmVyZmxvdyAqLwo+PiA+ID4gPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOwo+PiA+ID4gPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBpZiAoY2hhaW5lZCkgewo+PiA+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIHJlZyA9IF9fdmNwdV9zeXNfcmVnKHZjcHUsIFBNRVZDTlRSMF9FTDAgKyBp
-IAo+PiArCj4+ID4gPiA+IDEpICsgMTsKPj4gPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCByZWcgPSBsb3dlcl8zMl9iaXRzKHJlZyk7Cj4+ID4gPiA+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgX192Y3B1X3N5c19yZWcodmNwdSwgUE1FVkNOVFIwX0VMMCArIGkg
-KyAxKSA9IAo+PiByZWc7Cj4+ID4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-aWYgKHJlZykKPj4gPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGNvbnRpbnVlOwo+PiA+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIG1h
-cmsgYW4gb3ZlcmZsb3cgb24gaGlnaCBjb3VudGVyICovCj4+ID4gPiA+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgX192Y3B1X3N5c19yZWcodmNwdSwgUE1PVlNTRVRfRUwwKSB8PSBC
-SVQoaSArIAo+PiAxKTsKPj4gPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsK
-Pj4gPiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBtYXJrIGFuIG92ZXJm
-bG93ICovCj4+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIF9fdmNwdV9z
-eXNfcmVnKHZjcHUsIFBNT1ZTU0VUX0VMMCkgfD0gQklUKGkpOwo+PiA+ID4gPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCB9Cj4+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqAgfQo+PiA+ID4gPiDCoMKg
-wqDCoCB9Cj4+ID4gPiA+IMKgfQo+PiA+ID4KPj4gPiA+IEkgdGhpbmsgdGhlIHdob2xlIGZ1bmN0
-aW9uIGlzIGEgYml0IG9mIGEgbWVzcywgYW5kIGNvdWxkIGJlIAo+PiBiZXR0ZXIKPj4gPiA+IHN0
-cnVjdHVyZWQgdG8gdHJlYXQgNjRiaXQgY291bnRlcnMgYXMgYSBmaXJzdCBjbGFzcyBjaXRpemVu
-Lgo+PiA+ID4KPj4gPiA+IEknbSBzdWdnZXN0aW5nIHNvbWV0aGluZyBhbG9uZyB0aG9zZSBsaW5l
-cywgd2hpY2ggdHJpZXMgdG8KPj4gPiA+IHN0cmVhbWxpbmUgdGhpbmdzIGEgYml0IGFuZCBrZWVw
-IHRoZSBmbG93IHVuaWZvcm0gYmV0d2VlbiB0aGUKPj4gPiA+IHR3byB3b3JkIHNpemVzLiBJTUhP
-LCBpdCBoZWxwcyByZWFzb25uaW5nIGFib3V0IGl0IGFuZCBnaXZlcwo+PiA+ID4gc2NvcGUgdG8g
-dGhlIEFSTXY4LjUgZnVsbCA2NGJpdCBjb3VudGVycy4uLiBJdCBpcyBvZiBjb3Vyc2UKPj4gPiA+
-IGNvbXBsZXRlbHkgdW50ZXN0ZWQuCj4+ID4KPj4gPiBMb29rcyBPSyB0byBtZSBhcyB3ZWxsLiBP
-bmUgcmVtYXJrIHRob3VnaCwgZG9uJ3Qgd2UgbmVlZCB0byB0ZXN0IAo+PiBpZiB0aGUKPj4gPiBu
-KzF0aCByZWcgaXMgZW5hYmxlZCBiZWZvcmUgaW5jcmVtZW50aW5nIGl0Pwo+Cj4gSW5kZWVkIC0g
-d2UgZG9uJ3Qgd2FudCB0byBpbmRpY2F0ZSBhbiBvdmVyZmxvdyBvbiBhIGRpc2FibGVkIGNvdW50
-ZXIuCj4KPgo+Pgo+PiBIbW1tLiBJJ20gbm90IHN1cmUuIEkgdGhpbmsgd2Ugc2hvdWxkIG1ha2Ug
-c3VyZSB0aGF0IHdlIGRvbid0IGZsYWcKPj4gYSBjb3VudGVyIGFzIGJlaW5nIGNoYWluZWQgaWYg
-dGhlIG9kZCBjb3VudGVyIGlzIGRpc2FibGVkLCByYXRoZXIKPj4gdGhhbiBjaGVja2luZyBpdCBo
-ZXJlLiBBcyBsb25nIGFzIHRoZSBvZGQgY291bnRlciBpcyBub3QgY2hhaW5lZAo+PiAqYW5kKiBl
-bmFibGVkLCB3ZSBzaG91bGRuJ3QgdG91Y2ggaXQuCj4KPiBEb2VzIHRoaXMgbWVhbiB0aGF0IHdl
-IGRvbid0IGNhcmUgaWYgdGhlIGxvdyBjb3VudGVyIGlzIGVuYWJsZWQgb3IgCj4gbm90Cj4gd2hl
-biBkZWNpZGluZyBpZiB0aGUgcGFpciBpcyBjaGFpbmVkPwo+Cj4gSSB3b3VsZCBmaW5kIHRoZSBj
-b2RlIGVhc2llciB0byBmb2xsb3cgaWYgd2UgaGFkIGFuIGV4cGxpY2l0ICdpcyB0aGUKPiBoaWdo
-IGNvdW50ZXIgZW5hYmxlZCBoZXJlJyBjaGVjayAoYXQgdGhlIHBvaW50IG9mIGRlY2lkaW5nIHdo
-ZXJlIHRvCj4gcHV0IHRoZSBvdmVyZmxvdykuCgpTdXJlLiBCdXQgdGhlIHBvaW50IGlzIHRoYXQg
-d2UncmUgc3ByZWFkaW5nIHRoYXQga2luZCBvZiBjaGVja3MgYWxsIApvdmVyCnRoZSBtYXAsIGFu
-ZCB0aGF0IHdlIGRvbid0IGhhdmUgYSB3YXkgdG8gZXZlbiByZWFzb24gYWJvdXQgdGhlIHN0YXRl
-IG9mCmEgNjRiaXQgY291bnRlci4gRG9lc24ndCBpdCBzdHJpa2UgeW91IGFzIGJlaW5nIG1pbGRs
-eSBicm9rZW4/Cgo+Cj4KPj4KPj4gQWdhaW4sIHVudGVzdGVkOgo+Pgo+PiBkaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL3BtdS5jIGIvdmlydC9rdm0vYXJtL3BtdS5jCj4+IGluZGV4IGNmMzcxZjY0
-M2FkZS4uNDczNjY4MTdjZDJhIDEwMDY0NAo+PiAtLS0gYS92aXJ0L2t2bS9hcm0vcG11LmMKPj4g
-KysrIGIvdmlydC9rdm0vYXJtL3BtdS5jCj4+IEBAIC0xNSw2ICsxNSw3IEBACj4+ICAjaW5jbHVk
-ZSA8a3ZtL2FybV92Z2ljLmg+Cj4+Cj4+ICBzdGF0aWMgdm9pZCBrdm1fcG11X2NyZWF0ZV9wZXJm
-X2V2ZW50KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0Cj4+IHNlbGVjdF9pZHgpOwo+PiArc3Rh
-dGljIHZvaWQga3ZtX3BtdV91cGRhdGVfcG1jX2NoYWluZWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LCB1NjQKPj4gc2VsZWN0X2lkeCk7Cj4+Cj4+ICAjZGVmaW5lIFBFUkZfQVRUUl9DRkcxX0tWTV9Q
-TVVfQ0hBSU5FRCAweDEKPj4KPj4gQEAgLTI5OCw2ICsyOTksNyBAQCB2b2lkIGt2bV9wbXVfZW5h
-YmxlX2NvdW50ZXJfbWFzayhzdHJ1Y3Qga3ZtX3ZjcHUgCj4+ICp2Y3B1LAo+PiB1NjQgdmFsKQo+
-PiAgCQkgKiBGb3IgaGlnaCBjb3VudGVycyBvZiBjaGFpbmVkIGV2ZW50cyB3ZSBtdXN0IHJlY3Jl
-YXRlIHRoZQo+PiAgCQkgKiBwZXJmIGV2ZW50IHdpdGggdGhlIGxvbmcgKDY0Yml0KSBhdHRyaWJ1
-dGUgc2V0Lgo+PiAgCQkgKi8KPj4gKwkJa3ZtX3BtdV91cGRhdGVfcG1jX2NoYWluZWQodmNwdSwg
-aSk7Cj4+ICAJCWlmIChrdm1fcG11X3BtY19pc19jaGFpbmVkKHBtYykgJiYKPj4gIAkJICAgIGt2
-bV9wbXVfaWR4X2lzX2hpZ2hfY291bnRlcihpKSkgewo+PiAgCQkJa3ZtX3BtdV9jcmVhdGVfcGVy
-Zl9ldmVudCh2Y3B1LCBpKTsKPj4gQEAgLTY0NSw3ICs2NDcsOCBAQCBzdGF0aWMgdm9pZCBrdm1f
-cG11X3VwZGF0ZV9wbWNfY2hhaW5lZChzdHJ1Y3QgCj4+IGt2bV92Y3B1Cj4+ICp2Y3B1LCB1NjQg
-c2VsZWN0X2lkeCkKPj4gIAlzdHJ1Y3Qga3ZtX3BtdSAqcG11ID0gJnZjcHUtPmFyY2gucG11Owo+
-PiAgCXN0cnVjdCBrdm1fcG1jICpwbWMgPSAmcG11LT5wbWNbc2VsZWN0X2lkeF07Cj4+Cj4+IC0J
-aWYgKGt2bV9wbXVfaWR4X2hhc19jaGFpbl9ldnR5cGUodmNwdSwgcG1jLT5pZHgpKSB7Cj4+ICsJ
-aWYgKGt2bV9wbXVfaWR4X2hhc19jaGFpbl9ldnR5cGUodmNwdSwgcG1jLT5pZHgpICYmCj4+ICsJ
-ICAgIGt2bV9wbXVfY291bnRlcl9pc19lbmFibGVkKHZjcHUsIHBtYy0+aWR4KSkgewo+Cj4gSS5l
-LiBoZXJlIHdlIGRvbid0IGNhcmUgd2hhdCB0aGUgc3RhdGUgb2YgZW5hYmxlbWVudCBpcyBmb3Ig
-dGhlIGxvdyAKPiBjb3VudGVyLgo+Cj4gQWxzbyBhdCBwcmVzZW50LCB0aGlzIG1heSBicmVhayB0
-aGUgZm9sbG93aW5nIHVzZS1jYXNlCj4KPiAgLSBVc2VyIGNyZWF0ZXMgYW5kIHVzZXMgYSBwYWly
-IG9mIGNoYWluZWQgY291bnRlcnMKPiAgLSBVc2VyIGRpc2FibGVzIG9kZC9oaWdoIGNvdW50ZXIK
-PiAgLSBVc2VyIHJlYWRzIHZhbHVlcyBvZiBib3RoIGNvdW50ZXJzCj4gIC0gVXNlciByZXdyaXRl
-cyBDSEFJTiBldmVudCB0byBvZGQvaGlnaCBjb3VudGVyIE9SIHVzZXIgcmUtZW5hYmxlcwo+IGp1
-c3QgdGhlIGV2ZW4vbG93IGNvdW50ZXIKPiAgLSBVc2VyIHJlYWRzIHZhbHVlIG9mIGJvdGggY291
-bnRlcnMgPC0gdGhpcyBtYXkgbm93IGRpZmZlcmVudCB0byB0aGUKPiBsYXN0IHJlYWQKCkhleSwg
-SSBkaWRuJ3Qgc2F5IGl0IHdhcyBwZXJmZWN0IDstKS4gQnV0IGZvciBzdXJlIHdlIGNhbid0IGxl
-dCB0aGUKUE1VIGJpdHJvdCBtb3JlIHRoYW4gaXQgYWxyZWFkeSBoYXMsIGFuZCBJJ20gbm90IHN1
-cmUgdGhpcyBpcyBoZWFkaW5nCnRoZSByaWdodCB3YXkuCgpJJ20gY2VydGFpbmx5IGdvaW5nIHRv
-IHB1c2ggYmFjayBvbiBuZXcgUE1VIGZlYXR1cmVzIHVudGlsIHdlIGNhbiAKcHJvcGVybHkKcmVh
-c29uIGFib3V0IDY0Yml0IGNvdW50ZXJzIGFzIGEgdG9wLWxldmVsIGVudGl0eSAoYXMgb3Bwb3Nl
-ZCB0byBhIApidW5jaApvZiBkaXNjcmV0ZSBjb3VudGVycykuCgpUaGFua3MsCgogICAgICAgICBN
-LgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Thu, Dec 05, 2019 at 08:01:42PM +0100, Auger Eric wrote:
+> Hi Marc,
+> =
+
+> On 12/5/19 3:52 PM, Marc Zyngier wrote:
+> > On 2019-12-05 14:06, Auger Eric wrote:
+> >> Hi Marc,
+> >>
+> >> On 12/5/19 10:43 AM, Marc Zyngier wrote:
+> >>> Hi Eric,
+> >>>
+> >>> On 2019-12-04 20:44, Eric Auger wrote:
+> >>>> At the moment a SW_INCR counter always overflows on 32-bit
+> >>>> boundary, independently on whether the n+1th counter is
+> >>>> programmed as CHAIN.
+> >>>>
+> >>>> Check whether the SW_INCR counter is a 64b counter and if so,
+> >>>> implement the 64b logic.
+> >>>>
+> >>>> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>> ---
+> >>>> =A0virt/kvm/arm/pmu.c | 16 +++++++++++++++-
+> >>>> =A01 file changed, 15 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> >>>> index c3f8b059881e..7ab477db2f75 100644
+> >>>> --- a/virt/kvm/arm/pmu.c
+> >>>> +++ b/virt/kvm/arm/pmu.c
+> >>>> @@ -491,6 +491,8 @@ void kvm_pmu_software_increment(struct kvm_vcpu
+> >>>> *vcpu, u64 val)
+> >>>>
+> >>>> =A0=A0=A0=A0 enable =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> >>>> =A0=A0=A0=A0 for (i =3D 0; i < ARMV8_PMU_CYCLE_IDX; i++) {
+> >>>> +=A0=A0=A0=A0=A0=A0=A0 bool chained =3D test_bit(i >> 1, vcpu->arch.=
+pmu.chained);
+> >>>> +
+> >>>
+> >>> I'd rather you use kvm_pmu_pmc_is_chained() rather than open-coding
+> >>> this. But see below:
+> >>>
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0 if (!(val & BIT(i)))
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0 type =3D __vcpu_sys_reg(vcpu, PMEVTYPER0_EL=
+0 + i)
+> >>>> @@ -500,8 +502,20 @@ void kvm_pmu_software_increment(struct kvm_vcpu
+> >>>> *vcpu, u64 val)
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 reg =3D __vcpu_sys_reg(vcpu, PM=
+EVCNTR0_EL0 + i) + 1;
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 reg =3D lower_32_bits(reg);
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, PMEVCNTR0_=
+EL0 + i) =3D reg;
+> >>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!reg)
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (reg) /* no overflow */
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (chained) {
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 reg =3D __vcpu_sys_re=
+g(vcpu, PMEVCNTR0_EL0 + i + 1) + 1;
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 reg =3D lower_32_bits=
+(reg);
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, =
+PMEVCNTR0_EL0 + i + 1) =3D reg;
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (reg)
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* mark an overflow o=
+n high counter */
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, =
+PMOVSSET_EL0) |=3D BIT(i + 1);
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 } else {
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* mark an overflow */
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu=
+, PMOVSSET_EL0) |=3D BIT(i);
+> >>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+> >>>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+> >>>> =A0=A0=A0=A0 }
+> >>>> =A0}
+> >>>
+> >>> I think the whole function is a bit of a mess, and could be better
+> >>> structured to treat 64bit counters as a first class citizen.
+> >>>
+> >>> I'm suggesting something along those lines, which tries to
+> >>> streamline things a bit and keep the flow uniform between the
+> >>> two word sizes. IMHO, it helps reasonning about it and gives
+> >>> scope to the ARMv8.5 full 64bit counters... It is of course
+> >>> completely untested.
+> >>
+> >> Looks OK to me as well. One remark though, don't we need to test if the
+> >> n+1th reg is enabled before incrementing it?
+> > =
+
+> > Hmmm. I'm not sure. I think we should make sure that we don't flag
+> > a counter as being chained if the odd counter is disabled, rather
+> > than checking it here. As long as the odd counter is not chained
+> > *and* enabled, we shouldn't touch it.>
+> > Again, untested:
+> > =
+
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index cf371f643ade..47366817cd2a 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -15,6 +15,7 @@
+> > =A0#include <kvm/arm_vgic.h>
+> > =
+
+> > =A0static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64
+> > select_idx);
+> > +static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64
+> > select_idx);
+> > =
+
+> > =A0#define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+> > =
+
+> > @@ -298,6 +299,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu
+> > *vcpu, u64 val)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0 * For high counters of chained events we mu=
+st recreate the
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0 * perf event with the long (64bit) attribut=
+e set.
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0 */
+> > +=A0=A0=A0=A0=A0=A0=A0 kvm_pmu_update_pmc_chained(vcpu, i);
+> > =A0=A0=A0=A0=A0=A0=A0=A0 if (kvm_pmu_pmc_is_chained(pmc) &&
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kvm_pmu_idx_is_high_counter(i)) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kvm_pmu_create_perf_event(vcpu, i);
+> > @@ -645,7 +647,8 @@ static void kvm_pmu_update_pmc_chained(struct
+> > kvm_vcpu *vcpu, u64 select_idx)
+> > =A0=A0=A0=A0 struct kvm_pmu *pmu =3D &vcpu->arch.pmu;
+> > =A0=A0=A0=A0 struct kvm_pmc *pmc =3D &pmu->pmc[select_idx];
+> > =
+
+> > -=A0=A0=A0 if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx)) {
+> > +=A0=A0=A0 if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx) &&
+> > +=A0=A0=A0=A0=A0=A0=A0 kvm_pmu_counter_is_enabled(vcpu, pmc->idx)) {
+> =
+
+> In create_perf_event(), has_chain_evtype() is used and a 64b sample
+> period would be chosen even if the counters are disjoined (since the odd
+> is disabled). We would need to use pmc_is_chained() instead.
+
+So in this use-case, someone has configured a pair of chained counters
+but only enabled the lower half. In this case we only create a 32bit backing
+event (no PERF_ATTR_CFG1_KVM_PMU_CHAINED flag) - I guess this means the
+perf event will trigger on 64bit period(?) despite the high counter being
+disabled. The guest will see an interrupt in their disabled high counter.
+
+This is a know limitation - see the comment "For
+chained counters we only support overflow interrupts on the high counter"
+
+Though upon looking at this it seems a little more broken. I guess where
+both counters are enabled we want to overflow at 64bits and raise the
+overflow to the high counter. When the high counter is disabled we want to
+overflow on 32bits and raise the overflow to the low counter.
+
+Perhaps something like the following would help:
+
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -585,15 +585,16 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu=
+ *vcpu, u64 select_idx)
+ =
+
+        counter =3D kvm_pmu_get_pair_counter_value(vcpu, pmc);
+ =
+
+-       if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx)) {
++       if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx) &&
++           kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
++
+                /**
+                 * The initial sample period (overflow count) of an event. =
+For
+                 * chained counters we only support overflow interrupts on =
+the
+                 * high counter.
+                 */
+                attr.sample_period =3D (-counter) & GENMASK(63, 0);
+-               if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
+-                       attr.config1 |=3D PERF_ATTR_CFG1_KVM_PMU_CHAINED;
++               attr.config1 |=3D PERF_ATTR_CFG1_KVM_PMU_CHAINED;
+ =
+
+                event =3D perf_event_create_kernel_counter(&attr, -1, curre=
+nt,
+                                                         kvm_pmu_perf_overf=
+low,
+
+
+It's not clear to me what is supposed to happen with overflow handling on t=
+he
+low counter on chained counters (where the high counter is disabled).
+
+
+> =
+
+> With perf_events, the check of whether the odd register is enabled is
+> properly done (create_perf_event). Then I understand whenever there is a
+> change in enable state or type we delete the previous perf event and
+> re-create a new one. Enable state check just is missing for SW_INCR.
+> =
+
+> Some other questions:
+> - do we need a perf event to be created even if the counter is not
+> enabled? For instance on counter resets, create_perf_events get called.
+
+That would suggest we create and destroy them each time the guest enables
+and disables the counters - I would expect them to do that a lot (every
+context switch) - my assumption would be that the current approach has
+less overhead for a running guest.
+
+
+> - also actions are made for counters which are not implemented. loop
+> until ARMV8_PMU_MAX_COUNTERS. Do you think it is valuable to have a
+> bitmask of supported counters stored before pmu readiness?
+> I can propose such changes if you think they are valuable.
+
+Are they? Many of the calls into this file come from
+arch/arm64/kvm/sys_regs.c where we apply a mask (value from
+kvm_pmu_valid_counter_mask) to ignore unsupported counters.
+
+Thanks,
+
+Andrew Murray
+
+
+> =
+
+> Thanks
+> =
+
+> Eric
+> =
+
+> > =A0=A0=A0=A0=A0=A0=A0=A0 /*
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0 * During promotion from !chained to chained=
+ we must ensure
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0 * the adjacent counter is stopped and its e=
+vent destroyed
+> > =
+
+> > What do you think?
+> > =
+
+> > =A0=A0=A0=A0=A0=A0=A0 M.
+> =
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
