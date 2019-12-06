@@ -2,79 +2,64 @@ Return-Path: <SRS0=eeW8=Z4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8D9C43603
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 14:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D2AC2D0C2
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 14:14:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF9A120707
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 14:14:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9/iFhzn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF9A120707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id A2B2F2464E
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 14:14:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B2F2464E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28CD34AF41;
-	Fri,  6 Dec 2019 09:14:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF904AF2D;
+	Fri,  6 Dec 2019 09:14:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DgAHCIC1ntto; Fri,  6 Dec 2019 09:13:59 -0500 (EST)
+	with ESMTP id IP7DRTVwTPc8; Fri,  6 Dec 2019 09:14:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 337824AF39;
-	Fri,  6 Dec 2019 09:13:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6712B4AF39;
+	Fri,  6 Dec 2019 09:14:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69D6E4AF2D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 09:13:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82B9C4AF2D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 09:14:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O-17WWD8KHwP for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Dec 2019 09:13:56 -0500 (EST)
-Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com
- [209.85.210.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F2734AF15
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 09:13:56 -0500 (EST)
-Received: by mail-ot1-f65.google.com with SMTP id i4so5914209otr.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Dec 2019 06:13:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sAwG1RdahKAAnevB5fnXeo19T4BGa6gPTGH93hfaZww=;
- b=h9/iFhzntozkFHkukFSX0Kb7aymZtALNeROIGrhqu81gy3LwYfJXHDuf/ymfvDMQGO
- 4n8A6KNL8K5BPpH7zAfXi+cQFBZ+742OSQgY0XRPJtN4U00cf7rZx+Fbiwu5jlGBkBop
- G+XSPmj3Qpaxft53Gl1nzArHbZ0SJBcHUzL1H8GTivixhYvkwbF6KAoRGqtqZfHxSeg9
- CIRYpHWdBIW7oPJORN9r0+4bki2ouNTI/Zth2wlspsACJHF6MncT6SU9gdjppNAQpR/Z
- 38g4aXS8ur2rshwALmHUug/adW2t9NMeccCYWIJkwShLvIu9A0KeTXMJopt1FyVMUETq
- NoPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sAwG1RdahKAAnevB5fnXeo19T4BGa6gPTGH93hfaZww=;
- b=myLkiEfaiswcFh2nb3mHmnvjPykCsH/u/7h++0dDARx/zIxmZB9m/PmIOfklMGXL+R
- VrW0PmYfVZgBrukIydj9cxDOKGvS4eeDApkYolhBLq2GR4S0esjgsu7L9raJBweOmgew
- 8gP1TkkMVA2CpKU1b8WGWjebRRAYpGZE3kvHyd4QMzTVo0FNRfc7gToKZkM+IkiDFSKK
- w9HWxLlIv3MaT8thQ8GWJ9aiQ8QkGlu8h1zjAfaPYeC/sdh8OR3Qxz4o7FdHZlUeSd3b
- HbDQPJmvfw3E/NNYxL+ofzjSDRUUL36H6NPonb3CnUi5Lg/ibXB0hBhiIdYPt7hFpFZ/
- YM5Q==
-X-Gm-Message-State: APjAAAX/nUoe8nrYjR5HPOFVVbD7WDIE7WeqifQSKUqqUNBhoAlfg4Zt
- hi3LARbPSbFu2bizY+2Jly0s17l0qhI2mJXVQhGNcw==
-X-Google-Smtp-Source: APXvYqwbA0R++xciQcgbFLyRMhfm9S1jgLftXf41A9mZ+0k3+h0K0Uy1L8rc0QwiBBkE/CrvLtXGQIZimKsFmk631ZU=
-X-Received: by 2002:a9d:6745:: with SMTP id w5mr10591050otm.221.1575641635717; 
- Fri, 06 Dec 2019 06:13:55 -0800 (PST)
+ with ESMTP id gnglnEH8JQjh for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Dec 2019 09:14:54 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72F1A4AF15
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 09:14:54 -0500 (EST)
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1idENg-0004EG-0L; Fri, 06 Dec 2019 15:14:52 +0100
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
+Date: Fri, 06 Dec 2019 14:14:51 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
 References: <20191201122018.25808-1-maz@kernel.org>
-In-Reply-To: <20191201122018.25808-1-maz@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 14:13:45 +0000
-Message-ID: <CAFEAcA_XWvO4yhJzEaTGatTfqqjZ9u3cTd=eo1xaPszwEYpPkQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] target/arm: More EL2 trapping fixes
-To: Marc Zyngier <maz@kernel.org>
+ <20191201122018.25808-4-maz@kernel.org>
+ <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
+Message-ID: <eecc1855c043f690bc48cfaaeae442a4@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, richard.henderson@linaro.org,
+ edgar.iglesias@xilinx.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
@@ -89,36 +74,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 1 Dec 2019 at 12:20, Marc Zyngier <maz@kernel.org> wrote:
+On 2019-12-06 14:08, Peter Maydell wrote:
+> On Sun, 1 Dec 2019 at 12:20, Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
+>> EL2, and HCR_EL2.TID0 does the same for reads of FPSID.
+>> In order to handle this, introduce a new TCG helper function that
+>> checks for these control bits before executing the VMRC instruction.
+>>
+>> Tested with a hacked-up version of KVM/arm64 that sets the control
+>> bits for 32bit guests.
+>>
+>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  target/arm/helper-a64.h        |  2 ++
+>>  target/arm/translate-vfp.inc.c | 18 +++++++++++++++---
+>>  target/arm/vfp_helper.c        | 29 +++++++++++++++++++++++++++++
+>>  3 files changed, 46 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+>> index a915c1247f..0af44dc814 100644
+>> --- a/target/arm/helper-a64.h
+>> +++ b/target/arm/helper-a64.h
+>> @@ -102,3 +102,5 @@ DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, 
+>> env, i64, i64)
+>>  DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
+>>  DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>>  DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>> +
+>> +DEF_HELPER_3(check_hcr_el2_trap, void, env, i32, i32)
 >
-> Hi all,
->
-> This series is a follow-up on [1], which tried to address the
-> remaining missing HCR_EL2.TIDx traps. I've hopefully now adressed the
-> comments that Peter and Edgar raised.
->
-> I've also tried to tackle missing traps generated by HSTR_EL2, which
-> got completely ignored so far. Note that this results in the use of a
-> new TB bit, which I understand is a rare resource. I'd welcome
-> comments on how to handle it differently if at all possible.
->
-> Finally, and as a bonus non-feature, I've added support for the
-> missing Jazelle registers, giving me the opportunity to allow trapping
-> of JIDR to EL2 using HCR_EL2.TID0. Yay, Christmas! ;-)
->
-> I'm now going back to kernel stuff. I swear!
+> This has to be in helper.h, not helper-a64.h, otherwise
+> the arm-softmmu target won't build. helper-a64.h is for
+> helper functions which only exist in the aarch64 binary.
 
-To save you from having to roll a v3, I've fixed up the
-handful of nits Richard and I found as I applied this
-series to target-arm.next.
+Ah, fair enough. I guess I should build all targets rather than
+limit myself to aarch64...
 
-thanks
--- PMM
+I'll fix that and repost the series, having hopefully addressed
+Richard's comments.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
