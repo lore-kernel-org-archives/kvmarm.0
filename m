@@ -2,60 +2,93 @@ Return-Path: <SRS0=eeW8=Z4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28DABC43603
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 17:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A422CC43603
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 17:46:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C156624659
-	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 17:37:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C156624659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2B38821823
+	for <kvmarm@archiver.kernel.org>; Fri,  6 Dec 2019 17:46:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMTgyLwG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B38821823
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A9EA4AECD;
-	Fri,  6 Dec 2019 12:37:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8537F4AEDE;
+	Fri,  6 Dec 2019 12:46:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zAshyMWLH5Jg; Fri,  6 Dec 2019 12:37:03 -0500 (EST)
+	with ESMTP id Fhy20d8eCD-a; Fri,  6 Dec 2019 12:46:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 249A44AEDB;
-	Fri,  6 Dec 2019 12:37:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 746294AECD;
+	Fri,  6 Dec 2019 12:46:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D114AECD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 12:37:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DFCF4AECD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 12:46:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AFRD3GlViha5 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Dec 2019 12:37:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB91D4A800
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 12:37:00 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A52431B;
- Fri,  6 Dec 2019 09:37:00 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E51A03F52E;
- Fri,  6 Dec 2019 09:36:58 -0800 (PST)
-Subject: Re: [kvm-unit-tests RFC 01/10] arm64: Provide read/write_sysreg_s
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <20191206172724.947-1-eric.auger@redhat.com>
- <20191206172724.947-2-eric.auger@redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <efe2c571-1b69-5cc4-3505-24d092a9f985@arm.com>
-Date: Fri, 6 Dec 2019 17:36:57 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id 3SLHPy2VGBP6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Dec 2019 12:45:59 -0500 (EST)
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com
+ [209.85.210.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91D9E4AEC4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Dec 2019 12:45:59 -0500 (EST)
+Received: by mail-pf1-f195.google.com with SMTP id y14so3675761pfm.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Dec 2019 09:45:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+fTMpWPBwCKpCqV8qO6kMVlUDHWzwdoLpiyq66XcwJY=;
+ b=SMTgyLwGgqmK5Lm16vV4iVIS9Sk0krw+MFRSBO+zlMkAZCYLbXBHOe0lsacOUxbmBk
+ 7DL9LjtmKxIb45jq3ai8hgSRFVbVx+5Q3bjlE8OPAZi6OKi3rTRs7Or6Bhyi2UvF4Ax2
+ PHYHioQltXcdwXXBLwPAnoo/xVywvZJXuRXsPRl3uYPCh5ITFgb9HIoy+cgG2E20XXMw
+ enyLxaGx4Ls+relyVAArpS4sjQkwRmKKkPFofzkNy0nf5GRWItC+6qAW/oSjHNBvz5Pj
+ LK3TRoGRf4mh5C/EMtOlEDR3bwWur2jO0VHX2U6H3DFc+BA4fCb2UzcKCgOCUwzcRqEl
+ PZ3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+fTMpWPBwCKpCqV8qO6kMVlUDHWzwdoLpiyq66XcwJY=;
+ b=cS8Taqw4qtrZQMOgiIW6VwTVYX2TAeYbnp5JajFO8F+ZvREWxTjqGeRpZPhWQmTnO8
+ yVYSOgeaCEiJlcImuO24JyylOE8IQ5GZaq1diyZ/7PW4prWWO4ftqjrMUL/fKkIIlzv4
+ 1Fd/EIzwf5n/4N7UsKdRmsvUz/qx/2H7EQ7jSxgMluMlgOrTi7tsa9nXHE8H0vWSNmoH
+ 48P7o7iXKvHB/Fqz5MkAxs3+RuR/KuSE8tnAX9vZ8hJOs3yMzMMajO2HvObcbumbTe0G
+ uL1pxrgbfF+/w8OgmoqOzPS+g5RLI23K2BIWEVMxHMXfJmF2GlQq6vC0r28P50mNtmp6
+ gyew==
+X-Gm-Message-State: APjAAAVI2x1yhugM69xdEFQOzTfpKzeXgtUgbCekDfC8r59xP2sR6jRj
+ xVa3dmT/CcgzG/IScTCcvuKBwg==
+X-Google-Smtp-Source: APXvYqxWsL2vak7Zwd+GIlARGws6peo2c7aLHPenXpKWPsIGxl1JgY13+9ySoDyOIQu2NEE8PeIlbg==
+X-Received: by 2002:a63:4f54:: with SMTP id p20mr4807336pgl.246.1575654358388; 
+ Fri, 06 Dec 2019 09:45:58 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id 136sm15746431pgg.74.2019.12.06.09.45.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Dec 2019 09:45:57 -0800 (PST)
+Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+To: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>
+References: <20191201122018.25808-1-maz@kernel.org>
+ <20191201122018.25808-4-maz@kernel.org>
+ <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a13fdd7-9ee8-4b1b-5740-9b6d9488fe9b@linaro.org>
+Date: Fri, 6 Dec 2019 09:45:55 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191206172724.947-2-eric.auger@redhat.com>
+In-Reply-To: <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
 Content-Language: en-US
-Cc: andre.przywara@arm.com
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,48 +105,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On 12/6/19 6:08 AM, Peter Maydell wrote:
+>>  DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
+>>  DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>>  DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>> +
+>> +DEF_HELPER_3(check_hcr_el2_trap, void, env, i32, i32)
+> 
+> This has to be in helper.h, not helper-a64.h, otherwise
+> the arm-softmmu target won't build. helper-a64.h is for
+> helper functions which only exist in the aarch64 binary.
 
-On 12/6/19 5:27 PM, Eric Auger wrote:
-> From: Andrew Jones <drjones@redhat.com>
->
-> Sometimes we need to test access to system registers which are
-> missing assembler mnemonics.
->
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  lib/arm64/asm/sysreg.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index a03830b..a45eebd 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -38,6 +38,17 @@
->  	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
->  } while (0)
->  
-> +#define read_sysreg_s(r) ({					\
-> +	u64 __val;						\
-> +	asm volatile("mrs_s %0, " xstr(r) : "=r" (__val));	\
-> +	__val;							\
-> +})
-> +
-> +#define write_sysreg_s(v, r) do {				\
-> +	u64 __val = (u64)v;					\
-> +	asm volatile("msr_s " xstr(r) ", %x0" : : "rZ" (__val));\
-> +} while (0)
-> +
->  asm(
->  "	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\n"
->  "	.equ	.L__reg_num_x\\num, \\num\n"
+Oh, while we're at it,
 
-That's exactly the code that I wrote for my EL2 series :)
+  DEF_HELPER_FLAGS_3(..., TCG_CALL_NO_WG, ...)
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+The helper does not modify tcg globals (on successful return).
+It does read globals (via the exception path), and of course it has side
+effects (the exception).
 
-Thanks,
-Alex
+
+r~
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
