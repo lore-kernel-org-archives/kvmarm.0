@@ -2,60 +2,55 @@ Return-Path: <SRS0=SKDP=2A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED87C2D0BE
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Dec 2019 03:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828B4C2D0BF
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Dec 2019 12:01:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B28742077B
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Dec 2019 03:41:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B28742077B
+	by mail.kernel.org (Postfix) with ESMTP id 060CC2073D
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Dec 2019 12:01:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 060CC2073D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF9B4AF1D;
-	Mon,  9 Dec 2019 22:41:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 540A34AF42;
+	Tue, 10 Dec 2019 07:01:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zoAHFaqFV7Tq; Mon,  9 Dec 2019 22:41:27 -0500 (EST)
+	with ESMTP id DqGWHQu+azAg; Tue, 10 Dec 2019 07:01:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61F054ACC4;
-	Mon,  9 Dec 2019 22:41:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35BFC4AED9;
+	Tue, 10 Dec 2019 07:01:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C04CE4ACC4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Dec 2019 22:41:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A4494AED9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Dec 2019 07:01:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Lr8B0LKfgClN for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Dec 2019 22:41:24 -0500 (EST)
+ with ESMTP id 4AzgxiMxCR3R for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Dec 2019 07:01:52 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A14474A968
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Dec 2019 22:41:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4B084AEC4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Dec 2019 07:01:52 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B3B51FB;
- Mon,  9 Dec 2019 19:41:24 -0800 (PST)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
- [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 51CEA3F52E;
- Mon,  9 Dec 2019 19:41:19 -0800 (PST)
-From: Jianyong Wu <jianyong.wu@arm.com>
-To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
- maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
- will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com
-Subject: [RFC PATCH v9 8/8] kvm: arm64: Add capability check extension for
- ptp_kvm
-Date: Tue, 10 Dec 2019 11:40:26 +0800
-Message-Id: <20191210034026.45229-9-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191210034026.45229-1-jianyong.wu@arm.com>
-References: <20191210034026.45229-1-jianyong.wu@arm.com>
-Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 582851FB;
+ Tue, 10 Dec 2019 04:01:52 -0800 (PST)
+Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05AB33F6CF;
+ Tue, 10 Dec 2019 04:01:50 -0800 (PST)
+From: Andrew Murray <andrew.murray@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v2 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
+ counters
+Date: Tue, 10 Dec 2019 12:01:43 +0000
+Message-Id: <20191210120146.2942-1-andrew.murray@arm.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,49 +62,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let userspace check if there is kvm ptp service in host.
-before VMs migrate to a another host, VMM may check if this
-cap is available to determine the migration behaviour.
+At present ARMv8 event counters are limited to 32-bits, though by
+using the CHAIN event it's possible to combine adjacent counters to
+achieve 64-bits. The perf config1:0 bit can be set to use such a
+configuration.
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
----
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/arm/arm.c       | 1 +
- 2 files changed, 2 insertions(+)
+With the introduction of ARMv8.5-PMU support, all event counters can
+now be used as 64-bit counters. Let's add support for 64-bit event
+counters.
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..a0bff6002bd9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_KVM_PTP 173
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..80999985160b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -201,6 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_VCPU_EVENTS:
-+	case KVM_CAP_ARM_KVM_PTP:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+As KVM doesn't yet support 64-bit event counters, we also trap
+and emulate the Debug Feature Registers to limit the PMU version a
+guest sees to PMUv3 for ARMv8.4.
+
+Tested by running the following perf command on both guest and host
+and ensuring that the figures are very similar:
+
+perf stat -e armv8_pmuv3/inst_retired,long=1/ \
+          -e armv8_pmuv3/inst_retired,long=0/ -e cycles
+
+Changes since v1:
+
+ - Rebased onto v5.5-rc1
+
+
+Andrew Murray (3):
+  arm64: cpufeature: Extract capped fields
+  KVM: arm64: limit PMU version to ARMv8.4
+  arm64: perf: Add support for ARMv8.5-PMU 64-bit counters
+
+ arch/arm64/include/asm/cpufeature.h | 15 +++++
+ arch/arm64/include/asm/perf_event.h |  3 +-
+ arch/arm64/include/asm/sysreg.h     |  4 ++
+ arch/arm64/kernel/perf_event.c      | 86 +++++++++++++++++++++++------
+ arch/arm64/kvm/sys_regs.c           | 36 +++++++++++-
+ include/linux/perf/arm_pmu.h        |  1 +
+ 6 files changed, 125 insertions(+), 20 deletions(-)
+
 -- 
-2.17.1
+2.21.0
 
 _______________________________________________
 kvmarm mailing list
