@@ -2,61 +2,65 @@ Return-Path: <SRS0=JFMI=2B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B083C2D0C7
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B88C00454
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2CE72464B
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CE72464B
+	by mail.kernel.org (Postfix) with ESMTP id 1A616214AF
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A616214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 790F54AF0B;
-	Wed, 11 Dec 2019 11:57:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C64814AF07;
+	Wed, 11 Dec 2019 11:57:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dupsVUZJIvY2; Wed, 11 Dec 2019 11:57:10 -0500 (EST)
+	with ESMTP id hE5D2q7uEldf; Wed, 11 Dec 2019 11:57:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F5424AEF3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89EE44AEF6;
 	Wed, 11 Dec 2019 11:57:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F18EE4AEB2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 11:57:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7434AEAC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 11:57:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4jyPT-4x9njP for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 1TohIRjoAGGh for <kvmarm@lists.cs.columbia.edu>;
  Wed, 11 Dec 2019 11:57:07 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E00FD4AEAC
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DECE44AEAB
  for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 11:57:06 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1if5IN-00076q-Pr; Wed, 11 Dec 2019 17:57:04 +0100
+ id 1if5IO-00076q-HF; Wed, 11 Dec 2019 17:57:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 0/3] KVM: arm/arm64: user_mem_abort() assorted fixes
-Date: Wed, 11 Dec 2019 16:56:47 +0000
-Message-Id: <20191211165651.7889-1-maz@kernel.org>
+Subject: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
+ mappings
+Date: Wed, 11 Dec 2019 16:56:48 +0000
+Message-Id: <20191211165651.7889-2-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191211165651.7889-1-maz@kernel.org>
+References: <20191211165651.7889-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
  julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- Christoffer.Dall@arm.com, alexandru.elisei@arm.com
+ Christoffer.Dall@arm.com, alexandru.elisei@arm.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
+Cc: stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,28 +77,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Alexandru recently reported an interesting issue with our handling
-of device mapping in user_mem_abort(), which is sligtly less than
-correct. The first patch of the series address this issue, and
-is a stable candidate.
+A device mapping is normally always mapped at Stage-2, since there
+is very little gain in having it faulted in.
 
-While I was looking at this code, I spotted what I think is a potential
-issue when handling a poisoned page, where we can race with a VMA
-being removed. This second patch is mostly a RFC, as this is not
-my area of expertise.
+Nonetheless, it is possible to end-up in a situation where the device
+mapping has been removed from Stage-2 (userspace munmaped the VFIO
+region, and the MMU notifier did its job), but present in a userspace
+mapping (userpace has mapped it back at the same address). In such
+a situation, the device mapping will be demand-paged as the guest
+performs memory accesses.
 
-Finally, the last patch is a cleanup removing an unnecessary console
-output.
+This requires to be careful when dealing with mapping size, cache
+management, and to handle potential execution of a device mapping.
 
-Marc Zyngier (3):
-  KVM: arm/arm64: Properly handle faulting of device mappings
-  KVM: arm/arm64: Re-check VMA on detecting a poisoned page
-  KVM: arm/arm64: Drop spurious message when faulting on a non-existent
-    mapping
+Cc: stable@vger.kernel.org
+Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
- virt/kvm/arm/mmu.c | 47 +++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 40 insertions(+), 7 deletions(-)
-
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index a48994af70b8..0b32a904a1bb 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -38,6 +38,11 @@ static unsigned long io_map_base;
+ #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+ #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+ 
++static bool is_iomap(unsigned long flags)
++{
++	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
++}
++
+ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ {
+ 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+@@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	vma_pagesize = vma_kernel_pagesize(vma);
+ 	if (logging_active ||
++	    (vma->vm_flags & VM_PFNMAP) ||
+ 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+ 		force_pte = true;
+ 		vma_pagesize = PAGE_SIZE;
+@@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			writable = false;
+ 	}
+ 
++	if (exec_fault && is_iomap(flags))
++		return -ENOEXEC;
++
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+@@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (writable)
+ 		kvm_set_pfn_dirty(pfn);
+ 
+-	if (fault_status != FSC_PERM)
++	if (fault_status != FSC_PERM && !is_iomap(flags))
+ 		clean_dcache_guest_page(pfn, vma_pagesize);
+ 
+ 	if (exec_fault)
+@@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+ 		if (is_iabt) {
+ 			/* Prefetch Abort on I/O address */
+-			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+-			ret = 1;
+-			goto out_unlock;
++			ret = -ENOEXEC;
++			goto out;
+ 		}
+ 
+ 		/*
+@@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
+ 	if (ret == 0)
+ 		ret = 1;
++out:
++	if (ret == -ENOEXEC) {
++		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++		ret = 1;
++	}
+ out_unlock:
+ 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 	return ret;
 -- 
 2.20.1
 
