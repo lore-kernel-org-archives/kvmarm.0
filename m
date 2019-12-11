@@ -2,60 +2,64 @@ Return-Path: <SRS0=JFMI=2B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CD4C43603
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 15:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C6DC00454
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 264B42465B
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 15:21:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264B42465B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id CE14C222C4
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Dec 2019 16:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE14C222C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEFD04AEB2;
-	Wed, 11 Dec 2019 10:20:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9FA4AEAB;
+	Wed, 11 Dec 2019 11:57:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7PQqsmZHWUea; Wed, 11 Dec 2019 10:20:58 -0500 (EST)
+	with ESMTP id uCHvAO3HEfzO; Wed, 11 Dec 2019 11:57:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2FA34ACEE;
-	Wed, 11 Dec 2019 10:20:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CEE94AEAC;
+	Wed, 11 Dec 2019 11:57:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC8EE4ACEE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 10:20:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E667F4AECD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 11:57:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yO9TW5q+xtLZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Dec 2019 10:20:55 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 743184AC84
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 10:20:55 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCBB730E;
- Wed, 11 Dec 2019 07:20:54 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6E3D3F52E;
- Wed, 11 Dec 2019 07:20:53 -0800 (PST)
-Subject: Re: [PATCH v2 1/3] arm64: cpufeature: Extract capped fields
-To: Andrew Murray <andrew.murray@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-References: <20191210120146.2942-1-andrew.murray@arm.com>
- <20191210120146.2942-2-andrew.murray@arm.com>
-From: Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
-Message-ID: <b5c9e6dd-b7eb-2f93-4a7f-456af07b3dd7@arm.com>
-Date: Wed, 11 Dec 2019 15:20:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ with ESMTP id xwGeFZCXwTjo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Dec 2019 11:57:06 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD8934AEA7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Dec 2019 11:57:06 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1if5IP-00076q-Nw; Wed, 11 Dec 2019 17:57:05 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 3/3] KVM: arm/arm64: Drop spurious message when faulting on a
+ non-existent mapping
+Date: Wed, 11 Dec 2019 16:56:50 +0000
+Message-Id: <20191211165651.7889-4-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191211165651.7889-1-maz@kernel.org>
+References: <20191211165651.7889-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191210120146.2942-2-andrew.murray@arm.com>
-Content-Language: en-US
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ Christoffer.Dall@arm.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,49 +71,36 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
+Should userspace unmap memory whilst the guest is running, we exit
+with a -EFAULT, but also having spat a useless message on the console.
 
-On 10/12/2019 12:01, Andrew Murray wrote:
-> When emulating ID registers there is often a need to cap the version
-> bits of a feature such that the guest will not use features that do
-> not yet exist.
-> 
-> Let's add a helper that extracts a field and caps the version to a
-> given value.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->   arch/arm64/include/asm/cpufeature.h | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 4261d55e8506..19f051ec1610 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -447,6 +447,21 @@ cpuid_feature_extract_unsigned_field(u64 features, int field)
->   	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
->   }
->   
-> +static inline u64 __attribute_const__
-> +cpuid_feature_cap_signed_field_width(u64 features, int field, int width,
-> +				     s64 cap)
-> +{
-> +	s64 val = cpuid_feature_extract_signed_field_width(features, field,
-> +							   width);
-> +
-> +	if (val > cap) {
-> +		features &= ~GENMASK_ULL(field + width - 1, field);
-> +		features |= cap << field;
+Get rid of it.
 
-Please could we make sure that the "cap" is masked to "width" bits. 
-Otherwise looks good to me.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/mmu.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Suzuki
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index f73393f5ddb7..fbfdffb8fe8e 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1696,7 +1696,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	down_read(&current->mm->mmap_sem);
+ 	vma = find_vma_intersection(current->mm, hva, hva + 1);
+ 	if (unlikely(!vma)) {
+-		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+ 		up_read(&current->mm->mmap_sem);
+ 		return -EFAULT;
+ 	}
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
