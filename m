@@ -2,52 +2,52 @@ Return-Path: <SRS0=bs2E=2C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E693C2D0CA
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F298FC43603
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 532C221655
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532C221655
+	by mail.kernel.org (Postfix) with ESMTP id B6C542173E
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C542173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0774E4AC80;
-	Thu, 12 Dec 2019 12:28:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9AC4AECD;
+	Thu, 12 Dec 2019 12:28:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vS2OGdHTzVxf; Thu, 12 Dec 2019 12:28:55 -0500 (EST)
+	with ESMTP id 40xsY7rbI1za; Thu, 12 Dec 2019 12:28:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232B34AED5;
-	Thu, 12 Dec 2019 12:28:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46E7C4A968;
+	Thu, 12 Dec 2019 12:28:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB56E4AC88
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50E1E4AE99
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 741W9lu41qc4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Dec 2019 12:28:49 -0500 (EST)
+ with ESMTP id cj8yfj+NP0Sh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Dec 2019 12:28:50 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA10D4A541
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E56F4AEBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:49 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1ifSGZ-00069s-LQ; Thu, 12 Dec 2019 18:28:43 +0100
+ id 1ifSGb-00069s-Dd; Thu, 12 Dec 2019 18:28:45 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 6/8] KVM: arm/arm64: Remove excessive permission check in
- kvm_arch_prepare_memory_region
-Date: Thu, 12 Dec 2019 17:28:22 +0000
-Message-Id: <20191212172824.11523-7-maz@kernel.org>
+Subject: [PATCH 8/8] KVM: arm/arm64: Properly handle faulting of device
+ mappings
+Date: Thu, 12 Dec 2019 17:28:24 +0000
+Message-Id: <20191212172824.11523-9-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212172824.11523-1-maz@kernel.org>
 References: <20191212172824.11523-1-maz@kernel.org>
@@ -59,14 +59,14 @@ X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com,
  mark.rutland@arm.com, linmiaohe@huawei.com, steven.price@arm.com,
  will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com
+ suzuki.poulose@arm.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
 Cc: Jia He <justin.he@arm.com>, kvm@vger.kernel.org,
  Ard Biesheuvel <ard.biesheuvel@linaro.org>, Will Deacon <will@kernel.org>,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ stable@vger.kernel.org, Steven Price <steven.price@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,61 +83,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jia He <justin.he@arm.com>
+A device mapping is normally always mapped at Stage-2, since there
+is very little gain in having it faulted in.
 
-In kvm_arch_prepare_memory_region, arm kvm regards the memory region as
-writable if the flag has no KVM_MEM_READONLY, and the vm is readonly if
-!VM_WRITE.
+Nonetheless, it is possible to end-up in a situation where the device
+mapping has been removed from Stage-2 (userspace munmaped the VFIO
+region, and the MMU notifier did its job), but present in a userspace
+mapping (userpace has mapped it back at the same address). In such
+a situation, the device mapping will be demand-paged as the guest
+performs memory accesses.
 
-But there is common usage for setting kvm memory region as follows:
-e.g. qemu side (see the PROT_NONE flag)
-1. mmap(NULL, size, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-   memory_region_init_ram_ptr()
-2. re mmap the above area with read/write authority.
+This requires to be careful when dealing with mapping size, cache
+management, and to handle potential execution of a device mapping.
 
-Such example is used in virtio-fs qemu codes which hasn't been upstreamed
-[1]. But seems we can't forbid this example.
-
-Without this patch, it will cause an EPERM during kvm_set_memory_region()
-and cause qemu boot crash.
-
-As told by Ard, "the underlying assumption is incorrect, i.e., that the
-value of vm_flags at this point in time defines how the VMA is used
-during its lifetime. There may be other cases where a VMA is created
-with VM_READ vm_flags that are changed to VM_READ|VM_WRITE later, and
-we are currently rejecting this use case as well."
-
-[1] https://gitlab.com/virtio-fs/qemu/blob/5a356e/hw/virtio/vhost-user-fs.c#L488
-
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Jia He <justin.he@arm.com>
+Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Link: https://lore.kernel.org/r/20191206020802.196108-1-justin.he@arm.com
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: James Morse <james.morse@arm.com>
+Cc: stable@vger.kernel.org
+Link: https://lore.kernel.org/r/20191211165651.7889-2-maz@kernel.org
 ---
- virt/kvm/arm/mmu.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 38b4c910b6c3..a48994af70b8 100644
+index a48994af70b8..0b32a904a1bb 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -2301,15 +2301,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if (!vma || vma->vm_start >= reg_end)
- 			break;
+@@ -38,6 +38,11 @@ static unsigned long io_map_base;
+ #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+ #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
  
--		/*
--		 * Mapping a read-only VMA is only allowed if the
--		 * memory region is configured as read-only.
--		 */
--		if (writable && !(vma->vm_flags & VM_WRITE)) {
--			ret = -EPERM;
--			break;
--		}
--
++static bool is_iomap(unsigned long flags)
++{
++	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
++}
++
+ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ {
+ 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+@@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	vma_pagesize = vma_kernel_pagesize(vma);
+ 	if (logging_active ||
++	    (vma->vm_flags & VM_PFNMAP) ||
+ 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+ 		force_pte = true;
+ 		vma_pagesize = PAGE_SIZE;
+@@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			writable = false;
+ 	}
+ 
++	if (exec_fault && is_iomap(flags))
++		return -ENOEXEC;
++
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+@@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (writable)
+ 		kvm_set_pfn_dirty(pfn);
+ 
+-	if (fault_status != FSC_PERM)
++	if (fault_status != FSC_PERM && !is_iomap(flags))
+ 		clean_dcache_guest_page(pfn, vma_pagesize);
+ 
+ 	if (exec_fault)
+@@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+ 		if (is_iabt) {
+ 			/* Prefetch Abort on I/O address */
+-			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+-			ret = 1;
+-			goto out_unlock;
++			ret = -ENOEXEC;
++			goto out;
+ 		}
+ 
  		/*
- 		 * Take the intersection of this VMA with the memory region
- 		 */
+@@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
+ 	if (ret == 0)
+ 		ret = 1;
++out:
++	if (ret == -ENOEXEC) {
++		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++		ret = 1;
++	}
+ out_unlock:
+ 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 	return ret;
 -- 
 2.20.1
 
