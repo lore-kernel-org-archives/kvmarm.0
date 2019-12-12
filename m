@@ -2,66 +2,62 @@ Return-Path: <SRS0=bs2E=2C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EE5C43603
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 15:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4534BC43603
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 16:31:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C15DD20663
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 15:41:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15DD20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C01ED2073B
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 16:31:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01ED2073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20F644AEAB;
-	Thu, 12 Dec 2019 10:41:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 240904ACD6;
+	Thu, 12 Dec 2019 11:31:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zCZ0ucMss8Af; Thu, 12 Dec 2019 10:41:01 -0500 (EST)
+	with ESMTP id I16Uw7I6iQEE; Thu, 12 Dec 2019 11:31:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E22524A98A;
-	Thu, 12 Dec 2019 10:41:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 162294ACBA;
+	Thu, 12 Dec 2019 11:31:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 528D34A95B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 10:41:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D355C4A955
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 11:31:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R3qVluQ-VA66 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Dec 2019 10:40:59 -0500 (EST)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1879F4A586
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 10:40:59 -0500 (EST)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1ifQaG-0003ws-9n; Thu, 12 Dec 2019 16:40:56 +0100
-To: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: Re-check VMA on detecting a poisoned
- page
-X-PHP-Originating-Script: 0:main.inc
+ with ESMTP id OIvOAK8Cdzp5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Dec 2019 11:31:24 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0B54A551
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 11:31:24 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F407B30E;
+ Thu, 12 Dec 2019 08:31:23 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BEEFD3F6CF;
+ Thu, 12 Dec 2019 08:31:22 -0800 (PST)
+Date: Thu, 12 Dec 2019 16:31:20 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] arm64: Introduce ISAR6 CPU ID register
+Message-ID: <20191212163120.GH46910@lakrids.cambridge.arm.com>
+References: <1576145663-9909-1-git-send-email-anshuman.khandual@arm.com>
+ <20191212144633.GE46910@lakrids.cambridge.arm.com>
+ <be707b09-6469-d12f-07d5-50d574dc7284@arm.com>
 MIME-Version: 1.0
-Date: Thu, 12 Dec 2019 15:40:56 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <b0a2b074-b80f-84ee-bfaa-f81ab345b8c2@arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-3-maz@kernel.org>
- <88f65ab4ac87f53534fbbfd2410d1cc5@www.loen.fr>
- <b0a2b074-b80f-84ee-bfaa-f81ab345b8c2@arm.com>
-Message-ID: <238ff4a1b763f51cc1f8670bfc72fc15@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: james.morse@arm.com, kvm@vger.kernel.org,
+Content-Disposition: inline
+In-Reply-To: <be707b09-6469-d12f-07d5-50d574dc7284@arm.com>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,73 +69,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgSmFtZXMsCgpPbiAyMDE5LTEyLTEyIDE1OjM0LCBKYW1lcyBNb3JzZSB3cm90ZToKPiBIaSBN
-YXJjLAo+Cj4gT24gMTIvMTIvMjAxOSAxMTozMywgTWFyYyBaeW5naWVyIHdyb3RlOgo+PiBPbiAy
-MDE5LTEyLTExIDE2OjU2LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+PiBXaGVuIHdlIGNoZWNrIGZv
-ciBhIHBvaXNvbmVkIHBhZ2UsIHdlIHVzZSB0aGUgVk1BIHRvIHRlbGwgdXNlcnNwYWNlCj4+PiBh
-Ym91dCB0aGUgbG9vbWluZyBkaXNhc3Rlci4gQnV0IHdlIHBhc3MgYSBwb2ludGVyIHRvIHRoaXMg
-Vk1BCj4+PiBhZnRlciBoYXZpbmcgcmVsZWFzZWQgdGhlIG1tYXBfc2VtLCB3aGljaCBpc24ndCBh
-IGdvb2QgaWRlYS4KPgo+IFNvdW5kcyBsaWtlIGEgYnVnISBUaGUgdm1hLXNpemUgbWlnaHQgbm90
-IG1hdGNoIHRoZSBwb2lzb25lZCBwZm4uCj4KPgo+Pj4gSW5zdGVhZCwgcmUtY2hlY2sgdGhhdCB3
-ZSBoYXZlIHN0aWxsIGhhdmUgYSBWTUEsIGFuZCB0aGF0IHRoaXMKPj4+IFZNQSBzdGlsbCBwb2lu
-dHMgdG8gYSBwb2lzb25lZCBwYWdlLiBJZiB0aGUgVk1BIGlzbid0IHRoZXJlLAo+Pj4gdXNlcnNw
-YWNlIGlzIHBsYXlpbmcgd2l0aCBvdXIgbmVydmVzLCBzbyBsZXR5J3MgZ2l2ZSBpdCBhIC1FRkFV
-TFQKPj4+IChpdCBkZXNlcnZlcyBpdCkuIElmIHRoZSBQRk4gaXNuJ3QgcG9pc29uZWQgYW55bW9y
-ZSwgbGV0J3MgcmVzdGFydAo+Pj4gZnJvbSB0aGUgdG9wIGFuZCBoYW5kbGUgdGhlIGZhdWx0IGFn
-YWluLgo+Cj4KPj4+IMKgdmlydC9rdm0vYXJtL21tdS5jIHwgMjUgKysrKysrKysrKysrKysrKysr
-KysrKystLQo+Pj4gwqAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
-bnMoLSkKPgo+IC4uLiB5ZWFoIC4uLgo+CgpbLi4uXQoKPiBIb3cgYWJvdXQgKHVudGVzdGVkKToK
-PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tJTwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4g
-ZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9tbXUuYyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+IGlu
-ZGV4IDM4YjRjOTEwYjZjMy4uODAyMTJkNDkzNWJkIDEwMDY0NAo+IC0tLSBhL3ZpcnQva3ZtL2Fy
-bS9tbXUuYwo+ICsrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+IEBAIC0xNTkxLDE2ICsxNTkxLDgg
-QEAgc3RhdGljIHZvaWQKPiBpbnZhbGlkYXRlX2ljYWNoZV9ndWVzdF9wYWdlKGt2bV9wZm5fdCBw
-Zm4sIHVuc2lnbmVkCj4gbG9uZyBzaXplKQo+ICAgICAgICAgX19pbnZhbGlkYXRlX2ljYWNoZV9n
-dWVzdF9wYWdlKHBmbiwgc2l6ZSk7Cj4gIH0KPgo+IC1zdGF0aWMgdm9pZCBrdm1fc2VuZF9od3Bv
-aXNvbl9zaWduYWwodW5zaWduZWQgbG9uZyBhZGRyZXNzLAo+IC0gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBzdHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZtYSkKPiArc3RhdGljIHZv
-aWQga3ZtX3NlbmRfaHdwb2lzb25fc2lnbmFsKHVuc2lnbmVkIGxvbmcgYWRkcmVzcywgc2hvcnQg
-Cj4gbHNiKQo+ICB7Cj4gLSAgICAgICBzaG9ydCBsc2I7Cj4gLQo+IC0gICAgICAgaWYgKGlzX3Zt
-X2h1Z2V0bGJfcGFnZSh2bWEpKQo+IC0gICAgICAgICAgICAgICBsc2IgPSBodWdlX3BhZ2Vfc2hp
-ZnQoaHN0YXRlX3ZtYSh2bWEpKTsKPiAtICAgICAgIGVsc2UKPiAtICAgICAgICAgICAgICAgbHNi
-ID0gUEFHRV9TSElGVDsKPiAtCj4gICAgICAgICBzZW5kX3NpZ19tY2VlcnIoQlVTX01DRUVSUl9B
-UiwgKHZvaWQgX191c2VyICopYWRkcmVzcywgbHNiLCAKPiBjdXJyZW50KTsKPiAgfQo+Cj4gQEAg
-LTE2NzMsNiArMTY2NSw3IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2bV92
-Y3B1Cj4gKnZjcHUsIHBoeXNfYWRkcl90IGZhdWx0X2lwYSwKPiAgICAgICAgIHN0cnVjdCBrdm0g
-Kmt2bSA9IHZjcHUtPmt2bTsKPiAgICAgICAgIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZSAq
-bWVtY2FjaGUgPSAKPiAmdmNwdS0+YXJjaC5tbXVfcGFnZV9jYWNoZTsKPiAgICAgICAgIHN0cnVj
-dCB2bV9hcmVhX3N0cnVjdCAqdm1hOwo+ICsgICAgICAgc2hvcnQgc3RhZ2UxX3ZtYV9zaXplOwo+
-ICAgICAgICAga3ZtX3Bmbl90IHBmbjsKPiAgICAgICAgIHBncHJvdF90IG1lbV90eXBlID0gUEFH
-RV9TMjsKPiAgICAgICAgIGJvb2wgbG9nZ2luZ19hY3RpdmUgPSBtZW1zbG90X2lzX2xvZ2dpbmco
-bWVtc2xvdCk7Cj4KPiBAQCAtMTcwMyw2ICsxNjk2LDEyIEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1f
-YWJvcnQoc3RydWN0IGt2bV92Y3B1Cj4gKnZjcHUsIHBoeXNfYWRkcl90IGZhdWx0X2lwYSwKPiAg
-ICAgICAgICAgICAgICAgdm1hX3BhZ2VzaXplID0gUEFHRV9TSVpFOwo+ICAgICAgICAgfQo+Cj4g
-KyAgICAgICAvKiBGb3Igc2lnbmFscyBkdWUgdG8gaHdwb2lzb24sIHdlIG5lZWQgdG8gdXNlIHRo
-ZSBzdGFnZTEgCj4gc2l6ZSAqLwo+ICsgICAgICAgaWYgKGlzX3ZtX2h1Z2V0bGJfcGFnZSh2bWEp
-KQo+ICsgICAgICAgICAgICAgICBzdGFnZTFfdm1hX3NpemUgPSBodWdlX3BhZ2Vfc2hpZnQoaHN0
-YXRlX3ZtYSh2bWEpKTsKPiArICAgICAgIGVsc2UKPiArICAgICAgICAgICAgICAgc3RhZ2UxX3Zt
-YV9zaXplID0gUEFHRV9TSElGVDsKPiArCj4gICAgICAgICAvKgo+ICAgICAgICAgICogVGhlIHN0
-YWdlMiBoYXMgYSBtaW5pbXVtIG9mIDIgbGV2ZWwgdGFibGUgKEZvciBhcm02NCBzZWUKPiAgICAg
-ICAgICAqIGt2bV9hcm1fc2V0dXBfc3RhZ2UyKCkpLiBIZW5jZSwgd2UgYXJlIGd1YXJhbnRlZWQg
-dGhhdCB3ZSAKPiBjYW4KPiBAQCAtMTczNSw3ICsxNzM0LDcgQEAgc3RhdGljIGludCB1c2VyX21l
-bV9hYm9ydChzdHJ1Y3Qga3ZtX3ZjcHUKPiAqdmNwdSwgcGh5c19hZGRyX3QgZmF1bHRfaXBhLAo+
-Cj4gICAgICAgICBwZm4gPSBnZm5fdG9fcGZuX3Byb3Qoa3ZtLCBnZm4sIHdyaXRlX2ZhdWx0LCAm
-d3JpdGFibGUpOwo+ICAgICAgICAgaWYgKHBmbiA9PSBLVk1fUEZOX0VSUl9IV1BPSVNPTikgewo+
-IC0gICAgICAgICAgICAgICBrdm1fc2VuZF9od3BvaXNvbl9zaWduYWwoaHZhLCB2bWEpOwo+ICsg
-ICAgICAgICAgICAgICBrdm1fc2VuZF9od3BvaXNvbl9zaWduYWwoaHZhLCBzdGFnZTFfdm1hX3Np
-emUpOwo+ICAgICAgICAgICAgICAgICByZXR1cm4gMDsKPiAgICAgICAgIH0KPiAgICAgICAgIGlm
-IChpc19lcnJvcl9ub3Nsb3RfcGZuKHBmbikpCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSU8
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gSXRzIHBvc3NpYmxlIHRoaXMgY291bGQgZXZl
-biBiZSB0aGUgb3JpZ2luYWwgb3V0cHV0IG9mCj4gdm1hX2tlcm5lbF9wYWdlc2l6ZSgpLi4uIChQ
-dW5pdCBzdXBwbGllZCB0aGUgb3JpZ2luYWwKPiBodWdlX3BhZ2Vfc2hpZnQoaHN0YXRlX3ZtYSgp
-KSBydW5lcy4uLikKCkknZCBiZSBoYXBweSB3aXRoIHNvbWV0aGluZyBhbG9uZyB0aGVzZSBsaW5l
-cy4gQW55IGNoYW5jZSB5b3UgY291bGQKYSBwcm9wZXIgcGF0Y2g/CgpUaGFua3MsCgogICAgICAg
-ICBNLgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcg
-bGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1i
-aWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Thu, Dec 12, 2019 at 03:22:13PM +0000, Suzuki Kuruppassery Poulose wrote:
+> On 12/12/2019 14:46, Mark Rutland wrote:
+> > On Thu, Dec 12, 2019 at 03:44:23PM +0530, Anshuman Khandual wrote:
+> > > +#define ID_ISAR6_JSCVT_SHIFT		0
+> > > +#define ID_ISAR6_DP_SHIFT		4
+> > > +#define ID_ISAR6_FHM_SHIFT		8
+> > > +#define ID_ISAR6_SB_SHIFT		12
+> > > +#define ID_ISAR6_SPECRES_SHIFT		16
+> > > +#define ID_ISAR6_BF16_SHIFT		20
+> > > +#define ID_ISAR6_I8MM_SHIFT		24
+> > 
+> > > @@ -399,6 +399,7 @@ static const struct __ftr_reg_entry {
+> > >   	ARM64_FTR_REG(SYS_ID_ISAR4_EL1, ftr_generic_32bits),
+> > >   	ARM64_FTR_REG(SYS_ID_ISAR5_EL1, ftr_id_isar5),
+> > >   	ARM64_FTR_REG(SYS_ID_MMFR4_EL1, ftr_id_mmfr4),
+> > 
+> > > +	ARM64_FTR_REG(SYS_ID_ISAR6_EL1, ftr_generic_32bits),
+> > 
+> > Using ftr_generic_32bits exposes the lowest-common-denominator for all
+> > 4-bit fields in the register, and I don't think that's the right thing
+> > to do here, because:
+> > 
+> > * We have no idea what ID_ISAR6 bits [31:28] may mean in future.
+> > 
+> > * AFAICT, the instructions described by ID_ISAR6.SPECRES (from the
+> >    ARMv8.0-PredInv extension) operate on the local PE and are not
+> >    broadcast. To make those work as a guest expects, the host will need
+> >    to do additional things (e.g. to preserve that illusion when a vCPU is
+> >    migrated from one pCPU to another and back).
+> > 
+> > Given that, think we should add an explicit ftr_id_isar6 which only
+> > exposes the fields that we're certain are safe to expose to a guest
+> > (i.e. without SPECRES).
+> 
+> Agree. Thanks for pointing this out. I recommended the usage of
+> generic_32bits table without actually looking at the feature
+> definitions.
+
+No worries; this is /really/ easy to miss!
+
+Looking again, comparing to ARM DDI 0487E.a, there are a few other
+things we should probably sort out:
+
+* ID_DFR0 fields need more thought; we should limit what we expose here.
+  I don't think it's valid for us to expose TraceFilt, and I suspect we
+  need to add capping for debug features we currently emulate.
+
+* ID_ISAR0[31:28] are RES0 in ARMv8, Reserved/UNK in ARMv7.
+  We should probably ftr_id_isar0 so we can hide those bits.
+
+* ID_ISAR5[23:10] are RES0
+  We handle this already! :)
+
+* ID_MMFR4.SpecSEI should be trated as higher safe.
+  We should update ftr_id_mmfr4 to handle this and other fields.
+
+* ID_PFR0 is missing DIT and CSV2
+  We should probably add these (but neither RAS not AMU).
+
+* ID_PFR2 is missing
+  We should probably add this for SSBS and CSV3.
+
+Thanks,
+Mark.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
