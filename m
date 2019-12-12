@@ -2,71 +2,53 @@ Return-Path: <SRS0=bs2E=2C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F298FC43603
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CEBC43603
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 19:51:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B6C542173E
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C542173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id E0AAE2077B
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 19:51:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AAE2077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9AC4AECD;
-	Thu, 12 Dec 2019 12:28:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 492494AC7E;
+	Thu, 12 Dec 2019 14:51:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 40xsY7rbI1za; Thu, 12 Dec 2019 12:28:57 -0500 (EST)
+	with ESMTP id 4lkox-U7g0CW; Thu, 12 Dec 2019 14:51:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46E7C4A968;
-	Thu, 12 Dec 2019 12:28:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E751D4ACBE;
+	Thu, 12 Dec 2019 14:51:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 50E1E4AE99
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23EDE4AC7E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 14:51:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cj8yfj+NP0Sh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Dec 2019 12:28:50 -0500 (EST)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E56F4AEBB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 12:28:49 -0500 (EST)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by cheepnis.misterjones.org with esmtpsa
- (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1ifSGb-00069s-Dd; Thu, 12 Dec 2019 18:28:45 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 8/8] KVM: arm/arm64: Properly handle faulting of device
- mappings
-Date: Thu, 12 Dec 2019 17:28:24 +0000
-Message-Id: <20191212172824.11523-9-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191212172824.11523-1-maz@kernel.org>
-References: <20191212172824.11523-1-maz@kernel.org>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com,
- alexandru.elisei@arm.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com,
- eric.auger@redhat.com, james.morse@arm.com, justin.he@arm.com,
- mark.rutland@arm.com, linmiaohe@huawei.com, steven.price@arm.com,
- will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Jia He <justin.he@arm.com>, kvm@vger.kernel.org,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Will Deacon <will@kernel.org>,
- stable@vger.kernel.org, Steven Price <steven.price@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id H44XJXzEjGOj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Dec 2019 14:51:08 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4664A531
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 14:51:08 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE41B328;
+ Thu, 12 Dec 2019 11:51:07 -0800 (PST)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DA883F718;
+ Thu, 12 Dec 2019 11:51:07 -0800 (PST)
+From: Christoffer Dall <christoffer.dall@arm.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Only sign-extend MMIO up to register width
+Date: Thu, 12 Dec 2019 20:50:55 +0100
+Message-Id: <20191212195055.5541-1-christoffer.dall@arm.com>
+X-Mailer: git-send-email 2.18.0
+Cc: Marc Zyngier <maz@kernel.org>, Djordje.Kovacevic@arm.com,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,103 +60,144 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A device mapping is normally always mapped at Stage-2, since there
-is very little gain in having it faulted in.
+On AArch64 you can do a sign-extended load to either a 32-bit or 64-bit
+register, and we should only sign extend the register up to the width of
+the register as specified in the operation (by using the 32-bit Wn or
+64-bit Xn register specifier).
 
-Nonetheless, it is possible to end-up in a situation where the device
-mapping has been removed from Stage-2 (userspace munmaped the VFIO
-region, and the MMU notifier did its job), but present in a userspace
-mapping (userpace has mapped it back at the same address). In such
-a situation, the device mapping will be demand-paged as the guest
-performs memory accesses.
+As it turns out, the architecture provides this decoding information in
+the SF ("Sixty-Four" -- how cute...) bit.
 
-This requires to be careful when dealing with mapping size, cache
-management, and to handle potential execution of a device mapping.
+Let's take advantage of this with the usual 32-bit/64-bit header file
+dance and do the right thing on AArch64 hosts.
 
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: James Morse <james.morse@arm.com>
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/r/20191211165651.7889-2-maz@kernel.org
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h   | 5 +++++
+ arch/arm/include/asm/kvm_mmio.h      | 2 ++
+ arch/arm64/include/asm/kvm_emulate.h | 5 +++++
+ arch/arm64/include/asm/kvm_mmio.h    | 6 ++----
+ virt/kvm/arm/mmio.c                  | 8 +++++++-
+ 5 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index a48994af70b8..0b32a904a1bb 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -38,6 +38,11 @@ static unsigned long io_map_base;
- #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
- #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 9b118516d2db..fe55d8737a11 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -182,6 +182,11 @@ static inline bool kvm_vcpu_dabt_issext(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_hsr(vcpu) & HSR_SSE;
+ }
  
-+static bool is_iomap(unsigned long flags)
++static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
 +{
-+	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
++	return false;
 +}
 +
- static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
  {
- 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
-@@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >> HSR_SRT_SHIFT;
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index 7c0eddb0adb2..32fbf82e3ebc 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -14,6 +14,8 @@
+ struct kvm_decode {
+ 	unsigned long rt;
+ 	bool sign_extend;
++	/* Not used on 32-bit arm */
++	bool sixty_four;
+ };
  
- 	vma_pagesize = vma_kernel_pagesize(vma);
- 	if (logging_active ||
-+	    (vma->vm_flags & VM_PFNMAP) ||
- 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
- 		force_pte = true;
- 		vma_pagesize = PAGE_SIZE;
-@@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			writable = false;
- 	}
+ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5efe5ca8fecf..f407b6bdad2e 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -283,6 +283,11 @@ static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
+ 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
+ }
  
-+	if (exec_fault && is_iomap(flags))
-+		return -ENOEXEC;
++static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
++{
++	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SF);
++}
 +
- 	spin_lock(&kvm->mmu_lock);
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
+ static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+ {
+ 	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index 02b5c48fd467..b204501a0c39 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -10,13 +10,11 @@
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_arm.h>
  
--	if (fault_status != FSC_PERM)
-+	if (fault_status != FSC_PERM && !is_iomap(flags))
- 		clean_dcache_guest_page(pfn, vma_pagesize);
+-/*
+- * This is annoying. The mmio code requires this, even if we don't
+- * need any decoding. To be fixed.
+- */
+ struct kvm_decode {
+ 	unsigned long rt;
+ 	bool sign_extend;
++	/* Witdth of the register accessed by the faulting instruction is 64-bits */
++	bool sixty_four;
+ };
  
- 	if (exec_fault)
-@@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
- 		if (is_iabt) {
- 			/* Prefetch Abort on I/O address */
--			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
--			ret = 1;
--			goto out_unlock;
-+			ret = -ENOEXEC;
-+			goto out;
+ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+index 70d3b449692c..e62454b2e529 100644
+--- a/virt/kvm/arm/mmio.c
++++ b/virt/kvm/arm/mmio.c
+@@ -83,7 +83,7 @@ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	unsigned long data;
+-	unsigned int len;
++	unsigned int len, regsize;
+ 	int mask;
+ 
+ 	/* Detect an already handled MMIO return */
+@@ -105,6 +105,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			data = (data ^ mask) - mask;
  		}
  
- 		/*
-@@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
- 	if (ret == 0)
- 		ret = 1;
-+out:
-+	if (ret == -ENOEXEC) {
-+		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		ret = 1;
-+	}
- out_unlock:
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	return ret;
++		if (!vcpu->arch.mmio_decode.sixty_four)
++			data = data & 0xffffffff;
++
+ 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+ 			       &data);
+ 		data = vcpu_data_host_to_guest(vcpu, data, len);
+@@ -125,6 +128,7 @@ static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
+ 	unsigned long rt;
+ 	int access_size;
+ 	bool sign_extend;
++	bool sixty_four;
+ 
+ 	if (kvm_vcpu_dabt_iss1tw(vcpu)) {
+ 		/* page table accesses IO mem: tell guest to fix its TTBR */
+@@ -138,11 +142,13 @@ static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
+ 
+ 	*is_write = kvm_vcpu_dabt_iswrite(vcpu);
+ 	sign_extend = kvm_vcpu_dabt_issext(vcpu);
++	sixty_four = kvm_vcpu_dabt_issf(vcpu);
+ 	rt = kvm_vcpu_dabt_get_rd(vcpu);
+ 
+ 	*len = access_size;
+ 	vcpu->arch.mmio_decode.sign_extend = sign_extend;
+ 	vcpu->arch.mmio_decode.rt = rt;
++	vcpu->arch.mmio_decode.sixty_four = sixty_four;
+ 
+ 	return 0;
+ }
 -- 
-2.20.1
+2.18.0
 
 _______________________________________________
 kvmarm mailing list
