@@ -2,62 +2,63 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECAFC4D2C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7468C43603
 	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:58:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E24132469F
+	by mail.kernel.org (Postfix) with ESMTP id C7D65246AC
 	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:58:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24132469F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D65246AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D694A800;
-	Fri, 13 Dec 2019 09:24:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 000474A59B;
+	Fri, 13 Dec 2019 09:23:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KTlgsGAqBZor; Fri, 13 Dec 2019 09:24:20 -0500 (EST)
+	with ESMTP id fNrKwCRVvZ9C; Fri, 13 Dec 2019 09:23:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 264324A8E0;
-	Fri, 13 Dec 2019 09:24:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58E54A8E0;
+	Fri, 13 Dec 2019 09:23:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BAB94A8E0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 09:24:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B1BC4A7FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 09:23:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dP6tJ0EYj5tb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 09:24:18 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAC04A800
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 09:24:17 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88FA21424;
- Fri, 13 Dec 2019 06:24:17 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E7613F52E;
- Fri, 13 Dec 2019 06:24:16 -0800 (PST)
-Date: Fri, 13 Dec 2019 15:24:15 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Djordje Kovacevic <Djordje.Kovacevic@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Only sign-extend MMIO up to register width
-Message-ID: <20191213142415.GK28840@e113682-lin.lund.arm.com>
-References: <20191212195055.5541-1-christoffer.dall@arm.com>
- <92df358b3261598b587f95a2aa4d9bc5@www.loen.fr>
- <20191213105647.GH28840@e113682-lin.lund.arm.com>
- <DB6PR0801MB2071AF38F38A2FACBBFCE978F4540@DB6PR0801MB2071.eurprd08.prod.outlook.com>
+ with ESMTP id oVElLD0hs20p for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 09:23:01 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 121684A944
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 09:23:01 -0500 (EST)
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 28B05E28028A971DDEF3;
+ Fri, 13 Dec 2019 22:22:56 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Fri, 13 Dec 2019
+ 22:22:47 +0800
+Subject: Re: [PATCH] KVM: arm/arm64: vgic-its: Fix restoration of unmapped
+ collections
+To: Marc Zyngier <maz@kernel.org>
+References: <20191213094237.19627-1-eric.auger@redhat.com>
+ <d36b75e7-bd83-e501-3bd4-76bf0489c5ce@huawei.com>
+ <9e9e3ed65ddf40ab72528187089e0997@www.loen.fr>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <066e4f57-9f92-2bd6-130a-b3c8bb0dcfc4@huawei.com>
+Date: Fri, 13 Dec 2019 22:22:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <DB6PR0801MB2071AF38F38A2FACBBFCE978F4540@DB6PR0801MB2071.eurprd08.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>,
- Alexander Shirshikov <Alexander.Shirshikov@arm.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <9e9e3ed65ddf40ab72528187089e0997@www.loen.fr>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,244 +70,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 13, 2019 at 03:05:19PM +0100, Djordje Kovacevic wrote:
->    Hi Christoffer,
-> 
->    I have run some test payload to get the exact behavior of all nine
->    LDR[S][W|H|B] [Xt|Wt] instructions. Here it is:
-> 
->     # instruction       sas  sse  sf   Xt contents
->    =======================================================================
->    ====
->     1 LDR    Xt, ...     3    0    1   b[63:0] = MEM[63:0]
->     2 LDR    Wt, ...     2    0    0   b[63:32]='0..0' b[31:0] = MEM[31:0]
->     3 LDRH   Wt, ...     1    0    0   b[63:16]='0..0' b[15:0] = MEM[15:0]
->     4 LDRB   Wt, ...     0    0    0   b[63:8] ='0..0' b[7:0]  = MEM[7:0]
->     5 LDRSW  Xt, ...     2    1    1   b[63:32] = MEM[31] b[31:0] =
->    MEM[31:0]
->     6 LDRSH  Xt, ...     1    1    1   b[63:16] = MEM[15] b[15:0] =
->    MEM[15:0]
->     7 LDRSH  Wt, ...     1    1    0   b[63:32] = '0..0' b[31:16] =
->    MEM[15] b[15:0] = MEM[15:0]
->     8 LDRSB  Xt, ...     0    1    1   b[63:8] = MEM[7] b[7:0] = MEM[7:0]
->     9 LDRSB  Wt, ...     0    1    0   b[63:32] = '0..0' b[31:8] = MEM[7]
->    b[7:0] = MEM[7:0]
-> 
->    Any surprises?
-
-No, this looks as I expected it to.
-
-Thanks for the test.
-
-    Christoffer
-
->      __________________________________________________________________
-> 
->    From: Christoffer Dall <christoffer.dall@arm.com>
->    Sent: 13 December 2019 10:56
->    To: Marc Zyngier <maz@kernel.org>
->    Cc: kvmarm@lists.cs.columbia.edu <kvmarm@lists.cs.columbia.edu>;
->    linux-arm-kernel@lists.infradead.org
->    <linux-arm-kernel@lists.infradead.org>; Djordje Kovacevic
->    <Djordje.Kovacevic@arm.com>; James Morse <James.Morse@arm.com>; Julien
->    Thierry <julien.thierry.kdev@gmail.com>; Suzuki Poulose
->    <Suzuki.Poulose@arm.com>
->    Subject: Re: [PATCH] KVM: arm64: Only sign-extend MMIO up to register
->    width
-> 
->    On Fri, Dec 13, 2019 at 10:12:19AM +0000, Marc Zyngier wrote:
->    > On 2019-12-12 19:50, Christoffer Dall wrote:
->    > > On AArch64 you can do a sign-extended load to either a 32-bit or
->    64-bit
->    > > register, and we should only sign extend the register up to the
->    width of
->    > > the register as specified in the operation (by using the 32-bit Wn
->    or
->    > > 64-bit Xn register specifier).
->    >
->    > Nice catch. It's only been there for... Oh wait! ;-)
->    >
->    > >
->    > > As it turns out, the architecture provides this decoding
->    information in
->    > > the SF ("Sixty-Four" -- how cute...) bit.
->    > >
->    > > Let's take advantage of this with the usual 32-bit/64-bit header
->    file
->    > > dance and do the right thing on AArch64 hosts.
->    > >
->    > > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->    >
->    > Cc: stable?
->    >
->    Yes, good idea.
->    > > ---
->    > >  arch/arm/include/asm/kvm_emulate.h   | 5 +++++
->    > >  arch/arm/include/asm/kvm_mmio.h      | 2 ++
->    > >  arch/arm64/include/asm/kvm_emulate.h | 5 +++++
->    > >  arch/arm64/include/asm/kvm_mmio.h    | 6 ++----
->    > >  virt/kvm/arm/mmio.c                  | 8 +++++++-
->    > >  5 files changed, 21 insertions(+), 5 deletions(-)
->    > >
->    > > diff --git a/arch/arm/include/asm/kvm_emulate.h
->    > > b/arch/arm/include/asm/kvm_emulate.h
->    > > index 9b118516d2db..fe55d8737a11 100644
->    > > --- a/arch/arm/include/asm/kvm_emulate.h
->    > > +++ b/arch/arm/include/asm/kvm_emulate.h
->    > > @@ -182,6 +182,11 @@ static inline bool kvm_vcpu_dabt_issext(struct
->    > > kvm_vcpu *vcpu)
->    > >      return kvm_vcpu_get_hsr(vcpu) & HSR_SSE;
->    > >  }
->    > >
->    > > +static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
->    > > +{
->    > > +   return false;
->    > > +}
->    > > +
->    > >  static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
->    > >  {
->    > >      return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >>
->    HSR_SRT_SHIFT;
->    > > diff --git a/arch/arm/include/asm/kvm_mmio.h
->    > > b/arch/arm/include/asm/kvm_mmio.h
->    > > index 7c0eddb0adb2..32fbf82e3ebc 100644
->    > > --- a/arch/arm/include/asm/kvm_mmio.h
->    > > +++ b/arch/arm/include/asm/kvm_mmio.h
->    > > @@ -14,6 +14,8 @@
->    > >  struct kvm_decode {
->    > >      unsigned long rt;
->    > >      bool sign_extend;
->    > > +   /* Not used on 32-bit arm */
->    > > +   bool sixty_four;
->    > >  };
->    > >
->    > >  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long
->    > > data);
->    > > diff --git a/arch/arm64/include/asm/kvm_emulate.h
->    > > b/arch/arm64/include/asm/kvm_emulate.h
->    > > index 5efe5ca8fecf..f407b6bdad2e 100644
->    > > --- a/arch/arm64/include/asm/kvm_emulate.h
->    > > +++ b/arch/arm64/include/asm/kvm_emulate.h
->    > > @@ -283,6 +283,11 @@ static inline bool kvm_vcpu_dabt_issext(const
->    > > struct kvm_vcpu *vcpu)
->    > >      return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
->    > >  }
->    > >
->    > > +static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
->    > > +{
->    > > +   return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SF);
->    > > +}
->    > > +
->    > >  static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu
->    *vcpu)
->    > >  {
->    > >      return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >>
->    > > ESR_ELx_SRT_SHIFT;
->    > > diff --git a/arch/arm64/include/asm/kvm_mmio.h
->    > > b/arch/arm64/include/asm/kvm_mmio.h
->    > > index 02b5c48fd467..b204501a0c39 100644
->    > > --- a/arch/arm64/include/asm/kvm_mmio.h
->    > > +++ b/arch/arm64/include/asm/kvm_mmio.h
->    > > @@ -10,13 +10,11 @@
->    > >  #include <linux/kvm_host.h>
->    > >  #include <asm/kvm_arm.h>
->    > >
->    > > -/*
->    > > - * This is annoying. The mmio code requires this, even if we don't
->    > > - * need any decoding. To be fixed.
->    > > - */
->    > >  struct kvm_decode {
->    > >      unsigned long rt;
->    > >      bool sign_extend;
->    > > +   /* Witdth of the register accessed by the faulting instruction
->    is
->    > > 64-bits */
->    > > +   bool sixty_four;
->    > >  };
->    > >
->    > >  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long
->    > > data);
->    > > diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
->    > > index 70d3b449692c..e62454b2e529 100644
->    > > --- a/virt/kvm/arm/mmio.c
->    > > +++ b/virt/kvm/arm/mmio.c
->    > > @@ -83,7 +83,7 @@ unsigned long kvm_mmio_read_buf(const void *buf,
->    > > unsigned int len)
->    > >  int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run
->    *run)
->    > >  {
->    > >      unsigned long data;
->    > > -   unsigned int len;
->    > > +   unsigned int len, regsize;
->    >
->    > Unused variable?
->    >
->    Ah, yes, whoops.  Guess which unstaged change I still have in my
->    tree...
->    > >      int mask;
->    > >
->    > >      /* Detect an already handled MMIO return */
->    > > @@ -105,6 +105,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu
->    *vcpu,
->    > > struct kvm_run *run)
->    > >                      data = (data ^ mask) - mask;
->    > >              }
->    > >
->    > > +           if (!vcpu->arch.mmio_decode.sixty_four)
->    > > +                   data = data & 0xffffffff;
->    > > +
->    > >              trace_kvm_mmio(KVM_TRACE_MMIO_READ, len,
->    run->mmio.phys_addr,
->    > >                             &data);
->    > >              data = vcpu_data_host_to_guest(vcpu, data, len);
->    > > @@ -125,6 +128,7 @@ static int decode_hsr(struct kvm_vcpu *vcpu,
->    bool
->    > > *is_write, int *len)
->    > >      unsigned long rt;
->    > >      int access_size;
->    > >      bool sign_extend;
->    > > +   bool sixty_four;
->    > >
->    > >      if (kvm_vcpu_dabt_iss1tw(vcpu)) {
->    > >              /* page table accesses IO mem: tell guest to fix its
->    TTBR */
->    > > @@ -138,11 +142,13 @@ static int decode_hsr(struct kvm_vcpu *vcpu,
->    > > bool *is_write, int *len)
->    > >
->    > >      *is_write = kvm_vcpu_dabt_iswrite(vcpu);
->    > >      sign_extend = kvm_vcpu_dabt_issext(vcpu);
->    > > +   sixty_four = kvm_vcpu_dabt_issf(vcpu);
->    > >      rt = kvm_vcpu_dabt_get_rd(vcpu);
->    > >
->    > >      *len = access_size;
->    > >      vcpu->arch.mmio_decode.sign_extend = sign_extend;
->    > >      vcpu->arch.mmio_decode.rt = rt;
->    > > +   vcpu->arch.mmio_decode.sixty_four = sixty_four;
->    > >
->    > >      return 0;
->    > >  }
->    >
->    > I can't remember why we keep this mmio_decode structure as part of
->    > the vcpu. It isn't like it is going to change anytime soon (userspace
->    > cannot change the saved ESR_EL2)...
->    I think that was just an uninformed design decision on my part and it
->    could be reworked to operate on the ESR_EL2 directly or just take the
->    information from userspace (which we already rely on for read vs.
->    write).
->    >
->    > Anyway, your patch is in keeping with the current shape of the code.
->    > If you're OK with, it, I'll apply it with the above nits addressed.
->    >
->    Absolutely, I decided not to rework the mmio_decode stuff, and leave
->    that for some later day.
->    Thanks!
->        Christoffer
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMTkvMTIvMTMgMTk6MjgsIE1hcmMgWnluZ2llciB3cm90ZToKPiBIaSBa
+ZW5naHVpLAo+IAo+IE9uIDIwMTktMTItMTMgMTA6NTMsIFplbmdodWkgWXUgd3JvdGU6Cj4+IEhp
+IEVyaWMsCj4+Cj4+IE9uIDIwMTkvMTIvMTMgMTc6NDIsIEVyaWMgQXVnZXIgd3JvdGU6Cj4+PiBT
+YXZpbmcvcmVzdG9yaW5nIGFuIHVubWFwcGVkIGNvbGxlY3Rpb24gaXMgYSB2YWxpZCBzY2VuYXJp
+by4gRm9yCj4+PiBleGFtcGxlIHRoaXMgaGFwcGVucyBpZiBhIE1BUFRJIGNvbW1hbmQgd2FzIHNl
+bnQsIGZlYXR1cmluZyBhbgo+Pj4gdW5tYXBwZWQgY29sbGVjdGlvbi4gQXQgdGhlIG1vbWVudCB0
+aGUgQ1RFIGZhaWxzIHRvIGJlIHJlc3RvcmVkLgo+Pj4gT25seSBjb21wYXJlIGFnYWluc3QgdGhl
+IG51bWJlciBvZiBvbmxpbmUgdmNwdXMgaWYgdGhlIHJkaXN0Cj4+PiBiYXNlIGlzIHNldC4KPj4K
+Pj4gSGF2ZSB5b3UgYWN0dWFsbHkgc2VlbiBhIHByb2JsZW0gYW5kIHRoaXMgcGF0Y2ggZml4ZWQg
+aXQ/IFRvIGJlIGhvbmVzdCwKPj4gSSdtIHN1cnByaXNlZCB0byBmaW5kIHRoYXQgd2UgY2FuIG1h
+cCBhIExQSSB0byBhbiB1bm1hcHBlZCBjb2xsZWN0aW9uIDspCj4+IChhbmQgcHJldmVudCBpdCB0
+byBiZSBkZWxpdmVyZWQgdG8gdmNwdSB3aXRoIGFuIElOVF9VTk1BUFBFRF9JTlRFUlJVUFQKPj4g
+ZXJyb3IsIHVudGlsIHNvbWVvbmUgaGFkIGFjdHVhbGx5IG1hcHBlZCB0aGUgY29sbGVjdGlvbiku
+Cj4+IEFmdGVyIGEgcXVpY2sgZ2xhbmNlIG9mIHNwZWMgKE1BUFRJKSwganVzdCBhcyB5b3Ugc2Fp
+ZCwgdGhpcyBpcyB2YWxpZC4KPiAKPiBZZXMsIHRoaXMgaXMgb25lIG9mIHRoZSAobWFueSkgb2Rk
+IGJpdHMgaW4gdGhlIGFyY2hpdGVjdHVyZS4gQW5kIHRoZXJlIGlzCj4gYSBiaXphcnJlIHdvcmRp
+bmcgaW4gdGhlIE1BUEMgZGVzY3JpcHRpb24gd2hlbiBWPTA6Cj4gCj4gIkJlaGF2aW9yIGlzIHVu
+cHJlZGljdGFibGUgaWYgdGhlcmUgYXJlIGludGVycnVwdHMgdGhhdCBhcmUgbWFwcGVkIHRvIHRo
+ZQo+IHNwZWNpZmllZCBjb2xsZWN0aW9uLCB3aXRoIHRoZSByZXN0cmljdGlvbiB0aGF0IGZ1cnRo
+ZXIgdHJhbnNsYXRpb24gCj4gcmVxdWVzdHMKPiBmcm9tIHRoYXQgZGV2aWNlIGFyZSBpZ25vcmVk
+LiIKPiAKPiBJdCBpcyByZWFsbHkgb2RkIHRoYXQ6Cj4gCj4gLSBpdCBpcyB1bnByZWRpY3RhYmxl
+IHRvIHVubWFwIHRoZSBjb2xsZWN0aW9uIHdpdGggbWFwcGVkIGludGVycnVwdHMsCj4gIMKgIGJ1
+dCBtYXBwaW5nIGludGVycnVwdHMgdG8gYW4gdW5tYXBwZWQgY29sbGVjdGlvbiBpcyBmaW5lCgpZ
+ZXMsIGxvb2tzIG9kZC4uLiBXaXRob3V0IEVyaWMncyBwYXRjaCwgSSB3b24ndCBldmVuIG5vdGlj
+ZSBpdC4KCkkgZ3Vlc3MgdGhhdCB1bm1hcHBpbmcgdGhlIGNvbGxlY3Rpb24gd2l0aCBtYXBwZWQg
+aW50ZXJydXB0cyB3aWxsIG1ha2UKaXQgZGlmZmljdWx0IGZvciBIYXJkd2FyZSB0byBtYW5hZ2Ug
+dGhvc2UgaW50ZXJydXB0cycgaW50ZXJuYWwgc3RhdGVzLApidXQgb25seSBhIGd1ZXNzLgoKPiAt
+IHRoZSBub3Rpb24gb2YgImludGVycnVwdHMgZnJvbSB0aGF0IGRldmljZSIgZG9lc24ndCBtYXRj
+aCBhbnkgb2YgdGhlCj4gIMKgIE1BUEMgcGFyYW1ldGVycwoKTG9va3MgbGlrZSBhIHdyaXRpbmcg
+bWlzdGFrZSwgYSBiZXR0ZXIgc3RhdGVtZW50ICptaWdodCBiZSoKImZ1cnRoZXIgdHJhbnNsYXRp
+b24gcmVxdWVzdHMgdGFyZ2V0aW5nIHRoYXQgSUNJRCBhcmUgaWdub3JlZCI/Cgo+IERvIHlvdSBo
+YXRlIHRoZSBHSUMgYWxyZWFkeT8gOy0pCgpOb3QgeWV0ISAoSSdkIGxpa2UgdG8gY29udGludWUg
+YmVpbmcgbWVzc2VkIHdpdGggR0lDIGFuZCBzZWUgd2hlbiBJCndpbGwgaGF0ZSBpdCA6KQoKPiAK
+Pj4gSWYgTWFyYyBoYXMgbm8gb2JqZWN0aW9uIHRvIHRoaXMgZml4LCBwbGVhc2UgYWRkCj4+Cj4+
+IFJldmlld2VkLWJ5OiBaZW5naHVpIFl1IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KPiAKPiBUaGFu
+a3MgZm9yIHRoYXQsIEkndmUgYXBwbGllZCBpdCB0byB0aGUgcGF0Y2ggYW5kIHdpbGwgcHVzaCBv
+dXQKPiB0aGUgdXBkYXRlIGFzIHNvb24gYXMgcmEua2VybmVsLm9yZyBpcyByZWFjaGFibGUgYWdh
+aW4uCgpUaGFua3MsClplbmdodWkKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
