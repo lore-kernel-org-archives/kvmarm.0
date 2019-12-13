@@ -2,65 +2,81 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2468C00454
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F96C2D0CA
 	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:28:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A54224682
+	by mail.kernel.org (Postfix) with ESMTP id 0A72B24684
 	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:28:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A54224682
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0i1ltvF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A72B24684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D3414A36B;
-	Fri, 13 Dec 2019 13:59:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E22D4A522;
+	Fri, 13 Dec 2019 13:59:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZJKNyLNdFopd; Fri, 13 Dec 2019 13:59:38 -0500 (EST)
+	with ESMTP id Epa7DOpTLiOG; Fri, 13 Dec 2019 13:59:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48D864A65C;
-	Fri, 13 Dec 2019 13:59:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6894A4AEA0;
+	Fri, 13 Dec 2019 13:59:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B7424A541
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8EA4AEB3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 75LcfypbDpXi for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 13:59:36 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 400954A36B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:36 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C33DE106F;
- Fri, 13 Dec 2019 10:59:35 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD07C3F718;
- Fri, 13 Dec 2019 10:59:33 -0800 (PST)
-Subject: Re: [PATCH 1/7] KVM: Pass mmu_notifier_range down to
- kvm_unmap_hva_range()
-To: Marc Zyngier <maz@kernel.org>
-References: <20191213182503.14460-1-maz@kernel.org>
- <20191213182503.14460-2-maz@kernel.org>
-From: Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
-Message-ID: <c347df67-6cc3-9d5c-0dd9-72ebb8fa9712@arm.com>
-Date: Fri, 13 Dec 2019 18:59:32 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ with ESMTP id okjP7qnBC8pr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 13:59:38 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B55E4AC7C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576263577;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=BTVCt4lo2+JVoxNzS8jAAe82HqlgpftwzzDCvcWKC0o=;
+ b=C0i1ltvFqwe4zeI7v6E/GFBRKbO6Uy4u0Y2gvP4Ib/JW99SpfBOOD35qBfUk8XZjT3+7z5
+ 5YyILYHVT2VUhBzNRJhZRtsXVFN/PWBDgTY2wjwV56CNrfN4UyX5aBLA7EzWW9Qf+abQzP
+ jI3wMJfrNU/fQIif6jKYSk0iZYEmNq0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-nejDi4YpNM-3UQq70rGOwA-1; Fri, 13 Dec 2019 13:59:33 -0500
+X-MC-Unique: nejDi4YpNM-3UQq70rGOwA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D53785B6FD;
+ Fri, 13 Dec 2019 18:59:31 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-115.brq.redhat.com
+ [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63C8466851;
+ Fri, 13 Dec 2019 18:59:18 +0000 (UTC)
+Date: Fri, 13 Dec 2019 19:59:15 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests RFC 03/10] pmu: Add a pmu struct
+Message-ID: <20191213185915.7txbnxybupszis7r@kamzik.brq.redhat.com>
+References: <20191206172724.947-1-eric.auger@redhat.com>
+ <20191206172724.947-4-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191213182503.14460-2-maz@kernel.org>
-Content-Language: en-US
-Cc: kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Paul Mackerras <paulus@ozlabs.org>, linux-arm-kernel@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <20191206172724.947-4-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,66 +88,81 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-
-On 13/12/2019 18:24, Marc Zyngier wrote:
-> kvm_unmap_hva_range() is currently passed both start and end
-> fields from the mmu_notifier_range structure. As this struct
-> now contains important information about the reason of the
-> unmap (the event field), replace the start/end parameters
-> with the range struct, and update all architectures.
+On Fri, Dec 06, 2019 at 06:27:17PM +0100, Eric Auger wrote:
+> This struct aims at storing information potentially used by
+> all tests such as the pmu version, the read-only part of the
+> PMCR, the number of implemented event counters, ...
 > 
-> No functionnal change.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/pmu.c | 29 ++++++++++++++++++++++++-----
+>  1 file changed, 24 insertions(+), 5 deletions(-)
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 2ad6469..8e95251 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -33,7 +33,15 @@
+>  
+>  #define NR_SAMPLES 10
+>  
+> -static unsigned int pmu_version;
+> +struct pmu {
+> +	unsigned int version;
+> +	unsigned int nb_implemented_counters;
+> +	uint32_t pmcr_ro;
+> +};
+> +
+> +static struct pmu pmu;
+> +
+> +
+>  #if defined(__arm__)
+>  #define ID_DFR0_PERFMON_SHIFT 24
+>  #define ID_DFR0_PERFMON_MASK  0xf
+> @@ -265,7 +273,7 @@ static bool check_cpi(int cpi)
+>  static void pmccntr64_test(void)
+>  {
+>  #ifdef __arm__
+> -	if (pmu_version == 0x3) {
+> +	if (pmu.version == 0x3) {
+>  		if (ERRATA(9e3f7a296940)) {
+>  			write_sysreg(0xdead, PMCCNTR64);
+>  			report("pmccntr64", read_sysreg(PMCCNTR64) == 0xdead);
+> @@ -278,9 +286,20 @@ static void pmccntr64_test(void)
+>  /* Return FALSE if no PMU found, otherwise return TRUE */
+>  static bool pmu_probe(void)
+>  {
+> -	pmu_version = get_pmu_version();
+> -	report_info("PMU version: %d", pmu_version);
+> -	return pmu_version != 0 && pmu_version != 0xf;
+> +	uint32_t pmcr;
+> +
+> +	pmu.version = get_pmu_version();
+> +	report_info("PMU version: %d", pmu.version);
+> +
+> +	if (pmu.version == 0 || pmu.version  == 0xF)
+                                            ^ stray space
 
+> +		return false;
+> +
+> +	pmcr = get_pmcr();
+> +	pmu.pmcr_ro = pmcr & 0xFFFFFF80;
+> +	pmu.nb_implemented_counters = (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
+> +	report_info("Implements %d event counters", pmu.nb_implemented_counters);
+> +
+> +	return true;
+>  }
+>  
+>  int main(int argc, char *argv[])
+> -- 
+> 2.20.1
+> 
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 00268290dcbd..7c3665ad1035 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -158,7 +158,7 @@ static unsigned long long kvm_createvm_count;
->   static unsigned long long kvm_active_vms;
->   
->   __weak int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
-> -		unsigned long start, unsigned long end, bool blockable)
-> +		const struct mmu_notifier_range *range, bool blockable)
->   {
->   	return 0;
->   }
-> @@ -415,7 +415,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   	 * count is also read inside the mmu_lock critical section.
->   	 */
->   	kvm->mmu_notifier_count++;
-> -	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end);
-> +	need_tlb_flush = kvm_unmap_hva_range(kvm, range);
->   	need_tlb_flush |= kvm->tlbs_dirty;
->   	/* we've to flush the tlb before the pages can be freed */
->   	if (need_tlb_flush)
-> @@ -423,8 +423,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   
->   	spin_unlock(&kvm->mmu_lock);
->   
-> -	ret = kvm_arch_mmu_notifier_invalidate_range(kvm, range->start,
-> -					range->end,
-> +	ret = kvm_arch_mmu_notifier_invalidate_range(kvm, range,
->   					mmu_notifier_range_blockable(range));
-
-minor nit:
-
-Since we now have the range passed on to the arch hooks, we could get
-rid of the "blockable" too, as it is something you can deduce from the
-range.
-
-Otherwise looks good to me.
-
-Suzuki
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
