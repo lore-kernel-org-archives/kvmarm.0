@@ -2,58 +2,71 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D017C43603
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 10:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A97C3B1A2
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0D4B02073D
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 10:56:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D4B02073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id ED939246B1
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED939246B1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99ED14A4F6;
-	Fri, 13 Dec 2019 05:56:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8D754A500;
+	Fri, 13 Dec 2019 15:01:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id es1a9HwtGgEG; Fri, 13 Dec 2019 05:56:52 -0500 (EST)
+	with ESMTP id GSw5bNMr7Yvo; Fri, 13 Dec 2019 15:01:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 312384A65C;
-	Fri, 13 Dec 2019 05:56:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37994AC77;
+	Fri, 13 Dec 2019 15:01:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 457244A54B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 05:56:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 385C14A500
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 15:01:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J5BaZ-YYdYit for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 05:56:49 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C55744A4F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 05:56:49 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E41C1FB;
- Fri, 13 Dec 2019 02:56:49 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E69B03F718;
- Fri, 13 Dec 2019 02:56:48 -0800 (PST)
-Date: Fri, 13 Dec 2019 11:56:47 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Only sign-extend MMIO up to register width
-Message-ID: <20191213105647.GH28840@e113682-lin.lund.arm.com>
-References: <20191212195055.5541-1-christoffer.dall@arm.com>
- <92df358b3261598b587f95a2aa4d9bc5@www.loen.fr>
+ with ESMTP id YBnmCZI-0jv3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 15:01:54 -0500 (EST)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 453AC4A4F6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 15:01:54 -0500 (EST)
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 13 Dec 2019 12:01:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,311,1571727600"; d="scan'208";a="208563026"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.202])
+ by orsmga008.jf.intel.com with ESMTP; 13 Dec 2019 12:01:51 -0800
+Date: Fri, 13 Dec 2019 12:01:51 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+ Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
+Message-ID: <20191213200151.GF31552@linux.intel.com>
+References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
+ <20191203221433.GK19877@linux.intel.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <92df358b3261598b587f95a2aa4d9bc5@www.loen.fr>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: djordje.kovacevic@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20191203221433.GK19877@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,189 +83,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 13, 2019 at 10:12:19AM +0000, Marc Zyngier wrote:
-> On 2019-12-12 19:50, Christoffer Dall wrote:
-> > On AArch64 you can do a sign-extended load to either a 32-bit or 64-bit
-> > register, and we should only sign extend the register up to the width of
-> > the register as specified in the operation (by using the 32-bit Wn or
-> > 64-bit Xn register specifier).
+On Tue, Dec 03, 2019 at 02:14:33PM -0800, Sean Christopherson wrote:
+> On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
+> > The end goal of this series is to dynamically size the memslot array so
+> > that KVM allocates memory based on the number of memslots in use, as
+> > opposed to unconditionally allocating memory for the maximum number of
+> > memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+> > spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> > E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+> > the memory footprint from 90k to ~2.6k bytes.
+> > 
+> > The changes required to support dynamic sizing are relatively small,
+> > e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
+> > clean up the memslot code, which has gotten quite crusty, especially
+> > __kvm_set_memory_region().  The clean up is likely not strictly necessary
+> > to switch to dynamic sizing, but I didn't have a remotely reasonable
+> > level of confidence in the correctness of the dynamic sizing without first
+> > doing the clean up.
+> > 
+> > Christoffer, I added your Tested-by to the patches that I was confident
+> > would be fully tested based on the desription of what you tested.  Let me
+> > know if you disagree with any of 'em.
+> > 
+> > v3:
+> >   - Fix build errors on PPC and MIPS due to missed params during
+> >     refactoring [kbuild test robot].
+> >   - Rename the helpers for update_memslots() and add comments describing
+> >     the new algorithm and how it interacts with searching [Paolo].
+> >   - Remove the unnecessary and obnoxious warning regarding memslots being
+> >     a flexible array [Paolo].
+> >   - Fix typos in the changelog of patch 09/15 [Christoffer].
+> >   - Collect tags [Christoffer].
+> > 
+> > v2:
+> >   - Split "Drop kvm_arch_create_memslot()" into three patches to move
+> >     minor functional changes to standalone patches [Janosch].
+> >   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
+> >   - Collect an Acked-by and a Reviewed-by
 > 
-> Nice catch. It's only been there for... Oh wait! ;-)
-> 
-> > 
-> > As it turns out, the architecture provides this decoding information in
-> > the SF ("Sixty-Four" -- how cute...) bit.
-> > 
-> > Let's take advantage of this with the usual 32-bit/64-bit header file
-> > dance and do the right thing on AArch64 hosts.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> 
-> Cc: stable?
-> 
+> Paolo, do you want me to rebase this to the latest kvm/queue?
 
-Yes, good idea.
+Ping.
 
-> > ---
-> >  arch/arm/include/asm/kvm_emulate.h   | 5 +++++
-> >  arch/arm/include/asm/kvm_mmio.h      | 2 ++
-> >  arch/arm64/include/asm/kvm_emulate.h | 5 +++++
-> >  arch/arm64/include/asm/kvm_mmio.h    | 6 ++----
-> >  virt/kvm/arm/mmio.c                  | 8 +++++++-
-> >  5 files changed, 21 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_emulate.h
-> > b/arch/arm/include/asm/kvm_emulate.h
-> > index 9b118516d2db..fe55d8737a11 100644
-> > --- a/arch/arm/include/asm/kvm_emulate.h
-> > +++ b/arch/arm/include/asm/kvm_emulate.h
-> > @@ -182,6 +182,11 @@ static inline bool kvm_vcpu_dabt_issext(struct
-> > kvm_vcpu *vcpu)
-> >  	return kvm_vcpu_get_hsr(vcpu) & HSR_SSE;
-> >  }
-> > 
-> > +static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
-> > +{
-> > +	return false;
-> > +}
-> > +
-> >  static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
-> >  {
-> >  	return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >> HSR_SRT_SHIFT;
-> > diff --git a/arch/arm/include/asm/kvm_mmio.h
-> > b/arch/arm/include/asm/kvm_mmio.h
-> > index 7c0eddb0adb2..32fbf82e3ebc 100644
-> > --- a/arch/arm/include/asm/kvm_mmio.h
-> > +++ b/arch/arm/include/asm/kvm_mmio.h
-> > @@ -14,6 +14,8 @@
-> >  struct kvm_decode {
-> >  	unsigned long rt;
-> >  	bool sign_extend;
-> > +	/* Not used on 32-bit arm */
-> > +	bool sixty_four;
-> >  };
-> > 
-> >  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long
-> > data);
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h
-> > b/arch/arm64/include/asm/kvm_emulate.h
-> > index 5efe5ca8fecf..f407b6bdad2e 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -283,6 +283,11 @@ static inline bool kvm_vcpu_dabt_issext(const
-> > struct kvm_vcpu *vcpu)
-> >  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
-> >  }
-> > 
-> > +static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
-> > +{
-> > +	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SF);
-> > +}
-> > +
-> >  static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
-> >  {
-> >  	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >>
-> > ESR_ELx_SRT_SHIFT;
-> > diff --git a/arch/arm64/include/asm/kvm_mmio.h
-> > b/arch/arm64/include/asm/kvm_mmio.h
-> > index 02b5c48fd467..b204501a0c39 100644
-> > --- a/arch/arm64/include/asm/kvm_mmio.h
-> > +++ b/arch/arm64/include/asm/kvm_mmio.h
-> > @@ -10,13 +10,11 @@
-> >  #include <linux/kvm_host.h>
-> >  #include <asm/kvm_arm.h>
-> > 
-> > -/*
-> > - * This is annoying. The mmio code requires this, even if we don't
-> > - * need any decoding. To be fixed.
-> > - */
-> >  struct kvm_decode {
-> >  	unsigned long rt;
-> >  	bool sign_extend;
-> > +	/* Witdth of the register accessed by the faulting instruction is
-> > 64-bits */
-> > +	bool sixty_four;
-> >  };
-> > 
-> >  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long
-> > data);
-> > diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> > index 70d3b449692c..e62454b2e529 100644
-> > --- a/virt/kvm/arm/mmio.c
-> > +++ b/virt/kvm/arm/mmio.c
-> > @@ -83,7 +83,7 @@ unsigned long kvm_mmio_read_buf(const void *buf,
-> > unsigned int len)
-> >  int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >  {
-> >  	unsigned long data;
-> > -	unsigned int len;
-> > +	unsigned int len, regsize;
-> 
-> Unused variable?
-> 
-
-Ah, yes, whoops.  Guess which unstaged change I still have in my tree...
-
-> >  	int mask;
-> > 
-> >  	/* Detect an already handled MMIO return */
-> > @@ -105,6 +105,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu,
-> > struct kvm_run *run)
-> >  			data = (data ^ mask) - mask;
-> >  		}
-> > 
-> > +		if (!vcpu->arch.mmio_decode.sixty_four)
-> > +			data = data & 0xffffffff;
-> > +
-> >  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
-> >  			       &data);
-> >  		data = vcpu_data_host_to_guest(vcpu, data, len);
-> > @@ -125,6 +128,7 @@ static int decode_hsr(struct kvm_vcpu *vcpu, bool
-> > *is_write, int *len)
-> >  	unsigned long rt;
-> >  	int access_size;
-> >  	bool sign_extend;
-> > +	bool sixty_four;
-> > 
-> >  	if (kvm_vcpu_dabt_iss1tw(vcpu)) {
-> >  		/* page table accesses IO mem: tell guest to fix its TTBR */
-> > @@ -138,11 +142,13 @@ static int decode_hsr(struct kvm_vcpu *vcpu,
-> > bool *is_write, int *len)
-> > 
-> >  	*is_write = kvm_vcpu_dabt_iswrite(vcpu);
-> >  	sign_extend = kvm_vcpu_dabt_issext(vcpu);
-> > +	sixty_four = kvm_vcpu_dabt_issf(vcpu);
-> >  	rt = kvm_vcpu_dabt_get_rd(vcpu);
-> > 
-> >  	*len = access_size;
-> >  	vcpu->arch.mmio_decode.sign_extend = sign_extend;
-> >  	vcpu->arch.mmio_decode.rt = rt;
-> > +	vcpu->arch.mmio_decode.sixty_four = sixty_four;
-> > 
-> >  	return 0;
-> >  }
-> 
-> I can't remember why we keep this mmio_decode structure as part of
-> the vcpu. It isn't like it is going to change anytime soon (userspace
-> cannot change the saved ESR_EL2)...
-
-I think that was just an uninformed design decision on my part and it
-could be reworked to operate on the ESR_EL2 directly or just take the
-information from userspace (which we already rely on for read vs.
-write).
-
-> 
-> Anyway, your patch is in keeping with the current shape of the code.
-> If you're OK with, it, I'll apply it with the above nits addressed.
-> 
-
-Absolutely, I decided not to rework the mmio_decode stuff, and leave
-that for some later day.
-
-
-Thanks!
-
-    Christoffer
+Applies cleanly on the current kvm/queue and nothing caught fire in
+testing (though I only re-tested the series as a whole).
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
