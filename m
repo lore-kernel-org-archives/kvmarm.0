@@ -2,58 +2,66 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E51C43603
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB198C2D0BF
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:29:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B7093214D8
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7093214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 70B0424671
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:29:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B0424671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 702A84AC65;
-	Fri, 13 Dec 2019 04:26:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E25194A968;
+	Fri, 13 Dec 2019 04:29:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P7YEQDcpsmj1; Fri, 13 Dec 2019 04:26:47 -0500 (EST)
+	with ESMTP id bZuHeG-0upRk; Fri, 13 Dec 2019 04:29:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 610144A598;
-	Fri, 13 Dec 2019 04:26:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B07B24A591;
+	Fri, 13 Dec 2019 04:29:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 122D34A52C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:26:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 638CE4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:29:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id McyKVtXlBVk3 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 04:26:36 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E79864A511
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:26:35 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64CA41FB;
- Fri, 13 Dec 2019 01:26:35 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE99F3F52E;
- Fri, 13 Dec 2019 01:26:34 -0800 (PST)
-Date: Fri, 13 Dec 2019 10:26:33 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/3] KVM: arm/arm64: Drop spurious message when faulting
- on a non-existent mapping
-Message-ID: <20191213092633.GD28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-4-maz@kernel.org>
+ with ESMTP id I3gOgAIRBuff for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 04:29:01 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FFA44A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:29:01 -0500 (EST)
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ifhFr-00024d-DZ; Fri, 13 Dec 2019 10:28:59 +0100
+To: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
+ mappings
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191211165651.7889-4-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+Date: Fri, 13 Dec 2019 09:28:59 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <20191213082920.GA28840@e113682-lin.lund.arm.com>
+References: <20191211165651.7889-1-maz@kernel.org>
+ <20191211165651.7889-2-maz@kernel.org>
+ <20191213082920.GA28840@e113682-lin.lund.arm.com>
+Message-ID: <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -66,40 +74,201 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Dec 11, 2019 at 04:56:50PM +0000, Marc Zyngier wrote:
-> Should userspace unmap memory whilst the guest is running, we exit
-> with a -EFAULT, but also having spat a useless message on the console.
-> 
-> Get rid of it.
+Hi Christoffer,
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+On 2019-12-13 08:29, Christoffer Dall wrote:
+> Hi Marc,
+>
+> On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
+>> A device mapping is normally always mapped at Stage-2, since there
+>> is very little gain in having it faulted in.
+>
+> It is actually becoming less clear to me what the real benefits of
+> pre-populating the stage 2 page table are, especially given that we 
+> can
+> provoke a situation where they're faulted in anyhow.  Do you recall 
+> if
+> we had any specific case that motivated us to pre-fault in the pages?
 
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/arm/mmu.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index f73393f5ddb7..fbfdffb8fe8e 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1696,7 +1696,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	down_read(&current->mm->mmap_sem);
->  	vma = find_vma_intersection(current->mm, hva, hva + 1);
->  	if (unlikely(!vma)) {
-> -		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
->  		up_read(&current->mm->mmap_sem);
->  		return -EFAULT;
->  	}
-> -- 
-> 2.20.1
-> 
+It's only a minor performance optimization that was introduced by Ard 
+in
+8eef91239e57d. Which makes sense for platform devices that have a 
+single
+fixed location in memory. It makes slightly less sense for PCI, where
+you can move things around.
+
+>> Nonetheless, it is possible to end-up in a situation where the 
+>> device
+>> mapping has been removed from Stage-2 (userspace munmaped the VFIO
+>> region, and the MMU notifier did its job), but present in a 
+>> userspace
+>> mapping (userpace has mapped it back at the same address). In such
+>> a situation, the device mapping will be demand-paged as the guest
+>> performs memory accesses.
+>>
+>> This requires to be careful when dealing with mapping size, cache
+>> management, and to handle potential execution of a device mapping.
+>>
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+>>  1 file changed, 17 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index a48994af70b8..0b32a904a1bb 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -38,6 +38,11 @@ static unsigned long io_map_base;
+>>  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+>>  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+>>
+>> +static bool is_iomap(unsigned long flags)
+>> +{
+>> +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+>> +}
+>> +
+>
+> nit: I'm not really sure this indirection makes the code more 
+> readable,
+> but I guess that's a matter of taste.
+>
+>>  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>>  {
+>>  	return memslot->dirty_bitmap && !(memslot->flags & 
+>> KVM_MEM_READONLY);
+>> @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>
+>>  	vma_pagesize = vma_kernel_pagesize(vma);
+>>  	if (logging_active ||
+>> +	    (vma->vm_flags & VM_PFNMAP) ||
+>
+> WHat is actually the rationale for this?
+>
+> Why is a huge mapping not permitted to device memory?
+>
+> Are we guaranteed that VM_PFNMAP on the vma results in device 
+> mappings?
+> I'm not convinced this is the case, and it would be better if we can
+> stick to a single primitive (either kvm_is_device_pfn, or VM_PFNMAP) 
+> to
+> detect device mappings.
+
+For now, I've tried to keep the two paths that deal with mapping 
+devices
+(or rather, things that we interpret as devices) as close as possible.
+If we drop the "eager" mapping, then we're at liberty to restructure
+this in creative ways.
+
+This includes potential huge mappings, but I'm not sure the rest of the
+kernel uses them for devices anyway (I need to find out).
+
+> As a subsequent patch, I'd like to make sure that at the very least 
+> our
+> memslot prepare function follows the exact same logic for mapping 
+> device
+> memory as a fault-in approach does, or that we simply always fault 
+> pages
+> in.
+
+As far as I can see, the two approach are now identical. Am I missing 
+something?
+And yes, getting rid of the eager mapping works for me.
+
+>
+>>  	    !fault_supports_stage2_huge_mapping(memslot, hva, 
+>> vma_pagesize)) {
+>>  		force_pte = true;
+>>  		vma_pagesize = PAGE_SIZE;
+>> @@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  			writable = false;
+>>  	}
+>>
+>> +	if (exec_fault && is_iomap(flags))
+>> +		return -ENOEXEC;
+>> +
+>
+> nit: why don't you just do this when checking kvm_is_device_pfn() and
+> avoid having logic in two places to deal with this case?
+
+Good point. I've already sent the PR, but that could be a further 
+cleanup.
+
+>
+>>  	spin_lock(&kvm->mmu_lock);
+>>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>>  		goto out_unlock;
+>> @@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  	if (writable)
+>>  		kvm_set_pfn_dirty(pfn);
+>>
+>> -	if (fault_status != FSC_PERM)
+>> +	if (fault_status != FSC_PERM && !is_iomap(flags))
+>>  		clean_dcache_guest_page(pfn, vma_pagesize);
+>>
+>>  	if (exec_fault)
+>> @@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu 
+>> *vcpu, struct kvm_run *run)
+>>  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+>>  		if (is_iabt) {
+>>  			/* Prefetch Abort on I/O address */
+>> -			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>> -			ret = 1;
+>> -			goto out_unlock;
+>> +			ret = -ENOEXEC;
+>> +			goto out;
+>>  		}
+>>
+>>  		/*
+>> @@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu 
+>> *vcpu, struct kvm_run *run)
+>>  	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
+>>  	if (ret == 0)
+>>  		ret = 1;
+>> +out:
+>> +	if (ret == -ENOEXEC) {
+>> +		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+>> +		ret = 1;
+>> +	}
+>>  out_unlock:
+>>  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>>  	return ret;
+>> --
+>> 2.20.1
+>>
+>
+> I can't seem to decide for myself if I think there's a sematic
+> difference between trying to execute from somewhere the VMM has
+> explicitly told us is device memory and from somewhere which we 
+> happen
+> to have mapped with VM_PFNMAP from user space.  But I also can't seem 
+> to
+> really fault it (pun intended).  Thoughts?
+
+The issue is that the VMM never really tells us whether something is a
+device mapping or not (the only exception being the GICv2 cpuif). Even
+with PFNMAP, we guess it (it could well be memory that lives outside
+of the linear mapping). I don't see a way to lift this ambiguity.
+
+Ideally, faulting on executing a non-mapping should be offloaded to
+userspace for emulation, in line with your patches that offload
+non-emulated data accesses. That'd be a new ABI, and I can't imagine
+anyone willing to deal with it.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
