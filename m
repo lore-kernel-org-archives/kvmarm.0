@@ -2,81 +2,73 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F96C2D0CA
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39304C3F68F
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:33:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A72B24684
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:28:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0i1ltvF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A72B24684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id B273024682
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 21:33:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B273024682
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E22D4A522;
-	Fri, 13 Dec 2019 13:59:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 798FF4A94D;
+	Fri, 13 Dec 2019 13:27:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Epa7DOpTLiOG; Fri, 13 Dec 2019 13:59:40 -0500 (EST)
+	with ESMTP id gY6sycd1AcPY; Fri, 13 Dec 2019 13:27:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6894A4AEA0;
-	Fri, 13 Dec 2019 13:59:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A5FA4AEBC;
+	Fri, 13 Dec 2019 13:27:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8EA4AEB3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2ADD4A535
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:27:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id okjP7qnBC8pr for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 13:59:38 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B55E4AC7C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:59:38 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576263577;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BTVCt4lo2+JVoxNzS8jAAe82HqlgpftwzzDCvcWKC0o=;
- b=C0i1ltvFqwe4zeI7v6E/GFBRKbO6Uy4u0Y2gvP4Ib/JW99SpfBOOD35qBfUk8XZjT3+7z5
- 5YyILYHVT2VUhBzNRJhZRtsXVFN/PWBDgTY2wjwV56CNrfN4UyX5aBLA7EzWW9Qf+abQzP
- jI3wMJfrNU/fQIif6jKYSk0iZYEmNq0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-nejDi4YpNM-3UQq70rGOwA-1; Fri, 13 Dec 2019 13:59:33 -0500
-X-MC-Unique: nejDi4YpNM-3UQq70rGOwA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D53785B6FD;
- Fri, 13 Dec 2019 18:59:31 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-115.brq.redhat.com
- [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63C8466851;
- Fri, 13 Dec 2019 18:59:18 +0000 (UTC)
-Date: Fri, 13 Dec 2019 19:59:15 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests RFC 03/10] pmu: Add a pmu struct
-Message-ID: <20191213185915.7txbnxybupszis7r@kamzik.brq.redhat.com>
-References: <20191206172724.947-1-eric.auger@redhat.com>
- <20191206172724.947-4-eric.auger@redhat.com>
+ with ESMTP id OcEcKZFOKTQe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 13:27:51 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B6FE4A7FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:27:51 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ifpdG-0001O7-Df; Fri, 13 Dec 2019 19:25:42 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: 
+Subject: [PATCH 3/7] KVM: arm/arm64: Condition cache maintenance on unmap with
+ a flag
+Date: Fri, 13 Dec 2019 18:24:59 +0000
+Message-Id: <20191213182503.14460-4-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191213182503.14460-1-maz@kernel.org>
+References: <20191213182503.14460-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191206172724.947-4-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org,
+ pbonzini@redhat.com, rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+ vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+ joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Paul Mackerras <paulus@ozlabs.org>, linux-arm-kernel@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,75 +85,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 06, 2019 at 06:27:17PM +0100, Eric Auger wrote:
-> This struct aims at storing information potentially used by
-> all tests such as the pmu version, the read-only part of the
-> PMCR, the number of implemented event counters, ...
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/pmu.c | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 2ad6469..8e95251 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -33,7 +33,15 @@
->  
->  #define NR_SAMPLES 10
->  
-> -static unsigned int pmu_version;
-> +struct pmu {
-> +	unsigned int version;
-> +	unsigned int nb_implemented_counters;
-> +	uint32_t pmcr_ro;
-> +};
-> +
-> +static struct pmu pmu;
-> +
-> +
->  #if defined(__arm__)
->  #define ID_DFR0_PERFMON_SHIFT 24
->  #define ID_DFR0_PERFMON_MASK  0xf
-> @@ -265,7 +273,7 @@ static bool check_cpi(int cpi)
->  static void pmccntr64_test(void)
->  {
->  #ifdef __arm__
-> -	if (pmu_version == 0x3) {
-> +	if (pmu.version == 0x3) {
->  		if (ERRATA(9e3f7a296940)) {
->  			write_sysreg(0xdead, PMCCNTR64);
->  			report("pmccntr64", read_sysreg(PMCCNTR64) == 0xdead);
-> @@ -278,9 +286,20 @@ static void pmccntr64_test(void)
->  /* Return FALSE if no PMU found, otherwise return TRUE */
->  static bool pmu_probe(void)
->  {
-> -	pmu_version = get_pmu_version();
-> -	report_info("PMU version: %d", pmu_version);
-> -	return pmu_version != 0 && pmu_version != 0xf;
-> +	uint32_t pmcr;
-> +
-> +	pmu.version = get_pmu_version();
-> +	report_info("PMU version: %d", pmu.version);
-> +
-> +	if (pmu.version == 0 || pmu.version  == 0xF)
-                                            ^ stray space
+In order to allow the elision of cache maintenance operations
+on unmap, add a new flag (KVM_UNMAP_ELIDE_CMO) that a caller
+can use to indicate that CMOs are not required.
 
-> +		return false;
-> +
-> +	pmcr = get_pmcr();
-> +	pmu.pmcr_ro = pmcr & 0xFFFFFF80;
-> +	pmu.nb_implemented_counters = (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
-> +	report_info("Implements %d event counters", pmu.nb_implemented_counters);
-> +
-> +	return true;
->  }
->  
->  int main(int argc, char *argv[])
-> -- 
-> 2.20.1
-> 
+Nobody is passing this flag yet, hence no functional change.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/mmu.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 0fed7c19c6d5..ebf8c87cc007 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -35,6 +35,9 @@ static unsigned long io_map_base;
+ 
+ #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
+ 
++/* Flags controlling S2 unmapping */
++#define KVM_UNMAP_ELIDE_CMO		(1UL << 0)
++
+ #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+ #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+ 
+@@ -253,7 +256,8 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
+ 			kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 
+ 			/* No need to invalidate the cache for device mappings */
+-			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
++			if (!kvm_is_device_pfn(pte_pfn(old_pte)) &&
++			    !(flags & KVM_UNMAP_ELIDE_CMO))
+ 				kvm_flush_dcache_pte(old_pte);
+ 
+ 			put_page(virt_to_page(pte));
+@@ -281,7 +285,8 @@ static void unmap_stage2_pmds(struct kvm *kvm, pud_t *pud,
+ 				pmd_clear(pmd);
+ 				kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 
+-				kvm_flush_dcache_pmd(old_pmd);
++				if (!(flags & KVM_UNMAP_ELIDE_CMO))
++					kvm_flush_dcache_pmd(old_pmd);
+ 
+ 				put_page(virt_to_page(pmd));
+ 			} else {
+@@ -310,7 +315,8 @@ static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
+ 
+ 				stage2_pud_clear(kvm, pud);
+ 				kvm_tlb_flush_vmid_ipa(kvm, addr);
+-				kvm_flush_dcache_pud(old_pud);
++				if (!(flags & KVM_UNMAP_ELIDE_CMO))
++					kvm_flush_dcache_pud(old_pud);
+ 				put_page(virt_to_page(pud));
+ 			} else {
+ 				unmap_stage2_pmds(kvm, pud, addr, next, flags);
+-- 
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
