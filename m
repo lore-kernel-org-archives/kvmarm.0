@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4905C43603
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 08:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87912C2D0C9
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:22:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A23924658
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 08:29:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A23924658
+	by mail.kernel.org (Postfix) with ESMTP id 0CBA8214D8
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 09:22:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CBA8214D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99DA14A959;
-	Fri, 13 Dec 2019 03:29:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F7C94A4C0;
+	Fri, 13 Dec 2019 04:22:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id efX4pcNhHfp3; Fri, 13 Dec 2019 03:29:25 -0500 (EST)
+	with ESMTP id wiEXEoMFnWDZ; Fri, 13 Dec 2019 04:22:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CF144A7F1;
-	Fri, 13 Dec 2019 03:29:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8614A4F7;
+	Fri, 13 Dec 2019 04:22:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36EFB4A610
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 03:29:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD43E4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:22:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 67H+OJUDJAix for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 03:29:22 -0500 (EST)
+ with ESMTP id iSwgcfjrGVRb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 04:22:42 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E6F4A576
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 03:29:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 691F64A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 04:22:42 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 11AF8328;
- Fri, 13 Dec 2019 00:29:22 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90D2E1FB;
+ Fri, 13 Dec 2019 01:22:41 -0800 (PST)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 75CA43F52E;
- Fri, 13 Dec 2019 00:32:35 -0800 (PST)
-Date: Fri, 13 Dec 2019 09:29:20 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 255743F52E;
+ Fri, 13 Dec 2019 01:22:41 -0800 (PST)
+Date: Fri, 13 Dec 2019 10:22:39 +0100
 From: Christoffer Dall <christoffer.dall@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
- mappings
-Message-ID: <20191213082920.GA28840@e113682-lin.lund.arm.com>
+Subject: Re: [PATCH 2/3] KVM: arm/arm64: Re-check VMA on detecting a poisoned
+ page
+Message-ID: <20191213092239.GB28840@e113682-lin.lund.arm.com>
 References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
+ <20191211165651.7889-3-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20191211165651.7889-2-maz@kernel.org>
+In-Reply-To: <20191211165651.7889-3-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -72,134 +72,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
-> A device mapping is normally always mapped at Stage-2, since there
-> is very little gain in having it faulted in.
-
-It is actually becoming less clear to me what the real benefits of
-pre-populating the stage 2 page table are, especially given that we can
-provoke a situation where they're faulted in anyhow.  Do you recall if
-we had any specific case that motivated us to pre-fault in the pages?
-
+On Wed, Dec 11, 2019 at 04:56:49PM +0000, Marc Zyngier wrote:
+> When we check for a poisoned page, we use the VMA to tell userspace
+> about the looming disaster. But we pass a pointer to this VMA
+> after having released the mmap_sem, which isn't a good idea.
 > 
-> Nonetheless, it is possible to end-up in a situation where the device
-> mapping has been removed from Stage-2 (userspace munmaped the VFIO
-> region, and the MMU notifier did its job), but present in a userspace
-> mapping (userpace has mapped it back at the same address). In such
-> a situation, the device mapping will be demand-paged as the guest
-> performs memory accesses.
+> Instead, re-check that we have still have a VMA, and that this
+> VMA still points to a poisoned page. If the VMA isn't there,
+> userspace is playing with our nerves, so lety's give it a -EFAULT
+> (it deserves it). If the PFN isn't poisoned anymore, let's restart
+> from the top and handle the fault again.
 > 
-> This requires to be careful when dealing with mapping size, cache
-> management, and to handle potential execution of a device mapping.
-> 
-> Cc: stable@vger.kernel.org
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
+>  virt/kvm/arm/mmu.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
 > 
 > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index a48994af70b8..0b32a904a1bb 100644
+> index 0b32a904a1bb..f73393f5ddb7 100644
 > --- a/virt/kvm/arm/mmu.c
 > +++ b/virt/kvm/arm/mmu.c
-> @@ -38,6 +38,11 @@ static unsigned long io_map_base;
->  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
->  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+> @@ -1741,9 +1741,30 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >  
-> +static bool is_iomap(unsigned long flags)
-> +{
-> +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
-> +}
+>  	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
+>  	if (pfn == KVM_PFN_ERR_HWPOISON) {
+> -		kvm_send_hwpoison_signal(hva, vma);
+> -		return 0;
+> +		/*
+> +		 * Search for the VMA again, as it may have been
+> +		 * removed in the interval...
+> +		 */
+> +		down_read(&current->mm->mmap_sem);
+> +		vma = find_vma_intersection(current->mm, hva, hva + 1);
+> +		if (vma) {
+> +			/*
+> +			 * Recheck for a poisoned page. If something changed
+> +			 * behind our back, don't do a thing and take the
+> +			 * fault again.
+> +			 */
+> +			pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
+> +			if (pfn == KVM_PFN_ERR_HWPOISON)
+> +				kvm_send_hwpoison_signal(hva, vma);
 > +
-
-nit: I'm not really sure this indirection makes the code more readable,
-but I guess that's a matter of taste.
-
->  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->  {
->  	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
-> @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	vma_pagesize = vma_kernel_pagesize(vma);
->  	if (logging_active ||
-> +	    (vma->vm_flags & VM_PFNMAP) ||
-
-WHat is actually the rationale for this?
-
-Why is a huge mapping not permitted to device memory?
-
-Are we guaranteed that VM_PFNMAP on the vma results in device mappings?
-I'm not convinced this is the case, and it would be better if we can
-stick to a single primitive (either kvm_is_device_pfn, or VM_PFNMAP) to
-detect device mappings.
-
-As a subsequent patch, I'd like to make sure that at the very least our
-memslot prepare function follows the exact same logic for mapping device
-memory as a fault-in approach does, or that we simply always fault pages
-in.
-
->  	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
->  		force_pte = true;
->  		vma_pagesize = PAGE_SIZE;
-> @@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			writable = false;
+> +			ret = 0;
+> +		} else {
+> +			ret = -EFAULT;
+> +		}
+> +		up_read(&current->mm->mmap_sem);
+> +		return ret;
 >  	}
->  
-> +	if (exec_fault && is_iomap(flags))
-> +		return -ENOEXEC;
 > +
-
-nit: why don't you just do this when checking kvm_is_device_pfn() and
-avoid having logic in two places to deal with this case?
-
->  	spin_lock(&kvm->mmu_lock);
->  	if (mmu_notifier_retry(kvm, mmu_seq))
->  		goto out_unlock;
-> @@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (writable)
->  		kvm_set_pfn_dirty(pfn);
+>  	if (is_error_noslot_pfn(pfn))
+>  		return -EFAULT;
 >  
-> -	if (fault_status != FSC_PERM)
-> +	if (fault_status != FSC_PERM && !is_iomap(flags))
->  		clean_dcache_guest_page(pfn, vma_pagesize);
->  
->  	if (exec_fault)
-> @@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
->  		if (is_iabt) {
->  			/* Prefetch Abort on I/O address */
-> -			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> -			ret = 1;
-> -			goto out_unlock;
-> +			ret = -ENOEXEC;
-> +			goto out;
->  		}
->  
->  		/*
-> @@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
->  	if (ret == 0)
->  		ret = 1;
-> +out:
-> +	if (ret == -ENOEXEC) {
-> +		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		ret = 1;
-> +	}
->  out_unlock:
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  	return ret;
 > -- 
 > 2.20.1
 > 
 
-I can't seem to decide for myself if I think there's a sematic
-difference between trying to execute from somewhere the VMM has
-explicitly told us is device memory and from somewhere which we happen
-to have mapped with VM_PFNMAP from user space.  But I also can't seem to
-really fault it (pun intended).  Thoughts?
+If I read this code correctly, then all we use the VMA for is to find
+the page size used by the MMU to back the VMA, which we've already
+established in the vma_pagesize (and possibly adjusted to something more
+accurate based on our constraints in stage 2 which generated the error),
+so all we need is the size and a way to convert that into a shift.
+
+Not being 100% confident about the semantics of the lsb bit we pass to
+user space (is it indicating the size of the mapping which caused the
+error or the size of the mapping where user space could potentially
+trigger an error?), or wheter we care enough at that level, could we
+consider something like the following instead?
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 38b4c910b6c3..2509d9dec42d 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1592,15 +1592,9 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address,
+-				     struct vm_area_struct *vma)
++				     unsigned long vma_pagesize)
+ {
+-	short lsb;
+-
+-	if (is_vm_hugetlb_page(vma))
+-		lsb = huge_page_shift(hstate_vma(vma));
+-	else
+-		lsb = PAGE_SHIFT;
+-
++	short lsb = __ffs(vma_pagesize);
+ 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+ }
+ 
+@@ -1735,7 +1729,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+-		kvm_send_hwpoison_signal(hva, vma);
++		kvm_send_hwpoison_signal(hva, vma_pagesize);
+ 		return 0;
+ 	}
+ 	if (is_error_noslot_pfn(pfn))
 
 
 Thanks,
