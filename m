@@ -2,70 +2,69 @@ Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A97C3B1A2
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EA7C33C9B
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:53:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED939246B1
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED939246B1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 843A02469B
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 20:53:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 843A02469B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8D754A500;
-	Fri, 13 Dec 2019 15:01:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 667144AD09;
+	Fri, 13 Dec 2019 13:27:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GSw5bNMr7Yvo; Fri, 13 Dec 2019 15:01:57 -0500 (EST)
+	with ESMTP id 8hLhCDQ-0S4b; Fri, 13 Dec 2019 13:27:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37994AC77;
-	Fri, 13 Dec 2019 15:01:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38DDB4AE95;
+	Fri, 13 Dec 2019 13:27:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 385C14A500
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 15:01:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE004AD09
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:27:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YBnmCZI-0jv3 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Dec 2019 15:01:54 -0500 (EST)
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 453AC4A4F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 15:01:54 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 13 Dec 2019 12:01:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,311,1571727600"; d="scan'208";a="208563026"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by orsmga008.jf.intel.com with ESMTP; 13 Dec 2019 12:01:51 -0800
-Date: Fri, 13 Dec 2019 12:01:51 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
- Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-Message-ID: <20191213200151.GF31552@linux.intel.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191203221433.GK19877@linux.intel.com>
+ with ESMTP id Q3eTRnH9-p-e for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Dec 2019 13:27:50 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C94804A535
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Dec 2019 13:27:50 -0500 (EST)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by cheepnis.misterjones.org with esmtpsa
+ (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ifpdD-0001O7-Ur; Fri, 13 Dec 2019 19:25:40 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: 
+Subject: [PATCH 0/7] KVM: arm/arm64: Help VMs dying quicker
+Date: Fri, 13 Dec 2019 18:24:56 +0000
+Message-Id: <20191213182503.14460-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191203221433.GK19877@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org,
+ pbonzini@redhat.com, rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+ vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+ joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Paul Mackerras <paulus@ozlabs.org>, linux-arm-kernel@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
  kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -83,50 +82,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 03, 2019 at 02:14:33PM -0800, Sean Christopherson wrote:
-> On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
-> > The end goal of this series is to dynamically size the memslot array so
-> > that KVM allocates memory based on the number of memslots in use, as
-> > opposed to unconditionally allocating memory for the maximum number of
-> > memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
-> > spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> > E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
-> > the memory footprint from 90k to ~2.6k bytes.
-> > 
-> > The changes required to support dynamic sizing are relatively small,
-> > e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
-> > clean up the memslot code, which has gotten quite crusty, especially
-> > __kvm_set_memory_region().  The clean up is likely not strictly necessary
-> > to switch to dynamic sizing, but I didn't have a remotely reasonable
-> > level of confidence in the correctness of the dynamic sizing without first
-> > doing the clean up.
-> > 
-> > Christoffer, I added your Tested-by to the patches that I was confident
-> > would be fully tested based on the desription of what you tested.  Let me
-> > know if you disagree with any of 'em.
-> > 
-> > v3:
-> >   - Fix build errors on PPC and MIPS due to missed params during
-> >     refactoring [kbuild test robot].
-> >   - Rename the helpers for update_memslots() and add comments describing
-> >     the new algorithm and how it interacts with searching [Paolo].
-> >   - Remove the unnecessary and obnoxious warning regarding memslots being
-> >     a flexible array [Paolo].
-> >   - Fix typos in the changelog of patch 09/15 [Christoffer].
-> >   - Collect tags [Christoffer].
-> > 
-> > v2:
-> >   - Split "Drop kvm_arch_create_memslot()" into three patches to move
-> >     minor functional changes to standalone patches [Janosch].
-> >   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
-> >   - Collect an Acked-by and a Reviewed-by
-> 
-> Paolo, do you want me to rebase this to the latest kvm/queue?
+[Yes, the subject is deliberately provocative!]
 
-Ping.
+Having recently played with large, memory intensive, and very short lived
+VMs, I have realised that we spend a substantial amount of time cleaning up
+when a VM has terminated.
 
-Applies cleanly on the current kvm/queue and nothing caught fire in
-testing (though I only re-tested the series as a whole).
+It turns out that 99% of the overhead is due to the unnecessary cache
+cleaning that we perform when pages get unmapped from Stage-2, which
+only serves a single purpose: to make the page visible to a non-coherent
+IO subsystem when the page is being swapped out.
+
+It would make sense to drop these cache maintenance operations when
+userspace is either unmapping a VMA or simply exiting. Detecting the
+latter is easy, as KVM calls kvm_arch_flush_shadow_all(). The unmap
+case is harder, or at least it was until 5.2 gained the MMU notifier
+event, which allows subsystems to find out about the reason of an
+change in the page tables.
+
+And it turns out we can do even better: We can also avoid invalidating
+individual page mappings if we're tearing down the VM altogether, and
+replace it with a single TLBI VMALL, which will be much lighter on the
+whole system (specially if your interconnect is a bit flimsy).
+
+With the above, terminating a 64GB VM that has most of its memory
+mapped at S2 goes from several seconds (I've seen up to 12s) to less
+than a second on my D05. In general, multi-socket systems seem to
+benefit from this more than single socket machines (based on a
+non-representative sample of 4 random machines I have access to).
+
+The first patch affects most architectures, as it changes one of the
+core architecture hooks (in a fairly mechanical way). The rest is
+definitely ARM-specific.
+
+Marc Zyngier (7):
+  KVM: Pass mmu_notifier_range down to kvm_unmap_hva_range()
+  KVM: arm/arm64: Pass flags along Stage-2 unmapping functions
+  KVM: arm/arm64: Condition cache maintenance on unmap with a flag
+  KVM: arm/arm64: Condition TLB maintenance on unmap with a flag
+  KVM: arm/arm64: Elide both CMOs and TBLIs on freeing the whole Stage-2
+  KVM: arm/arm64: Elide CMOs when retrying a block mapping
+  KVM: arm/arm64: Elide CMOs when unmapping a range
+
+ arch/arm/include/asm/kvm_host.h     |  2 +-
+ arch/arm64/include/asm/kvm_host.h   |  2 +-
+ arch/mips/include/asm/kvm_host.h    |  2 +-
+ arch/mips/kvm/mmu.c                 |  6 +-
+ arch/powerpc/include/asm/kvm_host.h |  2 +-
+ arch/powerpc/kvm/book3s.c           |  5 +-
+ arch/powerpc/kvm/e500_mmu_host.c    |  4 +-
+ arch/x86/include/asm/kvm_host.h     |  3 +-
+ arch/x86/kvm/mmu/mmu.c              |  5 +-
+ arch/x86/kvm/x86.c                  |  4 +-
+ include/linux/kvm_host.h            |  2 +-
+ virt/kvm/arm/mmu.c                  | 97 +++++++++++++++++++----------
+ virt/kvm/kvm_main.c                 |  7 +--
+ 13 files changed, 88 insertions(+), 53 deletions(-)
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
