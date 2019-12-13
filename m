@@ -1,54 +1,61 @@
-Return-Path: <SRS0=bs2E=2C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=4/V8=2D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CEBC43603
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 19:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B22CC43603
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 03:20:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E0AAE2077B
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Dec 2019 19:51:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AAE2077B
+	by mail.kernel.org (Postfix) with ESMTP id 856622077B
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Dec 2019 03:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 856622077B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 492494AC7E;
-	Thu, 12 Dec 2019 14:51:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2E644AEB2;
+	Thu, 12 Dec 2019 22:20:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4lkox-U7g0CW; Thu, 12 Dec 2019 14:51:10 -0500 (EST)
+	with ESMTP id Z30PklpY2JB1; Thu, 12 Dec 2019 22:20:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E751D4ACBE;
-	Thu, 12 Dec 2019 14:51:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 765204ACF5;
+	Thu, 12 Dec 2019 22:20:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23EDE4AC7E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 14:51:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C83C14A8E8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 22:20:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H44XJXzEjGOj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Dec 2019 14:51:08 -0500 (EST)
+ with ESMTP id RQa-8jGoaB-X for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Dec 2019 22:20:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4664A531
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 14:51:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35A264A7F0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Dec 2019 22:20:15 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE41B328;
- Thu, 12 Dec 2019 11:51:07 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DA883F718;
- Thu, 12 Dec 2019 11:51:07 -0800 (PST)
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Only sign-extend MMIO up to register width
-Date: Thu, 12 Dec 2019 20:50:55 +0100
-Message-Id: <20191212195055.5541-1-christoffer.dall@arm.com>
-X-Mailer: git-send-email 2.18.0
-Cc: Marc Zyngier <maz@kernel.org>, Djordje.Kovacevic@arm.com,
- linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1A6C30E;
+ Thu, 12 Dec 2019 19:20:14 -0800 (PST)
+Received: from [192.168.0.10] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A11FE3F52E;
+ Thu, 12 Dec 2019 19:20:12 -0800 (PST)
+Subject: Re: [PATCH] arm64: Introduce ISAR6 CPU ID register
+To: Marc Zyngier <maz@kernel.org>
+References: <1576145663-9909-1-git-send-email-anshuman.khandual@arm.com>
+ <bdb9e0149de9d2a5020ddbdd8a4033b3@www.loen.fr>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <e9e0a133-ccde-8893-d165-15c831ca37b5@arm.com>
+Date: Fri, 13 Dec 2019 08:50:17 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <bdb9e0149de9d2a5020ddbdd8a4033b3@www.loen.fr>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,146 +67,134 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On AArch64 you can do a sign-extended load to either a 32-bit or 64-bit
-register, and we should only sign extend the register up to the width of
-the register as specified in the operation (by using the 32-bit Wn or
-64-bit Xn register specifier).
-
-As it turns out, the architecture provides this decoding information in
-the SF ("Sixty-Four" -- how cute...) bit.
-
-Let's take advantage of this with the usual 32-bit/64-bit header file
-dance and do the right thing on AArch64 hosts.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- arch/arm/include/asm/kvm_emulate.h   | 5 +++++
- arch/arm/include/asm/kvm_mmio.h      | 2 ++
- arch/arm64/include/asm/kvm_emulate.h | 5 +++++
- arch/arm64/include/asm/kvm_mmio.h    | 6 ++----
- virt/kvm/arm/mmio.c                  | 8 +++++++-
- 5 files changed, 21 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 9b118516d2db..fe55d8737a11 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -182,6 +182,11 @@ static inline bool kvm_vcpu_dabt_issext(struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_SSE;
- }
- 
-+static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- static inline int kvm_vcpu_dabt_get_rd(struct kvm_vcpu *vcpu)
- {
- 	return (kvm_vcpu_get_hsr(vcpu) & HSR_SRT_MASK) >> HSR_SRT_SHIFT;
-diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-index 7c0eddb0adb2..32fbf82e3ebc 100644
---- a/arch/arm/include/asm/kvm_mmio.h
-+++ b/arch/arm/include/asm/kvm_mmio.h
-@@ -14,6 +14,8 @@
- struct kvm_decode {
- 	unsigned long rt;
- 	bool sign_extend;
-+	/* Not used on 32-bit arm */
-+	bool sixty_four;
- };
- 
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5efe5ca8fecf..f407b6bdad2e 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -283,6 +283,11 @@ static inline bool kvm_vcpu_dabt_issext(const struct kvm_vcpu *vcpu)
- 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SSE);
- }
- 
-+static inline bool kvm_vcpu_dabt_issf(const struct kvm_vcpu *vcpu)
-+{
-+	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SF);
-+}
-+
- static inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
- {
- 	return (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
-diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-index 02b5c48fd467..b204501a0c39 100644
---- a/arch/arm64/include/asm/kvm_mmio.h
-+++ b/arch/arm64/include/asm/kvm_mmio.h
-@@ -10,13 +10,11 @@
- #include <linux/kvm_host.h>
- #include <asm/kvm_arm.h>
- 
--/*
-- * This is annoying. The mmio code requires this, even if we don't
-- * need any decoding. To be fixed.
-- */
- struct kvm_decode {
- 	unsigned long rt;
- 	bool sign_extend;
-+	/* Witdth of the register accessed by the faulting instruction is 64-bits */
-+	bool sixty_four;
- };
- 
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
-diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-index 70d3b449692c..e62454b2e529 100644
---- a/virt/kvm/arm/mmio.c
-+++ b/virt/kvm/arm/mmio.c
-@@ -83,7 +83,7 @@ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	unsigned long data;
--	unsigned int len;
-+	unsigned int len, regsize;
- 	int mask;
- 
- 	/* Detect an already handled MMIO return */
-@@ -105,6 +105,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			data = (data ^ mask) - mask;
- 		}
- 
-+		if (!vcpu->arch.mmio_decode.sixty_four)
-+			data = data & 0xffffffff;
-+
- 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
- 			       &data);
- 		data = vcpu_data_host_to_guest(vcpu, data, len);
-@@ -125,6 +128,7 @@ static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
- 	unsigned long rt;
- 	int access_size;
- 	bool sign_extend;
-+	bool sixty_four;
- 
- 	if (kvm_vcpu_dabt_iss1tw(vcpu)) {
- 		/* page table accesses IO mem: tell guest to fix its TTBR */
-@@ -138,11 +142,13 @@ static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
- 
- 	*is_write = kvm_vcpu_dabt_iswrite(vcpu);
- 	sign_extend = kvm_vcpu_dabt_issext(vcpu);
-+	sixty_four = kvm_vcpu_dabt_issf(vcpu);
- 	rt = kvm_vcpu_dabt_get_rd(vcpu);
- 
- 	*len = access_size;
- 	vcpu->arch.mmio_decode.sign_extend = sign_extend;
- 	vcpu->arch.mmio_decode.rt = rt;
-+	vcpu->arch.mmio_decode.sixty_four = sixty_four;
- 
- 	return 0;
- }
--- 
-2.18.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+CgpPbiAxMi8xMi8yMDE5IDA1OjEzIFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAxOS0x
+Mi0xMiAxMDoxNCwgQW5zaHVtYW4gS2hhbmR1YWwgd3JvdGU6Cj4+IFRoaXMgYWRkcyBiYXNpYyBi
+dWlsZGluZyBibG9ja3MgcmVxdWlyZWQgZm9yIElTQVI2IENQVSBJRCByZWdpc3RlciB3aGljaAo+
+PiBpZGVudGlmaWVzIHN1cHBvcnQgZm9yIHZhcmlvdXMgaW5zdHJ1Y3Rpb24gaW1wbGVtZW50YXRp
+b24gb24gQUFyY2gzMiBzdGF0ZS4KPiAKPiBuaXQ6IHRoZSByZWdpc3RlciBuYW1lIGlzIElEX0lT
+QVI2LgoKU3VyZSwgd2lsbCBjaGFuZ2UuCgo+IAo+Pgo+PiBDYzogQ2F0YWxpbiBNYXJpbmFzIDxj
+YXRhbGluLm1hcmluYXNAYXJtLmNvbT4KPj4gQ2M6IFdpbGwgRGVhY29uIDx3aWxsQGtlcm5lbC5v
+cmc+Cj4+IENjOiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPgo+PiBDYzogSmFtZXMgTW9y
+c2UgPGphbWVzLm1vcnNlQGFybS5jb20+Cj4+IENjOiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2ku
+cG91bG9zZUBhcm0uY29tPgo+PiBDYzogTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNv
+bT4KPj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcKPj4gQ2M6IGt2bWFybUBsaXN0
+cy5jcy5jb2x1bWJpYS5lZHUKPj4gU2lnbmVkLW9mZi1ieTogQW5zaHVtYW4gS2hhbmR1YWwgPGFu
+c2h1bWFuLmtoYW5kdWFsQGFybS5jb20+Cj4+IC0tLQo+PiDCoGFyY2gvYXJtNjQvaW5jbHVkZS9h
+c20vY3B1LmjCoMKgwqAgfCAxICsKPj4gwqBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5o
+IHwgOSArKysrKysrKysKPj4gwqBhcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmPCoCB8IDcg
+KysrKysrLQo+PiDCoGFyY2gvYXJtNjQva2VybmVsL2NwdWluZm8uY8KgwqDCoMKgIHwgMSArCj4+
+IMKgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuY8KgwqDCoMKgwqDCoCB8IDIgKy0KPj4gwqA1IGZp
+bGVzIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYg
+LS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdS5oIGIvYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9jcHUuaAo+PiBpbmRleCBkNzJkOTk1Li5iNGE0MDUzIDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L2FybTY0L2luY2x1ZGUvYXNtL2NwdS5oCj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
+Y3B1LmgKPj4gQEAgLTM5LDYgKzM5LDcgQEAgc3RydWN0IGNwdWluZm9fYXJtNjQgewo+PiDCoMKg
+wqDCoCB1MzLCoMKgwqDCoMKgwqDCoCByZWdfaWRfaXNhcjM7Cj4+IMKgwqDCoMKgIHUzMsKgwqDC
+oMKgwqDCoMKgIHJlZ19pZF9pc2FyNDsKPj4gwqDCoMKgwqAgdTMywqDCoMKgwqDCoMKgwqAgcmVn
+X2lkX2lzYXI1Owo+PiArwqDCoMKgIHUzMsKgwqDCoMKgwqDCoMKgIHJlZ19pZF9pc2FyNjsKPj4g
+wqDCoMKgwqAgdTMywqDCoMKgwqDCoMKgwqAgcmVnX2lkX21tZnIwOwo+PiDCoMKgwqDCoCB1MzLC
+oMKgwqDCoMKgwqDCoCByZWdfaWRfbW1mcjE7Cj4+IMKgwqDCoMKgIHUzMsKgwqDCoMKgwqDCoMKg
+IHJlZ19pZF9tbWZyMjsKPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lz
+cmVnLmgKPj4gYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5oCj4+IGluZGV4IDZkYjNh
+OWIuLjRmZDMzMjcgMTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lzcmVn
+LmgKPj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaAo+PiBAQCAtMTQ2LDYg
+KzE0Niw3IEBACj4+IMKgI2RlZmluZSBTWVNfSURfSVNBUjRfRUwxwqDCoMKgwqDCoMKgwqAgc3lz
+X3JlZygzLCAwLCAwLCAyLCA0KQo+PiDCoCNkZWZpbmUgU1lTX0lEX0lTQVI1X0VMMcKgwqDCoMKg
+wqDCoMKgIHN5c19yZWcoMywgMCwgMCwgMiwgNSkKPj4gwqAjZGVmaW5lIFNZU19JRF9NTUZSNF9F
+TDHCoMKgwqDCoMKgwqDCoCBzeXNfcmVnKDMsIDAsIDAsIDIsIDYpCj4+ICsjZGVmaW5lIFNZU19J
+RF9JU0FSNl9FTDHCoMKgwqDCoMKgwqDCoCBzeXNfcmVnKDMsIDAsIDAsIDIsIDcpCj4+Cj4+IMKg
+I2RlZmluZSBTWVNfTVZGUjBfRUwxwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzeXNfcmVnKDMsIDAs
+IDAsIDMsIDApCj4+IMKgI2RlZmluZSBTWVNfTVZGUjFfRUwxwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBzeXNfcmVnKDMsIDAsIDAsIDMsIDEpCj4+IEBAIC02ODMsNiArNjg0LDE0IEBACj4+IMKgI2Rl
+ZmluZSBJRF9JU0FSNV9BRVNfU0hJRlTCoMKgwqDCoMKgwqDCoCA0Cj4+IMKgI2RlZmluZSBJRF9J
+U0FSNV9TRVZMX1NISUZUwqDCoMKgwqDCoMKgwqAgMAo+Pgo+PiArI2RlZmluZSBJRF9JU0FSNl9K
+U0NWVF9TSElGVMKgwqDCoMKgwqDCoMKgIDAKPj4gKyNkZWZpbmUgSURfSVNBUjZfRFBfU0hJRlTC
+oMKgwqDCoMKgwqDCoCA0Cj4+ICsjZGVmaW5lIElEX0lTQVI2X0ZITV9TSElGVMKgwqDCoMKgwqDC
+oMKgIDgKPj4gKyNkZWZpbmUgSURfSVNBUjZfU0JfU0hJRlTCoMKgwqDCoMKgwqDCoCAxMgo+PiAr
+I2RlZmluZSBJRF9JU0FSNl9TUEVDUkVTX1NISUZUwqDCoMKgwqDCoMKgwqAgMTYKPj4gKyNkZWZp
+bmUgSURfSVNBUjZfQkYxNl9TSElGVMKgwqDCoMKgwqDCoMKgIDIwCj4+ICsjZGVmaW5lIElEX0lT
+QVI2X0k4TU1fU0hJRlTCoMKgwqDCoMKgwqDCoCAyNAo+IAo+IEkgY291bGRuJ3QgZmluZCB0aGUg
+bGFzdCB0d28gaXRlbXMgaW4gdGhlIEUuYSByZXZpc2lvbiBvZiB0aGUgQVJNdjggQVJNLgo+IEkg
+Z3Vlc3MgdGhleSBhcmUgZm9yIHBvc3QgOC41IHJldmlzaW9ucyBvZiB0aGUgYXJjaGl0ZWN0dXJl
+PwoKWWVzLgoKPiAKPj4gKwo+PiDCoCNkZWZpbmUgTVZGUjBfRlBST1VORF9TSElGVMKgwqDCoMKg
+wqDCoMKgIDI4Cj4+IMKgI2RlZmluZSBNVkZSMF9GUFNIVkVDX1NISUZUwqDCoMKgwqDCoMKgwqAg
+MjQKPj4gwqAjZGVmaW5lIE1WRlIwX0ZQU1FSVF9TSElGVMKgwqDCoMKgwqDCoMKgIDIwCj4+IGRp
+ZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgYi9hcmNoL2FybTY0L2tl
+cm5lbC9jcHVmZWF0dXJlLmMKPj4gaW5kZXggZjM0NGNlYS4uM2I5YWM4YiAxMDA2NDQKPj4gLS0t
+IGEvYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva2Vy
+bmVsL2NwdWZlYXR1cmUuYwo+PiBAQCAtMzQ2LDcgKzM0Niw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1
+Y3QgYXJtNjRfZnRyX2JpdHMgZnRyX3pjcltdID0gewo+PiDCoCAqIENvbW1vbiBmdHIgYml0cyBm
+b3IgYSAzMmJpdCByZWdpc3RlciB3aXRoIGFsbCBoaWRkZW4sIHN0cmljdAo+PiDCoCAqIGF0dHJp
+YnV0ZXMsIHdpdGggNGJpdCBmZWF0dXJlIGZpZWxkcyBhbmQgYSBkZWZhdWx0IHNhZmUgdmFsdWUg
+b2YKPj4gwqAgKiAwLiBDb3ZlcnMgdGhlIGZvbGxvd2luZyAzMmJpdCByZWdpc3RlcnM6Cj4+IC0g
+KiBpZF9pc2FyWzAtNF0sIGlkX21tZnJbMS0zXSwgaWRfcGZyMSwgbXZmclswLTFdCj4+ICsgKiBp
+ZF9pc2FyWzAtNCwgNl0sIGlkX21tZnJbMS0zXSwgaWRfcGZyMSwgbXZmclswLTFdCj4+IMKgICov
+Cj4+IMKgc3RhdGljIGNvbnN0IHN0cnVjdCBhcm02NF9mdHJfYml0cyBmdHJfZ2VuZXJpY18zMmJp
+dHNbXSA9IHsKPj4gwqDCoMKgwqAgQVJNNjRfRlRSX0JJVFMoRlRSX0hJRERFTiwgRlRSX1NUUklD
+VCwgRlRSX0xPV0VSX1NBRkUsIDI4LCA0LCAwKSwKPj4gQEAgLTM5OSw2ICszOTksNyBAQCBzdGF0
+aWMgY29uc3Qgc3RydWN0IF9fZnRyX3JlZ19lbnRyeSB7Cj4+IMKgwqDCoMKgIEFSTTY0X0ZUUl9S
+RUcoU1lTX0lEX0lTQVI0X0VMMSwgZnRyX2dlbmVyaWNfMzJiaXRzKSwKPj4gwqDCoMKgwqAgQVJN
+NjRfRlRSX1JFRyhTWVNfSURfSVNBUjVfRUwxLCBmdHJfaWRfaXNhcjUpLAo+PiDCoMKgwqDCoCBB
+Uk02NF9GVFJfUkVHKFNZU19JRF9NTUZSNF9FTDEsIGZ0cl9pZF9tbWZyNCksCj4+ICvCoMKgwqAg
+QVJNNjRfRlRSX1JFRyhTWVNfSURfSVNBUjZfRUwxLCBmdHJfZ2VuZXJpY18zMmJpdHMpLAo+Pgo+
+PiDCoMKgwqDCoCAvKiBPcDEgPSAwLCBDUm4gPSAwLCBDUm0gPSAzICovCj4+IMKgwqDCoMKgIEFS
+TTY0X0ZUUl9SRUcoU1lTX01WRlIwX0VMMSwgZnRyX2dlbmVyaWNfMzJiaXRzKSwKPj4gQEAgLTYw
+Myw2ICs2MDQsNyBAQCB2b2lkIF9faW5pdCBpbml0X2NwdV9mZWF0dXJlcyhzdHJ1Y3QgY3B1aW5m
+b19hcm02NCAqaW5mbykKPj4gwqDCoMKgwqDCoMKgwqDCoCBpbml0X2NwdV9mdHJfcmVnKFNZU19J
+RF9JU0FSM19FTDEsIGluZm8tPnJlZ19pZF9pc2FyMyk7Cj4+IMKgwqDCoMKgwqDCoMKgwqAgaW5p
+dF9jcHVfZnRyX3JlZyhTWVNfSURfSVNBUjRfRUwxLCBpbmZvLT5yZWdfaWRfaXNhcjQpOwo+PiDC
+oMKgwqDCoMKgwqDCoMKgIGluaXRfY3B1X2Z0cl9yZWcoU1lTX0lEX0lTQVI1X0VMMSwgaW5mby0+
+cmVnX2lkX2lzYXI1KTsKPj4gK8KgwqDCoMKgwqDCoMKgIGluaXRfY3B1X2Z0cl9yZWcoU1lTX0lE
+X0lTQVI2X0VMMSwgaW5mby0+cmVnX2lkX2lzYXI2KTsKPj4gwqDCoMKgwqDCoMKgwqDCoCBpbml0
+X2NwdV9mdHJfcmVnKFNZU19JRF9NTUZSMF9FTDEsIGluZm8tPnJlZ19pZF9tbWZyMCk7Cj4+IMKg
+wqDCoMKgwqDCoMKgwqAgaW5pdF9jcHVfZnRyX3JlZyhTWVNfSURfTU1GUjFfRUwxLCBpbmZvLT5y
+ZWdfaWRfbW1mcjEpOwo+PiDCoMKgwqDCoMKgwqDCoMKgIGluaXRfY3B1X2Z0cl9yZWcoU1lTX0lE
+X01NRlIyX0VMMSwgaW5mby0+cmVnX2lkX21tZnIyKTsKPj4gQEAgLTc1Niw2ICs3NTgsOCBAQCB2
+b2lkIHVwZGF0ZV9jcHVfZmVhdHVyZXMoaW50IGNwdSwKPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBpbmZvLT5yZWdfaWRfaXNhcjQsIGJvb3QtPnJlZ19pZF9pc2Fy
+NCk7Cj4+IMKgwqDCoMKgwqDCoMKgwqAgdGFpbnQgfD0gY2hlY2tfdXBkYXRlX2Z0cl9yZWcoU1lT
+X0lEX0lTQVI1X0VMMSwgY3B1LAo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIGluZm8tPnJlZ19pZF9pc2FyNSwgYm9vdC0+cmVnX2lkX2lzYXI1KTsKPj4gK8KgwqDC
+oMKgwqDCoMKgIHRhaW50IHw9IGNoZWNrX3VwZGF0ZV9mdHJfcmVnKFNZU19JRF9JU0FSNl9FTDEs
+IGNwdSwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGluZm8tPnJl
+Z19pZF9pc2FyNiwgYm9vdC0+cmVnX2lkX2lzYXI2KTsKPj4KPj4gwqDCoMKgwqDCoMKgwqDCoCAv
+Kgo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgKiBSZWdhcmRsZXNzIG9mIHRoZSB2YWx1ZSBvZiB0aGUg
+QXV4UmVnIGZpZWxkLCB0aGUgQUlGU1IsIEFERlNSLCBhbmQKPj4gQEAgLTgzNCw2ICs4MzgsNyBA
+QCBzdGF0aWMgdTY0IF9fcmVhZF9zeXNyZWdfYnlfZW5jb2RpbmcodTMyIHN5c19pZCkKPj4gwqDC
+oMKgwqAgcmVhZF9zeXNyZWdfY2FzZShTWVNfSURfSVNBUjNfRUwxKTsKPj4gwqDCoMKgwqAgcmVh
+ZF9zeXNyZWdfY2FzZShTWVNfSURfSVNBUjRfRUwxKTsKPj4gwqDCoMKgwqAgcmVhZF9zeXNyZWdf
+Y2FzZShTWVNfSURfSVNBUjVfRUwxKTsKPj4gK8KgwqDCoCByZWFkX3N5c3JlZ19jYXNlKFNZU19J
+RF9JU0FSNl9FTDEpOwo+PiDCoMKgwqDCoCByZWFkX3N5c3JlZ19jYXNlKFNZU19NVkZSMF9FTDEp
+Owo+PiDCoMKgwqDCoCByZWFkX3N5c3JlZ19jYXNlKFNZU19NVkZSMV9FTDEpOwo+PiDCoMKgwqDC
+oCByZWFkX3N5c3JlZ19jYXNlKFNZU19NVkZSMl9FTDEpOwo+PiBkaWZmIC0tZ2l0IGEvYXJjaC9h
+cm02NC9rZXJuZWwvY3B1aW5mby5jIGIvYXJjaC9hcm02NC9rZXJuZWwvY3B1aW5mby5jCj4+IGlu
+ZGV4IDEwMTIxZjUuLjYwMDVkMzggMTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2Nw
+dWluZm8uYwo+PiArKysgYi9hcmNoL2FybTY0L2tlcm5lbC9jcHVpbmZvLmMKPj4gQEAgLTM2Miw2
+ICszNjIsNyBAQCBzdGF0aWMgdm9pZCBfX2NwdWluZm9fc3RvcmVfY3B1KHN0cnVjdAo+PiBjcHVp
+bmZvX2FybTY0ICppbmZvKQo+PiDCoMKgwqDCoMKgwqDCoMKgIGluZm8tPnJlZ19pZF9pc2FyMyA9
+IHJlYWRfY3B1aWQoSURfSVNBUjNfRUwxKTsKPj4gwqDCoMKgwqDCoMKgwqDCoCBpbmZvLT5yZWdf
+aWRfaXNhcjQgPSByZWFkX2NwdWlkKElEX0lTQVI0X0VMMSk7Cj4+IMKgwqDCoMKgwqDCoMKgwqAg
+aW5mby0+cmVnX2lkX2lzYXI1ID0gcmVhZF9jcHVpZChJRF9JU0FSNV9FTDEpOwo+PiArwqDCoMKg
+wqDCoMKgwqAgaW5mby0+cmVnX2lkX2lzYXI2ID0gcmVhZF9jcHVpZChJRF9JU0FSNl9FTDEpOwo+
+PiDCoMKgwqDCoMKgwqDCoMKgIGluZm8tPnJlZ19pZF9tbWZyMCA9IHJlYWRfY3B1aWQoSURfTU1G
+UjBfRUwxKTsKPj4gwqDCoMKgwqDCoMKgwqDCoCBpbmZvLT5yZWdfaWRfbW1mcjEgPSByZWFkX2Nw
+dWlkKElEX01NRlIxX0VMMSk7Cj4+IMKgwqDCoMKgwqDCoMKgwqAgaW5mby0+cmVnX2lkX21tZnIy
+ID0gcmVhZF9jcHVpZChJRF9NTUZSMl9FTDEpOwo+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9r
+dm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4gaW5kZXggN2RhZGQy
+NC4uYTZiOGNhMSAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+PiAr
+KysgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4+IEBAIC0xNDI0LDcgKzE0MjQsNyBAQCBz
+dGF0aWMgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyBzeXNfcmVnX2Rlc2NzW10gPSB7Cj4+IMKg
+wqDCoMKgIElEX1NBTklUSVNFRChJRF9JU0FSNF9FTDEpLAo+PiDCoMKgwqDCoCBJRF9TQU5JVElT
+RUQoSURfSVNBUjVfRUwxKSwKPj4gwqDCoMKgwqAgSURfU0FOSVRJU0VEKElEX01NRlI0X0VMMSks
+Cj4+IC3CoMKgwqAgSURfVU5BTExPQ0FURUQoMiw3KSwKPj4gK8KgwqDCoCBJRF9TQU5JVElTRUQo
+SURfSVNBUjZfRUwxKSwKPj4KPj4gwqDCoMKgwqAgLyogQ1JtPTMgKi8KPj4gwqDCoMKgwqAgSURf
+U0FOSVRJU0VEKE1WRlIwX0VMMSksCj4gCj4gT3RoZXJ3aXNlLAo+IAo+IEFja2VkLWJ5OiBNYXJj
+IFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPgo+IAo+IMKgwqDCoMKgwqDCoMKgIE0uCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
+c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
+LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
