@@ -4,73 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4418C43603
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218B3C43603
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:05:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 98A16206A5
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDA10206EC
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QHiULuDY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A16206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EceEQl2S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA10206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5294C4A4AA;
-	Mon, 16 Dec 2019 09:05:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86D8E4ACB8;
+	Mon, 16 Dec 2019 09:05:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S23QjkpXJvO1; Mon, 16 Dec 2019 09:05:10 -0500 (EST)
+	with ESMTP id 2r7wGuAE+u18; Mon, 16 Dec 2019 09:05:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 187674A531;
-	Mon, 16 Dec 2019 09:05:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 494D04A50F;
+	Mon, 16 Dec 2019 09:05:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 208A54A4AA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:05:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B46554A49F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:05:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4wDXt+MfzJQV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Dec 2019 09:05:08 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E2A34A4A9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:05:08 -0500 (EST)
+ with ESMTP id Hi0IVhS5jciA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Dec 2019 09:05:14 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C034A531
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:05:14 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505107;
+ s=mimecast20190719; t=1576505114;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=50Vms+tgESY3M8NHXPohpfNztkjGMy8JPeeKVTKoeLA=;
- b=QHiULuDYBgTwGGwW1mR8qFFL6QDM/Pog1adpOKfvfrFJYvsMG3Do47iXss2owwk9FGo9yF
- tQAfse6PyQruZkRY0o/A8/5eVQh0LnUB4kTYILXVT1+vz5KsicuJPT0F0rmOkocSwmD3sI
- vknW++xVUMWnB+ODRE0ANyRJZ5OwDiM=
+ bh=xlSr73pKSiopKdILGn5ZrLva3IOgBSdl74YTmPimHio=;
+ b=EceEQl2S/7DB5qxiHsjqBoLyzNjSpZMoz0SCSrFLtPTx4N3Ps/cL0odiVpcnVuKYcpK0/v
+ XhaHEI3zE8pm7ZIH3WcUlr2kk0+hxoHjfTGprKhhh7cLZRtRst0EFecn5zD6JrKkY1AVHE
+ zOBXcrdJ75t/mFKdNL1qcwepP+K1dT8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-i2RWS0w7O9OR_4XEIYzBcg-1; Mon, 16 Dec 2019 09:04:19 -0500
-X-MC-Unique: i2RWS0w7O9OR_4XEIYzBcg-1
+ us-mta-275-iwcwYKPnPgyNrdKse5Nt7w-1; Mon, 16 Dec 2019 09:03:40 -0500
+X-MC-Unique: iwcwYKPnPgyNrdKse5Nt7w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CCD180257B;
- Mon, 16 Dec 2019 14:04:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D9DDB33;
+ Mon, 16 Dec 2019 14:03:38 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3242968863;
- Mon, 16 Dec 2019 14:04:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58BE1675B9;
+ Mon, 16 Dec 2019 14:03:31 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 11/16] arm/arm64: ITS: Device and collection
- Initialization
-Date: Mon, 16 Dec 2019 15:02:30 +0100
-Message-Id: <20191216140235.10751-12-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 02/16] arm: gic: Provide per-IRQ helper
+ functions
+Date: Mon, 16 Dec 2019 15:02:21 +0100
+Message-Id: <20191216140235.10751-3-eric.auger@redhat.com>
 In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,127 +91,170 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce an helper functions to register
-- a new device, characterized by its device id and the
-  max number of event IDs that dimension its ITT (Interrupt
-  Translation Table).  The function allocates the ITT.
+From: Andre Przywara <andre.przywara@arm.com>
 
-- a new collection, characterized by its ID and the
-  target processing engine (PE).
+A common theme when accessing per-IRQ parameters in the GIC distributor
+is to set fields of a certain bit width in a range of MMIO registers.
+Examples are the enabled status (one bit per IRQ), the level/edge
+configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Add a generic helper function which is able to mask and set the
+respective number of bits, given the IRQ number and the MMIO offset.
+Provide wrappers using this function to easily allow configuring an IRQ.
+
+For now assume that private IRQ numbers always refer to the current CPU.
+In a GICv2 accessing the "other" private IRQs is not easily doable (the
+registers are banked per CPU on the same MMIO address), so we impose the
+same limitation on GICv3, even though those registers are not banked
+there anymore.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
 ---
----
- lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
- lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
 
-diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index ab639c5..245ef61 100644
---- a/lib/arm/asm/gic-v3-its.h
-+++ b/lib/arm/asm/gic-v3-its.h
-@@ -87,6 +87,9 @@
+initialize reg
+---
+ lib/arm/asm/gic-v3.h |  2 +
+ lib/arm/asm/gic.h    |  9 +++++
+ lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 101 insertions(+)
+
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 347be2f..4a445a5 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -23,6 +23,8 @@
+ #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+ #define GICD_CTLR_ENABLE_G1		(1U << 0)
  
- #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
- 
-+#define GITS_MAX_DEVICES		8
-+#define GITS_MAX_COLLECTIONS		8
++#define GICD_IROUTER			0x6000
 +
- struct its_typer {
- 	unsigned int ite_size;
- 	unsigned int eventid_bits;
-@@ -117,6 +120,17 @@ struct its_cmd_block {
- 	u64     raw_cmd[4];
- };
+ /* Re-Distributor registers, offsets from RD_base */
+ #define GICR_TYPER			0x0008
  
-+struct its_device {
-+	u32 device_id;	/* device ID */
-+	u32 nr_ites;	/* Max Interrupt Translation Entries */
-+	void *itt;	/* Interrupt Translation Table GPA */
-+};
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 1fc10a0..21cdb58 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -15,6 +15,7 @@
+ #define GICD_IIDR			0x0008
+ #define GICD_IGROUPR			0x0080
+ #define GICD_ISENABLER			0x0100
++#define GICD_ICENABLER			0x0180
+ #define GICD_ISPENDR			0x0200
+ #define GICD_ICPENDR			0x0280
+ #define GICD_ISACTIVER			0x0300
+@@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+ 
++void gic_set_irq_bit(int irq, int offset);
++void gic_enable_irq(int irq);
++void gic_disable_irq(int irq);
++void gic_set_irq_priority(int irq, u8 prio);
++void gic_set_irq_target(int irq, int cpu);
++void gic_set_irq_group(int irq, int group);
++int gic_get_irq_group(int irq);
 +
-+struct its_collection {
-+	u64 target_address;
-+	u16 col_id;
-+};
-+
- struct its_data {
- 	void *base;
- 	struct its_typer typer;
-@@ -124,6 +138,10 @@ struct its_data {
- 	struct its_cmd_block *cmd_base;
- 	struct its_cmd_block *cmd_write;
- 	struct its_cmd_block *cmd_readr;
-+	struct its_device devices[GITS_MAX_DEVICES];
-+	u32 nb_devices;		/* Allocated Devices */
-+	struct its_collection collections[GITS_MAX_COLLECTIONS];
-+	u32 nb_collections;	/* Allocated Collections */
- };
- 
- extern struct its_data its_data;
-@@ -140,6 +158,8 @@ extern u8 get_lpi_config(int n);
- extern void set_pending_table_bit(int rdist, int n, bool set);
- extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
- extern void its_enable_defaults(void);
-+extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
-+extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
- 
  #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_V3_ITS_H_ */
-diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 9a51ef4..9906428 100644
---- a/lib/arm/gic-v3-its.c
-+++ b/lib/arm/gic-v3-its.c
-@@ -284,3 +284,49 @@ void its_enable_defaults(void)
- 
- 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 9430116..aa9cb86 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+ 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ 	gic_common_ops->ipi_send_mask(irq, dest);
  }
 +
-+struct its_device *its_create_device(u32 device_id, int nr_ites)
++enum gic_bit_access {
++	ACCESS_READ,
++	ACCESS_SET,
++	ACCESS_RMW
++};
++
++static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
++			      enum gic_bit_access access)
 +{
-+	struct its_baser *baser;
-+	struct its_device *new;
-+	unsigned long n, order;
++	void *base;
++	int split = 32 / bits;
++	int shift = (irq % split) * bits;
++	u32 reg = 0, mask = ((1U << bits) - 1) << shift;
 +
-+	if (its_data.nb_devices >= GITS_MAX_DEVICES)
-+		report_abort("%s redimension GITS_MAX_DEVICES", __func__);
++	switch (gic_version()) {
++	case 2:
++		base = gicv2_dist_base();
++		break;
++	case 3:
++		if (irq < 32)
++			base = gicv3_sgi_base();
++		else
++			base = gicv3_dist_base();
++		break;
++	default:
++		return 0;
++	}
++	base += offset + (irq / split) * 4;
 +
-+	baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
-+	if (!baser)
-+		return NULL;
++	switch (access) {
++	case ACCESS_READ:
++		return (readl(base) & mask) >> shift;
++	case ACCESS_SET:
++		reg = 0;
++		break;
++	case ACCESS_RMW:
++		reg = readl(base) & ~mask;
++		break;
++	}
 +
-+	new = &its_data.devices[its_data.nb_devices];
++	writel(reg | ((u32)value << shift), base);
 +
-+	new->device_id = device_id;
-+	new->nr_ites = nr_ites;
-+
-+	n = (baser->esz * nr_ites) >> PAGE_SHIFT;
-+	order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
-+	new->itt = (void *)virt_to_phys(alloc_pages(order));
-+
-+	its_data.nb_devices++;
-+	return new;
++	return 0;
 +}
 +
-+struct its_collection *its_create_collection(u32 col_id, u32 pe)
++void gic_set_irq_bit(int irq, int offset)
 +{
-+	struct its_collection *new;
++	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
++}
 +
-+	if (its_data.nb_collections >= GITS_MAX_COLLECTIONS)
-+		report_abort("%s redimension GITS_MAX_COLLECTIONS", __func__);
++void gic_enable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ISENABLER);
++}
 +
-+	new = &its_data.collections[its_data.nb_collections];
++void gic_disable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ICENABLER);
++}
 +
-+	new->col_id = col_id;
++void gic_set_irq_priority(int irq, u8 prio)
++{
++	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
++}
 +
-+	if (its_data.typer.pta)
-+		new->target_address = (u64)gicv3_data.redist_base[pe];
-+	else
-+		new->target_address = pe << 16;
++void gic_set_irq_target(int irq, int cpu)
++{
++	if (irq < 32)
++		return;
 +
-+	its_data.nb_collections++;
-+	return new;
++	if (gic_version() == 2) {
++		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
++				    ACCESS_RMW);
++
++		return;
++	}
++
++	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
++}
++
++int gic_get_irq_group(int irq)
++{
++	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
 +}
 -- 
 2.20.1
