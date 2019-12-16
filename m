@@ -2,151 +2,69 @@ Return-Path: <SRS0=GAmw=2G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 808E0C2D0CF
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 08:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB31C2D0C3
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 10:31:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0DBD1207FF
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 08:25:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DBD1207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2C84420725
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 10:31:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C84420725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64D464A4F7;
-	Mon, 16 Dec 2019 03:25:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7854A4F6;
+	Mon, 16 Dec 2019 05:31:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 716Kgx4zHk9l; Mon, 16 Dec 2019 03:25:38 -0500 (EST)
+	with ESMTP id KrxSN-0Q6Pkb; Mon, 16 Dec 2019 05:31:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5754A50F;
-	Mon, 16 Dec 2019 03:25:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CCAE4A500;
+	Mon, 16 Dec 2019 05:31:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9F534A4F7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 03:25:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2AF4A4F6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 05:31:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AbsL0w38PreB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Dec 2019 03:25:35 -0500 (EST)
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D77504A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 03:25:35 -0500 (EST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBG8MhU4135740
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 03:25:35 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wwdt905w8-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 03:25:35 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Mon, 16 Dec 2019 08:25:33 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 16 Dec 2019 08:25:26 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBG8PPQ143647108
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Dec 2019 08:25:25 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 91DDAA405B;
- Mon, 16 Dec 2019 08:25:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E7EEEA405F;
- Mon, 16 Dec 2019 08:25:24 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.212])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 16 Dec 2019 08:25:24 +0000 (GMT)
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-To: Sean Christopherson <sean.j.christopherson@intel.com>,
- James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
- Marc Zyngier <maz@kernel.org>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191203221433.GK19877@linux.intel.com>
- <20191213200151.GF31552@linux.intel.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 16 Dec 2019 09:25:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id uisUD3SuqUfl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Dec 2019 05:31:22 -0500 (EST)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44AAE4A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 05:31:22 -0500 (EST)
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1igneq-0003dz-DA; Mon, 16 Dec 2019 11:31:20 +0100
+To: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
+ mappings
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-In-Reply-To: <20191213200151.GF31552@linux.intel.com>
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19121608-0008-0000-0000-000003414B55
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121608-0009-0000-0000-00004A6156B0
-Message-Id: <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-16_01:2019-12-16,2019-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 mlxscore=0
- priorityscore=1501 spamscore=0 lowpriorityscore=0 bulkscore=0
- suspectscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912160075
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Date: Mon, 16 Dec 2019 10:31:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <20191213111400.GI28840@e113682-lin.lund.arm.com>
+References: <20191211165651.7889-1-maz@kernel.org>
+ <20191211165651.7889-2-maz@kernel.org>
+ <20191213082920.GA28840@e113682-lin.lund.arm.com>
+ <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
+ <20191213111400.GI28840@e113682-lin.lund.arm.com>
+Message-ID: <4889a4894f13c67f7e48466afb0763f6@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -158,62 +76,244 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 13.12.19 21:01, Sean Christopherson wrote:
-> On Tue, Dec 03, 2019 at 02:14:33PM -0800, Sean Christopherson wrote:
->> On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
->>> The end goal of this series is to dynamically size the memslot array so
->>> that KVM allocates memory based on the number of memslots in use, as
->>> opposed to unconditionally allocating memory for the maximum number of
->>> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
->>> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
->>> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
->>> the memory footprint from 90k to ~2.6k bytes.
->>>
->>> The changes required to support dynamic sizing are relatively small,
->>> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
->>> clean up the memslot code, which has gotten quite crusty, especially
->>> __kvm_set_memory_region().  The clean up is likely not strictly necessary
->>> to switch to dynamic sizing, but I didn't have a remotely reasonable
->>> level of confidence in the correctness of the dynamic sizing without first
->>> doing the clean up.
->>>
->>> Christoffer, I added your Tested-by to the patches that I was confident
->>> would be fully tested based on the desription of what you tested.  Let me
->>> know if you disagree with any of 'em.
->>>
->>> v3:
->>>   - Fix build errors on PPC and MIPS due to missed params during
->>>     refactoring [kbuild test robot].
->>>   - Rename the helpers for update_memslots() and add comments describing
->>>     the new algorithm and how it interacts with searching [Paolo].
->>>   - Remove the unnecessary and obnoxious warning regarding memslots being
->>>     a flexible array [Paolo].
->>>   - Fix typos in the changelog of patch 09/15 [Christoffer].
->>>   - Collect tags [Christoffer].
->>>
->>> v2:
->>>   - Split "Drop kvm_arch_create_memslot()" into three patches to move
->>>     minor functional changes to standalone patches [Janosch].
->>>   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
->>>   - Collect an Acked-by and a Reviewed-by
+On 2019-12-13 11:14, Christoffer Dall wrote:
+> On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
+>> Hi Christoffer,
 >>
->> Paolo, do you want me to rebase this to the latest kvm/queue?
-> 
-> Ping.
-> 
-> Applies cleanly on the current kvm/queue and nothing caught fire in
-> testing (though I only re-tested the series as a whole).
+>> On 2019-12-13 08:29, Christoffer Dall wrote:
+>> > Hi Marc,
+>> >
+>> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
+>> > > A device mapping is normally always mapped at Stage-2, since 
+>> there
+>> > > is very little gain in having it faulted in.
+>> >
+>> > It is actually becoming less clear to me what the real benefits of
+>> > pre-populating the stage 2 page table are, especially given that 
+>> we can
+>> > provoke a situation where they're faulted in anyhow.  Do you 
+>> recall if
+>> > we had any specific case that motivated us to pre-fault in the 
+>> pages?
+>>
+>> It's only a minor performance optimization that was introduced by 
+>> Ard in
+>> 8eef91239e57d. Which makes sense for platform devices that have a 
+>> single
+>> fixed location in memory. It makes slightly less sense for PCI, 
+>> where
+>> you can move things around.
+>
+> User space could still decide to move things around in its VA map 
+> even
+> if the device is fixed.
+>
+> Anyway, I was thinking more if there was some sort of device, like a
+> frambuffer, which for example crosses page boundaries and where it 
+> would
+> be visible to the user that there's a sudden performance drop while
+> operating the device over page boundaries.  Anything like that?
+>
+>>
+>> > > Nonetheless, it is possible to end-up in a situation where the
+>> > > device
+>> > > mapping has been removed from Stage-2 (userspace munmaped the 
+>> VFIO
+>> > > region, and the MMU notifier did its job), but present in a
+>> > > userspace
+>> > > mapping (userpace has mapped it back at the same address). In 
+>> such
+>> > > a situation, the device mapping will be demand-paged as the 
+>> guest
+>> > > performs memory accesses.
+>> > >
+>> > > This requires to be careful when dealing with mapping size, 
+>> cache
+>> > > management, and to handle potential execution of a device 
+>> mapping.
+>> > >
+>> > > Cc: stable@vger.kernel.org
+>> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> > > ---
+>> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+>> > >  1 file changed, 17 insertions(+), 4 deletions(-)
+>> > >
+>> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> > > index a48994af70b8..0b32a904a1bb 100644
+>> > > --- a/virt/kvm/arm/mmu.c
+>> > > +++ b/virt/kvm/arm/mmu.c
+>> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
+>> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+>> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+>> > >
+>> > > +static bool is_iomap(unsigned long flags)
+>> > > +{
+>> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+>> > > +}
+>> > > +
+>> >
+>> > nit: I'm not really sure this indirection makes the code more 
+>> readable,
+>> > but I guess that's a matter of taste.
+>> >
+>> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>> > >  {
+>> > >  	return memslot->dirty_bitmap && !(memslot->flags &
+>> > > KVM_MEM_READONLY);
+>> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
+>> > > *vcpu, phys_addr_t fault_ipa,
+>> > >
+>> > >  	vma_pagesize = vma_kernel_pagesize(vma);
+>> > >  	if (logging_active ||
+>> > > +	    (vma->vm_flags & VM_PFNMAP) ||
+>> >
+>> > WHat is actually the rationale for this?
+>> >
+>> > Why is a huge mapping not permitted to device memory?
+>> >
+>> > Are we guaranteed that VM_PFNMAP on the vma results in device 
+>> mappings?
+>> > I'm not convinced this is the case, and it would be better if we 
+>> can
+>> > stick to a single primitive (either kvm_is_device_pfn, or 
+>> VM_PFNMAP) to
+>> > detect device mappings.
+>>
+>> For now, I've tried to keep the two paths that deal with mapping 
+>> devices
+>> (or rather, things that we interpret as devices) as close as 
+>> possible.
+>> If we drop the "eager" mapping, then we're at liberty to restructure
+>> this in creative ways.
+>>
+>> This includes potential huge mappings, but I'm not sure the rest of 
+>> the
+>> kernel uses them for devices anyway (I need to find out).
+>>
+>> > As a subsequent patch, I'd like to make sure that at the very 
+>> least our
+>> > memslot prepare function follows the exact same logic for mapping 
+>> device
+>> > memory as a fault-in approach does, or that we simply always fault 
+>> pages
+>> > in.
+>>
+>> As far as I can see, the two approach are now identical. Am I 
+>> missing
+>> something?
+>> And yes, getting rid of the eager mapping works for me.
+>>
+>
+> As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() 
+> which
+> goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
+> might result in doing the same offset calculation that we do in
+> kvm_arch_prepare_memory_region(), but it also considers other 
+> scenarios.
+>
+> Even if we analyze all that and convince oursleves it's always all 
+> the
+> same on arm64, the two code paths could change, leading to really 
+> hard
+> to debug differing behavior, and nobody will actively keep the two 
+> paths
+> in sync.  I'd be fine with keeping the performance optimization if we
+> have good grounds for that though, and using the same translation
+> mechanism for VM_PFNMAP as user_mem_abort.
+>
+> Am I missing something?
 
-Do you have the latest version somewhere on a branch? The version on the
-list no longer applies cleanly.  
+I'm not disputing any of the above. I'm only trying to keep this patch
+minimal so that we can easily backport it (although it is arguable that
+deleting code isn't that big a deal).
 
+[...]
+
+>> > I can't seem to decide for myself if I think there's a sematic
+>> > difference between trying to execute from somewhere the VMM has
+>> > explicitly told us is device memory and from somewhere which we 
+>> happen
+>> > to have mapped with VM_PFNMAP from user space.  But I also can't 
+>> seem to
+>> > really fault it (pun intended).  Thoughts?
+>>
+>> The issue is that the VMM never really tells us whether something is 
+>> a
+>> device mapping or not (the only exception being the GICv2 cpuif). 
+>> Even
+>> with PFNMAP, we guess it (it could well be memory that lives outside
+>> of the linear mapping). I don't see a way to lift this ambiguity.
+>>
+>> Ideally, faulting on executing a non-mapping should be offloaded to
+>> userspace for emulation, in line with your patches that offload
+>> non-emulated data accesses. That'd be a new ABI, and I can't imagine
+>> anyone willing to deal with it.
+>
+> So what I was asking was if it makes sense to report the Prefetch 
+> Abort
+> in the case where the VMM has already told us that it doesn't want to
+> register anything backing the IPA (no memslot), and instead return an
+> error to user space, so that it can make a decision (for example 
+> inject
+> an external abort, which may have been the right thing to do in the
+> former case as well, but that could be considered ABI now, so let's 
+> not
+> kick that hornet's nest).
+>
+> In any case, no strong feelings here, I just have a vague feeling 
+> that
+> injecting more prefetch aborts on execute-from-some-device is not
+> necessarily the right thing to do.
+
+The ARMv8 ARM has the following stuff in B2.7.2 (Device Memory):
+
+<quote>
+Hardware does not prevent speculative instruction fetches from a memory 
+location with any of the Device
+memory attributes unless the memory location is also marked as 
+Execute-never for all Exception levels.
+
+Note
+
+This means that to prevent speculative instruction fetches from memory 
+locations with Device memory
+attributes, any location that is assigned any Device memory type must 
+also be marked as Execute-never for
+all Exception levels. Failure to mark a memory location with any Device 
+memory attribute as Execute-never
+for all Exception levels is a programming error.
+</quote>
+
+and
+
+<quote>
+For instruction fetches, if branches cause the program counter to point 
+to an area of memory with the Device
+attribute which is not marked as Execute-never for the current 
+Exception level, an implementation can either:
+
+- Treat the instruction fetch as if it were to a memory location with 
+the Normal Non-cacheable attribute.
+
+- Take a Permission fault.
+</quote>
+
+My reading here is that a prefetch abort is the right thing to do.
+What we don't do correctly is that we qualify it as an external abort
+instead of a permission fault (which is annoying as it requires us
+to find out about the S1 translation level).
+
+Happy to revisit this once we get a S1 PTW.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
