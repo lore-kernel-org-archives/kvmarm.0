@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92226C2D0BF
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A09C43603
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:04:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4AD1820684
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 703F020717
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 14:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AIylJovt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AD1820684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehfn8tjV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 703F020717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C62BF4A7FE;
-	Mon, 16 Dec 2019 09:04:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 150264AD09;
+	Mon, 16 Dec 2019 09:04:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aBv0KJHbZxXe; Mon, 16 Dec 2019 09:04:33 -0500 (EST)
+	with ESMTP id IbLErq2ADpcL; Mon, 16 Dec 2019 09:04:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EAB24A830;
-	Mon, 16 Dec 2019 09:04:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5FB54A65C;
+	Mon, 16 Dec 2019 09:04:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 640974A5A6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:04:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38FA44A5A8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:04:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U0-X35bHl91y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Dec 2019 09:04:31 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1642D4A7E4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:04:30 -0500 (EST)
+ with ESMTP id 0VRO+N1NGQRh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Dec 2019 09:04:37 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ED6A4ACD6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 09:04:36 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505069;
+ s=mimecast20190719; t=1576505075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oEODYmr2qU023nvtVQu7D64kTuPbyxsd5COA3rYdVjg=;
- b=AIylJovtuFyC3lK3zyGuwKMhrzNIViQO1pcfFMCoz2IWstoigMlnzcDaH0zQYPpTF+Zs+j
- tHiL87yaRNxHDN+z3b2rfLu34ojqgvK+YkqIDEwJGCDxqr0paFb//VU98AoGSrnX80HZtx
- zB7m8WD2xnMlz3CDeg90+VAwv4fN1Rg=
+ bh=olbkIGqVdpmbfsbYDxrstaTae7GtUoDRav6L33mLKZM=;
+ b=Ehfn8tjVj4GtRUptdOQybGkNR5DPbjxRoWZyS8iUGYiz+IMvhvo9i5IRoUwlb/RCTiV/CD
+ 9s3vpg1zAToOL6m2MAuAqcK17DZ+AZeGgWSxRig93Xs7qoE15f3lBS1v9kichL65u3tdRH
+ 95S2Kg//5G7gHxT3aSXhxThrVkaKdN0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-n_HoM9aQPTiBfhJ9ttW-PQ-1; Mon, 16 Dec 2019 09:04:27 -0500
-X-MC-Unique: n_HoM9aQPTiBfhJ9ttW-PQ-1
+ us-mta-64-Kf2l28LmO9O_7pIkl3byZg-1; Mon, 16 Dec 2019 09:04:34 -0500
+X-MC-Unique: Kf2l28LmO9O_7pIkl3byZg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BCF41854351;
- Mon, 16 Dec 2019 14:04:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA6F593A2;
+ Mon, 16 Dec 2019 14:04:32 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 26470675B9;
- Mon, 16 Dec 2019 14:04:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C8645675BE;
+ Mon, 16 Dec 2019 14:04:29 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 13/16] arm/arm64: ITS: INT functional tests
-Date: Mon, 16 Dec 2019 15:02:32 +0100
-Message-Id: <20191216140235.10751-14-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 15/16] arm/arm64: ITS: migration tests
+Date: Mon, 16 Dec 2019 15:02:34 +0100
+Message-Id: <20191216140235.10751-16-eric.auger@redhat.com>
 In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,137 +91,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Triggers LPIs through the INT command.
-
-the test checks the LPI hits the right CPU and triggers
-the right LPI intid, ie. the translation is correct.
-
-Updates to the config table also are tested, along with inv
-and invall commands.
+This test maps LPIs (populates the device table, the collection table,
+interrupt translation tables, configuration table), migrates and make
+sure the translation is correct on the destination.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/gic.c                | 174 +++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg        |   6 ++
- lib/arm/asm/gic-v3-its.h |  14 ++++
- 3 files changed, 194 insertions(+)
+ arm/gic.c                | 55 +++++++++++++++++++++++++++++++++++++---
+ arm/unittests.cfg        |  7 +++++
+ lib/arm/asm/gic-v3-its.h |  2 ++
+ lib/arm/gic-v3-its.c     | 22 ++++++++++++++++
+ 4 files changed, 82 insertions(+), 4 deletions(-)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index 8b56fce..6b73258 100644
+index 6b73258..8cca743 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -34,6 +34,7 @@ static struct gic *gic;
- static int acked[NR_CPUS], spurious[NR_CPUS];
- static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
- static cpumask_t ready;
-+static struct its_stats lpi_stats;
+@@ -642,13 +642,19 @@ static int its_prerequisites(int nb_cpus)
+ 	return 0;
+ }
  
- static void nr_cpu_check(int nr)
+-static void test_its_trigger(void)
++/*
++ * Setup the configuration for those mappings:
++ * dev_id=2 event=20 -> vcpu 3, intid=8195
++ * dev_id=7 event=255 -> vcpu 2, intid=8196
++ * LPIs ready to hit
++ */
++static int its_setup1(void)
  {
-@@ -158,6 +159,54 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 	}
- }
+ 	struct its_collection *col3, *col2;
+ 	struct its_device *dev2, *dev7;
  
-+static void lpi_handler(struct pt_regs *regs __unused)
-+{
-+	u32 irqstat = gic_read_iar();
-+	int irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+	if (irqnr < 8192)
-+		report(false, "Unexpected non LPI interrupt received");
-+	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
-+	lpi_stats.observed.cpu_id = smp_processor_id();
-+	lpi_stats.observed.lpi_id = irqnr;
-+	smp_wmb(); /* pairs with rmb in check_lpi_stats */
-+}
-+
-+static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
-+{
-+	lpi_stats.expected.cpu_id = exp_cpu_id;
-+	lpi_stats.expected.lpi_id = exp_lpi_id;
-+	lpi_stats.observed.cpu_id = -1;
-+	lpi_stats.observed.lpi_id = -1;
-+	smp_wmb(); /* pairs with rmb in handler */
-+}
-+
-+static void check_lpi_stats(void)
-+{
-+	mdelay(100);
-+	smp_rmb(); /* pairs with wmb in lpi_handler */
-+	if ((lpi_stats.observed.cpu_id != lpi_stats.expected.cpu_id) ||
-+	    (lpi_stats.observed.lpi_id != lpi_stats.expected.lpi_id)) {
-+		if (lpi_stats.observed.cpu_id == -1 &&
-+		    lpi_stats.observed.lpi_id == -1) {
-+			report(false,
-+			       "No LPI received whereas (cpuid=%d, intid=%d) "
-+			       "was expected", lpi_stats.expected.cpu_id,
-+			       lpi_stats.expected.lpi_id);
-+		} else {
-+			report(false, "Unexpected LPI (cpuid=%d, intid=%d)",
-+			       lpi_stats.observed.cpu_id,
-+			       lpi_stats.observed.lpi_id);
-+		}
-+	} else if (lpi_stats.expected.lpi_id != -1) {
-+		report(true, "LPI %d on CPU %d", lpi_stats.observed.lpi_id,
-+		       lpi_stats.observed.cpu_id);
-+	} else {
-+		report(true, "no LPI received, as expected");
-+	}
-+}
-+
- static void gicv2_ipi_send_self(void)
- {
- 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
-@@ -241,6 +290,14 @@ static void ipi_test(void *data __unused)
- 		ipi_recv();
- }
- 
-+static void secondary_lpi_test(void)
-+{
-+	setup_irq(lpi_handler);
-+	cpumask_set_cpu(smp_processor_id(), &ready);
-+	while (1)
-+		wfi();
-+}
-+
- static struct gic gicv2 = {
- 	.ipi = {
- 		.send_self = gicv2_ipi_send_self,
-@@ -552,6 +609,120 @@ static void test_its_baser(void)
- 	report_info("collection baser entry_size = 0x%x", dev_baser->esz);
- }
- 
-+static int its_prerequisites(int nb_cpus)
-+{
-+	int cpu;
-+
-+	if (!gicv3_its_base()) {
-+		report_skip("No ITS, skip ...");
+ 	if (its_prerequisites(4))
+-		return;
 +		return -1;
-+	}
-+
-+	if (nr_cpus < 4) {
-+		report_skip("Test requires at least %d vcpus", nb_cpus);
-+		return -1;
-+	}
-+
-+	stats_reset();
-+
-+	setup_irq(lpi_handler);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		smp_boot_secondary(cpu, secondary_lpi_test);
-+	}
-+	wait_on_ready();
-+
-+	its_enable_defaults();
-+
-+	lpi_stats_expect(-1, -1);
-+	check_lpi_stats();
-+
+ 
+ 	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+ 	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+@@ -662,8 +668,6 @@ static void test_its_trigger(void)
+ 	its_send_invall(col2);
+ 	its_send_invall(col3);
+ 
+-	report_prefix_push("int");
+-
+ 	its_send_mapd(dev2, true);
+ 	its_send_mapd(dev7, true);
+ 
+@@ -674,6 +678,23 @@ static void test_its_trigger(void)
+ 		       20 /* event id */, col3);
+ 	its_send_mapti(dev7, 8196 /* lpi id */,
+ 		       255 /* event id */, col2);
 +	return 0;
 +}
 +
@@ -230,33 +150,35 @@ index 8b56fce..6b73258 100644
 +	struct its_collection *col3, *col2;
 +	struct its_device *dev2, *dev7;
 +
-+	if (its_prerequisites(4))
++	if (its_setup1())
 +		return;
 +
-+	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
-+
-+	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
-+	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
-+
-+	set_lpi_config(8195, LPI_PROP_DEFAULT);
-+	set_lpi_config(8196, LPI_PROP_DEFAULT);
-+
-+	its_send_invall(col2);
-+	its_send_invall(col3);
++	col3 = its_get_collection(3);
++	col2 = its_get_collection(2);
++	dev2 = its_get_device(2);
++	dev7 = its_get_device(7);
 +
 +	report_prefix_push("int");
+ 
+ 	lpi_stats_expect(3, 8195);
+ 	its_send_int(dev2, 20);
+@@ -722,6 +743,28 @@ static void test_its_trigger(void)
+ 	check_lpi_stats();
+ }
+ 
++static void test_its_migration(void)
++{
++	struct its_device *dev2, *dev7;
 +
-+	its_send_mapd(dev2, true);
-+	its_send_mapd(dev7, true);
++	if (its_setup1())
++		return;
 +
-+	its_send_mapc(col3, true);
-+	its_send_mapc(col2, true);
++	dev2 = its_get_device(2);
++	dev7 = its_get_device(7);
 +
-+	its_send_mapti(dev2, 8195 /* lpi id */,
-+		       20 /* event id */, col3);
-+	its_send_mapti(dev7, 8196 /* lpi id */,
-+		       255 /* event id */, col2);
++	puts("Now migrate the VM, then press a key to continue...\n");
++	(void)getchar();
++	report(true, "Migration complete");
 +
 +	lpi_stats_expect(3, 8195);
 +	its_send_int(dev2, 20);
@@ -265,109 +187,82 @@ index 8b56fce..6b73258 100644
 +	lpi_stats_expect(2, 8196);
 +	its_send_int(dev7, 255);
 +	check_lpi_stats();
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("inv/invall");
-+
-+	/* disable 8195 */
-+	set_lpi_config(8195, LPI_PROP_DEFAULT & ~0x1);
-+	its_send_inv(dev2, 20);
-+
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats();
-+
-+	set_lpi_config(8195, LPI_PROP_DEFAULT);
-+	/* willingly forget the INVALL*/
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats();
-+
-+	its_send_invall(col3);
-+	lpi_stats_expect(3, 8195);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats();
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("mapd valid=false");
-+	its_send_mapd(dev2, false);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats();
-+	report_prefix_pop();
-+
-+	report_prefix_push("mapc valid=false");
-+	its_send_mapc(col2, false);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats();
 +}
-+
-+
+ 
  int main(int argc, char **argv)
  {
- 	if (!gic_init()) {
-@@ -582,6 +753,9 @@ int main(int argc, char **argv)
- 	} else if (strcmp(argv[1], "mmio") == 0) {
+@@ -757,6 +800,10 @@ int main(int argc, char **argv)
  		report_prefix_push(argv[1]);
- 		gic_test_mmio();
-+	} else if (!strcmp(argv[1], "its-trigger")) {
-+		report_prefix_push(argv[1]);
-+		test_its_trigger();
+ 		test_its_trigger();
  		report_prefix_pop();
++	} else if (!strcmp(argv[1], "its-migration")) {
++		report_prefix_push(argv[1]);
++		test_its_migration();
++		report_prefix_pop();
  	} else if (strcmp(argv[1], "its-introspection") == 0) {
  		report_prefix_push(argv[1]);
+ 		test_its_introspection();
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 2234a0f..80a1d27 100644
+index 80a1d27..29e2efc 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -134,6 +134,12 @@ smp = $MAX_SMP
- extra_params = -machine gic-version=3 -append 'its-baser'
+@@ -140,6 +140,13 @@ smp = $MAX_SMP
+ extra_params = -machine gic-version=3 -append 'its-trigger'
  groups = its
  
-+[its-trigger]
++[its-migration]
 +file = gic.flat
 +smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'its-trigger'
-+groups = its
++accel = kvm
++extra_params = -machine gic-version=3 -append 'its-migration'
++groups = its migration
 +
  # Test PSCI emulation
  [psci]
  file = psci.flat
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index d074c17..d4fd799 100644
+index d4fd799..c38d524 100644
 --- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -162,6 +162,16 @@ struct its_data {
- 	u32 nb_collections;	/* Allocated Collections */
- };
+@@ -206,6 +206,8 @@ extern void its_send_movi(struct its_device *dev,
+ 			  struct its_collection *col, u32 id);
+ extern void its_send_sync(struct its_collection *col);
+ extern void its_print_cmd_state(void);
++extern struct its_device *its_get_device(u32 id);
++extern struct its_collection *its_get_collection(u32 id);
  
-+struct its_event {
-+	int cpu_id;
-+	int lpi_id;
-+};
+ #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
+ #define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
+diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+index 9906428..e2e289c 100644
+--- a/lib/arm/gic-v3-its.c
++++ b/lib/arm/gic-v3-its.c
+@@ -330,3 +330,25 @@ struct its_collection *its_create_collection(u32 col_id, u32 pe)
+ 	its_data.nb_collections++;
+ 	return new;
+ }
 +
-+struct its_stats {
-+	struct its_event expected;
-+	struct its_event observed;
-+};
++struct its_device *its_get_device(u32 id)
++{
++	int i;
 +
- extern struct its_data its_data;
- 
- #define gicv3_its_base()		(its_data.base)
-@@ -178,6 +188,10 @@ extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
- extern void its_enable_defaults(void);
- extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
- extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
-+extern struct its_collection *its_create_collection(u32 col_id, u32 target);
++	for (i = 0; i < GITS_MAX_DEVICES; i++) {
++		if (its_data.devices[i].device_id == id)
++			return &its_data.devices[i];
++	}
++	return NULL;
++}
 +
-+extern void set_lpi_config(int n, u8 val);
-+extern u8 get_lpi_config(int n);
- 
- extern void its_send_mapd(struct its_device *dev, int valid);
- extern void its_send_mapc(struct its_collection *col, int valid);
++struct its_collection *its_get_collection(u32 id)
++{
++	int i;
++
++	for (i = 0; i < GITS_MAX_COLLECTIONS; i++) {
++		if (its_data.collections[i].col_id == id)
++			return &its_data.collections[i];
++	}
++	return NULL;
++}
 -- 
 2.20.1
 
