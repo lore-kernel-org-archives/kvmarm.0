@@ -2,69 +2,56 @@ Return-Path: <SRS0=GAmw=2G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB31C2D0C3
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 10:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1041C2D0BF
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 11:56:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2C84420725
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 10:31:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C84420725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 17A962072B
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Dec 2019 11:56:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A962072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7854A4F6;
-	Mon, 16 Dec 2019 05:31:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9724A586;
+	Mon, 16 Dec 2019 06:56:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KrxSN-0Q6Pkb; Mon, 16 Dec 2019 05:31:25 -0500 (EST)
+	with ESMTP id LwfdeNRkNzgn; Mon, 16 Dec 2019 06:56:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CCAE4A500;
-	Mon, 16 Dec 2019 05:31:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 602C84A59B;
+	Mon, 16 Dec 2019 06:56:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2AF4A4F6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 05:31:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D57FE4A586
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 06:56:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uisUD3SuqUfl for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Dec 2019 05:31:22 -0500 (EST)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44AAE4A4A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 05:31:22 -0500 (EST)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1igneq-0003dz-DA; Mon, 16 Dec 2019 11:31:20 +0100
-To: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
- mappings
-X-PHP-Originating-Script: 0:main.inc
+ with ESMTP id 83NsxnrQnw-B for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Dec 2019 06:56:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 966474A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Dec 2019 06:56:43 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E680F1FB;
+ Mon, 16 Dec 2019 03:56:42 -0800 (PST)
+Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com
+ [10.1.194.43])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E41E13F719;
+ Mon, 16 Dec 2019 03:56:41 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+Subject: [PATCH v5 0/3] arm64: Workaround for Cortex-A55 erratum 1530923
+Date: Mon, 16 Dec 2019 11:56:28 +0000
+Message-Id: <20191216115631.17804-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Date: Mon, 16 Dec 2019 10:31:19 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <20191213111400.GI28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
- <20191213082920.GA28840@e113682-lin.lund.arm.com>
- <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
- <20191213111400.GI28840@e113682-lin.lund.arm.com>
-Message-ID: <4889a4894f13c67f7e48466afb0763f6@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Steven Price <steven.price@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,244 +63,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019-12-13 11:14, Christoffer Dall wrote:
-> On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
->> Hi Christoffer,
->>
->> On 2019-12-13 08:29, Christoffer Dall wrote:
->> > Hi Marc,
->> >
->> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
->> > > A device mapping is normally always mapped at Stage-2, since 
->> there
->> > > is very little gain in having it faulted in.
->> >
->> > It is actually becoming less clear to me what the real benefits of
->> > pre-populating the stage 2 page table are, especially given that 
->> we can
->> > provoke a situation where they're faulted in anyhow.  Do you 
->> recall if
->> > we had any specific case that motivated us to pre-fault in the 
->> pages?
->>
->> It's only a minor performance optimization that was introduced by 
->> Ard in
->> 8eef91239e57d. Which makes sense for platform devices that have a 
->> single
->> fixed location in memory. It makes slightly less sense for PCI, 
->> where
->> you can move things around.
->
-> User space could still decide to move things around in its VA map 
-> even
-> if the device is fixed.
->
-> Anyway, I was thinking more if there was some sort of device, like a
-> frambuffer, which for example crosses page boundaries and where it 
-> would
-> be visible to the user that there's a sudden performance drop while
-> operating the device over page boundaries.  Anything like that?
->
->>
->> > > Nonetheless, it is possible to end-up in a situation where the
->> > > device
->> > > mapping has been removed from Stage-2 (userspace munmaped the 
->> VFIO
->> > > region, and the MMU notifier did its job), but present in a
->> > > userspace
->> > > mapping (userpace has mapped it back at the same address). In 
->> such
->> > > a situation, the device mapping will be demand-paged as the 
->> guest
->> > > performs memory accesses.
->> > >
->> > > This requires to be careful when dealing with mapping size, 
->> cache
->> > > management, and to handle potential execution of a device 
->> mapping.
->> > >
->> > > Cc: stable@vger.kernel.org
->> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
->> > > ---
->> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
->> > >  1 file changed, 17 insertions(+), 4 deletions(-)
->> > >
->> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> > > index a48994af70b8..0b32a904a1bb 100644
->> > > --- a/virt/kvm/arm/mmu.c
->> > > +++ b/virt/kvm/arm/mmu.c
->> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
->> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
->> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
->> > >
->> > > +static bool is_iomap(unsigned long flags)
->> > > +{
->> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
->> > > +}
->> > > +
->> >
->> > nit: I'm not really sure this indirection makes the code more 
->> readable,
->> > but I guess that's a matter of taste.
->> >
->> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->> > >  {
->> > >  	return memslot->dirty_bitmap && !(memslot->flags &
->> > > KVM_MEM_READONLY);
->> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
->> > > *vcpu, phys_addr_t fault_ipa,
->> > >
->> > >  	vma_pagesize = vma_kernel_pagesize(vma);
->> > >  	if (logging_active ||
->> > > +	    (vma->vm_flags & VM_PFNMAP) ||
->> >
->> > WHat is actually the rationale for this?
->> >
->> > Why is a huge mapping not permitted to device memory?
->> >
->> > Are we guaranteed that VM_PFNMAP on the vma results in device 
->> mappings?
->> > I'm not convinced this is the case, and it would be better if we 
->> can
->> > stick to a single primitive (either kvm_is_device_pfn, or 
->> VM_PFNMAP) to
->> > detect device mappings.
->>
->> For now, I've tried to keep the two paths that deal with mapping 
->> devices
->> (or rather, things that we interpret as devices) as close as 
->> possible.
->> If we drop the "eager" mapping, then we're at liberty to restructure
->> this in creative ways.
->>
->> This includes potential huge mappings, but I'm not sure the rest of 
->> the
->> kernel uses them for devices anyway (I need to find out).
->>
->> > As a subsequent patch, I'd like to make sure that at the very 
->> least our
->> > memslot prepare function follows the exact same logic for mapping 
->> device
->> > memory as a fault-in approach does, or that we simply always fault 
->> pages
->> > in.
->>
->> As far as I can see, the two approach are now identical. Am I 
->> missing
->> something?
->> And yes, getting rid of the eager mapping works for me.
->>
->
-> As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() 
-> which
-> goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
-> might result in doing the same offset calculation that we do in
-> kvm_arch_prepare_memory_region(), but it also considers other 
-> scenarios.
->
-> Even if we analyze all that and convince oursleves it's always all 
-> the
-> same on arm64, the two code paths could change, leading to really 
-> hard
-> to debug differing behavior, and nobody will actively keep the two 
-> paths
-> in sync.  I'd be fine with keeping the performance optimization if we
-> have good grounds for that though, and using the same translation
-> mechanism for VM_PFNMAP as user_mem_abort.
->
-> Am I missing something?
+Version 5 is a rebasing of version 4 (no changes).
 
-I'm not disputing any of the above. I'm only trying to keep this patch
-minimal so that we can easily backport it (although it is arguable that
-deleting code isn't that big a deal).
+This series enables a workaround for Cortex-A55 erratum 1530923. The
+erratum potentially allows TLB entries to be allocated as a result of a
+speculative AT instruction. This may happen in the middle of a guest
+world switch while the relevant VMSA configuration is in an inconsistent
+state, leading to erroneous content being allocated into TLBs.
 
-[...]
+There are existing workarounds for similar issues, 1165522 is
+effectively the same, and 1319367/1319537 is similar but without VHE
+support.  Rather than add to the selection of errata, the first patch
+renames 1165522 to WORKAROUND_SPECULATIVE_AT which can be reused (in the
+final patch) for 1530923.
 
->> > I can't seem to decide for myself if I think there's a sematic
->> > difference between trying to execute from somewhere the VMM has
->> > explicitly told us is device memory and from somewhere which we 
->> happen
->> > to have mapped with VM_PFNMAP from user space.  But I also can't 
->> seem to
->> > really fault it (pun intended).  Thoughts?
->>
->> The issue is that the VMM never really tells us whether something is 
->> a
->> device mapping or not (the only exception being the GICv2 cpuif). 
->> Even
->> with PFNMAP, we guess it (it could well be memory that lives outside
->> of the linear mapping). I don't see a way to lift this ambiguity.
->>
->> Ideally, faulting on executing a non-mapping should be offloaded to
->> userspace for emulation, in line with your patches that offload
->> non-emulated data accesses. That'd be a new ABI, and I can't imagine
->> anyone willing to deal with it.
->
-> So what I was asking was if it makes sense to report the Prefetch 
-> Abort
-> in the case where the VMM has already told us that it doesn't want to
-> register anything backing the IPA (no memslot), and instead return an
-> error to user space, so that it can make a decision (for example 
-> inject
-> an external abort, which may have been the right thing to do in the
-> former case as well, but that could be considered ABI now, so let's 
-> not
-> kick that hornet's nest).
->
-> In any case, no strong feelings here, I just have a vague feeling 
-> that
-> injecting more prefetch aborts on execute-from-some-device is not
-> necessarily the right thing to do.
+The workaround for errata 1319367 and 1319537 although similar cannot
+use VHE (not available on those CPUs) so cannot share the workaround.
+However, to keep some sense of symmetry the workaround is renamed to
+SPECULATIVE_AT_NVHE.
 
-The ARMv8 ARM has the following stuff in B2.7.2 (Device Memory):
+Changes since v4:
+ * Rebased to v5.5-rc1
 
-<quote>
-Hardware does not prevent speculative instruction fetches from a memory 
-location with any of the Device
-memory attributes unless the memory location is also marked as 
-Execute-never for all Exception levels.
+Changes since v3:
+ * Added Suzuki's reviewed-bys - thanks!
+ * Corrected ARM64_WORKAROUND_SPECULATIVE_AT to
+   ARM64_WORKAROUND_SPECULATIVE_AT_VHE in the final patch
 
-Note
+Changes since v2:
+ * Split 1319367/1319537 back into their own workaround, but rename it
+   for symmetry with the VHE workaround.
 
-This means that to prevent speculative instruction fetches from memory 
-locations with Device memory
-attributes, any location that is assigned any Device memory type must 
-also be marked as Execute-never for
-all Exception levels. Failure to mark a memory location with any Device 
-memory attribute as Execute-never
-for all Exception levels is a programming error.
-</quote>
+Changes since v1:
+ * Combine 1319367/1319537 into the same 'SPECULATIVE_AT' workaround.
 
-and
+Steven Price (3):
+  arm64: Rename WORKAROUND_1165522 to SPECULATIVE_AT_VHE
+  arm64: Rename WORKAROUND_1319367 to SPECULATIVE_AT_NVHE
+  arm64: Workaround for Cortex-A55 erratum 1530923
 
-<quote>
-For instruction fetches, if branches cause the program counter to point 
-to an area of memory with the Device
-attribute which is not marked as Execute-never for the current 
-Exception level, an implementation can either:
+ Documentation/arm64/silicon-errata.rst |  2 ++
+ arch/arm64/Kconfig                     | 21 +++++++++++++++++++++
+ arch/arm64/include/asm/cpucaps.h       |  4 ++--
+ arch/arm64/include/asm/kvm_host.h      |  2 +-
+ arch/arm64/include/asm/kvm_hyp.h       |  6 +++---
+ arch/arm64/kernel/cpu_errata.c         | 25 +++++++++++++++++++------
+ arch/arm64/kvm/hyp/switch.c            | 10 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c         |  4 ++--
+ arch/arm64/kvm/hyp/tlb.c               | 12 ++++++------
+ 9 files changed, 61 insertions(+), 25 deletions(-)
 
-- Treat the instruction fetch as if it were to a memory location with 
-the Normal Non-cacheable attribute.
-
-- Take a Permission fault.
-</quote>
-
-My reading here is that a prefetch abort is the right thing to do.
-What we don't do correctly is that we qualify it as an external abort
-instead of a permission fault (which is annoying as it requires us
-to find out about the S1 translation level).
-
-Happy to revisit this once we get a S1 PTW.
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
