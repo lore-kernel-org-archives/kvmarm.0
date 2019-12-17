@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BCDC3F68F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C0F1C2D0BF
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 067BB2176D
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 067BB2176D
+	by mail.kernel.org (Postfix) with ESMTP id 2BF0421582
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BF0421582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B18FF4A535;
-	Tue, 17 Dec 2019 15:41:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB7D34A5A3;
+	Tue, 17 Dec 2019 15:41:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HufV2YYyQtFP; Tue, 17 Dec 2019 15:41:02 -0500 (EST)
+	with ESMTP id renTb2-P2J6Q; Tue, 17 Dec 2019 15:41:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 084474AEB4;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53D7F4AEEE;
 	Tue, 17 Dec 2019 15:40:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2A14A54B
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64FCB4A94D
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gX93FLCh3e7X for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id K-JOirpEzGyp for <kvmarm@lists.cs.columbia.edu>;
  Tue, 17 Dec 2019 15:40:46 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA4624A7F0
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B0104A5A0
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:45 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,7 +41,7 @@ Received: from orsmga005.jf.intel.com ([10.7.209.41])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  17 Dec 2019 12:40:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="389952626"
+X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="389952620"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:43 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
@@ -49,9 +49,10 @@ To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v4 17/19] KVM: Terminate memslot walks via used_slots
-Date: Tue, 17 Dec 2019 12:40:39 -0800
-Message-Id: <20191217204041.10815-18-sean.j.christopherson@intel.com>
+Subject: [PATCH v4 15/19] KVM: Provide common implementation for generic dirty
+ log functions
+Date: Tue, 17 Dec 2019 12:40:37 -0800
+Message-Id: <20191217204041.10815-16-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
@@ -81,446 +82,545 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Refactor memslot handling to treat the number of used slots as the de
-facto size of the memslot array, e.g. return NULL from id_to_memslot()
-when an invalid index is provided instead of relying on npages==0 to
-detect an invalid memslot.  Rework the sorting and walking of memslots
-in advance of dynamically sizing memslots to aid bisection and debug,
-e.g. with luck, a bug in the refactoring will bisect here and/or hit a
-WARN instead of randomly corrupting memory.
+Move the implementations of KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG
+for CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT into common KVM code.
+The arch specific implemenations are extremely similar, differing
+only in whether the dirty log needs to be sync'd from hardware (x86)
+and how the TLBs are flushed.  Add new arch hooks to handle sync
+and TLB flush; the sync will also be used for non-generic dirty log
+support in a future patch (s390).
 
-Alternatively, a global null/invalid memslot could be returned, i.e. so
-callers of id_to_memslot() don't have to explicitly check for a NULL
-memslot, but that approach runs the risk of introducing difficult-to-
-debug issues, e.g. if the global null slot is modified.  Constifying
-the return from id_to_memslot() to combat such issues is possible, but
-would require a massive refactoring of arch specific code and would
-still be susceptible to casting shenanigans.
+The ulterior motive for providing a common implementation is to
+eliminate the dependency between arch and common code with respect to
+the memslot referenced by the dirty log, i.e. to make it obvious in the
+code that the validity of the memslot is guaranteed, as a future patch
+will rework memslot handling such that id_to_memslot() can return NULL.
 
-Add function comments to update_memslots() and search_memslots() to
-explicitly (and loudly) state how memslots are sorted.
-
-No functional change intended.
-
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Tested-by: Christoffer Dall <christoffer.dall@arm.com>
-Tested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/kvm/book3s_hv.c |   2 +-
- arch/x86/kvm/x86.c           |  14 +--
- include/linux/kvm_host.h     |  18 ++-
- virt/kvm/arm/mmu.c           |   9 +-
- virt/kvm/kvm_main.c          | 220 ++++++++++++++++++++++++++---------
- 5 files changed, 189 insertions(+), 74 deletions(-)
+ arch/mips/kvm/mips.c      | 63 +++--------------------------
+ arch/powerpc/kvm/book3s.c |  5 +++
+ arch/powerpc/kvm/booke.c  |  5 +++
+ arch/s390/kvm/kvm-s390.c  |  5 +--
+ arch/x86/kvm/x86.c        | 61 ++--------------------------
+ include/linux/kvm_host.h  | 21 +++++-----
+ virt/kvm/arm/arm.c        | 48 ++--------------------
+ virt/kvm/kvm_main.c       | 84 ++++++++++++++++++++++++++++++++-------
+ 8 files changed, 103 insertions(+), 189 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 04d5b7cf874f..c15cabb58e09 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4410,7 +4410,7 @@ static int kvm_vm_ioctl_get_dirty_log_hv(struct kvm *kvm,
- 	slots = kvm_memslots(kvm);
- 	memslot = id_to_memslot(slots, log->slot);
- 	r = -ENOENT;
--	if (!memslot->dirty_bitmap)
-+	if (!memslot || !memslot->dirty_bitmap)
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 108ed14cbcac..879b1e29f106 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -965,69 +965,16 @@ long kvm_arch_vcpu_ioctl(struct file *filp, unsigned int ioctl,
+ 	return r;
+ }
+ 
+-/**
+- * kvm_vm_ioctl_get_dirty_log - get and clear the log of dirty pages in a slot
+- * @kvm: kvm instance
+- * @log: slot id and address to which we copy the log
+- *
+- * Steps 1-4 below provide general overview of dirty page logging. See
+- * kvm_get_dirty_log_protect() function description for additional details.
+- *
+- * We call kvm_get_dirty_log_protect() to handle steps 1-3, upon return we
+- * always flush the TLB (step 4) even if previous step failed  and the dirty
+- * bitmap may be corrupt. Regardless of previous outcome the KVM logging API
+- * does not preclude user space subsequent dirty log read. Flushing TLB ensures
+- * writes will be marked dirty for next log read.
+- *
+- *   1. Take a snapshot of the bit and clear it if needed.
+- *   2. Write protect the corresponding page.
+- *   3. Copy the snapshot to the userspace.
+- *   4. Flush TLB's if needed.
+- */
+-int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
+-	struct kvm_memslots *slots;
+-	struct kvm_memory_slot *memslot;
+-	bool flush = false;
+-	int r;
+ 
+-	mutex_lock(&kvm->slots_lock);
+-
+-	r = kvm_get_dirty_log_protect(kvm, log, &flush);
+-
+-	if (flush) {
+-		slots = kvm_memslots(kvm);
+-		memslot = id_to_memslot(slots, log->slot);
+-
+-		/* Let implementation handle TLB/GVA invalidation */
+-		kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
+-	}
+-
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
+ }
+ 
+-int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm, struct kvm_clear_dirty_log *log)
++void kvm_arch_dirty_log_tlb_flush(struct kvm *kvm,
++				  struct kvm_memory_slot *memslot)
+ {
+-	struct kvm_memslots *slots;
+-	struct kvm_memory_slot *memslot;
+-	bool flush = false;
+-	int r;
+-
+-	mutex_lock(&kvm->slots_lock);
+-
+-	r = kvm_clear_dirty_log_protect(kvm, log, &flush);
+-
+-	if (flush) {
+-		slots = kvm_memslots(kvm);
+-		memslot = id_to_memslot(slots, log->slot);
+-
+-		/* Let implementation handle TLB/GVA invalidation */
+-		kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
+-	}
+-
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
++	/* Let implementation handle TLB/GVA invalidation */
++	kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
+ }
+ 
+ long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index b1c9b4d11b2a..b117ca317c0d 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -804,6 +804,11 @@ int kvmppc_core_check_requests(struct kvm_vcpu *vcpu)
+ 	return vcpu->kvm->arch.kvm_ops->check_requests(vcpu);
+ }
+ 
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
++{
++
++}
++
+ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
+ {
+ 	return kvm->arch.kvm_ops->get_dirty_log(kvm, log);
+diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+index a22ff567724a..35a4ef89a1db 100644
+--- a/arch/powerpc/kvm/booke.c
++++ b/arch/powerpc/kvm/booke.c
+@@ -1796,6 +1796,11 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
+ 
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
++{
++
++}
++
+ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
+ {
+ 	return -ENOTSUPP;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index a5b917b72ca0..9e38973fd2cc 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -569,8 +569,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	return r;
+ }
+ 
+-static void kvm_s390_sync_dirty_log(struct kvm *kvm,
+-				    struct kvm_memory_slot *memslot)
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
+ 	int i;
+ 	gfn_t cur_gfn, last_gfn;
+@@ -630,7 +629,7 @@ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
+ 	if (!memslot->dirty_bitmap)
  		goto out;
  
- 	/*
+-	kvm_s390_sync_dirty_log(kvm, memslot);
++	kvm_arch_sync_dirty_log(kvm, memslot);
+ 	r = kvm_get_dirty_log(kvm, log, &is_dirty);
+ 	if (r)
+ 		goto out;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 87fca25d5217..39ba1de85575 100644
+index 50bef3195533..87fca25d5217 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9532,9 +9532,9 @@ void kvm_arch_sync_events(struct kvm *kvm)
- int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
- {
- 	int i, r;
--	unsigned long hva;
-+	unsigned long hva, uninitialized_var(old_npages);
- 	struct kvm_memslots *slots = kvm_memslots(kvm);
--	struct kvm_memory_slot *slot, old;
-+	struct kvm_memory_slot *slot;
- 
- 	/* Called with kvm->slots_lock held.  */
- 	if (WARN_ON(id >= KVM_MEM_SLOTS_NUM))
-@@ -9542,7 +9542,7 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
- 
- 	slot = id_to_memslot(slots, id);
- 	if (size) {
--		if (slot->npages)
-+		if (slot && slot->npages)
- 			return -EEXIST;
- 
- 		/*
-@@ -9554,13 +9554,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
- 		if (IS_ERR((void *)hva))
- 			return PTR_ERR((void *)hva);
- 	} else {
--		if (!slot->npages)
-+		if (!slot || !slot->npages)
- 			return 0;
- 
--		hva = 0;
-+		hva = slot->userspace_addr;
-+		old_npages = slot->npages;
- 	}
- 
--	old = *slot;
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		struct kvm_userspace_memory_region m;
- 
-@@ -9575,7 +9575,7 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
- 	}
- 
- 	if (!size)
--		vm_munmap(old.userspace_addr, old.npages * PAGE_SIZE);
-+		vm_munmap(hva, old_npages * PAGE_SIZE);
- 
+@@ -4673,77 +4673,24 @@ static int kvm_vm_ioctl_reinject(struct kvm *kvm,
  	return 0;
  }
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7d666eedd203..49b6b457a157 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -574,10 +574,11 @@ static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
- 	return vcpu->vcpu_idx;
- }
  
--#define kvm_for_each_memslot(memslot, slots)	\
--	for (memslot = &slots->memslots[0];	\
--	      memslot < slots->memslots + KVM_MEM_SLOTS_NUM && memslot->npages;\
--		memslot++)
-+#define kvm_for_each_memslot(memslot, slots)				\
-+	for (memslot = &slots->memslots[0];				\
-+	     memslot < slots->memslots + slots->used_slots; memslot++)	\
-+		if (WARN_ON_ONCE(!memslot->npages)) {			\
-+		} else
- 
- int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id);
- void kvm_vcpu_uninit(struct kvm_vcpu *vcpu);
-@@ -638,12 +639,15 @@ static inline struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu)
- 	return __kvm_memslots(vcpu->kvm, as_id);
- }
- 
--static inline struct kvm_memory_slot *
--id_to_memslot(struct kvm_memslots *slots, int id)
-+static inline
-+struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
+-/**
+- * kvm_vm_ioctl_get_dirty_log - get and clear the log of dirty pages in a slot
+- * @kvm: kvm instance
+- * @log: slot id and address to which we copy the log
+- *
+- * Steps 1-4 below provide general overview of dirty page logging. See
+- * kvm_get_dirty_log_protect() function description for additional details.
+- *
+- * We call kvm_get_dirty_log_protect() to handle steps 1-3, upon return we
+- * always flush the TLB (step 4) even if previous step failed  and the dirty
+- * bitmap may be corrupt. Regardless of previous outcome the KVM logging API
+- * does not preclude user space subsequent dirty log read. Flushing TLB ensures
+- * writes will be marked dirty for next log read.
+- *
+- *   1. Take a snapshot of the bit and clear it if needed.
+- *   2. Write protect the corresponding page.
+- *   3. Copy the snapshot to the userspace.
+- *   4. Flush TLB's if needed.
+- */
+-int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
  {
- 	int index = slots->id_to_index[id];
- 	struct kvm_memory_slot *slot;
- 
-+	if (index < 0)
-+		return NULL;
-+
- 	slot = &slots->memslots[index];
- 
- 	WARN_ON(slot->id != id);
-@@ -1013,6 +1017,8 @@ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
-  * used in non-modular code in arch/powerpc/kvm/book3s_hv_rm_mmu.c.
-  * gfn_to_memslot() itself isn't here as an inline because that would
-  * bloat other code too much.
-+ *
-+ * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
-  */
- static inline struct kvm_memory_slot *
- search_memslots(struct kvm_memslots *slots, gfn_t gfn)
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index c49a3d5baad2..ae049c1033f3 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1536,8 +1536,13 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
- {
- 	struct kvm_memslots *slots = kvm_memslots(kvm);
- 	struct kvm_memory_slot *memslot = id_to_memslot(slots, slot);
--	phys_addr_t start = memslot->base_gfn << PAGE_SHIFT;
--	phys_addr_t end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
-+	phys_addr_t start, end;
-+
-+	if (WARN_ON_ONCE(!memslot))
-+		return;
-+
-+	start = memslot->base_gfn << PAGE_SHIFT;
-+	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
- 
- 	spin_lock(&kvm->mmu_lock);
- 	stage2_wp_range(kvm, start, end);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 999a2a0c83f5..a1566c5cee26 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -569,7 +569,7 @@ static struct kvm_memslots *kvm_alloc_memslots(void)
- 		return NULL;
- 
- 	for (i = 0; i < KVM_MEM_SLOTS_NUM; i++)
--		slots->id_to_index[i] = slots->memslots[i].id = i;
-+		slots->id_to_index[i] = slots->memslots[i].id = -1;
- 
- 	return slots;
- }
-@@ -873,63 +873,162 @@ static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
- }
- 
- /*
-- * Insert memslot and re-sort memslots based on their GFN,
-- * so binary search could be used to lookup GFN.
-- * Sorting algorithm takes advantage of having initially
-- * sorted array and known changed memslot position.
-+ * Delete a memslot by decrementing the number of used slots and shifting all
-+ * other entries in the array forward one spot.
-+ */
-+static inline void kvm_memslot_delete(struct kvm_memslots *slots,
-+				      struct kvm_memory_slot *memslot)
-+{
-+	struct kvm_memory_slot *mslots = slots->memslots;
-+	int i;
-+
-+	if (WARN_ON(slots->id_to_index[memslot->id] == -1))
-+		return;
-+
-+	slots->used_slots--;
-+
-+	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots; i++) {
-+		mslots[i] = mslots[i + 1];
-+		slots->id_to_index[mslots[i].id] = i;
-+	}
-+	mslots[i] = *memslot;
-+	slots->id_to_index[memslot->id] = -1;
-+}
-+
-+/*
-+ * "Insert" a new memslot by incrementing the number of used slots.  Returns
-+ * the new slot's initial index into the memslots array.
-+ */
-+static inline int kvm_memslot_insert_back(struct kvm_memslots *slots)
-+{
-+	return slots->used_slots++;
-+}
-+
-+/*
-+ * Move a changed memslot backwards in the array by shifting existing slots
-+ * with a higher GFN toward the front of the array.  Note, the changed memslot
-+ * itself is not preserved in the array, i.e. not swapped at this time, only
-+ * its new index into the array is tracked.  Returns the changed memslot's
-+ * current index into the memslots array.
-+ */
-+static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
-+					    struct kvm_memory_slot *memslot)
-+{
-+	struct kvm_memory_slot *mslots = slots->memslots;
-+	int i;
-+
-+	if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
-+	    WARN_ON_ONCE(!slots->used_slots))
-+		return -1;
-+
-+	/*
-+	 * Move the target memslot backward in the array by shifting existing
-+	 * memslots with a higher GFN (than the target memslot) towards the
-+	 * front of the array.
-+	 */
-+	for (i = slots->id_to_index[memslot->id]; i < slots->used_slots - 1; i++) {
-+		if (memslot->base_gfn > mslots[i + 1].base_gfn)
-+			break;
-+
-+		WARN_ON_ONCE(memslot->base_gfn == mslots[i + 1].base_gfn);
-+
-+		/* Shift the next memslot forward one and update its index. */
-+		mslots[i] = mslots[i + 1];
-+		slots->id_to_index[mslots[i].id] = i;
-+	}
-+	return i;
-+}
-+
-+/*
-+ * Move a changed memslot forwards in the array by shifting existing slots with
-+ * a lower GFN toward the back of the array.  Note, the changed memslot itself
-+ * is not preserved in the array, i.e. not swapped at this time, only its new
-+ * index into the array is tracked.  Returns the changed memslot's final index
-+ * into the memslots array.
-+ */
-+static inline int kvm_memslot_move_forward(struct kvm_memslots *slots,
-+					   struct kvm_memory_slot *memslot,
-+					   int start)
-+{
-+	struct kvm_memory_slot *mslots = slots->memslots;
-+	int i;
-+
-+	for (i = start; i > 0; i--) {
-+		if (memslot->base_gfn < mslots[i - 1].base_gfn)
-+			break;
-+
-+		WARN_ON_ONCE(memslot->base_gfn == mslots[i - 1].base_gfn);
-+
-+		/* Shift the next memslot back one and update its index. */
-+		mslots[i] = mslots[i - 1];
-+		slots->id_to_index[mslots[i].id] = i;
-+	}
-+	return i;
-+}
-+
-+/*
-+ * Re-sort memslots based on their GFN to account for an added, deleted, or
-+ * moved memslot.  Sorting memslots by GFN allows using a binary search during
-+ * memslot lookup.
-+ *
-+ * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!  I.e. the entry
-+ * at memslots[0] has the highest GFN.
-+ *
-+ * The sorting algorithm takes advantage of having initially sorted memslots
-+ * and knowing the position of the changed memslot.  Sorting is also optimized
-+ * by not swapping the updated memslot and instead only shifting other memslots
-+ * and tracking the new index for the update memslot.  Only once its final
-+ * index is known is the updated memslot copied into its position in the array.
-+ *
-+ *  - When deleting a memslot, the deleted memslot simply needs to be moved to
-+ *    the end of the array.
-+ *
-+ *  - When creating a memslot, the algorithm "inserts" the new memslot at the
-+ *    end of the array and then it forward to its correct location.
-+ *
-+ *  - When moving a memslot, the algorithm first moves the updated memslot
-+ *    backward to handle the scenario where the memslot's GFN was changed to a
-+ *    lower value.  update_memslots() then falls through and runs the same flow
-+ *    as creating a memslot to move the memslot forward to handle the scenario
-+ *    where its GFN was changed to a higher value.
-+ *
-+ * Note, slots are sorted from highest->lowest instead of lowest->highest for
-+ * historical reasons.  Originally, invalid memslots where denoted by having
-+ * GFN=0, thus sorting from highest->lowest naturally sorted invalid memslots
-+ * to the end of the array.  The current algorithm uses dedicated logic to
-+ * delete a memslot and thus does not rely on invalid memslots having GFN=0.
-+ *
-+ * The other historical motiviation for highest->lowest was to improve the
-+ * performance of memslot lookup.  KVM originally used a linear search starting
-+ * at memslots[0].  On x86, the largest memslot usually has one of the highest,
-+ * if not *the* highest, GFN, as the bulk of the guest's RAM is located in a
-+ * single memslot above the 4gb boundary.  As the largest memslot is also the
-+ * most likely to be referenced, sorting it to the front of the array was
-+ * advantageous.  The current binary search starts from the middle of the array
-+ * and uses an LRU pointer to improve performance for all memslots and GFNs.
-  */
- static void update_memslots(struct kvm_memslots *slots,
--			    struct kvm_memory_slot *new,
-+			    struct kvm_memory_slot *memslot,
- 			    enum kvm_mr_change change)
- {
--	int id = new->id;
--	int i = slots->id_to_index[id];
--	struct kvm_memory_slot *mslots = slots->memslots;
-+	int i;
- 
--	WARN_ON(mslots[i].id != id);
--	switch (change) {
--	case KVM_MR_CREATE:
--		slots->used_slots++;
--		WARN_ON(mslots[i].npages || !new->npages);
--		break;
--	case KVM_MR_DELETE:
--		slots->used_slots--;
--		WARN_ON(new->npages || !mslots[i].npages);
--		break;
--	default:
--		break;
--	}
-+	if (change == KVM_MR_DELETE) {
-+		kvm_memslot_delete(slots, memslot);
-+	} else {
-+		if (change == KVM_MR_CREATE)
-+			i = kvm_memslot_insert_back(slots);
-+		else
-+			i = kvm_memslot_move_backward(slots, memslot);
-+		i = kvm_memslot_move_forward(slots, memslot, i);
- 
--	while (i < KVM_MEM_SLOTS_NUM - 1 &&
--	       new->base_gfn <= mslots[i + 1].base_gfn) {
--		if (!mslots[i + 1].npages)
--			break;
--		mslots[i] = mslots[i + 1];
--		slots->id_to_index[mslots[i].id] = i;
--		i++;
-+		/*
-+		 * Copy the memslot to its new position in memslots and update
-+		 * its index accordingly.
-+		 */
-+		slots->memslots[i] = *memslot;
-+		slots->id_to_index[memslot->id] = i;
- 	}
+-	bool flush = false;
+-	int r;
+-
+-	mutex_lock(&kvm->slots_lock);
+-
+ 	/*
+ 	 * Flush potentially hardware-cached dirty pages to dirty_bitmap.
+ 	 */
+ 	if (kvm_x86_ops->flush_log_dirty)
+ 		kvm_x86_ops->flush_log_dirty(kvm);
+-
+-	r = kvm_get_dirty_log_protect(kvm, log, &flush);
 -
 -	/*
--	 * The ">=" is needed when creating a slot with base_gfn == 0,
--	 * so that it moves before all those with base_gfn == npages == 0.
--	 *
--	 * On the other hand, if new->npages is zero, the above loop has
--	 * already left i pointing to the beginning of the empty part of
--	 * mslots, and the ">=" would move the hole backwards in this
--	 * case---which is wrong.  So skip the loop when deleting a slot.
+-	 * All the TLBs can be flushed out of mmu lock, see the comments in
+-	 * kvm_mmu_slot_remove_write_access().
 -	 */
--	if (new->npages) {
--		while (i > 0 &&
--		       new->base_gfn >= mslots[i - 1].base_gfn) {
--			mslots[i] = mslots[i - 1];
--			slots->id_to_index[mslots[i].id] = i;
--			i--;
--		}
--	} else
--		WARN_ON_ONCE(i != slots->used_slots);
+-	lockdep_assert_held(&kvm->slots_lock);
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
 -
--	mslots[i] = *new;
--	slots->id_to_index[mslots[i].id] = i;
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
  }
  
- static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
-@@ -1108,8 +1207,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	 * when the memslots are re-sorted by update_memslots().
+-int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm, struct kvm_clear_dirty_log *log)
++void kvm_arch_dirty_log_tlb_flush(struct kvm *kvm,
++				  struct kvm_memory_slot *memslot)
+ {
+-	bool flush = false;
+-	int r;
+-
+-	mutex_lock(&kvm->slots_lock);
+-
+-	/*
+-	 * Flush potentially hardware-cached dirty pages to dirty_bitmap.
+-	 */
+-	if (kvm_x86_ops->flush_log_dirty)
+-		kvm_x86_ops->flush_log_dirty(kvm);
+-
+-	r = kvm_clear_dirty_log_protect(kvm, log, &flush);
+-
+ 	/*
+ 	 * All the TLBs can be flushed out of mmu lock, see the comments in
+ 	 * kvm_mmu_slot_remove_write_access().
  	 */
- 	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
--	old = *tmp;
--	tmp = NULL;
-+	if (tmp) {
-+		old = *tmp;
-+		tmp = NULL;
-+	} else {
-+		memset(&old, 0, sizeof(old));
-+		old.id = id;
-+	}
+ 	lockdep_assert_held(&kvm->slots_lock);
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
+-
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
++	kvm_flush_remote_tlbs(kvm);
+ }
  
- 	if (!mem->memory_size)
- 		return kvm_delete_memslot(kvm, mem, &old, as_id);
-@@ -1227,7 +1331,7 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_event,
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 8343ac5ee7a8..eb54d196c0cb 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -816,23 +816,20 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
  
- 	slots = __kvm_memslots(kvm, as_id);
- 	*memslot = id_to_memslot(slots, id);
--	if (!(*memslot)->dirty_bitmap)
-+	if (!(*memslot) || !(*memslot)->dirty_bitmap)
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+ 
+-int kvm_get_dirty_log(struct kvm *kvm,
+-			struct kvm_dirty_log *log, int *is_dirty);
+-
+-int kvm_get_dirty_log_protect(struct kvm *kvm,
+-			      struct kvm_dirty_log *log, bool *flush);
+-int kvm_clear_dirty_log_protect(struct kvm *kvm,
+-				struct kvm_clear_dirty_log *log, bool *flush);
+-
+ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 					struct kvm_memory_slot *slot,
+ 					gfn_t gfn_offset,
+ 					unsigned long mask);
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot);
+ 
+-int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
+-				struct kvm_dirty_log *log);
+-int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+-				  struct kvm_clear_dirty_log *log);
++#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
++void kvm_arch_dirty_log_tlb_flush(struct kvm *kvm,
++				  struct kvm_memory_slot *memslot);
++#else /* !CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
++int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log);
++int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
++		      int *is_dirty);
++#endif
+ 
+ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 			bool line_status);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 12e0280291ce..19f78a6c18bc 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1240,55 +1240,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-/**
+- * kvm_vm_ioctl_get_dirty_log - get and clear the log of dirty pages in a slot
+- * @kvm: kvm instance
+- * @log: slot id and address to which we copy the log
+- *
+- * Steps 1-4 below provide general overview of dirty page logging. See
+- * kvm_get_dirty_log_protect() function description for additional details.
+- *
+- * We call kvm_get_dirty_log_protect() to handle steps 1-3, upon return we
+- * always flush the TLB (step 4) even if previous step failed  and the dirty
+- * bitmap may be corrupt. Regardless of previous outcome the KVM logging API
+- * does not preclude user space subsequent dirty log read. Flushing TLB ensures
+- * writes will be marked dirty for next log read.
+- *
+- *   1. Take a snapshot of the bit and clear it if needed.
+- *   2. Write protect the corresponding page.
+- *   3. Copy the snapshot to the userspace.
+- *   4. Flush TLB's if needed.
+- */
+-int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
++void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
+-	bool flush = false;
+-	int r;
+ 
+-	mutex_lock(&kvm->slots_lock);
+-
+-	r = kvm_get_dirty_log_protect(kvm, log, &flush);
+-
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
+-
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
+ }
+ 
+-int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm, struct kvm_clear_dirty_log *log)
++void kvm_arch_dirty_log_tlb_flush(struct kvm *kvm,
++				  struct kvm_memory_slot *memslot)
+ {
+-	bool flush = false;
+-	int r;
+-
+-	mutex_lock(&kvm->slots_lock);
+-
+-	r = kvm_clear_dirty_log_protect(kvm, log, &flush);
+-
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
+-
+-	mutex_unlock(&kvm->slots_lock);
+-	return r;
++	kvm_flush_remote_tlbs(kvm);
+ }
+ 
+ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b3e732078ab2..4a4b5339f229 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -859,7 +859,7 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+ 
+ /*
+  * Allocation size is twice as large as the actual dirty bitmap size.
+- * See x86's kvm_vm_ioctl_get_dirty_log() why this is needed.
++ * See kvm_vm_ioctl_get_dirty_log() why this is needed.
+  */
+ static int kvm_create_dirty_bitmap(struct kvm_memory_slot *memslot)
+ {
+@@ -1201,6 +1201,7 @@ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+ 	return kvm_set_memory_region(kvm, mem);
+ }
+ 
++#ifndef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ int kvm_get_dirty_log(struct kvm *kvm,
+ 			struct kvm_dirty_log *log, int *is_dirty)
+ {
+@@ -1234,13 +1235,12 @@ int kvm_get_dirty_log(struct kvm *kvm,
+ }
+ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
+ 
+-#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
++#else /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+ /**
+  * kvm_get_dirty_log_protect - get a snapshot of dirty pages
+  *	and reenable dirty page tracking for the corresponding pages.
+  * @kvm:	pointer to kvm instance
+  * @log:	slot id and address to which we copy the log
+- * @flush:	true if TLB flush is needed by caller
+  *
+  * We need to keep it in mind that VCPU threads can write to the bitmap
+  * concurrently. So, to avoid losing track of dirty pages we keep the
+@@ -1257,8 +1257,7 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
+  * exiting to userspace will be logged for the next call.
+  *
+  */
+-int kvm_get_dirty_log_protect(struct kvm *kvm,
+-			struct kvm_dirty_log *log, bool *flush)
++static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
+ {
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memory_slot *memslot;
+@@ -1266,6 +1265,7 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
+ 	unsigned long n;
+ 	unsigned long *dirty_bitmap;
+ 	unsigned long *dirty_bitmap_buffer;
++	bool flush;
+ 
+ 	as_id = log->slot >> 16;
+ 	id = (u16)log->slot;
+@@ -1279,8 +1279,10 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
+ 	if (!dirty_bitmap)
  		return -ENOENT;
  
- 	kvm_arch_sync_dirty_log(kvm, *memslot);
-@@ -1285,10 +1389,10 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
++	kvm_arch_sync_dirty_log(kvm, memslot);
++
+ 	n = kvm_dirty_bitmap_bytes(memslot);
+-	*flush = false;
++	flush = false;
+ 	if (kvm->manual_dirty_log_protect) {
+ 		/*
+ 		 * Unlike kvm_get_dirty_log, we always return false in *flush,
+@@ -1303,7 +1305,7 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
+ 			if (!dirty_bitmap[i])
+ 				continue;
  
- 	slots = __kvm_memslots(kvm, as_id);
- 	memslot = id_to_memslot(slots, id);
-+	if (!memslot || !memslot->dirty_bitmap)
-+		return -ENOENT;
+-			*flush = true;
++			flush = true;
+ 			mask = xchg(&dirty_bitmap[i], 0);
+ 			dirty_bitmap_buffer[i] = mask;
  
- 	dirty_bitmap = memslot->dirty_bitmap;
--	if (!dirty_bitmap)
--		return -ENOENT;
+@@ -1314,21 +1316,55 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
+ 		spin_unlock(&kvm->mmu_lock);
+ 	}
  
- 	kvm_arch_sync_dirty_log(kvm, memslot);
++	if (flush)
++		kvm_arch_dirty_log_tlb_flush(kvm, memslot);
++
+ 	if (copy_to_user(log->dirty_bitmap, dirty_bitmap_buffer, n))
+ 		return -EFAULT;
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(kvm_get_dirty_log_protect);
++
++
++/**
++ * kvm_vm_ioctl_get_dirty_log - get and clear the log of dirty pages in a slot
++ * @kvm: kvm instance
++ * @log: slot id and address to which we copy the log
++ *
++ * Steps 1-4 below provide general overview of dirty page logging. See
++ * kvm_get_dirty_log_protect() function description for additional details.
++ *
++ * We call kvm_get_dirty_log_protect() to handle steps 1-3, upon return we
++ * always flush the TLB (step 4) even if previous step failed  and the dirty
++ * bitmap may be corrupt. Regardless of previous outcome the KVM logging API
++ * does not preclude user space subsequent dirty log read. Flushing TLB ensures
++ * writes will be marked dirty for next log read.
++ *
++ *   1. Take a snapshot of the bit and clear it if needed.
++ *   2. Write protect the corresponding page.
++ *   3. Copy the snapshot to the userspace.
++ *   4. Flush TLB's if needed.
++ */
++static int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
++				      struct kvm_dirty_log *log)
++{
++	int r;
++
++	mutex_lock(&kvm->slots_lock);
++
++	r = kvm_get_dirty_log_protect(kvm, log);
++
++	mutex_unlock(&kvm->slots_lock);
++	return r;
++}
  
-@@ -1396,10 +1500,10 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ /**
+  * kvm_clear_dirty_log_protect - clear dirty bits in the bitmap
+  *	and reenable dirty page tracking for the corresponding pages.
+  * @kvm:	pointer to kvm instance
+  * @log:	slot id and address from which to fetch the bitmap of dirty pages
+- * @flush:	true if TLB flush is needed by caller
+  */
+-int kvm_clear_dirty_log_protect(struct kvm *kvm,
+-				struct kvm_clear_dirty_log *log, bool *flush)
++static int kvm_clear_dirty_log_protect(struct kvm *kvm,
++				       struct kvm_clear_dirty_log *log)
+ {
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memory_slot *memslot;
+@@ -1337,6 +1373,7 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	unsigned long i, n;
+ 	unsigned long *dirty_bitmap;
+ 	unsigned long *dirty_bitmap_buffer;
++	bool flush;
  
- 	slots = __kvm_memslots(kvm, as_id);
- 	memslot = id_to_memslot(slots, id);
-+	if (!memslot || !memslot->dirty_bitmap)
-+		return -ENOENT;
+ 	as_id = log->slot >> 16;
+ 	id = (u16)log->slot;
+@@ -1360,7 +1397,9 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
+ 	    return -EINVAL;
  
- 	dirty_bitmap = memslot->dirty_bitmap;
--	if (!dirty_bitmap)
--		return -ENOENT;
+-	*flush = false;
++	kvm_arch_sync_dirty_log(kvm, memslot);
++
++	flush = false;
+ 	dirty_bitmap_buffer = kvm_second_dirty_bitmap(memslot);
+ 	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+ 		return -EFAULT;
+@@ -1383,17 +1422,32 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 		 * a problem if userspace sets them in log->dirty_bitmap.
+ 		*/
+ 		if (mask) {
+-			*flush = true;
++			flush = true;
+ 			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+ 								offset, mask);
+ 		}
+ 	}
+ 	spin_unlock(&kvm->mmu_lock);
  
- 	n = ALIGN(log->num_pages, BITS_PER_LONG) / 8;
++	if (flush)
++		kvm_arch_dirty_log_tlb_flush(kvm, memslot);
++
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(kvm_clear_dirty_log_protect);
+-#endif
++
++static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
++					struct kvm_clear_dirty_log *log)
++{
++	int r;
++
++	mutex_lock(&kvm->slots_lock);
++
++	r = kvm_clear_dirty_log_protect(kvm, log);
++
++	mutex_unlock(&kvm->slots_lock);
++	return r;
++}
++#endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
  
+ bool kvm_largepages_enabled(void)
+ {
 -- 
 2.24.1
 
