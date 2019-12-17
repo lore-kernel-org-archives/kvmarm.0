@@ -4,95 +4,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225BAC43603
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 21:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C627AC43603
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 22:07:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8221021582
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 21:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A07E20716
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 22:07:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gY5rR61H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8221021582
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLtqyOr7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A07E20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D662B4A7F1;
-	Tue, 17 Dec 2019 16:56:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B15E54A610;
+	Tue, 17 Dec 2019 17:07:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G7-2Hq1wyl8h; Tue, 17 Dec 2019 16:56:47 -0500 (EST)
+	with ESMTP id 2MgcxYgZ5AT5; Tue, 17 Dec 2019 17:07:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F8974A531;
-	Tue, 17 Dec 2019 16:56:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD9A94A536;
+	Tue, 17 Dec 2019 17:07:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B40E14A3BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 16:56:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 343CA4A52C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 17:07:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r4bK5egSD97n for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 16:56:45 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 740D84A3A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 16:56:45 -0500 (EST)
+ with ESMTP id hiYHB1jNlucS for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 17:07:26 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB124A389
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 17:07:26 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576619805;
+ s=mimecast20190719; t=1576620445;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y9EmI3Nr90MB39kVEiie1LgWNRBdKLDpuM1lu03ZacU=;
- b=gY5rR61HOKGxHDO6PTJL1Kwnm5AqdIIb0ntY0IElantXglWdwJKkEiyrdEhnu7RdS57pgS
- rMb+kQQG75SBlioJu8Ql5pO76p/oNRMYIuHXUFro/e71BZ830kGp91wBaSUkSo7bjEbg8p
- e3Ya9eO03yAj4vF06J3CZxBBVSt50Vo=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-p3b4T9aGPZGQZ369s923pg-1; Tue, 17 Dec 2019 16:56:43 -0500
-Received: by mail-qk1-f199.google.com with SMTP id g28so7833895qkl.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 13:56:43 -0800 (PST)
+ bh=dMNrU891HIbbCXzuvJMLqIA+nkJje43G6ahYCI5AhR8=;
+ b=DLtqyOr7NW1tNXcZ0IRHbQqnk6jKLTG/WuBzfO4Vx1u9Jm7GGGu3TdjZauOb9kbEhwaP8C
+ wnJgWGE8mMunvCIulNQ3/yPd3OiXVuZVmS2TaccBO/BEXSIto/U07wNqtxsgcGFhgQRaKP
+ xtW/fM8CwhWFjkBNFEKSTLJYOY88ToY=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-hLR9zjytNCGxjIon7xKfEQ-1; Tue, 17 Dec 2019 17:07:21 -0500
+Received: by mail-qt1-f200.google.com with SMTP id k27so128003qtu.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 14:07:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=hSE8d84YfV0TRBuqIE3TvHfXXVwzC5/7L6224fyao4A=;
- b=sjM90n6Q7OKITjUOLJgXUM+HcpBj08Br6Y2I9IhySg/QYybIFks8SW8A7j1kR82cyt
- VysADocT4y7LxFICkDJvOVediri66cVRwWq/Q8L4vyBqRWLLhyZICyMAX/VNglZM94sM
- dHB51dBsp+dJlgsg6SRbEDfHB/FHz3GjeLqUNXmLUrL8y0slvK4cHfkUHYqm/dEJ7ZyL
- PTgCWsU8UdOq0zl56MShx9RAovXLwnJvhz5mD86TErvedWgHCpEORavHOWGlPDqeWd38
- lVieA17yVHhThQE8qodlufRHAMM8g8N0jrCS4p3AE/rizrqH3l3JlWL0/02A2QwxfoQH
- LXGg==
-X-Gm-Message-State: APjAAAV7OQ4DlE9h0YGKDlfd4PmYK99pl8ZlYdnCU3JwGMslaUbfXObn
- Tnyn4G1CKwiQUHY3kkqCv00VRw+N/ZWpZF9d8tY4dSaoodmqj9aUHKGACE4lK95OlqAmHUI0QIB
- MQ1RTVHzcEPdFe3CxBiDSltFR
-X-Received: by 2002:a05:6214:707:: with SMTP id
- b7mr6932302qvz.97.1576619803180; 
- Tue, 17 Dec 2019 13:56:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxkJVTx6R82PYxH8CBMYAk4P1dJ5EjDAy6gossam+XsRnSgvrFRKTM01bOCNWxLxn1nVLa7oA==
-X-Received: by 2002:a05:6214:707:: with SMTP id
- b7mr6932279qvz.97.1576619802834; 
- Tue, 17 Dec 2019 13:56:42 -0800 (PST)
+ bh=slGVCNmnwx0F1K+nCa+cID8Tdy/RHxQkOhSUfY0VX6I=;
+ b=lj5Vz9zq0TR8QSVn0IiTfI3J+2Hf1qIBfP7qUc+K4EhcUtBUE9SH6HFplLZij7lLPb
+ 8PN03lRdljg027W7ERUOdsRXgV9gQza9KnIMA8/lm/I7KKyJPv6bLg3BxgvIZgsAj7eQ
+ JIlB6fdsK6WCstB3CWdrmZrMCX44JcUUqxsajj8E9CuyjK7si2DF7uShbb1rpWbJxEXW
+ yer8RAIT+m9G48peYcnDE5L8SJaLYQdE5d4EQ36Jp65+23UBdSKQtlbDzOxA8/cunZnN
+ 8CO0hrlZ9APA14zxxLFeAxpMgA7nM3g/skjP+EfEZHWMiJS7JNcieKT6ZtDZowg6v2IH
+ 1IZg==
+X-Gm-Message-State: APjAAAWVGT6Ktol3gPFr+hqE8rbBlDUhnwVuYzyfINLHWsVEH8dRYywQ
+ ZOPefHq1MQm9R+jvm//NxIlssymT/iwQ95MpvY+aRriYTPrDZIRz8s7poK/ebKXh0j/nhjfZAxF
+ j9GzDZhKiL5qEtu+wl/c64ggP
+X-Received: by 2002:a0c:f68f:: with SMTP id p15mr6885122qvn.79.1576620441553; 
+ Tue, 17 Dec 2019 14:07:21 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyYYchEVtwDwgk4Pr56pOeSJtWkuin1D2pVTuKZ433b4vaBfoHv6+mbPiSSnU54NveRu8NnwQ==
+X-Received: by 2002:a0c:f68f:: with SMTP id p15mr6885088qvn.79.1576620441243; 
+ Tue, 17 Dec 2019 14:07:21 -0800 (PST)
 Received: from xz-x1 ([104.156.64.74])
- by smtp.gmail.com with ESMTPSA id t198sm7534281qke.6.2019.12.17.13.56.41
+ by smtp.gmail.com with ESMTPSA id o9sm7592950qko.16.2019.12.17.14.07.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Dec 2019 13:56:41 -0800 (PST)
-Date: Tue, 17 Dec 2019 16:56:40 -0500
+ Tue, 17 Dec 2019 14:07:20 -0800 (PST)
+Date: Tue, 17 Dec 2019 17:07:18 -0500
 From: Peter Xu <peterx@redhat.com>
 To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v4 01/19] KVM: x86: Allocate new rmap and large page
- tracking when moving memslot
-Message-ID: <20191217215640.GI7258@xz-x1>
+Subject: Re: [PATCH v4 05/19] KVM: x86: Allocate memslot resources during
+ prepare_memory_region()
+Message-ID: <20191217220718.GJ7258@xz-x1>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
- <20191217204041.10815-2-sean.j.christopherson@intel.com>
+ <20191217204041.10815-6-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191217204041.10815-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20191217204041.10815-6-sean.j.christopherson@intel.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-MC-Unique: p3b4T9aGPZGQZ369s923pg-1
+X-MC-Unique: hLR9zjytNCGxjIon7xKfEQ-1
 X-Mimecast-Spam-Score: 0
 Content-Disposition: inline
 Cc: Wanpeng Li <wanpengli@tencent.com>, Janosch Frank <frankja@linux.ibm.com>,
@@ -104,8 +101,8 @@ Cc: Wanpeng Li <wanpengli@tencent.com>, Janosch Frank <frankja@linux.ibm.com>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>, Marc Zyngier <maz@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,91 +119,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 17, 2019 at 12:40:23PM -0800, Sean Christopherson wrote:
-> Reallocate a rmap array and recalcuate large page compatibility when
-> moving an existing memslot to correctly handle the alignment properties
-> of the new memslot.  The number of rmap entries required at each level
-> is dependent on the alignment of the memslot's base gfn with respect to
-> that level, e.g. moving a large-page aligned memslot so that it becomes
-> unaligned will increase the number of rmap entries needed at the now
-> unaligned level.
+On Tue, Dec 17, 2019 at 12:40:27PM -0800, Sean Christopherson wrote:
+> Allocate the various metadata structures associated with a new memslot
+> during kvm_arch_prepare_memory_region(), which paves the way for
+> removing kvm_arch_create_memslot() altogether.  Moving x86's memory
+> allocation only changes the order of kernel memory allocations between
+> x86 and common KVM code.
 > 
-> Not updating the rmap array is the most obvious bug, as KVM accesses
-> garbage data beyond the end of the rmap.  KVM interprets the bad data as
-> pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
+> No functional change intended.
+
+(I still think it's a functional change, though...)
+
 > 
->   general protection fault: 0000 [#1] SMP
->   CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->   RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
->   Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
->   RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
->   RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
->   RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
->   RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
->   R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
->   R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
->   FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
->   Call Trace:
->    kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
->    __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
->    kvm_set_memory_region+0x45/0x60 [kvm]
->    kvm_vm_ioctl+0x30f/0x920 [kvm]
->    do_vfs_ioctl+0xa1/0x620
->    ksys_ioctl+0x66/0x70
->    __x64_sys_ioctl+0x16/0x20
->    do_syscall_64+0x4c/0x170
->    entry_SYSCALL_64_after_hwframe+0x44/0xa9
->   RIP: 0033:0x7f7ed9911f47
->   Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
->   RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
->   RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
->   RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
->   RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
->   R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
->   R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
->   Modules linked in: kvm_intel kvm irqbypass
->   ---[ end trace 0c5f570b3358ca89 ]---
-> 
-> The disallow_lpage tracking is more subtle.  Failure to update results
-> in KVM creating large pages when it shouldn't, either due to stale data
-> or again due to indexing beyond the end of the metadata arrays, which
-> can lead to memory corruption and/or leaking data to guest/userspace.
-> 
-> Note, the arrays for the old memslot are freed by the unconditional call
-> to kvm_free_memslot() in __kvm_set_memory_region().
-> 
-> Fixes: 05da45583de9b ("KVM: MMU: large page support")
-> Cc: stable@vger.kernel.org
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
-
-I think the error-prone part is:
-
-	new = old = *slot;
-
-Where IMHO it would be better if we only copy pointers explicitly when
-under control, rather than blindly copying all the pointers in the
-structure which even contains sub-structures.
-
-For example, I see PPC has this:
-
-struct kvm_arch_memory_slot {
-#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-	unsigned long *rmap;
-#endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
-};
-
-I started to look into HV code of it a bit, then I see...
-
- - kvm_arch_create_memslot(kvmppc_core_create_memslot_hv) init slot->arch.rmap,
- - kvm_arch_flush_shadow_memslot(kvmppc_core_flush_memslot_hv) didn't free it,
- - kvm_arch_prepare_memory_region(kvmppc_core_prepare_memory_region_hv) is nop.
-
-So Does it have similar issue?
 
 -- 
 Peter Xu
