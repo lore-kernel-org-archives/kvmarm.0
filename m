@@ -2,68 +2,55 @@ Return-Path: <SRS0=Hq6c=2H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CEFC2D0D1
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 14:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E2DAC2D0BF
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 14:46:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 506F724679
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 14:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506F724679
+	by mail.kernel.org (Postfix) with ESMTP id D53262072D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 14:46:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D53262072D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E0D4A5A3;
-	Tue, 17 Dec 2019 09:40:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 483874A7FF;
+	Tue, 17 Dec 2019 09:46:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YqV5J9bd1yqk; Tue, 17 Dec 2019 09:40:40 -0500 (EST)
+	with ESMTP id 8A6RSX2y7hA4; Tue, 17 Dec 2019 09:46:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 304CC4A5A8;
-	Tue, 17 Dec 2019 09:40:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED2644A5A6;
+	Tue, 17 Dec 2019 09:46:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA5E4A597
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 09:40:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8AB04A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 09:46:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K0LBX+tbJLGs for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 09:40:37 -0500 (EST)
+ with ESMTP id C6+ITfb3hCcg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 09:46:40 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C95B4A418
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 09:40:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4767D4A418
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 09:46:40 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 474501FB;
- Tue, 17 Dec 2019 06:40:37 -0800 (PST)
-Received: from arm.com (e112269-lin.cambridge.arm.com [10.1.196.56])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B9183F67D;
- Tue, 17 Dec 2019 06:40:35 -0800 (PST)
-Date: Tue, 17 Dec 2019 14:40:33 +0000
-From: Steven Price <steven.price@arm.com>
-To: "yezengruan@huawei.com" <yezengruan@huawei.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Support the vcpu preemption check
-Message-ID: <20191217144032.GD38811@arm.com>
-References: <20191217135549.3240-1-yezengruan@huawei.com>
- <20191217135549.3240-6-yezengruan@huawei.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191217135549.3240-6-yezengruan@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- Catalin Marinas <Catalin.Marinas@arm.com>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD0901FB;
+ Tue, 17 Dec 2019 06:46:39 -0800 (PST)
+Received: from p8cg001049571a15.arm.com (unknown [10.163.1.79])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7BA513F67D;
+ Tue, 17 Dec 2019 06:46:34 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH V2] arm64: Introduce ID_ISAR6 CPU register
+Date: Tue, 17 Dec 2019 20:17:32 +0530
+Message-Id: <1576594052-10285-1-git-send-email-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,224 +62,160 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 17, 2019 at 01:55:49PM +0000, yezengruan@huawei.com wrote:
-> From: Zengruan Ye <yezengruan@huawei.com>
-> 
-> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
-> enhance lock performance on overcommitted hosts (more runnable vcpus
-> than physical cpus in the system) as doing busy waits for preempted
-> vcpus will hurt system performance far worse than early yielding.
-> 
-> unix benchmark result:
->   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 cpus
->   guest: kernel 5.5.0-rc1, 16 vcpus
-> 
->                test-case                |    after-patch    |   before-patch
-> ----------------------------------------+-------------------+------------------
->  Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
->  Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
->  Execl Throughput                       |      3662.1 lps   |      2718.0 lps
->  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
->  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
->  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
->  Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
->  Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
->  Process Creation                       |      4025.7 lps   |      3706.6 lps
->  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
->  Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
->  System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
-> ----------------------------------------+-------------------+------------------
->  System Benchmarks Index Score          |      1835.1       |      1327.6
-> 
-> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-> ---
->  arch/arm64/include/asm/paravirt.h |  3 +
->  arch/arm64/kernel/paravirt.c      | 91 +++++++++++++++++++++++++++++++
->  arch/arm64/kernel/setup.c         |  2 +
->  include/linux/cpuhotplug.h        |  1 +
->  4 files changed, 97 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-> index 7b1c81b544bb..a2cd0183bbef 100644
-> --- a/arch/arm64/include/asm/paravirt.h
-> +++ b/arch/arm64/include/asm/paravirt.h
-> @@ -29,6 +29,8 @@ static inline u64 paravirt_steal_clock(int cpu)
->  
->  int __init pv_time_init(void);
->  
-> +int __init kvm_guest_init(void);
-> +
+This adds basic building blocks required for ID_ISAR6 CPU register which
+identifies support for various instruction implementation on AArch32 state.
 
-This is a *very* generic name - I suggest something like pv_lock_init()
-so it's clear what the function actually does.
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu
+Acked-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+Changes in V2:
 
->  __visible bool __native_vcpu_is_preempted(int cpu);
->  
->  static inline bool pv_vcpu_is_preempted(int cpu)
-> @@ -39,6 +41,7 @@ static inline bool pv_vcpu_is_preempted(int cpu)
->  #else
->  
->  #define pv_time_init() do {} while (0)
-> +#define kvm_guest_init() do {} while (0)
->  
->  #endif // CONFIG_PARAVIRT
->  
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index d8f1ba8c22ce..a86dead40473 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -22,6 +22,7 @@
->  #include <asm/paravirt.h>
->  #include <asm/pvclock-abi.h>
->  #include <asm/smp_plat.h>
-> +#include <asm/pvlock-abi.h>
->  
->  struct static_key paravirt_steal_enabled;
->  struct static_key paravirt_steal_rq_enabled;
-> @@ -158,3 +159,93 @@ int __init pv_time_init(void)
->  
->  	return 0;
->  }
-> +
-> +DEFINE_PER_CPU(struct pvlock_vcpu_state, pvlock_vcpu_region) __aligned(64);
-> +EXPORT_PER_CPU_SYMBOL(pvlock_vcpu_region);
-> +
-> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
-> +{
-> +	struct pvlock_vcpu_state *reg;
-> +
-> +	reg = this_cpu_ptr(&pvlock_vcpu_region);
-> +	if (!reg)
-> +		return -EFAULT;
-> +
-> +	memset(reg, 0, sizeof(*reg));
+- Added an explicit ftr_id_isar6[] instead of using ftr_generic_32bits per Mark
+- Dropped ID_ISAR6_SPECRES_SHIFT exposure in ftr_id_isar6[] per Mark
+- Reversed ID_ISAR6_* definitions sequence to meet existing pattern in the file
 
-I might be missing something obvious here - but I don't see the point of
-this. The hypervisor might immediately overwrite the structure again.
-Indeed you should conside a mechanism for the guest to "unregister" the
-region - otherwise you will face issues with the likes of kexec.
+ arch/arm64/include/asm/cpu.h    |  1 +
+ arch/arm64/include/asm/sysreg.h |  9 +++++++++
+ arch/arm64/kernel/cpufeature.c  | 15 +++++++++++++++
+ arch/arm64/kernel/cpuinfo.c     |  1 +
+ arch/arm64/kvm/sys_regs.c       |  2 +-
+ 5 files changed, 27 insertions(+), 1 deletion(-)
 
-For pv_time the memory is allocated by the hypervisor not the guest to
-avoid lifetime issues about kexec.
+diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
+index d72d995..b4a4053 100644
+--- a/arch/arm64/include/asm/cpu.h
++++ b/arch/arm64/include/asm/cpu.h
+@@ -39,6 +39,7 @@ struct cpuinfo_arm64 {
+ 	u32		reg_id_isar3;
+ 	u32		reg_id_isar4;
+ 	u32		reg_id_isar5;
++	u32		reg_id_isar6;
+ 	u32		reg_id_mmfr0;
+ 	u32		reg_id_mmfr1;
+ 	u32		reg_id_mmfr2;
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6e919fa..7a176e1 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -146,6 +146,7 @@
+ #define SYS_ID_ISAR4_EL1		sys_reg(3, 0, 0, 2, 4)
+ #define SYS_ID_ISAR5_EL1		sys_reg(3, 0, 0, 2, 5)
+ #define SYS_ID_MMFR4_EL1		sys_reg(3, 0, 0, 2, 6)
++#define SYS_ID_ISAR6_EL1		sys_reg(3, 0, 0, 2, 7)
+ 
+ #define SYS_MVFR0_EL1			sys_reg(3, 0, 0, 3, 0)
+ #define SYS_MVFR1_EL1			sys_reg(3, 0, 0, 3, 1)
+@@ -679,6 +680,14 @@
+ #define ID_ISAR5_AES_SHIFT		4
+ #define ID_ISAR5_SEVL_SHIFT		0
+ 
++#define ID_ISAR6_I8MM_SHIFT		24
++#define ID_ISAR6_BF16_SHIFT		20
++#define ID_ISAR6_SPECRES_SHIFT		16
++#define ID_ISAR6_SB_SHIFT		12
++#define ID_ISAR6_FHM_SHIFT		8
++#define ID_ISAR6_DP_SHIFT		4
++#define ID_ISAR6_JSCVT_SHIFT		0
++
+ #define MVFR0_FPROUND_SHIFT		28
+ #define MVFR0_FPSHVEC_SHIFT		24
+ #define MVFR0_FPSQRT_SHIFT		20
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 04cf64e..6cec9aad 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -313,6 +313,16 @@ static const struct arm64_ftr_bits ftr_id_mmfr4[] = {
+ 	ARM64_FTR_END,
+ };
+ 
++static const struct arm64_ftr_bits ftr_id_isar6[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_I8MM_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_BF16_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_SB_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_FHM_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_DP_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR6_JSCVT_SHIFT, 4, 0),
++	ARM64_FTR_END,
++};
++
+ static const struct arm64_ftr_bits ftr_id_pfr0[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, 12, 4, 0),		/* State3 */
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, 8, 4, 0),		/* State2 */
+@@ -396,6 +406,7 @@ static const struct __ftr_reg_entry {
+ 	ARM64_FTR_REG(SYS_ID_ISAR4_EL1, ftr_generic_32bits),
+ 	ARM64_FTR_REG(SYS_ID_ISAR5_EL1, ftr_id_isar5),
+ 	ARM64_FTR_REG(SYS_ID_MMFR4_EL1, ftr_id_mmfr4),
++	ARM64_FTR_REG(SYS_ID_ISAR6_EL1, ftr_id_isar6),
+ 
+ 	/* Op1 = 0, CRn = 0, CRm = 3 */
+ 	ARM64_FTR_REG(SYS_MVFR0_EL1, ftr_generic_32bits),
+@@ -600,6 +611,7 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
+ 		init_cpu_ftr_reg(SYS_ID_ISAR3_EL1, info->reg_id_isar3);
+ 		init_cpu_ftr_reg(SYS_ID_ISAR4_EL1, info->reg_id_isar4);
+ 		init_cpu_ftr_reg(SYS_ID_ISAR5_EL1, info->reg_id_isar5);
++		init_cpu_ftr_reg(SYS_ID_ISAR6_EL1, info->reg_id_isar6);
+ 		init_cpu_ftr_reg(SYS_ID_MMFR0_EL1, info->reg_id_mmfr0);
+ 		init_cpu_ftr_reg(SYS_ID_MMFR1_EL1, info->reg_id_mmfr1);
+ 		init_cpu_ftr_reg(SYS_ID_MMFR2_EL1, info->reg_id_mmfr2);
+@@ -753,6 +765,8 @@ void update_cpu_features(int cpu,
+ 					info->reg_id_isar4, boot->reg_id_isar4);
+ 		taint |= check_update_ftr_reg(SYS_ID_ISAR5_EL1, cpu,
+ 					info->reg_id_isar5, boot->reg_id_isar5);
++		taint |= check_update_ftr_reg(SYS_ID_ISAR6_EL1, cpu,
++					info->reg_id_isar6, boot->reg_id_isar6);
+ 
+ 		/*
+ 		 * Regardless of the value of the AuxReg field, the AIFSR, ADFSR, and
+@@ -831,6 +845,7 @@ static u64 __read_sysreg_by_encoding(u32 sys_id)
+ 	read_sysreg_case(SYS_ID_ISAR3_EL1);
+ 	read_sysreg_case(SYS_ID_ISAR4_EL1);
+ 	read_sysreg_case(SYS_ID_ISAR5_EL1);
++	read_sysreg_case(SYS_ID_ISAR6_EL1);
+ 	read_sysreg_case(SYS_MVFR0_EL1);
+ 	read_sysreg_case(SYS_MVFR1_EL1);
+ 	read_sysreg_case(SYS_MVFR2_EL1);
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index 56bba74..e4e212f 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -360,6 +360,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+ 		info->reg_id_isar3 = read_cpuid(ID_ISAR3_EL1);
+ 		info->reg_id_isar4 = read_cpuid(ID_ISAR4_EL1);
+ 		info->reg_id_isar5 = read_cpuid(ID_ISAR5_EL1);
++		info->reg_id_isar6 = read_cpuid(ID_ISAR6_EL1);
+ 		info->reg_id_mmfr0 = read_cpuid(ID_MMFR0_EL1);
+ 		info->reg_id_mmfr1 = read_cpuid(ID_MMFR1_EL1);
+ 		info->reg_id_mmfr2 = read_cpuid(ID_MMFR2_EL1);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9f21659..3e909b1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1424,7 +1424,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_SANITISED(ID_ISAR4_EL1),
+ 	ID_SANITISED(ID_ISAR5_EL1),
+ 	ID_SANITISED(ID_MMFR4_EL1),
+-	ID_UNALLOCATED(2,7),
++	ID_SANITISED(ID_ISAR6_EL1),
+ 
+ 	/* CRm=3 */
+ 	ID_SANITISED(MVFR0_EL1),
+-- 
+2.7.4
 
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_pvlock_vcpu_state(unsigned int cpu)
-> +{
-> +	struct pvlock_vcpu_state *reg;
-> +	struct arm_smccc_res res;
-> +
-> +	reg = this_cpu_ptr(&pvlock_vcpu_region);
-> +	if (!reg)
-> +		return -EFAULT;
-> +
-> +	/* Pass the memory address to host via hypercall */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED,
-> +			     virt_to_phys(reg), &res);
-> +
-> +	return 0;
-> +}
-> +
-> +static bool kvm_vcpu_is_preempted(int cpu)
-> +{
-> +	struct pvlock_vcpu_state *reg = &per_cpu(pvlock_vcpu_region, cpu);
-> +
-> +	if (reg)
-> +		return !!(reg->preempted & 1);
-> +
-> +	return false;
-> +}
-> +
-> +static int kvm_arm_init_pvlock(void)
-> +{
-> +	int ret;
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
-> +				"hypervisor/arm/pvlock:starting",
-> +				init_pvlock_vcpu_state,
-> +				pvlock_vcpu_state_dying_cpu);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	pv_ops.lock.vcpu_is_preempted = kvm_vcpu_is_preempted;
-> +
-> +	pr_info("using PV-lock preempted\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static bool has_kvm_pvlock(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
-> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +int __init kvm_guest_init(void)
-> +{
-> +	if (is_hyp_mode_available())
-> +		return 0;
-> +
-> +	if (!has_kvm_pvlock())
-> +		return 0;
-> +
-> +	kvm_arm_init_pvlock();
-
-Consider reporting errors from kvm_arm_init_pvlock()? At the moment
-it's impossible to tell the difference between pvlock not being
-supported and something failing in the setup.
-
-Steve
-
-> +
-> +	return 0;
-> +}
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index 56f664561754..64c4d515ba2d 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -341,6 +341,8 @@ void __init setup_arch(char **cmdline_p)
->  	smp_init_cpus();
->  	smp_build_mpidr_hash();
->  
-> +	kvm_guest_init();
-> +
->  	/* Init percpu seeds for random tags after cpus are set up. */
->  	kasan_init_tags();
->  
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index e51ee772b9f5..f72ff95ab63a 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -138,6 +138,7 @@ enum cpuhp_state {
->  	CPUHP_AP_DUMMY_TIMER_STARTING,
->  	CPUHP_AP_ARM_XEN_STARTING,
->  	CPUHP_AP_ARM_KVMPV_STARTING,
-> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->  	CPUHP_AP_ARM_CORESIGHT_STARTING,
->  	CPUHP_AP_ARM64_ISNDEP_STARTING,
->  	CPUHP_AP_SMPCFD_DYING,
-> -- 
-> 2.19.1
-> 
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
