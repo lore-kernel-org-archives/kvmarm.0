@@ -2,72 +2,70 @@ Return-Path: <SRS0=Hq6c=2H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7E2C43603
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E66D6C43603
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:40:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 77F32206EC
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F32206EC
+	by mail.kernel.org (Postfix) with ESMTP id 68CD821582
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:40:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68CD821582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE3934A7F1;
-	Tue, 17 Dec 2019 12:55:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B61D44A535;
+	Tue, 17 Dec 2019 15:40:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SVX3P8dhuIqK; Tue, 17 Dec 2019 12:55:12 -0500 (EST)
+	with ESMTP id 5Je+txcwgAU0; Tue, 17 Dec 2019 15:40:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD76A4A4A9;
-	Tue, 17 Dec 2019 12:55:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 549B74A95C;
+	Tue, 17 Dec 2019 15:40:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDADE4A49C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 12:55:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB7CC4A830
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mugjKfDxhU7R for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 12:55:10 -0500 (EST)
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 861A74A319
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 12:55:10 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+ with ESMTP id IaxEfPkdyYJq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 15:40:44 -0500 (EST)
+Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8EB0A4A418
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:44 -0500 (EST)
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Dec 2019 09:55:08 -0800
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 17 Dec 2019 12:40:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="227576274"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by orsmga002.jf.intel.com with ESMTP; 17 Dec 2019 09:55:08 -0800
-Date: Tue, 17 Dec 2019 09:55:08 -0800
+X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="389952606"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+ by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:43 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-Message-ID: <20191217175507.GA8052@linux.intel.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191203221433.GK19877@linux.intel.com>
- <20191213200151.GF31552@linux.intel.com>
- <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
+To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Marc Zyngier <maz@kernel.org>
+Subject: [PATCH v4 11/19] KVM: x86: Free arrays for old memslot when moving
+ memslot's base gfn
+Date: Tue, 17 Dec 2019 12:40:33 -0800
+Message-Id: <20191217204041.10815-12-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- James Hogan <jhogan@kernel.org>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, David Hildenbrand <david@redhat.com>,
- kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, Wanpeng Li <wanpengli@tencent.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,20 +82,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Dec 16, 2019 at 09:25:24AM +0100, Christian Borntraeger wrote:
-> 
-> On 13.12.19 21:01, Sean Christopherson wrote:
-> > Applies cleanly on the current kvm/queue and nothing caught fire in
-> > testing (though I only re-tested the series as a whole).
-> 
-> Do you have the latest version somewhere on a branch? The version on the
-> list no longer applies cleanly.
+Explicitly free the metadata arrays (stored in slot->arch) in the old
+memslot structure when moving the memslot's base gfn is committed.  This
+eliminates x86's dependency on kvm_free_memslot() being called when a
+memlsot move is committed, and paves the way for removing the funky code
+in kvm_free_memslot() that conditionally frees structures based on its
+@dont param.
 
-Ah, I only tested with my sparse x86-only tree.  The result with three-way
-merging, i.e. 'git am -3', looks correct at a glance.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Regardless, I need to spin a new version to handle a conflict with an
-unrelated in-flight memslots bug fix, I'll get that sent out today.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0911b2f634c5..5f890812fac3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9884,6 +9884,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	 */
+ 	if (change != KVM_MR_DELETE)
+ 		kvm_mmu_slot_apply_flags(kvm, (struct kvm_memory_slot *) new);
++
++	/* Free the arrays associated with the old memslot. */
++	if (change == KVM_MR_MOVE)
++		kvm_arch_free_memslot(kvm, old, NULL);
+ }
+ 
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+-- 
+2.24.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
