@@ -4,52 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16097C2D0CD
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 12:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E14E2C2D0D2
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A9FBD21582
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 12:38:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FBD21582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 643672465E
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643672465E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19EF24A7FE;
-	Tue, 17 Dec 2019 07:38:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B80FD4A94D;
+	Tue, 17 Dec 2019 08:56:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c4p2wEcgpNFU; Tue, 17 Dec 2019 07:38:18 -0500 (EST)
+	with ESMTP id HGV8Npj-jM3E; Tue, 17 Dec 2019 08:56:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F07BE4A524;
-	Tue, 17 Dec 2019 07:38:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E1A14A576;
+	Tue, 17 Dec 2019 08:56:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49D0F4A4C0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 07:38:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EF084A576
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 08:56:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 52rMx9FFETOc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 07:38:17 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDA9F4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 07:38:16 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75CAE31B;
- Tue, 17 Dec 2019 04:38:16 -0800 (PST)
-Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 759903F718;
- Tue, 17 Dec 2019 04:38:15 -0800 (PST)
-From: James Morse <james.morse@arm.com>
-To: kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2] KVM: arm/arm64: Re-check VMA on detecting a poisoned page
-Date: Tue, 17 Dec 2019 12:38:09 +0000
-Message-Id: <20191217123809.197392-1-james.morse@arm.com>
-X-Mailer: git-send-email 2.24.0
+ with ESMTP id NQm2dwrW-l0n for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 08:56:34 -0500 (EST)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C06D4A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 08:56:34 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id C086CF8CE4FD6D29296B;
+ Tue, 17 Dec 2019 21:56:30 +0800 (CST)
+Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 17 Dec 2019 21:56:24 +0800
+From: <yezengruan@huawei.com>
+To: <yezengruan@huawei.com>, <linux-kernel@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
+ <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <virtualization@lists.linux-foundation.org>
+Subject: [PATCH 4/5] KVM: arm64: Add interface to support vcpu preempted check
+Date: Tue, 17 Dec 2019 21:55:48 +0800
+Message-ID: <20191217135549.3240-5-yezengruan@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
+In-Reply-To: <20191217135549.3240-1-yezengruan@huawei.com>
+References: <20191217135549.3240-1-yezengruan@huawei.com>
 MIME-Version: 1.0
-Cc: Marc Zyngier <maz@kernel.org>
+X-Originating-IP: [10.173.221.248]
+X-CFilter-Loop: Reflected
+Cc: catalin.marinas@arm.com, daniel.lezcano@linaro.org, linux@armlinux.org.uk,
+ steven.price@arm.com, maz@kernel.org, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,78 +73,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When we check for a poisoned page, we use the VMA to tell userspace
-about the looming disaster. But we pass a pointer to this VMA
-after having released the mmap_sem, which isn't a good idea.
+From: Zengruan Ye <yezengruan@huawei.com>
 
-Instead, stash the shift value that goes with this pfn while
-we are holding the mmap_sem.
+This is to fix some lock holder preemption issues. Some other locks
+implementation do a spin loop before acquiring the lock itself.
+Currently kernel has an interface of bool vcpu_is_preempted(int cpu). It
+takes the cpu as parameter and return true if the cpu is preempted.
+Then kernel can break the spin loops upon the retval of vcpu_is_preempted.
 
-Reported-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: James Morse <james.morse@arm.com>
+As kernel has used this interface, So lets support it.
+
+Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
 ---
+ arch/arm64/include/asm/paravirt.h      | 12 ++++++++++++
+ arch/arm64/include/asm/spinlock.h      |  7 +++++++
+ arch/arm64/kernel/Makefile             |  2 +-
+ arch/arm64/kernel/paravirt-spinlocks.c | 13 +++++++++++++
+ arch/arm64/kernel/paravirt.c           |  4 +++-
+ 5 files changed, 36 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/kernel/paravirt-spinlocks.c
 
-Based on Marc's patch:
-Link: lore.kernel.org/r/20191211165651.7889-3-maz@kernel.org
-
- virt/kvm/arm/mmu.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 38b4c910b6c3..bb0f8d648678 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1591,16 +1591,8 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
- 	__invalidate_icache_guest_page(pfn, size);
- }
+diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
+index cf3a0fd7c1a7..7b1c81b544bb 100644
+--- a/arch/arm64/include/asm/paravirt.h
++++ b/arch/arm64/include/asm/paravirt.h
+@@ -11,8 +11,13 @@ struct pv_time_ops {
+ 	unsigned long long (*steal_clock)(int cpu);
+ };
  
--static void kvm_send_hwpoison_signal(unsigned long address,
--				     struct vm_area_struct *vma)
-+static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
- {
--	short lsb;
--
--	if (is_vm_hugetlb_page(vma))
--		lsb = huge_page_shift(hstate_vma(vma));
--	else
--		lsb = PAGE_SHIFT;
--
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
- }
- 
-@@ -1673,6 +1665,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct vm_area_struct *vma;
-+	short vma_shift;
- 	kvm_pfn_t pfn;
- 	pgprot_t mem_type = PAGE_S2;
- 	bool logging_active = memslot_is_logging(memslot);
-@@ -1696,7 +1689,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 	}
- 
--	vma_pagesize = vma_kernel_pagesize(vma);
-+	if (is_vm_hugetlb_page(vma))
-+		vma_shift = huge_page_shift(hstate_vma(vma));
-+	else
-+		vma_shift = PAGE_SHIFT;
++struct pv_lock_ops {
++	bool (*vcpu_is_preempted)(int cpu);
++};
 +
-+	vma_pagesize = 1ULL << vma_shift;
- 	if (logging_active ||
- 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
- 		force_pte = true;
-@@ -1735,7 +1733,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ struct paravirt_patch_template {
+ 	struct pv_time_ops time;
++	struct pv_lock_ops lock;
+ };
  
- 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
--		kvm_send_hwpoison_signal(hva, vma);
-+		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
- 	}
- 	if (is_error_noslot_pfn(pfn))
+ extern struct paravirt_patch_template pv_ops;
+@@ -24,6 +29,13 @@ static inline u64 paravirt_steal_clock(int cpu)
+ 
+ int __init pv_time_init(void);
+ 
++__visible bool __native_vcpu_is_preempted(int cpu);
++
++static inline bool pv_vcpu_is_preempted(int cpu)
++{
++	return pv_ops.lock.vcpu_is_preempted(cpu);
++}
++
+ #else
+ 
+ #define pv_time_init() do {} while (0)
+diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
+index b093b287babf..45ff1b2949a6 100644
+--- a/arch/arm64/include/asm/spinlock.h
++++ b/arch/arm64/include/asm/spinlock.h
+@@ -7,8 +7,15 @@
+ 
+ #include <asm/qrwlock.h>
+ #include <asm/qspinlock.h>
++#include <asm/paravirt.h>
+ 
+ /* See include/linux/spinlock.h */
+ #define smp_mb__after_spinlock()	smp_mb()
+ 
++#define vcpu_is_preempted vcpu_is_preempted
++static inline bool vcpu_is_preempted(long cpu)
++{
++	return pv_vcpu_is_preempted(cpu);
++}
++
+ #endif /* __ASM_SPINLOCK_H */
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index fc6488660f64..b23cdae433a4 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -50,7 +50,7 @@ obj-$(CONFIG_ARMV8_DEPRECATED)		+= armv8_deprecated.o
+ obj-$(CONFIG_ACPI)			+= acpi.o
+ obj-$(CONFIG_ACPI_NUMA)			+= acpi_numa.o
+ obj-$(CONFIG_ARM64_ACPI_PARKING_PROTOCOL)	+= acpi_parking_protocol.o
+-obj-$(CONFIG_PARAVIRT)			+= paravirt.o
++obj-$(CONFIG_PARAVIRT)			+= paravirt.o paravirt-spinlocks.o
+ obj-$(CONFIG_RANDOMIZE_BASE)		+= kaslr.o
+ obj-$(CONFIG_HIBERNATION)		+= hibernate.o hibernate-asm.o
+ obj-$(CONFIG_KEXEC_CORE)		+= machine_kexec.o relocate_kernel.o	\
+diff --git a/arch/arm64/kernel/paravirt-spinlocks.c b/arch/arm64/kernel/paravirt-spinlocks.c
+new file mode 100644
+index 000000000000..718aa773d45c
+--- /dev/null
++++ b/arch/arm64/kernel/paravirt-spinlocks.c
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright(c) 2019 Huawei Technologies Co., Ltd
++ * Author: Zengruan Ye <yezengruan@huawei.com>
++ */
++
++#include <linux/spinlock.h>
++#include <asm/paravirt.h>
++
++__visible bool __native_vcpu_is_preempted(int cpu)
++{
++	return false;
++}
+diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+index 1ef702b0be2d..d8f1ba8c22ce 100644
+--- a/arch/arm64/kernel/paravirt.c
++++ b/arch/arm64/kernel/paravirt.c
+@@ -26,7 +26,9 @@
+ struct static_key paravirt_steal_enabled;
+ struct static_key paravirt_steal_rq_enabled;
+ 
+-struct paravirt_patch_template pv_ops;
++struct paravirt_patch_template pv_ops = {
++	.lock.vcpu_is_preempted		= __native_vcpu_is_preempted,
++};
+ EXPORT_SYMBOL_GPL(pv_ops);
+ 
+ struct pv_time_stolen_time_region {
 -- 
-2.24.0
+2.19.1
+
 
 _______________________________________________
 kvmarm mailing list
