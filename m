@@ -2,73 +2,110 @@ Return-Path: <SRS0=Hq6c=2H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0493C2D0BF
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225BAC43603
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 21:56:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 33F9D2146E
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:48:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33F9D2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 8221021582
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 21:56:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gY5rR61H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8221021582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DE534A535;
-	Tue, 17 Dec 2019 15:48:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D662B4A7F1;
+	Tue, 17 Dec 2019 16:56:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2iS-PIipew24; Tue, 17 Dec 2019 15:48:27 -0500 (EST)
+	with ESMTP id G7-2Hq1wyl8h; Tue, 17 Dec 2019 16:56:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56EAA4A5A0;
-	Tue, 17 Dec 2019 15:48:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F8974A531;
+	Tue, 17 Dec 2019 16:56:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 067B84A534
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:48:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B40E14A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 16:56:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PvooIAGBJW51 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 15:48:24 -0500 (EST)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 908FD4A531
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:48:24 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Dec 2019 12:48:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="247621238"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by fmsmga002.fm.intel.com with ESMTP; 17 Dec 2019 12:48:22 -0800
-Date: Tue, 17 Dec 2019 12:48:22 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
+ with ESMTP id r4bK5egSD97n for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 16:56:45 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 740D84A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 16:56:45 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576619805;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=y9EmI3Nr90MB39kVEiie1LgWNRBdKLDpuM1lu03ZacU=;
+ b=gY5rR61HOKGxHDO6PTJL1Kwnm5AqdIIb0ntY0IElantXglWdwJKkEiyrdEhnu7RdS57pgS
+ rMb+kQQG75SBlioJu8Ql5pO76p/oNRMYIuHXUFro/e71BZ830kGp91wBaSUkSo7bjEbg8p
+ e3Ya9eO03yAj4vF06J3CZxBBVSt50Vo=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-p3b4T9aGPZGQZ369s923pg-1; Tue, 17 Dec 2019 16:56:43 -0500
+Received: by mail-qk1-f199.google.com with SMTP id g28so7833895qkl.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 13:56:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=hSE8d84YfV0TRBuqIE3TvHfXXVwzC5/7L6224fyao4A=;
+ b=sjM90n6Q7OKITjUOLJgXUM+HcpBj08Br6Y2I9IhySg/QYybIFks8SW8A7j1kR82cyt
+ VysADocT4y7LxFICkDJvOVediri66cVRwWq/Q8L4vyBqRWLLhyZICyMAX/VNglZM94sM
+ dHB51dBsp+dJlgsg6SRbEDfHB/FHz3GjeLqUNXmLUrL8y0slvK4cHfkUHYqm/dEJ7ZyL
+ PTgCWsU8UdOq0zl56MShx9RAovXLwnJvhz5mD86TErvedWgHCpEORavHOWGlPDqeWd38
+ lVieA17yVHhThQE8qodlufRHAMM8g8N0jrCS4p3AE/rizrqH3l3JlWL0/02A2QwxfoQH
+ LXGg==
+X-Gm-Message-State: APjAAAV7OQ4DlE9h0YGKDlfd4PmYK99pl8ZlYdnCU3JwGMslaUbfXObn
+ Tnyn4G1CKwiQUHY3kkqCv00VRw+N/ZWpZF9d8tY4dSaoodmqj9aUHKGACE4lK95OlqAmHUI0QIB
+ MQ1RTVHzcEPdFe3CxBiDSltFR
+X-Received: by 2002:a05:6214:707:: with SMTP id
+ b7mr6932302qvz.97.1576619803180; 
+ Tue, 17 Dec 2019 13:56:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxkJVTx6R82PYxH8CBMYAk4P1dJ5EjDAy6gossam+XsRnSgvrFRKTM01bOCNWxLxn1nVLa7oA==
+X-Received: by 2002:a05:6214:707:: with SMTP id
+ b7mr6932279qvz.97.1576619802834; 
+ Tue, 17 Dec 2019 13:56:42 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+ by smtp.gmail.com with ESMTPSA id t198sm7534281qke.6.2019.12.17.13.56.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Dec 2019 13:56:41 -0800 (PST)
+Date: Tue, 17 Dec 2019 16:56:40 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
 Subject: Re: [PATCH v4 01/19] KVM: x86: Allocate new rmap and large page
  tracking when moving memslot
-Message-ID: <20191217204822.GC8052@linux.intel.com>
+Message-ID: <20191217215640.GI7258@xz-x1>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
  <20191217204041.10815-2-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Content-Disposition: inline
 In-Reply-To: <20191217204041.10815-2-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-MC-Unique: p3b4T9aGPZGQZ369s923pg-1
+X-Mimecast-Spam-Score: 0
+Content-Disposition: inline
+Cc: Wanpeng Li <wanpengli@tencent.com>, Janosch Frank <frankja@linux.ibm.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+ James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,13 +121,6 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-
-Dropping non-x86 folks...
-
-This should be included in 5.5 if possible even though the bug has existed
-for over a decade.  It's trivially easy for a malicious userspace to
-crash KVM and hang the host.  Depending how userspace VMM behavior, it may
-even be possible to trigger from a guest.
 
 On Tue, Dec 17, 2019 at 12:40:23PM -0800, Sean Christopherson wrote:
 > Reallocate a rmap array and recalcuate large page compatibility when
@@ -151,42 +181,36 @@ On Tue, Dec 17, 2019 at 12:40:23PM -0800, Sean Christopherson wrote:
 > Fixes: 05da45583de9b ("KVM: MMU: large page support")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 8bb2fb1705ff..04d1bf89da0e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9703,6 +9703,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
->  {
->  	int i;
->  
-> +	/*
-> +	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-> +	 * old arrays will be freed by __kvm_set_memory_region() if installing
-> +	 * the new memslot is successful.
-> +	 */
-> +	memset(&slot->arch, 0, sizeof(slot->arch));
-> +
->  	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
->  		struct kvm_lpage_info *linfo;
->  		unsigned long ugfn;
-> @@ -9777,6 +9784,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				const struct kvm_userspace_memory_region *mem,
->  				enum kvm_mr_change change)
->  {
-> +	if (change == KVM_MR_MOVE)
-> +		return kvm_arch_create_memslot(kvm, memslot,
-> +					       mem->memory_size >> PAGE_SHIFT);
-> +
->  	return 0;
->  }
->  
-> -- 
-> 2.24.1
-> 
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+I think the error-prone part is:
+
+	new = old = *slot;
+
+Where IMHO it would be better if we only copy pointers explicitly when
+under control, rather than blindly copying all the pointers in the
+structure which even contains sub-structures.
+
+For example, I see PPC has this:
+
+struct kvm_arch_memory_slot {
+#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+	unsigned long *rmap;
+#endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+};
+
+I started to look into HV code of it a bit, then I see...
+
+ - kvm_arch_create_memslot(kvmppc_core_create_memslot_hv) init slot->arch.rmap,
+ - kvm_arch_flush_shadow_memslot(kvmppc_core_flush_memslot_hv) didn't free it,
+ - kvm_arch_prepare_memory_region(kvmppc_core_prepare_memory_region_hv) is nop.
+
+So Does it have similar issue?
+
+-- 
+Peter Xu
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
