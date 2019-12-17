@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE14C43603
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C2AC2D0BF
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4787D21582
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4787D21582
+	by mail.kernel.org (Postfix) with ESMTP id E44AA2176D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 20:41:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44AA2176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F19994AC7E;
-	Tue, 17 Dec 2019 15:41:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99D594AEB3;
+	Tue, 17 Dec 2019 15:41:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GPL2K7tV0sUF; Tue, 17 Dec 2019 15:41:02 -0500 (EST)
+	with ESMTP id pk+rrmphCJSE; Tue, 17 Dec 2019 15:41:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE1BD4AEB3;
-	Tue, 17 Dec 2019 15:40:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2153C4AEDE;
+	Tue, 17 Dec 2019 15:40:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 19F114A535
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4686B4A535
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EYadclpUIdyp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 15:40:46 -0500 (EST)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B4964A5A3
+ with ESMTP id 3Sq65jWuvf8Y for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 15:40:47 -0500 (EST)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72DF14A94D
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 15:40:46 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  17 Dec 2019 12:40:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="389952632"
+X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; d="scan'208";a="389952600"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:43 -0800
+ by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:42 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v4 19/19] KVM: selftests: Add test for
- KVM_SET_USER_MEMORY_REGION
-Date: Tue, 17 Dec 2019 12:40:41 -0800
-Message-Id: <20191217204041.10815-20-sean.j.christopherson@intel.com>
+Subject: [PATCH v4 09/19] KVM: Move setting of memslot into helper routine
+Date: Tue, 17 Dec 2019 12:40:31 -0800
+Message-Id: <20191217204041.10815-10-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
@@ -77,263 +76,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a KVM selftest to test moving the base gfn of a userspace memory
-region.  The test is primarily targeted at x86 to verify its memslot
-metadata is correctly updated, but also provides basic functionality
-coverage on other architectures.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  30 ++++
- .../selftests/kvm/set_memory_region_test.c    | 142 ++++++++++++++++++
- 5 files changed, 177 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/set_memory_region_test.c
-
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 30072c3f52fb..6f60ceb81440 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -17,3 +17,4 @@
- /clear_dirty_log_test
- /dirty_log_test
- /kvm_create_max_vcpus
-+/set_memory_region_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 3138a916574a..01c79e02c5b7 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -29,15 +29,18 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += set_memory_region_test
- 
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += set_memory_region_test
- 
- TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += set_memory_region_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 29cccaf96baf..15d3b8690ffb 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -100,6 +100,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
- 		void *arg);
- void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
- void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-+void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
- vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
- 			  uint32_t data_memslot, uint32_t pgd_memslot);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 41cf45416060..464a75ce9843 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -756,6 +756,36 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
- 		ret, errno, slot, flags);
- }
- 
-+/*
-+ * VM Memory Region Move
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   slot - Slot of the memory region to move
-+ *   flags - Starting guest physical address
-+ *
-+ * Output Args: None
-+ *
-+ * Return: None
-+ *
-+ * Change the gpa of a memory region.
-+ */
-+void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
-+{
-+	struct userspace_mem_region *region;
-+	int ret;
-+
-+	region = memslot2region(vm, slot);
-+
-+	region->region.guest_phys_addr = new_gpa;
-+
-+	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region);
-+
-+	TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed\n"
-+		    "ret: %i errno: %i slot: %u flags: 0x%x",
-+		    ret, errno, slot, new_gpa);
-+}
-+
- /*
-  * VCPU mmap Size
-  *
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-new file mode 100644
-index 000000000000..c9603b95ccf7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -0,0 +1,142 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <pthread.h>
-+#include <sched.h>
-+#include <signal.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include <linux/compiler.h>
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+/*
-+ * Somewhat arbitrary location and slot, intended to not overlap anything.  The
-+ * location and size are specifically 2mb sized/aligned so that the initial
-+ * region corresponds to exactly one large page (on x86 and arm64).
-+ */
-+#define MEM_REGION_GPA		0xc0000000
-+#define MEM_REGION_SIZE		0x200000
-+#define MEM_REGION_SLOT		10
-+
-+static void guest_code(void)
-+{
-+	uint64_t val;
-+
-+	do {
-+		val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
-+	} while (!val);
-+
-+	if (val != 1)
-+		ucall(UCALL_ABORT, 1, val);
-+
-+	GUEST_DONE();
-+}
-+
-+static void *vcpu_worker(void *data)
-+{
-+	struct kvm_vm *vm = data;
-+	struct kvm_run *run;
-+	struct ucall uc;
-+	uint64_t cmd;
-+
-+	/*
-+	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
-+	 * which will occur if the guest attempts to access a memslot while it
-+	 * is being moved.
-+	 */
-+	run = vcpu_state(vm, VCPU_ID);
-+	do {
-+		vcpu_run(vm, VCPU_ID);
-+	} while (run->exit_reason == KVM_EXIT_MMIO);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Unexpected exit reason = %d", run->exit_reason);
-+
-+	cmd = get_ucall(vm, VCPU_ID, &uc);
-+	TEST_ASSERT(cmd == UCALL_DONE, "Unexpected val in guest = %llu",
-+		    uc.args[0]);
-+	return NULL;
-+}
-+
-+static void test_move_memory_region(void)
-+{
-+	pthread_t vcpu_thread;
-+	struct kvm_vm *vm;
-+	uint64_t *hva;
-+	uint64_t gpa;
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_THP,
-+				    MEM_REGION_GPA, MEM_REGION_SLOT,
-+				    MEM_REGION_SIZE / getpagesize(), 0);
-+
-+	/*
-+	 * Allocate and map two pages so that the GPA accessed by guest_code()
-+	 * stays valid across the memslot move.
-+	 */
-+	gpa = vm_phy_pages_alloc(vm, 2, MEM_REGION_GPA, MEM_REGION_SLOT);
-+	TEST_ASSERT(gpa == MEM_REGION_GPA, "Failed vm_phy_pages_alloc\n");
-+
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 2 * 4096, 0);
-+
-+	/* Ditto for the host mapping so that both pages can be zeroed. */
-+	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
-+	memset(hva, 0, 2 * 4096);
-+
-+	pthread_create(&vcpu_thread, NULL, vcpu_worker, vm);
-+
-+	/* Ensure the guest thread is spun up. */
-+	usleep(100000);
-+
-+	/*
-+	 * Shift the region's base GPA.  The guest should not see "2" as the
-+	 * hva->gpa translation is misaligned, i.e. the guest is accessing a
-+	 * different host pfn.
-+	 */
-+	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA - 4096);
-+	WRITE_ONCE(*hva, 2);
-+
-+	usleep(100000);
-+
-+	/*
-+	 * Note, value in memory needs to be changed *before* restoring the
-+	 * memslot, else the guest could race the update and see "2".
-+	 */
-+	WRITE_ONCE(*hva, 1);
-+
-+	/* Restore the original base, the guest should see "1". */
-+	vm_mem_region_move(vm, MEM_REGION_SLOT, MEM_REGION_GPA);
-+
-+	pthread_join(vcpu_thread, NULL);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int i, loops;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	if (argc > 1)
-+		loops = atoi(argv[1]);
-+	else
-+		loops = 10;
-+
-+	for (i = 0; i < loops; i++)
-+		test_move_memory_region();
-+
-+	return 0;
-+}
--- 
-2.24.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+U3BsaXQgb3V0IHRoZSBjb3JlIGZ1bmN0aW9uYWxpdHkgb2Ygc2V0dGluZyBhIG1lbXNsb3QgaW50
+byBhIHNlcGFyYXRlCmhlbHBlciBpbiBwcmVwYXJhdGlvbiBmb3IgbW92aW5nIG1lbXNsb3QgZGVs
+ZXRpb24gaW50byBpdHMgb3duIHJvdXRpbmUuCgpUZXN0ZWQtYnk6IENocmlzdG9mZmVyIERhbGwg
+PGNocmlzdG9mZmVyLmRhbGxAYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUt
+RGF1ZMOpIDxmNGJ1Z0BhbXNhdC5vcmc+ClNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJz
+b24gPHNlYW4uai5jaHJpc3RvcGhlcnNvbkBpbnRlbC5jb20+Ci0tLQogdmlydC9rdm0va3ZtX21h
+aW4uYyB8IDEwNiArKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQog
+MSBmaWxlIGNoYW5nZWQsIDYzIGluc2VydGlvbnMoKyksIDQzIGRlbGV0aW9ucygtKQoKZGlmZiAt
+LWdpdCBhL3ZpcnQva3ZtL2t2bV9tYWluLmMgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCmluZGV4IDlj
+NDg4YzY1MzI1Ny4uMzY2M2FjMjI5YzRkIDEwMDY0NAotLS0gYS92aXJ0L2t2bS9rdm1fbWFpbi5j
+CisrKyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMKQEAgLTk4Niw2ICs5ODYsNjYgQEAgc3RhdGljIHN0
+cnVjdCBrdm1fbWVtc2xvdHMgKmluc3RhbGxfbmV3X21lbXNsb3RzKHN0cnVjdCBrdm0gKmt2bSwK
+IAlyZXR1cm4gb2xkX21lbXNsb3RzOwogfQogCitzdGF0aWMgaW50IGt2bV9zZXRfbWVtc2xvdChz
+dHJ1Y3Qga3ZtICprdm0sCisJCQkgICBjb25zdCBzdHJ1Y3Qga3ZtX3VzZXJzcGFjZV9tZW1vcnlf
+cmVnaW9uICptZW0sCisJCQkgICBjb25zdCBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpvbGQsCisJ
+CQkgICBzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpuZXcsIGludCBhc19pZCwKKwkJCSAgIGVudW0g
+a3ZtX21yX2NoYW5nZSBjaGFuZ2UpCit7CisJc3RydWN0IGt2bV9tZW1vcnlfc2xvdCAqc2xvdDsK
+KwlzdHJ1Y3Qga3ZtX21lbXNsb3RzICpzbG90czsKKwlpbnQgcjsKKworCXNsb3RzID0ga3Z6YWxs
+b2Moc2l6ZW9mKHN0cnVjdCBrdm1fbWVtc2xvdHMpLCBHRlBfS0VSTkVMX0FDQ09VTlQpOworCWlm
+ICghc2xvdHMpCisJCXJldHVybiAtRU5PTUVNOworCW1lbWNweShzbG90cywgX19rdm1fbWVtc2xv
+dHMoa3ZtLCBhc19pZCksIHNpemVvZihzdHJ1Y3Qga3ZtX21lbXNsb3RzKSk7CisKKwlpZiAoY2hh
+bmdlID09IEtWTV9NUl9ERUxFVEUgfHwgY2hhbmdlID09IEtWTV9NUl9NT1ZFKSB7CisJCS8qCisJ
+CSAqIE5vdGUsIHRoZSBJTlZBTElEIGZsYWcgbmVlZHMgdG8gYmUgaW4gdGhlIGFwcHJvcHJpYXRl
+IGVudHJ5CisJCSAqIGluIHRoZSBmcmVzaGx5IGFsbG9jYXRlZCBtZW1zbG90cywgbm90IGluIEBv
+bGQgb3IgQG5ldy4KKwkJICovCisJCXNsb3QgPSBpZF90b19tZW1zbG90KHNsb3RzLCBvbGQtPmlk
+KTsKKwkJc2xvdC0+ZmxhZ3MgfD0gS1ZNX01FTVNMT1RfSU5WQUxJRDsKKworCQkvKgorCQkgKiBX
+ZSBjYW4gcmUtdXNlIHRoZSBvbGQgbWVtc2xvdHMsIHRoZSBvbmx5IGRpZmZlcmVuY2UgZnJvbSB0
+aGUKKwkJICogbmV3bHkgaW5zdGFsbGVkIG1lbXNsb3RzIGlzIHRoZSBpbnZhbGlkIGZsYWcsIHdo
+aWNoIHdpbGwgZ2V0CisJCSAqIGRyb3BwZWQgYnkgdXBkYXRlX21lbXNsb3RzIGFueXdheS4gIFdl
+J2xsIGFsc28gcmV2ZXJ0IHRvIHRoZQorCQkgKiBvbGQgbWVtc2xvdHMgaWYgcHJlcGFyaW5nIHRo
+ZSBuZXcgbWVtb3J5IHJlZ2lvbiBmYWlscy4KKwkJICovCisJCXNsb3RzID0gaW5zdGFsbF9uZXdf
+bWVtc2xvdHMoa3ZtLCBhc19pZCwgc2xvdHMpOworCisJCS8qIEZyb20gdGhpcyBwb2ludCBubyBu
+ZXcgc2hhZG93IHBhZ2VzIHBvaW50aW5nIHRvIGEgZGVsZXRlZCwKKwkJICogb3IgbW92ZWQsIG1l
+bXNsb3Qgd2lsbCBiZSBjcmVhdGVkLgorCQkgKgorCQkgKiB2YWxpZGF0aW9uIG9mIHNwLT5nZm4g
+aGFwcGVucyBpbjoKKwkJICoJLSBnZm5fdG9faHZhIChrdm1fcmVhZF9ndWVzdCwgZ2ZuX3RvX3Bm
+bikKKwkJICoJLSBrdm1faXNfdmlzaWJsZV9nZm4gKG1tdV9jaGVja19yb290cykKKwkJICovCisJ
+CWt2bV9hcmNoX2ZsdXNoX3NoYWRvd19tZW1zbG90KGt2bSwgc2xvdCk7CisJfQorCisJciA9IGt2
+bV9hcmNoX3ByZXBhcmVfbWVtb3J5X3JlZ2lvbihrdm0sIG5ldywgbWVtLCBjaGFuZ2UpOworCWlm
+IChyKQorCQlnb3RvIG91dF9zbG90czsKKworCXVwZGF0ZV9tZW1zbG90cyhzbG90cywgbmV3LCBj
+aGFuZ2UpOworCXNsb3RzID0gaW5zdGFsbF9uZXdfbWVtc2xvdHMoa3ZtLCBhc19pZCwgc2xvdHMp
+OworCisJa3ZtX2FyY2hfY29tbWl0X21lbW9yeV9yZWdpb24oa3ZtLCBtZW0sIG9sZCwgbmV3LCBj
+aGFuZ2UpOworCisJa3ZmcmVlKHNsb3RzKTsKKwlyZXR1cm4gMDsKKworb3V0X3Nsb3RzOgorCWlm
+IChjaGFuZ2UgPT0gS1ZNX01SX0RFTEVURSB8fCBjaGFuZ2UgPT0gS1ZNX01SX01PVkUpCisJCXNs
+b3RzID0gaW5zdGFsbF9uZXdfbWVtc2xvdHMoa3ZtLCBhc19pZCwgc2xvdHMpOworCWt2ZnJlZShz
+bG90cyk7CisJcmV0dXJuIHI7Cit9CisKIC8qCiAgKiBBbGxvY2F0ZSBzb21lIG1lbW9yeSBhbmQg
+Z2l2ZSBpdCBhbiBhZGRyZXNzIGluIHRoZSBndWVzdCBwaHlzaWNhbCBhZGRyZXNzCiAgKiBzcGFj
+ZS4KQEAgLTEwMDIsNyArMTA2Miw2IEBAIGludCBfX2t2bV9zZXRfbWVtb3J5X3JlZ2lvbihzdHJ1
+Y3Qga3ZtICprdm0sCiAJdW5zaWduZWQgbG9uZyBucGFnZXM7CiAJc3RydWN0IGt2bV9tZW1vcnlf
+c2xvdCAqc2xvdDsKIAlzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90IG9sZCwgbmV3OwotCXN0cnVjdCBr
+dm1fbWVtc2xvdHMgKnNsb3RzOwogCWludCBhc19pZCwgaWQ7CiAJZW51bSBrdm1fbXJfY2hhbmdl
+IGNoYW5nZTsKIApAQCAtMTA4OSw1OCArMTE0OCwxOSBAQCBpbnQgX19rdm1fc2V0X21lbW9yeV9y
+ZWdpb24oc3RydWN0IGt2bSAqa3ZtLAogCQkJcmV0dXJuIHI7CiAJfQogCi0Jc2xvdHMgPSBrdnph
+bGxvYyhzaXplb2Yoc3RydWN0IGt2bV9tZW1zbG90cyksIEdGUF9LRVJORUxfQUNDT1VOVCk7Ci0J
+aWYgKCFzbG90cykgewotCQlyID0gLUVOT01FTTsKLQkJZ290byBvdXRfYml0bWFwOwotCX0KLQlt
+ZW1jcHkoc2xvdHMsIF9fa3ZtX21lbXNsb3RzKGt2bSwgYXNfaWQpLCBzaXplb2Yoc3RydWN0IGt2
+bV9tZW1zbG90cykpOwotCi0JaWYgKChjaGFuZ2UgPT0gS1ZNX01SX0RFTEVURSkgfHwgKGNoYW5n
+ZSA9PSBLVk1fTVJfTU9WRSkpIHsKLQkJc2xvdCA9IGlkX3RvX21lbXNsb3Qoc2xvdHMsIGlkKTsK
+LQkJc2xvdC0+ZmxhZ3MgfD0gS1ZNX01FTVNMT1RfSU5WQUxJRDsKLQotCQkvKgotCQkgKiBXZSBj
+YW4gcmUtdXNlIHRoZSBvbGQgbWVtc2xvdHMsIHRoZSBvbmx5IGRpZmZlcmVuY2UgZnJvbSB0aGUK
+LQkJICogbmV3bHkgaW5zdGFsbGVkIG1lbXNsb3RzIGlzIHRoZSBpbnZhbGlkIGZsYWcsIHdoaWNo
+IHdpbGwgZ2V0Ci0JCSAqIGRyb3BwZWQgYnkgdXBkYXRlX21lbXNsb3RzIGFueXdheS4gIFdlJ2xs
+IGFsc28gcmV2ZXJ0IHRvIHRoZQotCQkgKiBvbGQgbWVtc2xvdHMgaWYgcHJlcGFyaW5nIHRoZSBu
+ZXcgbWVtb3J5IHJlZ2lvbiBmYWlscy4KLQkJICovCi0JCXNsb3RzID0gaW5zdGFsbF9uZXdfbWVt
+c2xvdHMoa3ZtLCBhc19pZCwgc2xvdHMpOwotCi0JCS8qIEZyb20gdGhpcyBwb2ludCBubyBuZXcg
+c2hhZG93IHBhZ2VzIHBvaW50aW5nIHRvIGEgZGVsZXRlZCwKLQkJICogb3IgbW92ZWQsIG1lbXNs
+b3Qgd2lsbCBiZSBjcmVhdGVkLgotCQkgKgotCQkgKiB2YWxpZGF0aW9uIG9mIHNwLT5nZm4gaGFw
+cGVucyBpbjoKLQkJICoJLSBnZm5fdG9faHZhIChrdm1fcmVhZF9ndWVzdCwgZ2ZuX3RvX3BmbikK
+LQkJICoJLSBrdm1faXNfdmlzaWJsZV9nZm4gKG1tdV9jaGVja19yb290cykKLQkJICovCi0JCWt2
+bV9hcmNoX2ZsdXNoX3NoYWRvd19tZW1zbG90KGt2bSwgc2xvdCk7Ci0JfQotCi0JciA9IGt2bV9h
+cmNoX3ByZXBhcmVfbWVtb3J5X3JlZ2lvbihrdm0sICZuZXcsIG1lbSwgY2hhbmdlKTsKLQlpZiAo
+cikKLQkJZ290byBvdXRfc2xvdHM7Ci0KIAkvKiBhY3R1YWwgbWVtb3J5IGlzIGZyZWVkIHZpYSBv
+bGQgaW4ga3ZtX2ZyZWVfbWVtc2xvdCBiZWxvdyAqLwogCWlmIChjaGFuZ2UgPT0gS1ZNX01SX0RF
+TEVURSkgewogCQluZXcuZGlydHlfYml0bWFwID0gTlVMTDsKIAkJbWVtc2V0KCZuZXcuYXJjaCwg
+MCwgc2l6ZW9mKG5ldy5hcmNoKSk7CiAJfQogCi0JdXBkYXRlX21lbXNsb3RzKHNsb3RzLCAmbmV3
+LCBjaGFuZ2UpOwotCXNsb3RzID0gaW5zdGFsbF9uZXdfbWVtc2xvdHMoa3ZtLCBhc19pZCwgc2xv
+dHMpOwotCi0Ja3ZtX2FyY2hfY29tbWl0X21lbW9yeV9yZWdpb24oa3ZtLCBtZW0sICZvbGQsICZu
+ZXcsIGNoYW5nZSk7CisJciA9IGt2bV9zZXRfbWVtc2xvdChrdm0sIG1lbSwgJm9sZCwgJm5ldywg
+YXNfaWQsIGNoYW5nZSk7CisJaWYgKHIpCisJCWdvdG8gb3V0X2JpdG1hcDsKIAogCWt2bV9mcmVl
+X21lbXNsb3Qoa3ZtLCAmb2xkLCAmbmV3KTsKLQlrdmZyZWUoc2xvdHMpOwogCXJldHVybiAwOwog
+Ci1vdXRfc2xvdHM6Ci0JaWYgKGNoYW5nZSA9PSBLVk1fTVJfREVMRVRFIHx8IGNoYW5nZSA9PSBL
+Vk1fTVJfTU9WRSkKLQkJc2xvdHMgPSBpbnN0YWxsX25ld19tZW1zbG90cyhrdm0sIGFzX2lkLCBz
+bG90cyk7Ci0Ja3ZmcmVlKHNsb3RzKTsKIG91dF9iaXRtYXA6CiAJaWYgKG5ldy5kaXJ0eV9iaXRt
+YXAgJiYgIW9sZC5kaXJ0eV9iaXRtYXApCiAJCWt2bV9kZXN0cm95X2RpcnR5X2JpdG1hcCgmbmV3
+KTsKLS0gCjIuMjQuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
+dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
