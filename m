@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D14AC43603
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E905C2D0D4
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C132021835
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C132021835
+	by mail.kernel.org (Postfix) with ESMTP id 129D821D7D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 13:56:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 129D821D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D3884A8E0;
-	Tue, 17 Dec 2019 08:56:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0CB34AE9E;
+	Tue, 17 Dec 2019 08:56:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K-OMOUfE2-7t; Tue, 17 Dec 2019 08:56:42 -0500 (EST)
+	with ESMTP id M3pw8IYB9yI1; Tue, 17 Dec 2019 08:56:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AAC74AD09;
-	Tue, 17 Dec 2019 08:56:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4044A4AC88;
+	Tue, 17 Dec 2019 08:56:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1FB24A944
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 08:56:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C88E4AC89
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 08:56:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xAXs4u5c-7TA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 08:56:38 -0500 (EST)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5691E4A51F
+ with ESMTP id eSTT6w6BeFXc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 08:56:41 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3D294A7F1
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 08:56:38 -0500 (EST)
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 862194F98DDFFED6A2E0;
- Tue, 17 Dec 2019 21:56:30 +0800 (CST)
+ by Forcepoint Email with ESMTP id 6C2D6875205B876C3AC9;
+ Tue, 17 Dec 2019 21:56:35 +0800 (CST)
 Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 17 Dec 2019 21:56:23 +0800
+ 14.3.439.0; Tue, 17 Dec 2019 21:56:25 +0800
 From: <yezengruan@huawei.com>
 To: <yezengruan@huawei.com>, <linux-kernel@vger.kernel.org>,
  <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
  <virtualization@lists.linux-foundation.org>
-Subject: [PATCH 3/5] KVM: arm64: Support pvlock preempted via shared structure
-Date: Tue, 17 Dec 2019 21:55:47 +0800
-Message-ID: <20191217135549.3240-4-yezengruan@huawei.com>
+Subject: [PATCH 5/5] KVM: arm64: Support the vcpu preemption check
+Date: Tue, 17 Dec 2019 21:55:49 +0800
+Message-ID: <20191217135549.3240-6-yezengruan@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
 In-Reply-To: <20191217135549.3240-1-yezengruan@huawei.com>
 References: <20191217135549.3240-1-yezengruan@huawei.com>
@@ -75,170 +75,192 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Zengruan Ye <yezengruan@huawei.com>
 
-Implement the service call for configuring a shared structure between a
-vcpu and the hypervisor in which the hypervisor can tell the vcpu is
-running or not.
+Support the vcpu_is_preempted() functionality under KVM/arm64. This will
+enhance lock performance on overcommitted hosts (more runnable vcpus
+than physical cpus in the system) as doing busy waits for preempted
+vcpus will hurt system performance far worse than early yielding.
 
-The preempted field is zero if 1) some old KVM deos not support this filed.
-2) the vcpu is not preempted. Other values means the vcpu has been preempted.
+unix benchmark result:
+  host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 cpus
+  guest: kernel 5.5.0-rc1, 16 vcpus
+
+               test-case                |    after-patch    |   before-patch
+----------------------------------------+-------------------+------------------
+ Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
+ Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
+ Execl Throughput                       |      3662.1 lps   |      2718.0 lps
+ File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
+ File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
+ File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
+ Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
+ Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
+ Process Creation                       |      4025.7 lps   |      3706.6 lps
+ Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
+ Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
+ System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
+----------------------------------------+-------------------+------------------
+ System Benchmarks Index Score          |      1835.1       |      1327.6
 
 Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 13 +++++++++++++
- arch/arm64/include/asm/kvm_host.h | 17 +++++++++++++++++
- arch/arm64/kvm/Makefile           |  1 +
- virt/kvm/arm/arm.c                |  8 ++++++++
- virt/kvm/arm/hypercalls.c         |  4 ++++
- virt/kvm/arm/pvlock.c             | 21 +++++++++++++++++++++
- 6 files changed, 64 insertions(+)
- create mode 100644 virt/kvm/arm/pvlock.c
+ arch/arm64/include/asm/paravirt.h |  3 +
+ arch/arm64/kernel/paravirt.c      | 91 +++++++++++++++++++++++++++++++
+ arch/arm64/kernel/setup.c         |  2 +
+ include/linux/cpuhotplug.h        |  1 +
+ 4 files changed, 97 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 556cd818eccf..098375f1c89e 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -356,6 +356,19 @@ static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
- 	return false;
- }
+diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
+index 7b1c81b544bb..a2cd0183bbef 100644
+--- a/arch/arm64/include/asm/paravirt.h
++++ b/arch/arm64/include/asm/paravirt.h
+@@ -29,6 +29,8 @@ static inline u64 paravirt_steal_clock(int cpu)
  
-+static inline void kvm_arm_pvlock_preempted_init(struct kvm_vcpu_arch *vcpu_arch)
+ int __init pv_time_init(void);
+ 
++int __init kvm_guest_init(void);
++
+ __visible bool __native_vcpu_is_preempted(int cpu);
+ 
+ static inline bool pv_vcpu_is_preempted(int cpu)
+@@ -39,6 +41,7 @@ static inline bool pv_vcpu_is_preempted(int cpu)
+ #else
+ 
+ #define pv_time_init() do {} while (0)
++#define kvm_guest_init() do {} while (0)
+ 
+ #endif // CONFIG_PARAVIRT
+ 
+diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+index d8f1ba8c22ce..a86dead40473 100644
+--- a/arch/arm64/kernel/paravirt.c
++++ b/arch/arm64/kernel/paravirt.c
+@@ -22,6 +22,7 @@
+ #include <asm/paravirt.h>
+ #include <asm/pvclock-abi.h>
+ #include <asm/smp_plat.h>
++#include <asm/pvlock-abi.h>
+ 
+ struct static_key paravirt_steal_enabled;
+ struct static_key paravirt_steal_rq_enabled;
+@@ -158,3 +159,93 @@ int __init pv_time_init(void)
+ 
+ 	return 0;
+ }
++
++DEFINE_PER_CPU(struct pvlock_vcpu_state, pvlock_vcpu_region) __aligned(64);
++EXPORT_PER_CPU_SYMBOL(pvlock_vcpu_region);
++
++static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
 +{
++	struct pvlock_vcpu_state *reg;
++
++	reg = this_cpu_ptr(&pvlock_vcpu_region);
++	if (!reg)
++		return -EFAULT;
++
++	memset(reg, 0, sizeof(*reg));
++
++	return 0;
 +}
 +
-+static inline bool kvm_arm_is_pvlock_preempted_ready(struct kvm_vcpu_arch *vcpu_arch)
++static int init_pvlock_vcpu_state(unsigned int cpu)
 +{
++	struct pvlock_vcpu_state *reg;
++	struct arm_smccc_res res;
++
++	reg = this_cpu_ptr(&pvlock_vcpu_region);
++	if (!reg)
++		return -EFAULT;
++
++	/* Pass the memory address to host via hypercall */
++	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED,
++			     virt_to_phys(reg), &res);
++
++	return 0;
++}
++
++static bool kvm_vcpu_is_preempted(int cpu)
++{
++	struct pvlock_vcpu_state *reg = &per_cpu(pvlock_vcpu_region, cpu);
++
++	if (reg)
++		return !!(reg->preempted & 1);
++
 +	return false;
 +}
 +
-+static inline void kvm_update_pvlock_preempted(struct kvm_vcpu *vcpu, u64 preempted)
++static int kvm_arm_init_pvlock(void)
 +{
++	int ret;
++
++	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
++				"hypervisor/arm/pvlock:starting",
++				init_pvlock_vcpu_state,
++				pvlock_vcpu_state_dying_cpu);
++	if (ret < 0)
++		return ret;
++
++	pv_ops.lock.vcpu_is_preempted = kvm_vcpu_is_preempted;
++
++	pr_info("using PV-lock preempted\n");
++
++	return 0;
 +}
 +
- void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- 
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c61260cf63c5..d9b2a21a87ac 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -354,6 +354,11 @@ struct kvm_vcpu_arch {
- 		u64 last_steal;
- 		gpa_t base;
- 	} steal;
-+
-+	/* Guest PV lock state */
-+	struct {
-+		gpa_t base;
-+	} pv;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -515,6 +520,18 @@ static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
- 	return (vcpu_arch->steal.base != GPA_INVALID);
- }
- 
-+static inline void kvm_arm_pvlock_preempted_init(struct kvm_vcpu_arch *vcpu_arch)
++static bool has_kvm_pvlock(void)
 +{
-+	vcpu_arch->pv.base = GPA_INVALID;
++	struct arm_smccc_res res;
++
++	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
++	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
++		return false;
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
++
++	if (res.a0 != SMCCC_RET_SUCCESS)
++		return false;
++
++	return true;
 +}
 +
-+static inline bool kvm_arm_is_pvlock_preempted_ready(struct kvm_vcpu_arch *vcpu_arch)
++int __init kvm_guest_init(void)
 +{
-+	return (vcpu_arch->pv.base != GPA_INVALID);
++	if (is_hyp_mode_available())
++		return 0;
++
++	if (!has_kvm_pvlock())
++		return 0;
++
++	kvm_arm_init_pvlock();
++
++	return 0;
 +}
-+
-+void kvm_update_pvlock_preempted(struct kvm_vcpu *vcpu, u64 preempted);
-+
- void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 56f664561754..64c4d515ba2d 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -341,6 +341,8 @@ void __init setup_arch(char **cmdline_p)
+ 	smp_init_cpus();
+ 	smp_build_mpidr_hash();
  
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 5ffbdc39e780..e4591f56d5f1 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -15,6 +15,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/pvtime.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/pvlock.o
- 
- kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
- kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 12e0280291ce..c562f62fdd45 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -383,6 +383,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- 
- 	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
- 
-+	kvm_arm_pvlock_preempted_init(&vcpu->arch);
++	kvm_guest_init();
 +
- 	return kvm_vgic_vcpu_init(vcpu);
- }
+ 	/* Init percpu seeds for random tags after cpus are set up. */
+ 	kasan_init_tags();
  
-@@ -421,6 +423,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		vcpu_set_wfx_traps(vcpu);
- 
- 	vcpu_ptrauth_setup_lazy(vcpu);
-+
-+	if (kvm_arm_is_pvlock_preempted_ready(&vcpu->arch))
-+		kvm_update_pvlock_preempted(vcpu, 0);
- }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -434,6 +439,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	vcpu->cpu = -1;
- 
- 	kvm_arm_set_running_vcpu(NULL);
-+
-+	if (kvm_arm_is_pvlock_preempted_ready(&vcpu->arch))
-+		kvm_update_pvlock_preempted(vcpu, 1);
- }
- 
- static void vcpu_power_off(struct kvm_vcpu *vcpu)
-diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-index ff13871fd85a..5964982ccd05 100644
---- a/virt/kvm/arm/hypercalls.c
-+++ b/virt/kvm/arm/hypercalls.c
-@@ -65,6 +65,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		if (gpa != GPA_INVALID)
- 			val = gpa;
- 		break;
-+	case ARM_SMCCC_HV_PV_LOCK_PREEMPTED:
-+		vcpu->arch.pv.base = smccc_get_arg1(vcpu);
-+		val = SMCCC_RET_SUCCESS;
-+		break;
- 	default:
- 		return kvm_psci_call(vcpu);
- 	}
-diff --git a/virt/kvm/arm/pvlock.c b/virt/kvm/arm/pvlock.c
-new file mode 100644
-index 000000000000..c3464958b0f5
---- /dev/null
-+++ b/virt/kvm/arm/pvlock.c
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright(c) 2019 Huawei Technologies Co., Ltd
-+ * Author: Zengruan Ye <yezengruan@huawei.com>
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+
-+#include <kvm/arm_hypercalls.h>
-+
-+void kvm_update_pvlock_preempted(struct kvm_vcpu *vcpu, u64 preempted)
-+{
-+	u64 preempted_le;
-+	u64 base;
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	base = vcpu->arch.pv.base;
-+	preempted_le = cpu_to_le64(preempted);
-+	kvm_put_guest(kvm, base, preempted_le, u64);
-+}
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index e51ee772b9f5..f72ff95ab63a 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -138,6 +138,7 @@ enum cpuhp_state {
+ 	CPUHP_AP_DUMMY_TIMER_STARTING,
+ 	CPUHP_AP_ARM_XEN_STARTING,
+ 	CPUHP_AP_ARM_KVMPV_STARTING,
++	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
+ 	CPUHP_AP_ARM_CORESIGHT_STARTING,
+ 	CPUHP_AP_ARM64_ISNDEP_STARTING,
+ 	CPUHP_AP_SMPCFD_DYING,
 -- 
 2.19.1
 
