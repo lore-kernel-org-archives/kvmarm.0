@@ -1,4 +1,4 @@
-Return-Path: <SRS0=Hq6c=2H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=uTqP=2I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,69 +6,58 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0099C2D0CD
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 22:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF54CC43603
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 57EB52176D
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Dec 2019 22:51:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57EB52176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 1378F2072B
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1378F2072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E20F94A51C;
-	Tue, 17 Dec 2019 17:51:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69A2F40152;
+	Tue, 17 Dec 2019 22:46:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VX7hVLgASprl; Tue, 17 Dec 2019 17:51:23 -0500 (EST)
+	with ESMTP id qQwkmq-Jv9Y9; Tue, 17 Dec 2019 22:46:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FC234A597;
-	Tue, 17 Dec 2019 17:51:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2326C4A3BF;
+	Tue, 17 Dec 2019 22:46:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D938E4A521
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 17:51:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E79894A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 22:46:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jrqU4uydlzFr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 17:51:20 -0500 (EST)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5926A4A51C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 17:51:20 -0500 (EST)
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Dec 2019 14:51:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,327,1571727600"; d="scan'208";a="247654290"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by fmsmga002.fm.intel.com with ESMTP; 17 Dec 2019 14:51:18 -0800
-Date: Tue, 17 Dec 2019 14:51:18 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v4 07/19] KVM: Explicitly free allocated-but-unused dirty
- bitmap
-Message-ID: <20191217225118.GF11771@linux.intel.com>
-References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
- <20191217204041.10815-8-sean.j.christopherson@intel.com>
- <20191217222446.GK7258@xz-x1>
+ with ESMTP id P5EH5Ou4ec9t for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Dec 2019 22:46:48 -0500 (EST)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC56C40152
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 22:46:47 -0500 (EST)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 6ABE29A27480C7A027BF;
+ Wed, 18 Dec 2019 11:46:44 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Wed, 18 Dec 2019
+ 11:46:36 +0800
+Subject: Re: [kvm-unit-tests PATCH 05/16] arm/arm64: ITS: Introspection tests
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+References: <20191216140235.10751-1-eric.auger@redhat.com>
+ <20191216140235.10751-6-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <c133ebe6-10f4-2ff7-f75f-75b755397785@huawei.com>
+Date: Wed, 18 Dec 2019 11:46:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191217222446.GK7258@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>, Janosch Frank <frankja@linux.ibm.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+In-Reply-To: <20191216140235.10751-6-eric.auger@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: andre.przywara@arm.com, thuth@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,99 +69,221 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 17, 2019 at 05:24:46PM -0500, Peter Xu wrote:
-> On Tue, Dec 17, 2019 at 12:40:29PM -0800, Sean Christopherson wrote:
-> > Explicitly free an allocated-but-unused dirty bitmap instead of relying
-> > on kvm_free_memslot() if an error occurs in __kvm_set_memory_region().
-> > There is no longer a need to abuse kvm_free_memslot() to free arch
-> > specific resources as arch specific code is now called only after the
-> > common flow is guaranteed to succeed.  Arch code can still fail, but
-> > it's responsible for its own cleanup in that case.
-> > 
-> > Eliminating the error path's abuse of kvm_free_memslot() paves the way
-> > for simplifying kvm_free_memslot(), i.e. dropping its @dont param.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 7 ++++---
-> >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d403e93e3028..6b2261a9e139 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1096,7 +1096,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >  
-> >  	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> >  	if (!slots)
-> > -		goto out_free;
-> > +		goto out_bitmap;
-> >  	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
-> >  
-> >  	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
-> > @@ -1144,8 +1144,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-> >  		slots = install_new_memslots(kvm, as_id, slots);
-> >  	kvfree(slots);
-> > -out_free:
-> > -	kvm_free_memslot(kvm, &new, &old);
-> > +out_bitmap:
-> > +	if (new.dirty_bitmap && !old.dirty_bitmap)
-> > +		kvm_destroy_dirty_bitmap(&new);
+Hi Eric,
+
+I have to admit that this is the first time I've looked into
+the kvm-unit-tests code, so only some minor comments inline :)
+
+On 2019/12/16 22:02, Eric Auger wrote:
+> Detect the presence of an ITS as part of the GICv3 init
+> routine, initialize its base address and read few registers
+> the IIDR, the TYPER to store its dimensioning parameters.
 > 
-> What if both the old and new have KVM_MEM_LOG_DIRTY_PAGES set?
-> kvm_free_memslot() did cover that but I see that you explicitly
-> dropped it.  Could I ask why?  Thanks,
+> This is our first ITS test, belonging to a new "its" group.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-In that case, old.dirty_bitmap == new.dirty_bitmap, i.e. shouldn't be freed
-by this error path since doing so would result in a use-after-free via the
-old memslot.
+[...]
 
-The kvm_free_memslot() logic is the same, albeit in a very twisted way.
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..2ce483e
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,116 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +#define GITS_CTLR			0x0000
+> +#define GITS_IIDR			0x0004
+> +#define GITS_TYPER			0x0008
+> +#define GITS_CBASER			0x0080
+> +#define GITS_CWRITER			0x0088
+> +#define GITS_CREADR			0x0090
+> +#define GITS_BASER			0x0100
+> +
+> +#define GITS_TYPER_PLPIS                (1UL << 0)
+> +#define GITS_TYPER_IDBITS_SHIFT         8
+> +#define GITS_TYPER_DEVBITS_SHIFT        13
+> +#define GITS_TYPER_DEVBITS(r)           ((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+> +#define GITS_TYPER_PTA                  (1UL << 19)
+> +#define GITS_TYPER_HWCOLLCNT_SHIFT      24
+> +
+> +#define GITS_CTLR_ENABLE                (1U << 0)
+> +
+> +#define GITS_CBASER_VALID                       (1UL << 63)
+> +#define GITS_CBASER_SHAREABILITY_SHIFT          (10)
+> +#define GITS_CBASER_INNER_CACHEABILITY_SHIFT    (59)
+> +#define GITS_CBASER_OUTER_CACHEABILITY_SHIFT    (53)
+> +#define GITS_CBASER_SHAREABILITY_MASK                                   \
+> +	GIC_BASER_SHAREABILITY(GITS_CBASER, SHAREABILITY_MASK)
+> +#define GITS_CBASER_INNER_CACHEABILITY_MASK                             \
+> +	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, MASK)
+> +#define GITS_CBASER_OUTER_CACHEABILITY_MASK                             \
+> +	GIC_BASER_CACHEABILITY(GITS_CBASER, OUTER, MASK)
+> +#define GITS_CBASER_CACHEABILITY_MASK GITS_CBASER_INNER_CACHEABILITY_MASK
+> +
+> +#define GITS_CBASER_InnerShareable                                      \
+> +	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
+> +
+> +#define GITS_CBASER_nCnB        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nCnB)
+> +#define GITS_CBASER_nC          GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
+> +#define GITS_CBASER_RaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
+> +#define GITS_CBASER_RaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
 
-In __kvm_set_memory_region(), @old and @new start with the same dirty_bitmap.
+s/RaWt/RaWb/
 
-	new = old = *slot;
+> +#define GITS_CBASER_WaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWt)
+> +#define GITS_CBASER_WaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
+> +#define GITS_CBASER_RaWaWt      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
+> +#define GITS_CBASER_RaWaWb      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+> +
+> +#define GITS_BASER_NR_REGS              8
+> +
+> +#define GITS_BASER_VALID                        (1UL << 63)
+> +#define GITS_BASER_INDIRECT                     (1ULL << 62)
+> +
+> +#define GITS_BASER_INNER_CACHEABILITY_SHIFT     (59)
+> +#define GITS_BASER_OUTER_CACHEABILITY_SHIFT     (53)
+> +#define GITS_BASER_CACHEABILITY_MASK		0x7
+> +
+> +#define GITS_BASER_nCnB         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nCnB)
+> +
+> +#define GITS_BASER_TYPE_SHIFT                   (56)
+> +#define GITS_BASER_TYPE(r)              (((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+> +#define GITS_BASER_ENTRY_SIZE_SHIFT             (48)
+> +#define GITS_BASER_ENTRY_SIZE(r)        ((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+> +#define GITS_BASER_SHAREABILITY_SHIFT   (10)
+> +#define GITS_BASER_InnerShareable                                       \
+> +	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
+> +#define GITS_BASER_PAGE_SIZE_SHIFT      (8)
+> +#define GITS_BASER_PAGE_SIZE_4K         (0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K        (1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K        (2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK       (3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGES_MAX            256
+> +#define GITS_BASER_PAGES_SHIFT          (0)
+> +#define GITS_BASER_NR_PAGES(r)          (((r) & 0xff) + 1)
+> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
+> +
+> +#define GITS_BASER_TYPE_NONE            0
+> +#define GITS_BASER_TYPE_DEVICE          1
+> +#define GITS_BASER_TYPE_VCPU            2
+> +#define GITS_BASER_TYPE_CPU             3
 
-And @new is modified based on KVM_MEM_LOG_DIRTY_PAGES.  If LOG_DIRTY_PAGES
-is set in both @new and @old, then both the "if" and "else if" evaluate
-false, i.e. new.dirty_bitmap == old.dirty_bitmap.
+'3' is one of the reserved values of the GITS_BASER.Type field, and
+what do we expect with a "GITS_BASER_TYPE_CPU" table type? ;-)
 
-	/* Allocate/free page dirty bitmap as needed */
-	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
-		new.dirty_bitmap = NULL;
-	else if (!new.dirty_bitmap) {
-		r = kvm_create_dirty_bitmap(&new);
-		if (r)
-			return r;
-	}
+I think we can copy (and might update in the future) all these
+macros against the latest Linux kernel.
 
-Subbing "@free <= @new" and "@dont <= @old" in kvm_free_memslot()
+> +#define GITS_BASER_TYPE_COLLECTION      4
+> +
+> +#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0) > +
+> +struct its_typer {
+> +	unsigned int ite_size;
+> +	unsigned int eventid_bits;
+> +	unsigned int deviceid_bits;
+> +	unsigned int collid_bits;
+> +	unsigned int hw_collections;
+> +	bool pta;
+> +	bool cil;
+> +	bool cct;
+> +	bool phys_lpi;
+> +	bool virt_lpi;
+> +};
+> +
+> +struct its_data {
+> +	void *base;
+> +	struct its_typer typer;
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+> +
+> +extern void its_parse_typer(void);
+> +extern void its_init(void);
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index 55dd84b..b44da9c 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -40,6 +40,7 @@
+>   
+>   #include <asm/gic-v2.h>
+>   #include <asm/gic-v3.h>
+> +#include <asm/gic-v3-its.h>
+>   
+>   #define PPI(irq)			((irq) + 16)
+>   #define SPI(irq)			((irq) + GIC_FIRST_SPI)
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..34f4d0e
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,41 @@
+> +/*
+> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +
+> +struct its_data its_data;
+> +
+> +void its_parse_typer(void)
+> +{
+> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
+> +
+> +	its_data.typer.ite_size = ((typer >> 4) & 0xf) + 1;
+> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
+> +	its_data.typer.eventid_bits =
+> +		((typer >> GITS_TYPER_IDBITS_SHIFT) & 0x1f) + 1;
+> +	its_data.typer.deviceid_bits = GITS_TYPER_DEVBITS(typer) + 1;
 
-  static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
-			       struct kvm_memory_slot *dont)
-  {
-	if (!dont || free->dirty_bitmap != dont->dirty_bitmap)
-		kvm_destroy_dirty_bitmap(free);
+No need to '+1'. As GITS_TYPER_DEVBITS already helps us to calculate
+the implemented DeviceID bits.
+
+> +
+> +	its_data.typer.cil = (typer >> 36) & 0x1;
+> +	if (its_data.typer.cil)
+> +		its_data.typer.collid_bits = ((typer >> 32) & 0xf) + 1;
+> +	else
+> +		its_data.typer.collid_bits = 16;
+> +
+> +	its_data.typer.hw_collections =
+> +		(typer >> GITS_TYPER_HWCOLLCNT_SHIFT) & 0xff;
+> +
+> +	its_data.typer.cct = typer & 0x4;
+> +	its_data.typer.virt_lpi = typer & 0x2;
+> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+
+Personally, mix using of GITS_TYPER_* macros and some magic constants to
+parse the TYPER makes it a bit difficult to review the code. Maybe we
+can have more such kinds of macros in the header file and get rid of all
+hardcoded numbers?
 
 
-yeids this, since @old is obviously non-NULL
+Thanks,
+Zenghui
 
-	if (new.dirty_bitmap != old.dirty_bitmap)
-		kvm_destroy_dirty_bitmap(&new);
-
-The dirty_bitmap allocation logic guarantees that new.dirty_bitmap is
-  a) NULL (the "if" case")
-  b) != old.dirty_bitmap iff old.dirty_bitmap == NULL (the "else if" case)
-  c) == old.dirty_bitmap (the implicit "else" case).
-
-kvm_free_memslot() frees @new.dirty_bitmap iff its != @old.dirty_bitmap,
-thus the explicit destroy only needs to check for (b).
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
