@@ -2,75 +2,69 @@ Return-Path: <SRS0=uTqP=2I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBBDBC2D0D2
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 18:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6B0C2D0BF
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5F9F721582
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 18:11:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9F721582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C8E5624680
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E5624680
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A19F24A7E4;
-	Wed, 18 Dec 2019 13:11:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEB434ACD5;
+	Wed, 18 Dec 2019 16:55:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qi8-Kc59p9lJ; Wed, 18 Dec 2019 13:11:13 -0500 (EST)
+	with ESMTP id y0We+hicwO7a; Wed, 18 Dec 2019 16:55:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C1284A52C;
-	Wed, 18 Dec 2019 13:11:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E64DD4A946;
+	Wed, 18 Dec 2019 16:55:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0E54A52C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 13:11:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0CDB4A5A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CmszIfCWgg-j for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Dec 2019 13:11:11 -0500 (EST)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23EEE4A4A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 13:11:11 -0500 (EST)
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1ihdmZ-0007pw-8W; Wed, 18 Dec 2019 19:10:47 +0100
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v4 00/19] KVM: Dynamically size memslot arrays
-X-PHP-Originating-Script: 0:main.inc
+ with ESMTP id zRjuQgrgxQBz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Dec 2019 16:55:34 -0500 (EST)
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC8704A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:33 -0500 (EST)
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Dec 2019 13:55:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108004"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+ by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:32 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 01/45] KVM: PPC: Book3S HV: Uninit vCPU if vcore creation
+ fails
+Date: Wed, 18 Dec 2019 13:54:46 -0800
+Message-Id: <20191218215530.2280-2-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
+References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-Date: Wed, 18 Dec 2019 18:10:47 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
-References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
-Message-ID: <3a6b03cc1300bc3cffd3904e22c09478@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org,
- paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
- pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com,
- wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, christoffer.dall@arm.com, f4bug@amsat.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Joerg Roedel <joro@8bytes.org>, Christian Borntraeger <borntraeger@de.ibm.com>,
- kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ linux-kernel@vger.kernel.org, Greg Kurz <groug@kaod.org>,
+ linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,59 +76,47 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019-12-17 20:40, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array 
-> so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number 
-> of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
-> address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
-> reduces
-> the memory footprint from 90k to ~2.6k bytes.
->
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 17/19 and 18/19.
->
-> Patches 2-16 clean up the memslot code, which has gotten quite 
-> crusty,
-> especially __kvm_set_memory_region().  The clean up is likely not 
-> strictly
-> necessary to switch to dynamic sizing, but I didn't have a remotely
-> reasonable level of confidence in the correctness of the dynamic 
-> sizing
-> without first doing the clean up.
->
-> The only functional change in v4 is the addition of an x86-specific 
-> bug
-> fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly 
-> related
-> to dynamically allocating memslots, but it has subtle and hidden 
-> conflicts
-> with the cleanup patches, and the fix is higher priority than 
-> anything
-> else in the series, i.e. should be merged first.
->
-> On non-x86 architectures, v3 and v4 should be functionally 
-> equivalent,
-> the only non-x86 change in v4 is the dropping of a "const" in
-> kvm_arch_commit_memory_region().
+Call kvm_vcpu_uninit() if vcore creation fails to avoid leaking any
+resources allocated by kvm_vcpu_init(), i.e. the vcpu->run page.
 
-Gave it another go on top of 5.5-rc2 on an arm64 box, and nothing
-exploded. So thumbs up from me.
+Fixes: 371fefd6f2dc4 ("KVM: PPC: Allow book3s_hv guests to use SMT processor modes")
+Cc: stable@vger.kernel.org
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/powerpc/kvm/book3s_hv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-
-        M.
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index dc53578193ee..d07d2f5273e5 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2368,7 +2368,7 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+ 	mutex_unlock(&kvm->lock);
+ 
+ 	if (!vcore)
+-		goto free_vcpu;
++		goto uninit_vcpu;
+ 
+ 	spin_lock(&vcore->lock);
+ 	++vcore->num_threads;
+@@ -2385,6 +2385,8 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_hv(struct kvm *kvm,
+ 
+ 	return vcpu;
+ 
++uninit_vcpu:
++	kvm_vcpu_uninit(vcpu);
+ free_vcpu:
+ 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+ out:
 -- 
-Jazz is not dead. It just smells funny...
+2.24.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
