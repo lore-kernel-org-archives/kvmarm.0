@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8FCC2D0D3
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86721C2D0BF
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D0C8B2146E
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C8B2146E
+	by mail.kernel.org (Postfix) with ESMTP id 456112146E
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 456112146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87FED4AEB2;
-	Wed, 18 Dec 2019 16:55:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F36E44AC80;
+	Wed, 18 Dec 2019 16:55:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yp7XQQNEC8cg; Wed, 18 Dec 2019 16:55:38 -0500 (EST)
+	with ESMTP id DkqIAc7Nb2sM; Wed, 18 Dec 2019 16:55:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 453EF4ACBE;
-	Wed, 18 Dec 2019 16:55:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 659B54A7FE;
+	Wed, 18 Dec 2019 16:55:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DD344A418
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA55F4A500
  for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q9lHM4gzOFmg for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id YipcmXiPO5bP for <kvmarm@lists.cs.columbia.edu>;
  Wed, 18 Dec 2019 16:55:34 -0500 (EST)
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51C1F4A54B
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA8DD4A576
  for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:34 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Dec 2019 13:55:33 -0800
+ 18 Dec 2019 13:55:34 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108017"
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108020"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:33 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
@@ -49,10 +49,9 @@ To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 03/45] KVM: x86: Free wbinvd_dirty_mask if vCPU creation
- fails
-Date: Wed, 18 Dec 2019 13:54:48 -0800
-Message-Id: <20191218215530.2280-4-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 04/45] KVM: VMX: Allocate VPID after initializing VCPU
+Date: Wed, 18 Dec 2019 13:54:49 -0800
+Message-Id: <20191218215530.2280-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
@@ -81,33 +80,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Free the vCPU's wbinvd_dirty_mask if vCPU creation fails after
-kvm_arch_vcpu_init(), e.g. when installing the vCPU's file descriptor.
-Do the freeing by calling kvm_arch_vcpu_free() instead of open coding
-the freeing.  This adds a likely superfluous, but ultimately harmless,
-call to kvmclock_reset(), which only clears vcpu->arch.pv_time_enabled.
-Using kvm_arch_vcpu_free() allows for additional cleanup in the future.
+Do VPID allocation after calling the common kvm_vcpu_init() as a step
+towards doing vCPU allocation (via kmem_cache_zalloc()) and calling
+kvm_vcpu_init() back-to-back.  Squishing allocation and initialization
+together will eventually allow the sequence to be moved to arch-agnostic
+creation code.
 
-Fixes: f5f48ee15c2ee ("KVM: VMX: Execute WBINVD to keep data consistency with assigned devices")
-Cc: stable@vger.kernel.org
+Note, the VPID is not consumed until KVM_RUN, slightly delaying its
+allocation should have no real function impact.  VPID allocation was
+arbitrarily placed in the original patch, commit 2384d2b326408 ("KVM:
+VMX: Enable Virtual Processor Identification (VPID)").
+
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8bb2fb1705ff..82d41257d2a3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9162,7 +9162,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_mmu_unload(vcpu);
- 	vcpu_put(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 51e3b27f90ed..2e44ef744c01 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6708,14 +6708,14 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 		goto free_user_fpu;
+ 	}
  
--	kvm_x86_ops->vcpu_free(vcpu);
-+	kvm_arch_vcpu_free(vcpu);
- }
+-	vmx->vpid = allocate_vpid();
+-
+ 	err = kvm_vcpu_init(&vmx->vcpu, kvm, id);
+ 	if (err)
+ 		goto free_vcpu;
  
- void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	err = -ENOMEM;
+ 
++	vmx->vpid = allocate_vpid();
++
+ 	/*
+ 	 * If PML is turned on, failure on enabling PML just results in failure
+ 	 * of creating the vcpu, therefore we can simplify PML logic (by
+@@ -6826,8 +6826,8 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	vmx_destroy_pml_buffer(vmx);
+ uninit_vcpu:
+ 	kvm_vcpu_uninit(&vmx->vcpu);
++	free_vpid(vmx->vpid);
+ free_vcpu:
+-	free_vpid(vmx->vpid);
+ 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.guest_fpu);
+ free_user_fpu:
+ 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.user_fpu);
 -- 
 2.24.1
 
