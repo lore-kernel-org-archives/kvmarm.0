@@ -2,62 +2,63 @@ Return-Path: <SRS0=uTqP=2I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF54CC43603
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4984C43603
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 05:53:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1378F2072B
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1378F2072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 26CF6206EC
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 05:53:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CF6206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69A2F40152;
-	Tue, 17 Dec 2019 22:46:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F52F4A524;
+	Wed, 18 Dec 2019 00:53:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qQwkmq-Jv9Y9; Tue, 17 Dec 2019 22:46:51 -0500 (EST)
+	with ESMTP id rTSBaMzddnJO; Wed, 18 Dec 2019 00:53:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2326C4A3BF;
-	Tue, 17 Dec 2019 22:46:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 428C84A541;
+	Wed, 18 Dec 2019 00:53:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E79894A3BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 22:46:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72A094A51F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 00:53:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P5EH5Ou4ec9t for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Dec 2019 22:46:48 -0500 (EST)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC56C40152
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Dec 2019 22:46:47 -0500 (EST)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 6ABE29A27480C7A027BF;
- Wed, 18 Dec 2019 11:46:44 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Wed, 18 Dec 2019
- 11:46:36 +0800
-Subject: Re: [kvm-unit-tests PATCH 05/16] arm/arm64: ITS: Introspection tests
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-References: <20191216140235.10751-1-eric.auger@redhat.com>
- <20191216140235.10751-6-eric.auger@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <c133ebe6-10f4-2ff7-f75f-75b755397785@huawei.com>
-Date: Wed, 18 Dec 2019 11:46:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id 4eY0CWaXeQQo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Dec 2019 00:53:08 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02F8A4A36B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 00:53:07 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6511D1FB;
+ Tue, 17 Dec 2019 21:53:07 -0800 (PST)
+Received: from [10.163.1.79] (unknown [10.163.1.79])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3833D3F718;
+ Tue, 17 Dec 2019 21:52:50 -0800 (PST)
+Subject: Re: [PATCH] arm64: Introduce ISAR6 CPU ID register
+To: Mark Rutland <mark.rutland@arm.com>,
+ Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
+References: <1576145663-9909-1-git-send-email-anshuman.khandual@arm.com>
+ <20191212144633.GE46910@lakrids.cambridge.arm.com>
+ <be707b09-6469-d12f-07d5-50d574dc7284@arm.com>
+ <20191212163120.GH46910@lakrids.cambridge.arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <b815ef0b-4dee-fea1-a43a-182952035afb@arm.com>
+Date: Wed, 18 Dec 2019 11:23:44 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20191216140235.10751-6-eric.auger@redhat.com>
+In-Reply-To: <20191212163120.GH46910@lakrids.cambridge.arm.com>
 Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: andre.przywara@arm.com, thuth@redhat.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,221 +70,115 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-I have to admit that this is the first time I've looked into
-the kvm-unit-tests code, so only some minor comments inline :)
-
-On 2019/12/16 22:02, Eric Auger wrote:
-> Detect the presence of an ITS as part of the GICv3 init
-> routine, initialize its base address and read few registers
-> the IIDR, the TYPER to store its dimensioning parameters.
+On 12/12/2019 10:01 PM, Mark Rutland wrote:
+> On Thu, Dec 12, 2019 at 03:22:13PM +0000, Suzuki Kuruppassery Poulose wrote:
+>> On 12/12/2019 14:46, Mark Rutland wrote:
+>>> On Thu, Dec 12, 2019 at 03:44:23PM +0530, Anshuman Khandual wrote:
+>>>> +#define ID_ISAR6_JSCVT_SHIFT		0
+>>>> +#define ID_ISAR6_DP_SHIFT		4
+>>>> +#define ID_ISAR6_FHM_SHIFT		8
+>>>> +#define ID_ISAR6_SB_SHIFT		12
+>>>> +#define ID_ISAR6_SPECRES_SHIFT		16
+>>>> +#define ID_ISAR6_BF16_SHIFT		20
+>>>> +#define ID_ISAR6_I8MM_SHIFT		24
+>>>
+>>>> @@ -399,6 +399,7 @@ static const struct __ftr_reg_entry {
+>>>>   	ARM64_FTR_REG(SYS_ID_ISAR4_EL1, ftr_generic_32bits),
+>>>>   	ARM64_FTR_REG(SYS_ID_ISAR5_EL1, ftr_id_isar5),
+>>>>   	ARM64_FTR_REG(SYS_ID_MMFR4_EL1, ftr_id_mmfr4),
+>>>
+>>>> +	ARM64_FTR_REG(SYS_ID_ISAR6_EL1, ftr_generic_32bits),
+>>>
+>>> Using ftr_generic_32bits exposes the lowest-common-denominator for all
+>>> 4-bit fields in the register, and I don't think that's the right thing
+>>> to do here, because:
+>>>
+>>> * We have no idea what ID_ISAR6 bits [31:28] may mean in future.
+>>>
+>>> * AFAICT, the instructions described by ID_ISAR6.SPECRES (from the
+>>>    ARMv8.0-PredInv extension) operate on the local PE and are not
+>>>    broadcast. To make those work as a guest expects, the host will need
+>>>    to do additional things (e.g. to preserve that illusion when a vCPU is
+>>>    migrated from one pCPU to another and back).
+>>>
+>>> Given that, think we should add an explicit ftr_id_isar6 which only
+>>> exposes the fields that we're certain are safe to expose to a guest
+>>> (i.e. without SPECRES).
+>>
+>> Agree. Thanks for pointing this out. I recommended the usage of
+>> generic_32bits table without actually looking at the feature
+>> definitions.
 > 
-> This is our first ITS test, belonging to a new "its" group.
+> No worries; this is /really/ easy to miss!
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Looking again, comparing to ARM DDI 0487E.a, there are a few other
+> things we should probably sort out:
+> 
+> * ID_DFR0 fields need more thought; we should limit what we expose here.
+>   I don't think it's valid for us to expose TraceFilt, and I suspect we
 
-[...]
+Sure, will go ahead and drop TraceFilt [28..31] from ID_DFR0 register.
 
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> new file mode 100644
-> index 0000000..2ce483e
-> --- /dev/null
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -0,0 +1,116 @@
-> +/*
-> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
-> + *
-> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#ifndef _ASMARM_GIC_V3_ITS_H_
-> +#define _ASMARM_GIC_V3_ITS_H_
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#define GITS_CTLR			0x0000
-> +#define GITS_IIDR			0x0004
-> +#define GITS_TYPER			0x0008
-> +#define GITS_CBASER			0x0080
-> +#define GITS_CWRITER			0x0088
-> +#define GITS_CREADR			0x0090
-> +#define GITS_BASER			0x0100
-> +
-> +#define GITS_TYPER_PLPIS                (1UL << 0)
-> +#define GITS_TYPER_IDBITS_SHIFT         8
-> +#define GITS_TYPER_DEVBITS_SHIFT        13
-> +#define GITS_TYPER_DEVBITS(r)           ((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
-> +#define GITS_TYPER_PTA                  (1UL << 19)
-> +#define GITS_TYPER_HWCOLLCNT_SHIFT      24
-> +
-> +#define GITS_CTLR_ENABLE                (1U << 0)
-> +
-> +#define GITS_CBASER_VALID                       (1UL << 63)
-> +#define GITS_CBASER_SHAREABILITY_SHIFT          (10)
-> +#define GITS_CBASER_INNER_CACHEABILITY_SHIFT    (59)
-> +#define GITS_CBASER_OUTER_CACHEABILITY_SHIFT    (53)
-> +#define GITS_CBASER_SHAREABILITY_MASK                                   \
-> +	GIC_BASER_SHAREABILITY(GITS_CBASER, SHAREABILITY_MASK)
-> +#define GITS_CBASER_INNER_CACHEABILITY_MASK                             \
-> +	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, MASK)
-> +#define GITS_CBASER_OUTER_CACHEABILITY_MASK                             \
-> +	GIC_BASER_CACHEABILITY(GITS_CBASER, OUTER, MASK)
-> +#define GITS_CBASER_CACHEABILITY_MASK GITS_CBASER_INNER_CACHEABILITY_MASK
-> +
-> +#define GITS_CBASER_InnerShareable                                      \
-> +	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
-> +
-> +#define GITS_CBASER_nCnB        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nCnB)
-> +#define GITS_CBASER_nC          GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
-> +#define GITS_CBASER_RaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
-> +#define GITS_CBASER_RaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
+>   need to add capping for debug features we currently emulate.
 
-s/RaWt/RaWb/
+Could you please elaborate ?
 
-> +#define GITS_CBASER_WaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWt)
-> +#define GITS_CBASER_WaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
-> +#define GITS_CBASER_RaWaWt      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
-> +#define GITS_CBASER_RaWaWb      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
-> +
-> +#define GITS_BASER_NR_REGS              8
-> +
-> +#define GITS_BASER_VALID                        (1UL << 63)
-> +#define GITS_BASER_INDIRECT                     (1ULL << 62)
-> +
-> +#define GITS_BASER_INNER_CACHEABILITY_SHIFT     (59)
-> +#define GITS_BASER_OUTER_CACHEABILITY_SHIFT     (53)
-> +#define GITS_BASER_CACHEABILITY_MASK		0x7
-> +
-> +#define GITS_BASER_nCnB         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nCnB)
-> +
-> +#define GITS_BASER_TYPE_SHIFT                   (56)
-> +#define GITS_BASER_TYPE(r)              (((r) >> GITS_BASER_TYPE_SHIFT) & 7)
-> +#define GITS_BASER_ENTRY_SIZE_SHIFT             (48)
-> +#define GITS_BASER_ENTRY_SIZE(r)        ((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
-> +#define GITS_BASER_SHAREABILITY_SHIFT   (10)
-> +#define GITS_BASER_InnerShareable                                       \
-> +	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-> +#define GITS_BASER_PAGE_SIZE_SHIFT      (8)
-> +#define GITS_BASER_PAGE_SIZE_4K         (0UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_16K        (1UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_64K        (2UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGE_SIZE_MASK       (3UL << GITS_BASER_PAGE_SIZE_SHIFT)
-> +#define GITS_BASER_PAGES_MAX            256
-> +#define GITS_BASER_PAGES_SHIFT          (0)
-> +#define GITS_BASER_NR_PAGES(r)          (((r) & 0xff) + 1)
-> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
-> +
-> +#define GITS_BASER_TYPE_NONE            0
-> +#define GITS_BASER_TYPE_DEVICE          1
-> +#define GITS_BASER_TYPE_VCPU            2
-> +#define GITS_BASER_TYPE_CPU             3
+> 
+> * ID_ISAR0[31:28] are RES0 in ARMv8, Reserved/UNK in ARMv7.
+>   We should probably ftr_id_isar0 so we can hide those bits.
 
-'3' is one of the reserved values of the GITS_BASER.Type field, and
-what do we expect with a "GITS_BASER_TYPE_CPU" table type? ;-)
+Sure, will do.
 
-I think we can copy (and might update in the future) all these
-macros against the latest Linux kernel.
+> 
+> * ID_ISAR5[23:10] are RES0
+>   We handle this already! :)
 
-> +#define GITS_BASER_TYPE_COLLECTION      4
-> +
-> +#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0) > +
-> +struct its_typer {
-> +	unsigned int ite_size;
-> +	unsigned int eventid_bits;
-> +	unsigned int deviceid_bits;
-> +	unsigned int collid_bits;
-> +	unsigned int hw_collections;
-> +	bool pta;
-> +	bool cil;
-> +	bool cct;
-> +	bool phys_lpi;
-> +	bool virt_lpi;
-> +};
-> +
-> +struct its_data {
-> +	void *base;
-> +	struct its_typer typer;
-> +};
-> +
-> +extern struct its_data its_data;
-> +
-> +#define gicv3_its_base()		(its_data.base)
-> +
-> +extern void its_parse_typer(void);
-> +extern void its_init(void);
-> +
-> +#endif /* !__ASSEMBLY__ */
-> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> index 55dd84b..b44da9c 100644
-> --- a/lib/arm/asm/gic.h
-> +++ b/lib/arm/asm/gic.h
-> @@ -40,6 +40,7 @@
->   
->   #include <asm/gic-v2.h>
->   #include <asm/gic-v3.h>
-> +#include <asm/gic-v3-its.h>
->   
->   #define PPI(irq)			((irq) + 16)
->   #define SPI(irq)			((irq) + GIC_FIRST_SPI)
-> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-> new file mode 100644
-> index 0000000..34f4d0e
-> --- /dev/null
-> +++ b/lib/arm/gic-v3-its.c
-> @@ -0,0 +1,41 @@
-> +/*
-> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <asm/gic.h>
-> +
-> +struct its_data its_data;
-> +
-> +void its_parse_typer(void)
-> +{
-> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
-> +
-> +	its_data.typer.ite_size = ((typer >> 4) & 0xf) + 1;
-> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
-> +	its_data.typer.eventid_bits =
-> +		((typer >> GITS_TYPER_IDBITS_SHIFT) & 0x1f) + 1;
-> +	its_data.typer.deviceid_bits = GITS_TYPER_DEVBITS(typer) + 1;
+I may be missing something here but some of these fields are already there.
 
-No need to '+1'. As GITS_TYPER_DEVBITS already helps us to calculate
-the implemented DeviceID bits.
+#define ID_ISAR5_RDM_SHIFT              24
+#define ID_ISAR5_CRC32_SHIFT            16
+#define ID_ISAR5_SHA2_SHIFT             12
+#define ID_ISAR5_SHA1_SHIFT             8
+#define ID_ISAR5_AES_SHIFT              4
+#define ID_ISAR5_SEVL_SHIFT             0
 
-> +
-> +	its_data.typer.cil = (typer >> 36) & 0x1;
-> +	if (its_data.typer.cil)
-> +		its_data.typer.collid_bits = ((typer >> 32) & 0xf) + 1;
-> +	else
-> +		its_data.typer.collid_bits = 16;
-> +
-> +	its_data.typer.hw_collections =
-> +		(typer >> GITS_TYPER_HWCOLLCNT_SHIFT) & 0xff;
-> +
-> +	its_data.typer.cct = typer & 0x4;
-> +	its_data.typer.virt_lpi = typer & 0x2;
-> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+static const struct arm64_ftr_bits ftr_id_isar5[] = {
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_RDM_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_CRC32_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_SHA2_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_SHA1_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_AES_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_ISAR5_SEVL_SHIFT, 4, 0),
+        ARM64_FTR_END,
+};
 
-Personally, mix using of GITS_TYPER_* macros and some magic constants to
-parse the TYPER makes it a bit difficult to review the code. Maybe we
-can have more such kinds of macros in the header file and get rid of all
-hardcoded numbers?
+> 
+> * ID_MMFR4.SpecSEI should be trated as higher safe.
+>   We should update ftr_id_mmfr4 to handle this and other fields.
 
+Sure but should we also export other fields as higher safe in there ?
 
-Thanks,
-Zenghui
+> 
+> * ID_PFR0 is missing DIT and CSV2
+>   We should probably add these (but neither RAS not AMU).
 
+Sure, will do.
+
+> 
+> * ID_PFR2 is missing
+>   We should probably add this for SSBS and CSV3.
+
+Sure but should we add corresponding ID_AA64PFR2_EL1 register as well ?
+
+> 
+> Thanks,
+> Mark.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
