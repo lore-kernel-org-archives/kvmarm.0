@@ -2,81 +2,79 @@ Return-Path: <SRS0=uTqP=2I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD05BC43603
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C05DC43603
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:40:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 461A821582
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:39:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461A821582
+	by mail.kernel.org (Postfix) with ESMTP id 2EEBD21582
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:40:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EEBD21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D927E4A8E8;
-	Wed, 18 Dec 2019 06:39:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC79D4A8E8;
+	Wed, 18 Dec 2019 06:40:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sFqOCuTvMlFD; Wed, 18 Dec 2019 06:39:57 -0500 (EST)
+	with ESMTP id OhbrOdYzQ4xQ; Wed, 18 Dec 2019 06:40:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89CF04A5A6;
-	Wed, 18 Dec 2019 06:39:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF2EA4A5A8;
+	Wed, 18 Dec 2019 06:40:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4A94A4A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58D1B4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:40:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4oUq4D8vRzr1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Dec 2019 06:39:55 -0500 (EST)
+ with ESMTP id Ed-u910ez2lK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Dec 2019 06:40:43 -0500 (EST)
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
  [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A4D04A3A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:55 -0500 (EST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D1744A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:40:43 -0500 (EST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBIBbPer100724
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:54 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjf7ab7k-1
+ xBIBbMns047565
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:40:42 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjcbt17s-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:53 -0500
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:40:42 -0500
 Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Wed, 18 Dec 2019 11:39:51 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Wed, 18 Dec 2019 11:40:38 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Dec 2019 11:39:45 -0000
+ Wed, 18 Dec 2019 11:40:31 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xBIBd1Qd45482342
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBIBeUUp51511492
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Dec 2019 11:39:01 GMT
+ Wed, 18 Dec 2019 11:40:30 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C0BFE4C046;
- Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id AC0784C044;
+ Wed, 18 Dec 2019 11:40:30 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 182E94C044;
- Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 0F3844C05A;
+ Wed, 18 Dec 2019 11:40:30 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
-Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
- KVM_SET_USER_MEMORY_REGION
+ Wed, 18 Dec 2019 11:40:29 +0000 (GMT)
+Subject: Re: [PATCH v4 00/19] KVM: Dynamically size memslot arrays
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
  James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Janosch Frank <frankja@linux.ibm.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
- <20191217204041.10815-20-sean.j.christopherson@intel.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -121,24 +119,24 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Wed, 18 Dec 2019 12:39:43 +0100
+Date: Wed, 18 Dec 2019 12:40:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191217204041.10815-20-sean.j.christopherson@intel.com>
+In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 Content-Language: en-US
 X-TM-AS-GCONF: 00
-x-cbid: 19121811-0012-0000-0000-000003762703
+x-cbid: 19121811-0016-0000-0000-000002D623BE
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121811-0013-0000-0000-000021B2154B
-Message-Id: <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
+x-cbparentid: 19121811-0017-0000-0000-0000333861B2
+Message-Id: <595b5ecc-d18b-3973-7041-59e58d7f1cc7@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-18_03:2019-12-17,2019-12-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxscore=0
- suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
- malwarescore=0 bulkscore=0 impostorscore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxscore=0 spamscore=0
+ impostorscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
+ adultscore=0 suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-1912180097
 Cc: Wanpeng Li <wanpengli@tencent.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, kvm@vger.kernel.org,
@@ -166,176 +164,34 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
 On 17.12.19 21:40, Sean Christopherson wrote:
-> Add a KVM selftest to test moving the base gfn of a userspace memory
-> region.  The test is primarily targeted at x86 to verify its memslot
-> metadata is correctly updated, but also provides basic functionality
-> coverage on other architectures.
+> The end goal of this series is to dynamically size the memslot array so
+> that KVM allocates memory based on the number of memslots in use, as
+> opposed to unconditionally allocating memory for the maximum number of
+> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+> the memory footprint from 90k to ~2.6k bytes.
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +
->  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  30 ++++
->  .../selftests/kvm/set_memory_region_test.c    | 142 ++++++++++++++++++
->  5 files changed, 177 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/set_memory_region_test.c
+> The changes required to support dynamic sizing are relatively small,
+> e.g. are essentially contained in patches 17/19 and 18/19.
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 30072c3f52fb..6f60ceb81440 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -17,3 +17,4 @@
->  /clear_dirty_log_test
->  /dirty_log_test
->  /kvm_create_max_vcpus
-> +/set_memory_region_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 3138a916574a..01c79e02c5b7 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -29,15 +29,18 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
->  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_x86_64 += set_memory_region_test
+> Patches 2-16 clean up the memslot code, which has gotten quite crusty,
+> especially __kvm_set_memory_region().  The clean up is likely not strictly
+> necessary to switch to dynamic sizing, but I didn't have a remotely
+> reasonable level of confidence in the correctness of the dynamic sizing
+> without first doing the clean up.
 > 
->  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_test
->  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_aarch64 += set_memory_region_test
+> The only functional change in v4 is the addition of an x86-specific bug
+> fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly related
+> to dynamically allocating memslots, but it has subtle and hidden conflicts
+> with the cleanup patches, and the fix is higher priority than anything
+> else in the series, i.e. should be merged first.
 > 
->  TEST_GEN_PROGS_s390x = s390x/memop
->  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->  TEST_GEN_PROGS_s390x += dirty_log_test
->  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-> +TEST_GEN_PROGS_s390x += set_memory_region_test
-> 
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 29cccaf96baf..15d3b8690ffb 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -100,6 +100,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
->  		void *arg);
->  void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
->  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> +void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
->  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
->  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
->  			  uint32_t data_memslot, uint32_t pgd_memslot);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 41cf45416060..464a75ce9843 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -756,6 +756,36 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
->  		ret, errno, slot, flags);
->  }
-> 
-> +/*
-> + * VM Memory Region Move
-> + *
-> + * Input Args:
-> + *   vm - Virtual Machine
-> + *   slot - Slot of the memory region to move
-> + *   flags - Starting guest physical address
-> + *
-> + * Output Args: None
-> + *
-> + * Return: None
-> + *
-> + * Change the gpa of a memory region.
-> + */
-> +void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
-> +{
-> +	struct userspace_mem_region *region;
-> +	int ret;
-> +
-> +	region = memslot2region(vm, slot);
-> +
-> +	region->region.guest_phys_addr = new_gpa;
-> +
-> +	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region);
-> +
-> +	TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed\n"
-> +		    "ret: %i errno: %i slot: %u flags: 0x%x",
-> +		    ret, errno, slot, new_gpa);
-> +}
-> +
->  /*
->   * VCPU mmap Size
->   *
-> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-> new file mode 100644
-> index 000000000000..c9603b95ccf7
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-> @@ -0,0 +1,142 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <fcntl.h>
-> +#include <pthread.h>
-> +#include <sched.h>
-> +#include <signal.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +
-> +#include <linux/compiler.h>
-> +
-> +#include <test_util.h>
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +
-> +#define VCPU_ID 0
-> +
-> +/*
-> + * Somewhat arbitrary location and slot, intended to not overlap anything.  The
-> + * location and size are specifically 2mb sized/aligned so that the initial
-> + * region corresponds to exactly one large page (on x86 and arm64).
-> + */
-> +#define MEM_REGION_GPA		0xc0000000
-> +#define MEM_REGION_SIZE		0x200000
-> +#define MEM_REGION_SLOT		10
-> +
-> +static void guest_code(void)
-> +{
-> +	uint64_t val;
-> +
-> +	do {
-> +		val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
-> +	} while (!val);
-> +
-> +	if (val != 1)
-> +		ucall(UCALL_ABORT, 1, val);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void *vcpu_worker(void *data)
-> +{
-> +	struct kvm_vm *vm = data;
-> +	struct kvm_run *run;
-> +	struct ucall uc;
-> +	uint64_t cmd;
-> +
-> +	/*
-> +	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
-> +	 * which will occur if the guest attempts to access a memslot while it
-> +	 * is being moved.
-> +	 */
-> +	run = vcpu_state(vm, VCPU_ID);
-> +	do {
-> +		vcpu_run(vm, VCPU_ID);
-> +	} while (run->exit_reason == KVM_EXIT_MMIO);
-> +
-> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +		    "Unexpected exit reason = %d", run->exit_reason);
+> On non-x86 architectures, v3 and v4 should be functionally equivalent,
+> the only non-x86 change in v4 is the dropping of a "const" in
+> kvm_arch_commit_memory_region().
 
-
-This will also not work for s390. Maybe just make this test x86 specific for now?
+I gave this series a quick spin and it still seems to work on s390 (minus the selftest).
 
 _______________________________________________
 kvmarm mailing list
