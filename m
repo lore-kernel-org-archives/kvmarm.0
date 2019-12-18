@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49CCCC43603
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD05BC43603
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:39:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2ACD21582
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:30:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2ACD21582
+	by mail.kernel.org (Postfix) with ESMTP id 461A821582
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 11:39:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461A821582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F04824A4A9;
-	Wed, 18 Dec 2019 06:30:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D927E4A8E8;
+	Wed, 18 Dec 2019 06:39:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gCgnv6vSw0jf; Wed, 18 Dec 2019 06:30:24 -0500 (EST)
+	with ESMTP id sFqOCuTvMlFD; Wed, 18 Dec 2019 06:39:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 918E64A4BE;
-	Wed, 18 Dec 2019 06:30:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89CF04A5A6;
+	Wed, 18 Dec 2019 06:39:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 646254A4A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:30:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4A94A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U6rxulooF4cb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Dec 2019 06:30:22 -0500 (EST)
+ with ESMTP id 4oUq4D8vRzr1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Dec 2019 06:39:55 -0500 (EST)
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
  [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAA524A3A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:30:21 -0500 (EST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A4D04A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:55 -0500 (EST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBIBOAjh180579
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:30:20 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjcbsqbv-1
+ xBIBbPer100724
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:54 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wyjf7ab7k-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:30:18 -0500
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 06:39:53 -0500
 Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Wed, 18 Dec 2019 11:30:07 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Wed, 18 Dec 2019 11:39:51 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 18 Dec 2019 11:29:59 -0000
+ Wed, 18 Dec 2019 11:39:45 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBIBTxSR53608522
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBIBd1Qd45482342
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Dec 2019 11:29:59 GMT
+ Wed, 18 Dec 2019 11:39:01 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0564D4C046;
- Wed, 18 Dec 2019 11:29:59 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id C0BFE4C046;
+ Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4FE024C044;
- Wed, 18 Dec 2019 11:29:58 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 182E94C044;
+ Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 18 Dec 2019 11:29:58 +0000 (GMT)
+ Wed, 18 Dec 2019 11:39:44 +0000 (GMT)
 Subject: Re: [PATCH v4 19/19] KVM: selftests: Add test for
  KVM_SET_USER_MEMORY_REGION
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -121,25 +121,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Wed, 18 Dec 2019 12:29:58 +0100
+Date: Wed, 18 Dec 2019 12:39:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
 In-Reply-To: <20191217204041.10815-20-sean.j.christopherson@intel.com>
 Content-Language: en-US
 X-TM-AS-GCONF: 00
-x-cbid: 19121811-0028-0000-0000-000003C9DCC7
+x-cbid: 19121811-0012-0000-0000-000003762703
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121811-0029-0000-0000-0000248D28FA
-Message-Id: <028948db-b59c-08bf-b2ce-29d8745ab9c7@de.ibm.com>
+x-cbparentid: 19121811-0013-0000-0000-000021B2154B
+Message-Id: <f962fafb-3956-746f-d077-3dbcefaae7c8@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-18_03:2019-12-17,2019-12-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 spamscore=0
- impostorscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
- adultscore=0 suspectscore=2 malwarescore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912180095
+ spamscore=0 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912180097
 Cc: Wanpeng Li <wanpengli@tencent.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, Joerg Roedel <joro@8bytes.org>,
@@ -158,165 +158,186 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CgpPbiAxNy4xMi4xOSAyMTo0MCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToKPiBBZGQgYSBL
-Vk0gc2VsZnRlc3QgdG8gdGVzdCBtb3ZpbmcgdGhlIGJhc2UgZ2ZuIG9mIGEgdXNlcnNwYWNlIG1l
-bW9yeQo+IHJlZ2lvbi4gIFRoZSB0ZXN0IGlzIHByaW1hcmlseSB0YXJnZXRlZCBhdCB4ODYgdG8g
-dmVyaWZ5IGl0cyBtZW1zbG90Cj4gbWV0YWRhdGEgaXMgY29ycmVjdGx5IHVwZGF0ZWQsIGJ1dCBh
-bHNvIHByb3ZpZGVzIGJhc2ljIGZ1bmN0aW9uYWxpdHkKPiBjb3ZlcmFnZSBvbiBvdGhlciBhcmNo
-aXRlY3R1cmVzLgoKVGhpcyBmYWlscyB0byBidWlsZCBvbiBzMzkwIChhbmQgcHJvYmFibHkgb3Ro
-ZXJzKQoKc2V0X21lbW9yeV9yZWdpb25fdGVzdC5jOiBJbiBmdW5jdGlvbiDigJh0ZXN0X21vdmVf
-bWVtb3J5X3JlZ2lvbuKAmToKc2V0X21lbW9yeV9yZWdpb25fdGVzdC5jOjc4OjI6IHdhcm5pbmc6
-IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHZjcHVfc2V0X2NwdWlk4oCZIFst
-V2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICA3OCB8ICB2Y3B1X3NldF9jcHVpZCh2
-bSwgVkNQVV9JRCwga3ZtX2dldF9zdXBwb3J0ZWRfY3B1aWQoKSk7CiAgICAgIHwgIF5+fn5+fn5+
-fn5+fn5+CnNldF9tZW1vcnlfcmVnaW9uX3Rlc3QuYzo3ODozMDogd2FybmluZzogaW1wbGljaXQg
-ZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYa3ZtX2dldF9zdXBwb3J0ZWRfY3B1aWTigJkgWy1X
-aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgIDc4IHwgIHZjcHVfc2V0X2NwdWlkKHZt
-LCBWQ1BVX0lELCBrdm1fZ2V0X3N1cHBvcnRlZF9jcHVpZCgpKTsKICAgICAgfCAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CgoKPiAKPiBTaWduZWQt
-b2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuLmouY2hyaXN0b3BoZXJzb25AaW50ZWwu
-Y29tPgo+IC0tLQo+ICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vLmdpdGlnbm9yZSAgICAg
-ICAgfCAgIDEgKwo+ICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUgICAgICAg
-ICAgfCAgIDMgKwo+ICAuLi4vdGVzdGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUva3ZtX3V0aWwu
-aCAgfCAgIDEgKwo+ICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vbGliL2t2bV91dGlsLmMg
-ICAgfCAgMzAgKysrKwo+ICAuLi4vc2VsZnRlc3RzL2t2bS9zZXRfbWVtb3J5X3JlZ2lvbl90ZXN0
-LmMgICAgfCAxNDIgKysrKysrKysrKysrKysrKysrCj4gIDUgZmlsZXMgY2hhbmdlZCwgMTc3IGlu
-c2VydGlvbnMoKykKPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9zZXRfbWVtb3J5X3JlZ2lvbl90ZXN0LmMKPiAKPiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVz
-dGluZy9zZWxmdGVzdHMva3ZtLy5naXRpZ25vcmUgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9r
-dm0vLmdpdGlnbm9yZQo+IGluZGV4IDMwMDcyYzNmNTJmYi4uNmY2MGNlYjgxNDQwIDEwMDY0NAo+
-IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS8uZ2l0aWdub3JlCj4gKysrIGIvdG9v
-bHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtLy5naXRpZ25vcmUKPiBAQCAtMTcsMyArMTcsNCBAQAo+
-ICAvY2xlYXJfZGlydHlfbG9nX3Rlc3QKPiAgL2RpcnR5X2xvZ190ZXN0Cj4gIC9rdm1fY3JlYXRl
-X21heF92Y3B1cwo+ICsvc2V0X21lbW9yeV9yZWdpb25fdGVzdAo+IGRpZmYgLS1naXQgYS90b29s
-cy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0
-cy9rdm0vTWFrZWZpbGUKPiBpbmRleCAzMTM4YTkxNjU3NGEuLjAxYzc5ZTAyYzViNyAxMDA2NDQK
-PiAtLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUKPiArKysgYi90b29s
-cy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZpbGUKPiBAQCAtMjksMTUgKzI5LDE4IEBAIFRF
-U1RfR0VOX1BST0dTX3g4Nl82NCArPSB4ODZfNjQveHNzX21zcl90ZXN0Cj4gIFRFU1RfR0VOX1BS
-T0dTX3g4Nl82NCArPSBjbGVhcl9kaXJ0eV9sb2dfdGVzdAo+ICBURVNUX0dFTl9QUk9HU194ODZf
-NjQgKz0gZGlydHlfbG9nX3Rlc3QKPiAgVEVTVF9HRU5fUFJPR1NfeDg2XzY0ICs9IGt2bV9jcmVh
-dGVfbWF4X3ZjcHVzCj4gK1RFU1RfR0VOX1BST0dTX3g4Nl82NCArPSBzZXRfbWVtb3J5X3JlZ2lv
-bl90ZXN0Cj4gIAo+ICBURVNUX0dFTl9QUk9HU19hYXJjaDY0ICs9IGNsZWFyX2RpcnR5X2xvZ190
-ZXN0Cj4gIFRFU1RfR0VOX1BST0dTX2FhcmNoNjQgKz0gZGlydHlfbG9nX3Rlc3QKPiAgVEVTVF9H
-RU5fUFJPR1NfYWFyY2g2NCArPSBrdm1fY3JlYXRlX21heF92Y3B1cwo+ICtURVNUX0dFTl9QUk9H
-U19hYXJjaDY0ICs9IHNldF9tZW1vcnlfcmVnaW9uX3Rlc3QKPiAgCj4gIFRFU1RfR0VOX1BST0dT
-X3MzOTB4ID0gczM5MHgvbWVtb3AKPiAgVEVTVF9HRU5fUFJPR1NfczM5MHggKz0gczM5MHgvc3lu
-Y19yZWdzX3Rlc3QKPiAgVEVTVF9HRU5fUFJPR1NfczM5MHggKz0gZGlydHlfbG9nX3Rlc3QKPiAg
-VEVTVF9HRU5fUFJPR1NfczM5MHggKz0ga3ZtX2NyZWF0ZV9tYXhfdmNwdXMKPiArVEVTVF9HRU5f
-UFJPR1NfczM5MHggKz0gc2V0X21lbW9yeV9yZWdpb25fdGVzdAo+ICAKPiAgVEVTVF9HRU5fUFJP
-R1MgKz0gJChURVNUX0dFTl9QUk9HU18kKFVOQU1FX00pKQo+ICBMSUJLVk0gKz0gJChMSUJLVk1f
-JChVTkFNRV9NKSkKPiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2lu
-Y2x1ZGUva3ZtX3V0aWwuaCBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL2t2
-bV91dGlsLmgKPiBpbmRleCAyOWNjY2FmOTZiYWYuLjE1ZDNiODY5MGZmYiAxMDA2NDQKPiAtLS0g
-YS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vaW5jbHVkZS9rdm1fdXRpbC5oCj4gKysrIGIv
-dG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2luY2x1ZGUva3ZtX3V0aWwuaAo+IEBAIC0xMDAs
-NiArMTAwLDcgQEAgaW50IF92Y3B1X2lvY3RsKHN0cnVjdCBrdm1fdm0gKnZtLCB1aW50MzJfdCB2
-Y3B1aWQsIHVuc2lnbmVkIGxvbmcgaW9jdGwsCj4gIAkJdm9pZCAqYXJnKTsKPiAgdm9pZCB2bV9p
-b2N0bChzdHJ1Y3Qga3ZtX3ZtICp2bSwgdW5zaWduZWQgbG9uZyBpb2N0bCwgdm9pZCAqYXJnKTsK
-PiAgdm9pZCB2bV9tZW1fcmVnaW9uX3NldF9mbGFncyhzdHJ1Y3Qga3ZtX3ZtICp2bSwgdWludDMy
-X3Qgc2xvdCwgdWludDMyX3QgZmxhZ3MpOwo+ICt2b2lkIHZtX21lbV9yZWdpb25fbW92ZShzdHJ1
-Y3Qga3ZtX3ZtICp2bSwgdWludDMyX3Qgc2xvdCwgdWludDY0X3QgbmV3X2dwYSk7Cj4gIHZvaWQg
-dm1fdmNwdV9hZGQoc3RydWN0IGt2bV92bSAqdm0sIHVpbnQzMl90IHZjcHVpZCk7Cj4gIHZtX3Zh
-ZGRyX3Qgdm1fdmFkZHJfYWxsb2Moc3RydWN0IGt2bV92bSAqdm0sIHNpemVfdCBzeiwgdm1fdmFk
-ZHJfdCB2YWRkcl9taW4sCj4gIAkJCSAgdWludDMyX3QgZGF0YV9tZW1zbG90LCB1aW50MzJfdCBw
-Z2RfbWVtc2xvdCk7Cj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9s
-aWIva3ZtX3V0aWwuYyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9saWIva3ZtX3V0aWwu
-Ywo+IGluZGV4IDQxY2Y0NTQxNjA2MC4uNDY0YTc1Y2U5ODQzIDEwMDY0NAo+IC0tLSBhL3Rvb2xz
-L3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9saWIva3ZtX3V0aWwuYwo+ICsrKyBiL3Rvb2xzL3Rlc3Rp
-bmcvc2VsZnRlc3RzL2t2bS9saWIva3ZtX3V0aWwuYwo+IEBAIC03NTYsNiArNzU2LDM2IEBAIHZv
-aWQgdm1fbWVtX3JlZ2lvbl9zZXRfZmxhZ3Moc3RydWN0IGt2bV92bSAqdm0sIHVpbnQzMl90IHNs
-b3QsIHVpbnQzMl90IGZsYWdzKQo+ICAJCXJldCwgZXJybm8sIHNsb3QsIGZsYWdzKTsKPiAgfQo+
-ICAKPiArLyoKPiArICogVk0gTWVtb3J5IFJlZ2lvbiBNb3ZlCj4gKyAqCj4gKyAqIElucHV0IEFy
-Z3M6Cj4gKyAqICAgdm0gLSBWaXJ0dWFsIE1hY2hpbmUKPiArICogICBzbG90IC0gU2xvdCBvZiB0
-aGUgbWVtb3J5IHJlZ2lvbiB0byBtb3ZlCj4gKyAqICAgZmxhZ3MgLSBTdGFydGluZyBndWVzdCBw
-aHlzaWNhbCBhZGRyZXNzCj4gKyAqCj4gKyAqIE91dHB1dCBBcmdzOiBOb25lCj4gKyAqCj4gKyAq
-IFJldHVybjogTm9uZQo+ICsgKgo+ICsgKiBDaGFuZ2UgdGhlIGdwYSBvZiBhIG1lbW9yeSByZWdp
-b24uCj4gKyAqLwo+ICt2b2lkIHZtX21lbV9yZWdpb25fbW92ZShzdHJ1Y3Qga3ZtX3ZtICp2bSwg
-dWludDMyX3Qgc2xvdCwgdWludDY0X3QgbmV3X2dwYSkKPiArewo+ICsJc3RydWN0IHVzZXJzcGFj
-ZV9tZW1fcmVnaW9uICpyZWdpb247Cj4gKwlpbnQgcmV0Owo+ICsKPiArCXJlZ2lvbiA9IG1lbXNs
-b3QycmVnaW9uKHZtLCBzbG90KTsKPiArCj4gKwlyZWdpb24tPnJlZ2lvbi5ndWVzdF9waHlzX2Fk
-ZHIgPSBuZXdfZ3BhOwo+ICsKPiArCXJldCA9IGlvY3RsKHZtLT5mZCwgS1ZNX1NFVF9VU0VSX01F
-TU9SWV9SRUdJT04sICZyZWdpb24tPnJlZ2lvbik7Cj4gKwo+ICsJVEVTVF9BU1NFUlQoIXJldCwg
-IktWTV9TRVRfVVNFUl9NRU1PUllfUkVHSU9OIGZhaWxlZFxuIgo+ICsJCSAgICAicmV0OiAlaSBl
-cnJubzogJWkgc2xvdDogJXUgZmxhZ3M6IDB4JXgiLAo+ICsJCSAgICByZXQsIGVycm5vLCBzbG90
-LCBuZXdfZ3BhKTsKPiArfQo+ICsKPiAgLyoKPiAgICogVkNQVSBtbWFwIFNpemUKPiAgICoKPiBk
-aWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL3NldF9tZW1vcnlfcmVnaW9u
-X3Rlc3QuYyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9zZXRfbWVtb3J5X3JlZ2lvbl90
-ZXN0LmMKPiBuZXcgZmlsZSBtb2RlIDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAwMC4uYzk2MDNi
-OTVjY2Y3Cj4gLS0tIC9kZXYvbnVsbAo+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2
-bS9zZXRfbWVtb3J5X3JlZ2lvbl90ZXN0LmMKPiBAQCAtMCwwICsxLDE0MiBAQAo+ICsvLyBTUERY
-LUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+ICsjZGVmaW5lIF9HTlVfU09VUkNFIC8qIGZv
-ciBwcm9ncmFtX2ludm9jYXRpb25fc2hvcnRfbmFtZSAqLwo+ICsjaW5jbHVkZSA8ZmNudGwuaD4K
-PiArI2luY2x1ZGUgPHB0aHJlYWQuaD4KPiArI2luY2x1ZGUgPHNjaGVkLmg+Cj4gKyNpbmNsdWRl
-IDxzaWduYWwuaD4KPiArI2luY2x1ZGUgPHN0ZGlvLmg+Cj4gKyNpbmNsdWRlIDxzdGRsaWIuaD4K
-PiArI2luY2x1ZGUgPHN0cmluZy5oPgo+ICsjaW5jbHVkZSA8c3lzL2lvY3RsLmg+Cj4gKwo+ICsj
-aW5jbHVkZSA8bGludXgvY29tcGlsZXIuaD4KPiArCj4gKyNpbmNsdWRlIDx0ZXN0X3V0aWwuaD4K
-PiArI2luY2x1ZGUgPGt2bV91dGlsLmg+Cj4gKyNpbmNsdWRlIDxwcm9jZXNzb3IuaD4KPiArCj4g
-KyNkZWZpbmUgVkNQVV9JRCAwCj4gKwo+ICsvKgo+ICsgKiBTb21ld2hhdCBhcmJpdHJhcnkgbG9j
-YXRpb24gYW5kIHNsb3QsIGludGVuZGVkIHRvIG5vdCBvdmVybGFwIGFueXRoaW5nLiAgVGhlCj4g
-KyAqIGxvY2F0aW9uIGFuZCBzaXplIGFyZSBzcGVjaWZpY2FsbHkgMm1iIHNpemVkL2FsaWduZWQg
-c28gdGhhdCB0aGUgaW5pdGlhbAo+ICsgKiByZWdpb24gY29ycmVzcG9uZHMgdG8gZXhhY3RseSBv
-bmUgbGFyZ2UgcGFnZSAob24geDg2IGFuZCBhcm02NCkuCj4gKyAqLwo+ICsjZGVmaW5lIE1FTV9S
-RUdJT05fR1BBCQkweGMwMDAwMDAwCj4gKyNkZWZpbmUgTUVNX1JFR0lPTl9TSVpFCQkweDIwMDAw
-MAo+ICsjZGVmaW5lIE1FTV9SRUdJT05fU0xPVAkJMTAKPiArCj4gK3N0YXRpYyB2b2lkIGd1ZXN0
-X2NvZGUodm9pZCkKPiArewo+ICsJdWludDY0X3QgdmFsOwo+ICsKPiArCWRvIHsKPiArCQl2YWwg
-PSBSRUFEX09OQ0UoKigodWludDY0X3QgKilNRU1fUkVHSU9OX0dQQSkpOwo+ICsJfSB3aGlsZSAo
-IXZhbCk7Cj4gKwo+ICsJaWYgKHZhbCAhPSAxKQo+ICsJCXVjYWxsKFVDQUxMX0FCT1JULCAxLCB2
-YWwpOwo+ICsKPiArCUdVRVNUX0RPTkUoKTsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQgKnZjcHVf
-d29ya2VyKHZvaWQgKmRhdGEpCj4gK3sKPiArCXN0cnVjdCBrdm1fdm0gKnZtID0gZGF0YTsKPiAr
-CXN0cnVjdCBrdm1fcnVuICpydW47Cj4gKwlzdHJ1Y3QgdWNhbGwgdWM7Cj4gKwl1aW50NjRfdCBj
-bWQ7Cj4gKwo+ICsJLyoKPiArCSAqIExvb3AgdW50aWwgdGhlIGd1ZXN0IGlzIGRvbmUuICBSZS1l
-bnRlciB0aGUgZ3Vlc3Qgb24gYWxsIE1NSU8gZXhpdHMsCj4gKwkgKiB3aGljaCB3aWxsIG9jY3Vy
-IGlmIHRoZSBndWVzdCBhdHRlbXB0cyB0byBhY2Nlc3MgYSBtZW1zbG90IHdoaWxlIGl0Cj4gKwkg
-KiBpcyBiZWluZyBtb3ZlZC4KPiArCSAqLwo+ICsJcnVuID0gdmNwdV9zdGF0ZSh2bSwgVkNQVV9J
-RCk7Cj4gKwlkbyB7Cj4gKwkJdmNwdV9ydW4odm0sIFZDUFVfSUQpOwo+ICsJfSB3aGlsZSAocnVu
-LT5leGl0X3JlYXNvbiA9PSBLVk1fRVhJVF9NTUlPKTsKPiArCj4gKwlURVNUX0FTU0VSVChydW4t
-PmV4aXRfcmVhc29uID09IEtWTV9FWElUX0lPLAo+ICsJCSAgICAiVW5leHBlY3RlZCBleGl0IHJl
-YXNvbiA9ICVkIiwgcnVuLT5leGl0X3JlYXNvbik7Cj4gKwo+ICsJY21kID0gZ2V0X3VjYWxsKHZt
-LCBWQ1BVX0lELCAmdWMpOwo+ICsJVEVTVF9BU1NFUlQoY21kID09IFVDQUxMX0RPTkUsICJVbmV4
-cGVjdGVkIHZhbCBpbiBndWVzdCA9ICVsbHUiLAo+ICsJCSAgICB1Yy5hcmdzWzBdKTsKPiArCXJl
-dHVybiBOVUxMOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCB0ZXN0X21vdmVfbWVtb3J5X3JlZ2lv
-bih2b2lkKQo+ICt7Cj4gKwlwdGhyZWFkX3QgdmNwdV90aHJlYWQ7Cj4gKwlzdHJ1Y3Qga3ZtX3Zt
-ICp2bTsKPiArCXVpbnQ2NF90ICpodmE7Cj4gKwl1aW50NjRfdCBncGE7Cj4gKwo+ICsJdm0gPSB2
-bV9jcmVhdGVfZGVmYXVsdChWQ1BVX0lELCAwLCBndWVzdF9jb2RlKTsKPiArCj4gKwl2Y3B1X3Nl
-dF9jcHVpZCh2bSwgVkNQVV9JRCwga3ZtX2dldF9zdXBwb3J0ZWRfY3B1aWQoKSk7Cj4gKwo+ICsJ
-dm1fdXNlcnNwYWNlX21lbV9yZWdpb25fYWRkKHZtLCBWTV9NRU1fU1JDX0FOT05ZTU9VU19USFAs
-Cj4gKwkJCQkgICAgTUVNX1JFR0lPTl9HUEEsIE1FTV9SRUdJT05fU0xPVCwKPiArCQkJCSAgICBN
-RU1fUkVHSU9OX1NJWkUgLyBnZXRwYWdlc2l6ZSgpLCAwKTsKPiArCj4gKwkvKgo+ICsJICogQWxs
-b2NhdGUgYW5kIG1hcCB0d28gcGFnZXMgc28gdGhhdCB0aGUgR1BBIGFjY2Vzc2VkIGJ5IGd1ZXN0
-X2NvZGUoKQo+ICsJICogc3RheXMgdmFsaWQgYWNyb3NzIHRoZSBtZW1zbG90IG1vdmUuCj4gKwkg
-Ki8KPiArCWdwYSA9IHZtX3BoeV9wYWdlc19hbGxvYyh2bSwgMiwgTUVNX1JFR0lPTl9HUEEsIE1F
-TV9SRUdJT05fU0xPVCk7Cj4gKwlURVNUX0FTU0VSVChncGEgPT0gTUVNX1JFR0lPTl9HUEEsICJG
-YWlsZWQgdm1fcGh5X3BhZ2VzX2FsbG9jXG4iKTsKPiArCj4gKwl2aXJ0X21hcCh2bSwgTUVNX1JF
-R0lPTl9HUEEsIE1FTV9SRUdJT05fR1BBLCAyICogNDA5NiwgMCk7Cj4gKwo+ICsJLyogRGl0dG8g
-Zm9yIHRoZSBob3N0IG1hcHBpbmcgc28gdGhhdCBib3RoIHBhZ2VzIGNhbiBiZSB6ZXJvZWQuICov
-Cj4gKwlodmEgPSBhZGRyX2dwYTJodmEodm0sIE1FTV9SRUdJT05fR1BBKTsKPiArCW1lbXNldCho
-dmEsIDAsIDIgKiA0MDk2KTsKPiArCj4gKwlwdGhyZWFkX2NyZWF0ZSgmdmNwdV90aHJlYWQsIE5V
-TEwsIHZjcHVfd29ya2VyLCB2bSk7Cj4gKwo+ICsJLyogRW5zdXJlIHRoZSBndWVzdCB0aHJlYWQg
-aXMgc3B1biB1cC4gKi8KPiArCXVzbGVlcCgxMDAwMDApOwo+ICsKPiArCS8qCj4gKwkgKiBTaGlm
-dCB0aGUgcmVnaW9uJ3MgYmFzZSBHUEEuICBUaGUgZ3Vlc3Qgc2hvdWxkIG5vdCBzZWUgIjIiIGFz
-IHRoZQo+ICsJICogaHZhLT5ncGEgdHJhbnNsYXRpb24gaXMgbWlzYWxpZ25lZCwgaS5lLiB0aGUg
-Z3Vlc3QgaXMgYWNjZXNzaW5nIGEKPiArCSAqIGRpZmZlcmVudCBob3N0IHBmbi4KPiArCSAqLwo+
-ICsJdm1fbWVtX3JlZ2lvbl9tb3ZlKHZtLCBNRU1fUkVHSU9OX1NMT1QsIE1FTV9SRUdJT05fR1BB
-IC0gNDA5Nik7Cj4gKwlXUklURV9PTkNFKCpodmEsIDIpOwo+ICsKPiArCXVzbGVlcCgxMDAwMDAp
-Owo+ICsKPiArCS8qCj4gKwkgKiBOb3RlLCB2YWx1ZSBpbiBtZW1vcnkgbmVlZHMgdG8gYmUgY2hh
-bmdlZCAqYmVmb3JlKiByZXN0b3JpbmcgdGhlCj4gKwkgKiBtZW1zbG90LCBlbHNlIHRoZSBndWVz
-dCBjb3VsZCByYWNlIHRoZSB1cGRhdGUgYW5kIHNlZSAiMiIuCj4gKwkgKi8KPiArCVdSSVRFX09O
-Q0UoKmh2YSwgMSk7Cj4gKwo+ICsJLyogUmVzdG9yZSB0aGUgb3JpZ2luYWwgYmFzZSwgdGhlIGd1
-ZXN0IHNob3VsZCBzZWUgIjEiLiAqLwo+ICsJdm1fbWVtX3JlZ2lvbl9tb3ZlKHZtLCBNRU1fUkVH
-SU9OX1NMT1QsIE1FTV9SRUdJT05fR1BBKTsKPiArCj4gKwlwdGhyZWFkX2pvaW4odmNwdV90aHJl
-YWQsIE5VTEwpOwo+ICsKPiArCWt2bV92bV9mcmVlKHZtKTsKPiArfQo+ICsKPiAraW50IG1haW4o
-aW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKPiArewo+ICsJaW50IGksIGxvb3BzOwo+ICsKPiArCS8q
-IFRlbGwgc3Rkb3V0IG5vdCB0byBidWZmZXIgaXRzIGNvbnRlbnQgKi8KPiArCXNldGJ1ZihzdGRv
-dXQsIE5VTEwpOwo+ICsKPiArCWlmIChhcmdjID4gMSkKPiArCQlsb29wcyA9IGF0b2koYXJndlsx
-XSk7Cj4gKwllbHNlCj4gKwkJbG9vcHMgPSAxMDsKPiArCj4gKwlmb3IgKGkgPSAwOyBpIDwgbG9v
-cHM7IGkrKykKPiArCQl0ZXN0X21vdmVfbWVtb3J5X3JlZ2lvbigpOwo+ICsKPiArCXJldHVybiAw
-Owo+ICt9Cj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+
+
+On 17.12.19 21:40, Sean Christopherson wrote:
+> Add a KVM selftest to test moving the base gfn of a userspace memory
+> region.  The test is primarily targeted at x86 to verify its memslot
+> metadata is correctly updated, but also provides basic functionality
+> coverage on other architectures.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   3 +
+>  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  30 ++++
+>  .../selftests/kvm/set_memory_region_test.c    | 142 ++++++++++++++++++
+>  5 files changed, 177 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/set_memory_region_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 30072c3f52fb..6f60ceb81440 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -17,3 +17,4 @@
+>  /clear_dirty_log_test
+>  /dirty_log_test
+>  /kvm_create_max_vcpus
+> +/set_memory_region_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 3138a916574a..01c79e02c5b7 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -29,15 +29,18 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
+>  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_x86_64 += set_memory_region_test
+> 
+>  TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_aarch64 += set_memory_region_test
+> 
+>  TEST_GEN_PROGS_s390x = s390x/memop
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> +TEST_GEN_PROGS_s390x += set_memory_region_test
+> 
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+>  LIBKVM += $(LIBKVM_$(UNAME_M))
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 29cccaf96baf..15d3b8690ffb 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -100,6 +100,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
+>  		void *arg);
+>  void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
+>  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
+> +void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+>  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
+>  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
+>  			  uint32_t data_memslot, uint32_t pgd_memslot);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 41cf45416060..464a75ce9843 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -756,6 +756,36 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
+>  		ret, errno, slot, flags);
+>  }
+> 
+> +/*
+> + * VM Memory Region Move
+> + *
+> + * Input Args:
+> + *   vm - Virtual Machine
+> + *   slot - Slot of the memory region to move
+> + *   flags - Starting guest physical address
+> + *
+> + * Output Args: None
+> + *
+> + * Return: None
+> + *
+> + * Change the gpa of a memory region.
+> + */
+> +void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
+> +{
+> +	struct userspace_mem_region *region;
+> +	int ret;
+> +
+> +	region = memslot2region(vm, slot);
+> +
+> +	region->region.guest_phys_addr = new_gpa;
+> +
+> +	ret = ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION, &region->region);
+> +
+> +	TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed\n"
+> +		    "ret: %i errno: %i slot: %u flags: 0x%x",
+> +		    ret, errno, slot, new_gpa);
+> +}
+> +
+>  /*
+>   * VCPU mmap Size
+>   *
+> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+> new file mode 100644
+> index 000000000000..c9603b95ccf7
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+> @@ -0,0 +1,142 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#define _GNU_SOURCE /* for program_invocation_short_name */
+> +#include <fcntl.h>
+> +#include <pthread.h>
+> +#include <sched.h>
+> +#include <signal.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include <linux/compiler.h>
+> +
+> +#include <test_util.h>
+> +#include <kvm_util.h>
+> +#include <processor.h>
+> +
+> +#define VCPU_ID 0
+> +
+> +/*
+> + * Somewhat arbitrary location and slot, intended to not overlap anything.  The
+> + * location and size are specifically 2mb sized/aligned so that the initial
+> + * region corresponds to exactly one large page (on x86 and arm64).
+> + */
+> +#define MEM_REGION_GPA		0xc0000000
+> +#define MEM_REGION_SIZE		0x200000
+> +#define MEM_REGION_SLOT		10
+> +
+> +static void guest_code(void)
+> +{
+> +	uint64_t val;
+> +
+> +	do {
+> +		val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
+> +	} while (!val);
+> +
+> +	if (val != 1)
+> +		ucall(UCALL_ABORT, 1, val);
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void *vcpu_worker(void *data)
+> +{
+> +	struct kvm_vm *vm = data;
+> +	struct kvm_run *run;
+> +	struct ucall uc;
+> +	uint64_t cmd;
+> +
+> +	/*
+> +	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
+> +	 * which will occur if the guest attempts to access a memslot while it
+> +	 * is being moved.
+> +	 */
+> +	run = vcpu_state(vm, VCPU_ID);
+> +	do {
+> +		vcpu_run(vm, VCPU_ID);
+> +	} while (run->exit_reason == KVM_EXIT_MMIO);
+> +
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
+> +		    "Unexpected exit reason = %d", run->exit_reason);
+
+
+This will also not work for s390. Maybe just make this test x86 specific for now?
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
