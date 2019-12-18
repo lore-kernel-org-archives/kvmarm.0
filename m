@@ -3,54 +3,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2D2C2D0CD
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 14:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCC0C2D0C3
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 14:49:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 77AFA2176D
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 14:39:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AFA2176D
+	by mail.kernel.org (Postfix) with ESMTP id 71B5B2176D
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 14:49:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B5B2176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 022F44A610;
-	Wed, 18 Dec 2019 09:39:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD524A5A0;
+	Wed, 18 Dec 2019 09:49:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2e03fQPQ5S3z; Wed, 18 Dec 2019 09:39:08 -0500 (EST)
+	with ESMTP id HsP1Sj+5ttBJ; Wed, 18 Dec 2019 09:48:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDA754A597;
-	Wed, 18 Dec 2019 09:39:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C56DD4A531;
+	Wed, 18 Dec 2019 09:48:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DB7D4A542
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 09:39:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E2914A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 09:48:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I-WxpjWKIb68 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Dec 2019 09:39:07 -0500 (EST)
+ with ESMTP id GZy9PQi+klQD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Dec 2019 09:48:57 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 347F44A541
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 09:39:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A3284A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 09:48:57 -0500 (EST)
 Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1ihaTg-0002jL-Mr; Wed, 18 Dec 2019 15:39:04 +0100
+ id 1ihadC-0002xn-Ku; Wed, 18 Dec 2019 15:48:54 +0100
 To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 13/36] irqchip/gic-v4.1: Don't use the VPE proxy if
- RVPEID is set
+Subject: Re: [PATCH v2 22/36] irqchip/gic-v4.1: Advertise support v4.1 to KVM
 X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-Date: Wed, 18 Dec 2019 14:39:04 +0000
+Date: Wed, 18 Dec 2019 14:48:54 +0000
 From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <8514ccbe-814a-5bdd-3791-bdd65510ce68@huawei.com>
+In-Reply-To: <14462a79-fc0b-b8e5-115a-dfb505351acb@huawei.com>
 References: <20191027144234.8395-1-maz@kernel.org>
- <20191027144234.8395-14-maz@kernel.org>
- <8514ccbe-814a-5bdd-3791-bdd65510ce68@huawei.com>
-Message-ID: <762f78e917ac501629729fcf7718178c@www.loen.fr>
+ <20191027144234.8395-23-maz@kernel.org>
+ <14462a79-fc0b-b8e5-115a-dfb505351acb@huawei.com>
+Message-ID: <c9f8f2590662cfe9e28e90cf8f79e708@www.loen.fr>
 X-Sender: maz@kernel.org
 User-Agent: Roundcube Webmail/0.7.2
 X-SA-Exim-Connect-IP: <locally generated>
@@ -82,77 +81,62 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019-11-01 11:05, Zenghui Yu wrote:
+On 2019-11-01 12:55, Zenghui Yu wrote:
 > Hi Marc,
 >
 > On 2019/10/27 22:42, Marc Zyngier wrote:
->> The infamous VPE proxy device isn't used with GICv4.1 because:
->> - we can invalidate any LPI from the DirectLPI MMIO interface
->> - the ITS and redistributors understand the life cycle of
->>    the doorbell, so we don't need to enable/disable it all
->>    the time
->> So let's escape early from the proxy related functions.
+>> Tell KVM that we support v4.1. Nothing uses this information so far.
 >> Signed-off-by: Marc Zyngier <maz@kernel.org>
->
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
->
 >> ---
->>   drivers/irqchip/irq-gic-v3-its.c | 23 ++++++++++++++++++++++-
->>   1 file changed, 22 insertions(+), 1 deletion(-)
+>>   drivers/irqchip/irq-gic-v3-its.c       | 9 ++++++++-
+>>   drivers/irqchip/irq-gic-v3.c           | 1 +
+>>   include/linux/irqchip/arm-gic-common.h | 2 ++
+>>   3 files changed, 11 insertions(+), 1 deletion(-)
 >> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
 >> b/drivers/irqchip/irq-gic-v3-its.c
->> index 220d490d516e..999e61a9b2c3 100644
+>> index df259e202482..6483f8051b3e 100644
 >> --- a/drivers/irqchip/irq-gic-v3-its.c
 >> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -3069,7 +3069,7 @@ static const struct irq_domain_ops 
->> its_domain_ops = {
->>   /*
->>    * This is insane.
->>    *
->> - * If a GICv4 doesn't implement Direct LPIs (which is extremely
->> + * If a GICv4.0 doesn't implement Direct LPIs (which is extremely
->>    * likely), the only way to perform an invalidate is to use a fake
->>    * device to issue an INV command, implying that the LPI has first
->>    * been mapped to some event on that device. Since this is not 
->> exactly
->> @@ -3077,9 +3077,18 @@ static const struct irq_domain_ops 
->> its_domain_ops = {
->>    * only issue an UNMAP if we're short on available slots.
->>    *
->>    * Broken by design(tm).
->> + *
->> + * GICv4.1 actually mandates that we're able to invalidate by 
->> writing to a
->> + * MMIO register. It doesn't implement the whole of DirectLPI, but 
->> that's
->> + * good enough. And most of the time, we don't even have to 
->> invalidate
->> + * anything, so that's actually pretty good!
+>> @@ -4580,6 +4580,7 @@ int __init its_init(struct fwnode_handle 
+>> *handle, struct rdists *rdists,
+>>   	struct device_node *of_node;
+>>   	struct its_node *its;
+>>   	bool has_v4 = false;
+>> +	bool has_v4_1 = false;
+>>   	int err;
+>>
+>>   	gic_rdists = rdists;
+>> @@ -4600,8 +4601,14 @@ int __init its_init(struct fwnode_handle 
+>> *handle, struct rdists *rdists,
+>>   	if (err)
+>>   		return err;
+>>   -	list_for_each_entry(its, &its_nodes, entry)
+>> +	list_for_each_entry(its, &its_nodes, entry) {
+>>   		has_v4 |= is_v4(its);
+>> +		has_v4_1 |= is_v4_1(its);
+>> +	}
+>> +
+>> +	/* Don't bother with inconsistent systems */
+>> +	if (WARN_ON(!has_v4_1 && rdists->has_rvpeid))
+>> +		rdists->has_rvpeid = false;
+>>
+>>   	if (has_v4 & rdists->has_vlpis) {
+>>   		if (its_init_vpe_domain() ||
+>> diff --git a/drivers/irqchip/irq-gic-v3.c 
+>> b/drivers/irqchip/irq-gic-v3.c
+>> index f0d33ac64a99..94dddfb21076 100644
+>> --- a/drivers/irqchip/irq-gic-v3.c
+>> +++ b/drivers/irqchip/irq-gic-v3.c
+>> @@ -1758,6 +1758,7 @@ static void __init 
+>> gic_of_setup_kvm_info(struct device_node *node)
+>>   		gic_v3_kvm_info.vcpu = r;
+>>
+>>   	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
+>> +	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
 >
-> I can't understand the meaning of this last sentence. May I ask for 
-> an
-> explanation? :)
+> Also set gic_v3_kvm_info.has_v4_1 in gic_acpi_setup_kvm_info().
 
-Yeah, reading this now, it feels pretty clumsy, and only remotely
-connected to the patch.
-
-What I'm trying to say here is that, although GICv4.1 doesn't have
-the full spectrum of v4.0 DirectLPI (it only allows a subset of it),
-this subset is more then enough for us. Here's the rational:
-
-When a vPE exits from the hypervisor, we know whether we need to
-request a doorbell or not (depending on whether we're blocking on
-WFI or not). On GICv4.0, this translates into enabling the doorbell
-interrupt, which generates an invalidation (costly). And whenever
-we've taken a doorbell, or are scheduled again, we need to turn
-the doorbell off (invalidation again).
-
-With v4.1, we can just say *at exit time* whether we want doorbells
-to be subsequently generated (see its_vpe_4_1_deschedule() and the
-req_db parameter in the info structure). This is part of making
-the vPE non-resident, so we have 0 overhead at this stage.
-
-I'll try and update the comment here.
+Indeed. Now fixed.
 
 Thanks,
 
