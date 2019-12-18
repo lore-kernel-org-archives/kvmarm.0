@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E25C2D0BF
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43480C2D0CD
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:56:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A545C24676
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A545C24676
+	by mail.kernel.org (Postfix) with ESMTP id EED7E2146E
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:56:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED7E2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0314AE93;
-	Wed, 18 Dec 2019 16:56:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A86294A418;
+	Wed, 18 Dec 2019 16:56:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5+jUfRcOnt3V; Wed, 18 Dec 2019 16:56:14 -0500 (EST)
+	with ESMTP id vvEfy7kV5xgY; Wed, 18 Dec 2019 16:56:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFCE84AF1B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDA274AED6;
 	Wed, 18 Dec 2019 16:56:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0974AEC8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:56:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 874BE4AEB9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:56:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c0cLrQ-ihRfF for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id LlaXH4MwjA6U for <kvmarm@lists.cs.columbia.edu>;
  Wed, 18 Dec 2019 16:56:01 -0500 (EST)
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73DF54AED8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2C4A4AF0B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:48 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Dec 2019 13:55:47 -0800
+ 18 Dec 2019 13:55:48 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108144"
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108155"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:46 -0800
+ by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:48 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 32/45] KVM: Move initialization of preempt notifier to
- kvm_vcpu_init()
-Date: Wed, 18 Dec 2019 13:55:17 -0800
-Message-Id: <20191218215530.2280-33-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 35/45] KVM: s390: Manually invoke vcpu setup during
+ kvm_arch_vcpu_create()
+Date: Wed, 18 Dec 2019 13:55:20 -0800
+Message-Id: <20191218215530.2280-36-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
@@ -81,61 +81,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Initialize the preempt notifier immediately in kvm_vcpu_init() to pave
-the way for removing kvm_arch_vcpu_setup(), i.e. to allow arch specific
-code to call vcpu_load() during kvm_arch_vcpu_create().
+Rename kvm_arch_vcpu_setup() to kvm_s390_vcpu_setup() and manually call
+the new function during kvm_arch_vcpu_create().  Define an empty
+kvm_arch_vcpu_setup() as it's still required for compilation.  This
+is effectively a nop as kvm_arch_vcpu_create() and kvm_arch_vcpu_setup()
+are called back-to-back by common KVM code.  Obsoleting
+kvm_arch_vcpu_setup() paves the way for its removal.
 
-Back when preemption support was added, the location of the call to init
-the preempt notifier was perfectly sane.  The overall vCPU creation flow
-featured a single arch specific hook and the preempt notifer was used
-immediately after its initialization (by vcpu_load()).  E.g.:
+Note, gmap_remove() is now called if setup fails, as s390 was previously
+freeing it via kvm_arch_vcpu_destroy(), which is called by common KVM
+code if kvm_arch_vcpu_setup() fails.
 
-        vcpu = kvm_arch_ops->vcpu_create(kvm, n);
-        if (IS_ERR(vcpu))
-                return PTR_ERR(vcpu);
+No functional change intended.
 
-        preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
-
-        vcpu_load(vcpu);
-        r = kvm_mmu_setup(vcpu);
-        vcpu_put(vcpu);
-        if (r < 0)
-                goto free_vcpu;
-
-Today, the call to preempt_notifier_init() is sandwiched between two
-arch specific calls, kvm_arch_vcpu_create() and kvm_arch_vcpu_setup(),
-which needlessly forces x86 (and possibly others?) to split its vCPU
-creation flow.  Init the preempt notifier prior to any arch specific
-call so that each arch can independently decide how best to organize
-its creation flow.
-
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- virt/kvm/kvm_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index fd8168b8c0e4..876cf3dd2c97 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -348,6 +348,7 @@ static int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	kvm_vcpu_set_dy_eligible(vcpu, false);
- 	vcpu->preempted = false;
- 	vcpu->ready = false;
-+	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 2ed76584ebd9..5cd92c9fc050 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2932,6 +2932,11 @@ static void kvm_s390_vcpu_setup_model(struct kvm_vcpu *vcpu)
+ }
  
- 	r = kvm_arch_vcpu_init(vcpu);
- 	if (r < 0)
-@@ -2752,8 +2753,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	if (r)
- 		goto vcpu_uninit;
+ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++
++static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+ {
+ 	int rc = 0;
  
--	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
--
- 	r = kvm_arch_vcpu_setup(vcpu);
- 	if (r)
- 		goto vcpu_destroy;
+@@ -3070,8 +3075,14 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 		 vcpu->arch.sie_block);
+ 	trace_kvm_s390_create_vcpu(id, vcpu, vcpu->arch.sie_block);
+ 
++	rc = kvm_s390_vcpu_setup(vcpu);
++	if (rc)
++		goto out_ucontrol_uninit;
+ 	return 0;
+ 
++out_ucontrol_uninit:
++	if (kvm_is_ucontrol(vcpu->kvm))
++		gmap_remove(vcpu->arch.gmap);
+ out_free_sie_block:
+ 	free_page((unsigned long)(vcpu->arch.sie_block));
+ 	return rc;
 -- 
 2.24.1
 
