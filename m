@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AFCC2D0BF
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E06CC2D0CD
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:56:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3EFB92469E
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFB92469E
+	by mail.kernel.org (Postfix) with ESMTP id C1D4B2469A
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Dec 2019 21:55:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1D4B2469A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC9594AF34;
-	Wed, 18 Dec 2019 16:55:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B1EB4ACFA;
+	Wed, 18 Dec 2019 16:55:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xcXFAkDSpEei; Wed, 18 Dec 2019 16:55:56 -0500 (EST)
+	with ESMTP id 2YIrr-JgQtTd; Wed, 18 Dec 2019 16:55:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7DD94AE94;
-	Wed, 18 Dec 2019 16:55:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 203E24AEFE;
+	Wed, 18 Dec 2019 16:55:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 276FF4AC65
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 804214A959
  for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hBL+J1I8Xtbj for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id cqEGu-B6Ums5 for <kvmarm@lists.cs.columbia.edu>;
  Wed, 18 Dec 2019 16:55:43 -0500 (EST)
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 052224A7FE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 889164ACB8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Dec 2019 16:55:41 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Dec 2019 13:55:40 -0800
+ 18 Dec 2019 13:55:41 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108088"
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; d="scan'208";a="222108093"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:40 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
@@ -49,9 +49,9 @@ To: Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
  Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 18/45] KVM: PPC: Drop kvm_arch_vcpu_free()
-Date: Wed, 18 Dec 2019 13:55:03 -0800
-Message-Id: <20191218215530.2280-19-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 19/45] KVM: arm: Drop kvm_arch_vcpu_free()
+Date: Wed, 18 Dec 2019 13:55:04 -0800
+Message-Id: <20191218215530.2280-20-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
@@ -85,34 +85,35 @@ from commmon KVM code.  Note, kvm_arch_vcpu_destroy() *is* called from
 common code, i.e. choosing which function to whack is not completely
 arbitrary.
 
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/kvm/powerpc.c | 9 ++-------
+ virt/kvm/arm/arm.c | 9 ++-------
  1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 173f57e0a1b5..a2ba708f5cec 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -475,7 +475,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- #endif
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 12e0280291ce..25b5e4c9b8db 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -194,7 +194,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
  
- 	kvm_for_each_vcpu(i, vcpu, kvm)
--		kvm_arch_vcpu_free(vcpu);
-+		kvm_arch_vcpu_destroy(vcpu);
- 
- 	mutex_lock(&kvm->lock);
- 	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
-@@ -752,7 +752,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (kvm->vcpus[i]) {
+-			kvm_arch_vcpu_free(kvm->vcpus[i]);
++			kvm_arch_vcpu_destroy(kvm->vcpus[i]);
+ 			kvm->vcpus[i] = NULL;
+ 		}
+ 	}
+@@ -321,7 +321,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
  {
  }
  
 -void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
 +void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  {
- 	/* Make sure we're not using the vcpu anymore */
- 	hrtimer_cancel(&vcpu->arch.dec_timer);
-@@ -781,11 +781,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 		static_branch_dec(&userspace_irqchip_in_use);
+@@ -333,11 +333,6 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
  	kmem_cache_free(kvm_vcpu_cache, vcpu);
  }
  
@@ -123,7 +124,7 @@ index 173f57e0a1b5..a2ba708f5cec 100644
 -
  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
  {
- 	return kvmppc_core_pending_dec(vcpu);
+ 	return kvm_timer_is_pending(vcpu);
 -- 
 2.24.1
 
