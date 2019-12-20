@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DFBC43603
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC73C43603
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:20:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B7AAD24679
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:18:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 709DF24679
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:20:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C69pT8lW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7AAD24679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crSTtJZ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 709DF24679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D79E4A576;
-	Fri, 20 Dec 2019 07:18:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB1A4A95B;
+	Fri, 20 Dec 2019 07:20:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eGzTKpAJfjvx; Fri, 20 Dec 2019 07:18:55 -0500 (EST)
+	with ESMTP id cuw61sZ+71si; Fri, 20 Dec 2019 07:20:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3532F4A500;
-	Fri, 20 Dec 2019 07:18:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91F334A576;
+	Fri, 20 Dec 2019 07:20:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBBE64A500
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:18:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14AAB4A524
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:20:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YlZnUPnBEDCC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Dec 2019 07:18:52 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC754A49C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:18:52 -0500 (EST)
+ with ESMTP id 45J-xEZZp4Z7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Dec 2019 07:20:54 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF014A500
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:20:54 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576844332;
+ s=mimecast20190719; t=1576844453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+uqLwzuT4/p/TrN/iMvSErZDSEuFtnJzWf7maJMj2iM=;
- b=C69pT8lWa53wGuSRZCB/GP4Q4UVFnSvk/8pZhiXGdv1gTMKFWhNoEhkj5BYD4zCiwPFU/T
- eoyrqCqVtmrY0vSEn8erqQMFnSdvqriKJVmk5FjvVNVlPL7aG0gbPdxLkmhFwH7eHu5n3q
- tKBMRM7K5x82MJ+Q0zD4eDKttd15nH0=
+ bh=nIVo2crlVc/txi8VIButrgzZivg7HgIELD3HSqFbFMs=;
+ b=crSTtJZ3qSuWo3CmlmEX84NAJP3zbQ8QEJ9khr1zVtc2wyGQ5u9Pl9qL9PQrw/1QM/rfJy
+ AlXqEiqShI1pvyO2t0DhJOVzAr/VFk4kR4O6CeBu8R+kQd2P9ChcJrfwr5oN9dXEGVzlpZ
+ KP1OZeHcIms2jjibVUtc5ELTbJ5auKo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-pvLJVYDBOgu0tNOhkYFqLQ-1; Fri, 20 Dec 2019 07:18:48 -0500
-X-MC-Unique: pvLJVYDBOgu0tNOhkYFqLQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-58-KjExN_K5PJeZFLWaH5Dnig-1; Fri, 20 Dec 2019 07:20:46 -0500
+X-MC-Unique: KjExN_K5PJeZFLWaH5Dnig-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 358EC185432C;
- Fri, 20 Dec 2019 12:18:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45DE7801E66;
+ Fri, 20 Dec 2019 12:20:45 +0000 (UTC)
 Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2086A5C3F8;
- Fri, 20 Dec 2019 12:18:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 487485DA75;
+ Fri, 20 Dec 2019 12:20:41 +0000 (UTC)
 Subject: Re: [PATCH] KVM: arm/arm64: vgic: Handle GICR_PENDBASER.PTZ filed as
  RAZ
 To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org
 References: <20191220111833.1422-1-yuzenghui@huawei.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8f8b063c-45cf-166d-bd94-ff96831314c0@redhat.com>
-Date: Fri, 20 Dec 2019 13:18:40 +0100
+Message-ID: <c469bc11-9cd0-531a-9bd3-46d070ec0e72@redhat.com>
+Date: Fri, 20 Dec 2019 13:20:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
 In-Reply-To: <20191220111833.1422-1-yuzenghui@huawei.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -95,7 +95,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
+Hi,
 
 On 12/20/19 12:18 PM, Zenghui Yu wrote:
 > Although guest will hardly read and use the PTZ (Pending Table Zero)
@@ -103,6 +103,10 @@ On 12/20/19 12:18 PM, Zenghui Yu wrote:
 > As per IHI 0069E 9.11.30, PTZ field is WO, and reads as 0.
 > 
 > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+nit
+s/filed/field in the commit title
+
+Eric
 > ---
 > 
 > Noticed when checking all fields of GICR_PENDBASER register.
@@ -134,11 +138,6 @@ On 12/20/19 12:18 PM, Zenghui Yu wrote:
 >  
 >  static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
 > 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
 
 _______________________________________________
 kvmarm mailing list
