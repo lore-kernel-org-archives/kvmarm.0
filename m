@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C38C2D0D2
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F2BC2D0C0
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A89782468B
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A89782468B
+	by mail.kernel.org (Postfix) with ESMTP id 7B5F524680
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:31:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5F524680
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 639174A535;
-	Fri, 20 Dec 2019 09:31:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B4A4AECC;
+	Fri, 20 Dec 2019 09:31:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zLQd21Sq+LB9; Fri, 20 Dec 2019 09:31:08 -0500 (EST)
+	with ESMTP id pThe6MfPN2GR; Fri, 20 Dec 2019 09:31:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BA594AEC4;
-	Fri, 20 Dec 2019 09:31:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26FDF4A578;
+	Fri, 20 Dec 2019 09:31:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DA774AC84
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:31:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D484A522
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:31:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G1hNxQZcvSvh for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Dec 2019 09:31:05 -0500 (EST)
+ with ESMTP id eVqYB7Ijr-6u for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Dec 2019 09:31:08 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F2B94A535
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:31:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96BF24AEAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:31:07 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4079811D4;
- Fri, 20 Dec 2019 06:31:05 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FC1811B3;
+ Fri, 20 Dec 2019 06:31:07 -0800 (PST)
 Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5FB2F3F718;
- Fri, 20 Dec 2019 06:31:03 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 87C853F86C;
+ Fri, 20 Dec 2019 06:31:05 -0800 (PST)
 From: Andrew Murray <andrew.murray@arm.com>
 To: Marc Zyngier <marc.zyngier@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will.deacon@arm.com>
-Subject: [PATCH v2 15/18] perf: arm_spe: Handle guest/host exclusion flags
-Date: Fri, 20 Dec 2019 14:30:22 +0000
-Message-Id: <20191220143025.33853-16-andrew.murray@arm.com>
+Subject: [PATCH v2 16/18] KVM: arm64: enable SPE support
+Date: Fri, 20 Dec 2019 14:30:23 +0000
+Message-Id: <20191220143025.33853-17-andrew.murray@arm.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191220143025.33853-1-andrew.murray@arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
@@ -71,33 +71,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A side effect of supporting the SPE in guests is that we prevent the
-host from collecting data whilst inside a guest thus creating a black-out
-window. This occurs because instead of emulating the SPE, we share it
-with our guests.
+From: Sudeep Holla <sudeep.holla@arm.com>
 
-Let's accurately describe our capabilities by using the perf exclude
-flags to prevent !exclude_guest and exclude_host flags from being used.
+We have all the bits and pieces to enable SPE for guest in place, so
+lets enable it.
 
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- drivers/perf/arm_spe_pmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+ virt/kvm/arm/arm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 2d24af4cfcab..3703dbf459de 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -679,6 +679,9 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 	if (attr->exclude_idle)
- 		return -EOPNOTSUPP;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index a66085c8e785..fb3ad0835255 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -611,6 +611,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 		return ret;
  
-+	if (!attr->exclude_guest || attr->exclude_host)
-+		return -EOPNOTSUPP;
+ 	ret = kvm_arm_pmu_v3_enable(vcpu);
++	if (ret)
++		return ret;
 +
- 	/*
- 	 * Feedback-directed frequency throttling doesn't work when we
- 	 * have a buffer of samples. We'd need to manually count the
++	ret = kvm_arm_spe_v1_enable(vcpu);
+ 
+ 	return ret;
+ }
 -- 
 2.21.0
 
