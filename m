@@ -4,50 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A43C47409
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 516D0C2D0D2
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:30:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 252BC24689
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:30:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 252BC24689
+	by mail.kernel.org (Postfix) with ESMTP id 10CAA2468B
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 14:30:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10CAA2468B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2B964A7FF;
-	Fri, 20 Dec 2019 09:30:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA374AC7C;
+	Fri, 20 Dec 2019 09:30:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EkEjujGYpGx4; Fri, 20 Dec 2019 09:30:42 -0500 (EST)
+	with ESMTP id egvS-AMK-foj; Fri, 20 Dec 2019 09:30:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657DB4AC84;
-	Fri, 20 Dec 2019 09:30:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4094A7E4;
+	Fri, 20 Dec 2019 09:30:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C2C64A968
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:30:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBB5A4ACFA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:30:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qzf6pgvjzl7f for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Dec 2019 09:30:40 -0500 (EST)
+ with ESMTP id S61BDUxospiC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Dec 2019 09:30:43 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34FDE4AC65
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:30:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76CCA4A7E4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 09:30:43 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF45611D4;
- Fri, 20 Dec 2019 06:30:38 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C03411B3;
+ Fri, 20 Dec 2019 06:30:43 -0800 (PST)
 Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1120D3F718;
- Fri, 20 Dec 2019 06:30:36 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6302E3F718;
+ Fri, 20 Dec 2019 06:30:41 -0800 (PST)
 From: Andrew Murray <andrew.murray@arm.com>
 To: Marc Zyngier <marc.zyngier@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will.deacon@arm.com>
-Subject: [PATCH v2 03/18] arm64: KVM: define SPE data structure for each vcpu
-Date: Fri, 20 Dec 2019 14:30:10 +0000
-Message-Id: <20191220143025.33853-4-andrew.murray@arm.com>
+Subject: [PATCH v2 05/18] arm64: KVM/VHE: enable the use PMSCR_EL12 on VHE
+ systems
+Date: Fri, 20 Dec 2019 14:30:12 +0000
+Message-Id: <20191220143025.33853-6-andrew.murray@arm.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191220143025.33853-1-andrew.murray@arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
@@ -73,92 +74,57 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Sudeep Holla <sudeep.holla@arm.com>
 
-In order to support virtual SPE for guest, so define some basic structs.
-This features depends on host having hardware with SPE support.
+Currently, we are just using PMSCR_EL1 in the host for non VHE systems.
+We already have the {read,write}_sysreg_el*() accessors for accessing
+particular ELs' sysregs in the presence of VHE.
 
-Since we can support this only on ARM64, add a separate config symbol
-for the same.
+Lets just define PMSCR_EL12 and start making use of it here which will
+access the right register on both VHE and non VHE systems. This change
+is required to add SPE guest support on VHE systems.
 
 Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-[ Add irq_level, rename irq to irq_num for kvm_spe ]
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/Kconfig            |  7 +++++++
- include/kvm/arm_spe.h             | 19 +++++++++++++++++++
- 3 files changed, 28 insertions(+)
- create mode 100644 include/kvm/arm_spe.h
+ arch/arm64/include/asm/sysreg.h | 1 +
+ arch/arm64/kvm/hyp/debug-sr.c   | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c61260cf63c5..f5dcff912645 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -35,6 +35,7 @@
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
- #include <kvm/arm_pmu.h>
-+#include <kvm/arm_spe.h>
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6e919fafb43d..6c0b0ad97688 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -468,6 +468,7 @@
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+ #define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
++#define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
+ #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+ #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+ #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 0fc9872a1467..98be2f11c16c 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -108,8 +108,8 @@ static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
+ 		return;
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+ 	/* Yes; save the control register and disable data generation */
+-	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
+-	write_sysreg_s(0, SYS_PMSCR_EL1);
++	*pmscr_el1 = read_sysreg_el1(SYS_PMSCR);
++	write_sysreg_el1(0, SYS_PMSCR);
+ 	isb();
  
-@@ -302,6 +303,7 @@ struct kvm_vcpu_arch {
- 	struct vgic_cpu vgic_cpu;
- 	struct arch_timer_cpu timer_cpu;
- 	struct kvm_pmu pmu;
-+	struct kvm_spe spe;
+ 	/* Now drain all buffered data to memory */
+@@ -126,7 +126,7 @@ static void __hyp_text __debug_restore_spe_nvhe(u64 pmscr_el1)
+ 	isb();
  
- 	/*
- 	 * Anything that is not used directly from assembly code goes
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index a475c68cbfec..af5be2c57dcb 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -35,6 +35,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select KVM_ARM_PMU if HW_PERF_EVENTS
-+	select KVM_ARM_SPE if (HW_PERF_EVENTS && ARM_SPE_PMU)
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-@@ -61,6 +62,12 @@ config KVM_ARM_PMU
- 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
- 	  virtual machines.
+ 	/* Re-enable data generation */
+-	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
++	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
+ }
  
-+config KVM_ARM_SPE
-+	bool
-+	---help---
-+	  Adds support for a virtual Statistical Profiling Extension(SPE) in
-+	  virtual machines.
-+
- config KVM_INDIRECT_VECTORS
-        def_bool KVM && (HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS)
- 
-diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
-new file mode 100644
-index 000000000000..48d118fdb174
---- /dev/null
-+++ b/include/kvm/arm_spe.h
-@@ -0,0 +1,19 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2019 ARM Ltd.
-+ */
-+
-+#ifndef __ASM_ARM_KVM_SPE_H
-+#define __ASM_ARM_KVM_SPE_H
-+
-+#include <uapi/linux/kvm.h>
-+#include <linux/kvm_host.h>
-+
-+struct kvm_spe {
-+	int irq_num;
-+	bool ready; /* indicates that SPE KVM instance is ready for use */
-+	bool created; /* SPE KVM instance is created, may not be ready yet */
-+	bool irq_level;
-+};
-+
-+#endif /* __ASM_ARM_KVM_SPE_H */
+ static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
 -- 
 2.21.0
 
