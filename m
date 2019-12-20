@@ -2,72 +2,83 @@ Return-Path: <SRS0=zNRV=2K=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59AD8C2D0D2
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 11:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DFBC43603
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:18:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CC78D2467F
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 11:43:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC78D2467F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B7AAD24679
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Dec 2019 12:18:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C69pT8lW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7AAD24679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35B944A51E;
-	Fri, 20 Dec 2019 06:43:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D79E4A576;
+	Fri, 20 Dec 2019 07:18:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jpyvuUQa3Gbx; Fri, 20 Dec 2019 06:43:56 -0500 (EST)
+	with ESMTP id eGzTKpAJfjvx; Fri, 20 Dec 2019 07:18:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14464A7F1;
-	Fri, 20 Dec 2019 06:43:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3532F4A500;
+	Fri, 20 Dec 2019 07:18:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D0D4A51E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 06:43:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBBE64A500
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:18:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DT9V2NL2lP8w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Dec 2019 06:43:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 723BB4A50F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 06:43:54 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0555B30E;
- Fri, 20 Dec 2019 03:43:54 -0800 (PST)
-Received: from [10.1.194.52] (e112269-lin.cambridge.arm.com [10.1.194.52])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 228E83F719;
- Fri, 20 Dec 2019 03:43:52 -0800 (PST)
-Subject: Re: [PATCH 1/5] KVM: arm64: Document PV-lock interface
-To: yezengruan <yezengruan@huawei.com>
-References: <20191217135549.3240-1-yezengruan@huawei.com>
- <20191217135549.3240-2-yezengruan@huawei.com>
- <20191217142138.GA38811@arm.com>
- <49120a3c-405d-d2e3-2a88-ba590feccbcc@huawei.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <e326cd81-7e22-72a8-7b80-8258e8f6a5c6@arm.com>
-Date: Fri, 20 Dec 2019 11:43:50 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ with ESMTP id YlZnUPnBEDCC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Dec 2019 07:18:52 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC754A49C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Dec 2019 07:18:52 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576844332;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+uqLwzuT4/p/TrN/iMvSErZDSEuFtnJzWf7maJMj2iM=;
+ b=C69pT8lWa53wGuSRZCB/GP4Q4UVFnSvk/8pZhiXGdv1gTMKFWhNoEhkj5BYD4zCiwPFU/T
+ eoyrqCqVtmrY0vSEn8erqQMFnSdvqriKJVmk5FjvVNVlPL7aG0gbPdxLkmhFwH7eHu5n3q
+ tKBMRM7K5x82MJ+Q0zD4eDKttd15nH0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-pvLJVYDBOgu0tNOhkYFqLQ-1; Fri, 20 Dec 2019 07:18:48 -0500
+X-MC-Unique: pvLJVYDBOgu0tNOhkYFqLQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 358EC185432C;
+ Fri, 20 Dec 2019 12:18:47 +0000 (UTC)
+Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2086A5C3F8;
+ Fri, 20 Dec 2019 12:18:41 +0000 (UTC)
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: Handle GICR_PENDBASER.PTZ filed as
+ RAZ
+To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org
+References: <20191220111833.1422-1-yuzenghui@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8f8b063c-45cf-166d-bd94-ff96831314c0@redhat.com>
+Date: Fri, 20 Dec 2019 13:18:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <49120a3c-405d-d2e3-2a88-ba590feccbcc@huawei.com>
+In-Reply-To: <20191220111833.1422-1-yuzenghui@huawei.com>
 Content-Language: en-US
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Catalin Marinas <Catalin.Marinas@arm.com>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,128 +95,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 19/12/2019 11:45, yezengruan wrote:
-> Hi Steve,
-> 
-> On 2019/12/17 22:21, Steven Price wrote:
->> On Tue, Dec 17, 2019 at 01:55:45PM +0000, yezengruan@huawei.com wrote:
->>> From: Zengruan Ye <yezengruan@huawei.com>
->>>
->>> Introduce a paravirtualization interface for KVM/arm64 to obtain the vcpu
->>> is currently running or not.
->>>
->>> A hypercall interface is provided for the guest to interrogate the
->>> hypervisor's support for this interface and the location of the shared
->>> memory structures.
->>>
->>> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
->>> ---
->>>  Documentation/virt/kvm/arm/pvlock.rst | 31 +++++++++++++++++++++++++++
->>>  1 file changed, 31 insertions(+)
->>>  create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
->>>
->>> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
->>> new file mode 100644
->>> index 000000000000..eec0c36edf17
->>> --- /dev/null
->>> +++ b/Documentation/virt/kvm/arm/pvlock.rst
->>> @@ -0,0 +1,31 @@
->>> +.. SPDX-License-Identifier: GPL-2.0
->>> +
->>> +Paravirtualized lock support for arm64
->>> +======================================
->>> +
->>> +KVM/arm64 provids some hypervisor service calls to support a paravirtualized
->>> +guest obtaining the vcpu is currently running or not.
->>> +
->>> +Two new SMCCC compatible hypercalls are defined:
->>> +
->>> +* PV_LOCK_FEATURES:   0xC5000040
->>> +* PV_LOCK_PREEMPTED:  0xC5000041
->>
->> These values are in the "Standard Hypervisor Service Calls" section of
->> SMCCC - so is there a document that describes this features such that
->> other OSes or hypervisors can implement it? I'm also not entirely sure
->> of the process of ensuring that the IDs picked are non-conflicting.
->>
->> Otherwise if this is a KVM specific interface this should probably
->> belong within the "Vendor Specific Hypervisor Service Calls" section
->> along with some probing that the hypervisor is actually KVM. Although I
->> don't see anything KVM specific.
-> 
-> Thanks for pointing it out to me! Actually, I also don't see any documents
-> or KVM specific that describes this features. The values in the "Vendor
-> Specific Hypervisor Service Calls" section may be more appropriate, such as
-> the following
-> 
-> * PV_LOCK_FEATURES:   0xC6000020
-> * PV_LOCK_PREEMPTED:  0xC6000021
-> 
-> Please let me know if you have any suggestions.
+Hi Zenghui,
 
-I don't have strong feelings on whether this should be KVM-specific or
-generic. I'm not familiar with whether there are competing solutions to
-this problem - it's obviously ideal if all hypervisors can make use of
-the same interface if possible, but maybe that ship has sailed already?
+On 12/20/19 12:18 PM, Zenghui Yu wrote:
+> Although guest will hardly read and use the PTZ (Pending Table Zero)
+> bit in GICR_PENDBASER, let us emulate the architecture strictly.
+> As per IHI 0069E 9.11.30, PTZ field is WO, and reads as 0.
+> 
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+> 
+> Noticed when checking all fields of GICR_PENDBASER register.
+> But _not_ sure whether it's worth a fix, as Linux never sets
+> the PTZ bit before enabling LPI (set GICR_CTLR_ENABLE_LPIS).
+> 
+> And I wonder under which scenarios can this bit be written as 1.
+> It seems difficult for software to determine whether the pending
+> table contains all zeros when writing this bit.
+> 
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 7dfd15dbb308..ebc218840fc2 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -414,8 +414,11 @@ static unsigned long vgic_mmio_read_pendbase(struct kvm_vcpu *vcpu,
+>  					     gpa_t addr, unsigned int len)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	u64 value = vgic_cpu->pendbaser;
+>  
+> -	return extract_bytes(vgic_cpu->pendbaser, addr & 7, len);
+> +	value &= ~GICR_PENDBASER_PTZ;
+> +
+> +	return extract_bytes(value, addr & 7, len);
+>  }
+>  
+>  static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+> 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-However if this going to be KVM-specific then you'll need to add the
-probing logic for checking whether the hypervisor is KVM or not. Will
-has a couple of patches on a branch which do this [1] and [2]. Then you
-can use kvm_arm_hyp_services_available() as the first step to probe
-whether the hypervisor is KVM.
+Thanks
 
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
-
-[2]
-https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
-
-Steve
-
->>
->>> +
->>> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
->>> +ARCH_FEATURES mechanism before calling it.
->>> +
->>> +PV_LOCK_FEATURES
->>> +    ============= ========    ==========
->>> +    Function ID:  (uint32)    0xC5000040
->>> +    PV_call_id:   (uint32)    The function to query for support.
->>> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->>> +                              PV-lock feature is supported by the hypervisor.
->>> +    ============= ========    ==========
->>> +
->>> +PV_LOCK_PREEMPTED
->>> +    ============= ========    ==========
->>> +    Function ID:  (uint32)    0xC5000041
->>> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the IPA of
->>> +                              this vcpu's pv data structure is configured by
->>> +                              the hypervisor.
->>> +    ============= ========    ==========
->>
->> >From the code it looks like there's another argument for this SMC - the
->> physical address (or IPA) of a struct pvlock_vcpu_state. This structure
->> also needs to be described as it is part of the ABI.
-> 
-> Will update.
-> 
->>
->> Steve
->>
->> .
->>
-> 
-> Thanks,
-> 
-> Zengruan
-> 
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+Eric
 
 _______________________________________________
 kvmarm mailing list
