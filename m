@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A19FC2D0C0
-	for <kvmarm@archiver.kernel.org>; Sat, 21 Dec 2019 13:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CF6C2D0D3
+	for <kvmarm@archiver.kernel.org>; Sat, 21 Dec 2019 14:13:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 378392072B
-	for <kvmarm@archiver.kernel.org>; Sat, 21 Dec 2019 13:58:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 378392072B
+	by mail.kernel.org (Postfix) with ESMTP id 02022206D3
+	for <kvmarm@archiver.kernel.org>; Sat, 21 Dec 2019 14:13:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02022206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A35C24AEDD;
-	Sat, 21 Dec 2019 08:58:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 536C24AED7;
+	Sat, 21 Dec 2019 09:13:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tjgwcN6-+jyM; Sat, 21 Dec 2019 08:58:03 -0500 (EST)
+	with ESMTP id R9hkkO7sxCJT; Sat, 21 Dec 2019 09:13:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E8D4AED8;
-	Sat, 21 Dec 2019 08:58:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 138F14AEC1;
+	Sat, 21 Dec 2019 09:13:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8704AED6
- for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Dec 2019 08:58:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B83934AEC1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Dec 2019 09:13:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8Sk-1qiyLNxT for <kvmarm@lists.cs.columbia.edu>;
- Sat, 21 Dec 2019 08:58:01 -0500 (EST)
+ with ESMTP id jPPx9L+jn8BG for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 21 Dec 2019 09:13:29 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E89E84AED5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Dec 2019 08:58:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CBCA4AC88
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 21 Dec 2019 09:13:29 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why)
  by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
  (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1iifGW-00047r-QW; Sat, 21 Dec 2019 14:57:57 +0100
-Date: Sat, 21 Dec 2019 13:57:55 +0000
+ id 1iifVX-0004U0-4h; Sat, 21 Dec 2019 15:13:27 +0100
+Date: Sat, 21 Dec 2019 14:13:25 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 08/18] arm64: KVM: add support to save/restore SPE
- profiling buffer controls
-Message-ID: <20191221135755.70a6e8df@why>
-In-Reply-To: <20191220143025.33853-9-andrew.murray@arm.com>
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
+ full SPE profiling buffer controls
+Message-ID: <20191221141325.5a177343@why>
+In-Reply-To: <20191220143025.33853-10-andrew.murray@arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-9-andrew.murray@arm.com>
+ <20191220143025.33853-10-andrew.murray@arm.com>
 Organization: Approximate
 X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, catalin.marinas@arm.com,
- will@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, Catalin.Marinas@arm.com,
+ Mark.Rutland@arm.com, will@kernel.org, Sudeep.Holla@arm.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Catalin Marinas <Catalin.Marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Sudeep Holla <Sudeep.Holla@arm.com>,
+ will@kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,149 +81,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 20 Dec 2019 14:30:15 +0000
+On Fri, 20 Dec 2019 14:30:16 +0000
 Andrew Murray <andrew.murray@arm.com> wrote:
+
+[somehow managed not to do a reply all, re-sending]
 
 > From: Sudeep Holla <sudeep.holla@arm.com>
 > 
-> Currently since we don't support profiling using SPE in the guests,
-> we just save the PMSCR_EL1, flush the profiling buffers and disable
-> sampling. However in order to support simultaneous sampling both in
-
-Is the sampling actually simultaneous? I don't believe so (the whole
-series would be much simpler if it was).
-
-> the host and guests, we need to save and reatore the complete SPE
-
-s/reatore/restore/
-
-> profiling buffer controls' context.
+> Now that we can save/restore the full SPE controls, we can enable it
+> if SPE is setup and ready to use in KVM. It's supported in KVM only if
+> all the CPUs in the system supports SPE.
 > 
-> Let's add the support for the same and keep it disabled for now.
-> We can enable it conditionally only if guests are allowed to use
-> SPE.
+> However to support heterogenous systems, we need to move the check if
+> host supports SPE and do a partial save/restore.
+
+No. Let's just not go down that path. For now, KVM on heterogeneous
+systems do not get SPE. If SPE has been enabled on a guest and a CPU
+comes up without SPE, this CPU should fail to boot (same as exposing a
+feature to userspace).
+
 > 
 > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> [ Clear PMBSR bit when saving state to prevent spurious interrupts ]
 > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 > ---
->  arch/arm64/kvm/hyp/debug-sr.c | 51 +++++++++++++++++++++++++++++------
->  1 file changed, 43 insertions(+), 8 deletions(-)
+>  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
+>  include/kvm/arm_spe.h         |  6 ++++++
+>  2 files changed, 22 insertions(+), 17 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> index 8a70a493345e..12429b212a3a 100644
+> index 12429b212a3a..d8d857067e6d 100644
 > --- a/arch/arm64/kvm/hyp/debug-sr.c
 > +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> @@ -85,7 +85,8 @@
->  	default:	write_debug(ptr[0], reg, 0);			\
+> @@ -86,18 +86,13 @@
 >  	}
 >  
-> -static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text
-> +__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-
-nit: don't split lines like this if you can avoid it. You can put the
-full_ctxt parameter on a separate line instead.
-
+>  static void __hyp_text
+> -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
 >  {
 >  	u64 reg;
 >  
-> @@ -102,22 +103,46 @@ static void __hyp_text __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt)
+>  	/* Clear pmscr in case of early return */
+>  	ctxt->sys_regs[PMSCR_EL1] = 0;
+>  
+> -	/* SPE present on this CPU? */
+> -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> -						  ID_AA64DFR0_PMSVER_SHIFT))
+> -		return;
+> -
+>  	/* Yes; is it owned by higher EL? */
+>  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
 >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
->  		return;
->  
-> -	/* No; is the host actually using the thing? */
-> -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> -	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
-> +	/* Save the control register and disable data generation */
-> +	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-> +
-> +	if (!ctxt->sys_regs[PMSCR_EL1])
-
-Shouldn't you check the enable bits instead of relying on the whole
-thing being zero?
-
->  		return;
->  
->  	/* Yes; save the control register and disable data generation */
-> -	ctxt->sys_regs[PMSCR_EL1] = read_sysreg_el1(SYS_PMSCR);
-
-You've already saved the control register...
-
->  	write_sysreg_el1(0, SYS_PMSCR);
->  	isb();
->  
->  	/* Now drain all buffered data to memory */
->  	psb_csync();
->  	dsb(nsh);
-> +
-> +	if (!full_ctxt)
-> +		return;
-> +
-> +	ctxt->sys_regs[PMBLIMITR_EL1] = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-> +
-> +	/*
-> +	 * As PMBSR is conditionally restored when returning to the host we
-> +	 * must ensure the service bit is unset here to prevent a spurious
-> +	 * host SPE interrupt from being raised.
-> +	 */
-> +	ctxt->sys_regs[PMBSR_EL1] = read_sysreg_s(SYS_PMBSR_EL1);
-> +	write_sysreg_s(0, SYS_PMBSR_EL1);
-> +
-> +	isb();
-> +
-> +	ctxt->sys_regs[PMSICR_EL1] = read_sysreg_s(SYS_PMSICR_EL1);
-> +	ctxt->sys_regs[PMSIRR_EL1] = read_sysreg_s(SYS_PMSIRR_EL1);
-> +	ctxt->sys_regs[PMSFCR_EL1] = read_sysreg_s(SYS_PMSFCR_EL1);
-> +	ctxt->sys_regs[PMSEVFR_EL1] = read_sysreg_s(SYS_PMSEVFR_EL1);
-> +	ctxt->sys_regs[PMSLATFR_EL1] = read_sysreg_s(SYS_PMSLATFR_EL1);
-> +	ctxt->sys_regs[PMBPTR_EL1] = read_sysreg_s(SYS_PMBPTR_EL1);
+> @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
 >  }
 >  
-> -static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
-> +static void __hyp_text
-> +__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+>  static void __hyp_text
+> -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
+> +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
 >  {
 >  	if (!ctxt->sys_regs[PMSCR_EL1])
 >  		return;
-> @@ -126,6 +151,16 @@ static void __hyp_text __debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt)
->  	isb();
+> @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
+>  	struct kvm_guest_debug_arch *host_dbg;
+>  	struct kvm_guest_debug_arch *guest_dbg;
 >  
->  	/* Re-enable data generation */
-> +	if (full_ctxt) {
-> +		write_sysreg_s(ctxt->sys_regs[PMBPTR_EL1], SYS_PMBPTR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMBLIMITR_EL1], SYS_PMBLIMITR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSFCR_EL1], SYS_PMSFCR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSEVFR_EL1], SYS_PMSEVFR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSLATFR_EL1], SYS_PMSLATFR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSIRR_EL1], SYS_PMSIRR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMSICR_EL1], SYS_PMSICR_EL1);
-> +		write_sysreg_s(ctxt->sys_regs[PMBSR_EL1], SYS_PMBSR_EL1);
-> +	}
->  	write_sysreg_el1(ctxt->sys_regs[PMSCR_EL1], SYS_PMSCR);
->  }
+> +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	guest_ctxt = &vcpu->arch.ctxt;
+> +
+> +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
+> +
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
 >  
-> @@ -198,7 +233,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> -	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = &vcpu->arch.host_debug_state.regs;
+>  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+>  
+> @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+>  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
 >  	guest_ctxt = &vcpu->arch.ctxt;
 >  
->  	if (!has_vhe())
-> -		__debug_restore_spe_nvhe(host_ctxt);
-> +		__debug_restore_spe_nvhe(host_ctxt, false);
+> -	if (!has_vhe())
+> -		__debug_restore_spe_nvhe(host_ctxt, false);
+> +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
+
+So you now do an unconditional save/restore on the exit path for VHE as
+well? Even if the host isn't using the SPE HW? That's not acceptable
+as, in most cases, only the host /or/ the guest will use SPE. Here, you
+put a measurable overhead on each exit.
+
+If the host is not using SPE, then the restore/save should happen in
+vcpu_load/vcpu_put. Only if the host is using SPE should you do
+something in the run loop. Of course, this only applies to VHE and
+non-VHE must switch eagerly.
+
 >  
 >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
 >  		return;
-> @@ -222,7 +257,7 @@ void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
+> @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
+>  
+>  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
+>  {
+> -	/*
+> -	 * Non-VHE: Disable and flush SPE data generation
+> -	 * VHE: The vcpu can run, but it can't hide.
+> -	 */
+>  	struct kvm_cpu_context *host_ctxt;
 >  
 >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->  	if (!has_vhe())
-> -		__debug_save_spe_nvhe(host_ctxt);
-> +		__debug_save_spe_nvhe(host_ctxt, false);
+> -	if (!has_vhe())
+> -		__debug_save_spe_nvhe(host_ctxt, false);
+> +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+> +						 ID_AA64DFR0_PMSVER_SHIFT))
+> +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
 >  }
 >  
 >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
+>  {
+> +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
+> +
+> +	/* SPE present on this vCPU? */
+> +	if (kvm_spe_ready)
+> +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
+>  }
+>  
+>  u32 __hyp_text __kvm_get_mdcr_el2(void)
+> diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> index 48d118fdb174..30c40b1bc385 100644
+> --- a/include/kvm/arm_spe.h
+> +++ b/include/kvm/arm_spe.h
+> @@ -16,4 +16,10 @@ struct kvm_spe {
+>  	bool irq_level;
+>  };
+>  
+> +#ifdef CONFIG_KVM_ARM_SPE
+> +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
+> +#else
+> +#define kvm_arm_spe_v1_ready(v)		(false)
+> +#endif /* CONFIG_KVM_ARM_SPE */
+> +
+>  #endif /* __ASM_ARM_KVM_SPE_H */
 
-So all of this is for non-VHE. What happens in the VHE case?
+Thanks,
 
 	M.
 -- 
