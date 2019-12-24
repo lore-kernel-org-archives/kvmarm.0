@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA818C2D0D2
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32155C2D0CF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D62D20706
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D62D20706
+	by mail.kernel.org (Postfix) with ESMTP id BDAA6206CB
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDAA6206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26A064AF31;
-	Tue, 24 Dec 2019 06:41:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E1B54AF48;
+	Tue, 24 Dec 2019 06:42:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zeaxmCsIh83a; Tue, 24 Dec 2019 06:41:52 -0500 (EST)
+	with ESMTP id aGxBP3IrouZi; Tue, 24 Dec 2019 06:42:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D5424AF68;
-	Tue, 24 Dec 2019 06:41:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD0C4AF21;
+	Tue, 24 Dec 2019 06:42:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A86404AF20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6A794AF1F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vAnL1km0H6um for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:41:49 -0500 (EST)
+ with ESMTP id R-PPA-DFem4u for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:42:36 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9609C4AEFC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B50354AEFC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:36 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji5u-000169-1R; Tue, 24 Dec 2019 12:11:18 +0100
+ id 1iji61-000169-6D; Tue, 24 Dec 2019 12:11:26 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 10/32] irqchip/gic-v4.1: Add mask/unmask doorbell callbacks
-Date: Tue, 24 Dec 2019 11:10:33 +0000
-Message-Id: <20191224111055.11836-11-maz@kernel.org>
+Subject: [PATCH v3 17/32] irqchip/gic-v4.1: Map the ITS SGIR register page
+Date: Tue, 24 Dec 2019 11:10:40 +0000
+Message-Id: <20191224111055.11836-18-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,146 +79,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-masking/unmasking doorbells on GICv4.1 relies on a new INVDB command,
-which broadcasts the invalidation to all RDs.
+One of the new features of GICv4.1 is to allow virtual SGIs to be
+directly signaled to a VPE. For that, the ITS has grown a new
+64kB page containing only a single register that is used to
+signal a SGI to a given VPE.
 
-Implement the new command as well as the masking callbacks, and plug
-the whole thing into the v4.1 VPE irqchip.
+Add a second mapping covering this new 64kB range, and take this
+opportunity to limit the original mapping to 64kB, which is enough
+to cover the span of the ITS registers.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 73 ++++++++++++++++++++++++++++++
- include/linux/irqchip/arm-gic-v3.h |  3 +-
- 2 files changed, 75 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 157f51398850..0da6baa48153 100644
+index 48d7ee443544..2f94fae67dfd 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -334,6 +334,10 @@ struct its_cmd_desc {
- 			u16 seq_num;
- 			u16 its_list;
- 		} its_vmovp_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
-+		} its_invdb_cmd;
- 	};
- };
+@@ -97,6 +97,7 @@ struct its_node {
+ 	struct mutex		dev_alloc_lock;
+ 	struct list_head	entry;
+ 	void __iomem		*base;
++	void __iomem		*sgir_base;
+ 	phys_addr_t		phys_base;
+ 	struct its_cmd_block	*cmd_base;
+ 	struct its_cmd_block	*cmd_write;
+@@ -4325,7 +4326,7 @@ static int __init its_probe_one(struct resource *res,
+ 	struct page *page;
+ 	int err;
  
-@@ -832,6 +836,21 @@ static struct its_vpe *its_build_vclear_cmd(struct its_node *its,
- 	return valid_vpe(its, map->vpe);
- }
+-	its_base = ioremap(res->start, resource_size(res));
++	its_base = ioremap(res->start, SZ_64K);
+ 	if (!its_base) {
+ 		pr_warn("ITS@%pa: Unable to map ITS registers\n", &res->start);
+ 		return -ENOMEM;
+@@ -4376,6 +4377,13 @@ static int __init its_probe_one(struct resource *res,
  
-+static struct its_vpe *its_build_invdb_cmd(struct its_node *its,
-+					   struct its_cmd_block *cmd,
-+					   struct its_cmd_desc *desc)
-+{
-+	if (WARN_ON(!is_v4_1(its)))
-+		return NULL;
+ 		if (is_v4_1(its)) {
+ 			u32 svpet = FIELD_GET(GITS_TYPER_SVPET, typer);
 +
-+	its_encode_cmd(cmd, GITS_CMD_INVDB);
-+	its_encode_vpeid(cmd, desc->its_invdb_cmd.vpe->vpe_id);
++			its->sgir_base = ioremap(res->start + SZ_128K, SZ_64K);
++			if (!its->sgir_base) {
++				err = -ENOMEM;
++				goto out_free_its;
++			}
 +
-+	its_fixup_cmd(cmd);
-+
-+	return valid_vpe(its, desc->its_invdb_cmd.vpe);
-+}
-+
- static u64 its_cmd_ptr_to_offset(struct its_node *its,
- 				 struct its_cmd_block *ptr)
- {
-@@ -1240,6 +1259,14 @@ static void its_send_vclear(struct its_device *dev, u32 event_id)
- 	its_send_single_vcommand(dev->its, its_build_vclear_cmd, &desc);
- }
+ 			its->mpidr = readl_relaxed(its_base + GITS_MPIDR);
  
-+static void its_send_invdb(struct its_node *its, struct its_vpe *vpe)
-+{
-+	struct its_cmd_desc desc;
-+
-+	desc.its_invdb_cmd.vpe = vpe;
-+	its_send_single_vcommand(its, its_build_invdb_cmd, &desc);
-+}
-+
- /*
-  * irqchip functions - assumes MSI, mostly.
-  */
-@@ -3554,6 +3581,50 @@ static struct irq_chip its_vpe_irq_chip = {
- 	.irq_set_vcpu_affinity	= its_vpe_set_vcpu_affinity,
- };
- 
-+static struct its_node *find_4_1_its(void)
-+{
-+	static struct its_node *its = NULL;
-+
-+	if (!its) {
-+		list_for_each_entry(its, &its_nodes, entry) {
-+			if (is_v4_1(its))
-+				return its;
-+		}
-+
-+		/* Oops? */
-+		its = NULL;
-+	}
-+
-+	return its;
-+}
-+
-+static void its_vpe_4_1_send_inv(struct irq_data *d)
-+{
-+	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+	struct its_node *its;
-+
-+	/*
-+	 * GICv4.1 wants doorbells to be invalidated using the
-+	 * INVDB command in order to be broadcast to all RDs. Send
-+	 * it to the first valid ITS, and let the HW do its magic.
-+	 */
-+	its = find_4_1_its();
-+	if (its)
-+		its_send_invdb(its, vpe);
-+}
-+
-+static void its_vpe_4_1_mask_irq(struct irq_data *d)
-+{
-+	lpi_write_config(d->parent_data, LPI_PROP_ENABLED, 0);
-+	its_vpe_4_1_send_inv(d);
-+}
-+
-+static void its_vpe_4_1_unmask_irq(struct irq_data *d)
-+{
-+	lpi_write_config(d->parent_data, 0, LPI_PROP_ENABLED);
-+	its_vpe_4_1_send_inv(d);
-+}
-+
- static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- {
- 	struct its_cmd_info *info = vcpu_info;
-@@ -3575,6 +3646,8 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- 
- static struct irq_chip its_vpe_4_1_irq_chip = {
- 	.name			= "GICv4.1-vpe",
-+	.irq_mask		= its_vpe_4_1_mask_irq,
-+	.irq_unmask		= its_vpe_4_1_unmask_irq,
- 	.irq_eoi		= irq_chip_eoi_parent,
- 	.irq_set_affinity	= its_vpe_set_affinity,
- 	.irq_set_vcpu_affinity	= its_vpe_4_1_set_vcpu_affinity,
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index df3b7cb50956..33519b7c96cf 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -486,8 +486,9 @@
- #define GITS_CMD_VMAPTI			GITS_CMD_GICv4(GITS_CMD_MAPTI)
- #define GITS_CMD_VMOVI			GITS_CMD_GICv4(GITS_CMD_MOVI)
- #define GITS_CMD_VSYNC			GITS_CMD_GICv4(GITS_CMD_SYNC)
--/* VMOVP is the odd one, as it doesn't have a physical counterpart */
-+/* VMOVP and INVDB are the odd ones, as they dont have a physical counterpart */
- #define GITS_CMD_VMOVP			GITS_CMD_GICv4(2)
-+#define GITS_CMD_INVDB			GITS_CMD_GICv4(0xe)
- 
- /*
-  * ITS error numbers
+ 			pr_info("ITS@%pa: Using GICv4.1 mode %08x %08x\n",
+@@ -4389,7 +4397,7 @@ static int __init its_probe_one(struct resource *res,
+ 				get_order(ITS_CMD_QUEUE_SZ));
+ 	if (!page) {
+ 		err = -ENOMEM;
+-		goto out_free_its;
++		goto out_unmap_sgir;
+ 	}
+ 	its->cmd_base = (void *)page_address(page);
+ 	its->cmd_write = its->cmd_base;
+@@ -4456,6 +4464,9 @@ static int __init its_probe_one(struct resource *res,
+ 	its_free_tables(its);
+ out_free_cmd:
+ 	free_pages((unsigned long)its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
++out_unmap_sgir:
++	if (its->sgir_base)
++		iounmap(its->sgir_base);
+ out_free_its:
+ 	kfree(its);
+ out_unmap:
 -- 
 2.20.1
 
