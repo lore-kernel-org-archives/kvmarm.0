@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32155C2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84E9C2D0CF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BDAA6206CB
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDAA6206CB
+	by mail.kernel.org (Postfix) with ESMTP id 986A620706
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:42:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986A620706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E1B54AF48;
-	Tue, 24 Dec 2019 06:42:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9EA4AF31;
+	Tue, 24 Dec 2019 06:42:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aGxBP3IrouZi; Tue, 24 Dec 2019 06:42:39 -0500 (EST)
+	with ESMTP id vIyeGJTuIbK6; Tue, 24 Dec 2019 06:42:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD0C4AF21;
-	Tue, 24 Dec 2019 06:42:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F97B4AF21;
+	Tue, 24 Dec 2019 06:42:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6A794AF1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 975604AF21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R-PPA-DFem4u for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:42:36 -0500 (EST)
+ with ESMTP id g7G5GLf9HfnU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:42:47 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B50354AEFC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A96C04AF1F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:42:47 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji61-000169-6D; Tue, 24 Dec 2019 12:11:26 +0100
+ id 1iji67-000169-7U; Tue, 24 Dec 2019 12:11:31 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 17/32] irqchip/gic-v4.1: Map the ITS SGIR register page
-Date: Tue, 24 Dec 2019 11:10:40 +0000
-Message-Id: <20191224111055.11836-18-maz@kernel.org>
+Subject: [PATCH v3 22/32] irqchip/gic-v4.1: Plumb set_vcpu_affinity SGI
+ callbacks
+Date: Tue, 24 Dec 2019 11:10:45 +0000
+Message-Id: <20191224111055.11836-23-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,74 +80,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-One of the new features of GICv4.1 is to allow virtual SGIs to be
-directly signaled to a VPE. For that, the ITS has grown a new
-64kB page containing only a single register that is used to
-signal a SGI to a given VPE.
+As for VLPIs, there is a number of configuration bits that cannot
+be directly communicated through the normal irqchip API, and we
+have to use our good old friend set_vcpu_affinity.
 
-Add a second mapping covering this new 64kB range, and take this
-opportunity to limit the original mapping to 64kB, which is enough
-to cover the span of the ITS registers.
+This is used to configure group and priority for a given vSGI.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 18 ++++++++++++++++++
+ include/linux/irqchip/arm-gic-v4.h |  5 +++++
+ 2 files changed, 23 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 48d7ee443544..2f94fae67dfd 100644
+index 47d63a5b43ff..5126bdcfe079 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -97,6 +97,7 @@ struct its_node {
- 	struct mutex		dev_alloc_lock;
- 	struct list_head	entry;
- 	void __iomem		*base;
-+	void __iomem		*sgir_base;
- 	phys_addr_t		phys_base;
- 	struct its_cmd_block	*cmd_base;
- 	struct its_cmd_block	*cmd_write;
-@@ -4325,7 +4326,7 @@ static int __init its_probe_one(struct resource *res,
- 	struct page *page;
- 	int err;
+@@ -3886,6 +3886,23 @@ static int its_sgi_get_irqchip_state(struct irq_data *d,
+ 	return 0;
+ }
  
--	its_base = ioremap(res->start, resource_size(res));
-+	its_base = ioremap(res->start, SZ_64K);
- 	if (!its_base) {
- 		pr_warn("ITS@%pa: Unable to map ITS registers\n", &res->start);
- 		return -ENOMEM;
-@@ -4376,6 +4377,13 @@ static int __init its_probe_one(struct resource *res,
- 
- 		if (is_v4_1(its)) {
- 			u32 svpet = FIELD_GET(GITS_TYPER_SVPET, typer);
++static int its_sgi_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
++{
++	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++	struct its_cmd_info *info = vcpu_info;
 +
-+			its->sgir_base = ioremap(res->start + SZ_128K, SZ_64K);
-+			if (!its->sgir_base) {
-+				err = -ENOMEM;
-+				goto out_free_its;
-+			}
++	switch (info->cmd_type) {
++	case PROP_UPDATE_SGI:
++		vpe->sgi_config[d->hwirq].priority = info->priority;
++		vpe->sgi_config[d->hwirq].group = info->group;
++		its_configure_sgi(d, false);
++		return 0;
 +
- 			its->mpidr = readl_relaxed(its_base + GITS_MPIDR);
++	default:
++		return -EINVAL;
++	}
++}
++
+ static struct irq_chip its_sgi_irq_chip = {
+ 	.name			= "GICv4.1-sgi",
+ 	.irq_mask		= its_sgi_mask_irq,
+@@ -3893,6 +3910,7 @@ static struct irq_chip its_sgi_irq_chip = {
+ 	.irq_set_affinity	= its_sgi_set_affinity,
+ 	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
+ 	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
++	.irq_set_vcpu_affinity	= its_sgi_set_vcpu_affinity,
+ };
  
- 			pr_info("ITS@%pa: Using GICv4.1 mode %08x %08x\n",
-@@ -4389,7 +4397,7 @@ static int __init its_probe_one(struct resource *res,
- 				get_order(ITS_CMD_QUEUE_SZ));
- 	if (!page) {
- 		err = -ENOMEM;
--		goto out_free_its;
-+		goto out_unmap_sgir;
- 	}
- 	its->cmd_base = (void *)page_address(page);
- 	its->cmd_write = its->cmd_base;
-@@ -4456,6 +4464,9 @@ static int __init its_probe_one(struct resource *res,
- 	its_free_tables(its);
- out_free_cmd:
- 	free_pages((unsigned long)its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
-+out_unmap_sgir:
-+	if (its->sgir_base)
-+		iounmap(its->sgir_base);
- out_free_its:
- 	kfree(its);
- out_unmap:
+ static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index 30b4855bf766..a1a9d40266f5 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -98,6 +98,7 @@ enum its_vcpu_info_cmd_type {
+ 	SCHEDULE_VPE,
+ 	DESCHEDULE_VPE,
+ 	INVALL_VPE,
++	PROP_UPDATE_SGI,
+ };
+ 
+ struct its_cmd_info {
+@@ -110,6 +111,10 @@ struct its_cmd_info {
+ 			bool		g0en;
+ 			bool		g1en;
+ 		};
++		struct {
++			u8		priority;
++			bool		group;
++		};
+ 	};
+ };
+ 
 -- 
 2.20.1
 
