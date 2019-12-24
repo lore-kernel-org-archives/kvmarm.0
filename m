@@ -4,50 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6EBC2D0D0
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAB7C2D0D2
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:11:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 03E0B20706
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:11:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E0B20706
+	by mail.kernel.org (Postfix) with ESMTP id 50AB420409
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:11:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AB420409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19734AF61;
-	Tue, 24 Dec 2019 06:11:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09E2C4AF74;
+	Tue, 24 Dec 2019 06:11:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OnUVA9rfhAzD; Tue, 24 Dec 2019 06:11:24 -0500 (EST)
+	with ESMTP id AmBPRw9FNtFO; Tue, 24 Dec 2019 06:11:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB804AF89;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 575744AF5E;
 	Tue, 24 Dec 2019 06:11:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8594AF49
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5929F4AF55
  for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:11:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v0h4yrKc4af5 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id FkALu8GmzaMm for <kvmarm@lists.cs.columbia.edu>;
  Tue, 24 Dec 2019 06:11:21 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 084684AF55
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAC4C4AF5E
  for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:11:17 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji5r-000169-Kr; Tue, 24 Dec 2019 12:11:16 +0100
+ id 1iji5s-000169-GZ; Tue, 24 Dec 2019 12:11:16 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 07/32] irqchip/gic-v4.1: Don't use the VPE proxy if RVPEID
- is set
-Date: Tue, 24 Dec 2019 11:10:30 +0000
-Message-Id: <20191224111055.11836-8-maz@kernel.org>
+Subject: [PATCH v3 08/32] irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP
+Date: Tue, 24 Dec 2019 11:10:31 +0000
+Message-Id: <20191224111055.11836-9-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -80,87 +79,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The infamous VPE proxy device isn't used with GICv4.1 because:
-- we can invalidate any LPI from the DirectLPI MMIO interface
-- the ITS and redistributors understand the life cycle of
-  the doorbell, so we don't need to enable/disable it all
-  the time
+With GICv4.1, VMOVP is extended to allow a default doorbell to be
+specified, as well as a validity bit for this doorbell. As an added
+bonus, VMOVP isn't required anymore of moving a VPE between
+redistributors that share the same affinity.
 
-So let's escape early from the proxy related functions.
+Let's add this support to the VMOVP builder, and make sure we don't
+issue the command if we don't really need to.
 
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 40 ++++++++++++++++++++++++++------
+ 1 file changed, 33 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index e3c7d9ae0bdb..86c69b5cc156 100644
+index 86c69b5cc156..fd9d3b6bb465 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3213,7 +3213,7 @@ static const struct irq_domain_ops its_domain_ops = {
- /*
-  * This is insane.
-  *
-- * If a GICv4 doesn't implement Direct LPIs (which is extremely
-+ * If a GICv4.0 doesn't implement Direct LPIs (which is extremely
-  * likely), the only way to perform an invalidate is to use a fake
-  * device to issue an INV command, implying that the LPI has first
-  * been mapped to some event on that device. Since this is not exactly
-@@ -3221,9 +3221,20 @@ static const struct irq_domain_ops its_domain_ops = {
-  * only issue an UNMAP if we're short on available slots.
-  *
-  * Broken by design(tm).
-+ *
-+ * GICv4.1, on the other hand, mandates that we're able to invalidate
-+ * by writing to a MMIO register. It doesn't implement the whole of
-+ * DirectLPI, but that's good enough. And most of the time, we don't
-+ * even have to invalidate anything, as the redistributor can be told
-+ * whether to generate a doorbell or not (we thus leave it enabled,
-+ * always).
-  */
- static void its_vpe_db_proxy_unmap_locked(struct its_vpe *vpe)
+@@ -471,6 +471,17 @@ static void its_encode_vmapp_default_db(struct its_cmd_block *cmd,
+ 	its_mask_encode(&cmd->raw_cmd[1], vpe_db_lpi, 31, 0);
+ }
+ 
++static void its_encode_vmovp_default_db(struct its_cmd_block *cmd,
++					u32 vpe_db_lpi)
++{
++	its_mask_encode(&cmd->raw_cmd[3], vpe_db_lpi, 31, 0);
++}
++
++static void its_encode_db(struct its_cmd_block *cmd, bool db)
++{
++	its_mask_encode(&cmd->raw_cmd[2], db, 63, 63);
++}
++
+ static inline void its_fixup_cmd(struct its_cmd_block *cmd)
  {
-+	/* GICv4.1 doesn't use a proxy, so nothing to do here */
-+	if (gic_rdists->has_rvpeid)
-+		return;
-+
- 	/* Already unmapped? */
- 	if (vpe->vpe_proxy_event == -1)
- 		return;
-@@ -3246,6 +3257,10 @@ static void its_vpe_db_proxy_unmap_locked(struct its_vpe *vpe)
+ 	/* Let's fixup BE commands */
+@@ -757,6 +768,11 @@ static struct its_vpe *its_build_vmovp_cmd(struct its_node *its,
+ 	its_encode_vpeid(cmd, desc->its_vmovp_cmd.vpe->vpe_id);
+ 	its_encode_target(cmd, target);
  
- static void its_vpe_db_proxy_unmap(struct its_vpe *vpe)
++	if (is_v4_1(its)) {
++		its_encode_db(cmd, true);
++		its_encode_vmovp_default_db(cmd, desc->its_vmovp_cmd.vpe->vpe_db_lpi);
++	}
++
+ 	its_fixup_cmd(cmd);
+ 
+ 	return valid_vpe(its, desc->its_vmovp_cmd.vpe);
+@@ -3328,7 +3344,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 				bool force)
  {
-+	/* GICv4.1 doesn't use a proxy, so nothing to do here */
-+	if (gic_rdists->has_rvpeid)
-+		return;
+ 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+-	int cpu = cpumask_first(mask_val);
++	int from, cpu = cpumask_first(mask_val);
+ 
+ 	/*
+ 	 * Changing affinity is mega expensive, so let's be as lazy as
+@@ -3336,14 +3352,24 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	 * into the proxy device, we need to move the doorbell
+ 	 * interrupt to its new location.
+ 	 */
+-	if (vpe->col_idx != cpu) {
+-		int from = vpe->col_idx;
++	if (vpe->col_idx == cpu)
++		goto out;
+ 
+-		vpe->col_idx = cpu;
+-		its_send_vmovp(vpe);
+-		its_vpe_db_proxy_move(vpe, from, cpu);
+-	}
++	from = vpe->col_idx;
++	vpe->col_idx = cpu;
 +
- 	if (!gic_rdists->has_direct_lpi) {
- 		unsigned long flags;
++	/*
++	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
++	 * is sharing its VPE table with the current one.
++	 */
++	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
++	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
++		goto out;
  
-@@ -3257,6 +3272,10 @@ static void its_vpe_db_proxy_unmap(struct its_vpe *vpe)
- 
- static void its_vpe_db_proxy_map_locked(struct its_vpe *vpe)
- {
-+	/* GICv4.1 doesn't use a proxy, so nothing to do here */
-+	if (gic_rdists->has_rvpeid)
-+		return;
++	its_send_vmovp(vpe);
++	its_vpe_db_proxy_move(vpe, from, cpu);
 +
- 	/* Already mapped? */
- 	if (vpe->vpe_proxy_event != -1)
- 		return;
-@@ -3279,6 +3298,10 @@ static void its_vpe_db_proxy_move(struct its_vpe *vpe, int from, int to)
- 	unsigned long flags;
- 	struct its_collection *target_col;
++out:
+ 	irq_data_update_effective_affinity(d, cpumask_of(cpu));
  
-+	/* GICv4.1 doesn't use a proxy, so nothing to do here */
-+	if (gic_rdists->has_rvpeid)
-+		return;
-+
- 	if (gic_rdists->has_direct_lpi) {
- 		void __iomem *rdbase;
- 
+ 	return IRQ_SET_MASK_OK_DONE;
 -- 
 2.20.1
 
