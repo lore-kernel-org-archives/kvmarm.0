@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77198C2D0D0
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DE8C2D0D2
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2B30F206CB
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B30F206CB
+	by mail.kernel.org (Postfix) with ESMTP id 44708206CB
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44708206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7BB74AF30;
-	Tue, 24 Dec 2019 06:43:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F11004AF61;
+	Tue, 24 Dec 2019 06:43:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o8y84ktH4tGn; Tue, 24 Dec 2019 06:43:08 -0500 (EST)
+	with ESMTP id dTtfe8VlgsMC; Tue, 24 Dec 2019 06:43:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E334AF39;
-	Tue, 24 Dec 2019 06:43:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F01434AF63;
+	Tue, 24 Dec 2019 06:43:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6374AF2F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E45CB4AF4E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yqn31w9MY9jc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:43:07 -0500 (EST)
+ with ESMTP id 8H5AHzXaQLHy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:43:14 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EAD9D4AF28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFD0D4AF28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:13 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji69-000169-DW; Tue, 24 Dec 2019 12:11:34 +0100
+ id 1iji6H-000169-3U; Tue, 24 Dec 2019 12:11:42 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 25/32] irqchip/gic-v4.1: Add VSGI property setup
-Date: Tue, 24 Dec 2019 11:10:48 +0000
-Message-Id: <20191224111055.11836-26-maz@kernel.org>
+Subject: [PATCH v3 31/32] KVM: arm64: GICv4.1: Reload VLPI configuration on
+ distributor enable/disable
+Date: Tue, 24 Dec 2019 11:10:54 +0000
+Message-Id: <20191224111055.11836-32-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,50 +80,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add the SGI configuration entry point for KVM to use.
+Each time a Group-enable bit gets flipped, the state of these bits
+needs to be forwarded to the hardware. This is a pretty heavy
+handed operation, requiring all vcpus to reload their GICv4
+configuration. It is thus implemented as a new request type.
+
+Of course, we only support Group-1 for now...
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
- include/linux/irqchip/arm-gic-v4.h |  1 +
- 2 files changed, 14 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ virt/kvm/arm/arm.c                | 8 ++++++++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c  | 5 ++++-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 99b33f60ac63..f3f06c5c7e54 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
- 	return irq_set_vcpu_affinity(irq, &info);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c61260cf63c5..4aeff0cc4ecf 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -45,6 +45,7 @@
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+ #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+ #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
++#define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+ 
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 12e0280291ce..a398dd449880 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -682,6 +682,14 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
+ 			kvm_update_stolen_time(vcpu);
++
++		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
++			/* The distributor enable bits were changed */
++			preempt_disable();
++			vgic_v4_put(vcpu, false);
++			vgic_v4_load(vcpu);
++			preempt_enable();
++		}
+ 	}
  }
  
-+int its_prop_update_vsgi(int irq, u8 priority, bool group)
-+{
-+	struct its_cmd_info info = {
-+		.cmd_type = PROP_UPDATE_SGI,
-+		{
-+			.priority	= priority,
-+			.group		= group,
-+		},
-+	};
-+
-+	return irq_set_vcpu_affinity(irq, &info);
-+}
-+
- int its_init_v4(struct irq_domain *domain,
- 		const struct irq_domain_ops *vpe_ops,
- 		const struct irq_domain_ops *sgi_ops)
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 9fbd0418f569..46c167a6349f 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -129,6 +129,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
- int its_get_vlpi(int irq, struct its_vlpi_map *map);
- int its_unmap_vlpi(int irq);
- int its_prop_update_vlpi(int irq, u8 config, bool inv);
-+int its_prop_update_vsgi(int irq, u8 priority, bool group);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 31ff8c7e09b0..4e72fc08a973 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -132,7 +132,10 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+ 		if (is_hwsgi != dist->nassgireq)
+ 			vgic_v4_configure_vsgis(vcpu->kvm);
  
- struct irq_domain_ops;
- int its_init_v4(struct irq_domain *domain,
+-		if (!was_enabled && dist->enabled)
++		if (kvm_vgic_global_state.has_gicv4_1 &&
++		    was_enabled != dist->enabled)
++			kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv4);
++		else if (!was_enabled && dist->enabled)
+ 			vgic_kick_vcpus(vcpu->kvm);
+ 
+ 		mutex_unlock(&vcpu->kvm->lock);
 -- 
 2.20.1
 
