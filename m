@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2998C2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6D2C2D0D2
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 868C220706
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868C220706
+	by mail.kernel.org (Postfix) with ESMTP id A164520706
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A164520706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E0434AF21;
-	Tue, 24 Dec 2019 06:41:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 595FB4AF68;
+	Tue, 24 Dec 2019 06:41:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tEcogczzpRs5; Tue, 24 Dec 2019 06:41:12 -0500 (EST)
+	with ESMTP id DAHaCma-RyVJ; Tue, 24 Dec 2019 06:41:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B8AC4AF44;
-	Tue, 24 Dec 2019 06:41:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3264AF33;
+	Tue, 24 Dec 2019 06:41:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 781274AF29
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F9E84AF29
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZaK0xR+uiz-N for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:41:10 -0500 (EST)
+ with ESMTP id YO7eTlNzum7n for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:41:17 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F4D14AF22
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63D6E4AF22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:17 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji5v-000169-JX; Tue, 24 Dec 2019 12:11:20 +0100
+ id 1iji6F-000169-Am; Tue, 24 Dec 2019 12:11:40 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 12/32] irqchip/gic-v4.1: Add VPE eviction callback
-Date: Tue, 24 Dec 2019 11:10:35 +0000
-Message-Id: <20191224111055.11836-13-maz@kernel.org>
+Subject: [PATCH v3 30/32] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+Date: Tue, 24 Dec 2019 11:10:53 +0000
+Message-Id: <20191224111055.11836-31-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,124 +80,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When descheduling a VPE, special care must be taken to tell the GIC
-about whether we want to receive a doorbell or not. This is a
-major improvement on GICv4.0, where the doorbell had to be separately
-enabled/disabled.
+The GICv4.1 architecture gives the hypervisor the option to let
+the guest choose whether it wants the good old SGIs with an
+active state, or the new, HW-based ones that do not have one.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+For this, plumb the configuration of SGIs into the GICv3 MMIO
+handling, present the GICD_TYPER2.nASSGIcap to the guest,
+and handle the GICD_CTLR.nASSGIreq setting.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 53 +++++++++++++++++++++++++-------
- 1 file changed, 42 insertions(+), 11 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 ++++++++++++++++++++++++++++++--
+ 1 file changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 49850297fe56..a5567d099a3e 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2631,7 +2631,7 @@ static int __init allocate_lpi_tables(void)
- 	return 0;
- }
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index d73f4ffd7d36..31ff8c7e09b0 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -3,6 +3,7 @@
+  * VGICv3 MMIO handling functions
+  */
  
--static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
-+static u64 its_clear_vpend_valid(void __iomem *vlpi_base, u64 clr, u64 set)
- {
- 	u32 count = 1000000;	/* 1s! */
- 	bool clean;
-@@ -2639,6 +2639,8 @@ static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
- 
- 	val = gits_read_vpendbaser(vlpi_base + GICR_VPENDBASER);
- 	val &= ~GICR_VPENDBASER_Valid;
-+	val &= ~clr;
-+	val |= set;
- 	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
- 
- 	do {
-@@ -2651,6 +2653,11 @@ static u64 its_clear_vpend_valid(void __iomem *vlpi_base)
++#include <linux/bitfield.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+@@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 		if (vgic->enabled)
+ 			value |= GICD_CTLR_ENABLE_SS_G1;
+ 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
++		if (kvm_vgic_global_state.has_gicv4_1 && vgic->nassgireq)
++			value |= GICD_CTLR_nASSGIreq;
+ 		break;
+ 	case GICD_TYPER:
+ 		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
+@@ -81,6 +84,10 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
  		}
- 	} while (!clean && count);
+ 		break;
++	case GICD_TYPER2:
++		if (kvm_vgic_global_state.has_gicv4_1)
++			value = GICD_TYPER2_nASSGIcap;
++		break;
+ 	case GICD_IIDR:
+ 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
+ 			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
+@@ -98,17 +105,43 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+ 				    unsigned long val)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	bool was_enabled = dist->enabled;
  
-+	if (unlikely(val & GICR_VPENDBASER_Dirty)) {
-+		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
-+		val |= GICR_VPENDBASER_PendingLast;
-+	}
+ 	switch (addr & 0x0c) {
+-	case GICD_CTLR:
++	case GICD_CTLR: {
++		bool was_enabled, is_hwsgi;
 +
- 	return val;
- }
++		mutex_lock(&vcpu->kvm->lock);
++
++		was_enabled = dist->enabled;
++		is_hwsgi = dist->nassgireq;
++
+ 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
  
-@@ -2759,7 +2766,7 @@ static void its_cpu_init_lpis(void)
- 		 * ancient programming gets left in and has possibility of
- 		 * corrupting memory.
- 		 */
--		val = its_clear_vpend_valid(vlpi_base);
-+		val = its_clear_vpend_valid(vlpi_base, 0, 0);
- 		WARN_ON(val & GICR_VPENDBASER_Dirty);
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
++
++		/* Dist stays enabled? nASSGIreq is RO */
++		if (was_enabled && dist->enabled) {
++			val &= ~GICD_CTLR_nASSGIreq;
++			val |= FIELD_PREP(GICD_CTLR_nASSGIreq, is_hwsgi);
++		}
++
++		/* Switching HW SGIs? */
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		if (is_hwsgi != dist->nassgireq)
++			vgic_v4_configure_vsgis(vcpu->kvm);
++
+ 		if (!was_enabled && dist->enabled)
+ 			vgic_kick_vcpus(vcpu->kvm);
++
++		mutex_unlock(&vcpu->kvm->lock);
+ 		break;
++	}
+ 	case GICD_TYPER:
++	case GICD_TYPER2:
+ 	case GICD_IIDR:
++		/* This is at best for documentation purposes... */
+ 		return;
+ 	}
+ }
+@@ -117,10 +150,21 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+ 					   gpa_t addr, unsigned int len,
+ 					   unsigned long val)
+ {
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++
+ 	switch (addr & 0x0c) {
+ 	case GICD_IIDR:
+ 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+ 			return -EINVAL;
++		return 0;
++	case GICD_CTLR:
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
++
++		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		return 0;
  	}
  
-@@ -3439,16 +3446,10 @@ static void its_vpe_deschedule(struct its_vpe *vpe)
- 	void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
- 	u64 val;
- 
--	val = its_clear_vpend_valid(vlpi_base);
-+	val = its_clear_vpend_valid(vlpi_base, 0, 0);
- 
--	if (unlikely(val & GICR_VPENDBASER_Dirty)) {
--		pr_err_ratelimited("ITS virtual pending table not cleaning\n");
--		vpe->idai = false;
--		vpe->pending_last = true;
--	} else {
--		vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
--		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
--	}
-+	vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
-+	vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
- }
- 
- static void its_vpe_invall(struct its_vpe *vpe)
-@@ -3640,6 +3641,35 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
- 	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
- }
- 
-+static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
-+				   struct its_cmd_info *info)
-+{
-+	void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
-+	u64 val;
-+
-+	if (info->req_db) {
-+		/*
-+		 * vPE is going to block: make the vPE non-resident with
-+		 * PendingLast clear and DB set. The GIC guarantees that if
-+		 * we read-back PendingLast clear, then a doorbell will be
-+		 * delivered when an interrupt comes.
-+		 */
-+		val = its_clear_vpend_valid(vlpi_base,
-+					    GICR_VPENDBASER_PendingLast,
-+					    GICR_VPENDBASER_4_1_DB);
-+		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
-+	} else {
-+		/*
-+		 * We're not blocking, so just make the vPE non-resident
-+		 * with PendingLast set, indicating that we'll be back.
-+		 */
-+		val = its_clear_vpend_valid(vlpi_base,
-+					    0,
-+					    GICR_VPENDBASER_PendingLast);
-+		vpe->pending_last = true;
-+	}
-+}
-+
- static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- {
- 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-@@ -3651,6 +3681,7 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- 		return 0;
- 
- 	case DESCHEDULE_VPE:
-+		its_vpe_4_1_deschedule(vpe, info);
- 		return 0;
- 
- 	case INVALL_VPE:
+ 	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
 -- 
 2.20.1
 
