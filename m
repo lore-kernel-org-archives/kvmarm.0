@@ -2,65 +2,65 @@ Return-Path: <SRS0=PUN/=2O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83894C2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 06:14:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B877FC2D0CF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 07:11:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EC27220706
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 06:14:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC27220706
+	by mail.kernel.org (Postfix) with ESMTP id 44DF2206CB
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 07:11:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44DF2206CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 590FF4AF4D;
-	Tue, 24 Dec 2019 01:14:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BD24AF5E;
+	Tue, 24 Dec 2019 02:11:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dLq9vxuzTSyt; Tue, 24 Dec 2019 01:14:49 -0500 (EST)
+	with ESMTP id 3-34jxl99pft; Tue, 24 Dec 2019 02:11:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69B7A4AF54;
-	Tue, 24 Dec 2019 01:14:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D13F54AF47;
+	Tue, 24 Dec 2019 02:11:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A03264AF4B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 01:14:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDCAC4AF2F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 02:11:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HvVoJ1ECvrIn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 01:14:46 -0500 (EST)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C7634AF12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 01:14:46 -0500 (EST)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id A384698883F1BF9557CF;
- Tue, 24 Dec 2019 14:14:42 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Tue, 24 Dec 2019
- 14:14:35 +0800
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Handle GICR_PENDBASER.PTZ filed as
- RAZ
-To: Auger Eric <eric.auger@redhat.com>, Marc Zyngier <maz@kernel.org>
-References: <20191220111833.1422-1-yuzenghui@huawei.com>
- <3a729559-d0eb-e042-d6bd-b69bacb0dd23@huawei.com>
- <c084aa29c029f97cdfb1b5dc9e6b29ac@www.loen.fr>
- <1225d839-3cf7-d513-778e-698e12e94875@huawei.com>
- <12a1e25b-617d-6b04-6a5a-4c67a39565a5@redhat.com>
+ with ESMTP id MBsfSI4Sny2K for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 02:11:10 -0500 (EST)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D651B4AEF6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 02:11:09 -0500 (EST)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 87DA525A48C8506A8904;
+ Tue, 24 Dec 2019 15:11:06 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 24 Dec 2019
+ 15:10:56 +0800
+Subject: Re: [PATCH v2 11/36] irqchip/gic-v4.1: VPE table (aka
+ GICR_VPROPBASER) allocation
+To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>
+References: <20191027144234.8395-1-maz@kernel.org>
+ <20191027144234.8395-12-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <5df2ebf7-f1e0-5d55-cdae-15b2fd1675d6@huawei.com>
-Date: Tue, 24 Dec 2019 14:14:33 +0800
+Message-ID: <61526052-aa00-0769-d5bb-3524161c5650@huawei.com>
+Date: Tue, 24 Dec 2019 15:10:54 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <12a1e25b-617d-6b04-6a5a-4c67a39565a5@redhat.com>
+In-Reply-To: <20191027144234.8395-12-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, wangwudi@hisilicon.com,
+ Robert Richter <rrichter@marvell.com>, Jayachandran C <jnair@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,74 +77,89 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019/12/24 12:45, Auger Eric wrote:
-> Hi Zenghui,
+Hi Marc,
+
+[ +Wudi and Nianyao. As they spotted the following issue but
+  I forgot to send it out. ]
+
+On 2019/10/27 22:42, Marc Zyngier wrote:
+> GICv4.1 defines a new VPE table that is potentially shared between
+> both the ITSs and the redistributors, following complicated affinity
+> rules.
 > 
-> On 12/24/19 3:52 AM, Zenghui Yu wrote:
->> Hi Marc, Eric,
->>
->> On 2019/12/23 22:07, Marc Zyngier wrote:
->>> Hi Zenghui,
->>>
->>> On 2019-12-23 13:43, Zenghui Yu wrote:
->>>> I noticed there is no userspace access callbacks for GICR_PENDBASER,
->>>> so this patch will make the PTZ field also 'Read As Zero' by userspace.
->>>> Should we consider adding a uaccess_read callback for GICR_PENDBASER
->>>> which just returns the unchanged vgic_cpu->pendbaser to userspace?
->>>> (Though this is really not a big deal. We now always emulate the PTZ
->>>> field to guest as RAZ. And 'vgic_cpu->pendbaser & GICR_PENDBASER_PTZ'
->>>> only indicates whether KVM will optimize the LPI enabling process,
->>>> where Read As Zero indicates never optimize..)
->>>
->>> I don't think adding a userspace accessor would help much. All this
->>> bit tells userspace is that the guest has programmed a zero filled
->>> table. On restore, we'd avoid a rescan of the table if there was
->>> no LPI mapped.
->>
->> Yes, I agree.
->>
->>> And thinking of it, this fixes a bug for non-Linux guests: If you write
->>> PTZ=1, we never clear it. Which means that if userspace saves and
->>> restores
->>> PENDBASER with PTZ set, we'll never restore the pending bits, which is
->>> pretty bad (see vgic_enable_lpis()).
->>
->> But I'm afraid I can't follow this point. After reading the code (with
->> Qemu) a bit further, the Redistributors are restored before the ITS.
+> To make things more confusing, the programming of this table at
+> the redistributor level is reusing the GICv4.0 GICR_VPROPBASER register
+> for something completely different.
 > 
-> This is also part of the kernel documentation:
-> Documentation/virt/kvm/devices/arm-vgic-its.txt (ITS restore sequence)
+> The code flow is somewhat complexified by the need to respect the
+> affinities required by the HW, meaning that tables can either be
+> inherited from a previously discovered ITS or redistributor.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---[...]
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 40912b3fb0e1..478d3678850c 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+[...]
+> @@ -2025,6 +2098,214 @@ static int its_alloc_tables(struct its_node *its)
+>   	return 0;
+>   }
+>   
+> +static u64 inherit_vpe_l1_table_from_its(void)
+> +{
+> +	struct its_node *its;
+> +	u64 val;
+> +	u32 aff;
+> +
+> +	val = gic_read_typer(gic_data_rdist_rd_base() + GICR_TYPER);
+> +	aff = compute_common_aff(val);
+> +
+> +	list_for_each_entry(its, &its_nodes, entry) {
+> +		u64 baser;
+> +
+> +		if (!is_v4_1(its))
+> +			continue;
+> +
+> +		if (!FIELD_GET(GITS_TYPER_SVPET, its->typer))
+> +			continue;
+> +
+> +		if (aff != compute_its_aff(its))
+> +			continue;
+> +
+> +		/* GICv4.1 guarantees that the vPE table is GITS_BASER2 */
+> +		baser = its->tables[2].val;
+> +		if (!(baser & GITS_BASER_VALID))
+> +			continue;
+> +
+> +		/* We have a winner! */
+> +		val  = GICR_VPROPBASER_4_1_VALID;
+> +		if (baser & GITS_BASER_INDIRECT)
+> +			val |= GICR_VPROPBASER_4_1_INDIRECT;
+> +		val |= FIELD_PREP(GICR_VPROPBASER_4_1_PAGE_SIZE,
+> +				  FIELD_GET(GITS_BASER_PAGE_SIZE_MASK, baser));
+> +		val |= FIELD_PREP(GICR_VPROPBASER_4_1_ADDR,
+> +				  GITS_BASER_ADDR_48_to_52(baser) >> 12);
 
-Yeah, I see. Thanks for the pointer, Eric!
+We've used GITS_BASER_ADDR_48_to_52() only in the KVM code where the
+pagesize of ITS table is fixed to 64K.
+It may not work when the pagesize is 4K or 16K?
 
 
+Thanks,
 Zenghui
 
->   So
->> there should be _no_ LPI has been mapped when we're restoring GICR_CTLR
->> and enabling LPI, which says we will not scan the whole pending table
->> and restore pending by vgic_enable_lpis()/its_sync_lpi_pending_table(),
->> regardless of what the PTZ is.
->>
->> Instead, vgic_its_restore_ite()/vgic_v3_lpi_sync_pending_status() is
->> where we actually read the guest RAM and restore the LPI pending state.
-> yes the pending state is restored from
-> vgic_its_restore_ite/vgic_add_lpi/vgic_v3_lpi_sync_pending_status and
-> this path ignores the PTZ.
-> 
-> Thanks
-> 
-> Eric
->> Which means we will still do the right thing even for non-Linux guests.
->> Not sure if I've got things correctly here.
->>
->> In the end, let's keep the patch as it is.
->>
->>>
->>> This patch on its own fixes more than one bug!
->>>
->>
->> If so, just by luck ;-)
+> +		val |= FIELD_PREP(GICR_VPROPBASER_SHAREABILITY_MASK,
+> +				  FIELD_GET(GITS_BASER_SHAREABILITY_MASK, baser));
+> +		val |= FIELD_PREP(GICR_VPROPBASER_INNER_CACHEABILITY_MASK,
+> +				  FIELD_GET(GITS_BASER_INNER_CACHEABILITY_MASK, baser));
+> +		val |= FIELD_PREP(GICR_VPROPBASER_4_1_SIZE, GITS_BASER_NR_PAGES(baser) - 1);
+> +
+> +		return val;
+> +	}
+> +
+> +	return 0;
+> +}
 
 _______________________________________________
 kvmarm mailing list
