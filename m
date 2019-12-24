@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CBDC2D0D2
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77198C2D0D0
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 10E66206CB
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E66206CB
+	by mail.kernel.org (Postfix) with ESMTP id 2B30F206CB
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:43:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B30F206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA464AF69;
-	Tue, 24 Dec 2019 06:43:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7BB74AF30;
+	Tue, 24 Dec 2019 06:43:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5PixELq-xR-E; Tue, 24 Dec 2019 06:43:01 -0500 (EST)
+	with ESMTP id o8y84ktH4tGn; Tue, 24 Dec 2019 06:43:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C964AF3B;
-	Tue, 24 Dec 2019 06:43:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E334AF39;
+	Tue, 24 Dec 2019 06:43:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D82F24AF1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6374AF2F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2703462YKcFc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:43:00 -0500 (EST)
+ with ESMTP id Yqn31w9MY9jc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:43:07 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01E2D4AF28
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EAD9D4AF28
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:43:06 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji5y-000169-H6; Tue, 24 Dec 2019 12:11:22 +0100
+ id 1iji69-000169-DW; Tue, 24 Dec 2019 12:11:34 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 14/32] irqchip/gic-v4.1: Suppress per-VLPI doorbell
-Date: Tue, 24 Dec 2019 11:10:37 +0000
-Message-Id: <20191224111055.11836-15-maz@kernel.org>
+Subject: [PATCH v3 25/32] irqchip/gic-v4.1: Add VSGI property setup
+Date: Tue, 24 Dec 2019 11:10:48 +0000
+Message-Id: <20191224111055.11836-26-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,52 +79,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since GICv4.1 gives us a per-VPE doorbell, avoid programming anything
-else on VMOVI/VMAPI/VMAPTI and on any other action that would have
-otherwise resulted in a per-VLPI doorbell to be programmed.
+Add the SGI configuration entry point for KVM to use.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
+ include/linux/irqchip/arm-gic-v4.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 403f5753e1ed..f00c8ddd3798 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -719,7 +719,7 @@ static struct its_vpe *its_build_vmapti_cmd(struct its_node *its,
- {
- 	u32 db;
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 99b33f60ac63..f3f06c5c7e54 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+ 	return irq_set_vcpu_affinity(irq, &info);
+ }
  
--	if (desc->its_vmapti_cmd.db_enabled)
-+	if (!is_v4_1(its) && desc->its_vmapti_cmd.db_enabled)
- 		db = desc->its_vmapti_cmd.vpe->vpe_db_lpi;
- 	else
- 		db = 1023;
-@@ -742,7 +742,7 @@ static struct its_vpe *its_build_vmovi_cmd(struct its_node *its,
- {
- 	u32 db;
- 
--	if (desc->its_vmovi_cmd.db_enabled)
-+	if (!is_v4_1(its) && desc->its_vmovi_cmd.db_enabled)
- 		db = desc->its_vmovi_cmd.vpe->vpe_db_lpi;
- 	else
- 		db = 1023;
-@@ -1353,6 +1353,13 @@ static void its_vlpi_set_doorbell(struct irq_data *d, bool enable)
- 	u32 event = its_get_event_id(d);
- 	struct its_vlpi_map *map;
- 
-+	/*
-+	 * GICv4.1 does away with the per-LPI nonsense, nothing to do
-+	 * here.
-+	 */
-+	if (is_v4_1(its_dev->its))
-+		return;
++int its_prop_update_vsgi(int irq, u8 priority, bool group)
++{
++	struct its_cmd_info info = {
++		.cmd_type = PROP_UPDATE_SGI,
++		{
++			.priority	= priority,
++			.group		= group,
++		},
++	};
 +
- 	map = dev_event_to_vlpi_map(its_dev, event);
++	return irq_set_vcpu_affinity(irq, &info);
++}
++
+ int its_init_v4(struct irq_domain *domain,
+ 		const struct irq_domain_ops *vpe_ops,
+ 		const struct irq_domain_ops *sgi_ops)
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index 9fbd0418f569..46c167a6349f 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -129,6 +129,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+ int its_get_vlpi(int irq, struct its_vlpi_map *map);
+ int its_unmap_vlpi(int irq);
+ int its_prop_update_vlpi(int irq, u8 config, bool inv);
++int its_prop_update_vsgi(int irq, u8 priority, bool group);
  
- 	if (map->db_enabled == enable)
+ struct irq_domain_ops;
+ int its_init_v4(struct irq_domain *domain,
 -- 
 2.20.1
 
