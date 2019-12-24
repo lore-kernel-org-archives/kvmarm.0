@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B63C2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A19ECC2D0D0
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 980B7206CB
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980B7206CB
+	by mail.kernel.org (Postfix) with ESMTP id 64FB020706
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64FB020706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2902E4AF5C;
-	Tue, 24 Dec 2019 06:41:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D76D4AF60;
+	Tue, 24 Dec 2019 06:41:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T1yqLmTFRZoR; Tue, 24 Dec 2019 06:41:00 -0500 (EST)
+	with ESMTP id YN1BizVk-hJJ; Tue, 24 Dec 2019 06:41:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0114C4AF21;
-	Tue, 24 Dec 2019 06:41:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B47F4AF33;
+	Tue, 24 Dec 2019 06:41:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24F9A4AF3F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C9E4AF22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kv5tN950enZM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:40:56 -0500 (EST)
+ with ESMTP id Liiu6chJF5lp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:41:04 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 036DE4AEFC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF0744AF21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:03 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji5u-000169-TW; Tue, 24 Dec 2019 12:11:19 +0100
+ id 1iji66-000169-DZ; Tue, 24 Dec 2019 12:11:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 11/32] irqchip/gic-v4.1: Add VPE residency callback
-Date: Tue, 24 Dec 2019 11:10:34 +0000
-Message-Id: <20191224111055.11836-12-maz@kernel.org>
+Subject: [PATCH v3 21/32] irqchip/gic-v4.1: Plumb get/set_irqchip_state SGI
+ callbacks
+Date: Tue, 24 Dec 2019 11:10:44 +0000
+Message-Id: <20191224111055.11836-22-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -79,88 +80,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Making a VPE resident on GICv4.1 is pretty simple, as it is just a
-single write to the local redistributor. We just need extra information
-about which groups to enable, which the KVM code will have to provide.
+To implement the get/set_irqchip_state callbacks (limited to the
+PENDING state), we have to use a particular set of hacks:
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+- Reading the pending state is done by using a pair of new redistributor
+  registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 interrupts
+  state to be retrieved.
+- Setting the pending state is done by generating it as we'd otherwise do
+  for a guest (writing to GITS_SGIR)
+- Clearing the pending state is done by emiting a VSGI command with the
+  "clear" bit set.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 17 +++++++++++++++++
- include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
- include/linux/irqchip/arm-gic-v4.h |  5 +++++
- 3 files changed, 31 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c   | 56 ++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h | 14 ++++++++
+ 2 files changed, 70 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 0da6baa48153..49850297fe56 100644
+index c13c889553c5..47d63a5b43ff 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3625,12 +3625,29 @@ static void its_vpe_4_1_unmask_irq(struct irq_data *d)
- 	its_vpe_4_1_send_inv(d);
+@@ -3832,11 +3832,67 @@ static int its_sgi_set_affinity(struct irq_data *d,
+ 	return -EINVAL;
  }
  
-+static void its_vpe_4_1_schedule(struct its_vpe *vpe,
-+				 struct its_cmd_info *info)
++static int its_sgi_set_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which,
++				     bool state)
 +{
-+	void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
-+	u64 val = 0;
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
 +
-+	/* Schedule the VPE */
-+	val |= GICR_VPENDBASER_Valid;
-+	val |= info->g0en ? GICR_VPENDBASER_4_1_VGRP0EN : 0;
-+	val |= info->g1en ? GICR_VPENDBASER_4_1_VGRP1EN : 0;
-+	val |= FIELD_PREP(GICR_VPENDBASER_4_1_VPEID, vpe->vpe_id);
++	if (state) {
++		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++		struct its_node *its = find_4_1_its();
++		u64 val;
 +
-+	gits_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
++		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
++		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
++		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
++	} else {
++		its_configure_sgi(d, true);
++	}
++
++	return 0;
 +}
 +
- static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
- {
++static int its_sgi_get_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which, bool *val)
++{
 +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
- 	struct its_cmd_info *info = vcpu_info;
++	void __iomem *base = gic_data_rdist_cpu(vpe->col_idx)->rd_base + SZ_128K;
++	u32 count = 1000000;	/* 1s! */
++	u32 status;
++
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
++
++	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
++	do {
++		status = readl_relaxed(base + GICR_VSGIPENDR);
++		if (!(status & GICR_VSGIPENDR_BUSY))
++			goto out;
++
++		count--;
++		if (!count) {
++			pr_err_ratelimited("Unable to get SGI status\n");
++			goto out;
++		}
++		cpu_relax();
++		udelay(1);
++	} while(count);
++
++out:
++	*val = !!(status & (1 << d->hwirq));
++
++	return 0;
++}
++
+ static struct irq_chip its_sgi_irq_chip = {
+ 	.name			= "GICv4.1-sgi",
+ 	.irq_mask		= its_sgi_mask_irq,
+ 	.irq_unmask		= its_sgi_unmask_irq,
+ 	.irq_set_affinity	= its_sgi_set_affinity,
++	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
++	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
+ };
  
- 	switch (info->cmd_type) {
- 	case SCHEDULE_VPE:
-+		its_vpe_4_1_schedule(vpe, info);
- 		return 0;
- 
- 	case DESCHEDULE_VPE:
+ static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
 diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 33519b7c96cf..1c91dede7663 100644
+index 64818ed4c238..a0566bd5516e 100644
 --- a/include/linux/irqchip/arm-gic-v3.h
 +++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -329,6 +329,15 @@
- #define GICR_VPENDBASER_IDAI		(1ULL << 62)
- #define GICR_VPENDBASER_Valid		(1ULL << 63)
+@@ -345,6 +345,15 @@
+ #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
+ #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
  
-+/*
-+ * GICv4.1 VPENDBASER, used for VPE residency. On top of these fields,
-+ * also use the above Valid, PendingLast and Dirty.
-+ */
-+#define GICR_VPENDBASER_4_1_DB		(1ULL << 62)
-+#define GICR_VPENDBASER_4_1_VGRP0EN	(1ULL << 59)
-+#define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
-+#define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
++#define GICR_VSGIR			0x0080
++
++#define GICR_VSGIR_VPEID		GENMASK(15, 0)
++
++#define GICR_VSGIPENDR			0x0088
++
++#define GICR_VSGIPENDR_BUSY		(1U << 31)
++#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
 +
  /*
   * ITS registers, offsets from ITS_base
   */
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index 498e523085a7..d9c34968467a 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -100,6 +100,11 @@ struct its_cmd_info {
- 	union {
- 		struct its_vlpi_map	*map;
- 		u8			config;
-+		bool			req_db;
-+		struct {
-+			bool		g0en;
-+			bool		g1en;
-+		};
- 	};
- };
+@@ -368,6 +377,11 @@
  
+ #define GITS_TRANSLATER			0x10040
+ 
++#define GITS_SGIR			0x20020
++
++#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
++#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
++
+ #define GITS_CTLR_ENABLE		(1U << 0)
+ #define GITS_CTLR_ImDe			(1U << 1)
+ #define	GITS_CTLR_ITS_NUMBER_SHIFT	4
 -- 
 2.20.1
 
