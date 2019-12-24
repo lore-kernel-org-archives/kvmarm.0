@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F74AC2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5688CC2D0CF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:40:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2E6ED20722
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:40:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E6ED20722
+	by mail.kernel.org (Postfix) with ESMTP id 176C220722
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:40:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 176C220722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBB704AF67;
-	Tue, 24 Dec 2019 06:40:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C164AF6E;
+	Tue, 24 Dec 2019 06:40:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1yJnnMDZVUoo; Tue, 24 Dec 2019 06:40:30 -0500 (EST)
+	with ESMTP id WP91uQyLfRaq; Tue, 24 Dec 2019 06:40:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DEDC4AF40;
-	Tue, 24 Dec 2019 06:40:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99AB74AF56;
+	Tue, 24 Dec 2019 06:40:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2164AF3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 864964AF3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iyoy0+p3DtFG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:40:28 -0500 (EST)
+ with ESMTP id VcCLBwjMkZVb for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:40:34 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D1694AF1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C0AA4AF1F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:40:34 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji67-000169-TL; Tue, 24 Dec 2019 12:11:32 +0100
+ id 1iji5z-000169-E5; Tue, 24 Dec 2019 12:11:23 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 23/32] irqchip/gic-v4.1: Move doorbell management to the
- GICv4 abstraction layer
-Date: Tue, 24 Dec 2019 11:10:46 +0000
-Message-Id: <20191224111055.11836-24-maz@kernel.org>
+Subject: [PATCH v3 15/32] irqchip/gic-v4.1: Allow direct invalidation of VLPIs
+Date: Tue, 24 Dec 2019 11:10:38 +0000
+Message-Id: <20191224111055.11836-16-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -80,208 +79,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to hide some of the differences between v4.0 and v4.1, move
-the doorbell management out of the KVM code, and into the GICv4-specific
-layer. This allows the calling code to ask for the doorbell when blocking,
-and otherwise to leave the doorbell permanently disabled.
+Just like for INVALL, GICv4.1 has grown a VPE-aware INVLPI register.
+Let's plumb it in and make use of the DirectLPI code in that case.
 
-This matches the v4.1 code perfectly, and only results in a minor
-refactoring of the v4.0 code.
-
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v4.c       | 45 +++++++++++++++++++++++++++---
- include/kvm/arm_vgic.h             |  1 +
- include/linux/irqchip/arm-gic-v4.h |  3 +-
- virt/kvm/arm/vgic/vgic-v3.c        |  1 +
- virt/kvm/arm/vgic/vgic-v4.c        | 34 ++++++++++------------
- 5 files changed, 59 insertions(+), 25 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 53 ++++++++++++++++++++----------
+ include/linux/irqchip/arm-gic-v3.h |  1 +
+ 2 files changed, 36 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index c01910d53f9e..117ba6db023d 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -87,6 +87,11 @@ static struct irq_domain *gic_domain;
- static const struct irq_domain_ops *vpe_domain_ops;
- static const struct irq_domain_ops *sgi_domain_ops;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index f00c8ddd3798..360ca2c1533f 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -228,11 +228,26 @@ static struct its_vlpi_map *dev_event_to_vlpi_map(struct its_device *its_dev,
+ 	return &its_dev->event_map.vlpi_maps[event];
+ }
  
-+static bool has_v4_1(void)
-+{
-+	return !!sgi_domain_ops;
+-static struct its_collection *irq_to_col(struct irq_data *d)
++static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
+ {
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	u32 event = its_get_event_id(d);
++
++	if (!irqd_is_forwarded_to_vcpu(d))
++		return NULL;
+ 
+-	return dev_event_to_col(its_dev, its_get_event_id(d));
++	return dev_event_to_vlpi_map(its_dev, event);
 +}
 +
- int its_alloc_vcpu_irqs(struct its_vm *vm)
- {
- 	int vpe_base_irq, i;
-@@ -139,18 +144,50 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
- 	return irq_set_vcpu_affinity(vpe->irq, info);
- }
- 
--int its_schedule_vpe(struct its_vpe *vpe, bool on)
-+int its_make_vpe_non_resident(struct its_vpe *vpe, bool db)
- {
--	struct its_cmd_info info;
-+	struct irq_desc *desc = irq_to_desc(vpe->irq);
-+	struct its_cmd_info info = { };
- 	int ret;
- 
- 	WARN_ON(preemptible());
- 
--	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
-+	info.cmd_type = DESCHEDULE_VPE;
-+	if (has_v4_1()) {
-+		/* GICv4.1 can directly deal with doorbells */
-+		info.req_db = db;
-+	} else {
-+		/* Undo the nested disable_irq() calls... */
-+		while (db && irqd_irq_disabled(&desc->irq_data))
-+			enable_irq(vpe->irq);
-+	}
-+
-+	ret = its_send_vpe_cmd(vpe, &info);
-+	if (!ret)
-+		vpe->resident = false;
-+
-+	return ret;
-+}
-+
-+int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
++static int irq_to_cpuid(struct irq_data *d)
 +{
-+	struct its_cmd_info info = { };
-+	int ret;
++	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++	struct its_vlpi_map *map = get_vlpi_map(d);
 +
-+	WARN_ON(preemptible());
++	if (map)
++		return map->vpe->col_idx;
 +
-+	info.cmd_type = SCHEDULE_VPE;
-+	if (has_v4_1()) {
-+		info.g0en = g0en;
-+		info.g1en = g1en;
++	return its_dev->event_map.col_map[its_get_event_id(d)];
+ }
+ 
+ static struct its_collection *valid_col(struct its_collection *col)
+@@ -1270,17 +1285,6 @@ static void its_send_invdb(struct its_node *its, struct its_vpe *vpe)
+ /*
+  * irqchip functions - assumes MSI, mostly.
+  */
+-static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
+-{
+-	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+-	u32 event = its_get_event_id(d);
+-
+-	if (!irqd_is_forwarded_to_vcpu(d))
+-		return NULL;
+-
+-	return dev_event_to_vlpi_map(its_dev, event);
+-}
+-
+ static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
+ {
+ 	struct its_vlpi_map *map = get_vlpi_map(d);
+@@ -1323,13 +1327,25 @@ static void wait_for_syncr(void __iomem *rdbase)
+ 
+ static void direct_lpi_inv(struct irq_data *d)
+ {
+-	struct its_collection *col;
++	struct its_vlpi_map *map = get_vlpi_map(d);
+ 	void __iomem *rdbase;
++	u64 val;
++
++	if (map) {
++		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++
++		WARN_ON(!is_v4_1(its_dev->its));
++
++		val  = GICR_INVLPIR_V;
++		val |= FIELD_PREP(GICR_INVLPIR_VPEID, map->vpe->vpe_id);
++		val |= FIELD_PREP(GICR_INVLPIR_INTID, map->vintid);
 +	} else {
-+		/* Disabled the doorbell, as we're about to enter the guest */
-+		disable_irq_nosync(vpe->irq);
++		val = d->hwirq;
 +	}
  
- 	ret = its_send_vpe_cmd(vpe, &info);
- 	if (!ret)
--		vpe->resident = on;
-+		vpe->resident = true;
+ 	/* Target the redistributor this LPI is currently routed to */
+-	col = irq_to_col(d);
+-	rdbase = per_cpu_ptr(gic_rdists->rdist, col->col_id)->rd_base;
+-	gic_write_lpir(d->hwirq, rdbase + GICR_INVLPIR);
++	rdbase = per_cpu_ptr(gic_rdists->rdist, irq_to_cpuid(d))->rd_base;
++	gic_write_lpir(val, rdbase + GICR_INVLPIR);
  
- 	return ret;
+ 	wait_for_syncr(rdbase);
  }
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9d53f545a3d5..63457908c9c4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -70,6 +70,7 @@ struct vgic_global {
+@@ -1339,7 +1355,8 @@ static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+ 	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
  
- 	/* Hardware has GICv4? */
- 	bool			has_gicv4;
-+	bool			has_gicv4_1;
+ 	lpi_write_config(d, clr, set);
+-	if (gic_rdists->has_direct_lpi && !irqd_is_forwarded_to_vcpu(d))
++	if (gic_rdists->has_direct_lpi &&
++	    (is_v4_1(its_dev->its) || !irqd_is_forwarded_to_vcpu(d)))
+ 		direct_lpi_inv(d);
+ 	else if (!irqd_is_forwarded_to_vcpu(d))
+ 		its_send_inv(its_dev, its_get_event_id(d));
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 37b14fb82773..a30ea5294784 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -249,6 +249,7 @@
+ #define GICR_TYPER_COMMON_LPI_AFF	GENMASK_ULL(25, 24)
+ #define GICR_TYPER_AFFINITY		GENMASK_ULL(63, 32)
  
- 	/* GIC system register CPU interface */
- 	struct static_key_false gicv3_cpuif;
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index a1a9d40266f5..cca4198fa1d5 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -120,7 +120,8 @@ struct its_cmd_info {
++#define GICR_INVLPIR_INTID		GENMASK_ULL(31, 0)
+ #define GICR_INVLPIR_VPEID		GENMASK_ULL(47, 32)
+ #define GICR_INVLPIR_V			GENMASK_ULL(63, 63)
  
- int its_alloc_vcpu_irqs(struct its_vm *vm);
- void its_free_vcpu_irqs(struct its_vm *vm);
--int its_schedule_vpe(struct its_vpe *vpe, bool on);
-+int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
-+int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
- int its_invall_vpe(struct its_vpe *vpe);
- int its_map_vlpi(int irq, struct its_vlpi_map *map);
- int its_get_vlpi(int irq, struct its_vlpi_map *map);
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index f45635a6f0ec..c2fdea201747 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -595,6 +595,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	/* GICv4 support? */
- 	if (info->has_v4) {
- 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
-+		kvm_vgic_global_state.has_gicv4_1 = info->has_v4_1;
- 		kvm_info("GICv4 support %sabled\n",
- 			 gicv4_enable ? "en" : "dis");
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 46f875589c47..1eb0f8c76219 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -67,10 +67,10 @@
-  * it. And if we've migrated our vcpu from one CPU to another, we must
-  * tell the ITS (so that the messages reach the right redistributor).
-  * This is done in two steps: first issue a irq_set_affinity() on the
-- * irq corresponding to the vcpu, then call its_schedule_vpe(). You
-- * must be in a non-preemptible context. On exit, another call to
-- * its_schedule_vpe() tells the redistributor that we're done with the
-- * vcpu.
-+ * irq corresponding to the vcpu, then call its_make_vpe_resident().
-+ * You must be in a non-preemptible context. On exit, a call to
-+ * its_make_vpe_non_resident() tells the redistributor that we're done
-+ * with the vcpu.
-  *
-  * Finally, the doorbell handling: Each vcpu is allocated an interrupt
-  * which will fire each time a VLPI is made pending whilst the vcpu is
-@@ -86,7 +86,8 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- 	struct kvm_vcpu *vcpu = info;
- 
- 	/* We got the message, no need to fire again */
--	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
-+	if (!kvm_vgic_global_state.has_gicv4_1 &&
-+	    !irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
- 		disable_irq_nosync(irq);
- 
- 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
-@@ -199,19 +200,11 @@ void vgic_v4_teardown(struct kvm *kvm)
- int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
--	struct irq_desc *desc = irq_to_desc(vpe->irq);
- 
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	/*
--	 * If blocking, a doorbell is required. Undo the nested
--	 * disable_irq() calls...
--	 */
--	while (need_db && irqd_irq_disabled(&desc->irq_data))
--		enable_irq(vpe->irq);
--
--	return its_schedule_vpe(vpe, false);
-+	return its_make_vpe_non_resident(vpe, need_db);
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
-@@ -232,18 +225,19 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
- 	if (err)
- 		return err;
- 
--	/* Disabled the doorbell, as we're about to enter the guest */
--	disable_irq_nosync(vpe->irq);
--
--	err = its_schedule_vpe(vpe, true);
-+	err = its_make_vpe_resident(vpe, false, vcpu->kvm->arch.vgic.enabled);
- 	if (err)
- 		return err;
- 
- 	/*
- 	 * Now that the VPE is resident, let's get rid of a potential
--	 * doorbell interrupt that would still be pending.
-+	 * doorbell interrupt that would still be pending. This is a
-+	 * GICv4.0 only "feature"...
- 	 */
--	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
-+	if (!kvm_vgic_global_state.has_gicv4_1)
-+		err = irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
-+
-+	return err;
- }
- 
- static struct vgic_its *vgic_get_its(struct kvm *kvm,
 -- 
 2.20.1
 
