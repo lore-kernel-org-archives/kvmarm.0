@@ -2,61 +2,64 @@ Return-Path: <SRS0=PUN/=2O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12150C2D0D0
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 12:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7DEC2D0D2
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 13:09:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8FFA32071A
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 12:56:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FFA32071A
+	by mail.kernel.org (Postfix) with ESMTP id 1EC8320731
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 13:09:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC8320731
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 317C44AF5A;
-	Tue, 24 Dec 2019 07:56:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7EB4AF5D;
+	Tue, 24 Dec 2019 08:09:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qQtEyjw5y01S; Tue, 24 Dec 2019 07:56:56 -0500 (EST)
+	with ESMTP id C9SB6ahyvjg4; Tue, 24 Dec 2019 08:08:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91834AF3A;
-	Tue, 24 Dec 2019 07:56:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB89A4AF3B;
+	Tue, 24 Dec 2019 08:08:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7401A4AF0B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 07:56:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0444A7FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 08:08:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tO4BGUIUuzYv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 07:56:54 -0500 (EST)
+ with ESMTP id gdDwcNt3OzPG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 08:08:56 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 288414AF21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 07:56:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9238D4A523
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 08:08:56 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC4991FB;
- Tue, 24 Dec 2019 04:56:53 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 334D01FB;
+ Tue, 24 Dec 2019 05:08:56 -0800 (PST)
 Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 446093F534;
- Tue, 24 Dec 2019 04:56:53 -0800 (PST)
-Date: Tue, 24 Dec 2019 12:56:51 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C5333F534;
+ Tue, 24 Dec 2019 05:08:55 -0800 (PST)
+Date: Tue, 24 Dec 2019 13:08:53 +0000
 From: Andrew Murray <andrew.murray@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 00/18] arm64: KVM: add SPE profiling support
-Message-ID: <20191224125651.GM42593@e119886-lin.cambridge.arm.com>
+Subject: Re: [PATCH v2 14/18] KVM: arm64: spe: Provide guest virtual
+ interrupts for SPE
+Message-ID: <20191224130853.GN42593@e119886-lin.cambridge.arm.com>
 References: <20191220143025.33853-1-andrew.murray@arm.com>
- <f023f5529361cc1e2d799daa70f196c2@www.loen.fr>
- <864kxsim8d.wl-maz@kernel.org>
+ <20191220143025.33853-15-andrew.murray@arm.com>
+ <867e2oimw9.wl-maz@kernel.org>
+ <20191224115031.GG42593@e119886-lin.cambridge.arm.com>
+ <1f3fbff6c9db0f14c92a6e3fb800fa0f@www.loen.fr>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <864kxsim8d.wl-maz@kernel.org>
+In-Reply-To: <1f3fbff6c9db0f14c92a6e3fb800fa0f@www.loen.fr>
 User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
  linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,92 +76,310 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Dec 22, 2019 at 12:22:10PM +0000, Marc Zyngier wrote:
-> On Sat, 21 Dec 2019 10:48:16 +0000,
-> Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > [fixing email addresses]
-> > 
-> > Hi Andrew,
-> > 
-> > On 2019-12-20 14:30, Andrew Murray wrote:
-> > > This series implements support for allowing KVM guests to use the Arm
-> > > Statistical Profiling Extension (SPE).
-> > 
-> > Thanks for this. In future, please Cc me and Will on email addresses
-> > we can actually read.
-> > 
-> > > It has been tested on a model to ensure that both host and guest can
-> > > simultaneously use SPE with valid data. E.g.
+On Tue, Dec 24, 2019 at 12:42:02PM +0000, Marc Zyngier wrote:
+> On 2019-12-24 11:50, Andrew Murray wrote:
+> > On Sun, Dec 22, 2019 at 12:07:50PM +0000, Marc Zyngier wrote:
+> > > On Fri, 20 Dec 2019 14:30:21 +0000,
+> > > Andrew Murray <andrew.murray@arm.com> wrote:
+> > > >
+> > > > Upon the exit of a guest, let's determine if the SPE device has
+> > > generated
+> > > > an interrupt - if so we'll inject a virtual interrupt to the
+> > > guest.
+> > > >
+> > > > Upon the entry and exit of a guest we'll also update the state of
+> > > the
+> > > > physical IRQ such that it is active when a guest interrupt is
+> > > pending
+> > > > and the guest is running.
+> > > >
+> > > > Finally we map the physical IRQ to the virtual IRQ such that the
+> > > guest
+> > > > can deactivate the interrupt when it handles the interrupt.
+> > > >
+> > > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > > ---
+> > > >  include/kvm/arm_spe.h |  6 ++++
+> > > >  virt/kvm/arm/arm.c    |  5 ++-
+> > > >  virt/kvm/arm/spe.c    | 71
+> > > +++++++++++++++++++++++++++++++++++++++++++
+> > > >  3 files changed, 81 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> > > > index 9c65130d726d..91b2214f543a 100644
+> > > > --- a/include/kvm/arm_spe.h
+> > > > +++ b/include/kvm/arm_spe.h
+> > > > @@ -37,6 +37,9 @@ static inline bool kvm_arm_support_spe_v1(void)
+> > > >  						      ID_AA64DFR0_PMSVER_SHIFT);
+> > > >  }
+> > > >
+> > > > +void kvm_spe_flush_hwstate(struct kvm_vcpu *vcpu);
+> > > > +inline void kvm_spe_sync_hwstate(struct kvm_vcpu *vcpu);
+> > > > +
+> > > >  int kvm_arm_spe_v1_set_attr(struct kvm_vcpu *vcpu,
+> > > >  			    struct kvm_device_attr *attr);
+> > > >  int kvm_arm_spe_v1_get_attr(struct kvm_vcpu *vcpu,
+> > > > @@ -49,6 +52,9 @@ int kvm_arm_spe_v1_enable(struct kvm_vcpu
+> > > *vcpu);
+> > > >  #define kvm_arm_support_spe_v1()	(false)
+> > > >  #define kvm_arm_spe_irq_initialized(v)	(false)
+> > > >
+> > > > +static inline void kvm_spe_flush_hwstate(struct kvm_vcpu *vcpu)
+> > > {}
+> > > > +static inline void kvm_spe_sync_hwstate(struct kvm_vcpu *vcpu) {}
+> > > > +
+> > > >  static inline int kvm_arm_spe_v1_set_attr(struct kvm_vcpu *vcpu,
+> > > >  					  struct kvm_device_attr *attr)
+> > > >  {
+> > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > > index 340d2388ee2c..a66085c8e785 100644
+> > > > --- a/virt/kvm/arm/arm.c
+> > > > +++ b/virt/kvm/arm/arm.c
+> > > > @@ -741,6 +741,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> > > *vcpu, struct kvm_run *run)
+> > > >  		preempt_disable();
+> > > >
+> > > >  		kvm_pmu_flush_hwstate(vcpu);
+> > > > +		kvm_spe_flush_hwstate(vcpu);
+> > > >
+> > > >  		local_irq_disable();
+> > > >
+> > > > @@ -782,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> > > *vcpu, struct kvm_run *run)
+> > > >  		    kvm_request_pending(vcpu)) {
+> > > >  			vcpu->mode = OUTSIDE_GUEST_MODE;
+> > > >  			isb(); /* Ensure work in x_flush_hwstate is committed */
+> > > > +			kvm_spe_sync_hwstate(vcpu);
+> > > >  			kvm_pmu_sync_hwstate(vcpu);
+> > > >  			if (static_branch_unlikely(&userspace_irqchip_in_use))
+> > > >  				kvm_timer_sync_hwstate(vcpu);
+> > > > @@ -816,11 +818,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> > > *vcpu, struct kvm_run *run)
+> > > >  		kvm_arm_clear_debug(vcpu);
+> > > >
+> > > >  		/*
+> > > > -		 * We must sync the PMU state before the vgic state so
+> > > > +		 * We must sync the PMU and SPE state before the vgic state so
+> > > >  		 * that the vgic can properly sample the updated state of the
+> > > >  		 * interrupt line.
+> > > >  		 */
+> > > >  		kvm_pmu_sync_hwstate(vcpu);
+> > > > +		kvm_spe_sync_hwstate(vcpu);
 > > > 
-> > > $ perf record -e arm_spe/ts_enable=1,pa_enable=1,pct_enable=1/ \
-> > >         dd if=/dev/zero of=/dev/null count=1000
-> > > $ perf report --dump-raw-trace > spe_buf.txt
+> > > The *HUGE* difference is that the PMU is purely a virtual interrupt,
+> > > while you're trying to deal with a HW interrupt here.
 > > > 
-> > > As we save and restore the SPE context, the guest can access the SPE
-> > > registers directly, thus in this version of the series we remove the
-> > > trapping and emulation.
+> > > >
+> > > >  		/*
+> > > >  		 * Sync the vgic state before syncing the timer state because
+> > > > diff --git a/virt/kvm/arm/spe.c b/virt/kvm/arm/spe.c
+> > > > index 83ac2cce2cc3..097ed39014e4 100644
+> > > > --- a/virt/kvm/arm/spe.c
+> > > > +++ b/virt/kvm/arm/spe.c
+> > > > @@ -35,6 +35,68 @@ int kvm_arm_spe_v1_enable(struct kvm_vcpu
+> > > *vcpu)
+> > > >  	return 0;
+> > > >  }
+> > > >
+> > > > +static inline void set_spe_irq_phys_active(struct
+> > > arm_spe_kvm_info *info,
+> > > > +					   bool active)
+> > > > +{
+> > > > +	int r;
+> > > > +	r = irq_set_irqchip_state(info->physical_irq,
+> > > IRQCHIP_STATE_ACTIVE,
+> > > > +				  active);
+> > > > +	WARN_ON(r);
+> > > > +}
+> > > > +
+> > > > +void kvm_spe_flush_hwstate(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	struct kvm_spe *spe = &vcpu->arch.spe;
+> > > > +	bool phys_active = false;
+> > > > +	struct arm_spe_kvm_info *info = arm_spe_get_kvm_info();
+> > > > +
+> > > > +	if (!kvm_arm_spe_v1_ready(vcpu))
+> > > > +		return;
+> > > > +
+> > > > +	if (irqchip_in_kernel(vcpu->kvm))
+> > > > +		phys_active = kvm_vgic_map_is_active(vcpu, spe->irq_num);
+> > > > +
+> > > > +	phys_active |= spe->irq_level;
+> > > > +
+> > > > +	set_spe_irq_phys_active(info, phys_active);
 > > > 
-> > > In the previous series of this support, when KVM SPE isn't
-> > > supported (e.g. via CONFIG_KVM_ARM_SPE) we were able to return a
-> > > value of 0 to all reads of the SPE registers - as we can no longer
-> > > do this there isn't a mechanism to prevent the guest from using
-> > > SPE - thus I'm keen for feedback on the best way of resolving
-> > > this.
+> > > So you're happy to mess with the HW interrupt state even when you
+> > > don't have a HW irqchip? If you are going to copy paste the timer
+> > > code
+> > > here, you'd need to support it all the way (no, don't).
+> > > 
+> > > > +}
+> > > > +
+> > > > +void kvm_spe_sync_hwstate(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	struct kvm_spe *spe = &vcpu->arch.spe;
+> > > > +	u64 pmbsr;
+> > > > +	int r;
+> > > > +	bool service;
+> > > > +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> > > > +	struct arm_spe_kvm_info *info = arm_spe_get_kvm_info();
+> > > > +
+> > > > +	if (!kvm_arm_spe_v1_ready(vcpu))
+> > > > +		return;
+> > > > +
+> > > > +	set_spe_irq_phys_active(info, false);
+> > > > +
+> > > > +	pmbsr = ctxt->sys_regs[PMBSR_EL1];
+> > > > +	service = !!(pmbsr & BIT(SYS_PMBSR_EL1_S_SHIFT));
+> > > > +	if (spe->irq_level == service)
+> > > > +		return;
+> > > > +
+> > > > +	spe->irq_level = service;
+> > > > +
+> > > > +	if (likely(irqchip_in_kernel(vcpu->kvm))) {
+> > > > +		r = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> > > > +					spe->irq_num, service, spe);
+> > > > +		WARN_ON(r);
+> > > > +	}
+> > > > +}
+> > > > +
+> > > > +static inline bool kvm_arch_arm_spe_v1_get_input_level(int
+> > > vintid)
+> > > > +{
+> > > > +	struct kvm_vcpu *vcpu = kvm_arm_get_running_vcpu();
+> > > > +	struct kvm_spe *spe = &vcpu->arch.spe;
+> > > > +
+> > > > +	return spe->irq_level;
+> > > > +}
+> > > 
+> > > This isn't what such a callback is for. It is supposed to sample the
+> > > HW, an nothing else.
+> > > 
+> > > > +
+> > > >  static int kvm_arm_spe_v1_init(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >  	if (!kvm_arm_support_spe_v1())
+> > > > @@ -48,6 +110,7 @@ static int kvm_arm_spe_v1_init(struct kvm_vcpu
+> > > *vcpu)
+> > > >
+> > > >  	if (irqchip_in_kernel(vcpu->kvm)) {
+> > > >  		int ret;
+> > > > +		struct arm_spe_kvm_info *info;
+> > > >
+> > > >  		/*
+> > > >  		 * If using the SPE with an in-kernel virtual GIC
+> > > > @@ -57,10 +120,18 @@ static int kvm_arm_spe_v1_init(struct
+> > > kvm_vcpu *vcpu)
+> > > >  		if (!vgic_initialized(vcpu->kvm))
+> > > >  			return -ENODEV;
+> > > >
+> > > > +		info = arm_spe_get_kvm_info();
+> > > > +		if (!info->physical_irq)
+> > > > +			return -ENODEV;
+> > > > +
+> > > >  		ret = kvm_vgic_set_owner(vcpu, vcpu->arch.spe.irq_num,
+> > > >  					 &vcpu->arch.spe);
+> > > >  		if (ret)
+> > > >  			return ret;
+> > > > +
+> > > > +		ret = kvm_vgic_map_phys_irq(vcpu, info->physical_irq,
+> > > > +					    vcpu->arch.spe.irq_num,
+> > > > +					    kvm_arch_arm_spe_v1_get_input_level);
+> > > 
+> > > You're mapping the interrupt int the guest, and yet you have never
+> > > forwarded the interrupt the first place. All this flow is only going
+> > > to wreck the host driver as soon as an interrupt occurs.
+> > > 
+> > > I think you should rethink the interrupt handling altogether. It
+> > > would
+> > > make more sense if the interrupt was actually completely
+> > > virtualized. If you can isolate the guest state and compute the
+> > > interrupt state in SW (and from the above, it seems that you can),
+> > > then you shouldn't mess with the whole forwarding *at all*, as it
+> > > isn't designed for devices shared between host and guests.
 > > 
-> > Surely there is a way to conditionally trap SPE registers, right? You
-> > should still be able to do this if SPE is not configured for a given
-> > guest (as we do for other feature such as PtrAuth).
-> > 
-> > > It appears necessary to pin the entire guest memory in order to
-> > > provide guest SPE access - otherwise it is possible for the guest
-> > > to receive Stage-2 faults.
-> > 
-> > Really? How can the guest receive a stage-2 fault? This doesn't fit
-> > what I understand of the ARMv8 exception model. Or do you mean a SPE
-> > interrupt describing a S2 fault?
-
-Yes the latter.
-
-
-> > 
-> > And this is not just pinning the memory either. You have to ensure that
-> > all S2 page tables are created ahead of SPE being able to DMA to guest
-> > memory. This may have some impacts on the THP code...
-> > 
-> > I'll have a look at the actual series ASAP (but that's not very soon).
+> > Yes it's possible to read SYS_PMBSR_EL1_S_SHIFT and determine if SPE
+> > wants
+> > service. If I understand correctly, you're suggesting on entry/exit to
+> > the
+> > guest we determine this and inject an interrupt to the guest. As well as
+> > removing the kvm_vgic_map_phys_irq mapping to the physical interrupt?
 > 
-> I found some time to go through the series, and there is clearly a lot
-> of work left to do:
-> 
-> - There so nothing here to handle memory pinning whatsoever. If it
->   works, it is only thanks to some side effect.
-> 
-> - The missing trapping is deeply worrying. Given that this is an
->   optional feature, you cannot just let the guest do whatever it wants
->   in an uncontrolled manner.
+> The mapping only makes sense for devices that have their interrupt
+> forwarded to a vcpu, where the expected flow is that the interrupt
+> is taken on the host with a normal interrupt handler and then
+> injected in the guest (you still have to manage the active state
+> though). The basic assumption is that such a device is entirely
+> owned by KVM.
 
-Yes I'll add this.
+Though the mapping does mean that if the guest handles the guest SPE
+interrupt it doesn't have to wait for a guest exit before having the
+SPE interrupt evaluated again (i.e. another SPE interrupt won't cause
+a guest exit) - thus increasing the size of any black hole.
 
 
 > 
-> - The interrupt handling is busted. You mix concepts picked from both
->   the PMU and the timer code, while the SPE device doesn't behave like
->   any of these two (it is neither a fully emulated device, nor a
->   device that is exclusively owned by a guest at any given time).
+> Here, you're abusing the mapping interface: you don't have an
+> interrupt handler (the host SPE driver owns it), the interrupt
+> isn't forwarded, and yet you're messing with the active state.
+> None of that is expected, and you are in uncharted territory
+> as far as KVM is concerned.
 > 
-> I expect some level of discussion on the list including at least Will
-> and myself before you respin this.
+> What bothers me the most is that this looks a lot like a previous
+> implementation of the timers, and we had all the problems in the
+> world to keep track of the interrupt state *and* have a reasonable
+> level of performance (hitting the redistributor on the fast path
+> is a performance killer).
+> 
+> > My understanding was that I needed knowledge of the physical SPE
+> > interrupt
+> > number so that I could prevent the host SPE driver from getting spurious
+> > interrupts due to guest use of the SPE.
+> 
+> You can't completely rule out the host getting interrupted. Even if you set
+> PMBSR_EL1.S to zero, there is no guarantee that the host will not observe
+> the interrupt anyway (the GIC architecture doesn't tell you how quickly
+> it will be retired, if ever). The host driver already checks for this
+> anyway.
+> 
+> What you need to ensure is that PMBSR_EL1.S being set on guest entry
+> doesn't immediately kick you out of the guest and prevent forward
+> progress. This is why you need to manage the active state.
+> 
+> The real question is: how quickly do you want to react to a SPE
+> interrupt firing while in a guest?
+> 
+> If you want to take it into account as soon as it fires, then you need
+> to eagerly save/restore the active state together with the SPE state on
+> each entry/exit, and performance will suffer. This is what you are
+> currently doing.
+> 
+> If you're OK with evaluating the interrupt status on exit, but without
+> the interrupt itself causing an exit, then you can simply manage it
+> as a purely virtual interrupt, and just deal with the active state
+> in load/put (set the interrupt as active on load, clear it on put).
 
-Thanks for the quick feedback.
+This does feel like the pragmatic approach - a larger black hole in exchange
+for performance. I imagine the blackhole would be naturally reduced on
+machines with high workloads.
+
+I'll refine the series to take this approach.
+
+> 
+> Given that SPE interrupts always indicate that profiling has stopped,
+
+and faults :|
+
+Thanks,
 
 Andrew Murray
 
+> this only affects the size of the black hole, and I'm inclined to do
+> the latter.
 > 
-> 	M.
-> 
+>         M.
 > -- 
-> Jazz is not dead, it just smells funny.
+> Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
