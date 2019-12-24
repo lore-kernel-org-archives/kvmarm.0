@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FA07C2D0CF
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7785FC2D0CF
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2E8E320706
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8E320706
+	by mail.kernel.org (Postfix) with ESMTP id 3ABB620706
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Dec 2019 11:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABB620706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1DE4AF25;
-	Tue, 24 Dec 2019 06:41:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E70124AF67;
+	Tue, 24 Dec 2019 06:41:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mrf3s7Bhu+GM; Tue, 24 Dec 2019 06:41:39 -0500 (EST)
+	with ESMTP id hJkpsB+gps7L; Tue, 24 Dec 2019 06:41:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1484AF30;
-	Tue, 24 Dec 2019 06:41:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE8324AF21;
+	Tue, 24 Dec 2019 06:41:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25F534AF29
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59DA34AF22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JrRGOoxM4nOZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Dec 2019 06:41:37 -0500 (EST)
+ with ESMTP id grojkRuR7nGc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Dec 2019 06:41:43 -0500 (EST)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 105E04AF25
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C3D74AF21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Dec 2019 06:41:43 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by cheepnis.misterjones.org with esmtpsa
  (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
  (envelope-from <maz@kernel.org>)
- id 1iji6E-000169-K4; Tue, 24 Dec 2019 12:11:38 +0100
+ id 1iji60-000169-9h; Tue, 24 Dec 2019 12:11:24 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 29/32] KVM: arm64: GICv4.1: Allow SGIs to switch between HW
- and SW interrupts
-Date: Tue, 24 Dec 2019 11:10:52 +0000
-Message-Id: <20191224111055.11836-30-maz@kernel.org>
+Subject: [PATCH v3 16/32] irqchip/gic-v4.1: Advertise support v4.1 to KVM
+Date: Tue, 24 Dec 2019 11:10:39 +0000
+Message-Id: <20191224111055.11836-17-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191224111055.11836-1-maz@kernel.org>
 References: <20191224111055.11836-1-maz@kernel.org>
@@ -80,165 +79,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to let a guest buy in the new, active-less SGIs, we
-need to be able to switch between the two modes.
-
-Handle this by stopping all guest activity, transfer the state
-from one mode to the other, and resume the guest.
+Tell KVM that we support v4.1. Nothing uses this information so far.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- include/kvm/arm_vgic.h      |  3 ++
- virt/kvm/arm/vgic/vgic-v3.c |  2 +
- virt/kvm/arm/vgic/vgic-v4.c | 96 +++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    |  1 +
- 4 files changed, 102 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c       | 9 ++++++++-
+ drivers/irqchip/irq-gic-v3.c           | 2 ++
+ include/linux/irqchip/arm-gic-common.h | 2 ++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 63457908c9c4..69f4164d6477 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -231,6 +231,9 @@ struct vgic_dist {
- 	/* distributor enabled */
- 	bool			enabled;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 360ca2c1533f..48d7ee443544 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -4739,6 +4739,7 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+ 	struct device_node *of_node;
+ 	struct its_node *its;
+ 	bool has_v4 = false;
++	bool has_v4_1 = false;
+ 	int err;
  
-+	/* Wants SGIs without active state */
-+	bool			nassgireq;
+ 	gic_rdists = rdists;
+@@ -4759,8 +4760,14 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+ 	if (err)
+ 		return err;
+ 
+-	list_for_each_entry(its, &its_nodes, entry)
++	list_for_each_entry(its, &its_nodes, entry) {
+ 		has_v4 |= is_v4(its);
++		has_v4_1 |= is_v4_1(its);
++	}
 +
- 	struct vgic_irq		*spis;
++	/* Don't bother with inconsistent systems */
++	if (WARN_ON(!has_v4_1 && rdists->has_rvpeid))
++		rdists->has_rvpeid = false;
  
- 	struct vgic_io_device	dist_iodev;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index c2fdea201747..c79a251c4974 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
- 	}
+ 	if (has_v4 & rdists->has_vlpis) {
+ 		if (its_init_vpe_domain() ||
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 624f351c0362..fcbd220c92b3 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -1784,6 +1784,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+ 		gic_v3_kvm_info.vcpu = r;
  
-+	if (kvm_vgic_global_state.has_gicv4_1)
-+		vgic_v4_configure_vsgis(kvm);
- 	dist->ready = true;
- 
- out:
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index c2fcde104ea2..063785fd2dc7 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -97,6 +97,102 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- 	return IRQ_HANDLED;
+ 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
++	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+ 	gic_set_kvm_info(&gic_v3_kvm_info);
  }
  
-+static void vgic_v4_sync_sgi_config(struct its_vpe *vpe, struct vgic_irq *irq)
-+{
-+	vpe->sgi_config[irq->intid].enabled	= irq->enabled;
-+	vpe->sgi_config[irq->intid].group 	= irq->group;
-+	vpe->sgi_config[irq->intid].priority	= irq->priority;
-+}
-+
-+static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
-+{
-+	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	int i;
-+
-+	/*
-+	 * With GICv4.1, every virtual SGI can be directly injected. So
-+	 * let's pretend that they are HW interrupts, tied to a host
-+	 * IRQ. The SGI code will do its magic.
-+	 */
-+	for (i = 0; i < VGIC_NR_SGIS; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct irq_desc *desc;
-+		int ret;
-+
-+		if (irq->hw) {
-+			vgic_put_irq(vcpu->kvm, irq);
-+			continue;
-+		}
-+
-+		irq->hw = true;
-+		irq->host_irq = irq_find_mapping(vpe->sgi_domain, i);
-+		vgic_v4_sync_sgi_config(vpe, irq);
-+		/*
-+		 * SGIs are initialised as disabled. Enable them if
-+		 * required by the rest of the VGIC init code.
-+		 */
-+		desc = irq_to_desc(irq->host_irq);
-+		ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
-+					      false);
-+		if (!WARN_ON(ret)) {
-+			/* Transfer pending state */
-+			ret = irq_set_irqchip_state(irq->host_irq,
-+						    IRQCHIP_STATE_PENDING,
-+						    irq->pending_latch);
-+			WARN_ON(ret);
-+			irq->pending_latch = false;
-+		}
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
-+static void vgic_v4_disable_vsgis(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	for (i = 0; i < VGIC_NR_SGIS; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
-+		struct irq_desc *desc;
-+		int ret;
-+
-+		if (!irq->hw) {
-+			vgic_put_irq(vcpu->kvm, irq);
-+			continue;
-+		}
-+
-+		irq->hw = false;
-+		ret = irq_get_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    &irq->pending_latch);
-+		WARN_ON(ret);
-+
-+		desc = irq_to_desc(irq->host_irq);
-+		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
-+/* Must be called with the kvm lock held */
-+void vgic_v4_configure_vsgis(struct kvm *kvm)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct kvm_vcpu *vcpu;
-+	int i;
-+
-+	kvm_arm_halt_guest(kvm);
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (dist->nassgireq)
-+			vgic_v4_enable_vsgis(vcpu);
-+		else
-+			vgic_v4_disable_vsgis(vcpu);
-+	}
-+
-+	kvm_arm_resume_guest(kvm);
-+}
-+
- /**
-  * vgic_v4_init - Initialize the GICv4 data structures
-  * @kvm:	Pointer to the VM being initialized
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c7fefd6b1c80..769e4802645e 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -316,5 +316,6 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
-+void vgic_v4_configure_vsgis(struct kvm *kvm);
+@@ -2094,6 +2095,7 @@ static void __init gic_acpi_setup_kvm_info(void)
+ 	}
  
- #endif
+ 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
++	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+ 	gic_set_kvm_info(&gic_v3_kvm_info);
+ }
+ 
+diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+index b9850f5f1906..fa8c0455c352 100644
+--- a/include/linux/irqchip/arm-gic-common.h
++++ b/include/linux/irqchip/arm-gic-common.h
+@@ -32,6 +32,8 @@ struct gic_kvm_info {
+ 	struct resource vctrl;
+ 	/* vlpi support */
+ 	bool		has_v4;
++	/* rvpeid support */
++	bool		has_v4_1;
+ };
+ 
+ const struct gic_kvm_info *gic_get_kvm_info(void);
 -- 
 2.20.1
 
