@@ -1,61 +1,65 @@
-Return-Path: <SRS0=/1aR=2R=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=wjz7=2S=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0CBC2D0C6
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Dec 2019 15:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 269EEC2D0C6
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 08:57:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE80020882
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Dec 2019 15:56:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE80020882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9FDFE20748
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 08:57:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FDFE20748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 307634A36B;
-	Fri, 27 Dec 2019 10:56:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCB214A4F7;
+	Sat, 28 Dec 2019 03:57:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SrhgN+7f9J+d; Fri, 27 Dec 2019 10:56:43 -0500 (EST)
+	with ESMTP id TefDc-jtxfqO; Sat, 28 Dec 2019 03:57:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E39F24A51C;
-	Fri, 27 Dec 2019 10:56:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E994A4FF;
+	Sat, 28 Dec 2019 03:57:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40AED4A3B4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Dec 2019 10:56:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D92214A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 03:57:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JqLmcGQLxrlU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Dec 2019 10:56:41 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7304A32E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Dec 2019 10:56:41 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4957331B;
- Fri, 27 Dec 2019 07:56:41 -0800 (PST)
-Received: from [10.37.8.128] (unknown [10.37.8.128])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 823E83F68F;
- Fri, 27 Dec 2019 07:56:37 -0800 (PST)
-Subject: Re: [PATCH 3/3] KVM: arm/arm64: correct AArch32 SPSR on exception
- entry
-To: Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org
-References: <20191220150549.31948-1-mark.rutland@arm.com>
- <20191220150549.31948-4-mark.rutland@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <1c1682fc-547a-87c1-0e13-63b0058eaa0c@arm.com>
-Date: Fri, 27 Dec 2019 15:56:40 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id CPtMMIf6NTK4 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 28 Dec 2019 03:57:07 -0500 (EST)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 306944A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 03:57:07 -0500 (EST)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id B331577D35CA242EE155;
+ Sat, 28 Dec 2019 16:57:03 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Sat, 28 Dec 2019
+ 16:56:56 +0800
+Subject: Re: [PATCH v3 04/32] irqchip/gic-v3: Use SGIs without active state if
+ offered
+To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>
+References: <20191224111055.11836-1-maz@kernel.org>
+ <20191224111055.11836-5-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <83459bef-49bb-8203-1631-0b02bb9efe17@huawei.com>
+Date: Sat, 28 Dec 2019 16:56:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191220150549.31948-4-mark.rutland@arm.com>
+In-Reply-To: <20191224111055.11836-5-maz@kernel.org>
 Content-Language: en-US
-Cc: stable@vger.kernel.org, Will Deacon <will@kernel.org>
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,146 +71,142 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi Marc,
 
-On 12/20/19 3:05 PM, Mark Rutland wrote:
-> Confusingly, there are three SPSR layouts that a kernel may need to deal
-> with:
->
-> (1) An AArch64 SPSR_ELx view of an AArch64 pstate
-> (2) An AArch64 SPSR_ELx view of an AArch32 pstate
-> (3) An AArch32 SPSR_* view of an AArch32 pstate
->
-> When the KVM AArch32 support code deals with SPSR_{EL2,HYP}, it's either
-> dealing with #2 or #3 consistently. On arm64 the PSR_AA32_* definitions
-> match the AArch64 SPSR_ELx view, and on arm the PSR_AA32_* definitions
-> match the AArch32 SPSR_* view.
->
-> However, when we inject an exception into an AArch32 guest, we have to
-> synthesize the AArch32 SPSR_* that the guest will see. Thus, an AArch64
-> host needs to synthesize layout #3 from layout #2.
->
-> This patch adds a new host_spsr_to_spsr32() helper for this, and makes
-> use of it in the KVM AArch32 support code. For arm64 we need to shuffle
-> the DIT bit around, and remove the SS bit, while for arm we can use the
-> value as-is.
->
-> I've open-coded the bit manipulation for now to avoid having to rework
-> the existing PSR_* definitions into PSR64_AA32_* and PSR32_AA32_*
-> definitions. I hope to perform a more thorough refactoring in future so
-> that we can handle pstate view manipulation more consistently across the
-> kernel tree.
->
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Cc: Drew Jones <drjones@redhat.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: stable@vger.kernel.org
+On 2019/12/24 19:10, Marc Zyngier wrote:
+> If running under control of a hypervisor that implements GICv4.1
+> SGIs, allow the hypervisor to use them at the expense of loosing
+> the Active state (which we don't care about for SGIs).
+> 
+> This is trivially done by checking for GICD_TYPER2.nASSGIcap, and
+> setting GICD_CTLR.nASSGIreq when enabling Group-1 interrupts.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm/include/asm/kvm_emulate.h   |  5 +++++
->  arch/arm64/include/asm/kvm_emulate.h | 32 ++++++++++++++++++++++++++++++++
->  virt/kvm/arm/aarch32.c               |  6 +++---
->  3 files changed, 40 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> index dee2567661ed..b811576bc456 100644
-> --- a/arch/arm/include/asm/kvm_emulate.h
-> +++ b/arch/arm/include/asm/kvm_emulate.h
-> @@ -53,6 +53,11 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
->  	*__vcpu_spsr(vcpu) = v;
->  }
->  
-> +static inline unsigned long host_spsr_to_spsr32(unsigned long spsr)
-> +{
-> +	return spsr;
-> +}
+>   drivers/irqchip/irq-gic-v3.c       | 10 ++++++++--
+>   include/linux/irqchip/arm-gic-v3.h |  2 ++
+>   2 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 640d4db65b78..624f351c0362 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -724,6 +724,7 @@ static void __init gic_dist_init(void)
+>   	unsigned int i;
+>   	u64 affinity;
+>   	void __iomem *base = gic_data.dist_base;
+> +	u32 val;
+>   
+>   	/* Disable the distributor */
+>   	writel_relaxed(0, base + GICD_CTLR);
+> @@ -756,9 +757,14 @@ static void __init gic_dist_init(void)
+>   	/* Now do the common stuff, and wait for the distributor to drain */
+>   	gic_dist_config(base, GIC_LINE_NR, gic_dist_wait_for_rwp);
+>   
+> +	val = GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1;
+> +	if (gic_data.rdists.gicd_typer2 & GICD_TYPER2_nASSGIcap) {
+> +		pr_info("Enabling SGIs without active state\n");
+> +		val |= GICD_CTLR_nASSGIreq;
+> +	}
 > +
->  static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
->  					 u8 reg_num)
->  {
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d69c1efc63e7..98672938f9f9 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -204,6 +204,38 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
->  		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = v;
->  }
->  
-> +/*
-> + * The layout of SPSR for an AArch32 state is different when observed from an
-> + * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-> + * view given an AArch64 view.
-> + *
-> + * In ARM DDI 0487E.a see:
-> + *
-> + * - The AArch64 view (SPSR_EL2) in section C5.2.18, page C5-426
-> + * - The AArch32 view (SPSR_abt) in section G8.2.126, page G8-6256
-> + * - The AArch32 view (SPSR_und) in section G8.2.132, page G8-6280
-> + *
-> + * Which show the following differences:
-> + *
-> + * | Bit | AA64 | AA32 | Notes                       |
-> + * +-----+------+------+-----------------------------|
-> + * | 24  | DIT  | J    | J is RES0 in ARMv8          |
-> + * | 21  | SS   | DIT  | SS doesn't exist in AArch32 |
-> + *
-> + * ... and all other bits are (currently) common.
-> + */
-> +static inline unsigned long host_spsr_to_spsr32(unsigned long spsr)
-> +{
-> +	const unsigned long overlap = BIT(24) | BIT(21);
-> +	unsigned long dit = !!(spsr & PSR_AA32_DIT_BIT);
-> +
-> +	spsr &= overlap;
-> +
-> +	spsr |= dit << 21;
-> +
-> +	return spsr;
-> +}
-> +
->  static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
->  {
->  	u32 mode;
-> diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
-> index 17bcde5c2451..115210e64682 100644
-> --- a/virt/kvm/arm/aarch32.c
-> +++ b/virt/kvm/arm/aarch32.c
-> @@ -128,15 +128,15 @@ static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
->  
->  static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
->  {
-> -	unsigned long new_spsr_value = *vcpu_cpsr(vcpu);
-> -	bool is_thumb = (new_spsr_value & PSR_AA32_T_BIT);
-> +	unsigned long spsr = *vcpu_cpsr(vcpu);
-> +	bool is_thumb = (spsr & PSR_AA32_T_BIT);
->  	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
->  	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
->  
->  	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
->  
->  	/* Note: These now point to the banked copies */
-> -	vcpu_write_spsr(vcpu, new_spsr_value);
-> +	vcpu_write_spsr(vcpu, host_spsr_to_spsr32(spsr));
->  	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
->  
->  	/* Branch to exception vector */
+>   	/* Enable distributor with ARE, Group1 */
+> -	writel_relaxed(GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1,
+> -		       base + GICD_CTLR);
+> +	writel_relaxed(val, base + GICD_CTLR);
+>   
+>   	/*
+>   	 * Set all global interrupts to the boot CPU only. ARE must be
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 9dfe64189d99..72b69f4e6c7b 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> +#define GICD_CTLR_nASSGIreq		(1U << 8)
 
-With Marc's comment fixed:
+> +#define GICD_TYPER2_nASSGIcap		(1U << 8)
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+I thought these two bits are newly added in the specification, which is
+not available yet... until I've reached patch 29 and 30.
+
+So they are actually some "kvm-implemented" bits and can only be used by
+the KVM guests. I have two questions now:
+
+1) As per the latest GIC specification, these two bits are Reserved
+    (RAZ/WI) from host's perspective, which is good for now. But will
+    they be (unexpectedly) used one day by the future architecture?
+
+2) Only Linux guest will check and make use of these bits now. What if
+    some non-Linux guests wants to run with KVM and use the GICv4.1 based
+    vSGIs?  Their developers might have no interests reading at the KVM
+    code... so what about plumbing some descriptions about these bits
+    into somewhere in the documentation (or code)?  Like below, mostly
+    copied from your commit messages:
+
+---8<---
+
+// Roughly writing, for the ease of reviewing the later patches.
+
+No-Active-State SGIs (?) Related Field Descriptions
+	--From Guest's Perspective
+
+With GICv4.1, KVM exposes two single bit (in GICD_TYPER2 and GICD_CTLR
+respectively) for guests, which can be used to probe the GICv4.1 based
+SGIs support on hypervisor and choose whether guests want the good old
+SGIs with an active state, or the new, HW-based ones that do not have
+one.
+
+GICD_TYPER2.nASSGIcap, bit [8]
+
+     Indicates whether guests are running under control of a hypervisor
+     that implements GICv4.1 SGIs, allow the hypervisor to use them at
+     the expense of loosing the Active state.
+
+     0b0    GICv4.1 SGIs capability is not offered by hypervisor.
+
+     0b1    GICv4.1 SGIs capability is offered by hypervisor.
+
+     This field is RO.
+
+
+GICD_CTLR.nASSGIreq, bit [8]
+
+     Indicates whether guests wants to use HW-based SGIs without Active
+     state if the GICv4.1 SGI capability is offered by hypervisor.
+     Hypervisor will then try to satisfy the request and switch between
+     HW/SW delivered SGIs.
+
+     0b0    If read, indicated that guest is using the old SW-emulated
+            SGIs.
+            If write, indicates that guest requests to use the old
+            SW-emulated SGIs.
+
+     0b1    If read, indicates that guest is using the new HW-based SGIs.
+            If write, indicates that guest requests to use the new
+            HW-based SGIs. If GICD_TYPER2.nASSGIcap is 0, the write has
+            no effect.
+
+     Changing this bit is UNPREDICTABLE if the Distributor is enabled.
+     KVM may just treat this bit as RO when Distributor stays enabled.
+
+
+See gic_dist_init() in drivers/irqchip/irq-gic-v3.c for an example that
+how Linux guest (since 5.6?) makes use of these bits and benefits from
+the GICv4.1 based vSGIs.
+
+These two bits are Reserved (RAZ/WI) from host's perspective, which is
+good for now.
+
+---8<---
+
 
 Thanks,
-Alex
+
+Zenghui
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
