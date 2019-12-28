@@ -2,71 +2,67 @@ Return-Path: <SRS0=wjz7=2S=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDD4C2D0C6
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 10:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EBAC2D0C6
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 11:34:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4275721582
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 10:41:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4275721582
+	by mail.kernel.org (Postfix) with ESMTP id 3C6C920838
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Dec 2019 11:34:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C6C920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E4BE4A536;
-	Sat, 28 Dec 2019 05:41:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B93844A578;
+	Sat, 28 Dec 2019 06:34:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g7UAvfqfL0vG; Sat, 28 Dec 2019 05:41:54 -0500 (EST)
+	with ESMTP id yNUwtY-pSwzh; Sat, 28 Dec 2019 06:34:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA23D4A3A5;
-	Sat, 28 Dec 2019 05:41:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C1574A524;
+	Sat, 28 Dec 2019 06:34:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0854A2E7
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 05:41:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D84F4A49C
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 06:34:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hOrtAAfGcg-d for <kvmarm@lists.cs.columbia.edu>;
- Sat, 28 Dec 2019 05:41:51 -0500 (EST)
+ with ESMTP id UA+HFOxq8xy7 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 28 Dec 2019 06:34:04 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C28CB4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 05:41:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0454B4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Dec 2019 06:34:03 -0500 (EST)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why) by disco-boy.misterjones.org with esmtpsa
+ helo=big-swifty.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1il9XY-0003x6-Oe; Sat, 28 Dec 2019 10:41:48 +0000
-Date: Sat, 28 Dec 2019 10:41:47 +0000
+ id 1ilALz-0004YB-Ri; Sat, 28 Dec 2019 11:33:55 +0000
+Date: Sat, 28 Dec 2019 11:33:54 +0000
+Message-ID: <861rsoit0d.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 28/32] KVM: arm64: GICv4.1: Add direct injection
- capability to SGI registers
-Message-ID: <20191228104147.0e658aa9@why>
-In-Reply-To: <c009fb1f-f4ec-22d5-ba7d-58426837c8af@huawei.com>
-References: <20191224111055.11836-1-maz@kernel.org>
- <20191224111055.11836-29-maz@kernel.org>
- <c009fb1f-f4ec-22d5-ba7d-58426837c8af@huawei.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH] arm64: kvm: fix IDMAP overlap with HYP VA
+In-Reply-To: <E1iko5f-0000z2-Tx@rmk-PC.armlinux.org.uk>
+References: <E1iko5f-0000z2-Tx@rmk-PC.armlinux.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, eric.auger@redhat.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, tglx@linutronix.de,
- jason@lakedaemon.net, lorenzo.pieralisi@arm.com, Andrew.Murray@arm.com,
- rrichter@marvell.com
+X-SA-Exim-Rcpt-To: rmk+kernel@armlinux.org.uk, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org,
- Robert Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,41 +79,143 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 28 Dec 2019 17:19:36 +0800
-Zenghui Yu <yuzenghui@huawei.com> wrote:
+Hi Russell,
 
-> Hi Marc,
+Thanks for this.
+
+On Fri, 27 Dec 2019 11:47:35 +0000,
+Russell King <rmk+kernel@armlinux.org.uk> wrote:
 > 
-> On 2019/12/24 19:10, Marc Zyngier wrote:
-> > Most of the GICv3 emulation code that deals with SGIs now has to be
-> > aware of the v4.1 capabilities in order to benefit from it.
-> > 
-> > Add such support, keyed on the interrupt having the hw flag set and
-> > being a SGI.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---  
+> Booting 5.4 on LX2160A reveals that KVM is non-functional:
 > 
-> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> > index 0d090482720d..6ebf747a7806 100644
-> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> > @@ -290,6 +345,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,  
-> >   >   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> >   > +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {  
-> > +			/* HW SGI? Ask the GIC to inject it */  
+> kvm: Limiting the IPA size due to kernel Virtual Address limit
+> kvm [1]: IPA Size Limit: 43bits
+> kvm [1]: IDMAP intersecting with HYP VA, unable to continue
+> kvm [1]: error initializing Hyp mode: -22
 > 
-> Shouldn't this be "Ask the GIC to clear its pending state"?
+> Debugging shows:
+> 
+> kvm [1]: IDMAP page: 81a26000
+> kvm [1]: HYP VA range: 0:22ffffffff
+> 
+> as RAM is located at:
+> 
+> 80000000-fbdfffff : System RAM
+> 2080000000-237fffffff : System RAM
 
-yeah, a silly copy-paste mistake, thanks for spotting this!
+Ouch. This looks like a terrible choice for a memory map.
 
-> Otherwise looks good!
+> 
+> Comparing this with the same kernel on Armada 8040 shows:
+> 
+> kvm: Limiting the IPA size due to kernel Virtual Address limit
+> kvm [1]: IPA Size Limit: 43bits
+> kvm [1]: IDMAP page: 2a26000
+> kvm [1]: HYP VA range: 4800000000:493fffffff
+> ...
+> kvm [1]: Hyp mode initialized successfully
+> 
+> which indicates that hyp_va_msb is set, and is always set to the
+> opposite value of the idmap page to avoid the overlap. This does not
+> happen with the LX2160A.
+> 
+> Further debugging shows vabits_actual = 39, kva_msb = 38 on LX2160A and
+> kva_msb = 33 on Armada 8040. Looking at the bit layout of the HYP VA,
+> there is still one bit available for hyp_va_msb. Set this bit
+> appropriately. This allows kvm to be functional on the LX2160A, but
+> without any HYP VA randomisation:
+> 
+> kvm: Limiting the IPA size due to kernel Virtual Address limit
+> kvm [1]: IPA Size Limit: 43bits
+> kvm [1]: IDMAP page: 81a24000
+> kvm [1]: HYP VA range: 4000000000:62ffffffff
+> ...
+> kvm [1]: Hyp mode initialized successfully
 
-Thanks for taking the time to review this work!
+Nice bit of debugging. I guess part of the confusion is due to the
+fact that the hyp_va_msb is part of the tag (as you found out), but
+that the documentation doesn't really make that clear at all (and only
+mentions the random part of the tag).
+
+> 
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> ---
+>  arch/arm64/kvm/va_layout.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> index 2cf7d4b606c3..83f8b3f51cf4 100644
+> --- a/arch/arm64/kvm/va_layout.c
+> +++ b/arch/arm64/kvm/va_layout.c
+> @@ -22,6 +22,17 @@ static u8 tag_lsb;
+>  static u64 tag_val;
+>  static u64 va_mask;
+>  
+> +/*
+> + * We want to generate a hyp VA with the following format:
+> + *
+> + *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
+> + *  ---------------------------------------------------------
+> + * | 0000000 | hyp_va_msb |    random tag  |  kern linear VA |
+                \---------- tag -------------/
+
+How about the above, to make it clearer that the tag must include the
+hyp_va_msb bit to avoid clashing with the IDMAP?
+
+> + *
+> + * which does not conflict with the idmap regions. This means that hyp_va_msb
+> + * must always be present. Luckily, when kva_msb == (vabits_actual - 1) we
+
+I'm not sure the "Luckily" part is appropriate here. Given the way
+kva_msb is computed, I can't see how it can see how this can
+fail.
+
+This stems from the fact that the vabits space for kernel mappings is
+split in two: vabits-1 for the linear map, and vabits-1 for the rest
+(kernel text and co). Given that we define kva_msb as the highest
+order bit that can change within the linear map, its value is at most
+vabits-1.
+
+> + * still have one bit for this, but no bits for the random tag.
+> + */
+>  static void compute_layout(void)
+>  {
+>  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+> @@ -39,19 +50,16 @@ static void compute_layout(void)
+>  		/*
+>  		 * No space in the address, let's compute the mask so
+>  		 * that it covers (vabits_actual - 1) bits, and the region
+> -		 * bit. The tag stays set to zero.
+> +		 * bit.
+>  		 */
+> -		va_mask  = BIT(vabits_actual - 1) - 1;
+> -		va_mask |= hyp_va_msb;
+> +		tag_lsb = kva_msb;
+> +		va_mask = BIT(vabits_actual - 1) - 1;
+> +		tag_val = hyp_va_msb >> tag_lsb;
+>  	} else {
+>  		/*
+>  		 * We do have some free bits to insert a random tag.
+>  		 * Hyp VAs are now created from kernel linear map VAs
+>  		 * using the following formula (with V == vabits_actual):
+> -		 *
+> -		 *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
+> -		 *  ---------------------------------------------------------
+> -		 * | 0000000 | hyp_va_msb |    random tag  |  kern linear VA |
+>  		 */
+>  		tag_lsb = kva_msb;
+>  		va_mask = GENMASK_ULL(tag_lsb - 1, 0);
+
+In the light of this, it'd be great to rework this code to simplify it
+(getting rid of kva_msb, which really is tag_lsb) and make some of the
+computing common to both branches.
+
+Thanks,
 
 	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
