@@ -1,87 +1,67 @@
-Return-Path: <SRS0=3XdM=2T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=uzGy=2U=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C03FC2D0CE
-	for <kvmarm@archiver.kernel.org>; Sun, 29 Dec 2019 15:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F16C9C2D0C3
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 03:51:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F09DC207FD
-	for <kvmarm@archiver.kernel.org>; Sun, 29 Dec 2019 15:17:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2uz+oTj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09DC207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 74EC6206E4
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 03:51:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74EC6206E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80FA44A36B;
-	Sun, 29 Dec 2019 10:17:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4D344A5A3;
+	Sun, 29 Dec 2019 22:51:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YCjz5cBSt7wq; Sun, 29 Dec 2019 10:17:49 -0500 (EST)
+	with ESMTP id Tb3xvzKJwcWQ; Sun, 29 Dec 2019 22:50:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3990D4A49C;
-	Sun, 29 Dec 2019 10:17:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A8B14A578;
+	Sun, 29 Dec 2019 22:50:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B601F4A36B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Dec 2019 10:17:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2347A4A52C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Dec 2019 22:50:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vo6sUp1zlwEN for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Dec 2019 10:17:46 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DA3C4A369
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Dec 2019 10:17:46 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1B1242071E;
- Sun, 29 Dec 2019 15:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1577632665;
- bh=tq36plNX5z/VbaU12lWsUkIY/yHltW3To+byEkXxk9I=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=f2uz+oTjPX1QUcsIpouRKR/LXg0cnPNXOBwlfWeDVhrbeL3pJnpfRtX0/MKxp0TUv
- EDQBUBtddReo8po7NEirx0/M05zfKzyeENpwcKbyWNQFqyxZwUZosvqGBy3LbJZO5T
- B2WTAsZO+DhLvMBnDU2gfvgkptBDuQmIi+aTUod8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=big-swifty.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1ilaK7-0000Bs-64; Sun, 29 Dec 2019 15:17:43 +0000
-Date: Sun, 29 Dec 2019 15:17:40 +0000
-Message-ID: <86zhfbgnzf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: correct PSTATE on exception entry
-In-Reply-To: <bace4197-a723-5312-3990-84232aab30d9@arm.com>
-References: <20191220150549.31948-1-mark.rutland@arm.com>
- <20191220150549.31948-2-mark.rutland@arm.com>
- <bace4197-a723-5312-3990-84232aab30d9@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, mark.rutland@arm.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- drjones@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- peter.maydell@linaro.org, suzuki.poulose@arm.com, will@kernel.org,
- stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 1kfiNVYSROrd for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 29 Dec 2019 22:50:56 -0500 (EST)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E61B04A369
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Dec 2019 22:50:55 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 7697ED891D40BB4DF227;
+ Mon, 30 Dec 2019 11:50:52 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Mon, 30 Dec 2019
+ 11:50:45 +0800
+Subject: Re: [PATCH v3 04/32] irqchip/gic-v3: Use SGIs without active state if
+ offered
+To: Marc Zyngier <maz@kernel.org>
+References: <20191224111055.11836-1-maz@kernel.org>
+ <20191224111055.11836-5-maz@kernel.org>
+ <83459bef-49bb-8203-1631-0b02bb9efe17@huawei.com>
+ <20191228103301.147f541c@why>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <33df30e8-8ce8-fde1-2e9f-9ef4eda4f563@huawei.com>
+Date: Mon, 30 Dec 2019 11:50:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <20191228103301.147f541c@why>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org,
+ Robert Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,131 +73,181 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 27 Dec 2019 13:01:57 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> On 12/20/19 3:05 PM, Mark Rutland wrote:
-> > When KVM injects an exception into a guest, it generates the PSTATE
-> > value from scratch, configuring PSTATE.{M[4:0],DAIF}, and setting all
-> > other bits to zero.
-> >
-> > This isn't correct, as the architecture specifies that some PSTATE bits
-> > are (conditionally) cleared or set upon an exception, and others are
-> > unchanged from the original context.
-> >
-> > This patch adds logic to match the architectural behaviour. To make this
-> > simple to follow/audit/extend, documentation references are provided,
-> > and bits are configured in order of their layout in SPSR_EL2. This
-> > layout can be seen in the diagram on ARM DDI 0487E.a page C5-429.
-> >
-> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Cc: Drew Jones <drjones@redhat.com>
-> > Cc: James Morse <james.morse@arm.com>
-> > Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  arch/arm64/include/uapi/asm/ptrace.h |  1 +
-> >  arch/arm64/kvm/inject_fault.c        | 69 +++++++++++++++++++++++++++++++++---
-> >  2 files changed, 65 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-> > index 7ed9294e2004..d1bb5b69f1ce 100644
-> > --- a/arch/arm64/include/uapi/asm/ptrace.h
-> > +++ b/arch/arm64/include/uapi/asm/ptrace.h
-> > @@ -49,6 +49,7 @@
-> >  #define PSR_SSBS_BIT	0x00001000
-> >  #define PSR_PAN_BIT	0x00400000
-> >  #define PSR_UAO_BIT	0x00800000
-> > +#define PSR_DIT_BIT	0x01000000
-> >  #define PSR_V_BIT	0x10000000
-> >  #define PSR_C_BIT	0x20000000
-> >  #define PSR_Z_BIT	0x40000000
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > index a9d25a305af5..270d91c05246 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -14,9 +14,6 @@
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/esr.h>
-> >  
-> > -#define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
-> > -				 PSR_I_BIT | PSR_D_BIT)
-> > -
-> >  #define CURRENT_EL_SP_EL0_VECTOR	0x0
-> >  #define CURRENT_EL_SP_ELx_VECTOR	0x200
-> >  #define LOWER_EL_AArch64_VECTOR		0x400
-> > @@ -50,6 +47,68 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
-> >  	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
-> >  }
-> >  
-> > +/*
-> > + * When an exception is taken, most PSTATE fields are left unchanged in the
-> > + * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-> > + * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-> > + * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
-> > + *
-> > + * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
-> > + * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
-> 
-> The commit message mentions only the SPSR_ELx layout for AArch64.
-> 
-> > + *
-> > + * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-> > + * MSB to LSB.
-> > + */
-> > +static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
-> > +{
-> > +	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> > +	unsigned long old, new;
-> > +
-> > +	old = *vcpu_cpsr(vcpu);
-> > +	new = 0;
-> > +
-> > +	new |= (old & PSR_N_BIT);
-> > +	new |= (old & PSR_Z_BIT);
-> > +	new |= (old & PSR_C_BIT);
-> > +	new |= (old & PSR_V_BIT);
-> > +
-> > +	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
-> > +
-> > +	new |= (old & PSR_DIT_BIT);
-> > +
-> > +	// PSTATE.UAO is set to zero upon any exception to AArch64
-> > +	// See ARM DDI 0487E.a, page D5-2579.
-> > +
-> > +	// PSTATE.PAN is unchanged unless overridden by SCTLR_ELx.SPAN
-> > +	// See ARM DDI 0487E.a, page D5-2578.
-> > +	new |= (old & PSR_PAN_BIT);
-> > +	if (sctlr & SCTLR_EL1_SPAN)
-> > +		new |= PSR_PAN_BIT;
-> 
-> On page D13-3264, it is stated that the PAN bit is set unconditionally if
-> SCTLR_EL1.SPAN is clear, not set.
+Hi Marc,
 
-Indeed. Given that when ARMv8.1-PAN is not implemented, SCTLR_EL1[23]
-is RES1, it seems surprising to force PAN based on this bit being set.
+On 2019/12/28 18:36, Marc Zyngier wrote:
+> On Sat, 28 Dec 2019 16:56:54 +0800
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> Hi Zenghui,
+> 
+>> Hi Marc,
+>>
+>> On 2019/12/24 19:10, Marc Zyngier wrote:
+>>> If running under control of a hypervisor that implements GICv4.1
+>>> SGIs, allow the hypervisor to use them at the expense of loosing
+>>> the Active state (which we don't care about for SGIs).
+>>>
+>>> This is trivially done by checking for GICD_TYPER2.nASSGIcap, and
+>>> setting GICD_CTLR.nASSGIreq when enabling Group-1 interrupts.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>    drivers/irqchip/irq-gic-v3.c       | 10 ++++++++--
+>>>    include/linux/irqchip/arm-gic-v3.h |  2 ++
+>>>    2 files changed, 10 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+>>> index 640d4db65b78..624f351c0362 100644
+>>> --- a/drivers/irqchip/irq-gic-v3.c
+>>> +++ b/drivers/irqchip/irq-gic-v3.c
+>>> @@ -724,6 +724,7 @@ static void __init gic_dist_init(void)
+>>>    	unsigned int i;
+>>>    	u64 affinity;
+>>>    	void __iomem *base = gic_data.dist_base;
+>>> +	u32 val;
+>>>    >   	/* Disable the distributor */
+>>>    	writel_relaxed(0, base + GICD_CTLR);
+>>> @@ -756,9 +757,14 @@ static void __init gic_dist_init(void)
+>>>    	/* Now do the common stuff, and wait for the distributor to drain */
+>>>    	gic_dist_config(base, GIC_LINE_NR, gic_dist_wait_for_rwp);
+>>>    > +	val = GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1;
+>>> +	if (gic_data.rdists.gicd_typer2 & GICD_TYPER2_nASSGIcap) {
+>>> +		pr_info("Enabling SGIs without active state\n");
+>>> +		val |= GICD_CTLR_nASSGIreq;
+>>> +	}
+>>> +
+>>>    	/* Enable distributor with ARE, Group1 */
+>>> -	writel_relaxed(GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1,
+>>> -		       base + GICD_CTLR);
+>>> +	writel_relaxed(val, base + GICD_CTLR);
+>>>    >   	/*
+>>>    	 * Set all global interrupts to the boot CPU only. ARE must be
+>>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>>> index 9dfe64189d99..72b69f4e6c7b 100644
+>>> --- a/include/linux/irqchip/arm-gic-v3.h
+>>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>>> +#define GICD_CTLR_nASSGIreq		(1U << 8)
+>>
+>>> +#define GICD_TYPER2_nASSGIcap		(1U << 8)
+>>
+>> I thought these two bits are newly added in the specification, which is
+>> not available yet... until I've reached patch 29 and 30.
+>>
+>> So they are actually some "kvm-implemented" bits and can only be used by
+>> the KVM guests. I have two questions now:
+>>
+>> 1) As per the latest GIC specification, these two bits are Reserved
+>>      (RAZ/WI) from host's perspective, which is good for now. But will
+>>      they be (unexpectedly) used one day by the future architecture?
+> 
+> These bits are now assigned by the latest revision of the GICv4.1 spec,
+> and are roughly defined as you reversed engineered them below.
 
-I've now dropped this series from my tree until Mark has a chance to
-clarify this.
+(Ah, so all what I'm having in the hand is a GICv4.0.5 ;-).
+
+> The idea is that unmodified SW expects SGIs to have an active state,
+> because that's the way it has always been so far. Any architecturally
+> compliant hypervisor must implement an active state for SGIs.
+> 
+> Now, there are obvious benefits in having HW-accelerated SGI delivery,
+> which for GICv4.1 comes at the expense of loosing the active state.
+> 
+> So we need a way to expose the fact that the hypervisor *can* support
+> non-active-state SGIs (hence the GICD_TYPER2.nASSGIcap bit), and a way
+> for the guest to say "I'm OK with losing the active state for SGIs",
+> which corresponds to the GICD_CTLR.nASSGIreq bit.
+
+Thanks for the explanation!
+
+> Note that this isn't a property that ever needs to be exposed by the
+> HW, but one that has been architected for the sole benefit of
+> hypervisors and guests (a HW implementation would keep them as RAZ/WI).
+
+Yeah, I can understand this point.
+
+>> 2) Only Linux guest will check and make use of these bits now. What if
+>>      some non-Linux guests wants to run with KVM and use the GICv4.1 based
+>>      vSGIs?  Their developers might have no interests reading at the KVM
+>>      code... so what about plumbing some descriptions about these bits
+>>      into somewhere in the documentation (or code)?  Like below, mostly
+>>      copied from your commit messages:
+>>
+>> ---8<---
+>>
+>> // Roughly writing, for the ease of reviewing the later patches.
+>>
+>> No-Active-State SGIs (?) Related Field Descriptions
+>> 	--From Guest's Perspective
+>>
+>> With GICv4.1, KVM exposes two single bit (in GICD_TYPER2 and GICD_CTLR
+>> respectively) for guests, which can be used to probe the GICv4.1 based
+>> SGIs support on hypervisor and choose whether guests want the good old
+>> SGIs with an active state, or the new, HW-based ones that do not have
+>> one.
+>>
+>> GICD_TYPER2.nASSGIcap, bit [8]
+>>
+>>       Indicates whether guests are running under control of a hypervisor
+>>       that implements GICv4.1 SGIs, allow the hypervisor to use them at
+>>       the expense of loosing the Active state.
+>>
+>>       0b0    GICv4.1 SGIs capability is not offered by hypervisor.
+>>
+>>       0b1    GICv4.1 SGIs capability is offered by hypervisor.
+>>
+>>       This field is RO.
+>>
+>>
+>> GICD_CTLR.nASSGIreq, bit [8]
+>>
+>>       Indicates whether guests wants to use HW-based SGIs without Active
+>>       state if the GICv4.1 SGI capability is offered by hypervisor.
+>>       Hypervisor will then try to satisfy the request and switch between
+>>       HW/SW delivered SGIs.
+>>
+>>       0b0    If read, indicated that guest is using the old SW-emulated
+>>              SGIs.
+>>              If write, indicates that guest requests to use the old
+>>              SW-emulated SGIs.
+>>
+>>       0b1    If read, indicates that guest is using the new HW-based SGIs.
+>>              If write, indicates that guest requests to use the new
+>>              HW-based SGIs. If GICD_TYPER2.nASSGIcap is 0, the write has
+>>              no effect.
+>>
+>>       Changing this bit is UNPREDICTABLE if the Distributor is enabled.
+>>       KVM may just treat this bit as RO when Distributor stays enabled.
+>>
+>>
+>> See gic_dist_init() in drivers/irqchip/irq-gic-v3.c for an example that
+>> how Linux guest (since 5.6?) makes use of these bits and benefits from
+>> the GICv4.1 based vSGIs.
+>>
+>> These two bits are Reserved (RAZ/WI) from host's perspective, which is
+>> good for now.
+> 
+> This write-up is sensible, but it would be a duplication of the
+> architecture spec once it is publicly available. As much as possible,
+> I'd like not to duplicate information, as the are bound to diverge as
+> the architecture spec gets amended. How about we add this to the commit
+> message instead, as a placeholder until the GICv4.1 doc is available
+> (hopefully some time next year)?
+
+Good idea, I'm all for it.
+
+It will (at least) help other reviewers to easily realize what is going
+on between guests and the hypervisor.
+
 
 Thanks,
+Zenghui
 
-	M.
-
--- 
-Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
