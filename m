@@ -2,70 +2,69 @@ Return-Path: <SRS0=uzGy=2U=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 443ABC2D0CE
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 08:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238E3C3F68F
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 12:52:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D6E7C2072E
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 08:51:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHQNmevq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6E7C2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8FC6B2071E
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Dec 2019 12:52:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC6B2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A94A4A418;
-	Mon, 30 Dec 2019 03:51:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9D584A522;
+	Mon, 30 Dec 2019 07:52:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yj5PpZwcO-Ox; Mon, 30 Dec 2019 03:50:57 -0500 (EST)
+	with ESMTP id Gi2YozilNn92; Mon, 30 Dec 2019 07:52:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB0294A59B;
-	Mon, 30 Dec 2019 03:50:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEC044A52E;
+	Mon, 30 Dec 2019 07:52:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 048EA4A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Dec 2019 03:27:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 387454A52E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Dec 2019 07:52:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Lq+iX06xar7m for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Dec 2019 03:27:49 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F0EA4A418
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Dec 2019 03:27:49 -0500 (EST)
-Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A861521744;
- Mon, 30 Dec 2019 08:27:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1577694468;
- bh=QW/jajy5kT0MuQUifiwKvoMWU1svh+TNpiNX1hpkSxk=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=iHQNmevqM5+vc2CXfrsW4GzYvDZ4HTlMupwlOu01i8JID2+0eUE5MPwm5mP4XMNcT
- qrpSaUdI/xrQVmQcQfdd2NXsSVpIiIHcFZi4H++CbMTt1Q638mv0WV9lOmVzd4b5SU
- 2Vkb0V0YpEGFM6Ktkt9dJLRfrc5Vj0kLyVecpENU=
-From: Mike Rapoport <rppt@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 1/1] arm/arm64: add support for folded p4d page tables
-Date: Mon, 30 Dec 2019 10:27:34 +0200
-Message-Id: <20191230082734.28954-2-rppt@kernel.org>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191230082734.28954-1-rppt@kernel.org>
-References: <20191230082734.28954-1-rppt@kernel.org>
+ with ESMTP id F8nTpX7mWRYz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Dec 2019 07:52:46 -0500 (EST)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B7504A36B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Dec 2019 07:52:46 -0500 (EST)
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 30 Dec 2019 04:52:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,375,1571727600"; 
+ d="gz'50?scan'50,208,50";a="243847324"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+ by fmsmga004.fm.intel.com with ESMTP; 30 Dec 2019 04:52:42 -0800
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+ (envelope-from <lkp@intel.com>)
+ id 1iluXJ-000D94-K8; Mon, 30 Dec 2019 20:52:41 +0800
+Date: Mon, 30 Dec 2019 20:52:15 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH 1/1] arm/arm64: add support for folded p4d page tables
+Message-ID: <201912302025.2e6EiBxe%lkp@intel.com>
+References: <20191230082734.28954-2-rppt@kernel.org>
 MIME-Version: 1.0
-X-Mailman-Approved-At: Mon, 30 Dec 2019 03:50:55 -0500
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
+Content-Type: multipart/mixed; boundary="qdqqb2xhd6wm23jo"
+Content-Disposition: inline
+In-Reply-To: <20191230082734.28954-2-rppt@kernel.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
+Cc: kbuild-all@lists.01.org, Catalin Marinas <catalin.marinas@arm.com>,
  Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, Mike Rapoport <rppt@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Mike Rapoport <rppt@linux.ibm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+ Mike Rapoport <rppt@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Mike Rapoport <rppt@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,1796 +76,667 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Mike Rapoport <rppt@linux.ibm.com>
 
-Implement primitives necessary for the 4th level folding, add walks of p4d
-level where appropriate, replace 5level-fixup.h with pgtable-nop4d.h and
-remove __ARCH_USE_5LEVEL_HACK.
+--qdqqb2xhd6wm23jo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Since arm and arm64 share kvm memory management bits, make the conversion
-for both variants at once to avoid breaking the builds in the middle.
+Hi Mike,
 
-Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+I love your patch! Yet something to improve:
+
+[auto build test ERROR on arm/for-next]
+[also build test ERROR on arm64/for-next/core kvmarm/next v5.5-rc4 next-20191220]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+
+url:    https://github.com/0day-ci/linux/commits/Mike-Rapoport/arm-arm64-add-support-for-folded-p4d-page-tables/20191230-172112
+base:   git://git.armlinux.org.uk/~rmk/linux-arm.git for-next
+config: arm64-randconfig-a001-20191229 (attached as .config)
+compiler: aarch64-linux-gcc (GCC) 7.5.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # save the attached .config to linux build tree
+        GCC_VERSION=7.5.0 make.cross ARCH=arm64 
+
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+All error/warnings (new ones prefixed by >>):
+
+   arch/arm64/mm/dump.c: In function 'walk_p4d':
+>> arch/arm64/mm/dump.c:358:24: error: implicit declaration of function 'p4d_sect'; did you mean 'pud_sect'? [-Werror=implicit-function-declaration]
+      if (p4d_none(p4d) || p4d_sect(p4d)) {
+                           ^~~~~~~~
+                           pud_sect
+   cc1: some warnings being treated as errors
+--
+   arch/arm64/mm/kasan_init.c: In function 'kasan_p4d_offset':
+>> arch/arm64/mm/kasan_init.c:112:17: error: implicit declaration of function 'p4d_offset_kimg'; did you mean 'pmd_offset_kimg'? [-Werror=implicit-function-declaration]
+     return early ? p4d_offset_kimg(pgdp, addr) : p4d_offset(pgdp, addr);
+                    ^~~~~~~~~~~~~~~
+                    pmd_offset_kimg
+>> arch/arm64/mm/kasan_init.c:112:45: warning: pointer/integer type mismatch in conditional expression
+     return early ? p4d_offset_kimg(pgdp, addr) : p4d_offset(pgdp, addr);
+                                                ^
+   arch/arm64/mm/kasan_init.c: In function 'kasan_p4d_populate':
+>> arch/arm64/mm/kasan_init.c:164:22: error: passing argument 1 of 'kasan_pmd_populate' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      kasan_pmd_populate(p4dp, addr, next, node, early);
+                         ^~~~
+   arch/arm64/mm/kasan_init.c:132:20: note: expected 'pud_t * {aka struct <anonymous> *}' but argument is of type 'p4d_t * {aka struct <anonymous> *}'
+    static void __init kasan_pmd_populate(pud_t *pudp, unsigned long addr,
+                       ^~~~~~~~~~~~~~~~~~
+   At top level:
+   arch/arm64/mm/kasan_init.c:144:20: warning: 'kasan_pud_populate' defined but not used [-Wunused-function]
+    static void __init kasan_pud_populate(p4d_t *p4dp, unsigned long addr,
+                       ^~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+vim +358 arch/arm64/mm/dump.c
+
+   347	
+   348	static void walk_p4d(struct pg_state *st, pgd_t *pgdp, unsigned long start,
+   349			     unsigned long end)
+   350	{
+   351		unsigned long next, addr = start;
+   352		p4d_t *p4dp = p4d_offset(pgdp, start);
+   353	
+   354		do {
+   355			p4d_t p4d = READ_ONCE(*p4dp);
+   356			next = p4d_addr_end(addr, end);
+   357	
+ > 358			if (p4d_none(p4d) || p4d_sect(p4d)) {
+   359				note_page(st, addr, 2, p4d_val(p4d));
+   360			} else {
+   361				BUG_ON(p4d_bad(p4d));
+   362				walk_pud(st, p4dp, addr, next);
+   363			}
+   364		} while (p4dp++, addr = next, addr != end);
+   365	}
+   366	
+
 ---
- arch/arm/include/asm/kvm_mmu.h          |   5 +-
- arch/arm/include/asm/pgtable.h          |   1 -
- arch/arm/include/asm/stage2_pgtable.h   |  15 +-
- arch/arm/lib/uaccess_with_memcpy.c      |   9 +-
- arch/arm/mach-sa1100/assabet.c          |   2 +-
- arch/arm/mm/dump.c                      |  29 +++-
- arch/arm/mm/fault-armv.c                |   7 +-
- arch/arm/mm/fault.c                     |  28 +++-
- arch/arm/mm/idmap.c                     |   3 +-
- arch/arm/mm/init.c                      |   2 +-
- arch/arm/mm/ioremap.c                   |  12 +-
- arch/arm/mm/mm.h                        |   2 +-
- arch/arm/mm/mmu.c                       |  35 +++-
- arch/arm/mm/pgd.c                       |  40 ++++-
- arch/arm64/include/asm/kvm_mmu.h        |  10 +-
- arch/arm64/include/asm/pgalloc.h        |  10 +-
- arch/arm64/include/asm/pgtable-types.h  |   5 +-
- arch/arm64/include/asm/pgtable.h        |  37 +++--
- arch/arm64/include/asm/stage2_pgtable.h |  48 ++++--
- arch/arm64/kernel/hibernate.c           |  46 +++++-
- arch/arm64/mm/dump.c                    |  29 +++-
- arch/arm64/mm/fault.c                   |   9 +-
- arch/arm64/mm/hugetlbpage.c             |  15 +-
- arch/arm64/mm/kasan_init.c              |  41 ++++-
- arch/arm64/mm/mmu.c                     |  52 ++++--
- arch/arm64/mm/pageattr.c                |   7 +-
- virt/kvm/arm/mmu.c                      | 209 ++++++++++++++++++++----
- 27 files changed, 565 insertions(+), 143 deletions(-)
+0-DAY kernel test infrastructure                 Open Source Technology Center
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel Corporation
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 0d84d50bf9ba..8c511bb99e4c 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -68,7 +68,8 @@ void kvm_clear_hyp_idmap(void);
- 
- #define kvm_mk_pmd(ptep)	__pmd(__pa(ptep) | PMD_TYPE_TABLE)
- #define kvm_mk_pud(pmdp)	__pud(__pa(pmdp) | PMD_TYPE_TABLE)
--#define kvm_mk_pgd(pudp)	({ BUILD_BUG(); 0; })
-+#define kvm_mk_p4d(pudp)	({ BUILD_BUG(); __p4d(0); })
-+#define kvm_mk_pgd(p4dp)	({ BUILD_BUG(); 0; })
- 
- #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
- #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
-@@ -194,10 +195,12 @@ static inline bool kvm_page_empty(void *ptr)
- #define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
- #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
- #define kvm_pud_table_empty(kvm, pudp) false
-+#define kvm_p4d_table_empty(kvm, p4dp) false
- 
- #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
- #define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
- #define hyp_pud_table_empty(pudp) false
-+#define hyp_p4d_table_empty(p4dp) false
- 
- struct kvm;
- 
-diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
-index eabcb48a7840..9e3464842dfc 100644
---- a/arch/arm/include/asm/pgtable.h
-+++ b/arch/arm/include/asm/pgtable.h
-@@ -17,7 +17,6 @@
- 
- #else
- 
--#define __ARCH_USE_5LEVEL_HACK
- #include <asm-generic/pgtable-nopud.h>
- #include <asm/memory.h>
- #include <asm/pgtable-hwdef.h>
-diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-index aaceec7855ec..7ed66e216a5e 100644
---- a/arch/arm/include/asm/stage2_pgtable.h
-+++ b/arch/arm/include/asm/stage2_pgtable.h
-@@ -19,8 +19,17 @@
- #define stage2_pgd_none(kvm, pgd)		pgd_none(pgd)
- #define stage2_pgd_clear(kvm, pgd)		pgd_clear(pgd)
- #define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
--#define stage2_pgd_populate(kvm, pgd, pud)	pgd_populate(NULL, pgd, pud)
--#define stage2_pud_offset(kvm, pgd, address)	pud_offset(pgd, address)
-+#define stage2_pgd_populate(kvm, pgd, p4d)	pgd_populate(NULL, pgd, p4d)
-+
-+#define stage2_p4d_offset(kvm, pgd, address)	p4d_offset(pgd, address)
-+#define stage2_p4d_free(kvm, p4d)		do { } while (0)
-+
-+#define stage2_p4d_none(kvm, p4d)		p4d_none(p4d)
-+#define stage2_p4d_clear(kvm, p4d)		p4d_clear(p4d)
-+#define stage2_p4d_present(kvm, p4d)		p4d_present(p4d)
-+#define stage2_p4d_populate(kvm, p4d, pud)	p4d_populate(NULL, p4d, pud)
-+
-+#define stage2_pud_offset(kvm, p4d, address)	pud_offset(p4d, address)
- #define stage2_pud_free(kvm, pud)		do { } while (0)
- 
- #define stage2_pud_none(kvm, pud)		pud_none(pud)
-@@ -41,6 +50,7 @@ stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 	return (boundary - 1 < end - 1) ? boundary : end;
- }
- 
-+#define stage2_p4d_addr_end(kvm, addr, end)	(end)
- #define stage2_pud_addr_end(kvm, addr, end)	(end)
- 
- static inline phys_addr_t
-@@ -56,6 +66,7 @@ stage2_pmd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- #define stage2_pte_table_empty(kvm, ptep)	kvm_page_empty(ptep)
- #define stage2_pmd_table_empty(kvm, pmdp)	kvm_page_empty(pmdp)
- #define stage2_pud_table_empty(kvm, pudp)	false
-+#define stage2_p4d_table_empty(kvm, p4dp)	false
- 
- static inline bool kvm_stage2_has_pud(struct kvm *kvm)
- {
-diff --git a/arch/arm/lib/uaccess_with_memcpy.c b/arch/arm/lib/uaccess_with_memcpy.c
-index c9450982a155..cabf1119c256 100644
---- a/arch/arm/lib/uaccess_with_memcpy.c
-+++ b/arch/arm/lib/uaccess_with_memcpy.c
-@@ -24,6 +24,7 @@ pin_page_for_write(const void __user *_addr, pte_t **ptep, spinlock_t **ptlp)
- {
- 	unsigned long addr = (unsigned long)_addr;
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pmd_t *pmd;
- 	pte_t *pte;
- 	pud_t *pud;
-@@ -33,7 +34,11 @@ pin_page_for_write(const void __user *_addr, pte_t **ptep, spinlock_t **ptlp)
- 	if (unlikely(pgd_none(*pgd) || pgd_bad(*pgd)))
- 		return 0;
- 
--	pud = pud_offset(pgd, addr);
-+	p4d = p4d_offset(pgd, addr);
-+	if (unlikely(p4d_none(*p4d) || p4d_bad(*p4d)))
-+		return 0;
-+
-+	pud = pud_offset(p4d, addr);
- 	if (unlikely(pud_none(*pud) || pud_bad(*pud)))
- 		return 0;
- 
-@@ -154,7 +159,7 @@ arm_copy_to_user(void __user *to, const void *from, unsigned long n)
- 	}
- 	return n;
- }
--	
-+
- static unsigned long noinline
- __clear_user_memset(void __user *addr, unsigned long n)
- {
-diff --git a/arch/arm/mach-sa1100/assabet.c b/arch/arm/mach-sa1100/assabet.c
-index d96a101e5504..0631a7b02678 100644
---- a/arch/arm/mach-sa1100/assabet.c
-+++ b/arch/arm/mach-sa1100/assabet.c
-@@ -633,7 +633,7 @@ static void __init map_sa1100_gpio_regs( void )
- 	int prot = PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_DOMAIN(DOMAIN_IO);
- 	pmd_t *pmd;
- 
--	pmd = pmd_offset(pud_offset(pgd_offset_k(virt), virt), virt);
-+	pmd = pmd_offset(pud_offset(p4d_offset(pgd_offset_k(virt), virt), virt), virt);
- 	*pmd = __pmd(phys | prot);
- 	flush_pmd_entry(pmd);
- }
-diff --git a/arch/arm/mm/dump.c b/arch/arm/mm/dump.c
-index 7d6291f23251..677549d6854c 100644
---- a/arch/arm/mm/dump.c
-+++ b/arch/arm/mm/dump.c
-@@ -207,6 +207,7 @@ struct pg_level {
- static struct pg_level pg_level[] = {
- 	{
- 	}, { /* pgd */
-+	}, { /* p4d */
- 	}, { /* pud */
- 	}, { /* pmd */
- 		.bits	= section_bits,
-@@ -308,7 +309,7 @@ static void walk_pte(struct pg_state *st, pmd_t *pmd, unsigned long start,
- 
- 	for (i = 0; i < PTRS_PER_PTE; i++, pte++) {
- 		addr = start + i * PAGE_SIZE;
--		note_page(st, addr, 4, pte_val(*pte), domain);
-+		note_page(st, addr, 5, pte_val(*pte), domain);
- 	}
- }
- 
-@@ -350,14 +351,14 @@ static void walk_pmd(struct pg_state *st, pud_t *pud, unsigned long start)
- 			addr += SECTION_SIZE;
- 			pmd++;
- 			domain = get_domain_name(pmd);
--			note_page(st, addr, 3, pmd_val(*pmd), domain);
-+			note_page(st, addr, 4, pmd_val(*pmd), domain);
- 		}
- 	}
- }
- 
--static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
-+static void walk_pud(struct pg_state *st, p4d_t *p4d, unsigned long start)
- {
--	pud_t *pud = pud_offset(pgd, 0);
-+	pud_t *pud = pud_offset(p4d, 0);
- 	unsigned long addr;
- 	unsigned i;
- 
-@@ -366,7 +367,23 @@ static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long start)
- 		if (!pud_none(*pud)) {
- 			walk_pmd(st, pud, addr);
- 		} else {
--			note_page(st, addr, 2, pud_val(*pud), NULL);
-+			note_page(st, addr, 3, pud_val(*pud), NULL);
-+		}
-+	}
-+}
-+
-+static void walk_p4d(struct pg_state *st, pgd_t *pgd, unsigned long start)
-+{
-+	p4d_t *p4d = p4d_offset(pgd, 0);
-+	unsigned long addr;
-+	unsigned i;
-+
-+	for (i = 0; i < PTRS_PER_P4D; i++, p4d++) {
-+		addr = start + i * P4D_SIZE;
-+		if (!p4d_none(*p4d)) {
-+			walk_pud(st, p4d, addr);
-+		} else {
-+			note_page(st, addr, 2, p4d_val(*p4d), NULL);
- 		}
- 	}
- }
-@@ -381,7 +398,7 @@ static void walk_pgd(struct pg_state *st, struct mm_struct *mm,
- 	for (i = 0; i < PTRS_PER_PGD; i++, pgd++) {
- 		addr = start + i * PGDIR_SIZE;
- 		if (!pgd_none(*pgd)) {
--			walk_pud(st, pgd, addr);
-+			walk_p4d(st, pgd, addr);
- 		} else {
- 			note_page(st, addr, 1, pgd_val(*pgd), NULL);
- 		}
-diff --git a/arch/arm/mm/fault-armv.c b/arch/arm/mm/fault-armv.c
-index ae857f41f68d..489aaafa6ebd 100644
---- a/arch/arm/mm/fault-armv.c
-+++ b/arch/arm/mm/fault-armv.c
-@@ -91,6 +91,7 @@ static int adjust_pte(struct vm_area_struct *vma, unsigned long address,
- {
- 	spinlock_t *ptl;
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
- 	pte_t *pte;
-@@ -100,7 +101,11 @@ static int adjust_pte(struct vm_area_struct *vma, unsigned long address,
- 	if (pgd_none_or_clear_bad(pgd))
- 		return 0;
- 
--	pud = pud_offset(pgd, address);
-+	p4d = p4d_offset(pgd, address);
-+	if (p4d_none_or_clear_bad(p4d))
-+		return 0;
-+
-+	pud = pud_offset(p4d, address);
- 	if (pud_none_or_clear_bad(pud))
- 		return 0;
- 
-diff --git a/arch/arm/mm/fault.c b/arch/arm/mm/fault.c
-index bd0f4821f7e1..c2bd35a822e3 100644
---- a/arch/arm/mm/fault.c
-+++ b/arch/arm/mm/fault.c
-@@ -43,6 +43,7 @@ void show_pte(const char *lvl, struct mm_struct *mm, unsigned long addr)
- 	printk("%s[%08lx] *pgd=%08llx", lvl, addr, (long long)pgd_val(*pgd));
- 
- 	do {
-+		p4d_t *p4d;
- 		pud_t *pud;
- 		pmd_t *pmd;
- 		pte_t *pte;
-@@ -55,7 +56,19 @@ void show_pte(const char *lvl, struct mm_struct *mm, unsigned long addr)
- 			break;
- 		}
- 
--		pud = pud_offset(pgd, addr);
-+		p4d = p4d_offset(pgd, addr);
-+		if (PTRS_PER_P4D != 1)
-+			pr_cont(", *p4d=%08llx", (long long)p4d_val(*p4d));
-+
-+		if (p4d_none(*p4d))
-+			break;
-+
-+		if (p4d_bad(*p4d)) {
-+			pr_cont("(bad)");
-+			break;
-+		}
-+
-+		pud = pud_offset(p4d, addr);
- 		if (PTRS_PER_PUD != 1)
- 			pr_cont(", *pud=%08llx", (long long)pud_val(*pud));
- 
-@@ -408,6 +421,7 @@ do_translation_fault(unsigned long addr, unsigned int fsr,
- {
- 	unsigned int index;
- 	pgd_t *pgd, *pgd_k;
-+	p4d_t *p4d, *p4d_k;
- 	pud_t *pud, *pud_k;
- 	pmd_t *pmd, *pmd_k;
- 
-@@ -427,8 +441,16 @@ do_translation_fault(unsigned long addr, unsigned int fsr,
- 	if (!pgd_present(*pgd))
- 		set_pgd(pgd, *pgd_k);
- 
--	pud = pud_offset(pgd, addr);
--	pud_k = pud_offset(pgd_k, addr);
-+	p4d = p4d_offset(pgd, addr);
-+	p4d_k = p4d_offset(pgd_k, addr);
-+
-+	if (p4d_none(*p4d_k))
-+		goto bad_area;
-+	if (!p4d_present(*p4d))
-+		set_p4d(p4d, *p4d_k);
-+
-+	pud = pud_offset(p4d, addr);
-+	pud_k = pud_offset(p4d_k, addr);
- 
- 	if (pud_none(*pud_k))
- 		goto bad_area;
-diff --git a/arch/arm/mm/idmap.c b/arch/arm/mm/idmap.c
-index a033f6134a64..cd54411ef1b8 100644
---- a/arch/arm/mm/idmap.c
-+++ b/arch/arm/mm/idmap.c
-@@ -68,7 +68,8 @@ static void idmap_add_pmd(pud_t *pud, unsigned long addr, unsigned long end,
- static void idmap_add_pud(pgd_t *pgd, unsigned long addr, unsigned long end,
- 	unsigned long prot)
- {
--	pud_t *pud = pud_offset(pgd, addr);
-+	p4d_t *p4d = p4d_offset(pgd, addr);
-+	pud_t *pud = pud_offset(p4d, addr);
- 	unsigned long next;
- 
- 	do {
-diff --git a/arch/arm/mm/init.c b/arch/arm/mm/init.c
-index 3ef204137e73..0b3803328735 100644
---- a/arch/arm/mm/init.c
-+++ b/arch/arm/mm/init.c
-@@ -571,7 +571,7 @@ static inline void section_update(unsigned long addr, pmdval_t mask,
- {
- 	pmd_t *pmd;
- 
--	pmd = pmd_offset(pud_offset(pgd_offset(mm, addr), addr), addr);
-+	pmd = pmd_off_k(addr);
- 
- #ifdef CONFIG_ARM_LPAE
- 	pmd[0] = __pmd((pmd_val(pmd[0]) & mask) | prot);
-diff --git a/arch/arm/mm/ioremap.c b/arch/arm/mm/ioremap.c
-index 72286f9a4d30..75529d76d28c 100644
---- a/arch/arm/mm/ioremap.c
-+++ b/arch/arm/mm/ioremap.c
-@@ -142,12 +142,14 @@ static void unmap_area_sections(unsigned long virt, unsigned long size)
- {
- 	unsigned long addr = virt, end = virt + (size & ~(SZ_1M - 1));
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmdp;
- 
- 	flush_cache_vunmap(addr, end);
- 	pgd = pgd_offset_k(addr);
--	pud = pud_offset(pgd, addr);
-+	p4d = p4d_offset(pgd, addr);
-+	pud = pud_offset(p4d, addr);
- 	pmdp = pmd_offset(pud, addr);
- 	do {
- 		pmd_t pmd = *pmdp;
-@@ -190,6 +192,7 @@ remap_area_sections(unsigned long virt, unsigned long pfn,
- {
- 	unsigned long addr = virt, end = virt + size;
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
- 
-@@ -200,7 +203,8 @@ remap_area_sections(unsigned long virt, unsigned long pfn,
- 	unmap_area_sections(virt, size);
- 
- 	pgd = pgd_offset_k(addr);
--	pud = pud_offset(pgd, addr);
-+	p4d = p4d_offset(pgd, addr);
-+	pud = pud_offset(p4d, addr);
- 	pmd = pmd_offset(pud, addr);
- 	do {
- 		pmd[0] = __pmd(__pfn_to_phys(pfn) | type->prot_sect);
-@@ -222,6 +226,7 @@ remap_area_supersections(unsigned long virt, unsigned long pfn,
- {
- 	unsigned long addr = virt, end = virt + size;
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
- 
-@@ -232,7 +237,8 @@ remap_area_supersections(unsigned long virt, unsigned long pfn,
- 	unmap_area_sections(virt, size);
- 
- 	pgd = pgd_offset_k(virt);
--	pud = pud_offset(pgd, addr);
-+	p4d = p4d_offset(pgd, addr);
-+	pud = pud_offset(p4d, addr);
- 	pmd = pmd_offset(pud, addr);
- 	do {
- 		unsigned long super_pmd_val, i;
-diff --git a/arch/arm/mm/mm.h b/arch/arm/mm/mm.h
-index 88c121ac14b3..4f1f72b75890 100644
---- a/arch/arm/mm/mm.h
-+++ b/arch/arm/mm/mm.h
-@@ -38,7 +38,7 @@ static inline pte_t get_top_pte(unsigned long va)
- 
- static inline pmd_t *pmd_off_k(unsigned long virt)
- {
--	return pmd_offset(pud_offset(pgd_offset_k(virt), virt), virt);
-+	return pmd_offset(pud_offset(p4d_offset(pgd_offset_k(virt), virt), virt), virt);
- }
- 
- struct mem_type {
-diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
-index 5d0d0f86e790..afd97342b634 100644
---- a/arch/arm/mm/mmu.c
-+++ b/arch/arm/mm/mmu.c
-@@ -375,7 +375,8 @@ static pte_t *pte_offset_late_fixmap(pmd_t *dir, unsigned long addr)
- static inline pmd_t * __init fixmap_pmd(unsigned long addr)
- {
- 	pgd_t *pgd = pgd_offset_k(addr);
--	pud_t *pud = pud_offset(pgd, addr);
-+	p4d_t *p4d = p4d_offset(pgd, addr);
-+	pud_t *pud = pud_offset(p4d, addr);
- 	pmd_t *pmd = pmd_offset(pud, addr);
- 
- 	return pmd;
-@@ -827,12 +828,12 @@ static void __init alloc_init_pmd(pud_t *pud, unsigned long addr,
- 	} while (pmd++, addr = next, addr != end);
- }
- 
--static void __init alloc_init_pud(pgd_t *pgd, unsigned long addr,
-+static void __init alloc_init_pud(p4d_t *p4d, unsigned long addr,
- 				  unsigned long end, phys_addr_t phys,
- 				  const struct mem_type *type,
- 				  void *(*alloc)(unsigned long sz), bool ng)
- {
--	pud_t *pud = pud_offset(pgd, addr);
-+	pud_t *pud = pud_offset(p4d, addr);
- 	unsigned long next;
- 
- 	do {
-@@ -842,6 +843,21 @@ static void __init alloc_init_pud(pgd_t *pgd, unsigned long addr,
- 	} while (pud++, addr = next, addr != end);
- }
- 
-+static void __init alloc_init_p4d(pgd_t *pgd, unsigned long addr,
-+				  unsigned long end, phys_addr_t phys,
-+				  const struct mem_type *type,
-+				  void *(*alloc)(unsigned long sz), bool ng)
-+{
-+	p4d_t *p4d = p4d_offset(pgd, addr);
-+	unsigned long next;
-+
-+	do {
-+		next = p4d_addr_end(addr, end);
-+		alloc_init_pud(p4d, addr, next, phys, type, alloc, ng);
-+		phys += next - addr;
-+	} while (p4d++, addr = next, addr != end);
-+}
-+
- #ifndef CONFIG_ARM_LPAE
- static void __init create_36bit_mapping(struct mm_struct *mm,
- 					struct map_desc *md,
-@@ -889,7 +905,8 @@ static void __init create_36bit_mapping(struct mm_struct *mm,
- 	pgd = pgd_offset(mm, addr);
- 	end = addr + length;
- 	do {
--		pud_t *pud = pud_offset(pgd, addr);
-+		p4d_t *p4d = p4d_offset(pgd, addr);
-+		pud_t *pud = pud_offset(p4d, addr);
- 		pmd_t *pmd = pmd_offset(pud, addr);
- 		int i;
- 
-@@ -940,7 +957,7 @@ static void __init __create_mapping(struct mm_struct *mm, struct map_desc *md,
- 	do {
- 		unsigned long next = pgd_addr_end(addr, end);
- 
--		alloc_init_pud(pgd, addr, next, phys, type, alloc, ng);
-+		alloc_init_p4d(pgd, addr, next, phys, type, alloc, ng);
- 
- 		phys += next - addr;
- 		addr = next;
-@@ -976,7 +993,13 @@ void __init create_mapping_late(struct mm_struct *mm, struct map_desc *md,
- 				bool ng)
- {
- #ifdef CONFIG_ARM_LPAE
--	pud_t *pud = pud_alloc(mm, pgd_offset(mm, md->virtual), md->virtual);
-+	p4d_t *p4d;
-+	pud_t *pud;
-+
-+	p4d = p4d_alloc(mm, pgd_offset(mm, md->virtual), md->virtual);
-+	if (!WARN_ON(!p4d))
-+		return;
-+	pud = pud_alloc(mm, p4d, md->virtual);
- 	if (WARN_ON(!pud))
- 		return;
- 	pmd_alloc(mm, pud, 0);
-diff --git a/arch/arm/mm/pgd.c b/arch/arm/mm/pgd.c
-index 478bd2c6aa50..c5e1b27046a8 100644
---- a/arch/arm/mm/pgd.c
-+++ b/arch/arm/mm/pgd.c
-@@ -30,6 +30,7 @@
- pgd_t *pgd_alloc(struct mm_struct *mm)
- {
- 	pgd_t *new_pgd, *init_pgd;
-+	p4d_t *new_p4d, *init_p4d;
- 	pud_t *new_pud, *init_pud;
- 	pmd_t *new_pmd, *init_pmd;
- 	pte_t *new_pte, *init_pte;
-@@ -53,8 +54,12 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
- 	/*
- 	 * Allocate PMD table for modules and pkmap mappings.
- 	 */
--	new_pud = pud_alloc(mm, new_pgd + pgd_index(MODULES_VADDR),
-+	new_p4d = p4d_alloc(mm, new_pgd + pgd_index(MODULES_VADDR),
- 			    MODULES_VADDR);
-+	if (!new_p4d)
-+		goto no_p4d;
-+
-+	new_pud = pud_alloc(mm, new_p4d, MODULES_VADDR);
- 	if (!new_pud)
- 		goto no_pud;
- 
-@@ -69,7 +74,11 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
- 		 * contains the machine vectors. The vectors are always high
- 		 * with LPAE.
- 		 */
--		new_pud = pud_alloc(mm, new_pgd, 0);
-+		new_p4d = p4d_alloc(mm, new_pgd, 0);
-+		if (!new_p4d)
-+			goto no_p4d;
-+
-+		new_pud = pud_alloc(mm, new_p4d, 0);
- 		if (!new_pud)
- 			goto no_pud;
- 
-@@ -91,7 +100,8 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
- 		pmd_val(*new_pmd) |= PMD_DOMAIN(DOMAIN_VECTORS);
- #endif
- 
--		init_pud = pud_offset(init_pgd, 0);
-+		init_p4d = p4d_offset(init_pgd, 0);
-+		init_pud = pud_offset(init_p4d, 0);
- 		init_pmd = pmd_offset(init_pud, 0);
- 		init_pte = pte_offset_map(init_pmd, 0);
- 		set_pte_ext(new_pte + 0, init_pte[0], 0);
-@@ -108,6 +118,8 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
- no_pmd:
- 	pud_free(mm, new_pud);
- no_pud:
-+	p4d_free(mm, new_p4d);
-+no_p4d:
- 	__pgd_free(new_pgd);
- no_pgd:
- 	return NULL;
-@@ -116,6 +128,7 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
- void pgd_free(struct mm_struct *mm, pgd_t *pgd_base)
- {
- 	pgd_t *pgd;
-+	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
- 	pgtable_t pte;
-@@ -127,7 +140,11 @@ void pgd_free(struct mm_struct *mm, pgd_t *pgd_base)
- 	if (pgd_none_or_clear_bad(pgd))
- 		goto no_pgd;
- 
--	pud = pud_offset(pgd, 0);
-+	p4d = p4d_offset(pgd, 0);
-+	if (p4d_none_or_clear_bad(p4d))
-+		goto no_p4d;
-+
-+	pud = pud_offset(p4d, 0);
- 	if (pud_none_or_clear_bad(pud))
- 		goto no_pud;
- 
-@@ -144,8 +161,11 @@ void pgd_free(struct mm_struct *mm, pgd_t *pgd_base)
- 	pmd_free(mm, pmd);
- 	mm_dec_nr_pmds(mm);
- no_pud:
--	pgd_clear(pgd);
-+	p4d_clear(p4d);
- 	pud_free(mm, pud);
-+no_p4d:
-+	pgd_clear(pgd);
-+	p4d_free(mm, p4d);
- no_pgd:
- #ifdef CONFIG_ARM_LPAE
- 	/*
-@@ -156,15 +176,21 @@ void pgd_free(struct mm_struct *mm, pgd_t *pgd_base)
- 			continue;
- 		if (pgd_val(*pgd) & L_PGD_SWAPPER)
- 			continue;
--		pud = pud_offset(pgd, 0);
-+		p4d = p4d_offset(pgd, 0);
-+		if (p4d_none_or_clear_bad(p4d))
-+			continue;
-+		pud = pud_offset(p4d, 0);
- 		if (pud_none_or_clear_bad(pud))
- 			continue;
- 		pmd = pmd_offset(pud, 0);
- 		pud_clear(pud);
- 		pmd_free(mm, pmd);
- 		mm_dec_nr_pmds(mm);
--		pgd_clear(pgd);
-+		p4d_clear(p4d);
- 		pud_free(mm, pud);
-+		mm_dec_nr_puds(mm);
-+		pgd_clear(pgd);
-+		p4d_free(mm, p4d);
- 	}
- #endif
- 	__pgd_free(pgd_base);
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 53d846f1bfe7..1f9bf19ac553 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -172,8 +172,8 @@ void kvm_clear_hyp_idmap(void);
- 	__pmd(__phys_to_pmd_val(__pa(ptep)) | PMD_TYPE_TABLE)
- #define kvm_mk_pud(pmdp)					\
- 	__pud(__phys_to_pud_val(__pa(pmdp)) | PMD_TYPE_TABLE)
--#define kvm_mk_pgd(pudp)					\
--	__pgd(__phys_to_pgd_val(__pa(pudp)) | PUD_TYPE_TABLE)
-+#define kvm_mk_p4d(pmdp)					\
-+	__p4d(__phys_to_p4d_val(__pa(pmdp)) | PUD_TYPE_TABLE)
- 
- #define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
- 
-@@ -299,6 +299,12 @@ static inline bool kvm_s2pud_young(pud_t pud)
- #define hyp_pud_table_empty(pudp) kvm_page_empty(pudp)
- #endif
- 
-+#ifdef __PAGETABLE_P4D_FOLDED
-+#define hyp_p4d_table_empty(p4dp) (0)
-+#else
-+#define hyp_p4d_table_empty(p4dp) kvm_page_empty(p4dp)
-+#endif
-+
- struct kvm;
- 
- #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
-diff --git a/arch/arm64/include/asm/pgalloc.h b/arch/arm64/include/asm/pgalloc.h
-index 172d76fa0245..58e93583ddb6 100644
---- a/arch/arm64/include/asm/pgalloc.h
-+++ b/arch/arm64/include/asm/pgalloc.h
-@@ -73,17 +73,17 @@ static inline void pud_free(struct mm_struct *mm, pud_t *pudp)
- 	free_page((unsigned long)pudp);
- }
- 
--static inline void __pgd_populate(pgd_t *pgdp, phys_addr_t pudp, pgdval_t prot)
-+static inline void __p4d_populate(p4d_t *p4dp, phys_addr_t pudp, p4dval_t prot)
- {
--	set_pgd(pgdp, __pgd(__phys_to_pgd_val(pudp) | prot));
-+	set_p4d(p4dp, __p4d(__phys_to_p4d_val(pudp) | prot));
- }
- 
--static inline void pgd_populate(struct mm_struct *mm, pgd_t *pgdp, pud_t *pudp)
-+static inline void p4d_populate(struct mm_struct *mm, p4d_t *p4dp, pud_t *pudp)
- {
--	__pgd_populate(pgdp, __pa(pudp), PUD_TYPE_TABLE);
-+	__p4d_populate(p4dp, __pa(pudp), PUD_TYPE_TABLE);
- }
- #else
--static inline void __pgd_populate(pgd_t *pgdp, phys_addr_t pudp, pgdval_t prot)
-+static inline void __p4d_populate(p4d_t *p4dp, phys_addr_t pudp, p4dval_t prot)
- {
- 	BUILD_BUG();
- }
-diff --git a/arch/arm64/include/asm/pgtable-types.h b/arch/arm64/include/asm/pgtable-types.h
-index acb0751a6606..b8f158ae2527 100644
---- a/arch/arm64/include/asm/pgtable-types.h
-+++ b/arch/arm64/include/asm/pgtable-types.h
-@@ -14,6 +14,7 @@
- typedef u64 pteval_t;
- typedef u64 pmdval_t;
- typedef u64 pudval_t;
-+typedef u64 p4dval_t;
- typedef u64 pgdval_t;
- 
- /*
-@@ -44,13 +45,11 @@ typedef struct { pteval_t pgprot; } pgprot_t;
- #define __pgprot(x)	((pgprot_t) { (x) } )
- 
- #if CONFIG_PGTABLE_LEVELS == 2
--#define __ARCH_USE_5LEVEL_HACK
- #include <asm-generic/pgtable-nopmd.h>
- #elif CONFIG_PGTABLE_LEVELS == 3
--#define __ARCH_USE_5LEVEL_HACK
- #include <asm-generic/pgtable-nopud.h>
- #elif CONFIG_PGTABLE_LEVELS == 4
--#include <asm-generic/5level-fixup.h>
-+#include <asm-generic/pgtable-nop4d.h>
- #endif
- 
- #endif	/* __ASM_PGTABLE_TYPES_H */
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 5d15b4735a0e..b249d3e249fa 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -302,6 +302,11 @@ static inline pte_t pgd_pte(pgd_t pgd)
- 	return __pte(pgd_val(pgd));
- }
- 
-+static inline pte_t p4d_pte(p4d_t p4d)
-+{
-+	return __pte(p4d_val(p4d));
-+}
-+
- static inline pte_t pud_pte(pud_t pud)
- {
- 	return __pte(pud_val(pud));
-@@ -405,6 +410,9 @@ static inline pmd_t pmd_mkdevmap(pmd_t pmd)
- 
- #define set_pmd_at(mm, addr, pmdp, pmd)	set_pte_at(mm, addr, (pte_t *)pmdp, pmd_pte(pmd))
- 
-+#define __p4d_to_phys(p4d)	__pte_to_phys(p4d_pte(p4d))
-+#define __phys_to_p4d_val(phys)	__phys_to_pte_val(phys)
-+
- #define __pgd_to_phys(pgd)	__pte_to_phys(pgd_pte(pgd))
- #define __phys_to_pgd_val(phys)	__phys_to_pte_val(phys)
- 
-@@ -590,49 +598,50 @@ static inline phys_addr_t pud_page_paddr(pud_t pud)
- 
- #define pud_ERROR(pud)		__pud_error(__FILE__, __LINE__, pud_val(pud))
- 
--#define pgd_none(pgd)		(!pgd_val(pgd))
--#define pgd_bad(pgd)		(!(pgd_val(pgd) & 2))
--#define pgd_present(pgd)	(pgd_val(pgd))
-+#define p4d_none(p4d)		(!p4d_val(p4d))
-+#define p4d_bad(p4d)		(!(p4d_val(p4d) & 2))
-+#define p4d_present(p4d)	(p4d_val(p4d))
- 
--static inline void set_pgd(pgd_t *pgdp, pgd_t pgd)
-+static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
- {
--	if (in_swapper_pgdir(pgdp)) {
--		set_swapper_pgd(pgdp, pgd);
-+	if (in_swapper_pgdir(p4dp)) {
-+		set_swapper_pgd((pgd_t *)p4dp, __pgd(p4d_val(p4d)));
- 		return;
- 	}
- 
--	WRITE_ONCE(*pgdp, pgd);
-+	WRITE_ONCE(*p4dp, p4d);
- 	dsb(ishst);
- 	isb();
- }
- 
--static inline void pgd_clear(pgd_t *pgdp)
-+static inline void p4d_clear(p4d_t *p4dp)
- {
--	set_pgd(pgdp, __pgd(0));
-+	set_p4d(p4dp, __p4d(0));
- }
- 
--static inline phys_addr_t pgd_page_paddr(pgd_t pgd)
-+static inline phys_addr_t p4d_page_paddr(p4d_t p4d)
- {
--	return __pgd_to_phys(pgd);
-+	return __p4d_to_phys(p4d);
- }
- 
- /* Find an entry in the frst-level page table. */
- #define pud_index(addr)		(((addr) >> PUD_SHIFT) & (PTRS_PER_PUD - 1))
- 
--#define pud_offset_phys(dir, addr)	(pgd_page_paddr(READ_ONCE(*(dir))) + pud_index(addr) * sizeof(pud_t))
-+#define pud_offset_phys(dir, addr)	(p4d_page_paddr(READ_ONCE(*(dir))) + pud_index(addr) * sizeof(pud_t))
- #define pud_offset(dir, addr)		((pud_t *)__va(pud_offset_phys((dir), (addr))))
- 
- #define pud_set_fixmap(addr)		((pud_t *)set_fixmap_offset(FIX_PUD, addr))
--#define pud_set_fixmap_offset(pgd, addr)	pud_set_fixmap(pud_offset_phys(pgd, addr))
-+#define pud_set_fixmap_offset(p4d, addr)	pud_set_fixmap(pud_offset_phys(p4d, addr))
- #define pud_clear_fixmap()		clear_fixmap(FIX_PUD)
- 
--#define pgd_page(pgd)		pfn_to_page(__phys_to_pfn(__pgd_to_phys(pgd)))
-+#define p4d_page(p4d)		pfn_to_page(__phys_to_pfn(__p4d_to_phys(p4d)))
- 
- /* use ONLY for statically allocated translation tables */
- #define pud_offset_kimg(dir,addr)	((pud_t *)__phys_to_kimg(pud_offset_phys((dir), (addr))))
- 
- #else
- 
-+#define p4d_page_paddr(p4d)	({ BUILD_BUG(); 0;})
- #define pgd_page_paddr(pgd)	({ BUILD_BUG(); 0;})
- 
- /* Match pud_offset folding in <asm/generic/pgtable-nopud.h> */
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index 326aac658b9d..9a364aeae5fb 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -68,41 +68,67 @@ static inline bool kvm_stage2_has_pud(struct kvm *kvm)
- #define S2_PUD_SIZE			(1UL << S2_PUD_SHIFT)
- #define S2_PUD_MASK			(~(S2_PUD_SIZE - 1))
- 
--static inline bool stage2_pgd_none(struct kvm *kvm, pgd_t pgd)
-+#define stage2_pgd_none(kvm, pgd)		pgd_none(pgd)
-+#define stage2_pgd_clear(kvm, pgd)		pgd_clear(pgd)
-+#define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
-+#define stage2_pgd_populate(kvm, pgd, p4d)	pgd_populate(NULL, pgd, p4d)
-+
-+static inline p4d_t *stage2_p4d_offset(struct kvm *kvm,
-+				       pgd_t *pgd, unsigned long address)
-+{
-+	return p4d_offset(pgd, address);
-+}
-+
-+static inline void stage2_p4d_free(struct kvm *kvm, p4d_t *p4d)
-+{
-+}
-+
-+static inline bool stage2_p4d_table_empty(struct kvm *kvm, p4d_t *p4dp)
-+{
-+	return false;
-+}
-+
-+static inline phys_addr_t stage2_p4d_addr_end(struct kvm *kvm,
-+					      phys_addr_t addr, phys_addr_t end)
-+{
-+	return end;
-+}
-+
-+static inline bool stage2_p4d_none(struct kvm *kvm, p4d_t p4d)
- {
- 	if (kvm_stage2_has_pud(kvm))
--		return pgd_none(pgd);
-+		return p4d_none(p4d);
- 	else
- 		return 0;
- }
- 
--static inline void stage2_pgd_clear(struct kvm *kvm, pgd_t *pgdp)
-+static inline void stage2_p4d_clear(struct kvm *kvm, p4d_t *p4dp)
- {
- 	if (kvm_stage2_has_pud(kvm))
--		pgd_clear(pgdp);
-+		p4d_clear(p4dp);
- }
- 
--static inline bool stage2_pgd_present(struct kvm *kvm, pgd_t pgd)
-+static inline bool stage2_p4d_present(struct kvm *kvm, p4d_t p4d)
- {
- 	if (kvm_stage2_has_pud(kvm))
--		return pgd_present(pgd);
-+		return p4d_present(p4d);
- 	else
- 		return 1;
- }
- 
--static inline void stage2_pgd_populate(struct kvm *kvm, pgd_t *pgd, pud_t *pud)
-+static inline void stage2_p4d_populate(struct kvm *kvm, p4d_t *p4d, pud_t *pud)
- {
- 	if (kvm_stage2_has_pud(kvm))
--		pgd_populate(NULL, pgd, pud);
-+		p4d_populate(NULL, p4d, pud);
- }
- 
- static inline pud_t *stage2_pud_offset(struct kvm *kvm,
--				       pgd_t *pgd, unsigned long address)
-+				       p4d_t *p4d, unsigned long address)
- {
- 	if (kvm_stage2_has_pud(kvm))
--		return pud_offset(pgd, address);
-+		return pud_offset(p4d, address);
- 	else
--		return (pud_t *)pgd;
-+		return (pud_t *)p4d;
- }
- 
- static inline void stage2_pud_free(struct kvm *kvm, pud_t *pud)
-diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
-index a96b2921d22c..24d1b04525c2 100644
---- a/arch/arm64/kernel/hibernate.c
-+++ b/arch/arm64/kernel/hibernate.c
-@@ -203,6 +203,7 @@ static int create_safe_exec_page(void *src_start, size_t length,
- 	int rc = 0;
- 	pgd_t *trans_pgd;
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp;
- 	pmd_t *pmdp;
- 	pte_t *ptep;
-@@ -232,7 +233,17 @@ static int create_safe_exec_page(void *src_start, size_t length,
- 		pgd_populate(&init_mm, pgdp, pudp);
- 	}
- 
--	pudp = pud_offset(pgdp, dst_addr);
-+	p4dp = p4d_offset(pgdp, dst_addr);
-+	if (p4d_none(READ_ONCE(*p4dp))) {
-+		pudp = allocator(mask);
-+		if (!pudp) {
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+		p4d_populate(&init_mm, p4dp, pudp);
-+	}
-+
-+	pudp = pud_offset(p4dp, dst_addr);
- 	if (pud_none(READ_ONCE(*pudp))) {
- 		pmdp = allocator(mask);
- 		if (!pmdp) {
-@@ -422,7 +433,7 @@ static int copy_pmd(pud_t *dst_pudp, pud_t *src_pudp, unsigned long start,
- 	return 0;
- }
- 
--static int copy_pud(pgd_t *dst_pgdp, pgd_t *src_pgdp, unsigned long start,
-+static int copy_pud(p4d_t *dst_p4dp, p4d_t *src_p4dp, unsigned long start,
- 		    unsigned long end)
- {
- 	pud_t *dst_pudp;
-@@ -430,15 +441,15 @@ static int copy_pud(pgd_t *dst_pgdp, pgd_t *src_pgdp, unsigned long start,
- 	unsigned long next;
- 	unsigned long addr = start;
- 
--	if (pgd_none(READ_ONCE(*dst_pgdp))) {
-+	if (p4d_none(READ_ONCE(*dst_p4dp))) {
- 		dst_pudp = (pud_t *)get_safe_page(GFP_ATOMIC);
- 		if (!dst_pudp)
- 			return -ENOMEM;
--		pgd_populate(&init_mm, dst_pgdp, dst_pudp);
-+		p4d_populate(&init_mm, dst_p4dp, dst_pudp);
- 	}
--	dst_pudp = pud_offset(dst_pgdp, start);
-+	dst_pudp = pud_offset(dst_p4dp, start);
- 
--	src_pudp = pud_offset(src_pgdp, start);
-+	src_pudp = pud_offset(src_p4dp, start);
- 	do {
- 		pud_t pud = READ_ONCE(*src_pudp);
- 
-@@ -457,6 +468,27 @@ static int copy_pud(pgd_t *dst_pgdp, pgd_t *src_pgdp, unsigned long start,
- 	return 0;
- }
- 
-+static int copy_p4d(pgd_t *dst_pgdp, pgd_t *src_pgdp, unsigned long start,
-+		    unsigned long end)
-+{
-+	p4d_t *dst_p4dp;
-+	p4d_t *src_p4dp;
-+	unsigned long next;
-+	unsigned long addr = start;
-+
-+	dst_p4dp = p4d_offset(dst_pgdp, start);
-+	src_p4dp = p4d_offset(src_pgdp, start);
-+	do {
-+		next = p4d_addr_end(addr, end);
-+		if (p4d_none(READ_ONCE(*src_p4dp)))
-+			continue;
-+		if (copy_pud(dst_p4dp, src_p4dp, addr, next))
-+			return -ENOMEM;
-+	} while (dst_p4dp++, src_p4dp++, addr = next, addr != end);
-+
-+	return 0;
-+}
-+
- static int copy_page_tables(pgd_t *dst_pgdp, unsigned long start,
- 			    unsigned long end)
- {
-@@ -469,7 +501,7 @@ static int copy_page_tables(pgd_t *dst_pgdp, unsigned long start,
- 		next = pgd_addr_end(addr, end);
- 		if (pgd_none(READ_ONCE(*src_pgdp)))
- 			continue;
--		if (copy_pud(dst_pgdp, src_pgdp, addr, next))
-+		if (copy_p4d(dst_pgdp, src_pgdp, addr, next))
- 			return -ENOMEM;
- 	} while (dst_pgdp++, src_pgdp++, addr = next, addr != end);
- 
-diff --git a/arch/arm64/mm/dump.c b/arch/arm64/mm/dump.c
-index 0a920b538a89..0fc1d88b6ed4 100644
---- a/arch/arm64/mm/dump.c
-+++ b/arch/arm64/mm/dump.c
-@@ -179,6 +179,10 @@ static struct pg_level pg_level[] = {
- 		.name	= "PGD",
- 		.bits	= pte_bits,
- 		.num	= ARRAY_SIZE(pte_bits),
-+	}, { /* p4d */
-+		.name	= "P4D",
-+		.bits	= pte_bits,
-+		.num	= ARRAY_SIZE(pte_bits),
- 	}, { /* pud */
- 		.name	= (CONFIG_PGTABLE_LEVELS > 3) ? "PUD" : "PGD",
- 		.bits	= pte_bits,
-@@ -323,11 +327,11 @@ static void walk_pmd(struct pg_state *st, pud_t *pudp, unsigned long start,
- 	} while (pmdp++, addr = next, addr != end);
- }
- 
--static void walk_pud(struct pg_state *st, pgd_t *pgdp, unsigned long start,
-+static void walk_pud(struct pg_state *st, p4d_t *p4dp, unsigned long start,
- 		     unsigned long end)
- {
- 	unsigned long next, addr = start;
--	pud_t *pudp = pud_offset(pgdp, start);
-+	pud_t *pudp = pud_offset(p4dp, start);
- 
- 	do {
- 		pud_t pud = READ_ONCE(*pudp);
-@@ -342,6 +346,25 @@ static void walk_pud(struct pg_state *st, pgd_t *pgdp, unsigned long start,
- 	} while (pudp++, addr = next, addr != end);
- }
- 
-+static void walk_p4d(struct pg_state *st, pgd_t *pgdp, unsigned long start,
-+		     unsigned long end)
-+{
-+	unsigned long next, addr = start;
-+	p4d_t *p4dp = p4d_offset(pgdp, start);
-+
-+	do {
-+		p4d_t p4d = READ_ONCE(*p4dp);
-+		next = p4d_addr_end(addr, end);
-+
-+		if (p4d_none(p4d) || p4d_sect(p4d)) {
-+			note_page(st, addr, 2, p4d_val(p4d));
-+		} else {
-+			BUG_ON(p4d_bad(p4d));
-+			walk_pud(st, p4dp, addr, next);
-+		}
-+	} while (p4dp++, addr = next, addr != end);
-+}
-+
- static void walk_pgd(struct pg_state *st, struct mm_struct *mm,
- 		     unsigned long start)
- {
-@@ -357,7 +380,7 @@ static void walk_pgd(struct pg_state *st, struct mm_struct *mm,
- 			note_page(st, addr, 1, pgd_val(pgd));
- 		} else {
- 			BUG_ON(pgd_bad(pgd));
--			walk_pud(st, pgdp, addr, next);
-+			walk_p4d(st, pgdp, addr, next);
- 		}
- 	} while (pgdp++, addr = next, addr != end);
- }
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 077b02a2d4d3..245fa39e9958 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -145,6 +145,7 @@ static void show_pte(unsigned long addr)
- 	pr_alert("[%016lx] pgd=%016llx", addr, pgd_val(pgd));
- 
- 	do {
-+		p4d_t *p4dp, p4d;
- 		pud_t *pudp, pud;
- 		pmd_t *pmdp, pmd;
- 		pte_t *ptep, pte;
-@@ -152,7 +153,13 @@ static void show_pte(unsigned long addr)
- 		if (pgd_none(pgd) || pgd_bad(pgd))
- 			break;
- 
--		pudp = pud_offset(pgdp, addr);
-+		p4dp = p4d_offset(pgdp, addr);
-+		p4d = READ_ONCE(*p4dp);
-+		pr_cont(", p4d=%016llx", p4d_val(p4d));
-+		if (p4d_none(p4d) || p4d_bad(p4d))
-+			break;
-+
-+		pudp = pud_offset(p4dp, addr);
- 		pud = READ_ONCE(*pudp);
- 		pr_cont(", pud=%016llx", pud_val(pud));
- 		if (pud_none(pud) || pud_bad(pud))
-diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
-index bbeb6a5a6ba6..b8a9f26f3790 100644
---- a/arch/arm64/mm/hugetlbpage.c
-+++ b/arch/arm64/mm/hugetlbpage.c
-@@ -67,11 +67,13 @@ static int find_num_contig(struct mm_struct *mm, unsigned long addr,
- 			   pte_t *ptep, size_t *pgsize)
- {
- 	pgd_t *pgdp = pgd_offset(mm, addr);
-+	p4d_t *p4dp;
- 	pud_t *pudp;
- 	pmd_t *pmdp;
- 
- 	*pgsize = PAGE_SIZE;
--	pudp = pud_offset(pgdp, addr);
-+	p4dp = p4d_offset(pgdp, addr);
-+	pudp = pud_offset(p4dp, addr);
- 	pmdp = pmd_offset(pudp, addr);
- 	if ((pte_t *)pmdp == ptep) {
- 		*pgsize = PMD_SIZE;
-@@ -217,12 +219,14 @@ pte_t *huge_pte_alloc(struct mm_struct *mm,
- 		      unsigned long addr, unsigned long sz)
- {
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp;
- 	pmd_t *pmdp;
- 	pte_t *ptep = NULL;
- 
- 	pgdp = pgd_offset(mm, addr);
--	pudp = pud_alloc(mm, pgdp, addr);
-+	p4dp = p4d_offset(pgdp, addr);
-+	pudp = pud_alloc(mm, p4dp, addr);
- 	if (!pudp)
- 		return NULL;
- 
-@@ -259,6 +263,7 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
- 		       unsigned long addr, unsigned long sz)
- {
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp, pud;
- 	pmd_t *pmdp, pmd;
- 
-@@ -266,7 +271,11 @@ pte_t *huge_pte_offset(struct mm_struct *mm,
- 	if (!pgd_present(READ_ONCE(*pgdp)))
- 		return NULL;
- 
--	pudp = pud_offset(pgdp, addr);
-+	p4dp = p4d_offset(pgdp, addr);
-+	if (!p4d_present(READ_ONCE(*p4dp)))
-+		return NULL;
-+
-+	pudp = pud_offset(p4dp, addr);
- 	pud = READ_ONCE(*pudp);
- 	if (sz != PUD_SIZE && pud_none(pud))
- 		return NULL;
-diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
-index f87a32484ea8..fd6220508711 100644
---- a/arch/arm64/mm/kasan_init.c
-+++ b/arch/arm64/mm/kasan_init.c
-@@ -84,17 +84,32 @@ static pmd_t *__init kasan_pmd_offset(pud_t *pudp, unsigned long addr, int node,
- 	return early ? pmd_offset_kimg(pudp, addr) : pmd_offset(pudp, addr);
- }
- 
--static pud_t *__init kasan_pud_offset(pgd_t *pgdp, unsigned long addr, int node,
-+static pud_t *__init kasan_pud_offset(p4d_t *p4dp, unsigned long addr, int node,
- 				      bool early)
- {
--	if (pgd_none(READ_ONCE(*pgdp))) {
-+	if (p4d_none(READ_ONCE(*p4dp))) {
- 		phys_addr_t pud_phys = early ?
- 				__pa_symbol(kasan_early_shadow_pud)
- 					: kasan_alloc_zeroed_page(node);
--		__pgd_populate(pgdp, pud_phys, PMD_TYPE_TABLE);
-+		__p4d_populate(p4dp, pud_phys, PMD_TYPE_TABLE);
-+	}
-+
-+	return early ? pud_offset_kimg(p4dp, addr) : pud_offset(p4dp, addr);
-+}
-+
-+static p4d_t *__init kasan_p4d_offset(pgd_t *pgdp, unsigned long addr, int node,
-+				      bool early)
-+{
-+#ifndef __PAGETABLE_P4D_FOLDED
-+	if (pgd_none(READ_ONCE(*pgdp))) {
-+		phys_addr_t p4d_phys = early ?
-+				__pa_symbol(kasan_early_shadow_p4d)
-+					: kasan_alloc_zeroed_page(node);
-+		__pgd_populate(pgdp, p4d_phys, PMD_TYPE_TABLE);
- 	}
-+#endif
- 
--	return early ? pud_offset_kimg(pgdp, addr) : pud_offset(pgdp, addr);
-+	return early ? p4d_offset_kimg(pgdp, addr) : p4d_offset(pgdp, addr);
- }
- 
- static void __init kasan_pte_populate(pmd_t *pmdp, unsigned long addr,
-@@ -126,11 +141,11 @@ static void __init kasan_pmd_populate(pud_t *pudp, unsigned long addr,
- 	} while (pmdp++, addr = next, addr != end && pmd_none(READ_ONCE(*pmdp)));
- }
- 
--static void __init kasan_pud_populate(pgd_t *pgdp, unsigned long addr,
-+static void __init kasan_pud_populate(p4d_t *p4dp, unsigned long addr,
- 				      unsigned long end, int node, bool early)
- {
- 	unsigned long next;
--	pud_t *pudp = kasan_pud_offset(pgdp, addr, node, early);
-+	pud_t *pudp = kasan_pud_offset(p4dp, addr, node, early);
- 
- 	do {
- 		next = pud_addr_end(addr, end);
-@@ -138,6 +153,18 @@ static void __init kasan_pud_populate(pgd_t *pgdp, unsigned long addr,
- 	} while (pudp++, addr = next, addr != end && pud_none(READ_ONCE(*pudp)));
- }
- 
-+static void __init kasan_p4d_populate(pgd_t *pgdp, unsigned long addr,
-+				      unsigned long end, int node, bool early)
-+{
-+	unsigned long next;
-+	p4d_t *p4dp = kasan_p4d_offset(pgdp, addr, node, early);
-+
-+	do {
-+		next = p4d_addr_end(addr, end);
-+		kasan_pmd_populate(p4dp, addr, next, node, early);
-+	} while (p4dp++, addr = next, addr != end && p4d_none(READ_ONCE(*p4dp)));
-+}
-+
- static void __init kasan_pgd_populate(unsigned long addr, unsigned long end,
- 				      int node, bool early)
- {
-@@ -147,7 +174,7 @@ static void __init kasan_pgd_populate(unsigned long addr, unsigned long end,
- 	pgdp = pgd_offset_k(addr);
- 	do {
- 		next = pgd_addr_end(addr, end);
--		kasan_pud_populate(pgdp, addr, next, node, early);
-+		kasan_p4d_populate(pgdp, addr, next, node, early);
- 	} while (pgdp++, addr = next, addr != end);
- }
- 
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index 5a3b15a14a7f..baf312098dd1 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -289,18 +289,19 @@ static void alloc_init_pud(pgd_t *pgdp, unsigned long addr, unsigned long end,
- {
- 	unsigned long next;
- 	pud_t *pudp;
--	pgd_t pgd = READ_ONCE(*pgdp);
-+	p4d_t *p4dp = p4d_offset(pgdp, addr);
-+	p4d_t p4d = READ_ONCE(*p4dp);
- 
--	if (pgd_none(pgd)) {
-+	if (p4d_none(p4d)) {
- 		phys_addr_t pud_phys;
- 		BUG_ON(!pgtable_alloc);
- 		pud_phys = pgtable_alloc(PUD_SHIFT);
--		__pgd_populate(pgdp, pud_phys, PUD_TYPE_TABLE);
--		pgd = READ_ONCE(*pgdp);
-+		__p4d_populate(p4dp, pud_phys, PUD_TYPE_TABLE);
-+		p4d = READ_ONCE(*p4dp);
- 	}
--	BUG_ON(pgd_bad(pgd));
-+	BUG_ON(p4d_bad(p4d));
- 
--	pudp = pud_set_fixmap_offset(pgdp, addr);
-+	pudp = pud_set_fixmap_offset(p4dp, addr);
- 	do {
- 		pud_t old_pud = READ_ONCE(*pudp);
- 
-@@ -647,6 +648,7 @@ static void __init map_kernel(pgd_t *pgdp)
- 			READ_ONCE(*pgd_offset_k(FIXADDR_START)));
- 	} else if (CONFIG_PGTABLE_LEVELS > 3) {
- 		pgd_t *bm_pgdp;
-+		p4d_t *bm_p4dp;
- 		pud_t *bm_pudp;
- 		/*
- 		 * The fixmap shares its top level pgd entry with the kernel
-@@ -656,7 +658,8 @@ static void __init map_kernel(pgd_t *pgdp)
- 		 */
- 		BUG_ON(!IS_ENABLED(CONFIG_ARM64_16K_PAGES));
- 		bm_pgdp = pgd_offset_raw(pgdp, FIXADDR_START);
--		bm_pudp = pud_set_fixmap_offset(bm_pgdp, FIXADDR_START);
-+		bm_p4dp = p4d_offset(bm_pgdp, FIXADDR_START);
-+		bm_pudp = pud_set_fixmap_offset(bm_p4dp, FIXADDR_START);
- 		pud_populate(&init_mm, bm_pudp, lm_alias(bm_pmd));
- 		pud_clear_fixmap();
- 	} else {
-@@ -690,6 +693,7 @@ void __init paging_init(void)
- int kern_addr_valid(unsigned long addr)
- {
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp, pud;
- 	pmd_t *pmdp, pmd;
- 	pte_t *ptep, pte;
-@@ -701,7 +705,11 @@ int kern_addr_valid(unsigned long addr)
- 	if (pgd_none(READ_ONCE(*pgdp)))
- 		return 0;
- 
--	pudp = pud_offset(pgdp, addr);
-+	p4dp = p4d_offset(pgdp, addr);
-+	if (p4d_none(READ_ONCE(*p4dp)))
-+		return 0;
-+
-+	pudp = pud_offset(p4dp, addr);
- 	pud = READ_ONCE(*pudp);
- 	if (pud_none(pud))
- 		return 0;
-@@ -738,6 +746,7 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
- 	unsigned long addr = start;
- 	unsigned long next;
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp;
- 	pmd_t *pmdp;
- 
-@@ -748,7 +757,11 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
- 		if (!pgdp)
- 			return -ENOMEM;
- 
--		pudp = vmemmap_pud_populate(pgdp, addr, node);
-+		p4dp = vmemmap_p4d_populate(pgdp, addr, node);
-+		if (!p4dp)
-+			return -ENOMEM;
-+
-+		pudp = vmemmap_pud_populate(p4dp, addr, node);
- 		if (!pudp)
- 			return -ENOMEM;
- 
-@@ -777,11 +790,12 @@ void vmemmap_free(unsigned long start, unsigned long end,
- static inline pud_t * fixmap_pud(unsigned long addr)
- {
- 	pgd_t *pgdp = pgd_offset_k(addr);
--	pgd_t pgd = READ_ONCE(*pgdp);
-+	p4d_t *p4dp = p4d_offset(pgdp, addr);
-+	p4d_t p4d = READ_ONCE(*p4dp);
- 
--	BUG_ON(pgd_none(pgd) || pgd_bad(pgd));
-+	BUG_ON(p4d_none(p4d) || p4d_bad(p4d));
- 
--	return pud_offset_kimg(pgdp, addr);
-+	return pud_offset_kimg(p4dp, addr);
- }
- 
- static inline pmd_t * fixmap_pmd(unsigned long addr)
-@@ -807,25 +821,27 @@ static inline pte_t * fixmap_pte(unsigned long addr)
-  */
- void __init early_fixmap_init(void)
- {
--	pgd_t *pgdp, pgd;
-+	pgd_t *pgdp;
-+	p4d_t *p4dp, p4d;
- 	pud_t *pudp;
- 	pmd_t *pmdp;
- 	unsigned long addr = FIXADDR_START;
- 
- 	pgdp = pgd_offset_k(addr);
--	pgd = READ_ONCE(*pgdp);
-+	p4dp = p4d_offset(pgdp, addr);
-+	p4d = READ_ONCE(*p4dp);
- 	if (CONFIG_PGTABLE_LEVELS > 3 &&
--	    !(pgd_none(pgd) || pgd_page_paddr(pgd) == __pa_symbol(bm_pud))) {
-+	    !(p4d_none(p4d) || p4d_page_paddr(p4d) == __pa_symbol(bm_pud))) {
- 		/*
- 		 * We only end up here if the kernel mapping and the fixmap
- 		 * share the top level pgd entry, which should only happen on
- 		 * 16k/4 levels configurations.
- 		 */
- 		BUG_ON(!IS_ENABLED(CONFIG_ARM64_16K_PAGES));
--		pudp = pud_offset_kimg(pgdp, addr);
-+		pudp = pud_offset_kimg(p4dp, addr);
- 	} else {
--		if (pgd_none(pgd))
--			__pgd_populate(pgdp, __pa_symbol(bm_pud), PUD_TYPE_TABLE);
-+		if (p4d_none(p4d))
-+			__p4d_populate(p4dp, __pa_symbol(bm_pud), PUD_TYPE_TABLE);
- 		pudp = fixmap_pud(addr);
- 	}
- 	if (pud_none(READ_ONCE(*pudp)))
-diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-index 9ce7bd9d4d9c..78ece756ca89 100644
---- a/arch/arm64/mm/pageattr.c
-+++ b/arch/arm64/mm/pageattr.c
-@@ -198,6 +198,7 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
- bool kernel_page_present(struct page *page)
- {
- 	pgd_t *pgdp;
-+	p4d_t *p4dp;
- 	pud_t *pudp, pud;
- 	pmd_t *pmdp, pmd;
- 	pte_t *ptep;
-@@ -210,7 +211,11 @@ bool kernel_page_present(struct page *page)
- 	if (pgd_none(READ_ONCE(*pgdp)))
- 		return false;
- 
--	pudp = pud_offset(pgdp, addr);
-+	p4dp = p4d_offset(pgdp, addr);
-+	if (p4d_none(READ_ONCE(*p4dp)))
-+		return false;
-+
-+	pudp = pud_offset(p4dp, addr);
- 	pud = READ_ONCE(*pudp);
- 	if (pud_none(pud))
- 		return false;
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 0b32a904a1bb..2c9fba63f68a 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -159,13 +159,22 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- 
- static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
- {
--	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, pgd, 0UL);
-+	p4d_t *p4d_table __maybe_unused = stage2_p4d_offset(kvm, pgd, 0UL);
- 	stage2_pgd_clear(kvm, pgd);
- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
--	stage2_pud_free(kvm, pud_table);
-+	stage2_p4d_free(kvm, p4d_table);
- 	put_page(virt_to_page(pgd));
- }
- 
-+static void clear_stage2_p4d_entry(struct kvm *kvm, p4d_t *p4d, phys_addr_t addr)
-+{
-+	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, p4d, 0);
-+	stage2_p4d_clear(kvm, p4d);
-+	kvm_tlb_flush_vmid_ipa(kvm, addr);
-+	stage2_pud_free(kvm, pud_table);
-+	put_page(virt_to_page(p4d));
-+}
-+
- static void clear_stage2_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
- {
- 	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
-@@ -209,12 +218,20 @@ static inline void kvm_pud_populate(pud_t *pudp, pmd_t *pmdp)
- 	dsb(ishst);
- }
- 
--static inline void kvm_pgd_populate(pgd_t *pgdp, pud_t *pudp)
-+static inline void kvm_p4d_populate(p4d_t *p4dp, pud_t *pudp)
- {
--	WRITE_ONCE(*pgdp, kvm_mk_pgd(pudp));
-+	WRITE_ONCE(*p4dp, kvm_mk_p4d(pudp));
- 	dsb(ishst);
- }
- 
-+static inline void kvm_pgd_populate(pgd_t *pgdp, p4d_t *p4dp)
-+{
-+#ifndef __PAGETABLE_P4D_FOLDED
-+	WRITE_ONCE(*pgdp, kvm_mk_pgd(p4dp));
-+	dsb(ishst);
-+#endif
-+}
-+
- /*
-  * Unmapping vs dcache management:
-  *
-@@ -294,13 +311,13 @@ static void unmap_stage2_pmds(struct kvm *kvm, pud_t *pud,
- 		clear_stage2_pud_entry(kvm, pud, start_addr);
- }
- 
--static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
-+static void unmap_stage2_puds(struct kvm *kvm, p4d_t *p4d,
- 		       phys_addr_t addr, phys_addr_t end)
- {
- 	phys_addr_t next, start_addr = addr;
- 	pud_t *pud, *start_pud;
- 
--	start_pud = pud = stage2_pud_offset(kvm, pgd, addr);
-+	start_pud = pud = stage2_pud_offset(kvm, p4d, addr);
- 	do {
- 		next = stage2_pud_addr_end(kvm, addr, end);
- 		if (!stage2_pud_none(kvm, *pud)) {
-@@ -318,6 +335,23 @@ static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
- 	} while (pud++, addr = next, addr != end);
- 
- 	if (stage2_pud_table_empty(kvm, start_pud))
-+		clear_stage2_p4d_entry(kvm, p4d, start_addr);
-+}
-+
-+static void unmap_stage2_p4ds(struct kvm *kvm, pgd_t *pgd,
-+		       phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t next, start_addr = addr;
-+	p4d_t *p4d, *start_p4d;
-+
-+	start_p4d = p4d = stage2_p4d_offset(kvm, pgd, addr);
-+	do {
-+		next = stage2_p4d_addr_end(kvm, addr, end);
-+		if (!stage2_p4d_none(kvm, *p4d))
-+			unmap_stage2_puds(kvm, p4d, addr, next);
-+	} while (p4d++, addr = next, addr != end);
-+
-+	if (stage2_p4d_table_empty(kvm, start_p4d))
- 		clear_stage2_pgd_entry(kvm, pgd, start_addr);
- }
- 
-@@ -352,7 +386,7 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 			break;
- 		next = stage2_pgd_addr_end(kvm, addr, end);
- 		if (!stage2_pgd_none(kvm, *pgd))
--			unmap_stage2_puds(kvm, pgd, addr, next);
-+			unmap_stage2_p4ds(kvm, pgd, addr, next);
- 		/*
- 		 * If the range is too large, release the kvm->mmu_lock
- 		 * to prevent starvation and lockup detector warnings.
-@@ -392,13 +426,13 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 	} while (pmd++, addr = next, addr != end);
- }
- 
--static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
-+static void stage2_flush_puds(struct kvm *kvm, p4d_t *p4d,
- 			      phys_addr_t addr, phys_addr_t end)
- {
- 	pud_t *pud;
- 	phys_addr_t next;
- 
--	pud = stage2_pud_offset(kvm, pgd, addr);
-+	pud = stage2_pud_offset(kvm, p4d, addr);
- 	do {
- 		next = stage2_pud_addr_end(kvm, addr, end);
- 		if (!stage2_pud_none(kvm, *pud)) {
-@@ -410,6 +444,20 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
- 	} while (pud++, addr = next, addr != end);
- }
- 
-+static void stage2_flush_p4ds(struct kvm *kvm, pgd_t *pgd,
-+			      phys_addr_t addr, phys_addr_t end)
-+{
-+	p4d_t *p4d;
-+	phys_addr_t next;
-+
-+	p4d = stage2_p4d_offset(kvm, pgd, addr);
-+	do {
-+		next = stage2_p4d_addr_end(kvm, addr, end);
-+		if (!stage2_p4d_none(kvm, *p4d))
-+			stage2_flush_puds(kvm, p4d, addr, next);
-+	} while (p4d++, addr = next, addr != end);
-+}
-+
- static void stage2_flush_memslot(struct kvm *kvm,
- 				 struct kvm_memory_slot *memslot)
- {
-@@ -422,7 +470,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	do {
- 		next = stage2_pgd_addr_end(kvm, addr, end);
- 		if (!stage2_pgd_none(kvm, *pgd))
--			stage2_flush_puds(kvm, pgd, addr, next);
-+			stage2_flush_p4ds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
- 
-@@ -452,12 +500,21 @@ static void stage2_flush_vm(struct kvm *kvm)
- 
- static void clear_hyp_pgd_entry(pgd_t *pgd)
- {
--	pud_t *pud_table __maybe_unused = pud_offset(pgd, 0UL);
-+	p4d_t *p4d_table __maybe_unused = p4d_offset(pgd, 0UL);
- 	pgd_clear(pgd);
--	pud_free(NULL, pud_table);
-+	p4d_free(NULL, p4d_table);
- 	put_page(virt_to_page(pgd));
- }
- 
-+static void clear_hyp_p4d_entry(p4d_t *p4d)
-+{
-+	pud_t *pud_table __maybe_unused = pud_offset(p4d, 0);
-+	VM_BUG_ON(p4d_huge(*p4d));
-+	p4d_clear(p4d);
-+	pud_free(NULL, pud_table);
-+	put_page(virt_to_page(p4d));
-+}
-+
- static void clear_hyp_pud_entry(pud_t *pud)
- {
- 	pmd_t *pmd_table __maybe_unused = pmd_offset(pud, 0);
-@@ -509,12 +566,12 @@ static void unmap_hyp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
- 		clear_hyp_pud_entry(pud);
- }
- 
--static void unmap_hyp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
-+static void unmap_hyp_puds(p4d_t *p4d, phys_addr_t addr, phys_addr_t end)
- {
- 	phys_addr_t next;
- 	pud_t *pud, *start_pud;
- 
--	start_pud = pud = pud_offset(pgd, addr);
-+	start_pud = pud = pud_offset(p4d, addr);
- 	do {
- 		next = pud_addr_end(addr, end);
- 		/* Hyp doesn't use huge puds */
-@@ -523,6 +580,23 @@ static void unmap_hyp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
- 	} while (pud++, addr = next, addr != end);
- 
- 	if (hyp_pud_table_empty(start_pud))
-+		clear_hyp_p4d_entry(p4d);
-+}
-+
-+static void unmap_hyp_p4ds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t next;
-+	p4d_t *p4d, *start_p4d;
-+
-+	start_p4d = p4d = p4d_offset(pgd, addr);
-+	do {
-+		next = p4d_addr_end(addr, end);
-+		/* Hyp doesn't use huge p4ds */
-+		if (!p4d_none(*p4d))
-+			unmap_hyp_puds(p4d, addr, next);
-+	} while (p4d++, addr = next, addr != end);
-+
-+	if (hyp_p4d_table_empty(start_p4d))
- 		clear_hyp_pgd_entry(pgd);
- }
- 
-@@ -546,7 +620,7 @@ static void __unmap_hyp_range(pgd_t *pgdp, unsigned long ptrs_per_pgd,
- 	do {
- 		next = pgd_addr_end(addr, end);
- 		if (!pgd_none(*pgd))
--			unmap_hyp_puds(pgd, addr, next);
-+			unmap_hyp_p4ds(pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
- 
-@@ -656,7 +730,7 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
- 	return 0;
- }
- 
--static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
-+static int create_hyp_pud_mappings(p4d_t *p4d, unsigned long start,
- 				   unsigned long end, unsigned long pfn,
- 				   pgprot_t prot)
- {
-@@ -667,7 +741,7 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
- 
- 	addr = start;
- 	do {
--		pud = pud_offset(pgd, addr);
-+		pud = pud_offset(p4d, addr);
- 
- 		if (pud_none_or_clear_bad(pud)) {
- 			pmd = pmd_alloc_one(NULL, addr);
-@@ -689,12 +763,45 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
- 	return 0;
- }
- 
-+static int create_hyp_p4d_mappings(pgd_t *pgd, unsigned long start,
-+				   unsigned long end, unsigned long pfn,
-+				   pgprot_t prot)
-+{
-+	p4d_t *p4d;
-+	pud_t *pud;
-+	unsigned long addr, next;
-+	int ret;
-+
-+	addr = start;
-+	do {
-+		p4d = p4d_offset(pgd, addr);
-+
-+		if (p4d_none(*p4d)) {
-+			pud = pud_alloc_one(NULL, addr);
-+			if (!pud) {
-+				kvm_err("Cannot allocate Hyp pud\n");
-+				return -ENOMEM;
-+			}
-+			kvm_p4d_populate(p4d, pud);
-+			get_page(virt_to_page(p4d));
-+		}
-+
-+		next = p4d_addr_end(addr, end);
-+		ret = create_hyp_pud_mappings(p4d, addr, next, pfn, prot);
-+		if (ret)
-+			return ret;
-+		pfn += (next - addr) >> PAGE_SHIFT;
-+	} while (addr = next, addr != end);
-+
-+	return 0;
-+}
-+
- static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
- 				 unsigned long start, unsigned long end,
- 				 unsigned long pfn, pgprot_t prot)
- {
- 	pgd_t *pgd;
--	pud_t *pud;
-+	p4d_t *p4d;
- 	unsigned long addr, next;
- 	int err = 0;
- 
-@@ -705,18 +812,18 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
- 		pgd = pgdp + kvm_pgd_index(addr, ptrs_per_pgd);
- 
- 		if (pgd_none(*pgd)) {
--			pud = pud_alloc_one(NULL, addr);
--			if (!pud) {
--				kvm_err("Cannot allocate Hyp pud\n");
-+			p4d = p4d_alloc_one(NULL, addr);
-+			if (!p4d) {
-+				kvm_err("Cannot allocate Hyp p4d\n");
- 				err = -ENOMEM;
- 				goto out;
- 			}
--			kvm_pgd_populate(pgd, pud);
-+			kvm_pgd_populate(pgd, p4d);
- 			get_page(virt_to_page(pgd));
- 		}
- 
- 		next = pgd_addr_end(addr, end);
--		err = create_hyp_pud_mappings(pgd, addr, next, pfn, prot);
-+		err = create_hyp_p4d_mappings(pgd, addr, next, pfn, prot);
- 		if (err)
- 			goto out;
- 		pfn += (next - addr) >> PAGE_SHIFT;
-@@ -1013,22 +1120,40 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 		free_pages_exact(pgd, stage2_pgd_size(kvm));
- }
- 
--static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+static p4d_t *stage2_get_p4d(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 			     phys_addr_t addr)
- {
- 	pgd_t *pgd;
--	pud_t *pud;
-+	p4d_t *p4d;
- 
- 	pgd = kvm->arch.pgd + stage2_pgd_index(kvm, addr);
- 	if (stage2_pgd_none(kvm, *pgd)) {
- 		if (!cache)
- 			return NULL;
--		pud = mmu_memory_cache_alloc(cache);
--		stage2_pgd_populate(kvm, pgd, pud);
-+		p4d = mmu_memory_cache_alloc(cache);
-+		stage2_pgd_populate(kvm, pgd, p4d);
- 		get_page(virt_to_page(pgd));
- 	}
- 
--	return stage2_pud_offset(kvm, pgd, addr);
-+	return stage2_p4d_offset(kvm, pgd, addr);
-+}
-+
-+static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+			     phys_addr_t addr)
-+{
-+	p4d_t *p4d;
-+	pud_t *pud;
-+
-+	p4d = stage2_get_p4d(kvm, cache, addr);
-+	if (stage2_p4d_none(kvm, *p4d)) {
-+		if (!cache)
-+			return NULL;
-+		pud = mmu_memory_cache_alloc(cache);
-+		stage2_p4d_populate(kvm, p4d, pud);
-+		get_page(virt_to_page(p4d));
-+	}
-+
-+	return stage2_pud_offset(kvm, p4d, addr);
- }
- 
- static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -1468,18 +1593,18 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
- }
- 
- /**
-- * stage2_wp_puds - write protect PGD range
-+ * stage2_wp_puds - write protect P4D range
-  * @pgd:	pointer to pgd entry
-  * @addr:	range start address
-  * @end:	range end address
-  */
--static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
-+static void  stage2_wp_puds(struct kvm *kvm, p4d_t *p4d,
- 			    phys_addr_t addr, phys_addr_t end)
- {
- 	pud_t *pud;
- 	phys_addr_t next;
- 
--	pud = stage2_pud_offset(kvm, pgd, addr);
-+	pud = stage2_pud_offset(kvm, p4d, addr);
- 	do {
- 		next = stage2_pud_addr_end(kvm, addr, end);
- 		if (!stage2_pud_none(kvm, *pud)) {
-@@ -1493,6 +1618,26 @@ static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
- 	} while (pud++, addr = next, addr != end);
- }
- 
-+/**
-+ * stage2_wp_p4ds - write protect PGD range
-+ * @pgd:	pointer to pgd entry
-+ * @addr:	range start address
-+ * @end:	range end address
-+ */
-+static void  stage2_wp_p4ds(struct kvm *kvm, pgd_t *pgd,
-+			    phys_addr_t addr, phys_addr_t end)
-+{
-+	p4d_t *p4d;
-+	phys_addr_t next;
-+
-+	p4d = stage2_p4d_offset(kvm, pgd, addr);
-+	do {
-+		next = stage2_p4d_addr_end(kvm, addr, end);
-+		if (!stage2_p4d_none(kvm, *p4d))
-+			stage2_wp_puds(kvm, p4d, addr, next);
-+	} while (p4d++, addr = next, addr != end);
-+}
-+
- /**
-  * stage2_wp_range() - write protect stage2 memory region range
-  * @kvm:	The KVM pointer
-@@ -1520,7 +1665,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 			break;
- 		next = stage2_pgd_addr_end(kvm, addr, end);
- 		if (stage2_pgd_present(kvm, *pgd))
--			stage2_wp_puds(kvm, pgd, addr, next);
-+			stage2_wp_p4ds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
- 
--- 
-2.24.0
+--qdqqb2xhd6wm23jo
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
+
+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
+5N03OMImnS94655lx/t/X0e0dNzbAQA=
+
+--qdqqb2xhd6wm23jo
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--qdqqb2xhd6wm23jo--
