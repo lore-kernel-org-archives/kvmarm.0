@@ -2,57 +2,63 @@ Return-Path: <SRS0=ViKE=2X=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03187C2D0DC
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 12:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1098CC2D0DC
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:21:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A111D20863
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 12:39:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A111D20863
+	by mail.kernel.org (Postfix) with ESMTP id 90DA9215A4
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:21:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90DA9215A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ADD14A551;
-	Thu,  2 Jan 2020 07:39:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C434A5C6;
+	Thu,  2 Jan 2020 11:21:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Kkfdp3r8+6pA; Thu,  2 Jan 2020 07:39:21 -0500 (EST)
+	with ESMTP id mSfZsKJ-cL-9; Thu,  2 Jan 2020 11:21:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE0E74A7F0;
-	Thu,  2 Jan 2020 07:39:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CB254A500;
+	Thu,  2 Jan 2020 11:21:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1254A7FD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 07:39:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD2E4A49F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:21:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EeLmYvfKOkpw for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jan 2020 07:39:18 -0500 (EST)
+ with ESMTP id Ttkpwa2ibiWw for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jan 2020 11:21:51 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 576684A588
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 07:39:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A93A04A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:21:51 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 168EF1FB;
- Thu,  2 Jan 2020 04:39:18 -0800 (PST)
-Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67EB33F703;
- Thu,  2 Jan 2020 04:39:16 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2E78328;
+ Thu,  2 Jan 2020 08:21:50 -0800 (PST)
+Received: from localhost (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B3873F68F;
+ Thu,  2 Jan 2020 08:21:50 -0800 (PST)
+Date: Thu, 2 Jan 2020 16:21:48 +0000
 From: Andrew Murray <andrew.murray@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH v3 3/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
- counters
-Date: Thu,  2 Jan 2020 12:39:05 +0000
-Message-Id: <20200102123905.29360-4-andrew.murray@arm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200102123905.29360-1-andrew.murray@arm.com>
-References: <20200102123905.29360-1-andrew.murray@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 02/18] arm64: KVM: reset E2PB correctly in MDCR_EL2
+ when exiting the guest(VHE)
+Message-ID: <20200102162147.GQ42593@e119886-lin.cambridge.arm.com>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-3-andrew.murray@arm.com>
+ <20191221131214.769a140e@why>
+ <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
 MIME-Version: 1.0
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,227 +75,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At present ARMv8 event counters are limited to 32-bits, though by
-using the CHAIN event it's possible to combine adjacent counters to
-achieve 64-bits. The perf config1:0 bit can be set to use such a
-configuration.
+On Tue, Dec 24, 2019 at 10:29:50AM +0000, Andrew Murray wrote:
+> On Sat, Dec 21, 2019 at 01:12:14PM +0000, Marc Zyngier wrote:
+> > On Fri, 20 Dec 2019 14:30:09 +0000
+> > Andrew Murray <andrew.murray@arm.com> wrote:
+> > 
+> > > From: Sudeep Holla <sudeep.holla@arm.com>
+> > > 
+> > > On VHE systems, the reset value for MDCR_EL2.E2PB=b00 which defaults
+> > > to profiling buffer using the EL2 stage 1 translations. 
+> > 
+> > Does the reset value actually matter here? I don't see it being
+> > specific to VHE systems, and all we're trying to achieve is to restore
+> > the SPE configuration to a state where it can be used by the host.
+> > 
+> > > However if the
+> > > guest are allowed to use profiling buffers changing E2PB settings, we
+> > 
+> > How can the guest be allowed to change E2PB settings? Or do you mean
+> > here that allowing the guest to use SPE will mandate changes of the
+> > E2PB settings, and that we'd better restore the hypervisor state once
+> > we exit?
+> > 
+> > > need to ensure we resume back MDCR_EL2.E2PB=b00. Currently we just
+> > > do bitwise '&' with MDCR_EL2_E2PB_MASK which will retain the value.
+> > > 
+> > > So fix it by clearing all the bits in E2PB.
+> > > 
+> > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/switch.c | 4 +---
+> > >  1 file changed, 1 insertion(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > > index 72fbbd86eb5e..250f13910882 100644
+> > > --- a/arch/arm64/kvm/hyp/switch.c
+> > > +++ b/arch/arm64/kvm/hyp/switch.c
+> > > @@ -228,9 +228,7 @@ void deactivate_traps_vhe_put(void)
+> > >  {
+> > >  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> > >  
+> > > -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+> > > -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> > > -		    MDCR_EL2_TPMS;
+> > > +	mdcr_el2 &= MDCR_EL2_HPMN_MASK | MDCR_EL2_TPMS;
+> > >  
+> > >  	write_sysreg(mdcr_el2, mdcr_el2);
+> > >  
+> > 
+> > I'm OK with this change, but I believe the commit message could use
+> > some tidying up.
+> 
+> No problem, I'll update the commit message.
 
-With the introduction of ARMv8.5-PMU support, all event counters can
-now be used as 64-bit counters.
+This is my new description:
 
-Let's enable 64-bit event counters where support exists. Unless the
-user sets config1:0 we will adjust the counter value such that it
-overflows upon 32-bit overflow. This follows the same behaviour as
-the cycle counter which has always been (and remains) 64-bits.
+    arm64: KVM: reset E2PB correctly in MDCR_EL2 when exiting the guest (VHE)
+    
+    Upon leaving the guest on VHE systems we currently preserve the value of
+    MDCR_EL2.E2PB. This register determines if the SPE profiling buffer controls
+    are trapped and which translation regime they use.
+    
+    In order to permit guest access to SPE we may use a different translation
+    regime whilst the vCPU is scheduled - therefore let's ensure that upon leaving
+    the guest we set E2PB back to the value expected by the host (b00).
+    
+    For nVHE systems we already explictly set E2PB back to the expected value
+    of 0b11 in __deactivate_traps_nvhe.
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/include/asm/perf_event.h |  3 +-
- arch/arm64/kernel/perf_event.c      | 86 +++++++++++++++++++++++------
- include/linux/perf/arm_pmu.h        |  1 +
- 3 files changed, 72 insertions(+), 18 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 2bdbc79bbd01..e7765b62c712 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -176,9 +176,10 @@
- #define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
- #define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive debug*/
- #define ARMV8_PMU_PMCR_LC	(1 << 6) /* Overflow on 64 bit cycle counter */
-+#define ARMV8_PMU_PMCR_LP	(1 << 7) /* Long event counter enable */
- #define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
- #define	ARMV8_PMU_PMCR_N_MASK	0x1f
--#define	ARMV8_PMU_PMCR_MASK	0x7f	 /* Mask for writable bits */
-+#define	ARMV8_PMU_PMCR_MASK	0xff	 /* Mask for writable bits */
- 
- /*
-  * PMOVSR: counters overflow flag status reg
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index e40b65645c86..4e27f90bb89e 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -285,6 +285,17 @@ static struct attribute_group armv8_pmuv3_format_attr_group = {
- #define	ARMV8_IDX_COUNTER_LAST(cpu_pmu) \
- 	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
- 
-+
-+/*
-+ * We unconditionally enable ARMv8.5-PMU long event counter support
-+ * (64-bit events) where supported. Indicate if this arm_pmu has long
-+ * event counter support.
-+ */
-+static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
-+{
-+	return (cpu_pmu->pmuver > ID_DFR0_EL1_PMUVER_8_4);
-+}
-+
- /*
-  * We must chain two programmable counters for 64 bit events,
-  * except when we have allocated the 64bit cycle counter (for CPU
-@@ -294,9 +305,11 @@ static struct attribute_group armv8_pmuv3_format_attr_group = {
- static inline bool armv8pmu_event_is_chained(struct perf_event *event)
- {
- 	int idx = event->hw.idx;
-+	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
- 
- 	return !WARN_ON(idx < 0) &&
- 	       armv8pmu_event_is_64bit(event) &&
-+	       !armv8pmu_has_long_event(cpu_pmu) &&
- 	       (idx != ARMV8_IDX_CYCLE_COUNTER);
- }
- 
-@@ -345,7 +358,7 @@ static inline void armv8pmu_select_counter(int idx)
- 	isb();
- }
- 
--static inline u32 armv8pmu_read_evcntr(int idx)
-+static inline u64 armv8pmu_read_evcntr(int idx)
- {
- 	armv8pmu_select_counter(idx);
- 	return read_sysreg(pmxevcntr_el0);
-@@ -362,6 +375,44 @@ static inline u64 armv8pmu_read_hw_counter(struct perf_event *event)
- 	return val;
- }
- 
-+/*
-+ * The cycle counter is always a 64-bit counter. When ARMV8_PMU_PMCR_LP
-+ * is set the event counters also become 64-bit counters. Unless the
-+ * user has requested a long counter (attr.config1) then we want to
-+ * interrupt upon 32-bit overflow - we achieve this by applying a bias.
-+ */
-+static bool armv8pmu_event_needs_bias(struct perf_event *event)
-+{
-+	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
-+	struct hw_perf_event *hwc = &event->hw;
-+	int idx = hwc->idx;
-+
-+	if (armv8pmu_event_is_64bit(event))
-+		return false;
-+
-+	if (armv8pmu_has_long_event(cpu_pmu) ||
-+	    idx == ARMV8_IDX_CYCLE_COUNTER)
-+		return true;
-+
-+	return false;
-+}
-+
-+static u64 armv8pmu_bias_long_counter(struct perf_event *event, u64 value)
-+{
-+	if (armv8pmu_event_needs_bias(event))
-+		value |= GENMASK(63, 32);
-+
-+	return value;
-+}
-+
-+static u64 armv8pmu_unbias_long_counter(struct perf_event *event, u64 value)
-+{
-+	if (armv8pmu_event_needs_bias(event))
-+		value &= ~GENMASK(63, 32);
-+
-+	return value;
-+}
-+
- static u64 armv8pmu_read_counter(struct perf_event *event)
- {
- 	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
-@@ -377,10 +428,10 @@ static u64 armv8pmu_read_counter(struct perf_event *event)
- 	else
- 		value = armv8pmu_read_hw_counter(event);
- 
--	return value;
-+	return  armv8pmu_unbias_long_counter(event, value);
- }
- 
--static inline void armv8pmu_write_evcntr(int idx, u32 value)
-+static inline void armv8pmu_write_evcntr(int idx, u64 value)
- {
- 	armv8pmu_select_counter(idx);
- 	write_sysreg(value, pmxevcntr_el0);
-@@ -405,20 +456,14 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
- 	struct hw_perf_event *hwc = &event->hw;
- 	int idx = hwc->idx;
- 
-+	value = armv8pmu_bias_long_counter(event, value);
-+
- 	if (!armv8pmu_counter_valid(cpu_pmu, idx))
- 		pr_err("CPU%u writing wrong counter %d\n",
- 			smp_processor_id(), idx);
--	else if (idx == ARMV8_IDX_CYCLE_COUNTER) {
--		/*
--		 * The cycles counter is really a 64-bit counter.
--		 * When treating it as a 32-bit counter, we only count
--		 * the lower 32 bits, and set the upper 32-bits so that
--		 * we get an interrupt upon 32-bit overflow.
--		 */
--		if (!armv8pmu_event_is_64bit(event))
--			value |= 0xffffffff00000000ULL;
-+	else if (idx == ARMV8_IDX_CYCLE_COUNTER)
- 		write_sysreg(value, pmccntr_el0);
--	} else
-+	else
- 		armv8pmu_write_hw_counter(event, value);
- }
- 
-@@ -743,7 +788,8 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 	/*
- 	 * Otherwise use events counters
- 	 */
--	if (armv8pmu_event_is_64bit(event))
-+	if (armv8pmu_event_is_64bit(event) &&
-+	    !armv8pmu_has_long_event(cpu_pmu))
- 		return	armv8pmu_get_chain_idx(cpuc, cpu_pmu);
- 	else
- 		return armv8pmu_get_single_idx(cpuc, cpu_pmu);
-@@ -815,7 +861,7 @@ static int armv8pmu_filter_match(struct perf_event *event)
- static void armv8pmu_reset(void *info)
- {
- 	struct arm_pmu *cpu_pmu = (struct arm_pmu *)info;
--	u32 idx, nb_cnt = cpu_pmu->num_events;
-+	u32 idx, pmcr, nb_cnt = cpu_pmu->num_events;
- 
- 	/* The counter and interrupt enable registers are unknown at reset. */
- 	for (idx = ARMV8_IDX_CYCLE_COUNTER; idx < nb_cnt; ++idx) {
-@@ -830,8 +876,13 @@ static void armv8pmu_reset(void *info)
- 	 * Initialize & Reset PMNC. Request overflow interrupt for
- 	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
- 	 */
--	armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C |
--			    ARMV8_PMU_PMCR_LC);
-+	pmcr = ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_LC;
-+
-+	/* Enable long event counter support where available */
-+	if (armv8pmu_has_long_event(cpu_pmu))
-+		pmcr |= ARMV8_PMU_PMCR_LP;
-+
-+	armv8pmu_pmcr_write(pmcr);
- }
- 
- static int __armv8_pmuv3_map_event(struct perf_event *event,
-@@ -914,6 +965,7 @@ static void __armv8pmu_probe_pmu(void *info)
- 	if (pmuver == 0xf || pmuver == 0)
- 		return;
- 
-+	cpu_pmu->pmuver = pmuver;
- 	probe->present = true;
- 
- 	/* Read the nb of CNTx counters supported from PMNC */
-diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-index 71f525a35ac2..5b616dde9a4c 100644
---- a/include/linux/perf/arm_pmu.h
-+++ b/include/linux/perf/arm_pmu.h
-@@ -80,6 +80,7 @@ struct arm_pmu {
- 	struct pmu	pmu;
- 	cpumask_t	supported_cpus;
- 	char		*name;
-+	int		pmuver;
- 	irqreturn_t	(*handle_irq)(struct arm_pmu *pmu);
- 	void		(*enable)(struct perf_event *event);
- 	void		(*disable)(struct perf_event *event);
--- 
-2.21.0
+Andrew Murray
 
+> 
+> Thanks,
+> 
+> Andrew Murray
+> 
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > -- 
+> > Jazz is not dead. It just smells funny...
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
