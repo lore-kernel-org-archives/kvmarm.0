@@ -2,63 +2,60 @@ Return-Path: <SRS0=ViKE=2X=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1098CC2D0DC
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1FBC2D0DC
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:22:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 90DA9215A4
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:21:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90DA9215A4
+	by mail.kernel.org (Postfix) with ESMTP id B82F820866
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jan 2020 16:22:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82F820866
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C434A5C6;
-	Thu,  2 Jan 2020 11:21:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F8EC4A7F0;
+	Thu,  2 Jan 2020 11:22:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mSfZsKJ-cL-9; Thu,  2 Jan 2020 11:21:54 -0500 (EST)
+	with ESMTP id YMoDbv8iJFmv; Thu,  2 Jan 2020 11:22:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CB254A500;
-	Thu,  2 Jan 2020 11:21:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F7B4A59B;
+	Thu,  2 Jan 2020 11:22:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD2E4A49F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:21:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 518F34A51E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:22:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ttkpwa2ibiWw for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jan 2020 11:21:51 -0500 (EST)
+ with ESMTP id VIZ7VY6QRRAy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jan 2020 11:22:29 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A93A04A3A5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:21:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39C0D4A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jan 2020 11:22:29 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2E78328;
- Thu,  2 Jan 2020 08:21:50 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B3873F68F;
- Thu,  2 Jan 2020 08:21:50 -0800 (PST)
-Date: Thu, 2 Jan 2020 16:21:48 +0000
-From: Andrew Murray <andrew.murray@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 02/18] arm64: KVM: reset E2PB correctly in MDCR_EL2
- when exiting the guest(VHE)
-Message-ID: <20200102162147.GQ42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-3-andrew.murray@arm.com>
- <20191221131214.769a140e@why>
- <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1FE7328;
+ Thu,  2 Jan 2020 08:22:28 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 822323F68F;
+ Thu,  2 Jan 2020 08:22:27 -0800 (PST)
+Subject: Re: [PATCH v3 1/3] arm64: cpufeature: Extract capped fields
+To: Andrew Murray <andrew.murray@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+References: <20200102123905.29360-1-andrew.murray@arm.com>
+ <20200102123905.29360-2-andrew.murray@arm.com>
+From: Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
+Message-ID: <cbf5e5e0-a31a-3f52-c113-7e069c920bf1@arm.com>
+Date: Thu, 2 Jan 2020 16:22:26 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191224102949.GD42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200102123905.29360-2-andrew.murray@arm.com>
+Content-Language: en-US
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,99 +67,23 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 24, 2019 at 10:29:50AM +0000, Andrew Murray wrote:
-> On Sat, Dec 21, 2019 at 01:12:14PM +0000, Marc Zyngier wrote:
-> > On Fri, 20 Dec 2019 14:30:09 +0000
-> > Andrew Murray <andrew.murray@arm.com> wrote:
-> > 
-> > > From: Sudeep Holla <sudeep.holla@arm.com>
-> > > 
-> > > On VHE systems, the reset value for MDCR_EL2.E2PB=b00 which defaults
-> > > to profiling buffer using the EL2 stage 1 translations. 
-> > 
-> > Does the reset value actually matter here? I don't see it being
-> > specific to VHE systems, and all we're trying to achieve is to restore
-> > the SPE configuration to a state where it can be used by the host.
-> > 
-> > > However if the
-> > > guest are allowed to use profiling buffers changing E2PB settings, we
-> > 
-> > How can the guest be allowed to change E2PB settings? Or do you mean
-> > here that allowing the guest to use SPE will mandate changes of the
-> > E2PB settings, and that we'd better restore the hypervisor state once
-> > we exit?
-> > 
-> > > need to ensure we resume back MDCR_EL2.E2PB=b00. Currently we just
-> > > do bitwise '&' with MDCR_EL2_E2PB_MASK which will retain the value.
-> > > 
-> > > So fix it by clearing all the bits in E2PB.
-> > > 
-> > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/switch.c | 4 +---
-> > >  1 file changed, 1 insertion(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > index 72fbbd86eb5e..250f13910882 100644
-> > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > @@ -228,9 +228,7 @@ void deactivate_traps_vhe_put(void)
-> > >  {
-> > >  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> > >  
-> > > -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-> > > -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> > > -		    MDCR_EL2_TPMS;
-> > > +	mdcr_el2 &= MDCR_EL2_HPMN_MASK | MDCR_EL2_TPMS;
-> > >  
-> > >  	write_sysreg(mdcr_el2, mdcr_el2);
-> > >  
-> > 
-> > I'm OK with this change, but I believe the commit message could use
-> > some tidying up.
+On 02/01/2020 12:39, Andrew Murray wrote:
+> When emulating ID registers there is often a need to cap the version
+> bits of a feature such that the guest will not use features that do
+> not yet exist.
 > 
-> No problem, I'll update the commit message.
-
-This is my new description:
-
-    arm64: KVM: reset E2PB correctly in MDCR_EL2 when exiting the guest (VHE)
-    
-    Upon leaving the guest on VHE systems we currently preserve the value of
-    MDCR_EL2.E2PB. This register determines if the SPE profiling buffer controls
-    are trapped and which translation regime they use.
-    
-    In order to permit guest access to SPE we may use a different translation
-    regime whilst the vCPU is scheduled - therefore let's ensure that upon leaving
-    the guest we set E2PB back to the value expected by the host (b00).
-    
-    For nVHE systems we already explictly set E2PB back to the expected value
-    of 0b11 in __deactivate_traps_nvhe.
-
-Thanks,
-
-Andrew Murray
-
+> Let's add a helper that extracts a field and caps the version to a
+> given value.
 > 
-> Thanks,
-> 
-> Andrew Murray
-> 
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > -- 
-> > Jazz is not dead. It just smells funny...
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
