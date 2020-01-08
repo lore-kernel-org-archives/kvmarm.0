@@ -1,63 +1,62 @@
-Return-Path: <SRS0=v4UO=24=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HiVh=25=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CE8C33C9E
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jan 2020 15:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37881C00523
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 11:13:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B7BE92087F
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jan 2020 15:13:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7BE92087F
+	by mail.kernel.org (Postfix) with ESMTP id AF25A20673
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 11:13:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF25A20673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4B494AECC;
-	Tue,  7 Jan 2020 10:13:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 268E34B00A;
+	Wed,  8 Jan 2020 06:13:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B6CjHIJeJCuu; Tue,  7 Jan 2020 10:13:34 -0500 (EST)
+	with ESMTP id 4B+hqUTp9Poy; Wed,  8 Jan 2020 06:13:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78CF94AEA7;
-	Tue,  7 Jan 2020 10:13:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D83BC4B00E;
+	Wed,  8 Jan 2020 06:13:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 152264AC6C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jan 2020 10:13:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F7D04B00E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 06:13:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xRpauR+25kSo for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jan 2020 10:13:32 -0500 (EST)
+ with ESMTP id aBMPm4j9csL9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jan 2020 06:13:01 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B2AE4A7E4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jan 2020 10:13:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C99364B00A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 06:13:01 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05127328;
- Tue,  7 Jan 2020 07:13:32 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C0F93F703;
- Tue,  7 Jan 2020 07:13:31 -0800 (PST)
-Date: Tue, 7 Jan 2020 15:13:29 +0000
-From: Andrew Murray <andrew.murray@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
- full SPE profiling buffer controls
-Message-ID: <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15B3630E;
+ Wed,  8 Jan 2020 03:13:01 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9ECDF3F703;
+ Wed,  8 Jan 2020 03:12:59 -0800 (PST)
+Date: Wed, 8 Jan 2020 11:12:53 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: correct PSTATE on exception entry
+Message-ID: <20200108111253.GA49203@lakrids.cambridge.arm.com>
+References: <20191220150549.31948-1-mark.rutland@arm.com>
+ <20191220150549.31948-2-mark.rutland@arm.com>
+ <bace4197-a723-5312-3990-84232aab30d9@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20191221141325.5a177343@why>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvm@vger.kernel.org, Catalin Marinas <Catalin.Marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <Sudeep.Holla@arm.com>,
- will@kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <bace4197-a723-5312-3990-84232aab30d9@arm.com>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Cc: maz@kernel.org, stable@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,188 +73,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
-> On Fri, 20 Dec 2019 14:30:16 +0000
-> Andrew Murray <andrew.murray@arm.com> wrote:
+Hi Alex,
+
+On Fri, Dec 27, 2019 at 01:01:57PM +0000, Alexandru Elisei wrote:
+> On 12/20/19 3:05 PM, Mark Rutland wrote:
+> > When KVM injects an exception into a guest, it generates the PSTATE
+> > value from scratch, configuring PSTATE.{M[4:0],DAIF}, and setting all
+> > other bits to zero.
+> >
+> > This isn't correct, as the architecture specifies that some PSTATE bits
+> > are (conditionally) cleared or set upon an exception, and others are
+> > unchanged from the original context.
+> >
+> > This patch adds logic to match the architectural behaviour. To make this
+> > simple to follow/audit/extend, documentation references are provided,
+> > and bits are configured in order of their layout in SPSR_EL2. This
+> > layout can be seen in the diagram on ARM DDI 0487E.a page C5-429.
+
+> > +/*
+> > + * When an exception is taken, most PSTATE fields are left unchanged in the
+> > + * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
+> > + * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
+> > + * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
+> > + *
+> > + * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
+> > + * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
 > 
-> [somehow managed not to do a reply all, re-sending]
+> The commit message mentions only the SPSR_ELx layout for AArch64.
+
+That was intentional; there I was only providing rationale for how to
+review the patch...
+
+> > + * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
+> > + * MSB to LSB.
+
+... as also commented here.
+
+I can drop the reference from the commit message, if that's confusing?
+
+> > + */
+> > +static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
+> > +{
+> > +	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > +	unsigned long old, new;
+> > +
+> > +	old = *vcpu_cpsr(vcpu);
+> > +	new = 0;
+> > +
+> > +	new |= (old & PSR_N_BIT);
+> > +	new |= (old & PSR_Z_BIT);
+> > +	new |= (old & PSR_C_BIT);
+> > +	new |= (old & PSR_V_BIT);
+> > +
+> > +	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
+> > +
+> > +	new |= (old & PSR_DIT_BIT);
+> > +
+> > +	// PSTATE.UAO is set to zero upon any exception to AArch64
+> > +	// See ARM DDI 0487E.a, page D5-2579.
+> > +
+> > +	// PSTATE.PAN is unchanged unless overridden by SCTLR_ELx.SPAN
+> > +	// See ARM DDI 0487E.a, page D5-2578.
+> > +	new |= (old & PSR_PAN_BIT);
+> > +	if (sctlr & SCTLR_EL1_SPAN)
+> > +		new |= PSR_PAN_BIT;
 > 
-> > From: Sudeep Holla <sudeep.holla@arm.com>
-> > 
-> > Now that we can save/restore the full SPE controls, we can enable it
-> > if SPE is setup and ready to use in KVM. It's supported in KVM only if
-> > all the CPUs in the system supports SPE.
-> > 
-> > However to support heterogenous systems, we need to move the check if
-> > host supports SPE and do a partial save/restore.
-> 
-> No. Let's just not go down that path. For now, KVM on heterogeneous
-> systems do not get SPE.
+> On page D13-3264, it is stated that the PAN bit is set unconditionally if
+> SCTLR_EL1.SPAN is clear, not set.
 
-At present these patches only offer the SPE feature to VCPU's where the
-sanitised AA64DFR0 register indicates that all CPUs have this support
-(kvm_arm_support_spe_v1) at the time of setting the attribute
-(KVM_SET_DEVICE_ATTR).
+very good spot, and that's a much better reference. 
 
-Therefore if a new CPU comes online without SPE support, and an
-existing VCPU is scheduled onto it, then bad things happen - which I guess
-must have been the intention behind this patch.
+I had mistakenly assumed SPAN took effect when 0b1, since it wasn't
+called nSPAN, and page D5-2578 doesn't mention the polarity of the bit:
 
+| When ARMv8.1-PAN is implemented, the SCTLR_EL1.SPAN and SCTLR_EL2.SPAN
+| bits are used to control whether the PAN bit is set on an exception to
+| EL1 or EL2. 
 
-> If SPE has been enabled on a guest and a CPU
-> comes up without SPE, this CPU should fail to boot (same as exposing a
-> feature to userspace).
+I've updated this to be:
 
-I'm unclear as how to prevent this. We can set the FTR_STRICT flag on
-the sanitised register - thus tainting the kernel if such a non-SPE CPU
-comes online - thought that doesn't prevent KVM from blowing up. Though
-I don't believe we can prevent a CPU coming up. At the moment this is
-my preferred approach.
+|	// PSTATE.PAN is unchanged unless SCTLR_ELx.SPAN == 0b0
+|	// SCTLR_ELx.SPAN is RES1 when ARMv8.1-PAN is not implemented
+|	// See ARM DDI 0487E.a, page D13-3264.
+|	new |= (old & PSR_PAN_BIT);
+|	if (!(sctlr & SCTLR_EL1_SPAN))
+|		new |= PSR_PAN_BIT;
 
-Looking at the vcpu_load and related code, I don't see a way of saying
-'don't schedule this VCPU on this CPU' or bailing in any way.
+[...]
 
-One solution could be to allow scheduling onto non-SPE VCPUs but wrap the
-SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
-reads the non-sanitised feature register. Therefore we don't go bang, but
-we also increase the size of any black-holes in SPE capturing. Though this
-feels like something that will cause grief down the line.
+> I've also checked the ARM ARM pages mentioned in the comments, and the
+> references are correct. The SPSR_EL2 layouts for exceptions taken from AArch64,
+> respectively AArch32, states are compatible with the way we create the SPSR_EL2
+> that will be used for eret'ing to the guest, just like the comment says.
 
-Is there something else that can be done?
+Thanks for confirming this!
+ 
+> I have a suggestion. I think that in ARM ARM, shuffling things between sections
+> happens a lot less often than adding/removing things from one particular
+> section, so the pages referenced are more likely to change in later versions.
+> How about referencing the section instead of the exact page? Something like:
+> "This layout can be seen in the diagram on ARM DDI 0487E.a, section C5.2.18,
+> when an exception is taken from AArch64 state"?
+
+I did something like that initially, but the comments got very verbose,
+and so I moved to doc + page/section numbers alone.
+
+The section numbers and headings also vary between revisions of the ARM
+ARM, so I'd prefer to leave this as-is for now. I think it's always
+going to be necessary to look at the referenced version of the ARM ARM
+(in addition to a subsequent revision when updating things).
 
 Thanks,
-
-Andrew Murray
-
-> 
-> > 
-> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
-> >  include/kvm/arm_spe.h         |  6 ++++++
-> >  2 files changed, 22 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-> > index 12429b212a3a..d8d857067e6d 100644
-> > --- a/arch/arm64/kvm/hyp/debug-sr.c
-> > +++ b/arch/arm64/kvm/hyp/debug-sr.c
-> > @@ -86,18 +86,13 @@
-> >  	}
-> >  
-> >  static void __hyp_text
-> > -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> > +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> >  {
-> >  	u64 reg;
-> >  
-> >  	/* Clear pmscr in case of early return */
-> >  	ctxt->sys_regs[PMSCR_EL1] = 0;
-> >  
-> > -	/* SPE present on this CPU? */
-> > -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> > -						  ID_AA64DFR0_PMSVER_SHIFT))
-> > -		return;
-> > -
-> >  	/* Yes; is it owned by higher EL? */
-> >  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
-> >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
-> > @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> >  }
-> >  
-> >  static void __hyp_text
-> > -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> > +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
-> >  {
-> >  	if (!ctxt->sys_regs[PMSCR_EL1])
-> >  		return;
-> > @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
-> >  	struct kvm_guest_debug_arch *host_dbg;
-> >  	struct kvm_guest_debug_arch *guest_dbg;
-> >  
-> > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> > +	guest_ctxt = &vcpu->arch.ctxt;
-> > +
-> > +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
-> > +
-> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
-> >  		return;
-> >  
-> > -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> > -	guest_ctxt = &vcpu->arch.ctxt;
-> >  	host_dbg = &vcpu->arch.host_debug_state.regs;
-> >  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> >  
-> > @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
-> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> >  	guest_ctxt = &vcpu->arch.ctxt;
-> >  
-> > -	if (!has_vhe())
-> > -		__debug_restore_spe_nvhe(host_ctxt, false);
-> > +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
-> 
-> So you now do an unconditional save/restore on the exit path for VHE as
-> well? Even if the host isn't using the SPE HW? That's not acceptable
-> as, in most cases, only the host /or/ the guest will use SPE. Here, you
-> put a measurable overhead on each exit.
-> 
-> If the host is not using SPE, then the restore/save should happen in
-> vcpu_load/vcpu_put. Only if the host is using SPE should you do
-> something in the run loop. Of course, this only applies to VHE and
-> non-VHE must switch eagerly.
-> 
-> >  
-> >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
-> >  		return;
-> > @@ -249,19 +246,21 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
-> >  
-> >  void __hyp_text __debug_save_host_context(struct kvm_vcpu *vcpu)
-> >  {
-> > -	/*
-> > -	 * Non-VHE: Disable and flush SPE data generation
-> > -	 * VHE: The vcpu can run, but it can't hide.
-> > -	 */
-> >  	struct kvm_cpu_context *host_ctxt;
-> >  
-> >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-> > -	if (!has_vhe())
-> > -		__debug_save_spe_nvhe(host_ctxt, false);
-> > +	if (cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> > +						 ID_AA64DFR0_PMSVER_SHIFT))
-> > +		__debug_save_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
-> >  }
-> >  
-> >  void __hyp_text __debug_save_guest_context(struct kvm_vcpu *vcpu)
-> >  {
-> > +	bool kvm_spe_ready = kvm_arm_spe_v1_ready(vcpu);
-> > +
-> > +	/* SPE present on this vCPU? */
-> > +	if (kvm_spe_ready)
-> > +		__debug_save_spe_context(&vcpu->arch.ctxt, kvm_spe_ready);
-> >  }
-> >  
-> >  u32 __hyp_text __kvm_get_mdcr_el2(void)
-> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
-> > index 48d118fdb174..30c40b1bc385 100644
-> > --- a/include/kvm/arm_spe.h
-> > +++ b/include/kvm/arm_spe.h
-> > @@ -16,4 +16,10 @@ struct kvm_spe {
-> >  	bool irq_level;
-> >  };
-> >  
-> > +#ifdef CONFIG_KVM_ARM_SPE
-> > +#define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
-> > +#else
-> > +#define kvm_arm_spe_v1_ready(v)		(false)
-> > +#endif /* CONFIG_KVM_ARM_SPE */
-> > +
-> >  #endif /* __ASM_ARM_KVM_SPE_H */
-> 
-> Thanks,
-> 
-> 	M.
-> -- 
-> Jazz is not dead. It just smells funny...
+Mark
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
