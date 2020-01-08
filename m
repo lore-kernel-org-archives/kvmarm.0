@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 909CFC33CA5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 134DBC33CB0
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5099120720
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5099120720
+	by mail.kernel.org (Postfix) with ESMTP id C398A20880
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C398A20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 054DD4B118;
-	Wed,  8 Jan 2020 15:27:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D2A74B13A;
+	Wed,  8 Jan 2020 15:27:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rz8Mi8EBYv9H; Wed,  8 Jan 2020 15:27:13 -0500 (EST)
+	with ESMTP id bcrrzLmusAkM; Wed,  8 Jan 2020 15:27:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8374B15E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CA784B176;
 	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C614B12F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDB7F4B147
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Us7hIz0mfCJN for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id hJaDxPuRusgY for <kvmarm@lists.cs.columbia.edu>;
  Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 384744B132
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B0AD4B13A
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,14 +41,14 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  08 Jan 2020 12:27:06 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658370"
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658377"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
-Date: Wed,  8 Jan 2020 12:24:39 -0800
-Message-Id: <20200108202448.9669-6-sean.j.christopherson@intel.com>
+Subject: [PATCH 07/14] KVM: x86/mmu: Walk host page tables to find THP mappings
+Date: Wed,  8 Jan 2020 12:24:41 -0800
+Message-Id: <20200108202448.9669-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -84,57 +84,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a helper, lookup_address_in_mm(), to traverse the page tables of a
-given mm struct.  KVM will use the helper to retrieve the host mapping
-level, e.g. 4k vs. 2mb vs. 1gb, of a compound (or DAX-backed) page
-without having to resort to implementation specific metadata.  E.g. KVM
-currently uses different logic for HugeTLB vs. THP, and would add a
-third variant for DAX-backed files.
+Explicitly walk the host page tables to identify THP mappings instead
+of relying solely on the metadata in struct page.  This sets the stage
+for using a common method of identifying huge mappings regardless of the
+underlying implementation (HugeTLB vs THB vs DAX), and hopefully avoids
+the pitfalls of relying on metadata to identify THP mappings, e.g. see
+commit 169226f7e0d2 ("mm: thp: handle page cache THP correctly in
+PageTransCompoundMap") and the need for KVM to explicitly check for a
+THP compound page.  KVM will also naturally work with 1gb THP pages, if
+they are ever supported.
 
-Cc: Dan Williams <dan.j.williams@intel.com>
+Walking the tables for THP mappings is likely marginally slower than
+querying metadata, but a future patch will reuse the walk to identify
+HugeTLB mappings, at which point eliminating the existing VMA lookup for
+HugeTLB will make this a net positive.
+
+Cc: Andrea Arcangeli <aarcange@redhat.com>
+Cc: Barret Rhoden <brho@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/pgtable_types.h |  4 ++++
- arch/x86/mm/pageattr.c               | 11 +++++++++++
- 2 files changed, 15 insertions(+)
+ arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
-index b5e49e6bac63..400ac8da75e8 100644
---- a/arch/x86/include/asm/pgtable_types.h
-+++ b/arch/x86/include/asm/pgtable_types.h
-@@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
- extern pte_t *lookup_address(unsigned long address, unsigned int *level);
- extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
- 				    unsigned int *level);
-+
-+struct mm_struct;
-+pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
-+			    unsigned int *level);
- extern pmd_t *lookup_pmd_address(unsigned long address);
- extern phys_addr_t slow_virt_to_phys(void *__address);
- extern int __init kernel_map_pages_in_pgd(pgd_t *pgd, u64 pfn,
-diff --git a/arch/x86/mm/pageattr.c b/arch/x86/mm/pageattr.c
-index 0d09cc5aad61..8787fec876e4 100644
---- a/arch/x86/mm/pageattr.c
-+++ b/arch/x86/mm/pageattr.c
-@@ -618,6 +618,17 @@ pte_t *lookup_address(unsigned long address, unsigned int *level)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 30836899be73..4bd7f745b56d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3329,6 +3329,41 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+ 	__direct_pte_prefetch(vcpu, sp, sptep);
  }
- EXPORT_SYMBOL_GPL(lookup_address);
  
-+/*
-+ * Lookup the page table entry for a virtual address in a given mm. Return a
-+ * pointer to the entry and the level of the mapping.
-+ */
-+pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
-+			    unsigned int *level)
++static int host_pfn_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn,
++				  kvm_pfn_t pfn)
 +{
-+	return lookup_address_in_pgd(pgd_offset(mm, address), address, level);
-+}
-+EXPORT_SYMBOL_GPL(lookup_address_in_mm);
++	struct kvm_memory_slot *slot;
++	unsigned long hva;
++	pte_t *pte;
++	int level;
 +
- static pte_t *_lookup_address_cpa(struct cpa_data *cpa, unsigned long address,
- 				  unsigned int *level)
- {
++	BUILD_BUG_ON(PT_PAGE_TABLE_LEVEL != (int)PG_LEVEL_4K ||
++		     PT_DIRECTORY_LEVEL != (int)PG_LEVEL_2M ||
++		     PT_PDPE_LEVEL != (int)PG_LEVEL_1G);
++
++	if (!PageCompound(pfn_to_page(pfn)))
++		return PT_PAGE_TABLE_LEVEL;
++
++	/*
++	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
++	 * "writable" check in __gfn_to_hva_many(), which will always fail on
++	 * read-only memslots due to gfn_to_hva() assuming writes.  Earlier
++	 * page fault steps have already verified the guest isn't writing a
++	 * read-only memslot.
++	 */
++	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	if (!memslot_valid_for_gpte(slot, true))
++		return PT_PAGE_TABLE_LEVEL;
++
++	hva = __gfn_to_hva_memslot(slot, gfn);
++
++	pte = lookup_address_in_mm(vcpu->kvm->mm, hva, &level);
++	if (unlikely(!pte))
++		return PT_PAGE_TABLE_LEVEL;
++
++	return level;
++}
++
+ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 					int max_level, kvm_pfn_t *pfnp,
+ 					int *levelp)
+@@ -3344,10 +3379,11 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 	    kvm_is_zone_device_pfn(pfn))
+ 		return;
+ 
+-	if (!kvm_is_transparent_hugepage(pfn))
++	level = host_pfn_mapping_level(vcpu, gfn, pfn);
++	if (level == PT_PAGE_TABLE_LEVEL)
+ 		return;
+ 
+-	level = PT_DIRECTORY_LEVEL;
++	level = min(level, max_level);
+ 
+ 	/*
+ 	 * mmu_notifier_retry() was successful and mmu_lock is held, so
 -- 
 2.24.1
 
