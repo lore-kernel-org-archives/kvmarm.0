@@ -2,76 +2,54 @@ Return-Path: <SRS0=HiVh=25=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35BDEC33CA2
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D32C282DD
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:43:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AAB39205F4
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:10:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRA4td7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB39205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0B0C7206DB
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:43:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0C7206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8944B07B;
-	Wed,  8 Jan 2020 08:10:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712164AFAC;
+	Wed,  8 Jan 2020 08:43:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3ZXDx3O36g1d; Wed,  8 Jan 2020 08:10:35 -0500 (EST)
+	with ESMTP id enTQVqPEOAIh; Wed,  8 Jan 2020 08:43:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F4824B00C;
-	Wed,  8 Jan 2020 08:10:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 407604AFAD;
+	Wed,  8 Jan 2020 08:43:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00BB34B002
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:10:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FDF74AFAA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:43:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qT1x8gUf5ZHQ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jan 2020 08:10:32 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C06684AFDD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:10:32 -0500 (EST)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3C341205F4;
- Wed,  8 Jan 2020 13:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1578489031;
- bh=YWAjQGTx7BqSwb3NRHw94BdAJ9TevBImfPuZnNeApRg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=vRA4td7eQhe14Dw6kpIUT5AKCpVJ8eThPzcv196v8clU/e8IxC95MhZ6KcIvPoIeX
- qVPjTikfCVOQRgH1/xQ6KhfVPAKUb+1NEa9acZrQpZjUEFj8shK2R3dmC/aeYUOF/Q
- BAC1G1isw5RJkjwuJG3xXL5lg7An+xfY0JjHe77c=
-Date: Wed, 8 Jan 2020 13:10:21 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
- full SPE profiling buffer controls
-Message-ID: <20200108131020.GB16658@willie-the-truck>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
- <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
- <fc222fef381f4ada37966db0a1ec314a@kernel.org>
- <20200108115816.GB15861@willie-the-truck>
- <745529f7e469b898b74dfc5153e3daf6@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <745529f7e469b898b74dfc5153e3daf6@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Catalin Marinas <Catalin.Marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <Sudeep.Holla@arm.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id dJu-XUGgU79L for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jan 2020 08:43:35 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C2EE4AFA9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:43:35 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0DBC31B;
+ Wed,  8 Jan 2020 05:43:34 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4A7833F703;
+ Wed,  8 Jan 2020 05:43:33 -0800 (PST)
+From: Mark Rutland <mark.rutland@arm.com>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ maz@kernel.org, alexandru.elisei@arm.com
+Subject: [PATCHv2 0/3] KVM: arm/arm64: exception injection fixes
+Date: Wed,  8 Jan 2020 13:43:21 +0000
+Message-Id: <20200108134324.46500-1-mark.rutland@arm.com>
+X-Mailer: git-send-email 2.11.0
+Cc: stable@vger.kernel.org, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,87 +61,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 08, 2020 at 12:36:11PM +0000, Marc Zyngier wrote:
-> On 2020-01-08 11:58, Will Deacon wrote:
-> > On Wed, Jan 08, 2020 at 11:17:16AM +0000, Marc Zyngier wrote:
-> > > On 2020-01-07 15:13, Andrew Murray wrote:
-> > > > Looking at the vcpu_load and related code, I don't see a way of saying
-> > > > 'don't schedule this VCPU on this CPU' or bailing in any way.
-> > > 
-> > > That would actually be pretty easy to implement. In vcpu_load(), check
-> > > that that the CPU physical has SPE. If not, raise a request for that
-> > > vcpu.
-> > > In the run loop, check for that request and abort if raised, returning
-> > > to userspace.
-> > > 
-> > > Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
-> > > where to run that particular vcpu.
-> > 
-> > It's also worth considering systems where there are multiple
-> > implementations
-> > of SPE in play. Assuming we don't want to expose this to a guest, then
-> > the
-> > right interface here is probably for userspace to pick one SPE
-> > implementation and expose that to the guest. That fits with your idea
-> > above,
-> > where you basically get an immediate exit if we try to schedule a vCPU
-> > onto
-> > a CPU that isn't part of the SPE mask.
-> 
-> Then it means that the VM should be configured with a mask indicating
-> which CPUs it is intended to run on, and setting such a mask is mandatory
-> for SPE.
+Hi,
 
-Yeah, and this could probably all be wrapped up by userspace so you just
-pass the SPE PMU name or something and it grabs the corresponding cpumask
-for you.
+While looking at the KVM code, I realised that our exception injection handling
+isn't quite right, as it generates the target PSTATE/CPSR from scratch, and
+doesn't handle all bits which need to be (conditionally) cleared or set upon
+taking an exception.
 
-> > > > One solution could be to allow scheduling onto non-SPE VCPUs but wrap
-> > > > the
-> > > > SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
-> > > > reads the non-sanitised feature register. Therefore we don't go bang,
-> > > > but
-> > > > we also increase the size of any black-holes in SPE capturing. Though
-> > > > this
-> > > > feels like something that will cause grief down the line.
-> > > >
-> > > > Is there something else that can be done?
-> > > 
-> > > How does userspace deal with this? When SPE is only available on
-> > > half of
-> > > the CPUs, how does perf work in these conditions?
-> > 
-> > Not sure about userspace, but the kernel driver works by instantiating
-> > an
-> > SPE PMU instance only for the CPUs that have it and then that instance
-> > profiles for only those CPUs. You also need to do something similar if
-> > you had two CPU types with SPE, since the SPE configuration is likely to
-> > be
-> > different between them.
-> 
-> So that's closer to what Andrew was suggesting above (running a guest on a
-> non-SPE CPU creates a profiling black hole). Except that we can't really
-> run a SPE-enabled guest on a non-SPE CPU, as the SPE sysregs will UNDEF
-> at EL1.
+The first two patches address this for injecting exceptions into AArch64 and
+AArch32 contexts respectively. I've tried to organise the code so that it can
+easily be audited against the ARM ARM, and/or extended in future if/when new
+bits are added to the SPSRs.
 
-Right. I wouldn't suggest the "black hole" approach for VMs, but it works
-for userspace so that's why the driver does it that way.
+While writing the AArch32 portion I also realised that on an AArch64 host we
+don't correctly synthesize the SPSR_{abt,und} seen by the guest, as we copy the
+value of SPSR_EL2, and the layouts of those SPSRs differ. The third patch
+addresses this by explicitly moving bits into the SPSR_{abt,und} layout.
 
-> Conclusion: we need a mix of a cpumask to indicate which CPUs we want to
-> run on (generic, not-SPE related), and a check for SPE-capable CPUs.
-> If any of these condition is not satisfied, the vcpu exits for userspace
-> to sort out the affinity.
-> 
-> I hate heterogeneous systems.
+I'd appreciate any testing people could offer, especially for AArch32 guests
+and/or AArch32 hosts, which I'm currently ill equipped to test. Ideally we'd
+have some unit tests for this.
 
-They hate you too ;)
+These issues don't seem to upset contemporary guests, but they do mean that KVM
+isn't providing an architecturally compliant environment in all cases, which is
+liable to cause issues in future. Given that, and that the patches are fairly
+self-contained, I've marked all three patches for stable.
 
-Will
+All three patches can be found on my kvm/exception-state branch [1].
+
+Since v1 [2]:
+* Fix host_spsr_to_spsr32() bit preservation
+* Fix SPAN polarity; tested with a modified arm64 guest
+* Fix DIT preservation on 32-bit hosts
+* Add Alex's Reviewed-by to patch 3
+
+Thanks,
+Mark.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git/log/?h=kvm/exception-state
+
+Mark Rutland (3):
+  KVM: arm64: correct PSTATE on exception entry
+  KVM: arm/arm64: correct CPSR on exception entry
+  KVM: arm/arm64: correct AArch32 SPSR on exception entry
+
+ arch/arm/include/asm/kvm_emulate.h   |  17 +++++
+ arch/arm64/include/asm/kvm_emulate.h |  32 ++++++++++
+ arch/arm64/include/asm/ptrace.h      |   1 +
+ arch/arm64/include/uapi/asm/ptrace.h |   1 +
+ arch/arm64/kvm/inject_fault.c        |  70 +++++++++++++++++++--
+ virt/kvm/arm/aarch32.c               | 117 +++++++++++++++++++++++++++++++----
+ 6 files changed, 220 insertions(+), 18 deletions(-)
+
+-- 
+2.11.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
