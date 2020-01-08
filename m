@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44642C33CAA
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 909CFC33CA5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 071F020705
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071F020705
+	by mail.kernel.org (Postfix) with ESMTP id 5099120720
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5099120720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4B084B183;
-	Wed,  8 Jan 2020 15:27:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 054DD4B118;
+	Wed,  8 Jan 2020 15:27:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SqksLITJMwSG; Wed,  8 Jan 2020 15:27:12 -0500 (EST)
+	with ESMTP id Rz8Mi8EBYv9H; Wed,  8 Jan 2020 15:27:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4262F4B13B;
-	Wed,  8 Jan 2020 15:27:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8374B15E;
+	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6174B13F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C614B12F
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AhJ0cWHn1mlK for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Us7hIz0mfCJN for <kvmarm@lists.cs.columbia.edu>;
  Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E6E84B12F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 384744B132
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  08 Jan 2020 12:27:06 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658366"
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658370"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 04/14] KVM: Play nice with read-only memslots when querying
- host page size
-Date: Wed,  8 Jan 2020 12:24:38 -0800
-Message-Id: <20200108202448.9669-5-sean.j.christopherson@intel.com>
+Subject: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
+Date: Wed,  8 Jan 2020 12:24:39 -0800
+Message-Id: <20200108202448.9669-6-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -85,55 +84,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Open code an equivalent of kvm_vcpu_gfn_to_memslot() when querying the
-host page size to avoid the "writable" check in __gfn_to_hva_many(),
-which will always fail on read-only memslots due to gfn_to_hva()
-assuming writes.  Functionally, this allows x86 to create large mappings
-for read-only memslots that are backed by HugeTLB mappings.
+Add a helper, lookup_address_in_mm(), to traverse the page tables of a
+given mm struct.  KVM will use the helper to retrieve the host mapping
+level, e.g. 4k vs. 2mb vs. 1gb, of a compound (or DAX-backed) page
+without having to resort to implementation specific metadata.  E.g. KVM
+currently uses different logic for HugeTLB vs. THP, and would add a
+third variant for DAX-backed files.
 
-Note, the changelog for commit 05da45583de9 ("KVM: MMU: large page
-support") states "If the largepage contains write-protected pages, a
-large pte is not used.", but "write-protected" refers to pages that are
-temporarily read-only, e.g. read-only memslots didn't even exist at the
-time.
-
-Fixes: 4d8b81abc47b ("KVM: introduce readonly memslot")
-Cc: stable@vger.kernel.org
+Cc: Dan Williams <dan.j.williams@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- virt/kvm/kvm_main.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/pgtable_types.h |  4 ++++
+ arch/x86/mm/pageattr.c               | 11 +++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5f7f06824c2b..d9aced677ddd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1418,15 +1418,23 @@ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
- 
- unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
- {
-+	struct kvm_memory_slot *slot;
- 	struct vm_area_struct *vma;
- 	unsigned long addr, size;
- 
- 	size = PAGE_SIZE;
- 
--	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
--	if (kvm_is_error_hva(addr))
-+	/*
-+	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
-+	 * "writable" check in __gfn_to_hva_many(), which will always fail on
-+	 * read-only memslots due to gfn_to_hva() assuming writes.
-+	 */
-+	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
- 		return PAGE_SIZE;
- 
-+	addr = __gfn_to_hva_memslot(slot, gfn);
+diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+index b5e49e6bac63..400ac8da75e8 100644
+--- a/arch/x86/include/asm/pgtable_types.h
++++ b/arch/x86/include/asm/pgtable_types.h
+@@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
+ extern pte_t *lookup_address(unsigned long address, unsigned int *level);
+ extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
+ 				    unsigned int *level);
 +
- 	down_read(&current->mm->mmap_sem);
- 	vma = find_vma(current->mm, addr);
- 	if (!vma)
++struct mm_struct;
++pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
++			    unsigned int *level);
+ extern pmd_t *lookup_pmd_address(unsigned long address);
+ extern phys_addr_t slow_virt_to_phys(void *__address);
+ extern int __init kernel_map_pages_in_pgd(pgd_t *pgd, u64 pfn,
+diff --git a/arch/x86/mm/pageattr.c b/arch/x86/mm/pageattr.c
+index 0d09cc5aad61..8787fec876e4 100644
+--- a/arch/x86/mm/pageattr.c
++++ b/arch/x86/mm/pageattr.c
+@@ -618,6 +618,17 @@ pte_t *lookup_address(unsigned long address, unsigned int *level)
+ }
+ EXPORT_SYMBOL_GPL(lookup_address);
+ 
++/*
++ * Lookup the page table entry for a virtual address in a given mm. Return a
++ * pointer to the entry and the level of the mapping.
++ */
++pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
++			    unsigned int *level)
++{
++	return lookup_address_in_pgd(pgd_offset(mm, address), address, level);
++}
++EXPORT_SYMBOL_GPL(lookup_address_in_mm);
++
+ static pte_t *_lookup_address_cpa(struct cpa_data *cpa, unsigned long address,
+ 				  unsigned int *level)
+ {
 -- 
 2.24.1
 
