@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2ADC282DD
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44642C33CAA
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7DC3A20643
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC3A20643
+	by mail.kernel.org (Postfix) with ESMTP id 071F020705
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071F020705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B1D54B142;
-	Wed,  8 Jan 2020 15:27:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4B084B183;
+	Wed,  8 Jan 2020 15:27:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JwcG67DZgWAF; Wed,  8 Jan 2020 15:27:15 -0500 (EST)
+	with ESMTP id SqksLITJMwSG; Wed,  8 Jan 2020 15:27:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86B474B16E;
-	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4262F4B13B;
+	Wed,  8 Jan 2020 15:27:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBF1A4B146
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6174B13F
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3cecrvIZFyhe for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id AhJ0cWHn1mlK for <kvmarm@lists.cs.columbia.edu>;
  Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE2B44B13D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E6E84B12F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:06 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  08 Jan 2020 12:27:06 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658380"
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658366"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 08/14] KVM: x86/mmu: Drop level optimization from
- fast_page_fault()
-Date: Wed,  8 Jan 2020 12:24:42 -0800
-Message-Id: <20200108202448.9669-9-sean.j.christopherson@intel.com>
+Subject: [PATCH 04/14] KVM: Play nice with read-only memslots when querying
+ host page size
+Date: Wed,  8 Jan 2020 12:24:38 -0800
+Message-Id: <20200108202448.9669-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -85,50 +85,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Remove fast_page_fault()'s optimization to stop the shadow walk if the
-iterator level drops below the intended map level.  The intended map
-level is only acccurate for HugeTLB mappings (THP mappings are detected
-after fast_page_fault()), i.e. it's not required for correctness, and
-a future patch will also move HugeTLB mapping detection to after
-fast_page_fault().
+Open code an equivalent of kvm_vcpu_gfn_to_memslot() when querying the
+host page size to avoid the "writable" check in __gfn_to_hva_many(),
+which will always fail on read-only memslots due to gfn_to_hva()
+assuming writes.  Functionally, this allows x86 to create large mappings
+for read-only memslots that are backed by HugeTLB mappings.
 
+Note, the changelog for commit 05da45583de9 ("KVM: MMU: large page
+support") states "If the largepage contains write-protected pages, a
+large pte is not used.", but "write-protected" refers to pages that are
+temporarily read-only, e.g. read-only memslots didn't even exist at the
+time.
+
+Fixes: 4d8b81abc47b ("KVM: introduce readonly memslot")
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ virt/kvm/kvm_main.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4bd7f745b56d..7d78d1d996ed 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3593,7 +3593,7 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
-  * - true: let the vcpu to access on the same address again.
-  * - false: let the real page fault path to fix it.
-  */
--static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, int level,
-+static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 			    u32 error_code)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5f7f06824c2b..d9aced677ddd 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1418,15 +1418,23 @@ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
+ 
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
  {
- 	struct kvm_shadow_walk_iterator iterator;
-@@ -3611,8 +3611,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, int level,
- 		u64 new_spte;
++	struct kvm_memory_slot *slot;
+ 	struct vm_area_struct *vma;
+ 	unsigned long addr, size;
  
- 		for_each_shadow_entry_lockless(vcpu, cr2_or_gpa, iterator, spte)
--			if (!is_shadow_present_pte(spte) ||
--			    iterator.level < level)
-+			if (!is_shadow_present_pte(spte))
- 				break;
+ 	size = PAGE_SIZE;
  
- 		sp = page_header(__pa(iterator.sptep));
-@@ -4223,7 +4222,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	if (level > PT_PAGE_TABLE_LEVEL)
- 		gfn &= ~(KVM_PAGES_PER_HPAGE(level) - 1);
+-	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
+-	if (kvm_is_error_hva(addr))
++	/*
++	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
++	 * "writable" check in __gfn_to_hva_many(), which will always fail on
++	 * read-only memslots due to gfn_to_hva() assuming writes.
++	 */
++	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+ 		return PAGE_SIZE;
  
--	if (fast_page_fault(vcpu, gpa, level, error_code))
-+	if (fast_page_fault(vcpu, gpa, error_code))
- 		return RET_PF_RETRY;
- 
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
++	addr = __gfn_to_hva_memslot(slot, gfn);
++
+ 	down_read(&current->mm->mmap_sem);
+ 	vma = find_vma(current->mm, addr);
+ 	if (!vma)
 -- 
 2.24.1
 
