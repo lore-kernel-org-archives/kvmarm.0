@@ -2,54 +2,57 @@ Return-Path: <SRS0=HiVh=25=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37981C33CA4
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51ED0C33CA5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B890E20880
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B890E20880
+	by mail.kernel.org (Postfix) with ESMTP id 1540C20705
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1540C20705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CAC74B118;
-	Wed,  8 Jan 2020 15:27:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C30094B162;
+	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DfeRYRBH4UzT; Wed,  8 Jan 2020 15:27:08 -0500 (EST)
+	with ESMTP id 3JACvjWj5hWg; Wed,  8 Jan 2020 15:27:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6B234B131;
-	Wed,  8 Jan 2020 15:27:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BBD4B156;
+	Wed,  8 Jan 2020 15:27:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B85C4B135
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D47EB4B118
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ukRo1DDu1iZf for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jan 2020 15:27:05 -0500 (EST)
+ with ESMTP id wsYT7Qqi6pUo for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jan 2020 15:27:06 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4F8A4B10F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 986DC4B12D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:06 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Jan 2020 12:27:04 -0800
+ 08 Jan 2020 12:27:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658348"
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658362"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:04 -0800
+ by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:05 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
-Date: Wed,  8 Jan 2020 12:24:34 -0800
-Message-Id: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 03/14] KVM: Use vcpu-specific gva->hva translation when
+ querying host page size
+Date: Wed,  8 Jan 2020 12:24:37 -0800
+Message-Id: <20200108202448.9669-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
@@ -82,71 +85,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series is a mix of bug fixes, cleanup and new support in KVM's
-handling of huge pages.  The series initially stemmed from a syzkaller
-bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
-check for THP when populating secondary MMU".
+Use kvm_vcpu_gfn_to_hva() when retrieving the host page size so that the
+correct set of memslots is used when handling x86 page faults in SMM.
 
-While investigating options for fixing the syzkaller bug, I realized KVM
-could reuse the approach from Barret's series to enable huge pages for DAX
-mappings in KVM[2] for all types of huge mappings, i.e. walk the host page
-tables instead of querying metadata (patches 05 - 09).
+Fixes: 54bf36aac520 ("KVM: x86: use vcpu-specific functions to read/write/translate GFNs")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/powerpc/kvm/book3s_xive_native.c | 2 +-
+ arch/x86/kvm/mmu/mmu.c                | 6 +++---
+ include/linux/kvm_host.h              | 2 +-
+ virt/kvm/kvm_main.c                   | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-Walking the host page tables sidesteps the issues with refcounting and
-identifying THP mappings (in theory), and using a common method for
-identifying huge mappings should improve (haven't actually measured) KVM's
-overall page fault latency by eliminating the vma lookup that is currently
-used to identify HugeTLB mappings.  Eliminating the HugeTLB specific code
-also allows for additional cleanup (patches 10 - 13).
-
-Testing the page walk approach revealed several pre-existing bugs that
-are included here (patches 01, 03 and 04) because the changes interact
-with the rest of the series, e.g. without the read-only memslots fix,
-walking the host page tables without explicitly filtering out HugeTLB
-mappings would pick up read-only memslots and introduce a completely
-unintended functional change.
-
-Lastly, with the page walk infrastructure in place, supporting DAX-based
-huge mappings becomes a trivial change (patch 14).
-
-Based on kvm/queue, commit e41a90be9659 ("KVM: x86/mmu: WARN if root_hpa
-is invalid when handling a page fault")
-
-Paolo, assuming I understand your workflow, patch 01 can be squashed with
-the buggy commit as it's still sitting in kvm/queue.
-
-[1] https://lkml.kernel.org/r/0000000000003cffc30599d3d1a0@google.com
-[2] https://lkml.kernel.org/r/20191212182238.46535-1-brho@google.com
-
-Sean Christopherson (14):
-  KVM: x86/mmu: Enforce max_level on HugeTLB mappings
-  mm: thp: KVM: Explicitly check for THP when populating secondary MMU
-  KVM: Use vcpu-specific gva->hva translation when querying host page
-    size
-  KVM: Play nice with read-only memslots when querying host page size
-  x86/mm: Introduce lookup_address_in_mm()
-  KVM: x86/mmu: Refactor THP adjust to prep for changing query
-  KVM: x86/mmu: Walk host page tables to find THP mappings
-  KVM: x86/mmu: Drop level optimization from fast_page_fault()
-  KVM: x86/mmu: Rely on host page tables to find HugeTLB mappings
-  KVM: x86/mmu: Remove obsolete gfn restoration in FNAME(fetch)
-  KVM: x86/mmu: Zap any compound page when collapsing sptes
-  KVM: x86/mmu: Fold max_mapping_level() into kvm_mmu_hugepage_adjust()
-  KVM: x86/mmu: Remove lpage_is_disallowed() check from set_spte()
-  KVM: x86/mmu: Use huge pages for DAX-backed files
-
- arch/powerpc/kvm/book3s_xive_native.c |   2 +-
- arch/x86/include/asm/pgtable_types.h  |   4 +
- arch/x86/kvm/mmu/mmu.c                | 208 ++++++++++----------------
- arch/x86/kvm/mmu/paging_tmpl.h        |  29 +---
- arch/x86/mm/pageattr.c                |  11 ++
- include/linux/huge_mm.h               |   6 +
- include/linux/kvm_host.h              |   3 +-
- mm/huge_memory.c                      |  11 ++
- virt/kvm/arm/mmu.c                    |   8 +-
- virt/kvm/kvm_main.c                   |  24 ++-
- 10 files changed, 145 insertions(+), 161 deletions(-)
-
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+index d83adb1e1490..6ef0151ff70a 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -631,7 +631,7 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
+ 	srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	gfn = gpa_to_gfn(kvm_eq.qaddr);
+ 
+-	page_size = kvm_host_page_size(kvm, gfn);
++	page_size = kvm_host_page_size(vcpu, gfn);
+ 	if (1ull << kvm_eq.qshift > page_size) {
+ 		srcu_read_unlock(&kvm->srcu, srcu_idx);
+ 		pr_warn("Incompatible host page size %lx!\n", page_size);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ca14c84c4f4b..8ca6cd04cdf1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1286,12 +1286,12 @@ static bool mmu_gfn_lpage_is_disallowed(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 	return __mmu_gfn_lpage_is_disallowed(gfn, level, slot);
+ }
+ 
+-static int host_mapping_level(struct kvm *kvm, gfn_t gfn)
++static int host_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn)
+ {
+ 	unsigned long page_size;
+ 	int i, ret = 0;
+ 
+-	page_size = kvm_host_page_size(kvm, gfn);
++	page_size = kvm_host_page_size(vcpu, gfn);
+ 
+ 	for (i = PT_PAGE_TABLE_LEVEL; i <= PT_MAX_HUGEPAGE_LEVEL; ++i) {
+ 		if (page_size >= KVM_HPAGE_SIZE(i))
+@@ -1362,7 +1362,7 @@ static int mapping_level(struct kvm_vcpu *vcpu, gfn_t large_gfn,
+ 	 * So, do not propagate host_mapping_level() to max_level as KVM can
+ 	 * still promote the guest mapping to a huge page in the THP case.
+ 	 */
+-	host_level = host_mapping_level(vcpu->kvm, large_gfn);
++	host_level = host_mapping_level(vcpu, large_gfn);
+ 	return min(host_level, max_level);
+ }
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 411b71a02f25..3c0ceec45ebd 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -767,7 +767,7 @@ int kvm_clear_guest_page(struct kvm *kvm, gfn_t gfn, int offset, int len);
+ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
+ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
+ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
+-unsigned long kvm_host_page_size(struct kvm *kvm, gfn_t gfn);
++unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
+ 
+ struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e8ca8bf12320..5f7f06824c2b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1416,14 +1416,14 @@ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+ }
+ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
+ 
+-unsigned long kvm_host_page_size(struct kvm *kvm, gfn_t gfn)
++unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
+ {
+ 	struct vm_area_struct *vma;
+ 	unsigned long addr, size;
+ 
+ 	size = PAGE_SIZE;
+ 
+-	addr = gfn_to_hva(kvm, gfn);
++	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
+ 	if (kvm_is_error_hva(addr))
+ 		return PAGE_SIZE;
+ 
 -- 
 2.24.1
 
