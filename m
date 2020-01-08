@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51ED0C33CA5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD04C33CA3
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1540C20705
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1540C20705
+	by mail.kernel.org (Postfix) with ESMTP id 4E03C20838
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E03C20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C30094B162;
-	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFA384B146;
+	Wed,  8 Jan 2020 15:27:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3JACvjWj5hWg; Wed,  8 Jan 2020 15:27:10 -0500 (EST)
+	with ESMTP id ozmMdWO+B0zP; Wed,  8 Jan 2020 15:27:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BBD4B156;
-	Wed,  8 Jan 2020 15:27:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4AB14B14D;
+	Wed,  8 Jan 2020 15:27:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D47EB4B118
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3854B135
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wsYT7Qqi6pUo for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id NDJI5GMfkuoh for <kvmarm@lists.cs.columbia.edu>;
  Wed,  8 Jan 2020 15:27:06 -0500 (EST)
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 986DC4B12D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23EE34B118
  for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:06 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,15 +41,14 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  08 Jan 2020 12:27:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658362"
+X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658356"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:05 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 03/14] KVM: Use vcpu-specific gva->hva translation when
- querying host page size
-Date: Wed,  8 Jan 2020 12:24:37 -0800
-Message-Id: <20200108202448.9669-4-sean.j.christopherson@intel.com>
+Subject: [PATCH 01/14] KVM: x86/mmu: Enforce max_level on HugeTLB mappings
+Date: Wed,  8 Jan 2020 12:24:35 -0800
+Message-Id: <20200108202448.9669-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
@@ -85,94 +84,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use kvm_vcpu_gfn_to_hva() when retrieving the host page size so that the
-correct set of memslots is used when handling x86 page faults in SMM.
+Limit KVM's mapping level for HugeTLB based on its calculated max_level.
+The max_level check prior to invoking host_mapping_level() only filters
+out the case where KVM cannot create a 2mb mapping, it doesn't handle
+the scenario where KVM can create a 2mb but not 1gb mapping, and the
+host is using a 1gb HugeTLB mapping.
 
-Fixes: 54bf36aac520 ("KVM: x86: use vcpu-specific functions to read/write/translate GFNs")
-Cc: stable@vger.kernel.org
+Fixes: ad163aa8903d ("KVM: x86/mmu: Persist gfn_lpage_is_disallowed() to max_level")
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/kvm/book3s_xive_native.c | 2 +-
- arch/x86/kvm/mmu/mmu.c                | 6 +++---
- include/linux/kvm_host.h              | 2 +-
- virt/kvm/kvm_main.c                   | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index d83adb1e1490..6ef0151ff70a 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -631,7 +631,7 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
- 	srcu_idx = srcu_read_lock(&kvm->srcu);
- 	gfn = gpa_to_gfn(kvm_eq.qaddr);
- 
--	page_size = kvm_host_page_size(kvm, gfn);
-+	page_size = kvm_host_page_size(vcpu, gfn);
- 	if (1ull << kvm_eq.qshift > page_size) {
- 		srcu_read_unlock(&kvm->srcu, srcu_idx);
- 		pr_warn("Incompatible host page size %lx!\n", page_size);
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ca14c84c4f4b..8ca6cd04cdf1 100644
+index 7269130ea5e2..8e822c09170d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1286,12 +1286,12 @@ static bool mmu_gfn_lpage_is_disallowed(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	return __mmu_gfn_lpage_is_disallowed(gfn, level, slot);
- }
- 
--static int host_mapping_level(struct kvm *kvm, gfn_t gfn)
-+static int host_mapping_level(struct kvm_vcpu *vcpu, gfn_t gfn)
+@@ -1330,7 +1330,7 @@ gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+ static int mapping_level(struct kvm_vcpu *vcpu, gfn_t large_gfn,
+ 			 int *max_levelp)
  {
- 	unsigned long page_size;
- 	int i, ret = 0;
+-	int max_level = *max_levelp;
++	int host_level, max_level = *max_levelp;
+ 	struct kvm_memory_slot *slot;
  
--	page_size = kvm_host_page_size(kvm, gfn);
-+	page_size = kvm_host_page_size(vcpu, gfn);
- 
- 	for (i = PT_PAGE_TABLE_LEVEL; i <= PT_MAX_HUGEPAGE_LEVEL; ++i) {
- 		if (page_size >= KVM_HPAGE_SIZE(i))
-@@ -1362,7 +1362,7 @@ static int mapping_level(struct kvm_vcpu *vcpu, gfn_t large_gfn,
+ 	if (unlikely(max_level == PT_PAGE_TABLE_LEVEL))
+@@ -1362,7 +1362,8 @@ static int mapping_level(struct kvm_vcpu *vcpu, gfn_t large_gfn,
  	 * So, do not propagate host_mapping_level() to max_level as KVM can
  	 * still promote the guest mapping to a huge page in the THP case.
  	 */
--	host_level = host_mapping_level(vcpu->kvm, large_gfn);
-+	host_level = host_mapping_level(vcpu, large_gfn);
- 	return min(host_level, max_level);
+-	return host_mapping_level(vcpu->kvm, large_gfn);
++	host_level = host_mapping_level(vcpu->kvm, large_gfn);
++	return min(host_level, max_level);
  }
  
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 411b71a02f25..3c0ceec45ebd 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -767,7 +767,7 @@ int kvm_clear_guest_page(struct kvm *kvm, gfn_t gfn, int offset, int len);
- int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
- struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
- bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
--unsigned long kvm_host_page_size(struct kvm *kvm, gfn_t gfn);
-+unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
- void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
- 
- struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e8ca8bf12320..5f7f06824c2b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1416,14 +1416,14 @@ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
- }
- EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
- 
--unsigned long kvm_host_page_size(struct kvm *kvm, gfn_t gfn)
-+unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
- {
- 	struct vm_area_struct *vma;
- 	unsigned long addr, size;
- 
- 	size = PAGE_SIZE;
- 
--	addr = gfn_to_hva(kvm, gfn);
-+	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
- 	if (kvm_is_error_hva(addr))
- 		return PAGE_SIZE;
- 
+ /*
 -- 
 2.24.1
 
