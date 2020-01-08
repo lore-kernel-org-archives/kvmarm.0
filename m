@@ -2,62 +2,76 @@ Return-Path: <SRS0=HiVh=25=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD35C33CA1
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 12:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35BDEC33CA2
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:10:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0960B2067D
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 12:44:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0960B2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AAB39205F4
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 13:10:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRA4td7e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB39205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66FD44B07B;
-	Wed,  8 Jan 2020 07:44:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8944B07B;
+	Wed,  8 Jan 2020 08:10:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gqXTRPYQGP+s; Wed,  8 Jan 2020 07:44:41 -0500 (EST)
+	with ESMTP id 3ZXDx3O36g1d; Wed,  8 Jan 2020 08:10:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02AF94B068;
-	Wed,  8 Jan 2020 07:44:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F4824B00C;
+	Wed,  8 Jan 2020 08:10:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7E24B062
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 07:44:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00BB34B002
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:10:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FAdgsfAjyImb for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jan 2020 07:44:38 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C545A4AFE9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 07:44:38 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 658EE31B;
- Wed,  8 Jan 2020 04:44:38 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 947923F703;
- Wed,  8 Jan 2020 04:44:36 -0800 (PST)
-Subject: Re: [PATCH 1/3] KVM: arm64: correct PSTATE on exception entry
-To: Mark Rutland <mark.rutland@arm.com>
-References: <20191220150549.31948-1-mark.rutland@arm.com>
- <20191220150549.31948-2-mark.rutland@arm.com>
- <bace4197-a723-5312-3990-84232aab30d9@arm.com>
- <20200108111253.GA49203@lakrids.cambridge.arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4be2f666-1139-0087-a69e-f8b779e71e11@arm.com>
-Date: Wed, 8 Jan 2020 12:44:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id qT1x8gUf5ZHQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jan 2020 08:10:32 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C06684AFDD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 08:10:32 -0500 (EST)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3C341205F4;
+ Wed,  8 Jan 2020 13:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1578489031;
+ bh=YWAjQGTx7BqSwb3NRHw94BdAJ9TevBImfPuZnNeApRg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=vRA4td7eQhe14Dw6kpIUT5AKCpVJ8eThPzcv196v8clU/e8IxC95MhZ6KcIvPoIeX
+ qVPjTikfCVOQRgH1/xQ6KhfVPAKUb+1NEa9acZrQpZjUEFj8shK2R3dmC/aeYUOF/Q
+ BAC1G1isw5RJkjwuJG3xXL5lg7An+xfY0JjHe77c=
+Date: Wed, 8 Jan 2020 13:10:21 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
+ full SPE profiling buffer controls
+Message-ID: <20200108131020.GB16658@willie-the-truck>
+References: <20191220143025.33853-1-andrew.murray@arm.com>
+ <20191220143025.33853-10-andrew.murray@arm.com>
+ <20191221141325.5a177343@why>
+ <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
+ <fc222fef381f4ada37966db0a1ec314a@kernel.org>
+ <20200108115816.GB15861@willie-the-truck>
+ <745529f7e469b898b74dfc5153e3daf6@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200108111253.GA49203@lakrids.cambridge.arm.com>
-Content-Language: en-US
-Cc: maz@kernel.org, stable@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <745529f7e469b898b74dfc5153e3daf6@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, Catalin Marinas <Catalin.Marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Sudeep Holla <Sudeep.Holla@arm.com>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,124 +88,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Wed, Jan 08, 2020 at 12:36:11PM +0000, Marc Zyngier wrote:
+> On 2020-01-08 11:58, Will Deacon wrote:
+> > On Wed, Jan 08, 2020 at 11:17:16AM +0000, Marc Zyngier wrote:
+> > > On 2020-01-07 15:13, Andrew Murray wrote:
+> > > > Looking at the vcpu_load and related code, I don't see a way of saying
+> > > > 'don't schedule this VCPU on this CPU' or bailing in any way.
+> > > 
+> > > That would actually be pretty easy to implement. In vcpu_load(), check
+> > > that that the CPU physical has SPE. If not, raise a request for that
+> > > vcpu.
+> > > In the run loop, check for that request and abort if raised, returning
+> > > to userspace.
+> > > 
+> > > Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
+> > > where to run that particular vcpu.
+> > 
+> > It's also worth considering systems where there are multiple
+> > implementations
+> > of SPE in play. Assuming we don't want to expose this to a guest, then
+> > the
+> > right interface here is probably for userspace to pick one SPE
+> > implementation and expose that to the guest. That fits with your idea
+> > above,
+> > where you basically get an immediate exit if we try to schedule a vCPU
+> > onto
+> > a CPU that isn't part of the SPE mask.
+> 
+> Then it means that the VM should be configured with a mask indicating
+> which CPUs it is intended to run on, and setting such a mask is mandatory
+> for SPE.
 
-On 1/8/20 11:12 AM, Mark Rutland wrote:
-> Hi Alex,
->
-> On Fri, Dec 27, 2019 at 01:01:57PM +0000, Alexandru Elisei wrote:
->> On 12/20/19 3:05 PM, Mark Rutland wrote:
->>> When KVM injects an exception into a guest, it generates the PSTATE
->>> value from scratch, configuring PSTATE.{M[4:0],DAIF}, and setting all
->>> other bits to zero.
->>>
->>> This isn't correct, as the architecture specifies that some PSTATE bits
->>> are (conditionally) cleared or set upon an exception, and others are
->>> unchanged from the original context.
->>>
->>> This patch adds logic to match the architectural behaviour. To make this
->>> simple to follow/audit/extend, documentation references are provided,
->>> and bits are configured in order of their layout in SPSR_EL2. This
->>> layout can be seen in the diagram on ARM DDI 0487E.a page C5-429.
->>> +/*
->>> + * When an exception is taken, most PSTATE fields are left unchanged in the
->>> + * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
->>> + * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
->>> + * layouts, so we don't need to shuffle these for exceptions from AArch32 EL0.
->>> + *
->>> + * For the SPSR_ELx layout for AArch64, see ARM DDI 0487E.a page C5-429.
->>> + * For the SPSR_ELx layout for AArch32, see ARM DDI 0487E.a page C5-426.
->> The commit message mentions only the SPSR_ELx layout for AArch64.
-> That was intentional; there I was only providing rationale for how to
-> review the patch...
->
->>> + * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
->>> + * MSB to LSB.
-> ... as also commented here.
->
-> I can drop the reference from the commit message, if that's confusing?
+Yeah, and this could probably all be wrapped up by userspace so you just
+pass the SPE PMU name or something and it grabs the corresponding cpumask
+for you.
 
-It's fine as it is, no need to change it.
+> > > > One solution could be to allow scheduling onto non-SPE VCPUs but wrap
+> > > > the
+> > > > SPE save/restore code in a macro (much like kvm_arm_spe_v1_ready) that
+> > > > reads the non-sanitised feature register. Therefore we don't go bang,
+> > > > but
+> > > > we also increase the size of any black-holes in SPE capturing. Though
+> > > > this
+> > > > feels like something that will cause grief down the line.
+> > > >
+> > > > Is there something else that can be done?
+> > > 
+> > > How does userspace deal with this? When SPE is only available on
+> > > half of
+> > > the CPUs, how does perf work in these conditions?
+> > 
+> > Not sure about userspace, but the kernel driver works by instantiating
+> > an
+> > SPE PMU instance only for the CPUs that have it and then that instance
+> > profiles for only those CPUs. You also need to do something similar if
+> > you had two CPU types with SPE, since the SPE configuration is likely to
+> > be
+> > different between them.
+> 
+> So that's closer to what Andrew was suggesting above (running a guest on a
+> non-SPE CPU creates a profiling black hole). Except that we can't really
+> run a SPE-enabled guest on a non-SPE CPU, as the SPE sysregs will UNDEF
+> at EL1.
 
->
->>> + */
->>> +static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
->>> +{
->>> +	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->>> +	unsigned long old, new;
->>> +
->>> +	old = *vcpu_cpsr(vcpu);
->>> +	new = 0;
->>> +
->>> +	new |= (old & PSR_N_BIT);
->>> +	new |= (old & PSR_Z_BIT);
->>> +	new |= (old & PSR_C_BIT);
->>> +	new |= (old & PSR_V_BIT);
->>> +
->>> +	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
->>> +
->>> +	new |= (old & PSR_DIT_BIT);
->>> +
->>> +	// PSTATE.UAO is set to zero upon any exception to AArch64
->>> +	// See ARM DDI 0487E.a, page D5-2579.
->>> +
->>> +	// PSTATE.PAN is unchanged unless overridden by SCTLR_ELx.SPAN
->>> +	// See ARM DDI 0487E.a, page D5-2578.
->>> +	new |= (old & PSR_PAN_BIT);
->>> +	if (sctlr & SCTLR_EL1_SPAN)
->>> +		new |= PSR_PAN_BIT;
->> On page D13-3264, it is stated that the PAN bit is set unconditionally if
->> SCTLR_EL1.SPAN is clear, not set.
-> very good spot, and that's a much better reference. 
->
-> I had mistakenly assumed SPAN took effect when 0b1, since it wasn't
-> called nSPAN, and page D5-2578 doesn't mention the polarity of the bit:
->
-> | When ARMv8.1-PAN is implemented, the SCTLR_EL1.SPAN and SCTLR_EL2.SPAN
-> | bits are used to control whether the PAN bit is set on an exception to
-> | EL1 or EL2. 
->
-> I've updated this to be:
->
-> |	// PSTATE.PAN is unchanged unless SCTLR_ELx.SPAN == 0b0
-> |	// SCTLR_ELx.SPAN is RES1 when ARMv8.1-PAN is not implemented
-> |	// See ARM DDI 0487E.a, page D13-3264.
-> |	new |= (old & PSR_PAN_BIT);
-> |	if (!(sctlr & SCTLR_EL1_SPAN))
-> |		new |= PSR_PAN_BIT;
+Right. I wouldn't suggest the "black hole" approach for VMs, but it works
+for userspace so that's why the driver does it that way.
 
-Looks good.
+> Conclusion: we need a mix of a cpumask to indicate which CPUs we want to
+> run on (generic, not-SPE related), and a check for SPE-capable CPUs.
+> If any of these condition is not satisfied, the vcpu exits for userspace
+> to sort out the affinity.
+> 
+> I hate heterogeneous systems.
 
->
-> [...]
->
->> I've also checked the ARM ARM pages mentioned in the comments, and the
->> references are correct. The SPSR_EL2 layouts for exceptions taken from AArch64,
->> respectively AArch32, states are compatible with the way we create the SPSR_EL2
->> that will be used for eret'ing to the guest, just like the comment says.
-> Thanks for confirming this!
->  
->> I have a suggestion. I think that in ARM ARM, shuffling things between sections
->> happens a lot less often than adding/removing things from one particular
->> section, so the pages referenced are more likely to change in later versions.
->> How about referencing the section instead of the exact page? Something like:
->> "This layout can be seen in the diagram on ARM DDI 0487E.a, section C5.2.18,
->> when an exception is taken from AArch64 state"?
-> I did something like that initially, but the comments got very verbose,
-> and so I moved to doc + page/section numbers alone.
->
-> The section numbers and headings also vary between revisions of the ARM
-> ARM, so I'd prefer to leave this as-is for now. I think it's always
-> going to be necessary to look at the referenced version of the ARM ARM
-> (in addition to a subsequent revision when updating things).
+They hate you too ;)
 
-Makes sense.
-
-Thanks,
-Alex
->
-> Thanks,
-> Mark
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
