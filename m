@@ -2,79 +2,63 @@ Return-Path: <SRS0=UWlR=26=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B5DC32771
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 12:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A9B9C282DD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 14:53:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7284D2077B
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 12:01:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zJiKDhH8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7284D2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id AD9532067D
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 14:53:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD9532067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EF004B269;
-	Thu,  9 Jan 2020 07:01:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5A44B1D5;
+	Thu,  9 Jan 2020 09:53:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jfHQYZR1zRAX; Thu,  9 Jan 2020 07:01:47 -0500 (EST)
+	with ESMTP id YbeIQUG4zoN7; Thu,  9 Jan 2020 09:53:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8D774B2A0;
-	Thu,  9 Jan 2020 07:01:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B246B4B261;
+	Thu,  9 Jan 2020 09:53:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF144B27A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 07:01:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 315504B1C8
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 09:53:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C3HtmdnFCv8u for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jan 2020 07:01:45 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B5FE14B269
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 07:01:45 -0500 (EST)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5177F2075D;
- Thu,  9 Jan 2020 12:01:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1578571304;
- bh=wykY2q8q14HRcxcgRn9igHW61k+IWSYOGFm/09lGxGE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=zJiKDhH8Jx3JQmDdSWbVx+GYxcI51ag8Rfy+g+aMsGE5xIQopgNubFHIlCNU3SpiT
- 3ZiibELRBbcmZeS9pO1hkBHiJciD66To1K1kvN+0cl6sgfK69LyHvTvCTSIhGiWFdY
- c0z+BLx63ADXa50pFBUBtUvYV7miN+DENeqJp7kU=
-Date: Thu, 9 Jan 2020 12:01:39 +0000
-From: Will Deacon <will@kernel.org>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore
- full SPE profiling buffer controls
-Message-ID: <20200109120139.GA7512@willie-the-truck>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
- <20200107151328.GW42593@e119886-lin.cambridge.arm.com>
- <fc222fef381f4ada37966db0a1ec314a@kernel.org>
- <20200108115816.GB15861@willie-the-truck>
- <745529f7e469b898b74dfc5153e3daf6@kernel.org>
- <20200108131020.GB16658@willie-the-truck>
- <20200109112336.GY42593@e119886-lin.cambridge.arm.com>
- <20200109112504.GZ42593@e119886-lin.cambridge.arm.com>
+ with ESMTP id Fp0yNZCYZYfQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 09:53:11 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 990454A524
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 09:53:11 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2267C1FB;
+ Thu,  9 Jan 2020 06:53:11 -0800 (PST)
+Received: from [10.1.27.38] (e122027.cambridge.arm.com [10.1.27.38])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 120D93F534;
+ Thu,  9 Jan 2020 06:53:08 -0800 (PST)
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Document PV-lock interface
+To: Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
+References: <20191226135833.1052-1-yezengruan@huawei.com>
+ <20191226135833.1052-2-yezengruan@huawei.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <c26ebc8d-6a10-6bc4-0af8-cd4883addbf0@arm.com>
+Date: Thu, 9 Jan 2020 14:53:08 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200109112504.GZ42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
- Catalin Marinas <Catalin.Marinas@arm.com>, linux-kernel@vger.kernel.org,
- Sudeep Holla <Sudeep.Holla@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20191226135833.1052-2-yezengruan@huawei.com>
+Content-Language: en-GB
+Cc: catalin.marinas@arm.com, daniel.lezcano@linaro.org, linux@armlinux.org.uk,
+ maz@kernel.org, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,68 +70,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jan 09, 2020 at 11:25:04AM +0000, Andrew Murray wrote:
-> On Thu, Jan 09, 2020 at 11:23:37AM +0000, Andrew Murray wrote:
-> > On Wed, Jan 08, 2020 at 01:10:21PM +0000, Will Deacon wrote:
-> > > On Wed, Jan 08, 2020 at 12:36:11PM +0000, Marc Zyngier wrote:
-> > > > On 2020-01-08 11:58, Will Deacon wrote:
-> > > > > On Wed, Jan 08, 2020 at 11:17:16AM +0000, Marc Zyngier wrote:
-> > > > > > On 2020-01-07 15:13, Andrew Murray wrote:
-> > > > > > > Looking at the vcpu_load and related code, I don't see a way of saying
-> > > > > > > 'don't schedule this VCPU on this CPU' or bailing in any way.
-> > > > > > 
-> > > > > > That would actually be pretty easy to implement. In vcpu_load(), check
-> > > > > > that that the CPU physical has SPE. If not, raise a request for that
-> > > > > > vcpu.
-> > > > > > In the run loop, check for that request and abort if raised, returning
-> > > > > > to userspace.
-> > 
-> > I hadn't really noticed the kvm_make_request mechanism - however it's now
-> > clear how this could be implemented.
-> > 
-> > This approach gives responsibility for which CPUs should be used to userspace
-> > and if userspace gets it wrong then the KVM_RUN ioctl won't do very much.
-> > 
-> > 
-> > > > > > 
-> > > > > > Userspace can always check /sys/devices/arm_spe_0/cpumask and work out
-> > > > > > where to run that particular vcpu.
-> > > > > 
-> > > > > It's also worth considering systems where there are multiple
-> > > > > implementations
-> > > > > of SPE in play. Assuming we don't want to expose this to a guest, then
-> > > > > the
-> > > > > right interface here is probably for userspace to pick one SPE
-> > > > > implementation and expose that to the guest.
-> > 
-> > If I understand correctly then this implies the following:
-> > 
-> >  - If the host userspace indicates it wants support for SPE in the guest (via 
-> >    KVM_SET_DEVICE_ATTR at start of day) - then we should check in vcpu_load that
-> >    the minimum version of SPE is present on the current CPU. 'minimum' because
-> >    we don't know why userspace has selected the given cpumask.
-> > 
-> >  - Userspace can get it wrong, i.e. it can create a CPU mask with CPUs that
-> >    have SPE with differing versions. If it does, and all CPUs have some form of
-> >    SPE then errors may occur in the guest. Perhaps this is OK and userspace
-> >    shouldn't get it wrong?
+On 26/12/2019 13:58, Zengruan Ye wrote:
+> Introduce a paravirtualization interface for KVM/arm64 to obtain the VCPU
+> is currently running or not.
 > 
-> Actually this could be guarded against by emulating the ID_AA64DFR0_EL1 such to
-> cap the version to the minimum SPE version - if absolutely required.
+> The PV lock structure of the guest is allocated by user space.
+> 
+> A hypercall interface is provided for the guest to interrogate the
+> hypervisor's support for this interface and the location of the shared
+> memory structures.
+> 
+> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+> ---
+>   Documentation/virt/kvm/arm/pvlock.rst   | 63 +++++++++++++++++++++++++
+>   Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
+>   2 files changed, 77 insertions(+)
+>   create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+> 
+> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
+> new file mode 100644
+> index 000000000000..58b3b8ee7537
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/pvlock.rst
+> @@ -0,0 +1,63 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Paravirtualized lock support for arm64
+> +======================================
+> +
+> +KVM/arm64 provides some hypervisor service calls to support a paravirtualized
+> +guest obtaining the VCPU is currently running or not.
+NIT:              ^ whether
 
-The problem is, it's not as simple as checking a version field. Instead,
-you'd have to look at all of the ID registers for SPE so that you don't end
-up with funny differences such as minimum sampling interval, or hardware RNG
-support. Ultimately though, *much* of the trace is going to be describing
-IMP DEF stuff because it's so micro-architectural, and there's very little
-you can do to hide that.
+> +
+> +Two new SMCCC compatible hypercalls are defined:
+> +
+> +* PV_LOCK_FEATURES:   0xC6000020
+> +* PV_LOCK_PREEMPTED:  0xC6000021
+> +
+> +The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
+> +ARCH_FEATURES mechanism before calling it.
 
-Will
+Since these are within the "vendor specific" SMCCC region ideally you should also check that you are talking to KVM. (Other hypervisors could allocate SMCCC IDs differently within this block). Will has a patch on a branch which gives an example of how this could work [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+
+> +
+> +PV_LOCK_FEATURES
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0xC6000020
+> +    PV_call_id:   (uint32)    The function to query for support.
+> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> +                              PV-lock feature is supported by the hypervisor.
+> +    ============= ========    ==========
+> +
+> +PV_LOCK_PREEMPTED
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0xC6000021
+> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the IPA of
+> +                              this VCPU's pv data structure is configured by
+> +                              the hypervisor.
+> +    ============= ========    ==========
+
+PV_LOCK_PREEMPTED also needs to return the address of this data structure. Either by returning this in another register, or by e.g. treating a positive return as an address and a negative value as an error.
+
+> +
+> +The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as normal
+> +memory with inner and outer write back caching attributes, in the inner
+> +shareable domain.
+> +
+> +PV_LOCK_PREEMPTED returns the structure for the calling VCPU.
+> +
+> +PV lock state
+> +-------------
+> +
+> +The structure pointed to by the PV_LOCK_PREEMPTED hypercall is as follows:
+> +
+> ++-----------+-------------+-------------+---------------------------------+
+> +| Field     | Byte Length | Byte Offset | Description                     |
+> ++===========+=============+=============+=================================+
+> +| preempted |      8      |      0      | Indicate the VCPU who owns this |
+
+NIT: s/Indicate/Indicates that/. Also more common English would be "the VCPU *that* owns"
+
+> +|           |             |             | struct is running or not.       |
+> +|           |             |             | Non-zero values mean the VCPU   |
+> +|           |             |             | has been preempted. Zero means  |
+> +|           |             |             | the VCPU is not preempted.      |
+> ++-----------+-------------+-------------+---------------------------------+
+> +
+> +The preempted field will be updated to 1 by the hypervisor prior to scheduling
+> +a VCPU. When the VCPU is scheduled out, the preempted field will be updated
+> +to 0 by the hypervisor.
+> +
+> +The structure will be present within a reserved region of the normal memory
+> +given to the guest. The guest should not attempt to write into this memory.
+> +There is a structure per VCPU of the guest.
+
+I think it would be worth mentioning in this document that the structure is guaranteed to be 64-byte aligned.
+
+Steve
+
+> +
+> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
+> +section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
+> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+> index 6f3bd64a05b0..c10a5945075b 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.txt
+> +++ b/Documentation/virt/kvm/devices/vcpu.txt
+> @@ -74,3 +74,17 @@ Specifies the base address of the stolen time structure for this VCPU. The
+>   base address must be 64 byte aligned and exist within a valid guest memory
+>   region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+>   including the layout of the stolen time structure.
+> +
+> +4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL
+> +Architectures: ARM64
+> +
+> +4.1 ATTRIBUTE: KVM_ARM_VCPU_PVLOCK_IPA
+> +Parameters: 64-bit base address
+> +Returns: -ENXIO:  PV lock not implemented
+> +         -EEXIST: Base address already set for this VCPU
+> +         -EINVAL: Base address not 64 byte aligned
+> +
+> +Specifies the base address of the PV lock structure for this VCPU. The
+> +base address must be 64 byte aligned and exist within a valid guest memory
+> +region. See Documentation/virt/kvm/arm/pvlock.rst for more information
+> +including the layout of the pv lock structure.
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
