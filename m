@@ -2,88 +2,105 @@ Return-Path: <SRS0=Qg2m=27=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B21C33CA2
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 11:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EFBC33CA2
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 12:01:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C28CA2082E
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 11:51:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2139E2072A
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 12:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lPDFLIp2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28CA2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="cG0QOwda"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2139E2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 543A14B15F;
-	Fri, 10 Jan 2020 06:51:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC9E4B181;
+	Fri, 10 Jan 2020 07:01:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aDTv0o7xl3Ns; Fri, 10 Jan 2020 06:51:45 -0500 (EST)
+	with ESMTP id 775D00O4wlI0; Fri, 10 Jan 2020 07:01:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E308F4B162;
-	Fri, 10 Jan 2020 06:51:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D0764B176;
+	Fri, 10 Jan 2020 07:01:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAF2A4B14E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 06:51:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF5B4B1FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 14:47:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7Bq3nUnclj-a for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jan 2020 06:51:42 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AFA64B138
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 06:51:42 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 70ECB2080D;
- Fri, 10 Jan 2020 11:51:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1578657101;
- bh=jJUkcjlxwjxVbdrRgoCs6tTj/btd2RuYwbP/9MOQQHc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=lPDFLIp2y/zfIEfpK3sWSrIpYRzJDteW6v0AejN7nmS3UdT4LDA3sb9n+txHlFqjK
- QUee08LOPhT7Z+dufKo0LNTV0jpsxFsFrSU8fVs4tRm5DwCRrGwWLNftXy0jT4qq+Z
- +/DUPa2uDXcm188GW7HYO/neBOaAWRv/J/NPofxE=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1ipspH-0008EI-PA; Fri, 10 Jan 2020 11:51:39 +0000
+ with ESMTP id umjLYyO27Bmy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 14:47:47 -0500 (EST)
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com
+ [209.85.210.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED91A4B1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 14:47:46 -0500 (EST)
+Received: by mail-pf1-f194.google.com with SMTP id x185so3849250pfc.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jan 2020 11:47:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+ b=cG0QOwda3n2lMKGGwl2gvG+FY0g5k14CGaWhbv4nmRcoT2JX4qtut3O08AYJiZSsJ1
+ cr8cRqsI97d5/bOkzP8tKl3Tt9qtR5JvXtPKrWUCiPl4DV38hUy0eNUJDkm8kHbJEuBE
+ yaFZx1vNucRxrssnQpATjd86jpNCMGp+2Uyc8U06zuHuUL2AoQcrnZJ+y884oRxt8t+n
+ VRC8uxlGUAtadaiER22t+8Zb5vtrFxei+x4QHt8BHfVM01jX4dRRdZl9Mv3Dje2YTVYW
+ tV4Ihp6XBYA3izk3Ms3j7QY4sBnbwek7lIwiWDhHQ5xPFFbll2klVlmKSmR8wUaYCyZ9
+ y5qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tOr15WETxbkLw/hVhIIJI77xVs+gy+a9H8+1jFpIRfc=;
+ b=IoJv7VAwRHEKPnMQ+VLcGN8RzcNTPj6PpPjYl/P5Pkf/RJzfngWrrq8lPcZlHe1j7Y
+ SuRe8BalfyjVffZ4UmiL45SreG2pfW0Im43N7ASOFj2PigSkgJ2+eospApFW0xyFDQlm
+ GFfizf4be1b7/vIHZCJGgCT4eWs5gUhy9y3BVXoRDUdsl9hOrYvzMTreS3lP4KBEczOY
+ 31WhjsYtKh7/l/u0W10NQcXb4DtE3cfNnR+dIbv+Si6oBt6OW4JRdnSQx0MQ3+QT4omX
+ vt0tJDy8pwoiidrvAukRPOH0wzg6phGH3LYpdYjZfJ/EtN/whrf3oqqTOvKEtMU6ACtj
+ PdoA==
+X-Gm-Message-State: APjAAAWJDC6M+yvzGE5qY6YXo+0c62vjnVuVFVSU6jIB2F//fBoB6NOu
+ AMvQaruzkJppbfhDn42o05bS1g==
+X-Google-Smtp-Source: APXvYqzh23zJ0M/6YUkb1gak5IeC/b1rxGMe/2+na8ui5AM37mG7vNvlQ/Y50JVkaXV8dlCW2yJyFQ==
+X-Received: by 2002:a62:e30f:: with SMTP id g15mr235672pfh.124.1578599265739; 
+ Thu, 09 Jan 2020 11:47:45 -0800 (PST)
+Received: from gnomeregan01.cam.corp.google.com
+ ([2620:15c:6:14:50b7:ffca:29c4:6488])
+ by smtp.googlemail.com with ESMTPSA id z130sm8572761pgz.6.2020.01.09.11.47.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jan 2020 11:47:44 -0800 (PST)
+Subject: Re: [PATCH 00/14] KVM: x86/mmu: Huge page fixes, cleanup, and DAX
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+From: Barret Rhoden <brho@google.com>
+Message-ID: <e3e12d17-32e4-84ad-94da-91095d999238@google.com>
+Date: Thu, 9 Jan 2020 14:47:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Date: Fri, 10 Jan 2020 11:51:39 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 09/18] arm64: KVM: enable conditional save/restore full
- SPE profiling buffer controls
-In-Reply-To: <20200110110420.GD42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-10-andrew.murray@arm.com>
- <20191221141325.5a177343@why>
- <20200110105435.GC42593@e119886-lin.cambridge.arm.com>
- <20200110110420.GD42593@e119886-lin.cambridge.arm.com>
-Message-ID: <ee0fd7bcdbbbcc942117468eb676b18f@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, kvm@vger.kernel.org,
- Catalin.Marinas@arm.com, linux-kernel@vger.kernel.org, Sudeep.Holla@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <Catalin.Marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <Sudeep.Holla@arm.com>,
- will@kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+Content-Language: en-US
+X-Mailman-Approved-At: Fri, 10 Jan 2020 07:01:03 -0500
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Paul Mackerras <paulus@ozlabs.org>,
+ linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu,
+ Dave Jiang <dave.jiang@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com, kvm-ppc@vger.kernel.org,
+ Liran Alon <liran.alon@oracle.com>, Andy Lutomirski <luto@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ linux-kernel@vger.kernel.org, Jason Zeng <jason.zeng@intel.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,187 +117,28 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-01-10 11:04, Andrew Murray wrote:
-> On Fri, Jan 10, 2020 at 10:54:36AM +0000, Andrew Murray wrote:
->> On Sat, Dec 21, 2019 at 02:13:25PM +0000, Marc Zyngier wrote:
->> > On Fri, 20 Dec 2019 14:30:16 +0000
->> > Andrew Murray <andrew.murray@arm.com> wrote:
->> >
->> > [somehow managed not to do a reply all, re-sending]
->> >
->> > > From: Sudeep Holla <sudeep.holla@arm.com>
->> > >
->> > > Now that we can save/restore the full SPE controls, we can enable it
->> > > if SPE is setup and ready to use in KVM. It's supported in KVM only if
->> > > all the CPUs in the system supports SPE.
->> > >
->> > > However to support heterogenous systems, we need to move the check if
->> > > host supports SPE and do a partial save/restore.
->> >
->> > No. Let's just not go down that path. For now, KVM on heterogeneous
->> > systems do not get SPE. If SPE has been enabled on a guest and a CPU
->> > comes up without SPE, this CPU should fail to boot (same as exposing a
->> > feature to userspace).
->> >
->> > >
->> > > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
->> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
->> > > ---
->> > >  arch/arm64/kvm/hyp/debug-sr.c | 33 ++++++++++++++++-----------------
->> > >  include/kvm/arm_spe.h         |  6 ++++++
->> > >  2 files changed, 22 insertions(+), 17 deletions(-)
->> > >
->> > > diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
->> > > index 12429b212a3a..d8d857067e6d 100644
->> > > --- a/arch/arm64/kvm/hyp/debug-sr.c
->> > > +++ b/arch/arm64/kvm/hyp/debug-sr.c
->> > > @@ -86,18 +86,13 @@
->> > >  	}
->> > >
->> > >  static void __hyp_text
->> > > -__debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
->> > > +__debug_save_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
->> > >  {
->> > >  	u64 reg;
->> > >
->> > >  	/* Clear pmscr in case of early return */
->> > >  	ctxt->sys_regs[PMSCR_EL1] = 0;
->> > >
->> > > -	/* SPE present on this CPU? */
->> > > -	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
->> > > -						  ID_AA64DFR0_PMSVER_SHIFT))
->> > > -		return;
->> > > -
->> > >  	/* Yes; is it owned by higher EL? */
->> > >  	reg = read_sysreg_s(SYS_PMBIDR_EL1);
->> > >  	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
->> > > @@ -142,7 +137,7 @@ __debug_save_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
->> > >  }
->> > >
->> > >  static void __hyp_text
->> > > -__debug_restore_spe_nvhe(struct kvm_cpu_context *ctxt, bool full_ctxt)
->> > > +__debug_restore_spe_context(struct kvm_cpu_context *ctxt, bool full_ctxt)
->> > >  {
->> > >  	if (!ctxt->sys_regs[PMSCR_EL1])
->> > >  		return;
->> > > @@ -210,11 +205,14 @@ void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
->> > >  	struct kvm_guest_debug_arch *host_dbg;
->> > >  	struct kvm_guest_debug_arch *guest_dbg;
->> > >
->> > > +	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->> > > +	guest_ctxt = &vcpu->arch.ctxt;
->> > > +
->> > > +	__debug_restore_spe_context(guest_ctxt, kvm_arm_spe_v1_ready(vcpu));
->> > > +
->> > >  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->> > >  		return;
->> > >
->> > > -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->> > > -	guest_ctxt = &vcpu->arch.ctxt;
->> > >  	host_dbg = &vcpu->arch.host_debug_state.regs;
->> > >  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
->> > >
->> > > @@ -232,8 +230,7 @@ void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
->> > >  	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
->> > >  	guest_ctxt = &vcpu->arch.ctxt;
->> > >
->> > > -	if (!has_vhe())
->> > > -		__debug_restore_spe_nvhe(host_ctxt, false);
->> > > +	__debug_restore_spe_context(host_ctxt, kvm_arm_spe_v1_ready(vcpu));
->> >
->> > So you now do an unconditional save/restore on the exit path for VHE as
->> > well? Even if the host isn't using the SPE HW? That's not acceptable
->> > as, in most cases, only the host /or/ the guest will use SPE. Here, you
->> > put a measurable overhead on each exit.
->> >
->> > If the host is not using SPE, then the restore/save should happen in
->> > vcpu_load/vcpu_put. Only if the host is using SPE should you do
->> > something in the run loop. Of course, this only applies to VHE and
->> > non-VHE must switch eagerly.
->> >
->> 
->> On VHE where SPE is used in the guest only - we save/restore in 
->> vcpu_load/put.
->> 
->> On VHE where SPE is used in the host only - we save/restore in the run 
->> loop.
->> 
->> On VHE where SPE is used in guest and host - we save/restore in the 
->> run loop.
->> 
->> As the guest can't trace EL2 it doesn't matter if we restore guest SPE 
->> early
->> in the vcpu_load/put functions. (I assume it doesn't matter that we 
->> restore
->> an EL0/EL1 profiling buffer address at this point and enable tracing 
->> given
->> that there is nothing to trace until entering the guest).
->> 
->> However the reason for moving save/restore to vcpu_load/put when the 
->> host is
->> using SPE is to minimise the host EL2 black-out window.
->> 
->> 
->> On nVHE we always save/restore in the run loop. For the SPE 
->> guest-use-only
->> use-case we can't save/restore in vcpu_load/put - because the guest 
->> runs at
->> the same ELx level as the host - and thus doing so would result in the 
->> guest
->> tracing part of the host.
->> 
->> Though if we determine that (for nVHE systems) the guest SPE is 
->> profiling only
->> EL0 - then we could also save/restore in vcpu_load/put where SPE is 
->> only being
->> used in the guest.
->> 
->> Does that make sense, are my reasons correct?
+Hi -
+
+On 1/8/20 3:24 PM, Sean Christopherson wrote:
+> This series is a mix of bug fixes, cleanup and new support in KVM's
+> handling of huge pages.  The series initially stemmed from a syzkaller
+> bug report[1], which is fixed by patch 02, "mm: thp: KVM: Explicitly
+> check for THP when populating secondary MMU".
 > 
-> Also I'm making the following assumptions:
-> 
->  - We determine if the host or guest are using SPE by seeing if 
-> profiling
->    (e.g. PMSCR_EL1) is enabled. That should determine *when* we restore 
-> as per
->    my previous email.
+> While investigating options for fixing the syzkaller bug, I realized KVM
+> could reuse the approach from Barret's series to enable huge pages for DAX
+> mappings in KVM[2] for all types of huge mappings, i.e. walk the host page
+> tables instead of querying metadata (patches 05 - 09).
 
-Yes.
+Thanks, Sean.  I tested this patch series out, and it works for me. 
+(Huge KVM mappings of a DAX file, etc.).
 
->  - I'm less sure on this: We should determine *what* we restore based 
-> on the
->    availability of the SPE feature and not if it is being used - so for 
-> guest
->    this is if the guest has the feature on the vcpu. For host this is 
-> based on
->    the CPU feature registers.
+Thanks,
 
-As long as the guest's feature is conditionned on the HW being present 
-*and*
-that you're running on a CPU that has the HW.
+Barret
 
->    The downshot of this is that if you have SPE support present on 
-> guest and
->    host and they aren't being used, then you still save/restore upon 
-> entering/
->    leaving a guest. The reason I feel this is needed is to prevent the 
-> issue
->    where the host starts programming the SPE registers, but is 
-> preempted by
->    KVM entering a guest, before it could enable host SPE. Thus when we 
-> enter the
->    guest we don't save all the registers, we return to the host and the 
-> host
->    SPE carries on from where it left of and enables it - yet because we 
-> didn't
->    restore all the programmed registers it doesn't work.
 
-Saving the host registers is never optional if they are shared with the 
-guest.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
