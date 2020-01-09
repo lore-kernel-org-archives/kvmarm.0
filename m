@@ -2,101 +2,84 @@ Return-Path: <SRS0=UWlR=26=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD014C33CA2
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 16:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A72C282DD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 16:54:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 950872067D
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 16:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 332BA20721
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 16:54:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5Eljg8Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950872067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyoaGFzo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 332BA20721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF084B249;
-	Thu,  9 Jan 2020 11:23:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2FB54B2B4;
+	Thu,  9 Jan 2020 11:54:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GAPVfn1z69Ag; Thu,  9 Jan 2020 11:23:24 -0500 (EST)
+	with ESMTP id S870nu0O6rIR; Thu,  9 Jan 2020 11:54:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 046BD4B24E;
-	Thu,  9 Jan 2020 11:23:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 545154B2B1;
+	Thu,  9 Jan 2020 11:54:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2F1C4ACFA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 11:09:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96A364B2AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 11:54:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xSZJhupkhZxQ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jan 2020 11:09:37 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE2EA4A982
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 11:09:37 -0500 (EST)
+ with ESMTP id 5PK-5QwS8nvr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 11:54:12 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7966D4B2AE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 11:54:12 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578586177;
+ s=mimecast20190719; t=1578588852;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mua/qHbvjxBZzAa9DGgUWjthaiVLr4wGp81bwymTxFo=;
- b=c5Eljg8ZOZJt2KVzzWYiZiw3aAQddX008DirZRopY94TzxdWlSAdeD+1yhGNpTh8hZaE6W
- JSy0+27pVuUYTvRUhnrOTD6mKMb+GVGdusg7CbW+euTg1wt8ju8/DYfu7tihrlx+djVE6N
- Ot+EXxd/x57x+GWpO3+Wkag9fuPNfO4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-EwnQ1etbOvC8t0wUxZWydQ-1; Thu, 09 Jan 2020 11:09:36 -0500
-Received: by mail-wm1-f72.google.com with SMTP id l11so891461wmi.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jan 2020 08:09:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NXlvrJt6z83MLX+WxwdFOCINB+GcX+Yj981D0b2qPGQ=;
- b=gZh0IIGIlpcI7WoRbwiNZc+B/L0hwZG3G6L01dPwHwqVHeRgPpA9Rr21WhBty20BM8
- IiiNQ+02dUjMWhybjh99CBPYED8QWkSX/o1A4UMr37c0qDevbHbICS4xu05W5/Q4XfL1
- 6a2aInDAbUtFr9rj5oKzdFamX5opkxkae1Rj1QieUTVu066P5qGwUsQ+JwJLoSEMdKgu
- ZDuk98U+QlJQoXzTvE+y33fX+aW7j0ozZzvluSaF7segpTfIc1Uzh+brzVEt4gSUn7L/
- 1udtYZ4hcFj1JbjX2K7ArK8vhCLyDTXJ7ktMaG2yKONBG/NL4WlCA2vy1kF+ZKBNGywk
- QTtw==
-X-Gm-Message-State: APjAAAUFxDUHGpvFCVFphDnoECkCUmKTKkYgHSJAkSBetls8pHqLjBhP
- F9XRuc3cBRa608iIZFuqtIsdZaaRcpwiN4TlCFg0JbXko5tHs6jb1mG5tZb10gc4Z1EvBUIt9Ih
- z/2nPWRE4jEKa/PVBh9JrZIKs
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr5807757wmi.89.1578586175351;
- Thu, 09 Jan 2020 08:09:35 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzmBZZfDXBq6RqR3Rkcb9sOH+t9Q3MfPwQWoV78KSevOPVEW0amjALm+VNPMHJy5/8IKwjOOA==
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr5807724wmi.89.1578586175172;
- Thu, 09 Jan 2020 08:09:35 -0800 (PST)
-Received: from redfedo.redhat.com
- (host81-140-166-164.range81-140.btcentralplus.com. [81.140.166.164])
- by smtp.gmail.com with ESMTPSA id e8sm8517707wrt.7.2020.01.09.08.09.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Jan 2020 08:09:34 -0800 (PST)
-From: Julien Thierry <jthierry@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [RFC v5 52/57] arm64: kernel: Annotate non-standard stack frame
- functions
-Date: Thu,  9 Jan 2020 16:02:55 +0000
-Message-Id: <20200109160300.26150-53-jthierry@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200109160300.26150-1-jthierry@redhat.com>
-References: <20200109160300.26150-1-jthierry@redhat.com>
+ bh=9kKHMcsYX/2pX7iLpzc+Kf3IMCkj1tCMKoecB+pyXhI=;
+ b=UyoaGFzoDkrSacUp+HeziRQ0QlUHIhHpofyX619l8XjXidHlfvnh7HYVqFY8Lw2kwRKSzI
+ XUIc7jUevAyo1HzOj8v+gtvv3M+Rw9n8INwxRJydv0v0KNa+ZFlyMjr8kznOWxV8iHpk05
+ 4sFz05QkxdcgX1JnHPb1SYu7UjRCUlM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-bBW5FKprOTO-ocWw6H6t7A-1; Thu, 09 Jan 2020 11:54:08 -0500
+X-MC-Unique: bBW5FKprOTO-ocWw6H6t7A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7192100F191;
+ Thu,  9 Jan 2020 16:54:06 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CB4E686CBD;
+ Thu,  9 Jan 2020 16:54:03 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 04/10] arm: pmu: Check Required Event
+ Support
+To: Andre Przywara <andre.przywara@arm.com>
+References: <20191216204757.4020-1-eric.auger@redhat.com>
+ <20191216204757.4020-5-eric.auger@redhat.com>
+ <20200103181251.72cfcae2@donnerap.cambridge.arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+Date: Thu, 9 Jan 2020 17:54:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-MC-Unique: EwnQ1etbOvC8t0wUxZWydQ-1
-X-Mimecast-Spam-Score: 0
-X-Mailman-Approved-At: Thu, 09 Jan 2020 11:23:21 -0500
-Cc: Marc Zyngier <maz@kernel.org>, Julien Thierry <jthierry@redhat.com>,
- peterz@infradead.org, catalin.marinas@arm.com, raphael.gault@arm.com,
- jpoimboe@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200103181251.72cfcae2@donnerap.cambridge.arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,80 +96,177 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Raphael Gault <raphael.gault@arm.com>
+Hi Andre,
 
-Annotate assembler functions which are callable but do not
-setup a correct stack frame.
+On 1/3/20 7:12 PM, Andre Przywara wrote:
+> On Mon, 16 Dec 2019 21:47:51 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Eric,
+> 
+>> If event counters are implemented check the common events
+>> required by the PMUv3 are implemented.
+>>
+>> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+>> either INST_RETIRED or INST_SPEC). Some others only are
+>> required if the implementation implements some other features.
+>>
+>> Check those wich are unconditionally required.
+>>
+>> This test currently fails on TCG as neither INST_RETIRED
+>> or INST_SPEC are supported.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 ->v2:
+>> - add a comment to explain the PMCEID0/1 splits
+>> ---
+>>  arm/pmu.c         | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  arm/unittests.cfg |  6 ++++
+>>  2 files changed, 77 insertions(+)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index d24857e..d88ef22 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>>  	: "cc");
+>>  }
+>> +
+>> +/* event counter tests only implemented for aarch64 */
+>> +static void test_event_introspection(void) {}
+>> +
+>>  #elif defined(__aarch64__)
+>>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+>> @@ -139,6 +143,70 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>  	: [pmcr] "r" (pmcr)
+>>  	: "cc");
+>>  }
+>> +
+>> +#define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+>> +
+>> +static bool is_event_supported(uint32_t n, bool warn)
+>> +{
+>> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+>> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+>> +	bool supported;
+>> +	uint32_t reg;
+>> +
+>> +	/*
+>> +	 * The low 32-bits of PMCEID0/1 respectly describe
+>> +	 * event support for events 0-31/32-63. Their High
+>> +	 * 32-bits describe support for extended events
+>> +	 * starting at 0x4000, using the same split.
+>> +	 */
+>> +	if (n >= 0x0  && n <= 0x1F)
+>> +		reg = pmceid0 & 0xFFFFFFFF;
+>> +	else if  (n >= 0x4000 && n <= 0x401F)
+>> +		reg = pmceid0 >> 32;
+>> +	else if (n >= 0x20  && n <= 0x3F)
+>> +		reg = pmceid1 & 0xFFFFFFFF;
+>> +	else if (n >= 0x4020 && n <= 0x403F)
+>> +		reg = pmceid1 >> 32;
+>> +	else
+>> +		abort();
+>> +
+>> +	supported =  reg & (1 << n);
+> 
+> Don't we need to mask off everything but the lowest 5 bits of "n"? Probably also using "1U" is better.
+I added an assert to check n is less or equal than 0x3F
+> 
+>> +	if (!supported && warn)
+>> +		report_info("event %d is not supported", n);
+>> +	return supported;
+>> +}
+>> +
+>> +static void test_event_introspection(void)
+> 
+> "introspection" sounds quite sophisticated. Are you planning to extend this? If not, could we maybe rename it to "test_available_events"?
+Yes this test is a placeholder for looking at the PMU characteristics
+and we may add some other queries there.
+> 
+>> +{
+>> +	bool required_events;
+>> +
+>> +	if (!pmu.nb_implemented_counters) {
+>> +		report_skip("No event counter, skip ...");
+>> +		return;
+>> +	}
+>> +
+>> +	/* PMUv3 requires an implementation includes some common events */
+>> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+>> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+>> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+>> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+>> +
+>> +	if (pmu.version == 0x4) {
+>> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+>> +		required_events = required_events ||
+>> +				  is_event_supported(0x23, true) ||
+> 
+> Shouldn't those two operators be '&&' instead?
+yes definitively
+> 
+>> +				  is_event_supported(0x24, true);
+>> +	}
+>> +
+>> +	/*
+>> +	 * L1D_CACHE_REFILL(0x3) and L1D_CACHE(0x4) are only required if
+>> +	 * L1 data / unified cache. BR_MIS_PRED(0x10), BR_PRED(0x12) are only
+>> +	 * required if program-flow prediction is implemented.
+>> +	 */
+> 
+> Is this a TODO?
+yes. Added TODO. I do not know how to check whether the conditions are
+satisfied? Do you have any idea?
 
-Signed-off-by: Raphael Gault <raphael.gault@arm.com>
-Signed-off-by: Julien Thierry <jthierry@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/kernel/hyp-stub.S | 3 +++
- arch/arm64/kvm/hyp-init.S    | 3 +++
- 2 files changed, 6 insertions(+)
+Thank you for the review!
 
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 73d46070b315..8917d42f38c7 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -6,6 +6,7 @@
-  * Author:	Marc Zyngier <marc.zyngier@arm.com>
-  */
-
-+#include <linux/frame.h>
- #include <linux/init.h>
- #include <linux/linkage.h>
- #include <linux/irqchip/arm-gic-v3.h>
-@@ -42,6 +43,7 @@ ENTRY(__hyp_stub_vectors)
- 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
- 	ventry	el1_error_invalid		// Error 32-bit EL1
- ENDPROC(__hyp_stub_vectors)
-+asm_stack_frame_non_standard __hyp_stub_vectors
-
- 	.align 11
-
-@@ -69,6 +71,7 @@ el1_sync:
- 9:	mov	x0, xzr
- 	eret
- ENDPROC(el1_sync)
-+asm_stack_frame_non_standard el1_sync
-
- .macro invalid_vector	label
- \label:
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 160be2b4696d..63deea39313d 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -12,6 +12,7 @@
- #include <asm/pgtable-hwdef.h>
- #include <asm/sysreg.h>
- #include <asm/virt.h>
-+#include <linux/frame.h>
-
- 	.text
- 	.pushsection	.hyp.idmap.text, "ax"
-@@ -118,6 +119,7 @@ CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
- 	/* Hello, World! */
- 	eret
- ENDPROC(__kvm_hyp_init)
-+asm_stack_frame_non_standard __kvm_hyp_init
-
- ENTRY(__kvm_handle_stub_hvc)
- 	cmp	x0, #HVC_SOFT_RESTART
-@@ -159,6 +161,7 @@ reset:
- 	eret
-
- ENDPROC(__kvm_handle_stub_hvc)
-+asm_stack_frame_non_standard __kvm_handle_stub_hvc
-
- 	.ltorg
-
---
-2.21.0
+Eric
+> 
+> Cheers,
+> Andre
+> 
+> 
+>> +
+>> +	report(required_events, "Check required events are implemented");
+>> +}
+>> +
+>>  #endif
+>>  
+>>  /*
+>> @@ -326,6 +394,9 @@ int main(int argc, char *argv[])
+>>  		       "Monotonically increasing cycle count");
+>>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>>  		pmccntr64_test();
+>> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_event_introspection();
+>>  	} else {
+>>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>>  	}
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index 79f0d7a..4433ef3 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -66,6 +66,12 @@ file = pmu.flat
+>>  groups = pmu
+>>  extra_params = -append 'cycle-counter 0'
+>>  
+>> +[pmu-event-introspection]
+>> +file = pmu.flat
+>> +groups = pmu
+>> +arch = arm64
+>> +extra_params = -append 'event-introspection'
+>> +
+>>  # Test PMU support (TCG) with -icount IPC=1
+>>  #[pmu-tcg-icount-1]
+>>  #file = pmu.flat
+> 
 
 _______________________________________________
 kvmarm mailing list
