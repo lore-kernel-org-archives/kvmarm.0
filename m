@@ -2,62 +2,72 @@ Return-Path: <SRS0=UWlR=26=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 939D6C33CA2
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 15:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9B6C282DD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 15:29:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 249C1206ED
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 15:09:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249C1206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2998B20673
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 15:29:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5FmlW6o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2998B20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFB54B250;
-	Thu,  9 Jan 2020 10:09:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A19AE4B1F2;
+	Thu,  9 Jan 2020 10:29:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zdc2mLjoCG4t; Thu,  9 Jan 2020 10:09:35 -0500 (EST)
+	with ESMTP id SCm-lpElX5Ut; Thu,  9 Jan 2020 10:29:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4563D4B1D6;
-	Thu,  9 Jan 2020 10:09:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCEE84B1EF;
+	Thu,  9 Jan 2020 10:29:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 222064B250
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 10:09:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6990B4B1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 04:07:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8hlGtYk+KvjE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jan 2020 10:09:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A19364B184
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 10:09:32 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E08C1FB;
- Thu,  9 Jan 2020 07:09:32 -0800 (PST)
-Received: from [10.1.27.38] (e122027.cambridge.arm.com [10.1.27.38])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 336333F534;
- Thu,  9 Jan 2020 07:09:30 -0800 (PST)
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Support the VCPU preemption check
-To: Zengruan Ye <yezengruan@huawei.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- virtualization@lists.linux-foundation.org
-References: <20191226135833.1052-1-yezengruan@huawei.com>
- <20191226135833.1052-7-yezengruan@huawei.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <5a1f6745-2deb-253b-7022-f2725d8d40ba@arm.com>
-Date: Thu, 9 Jan 2020 15:09:28 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ with ESMTP id unaMSqoFtevN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 04:07:33 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E45F4B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 04:07:33 -0500 (EST)
+Received: from rapoport-lnx (nesher1.haifa.il.ibm.com [195.110.40.7])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1E1E920673;
+ Thu,  9 Jan 2020 09:07:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1578560852;
+ bh=80VO7IRaadflRsWGeFaWpP4uMh6gHTYCmJeL67RjZyc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=q5FmlW6oNXmmHi8t5SgWv6hqbdIOcUc7kC9MBmRyqClnLeB0DbMUArm6zNITYQbZM
+ X3khTwxh8dUFqbTImNB9UVzgMvIDlRJW427ftIDOSroG+TSjzJJ7++lD9C0seZcwE+
+ 32RfwPZhjFiLV95ZOf0ynTo5+MVxORQ//gS9cugs=
+Date: Thu, 9 Jan 2020 11:07:20 +0200
+From: Mike Rapoport <rppt@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 0/1] arm/arm64: add support for folded p4d page tables
+Message-ID: <20200109090719.GA14426@rapoport-lnx>
+References: <20191230082734.28954-1-rppt@kernel.org>
+ <19fc0640-2b7e-a06f-a4c8-2736d54dd565@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191226135833.1052-7-yezengruan@huawei.com>
-Content-Language: en-GB
-Cc: catalin.marinas@arm.com, daniel.lezcano@linaro.org, linux@armlinux.org.uk,
- maz@kernel.org, will@kernel.org
+Content-Disposition: inline
+In-Reply-To: <19fc0640-2b7e-a06f-a4c8-2736d54dd565@arm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Mailman-Approved-At: Thu, 09 Jan 2020 10:29:41 -0500
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Mike Rapoport <rppt@linux.ibm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,241 +79,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 26/12/2019 13:58, Zengruan Ye wrote:
-> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
-> enhance lock performance on overcommitted hosts (more runnable VCPUs
-> than physical CPUs in the system) as doing busy waits for preempted
-> VCPUs will hurt system performance far worse than early yielding.
+On Thu, Jan 09, 2020 at 08:38:54AM +0530, Anshuman Khandual wrote:
 > 
-> unix benchmark result:
->    host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
->    guest: kernel 5.5.0-rc1, 16 VCPUs
 > 
->                 test-case                |    after-patch    |   before-patch
-> ----------------------------------------+-------------------+------------------
->   Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
->   Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
->   Execl Throughput                       |      3662.1 lps   |      2718.0 lps
->   File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
->   File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
->   File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
->   Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
->   Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
->   Process Creation                       |      4025.7 lps   |      3706.6 lps
->   Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
->   Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
->   System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
-> ----------------------------------------+-------------------+------------------
->   System Benchmarks Index Score          |      1835.1       |      1327.6
+> On 12/30/2019 01:57 PM, Mike Rapoport wrote:
+> > From: Mike Rapoport <rppt@linux.ibm.com>
+> > 
+> > Hi,
 > 
-> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-> ---
->   arch/arm64/include/asm/paravirt.h |   3 +
->   arch/arm64/kernel/paravirt.c      | 117 ++++++++++++++++++++++++++++++
->   arch/arm64/kernel/setup.c         |   2 +
->   include/linux/cpuhotplug.h        |   1 +
->   4 files changed, 123 insertions(+)
+> Hello Mike,
 > 
-> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-> index 7b1c81b544bb..ca3a2c7881f3 100644
-> --- a/arch/arm64/include/asm/paravirt.h
-> +++ b/arch/arm64/include/asm/paravirt.h
-> @@ -29,6 +29,8 @@ static inline u64 paravirt_steal_clock(int cpu)
->   
->   int __init pv_time_init(void);
->   
-> +int __init pv_lock_init(void);
-> +
->   __visible bool __native_vcpu_is_preempted(int cpu);
->   
->   static inline bool pv_vcpu_is_preempted(int cpu)
-> @@ -39,6 +41,7 @@ static inline bool pv_vcpu_is_preempted(int cpu)
->   #else
->   
->   #define pv_time_init() do {} while (0)
-> +#define pv_lock_init() do {} while (0)
->   
->   #endif // CONFIG_PARAVIRT
->   
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index d8f1ba8c22ce..bd2ad6a17a26 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -22,6 +22,7 @@
->   #include <asm/paravirt.h>
->   #include <asm/pvclock-abi.h>
->   #include <asm/smp_plat.h>
-> +#include <asm/pvlock-abi.h>
->   
->   struct static_key paravirt_steal_enabled;
->   struct static_key paravirt_steal_rq_enabled;
-> @@ -35,6 +36,10 @@ struct pv_time_stolen_time_region {
->   	struct pvclock_vcpu_stolen_time *kaddr;
->   };
->   
-> +struct pv_lock_state_region {
-> +	struct pvlock_vcpu_state *kaddr;
-> +};
-> +
->   static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
->   
->   static bool steal_acc = true;
-> @@ -158,3 +163,115 @@ int __init pv_time_init(void)
->   
->   	return 0;
->   }
-> +
-> +static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
-> +
-> +static bool kvm_vcpu_is_preempted(int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	__le64 preempted_le;
-> +
-> +	reg = per_cpu_ptr(&lock_state_region, cpu);
-> +	if (!reg->kaddr) {
-> +		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
-> +			     cpu);
-> +		return false;
-> +	}
-> +
-> +	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
-> +
-> +	return !!(preempted_le & 1);
-
-According to the documentation preempted != 0 means preempted, but here you are checking the LSB. You need to be consistent about the ABI.
-
-> +}
-> +
-> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +	if (!reg->kaddr)
-> +		return 0;
-> +
-> +	memunmap(reg->kaddr);
-> +	memset(reg, 0, sizeof(*reg));
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_pvlock_vcpu_state(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	struct arm_smccc_res res;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
-> +		pr_warn("Failed to init PV lock data structure\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg->kaddr = memremap(res.a0,
-> +			      sizeof(struct pvlock_vcpu_state),
-> +			      MEMREMAP_WB);
-> +
-> +	if (!reg->kaddr) {
-> +		pr_warn("Failed to map PV lock data structure\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_arm_init_pvlock(void)
-> +{
-> +	int ret;
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
-> +				"hypervisor/arm/pvlock:starting",
-> +				init_pvlock_vcpu_state,
-> +				pvlock_vcpu_state_dying_cpu);
-> +	if (ret < 0) {
-> +		pr_warn("PV-lock init failed\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool has_kvm_pvlock(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
-> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
-
-As mentioned previously we could do with something more robust to check that the hypervisor is actually KVM before assuming that vendor specific IDs are valid.
-
-Steve
-
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +int __init pv_lock_init(void)
-> +{
-> +	int ret;
-> +
-> +	if (is_hyp_mode_available())
-> +		return 0;
-> +
-> +	if (!has_kvm_pvlock())
-> +		return 0;
-> +
-> +	ret = kvm_arm_init_pvlock();
-> +	if (ret)
-> +		return ret;
-> +
-> +	pv_ops.lock.vcpu_is_preempted = kvm_vcpu_is_preempted;
-> +	pr_info("using PV-lock preempted\n");
-> +
-> +	return 0;
-> +}
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index 56f664561754..aa3a8b9e710f 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -341,6 +341,8 @@ void __init setup_arch(char **cmdline_p)
->   	smp_init_cpus();
->   	smp_build_mpidr_hash();
->   
-> +	pv_lock_init();
-> +
->   	/* Init percpu seeds for random tags after cpus are set up. */
->   	kasan_init_tags();
->   
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index e51ee772b9f5..f72ff95ab63a 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -138,6 +138,7 @@ enum cpuhp_state {
->   	CPUHP_AP_DUMMY_TIMER_STARTING,
->   	CPUHP_AP_ARM_XEN_STARTING,
->   	CPUHP_AP_ARM_KVMPV_STARTING,
-> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->   	CPUHP_AP_ARM_CORESIGHT_STARTING,
->   	CPUHP_AP_ARM64_ISNDEP_STARTING,
->   	CPUHP_AP_SMPCFD_DYING,
+> > 
+> > This is a part of clean up of the page table manipulation code that aims to
+> > remove asm-generic/5level-fixup.h and asm-generic/pgtable-nop4d-hack.h
+> > 
+> > There is a single patch for both arm and arm64 because doing the conversion
+> > separately would mean breaking the shared mmu bits in virt/kvm/arm.
+> > 
+> > The patch is build tested and boot tested on qemu-system-{arm,aarch64}.
 > 
+> There are lots of code changes here for a single patch but as you have
+> mentioned shared KVM bits would have prevented splitting arm and arm64
+> changes into separate patches. Just curious, are you planning to respin
+> this patch sooner after fixing the reported build problems caused by
+> missing p4d_offset_kimg() and p4d_sect() definitions ?
 
+Well, I was waiting to see if there was some feedback except kbuild robot
+response :)
+
+I'm planning to send v2 soon, probably next week.
+ 
+> - Anshuman
+
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
