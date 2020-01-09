@@ -2,67 +2,75 @@ Return-Path: <SRS0=UWlR=26=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DFFC33CA1
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D17C282DD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 21:05:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9480120678
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:46:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9480120678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 39BBE20721
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 21:05:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39BBE20721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E81C44B24A;
-	Thu,  9 Jan 2020 12:46:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95AE74B1CB;
+	Thu,  9 Jan 2020 16:05:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rg3+Yk--M9YZ; Thu,  9 Jan 2020 12:46:27 -0500 (EST)
+	with ESMTP id Bh3Tp6K+SzWM; Thu,  9 Jan 2020 16:05:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD504B250;
-	Thu,  9 Jan 2020 12:46:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA1D4B1CC;
+	Thu,  9 Jan 2020 16:05:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D12044B23E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:46:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD8124B1C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 16:05:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Kg356vHmueM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jan 2020 12:46:24 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A874D4B214
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:46:24 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 58D57328;
- Thu,  9 Jan 2020 09:46:24 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDE423F703;
- Thu,  9 Jan 2020 09:46:23 -0800 (PST)
-Date: Thu, 9 Jan 2020 17:46:22 +0000
-From: Andrew Murray <andrew.murray@arm.com>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v2 11/18] KVM: arm64: don't trap Statistical Profiling
- controls to EL2
-Message-ID: <20200109174621.GB42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-12-andrew.murray@arm.com>
- <86bls0iqv6.wl-maz@kernel.org>
- <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
- <1bb190091362262021dbaf41b5fe601e@www.loen.fr>
- <20191223121042.GC42593@e119886-lin.cambridge.arm.com>
- <20200109172511.GA42593@e119886-lin.cambridge.arm.com>
- <20200109174251.GJ3112@lakrids.cambridge.arm.com>
+ with ESMTP id y5H1Aye+iKwL for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 16:05:07 -0500 (EST)
+Received: from Galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E1F44B1C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 16:05:07 -0500 (EST)
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34]
+ helo=nanos.tec.linutronix.de)
+ by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+ (Exim 4.80) (envelope-from <tglx@linutronix.de>)
+ id 1ipez7-0008OC-Ij; Thu, 09 Jan 2020 22:04:53 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+ id 0AA1A105BCE; Thu,  9 Jan 2020 22:04:53 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
+In-Reply-To: <20200108202448.9669-6-sean.j.christopherson@intel.com>
+References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+ <20200108202448.9669-6-sean.j.christopherson@intel.com>
+Date: Thu, 09 Jan 2020 22:04:53 +0100
+Message-ID: <871rs8batm.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200109174251.GJ3112@lakrids.cambridge.arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required, ALL_TRUSTED=-1,
+ SHORTCIRCUIT=-0.0001
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Paul Mackerras <paulus@ozlabs.org>,
+ linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu,
+ Dave Jiang <dave.jiang@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
+ Barret Rhoden <brho@google.com>, kvm-ppc@vger.kernel.org,
+ Liran Alon <liran.alon@oracle.com>, Andy Lutomirski <luto@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ linux-kernel@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Jason Zeng <jason.zeng@intel.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,55 +87,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jan 09, 2020 at 05:42:51PM +0000, Mark Rutland wrote:
-> Hi Andrew,
-> 
-> On Thu, Jan 09, 2020 at 05:25:12PM +0000, Andrew Murray wrote:
-> > On Mon, Dec 23, 2019 at 12:10:42PM +0000, Andrew Murray wrote:
-> > > On Mon, Dec 23, 2019 at 12:05:12PM +0000, Marc Zyngier wrote:
-> > > > On 2019-12-23 11:56, Andrew Murray wrote:
-> > > > > My original concern in the cover letter was in how to prevent
-> > > > > the guest from attempting to use these registers in the first
-> > > > > place - I think the solution I was looking for is to
-> > > > > trap-and-emulate ID_AA64DFR0_EL1 such that the PMSVer bits
-> > > > > indicate that SPE is not emulated.
-> > > > 
-> > > > That, and active trapping of the SPE system registers resulting in injection
-> > > > of an UNDEF into the offending guest.
-> > > 
-> > > Yes that's no problem.
-> > 
-> > The spec says that 'direct access to [these registers] are UNDEFINED' - is it
-> > not more correct to handle this with trap_raz_wi than an undefined instruction?
-> 
-> The term UNDEFINED specifically means treated as an undefined
-> instruction. The Glossary in ARM DDI 0487E.a says for UNDEFINED:
-> 
-> | Indicates cases where an attempt to execute a particular encoding bit
-> | pattern generates an exception, that is taken to the current Exception
-> | level, or to the default Exception level for taking exceptions if the
-> | UNDEFINED encoding was executed at EL0. This applies to:
-> |
-> | * Any encoding that is not allocated to any instruction.
-> |
-> | * Any encoding that is defined as never accessible at the current
-> |   Exception level.
-> |
-> | * Some cases where an enable, disable, or trap control means an
-> |   encoding is not accessible at the current Exception level.
-> 
-> So these should trigger an UNDEFINED exception rather than behaving as
-> RAZ/WI.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-OK thanks for the clarification - I'll leave it as an undefined instruction.
+> diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+> index b5e49e6bac63..400ac8da75e8 100644
+> --- a/arch/x86/include/asm/pgtable_types.h
+> +++ b/arch/x86/include/asm/pgtable_types.h
+> @@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
+>  extern pte_t *lookup_address(unsigned long address, unsigned int *level);
+>  extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
+>  				    unsigned int *level);
+> +
+> +struct mm_struct;
+> +pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
+> +			    unsigned int *level);
 
-Thanks,
+Please keep the file consistent and use extern even if not required.
 
-Andrew Murray
+Other than that:
 
-> 
-> Thanks,
-> Mark.
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
