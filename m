@@ -1,74 +1,62 @@
-Return-Path: <SRS0=HiVh=25=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=UWlR=26=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D70EC33CA2
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3815FC33C9E
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 03:07:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 30DE820705
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jan 2020 20:27:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30DE820705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id A88AF2067D
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 03:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88AF2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD6544B16F;
-	Wed,  8 Jan 2020 15:27:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E06F84B193;
+	Wed,  8 Jan 2020 22:07:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RMGAUksOkxMQ; Wed,  8 Jan 2020 15:27:17 -0500 (EST)
+	with ESMTP id 31fSiB+BLm7m; Wed,  8 Jan 2020 22:07:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE80E4B156;
-	Wed,  8 Jan 2020 15:27:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF2514B194;
+	Wed,  8 Jan 2020 22:07:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3185B4B134
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84D8A4B192
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 22:07:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9BUgUrFVXpJy for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jan 2020 15:27:08 -0500 (EST)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 254794B13E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 15:27:08 -0500 (EST)
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Jan 2020 12:27:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,411,1571727600"; d="scan'208";a="211658391"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by orsmga007.jf.intel.com with ESMTP; 08 Jan 2020 12:27:06 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 11/14] KVM: x86/mmu: Zap any compound page when collapsing
- sptes
-Date: Wed,  8 Jan 2020 12:24:45 -0800
-Message-Id: <20200108202448.9669-12-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200108202448.9669-1-sean.j.christopherson@intel.com>
-References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
+ with ESMTP id LW2PVPquO92Y for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jan 2020 22:07:47 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40F574B18E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jan 2020 22:07:47 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F353131B;
+ Wed,  8 Jan 2020 19:07:45 -0800 (PST)
+Received: from [10.162.40.138] (p8cg001049571a15.blr.arm.com [10.162.40.138])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ B53F93F534; Wed,  8 Jan 2020 19:07:41 -0800 (PST)
+Subject: Re: [PATCH 0/1] arm/arm64: add support for folded p4d page tables
+To: Mike Rapoport <rppt@kernel.org>, linux-arm-kernel@lists.infradead.org
+References: <20191230082734.28954-1-rppt@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <19fc0640-2b7e-a06f-a4c8-2736d54dd565@arm.com>
+Date: Thu, 9 Jan 2020 08:38:54 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, Paul Mackerras <paulus@ozlabs.org>,
- linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu,
- Dave Jiang <dave.jiang@intel.com>, linux-nvdimm <linux-nvdimm@lists.01.org>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com,
- Barret Rhoden <brho@google.com>, kvm-ppc@vger.kernel.org,
- Liran Alon <liran.alon@oracle.com>, Andy Lutomirski <luto@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Jason Zeng <jason.zeng@intel.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20191230082734.28954-1-rppt@kernel.org>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, Marc Zyngier <maz@kernel.org>,
+ Mike Rapoport <rppt@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,34 +73,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Zap any compound page, e.g. THP or HugeTLB pages, when zapping sptes
-that can potentially be converted to huge sptes after disabling dirty
-logging on the associated memslot.  Note, this approach could result in
-false positives, e.g. if a random compound page is mapped into the
-guest, but mapping non-huge compound pages into the guest is far from
-the norm, and toggling dirty logging is not a frequent operation.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 68aec984f953..f93b0c5e4170 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5956,7 +5956,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 		 */
- 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
- 		    !kvm_is_zone_device_pfn(pfn) &&
--		    kvm_is_transparent_hugepage(pfn)) {
-+		    PageCompound(pfn_to_page(pfn))) {
- 			pte_list_remove(rmap_head, sptep);
- 
- 			if (kvm_available_flush_tlb_with_range())
--- 
-2.24.1
+On 12/30/2019 01:57 PM, Mike Rapoport wrote:
+> From: Mike Rapoport <rppt@linux.ibm.com>
+> 
+> Hi,
 
+Hello Mike,
+
+> 
+> This is a part of clean up of the page table manipulation code that aims to
+> remove asm-generic/5level-fixup.h and asm-generic/pgtable-nop4d-hack.h
+> 
+> There is a single patch for both arm and arm64 because doing the conversion
+> separately would mean breaking the shared mmu bits in virt/kvm/arm.
+> 
+> The patch is build tested and boot tested on qemu-system-{arm,aarch64}.
+
+There are lots of code changes here for a single patch but as you have
+mentioned shared KVM bits would have prevented splitting arm and arm64
+changes into separate patches. Just curious, are you planning to respin
+this patch sooner after fixing the reported build problems caused by
+missing p4d_offset_kimg() and p4d_sect() definitions ?
+
+- Anshuman
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
