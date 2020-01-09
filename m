@@ -6,60 +6,102 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35208C282DD
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3E4C282DD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:30:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B7F68206ED
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:25:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F68206ED
+	by mail.kernel.org (Postfix) with ESMTP id 6B9F2206ED
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jan 2020 17:30:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B9F2206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F17234B296;
-	Thu,  9 Jan 2020 12:25:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DADD94B29A;
+	Thu,  9 Jan 2020 12:30:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yiHEVXeQW70p; Thu,  9 Jan 2020 12:25:17 -0500 (EST)
+	with ESMTP id jRlqcxF0+-ls; Thu,  9 Jan 2020 12:30:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B15974B24A;
-	Thu,  9 Jan 2020 12:25:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1EB4B235;
+	Thu,  9 Jan 2020 12:30:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B944B241
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:25:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 051B34B1F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:30:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id owEKWChwTifg for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jan 2020 12:25:14 -0500 (EST)
+ with ESMTP id GAnaMTcLf3UH for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jan 2020 12:30:11 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC074B23C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:25:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7E44B1BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jan 2020 12:30:11 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 320E7328;
- Thu,  9 Jan 2020 09:25:14 -0800 (PST)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A75BE3F703;
- Thu,  9 Jan 2020 09:25:13 -0800 (PST)
-Date: Thu, 9 Jan 2020 17:25:12 +0000
-From: Andrew Murray <andrew.murray@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 11/18] KVM: arm64: don't trap Statistical Profiling
- controls to EL2
-Message-ID: <20200109172511.GA42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-12-andrew.murray@arm.com>
- <86bls0iqv6.wl-maz@kernel.org>
- <20191223115651.GA42593@e119886-lin.cambridge.arm.com>
- <1bb190091362262021dbaf41b5fe601e@www.loen.fr>
- <20191223121042.GC42593@e119886-lin.cambridge.arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35477328;
+ Thu,  9 Jan 2020 09:30:11 -0800 (PST)
+Received: from [192.168.3.111] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF75D3F703;
+ Thu,  9 Jan 2020 09:30:08 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 04/10] arm: pmu: Check Required Event
+ Support
+To: Auger Eric <eric.auger@redhat.com>
+References: <20191216204757.4020-1-eric.auger@redhat.com>
+ <20191216204757.4020-5-eric.auger@redhat.com>
+ <20200103181251.72cfcae2@donnerap.cambridge.arm.com>
+ <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <380b27cb-a762-0622-af9c-1d2afc3a4b5e@arm.com>
+Date: Thu, 9 Jan 2020 17:30:00 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20191223121042.GC42593@e119886-lin.cambridge.arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,89 +118,194 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Dec 23, 2019 at 12:10:42PM +0000, Andrew Murray wrote:
-> On Mon, Dec 23, 2019 at 12:05:12PM +0000, Marc Zyngier wrote:
-> > On 2019-12-23 11:56, Andrew Murray wrote:
-> > > On Sun, Dec 22, 2019 at 10:42:05AM +0000, Marc Zyngier wrote:
-> > > > On Fri, 20 Dec 2019 14:30:18 +0000,
-> > > > Andrew Murray <andrew.murray@arm.com> wrote:
-> > > > >
-> > > > > As we now save/restore the profiler state there is no need to trap
-> > > > > accesses to the statistical profiling controls. Let's unset the
-> > > > > _TPMS bit.
-> > > > >
-> > > > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > > > ---
-> > > > >  arch/arm64/kvm/debug.c | 2 --
-> > > > >  1 file changed, 2 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > > > > index 43487f035385..07ca783e7d9e 100644
-> > > > > --- a/arch/arm64/kvm/debug.c
-> > > > > +++ b/arch/arm64/kvm/debug.c
-> > > > > @@ -88,7 +88,6 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu
-> > > > *vcpu)
-> > > > >   *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
-> > > > >   *  - Debug ROM Address (MDCR_EL2_TDRA)
-> > > > >   *  - OS related registers (MDCR_EL2_TDOSA)
-> > > > > - *  - Statistical profiler (MDCR_EL2_TPMS/MDCR_EL2_E2PB)
-> > > > >   *
-> > > > >   * Additionally, KVM only traps guest accesses to the debug
-> > > > registers if
-> > > > >   * the guest is not actively using them (see the
-> > > > KVM_ARM64_DEBUG_DIRTY
-> > > > > @@ -111,7 +110,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu
-> > > > *vcpu)
-> > > > >  	 */
-> > > > >  	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) &
-> > > > MDCR_EL2_HPMN_MASK;
-> > > > >  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-> > > > > -				MDCR_EL2_TPMS |
-> > > > 
-> > > > No. This is an *optional* feature (the guest could not be presented
-> > > > with the SPE feature, or the the support simply not be compiled in).
-> > > > 
-> > > > If the guest is not allowed to see the feature, for whichever
-> > > > reason,
-> > > > the traps *must* be enabled and handled.
-> > > 
-> > > I'll update this (and similar) to trap such registers when we don't
-> > > support
-> > > SPE in the guest.
-> > > 
-> > > My original concern in the cover letter was in how to prevent the guest
-> > > from attempting to use these registers in the first place - I think the
-> > > solution I was looking for is to trap-and-emulate ID_AA64DFR0_EL1 such
-> > > that
-> > > the PMSVer bits indicate that SPE is not emulated.
-> > 
-> > That, and active trapping of the SPE system registers resulting in injection
-> > of an UNDEF into the offending guest.
-> 
-> Yes that's no problem.
+On 09/01/2020 16:54, Auger Eric wrote:
 
-The spec says that 'direct access to [these registers] are UNDEFINED' - is it
-not more correct to handle this with trap_raz_wi than an undefined instruction?
+Hi Eric,
 
-Thanks,
+> On 1/3/20 7:12 PM, Andre Przywara wrote:
+>> On Mon, 16 Dec 2019 21:47:51 +0100
+>> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> Hi Eric,
+>>
+>>> If event counters are implemented check the common events
+>>> required by the PMUv3 are implemented.
+>>>
+>>> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+>>> either INST_RETIRED or INST_SPEC). Some others only are
+>>> required if the implementation implements some other features.
+>>>
+>>> Check those wich are unconditionally required.
+>>>
+>>> This test currently fails on TCG as neither INST_RETIRED
+>>> or INST_SPEC are supported.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>>
+>>> v1 ->v2:
+>>> - add a comment to explain the PMCEID0/1 splits
+>>> ---
+>>>  arm/pmu.c         | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>  arm/unittests.cfg |  6 ++++
+>>>  2 files changed, 77 insertions(+)
+>>>
+>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>> index d24857e..d88ef22 100644
+>>> --- a/arm/pmu.c
+>>> +++ b/arm/pmu.c
+>>> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>>>  	: "cc");
+>>>  }
+>>> +
+>>> +/* event counter tests only implemented for aarch64 */
+>>> +static void test_event_introspection(void) {}
+>>> +
+>>>  #elif defined(__aarch64__)
+>>>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+>>> @@ -139,6 +143,70 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>>  	: [pmcr] "r" (pmcr)
+>>>  	: "cc");
+>>>  }
+>>> +
+>>> +#define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+>>> +
+>>> +static bool is_event_supported(uint32_t n, bool warn)
+>>> +{
+>>> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+>>> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+>>> +	bool supported;
+>>> +	uint32_t reg;
+>>> +
+>>> +	/*
+>>> +	 * The low 32-bits of PMCEID0/1 respectly describe
+>>> +	 * event support for events 0-31/32-63. Their High
+>>> +	 * 32-bits describe support for extended events
+>>> +	 * starting at 0x4000, using the same split.
+>>> +	 */
+>>> +	if (n >= 0x0  && n <= 0x1F)
+>>> +		reg = pmceid0 & 0xFFFFFFFF;
+>>> +	else if  (n >= 0x4000 && n <= 0x401F)
+>>> +		reg = pmceid0 >> 32;
+>>> +	else if (n >= 0x20  && n <= 0x3F)
+>>> +		reg = pmceid1 & 0xFFFFFFFF;
+>>> +	else if (n >= 0x4020 && n <= 0x403F)
+>>> +		reg = pmceid1 >> 32;
+>>> +	else
+>>> +		abort();
+>>> +
+>>> +	supported =  reg & (1 << n);
+>>
+>> Don't we need to mask off everything but the lowest 5 bits of "n"? Probably also using "1U" is better.
+> I added an assert to check n is less or equal than 0x3F
 
-Andrew Murray
+But "n" will definitely be bigger than that in case of an extended
+event, won't it? So you adjust "reg" accordingly, but miss to do
+something similar to "n"?
 
+>>
+>>> +	if (!supported && warn)
+>>> +		report_info("event %d is not supported", n);
+>>> +	return supported;
+>>> +}
+>>> +
+>>> +static void test_event_introspection(void)
+>>
+>> "introspection" sounds quite sophisticated. Are you planning to extend this? If not, could we maybe rename it to "test_available_events"?
+> Yes this test is a placeholder for looking at the PMU characteristics
+> and we may add some other queries there.
+>>
+>>> +{
+>>> +	bool required_events;
+>>> +
+>>> +	if (!pmu.nb_implemented_counters) {
+>>> +		report_skip("No event counter, skip ...");
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	/* PMUv3 requires an implementation includes some common events */
+>>> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+>>> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+>>> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+>>> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+>>> +
+>>> +	if (pmu.version == 0x4) {
+>>> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+>>> +		required_events = required_events ||
+>>> +				  is_event_supported(0x23, true) ||
+>>
+>> Shouldn't those two operators be '&&' instead?
+> yes definitively
+>>
+>>> +				  is_event_supported(0x24, true);
+>>> +	}
+>>> +
+>>> +	/*
+>>> +	 * L1D_CACHE_REFILL(0x3) and L1D_CACHE(0x4) are only required if
+>>> +	 * L1 data / unified cache. BR_MIS_PRED(0x10), BR_PRED(0x12) are only
+>>> +	 * required if program-flow prediction is implemented.
+>>> +	 */
+>>
+>> Is this a TODO?
+> yes. Added TODO. I do not know how to check whether the conditions are
+> satisfied? Do you have any idea?
+
+Well, AFAICS KVM doesn't filter PMCEIDn, right? So some basic checks are
+surely fine, but I wouldn't go crazy about checking every possible
+aspect of it. After all you would just check the hardware, as we pass
+this register on.
+
+Cheers,
+Andre.
+
+> Thank you for the review!
 > 
-> Thanks,
+> Eric
+>>
+>> Cheers,
+>> Andre
+>>
+>>
+>>> +
+>>> +	report(required_events, "Check required events are implemented");
+>>> +}
+>>> +
+>>>  #endif
+>>>  
+>>>  /*
+>>> @@ -326,6 +394,9 @@ int main(int argc, char *argv[])
+>>>  		       "Monotonically increasing cycle count");
+>>>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>>>  		pmccntr64_test();
+>>> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>>> +		report_prefix_push(argv[1]);
+>>> +		test_event_introspection();
+>>>  	} else {
+>>>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>>>  	}
+>>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>>> index 79f0d7a..4433ef3 100644
+>>> --- a/arm/unittests.cfg
+>>> +++ b/arm/unittests.cfg
+>>> @@ -66,6 +66,12 @@ file = pmu.flat
+>>>  groups = pmu
+>>>  extra_params = -append 'cycle-counter 0'
+>>>  
+>>> +[pmu-event-introspection]
+>>> +file = pmu.flat
+>>> +groups = pmu
+>>> +arch = arm64
+>>> +extra_params = -append 'event-introspection'
+>>> +
+>>>  # Test PMU support (TCG) with -icount IPC=1
+>>>  #[pmu-tcg-icount-1]
+>>>  #file = pmu.flat
+>>
 > 
-> Andrew Murray
-> 
-> > 
-> > Thanks,
-> > 
-> >         M.
-> > -- 
-> > Jazz is not dead. It just smells funny...
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
