@@ -2,80 +2,89 @@ Return-Path: <SRS0=Qg2m=27=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4B7C282DD
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 14:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4987CC282DD
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 16:05:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 992192072E
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 14:55:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0E022087F
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jan 2020 16:05:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JW1RDjmp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 992192072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZGts9mEs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E022087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F89A4B1B0;
-	Fri, 10 Jan 2020 09:55:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57C284B192;
+	Fri, 10 Jan 2020 11:05:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oaG8k5lGjOYB; Fri, 10 Jan 2020 09:55:40 -0500 (EST)
+	with ESMTP id eVEBvhBg7LRt; Fri, 10 Jan 2020 11:05:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D35704B17C;
-	Fri, 10 Jan 2020 09:55:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4939E4B175;
+	Fri, 10 Jan 2020 11:05:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 807B04B162
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 09:55:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EBB24B170
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 11:05:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dClAJbs5wvtn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jan 2020 09:55:38 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61FFA4B0CF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 09:55:38 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578668138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a23BP+daq14PCXzBJ1VBQHnFohqZ7eqS+b84+7K03gk=;
- b=JW1RDjmpEsFJmYOLaCSZ8OHebHR2dEnrmct2dbN+aw1pweR0h8t94FonAGOiOacq10bF6C
- pU9VhVQ4LCZ9DGMPCT2Zl3KTDhy5TLNjI9gYOEg/QQgLpyXLSGS+6uT8Ev5w3hEGEWxukN
- axj6PP/aaR7Ct6Y6h4Hqv/E5Oma4gIE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-2xX62-pzMkGeqrj6IDdk8Q-1; Fri, 10 Jan 2020 09:55:36 -0500
-X-MC-Unique: 2xX62-pzMkGeqrj6IDdk8Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 472A91083E84;
- Fri, 10 Jan 2020 14:55:35 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 615E67C3EB;
- Fri, 10 Jan 2020 14:55:32 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 16/16] arm/arm64: ITS: pending table
- migration test
-Date: Fri, 10 Jan 2020 15:54:12 +0100
-Message-Id: <20200110145412.14937-17-eric.auger@redhat.com>
-In-Reply-To: <20200110145412.14937-1-eric.auger@redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
+ with ESMTP id jTqRMcYM3cGy for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jan 2020 11:05:26 -0500 (EST)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78AA24AF63
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 11:05:26 -0500 (EST)
+Received: by mail-wr1-f68.google.com with SMTP id c14so2317200wrn.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jan 2020 08:05:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/DmvPJlY9Tmv4EyIG/NDnFk433eow2vkRfUSRyghGd0=;
+ b=ZGts9mEsV07oqMlH5CGwSt00UWM0Vhti8vRXxb5TEq9QRrXQJuYE7jQMZqw8HkyyAS
+ sV/PLumRLEtdMsCQeerA3sVA2vS7CrLAEQ7hwe0cIMc+mToYOAxqRm/Pe52vxzA02HfA
+ PFPISdEWNRntwUhvfwVSkiVgxtgs3PmKbjkYAEy0e3PN828LfaH9kiQq3ZgPHuJ4rybp
+ FNfwTYKFCs3OdjzPHPk1WZ+Oajm3TxK8owHm/HfsLF0DOyMl0QNKjyiyApvsOQ4YH2MP
+ UvZ+5hfmtLRzrHEwCA3Sv1mdagoBY/97MR1UDieUNaC6N4CX2GpiamxSKcaDcaYG7V8i
+ 5vKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/DmvPJlY9Tmv4EyIG/NDnFk433eow2vkRfUSRyghGd0=;
+ b=B98qp2F5/flf2o3G3UjCQCsCCvAJKhy7I6edI9RQiHmihWe9TY0cM4M+onKrz0eI4z
+ vp8FZh5r1ismJ4/o5m/3gHhYe6XxeBhM+3gCFwr9MkCWCxpJSpEtYgMi/EnVpaXB68r3
+ xF3Va2voRlPyajVV6uILhXKYxXz0wXvUnNwXXto3U/KuDoqrVXeXq84BKTeT2R5HSBi5
+ 4gpeMGqStALopJAFF/dDKVq6h+/9+aH/+duUyeqLxA8wiDVamS4EFmMB2B6Wcl1nzxiZ
+ 2bfB/WixN8vrhhBZvR4w8hmWdi7GKSnQ5J+FCwYy0jDZM/9h6r31kuiF56iL3qaEgZnj
+ qywQ==
+X-Gm-Message-State: APjAAAXGukRm2/6gj7QRR3IFGalzGqJho60vARZUmKj+jvzQ8KJ1zU21
+ PbEPZqrAPdcwVL/PIiO2g1exNg==
+X-Google-Smtp-Source: APXvYqwIgQwXtS11bXhGVH9Pe2V3XwcTTGW7CWEBZv0DL+719DfIpRZwWKHhcoYjgXjNyQ3lv3A/JQ==
+X-Received: by 2002:adf:f5cb:: with SMTP id k11mr4164701wrp.71.1578672325294; 
+ Fri, 10 Jan 2020 08:05:25 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p17sm2684593wmk.30.2020.01.10.08.05.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jan 2020 08:05:23 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2601D1FF87;
+ Fri, 10 Jan 2020 16:05:23 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: pbonzini@redhat.com
+Subject: [kvm-unit-tests PATCH] arm: expand the timer tests
+Date: Fri, 10 Jan 2020 16:05:11 +0000
+Message-Id: <20200110160511.17821-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: andre.przywara@arm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,239 +96,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add two new migration tests. One testing the migration of
-a topology where collection were unmapped. The second test
-checks the migration of the pending table.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c         | 148 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  16 ++++-
- 2 files changed, 163 insertions(+), 1 deletion(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index bf4b5ba..cb976c3 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -170,6 +170,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
- 	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
- 	lpi_stats.observed.cpu_id = smp_processor_id();
- 	lpi_stats.observed.lpi_id = irqnr;
-+	acked[lpi_stats.observed.cpu_id]++;
- 	smp_wmb(); /* pairs with rmb in check_lpi_stats */
- }
- 
-@@ -207,6 +208,18 @@ static void check_lpi_stats(void)
- 	}
- }
- 
-+static void check_lpi_hits(int *expected)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_cpus; i++) {
-+		if (acked[i] != expected[i])
-+			report(false, "expected %d LPIs on PE #%d, %d observed",
-+			       expected[i], i, acked[i]);
-+		}
-+	report(true, "check LPI on all vcpus");
-+}
-+
- static void gicv2_ipi_send_self(void)
- {
- 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
-@@ -641,6 +654,18 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
- 
-+static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-+		    struct its_collection *col)
-+{
-+	if (!dev || !col)
-+		report_abort("wrong device or collection");
-+
-+	its_send_mapti(dev, physid, eventid, col);
-+
-+	set_lpi_config(physid, LPI_PROP_DEFAULT);
-+	its_send_invall(col);
-+}
-+
- /*
-  * Setup the configuration for those mappings:
-  * dev_id=2 event=20 -> vcpu 3, intid=8195
-@@ -765,6 +790,121 @@ static void test_its_migration(void)
- 	check_lpi_stats();
- }
- 
-+static void test_migrate_unmapped_collection(void)
-+{
-+	struct its_collection *col;
-+	struct its_device *dev2, *dev7;
-+	u8 config;
-+
-+	if (its_setup1())
-+		return;
-+
-+	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-+	dev2 = its_get_device(2);
-+	dev7 = its_get_device(7);
-+
-+	/* MAPTI with the collection unmapped */
-+	set_lpi(dev2, 0, 8192, col);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report(true, "Migration complete");
-+
-+	/* on the destination, map the collection */
-+	its_send_mapc(col, true);
-+
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats();
-+
-+	config = get_lpi_config(8192);
-+	report(config == LPI_PROP_DEFAULT,
-+	       "Config of LPI 8192 was properly migrated");
-+
-+	lpi_stats_expect(nr_cpus - 1, 8192);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* unmap the collection */
-+	its_send_mapc(col, false);
-+
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* remap event 0 onto lpiid 8193 */
-+	set_lpi(dev2, 0, 8193, col);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats();
-+
-+	/* remap the collection */
-+	its_send_mapc(col, true);
-+	lpi_stats_expect(nr_cpus - 1, 8193);
-+}
-+
-+static void test_its_pending_migration(void)
-+{
-+	struct its_device *dev;
-+	struct its_collection *collection[2];
-+	int expected[NR_CPUS];
-+	u64 pendbaser;
-+	void *ptr;
-+	int i;
-+
-+	if (its_prerequisites(4))
-+		return;
-+
-+	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	its_send_mapd(dev, true);
-+
-+	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-+	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
-+	its_send_mapc(collection[0], true);
-+	its_send_mapc(collection[1], true);
-+
-+	/* disable lpi at redist level */
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 1, false);
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 2, false);
-+
-+	/* even lpis are assigned to even cpu */
-+	for (i = 0; i < 256; i++) {
-+		struct its_collection *col = i % 2 ? collection[0] :
-+						     collection[1];
-+		int vcpu = col->target_address >> 16;
-+
-+		its_send_mapti(dev, 8192 + i, i, col);
-+		set_lpi_config(8192 + i, LPI_PROP_DEFAULT);
-+		set_pending_table_bit(vcpu, 8192 + i, true);
-+	}
-+	its_send_invall(collection[0]);
-+	its_send_invall(collection[1]);
-+
-+	/* Set the PTZ bit on each pendbaser */
-+
-+	expected[nr_cpus - 1] = 128;
-+	expected[nr_cpus - 2] = 128;
-+
-+	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-+	pendbaser = readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-+	pendbaser = readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 1, true);
-+	gicv3_rdist_ctrl_lpi(nr_cpus - 2, true);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report(true, "Migration complete");
-+
-+	mdelay(1000);
-+
-+	check_lpi_hits(expected);
-+}
-+
- int main(int argc, char **argv)
- {
- 	if (!gic_init()) {
-@@ -803,6 +943,14 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_migration();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-pending-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_pending_migration();
-+		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-+		report_prefix_push(argv[1]);
-+		test_migrate_unmapped_collection();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") == 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 29e2efc..911f0b7 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -145,7 +145,21 @@ file = gic.flat
- smp = $MAX_SMP
- accel = kvm
- extra_params = -machine gic-version=3 -append 'its-migration'
--groups = its migration
-+groups = migration
-+
-+[its-pending-migration]
-+file = gic.flat
-+smp = $MAX_SMP
-+accel = kvm
-+extra_params = -machine gic-version=3 -append 'its-pending-migration'
-+groups = migration
-+
-+[its-migrate-unmapped-collection]
-+file = gic.flat
-+smp = $MAX_SMP
-+accel = kvm
-+extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-+groups = migration
- 
- # Test PSCI emulation
- [psci]
--- 
-2.20.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+VGhpcyB3YXMgYW4gYXR0ZW1wdCB0byByZXBsaWNhdGUgYSBRRU1VIGJ1Zy4gSG93ZXZlciB0byB0
+cmlnZ2VyIHRoZQpidWcgeW91IG5lZWQgdG8gaGF2ZSBhbiBvZmZzZXQgc2V0IGluIEVMMiB3aGlj
+aCBrdm0tdW5pdC10ZXN0cyBpcwp1bmFibGUgdG8gZG8uIEhvd2V2ZXIgaXQgZG9lcyBleGVyY2lz
+ZSBzb21lIG1vcmUgY29ybmVyIGNhc2VzLgoKQnVnOiBodHRwczovL2J1Z3MubGF1bmNocGFkLm5l
+dC9idWdzLzE4NTkwMjEKU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBs
+aW5hcm8ub3JnPgotLS0KIGFybS90aW1lci5jIHwgMjcgKysrKysrKysrKysrKysrKysrKysrKysr
+KystCiAxIGZpbGUgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlm
+ZiAtLWdpdCBhL2FybS90aW1lci5jIGIvYXJtL3RpbWVyLmMKaW5kZXggZjM5MGU4ZS4uYWUxZDI5
+OSAxMDA2NDQKLS0tIGEvYXJtL3RpbWVyLmMKKysrIGIvYXJtL3RpbWVyLmMKQEAgLTIxNCwyMSAr
+MjE0LDQ2IEBAIHN0YXRpYyB2b2lkIHRlc3RfdGltZXIoc3RydWN0IHRpbWVyX2luZm8gKmluZm8p
+CiAJICogc3RpbGwgcmVhZCB0aGUgcGVuZGluZyBzdGF0ZSBldmVuIGlmIGl0J3MgZGlzYWJsZWQu
+ICovCiAJc2V0X3RpbWVyX2lycV9lbmFibGVkKGluZm8sIGZhbHNlKTsKIAorCS8qIFZlcmlmeSBj
+b3VudCBnb2VzIHVwICovCisJcmVwb3J0KGluZm8tPnJlYWRfY291bnRlcigpID49IG5vdywgImNv
+dW50ZXIgaW5jcmVtZW50cyIpOworCiAJLyogRW5hYmxlIHRoZSB0aW1lciwgYnV0IHNjaGVkdWxl
+IGl0IGZvciBtdWNoIGxhdGVyICovCiAJaW5mby0+d3JpdGVfY3ZhbChsYXRlcik7CiAJaW5mby0+
+d3JpdGVfY3RsKEFSQ0hfVElNRVJfQ1RMX0VOQUJMRSk7CiAJaXNiKCk7Ci0JcmVwb3J0KCFnaWNf
+dGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJlZm9yZSIpOworCXJlcG9ydCghZ2lj
+X3RpbWVyX3BlbmRpbmcoaW5mbyksICJub3QgcGVuZGluZyBiZWZvcmUgMTBzIik7CisKKwkvKiBD
+aGVjayB3aXRoIGEgbWF4aW11bSBwb3NzaWJsZSBjdmFsICovCisJaW5mby0+d3JpdGVfY3ZhbChV
+SU5UNjRfTUFYKTsKKwlpc2IoKTsKKwlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAi
+bm90IHBlbmRpbmcgYmVmb3JlIFVJTlQ2NF9NQVgiKTsKKworCS8qIGFsc28gYnkgc2V0dGluZyB0
+dmFsICovCisJaW5mby0+d3JpdGVfdHZhbCh0aW1lXzEwcyk7CisJaXNiKCk7CisJcmVwb3J0KCFn
+aWNfdGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJlZm9yZSAxMHMgKHZpYSB0dmFs
+KSIpOworCXJlcG9ydF9pbmZvKCJUVkFMIGlzICVkIChkZWx0YSBDVkFMICVsZCkgdGlja3MiLAor
+CQkgICAgaW5mby0+cmVhZF90dmFsKCksIGluZm8tPnJlYWRfY3ZhbCgpIC0gaW5mby0+cmVhZF9j
+b3VudGVyKCkpOwogCisgICAgICAgIC8qIGNoZWNrIHBlbmRpbmcgb25jZSBjdmFsIGlzIGJlZm9y
+ZSBub3cgKi8KIAlpbmZvLT53cml0ZV9jdmFsKG5vdyAtIDEpOwogCWlzYigpOwogCXJlcG9ydChn
+aWNfdGltZXJfcGVuZGluZyhpbmZvKSwgImludGVycnVwdCBzaWduYWwgcGVuZGluZyIpOworCXJl
+cG9ydF9pbmZvKCJUVkFMIGlzICVkIHRpY2tzIiwgaW5mby0+cmVhZF90dmFsKCkpOwogCiAJLyog
+RGlzYWJsZSB0aGUgdGltZXIgYWdhaW4gYW5kIHByZXBhcmUgdG8gdGFrZSBpbnRlcnJ1cHRzICov
+CiAJaW5mby0+d3JpdGVfY3RsKDApOwogCXNldF90aW1lcl9pcnFfZW5hYmxlZChpbmZvLCB0cnVl
+KTsKIAlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAiaW50ZXJydXB0IHNpZ25hbCBu
+byBsb25nZXIgcGVuZGluZyIpOwogCisJLyogUUVNVSBidWcgd2hlbiBjbnR2b2ZmX2VsMiA+IDAK
+KwkgKiBodHRwczovL2J1Z3MubGF1bmNocGFkLm5ldC9idWdzLzE4NTkwMjEgKi8KKwlpbmZvLT53
+cml0ZV9jdGwoQVJDSF9USU1FUl9DVExfRU5BQkxFKTsKKwlpbmZvLT53cml0ZV9jdmFsKFVJTlQ2
+NF9NQVgpOworCWlzYigpOworCXJlcG9ydCghZ2ljX3RpbWVyX3BlbmRpbmcoaW5mbyksICJub3Qg
+cGVuZGluZyBiZWZvcmUgVUlOVDY0X01BWCAoaXJxcyBvbikiKTsKKwlpbmZvLT53cml0ZV9jdGwo
+MCk7CisKIAlyZXBvcnQodGVzdF9jdmFsXzEwbXNlYyhpbmZvKSwgImxhdGVuY3kgd2l0aGluIDEw
+IG1zIik7CiAJcmVwb3J0KGluZm8tPmlycV9yZWNlaXZlZCwgImludGVycnVwdCByZWNlaXZlZCIp
+OwogCi0tIAoyLjIwLjEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
+dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
