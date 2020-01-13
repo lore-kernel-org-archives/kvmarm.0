@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28316C33CAD
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 13:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B79C33CAF
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 13:01:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D2BAA2080D
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 13:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1083A207FF
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 13:01:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MtXWPV4U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2BAA2080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ifHeLtqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1083A207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC0E4AF14;
-	Mon, 13 Jan 2020 08:00:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99B274AF05;
+	Mon, 13 Jan 2020 08:01:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id muyo6nB4EjAR; Mon, 13 Jan 2020 08:00:58 -0500 (EST)
+	with ESMTP id JpkLvBmVNCS7; Mon, 13 Jan 2020 08:00:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 684B04AF20;
-	Mon, 13 Jan 2020 08:00:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29B0E4AF10;
+	Mon, 13 Jan 2020 08:00:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6ED4AEE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 08:00:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF4514AEFB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 08:00:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4WzdRNwRdCDZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jan 2020 08:00:56 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45FEA4AEFB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 08:00:55 -0500 (EST)
+ with ESMTP id kGZOfH0XBLCX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jan 2020 08:00:53 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D338E4AEFC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 08:00:53 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578920454;
+ s=mimecast20190719; t=1578920453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wP6Y3rc1foY9/KBm0PlaD6Mr4Cp4jAYaI3HOzXM8Vu8=;
- b=MtXWPV4Uc2r+wJ4z5g6H5LG870wEX29IbTs9Tj5JNdQ4HB/LeqGBe6e7uQ7TxF80QX/I9A
- a0pxsAiCw6xyzh2Txuv3xo8NX5WwounuBROX2P31XlYOg+Eyd9iEhTef0ySH6rtTD39cpM
- 9t7I4P9DxvVcGe8IVPX7Ce3V9Y4kxE4=
+ bh=iYCjGxzJCWEwpMFHkJ6WPIm1RckrAtr3ks7PkFNvEmw=;
+ b=ifHeLtqzfwG0BqXxGIPhZCFZKm5a12+GdSZR36t7h/k/CYgPAXnqk2ro/GBuEAjCAKSRvF
+ EwEFsdbhrPkOwVYZ7yt8/l+p3QolOctGOL3nZGRPA8WqqI4Y0TrWQbMvnfpmefGxtpH0EO
+ skuvco4GKEuemXPdscLfAg9dRoEWmlc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-1Ie-Gl7oMneANM1awoS6AA-1; Mon, 13 Jan 2020 08:00:51 -0500
-X-MC-Unique: 1Ie-Gl7oMneANM1awoS6AA-1
+ us-mta-243-bjXci8QmO6ms46qwsLSVNQ-1; Mon, 13 Jan 2020 08:00:50 -0500
+X-MC-Unique: bjXci8QmO6ms46qwsLSVNQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DBA2108BC8F;
- Mon, 13 Jan 2020 13:00:50 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 16D64811E1;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5C408024E1;
  Mon, 13 Jan 2020 13:00:48 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B3C380F5F;
+ Mon, 13 Jan 2020 13:00:47 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvm-unit-tests 3/3] arm/arm64: selftest: Add prefetch abort
- test
-Date: Mon, 13 Jan 2020 14:00:43 +0100
-Message-Id: <20200113130043.30851-4-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests 2/3] arm/arm64: selftest: Allow test_exception
+ clobber list to be extended
+Date: Mon, 13 Jan 2020 14:00:42 +0100
+Message-Id: <20200113130043.30851-3-drjones@redhat.com>
 In-Reply-To: <20200113130043.30851-1-drjones@redhat.com>
 References: <20200113130043.30851-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -91,173 +91,161 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When a guest tries to execute code from an invalid physical address
-KVM should inject an external abort. This test is based on a test
-originally posted by Alexandru Elisei. This version avoids hard
-coding the invalid physical address used.
+test_exception() callers may need to extend the clobber list. Also
+there's no reason for the callers to need to assume that R0 and R1
+are already in the list.
 
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/selftest.c      | 94 +++++++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/esr.h |  3 ++
- 2 files changed, 97 insertions(+)
+ arm/selftest.c | 105 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 51 insertions(+), 54 deletions(-)
 
 diff --git a/arm/selftest.c b/arm/selftest.c
-index 6d74fa1fa4c4..4495b161cdd5 100644
+index 89759cf9f592..6d74fa1fa4c4 100644
 --- a/arm/selftest.c
 +++ b/arm/selftest.c
-@@ -8,6 +8,7 @@
- #include <libcflat.h>
- #include <util.h>
- #include <devicetree.h>
-+#include <vmalloc.h>
- #include <asm/setup.h>
- #include <asm/ptrace.h>
- #include <asm/asm-offsets.h>
-@@ -15,6 +16,7 @@
- #include <asm/thread_info.h>
- #include <asm/psci.h>
- #include <asm/smp.h>
-+#include <asm/mmu.h>
- #include <asm/barrier.h>
+@@ -74,24 +74,22 @@ static bool svc_works;
+  * that causes an exception. The test handler will check that its
+  * capture of the current register state matches the capture done
+  * here.
+- *
+- * NOTE: update clobber list if passed insns needs more than r0,r1
+  */
+-#define test_exception(pre_insns, excptn_insn, post_insns)	\
+-	asm volatile(						\
+-		pre_insns "\n"					\
+-		"mov	r0, %0\n"				\
+-		"stmia	r0, { r0-lr }\n"			\
+-		"mrs	r1, cpsr\n"				\
+-		"str	r1, [r0, #" xstr(S_PSR) "]\n"		\
+-		"mov	r1, #-1\n"				\
+-		"str	r1, [r0, #" xstr(S_OLD_R0) "]\n"	\
+-		"add	r1, pc, #8\n"				\
+-		"str	r1, [r0, #" xstr(S_R1) "]\n"		\
+-		"str	r1, [r0, #" xstr(S_PC) "]\n"		\
+-		excptn_insn "\n"				\
+-		post_insns "\n"					\
+-	:: "r" (&expected_regs) : "r0", "r1")
++#define test_exception(pre_insns, excptn_insn, post_insns, clobbers...)	\
++	asm volatile(							\
++		pre_insns "\n"						\
++		"mov	r0, %0\n"					\
++		"stmia	r0, { r0-lr }\n"				\
++		"mrs	r1, cpsr\n"					\
++		"str	r1, [r0, #" xstr(S_PSR) "]\n"			\
++		"mov	r1, #-1\n"					\
++		"str	r1, [r0, #" xstr(S_OLD_R0) "]\n"		\
++		"add	r1, pc, #8\n"					\
++		"str	r1, [r0, #" xstr(S_R1) "]\n"			\
++		"str	r1, [r0, #" xstr(S_PC) "]\n"			\
++		excptn_insn "\n"					\
++		post_insns "\n"						\
++	:: "r" (&expected_regs) : "r0", "r1", ##clobbers)
  
- static cpumask_t ready, valid;
-@@ -65,9 +67,43 @@ static void check_setup(int argc, char **argv)
- 		report_abort("missing input");
- }
- 
-+unsigned long check_pabt_invalid_paddr;
-+static bool check_pabt_init(void)
-+{
-+	phys_addr_t highest_end = 0;
-+	unsigned long vaddr;
-+	struct mem_region *r;
-+
-+	/*
-+	 * We need a physical address that isn't backed by anything. Without
-+	 * fully parsing the device tree there's no way to be certain of any
-+	 * address, but an unknown address immediately following the highest
-+	 * memory region has a reasonable chance. This is because we can
-+	 * assume that that memory region could have been larger, if the user
-+	 * had configured more RAM, and therefore no MMIO region should be
-+	 * there.
-+	 */
-+	for (r = mem_regions; r->end; ++r) {
-+		if (r->flags & MR_F_IO)
-+			continue;
-+		if (r->end > highest_end)
-+			highest_end = PAGE_ALIGN(r->end);
-+	}
-+
-+	if (mem_region_get_flags(highest_end) != MR_F_UNKNOWN)
-+		return false;
-+
-+	vaddr = (unsigned long)vmap(highest_end, PAGE_SIZE);
-+	mmu_clear_user(current_thread_info()->pgtable, vaddr);
-+	check_pabt_invalid_paddr = vaddr;
-+
-+	return true;
-+}
-+
- static struct pt_regs expected_regs;
- static bool und_works;
- static bool svc_works;
-+static bool pabt_works;
- #if defined(__arm__)
- /*
-  * Capture the current register state and execute an instruction
-@@ -166,6 +202,30 @@ static bool check_svc(void)
- 	return svc_works;
- }
- 
-+static void pabt_handler(struct pt_regs *regs)
-+{
-+	expected_regs.ARM_lr = expected_regs.ARM_pc;
-+	expected_regs.ARM_pc = expected_regs.ARM_r9;
-+
-+	pabt_works = check_regs(regs);
-+
-+	regs->ARM_pc = regs->ARM_lr;
-+}
-+
-+static bool check_pabt(void)
-+{
-+	install_exception_handler(EXCPTN_PABT, pabt_handler);
-+
-+	test_exception("ldr	r9, =check_pabt_invalid_paddr\n"
-+		       "ldr	r9, [r9]\n",
-+		       "blx	r9\n",
-+		       "", "r9", "lr");
-+
-+	install_exception_handler(EXCPTN_PABT, NULL);
-+
-+	return pabt_works;
-+}
-+
- static void user_psci_system_off(struct pt_regs *regs)
+ static bool check_regs(struct pt_regs *regs)
  {
- 	__user_psci_system_off();
-@@ -285,6 +345,35 @@ static bool check_svc(void)
- 	return svc_works;
- }
+@@ -119,7 +117,7 @@ static bool check_und(void)
+ 	install_exception_handler(EXCPTN_UND, und_handler);
  
-+static void pabt_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	bool is_extabt = (esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT;
-+
-+	expected_regs.regs[30] = expected_regs.pc + 4;
-+	expected_regs.pc = expected_regs.regs[9];
-+
-+	pabt_works = check_regs(regs) && is_extabt;
-+
-+	regs->pc = regs->regs[30];
-+}
-+
-+static bool check_pabt(void)
-+{
-+	enum vector v = check_vector_prep();
-+
-+	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
-+
-+	test_exception("adrp	x9, check_pabt_invalid_paddr\n"
-+		       "add	x9, x9, :lo12:check_pabt_invalid_paddr\n"
-+		       "ldr	x9, [x9]\n",
-+		       "blr	x9\n",
-+		       "", "x9", "x30");
-+
-+	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, NULL);
-+
-+	return pabt_works;
-+}
-+
- static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
+ 	/* issue an instruction to a coprocessor we don't have */
+-	test_exception("", "mcr p2, 0, r0, c0, c0", "");
++	test_exception("", "mcr p2, 0, r0, c0, c0", "", "r0");
+ 
+ 	install_exception_handler(EXCPTN_UND, NULL);
+ 
+@@ -156,7 +154,8 @@ static bool check_svc(void)
+ 			"push	{ r0,lr }\n",
+ 			"svc	#123\n",
+ 			"pop	{ r0,lr }\n"
+-			"msr	spsr_cxsf, r0\n"
++			"msr	spsr_cxsf, r0\n",
++			"r0", "lr"
+ 		);
+ 	} else {
+ 		test_exception("", "svc #123", "");
+@@ -178,41 +177,39 @@ static void user_psci_system_off(struct pt_regs *regs)
+  * that causes an exception. The test handler will check that its
+  * capture of the current register state matches the capture done
+  * here.
+- *
+- * NOTE: update clobber list if passed insns needs more than x0,x1
+  */
+-#define test_exception(pre_insns, excptn_insn, post_insns)	\
+-	asm volatile(						\
+-		pre_insns "\n"					\
+-		"mov	x1, %0\n"				\
+-		"ldr	x0, [x1, #" xstr(S_PSTATE) "]\n"	\
+-		"mrs	x1, nzcv\n"				\
+-		"orr	w0, w0, w1\n"				\
+-		"mov	x1, %0\n"				\
+-		"str	w0, [x1, #" xstr(S_PSTATE) "]\n"	\
+-		"mov	x0, sp\n"				\
+-		"str	x0, [x1, #" xstr(S_SP) "]\n"		\
+-		"adr	x0, 1f\n"				\
+-		"str	x0, [x1, #" xstr(S_PC) "]\n"		\
+-		"stp	 x2,  x3, [x1,  #16]\n"			\
+-		"stp	 x4,  x5, [x1,  #32]\n"			\
+-		"stp	 x6,  x7, [x1,  #48]\n"			\
+-		"stp	 x8,  x9, [x1,  #64]\n"			\
+-		"stp	x10, x11, [x1,  #80]\n"			\
+-		"stp	x12, x13, [x1,  #96]\n"			\
+-		"stp	x14, x15, [x1, #112]\n"			\
+-		"stp	x16, x17, [x1, #128]\n"			\
+-		"stp	x18, x19, [x1, #144]\n"			\
+-		"stp	x20, x21, [x1, #160]\n"			\
+-		"stp	x22, x23, [x1, #176]\n"			\
+-		"stp	x24, x25, [x1, #192]\n"			\
+-		"stp	x26, x27, [x1, #208]\n"			\
+-		"stp	x28, x29, [x1, #224]\n"			\
+-		"str	x30, [x1, #" xstr(S_LR) "]\n"		\
+-		"stp	 x0,  x1, [x1]\n"			\
+-	"1:"	excptn_insn "\n"				\
+-		post_insns "\n"					\
+-	:: "r" (&expected_regs) : "x0", "x1")
++#define test_exception(pre_insns, excptn_insn, post_insns, clobbers...)	\
++	asm volatile(							\
++		pre_insns "\n"						\
++		"mov	x1, %0\n"					\
++		"ldr	x0, [x1, #" xstr(S_PSTATE) "]\n"		\
++		"mrs	x1, nzcv\n"					\
++		"orr	w0, w0, w1\n"					\
++		"mov	x1, %0\n"					\
++		"str	w0, [x1, #" xstr(S_PSTATE) "]\n"		\
++		"mov	x0, sp\n"					\
++		"str	x0, [x1, #" xstr(S_SP) "]\n"			\
++		"adr	x0, 1f\n"					\
++		"str	x0, [x1, #" xstr(S_PC) "]\n"			\
++		"stp	 x2,  x3, [x1,  #16]\n"				\
++		"stp	 x4,  x5, [x1,  #32]\n"				\
++		"stp	 x6,  x7, [x1,  #48]\n"				\
++		"stp	 x8,  x9, [x1,  #64]\n"				\
++		"stp	x10, x11, [x1,  #80]\n"				\
++		"stp	x12, x13, [x1,  #96]\n"				\
++		"stp	x14, x15, [x1, #112]\n"				\
++		"stp	x16, x17, [x1, #128]\n"				\
++		"stp	x18, x19, [x1, #144]\n"				\
++		"stp	x20, x21, [x1, #160]\n"				\
++		"stp	x22, x23, [x1, #176]\n"				\
++		"stp	x24, x25, [x1, #192]\n"				\
++		"stp	x26, x27, [x1, #208]\n"				\
++		"stp	x28, x29, [x1, #224]\n"				\
++		"str	x30, [x1, #" xstr(S_LR) "]\n"			\
++		"stp	 x0,  x1, [x1]\n"				\
++	"1:"	excptn_insn "\n"					\
++		post_insns "\n"						\
++	:: "r" (&expected_regs) : "x0", "x1", ##clobbers)
+ 
+ static bool check_regs(struct pt_regs *regs)
  {
- 	__user_psci_system_off();
-@@ -302,6 +391,11 @@ static void check_vectors(void *arg __unused)
- 		install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN,
- 					  user_psci_system_off);
- #endif
-+	} else {
-+		if (!check_pabt_init())
-+			report_skip("Couldn't guess an invalid physical address");
-+		else
-+			report(check_pabt(), "pabt");
- 	}
- 	exit(report_summary());
- }
-diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
-index 8e5af4d90767..8c351631b0a0 100644
---- a/lib/arm64/asm/esr.h
-+++ b/lib/arm64/asm/esr.h
-@@ -44,4 +44,7 @@
- #define ESR_EL1_EC_BKPT32	(0x38)
- #define ESR_EL1_EC_BRK64	(0x3C)
+@@ -260,7 +257,7 @@ static bool check_und(void)
+ 	install_exception_handler(v, ESR_EL1_EC_UNKNOWN, unknown_handler);
  
-+#define ESR_EL1_FSC_MASK	(0x3F)
-+#define ESR_EL1_FSC_EXTABT	(0x10)
-+
- #endif /* _ASMARM64_ESR_H_ */
+ 	/* try to read an el2 sysreg from el0/1 */
+-	test_exception("", "mrs x0, sctlr_el2", "");
++	test_exception("", "mrs x0, sctlr_el2", "", "x0");
+ 
+ 	install_exception_handler(v, ESR_EL1_EC_UNKNOWN, NULL);
+ 
 -- 
 2.21.1
 
