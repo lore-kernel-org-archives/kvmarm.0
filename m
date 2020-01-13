@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 729EFC3F68F
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E89C33CA9
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:46:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E3B1A20CC7
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C6F9214AF
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:46:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6kdelts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B1A20CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qvurka2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6F9214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23BBA4AE94;
-	Mon, 13 Jan 2020 13:41:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 822544AF1E;
+	Mon, 13 Jan 2020 13:46:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K+ONv9QOAxjL; Mon, 13 Jan 2020 13:41:10 -0500 (EST)
+	with ESMTP id Gx7d+dgVRAmg; Mon, 13 Jan 2020 13:46:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 151DD4AEE1;
-	Mon, 13 Jan 2020 13:41:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 119524AED7;
+	Mon, 13 Jan 2020 13:46:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CEEB4AE94
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:41:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D4D64AED3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:46:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SzlU4t-t0iXm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jan 2020 13:41:08 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D7314ACF4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:41:08 -0500 (EST)
+ with ESMTP id ooMCG8gXDqWl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jan 2020 13:46:01 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D32BC4ACF4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:46:01 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578940868;
+ s=mimecast20190719; t=1578941161;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=lzsvSn3vm+wBgNMJ8PeCKY2Pk4Acog14y15igrOXvYo=;
- b=d6kdeltsXvLjomuQzyokg6k14UrxjQmgfnPK3L7BjHh4UYhnM5F6UPbURpyodEqmL+dr9L
- bcJE2OsbLDjWeSCLmlt7COnyDdPtWw90kuHtLaSB8O3XcGGExteL5PbYkUObYhybHIUTT5
- ky1UxweChrNp+5V2Zz7Su/EQOTCvq+4=
+ bh=Q4ObEYBRxIr5fchCJoZYCDsLE6HuwS5q2rVELGd2+v8=;
+ b=Qvurka2NdniY5SezkqIhOQAkCeNqN5bWScV1OuKE7tE/5V8zYoD+X/Et+un8UXa8qlUBTE
+ +8PWWwKTVn25ngRGV8+I6saN6t234lCaVVt3/G3MmNr/FX87CilOEuM0NuLJB69AW0piED
+ 9DbfqdW+X64EUCS1F8PUdYLhzkCWHJk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-5paUai2PN46VI-a3bWSjqw-1; Mon, 13 Jan 2020 13:41:05 -0500
-X-MC-Unique: 5paUai2PN46VI-a3bWSjqw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-225-AyAcUEL0MdqFSFd0TkEsxw-1; Mon, 13 Jan 2020 13:45:56 -0500
+X-MC-Unique: AyAcUEL0MdqFSFd0TkEsxw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E10E9907607;
- Mon, 13 Jan 2020 18:41:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C1AF18557F1;
+ Mon, 13 Jan 2020 18:45:54 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3302A19C5B;
- Mon, 13 Jan 2020 18:40:57 +0000 (UTC)
-Date: Mon, 13 Jan 2020 19:40:55 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F031160BE2;
+ Mon, 13 Jan 2020 18:45:49 +0000 (UTC)
+Date: Mon, 13 Jan 2020 19:45:47 +0100
 From: Andrew Jones <drjones@redhat.com>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 14/16] arm/run: Allow Migration tests
-Message-ID: <20200113184055.tu3qqpsc72xqfw6t@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 16/16] arm/arm64: ITS: pending table
+ migration test
+Message-ID: <20200113184547.zqilrexm27hpkkou@kamzik.brq.redhat.com>
 References: <20200110145412.14937-1-eric.auger@redhat.com>
- <20200110145412.14937-15-eric.auger@redhat.com>
+ <20200110145412.14937-17-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200110145412.14937-15-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200110145412.14937-17-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
  kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
@@ -92,132 +92,240 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 10, 2020 at 03:54:10PM +0100, Eric Auger wrote:
-> Let's link getchar.o to use puts and getchar from the
-> tests.
-> 
-> Then allow tests belonging to the migration group to
-> trigger the migration from the test code by putting
-> "migrate" into the uart. Then the code can wait for the
-> migration completion by using getchar().
-> 
-> The __getchar implement is minimalist as it just reads the
-> data register. It is just meant to read the single character
-> emitted at the end of the migration by the runner script.
-> 
-> It is not meant to read more data (FIFOs are not enabled).
+On Fri, Jan 10, 2020 at 03:54:12PM +0100, Eric Auger wrote:
+> Add two new migration tests. One testing the migration of
+> a topology where collection were unmapped. The second test
+> checks the migration of the pending table.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  arm/Makefile.common |  2 +-
->  arm/run             |  2 +-
->  lib/arm/io.c        | 13 +++++++++++++
->  3 files changed, 15 insertions(+), 2 deletions(-)
+>  arm/gic.c         | 148 ++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  16 ++++-
+>  2 files changed, 163 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 7cc0f04..327f112 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -32,7 +32,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
->  asm-offsets = lib/$(ARCH)/asm-offsets.h
->  include $(SRCDIR)/scripts/asm-offsets.mak
->  
-> -cflatobjs += lib/util.o
-> +cflatobjs += lib/util.o lib/getchar.o
->  cflatobjs += lib/alloc_phys.o
->  cflatobjs += lib/alloc_page.o
->  cflatobjs += lib/vmalloc.o
-> diff --git a/arm/run b/arm/run
-> index 277db9b..a390ca5 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -61,6 +61,6 @@ fi
->  M+=",accel=$ACCEL"
->  command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
->  command+=" -display none -serial stdio -kernel"
-> -command="$(timeout_cmd) $command"
-> +command="$(migration_cmd) $(timeout_cmd) $command"
->  
->  run_qemu $command "$@"
-> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> index 99fd315..ed89e19 100644
-> --- a/lib/arm/io.c
-> +++ b/lib/arm/io.c
-> @@ -87,6 +87,19 @@ void puts(const char *s)
->  	spin_unlock(&uart_lock);
+> diff --git a/arm/gic.c b/arm/gic.c
+> index bf4b5ba..cb976c3 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -170,6 +170,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
+>  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
+>  	lpi_stats.observed.cpu_id = smp_processor_id();
+>  	lpi_stats.observed.lpi_id = irqnr;
+> +	acked[lpi_stats.observed.cpu_id]++;
+>  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
 >  }
 >  
-> +/*
-> + * Minimalist implementation for migration completion detection.
-> + * Needs to be improved for more advanced Rx cases
-
-Please add that QEMU supports reading a maximum of 16 characters in
-this minimal mode. We could even add a counter and then assert if
-we try to read 16 or more.
-
-> + */
-> +int __getchar(void)
-> +{
-> +	int ret;
-> +
-> +	ret = readb(uart0_base);
-> +	if (!ret)
-> +		return -1;
-> +	return ret;
-> +}
-
-What about taking the lock?
-
+> @@ -207,6 +208,18 @@ static void check_lpi_stats(void)
+>  	}
+>  }
 >  
+> +static void check_lpi_hits(int *expected)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < nr_cpus; i++) {
+> +		if (acked[i] != expected[i])
+> +			report(false, "expected %d LPIs on PE #%d, %d observed",
+> +			       expected[i], i, acked[i]);
+> +		}
+> +	report(true, "check LPI on all vcpus");
+> +}
+> +
+>  static void gicv2_ipi_send_self(void)
+>  {
+>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+> @@ -641,6 +654,18 @@ static int its_prerequisites(int nb_cpus)
+>  	return 0;
+>  }
+>  
+> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
+> +		    struct its_collection *col)
+> +{
+> +	if (!dev || !col)
+> +		report_abort("wrong device or collection");
+> +
+> +	its_send_mapti(dev, physid, eventid, col);
+> +
+> +	set_lpi_config(physid, LPI_PROP_DEFAULT);
+> +	its_send_invall(col);
+> +}
+> +
 >  /*
->   * Defining halt to take 'code' as an argument guarantees that it will
-> -- 
-> 2.20.1
-> 
+>   * Setup the configuration for those mappings:
+>   * dev_id=2 event=20 -> vcpu 3, intid=8195
+> @@ -765,6 +790,121 @@ static void test_its_migration(void)
+>  	check_lpi_stats();
+>  }
+>  
+> +static void test_migrate_unmapped_collection(void)
+> +{
+> +	struct its_collection *col;
+> +	struct its_device *dev2, *dev7;
+> +	u8 config;
+> +
+> +	if (its_setup1())
+> +		return;
+> +
+> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
+> +	dev2 = its_get_device(2);
+> +	dev7 = its_get_device(7);
+> +
+> +	/* MAPTI with the collection unmapped */
+> +	set_lpi(dev2, 0, 8192, col);
+> +
+> +	puts("Now migrate the VM, then press a key to continue...\n");
+> +	(void)getchar();
+> +	report(true, "Migration complete");
+> +
+> +	/* on the destination, map the collection */
+> +	its_send_mapc(col, true);
+> +
+> +	lpi_stats_expect(2, 8196);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats();
+> +
+> +	config = get_lpi_config(8192);
+> +	report(config == LPI_PROP_DEFAULT,
+> +	       "Config of LPI 8192 was properly migrated");
+> +
+> +	lpi_stats_expect(nr_cpus - 1, 8192);
+> +	its_send_int(dev2, 0);
+> +	check_lpi_stats();
+> +
+> +	/* unmap the collection */
+> +	its_send_mapc(col, false);
+> +
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 0);
+> +	check_lpi_stats();
+> +
+> +	/* remap event 0 onto lpiid 8193 */
+> +	set_lpi(dev2, 0, 8193, col);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 0);
+> +	check_lpi_stats();
+> +
+> +	/* remap the collection */
+> +	its_send_mapc(col, true);
+> +	lpi_stats_expect(nr_cpus - 1, 8193);
+> +}
+> +
+> +static void test_its_pending_migration(void)
+> +{
+> +	struct its_device *dev;
+> +	struct its_collection *collection[2];
+> +	int expected[NR_CPUS];
+> +	u64 pendbaser;
+> +	void *ptr;
+> +	int i;
+> +
+> +	if (its_prerequisites(4))
+> +		return;
+> +
+> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	its_send_mapd(dev, true);
+> +
+> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
+> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
+> +	its_send_mapc(collection[0], true);
+> +	its_send_mapc(collection[1], true);
+> +
+> +	/* disable lpi at redist level */
+> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, false);
+> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, false);
+> +
+> +	/* even lpis are assigned to even cpu */
+> +	for (i = 0; i < 256; i++) {
+> +		struct its_collection *col = i % 2 ? collection[0] :
+> +						     collection[1];
+> +		int vcpu = col->target_address >> 16;
+> +
+> +		its_send_mapti(dev, 8192 + i, i, col);
+> +		set_lpi_config(8192 + i, LPI_PROP_DEFAULT);
+> +		set_pending_table_bit(vcpu, 8192 + i, true);
+> +	}
+> +	its_send_invall(collection[0]);
+> +	its_send_invall(collection[1]);
+> +
+> +	/* Set the PTZ bit on each pendbaser */
+> +
+> +	expected[nr_cpus - 1] = 128;
+> +	expected[nr_cpus - 2] = 128;
+> +
+> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
+> +	pendbaser = readq(ptr);
+> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+> +
+> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
+> +	pendbaser = readq(ptr);
+> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+> +
+> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, true);
+> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, true);
+> +
+> +	puts("Now migrate the VM, then press a key to continue...\n");
+> +	(void)getchar();
+> +	report(true, "Migration complete");
+> +
+> +	mdelay(1000);
+> +
+> +	check_lpi_hits(expected);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	if (!gic_init()) {
+> @@ -803,6 +943,14 @@ int main(int argc, char **argv)
+>  		report_prefix_push(argv[1]);
+>  		test_its_migration();
+>  		report_prefix_pop();
+> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_pending_migration();
+> +		report_prefix_pop();
+> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
+> +		report_prefix_push(argv[1]);
+> +		test_migrate_unmapped_collection();
+> +		report_prefix_pop();
+>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
+>  		report_prefix_push(argv[1]);
+>  		test_its_introspection();
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 29e2efc..911f0b7 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -145,7 +145,21 @@ file = gic.flat
+>  smp = $MAX_SMP
+>  accel = kvm
+>  extra_params = -machine gic-version=3 -append 'its-migration'
+> -groups = its migration
+> +groups = migration
+> +
+> +[its-pending-migration]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +accel = kvm
+> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
+> +groups = migration
+> +
+> +[its-migrate-unmapped-collection]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +accel = kvm
+> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
+> +groups = migration
 
-What do you think of the __getchar below?
+Why drop the 'its' group?
 
 Thanks,
 drew
 
-
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index 99fd31560084..77beb331d6b2 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -79,6 +79,31 @@ void io_init(void)
- 	chr_testdev_init();
- }
- 
-+static int ____getchar(void)
-+{
-+	int c;
-+
-+	spin_lock(&uart_lock);
-+	c = readb(uart0_base);
-+	spin_unlock(&uart_lock);
-+
-+	return c ?: -1;
-+}
-+
-+int __getchar(void)
-+{
-+	static int count;
-+	int c;
-+
-+	if ((c = ____getchar()) != -1)
-+		++count;
-+
-+	/* Without special UART initialization we can only read 16 characters. */
-+	assert(count < 16);
-+
-+	return c;
-+}
-+
- void puts(const char *s)
- {
- 	spin_lock(&uart_lock);
+>  
+>  # Test PSCI emulation
+>  [psci]
+> -- 
+> 2.20.1
+> 
 
 _______________________________________________
 kvmarm mailing list
