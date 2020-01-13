@@ -1,72 +1,191 @@
-Return-Path: <SRS0=VUKM=3A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=vgt5=3C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F64C33CA3
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Jan 2020 07:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A929C33CAD
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 10:30:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7493E20842
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Jan 2020 07:33:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7493E20842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id EBC52207E0
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 10:30:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="0UxuehJJ";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="0UxuehJJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC52207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EACF14B08D;
-	Sat, 11 Jan 2020 02:33:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59EEA4AEFB;
+	Mon, 13 Jan 2020 05:30:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5B5kDjrRKqUe; Sat, 11 Jan 2020 02:33:25 -0500 (EST)
+	with ESMTP id QBagJ7p432eF; Mon, 13 Jan 2020 05:30:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 814D04B0B5;
-	Sat, 11 Jan 2020 02:33:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F61F4AEF9;
+	Mon, 13 Jan 2020 05:30:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2AD4B08D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jan 2020 02:33:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3344AEC9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 05:30:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0xE9DH1K3eUu for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Jan 2020 02:33:23 -0500 (EST)
-Received: from huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C3E34AFFB
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jan 2020 02:33:23 -0500 (EST)
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 85B55B68251585DA7E47;
- Sat, 11 Jan 2020 15:33:19 +0800 (CST)
-Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 11 Jan 2020 15:33:19 +0800
-Received: from [127.0.0.1] (10.173.221.248) by dggeme755-chm.china.huawei.com
- (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Sat, 11
- Jan 2020 15:33:18 +0800
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Support the VCPU preemption check
-To: Steven Price <steven.price@arm.com>, <linux-kernel@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <virtualization@lists.linux-foundation.org>
-References: <20191226135833.1052-1-yezengruan@huawei.com>
- <20191226135833.1052-7-yezengruan@huawei.com>
- <5a1f6745-2deb-253b-7022-f2725d8d40ba@arm.com>
-From: yezengruan <yezengruan@huawei.com>
-Message-ID: <f746a436-e8da-d263-c4b8-e5b73366d8e4@huawei.com>
-Date: Sat, 11 Jan 2020 15:33:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <5a1f6745-2deb-253b-7022-f2725d8d40ba@arm.com>
+ with ESMTP id jJGWrmMw1PXJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jan 2020 05:30:24 -0500 (EST)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+ (mail-eopbgr80052.outbound.protection.outlook.com [40.107.8.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 817914AECA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 05:30:24 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T0xmuY5jgnprKd5FS468llO7cLxmixChk8r2J3IVv1U=;
+ b=0UxuehJJPXPBzo93T9w+LI4dBfuXSOGofaeOtFBbYcXrgoX+6x/LJFRB7R9aUpWApaHp0HGub0XErdUZ+u2lNjUi8haN/ZNn5cqWIdKeAXXx9y0+mu9DCeTEZmhTdBy674DMUYW6LTbPsi8+7xSBpReiDPH8R5CR9YzRHUJzLf0=
+Received: from VI1PR08CA0098.eurprd08.prod.outlook.com (2603:10a6:800:d3::24)
+ by AM6PR08MB5064.eurprd08.prod.outlook.com (2603:10a6:20b:e6::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.13; Mon, 13 Jan
+ 2020 10:30:20 +0000
+Received: from AM5EUR03FT061.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e08::206) by VI1PR08CA0098.outlook.office365.com
+ (2603:10a6:800:d3::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.10 via Frontend
+ Transport; Mon, 13 Jan 2020 10:30:20 +0000
+Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; lists.cs.columbia.edu; dkim=pass (signature was
+ verified) header.d=armh.onmicrosoft.com;lists.cs.columbia.edu;
+ dmarc=bestguesspass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM5EUR03FT061.mail.protection.outlook.com (10.152.16.247) with
+ Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2602.11 via Frontend Transport; Mon, 13 Jan 2020 10:30:19 +0000
+Received: ("Tessian outbound 1da651c29646:v40");
+ Mon, 13 Jan 2020 10:30:19 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from b5f5d1130c4c.2
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ 1BF7D65A-0CA4-4669-B57E-27485FDFBAA1.1; 
+ Mon, 13 Jan 2020 10:30:14 +0000
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id b5f5d1130c4c.2
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Mon, 13 Jan 2020 10:30:14 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W7WSnlkzINWY411QiuIUsZGP8kZBHxok1gYEU5lOW3hw4g7Jq4GkoNofh39lO5TTYx/Z5jNxpgA8dThEB+nMYvgXQO6EgbGSsADv0oBYBVFOahgmYg3KcX/PpV08zUFfNMkd3V+a9tMULgDNbLyvQAUaKCe2RLr1v/aPPThBqnsm5D4yzXduL0eKEN1IHkyg7qGcMjDCgn1Oiym+KwA4wSRHmH4gma2a1kO2omiey0dHd9rpkXsWRXnciLu1ozPzdqenjR8rxCRpk0SnH+MEMAt1AFKKeVnmtJz+EX9DTINoNZbK4W7dC1SMl4+fD7HMlfy4MlQdFXcmLbOd3ywV2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T0xmuY5jgnprKd5FS468llO7cLxmixChk8r2J3IVv1U=;
+ b=KHg/BzswW9NWm0jT82jaFCzmy0ORid54hS9LsN5rsJKspcViHY8sj55pOis/KihjTAAnwigMqqITBb0u9lnzP1AYKm2bh5nc812/NZavvcFpPI+lk3XZPPIEanz8K4DWzD46WOO1MRyXZKo4tJDC8qdwOsHaTnGVOu5ODhhS18JopvAdvZ3yAX2kAZfXUX7TVA3pZ6/yVbqXZxz1jWPoJyYph2VzQMtcTrIDg431hTqpzEkEE1oP9/vYxn5Ja2F8z0p/Uwur6J33JxIhT79ARe7F17Wz8QyKlNUGUjR77P+LybdJ7yqGTGku2rFosFrNzagEiMbTSYAyT+oGrT5GkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T0xmuY5jgnprKd5FS468llO7cLxmixChk8r2J3IVv1U=;
+ b=0UxuehJJPXPBzo93T9w+LI4dBfuXSOGofaeOtFBbYcXrgoX+6x/LJFRB7R9aUpWApaHp0HGub0XErdUZ+u2lNjUi8haN/ZNn5cqWIdKeAXXx9y0+mu9DCeTEZmhTdBy674DMUYW6LTbPsi8+7xSBpReiDPH8R5CR9YzRHUJzLf0=
+Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com (10.168.146.150) by
+ HE1PR0801MB1803.eurprd08.prod.outlook.com (10.168.148.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9; Mon, 13 Jan 2020 10:30:11 +0000
+Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com
+ ([fe80::49c0:e8df:b9be:724f]) by HE1PR0801MB1676.eurprd08.prod.outlook.com
+ ([fe80::49c0:e8df:b9be:724f%8]) with mapi id 15.20.2623.015; Mon, 13 Jan 2020
+ 10:30:11 +0000
+From: Jianyong Wu <Jianyong.Wu@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: RE: [RFC PATCH v9 6/8] psci: Add hvc call service for ptp_kvm.
+Thread-Topic: [RFC PATCH v9 6/8] psci: Add hvc call service for ptp_kvm.
+Thread-Index: AQHVrwuxR+1ZEaCriEa+CGCL3lP4K6ffGBkAgALhg9CAAEMegIABkMMAgAAdn4CABKu08A==
+Date: Mon, 13 Jan 2020 10:30:10 +0000
+Message-ID: <HE1PR0801MB167693BFB769ACEEA8A6B007F4350@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+References: <20191210034026.45229-1-jianyong.wu@arm.com>
+ <20191210034026.45229-7-jianyong.wu@arm.com>
+ <7383dc06897bba253f174cd21a19b5c0@kernel.org>
+ <HE1PR0801MB1676AB738138AB24E2158AD4F4390@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <099a26ffef5d554b88a5e33d7f2a6e3a@kernel.org>
+ <HE1PR0801MB16765B507D9B5A1A7827078BF4380@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <ca80d88f5e00937fca7ee80be8f5c962@kernel.org>
+In-Reply-To: <ca80d88f5e00937fca7ee80be8f5c962@kernel.org>
+Accept-Language: en-US
 Content-Language: en-US
-X-Originating-IP: [10.173.221.248]
-X-ClientProxiedBy: dggeme701-chm.china.huawei.com (10.1.199.97) To
- dggeme755-chm.china.huawei.com (10.3.19.101)
-X-CFilter-Loop: Reflected
-Cc: catalin.marinas@arm.com, daniel.lezcano@linaro.org, linux@armlinux.org.uk,
- maz@kernel.org, will@kernel.org
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: bc0b5312-7e18-4b28-ab46-9595b2dd3baf.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=Jianyong.Wu@arm.com; 
+x-originating-ip: [113.29.88.7]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fbf322de-788f-44a8-b039-08d7981396cc
+X-MS-TrafficTypeDiagnostic: HE1PR0801MB1803:|HE1PR0801MB1803:|AM6PR08MB5064:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5064E9E3570FBAFB5D33015AF4350@AM6PR08MB5064.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: True
+x-ms-oob-tlc-oobclassifiers: OLM:7691;OLM:7691;
+x-forefront-prvs: 028166BF91
+X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;
+ SFS:(10009020)(4636009)(39860400002)(376002)(346002)(136003)(366004)(396003)(189003)(199004)(2906002)(4001150100001)(71200400001)(6506007)(53546011)(55236004)(26005)(186003)(7696005)(7416002)(316002)(54906003)(8936002)(52536014)(8676002)(81166006)(5660300002)(81156014)(9686003)(76116006)(6916009)(66946007)(66556008)(64756008)(66446008)(66476007)(33656002)(4326008)(86362001)(55016002)(478600001);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:HE1PR0801MB1803;
+ H:HE1PR0801MB1676.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: arm.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: wi0aWHtQ7DZpbGp2BWNVFTUPe/ayMXn2cd0S/I7Sdn4c4GEpv/hAZQ/DH81Z9IeBlhkQEELSm58UtJaIY1eG5HyABpV1DtQyLq8qxZmw78t/yBNb32T/EUm3FhDYmQxAnApA6npoivUnrYHdUHJ+d22pQwgtqkWBUJJqo/zdkcsYUx+MfJ/XY+owqiE/CuoZPpTrZQP+7Fhh4Uvc0MR0ne+ZTUf1FuTJ1Xu9LAazjf+pX/R8lE01ju/zmseRor9fQPZkfke/l4iU8ngBJ0q/MPKcS75M4BoXLADWvjJGe1KrXjqArVVj5mU+xwR5LKMLiIbxlPT8eOOGj/5/KNpBbcUxeSwTIGzJWTe7fkmAwiq6U/KbKgxUodywhdJ6NCD3J+haFs5BbYNkn0Qu5Rdd93ys1qBx9mILS5NmbuIVxI8Kav+UePN677lqz5s+KTA3
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1803
+Original-Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Jianyong.Wu@arm.com; 
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT061.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123; IPV:CAL; SCL:-1; CTRY:IE;
+ EFV:NLI; SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(346002)(39860400002)(136003)(396003)(189003)(199004)(336012)(356004)(2906002)(26826003)(33656002)(4326008)(7696005)(4001150100001)(55016002)(478600001)(8676002)(53546011)(6506007)(6862004)(54906003)(81166006)(5660300002)(316002)(9686003)(81156014)(26005)(86362001)(36906005)(70206006)(8936002)(70586007)(52536014)(186003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:AM6PR08MB5064;
+ H:64aa7808-outbound-1.mta.getcheckrecipient.com; FPR:; SPF:Pass; LANG:en;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; MX:1; A:1; 
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 1c12a954-7519-4c88-2ce3-08d7981391ad
+X-Forefront-PRVS: 028166BF91
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xr8JCdOg84jysM/XKhhp7ZzGJEoqwK9Ld5box9S7TC4F/oKbfofGoaygya+fOolGLFuiQIeYh/SRTQK5X4FtHBGDhrkqxtfHlj15L+jahTS0iwzRfwNA3eOGLmZP2VGnDobJ2xsGPks71Y1yghyDRzhhmC6LqpZRMlUamJCU1HPF3W8cW/hcR11SIjrWlyh8XZ96vYCXvDu2Y3hEKMniQ0m3Pv7TeN7UzbP69xa22gfpZDVxtGpoj7A6djlS8/VqQ8CmgKeettOnzuGkdWiqU/JQx2rfOeF2Ai4mqtHrliPwxsgM7ZO7GgU1do5Y6LvSCOw883WWWCFQ3rqtf+XokJX0o8R3WSpv3Ky/7y1BANmAvHnG/ZRgtLN3CQv5qnp6acQwLoeXo/HjK3Bi0ljuyxsUPlorBsTI/76n0/LMPHgzHXYr6NTot8+5j0dYR3oM
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2020 10:30:19.6991 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbf322de-788f-44a8-b039-08d7981396cc
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5064
+Cc: Justin He <Justin.He@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ Steven Price <Steven.Price@arm.com>,
+ "john.stultz@linaro.org" <john.stultz@linaro.org>,
+ "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, nd <nd@arm.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,164 +197,237 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgU3RldmUsCgpPbiAyMDIwLzEvOSAyMzowOSwgU3RldmVuIFByaWNlIHdyb3RlOgo+IE9uIDI2
-LzEyLzIwMTkgMTM6NTgsIFplbmdydWFuIFllIHdyb3RlOgo+PiBTdXBwb3J0IHRoZSB2Y3B1X2lz
-X3ByZWVtcHRlZCgpIGZ1bmN0aW9uYWxpdHkgdW5kZXIgS1ZNL2FybTY0LiBUaGlzIHdpbGwKPj4g
-ZW5oYW5jZSBsb2NrIHBlcmZvcm1hbmNlIG9uIG92ZXJjb21taXR0ZWQgaG9zdHMgKG1vcmUgcnVu
-bmFibGUgVkNQVXMKPj4gdGhhbiBwaHlzaWNhbCBDUFVzIGluIHRoZSBzeXN0ZW0pIGFzIGRvaW5n
-IGJ1c3kgd2FpdHMgZm9yIHByZWVtcHRlZAo+PiBWQ1BVcyB3aWxsIGh1cnQgc3lzdGVtIHBlcmZv
-cm1hbmNlIGZhciB3b3JzZSB0aGFuIGVhcmx5IHlpZWxkaW5nLgo+Pgo+PiB1bml4IGJlbmNobWFy
-ayByZXN1bHQ6Cj4+IMKgwqAgaG9zdDrCoCBrZXJuZWwgNS41LjAtcmMxLCBIaVNpbGljb24gS3Vu
-cGVuZzkyMCwgOCBDUFVzCj4+IMKgwqAgZ3Vlc3Q6IGtlcm5lbCA1LjUuMC1yYzEsIDE2IFZDUFVz
-Cj4+Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB0ZXN0LWNhc2XCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoCBhZnRlci1wYXRjaMKgwqDCoCB8wqDCoCBiZWZv
-cmUtcGF0Y2gKPj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0t
-LS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLQo+PiDCoCBEaHJ5c3RvbmUgMiB1c2lu
-ZyByZWdpc3RlciB2YXJpYWJsZXPCoMKgIHwgMzM0NjAwNzUxLjAgbHBzwqDCoCB8IDMzNTMxOTAy
-OC4zIGxwcwo+PiDCoCBEb3VibGUtUHJlY2lzaW9uIFdoZXRzdG9uZcKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCB8wqDCoMKgwqAgMzI4NTYuMSBNV0lQUyB8wqDCoMKgwqAgMzI4NDkuNiBNV0lQUwo+
-PiDCoCBFeGVjbCBUaHJvdWdocHV0wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgfMKgwqDCoMKgwqAgMzY2Mi4xIGxwc8KgwqAgfMKgwqDCoMKgwqAgMjcxOC4wIGxw
-cwo+PiDCoCBGaWxlIENvcHkgMTAyNCBidWZzaXplIDIwMDAgbWF4YmxvY2tzwqAgfMKgwqDCoCA0
-MzI5MDYuNCBLQnBzwqAgfMKgwqDCoCAxNTgwMTEuOCBLQnBzCj4+IMKgIEZpbGUgQ29weSAyNTYg
-YnVmc2l6ZSA1MDAgbWF4YmxvY2tzwqDCoMKgIHzCoMKgwqAgMTE2MDIzLjAgS0Jwc8KgIHzCoMKg
-wqDCoCAzNzY2NC4wIEtCcHMKPj4gwqAgRmlsZSBDb3B5IDQwOTYgYnVmc2l6ZSA4MDAwIG1heGJs
-b2Nrc8KgIHzCoMKgIDE0MzI3NjkuOCBLQnBzwqAgfMKgwqDCoCA0NDExMDguOCBLQnBzCj4+IMKg
-IFBpcGUgVGhyb3VnaHB1dMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgfMKgwqAgNjQwNTAyOS42IGxwc8KgwqAgfMKgwqAgNjAyMTQ1Ny42IGxwcwo+PiDCoCBQ
-aXBlLWJhc2VkIENvbnRleHQgU3dpdGNoaW5nwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoCAx
-ODU4NzIuNyBscHPCoMKgIHzCoMKgwqAgMTg0MjU1LjMgbHBzCj4+IMKgIFByb2Nlc3MgQ3JlYXRp
-b27CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDC
-oCA0MDI1LjcgbHBzwqDCoCB8wqDCoMKgwqDCoCAzNzA2LjYgbHBzCj4+IMKgIFNoZWxsIFNjcmlw
-dHMgKDEgY29uY3VycmVudCnCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoCA2NzQ1LjYg
-bHBtwqDCoCB8wqDCoMKgwqDCoCA2NDM2LjEgbHBtCj4+IMKgIFNoZWxsIFNjcmlwdHMgKDggY29u
-Y3VycmVudCnCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgIDk5OC43IGxwbcKgwqAg
-fMKgwqDCoMKgwqDCoCA5MzEuMSBscG0KPj4gwqAgU3lzdGVtIENhbGwgT3ZlcmhlYWTCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqAgMzkxMzM2My4xIGxwc8KgwqAgfMKg
-wqAgMzg4MzI4Ny44IGxwcwo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tCj4+IMKgIFN5c3RlbSBC
-ZW5jaG1hcmtzIEluZGV4IFNjb3JlwqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgIDE4MzUu
-McKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoCAxMzI3LjYKPj4KPj4gU2lnbmVkLW9mZi1ieTogWmVu
-Z3J1YW4gWWUgPHllemVuZ3J1YW5AaHVhd2VpLmNvbT4KPj4gLS0tCj4+IMKgIGFyY2gvYXJtNjQv
-aW5jbHVkZS9hc20vcGFyYXZpcnQuaCB8wqDCoCAzICsKPj4gwqAgYXJjaC9hcm02NC9rZXJuZWwv
-cGFyYXZpcnQuY8KgwqDCoMKgwqAgfCAxMTcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Cj4+IMKgIGFyY2gvYXJtNjQva2VybmVsL3NldHVwLmPCoMKgwqDCoMKgwqDCoMKgIHzCoMKgIDIg
-Kwo+PiDCoCBpbmNsdWRlL2xpbnV4L2NwdWhvdHBsdWcuaMKgwqDCoMKgwqDCoMKgIHzCoMKgIDEg
-Kwo+PiDCoCA0IGZpbGVzIGNoYW5nZWQsIDEyMyBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1n
-aXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3BhcmF2aXJ0LmggYi9hcmNoL2FybTY0L2luY2x1
-ZGUvYXNtL3BhcmF2aXJ0LmgKPj4gaW5kZXggN2IxYzgxYjU0NGJiLi5jYTNhMmM3ODgxZjMgMTAw
-NjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vcGFyYXZpcnQuaAo+PiArKysgYi9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL3BhcmF2aXJ0LmgKPj4gQEAgLTI5LDYgKzI5LDggQEAgc3Rh
-dGljIGlubGluZSB1NjQgcGFyYXZpcnRfc3RlYWxfY2xvY2soaW50IGNwdSkKPj4gwqAgwqAgaW50
-IF9faW5pdCBwdl90aW1lX2luaXQodm9pZCk7Cj4+IMKgICtpbnQgX19pbml0IHB2X2xvY2tfaW5p
-dCh2b2lkKTsKPj4gKwo+PiDCoCBfX3Zpc2libGUgYm9vbCBfX25hdGl2ZV92Y3B1X2lzX3ByZWVt
-cHRlZChpbnQgY3B1KTsKPj4gwqAgwqAgc3RhdGljIGlubGluZSBib29sIHB2X3ZjcHVfaXNfcHJl
-ZW1wdGVkKGludCBjcHUpCj4+IEBAIC0zOSw2ICs0MSw3IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBw
-dl92Y3B1X2lzX3ByZWVtcHRlZChpbnQgY3B1KQo+PiDCoCAjZWxzZQo+PiDCoCDCoCAjZGVmaW5l
-IHB2X3RpbWVfaW5pdCgpIGRvIHt9IHdoaWxlICgwKQo+PiArI2RlZmluZSBwdl9sb2NrX2luaXQo
-KSBkbyB7fSB3aGlsZSAoMCkKPj4gwqAgwqAgI2VuZGlmIC8vIENPTkZJR19QQVJBVklSVAo+PiDC
-oCBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvcGFyYXZpcnQuYyBiL2FyY2gvYXJtNjQv
-a2VybmVsL3BhcmF2aXJ0LmMKPj4gaW5kZXggZDhmMWJhOGMyMmNlLi5iZDJhZDZhMTdhMjYgMTAw
-NjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL3BhcmF2aXJ0LmMKPj4gKysrIGIvYXJjaC9h
-cm02NC9rZXJuZWwvcGFyYXZpcnQuYwo+PiBAQCAtMjIsNiArMjIsNyBAQAo+PiDCoCAjaW5jbHVk
-ZSA8YXNtL3BhcmF2aXJ0Lmg+Cj4+IMKgICNpbmNsdWRlIDxhc20vcHZjbG9jay1hYmkuaD4KPj4g
-wqAgI2luY2x1ZGUgPGFzbS9zbXBfcGxhdC5oPgo+PiArI2luY2x1ZGUgPGFzbS9wdmxvY2stYWJp
-Lmg+Cj4+IMKgIMKgIHN0cnVjdCBzdGF0aWNfa2V5IHBhcmF2aXJ0X3N0ZWFsX2VuYWJsZWQ7Cj4+
-IMKgIHN0cnVjdCBzdGF0aWNfa2V5IHBhcmF2aXJ0X3N0ZWFsX3JxX2VuYWJsZWQ7Cj4+IEBAIC0z
-NSw2ICszNiwxMCBAQCBzdHJ1Y3QgcHZfdGltZV9zdG9sZW5fdGltZV9yZWdpb24gewo+PiDCoMKg
-wqDCoMKgIHN0cnVjdCBwdmNsb2NrX3ZjcHVfc3RvbGVuX3RpbWUgKmthZGRyOwo+PiDCoCB9Owo+
-PiDCoCArc3RydWN0IHB2X2xvY2tfc3RhdGVfcmVnaW9uIHsKPj4gK8KgwqDCoCBzdHJ1Y3QgcHZs
-b2NrX3ZjcHVfc3RhdGUgKmthZGRyOwo+PiArfTsKPj4gKwo+PiDCoCBzdGF0aWMgREVGSU5FX1BF
-Ul9DUFUoc3RydWN0IHB2X3RpbWVfc3RvbGVuX3RpbWVfcmVnaW9uLCBzdG9sZW5fdGltZV9yZWdp
-b24pOwo+PiDCoCDCoCBzdGF0aWMgYm9vbCBzdGVhbF9hY2MgPSB0cnVlOwo+PiBAQCAtMTU4LDMg
-KzE2MywxMTUgQEAgaW50IF9faW5pdCBwdl90aW1lX2luaXQodm9pZCkKPj4gwqAgwqDCoMKgwqDC
-oCByZXR1cm4gMDsKPj4gwqAgfQo+PiArCj4+ICtzdGF0aWMgREVGSU5FX1BFUl9DUFUoc3RydWN0
-IHB2X2xvY2tfc3RhdGVfcmVnaW9uLCBsb2NrX3N0YXRlX3JlZ2lvbik7Cj4+ICsKPj4gK3N0YXRp
-YyBib29sIGt2bV92Y3B1X2lzX3ByZWVtcHRlZChpbnQgY3B1KQo+PiArewo+PiArwqDCoMKgIHN0
-cnVjdCBwdl9sb2NrX3N0YXRlX3JlZ2lvbiAqcmVnOwo+PiArwqDCoMKgIF9fbGU2NCBwcmVlbXB0
-ZWRfbGU7Cj4+ICsKPj4gK8KgwqDCoCByZWcgPSBwZXJfY3B1X3B0cigmbG9ja19zdGF0ZV9yZWdp
-b24sIGNwdSk7Cj4+ICvCoMKgwqAgaWYgKCFyZWctPmthZGRyKSB7Cj4+ICvCoMKgwqDCoMKgwqDC
-oCBwcl93YXJuX29uY2UoIlBWIGxvY2sgZW5hYmxlZCBidXQgbm90IGNvbmZpZ3VyZWQgZm9yIGNw
-dSAlZFxuIiwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdSk7Cj4+ICvC
-oMKgwqDCoMKgwqDCoCByZXR1cm4gZmFsc2U7Cj4+ICvCoMKgwqAgfQo+PiArCj4+ICvCoMKgwqAg
-cHJlZW1wdGVkX2xlID0gbGU2NF90b19jcHUoUkVBRF9PTkNFKHJlZy0+a2FkZHItPnByZWVtcHRl
-ZCkpOwo+PiArCj4+ICvCoMKgwqAgcmV0dXJuICEhKHByZWVtcHRlZF9sZSAmIDEpOwo+IAo+IEFj
-Y29yZGluZyB0byB0aGUgZG9jdW1lbnRhdGlvbiBwcmVlbXB0ZWQgIT0gMCBtZWFucyBwcmVlbXB0
-ZWQsIGJ1dCBoZXJlIHlvdSBhcmUgY2hlY2tpbmcgdGhlIExTQi4gWW91IG5lZWQgdG8gYmUgY29u
-c2lzdGVudCBhYm91dCB0aGUgQUJJLgoKVGhhbmtzIGZvciBwb3N0aW5nIHRoaXMuIEknbGwgdXBk
-YXRlIHRoZSBjb2RlLgoKPiAKPj4gK30KPj4gKwo+PiArc3RhdGljIGludCBwdmxvY2tfdmNwdV9z
-dGF0ZV9keWluZ19jcHUodW5zaWduZWQgaW50IGNwdSkKPj4gK3sKPj4gK8KgwqDCoCBzdHJ1Y3Qg
-cHZfbG9ja19zdGF0ZV9yZWdpb24gKnJlZzsKPj4gKwo+PiArwqDCoMKgIHJlZyA9IHRoaXNfY3B1
-X3B0cigmbG9ja19zdGF0ZV9yZWdpb24pOwo+PiArwqDCoMKgIGlmICghcmVnLT5rYWRkcikKPj4g
-K8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+PiArCj4+ICvCoMKgwqAgbWVtdW5tYXAocmVnLT5r
-YWRkcik7Cj4+ICvCoMKgwqAgbWVtc2V0KHJlZywgMCwgc2l6ZW9mKCpyZWcpKTsKPj4gKwo+PiAr
-wqDCoMKgIHJldHVybiAwOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgaW50IGluaXRfcHZsb2NrX3Zj
-cHVfc3RhdGUodW5zaWduZWQgaW50IGNwdSkKPj4gK3sKPj4gK8KgwqDCoCBzdHJ1Y3QgcHZfbG9j
-a19zdGF0ZV9yZWdpb24gKnJlZzsKPj4gK8KgwqDCoCBzdHJ1Y3QgYXJtX3NtY2NjX3JlcyByZXM7
-Cj4+ICsKPj4gK8KgwqDCoCByZWcgPSB0aGlzX2NwdV9wdHIoJmxvY2tfc3RhdGVfcmVnaW9uKTsK
-Pj4gKwo+PiArwqDCoMKgIGFybV9zbWNjY18xXzFfaW52b2tlKEFSTV9TTUNDQ19IVl9QVl9MT0NL
-X1BSRUVNUFRFRCwgJnJlcyk7Cj4+ICsKPj4gK8KgwqDCoCBpZiAocmVzLmEwID09IFNNQ0NDX1JF
-VF9OT1RfU1VQUE9SVEVEKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBwcl93YXJuKCJGYWlsZWQgdG8g
-aW5pdCBQViBsb2NrIGRhdGEgc3RydWN0dXJlXG4iKTsKPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVy
-biAtRUlOVkFMOwo+PiArwqDCoMKgIH0KPj4gKwo+PiArwqDCoMKgIHJlZy0+a2FkZHIgPSBtZW1y
-ZW1hcChyZXMuYTAsCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNpemVv
-ZihzdHJ1Y3QgcHZsb2NrX3ZjcHVfc3RhdGUpLAo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBNRU1SRU1BUF9XQik7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoIXJlZy0+a2FkZHIp
-IHsKPj4gK8KgwqDCoMKgwqDCoMKgIHByX3dhcm4oIkZhaWxlZCB0byBtYXAgUFYgbG9jayBkYXRh
-IHN0cnVjdHVyZVxuIik7Cj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVOT01FTTsKPj4gK8Kg
-wqDCoCB9Cj4+ICsKPj4gK8KgwqDCoCByZXR1cm4gMDsKPj4gK30KPj4gKwo+PiArc3RhdGljIGlu
-dCBrdm1fYXJtX2luaXRfcHZsb2NrKHZvaWQpCj4+ICt7Cj4+ICvCoMKgwqAgaW50IHJldDsKPj4g
-Kwo+PiArwqDCoMKgIHJldCA9IGNwdWhwX3NldHVwX3N0YXRlKENQVUhQX0FQX0FSTV9LVk1fUFZM
-T0NLX1NUQVJUSU5HLAo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJoeXBlcnZp
-c29yL2FybS9wdmxvY2s6c3RhcnRpbmciLAo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIGluaXRfcHZsb2NrX3ZjcHVfc3RhdGUsCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgcHZsb2NrX3ZjcHVfc3RhdGVfZHlpbmdfY3B1KTsKPj4gK8KgwqDCoCBpZiAocmV0IDwg
-MCkgewo+PiArwqDCoMKgwqDCoMKgwqAgcHJfd2FybigiUFYtbG9jayBpbml0IGZhaWxlZFxuIik7
-Cj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Owo+PiArwqDCoMKgIH0KPj4gKwo+PiArwqDC
-oMKgIHJldHVybiAwOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgYm9vbCBoYXNfa3ZtX3B2bG9jayh2
-b2lkKQo+PiArewo+PiArwqDCoMKgIHN0cnVjdCBhcm1fc21jY2NfcmVzIHJlczsKPj4gKwo+PiAr
-wqDCoMKgIC8qIFRvIGRldGVjdCB0aGUgcHJlc2VuY2Ugb2YgUFYgbG9jayBzdXBwb3J0IHdlIHJl
-cXVpcmUgU01DQ0MgMS4xKyAqLwo+PiArwqDCoMKgIGlmIChwc2NpX29wcy5zbWNjY192ZXJzaW9u
-IDwgU01DQ0NfVkVSU0lPTl8xXzEpCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gZmFsc2U7Cj4+
-ICsKPj4gK8KgwqDCoCBhcm1fc21jY2NfMV8xX2ludm9rZShBUk1fU01DQ0NfQVJDSF9GRUFUVVJF
-U19GVU5DX0lELAo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQVJNX1NNQ0ND
-X0hWX1BWX0xPQ0tfRkVBVFVSRVMsICZyZXMpOwo+IAo+IEFzIG1lbnRpb25lZCBwcmV2aW91c2x5
-IHdlIGNvdWxkIGRvIHdpdGggc29tZXRoaW5nIG1vcmUgcm9idXN0IHRvIGNoZWNrIHRoYXQgdGhl
-IGh5cGVydmlzb3IgaXMgYWN0dWFsbHkgS1ZNIGJlZm9yZSBhc3N1bWluZyB0aGF0IHZlbmRvciBz
-cGVjaWZpYyBJRHMgYXJlIHZhbGlkLgoKV2lsbCB1cGRhdGUgbmV4dCB2ZXJzaW9uLgoKPiAKPiBT
-dGV2ZQo+IAo+PiArCj4+ICvCoMKgwqAgaWYgKHJlcy5hMCAhPSBTTUNDQ19SRVRfU1VDQ0VTUykK
-Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiBmYWxzZTsKPj4gKwo+PiArwqDCoMKgIHJldHVybiB0
-cnVlOwo+PiArfQo+PiArCj4+ICtpbnQgX19pbml0IHB2X2xvY2tfaW5pdCh2b2lkKQo+PiArewo+
-PiArwqDCoMKgIGludCByZXQ7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoaXNfaHlwX21vZGVfYXZhaWxh
-YmxlKCkpCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKPj4gKwo+PiArwqDCoMKgIGlmICgh
-aGFzX2t2bV9wdmxvY2soKSkKPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+PiArCj4+ICvC
-oMKgwqAgcmV0ID0ga3ZtX2FybV9pbml0X3B2bG9jaygpOwo+PiArwqDCoMKgIGlmIChyZXQpCj4+
-ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Owo+PiArCj4+ICvCoMKgwqAgcHZfb3BzLmxvY2su
-dmNwdV9pc19wcmVlbXB0ZWQgPSBrdm1fdmNwdV9pc19wcmVlbXB0ZWQ7Cj4+ICvCoMKgwqAgcHJf
-aW5mbygidXNpbmcgUFYtbG9jayBwcmVlbXB0ZWRcbiIpOwo+PiArCj4+ICvCoMKgwqAgcmV0dXJu
-IDA7Cj4+ICt9Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9zZXR1cC5jIGIvYXJj
-aC9hcm02NC9rZXJuZWwvc2V0dXAuYwo+PiBpbmRleCA1NmY2NjQ1NjE3NTQuLmFhM2E4YjllNzEw
-ZiAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvc2V0dXAuYwo+PiArKysgYi9hcmNo
-L2FybTY0L2tlcm5lbC9zZXR1cC5jCj4+IEBAIC0zNDEsNiArMzQxLDggQEAgdm9pZCBfX2luaXQg
-c2V0dXBfYXJjaChjaGFyICoqY21kbGluZV9wKQo+PiDCoMKgwqDCoMKgIHNtcF9pbml0X2NwdXMo
-KTsKPj4gwqDCoMKgwqDCoCBzbXBfYnVpbGRfbXBpZHJfaGFzaCgpOwo+PiDCoCArwqDCoMKgIHB2
-X2xvY2tfaW5pdCgpOwo+PiArCj4+IMKgwqDCoMKgwqAgLyogSW5pdCBwZXJjcHUgc2VlZHMgZm9y
-IHJhbmRvbSB0YWdzIGFmdGVyIGNwdXMgYXJlIHNldCB1cC4gKi8KPj4gwqDCoMKgwqDCoCBrYXNh
-bl9pbml0X3RhZ3MoKTsKPj4gwqAgZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvY3B1aG90cGx1
-Zy5oIGIvaW5jbHVkZS9saW51eC9jcHVob3RwbHVnLmgKPj4gaW5kZXggZTUxZWU3NzJiOWY1Li5m
-NzJmZjk1YWI2M2EgMTAwNjQ0Cj4+IC0tLSBhL2luY2x1ZGUvbGludXgvY3B1aG90cGx1Zy5oCj4+
-ICsrKyBiL2luY2x1ZGUvbGludXgvY3B1aG90cGx1Zy5oCj4+IEBAIC0xMzgsNiArMTM4LDcgQEAg
-ZW51bSBjcHVocF9zdGF0ZSB7Cj4+IMKgwqDCoMKgwqAgQ1BVSFBfQVBfRFVNTVlfVElNRVJfU1RB
-UlRJTkcsCj4+IMKgwqDCoMKgwqAgQ1BVSFBfQVBfQVJNX1hFTl9TVEFSVElORywKPj4gwqDCoMKg
-wqDCoCBDUFVIUF9BUF9BUk1fS1ZNUFZfU1RBUlRJTkcsCj4+ICvCoMKgwqAgQ1BVSFBfQVBfQVJN
-X0tWTV9QVkxPQ0tfU1RBUlRJTkcsCj4+IMKgwqDCoMKgwqAgQ1BVSFBfQVBfQVJNX0NPUkVTSUdI
-VF9TVEFSVElORywKPj4gwqDCoMKgwqDCoCBDUFVIUF9BUF9BUk02NF9JU05ERVBfU1RBUlRJTkcs
-Cj4+IMKgwqDCoMKgwqAgQ1BVSFBfQVBfU01QQ0ZEX0RZSU5HLAo+Pgo+IAo+IAo+IC4KClRoYW5r
-cywKClplbmdydWFuCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
-cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Marc,
+
+> -----Original Message-----
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Friday, January 10, 2020 6:56 PM
+> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
+> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; Steven Price
+> <Steven.Price@arm.com>; linux-kernel@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Kaly Xin
+> <Kaly.Xin@arm.com>; Justin He <Justin.He@arm.com>; nd <nd@arm.com>
+> Subject: Re: [RFC PATCH v9 6/8] psci: Add hvc call service for ptp_kvm.
+> 
+> On 2020-01-10 09:51, Jianyong Wu wrote:
+> > Hi Marc,
+> >
+> >> -----Original Message-----
+> >> From: Marc Zyngier <maz@kernel.org>
+> >> Sent: Thursday, January 9, 2020 5:16 PM
+> >> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> >> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com;
+> >> john.stultz@linaro.org; tglx@linutronix.de; pbonzini@redhat.com;
+> >> sean.j.christopherson@intel.com; richardcochran@gmail.com; Mark
+> >> Rutland <Mark.Rutland@arm.com>; will@kernel.org; Suzuki Poulose
+> >> <Suzuki.Poulose@arm.com>; Steven Price <Steven.Price@arm.com>;
+> >> linux-kernel@vger.kernel.org; linux-arm- kernel@lists.infradead.org;
+> >> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
+> >> <Steve.Capper@arm.com>; Kaly Xin <Kaly.Xin@arm.com>; Justin He
+> >> <Justin.He@arm.com>; nd <nd@arm.com>
+> >> Subject: Re: [RFC PATCH v9 6/8] psci: Add hvc call service for
+> >> ptp_kvm.
+> >>
+> >> On 2020-01-09 05:45, Jianyong Wu wrote:
+> >> > Hi Marc,
+> >> >
+> >> >> -----Original Message-----
+> >> >> From: Marc Zyngier <maz@kernel.org>
+> >> >> Sent: Tuesday, January 7, 2020 5:16 PM
+> >> >> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> >> >> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com;
+> >> >> john.stultz@linaro.org; tglx@linutronix.de; pbonzini@redhat.com;
+> >> >> sean.j.christopherson@intel.com; richardcochran@gmail.com; Mark
+> >> >> Rutland <Mark.Rutland@arm.com>; will@kernel.org; Suzuki Poulose
+> >> >> <Suzuki.Poulose@arm.com>; Steven Price <Steven.Price@arm.com>;
+> >> >> linux-kernel@vger.kernel.org; linux-arm-
+> >> >> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> >> >> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Kaly
+> Xin
+> >> >> <Kaly.Xin@arm.com>; Justin He <Justin.He@arm.com>; nd
+> <nd@arm.com>
+> >> >> Subject: Re: [RFC PATCH v9 6/8] psci: Add hvc call service for
+> >> >> ptp_kvm.
+> >> >>
+> >> >> On 2019-12-10 03:40, Jianyong Wu wrote:
+> >> >> > ptp_kvm modules will call hvc to get this service.
+> >> >> > The service offers real time and counter cycle of host for guest.
+> >> >> >
+> >> >> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> >> >> > ---
+> >> >> >  include/linux/arm-smccc.h | 12 ++++++++++++
+> >> >> >  virt/kvm/arm/psci.c       | 22 ++++++++++++++++++++++
+> >> >> >  2 files changed, 34 insertions(+)
+> >> >> >
+> >> >> > diff --git a/include/linux/arm-smccc.h
+> >> >> > b/include/linux/arm-smccc.h index 6f82c87308ed..aafb6bac167d
+> >> >> > 100644
+> >> >> > --- a/include/linux/arm-smccc.h
+> >> >> > +++ b/include/linux/arm-smccc.h
+> >> >> > @@ -94,6 +94,7 @@
+> >> >> >
+> >> >> >  /* KVM "vendor specific" services */
+> >> >> >  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> >> >> > +#define ARM_SMCCC_KVM_PTP			1
+> >> >> >  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+> >> >> >  #define ARM_SMCCC_KVM_NUM_FUNCS			128
+> >> >> >
+> >> >> > @@ -103,6 +104,17 @@
+> >> >> >  			   ARM_SMCCC_OWNER_VENDOR_HYP,
+> >> >> 		\
+> >> >> >  			   ARM_SMCCC_KVM_FUNC_FEATURES)
+> >> >> >
+> >> >> > +/*
+> >> >> > + * This ID used for virtual ptp kvm clock and it will pass
+> >> >> > +second
+> >> >> > value
+> >> >> > + * and nanosecond value of host real time and system counter by
+> >> >> > +vcpu
+> >> >> > + * register to guest.
+> >> >> > + */
+> >> >> > +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
+> >> >> 		\
+> >> >> > +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
+> >> >> 		\
+> >> >> > +			   ARM_SMCCC_SMC_32,
+> >> >> 	\
+> >> >> > +			   ARM_SMCCC_OWNER_VENDOR_HYP,
+> >> >> 		\
+> >> >> > +			   ARM_SMCCC_KVM_PTP)
+> >> >> > +
+> >> >>
+> >> >> All of this depends on patches that have never need posted to any
+> >> >> ML, and just linger in Will's tree. You need to pick them up and
+> >> >> post them as part of this series so that they can at least be reviewed.
+> >> >>
+> >> > Ok, I will add them next version.
+> >> >
+> >> >> >  #ifndef __ASSEMBLY__
+> >> >> >
+> >> >> >  #include <linux/linkage.h>
+> >> >> > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c index
+> >> >> > 0debf49bf259..682d892d6717 100644
+> >> >> > --- a/virt/kvm/arm/psci.c
+> >> >> > +++ b/virt/kvm/arm/psci.c
+> >> >> > @@ -9,6 +9,7 @@
+> >> >> >  #include <linux/kvm_host.h>
+> >> >> >  #include <linux/uaccess.h>
+> >> >> >  #include <linux/wait.h>
+> >> >> > +#include <linux/clocksource_ids.h>
+> >> >> >
+> >> >> >  #include <asm/cputype.h>
+> >> >> >  #include <asm/kvm_emulate.h>
+> >> >> > @@ -389,6 +390,8 @@ static int kvm_psci_call(struct kvm_vcpu
+> >> >> > *vcpu)
+> >> >> >
+> >> >> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)  {
+> >> >> > +	struct system_time_snapshot systime_snapshot;
+> >> >> > +	u64 cycles;
+> >> >> >  	u32 func_id = smccc_get_function(vcpu);
+> >> >> >  	u32 val[4] = {};
+> >> >> >  	u32 option;
+> >> >> > @@ -431,6 +434,25 @@ int kvm_hvc_call_handler(struct kvm_vcpu
+> >> *vcpu)
+> >> >> >  	case
+> ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> >> >> >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> >> >> >  		break;
+> >> >> > +	/*
+> >> >> > +	 * This will used for virtual ptp kvm clock. three
+> >> >> > +	 * values will be passed back.
+> >> >> > +	 * reg0 stores high 32-bit host ktime;
+> >> >> > +	 * reg1 stores low 32-bit host ktime;
+> >> >> > +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
+> >> >> > +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+> >> >>
+> >> >> That's either two or four values, and not three as you claim above.
+> >> >>
+> >> > Sorry, I'm not sure what do you mean "three", the registers here is
+> >> > 4 from reg0 to reg3.
+> >>
+> >> Please read the comment you have written above...
+> >
+> > oh, I see it.
+> >
+> >>
+> >> >> Also, I fail to understand the meaning of the host cycle vs
+> >> >> cntvoff comparison.
+> >> >> This is something that guest can perform on its own (it has access
+> >> >> to both physical and virtual timers, and can compute cntvoff
+> >> >> without intervention of the hypervisor).
+> >> >>
+> >> > To keep consistency and precision, clock time and counter cycle
+> >> > must captured at the same time. It will perform at ktime_get_snapshot.
+> >>
+> >> Fair enough. It would vertainly help if you documented it. It would
+> >> also help if you explained why it is so much worse to read the
+> >> counter in the guest before *and* after the call, and assume that the
+> >> clock time read happened right in the middle?
+> >>
+> > ok, I will give explain in comments.
+> >
+> >> That aside, what you are returning is something that *looks* like the
+> >> virtual counter. What if the guest is using the physical counter,
+> >> which is likely to be the case with nested virt? Do you expect the
+> >> guest to always use the virtual counter? This isn't going to fly.
+> >
+> > To be honest, I have little knowledge of nested virtualization for arm
+> > and I'm confused with that guest'guest will use physical counter.
+> 
+> Not the guest's guest (L2), but L1. Just look at what counter the KVM host
+> uses: that's the physical counter. Now imagine you run that host as a guest,
+> no other change.
+> 
+Ok,
+
+> > IMO, ptp_kvm will call hvc to trap to its hypervisor adjacent to it.
+> > So guest'guest will trap to hypervisor in guest and will get guest's
+> > counter cycle then calculate guest'guest's counter cycle by something
+> > like offset to sync time with it. So only if the guest's hypervisor
+> > can calculate the guest'guest's counter value, can ptp_kvm works.
+> 
+> Sure, but that's not the problem we're trying to solve. The issue is that of the
+> reference counter value you're including in the hypercall response.
+> It needs to be a value that makes sense to the guest, and so far you're
+> assuming virtual.
+>
+Get it.
+ 
+> NV breaks that assumtion, because the guest hypervisor is using the physical
+> counter. Also, let's not forget that the hypercall isn't Linux specific.
+> I can write my own non-Linux guest and still use this hypercall. Nothing in
+> there says that I can't use the physical counter if I want to.
+> 
+> So somehow, you need to convey the the hypervisor the notion of *which*
+> counter the guest uses.
+> 
+> Does it make sense? Or am I missing something?
+>
+I know what you say. Let me try to solve this problem.
+	Step 0, summary out all the conditions we should process, which will sever as branch condition.(now only normal virt and nested virt, I think) 
+	Step 1, figure out the set of reference counter value used by guest in all condition.
+	Step 2, determine which reference counter value will be used by guest in a certain condition in hypercall.
+In step 1, can we give the set only 2 elements that one is physical counter the other is virtual counter?
+For step 2, I have no idea for that now. can you give me some hint about it?
+
+Thanks
+Jianyong 
+ 
+> Thanks,
+> 
+>          M.
+> --
+> Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
