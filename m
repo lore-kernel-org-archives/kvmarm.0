@@ -2,80 +2,69 @@ Return-Path: <SRS0=vgt5=3C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E89C33CA9
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 380C7C33CA9
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:57:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1C6F9214AF
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:46:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2320214AF
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jan 2020 18:57:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qvurka2N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C6F9214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IX+5b6/z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2320214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 822544AF1E;
-	Mon, 13 Jan 2020 13:46:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B0DA4AEE3;
+	Mon, 13 Jan 2020 13:57:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Gx7d+dgVRAmg; Mon, 13 Jan 2020 13:46:04 -0500 (EST)
+	with ESMTP id z14pvCbLne5v; Mon, 13 Jan 2020 13:57:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 119524AED7;
-	Mon, 13 Jan 2020 13:46:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 017684AF0C;
+	Mon, 13 Jan 2020 13:57:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D4D64AED3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:46:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF46D4AED8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 06:13:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ooMCG8gXDqWl for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jan 2020 13:46:01 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D32BC4ACF4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 13:46:01 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578941161;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Q4ObEYBRxIr5fchCJoZYCDsLE6HuwS5q2rVELGd2+v8=;
- b=Qvurka2NdniY5SezkqIhOQAkCeNqN5bWScV1OuKE7tE/5V8zYoD+X/Et+un8UXa8qlUBTE
- +8PWWwKTVn25ngRGV8+I6saN6t234lCaVVt3/G3MmNr/FX87CilOEuM0NuLJB69AW0piED
- 9DbfqdW+X64EUCS1F8PUdYLhzkCWHJk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-AyAcUEL0MdqFSFd0TkEsxw-1; Mon, 13 Jan 2020 13:45:56 -0500
-X-MC-Unique: AyAcUEL0MdqFSFd0TkEsxw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id tgQ20lba-O3M for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jan 2020 06:13:31 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE40F4AEC4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jan 2020 06:13:31 -0500 (EST)
+Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C1AF18557F1;
- Mon, 13 Jan 2020 18:45:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F031160BE2;
- Mon, 13 Jan 2020 18:45:49 +0000 (UTC)
-Date: Mon, 13 Jan 2020 19:45:47 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 16/16] arm/arm64: ITS: pending table
- migration test
-Message-ID: <20200113184547.zqilrexm27hpkkou@kamzik.brq.redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
- <20200110145412.14937-17-eric.auger@redhat.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id 27F4B207E0;
+ Mon, 13 Jan 2020 11:13:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1578914010;
+ bh=2dNo0A03VcIFSZvSVz5n249R91p3bkLWCwPae+CNXW0=;
+ h=From:To:Cc:Subject:Date:From;
+ b=IX+5b6/zaFTN4DBWq29kUL2XqxChB0YlXW59APXI9VbSvWpxMI2golVWfmN/xTNmw
+ Gkv83m0zbhQ9eU2BPnGjQS2cDCExIFz4OeE/q2lCt70MQii1SemUn7XwSlV3Rr6HSs
+ gJ1ol+7k77BtPl5GR2FLBxueLQnjS+tB6XbfrcLg=
+From: Mike Rapoport <rppt@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v2 0/1] arm/arm64: add support for folded p4d page tables
+Date: Mon, 13 Jan 2020 13:13:22 +0200
+Message-Id: <20200113111323.10463-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200110145412.14937-17-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+X-Mailman-Approved-At: Mon, 13 Jan 2020 13:57:49 -0500
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ Mike Rapoport <rppt@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Mike Rapoport <rppt@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,240 +81,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 10, 2020 at 03:54:12PM +0100, Eric Auger wrote:
-> Add two new migration tests. One testing the migration of
-> a topology where collection were unmapped. The second test
-> checks the migration of the pending table.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/gic.c         | 148 ++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg |  16 ++++-
->  2 files changed, 163 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index bf4b5ba..cb976c3 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -170,6 +170,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
->  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
->  	lpi_stats.observed.cpu_id = smp_processor_id();
->  	lpi_stats.observed.lpi_id = irqnr;
-> +	acked[lpi_stats.observed.cpu_id]++;
->  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
->  }
->  
-> @@ -207,6 +208,18 @@ static void check_lpi_stats(void)
->  	}
->  }
->  
-> +static void check_lpi_hits(int *expected)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_cpus; i++) {
-> +		if (acked[i] != expected[i])
-> +			report(false, "expected %d LPIs on PE #%d, %d observed",
-> +			       expected[i], i, acked[i]);
-> +		}
-> +	report(true, "check LPI on all vcpus");
-> +}
-> +
->  static void gicv2_ipi_send_self(void)
->  {
->  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
-> @@ -641,6 +654,18 @@ static int its_prerequisites(int nb_cpus)
->  	return 0;
->  }
->  
-> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> +		    struct its_collection *col)
-> +{
-> +	if (!dev || !col)
-> +		report_abort("wrong device or collection");
-> +
-> +	its_send_mapti(dev, physid, eventid, col);
-> +
-> +	set_lpi_config(physid, LPI_PROP_DEFAULT);
-> +	its_send_invall(col);
-> +}
-> +
->  /*
->   * Setup the configuration for those mappings:
->   * dev_id=2 event=20 -> vcpu 3, intid=8195
-> @@ -765,6 +790,121 @@ static void test_its_migration(void)
->  	check_lpi_stats();
->  }
->  
-> +static void test_migrate_unmapped_collection(void)
-> +{
-> +	struct its_collection *col;
-> +	struct its_device *dev2, *dev7;
-> +	u8 config;
-> +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	/* MAPTI with the collection unmapped */
-> +	set_lpi(dev2, 0, 8192, col);
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report(true, "Migration complete");
-> +
-> +	/* on the destination, map the collection */
-> +	its_send_mapc(col, true);
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats();
-> +
-> +	config = get_lpi_config(8192);
-> +	report(config == LPI_PROP_DEFAULT,
-> +	       "Config of LPI 8192 was properly migrated");
-> +
-> +	lpi_stats_expect(nr_cpus - 1, 8192);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* unmap the collection */
-> +	its_send_mapc(col, false);
-> +
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* remap event 0 onto lpiid 8193 */
-> +	set_lpi(dev2, 0, 8193, col);
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats();
-> +
-> +	/* remap the collection */
-> +	its_send_mapc(col, true);
-> +	lpi_stats_expect(nr_cpus - 1, 8193);
-> +}
-> +
-> +static void test_its_pending_migration(void)
-> +{
-> +	struct its_device *dev;
-> +	struct its_collection *collection[2];
-> +	int expected[NR_CPUS];
-> +	u64 pendbaser;
-> +	void *ptr;
-> +	int i;
-> +
-> +	if (its_prerequisites(4))
-> +		return;
-> +
-> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	its_send_mapd(dev, true);
-> +
-> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
-> +	its_send_mapc(collection[0], true);
-> +	its_send_mapc(collection[1], true);
-> +
-> +	/* disable lpi at redist level */
-> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, false);
-> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, false);
-> +
-> +	/* even lpis are assigned to even cpu */
-> +	for (i = 0; i < 256; i++) {
-> +		struct its_collection *col = i % 2 ? collection[0] :
-> +						     collection[1];
-> +		int vcpu = col->target_address >> 16;
-> +
-> +		its_send_mapti(dev, 8192 + i, i, col);
-> +		set_lpi_config(8192 + i, LPI_PROP_DEFAULT);
-> +		set_pending_table_bit(vcpu, 8192 + i, true);
-> +	}
-> +	its_send_invall(collection[0]);
-> +	its_send_invall(collection[1]);
-> +
-> +	/* Set the PTZ bit on each pendbaser */
-> +
-> +	expected[nr_cpus - 1] = 128;
-> +	expected[nr_cpus - 2] = 128;
-> +
-> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	gicv3_rdist_ctrl_lpi(nr_cpus - 1, true);
-> +	gicv3_rdist_ctrl_lpi(nr_cpus - 2, true);
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report(true, "Migration complete");
-> +
-> +	mdelay(1000);
-> +
-> +	check_lpi_hits(expected);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->  	if (!gic_init()) {
-> @@ -803,6 +943,14 @@ int main(int argc, char **argv)
->  		report_prefix_push(argv[1]);
->  		test_its_migration();
->  		report_prefix_pop();
-> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
-> +		report_prefix_push(argv[1]);
-> +		test_its_pending_migration();
-> +		report_prefix_pop();
-> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-> +		report_prefix_push(argv[1]);
-> +		test_migrate_unmapped_collection();
-> +		report_prefix_pop();
->  	} else if (strcmp(argv[1], "its-introspection") == 0) {
->  		report_prefix_push(argv[1]);
->  		test_its_introspection();
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 29e2efc..911f0b7 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -145,7 +145,21 @@ file = gic.flat
->  smp = $MAX_SMP
->  accel = kvm
->  extra_params = -machine gic-version=3 -append 'its-migration'
-> -groups = its migration
-> +groups = migration
-> +
-> +[its-pending-migration]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +accel = kvm
-> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
-> +groups = migration
-> +
-> +[its-migrate-unmapped-collection]
-> +file = gic.flat
-> +smp = $MAX_SMP
-> +accel = kvm
-> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-> +groups = migration
+From: Mike Rapoport <rppt@linux.ibm.com>
 
-Why drop the 'its' group?
+Hi,
 
-Thanks,
-drew
+This is a part of clean up of the page table manipulation code that aims to
+remove asm-generic/5level-fixup.h and asm-generic/pgtable-nop4d-hack.h
 
->  
->  # Test PSCI emulation
->  [psci]
-> -- 
-> 2.20.1
-> 
+There is a single patch for both arm and arm64 because doing the conversion
+separately would mean breaking the shared mmu bits in virt/kvm/arm.
+
+v2:
+* fix build error for arch/arm64/mm/dump.c
+* simplify p4d unfolding in arch/arm64/mm/kasan_init.c
+
+Mike Rapoport (1):
+  arm/arm64: add support for folded p4d page tables
+
+ arch/arm/include/asm/kvm_mmu.h          |   5 +-
+ arch/arm/include/asm/pgtable.h          |   1 -
+ arch/arm/include/asm/stage2_pgtable.h   |  15 +-
+ arch/arm/lib/uaccess_with_memcpy.c      |   9 +-
+ arch/arm/mach-sa1100/assabet.c          |   2 +-
+ arch/arm/mm/dump.c                      |  29 +++-
+ arch/arm/mm/fault-armv.c                |   7 +-
+ arch/arm/mm/fault.c                     |  28 +++-
+ arch/arm/mm/idmap.c                     |   3 +-
+ arch/arm/mm/init.c                      |   2 +-
+ arch/arm/mm/ioremap.c                   |  12 +-
+ arch/arm/mm/mm.h                        |   2 +-
+ arch/arm/mm/mmu.c                       |  35 +++-
+ arch/arm/mm/pgd.c                       |  40 ++++-
+ arch/arm64/include/asm/kvm_mmu.h        |  10 +-
+ arch/arm64/include/asm/pgalloc.h        |  10 +-
+ arch/arm64/include/asm/pgtable-types.h  |   5 +-
+ arch/arm64/include/asm/pgtable.h        |  37 +++--
+ arch/arm64/include/asm/stage2_pgtable.h |  48 ++++--
+ arch/arm64/kernel/hibernate.c           |  46 +++++-
+ arch/arm64/mm/dump.c                    |  29 +++-
+ arch/arm64/mm/fault.c                   |   9 +-
+ arch/arm64/mm/hugetlbpage.c             |  15 +-
+ arch/arm64/mm/kasan_init.c              |  26 ++-
+ arch/arm64/mm/mmu.c                     |  52 ++++--
+ arch/arm64/mm/pageattr.c                |   7 +-
+ virt/kvm/arm/mmu.c                      | 209 ++++++++++++++++++++----
+ 27 files changed, 550 insertions(+), 143 deletions(-)
+
+-- 
+2.24.0
 
 _______________________________________________
 kvmarm mailing list
