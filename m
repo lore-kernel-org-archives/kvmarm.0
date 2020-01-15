@@ -2,86 +2,87 @@ Return-Path: <SRS0=diMM=3E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D29C33CB2
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jan 2020 14:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A448C33CB1
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jan 2020 14:14:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2ABC6222C3
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jan 2020 14:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA2022467C
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jan 2020 14:14:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQaWytZ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ABC6222C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IfVjmj7K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2022467C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C04294B12D;
-	Wed, 15 Jan 2020 09:03:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EBC54B13B;
+	Wed, 15 Jan 2020 09:14:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J3SsiA2YrCq8; Wed, 15 Jan 2020 09:03:34 -0500 (EST)
+	with ESMTP id 3wkqoCvtl4sG; Wed, 15 Jan 2020 09:14:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0F2E4B14F;
-	Wed, 15 Jan 2020 09:03:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E504B159;
+	Wed, 15 Jan 2020 09:14:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 133A04B119
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jan 2020 09:03:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61CFA4B141
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jan 2020 09:14:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BqqaG09sTZZU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jan 2020 09:03:28 -0500 (EST)
+ with ESMTP id atKk1m2KE+Ci for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jan 2020 09:14:13 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D691C4B118
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jan 2020 09:03:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DACC94B120
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jan 2020 09:14:12 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B82C5222C3;
- Wed, 15 Jan 2020 14:03:26 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B7CDC24679;
+ Wed, 15 Jan 2020 14:14:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1579097006;
- bh=JirmHW6SrM9Hhd8eR0okNq08LwBENG1og0f1buqr/1Y=;
+ s=default; t=1579097651;
+ bh=CaXoAkqOajL0kmg6h715f9PHn0XAZVLVKqsyXgOXacM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=fQaWytZ7KsNB89iwcVBDmdEt+rfMqlGGqtUg+R8Ieh2y8PCK5qUynF6pqnwoxIMbT
- kLYBAQ7i9EurH/JL1cvPviuEvCTxl9ZCL9wzODI8sLMvDUbVqUrdV4T4MV9MbsmmmR
- 9e1OyDH3nKRPFogqMEy0l+gAhzniSWMYDe4q+wQ0=
+ b=IfVjmj7KSiyixL26Y39CJZiiWPKnwpOP90yCrThZ4afM3dMYPowazyc4h9gC+j/q/
+ AW95yu14rcNeC/TEWOUi3I0du1tfRtRn00bWjyiSecTPMTfwJDnMJG09iFY87NdN1S
+ yZ3p6nWb+/NtCMwUmPpa43pUBiyDYqjj1Lq8ET1I=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1irjGW-0000US-UF; Wed, 15 Jan 2020 14:03:25 +0000
+ id 1irjQw-0000fF-2L; Wed, 15 Jan 2020 14:14:10 +0000
 MIME-Version: 1.0
-Date: Wed, 15 Jan 2020 14:03:24 +0000
+Date: Wed, 15 Jan 2020 14:14:10 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 10/18] arm64: KVM/debug: use EL1&0 stage 1 translation
- regime
-In-Reply-To: <20200113163138.GP42593@e119886-lin.cambridge.arm.com>
-References: <20191220143025.33853-1-andrew.murray@arm.com>
- <20191220143025.33853-11-andrew.murray@arm.com>
- <86d0cgir74.wl-maz@kernel.org>
- <20200113163138.GP42593@e119886-lin.cambridge.arm.com>
-Message-ID: <5f141f153ceec55b4428d9c2d2dd9064@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: VCPU preempted check support
+In-Reply-To: <20200113121240.GC3260@willie-the-truck>
+References: <20191226135833.1052-1-yezengruan@huawei.com>
+ <20200113121240.GC3260@willie-the-truck>
+Message-ID: <b1d23a82d6a7caa79a99597fb83472be@kernel.org>
 X-Sender: maz@kernel.org
 User-Agent: Roundcube Webmail/1.3.8
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, catalin.marinas@arm.com,
- will@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: will@kernel.org, yezengruan@huawei.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, james.morse@arm.com,
+ linux@armlinux.org.uk, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
+ catalin.marinas@arm.com, mark.rutland@arm.com, steven.price@arm.com,
+ daniel.lezcano@linaro.org, peterz@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+Cc: daniel.lezcano@linaro.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ peterz@infradead.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+ steven.price@arm.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,64 +100,103 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-01-13 16:31, Andrew Murray wrote:
-> On Sun, Dec 22, 2019 at 10:34:55AM +0000, Marc Zyngier wrote:
->> On Fri, 20 Dec 2019 14:30:17 +0000,
->> Andrew Murray <andrew.murray@arm.com> wrote:
->> >
->> > From: Sudeep Holla <sudeep.holla@arm.com>
->> >
->> > Now that we have all the save/restore mechanism in place, lets enable
->> > the translation regime used by buffer from EL2 stage 1 to EL1 stage 1
->> > on VHE systems.
->> >
->> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
->> > [ Reword commit, don't trap to EL2 ]
->> 
->> Not trapping to EL2 for the case where we don't allow SPE in the
->> guest is not acceptable.
->> 
->> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
->> > ---
->> >  arch/arm64/kvm/hyp/switch.c | 2 ++
->> >  1 file changed, 2 insertions(+)
->> >
->> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> > index 67b7c160f65b..6c153b79829b 100644
->> > --- a/arch/arm64/kvm/hyp/switch.c
->> > +++ b/arch/arm64/kvm/hyp/switch.c
->> > @@ -100,6 +100,7 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
->> >
->> >  	write_sysreg(val, cpacr_el1);
->> >
->> > +	write_sysreg(vcpu->arch.mdcr_el2 | 3 << MDCR_EL2_E2PB_SHIFT, mdcr_el2);
->> >  	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
->> >  }
->> >  NOKPROBE_SYMBOL(activate_traps_vhe);
->> > @@ -117,6 +118,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
->> >  		__activate_traps_fpsimd32(vcpu);
->> >  	}
->> >
->> > +	write_sysreg(vcpu->arch.mdcr_el2 | 3 << MDCR_EL2_E2PB_SHIFT, mdcr_el2);
->> 
->> There is a _MASK macro that can replace this '3', and is in keeping
->> with the rest of the code.
->> 
->> It still remains that it looks like the wrong place to do this, and
->> vcpu_load seems much better. Why should you write to mdcr_el2 on each
->> entry to the guest, since you know whether it has SPE enabled at the
->> point where it gets scheduled?
+On 2020-01-13 12:12, Will Deacon wrote:
+> [+PeterZ]
 > 
-> For nVHE, the only reason we'd want to change E2PB on entry/exit of 
-> guest
-> would be if the host is also using SPE. If the host is using SPE whilst
-> the vcpu is 'loaded' but we're not in the guest, then host SPE could 
-> raise
-> an interrupt - we need the E2PB bits to allow access from EL1 (host).
+> On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
+>> This patch set aims to support the vcpu_is_preempted() functionality
+>> under KVM/arm64, which allowing the guest to obtain the VCPU is
+>> currently running or not. This will enhance lock performance on
+>> overcommitted hosts (more runnable VCPUs than physical CPUs in the
+>> system) as doing busy waits for preempted VCPUs will hurt system
+>> performance far worse than early yielding.
+>> 
+>> We have observed some performace improvements in uninx benchmark 
+>> tests.
+>> 
+>> unix benchmark result:
+>>   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
+>>   guest: kernel 5.5.0-rc1, 16 VCPUs
+>> 
+>>                test-case                |    after-patch    |   
+>> before-patch
+>> ----------------------------------------+-------------------+------------------
+>>  Dhrystone 2 using register variables   | 334600751.0 lps   | 
+>> 335319028.3 lps
+>>  Double-Precision Whetstone             |     32856.1 MWIPS |     
+>> 32849.6 MWIPS
+>>  Execl Throughput                       |      3662.1 lps   |      
+>> 2718.0 lps
+>>  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    
+>> 158011.8 KBps
+>>  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     
+>> 37664.0 KBps
+>>  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    
+>> 441108.8 KBps
+>>  Pipe Throughput                        |   6405029.6 lps   |   
+>> 6021457.6 lps
+>>  Pipe-based Context Switching           |    185872.7 lps   |    
+>> 184255.3 lps
+>>  Process Creation                       |      4025.7 lps   |      
+>> 3706.6 lps
+>>  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      
+>> 6436.1 lpm
+>>  Shell Scripts (8 concurrent)           |       998.7 lpm   |       
+>> 931.1 lpm
+>>  System Call Overhead                   |   3913363.1 lps   |   
+>> 3883287.8 lps
+>> ----------------------------------------+-------------------+------------------
+>>  System Benchmarks Index Score          |      1835.1       |      
+>> 1327.6
+> 
+> Interesting, thanks for the numbers.
+> 
+> So it looks like there is a decent improvement to be had from targetted 
+> vCPU
+> wakeup, but I really dislike the explicit PV interface and it's already 
+> been
+> shown to interact badly with the WFE-based polling in 
+> smp_cond_load_*().
+> 
+> Rather than expose a divergent interface, I would instead like to 
+> explore an
+> improvement to smp_cond_load_*() and see how that performs before we 
+> commit
+> to something more intrusive. Marc and I looked at this very briefly in 
+> the
+> past, and the basic idea is to register all of the WFE sites with the
+> hypervisor, indicating which register contains the address being spun 
+> on
+> and which register contains the "bad" value. That way, you don't bother
+> rescheduling a vCPU if the value at the address is still bad, because 
+> you
+> know it will exit immediately.
+> 
+> Of course, the devil is in the details because when I say "address", 
+> that's
+> a guest virtual address, so you need to play some tricks in the 
+> hypervisor
+> so that you have a separate mapping for the lockword (it's enough to 
+> keep
+> track of the physical address).
+> 
+> Our hacks are here but we basically ran out of time to work on them 
+> beyond
+> an unoptimised and hacky prototype:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
+> 
+> Marc -- how would you prefer to handle this?
 
-My comment was of course for VHE. nVHE hardly makes use of load/put at 
-all,
-for obvious reasons.
+Let me try and rebase this thing to a modern kernel (I doubt it applies 
+without
+conflicts to mainline). We can then have discussion about its merit on 
+the list
+once I post it. It'd be good to have a pointer to the benchamrks that 
+have been
+used here.
+
+Thanks,
 
          M.
 -- 
