@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4A4C33CB8
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EE8C33CB7
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D1C6D2081E
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C6D2081E
+	by mail.kernel.org (Postfix) with ESMTP id 085E92081E
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085E92081E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C464B194;
-	Thu, 16 Jan 2020 07:47:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B55CF4B16B;
+	Thu, 16 Jan 2020 07:47:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0XqG7Oi-phe9; Thu, 16 Jan 2020 07:47:09 -0500 (EST)
+	with ESMTP id cjvQJmNOuBEE; Thu, 16 Jan 2020 07:47:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2224B1A5;
-	Thu, 16 Jan 2020 07:47:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AB2C4B198;
+	Thu, 16 Jan 2020 07:47:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1587E4B195
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:47:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED684B17F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:47:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K+QGs5FW-ne4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jan 2020 07:47:00 -0500 (EST)
+ with ESMTP id 9wEJIJsXkey6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jan 2020 07:47:05 -0500 (EST)
 Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C52184B156
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:46:59 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id C0D6D10B7A71FDDEFD05;
- Thu, 16 Jan 2020 20:46:54 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D1444B17C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:47:01 -0500 (EST)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id B4799E76B3DB9F8CD895;
+ Thu, 16 Jan 2020 20:46:59 +0800 (CST)
 Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 20:46:46 +0800
+ 14.3.439.0; Thu, 16 Jan 2020 20:46:51 +0800
 From: Zengruan Ye <yezengruan@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
  <linux-doc@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
-Subject: [PATCH v3 2/8] arm64: Probe for the presence of KVM hypervisor
- services during boot
-Date: Thu, 16 Jan 2020 20:46:20 +0800
-Message-ID: <20200116124626.1155-3-yezengruan@huawei.com>
+Subject: [PATCH v3 8/8] KVM: arm64: Support the vCPU preemption check
+Date: Thu, 16 Jan 2020 20:46:26 +0800
+Message-ID: <20200116124626.1155-9-yezengruan@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
 In-Reply-To: <20200116124626.1155-1-yezengruan@huawei.com>
 References: <20200116124626.1155-1-yezengruan@huawei.com>
@@ -74,158 +73,233 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Will Deacon <will@kernel.org>
+Support the vcpu_is_preempted() functionality under KVM/arm64. This will
+enhance lock performance on overcommitted hosts (more runnable vCPUs
+than physical CPUs in the system) as doing busy waits for preempted
+vCPUs will hurt system performance far worse than early yielding.
 
-Although the SMCCC specification provides some limited functionality for
-describing the presence of hypervisor and firmware services, this is
-generally applicable only to functions designated as "Arm Architecture
-Service Functions" and no portable discovery mechanism is provided for
-standard hypervisor services, despite having a designated range of
-function identifiers reserved by the specification.
+unix benchmark result:
+  host:  kernel 5.5.0-rc5, HiSilicon Kunpeng920, 8 CPUs
+  guest: kernel 5.5.0-rc5, 16 vCPUs
 
-In an attempt to avoid the need for additional firmware changes every
-time a new function is added, introduce a UID to identify the service
-provider as being compatible with KVM. Once this has been established,
-additional services can be discovered via a feature bitmap.
+               test-case                |    after-patch    |   before-patch
+----------------------------------------+-------------------+------------------
+ Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
+ Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
+ Execl Throughput                       |      3662.1 lps   |      2718.0 lps
+ File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
+ File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
+ File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
+ Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
+ Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
+ Process Creation                       |      4025.7 lps   |      3706.6 lps
+ Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
+ Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
+ System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
+----------------------------------------+-------------------+------------------
+ System Benchmarks Index Score          |      1835.1       |      1327.6
 
-Signed-off-by: Will Deacon <will@kernel.org>
-[yezengruan@huawei.com: rebased]
+Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
 ---
- arch/arm64/include/asm/hypervisor.h | 11 +++++++++
- arch/arm64/kernel/setup.c           | 35 +++++++++++++++++++++++++++++
- include/linux/arm-smccc.h           | 26 +++++++++++++++++++++
- 3 files changed, 72 insertions(+)
+ arch/arm64/include/asm/paravirt.h |   3 +
+ arch/arm64/kernel/paravirt.c      | 125 ++++++++++++++++++++++++++++++
+ arch/arm64/kernel/setup.c         |   2 +
+ include/linux/cpuhotplug.h        |   1 +
+ 4 files changed, 131 insertions(+)
 
-diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
-index f9cc1d021791..91e4bd890819 100644
---- a/arch/arm64/include/asm/hypervisor.h
-+++ b/arch/arm64/include/asm/hypervisor.h
-@@ -2,6 +2,17 @@
- #ifndef _ASM_ARM64_HYPERVISOR_H
- #define _ASM_ARM64_HYPERVISOR_H
+diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
+index 7b1c81b544bb..ca3a2c7881f3 100644
+--- a/arch/arm64/include/asm/paravirt.h
++++ b/arch/arm64/include/asm/paravirt.h
+@@ -29,6 +29,8 @@ static inline u64 paravirt_steal_clock(int cpu)
  
-+#include <linux/arm-smccc.h>
- #include <asm/xen/hypervisor.h>
+ int __init pv_time_init(void);
  
-+static inline bool kvm_arm_hyp_service_available(u32 func_id)
++int __init pv_lock_init(void);
++
+ __visible bool __native_vcpu_is_preempted(int cpu);
+ 
+ static inline bool pv_vcpu_is_preempted(int cpu)
+@@ -39,6 +41,7 @@ static inline bool pv_vcpu_is_preempted(int cpu)
+ #else
+ 
+ #define pv_time_init() do {} while (0)
++#define pv_lock_init() do {} while (0)
+ 
+ #endif // CONFIG_PARAVIRT
+ 
+diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+index d8f1ba8c22ce..39c6c35e59c6 100644
+--- a/arch/arm64/kernel/paravirt.c
++++ b/arch/arm64/kernel/paravirt.c
+@@ -22,6 +22,8 @@
+ #include <asm/paravirt.h>
+ #include <asm/pvclock-abi.h>
+ #include <asm/smp_plat.h>
++#include <asm/pvlock-abi.h>
++#include <asm/hypervisor.h>
+ 
+ struct static_key paravirt_steal_enabled;
+ struct static_key paravirt_steal_rq_enabled;
+@@ -35,6 +37,10 @@ struct pv_time_stolen_time_region {
+ 	struct pvclock_vcpu_stolen_time *kaddr;
+ };
+ 
++struct pv_lock_state_region {
++	struct pvlock_vcpu_state *kaddr;
++};
++
+ static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
+ 
+ static bool steal_acc = true;
+@@ -158,3 +164,122 @@ int __init pv_time_init(void)
+ 
+ 	return 0;
+ }
++
++static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
++
++static bool kvm_vcpu_is_preempted(int cpu)
 +{
-+	extern DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS);
++	struct pv_lock_state_region *reg;
++	__le64 preempted_le;
 +
-+	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
-+		return -EINVAL;
-+
-+	return test_bit(func_id, __kvm_arm_hyp_services);
-+}
-+
- #endif
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index 56f664561754..ad595c30ded0 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/acpi.h>
-+#include <linux/arm-smccc.h>
- #include <linux/export.h>
- #include <linux/kernel.h>
- #include <linux/stddef.h>
-@@ -275,6 +276,39 @@ static int __init reserve_memblock_reserved_regions(void)
- arch_initcall(reserve_memblock_reserved_regions);
- 
- u64 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID_HWID };
-+DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) = { };
-+
-+static void __init kvm_init_hyp_services(void)
-+{
-+	int i;
-+	struct arm_smccc_res res;
-+
-+	if (psci_ops.smccc_version == SMCCC_VERSION_1_0)
-+		return;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
-+	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
-+	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
-+	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
-+	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
-+		return;
-+
-+	memset(&res, 0, sizeof(res));
-+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
-+	for (i = 0; i < 32; ++i) {
-+		if (res.a0 & (i))
-+			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
-+		if (res.a1 & (i))
-+			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
-+		if (res.a2 & (i))
-+			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
-+		if (res.a3 & (i))
-+			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
++	reg = per_cpu_ptr(&lock_state_region, cpu);
++	if (!reg->kaddr) {
++		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
++			     cpu);
++		return false;
 +	}
 +
-+	pr_info("KVM hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
-+		res.a3, res.a2, res.a1, res.a0);
++	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
++
++	return !!preempted_le;
 +}
- 
- void __init setup_arch(char **cmdline_p)
- {
-@@ -337,6 +371,7 @@ void __init setup_arch(char **cmdline_p)
- 	else
- 		psci_acpi_init();
- 
-+	kvm_init_hyp_services();
- 	cpu_read_bootcpu_ops();
++
++static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
++{
++	struct pv_lock_state_region *reg;
++
++	reg = this_cpu_ptr(&lock_state_region);
++	if (!reg->kaddr)
++		return 0;
++
++	memunmap(reg->kaddr);
++	memset(reg, 0, sizeof(*reg));
++
++	return 0;
++}
++
++static int init_pvlock_vcpu_state(unsigned int cpu)
++{
++	struct pv_lock_state_region *reg;
++	struct arm_smccc_res res;
++
++	reg = this_cpu_ptr(&lock_state_region);
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID,
++			     KVM_PV_LOCK_PREEMPTED, &res);
++
++	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
++		pr_warn("Failed to init PV lock data structure\n");
++		return -EINVAL;
++	}
++
++	reg->kaddr = memremap(res.a0,
++			      sizeof(struct pvlock_vcpu_state),
++			      MEMREMAP_WB);
++
++	if (!reg->kaddr) {
++		pr_warn("Failed to map PV lock data structure\n");
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static int kvm_arm_init_pvlock(void)
++{
++	int ret;
++
++	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
++				"hypervisor/arm/pvlock:starting",
++				init_pvlock_vcpu_state,
++				pvlock_vcpu_state_dying_cpu);
++	if (ret < 0) {
++		pr_warn("PV lock init failed\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++static bool has_kvm_pvlock(void)
++{
++	struct arm_smccc_res res;
++
++	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
++	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
++		return false;
++
++	if (!kvm_arm_hyp_service_available(
++			ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID)) {
++		pr_warn("PV lock is not available\n");
++		return false;
++	}
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID,
++			     KVM_PV_LOCK_FEATURES, &res);
++
++	if (res.a0 != SMCCC_RET_SUCCESS)
++		return false;
++
++	return true;
++}
++
++int __init pv_lock_init(void)
++{
++	int ret;
++
++	if (is_hyp_mode_available())
++		return 0;
++
++	if (!has_kvm_pvlock())
++		return 0;
++
++	ret = kvm_arm_init_pvlock();
++	if (ret)
++		return ret;
++
++	pv_ops.lock.vcpu_is_preempted = kvm_vcpu_is_preempted;
++	pr_info("using PV lock preempted\n");
++
++	return 0;
++}
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index ad595c30ded0..b2a6c2a435ba 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -376,6 +376,8 @@ void __init setup_arch(char **cmdline_p)
  	smp_init_cpus();
  	smp_build_mpidr_hash();
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 59494df0f55b..2b2c295c9109 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -46,11 +46,14 @@
- #define ARM_SMCCC_OWNER_OEM		3
- #define ARM_SMCCC_OWNER_STANDARD	4
- #define ARM_SMCCC_OWNER_STANDARD_HYP	5
-+#define ARM_SMCCC_OWNER_VENDOR_HYP	6
- #define ARM_SMCCC_OWNER_TRUSTED_APP	48
- #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
- #define ARM_SMCCC_OWNER_TRUSTED_OS	50
- #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
  
-+#define ARM_SMCCC_FUNC_QUERY_CALL_UID	0xff01
++	pv_lock_init();
 +
- #define ARM_SMCCC_QUIRK_NONE		0
- #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+ 	/* Init percpu seeds for random tags after cpus are set up. */
+ 	kasan_init_tags();
  
-@@ -377,5 +380,28 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
- 			   0x21)
- 
-+#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
-+
-+/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
-+
-+/* KVM "vendor specific" services */
-+#define ARM_SMCCC_KVM_FUNC_FEATURES		0
-+#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-+#define ARM_SMCCC_KVM_NUM_FUNCS			128
-+
-+#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_FEATURES)
-+
- #endif /*__ASSEMBLY__*/
- #endif /*__LINUX_ARM_SMCCC_H*/
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index e51ee772b9f5..f72ff95ab63a 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -138,6 +138,7 @@ enum cpuhp_state {
+ 	CPUHP_AP_DUMMY_TIMER_STARTING,
+ 	CPUHP_AP_ARM_XEN_STARTING,
+ 	CPUHP_AP_ARM_KVMPV_STARTING,
++	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
+ 	CPUHP_AP_ARM_CORESIGHT_STARTING,
+ 	CPUHP_AP_ARM64_ISNDEP_STARTING,
+ 	CPUHP_AP_SMPCFD_DYING,
 -- 
 2.19.1
 
