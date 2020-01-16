@@ -2,55 +2,53 @@ Return-Path: <SRS0=uwID=3F=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE07C33CB6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C78A7C33CB3
 	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4048521582
+	by mail.kernel.org (Postfix) with ESMTP id 8BD4A217F4
 	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4048521582
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BD4A217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8004B16D;
-	Thu, 16 Jan 2020 07:47:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 214E34B19F;
+	Thu, 16 Jan 2020 07:47:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fsq2beHCNdmx; Thu, 16 Jan 2020 07:47:02 -0500 (EST)
+	with ESMTP id 0LvICurLxzZK; Thu, 16 Jan 2020 07:47:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD574B17A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2A2F4B180;
 	Thu, 16 Jan 2020 07:47:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D424B129
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B367B4B121
  for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:46:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dnkWS9jSeCsz for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Y4K8W9i2qB-I for <kvmarm@lists.cs.columbia.edu>;
  Thu, 16 Jan 2020 07:46:58 -0500 (EST)
 Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22AE94B121
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 216014B0F2
  for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:46:58 -0500 (EST)
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id B12F5C83404AD649F118;
+ by Forcepoint Email with ESMTP id 9C97F30E39BD4543FFB2;
  Thu, 16 Jan 2020 20:46:54 +0800 (CST)
 Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 20:46:45 +0800
+ 14.3.439.0; Thu, 16 Jan 2020 20:46:44 +0800
 From: Zengruan Ye <yezengruan@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
  <linux-doc@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
-Subject: [PATCH v3 1/8] KVM: arm64: Document PV-lock interface
-Date: Thu, 16 Jan 2020 20:46:19 +0800
-Message-ID: <20200116124626.1155-2-yezengruan@huawei.com>
+Subject: [PATCH v3 0/8] KVM: arm64: vCPU preempted check support
+Date: Thu, 16 Jan 2020 20:46:18 +0800
+Message-ID: <20200116124626.1155-1-yezengruan@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
-In-Reply-To: <20200116124626.1155-1-yezengruan@huawei.com>
-References: <20200116124626.1155-1-yezengruan@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.173.221.248]
 X-CFilter-Loop: Reflected
@@ -73,118 +71,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a paravirtualization interface for KVM/arm64 to obtain the vCPU
-that is currently running or not.
+This patch set aims to support the vcpu_is_preempted() functionality
+under KVM/arm64, which allowing the guest to obtain the vCPU is
+currently running or not. This will enhance lock performance on
+overcommitted hosts (more runnable vCPUs than physical CPUs in the
+system) as doing busy waits for preempted vCPUs will hurt system
+performance far worse than early yielding.
 
-The PV lock structure of the guest is allocated by user space.
+We have observed some performace improvements in uninx benchmark tests.
 
-A hypercall interface is provided for the guest to interrogate the
-hypervisor's support for this interface and the location of the shared
-memory structures.
+unix benchmark result:
+  host:  kernel 5.5.0-rc5, HiSilicon Kunpeng920, 8 CPUs
+  guest: kernel 5.5.0-rc5, 16 vCPUs
 
-Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
----
- Documentation/virt/kvm/arm/pvlock.rst   | 68 +++++++++++++++++++++++++
- Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
- 2 files changed, 82 insertions(+)
+               test-case                |    after-patch    |   before-patch
+----------------------------------------+-------------------+------------------
+ Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
+ Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
+ Execl Throughput                       |      3662.1 lps   |      2718.0 lps
+ File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
+ File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
+ File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
+ Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
+ Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
+ Process Creation                       |      4025.7 lps   |      3706.6 lps
+ Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
+ Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
+ System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
+----------------------------------------+-------------------+------------------
+ System Benchmarks Index Score          |      1835.1       |      1327.6
+
+Changes from v2:
+https://lore.kernel.org/lkml/20191226135833.1052-1-yezengruan@huawei.com/
+ * Post Will's patches as part of this series [1][2], and add the
+   probing logic for checking whether the hypervisor is KVM or not
+ * Clear PV-lock interface documentation
+ * Remove preempted state field
+ * Fix build error when CONFIG_PARAVIRT is not set
+ * Bunch of typo fixes.
+
+Changes from v1:
+https://lore.kernel.org/lkml/20191217135549.3240-1-yezengruan@huawei.com/
+ * Guest kernel no longer allocates the PV lock structure, instead it
+   is allocated by user space to avoid lifetime issues about kexec.
+ * Provide vCPU attributes for PV lock.
+ * Update SMC number of PV lock features.
+ * Report some basic validation when PV lock init.
+ * Document preempted field.
+ * Bunch of typo fixes.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
+
+Will Deacon (2):
+  arm64: Probe for the presence of KVM hypervisor services during boot
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+
+Zengruan Ye (6):
+  KVM: arm64: Document PV-lock interface
+  KVM: arm64: Add SMCCC paravirtualised lock calls
+  KVM: arm64: Support pvlock preempted via shared structure
+  KVM: arm64: Provide vCPU attributes for PV lock
+  KVM: arm64: Add interface to support vCPU preempted check
+  KVM: arm64: Support the vCPU preemption check
+
+ Documentation/virt/kvm/arm/pvlock.rst   |  68 +++++++++++++
+ Documentation/virt/kvm/devices/vcpu.txt |  14 +++
+ arch/arm/include/asm/kvm_host.h         |  18 ++++
+ arch/arm64/include/asm/hypervisor.h     |  11 ++
+ arch/arm64/include/asm/kvm_host.h       |  27 +++++
+ arch/arm64/include/asm/paravirt.h       |  15 +++
+ arch/arm64/include/asm/pvlock-abi.h     |  16 +++
+ arch/arm64/include/asm/spinlock.h       |   9 ++
+ arch/arm64/include/uapi/asm/kvm.h       |   2 +
+ arch/arm64/kernel/Makefile              |   2 +-
+ arch/arm64/kernel/paravirt-spinlocks.c  |  13 +++
+ arch/arm64/kernel/paravirt.c            | 129 +++++++++++++++++++++++-
+ arch/arm64/kernel/setup.c               |  37 +++++++
+ arch/arm64/kvm/Makefile                 |   1 +
+ arch/arm64/kvm/guest.c                  |   9 ++
+ include/linux/arm-smccc.h               |  36 +++++++
+ include/linux/cpuhotplug.h              |   1 +
+ include/uapi/linux/kvm.h                |   2 +
+ virt/kvm/arm/arm.c                      |   8 ++
+ virt/kvm/arm/hypercalls.c               |  54 +++++++---
+ virt/kvm/arm/pvlock.c                   | 102 +++++++++++++++++++
+ 21 files changed, 559 insertions(+), 15 deletions(-)
  create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+ create mode 100644 arch/arm64/include/asm/pvlock-abi.h
+ create mode 100644 arch/arm64/kernel/paravirt-spinlocks.c
+ create mode 100644 virt/kvm/arm/pvlock.c
 
-diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
-new file mode 100644
-index 000000000000..11776273c0a4
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/pvlock.rst
-@@ -0,0 +1,68 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Paravirtualized lock support for arm64
-+======================================
-+
-+KVM/arm64 provides some hypervisor service calls to support a paravirtualized
-+guest obtaining whether the vCPU is currently running or not.
-+
-+Two new SMCCC compatible hypercalls are defined:
-+* ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID:  0x86000001
-+  - KVM_PV_LOCK_FEATURES   0
-+  - KVM_PV_LOCK_PREEMPTED  1
-+
-+The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
-+ARCH_FEATURES mechanism and the hypervisor should be KVM before calling it.
-+
-+KVM_PV_LOCK_FEATURES
-+    ============= ========    ==========
-+    Function ID:  (uint32)    0x86000001
-+    PV_call_id:   (uint32)    0
-+    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-+                              PV-lock feature is supported by the hypervisor.
-+    ============= ========    ==========
-+
-+KVM_PV_LOCK_PREEMPTED
-+    ============= ========    ==========
-+    Function ID:  (uint32)    0x86000001
-+    PV_call_id:   (uint32)    1
-+    Return value: (int64)     IPA of the PV-lock data structure for this vCPU.
-+                              On failure:
-+                              NOT_SUPPORTED (-1)
-+    ============= ========    ==========
-+
-+The IPA returned by KVM_PV_LOCK_PREEMPTED should be mapped by the guest as
-+normal memory with inner and outer write back caching attributes, in the inner
-+shareable domain.
-+
-+KVM_PV_LOCK_PREEMPTED returns the structure for the calling vCPU.
-+
-+PV lock state
-+-------------
-+
-+The structure pointed to by the KVM_PV_LOCK_PREEMPTED hypercall is as follows:
-+
-++-----------+-------------+-------------+-----------------------------------+
-+| Field     | Byte Length | Byte Offset | Description                       |
-++===========+=============+=============+===================================+
-+| preempted |      8      |      0      | Indicates that the vCPU that owns |
-+|           |             |             | this struct is running or not.    |
-+|           |             |             | Non-zero values mean the vCPU has |
-+|           |             |             | been preempted. Zero means the    |
-+|           |             |             | vCPU is not preempted.            |
-++-----------+-------------+-------------+-----------------------------------+
-+
-+The preempted field will be updated to 1 by the hypervisor prior to scheduling
-+a vCPU. When the vCPU is scheduled out, the preempted field will be updated
-+to 0 by the hypervisor.
-+
-+The structure will be present within a reserved region of the normal memory
-+given to the guest. The guest should not attempt to write into this memory.
-+There is a structure per vCPU of the guest.
-+
-+It is advisable that one or more 64k pages are set aside for the purpose of
-+these structures and not used for other purposes, this enables the guest to map
-+the region using 64k pages and avoids conflicting attributes with other memory.
-+
-+For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
-+section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
-diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
-index 6f3bd64a05b0..2c68d9a0f644 100644
---- a/Documentation/virt/kvm/devices/vcpu.txt
-+++ b/Documentation/virt/kvm/devices/vcpu.txt
-@@ -74,3 +74,17 @@ Specifies the base address of the stolen time structure for this VCPU. The
- base address must be 64 byte aligned and exist within a valid guest memory
- region. See Documentation/virt/kvm/arm/pvtime.txt for more information
- including the layout of the stolen time structure.
-+
-+4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL
-+Architectures: ARM64
-+
-+4.1 ATTRIBUTE: KVM_ARM_VCPU_PVLOCK_IPA
-+Parameters: 64-bit base address
-+Returns: -ENXIO:  PV lock not implemented
-+         -EEXIST: Base address already set for this vCPU
-+         -EINVAL: Base address not 64 byte aligned
-+
-+Specifies the base address of the PV lock structure for this vCPU. The
-+base address must be 64 byte aligned and exist within a valid guest memory
-+region. See Documentation/virt/kvm/arm/pvlock.rst for more information
-+including the layout of the pv lock structure.
 -- 
 2.19.1
 
