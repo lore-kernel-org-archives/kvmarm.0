@@ -1,63 +1,112 @@
-Return-Path: <SRS0=uwID=3F=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=hOah=3G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 416D1C33CB1
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7180C33CB8
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jan 2020 10:13:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F35432064C
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jan 2020 12:47:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35432064C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 579D124653
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jan 2020 10:13:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JZtAPVZY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 579D124653
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACAE84B16D;
-	Thu, 16 Jan 2020 07:47:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5CA14B218;
+	Fri, 17 Jan 2020 05:13:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JlF8+1cYaVfP; Thu, 16 Jan 2020 07:47:15 -0500 (EST)
+	with ESMTP id ttbGdzr+XtxD; Fri, 17 Jan 2020 05:13:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B1014B18D;
-	Thu, 16 Jan 2020 07:47:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CDD04B208;
+	Fri, 17 Jan 2020 05:13:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7DF24B15D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:47:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72D844B203
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jan 2020 05:13:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 769gAhg575RF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jan 2020 07:47:08 -0500 (EST)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8923F4B192
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jan 2020 07:47:02 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AA29BC0B62D0F3F8873D;
- Thu, 16 Jan 2020 20:46:59 +0800 (CST)
-Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 16 Jan 2020 20:46:50 +0800
-From: Zengruan Ye <yezengruan@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
-Subject: [PATCH v3 7/8] KVM: arm64: Add interface to support vCPU preempted
- check
-Date: Thu, 16 Jan 2020 20:46:25 +0800
-Message-ID: <20200116124626.1155-8-yezengruan@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
-In-Reply-To: <20200116124626.1155-1-yezengruan@huawei.com>
-References: <20200116124626.1155-1-yezengruan@huawei.com>
+ with ESMTP id wf6U9brS6oXY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jan 2020 05:13:43 -0500 (EST)
+Received: from mail-lj1-f194.google.com (mail-lj1-f194.google.com
+ [209.85.208.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17CC44B1FF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jan 2020 05:13:43 -0500 (EST)
+Received: by mail-lj1-f194.google.com with SMTP id a13so25868273ljm.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jan 2020 02:13:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5Jhg4+UAB/mfmS/kvRrF2GKzyf6Tn27Jkcr+2SRy5OE=;
+ b=JZtAPVZYG36wekyZYFjYNz63EBXhO9thOFOWavIBZaF6brqIuhH4QmJ/RyadxDwpF0
+ tqgFwvmRZU0d+6gq48nDYrfnWBrIl3KOTVFbOF61H5AArNOBt1AibiaQIjhbyQC/WHxx
+ sOODAD9I5mWn8l27u+y/scXSDEhjqTKzIRFMwxzcYLbaMMGOccVWGfbBWhocsqUwR6oq
+ RemQe435CNyIhBtHlQ7mcxMtfEMn3o1ymJjbc7YMxccJ5nsZwkBdmzi7ZDN+5mhbKkSN
+ TwPEwzfhUp+wIdlP/gLVlMTVYunVs+iJ2ljt5qt6juxEuO8jex7ENFPo0JSlG56g2Aiz
+ uy6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5Jhg4+UAB/mfmS/kvRrF2GKzyf6Tn27Jkcr+2SRy5OE=;
+ b=nHIRNE4lRzD6XZNAw1LTd/F2Os5N4Fb/hWqL5SQctHceqZwLtio5JwDK2m3727gzkt
+ UZ1qebszsI3QnKGkICgQ/36+P8HBY0A/VYGqg8YLQZjNLXpfHP0r+yn5Kq+gsBVoiagw
+ doC5dL8h4EXemj1AIqlyOx6z8ANJ0dgtxxJMJ0G8x1EeT3xPBitQaA0fnZo3X6N2fz7u
+ 5Slc15AH0cALerCb0KQyH3l3X9eMxzpXTWJqnIUvlOqRALbSrNzAVXUpkWeMn9q0btOM
+ OfEvXsG61qExRQ100YlJ6T0hgIZepPgDX8DumpyQkAEBxUfdogGRprVUwzMuXRXiDiQM
+ KScw==
+X-Gm-Message-State: APjAAAXf7w4Z27pXPrny9+RWxLx8So+bRi1ce+Dce7mJh6uddCEATaIv
+ I0jjq6BnE853Vj9SDE2dI8/0uF1RtZepwAq+2hUG7Q==
+X-Google-Smtp-Source: APXvYqwMboC6xc8+uyhTbyFk+OuGSIgc+KbllCY1pv69DqczX6VA3ZVNZ98GcDj4lK4WjnF/z3/hoHDiXYy2YV86J+4=
+X-Received: by 2002:a2e:918c:: with SMTP id f12mr5288808ljg.66.1579256021661; 
+ Fri, 17 Jan 2020 02:13:41 -0800 (PST)
 MIME-Version: 1.0
-X-Originating-IP: [10.173.221.248]
-X-CFilter-Loop: Reflected
-Cc: kbuild test robot <lkp@intel.com>, peterz@infradead.org, maz@kernel.org,
- daniel.lezcano@linaro.org, linux@armlinux.org.uk, steven.price@arm.com,
- longman@redhat.com, catalin.marinas@arm.com, will@kernel.org
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <20191114181243.q37rxoo3seds6oxy@pengutronix.de>
+ <7322163f-e08e-a6b7-b143-e9d59917ee5b@gmail.com>
+ <20191115070842.2x7psp243nfo76co@pengutronix.de>
+ <20191115114416.ba6lmwb7q4gmepzc@pengutronix.de>
+ <60bda4a9-f4f8-3641-2612-17fab3173b29@gmail.com>
+In-Reply-To: <60bda4a9-f4f8-3641-2612-17fab3173b29@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 17 Jan 2020 11:13:30 +0100
+Message-ID: <CACRpkdYJR3gQCb4WXwF4tGzk+tT7jMcV9=nDK0PFkeh+0G11bA@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Marco Felsch <m.felsch@pengutronix.de>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Rob Landley <rob@landley.net>, Jonathan Corbet <corbet@lwn.net>,
+ Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, philip@cog.systems,
+ Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Dmitry Vyukov <dvyukov@google.com>, Nicolas Pitre <nico@fluxnic.net>,
+ Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Sascha Hauer <kernel@pengutronix.de>,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,130 +123,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is to fix some lock holder preemption issues. Some other locks
-implementation do a spin loop before acquiring the lock itself.
-Currently kernel has an interface of bool vcpu_is_preempted(int cpu). It
-takes the CPU as parameter and return true if the CPU is preempted.
-Then kernel can break the spin loops upon the retval of vcpu_is_preempted.
+On Tue, Nov 19, 2019 at 1:14 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+> On 11/15/19 3:44 AM, Marco Felsch wrote:
+> >
+> > With your v7 it is working on my imx6 but unfortunately I can't run my
+> > gstreamer testcase. My CPU load goes to 100% after starting gstreamer
+> > and nothing happens.. But the test_kasan module works =) So I decided to
+> > check a imx6quadplus but this target did not boot.. I used another
+> > toolchain for the imx6quadplus gcc-9 instead of gcc-8. So it seems that
+> > something went wrong during compilation. Because you didn't changed
+> > something within the logic.
+> >
+> > I wonder why we must not define the CONFIG_KASAN_SHADOW_OFFSET for arm.
+>
+> That is was oversight. I have pushed updates to the branch here:
+>
+> https://github.com/ffainelli/linux/pull/new/kasan-v7
 
-As kernel has used this interface, So lets support it.
+I just git Kasan back on my radar because it needs to be fixed some day.
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
----
- arch/arm64/include/asm/paravirt.h      | 12 ++++++++++++
- arch/arm64/include/asm/spinlock.h      |  9 +++++++++
- arch/arm64/kernel/Makefile             |  2 +-
- arch/arm64/kernel/paravirt-spinlocks.c | 13 +++++++++++++
- arch/arm64/kernel/paravirt.c           |  4 +++-
- 5 files changed, 38 insertions(+), 2 deletions(-)
- create mode 100644 arch/arm64/kernel/paravirt-spinlocks.c
+I took this branch for a ride on some QEMU and some real hardware.
+Here I use the test module and just hacked it into the kernel instead of
+as a module, it then crashes predictably but performs all the KASan
+tests first and it works file, as in provokes the right warnings from
+KASan.
 
-diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-index cf3a0fd7c1a7..7b1c81b544bb 100644
---- a/arch/arm64/include/asm/paravirt.h
-+++ b/arch/arm64/include/asm/paravirt.h
-@@ -11,8 +11,13 @@ struct pv_time_ops {
- 	unsigned long long (*steal_clock)(int cpu);
- };
- 
-+struct pv_lock_ops {
-+	bool (*vcpu_is_preempted)(int cpu);
-+};
-+
- struct paravirt_patch_template {
- 	struct pv_time_ops time;
-+	struct pv_lock_ops lock;
- };
- 
- extern struct paravirt_patch_template pv_ops;
-@@ -24,6 +29,13 @@ static inline u64 paravirt_steal_clock(int cpu)
- 
- int __init pv_time_init(void);
- 
-+__visible bool __native_vcpu_is_preempted(int cpu);
-+
-+static inline bool pv_vcpu_is_preempted(int cpu)
-+{
-+	return pv_ops.lock.vcpu_is_preempted(cpu);
-+}
-+
- #else
- 
- #define pv_time_init() do {} while (0)
-diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
-index b093b287babf..b5d1982414c5 100644
---- a/arch/arm64/include/asm/spinlock.h
-+++ b/arch/arm64/include/asm/spinlock.h
-@@ -7,8 +7,17 @@
- 
- #include <asm/qrwlock.h>
- #include <asm/qspinlock.h>
-+#include <asm/paravirt.h>
- 
- /* See include/linux/spinlock.h */
- #define smp_mb__after_spinlock()	smp_mb()
- 
-+#ifdef CONFIG_PARAVIRT
-+#define vcpu_is_preempted vcpu_is_preempted
-+static inline bool vcpu_is_preempted(long cpu)
-+{
-+	return pv_vcpu_is_preempted(cpu);
-+}
-+#endif // CONFIG_PARAVIRT
-+
- #endif /* __ASM_SPINLOCK_H */
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index fc6488660f64..b23cdae433a4 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -50,7 +50,7 @@ obj-$(CONFIG_ARMV8_DEPRECATED)		+= armv8_deprecated.o
- obj-$(CONFIG_ACPI)			+= acpi.o
- obj-$(CONFIG_ACPI_NUMA)			+= acpi_numa.o
- obj-$(CONFIG_ARM64_ACPI_PARKING_PROTOCOL)	+= acpi_parking_protocol.o
--obj-$(CONFIG_PARAVIRT)			+= paravirt.o
-+obj-$(CONFIG_PARAVIRT)			+= paravirt.o paravirt-spinlocks.o
- obj-$(CONFIG_RANDOMIZE_BASE)		+= kaslr.o
- obj-$(CONFIG_HIBERNATION)		+= hibernate.o hibernate-asm.o
- obj-$(CONFIG_KEXEC_CORE)		+= machine_kexec.o relocate_kernel.o	\
-diff --git a/arch/arm64/kernel/paravirt-spinlocks.c b/arch/arm64/kernel/paravirt-spinlocks.c
-new file mode 100644
-index 000000000000..718aa773d45c
---- /dev/null
-+++ b/arch/arm64/kernel/paravirt-spinlocks.c
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright(c) 2019 Huawei Technologies Co., Ltd
-+ * Author: Zengruan Ye <yezengruan@huawei.com>
-+ */
-+
-+#include <linux/spinlock.h>
-+#include <asm/paravirt.h>
-+
-+__visible bool __native_vcpu_is_preempted(int cpu)
-+{
-+	return false;
-+}
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index 1ef702b0be2d..d8f1ba8c22ce 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -26,7 +26,9 @@
- struct static_key paravirt_steal_enabled;
- struct static_key paravirt_steal_rq_enabled;
- 
--struct paravirt_patch_template pv_ops;
-+struct paravirt_patch_template pv_ops = {
-+	.lock.vcpu_is_preempted		= __native_vcpu_is_preempted,
-+};
- EXPORT_SYMBOL_GPL(pv_ops);
- 
- struct pv_time_stolen_time_region {
--- 
-2.19.1
+Tested systems:
 
+QEMU ARM RealView PBA8
+QEMU ARM RealView PBX A9
+QEMU ARM Versatile AB
+Hardware Integrator CP
+Hardware Versatile AB with IB2
 
+Can we start to submit these patches to Russell's patch tracker?
+Any more testing I should be doing?
+
+Yours,
+Linus Walleij
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
