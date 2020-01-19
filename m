@@ -2,63 +2,89 @@ Return-Path: <SRS0=lFwt=3J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 098E7C2D0DB
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 11:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21347C2D0DB
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 11:45:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8B801208E4
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 11:34:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B801208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9F0A62073D
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 11:45:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8nEzMf7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F0A62073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 051234AF02;
-	Mon, 20 Jan 2020 06:34:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B2AE4AF0B;
+	Mon, 20 Jan 2020 06:45:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UXpbho2pFGW7; Mon, 20 Jan 2020 06:34:51 -0500 (EST)
+	with ESMTP id XlueYZ7zPBP8; Mon, 20 Jan 2020 06:45:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C254AEF1;
-	Mon, 20 Jan 2020 06:34:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 032DF4AEF5;
+	Mon, 20 Jan 2020 06:45:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8E714AEF1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jan 2020 06:34:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C73B14AE96
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Jan 2020 17:48:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id egbwZmdsbeYO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Jan 2020 06:34:47 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F054AEEA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jan 2020 06:34:47 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30C4F30E;
- Mon, 20 Jan 2020 03:34:47 -0800 (PST)
-Received: from [10.2.69.39] (unknown [10.2.69.39])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B137B3F68E;
- Mon, 20 Jan 2020 03:34:46 -0800 (PST)
-Subject: Re: [PATCH] ARM: virt: Relax arch timer version check during early
- boot
-To: Marc Zyngier <maz@kernel.org>
-References: <1579097798-106243-1-git-send-email-vladimir.murzin@arm.com>
- <eb889279-87f2-d674-9299-169794c285eb@arm.com>
- <d4b8bb91f95385682f20c9dc5c6f5e50@kernel.org>
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Message-ID: <38a43fed-1c7a-69ea-3662-e17f13ca74d6@arm.com>
-Date: Mon, 20 Jan 2020 11:34:45 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ with ESMTP id r2nvHpLRRbpY for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 19 Jan 2020 17:48:07 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B705B4A531
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Jan 2020 17:48:07 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579474087;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q8gG+1cgJTMe7mIrJCeKPohDJq4KgvzUnmCCGFTyYv0=;
+ b=N8nEzMf7tOyvBMDn7lvEt1GdK6A3C3iFhNIOAUGKaBxG3gL5w8Csbi8tckZXtTlQondZqa
+ bjT0bHTh0kxhA5pppiatlYuXPkatwi21o02XOaUrMqowqYrssWez+3GRZ7/LGT7rr/nEKZ
+ 1RmS2cHm1UFLRi6rIr7E5H2DnfZg7Xw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-yW7lfmG9NhS_66Jh5-G9Qg-1; Sun, 19 Jan 2020 17:48:03 -0500
+X-MC-Unique: yW7lfmG9NhS_66Jh5-G9Qg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F96E10054E3;
+ Sun, 19 Jan 2020 22:48:02 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-61.bne.redhat.com [10.64.54.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E612960BE2;
+ Sun, 19 Jan 2020 22:47:59 +0000 (UTC)
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: Drop the
+ kvm_vgic_register_mmio_region()
+To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org
+References: <20200119090604.398-1-yuzenghui@huawei.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <479f2e5f-80c4-37e1-8f3a-2f1197fddd51@redhat.com>
+Date: Mon, 20 Jan 2020 09:47:57 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <d4b8bb91f95385682f20c9dc5c6f5e50@kernel.org>
+In-Reply-To: <20200119090604.398-1-yuzenghui@huawei.com>
 Content-Language: en-US
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mailman-Approved-At: Mon, 20 Jan 2020 06:45:32 -0500
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -67,49 +93,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDEvMjAvMjAgMTE6MTQgQU0sIE1hcmMgWnluZ2llciB3cm90ZToKPiBIaSBW
-bGFkaW1pciwKPiAKPiBPbiAyMDIwLTAxLTIwIDExOjQ2LCBWbGFkaW1pciBNdXJ6aW4gd3JvdGU6
-Cj4+ICsgTWFyYwo+PiArIGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKPj4KPj4gT24gMS8x
-NS8yMCAyOjE2IFBNLCBWbGFkaW1pciBNdXJ6aW4gd3JvdGU6Cj4+PiBVcGRhdGVzIHRvIHRoZSBH
-ZW5lcmljIFRpbWVyIGFyY2hpdGVjdHVyZSBhbGxvdyBJRF9QRlIxLkdlblRpbWVyIHRvCj4+PiBo
-YXZlIHZhbHVlcyBvdGhlciB0aGFuIDAgb3IgMS4gQXQgdGhlIG1vbWVudCwgTGludXggaXMgcXVp
-dGUgc3RyaWN0IGluCj4+PiB0aGUgd2F5IGl0IGhhbmRsZXMgdGhpcyBmaWVsZCBhdCBlYXJseSBi
-b290IGFuZCB3aWxsIG5vdCBjb25maWd1cmUKPj4+IGFyY2ggdGltZXIgaWYgaXQgZG9lc24ndCBm
-aW5kIHRoZSB2YWx1ZSAxLgo+Pj4KPj4+IFNpbmNlIGhlcmUgdXNlIHViZnggZm9yIGFyY2ggdGlt
-ZXIgdmVyc2lvbiBleHRyYWN0aW9uIChoeWItc3R1YiBidWlsZAo+Pj4gd2l0aCAtbWFyY2g9YXJt
-djctYSwgc28gaXQgaXMgc2FmZSkKPj4+Cj4+PiBUbyBoZWxwIGJhY2twb3J0cyAoZXZlbiB0aG91
-Z2ggdGhlIGNvZGUgd2FzIGNvcnJlY3QgYXQgdGhlIHRpbWUgb2Ygd3JpdGluZykKPj4+IEZpeGVz
-OiA4ZWM1OGJlOWYzZmYgKCJBUk06IHZpcnQ6IGFyY2hfdGltZXJzOiBlbmFibGUgYWNjZXNzIHRv
-IHBoeXNpY2FsIHRpbWVycyIpCj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBNdXJ6aW4gPHZs
-YWRpbWlyLm11cnppbkBhcm0uY29tPgo+IAo+IEknbSBub3Qgb3Bwb3NlZCB0byBzdWNoIGEgY2hh
-bmdlLCBidXQgaXQnZCBiZSBnb29kIHRvIGRvY3VtZW50IHdoYXQgb3RoZXIgdmFsdWVzCj4gYXJl
-IGV4cGVjdGVkIGhlcmUsIGFzIHRoZSBjdXJyZW50IChSZXYgRV9hKSBBUk0gQVJNIG9ubHkgbWVu
-dGlvbnMgdmFsdWVzIDAgYW5kIDEuCgpUaGF0IHRydWUsIEFSTSBBUk0gZG9lc24ndCBtZW50aW9u
-IGl0IHlldC4gT1RPSCwgc2hvdWxkIHdlIHJlYWxseSBjYXJlIGFib3V0IGV4YWN0CnZhbHVlcyBh
-cyBzb29uIGl0IHN0YXlzIGNvbXBhdGlibGU/CgpDaGVlcnMKVmxhZGltaXIKCj4gCj4gVGhhbmtz
-LAo+IAo+IMKgwqDCoMKgwqDCoMKgIE0uCj4gCj4+PiAtLS0KPj4+IMKgYXJjaC9hcm0va2VybmVs
-L2h5cC1zdHViLlMgfCA3ICsrKy0tLS0KPj4+IMKgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9u
-cygrKSwgNCBkZWxldGlvbnMoLSkKPj4+Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm0va2VybmVs
-L2h5cC1zdHViLlMgYi9hcmNoL2FybS9rZXJuZWwvaHlwLXN0dWIuUwo+Pj4gaW5kZXggYWU1MDIw
-My4uNjYwN2ZhOCAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJtL2tlcm5lbC9oeXAtc3R1Yi5TCj4+
-PiArKysgYi9hcmNoL2FybS9rZXJuZWwvaHlwLXN0dWIuUwo+Pj4gQEAgLTE0NiwxMCArMTQ2LDkg
-QEAgQVJNX0JFOChvcnLCoMKgwqAgcjcsIHI3LCAjKDEgPDwgMjUpKcKgwqDCoMKgIEAgSFNDVExS
-LkVFCj4+PiDCoCNpZiAhZGVmaW5lZChaSU1BR0UpICYmIGRlZmluZWQoQ09ORklHX0FSTV9BUkNI
-X1RJTUVSKQo+Pj4gwqDCoMKgwqAgQCBtYWtlIENOVFBfKiBhbmQgQ05UUENUIGFjY2Vzc2libGUg
-ZnJvbSBQTDEKPj4+IMKgwqDCoMKgIG1yY8KgwqDCoCBwMTUsIDAsIHI3LCBjMCwgYzEsIDHCoMKg
-wqAgQCBJRF9QRlIxCj4+PiAtwqDCoMKgIGxzcsKgwqDCoCByNywgIzE2Cj4+PiAtwqDCoMKgIGFu
-ZMKgwqDCoCByNywgIzB4Zgo+Pj4gLcKgwqDCoCBjbXDCoMKgwqAgcjcsICMxCj4+PiAtwqDCoMKg
-IGJuZcKgwqDCoCAxZgo+Pj4gK8KgwqDCoCB1YmZ4wqDCoMKgIHI3LCByNywgIzE2LCAjNAo+Pj4g
-K8KgwqDCoCB0ZXHCoMKgwqAgcjcsICMwCj4+PiArwqDCoMKgIGJlccKgwqDCoCAxZgo+Pj4gwqDC
-oMKgwqAgbXJjwqDCoMKgIHAxNSwgNCwgcjcsIGMxNCwgYzEsIDDCoMKgwqAgQCBDTlRIQ1RMCj4+
-PiDCoMKgwqDCoCBvcnLCoMKgwqAgcjcsIHI3LCAjM8KgwqDCoMKgwqDCoMKgIEAgUEwxUENFTiB8
-IFBMMVBDVEVOCj4+PiDCoMKgwqDCoCBtY3LCoMKgwqAgcDE1LCA0LCByNywgYzE0LCBjMSwgMMKg
-wqDCoCBAIENOVEhDVEwKPj4+Cj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+On 1/19/20 8:06 PM, Zenghui Yu wrote:
+> kvm_vgic_register_mmio_region() was introduced in commit 4493b1c4866a
+> ("KVM: arm/arm64: vgic-new: Add MMIO handling framework") but never
+> used, and even never implemented. Remove it to avoid confusing readers.
+> 
+> Reported-by: Haibin Wang <wanghaibin.wang@huawei.com>
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+>   virt/kvm/arm/vgic/vgic-mmio.h | 5 -----
+>   1 file changed, 5 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+> index 836f418f1ee8..5af2aefad435 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.h
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.h
+> @@ -98,11 +98,6 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
+>   		.uaccess_write = uwr,					\
+>   	}
+>   
+> -int kvm_vgic_register_mmio_region(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> -				  struct vgic_register_region *reg_desc,
+> -				  struct vgic_io_device *region,
+> -				  int nr_irqs, bool offset_private);
+> -
+>   unsigned long vgic_data_mmio_bus_to_host(const void *val, unsigned int len);
+>   
+>   void vgic_data_host_to_mmio_bus(void *buf, unsigned int len,
+> 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
