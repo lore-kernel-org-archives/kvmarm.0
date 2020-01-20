@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 565DFC32771
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 03:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3EAC33CB8
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 03:34:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C4E0820678
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 03:34:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E82DA2075B
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jan 2020 03:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="XhZomLA0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4E0820678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="J+bOs+Mo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82DA2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ozlabs.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 278724AEEB;
-	Sun, 19 Jan 2020 22:34:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91F904AECC;
+	Sun, 19 Jan 2020 22:34:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@ozlabs.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Acj3CBK3NEml; Sun, 19 Jan 2020 22:34:20 -0500 (EST)
+	with ESMTP id YM3MW3pHP1ec; Sun, 19 Jan 2020 22:34:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 189BB4AECC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45FD94AEE8;
 	Sun, 19 Jan 2020 22:34:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2BB24AEC3
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5A4B4A830
  for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Jan 2020 22:34:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dgBZlnsNIoeb for <kvmarm@lists.cs.columbia.edu>;
- Sun, 19 Jan 2020 22:34:17 -0500 (EST)
-Received: from ozlabs.org (ozlabs.org [203.11.71.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D8884ACF5
+ with ESMTP id oXsq5fL75hOZ for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 19 Jan 2020 22:34:18 -0500 (EST)
+Received: from ozlabs.org (bilbo.ozlabs.org [203.11.71.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D37354AEB9
  for <kvmarm@lists.cs.columbia.edu>; Sun, 19 Jan 2020 22:34:17 -0500 (EST)
 Received: by ozlabs.org (Postfix, from userid 1003)
- id 481HMj19Cqz9sR1; Mon, 20 Jan 2020 14:34:09 +1100 (AEDT)
+ id 481HMj2M00z9sRQ; Mon, 20 Jan 2020 14:34:09 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
- t=1579491249; bh=CYQ1aZ17JhSt3DjEaZvaRhmx5aaB56ZpLc9jKEgrQHg=;
+ t=1579491249; bh=6J0yPKo/kn+WbG/Jx05ZU6+6m/AlQNEvaTssDj+re3g=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=XhZomLA0ZQA5ksrIQZqTYTjoL3DPHU68CbqTHKmAYu16fL/fIE1BYH7UjUNBUUN96
- BOuEpy2CunYKbeiub7mIts8QMfAiWmeBeKcarVFg26ySQX+0isv7JeVEL1d4Z7b45d
- 5m7sEPD4iauKp3dpRpTlihU23q+pd7On1gqkqYQPHrJPglWg+MBbDBmbYJkatU8xz0
- Uz3Fq5i/6DiaknB95EBdraZENg7mGA9XAyQVsRAdFWKMiy5SfqI7mq2lhpVa6uDvRO
- oWMfXTCMsTK2ig1sBV5Ak32Iy5mNr3ucrWW4O2iQ2wR/sSeHCe8APza70YCBWrJGVb
- GMaswqr6dHlKA==
-Date: Mon, 20 Jan 2020 14:34:02 +1100
+ b=J+bOs+MonJV9E7pI5lPc45XM0RCY2NjfQhio5m6/DttgJzWYQ3HNgH1xNUIV476t1
+ ts+G5ufVu2nlLxna51nc4RLV4i+BMxNIj8OtXWtlekVH++JUnEo50tNL+EcDdMfnkK
+ 0tKNeAH0zTIwzwjt/ddygd75H6MloM9kMawF09dx8px7N8Z19MLfg0DZDiMcl7Jxj9
+ O7BDLwTM/8mWG+Mi5fGu3SEx+TpDcDN2c+ViWcUIssgNg+IQQZy1GA8JrmdTUkDUam
+ B5LzqGm2UwjQc0vxq2SUD2N7ikcbM2cnwWO5UhkiGCsdd5z9MQlNdr+cIMYXi//Jw1
+ JWsmSqN7nCbMg==
+Date: Mon, 20 Jan 2020 14:00:41 +1100
 From: Paul Mackerras <paulus@ozlabs.org>
 To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v2 15/45] KVM: PPC: Move kvm_vcpu_init() invocation to
- common code
-Message-ID: <20200120033402.GC14307@blackberry>
+Subject: Re: [PATCH v2 02/45] KVM: PPC: Book3S PR: Free shared page if mmu
+ initialization fails
+Message-ID: <20200120030041.GB14307@blackberry>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
- <20191218215530.2280-16-sean.j.christopherson@intel.com>
+ <20191218215530.2280-3-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20191218215530.2280-16-sean.j.christopherson@intel.com>
+In-Reply-To: <20191218215530.2280-3-sean.j.christopherson@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
@@ -83,42 +83,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gV2VkLCBEZWMgMTgsIDIwMTkgYXQgMDE6NTU6MDBQTSAtMDgwMCwgU2VhbiBDaHJpc3RvcGhl
-cnNvbiB3cm90ZToKPiBNb3ZlIHRoZSBrdm1fY3B1X3t1bn1pbml0KCkgY2FsbHMgdG8gY29tbW9u
-IFBQQyBjb2RlIGFzIGFuIGludGVybWVkaWF0ZQo+IHN0ZXAgdG93YXJkcyByZW1vdmluZyBrdm1f
-Y3B1X3t1bn1pbml0KCkgYWx0b2dldGhlci4KPiAKPiBObyBmdW5jdGlvbmFsIGNoYW5nZSBpbnRl
-bmRlZC4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuLmouY2hy
-aXN0b3BoZXJzb25AaW50ZWwuY29tPgoKVGhpcyBkb2Vzbid0IGNvbXBpbGU6CgogIENDIFtNXSAg
-YXJjaC9wb3dlcnBjL2t2bS9ib29rM3MubwovaG9tZS9wYXVsdXMva2VybmVsL2t2bS9hcmNoL3Bv
-d2VycGMva3ZtL2Jvb2szcy5jOiBJbiBmdW5jdGlvbiDigJhrdm1wcGNfY29yZV92Y3B1X2NyZWF0
-ZeKAmToKL2hvbWUvcGF1bHVzL2tlcm5lbC9rdm0vYXJjaC9wb3dlcnBjL2t2bS9ib29rM3MuYzo3
-OTQ6OTogZXJyb3I6IOKAmGt2beKAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5j
-dGlvbikKICByZXR1cm4ga3ZtLT5hcmNoLmt2bV9vcHMtPnZjcHVfY3JlYXRlKHZjcHUpOwogICAg
-ICAgICBeCi9ob21lL3BhdWx1cy9rZXJuZWwva3ZtL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzLmM6
-Nzk0Ojk6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkg
-b25jZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluCi9ob21lL3BhdWx1cy9rZXJuZWwv
-a3ZtL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzLmM6Nzk1OjE6IHdhcm5pbmc6IGNvbnRyb2wgcmVh
-Y2hlcyBlbmQgb2Ygbm9uLXZvaWQgZnVuY3Rpb24gWy1XcmV0dXJuLXR5cGVdCiB9CiBeCm1ha2Vb
-M106ICoqKiBbL2hvbWUvcGF1bHVzL2tlcm5lbC9rdm0vc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoy
-NjY6IGFyY2gvcG93ZXJwYy9rdm0vYm9vazNzLm9dIEVycm9yIDEKCj4gZGlmZiAtLWdpdCBhL2Fy
-Y2gvcG93ZXJwYy9rdm0vYm9vazNzLmMgYi9hcmNoL3Bvd2VycGMva3ZtL2Jvb2szcy5jCj4gaW5k
-ZXggMTMzODU2NTZiOTBkLi41YWQyMGZjMGM2YTEgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9wb3dlcnBj
-L2t2bS9ib29rM3MuYwo+ICsrKyBiL2FyY2gvcG93ZXJwYy9rdm0vYm9vazNzLmMKPiBAQCAtNzg5
-LDEwICs3ODksOSBAQCB2b2lkIGt2bXBwY19kZWNyZW1lbnRlcl9mdW5jKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSkKPiAgCWt2bV92Y3B1X2tpY2sodmNwdSk7Cj4gIH0KPiAgCj4gLWludCBrdm1wcGNf
-Y29yZV92Y3B1X2NyZWF0ZShzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwK
-PiAtCQkJICAgIHVuc2lnbmVkIGludCBpZCkKPiAraW50IGt2bXBwY19jb3JlX3ZjcHVfY3JlYXRl
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgewo+IC0JcmV0dXJuIGt2bS0+YXJjaC5rdm1fb3Bz
-LT52Y3B1X2NyZWF0ZShrdm0sIHZjcHUsIGlkKTsKPiArCXJldHVybiBrdm0tPmFyY2gua3ZtX29w
-cy0+dmNwdV9jcmVhdGUodmNwdSk7CgpOZWVkcyBzL2t2bS92Y3B1LT5rdm0vIGhlcmUuCgpZb3Ug
-YWxzbyBuZWVkIHRvIGNoYW5nZSB0aGUgZGVjbGFyYXRpb24gb2YgdGhlIHZjcHVfY3JlYXRlIGZ1
-bmN0aW9uCnBvaW50ZXIgaW4gdGhlIGt2bXBwY19vcHMgc3RydWN0IGluIGt2bV9wcGMuaCB0byBo
-YXZlIGp1c3QgdGhlIHZjcHUKcGFyYW1ldGVyIGluc3RlYWQgb2YgMyBwYXJhbWV0ZXJzLgoKUGF1
-bC4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
-IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, Dec 18, 2019 at 01:54:47PM -0800, Sean Christopherson wrote:
+> Explicitly free the shared page if kvmppc_mmu_init() fails during
+> kvmppc_core_vcpu_create(), as the page is freed only in
+> kvmppc_core_vcpu_free(), which is not reached via kvm_vcpu_uninit().
+> 
+> Fixes: 96bc451a15329 ("KVM: PPC: Introduce shared page")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/powerpc/kvm/book3s_pr.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+> index ce4fcf76e53e..26ca62b6d773 100644
+> --- a/arch/powerpc/kvm/book3s_pr.c
+> +++ b/arch/powerpc/kvm/book3s_pr.c
+> @@ -1806,10 +1806,12 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_pr(struct kvm *kvm,
+>  
+>  	err = kvmppc_mmu_init(vcpu);
+>  	if (err < 0)
+> -		goto uninit_vcpu;
+> +		goto free_shared_page;
+>  
+>  	return vcpu;
+>  
+> +free_shared_page:
+> +	free_page((unsigned long)vcpu->arch.shared);
+>  uninit_vcpu:
+>  	kvm_vcpu_uninit(vcpu);
+>  free_shadow_vcpu:
+> -- 
+> 2.24.1
+
+Looks correct.
+
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
