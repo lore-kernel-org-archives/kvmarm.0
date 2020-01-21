@@ -4,51 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE55C33CBA
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE20C2D0CE
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 70C5424656
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C5424656
+	by mail.kernel.org (Postfix) with ESMTP id 6001A24656
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6001A24656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D74E44AED3;
-	Tue, 21 Jan 2020 17:32:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD0B4AF4C;
+	Tue, 21 Jan 2020 17:32:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vvenA6rAlauc; Tue, 21 Jan 2020 17:32:16 -0500 (EST)
+	with ESMTP id PvBJaFRTO1Qf; Tue, 21 Jan 2020 17:32:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B81D4AEC5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63AFF4AEB2;
 	Tue, 21 Jan 2020 17:32:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 424154AEBB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4E64ACE6
  for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yl9fLIIkAIK9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jan 2020 17:32:05 -0500 (EST)
+ with ESMTP id wwuugFX48z4g for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jan 2020 17:32:06 -0500 (EST)
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 498BA4AE9F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E3694AEBC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:06 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  21 Jan 2020 14:32:03 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; d="scan'208";a="244845122"
+X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; d="scan'208";a="244845150"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:03 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v5 06/19] KVM: Drop kvm_arch_create_memslot()
-Date: Tue, 21 Jan 2020 14:31:44 -0800
-Message-Id: <20200121223157.15263-7-sean.j.christopherson@intel.com>
+Subject: [PATCH v5 12/19] KVM: Move memslot deletion to helper function
+Date: Tue, 21 Jan 2020 14:31:50 -0800
+Message-Id: <20200121223157.15263-13-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200121223157.15263-1-sean.j.christopherson@intel.com>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
@@ -79,169 +79,138 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Remove kvm_arch_create_memslot() now that all arch implementations are
-effectively nops.  Removing kvm_arch_create_memslot() eliminates the
-possibility for arch specific code to allocate memory prior to setting
-a memslot, which sets the stage for simplifying kvm_free_memslot().
+Move memslot deletion into its own routine so that the success path for
+other memslot updates does not need to use kvm_free_memslot(), i.e. can
+explicitly destroy the dirty bitmap when necessary.  This paves the way
+for dropping @dont from kvm_free_memslot(), i.e. all callers now pass
+NULL for @dont.
 
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Add a comment above the code to make a copy of the existing memslot
+prior to deletion, it is not at all obvious that the pointer will become
+stale during sorting and/or installation of new memslots.
+
+Note, kvm_arch_commit_memory_region() allows an architecture to free
+resources when moving a memslot or changing its flags, e.g. x86 frees
+its arch specific memslot metadata during commit_memory_region().
+
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Tested-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/mips/kvm/mips.c       |  6 ------
- arch/powerpc/kvm/powerpc.c |  6 ------
- arch/s390/kvm/kvm-s390.c   |  6 ------
- arch/x86/kvm/x86.c         |  6 ------
- include/linux/kvm_host.h   |  2 --
- virt/kvm/arm/mmu.c         |  6 ------
- virt/kvm/kvm_main.c        | 21 +++++++--------------
- 7 files changed, 7 insertions(+), 46 deletions(-)
+ virt/kvm/kvm_main.c | 73 +++++++++++++++++++++++++++------------------
+ 1 file changed, 44 insertions(+), 29 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 2606f3f02b54..6d54e18ebdc1 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -188,12 +188,6 @@ long kvm_arch_dev_ioctl(struct file *filp, unsigned int ioctl,
- 	return -ENOIOCTLCMD;
- }
- 
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages)
--{
--	return 0;
--}
--
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
- 	/* Flush whole GPA */
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 4e0f7a77920d..48abf1b9ad58 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -691,12 +691,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- 	kvmppc_core_free_memslot(kvm, free, dont);
- }
- 
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages)
--{
--	return 0;
--}
--
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *memslot,
- 				   const struct kvm_userspace_memory_region *mem,
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index c059b86aacd4..743e09dd38b5 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4483,12 +4483,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- 	return VM_FAULT_SIGBUS;
- }
- 
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages)
--{
--	return 0;
--}
--
- /* Section: memory related */
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *memslot,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 35a7e3d9b99a..b55bf2ecdd98 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9788,12 +9788,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- 	kvm_page_track_free_memslot(free, dont);
- }
- 
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages)
--{
--	return 0;
--}
--
- static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
- 				      unsigned long npages)
- {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6d5331b0d937..aa5cb2ff7a2b 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -671,8 +671,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 			    const struct kvm_userspace_memory_region *mem);
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- 			   struct kvm_memory_slot *dont);
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages);
- void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				struct kvm_memory_slot *memslot,
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index dc8254bf30ea..66f59c067bf6 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -2356,12 +2356,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- {
- }
- 
--int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			    unsigned long npages)
--{
--	return 0;
--}
--
- void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- {
- }
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8c9211182680..5e777ab02395 100644
+index 69d6158cb405..5ae2dd6d9993 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1039,12 +1039,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	new.base_gfn = base_gfn;
- 	new.npages = npages;
- 	new.flags = mem->flags;
-+	new.userspace_addr = mem->userspace_addr;
+@@ -1042,6 +1042,27 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	return r;
+ }
  
- 	if (npages) {
- 		if (!old.npages)
- 			change = KVM_MR_CREATE;
- 		else { /* Modify an existing slot. */
--			if ((mem->userspace_addr != old.userspace_addr) ||
-+			if ((new.userspace_addr != old.userspace_addr) ||
- 			    (npages != old.npages) ||
- 			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
- 				goto out;
-@@ -1079,22 +1080,14 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		}
++static int kvm_delete_memslot(struct kvm *kvm,
++			      const struct kvm_userspace_memory_region *mem,
++			      struct kvm_memory_slot *old, int as_id)
++{
++	struct kvm_memory_slot new;
++	int r;
++
++	if (!old->npages)
++		return -EINVAL;
++
++	memset(&new, 0, sizeof(new));
++	new.id = old->id;
++
++	r = kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
++	if (r)
++		return r;
++
++	kvm_free_memslot(kvm, old, NULL);
++	return 0;
++}
++
+ /*
+  * Allocate some memory and give it an address in the guest physical address
+  * space.
+@@ -1091,7 +1112,15 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	if (npages > KVM_MEM_MAX_NR_PAGES)
+ 		return -EINVAL;
+ 
+-	new = old = *slot;
++	/*
++	 * Make a full copy of the old memslot, the pointer will become stale
++	 * when the memslots are re-sorted by update_memslots().
++	 */
++	old = *slot;
++	if (!mem->memory_size)
++		return kvm_delete_memslot(kvm, mem, &old, as_id);
++
++	new = old;
+ 
+ 	new.id = id;
+ 	new.base_gfn = base_gfn;
+@@ -1099,29 +1128,20 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	new.flags = mem->flags;
+ 	new.userspace_addr = mem->userspace_addr;
+ 
+-	if (npages) {
+-		if (!old.npages)
+-			change = KVM_MR_CREATE;
+-		else { /* Modify an existing slot. */
+-			if ((new.userspace_addr != old.userspace_addr) ||
+-			    (npages != old.npages) ||
+-			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
+-				return -EINVAL;
+-
+-			if (base_gfn != old.base_gfn)
+-				change = KVM_MR_MOVE;
+-			else if (new.flags != old.flags)
+-				change = KVM_MR_FLAGS_ONLY;
+-			else /* Nothing to change. */
+-				return 0;
+-		}
+-	} else {
+-		if (!old.npages)
++	if (!old.npages) {
++		change = KVM_MR_CREATE;
++	} else { /* Modify an existing slot. */
++		if ((new.userspace_addr != old.userspace_addr) ||
++		    (npages != old.npages) ||
++		    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
+ 			return -EINVAL;
+ 
+-		change = KVM_MR_DELETE;
+-		new.base_gfn = 0;
+-		new.flags = 0;
++		if (base_gfn != old.base_gfn)
++			change = KVM_MR_MOVE;
++		else if (new.flags != old.flags)
++			change = KVM_MR_FLAGS_ONLY;
++		else /* Nothing to change. */
++			return 0;
  	}
  
--	/* Free page dirty bitmap if unneeded */
--	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
--		new.dirty_bitmap = NULL;
--
- 	r = -ENOMEM;
--	if (change == KVM_MR_CREATE) {
--		new.userspace_addr = mem->userspace_addr;
+ 	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+@@ -1144,17 +1164,12 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			return r;
+ 	}
  
--		if (kvm_arch_create_memslot(kvm, &new, npages))
--			goto out;
+-	/* actual memory is freed via old in kvm_free_memslot below */
+-	if (change == KVM_MR_DELETE) {
+-		new.dirty_bitmap = NULL;
+-		memset(&new.arch, 0, sizeof(new.arch));
 -	}
 -
--	/* Allocate page dirty bitmap if needed */
--	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
-+	/* Allocate/free page dirty bitmap as needed */
-+	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
-+		new.dirty_bitmap = NULL;
-+	else if (!new.dirty_bitmap) {
- 		if (kvm_create_dirty_bitmap(&new) < 0)
--			goto out_free;
-+			goto out;
- 	}
+ 	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
+ 	if (r)
+ 		goto out_bitmap;
  
- 	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+-	kvm_free_memslot(kvm, &old, &new);
++	if (old.dirty_bitmap && !new.dirty_bitmap)
++		kvm_destroy_dirty_bitmap(&old);
+ 	return 0;
+ 
+ out_bitmap:
 -- 
 2.24.1
 
