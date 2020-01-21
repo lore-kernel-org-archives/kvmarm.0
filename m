@@ -2,100 +2,65 @@ Return-Path: <SRS0=DlSC=3K=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC81CC2D0CE
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 15:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17AB0C3F68F
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 543CA24125
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 15:30:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIdprWPC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543CA24125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C90612467E
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C90612467E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA73F4AEC4;
-	Tue, 21 Jan 2020 10:30:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81C324AEFA;
+	Tue, 21 Jan 2020 17:32:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fg52Rz12EZa0; Tue, 21 Jan 2020 10:29:58 -0500 (EST)
+	with ESMTP id wB2cmKzPPyar; Tue, 21 Jan 2020 17:32:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13CFF4AFC0;
-	Tue, 21 Jan 2020 10:29:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17EC04AEC6;
+	Tue, 21 Jan 2020 17:32:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3171C4AF88
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 10:29:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A5124A534
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pWQbzJKgbanZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jan 2020 10:29:52 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 632E34AFC3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 10:29:52 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579620592;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=drluyyJgvZU1MSvZk9nVX/INIds5bPQT7NFflzdSLzQ=;
- b=DIdprWPCd3icdkJvpKZGSsrLU6TXoiJj5s2bntffE6pRcf3hTRdZTzDmJfxMyiqNC+xcI4
- ckRW6Pixk1/t+IHpe0dxGlHgUok6XuFg7C5dlHtfO7BBvZpbMiMPkzGe7EgO+fvFwQx8Wi
- ZjWcWtmw7ht9ztq+ectisIlB4/08PIU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-8shXb-kcOT2i71EFNY0-Jw-1; Tue, 21 Jan 2020 10:29:50 -0500
-Received: by mail-wm1-f70.google.com with SMTP id q26so487591wmq.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 07:29:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=drluyyJgvZU1MSvZk9nVX/INIds5bPQT7NFflzdSLzQ=;
- b=Cv+4mxnY0+Lt51Gd6N9uN5fVc7G+iybZTTiEcRhOX4weiABAzobR4JSaqDEwm3zTuA
- VAalRORfHKtFHcQ9B24DjztcPpVWpgVI4xyarHAtuPzWXTQHofX2QSEkwqAYviGXfPco
- fdzBqReBDcOIPKvacbRPp+4/NG2ceqlcPLqP9Dj+Py6Bvq3FqnsRwvmDhrU5WNATglHE
- 2uT92Fr69hfLVce14ZL0LcMhoWW/Qzswybqepkr0ViK66rW2pbplrHn0Dd1R1U0DV8ly
- l9HzdQR7PJPgZokBZyo8rWnt9l2E3Ew+9AS6h42e3zgbr/6aW4J4pWRb8uqOSYl3MW4M
- fFxg==
-X-Gm-Message-State: APjAAAUzmA2K5tncRkKQWKyrK8wUCXn9QJ9sQc888iyI8seieZUXRVRO
- w+ytwwzk0m/1B9g/+p8PBe1I0wvodfdUMjAdpXS9piYKZu3ZFOlft+mh1vVn5pVRngx9StBlOib
- g0icFeZxC9igWupeNKLNiuMOZ
-X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr4986299wmj.165.1579620588915; 
- Tue, 21 Jan 2020 07:29:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzv1AiZkeRHvYhkTqdyoDwaDda+xt9Gb+5IDcg8qw+ja8rw8ozohTnvztIc5tRcztih3xCz/Q==
-X-Received: by 2002:a7b:cb0a:: with SMTP id u10mr4986279wmj.165.1579620588629; 
- Tue, 21 Jan 2020 07:29:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a?
- ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
- by smtp.gmail.com with ESMTPSA id p17sm52810460wrx.20.2020.01.21.07.29.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jan 2020 07:29:48 -0800 (PST)
-Subject: Re: [PULL kvm-unit-tests 0/3] arm/arm64: Add prefetch abort test
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-References: <20200121131745.7199-1-drjones@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b3033da-f347-f393-b7b0-3482a52a9185@redhat.com>
-Date: Tue, 21 Jan 2020 16:29:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ with ESMTP id isvQKF7kfofu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jan 2020 17:32:04 -0500 (EST)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4728A4A65C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:04 -0500 (EST)
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Jan 2020 14:32:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; d="scan'208";a="244845094"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+ by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:02 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v5 00/19] KVM: Dynamically size memslot arrays
+Date: Tue, 21 Jan 2020 14:31:38 -0800
+Message-Id: <20200121223157.15263-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200121131745.7199-1-drjones@redhat.com>
-Content-Language: en-US
-X-MC-Unique: 8shXb-kcOT2i71EFNY0-Jw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Christian Borntraeger <borntraeger@de.ibm.com>,
+ kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,13 +77,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 21/01/20 14:17, Andrew Jones wrote:
->   https://github.com/rhdrjones/kvm-unit-tests arm/queue
+I'd love to get this into 5.6 if possible.  The rebase to kvm/queue only
+had a single superficial conflict with 668effb63de8 ("KVM: Fix some wrong
+function names in comment"), and s390 (Christian) and arm64 (Marc) both
+got smoke tested in v4.
 
-Pulled, thanks.  It may take until tomorrow before I push because I'm
-testing 100-odd x86 patches. :)
+Thanks!
 
-Paolo
+v5:
+  - Make the selftest x86-only. [Christian].
+  - Collect tags. [Peter]
+  - Rebase to kvm/queue, fb0c5f8fb698 ("KVM: x86: inline memslot_...").
+
+v4:
+  - Add patch 01 to fix an x86 rmap/lpage bug, and patches 10 and 11 to
+    resolve hidden conflicts with the bug fix.
+  - Collect tags [Christian, Marc, Philippe].
+  - Rebase to kvm/queue, commit e41a90be9659 ("KVM: x86/mmu: WARN if
+    root_hpa is invalid when handling a page fault").
+v3:
+  - Fix build errors on PPC and MIPS due to missed params during
+    refactoring [kbuild test robot].
+  - Rename the helpers for update_memslots() and add comments describing
+    the new algorithm and how it interacts with searching [Paolo].
+  - Remove the unnecessary and obnoxious warning regarding memslots being
+    a flexible array [Paolo].
+  - Fix typos in the changelog of patch 09/15 [Christoffer].
+  - Collect tags [Christoffer].
+
+v2:
+  - Split "Drop kvm_arch_create_memslot()" into three patches to move
+    minor functional changes to standalone patches [Janosch].
+  - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
+  - Collect an Acked-by and a Reviewed-by
+
+*** v1 cover letter ***
+
+The end goal of this series is to dynamically size the memslot array so
+that KVM allocates memory based on the number of memslots in use, as
+opposed to unconditionally allocating memory for the maximum number of
+memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+the memory footprint from 90k to ~2.6k bytes.
+
+The changes required to support dynamic sizing are relatively small,
+e.g. are essentially contained in patches 17/19 and 18/19.
+
+Patches 2-16 clean up the memslot code, which has gotten quite crusty,
+especially __kvm_set_memory_region().  The clean up is likely not strictly
+necessary to switch to dynamic sizing, but I didn't have a remotely
+reasonable level of confidence in the correctness of the dynamic sizing
+without first doing the clean up.
+
+The only functional change in v4 is the addition of an x86-specific bug
+fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly related
+to dynamically allocating memslots, but it has subtle and hidden conflicts
+with the cleanup patches, and the fix is higher priority than anything
+else in the series, i.e. should be merged first.
+
+On non-x86 architectures, v3 and v4 should be functionally equivalent,
+the only non-x86 change in v4 is the dropping of a "const" in
+kvm_arch_commit_memory_region().
+
+Sean Christopherson (19):
+  KVM: x86: Allocate new rmap and large page tracking when moving
+    memslot
+  KVM: Reinstall old memslots if arch preparation fails
+  KVM: Don't free new memslot if allocation of said memslot fails
+  KVM: PPC: Move memslot memory allocation into prepare_memory_region()
+  KVM: x86: Allocate memslot resources during prepare_memory_region()
+  KVM: Drop kvm_arch_create_memslot()
+  KVM: Explicitly free allocated-but-unused dirty bitmap
+  KVM: Refactor error handling for setting memory region
+  KVM: Move setting of memslot into helper routine
+  KVM: Drop "const" attribute from old memslot in commit_memory_region()
+  KVM: x86: Free arrays for old memslot when moving memslot's base gfn
+  KVM: Move memslot deletion to helper function
+  KVM: Simplify kvm_free_memslot() and all its descendents
+  KVM: Clean up local variable usage in __kvm_set_memory_region()
+  KVM: Provide common implementation for generic dirty log functions
+  KVM: Ensure validity of memslot with respect to kvm_get_dirty_log()
+  KVM: Terminate memslot walks via used_slots
+  KVM: Dynamically size memslot array based on number of used slots
+  KVM: selftests: Add test for KVM_SET_USER_MEMORY_REGION
+
+ arch/mips/include/asm/kvm_host.h              |   2 +-
+ arch/mips/kvm/mips.c                          |  71 +-
+ arch/powerpc/include/asm/kvm_ppc.h            |  17 +-
+ arch/powerpc/kvm/book3s.c                     |  22 +-
+ arch/powerpc/kvm/book3s_hv.c                  |  36 +-
+ arch/powerpc/kvm/book3s_pr.c                  |  20 +-
+ arch/powerpc/kvm/booke.c                      |  17 +-
+ arch/powerpc/kvm/powerpc.c                    |  15 +-
+ arch/s390/include/asm/kvm_host.h              |   2 +-
+ arch/s390/kvm/kvm-s390.c                      |  23 +-
+ arch/x86/include/asm/kvm_page_track.h         |   3 +-
+ arch/x86/kvm/mmu/page_track.c                 |  15 +-
+ arch/x86/kvm/x86.c                            | 114 +---
+ include/linux/kvm_host.h                      |  48 +-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  30 +
+ .../kvm/x86_64/set_memory_region_test.c       | 142 ++++
+ virt/kvm/arm/arm.c                            |  48 +-
+ virt/kvm/arm/mmu.c                            |  20 +-
+ virt/kvm/kvm_main.c                           | 621 ++++++++++++------
+ 22 files changed, 734 insertions(+), 535 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/set_memory_region_test.c
+
+-- 
+2.24.1
 
 _______________________________________________
 kvmarm mailing list
