@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18928C33CAA
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3760EC33CAF
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CFB112465A
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB112465A
+	by mail.kernel.org (Postfix) with ESMTP id E6F6424653
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 22:32:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6F6424653
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F794AECE;
-	Tue, 21 Jan 2020 17:32:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BD984A534;
+	Tue, 21 Jan 2020 17:32:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GhcvezgEoSk5; Tue, 21 Jan 2020 17:32:12 -0500 (EST)
+	with ESMTP id riSuX-WkuwzF; Tue, 21 Jan 2020 17:32:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B544AEFB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B13524AF05;
 	Tue, 21 Jan 2020 17:32:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D98B4AEB8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CEA64AEBD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sGZeaRz8NoJ3 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Vn5zXhM5PeAT for <kvmarm@lists.cs.columbia.edu>;
  Tue, 21 Jan 2020 17:32:05 -0500 (EST)
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E07434ACC4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FDF94AC88
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 17:32:05 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Jan 2020 14:32:02 -0800
+ 21 Jan 2020 14:32:03 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; d="scan'208";a="244845112"
+X-IronPort-AV: E=Sophos;i="5.70,347,1574150400"; d="scan'208";a="244845128"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:02 -0800
+ by orsmga002.jf.intel.com with ESMTP; 21 Jan 2020 14:32:03 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v5 04/19] KVM: PPC: Move memslot memory allocation into
- prepare_memory_region()
-Date: Tue, 21 Jan 2020 14:31:42 -0800
-Message-Id: <20200121223157.15263-5-sean.j.christopherson@intel.com>
+Subject: [PATCH v5 07/19] KVM: Explicitly free allocated-but-unused dirty
+ bitmap
+Date: Tue, 21 Jan 2020 14:31:45 -0800
+Message-Id: <20200121223157.15263-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200121223157.15263-1-sean.j.christopherson@intel.com>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
@@ -80,218 +80,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allocate the rmap array during kvm_arch_prepare_memory_region() to pave
-the way for removing kvm_arch_create_memslot() altogether.  Moving PPC's
-memory allocation only changes the order of kernel memory allocations
-between PPC and common KVM code.
+Explicitly free an allocated-but-unused dirty bitmap instead of relying
+on kvm_free_memslot() if an error occurs in __kvm_set_memory_region().
+There is no longer a need to abuse kvm_free_memslot() to free arch
+specific resources as arch specific code is now called only after the
+common flow is guaranteed to succeed.  Arch code can still fail, but
+it's responsible for its own cleanup in that case.
 
-No functional change intended.
+Eliminating the error path's abuse of kvm_free_memslot() paves the way
+for simplifying kvm_free_memslot(), i.e. dropping its @dont param.
 
-Acked-by: Paul Mackerras <paulus@ozlabs.org>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/include/asm/kvm_ppc.h | 11 ++++-------
- arch/powerpc/kvm/book3s.c          | 12 ++++--------
- arch/powerpc/kvm/book3s_hv.c       | 25 ++++++++++++-------------
- arch/powerpc/kvm/book3s_pr.c       | 11 ++---------
- arch/powerpc/kvm/booke.c           |  9 ++-------
- arch/powerpc/kvm/powerpc.c         |  4 ++--
- 6 files changed, 26 insertions(+), 46 deletions(-)
+ virt/kvm/kvm_main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index bc2494e5710a..d162649430ba 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -202,12 +202,10 @@ extern void kvmppc_core_destroy_vm(struct kvm *kvm);
- extern void kvmppc_core_free_memslot(struct kvm *kvm,
- 				     struct kvm_memory_slot *free,
- 				     struct kvm_memory_slot *dont);
--extern int kvmppc_core_create_memslot(struct kvm *kvm,
--				      struct kvm_memory_slot *slot,
--				      unsigned long npages);
- extern int kvmppc_core_prepare_memory_region(struct kvm *kvm,
- 				struct kvm_memory_slot *memslot,
--				const struct kvm_userspace_memory_region *mem);
-+				const struct kvm_userspace_memory_region *mem,
-+				enum kvm_mr_change change);
- extern void kvmppc_core_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
- 				const struct kvm_memory_slot *old,
-@@ -280,7 +278,8 @@ struct kvmppc_ops {
- 	void (*flush_memslot)(struct kvm *kvm, struct kvm_memory_slot *memslot);
- 	int (*prepare_memory_region)(struct kvm *kvm,
- 				     struct kvm_memory_slot *memslot,
--				     const struct kvm_userspace_memory_region *mem);
-+				     const struct kvm_userspace_memory_region *mem,
-+				     enum kvm_mr_change change);
- 	void (*commit_memory_region)(struct kvm *kvm,
- 				     const struct kvm_userspace_memory_region *mem,
- 				     const struct kvm_memory_slot *old,
-@@ -294,8 +293,6 @@ struct kvmppc_ops {
- 	void (*mmu_destroy)(struct kvm_vcpu *vcpu);
- 	void (*free_memslot)(struct kvm_memory_slot *free,
- 			     struct kvm_memory_slot *dont);
--	int (*create_memslot)(struct kvm_memory_slot *slot,
--			      unsigned long npages);
- 	int (*init_vm)(struct kvm *kvm);
- 	void (*destroy_vm)(struct kvm *kvm);
- 	int (*get_smmu_info)(struct kvm *kvm, struct kvm_ppc_smmu_info *info);
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index d07a8e12fa15..e9149a815806 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -810,12 +810,6 @@ void kvmppc_core_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- 	kvm->arch.kvm_ops->free_memslot(free, dont);
- }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5e777ab02395..9bc51f062022 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1092,7 +1092,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
  
--int kvmppc_core_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			       unsigned long npages)
--{
--	return kvm->arch.kvm_ops->create_memslot(slot, npages);
--}
--
- void kvmppc_core_flush_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
- {
- 	kvm->arch.kvm_ops->flush_memslot(kvm, memslot);
-@@ -823,9 +817,11 @@ void kvmppc_core_flush_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ 	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+ 	if (!slots)
+-		goto out_free;
++		goto out_bitmap;
+ 	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
  
- int kvmppc_core_prepare_memory_region(struct kvm *kvm,
- 				struct kvm_memory_slot *memslot,
--				const struct kvm_userspace_memory_region *mem)
-+				const struct kvm_userspace_memory_region *mem,
-+				enum kvm_mr_change change)
- {
--	return kvm->arch.kvm_ops->prepare_memory_region(kvm, memslot, mem);
-+	return kvm->arch.kvm_ops->prepare_memory_region(kvm, memslot, mem,
-+							change);
+ 	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
+@@ -1140,8 +1140,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+ 		slots = install_new_memslots(kvm, as_id, slots);
+ 	kvfree(slots);
+-out_free:
+-	kvm_free_memslot(kvm, &new, &old);
++out_bitmap:
++	if (new.dirty_bitmap && !old.dirty_bitmap)
++		kvm_destroy_dirty_bitmap(&new);
+ out:
+ 	return r;
  }
- 
- void kvmppc_core_commit_memory_region(struct kvm *kvm,
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index f4b72cef09d5..c3d4abae5a4d 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4453,20 +4453,20 @@ static void kvmppc_core_free_memslot_hv(struct kvm_memory_slot *free,
- 	}
- }
- 
--static int kvmppc_core_create_memslot_hv(struct kvm_memory_slot *slot,
--					 unsigned long npages)
--{
--	slot->arch.rmap = vzalloc(array_size(npages, sizeof(*slot->arch.rmap)));
--	if (!slot->arch.rmap)
--		return -ENOMEM;
--
--	return 0;
--}
--
- static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
--					struct kvm_memory_slot *memslot,
--					const struct kvm_userspace_memory_region *mem)
-+					struct kvm_memory_slot *slot,
-+					const struct kvm_userspace_memory_region *mem,
-+					enum kvm_mr_change change)
- {
-+	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
-+
-+	if (change == KVM_MR_CREATE) {
-+		slot->arch.rmap = vzalloc(array_size(npages,
-+					  sizeof(*slot->arch.rmap)));
-+		if (!slot->arch.rmap)
-+			return -ENOMEM;
-+	}
-+
- 	return 0;
- }
- 
-@@ -5525,7 +5525,6 @@ static struct kvmppc_ops kvm_ops_hv = {
- 	.set_spte_hva = kvm_set_spte_hva_hv,
- 	.mmu_destroy  = kvmppc_mmu_destroy_hv,
- 	.free_memslot = kvmppc_core_free_memslot_hv,
--	.create_memslot = kvmppc_core_create_memslot_hv,
- 	.init_vm =  kvmppc_core_init_vm_hv,
- 	.destroy_vm = kvmppc_core_destroy_vm_hv,
- 	.get_smmu_info = kvm_vm_ioctl_get_smmu_info_hv,
-diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-index d88f708d5be3..d507bbf7a685 100644
---- a/arch/powerpc/kvm/book3s_pr.c
-+++ b/arch/powerpc/kvm/book3s_pr.c
-@@ -1927,7 +1927,8 @@ static void kvmppc_core_flush_memslot_pr(struct kvm *kvm,
- 
- static int kvmppc_core_prepare_memory_region_pr(struct kvm *kvm,
- 					struct kvm_memory_slot *memslot,
--					const struct kvm_userspace_memory_region *mem)
-+					const struct kvm_userspace_memory_region *mem,
-+					enum kvm_mr_change change)
- {
- 	return 0;
- }
-@@ -1947,13 +1948,6 @@ static void kvmppc_core_free_memslot_pr(struct kvm_memory_slot *free,
- 	return;
- }
- 
--static int kvmppc_core_create_memslot_pr(struct kvm_memory_slot *slot,
--					 unsigned long npages)
--{
--	return 0;
--}
--
--
- #ifdef CONFIG_PPC64
- static int kvm_vm_ioctl_get_smmu_info_pr(struct kvm *kvm,
- 					 struct kvm_ppc_smmu_info *info)
-@@ -2098,7 +2092,6 @@ static struct kvmppc_ops kvm_ops_pr = {
- 	.set_spte_hva = kvm_set_spte_hva_pr,
- 	.mmu_destroy  = kvmppc_mmu_destroy_pr,
- 	.free_memslot = kvmppc_core_free_memslot_pr,
--	.create_memslot = kvmppc_core_create_memslot_pr,
- 	.init_vm = kvmppc_core_init_vm_pr,
- 	.destroy_vm = kvmppc_core_destroy_vm_pr,
- 	.get_smmu_info = kvm_vm_ioctl_get_smmu_info_pr,
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 9cb8257b4118..05cf548f172c 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -1776,15 +1776,10 @@ void kvmppc_core_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- {
- }
- 
--int kvmppc_core_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			       unsigned long npages)
--{
--	return 0;
--}
--
- int kvmppc_core_prepare_memory_region(struct kvm *kvm,
- 				      struct kvm_memory_slot *memslot,
--				      const struct kvm_userspace_memory_region *mem)
-+				      const struct kvm_userspace_memory_region *mem,
-+				      enum kvm_mr_change change)
- {
- 	return 0;
- }
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 1af96fb5dc6f..4e0f7a77920d 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -694,7 +694,7 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			    unsigned long npages)
- {
--	return kvmppc_core_create_memslot(kvm, slot, npages);
-+	return 0;
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
-@@ -702,7 +702,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   enum kvm_mr_change change)
- {
--	return kvmppc_core_prepare_memory_region(kvm, memslot, mem);
-+	return kvmppc_core_prepare_memory_region(kvm, memslot, mem, change);
- }
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
 -- 
 2.24.1
 
