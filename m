@@ -6,94 +6,95 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550DFC2D0CE
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 14:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD7BC2D0CE
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CFFA824655
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 14:24:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24808217F4
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jan 2020 14:26:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gEcewj+6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFA824655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkNEywdQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24808217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52C584AFEF;
-	Tue, 21 Jan 2020 09:24:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD5E4AFC5;
+	Tue, 21 Jan 2020 09:26:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Cqus+ktJC8YH; Tue, 21 Jan 2020 09:24:38 -0500 (EST)
+	with ESMTP id SGE1OJRcOHbe; Tue, 21 Jan 2020 09:26:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44BD44AFF8;
-	Tue, 21 Jan 2020 09:24:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAE7A4AFF8;
+	Tue, 21 Jan 2020 09:26:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 856F74AFEF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 09:24:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA2D54AFC9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 09:26:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 037jIWmOP+ej for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jan 2020 09:24:36 -0500 (EST)
+ with ESMTP id 048X3ls-5yRu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jan 2020 09:26:34 -0500 (EST)
 Received: from us-smtp-delivery-1.mimecast.com
  (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92A724AFDE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 09:24:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0A64AFC5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 09:26:34 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579616676;
+ s=mimecast20190719; t=1579616793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
- b=gEcewj+6vNDNPjxB+44kCmZ+rItN4DxLbT80VCVg8+N8fu2PTt+twUsu1wDr/D0rhQ+htq
- pjrJwChUdeFVogbZrrFU7UQuydVQ40ZrMocDW15OSzZa/GxCcaxL9c20F/SiGJtea9qG74
- GschU2NtrPgdD7YCRnE/Wc71nDtcVvs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-a9MGI32rMt2gy_FJ0v6DiQ-1; Tue, 21 Jan 2020 09:24:35 -0500
-Received: by mail-wm1-f70.google.com with SMTP id 7so426119wmf.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 06:24:35 -0800 (PST)
+ bh=wB7oBUxPFMMo41Dhy/A6/q8IlRImdTJH/qsnmSwn8s8=;
+ b=SkNEywdQxA2MNtBg974Sn0ZydviqoFf7LucDrjpzy39Tsk8ub9HgZig3tiUC1+XV8YjbVC
+ dTZMVC1+cXJQ0Y9JvlxcvsQVNTw2JT79hjDojprlb9ehkrPWMN4i5j+ONb6/mm5FEXWbh0
+ xgCF491KvV5JkAxjJhjWm2briBhiIR8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-Y6cku3gIPYWA6k5aWJ7YYg-1; Tue, 21 Jan 2020 09:26:31 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z14so1394878wrs.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jan 2020 06:26:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=iietA04mTbBj3y8KEP1nE87RzCPxCIolbi4wDz4ohvY=;
- b=SARxfyJTCaCaTMm/dZfYkZbo5jSLwwXVGfBxQvxdxvJZ5YcV6/1ovrIVQDz/UBls4z
- AyXJC2xBlTCAHuDb+dWTyyurMVk0qP7zgJoChmKVdpVKjZN2thQ9lfZ8WpuCXJQymTCd
- PaQnQbx9GF+AdIIb2rqMZNko1ChfshfILwJsJIkowzAtDXk3ZDnh5k0xARQ0rywd0jxj
- NYPWcQB0Ab1HjhOb+Y+eErrEQ6ZTF++vujFGNfwgx0y009Jzc5Dst0+aSOTy1qknWOQa
- Pbskrrd0VSLQFnr4JDqo5otXZn54TuDERZwKeLsLe98BTK0dOKGK8BLOf62WJjruzpIU
- x6uQ==
-X-Gm-Message-State: APjAAAX0VXEL3o0LQygqf8feC6lIO1jKWreNuelK6qOKkF6BBodk5puW
- Haz6WjGNTUluqGayfUoX/r4Z9RocCWb80kHemT8wbgtDEfEBPqyxaENNtWoxFnyMqUYylSYDUmC
- IU5+9XMhJYRIM3CsTUs3wZFns
-X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440107wrt.339.1579616673970; 
- Tue, 21 Jan 2020 06:24:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyTZsEeiVXo1aYXs9MoGNtX19umLmm3R/ZbsXqxiGO2rVQCtL37lQcA37U+6PdsUBw/nSKlMg==
-X-Received: by 2002:a5d:4d06:: with SMTP id z6mr5440056wrt.339.1579616673641; 
- Tue, 21 Jan 2020 06:24:33 -0800 (PST)
+ bh=wB7oBUxPFMMo41Dhy/A6/q8IlRImdTJH/qsnmSwn8s8=;
+ b=BwqkAd4SgeH5Eah2n+5zlxC4l/KhMIIe2r/ZEI/8tmeor+iPjLpjv5XL7eTsatiOhg
+ GqT02JSZCoGPqxJEifdrBPLO0ooOdvIropeM2keqK7YlbzAm0e8ut1FWgt0bVva8MOVS
+ 7KkJz9EEwXZw+S24I7gkhsCaZdY+3MGGV6vzgd7uR3ooXoscbRW/14PvNnFV0jNUqxsN
+ Z0HCJvpCyuQH1dRPgZ8GTReB5nel2gCcDhaJu3jdj6xS1g4DXJWTPUhToGBKuDcvqPQS
+ eJO+eqWoj04Pi5LDZ5iWslpQ/UaCufsfaLPpJdLs+Lz/oX6ppgwLlR96LNKRiHogL5YF
+ uyjw==
+X-Gm-Message-State: APjAAAW3SNjFMFbZrwPVOBiuxL2z4a/loZQERvdmz/3allKrsxcVtkLR
+ PWX/IgIOmQVTOjAqHScoKTwPJICnQPMiO2nULv8/uRoBIbBluRZKgI+Sb+xQza26rfe/+Z9lIhO
+ T4aWIcOc6Q28VRVy6NSZbFsS6
+X-Received: by 2002:a5d:6089:: with SMTP id w9mr5614967wrt.228.1579616790219; 
+ Tue, 21 Jan 2020 06:26:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxWjz4Oe+H/gSHDnoSQ5o2pah30WIinDPbt454AQ/QK4v/OQZOFatnXxkc9zEh4soAyNb9f2w==
+X-Received: by 2002:a5d:6089:: with SMTP id w9mr5614921wrt.228.1579616789896; 
+ Tue, 21 Jan 2020 06:26:29 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:b509:fc01:ee8a:ca8a?
  ([2001:b07:6468:f312:b509:fc01:ee8a:ca8a])
- by smtp.gmail.com with ESMTPSA id m3sm51279088wrs.53.2020.01.21.06.24.31
+ by smtp.gmail.com with ESMTPSA id q68sm4727432wme.14.2020.01.21.06.26.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jan 2020 06:24:33 -0800 (PST)
-Subject: Re: [PATCH 04/14] KVM: Play nice with read-only memslots when
- querying host page size
-To: Sean Christopherson <sean.j.christopherson@intel.com>
+ Tue, 21 Jan 2020 06:26:29 -0800 (PST)
+Subject: Re: [PATCH 05/14] x86/mm: Introduce lookup_address_in_mm()
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Sean Christopherson <sean.j.christopherson@intel.com>
 References: <20200108202448.9669-1-sean.j.christopherson@intel.com>
- <20200108202448.9669-5-sean.j.christopherson@intel.com>
+ <20200108202448.9669-6-sean.j.christopherson@intel.com>
+ <871rs8batm.fsf@nanos.tec.linutronix.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c091d40-8e32-1e55-2eff-27a4b43e0674@redhat.com>
-Date: Tue, 21 Jan 2020 15:24:29 +0100
+Message-ID: <175cef39-1e0e-d1b7-69bc-95a3a2a651a7@redhat.com>
+Date: Tue, 21 Jan 2020 15:26:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200108202448.9669-5-sean.j.christopherson@intel.com>
+In-Reply-To: <871rs8batm.fsf@nanos.tec.linutronix.de>
 Content-Language: en-US
-X-MC-Unique: a9MGI32rMt2gy_FJ0v6DiQ-1
+X-MC-Unique: Y6cku3gIPYWA6k5aWJ7YYg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
@@ -126,45 +127,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/01/20 21:24, Sean Christopherson wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 5f7f06824c2b..d9aced677ddd 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1418,15 +1418,23 @@ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
->  
->  unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
->  {
-> +	struct kvm_memory_slot *slot;
->  	struct vm_area_struct *vma;
->  	unsigned long addr, size;
->  
->  	size = PAGE_SIZE;
->  
-> -	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
-> -	if (kvm_is_error_hva(addr))
-> +	/*
-> +	 * Manually do the equivalent of kvm_vcpu_gfn_to_hva() to avoid the
-> +	 * "writable" check in __gfn_to_hva_many(), which will always fail on
-> +	 * read-only memslots due to gfn_to_hva() assuming writes.
-> +	 */
-> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-> +	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
->  		return PAGE_SIZE;
->  
-> +	addr = __gfn_to_hva_memslot(slot, gfn);
-> +
->  	down_read(&current->mm->mmap_sem);
->  	vma = find_vma(current->mm, addr);
->  	if (!vma)
+On 09/01/20 22:04, Thomas Gleixner wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> 
+>> diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
+>> index b5e49e6bac63..400ac8da75e8 100644
+>> --- a/arch/x86/include/asm/pgtable_types.h
+>> +++ b/arch/x86/include/asm/pgtable_types.h
+>> @@ -561,6 +561,10 @@ static inline void update_page_count(int level, unsigned long pages) { }
+>>  extern pte_t *lookup_address(unsigned long address, unsigned int *level);
+>>  extern pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
+>>  				    unsigned int *level);
+>> +
+>> +struct mm_struct;
+>> +pte_t *lookup_address_in_mm(struct mm_struct *mm, unsigned long address,
+>> +			    unsigned int *level);
+> 
+> Please keep the file consistent and use extern even if not required.
+> 
+> Other than that:
+> 
+> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 > 
 
-Even simpler: use kvm_vcpu_gfn_to_hva_prot
-
--	addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
-+	addr = kvm_vcpu_gfn_to_hva_prot(vcpu, gfn, NULL);
-
-"You are in a maze of twisty little functions, all alike".
+Adjusted, thanks for the review.
 
 Paolo
 
