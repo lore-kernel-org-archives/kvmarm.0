@@ -2,79 +2,60 @@ Return-Path: <SRS0=OV02=3L=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE2CC2D0DB
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 10:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B7CC2D0DB
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 11:30:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9635F24689
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 10:44:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXkWgPRY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9635F24689
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 463E324680
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 11:30:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463E324680
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E41974AC7C;
-	Wed, 22 Jan 2020 05:44:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A189C4AE94;
+	Wed, 22 Jan 2020 06:30:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hI+cVyYs61wu; Wed, 22 Jan 2020 05:44:11 -0500 (EST)
+	with ESMTP id TRHZcDb56wGy; Wed, 22 Jan 2020 06:30:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D22FA4ACBA;
-	Wed, 22 Jan 2020 05:44:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86FA74ACBA;
+	Wed, 22 Jan 2020 06:30:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99DA94AC6C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 05:44:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E4EB4AC86
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 06:30:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9nGgRErs1w2k for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jan 2020 05:44:09 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73A184A52C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 05:44:09 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5FA0224688;
- Wed, 22 Jan 2020 10:44:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1579689848;
- bh=U7baVMUBD0atkOvxVpY1i6OsBGZBdoYk6vMsLlamq5I=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ZXkWgPRYXC9AKBrp3Hlil++Z4lNFiEZjUjC/mAdr53vbH1Wtz8Z2quRd0RSkznGf0
- x8pQmO3goBhNl8wI7rTYrajTkOSfJXw0i+olU0Wb/ZD+Lm1lphPJtg9gDwREphdoRI
- WtwfN8MwqWIKnFv52fFI/Pcmwl9nOYFGbILW9ojY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1iuDUU-000ipx-AG; Wed, 22 Jan 2020 10:44:06 +0000
-MIME-Version: 1.0
-Date: Wed, 22 Jan 2020 10:44:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id 9n6LhJmkPaUd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jan 2020 06:30:03 -0500 (EST)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6F8C4A959
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 06:30:02 -0500 (EST)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id DCEDA8B92F11E2311C26;
+ Wed, 22 Jan 2020 19:29:59 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Wed, 22 Jan 2020
+ 19:29:49 +0800
 Subject: Re: [PATCH] irqchip/gic-v3-its: Don't confuse get_vlpi_map() by
  writing DB config
-In-Reply-To: <20200122085609.658-1-yuzenghui@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200122085609.658-1-yuzenghui@huawei.com>
-Message-ID: <4aaaad3ae7367c5c932c430e18550d9e@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, jason@lakedaemon.net,
- wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <4aaaad3ae7367c5c932c430e18550d9e@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <06a484bd-4f46-6884-1bee-9b7b65fd0856@huawei.com>
+Date: Wed, 22 Jan 2020 19:29:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <4aaaad3ae7367c5c932c430e18550d9e@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Cc: tglx@linutronix.de, kvmarm@lists.cs.columbia.edu, jason@lakedaemon.net,
  linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -88,102 +69,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-Thanks for this.
-
-On 2020-01-22 08:56, Zenghui Yu wrote:
-> When we're writing config for the doorbell interrupt, get_vlpi_map() 
-> will
-> get confused by doorbell's d->parent_data hack and find the wrong 
-> its_dev
-> as chip data and the wrong event.
-> 
-> Fix this issue by making sure no doorbells will be involved before 
-> invoking
-> get_vlpi_map(), which restore some of the logic in lpi_write_config().
-> 
-> Fixes: c1d4d5cd203c ("irqchip/gic-v3-its: Add its_vlpi_map helpers")
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
-> 
-> This is based on mainline and can't be directly applied to the current
-> irqchip-next.
-> 
->  drivers/irqchip/irq-gic-v3-its.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index e05673bcd52b..cc8a4fcbd6d6 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1181,12 +1181,13 @@ static struct its_vlpi_map
-> *get_vlpi_map(struct irq_data *d)
-> 
->  static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
->  {
-> -	struct its_vlpi_map *map = get_vlpi_map(d);
->  	irq_hw_number_t hwirq;
->  	void *va;
->  	u8 *cfg;
-> 
-> -	if (map) {
-> +	if (irqd_is_forwarded_to_vcpu(d)) {
-> +		struct its_vlpi_map *map = get_vlpi_map(d);
-> +
->  		va = page_address(map->vm->vprop_page);
->  		hwirq = map->vintid;
-
-Shouldn't we fix get_vlpi_map() instead? Something like (untested):
-
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index e05673bcd52b..b704214390c0 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1170,13 +1170,14 @@ static void its_send_vclear(struct its_device 
-*dev, u32 event_id)
-   */
-  static struct its_vlpi_map *get_vlpi_map(struct irq_data *d)
-  {
--	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
--	u32 event = its_get_event_id(d);
-+	if (irqd_is_forwarded_to_vcpu(d)) {
-+		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
-+		u32 event = its_get_event_id(d);
-
--	if (!irqd_is_forwarded_to_vcpu(d))
--		return NULL;
-+		return dev_event_to_vlpi_map(its_dev, event);
-+	}
-
--	return dev_event_to_vlpi_map(its_dev, event);
-+	return NULL;
-  }
-
-  static void lpi_write_config(struct irq_data *d, u8 clr, u8 set)
-
-
-Or am I missing the actual problem?
-
-Overall, I'm starting to hate that ->parent hack as it's been the source
-of a number of bugs.
-
-The main issue is that the VPE hierarchy is missing one level (it has
-no ITS domain, and goes directly from the VPE domain to the low-level
-GIC domain). It means we end-up special-casing things, and that's never
-good...
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMS8yMiAxODo0NCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFpl
+bmdodWksCj4gCj4gVGhhbmtzIGZvciB0aGlzLgo+IAo+IE9uIDIwMjAtMDEtMjIgMDg6NTYsIFpl
+bmdodWkgWXUgd3JvdGU6Cj4+IFdoZW4gd2UncmUgd3JpdGluZyBjb25maWcgZm9yIHRoZSBkb29y
+YmVsbCBpbnRlcnJ1cHQsIGdldF92bHBpX21hcCgpIHdpbGwKPj4gZ2V0IGNvbmZ1c2VkIGJ5IGRv
+b3JiZWxsJ3MgZC0+cGFyZW50X2RhdGEgaGFjayBhbmQgZmluZCB0aGUgd3JvbmcgaXRzX2Rldgo+
+PiBhcyBjaGlwIGRhdGEgYW5kIHRoZSB3cm9uZyBldmVudC4KPj4KPj4gRml4IHRoaXMgaXNzdWUg
+YnkgbWFraW5nIHN1cmUgbm8gZG9vcmJlbGxzIHdpbGwgYmUgaW52b2x2ZWQgYmVmb3JlIAo+PiBp
+bnZva2luZwo+PiBnZXRfdmxwaV9tYXAoKSwgd2hpY2ggcmVzdG9yZSBzb21lIG9mIHRoZSBsb2dp
+YyBpbiBscGlfd3JpdGVfY29uZmlnKCkuCj4+Cj4+IEZpeGVzOiBjMWQ0ZDVjZDIwM2MgKCJpcnFj
+aGlwL2dpYy12My1pdHM6IEFkZCBpdHNfdmxwaV9tYXAgaGVscGVycyIpCj4+IFNpZ25lZC1vZmYt
+Ynk6IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+PiAtLS0KPj4KPj4gVGhpcyBp
+cyBiYXNlZCBvbiBtYWlubGluZSBhbmQgY2FuJ3QgYmUgZGlyZWN0bHkgYXBwbGllZCB0byB0aGUg
+Y3VycmVudAo+PiBpcnFjaGlwLW5leHQuCj4+Cj4+IMKgZHJpdmVycy9pcnFjaGlwL2lycS1naWMt
+djMtaXRzLmMgfCA1ICsrKy0tCj4+IMKgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwg
+MiBkZWxldGlvbnMoLSkKPj4KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2lj
+LXYzLWl0cy5jIAo+PiBiL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYzLWl0cy5jCj4+IGluZGV4
+IGUwNTY3M2JjZDUyYi4uY2M4YTRmY2JkNmQ2IDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL2lycWNo
+aXAvaXJxLWdpYy12My1pdHMuYwo+PiArKysgYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1p
+dHMuYwo+PiBAQCAtMTE4MSwxMiArMTE4MSwxMyBAQCBzdGF0aWMgc3RydWN0IGl0c192bHBpX21h
+cAo+PiAqZ2V0X3ZscGlfbWFwKHN0cnVjdCBpcnFfZGF0YSAqZCkKPj4KPj4gwqBzdGF0aWMgdm9p
+ZCBscGlfd3JpdGVfY29uZmlnKHN0cnVjdCBpcnFfZGF0YSAqZCwgdTggY2xyLCB1OCBzZXQpCj4+
+IMKgewo+PiAtwqDCoMKgIHN0cnVjdCBpdHNfdmxwaV9tYXAgKm1hcCA9IGdldF92bHBpX21hcChk
+KTsKPj4gwqDCoMKgwqAgaXJxX2h3X251bWJlcl90IGh3aXJxOwo+PiDCoMKgwqDCoCB2b2lkICp2
+YTsKPj4gwqDCoMKgwqAgdTggKmNmZzsKPj4KPj4gLcKgwqDCoCBpZiAobWFwKSB7Cj4+ICvCoMKg
+wqAgaWYgKGlycWRfaXNfZm9yd2FyZGVkX3RvX3ZjcHUoZCkpIHsKPj4gK8KgwqDCoMKgwqDCoMKg
+IHN0cnVjdCBpdHNfdmxwaV9tYXAgKm1hcCA9IGdldF92bHBpX21hcChkKTsKPj4gKwo+PiDCoMKg
+wqDCoMKgwqDCoMKgIHZhID0gcGFnZV9hZGRyZXNzKG1hcC0+dm0tPnZwcm9wX3BhZ2UpOwo+PiDC
+oMKgwqDCoMKgwqDCoMKgIGh3aXJxID0gbWFwLT52aW50aWQ7Cj4gCj4gU2hvdWxkbid0IHdlIGZp
+eCBnZXRfdmxwaV9tYXAoKSBpbnN0ZWFkPyBTb21ldGhpbmcgbGlrZSAodW50ZXN0ZWQpOgo+IAo+
+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYyAKPiBiL2RyaXZl
+cnMvaXJxY2hpcC9pcnEtZ2ljLXYzLWl0cy5jCj4gaW5kZXggZTA1NjczYmNkNTJiLi5iNzA0MjE0
+MzkwYzAgMTAwNjQ0Cj4gLS0tIGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPiAr
+KysgYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYwo+IEBAIC0xMTcwLDEzICsxMTcw
+LDE0IEBAIHN0YXRpYyB2b2lkIGl0c19zZW5kX3ZjbGVhcihzdHJ1Y3QgaXRzX2RldmljZSAKPiAq
+ZGV2LCB1MzIgZXZlbnRfaWQpCj4gIMKgICovCj4gIMKgc3RhdGljIHN0cnVjdCBpdHNfdmxwaV9t
+YXAgKmdldF92bHBpX21hcChzdHJ1Y3QgaXJxX2RhdGEgKmQpCj4gIMKgewo+IC3CoMKgwqAgc3Ry
+dWN0IGl0c19kZXZpY2UgKml0c19kZXYgPSBpcnFfZGF0YV9nZXRfaXJxX2NoaXBfZGF0YShkKTsK
+PiAtwqDCoMKgIHUzMiBldmVudCA9IGl0c19nZXRfZXZlbnRfaWQoZCk7Cj4gK8KgwqDCoCBpZiAo
+aXJxZF9pc19mb3J3YXJkZWRfdG9fdmNwdShkKSkgewo+ICvCoMKgwqDCoMKgwqDCoCBzdHJ1Y3Qg
+aXRzX2RldmljZSAqaXRzX2RldiA9IGlycV9kYXRhX2dldF9pcnFfY2hpcF9kYXRhKGQpOwo+ICvC
+oMKgwqDCoMKgwqDCoCB1MzIgZXZlbnQgPSBpdHNfZ2V0X2V2ZW50X2lkKGQpOwo+IAo+IC3CoMKg
+wqAgaWYgKCFpcnFkX2lzX2ZvcndhcmRlZF90b192Y3B1KGQpKQo+IC3CoMKgwqDCoMKgwqDCoCBy
+ZXR1cm4gTlVMTDsKPiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIGRldl9ldmVudF90b192bHBpX21h
+cChpdHNfZGV2LCBldmVudCk7Cj4gK8KgwqDCoCB9Cj4gCj4gLcKgwqDCoCByZXR1cm4gZGV2X2V2
+ZW50X3RvX3ZscGlfbWFwKGl0c19kZXYsIGV2ZW50KTsKPiArwqDCoMKgIHJldHVybiBOVUxMOwo+
+ICDCoH0KPiAKPiAgwqBzdGF0aWMgdm9pZCBscGlfd3JpdGVfY29uZmlnKHN0cnVjdCBpcnFfZGF0
+YSAqZCwgdTggY2xyLCB1OCBzZXQpCj4gCj4gCj4gT3IgYW0gSSBtaXNzaW5nIHRoZSBhY3R1YWwg
+cHJvYmxlbT8KCk5vLiBJIGFsc28gdGhvdWdodCBhYm91dCBmaXhpbmcgdGhlIGlzc3VlIGJ5IHRo
+aXMgd2F5IGFuZCBJJ20gT0sgd2l0aApib3RoIGFwcHJvYWNoZXMuCgo+IAo+IE92ZXJhbGwsIEkn
+bSBzdGFydGluZyB0byBoYXRlIHRoYXQgLT5wYXJlbnQgaGFjayBhcyBpdCdzIGJlZW4gdGhlIHNv
+dXJjZQo+IG9mIGEgbnVtYmVyIG9mIGJ1Z3MuCgoodGhhbmtmdWxseSBpdCdzIHJhcmVseSB1c2Vk
+IGFuZCB3ZSd2ZSBzbyBmYXIgaGFuZGxlZCB0aGVtIGNhcmVmdWxseSwKZXhjZXB0IHRoZSBscGlf
+d3JpdGVfY29uZmlnIGlzc3VlIGluIHRoaXMgcGF0Y2guLi4pCgo+IAo+IFRoZSBtYWluIGlzc3Vl
+IGlzIHRoYXQgdGhlIFZQRSBoaWVyYXJjaHkgaXMgbWlzc2luZyBvbmUgbGV2ZWwgKGl0IGhhcwo+
+IG5vIElUUyBkb21haW4sIGFuZCBnb2VzIGRpcmVjdGx5IGZyb20gdGhlIFZQRSBkb21haW4gdG8g
+dGhlIGxvdy1sZXZlbAo+IEdJQyBkb21haW4pLiBJdCBtZWFucyB3ZSBlbmQtdXAgc3BlY2lhbC1j
+YXNpbmcgdGhpbmdzLCBhbmQgdGhhdCdzIG5ldmVyCj4gZ29vZC4uLgoKWWVhaCwgdGhpcyBtYXkg
+Y29tZXMgZnJvbSB0aGUgZmFjdCB0aGF0IHRoZSBwZXItdlBFIGRvb3JiZWxsIGlzIG5vdApzZXJ2
+ZWQgYnkgSVRTIGFuZCBjYW4gYmUgYXNzZXJ0ZWQgYnkgcmVkaXN0cmlidXRvciBkaXJlY3RseS4g
+QW5kIHRoZQpzcGVjaWFsIGRvb3JiZWxsIGlzIHByb2dyYW1tZWQgdG9nZXRoZXIgd2l0aCB0aG9z
+ZSBub3JtYWwgTFBJCih0cmFuc2xhdGVkIGZyb20gTVNJIGJ5IElUUykuCgoKVGhhbmtzLApaZW5n
+aHVpCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1h
+cm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0
+cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
