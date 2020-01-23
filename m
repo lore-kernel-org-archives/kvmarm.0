@@ -2,53 +2,54 @@ Return-Path: <SRS0=WfsG=3M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24F7C2D0DB
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62441C33CAF
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4360E24655
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4360E24655
+	by mail.kernel.org (Postfix) with ESMTP id 1B89924655
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B89924655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 953DD4AEFB;
-	Thu, 23 Jan 2020 06:59:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA34B4AF23;
+	Thu, 23 Jan 2020 06:59:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id frScUG9LRWRU; Thu, 23 Jan 2020 06:59:04 -0500 (EST)
+	with ESMTP id rpsP7xFy79z7; Thu, 23 Jan 2020 06:59:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A62D4AEFF;
-	Thu, 23 Jan 2020 06:59:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B588B4AF22;
+	Thu, 23 Jan 2020 06:59:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 473284AED3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D03E4AED3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z1ntV-uHvGHH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Jan 2020 06:59:02 -0500 (EST)
+ with ESMTP id o6hvGP9yOk0j for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Jan 2020 06:59:04 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F26DB4ACC4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78CB54ACC4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:04 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79519328;
- Thu, 23 Jan 2020 03:59:01 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4826FEC;
+ Thu, 23 Jan 2020 03:59:03 -0800 (PST)
 Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10A973F6C4;
- Thu, 23 Jan 2020 03:58:59 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DACF53F6C4;
+ Thu, 23 Jan 2020 03:59:01 -0800 (PST)
 From: Andrew Murray <andrew.murray@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH v4 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
- counters
-Date: Thu, 23 Jan 2020 11:58:49 +0000
-Message-Id: <20200123115852.55595-1-andrew.murray@arm.com>
+Subject: [PATCH v4 1/3] arm64: cpufeature: Extract capped fields
+Date: Thu, 23 Jan 2020 11:58:50 +0000
+Message-Id: <20200123115852.55595-2-andrew.murray@arm.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200123115852.55595-1-andrew.murray@arm.com>
+References: <20200123115852.55595-1-andrew.murray@arm.com>
 MIME-Version: 1.0
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -67,53 +68,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At present ARMv8 event counters are limited to 32-bits, though by
-using the CHAIN event it's possible to combine adjacent counters to
-achieve 64-bits. The perf config1:0 bit can be set to use such a
-configuration.
+When emulating ID registers there is often a need to cap the version
+bits of a feature such that the guest will not use features that do
+not yet exist.
 
-With the introduction of ARMv8.5-PMU support, all event counters can
-now be used as 64-bit counters. Let's add support for 64-bit event
-counters.
+Let's add a helper that extracts a field and caps the version to a
+given value.
 
-As KVM doesn't yet support 64-bit event counters, we also trap
-and emulate the Debug Feature Registers to limit the PMU version a
-guest sees to PMUv3 for ARMv8.4.
+Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+---
+ arch/arm64/include/asm/cpufeature.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Tested by running the following perf command on both guest and host
-and ensuring that the figures are very similar:
-
-perf stat -e armv8_pmuv3/inst_retired,long=1/ \
-          -e armv8_pmuv3/inst_retired,long=0/ -e cycles
-
-Changes since v3:
-
- - Rebased onto v5.5-rc7
- - Instead of overriding trap access handler, update read_id_reg
-
-Changes since v2:
-
- - Rebased onto v5.5-rc4
- - Mask 'cap' value to 'width' in cpuid_feature_cap_signed_field_width
-
-Changes since v1:
-
- - Rebased onto v5.5-rc1
-
-
-Andrew Murray (3):
-  arm64: cpufeature: Extract capped fields
-  KVM: arm64: limit PMU version to ARMv8.4
-  arm64: perf: Add support for ARMv8.5-PMU 64-bit counters
-
- arch/arm64/include/asm/cpufeature.h | 16 ++++++
- arch/arm64/include/asm/perf_event.h |  3 +-
- arch/arm64/include/asm/sysreg.h     |  5 ++
- arch/arm64/kernel/perf_event.c      | 86 +++++++++++++++++++++++------
- arch/arm64/kvm/sys_regs.c           | 11 ++++
- include/linux/perf/arm_pmu.h        |  1 +
- 6 files changed, 104 insertions(+), 18 deletions(-)
-
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 4261d55e8506..1462fd1101e3 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -447,6 +447,22 @@ cpuid_feature_extract_unsigned_field(u64 features, int field)
+ 	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
+ }
+ 
++static inline u64 __attribute_const__
++cpuid_feature_cap_signed_field_width(u64 features, int field, int width,
++				     s64 cap)
++{
++	s64 val = cpuid_feature_extract_signed_field_width(features, field,
++							   width);
++	u64 mask = GENMASK_ULL(field + width - 1, field);
++
++	if (val > cap) {
++		features &= ~mask;
++		features |= (cap << field) & mask;
++	}
++
++	return features;
++}
++
+ static inline u64 arm64_ftr_mask(const struct arm64_ftr_bits *ftrp)
+ {
+ 	return (u64)GENMASK(ftrp->shift + ftrp->width - 1, ftrp->shift);
 -- 
 2.21.0
 
