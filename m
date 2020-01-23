@@ -1,87 +1,56 @@
-Return-Path: <SRS0=OV02=3L=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=WfsG=3M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C037C33CB6
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 18:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C24F7C2D0DB
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C6F502467C
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jan 2020 18:56:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZ8CdyDm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F502467C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 4360E24655
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jan 2020 11:59:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4360E24655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A68774AEFB;
-	Wed, 22 Jan 2020 13:56:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 953DD4AEFB;
+	Thu, 23 Jan 2020 06:59:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jiUYSmNt8vJM; Wed, 22 Jan 2020 13:56:43 -0500 (EST)
+	with ESMTP id frScUG9LRWRU; Thu, 23 Jan 2020 06:59:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A98354AE92;
-	Wed, 22 Jan 2020 13:56:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A62D4AEFF;
+	Thu, 23 Jan 2020 06:59:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 309EF4A830
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 13:56:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 473284AED3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uM-r+MBDxZII for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jan 2020 13:56:41 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1CC1A40217
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jan 2020 13:56:41 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F26B121835;
- Wed, 22 Jan 2020 18:56:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1579719400;
- bh=A1sveuLlqqQKceZWUAfaJuEVgzcWTxZ9DNy4YwMID1M=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=QZ8CdyDm7SZ5aEnXV0NmjiW3eVtkqaHu+EdT4hcHHRfmTQZepyKl8Hrn/qG/z4MdD
- xT/kCCT1tnBwgq5siEH90jGhstBx1yUgCoGOjf+4XEkIbP3lXVvA1jGuk1qQSDq7LQ
- 0/t5wVmcbzzRXcOeast0al9DP3vMqfgwn8b9JF00=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1iuLB8-000o1p-9q; Wed, 22 Jan 2020 18:56:38 +0000
+ with ESMTP id z1ntV-uHvGHH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Jan 2020 06:59:02 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F26DB4ACC4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jan 2020 06:59:01 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79519328;
+ Thu, 23 Jan 2020 03:59:01 -0800 (PST)
+Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10A973F6C4;
+ Thu, 23 Jan 2020 03:58:59 -0800 (PST)
+From: Andrew Murray <andrew.murray@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v4 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
+ counters
+Date: Thu, 23 Jan 2020 11:58:49 +0000
+Message-Id: <20200123115852.55595-1-andrew.murray@arm.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Date: Wed, 22 Jan 2020 18:56:38 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>, Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH v2 0/1] arm/arm64: add support for folded p4d page tables
-In-Reply-To: <20200122185017.GA17321@willie-the-truck>
-References: <20200113111323.10463-1-rppt@kernel.org>
- <20200122185017.GA17321@willie-the-truck>
-Message-ID: <cb6357040bd5d9fa061a8d3bd96fb571@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, rppt@kernel.org,
- linux-arm-kernel@lists.infradead.org, anshuman.khandual@arm.com,
- catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- linux@armlinux.org.uk, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, rppt@linux.ibm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
- Mike Rapoport <rppt@linux.ibm.com>, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,37 +62,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-01-22 18:50, Will Deacon wrote:
-> On Mon, Jan 13, 2020 at 01:13:22PM +0200, Mike Rapoport wrote:
->> From: Mike Rapoport <rppt@linux.ibm.com>
->> 
->> This is a part of clean up of the page table manipulation code that 
->> aims to
->> remove asm-generic/5level-fixup.h and asm-generic/pgtable-nop4d-hack.h
->> 
->> There is a single patch for both arm and arm64 because doing the 
->> conversion
->> separately would mean breaking the shared mmu bits in virt/kvm/arm.
-> 
-> Unfortunately, that's going to be really hard to merge, as the two
-> architectures are maintained in different trees and the breadth of this
-> patch series is likely to lead to conflicts in both.
+At present ARMv8 event counters are limited to 32-bits, though by
+using the CHAIN event it's possible to combine adjacent counters to
+achieve 64-bits. The perf config1:0 bit can be set to use such a
+configuration.
 
-But maybe this is the reason we've all been waiting for, for which we
-sacrifice 32bit KVM host on the altar of progress, and finally move 
-along.
+With the introduction of ARMv8.5-PMU support, all event counters can
+now be used as 64-bit counters. Let's add support for 64-bit event
+counters.
 
-Will and I are the only known users, and that'd be a good incentive to
-experience some if this 64bit goodness... ;-)
+As KVM doesn't yet support 64-bit event counters, we also trap
+and emulate the Debug Feature Registers to limit the PMU version a
+guest sees to PMUv3 for ARMv8.4.
 
-         M.
+Tested by running the following perf command on both guest and host
+and ensuring that the figures are very similar:
+
+perf stat -e armv8_pmuv3/inst_retired,long=1/ \
+          -e armv8_pmuv3/inst_retired,long=0/ -e cycles
+
+Changes since v3:
+
+ - Rebased onto v5.5-rc7
+ - Instead of overriding trap access handler, update read_id_reg
+
+Changes since v2:
+
+ - Rebased onto v5.5-rc4
+ - Mask 'cap' value to 'width' in cpuid_feature_cap_signed_field_width
+
+Changes since v1:
+
+ - Rebased onto v5.5-rc1
+
+
+Andrew Murray (3):
+  arm64: cpufeature: Extract capped fields
+  KVM: arm64: limit PMU version to ARMv8.4
+  arm64: perf: Add support for ARMv8.5-PMU 64-bit counters
+
+ arch/arm64/include/asm/cpufeature.h | 16 ++++++
+ arch/arm64/include/asm/perf_event.h |  3 +-
+ arch/arm64/include/asm/sysreg.h     |  5 ++
+ arch/arm64/kernel/perf_event.c      | 86 +++++++++++++++++++++++------
+ arch/arm64/kvm/sys_regs.c           | 11 ++++
+ include/linux/perf/arm_pmu.h        |  1 +
+ 6 files changed, 104 insertions(+), 18 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.21.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
