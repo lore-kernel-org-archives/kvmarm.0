@@ -2,78 +2,82 @@ Return-Path: <SRS0=41R7=3N=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE612C2D0DB
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jan 2020 14:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7551C2D0DB
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jan 2020 15:39:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A74512077C
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jan 2020 14:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 329C92072C
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jan 2020 15:39:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1lgZuCu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74512077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RaKX4m8i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 329C92072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53AD34AEED;
-	Fri, 24 Jan 2020 09:26:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7902D4AF27;
+	Fri, 24 Jan 2020 10:39:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id POLlTU6-nPmm; Fri, 24 Jan 2020 09:26:05 -0500 (EST)
+	with ESMTP id ncMAAJO1-Nhn; Fri, 24 Jan 2020 10:39:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AFF14AF08;
-	Fri, 24 Jan 2020 09:26:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F7B4AF16;
+	Fri, 24 Jan 2020 10:39:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3204B4AF21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jan 2020 09:26:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CACD4AF09
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jan 2020 10:39:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xUFTbU4H-lpt for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jan 2020 09:26:03 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE74E4AF12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jan 2020 09:26:02 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579875962;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BcYl7Hnv7p+sg1oHvBDUntuXOOPjc9pGbSFE7rJ89fY=;
- b=Q1lgZuCu1PRT1C89oBwuDG+EJom1wJCUCIkTGwDBTKiljgEoMC1ibQB7vjI+e6hHtTppyy
- goeU203ZJbSRKPwM1F8kt+Mp0c/9pVwqZVfA4La6Tjg2Vi8Xg1SeIs+VFIuY9/Zn9dW6hG
- O1BIFmgT91vc16PEwaLBiz0XtHOOrRQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-n7u0JYvMN36UujCAySSk7w-1; Fri, 24 Jan 2020 09:26:01 -0500
-X-MC-Unique: n7u0JYvMN36UujCAySSk7w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DCF4477;
- Fri, 24 Jan 2020 14:25:59 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4492A19C69;
- Fri, 24 Jan 2020 14:25:55 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 4/4] KVM: arm64: pmu: Only handle supported event counters
-Date: Fri, 24 Jan 2020 15:25:35 +0100
-Message-Id: <20200124142535.29386-5-eric.auger@redhat.com>
-In-Reply-To: <20200124142535.29386-1-eric.auger@redhat.com>
-References: <20200124142535.29386-1-eric.auger@redhat.com>
+ with ESMTP id AYGs8wsN3oG4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jan 2020 10:39:41 -0500 (EST)
+Received: from mail-il1-f195.google.com (mail-il1-f195.google.com
+ [209.85.166.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33C114AEBE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jan 2020 10:39:41 -0500 (EST)
+Received: by mail-il1-f195.google.com with SMTP id u14so1978672ilj.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jan 2020 07:39:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QM/EtkwyClr/K/8UX2OIGcGSafCE4GTMwKR9OdqwWPI=;
+ b=RaKX4m8iUPforfBmvz0ix1bxNr6D5/mBX8Gg0wTQeHNbHqSz6lTbB/PhA9V6kLV1ur
+ zZJy5THuxHIRtxdmOOOT2Urr/QxVxq/C6Is7bV+Bx1JD08xjrHcCt0NzAyYLLhIVovv+
+ rnQxyi6OJxZ5aJ/zyFhMNxj8eLXc5jMig9XM47pKioyWu5jzORE+JgD/LqydieXcCag8
+ +CtlQsGeTiGsWXTSgg4pVQGSnBbqwhXkjtRW87hoOP34XmmqnvOP2/m/oZbC8oF2W9YI
+ ibL7GRdV/K0QRd+2mx6Us9VNIETuhTVOlu4YiZ4c+vk4oFfbb5NaOla6+dDjTl1v4FI2
+ 2awA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QM/EtkwyClr/K/8UX2OIGcGSafCE4GTMwKR9OdqwWPI=;
+ b=U46XOnqMGMe3Uf8aP5KXx0wBJJq7FXEkArLhPNiZrIIWs4Rx6ln1+QS2v1V66FBtaG
+ JkRvd5A1+DRP2x8x7AuotjMFcz7KoFcpqBCMON9eC5CnsdTlTfsqiS0lmOpg5tGKisSs
+ GV0dU1EvrrGTZZ6Ok35daLxnq+PtqSWr4Ow3/Mm84tbER8tuJ9CKUcbe3bMfP0smaf7u
+ 8iEhuTdsUn/yB93c4dO3VigekBa5b1Y2fqwg7W8i9x71Nr/yTw4vXxDLKnVUt0GiZptV
+ xDTKONvKGgV1QVw5FyjcN0OqgQxTfqNXt8KGB6m0+Ptmvy4L/5z3wncwD+bDG6odoRPa
+ wFUA==
+X-Gm-Message-State: APjAAAX4rkdvDujeFmJ0Emof0d4a7Jr/DvWgn6GVBB2X9iLPZgzxTA2x
+ qP+OixvXr5HZ2oDBFNP+LgZBLvh3VoAbcOjkM5uNuw==
+X-Google-Smtp-Source: APXvYqzk39H6WK0GRTQGylIpatJ9EFAaNs9QKAf04kQ9GbnPaP9vyQ+237FsLkSZMxyGEf2CfaCa7mpPPm2E9kduWPo=
+X-Received: by 2002:a05:6e02:685:: with SMTP id
+ o5mr3531895ils.248.1579880380510; 
+ Fri, 24 Jan 2020 07:39:40 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Cc: andrew.murray@arm.com
+References: <20200121123356.203000-1-james.morse@arm.com>
+In-Reply-To: <20200121123356.203000-1-james.morse@arm.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Fri, 24 Jan 2020 15:39:29 +0000
+Message-ID: <CADSWDzubQHvG8_c6a7E=basbtXxW-7u_ZVRz6+M7zGOAYYxz7A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: arm: fix KVM_CAP_ARM_INJECT_EXT_DABT for aarch32
+ guests
+To: James Morse <james.morse@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,60 +94,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let the code never use unsupported event counters. Change
-kvm_pmu_handle_pmcr() to only reset supported counters and
-kvm_pmu_vcpu_reset() to only sto supported counters.
+Hi James,
 
-Other actions are filtered on the supported counters in
-kvm/sysregs.c
+Thanks for the fixes - they work like a charm.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- virt/kvm/arm/pmu.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On Tue, 21 Jan 2020 at 12:34, James Morse <james.morse@arm.com> wrote:
+>
+> Beata reports that KVM_CAP_ARM_INJECT_EXT_DABT doesn't do the expected
+> thing for aarch32 guests. We get the wrong register layout, and weren't
+> even trying to set a 'external abort' in the first place!
+>
+> Both patches are intended as fixes, but patch 2 is somewhat in the eye
+> of the beholder. I don't know why an imp-def exception was picked...
+>
+On a side note - currently KVM exposes capability that is not fully supported
+(till the fix gets applied) and there is no easy way for the user space to
+determine whether the injection will work as expected and whether it is safe to
+use it or not. Although this is addressing a problem that is not that common
+(I suppose) but still it might be worth to add a way for the kernel to inform
+the user-space that it is all good to go? There has been a 'similar' case in the
+past with KVM_SET_USER_MEMORY_REGION, where fixes where needed
+and those were announced through new caps. Now, I'm not sure if adding new
+capability would be the best approach here though it seems that there is not
+much of a choice?
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 560db6282137..f0d0312c0a55 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -247,10 +247,11 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
-  */
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- {
--	int i;
-+	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	int i;
- 
--	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
-+	for_each_set_bit(i, &mask, 32)
- 		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
- 
- 	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
-@@ -527,10 +528,9 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
-  */
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- {
--	u64 mask;
-+	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
- 	int i;
- 
--	mask = kvm_pmu_valid_counter_mask(vcpu);
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter_mask(vcpu,
- 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
-@@ -542,7 +542,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
- 
- 	if (val & ARMV8_PMU_PMCR_P) {
--		for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++)
-+		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_counter_value(vcpu, i, 0);
- 	}
- }
--- 
-2.20.1
+Best Regards
+Beata
 
+> Thanks,
+>
+> James Morse (2):
+>   KVM: arm: fix DFSR setting for non-LPAE aarch32 guests
+>   KVM: arm: Make inject_abt32() inject an external abort instead
+>
+>  virt/kvm/arm/aarch32.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+>
+> --
+> 2.24.1
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
