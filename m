@@ -2,80 +2,58 @@ Return-Path: <SRS0=6gnH=3Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778F4C32771
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F839C32771
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:12:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF67E214AF
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:07:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="oyjsE4Ti"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF67E214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 191A4214AF
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:12:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191A4214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F53B4AF20;
-	Mon, 27 Jan 2020 06:07:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9294E4AF2F;
+	Mon, 27 Jan 2020 06:12:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id piGjlxUovJ18; Mon, 27 Jan 2020 06:07:57 -0500 (EST)
+	with ESMTP id kOsdIEiQFYSl; Mon, 27 Jan 2020 06:12:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B134AF1D;
-	Mon, 27 Jan 2020 06:07:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6224AEF6;
+	Mon, 27 Jan 2020 06:12:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0CE44AEBE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:07:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC2F44AEB9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:12:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FYPOVnUkaQwW for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jan 2020 06:07:55 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B05E4AEB9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:07:55 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2B98C206A2;
- Mon, 27 Jan 2020 11:07:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1580123274;
- bh=XtPA8Ig4ryv+n4XTiVr/+miOFcjAr3IBN5e8V49V0oc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=oyjsE4Tia2Xnz3WM35PVEk56sRpDCe/euovB/pw+uefePlv5393JZDREcGK5b36Oj
- 0zG68m2ZlSJU21o80OQgWbdzZlBN8L34HkpKrWL3ic1O1TqX+yJbtg6+gV7YfKI/8g
- b4agbuXpEZQGiSCylixAVF/Xfvith77Aw4v70OJ4=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1iw2FE-001arU-EI; Mon, 27 Jan 2020 11:07:52 +0000
-MIME-Version: 1.0
-Date: Mon, 27 Jan 2020 11:07:52 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id 0v4y9tE6CzSA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jan 2020 06:12:12 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 929CD4AEB4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:12:12 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A2BC30E;
+ Mon, 27 Jan 2020 03:12:12 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C52A3F52E;
+ Mon, 27 Jan 2020 03:12:11 -0800 (PST)
 Subject: Re: [PATCH] KVM: arm64: Treat emulated TVAL TimerValue as a signed
  32-bit integer
-In-Reply-To: <20200127103652.2326-1-alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200127103652.2326-1-alexandru.elisei@arm.com>
-Message-ID: <5f633dfb2abe63059d75c0da58c69241@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <5f633dfb2abe63059d75c0da58c69241@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <de0621e2-3920-3897-bde4-fecf36c9c348@arm.com>
+Date: Mon, 27 Jan 2020 11:12:08 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <5f633dfb2abe63059d75c0da58c69241@kernel.org>
+Content-Language: en-US
 Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -89,102 +67,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
-
-On 2020-01-27 10:36, Alexandru Elisei wrote:
-> According to the ARM ARM, registers CNT{P,V}_TVAL_EL0 have bits [63:32]
-> RES0 [1]. When reading the register, the value is truncated to the 
-> least
-> significant 32 bits [2], and on writes, TimerValue is treated as a 
-> signed
-> 32-bit integer [1, 2].
-> 
-> When the guest behaves correctly and writes 32-bit values, treating 
-> TVAL
-> as an unsigned 64 bit register works as expected. However, things start
-> to break down when the guest writes larger values, because
-> (u64)0x1_ffff_ffff = 8589934591. but (s32)0x1_ffff_ffff = -1, and the
-> former will cause the timer interrupt to be asserted in the future, but
-> the latter will cause it to be asserted now.  Let's treat TVAL as a
-> signed 32-bit register on writes, to match the behaviour described in
-> the architecture, and the behaviour experimentally exhibited by the
-> virtual timer on a non-vhe host.
-> 
-> [1] Arm DDI 0487E.a, section D13.8.18
-> [2] Arm DDI 0487E.a, section D11.2.4
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Huhuh... Nice catch!
-
-Fixes: 8fa761624871 ("KVM: arm/arm64: arch_timer: Fix CNTP_TVAL 
-calculation")
-
-(how many times are we doing to fix this???)
-
-> ---
->  include/kvm/arm_arch_timer.h | 2 ++
->  virt/kvm/arm/arch_timer.c    | 3 ++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/kvm/arm_arch_timer.h 
-> b/include/kvm/arm_arch_timer.h
-> index d120e6c323e7..be912176b7a3 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -10,6 +10,8 @@
->  #include <linux/clocksource.h>
->  #include <linux/hrtimer.h>
-> 
-> +#define ARCH_TIMER_TVAL_MASK	((1ULL << 32) - 1)
-> +
->  enum kvm_arch_timers {
->  	TIMER_PTIMER,
->  	TIMER_VTIMER,
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index f182b2380345..5d40f17f7024 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -805,6 +805,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu 
-> *vcpu,
->  	switch (treg) {
->  	case TIMER_REG_TVAL:
->  		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
-> +		val &= ARCH_TIMER_TVAL_MASK;
-
-nit: Do we really need this mask? I'd rather see it written as
-
-                 val = lower_32_bits(val);
-
-
->  		break;
-> 
->  	case TIMER_REG_CTL:
-> @@ -850,7 +851,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu 
-> *vcpu,
->  {
->  	switch (treg) {
->  	case TIMER_REG_TVAL:
-> -		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + val;
-> +		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
->  		break;
-> 
->  	case TIMER_REG_CTL:
-
-Otherwise, looks good to me. If you're OK with the above change, I'll
-take it as a fix.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGksCgpPbiAxLzI3LzIwIDExOjA3IEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gSGkgQWxleGFu
+ZHJ1LAo+Cj4gT24gMjAyMC0wMS0yNyAxMDozNiwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4g
+QWNjb3JkaW5nIHRvIHRoZSBBUk0gQVJNLCByZWdpc3RlcnMgQ05Ue1AsVn1fVFZBTF9FTDAgaGF2
+ZSBiaXRzIFs2MzozMl0KPj4gUkVTMCBbMV0uIFdoZW4gcmVhZGluZyB0aGUgcmVnaXN0ZXIsIHRo
+ZSB2YWx1ZSBpcyB0cnVuY2F0ZWQgdG8gdGhlIGxlYXN0Cj4+IHNpZ25pZmljYW50IDMyIGJpdHMg
+WzJdLCBhbmQgb24gd3JpdGVzLCBUaW1lclZhbHVlIGlzIHRyZWF0ZWQgYXMgYSBzaWduZWQKPj4g
+MzItYml0IGludGVnZXIgWzEsIDJdLgo+Pgo+PiBXaGVuIHRoZSBndWVzdCBiZWhhdmVzIGNvcnJl
+Y3RseSBhbmQgd3JpdGVzIDMyLWJpdCB2YWx1ZXMsIHRyZWF0aW5nIFRWQUwKPj4gYXMgYW4gdW5z
+aWduZWQgNjQgYml0IHJlZ2lzdGVyIHdvcmtzIGFzIGV4cGVjdGVkLiBIb3dldmVyLCB0aGluZ3Mg
+c3RhcnQKPj4gdG8gYnJlYWsgZG93biB3aGVuIHRoZSBndWVzdCB3cml0ZXMgbGFyZ2VyIHZhbHVl
+cywgYmVjYXVzZQo+PiAodTY0KTB4MV9mZmZmX2ZmZmYgPSA4NTg5OTM0NTkxLiBidXQgKHMzMikw
+eDFfZmZmZl9mZmZmID0gLTEsIGFuZCB0aGUKPj4gZm9ybWVyIHdpbGwgY2F1c2UgdGhlIHRpbWVy
+IGludGVycnVwdCB0byBiZSBhc3NlcnRlZCBpbiB0aGUgZnV0dXJlLCBidXQKPj4gdGhlIGxhdHRl
+ciB3aWxsIGNhdXNlIGl0IHRvIGJlIGFzc2VydGVkIG5vdy7CoCBMZXQncyB0cmVhdCBUVkFMIGFz
+IGEKPj4gc2lnbmVkIDMyLWJpdCByZWdpc3RlciBvbiB3cml0ZXMsIHRvIG1hdGNoIHRoZSBiZWhh
+dmlvdXIgZGVzY3JpYmVkIGluCj4+IHRoZSBhcmNoaXRlY3R1cmUsIGFuZCB0aGUgYmVoYXZpb3Vy
+IGV4cGVyaW1lbnRhbGx5IGV4aGliaXRlZCBieSB0aGUKPj4gdmlydHVhbCB0aW1lciBvbiBhIG5v
+bi12aGUgaG9zdC4KPj4KPj4gWzFdIEFybSBEREkgMDQ4N0UuYSwgc2VjdGlvbiBEMTMuOC4xOAo+
+PiBbMl0gQXJtIERESSAwNDg3RS5hLCBzZWN0aW9uIEQxMS4yLjQKPj4KPj4gU2lnbmVkLW9mZi1i
+eTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+Cj4gSHVodWgu
+Li4gTmljZSBjYXRjaCEKPgo+IEZpeGVzOiA4ZmE3NjE2MjQ4NzEgKCJLVk06IGFybS9hcm02NDog
+YXJjaF90aW1lcjogRml4IENOVFBfVFZBTCBjYWxjdWxhdGlvbiIpCj4KPiAoaG93IG1hbnkgdGlt
+ZXMgYXJlIHdlIGRvaW5nIHRvIGZpeCB0aGlzPz8/KQo+Cj4+IC0tLQo+PiDCoGluY2x1ZGUva3Zt
+L2FybV9hcmNoX3RpbWVyLmggfCAyICsrCj4+IMKgdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuY8Kg
+wqDCoCB8IDMgKystCj4+IMKgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDEgZGVs
+ZXRpb24oLSkKPj4KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmgg
+Yi9pbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oCj4+IGluZGV4IGQxMjBlNmMzMjNlNy4uYmU5
+MTIxNzZiN2EzIDEwMDY0NAo+PiAtLS0gYS9pbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oCj4+
+ICsrKyBiL2luY2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmgKPj4gQEAgLTEwLDYgKzEwLDggQEAK
+Pj4gwqAjaW5jbHVkZSA8bGludXgvY2xvY2tzb3VyY2UuaD4KPj4gwqAjaW5jbHVkZSA8bGludXgv
+aHJ0aW1lci5oPgo+Pgo+PiArI2RlZmluZSBBUkNIX1RJTUVSX1RWQUxfTUFTS8KgwqDCoCAoKDFV
+TEwgPDwgMzIpIC0gMSkKPj4gKwo+PiDCoGVudW0ga3ZtX2FyY2hfdGltZXJzIHsKPj4gwqDCoMKg
+wqAgVElNRVJfUFRJTUVSLAo+PiDCoMKgwqDCoCBUSU1FUl9WVElNRVIsCj4+IGRpZmYgLS1naXQg
+YS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jIGIvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwo+
+PiBpbmRleCBmMTgyYjIzODAzNDUuLjVkNDBmMTdmNzAyNCAxMDA2NDQKPj4gLS0tIGEvdmlydC9r
+dm0vYXJtL2FyY2hfdGltZXIuYwo+PiArKysgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCj4+
+IEBAIC04MDUsNiArODA1LDcgQEAgc3RhdGljIHU2NCBrdm1fYXJtX3RpbWVyX3JlYWQoc3RydWN0
+IGt2bV92Y3B1ICp2Y3B1LAo+PiDCoMKgwqDCoCBzd2l0Y2ggKHRyZWcpIHsKPj4gwqDCoMKgwqAg
+Y2FzZSBUSU1FUl9SRUdfVFZBTDoKPj4gwqDCoMKgwqDCoMKgwqDCoCB2YWwgPSB0aW1lci0+Y250
+X2N2YWwgLSBrdm1fcGh5c190aW1lcl9yZWFkKCkgKyB0aW1lci0+Y250dm9mZjsKPj4gK8KgwqDC
+oMKgwqDCoMKgIHZhbCAmPSBBUkNIX1RJTUVSX1RWQUxfTUFTSzsKPgo+IG5pdDogRG8gd2UgcmVh
+bGx5IG5lZWQgdGhpcyBtYXNrPyBJJ2QgcmF0aGVyIHNlZSBpdCB3cml0dGVuIGFzCj4KPiDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdmFsID0gbG93ZXJfMzJfYml0cyh2YWwpOwoKSSBk
+aWRuJ3QgcmVhbGx5IGxpa2UgdXNpbmcgdGhlIG1hc2sgZWl0aGVyLCBidXQgSSBjb3VsZG4ndCB0
+aGluayBvZiBhbnl0aGluZwpiZXR0ZXIuIFRoaXMgbG9va3MgdmVyeSBnb29kLgoKPgo+Cj4+IMKg
+wqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+Cj4+IMKgwqDCoMKgIGNhc2UgVElNRVJfUkVHX0NUTDoK
+Pj4gQEAgLTg1MCw3ICs4NTEsNyBAQCBzdGF0aWMgdm9pZCBrdm1fYXJtX3RpbWVyX3dyaXRlKHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gwqB7Cj4+IMKgwqDCoMKgIHN3aXRjaCAodHJlZykgewo+
+PiDCoMKgwqDCoCBjYXNlIFRJTUVSX1JFR19UVkFMOgo+PiAtwqDCoMKgwqDCoMKgwqAgdGltZXIt
+PmNudF9jdmFsID0ga3ZtX3BoeXNfdGltZXJfcmVhZCgpIC0gdGltZXItPmNudHZvZmYgKyB2YWw7
+Cj4+ICvCoMKgwqDCoMKgwqDCoCB0aW1lci0+Y250X2N2YWwgPSBrdm1fcGh5c190aW1lcl9yZWFk
+KCkgLSB0aW1lci0+Y250dm9mZiArIChzMzIpdmFsOwo+PiDCoMKgwqDCoMKgwqDCoMKgIGJyZWFr
+Owo+Pgo+PiDCoMKgwqDCoCBjYXNlIFRJTUVSX1JFR19DVEw6Cj4KPiBPdGhlcndpc2UsIGxvb2tz
+IGdvb2QgdG8gbWUuIElmIHlvdSdyZSBPSyB3aXRoIHRoZSBhYm92ZSBjaGFuZ2UsIEknbGwKPiB0
+YWtlIGl0IGFzIGEgZml4LgoKWWVzLCBJJ20gdmVyeSBtdWNoIE9LIHdpdGggdGhlIGNoYW5nZS4K
+ClRoYW5rcywKQWxleAo+Cj4gVGhhbmtzLAo+Cj4gwqDCoMKgwqDCoMKgwqAgTS4KX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
