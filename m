@@ -2,83 +2,59 @@ Return-Path: <SRS0=6gnH=3Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2B7C33CB7
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 13:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FA7C33CB1
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 15:20:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 02EBD214DB
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 13:46:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hpj17Zs8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02EBD214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 173AD20674
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 15:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173AD20674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5962A4AEB9;
-	Mon, 27 Jan 2020 08:46:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9169C4AEC3;
+	Mon, 27 Jan 2020 10:20:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hUdMvO02vHXS; Mon, 27 Jan 2020 08:46:32 -0500 (EST)
+	with ESMTP id scSdLkcbcLtJ; Mon, 27 Jan 2020 10:20:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F34D4AEBF;
-	Mon, 27 Jan 2020 08:46:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36BD14AEC5;
+	Mon, 27 Jan 2020 10:20:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C61874AEBF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 08:46:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E49114AEC0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 10:20:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id abKIY3C3PRyQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jan 2020 08:46:29 -0500 (EST)
-Received: from mail-io1-f65.google.com (mail-io1-f65.google.com
- [209.85.166.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA2274ACE9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 08:46:29 -0500 (EST)
-Received: by mail-io1-f65.google.com with SMTP id h8so10007477iob.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 05:46:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=eq3JQW8Til6OlewIurvKZ6yaFYM/l603C+HIJHEMB0c=;
- b=Hpj17Zs8Zuyd5ePaFoTmcbQgV8pucl+bbvypSnw6q77X+iKCdOQR8nQeiSP+53UaUW
- 690HG6Qoh1GBTnbvcjH+3+Fmz30c2iiybD3EckA44dkDJ2yHEfz3Q1ksxQ+eCvV79i/j
- /7Y4lrFWciMe+EpgWZv54TdF50a1+l7YS5BW3dqUcpWL3xn5FoXvYxHrxbnSsaMWQUUc
- +1GEbb0k6TtYfkdIjSo3UzZcVPRdkquJSA4ihEIa/gL91Ine/6iOiyCi10s9a5xQz8SN
- XsXkdr6Sy43gkicC3yYvfkhfG97OBLYy4jaLsIMypQlrLMmyu7m9iTZORBgMec6obqRz
- KqCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=eq3JQW8Til6OlewIurvKZ6yaFYM/l603C+HIJHEMB0c=;
- b=rBCoRGOqtGGdxei7fXo+MCRHTWz3EWK9m0i/gsuLqL8XjsH0CkFVYf7HugTQF1TQwo
- RhYLaZklMByJi8nP+Y5c3tKb5HdPfeQfdX8epCABVpgl0LnMzUHKomHfthZ+36FfWzs8
- vMCP8Us+R6OQ8oFN9RvXWtK1krYW8WNM5WDoZmNRamX+TNzXBHM4vD3elhS2dQcC+Hfc
- sRdlNeDk7bICflAd0dKl5+KbBOLA1zasauU0LPpS2cZ5uMgP6BQXNuGPc8C6IWRkP0vj
- ZZP42XQDSLjK81bGsiAh90KTtwfqO3NU8WYXk0N1wmZezVQyLHfEbcYvLjAMTeZ0fvjG
- Y0ew==
-X-Gm-Message-State: APjAAAWVR1zyAsgjHVfgbgOw6RweuwBse9PFvBkS6ZykLjfFJJvsXWb0
- m4XBhhvvKaNpnTbxmVPsxmBF2oEPlbeuUsSjp7T2mQ==
-X-Google-Smtp-Source: APXvYqzJlX/Q0HCE6FDbMkOd2bOk33RfK1OKjHmBhyU3TPobFfd9EmZwXNBaQzzY0gD8feoU43LveSHRNtTHZgTA7ME=
-X-Received: by 2002:a6b:dc1a:: with SMTP id s26mr12145159ioc.307.1580132789103; 
- Mon, 27 Jan 2020 05:46:29 -0800 (PST)
+ with ESMTP id tXaYmc63G35W for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jan 2020 10:20:50 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 364254AEAB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 10:20:50 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFD9D31B;
+ Mon, 27 Jan 2020 07:20:49 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF9EB3F67D;
+ Mon, 27 Jan 2020 07:20:48 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] arm: expand the timer tests
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200110160511.17821-1-alex.bennee@linaro.org>
+ <8455cdf6-e5c3-bd84-5b85-33ffad581d0e@arm.com> <871rs3ntok.fsf@linaro.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <c5b006e9-bff9-1d92-e1f9-98287a0cebcc@arm.com>
+Date: Mon, 27 Jan 2020 15:20:47 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200121123356.203000-1-james.morse@arm.com>
- <CADSWDzubQHvG8_c6a7E=basbtXxW-7u_ZVRz6+M7zGOAYYxz7A@mail.gmail.com>
- <20200126115602.6e67b11b@why>
-In-Reply-To: <20200126115602.6e67b11b@why>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Mon, 27 Jan 2020 13:46:18 +0000
-Message-ID: <CADSWDzuW4ZGyvprmOOv_=TqBm4yCHp32sMZs8fp-1wB3e-2y4g@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: arm: fix KVM_CAP_ARM_INJECT_EXT_DABT for aarch32
- guests
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.cs.columbia.edu
+In-Reply-To: <871rs3ntok.fsf@linaro.org>
+Content-Language: en-US
+Cc: linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,77 +66,134 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Sun, 26 Jan 2020 at 11:56, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 24 Jan 2020 15:39:29 +0000
-> Beata Michalska <beata.michalska@linaro.org> wrote:
->
-> Hi Beata,
->
-> > Hi James,
-> >
-> > Thanks for the fixes - they work like a charm.
-> >
-> > On Tue, 21 Jan 2020 at 12:34, James Morse <james.morse@arm.com> wrote:
-> > >
-> > > Beata reports that KVM_CAP_ARM_INJECT_EXT_DABT doesn't do the expected
-> > > thing for aarch32 guests. We get the wrong register layout, and weren't
-> > > even trying to set a 'external abort' in the first place!
-> > >
-> > > Both patches are intended as fixes, but patch 2 is somewhat in the eye
-> > > of the beholder. I don't know why an imp-def exception was picked...
-> > >
-> > On a side note - currently KVM exposes capability that is not fully supported
-> > (till the fix gets applied) and there is no easy way for the user space to
-> > determine whether the injection will work as expected and whether it is safe to
-> > use it or not. Although this is addressing a problem that is not that common
-> > (I suppose) but still it might be worth to add a way for the kernel to inform
-> > the user-space that it is all good to go? There has been a 'similar' case in the
-> > past with KVM_SET_USER_MEMORY_REGION, where fixes where needed
-> > and those were announced through new caps. Now, I'm not sure if adding new
-> > capability would be the best approach here though it seems that there is not
-> > much of a choice?
->
-> My take on this particular issue is that although the functionality is
-> not perfectly working (far from it), it isn't completely broken (the
-> guest does get some form of abort). Furthermore, we tend to add this
-> kind of discovery mechanism when the userspace interface is broken, not
-> when we have an implementation defect in the CPU emulation.
->
-Indeed, the guest will get 'the' abort with a small catch though:
-the fault handler will actually manage to handle it leading to the faulting
-instruction being restarted, trapping thereby the guest in a vicious
-circle. This is trading in abnormal termination of the guest (aka 'no idea what
-has just happened' ) for rather meaningless back-and-forth with the host kernel.
-
-> The real question is whether there anything out there that would depend
-> on such broken behaviour?
->
-AFAICT, that would be Qemu trying to handle 'nicely' all the unexpected cases,
-where guest triggers the DABT with no valid instruction syndrome (changes on
-the way). Now, I agree this is not the most common case ever, but still.
-Currently the guest will keep on repeating the same mistake ... until
-it gets told
-it's high time to stop trying. And that becomes arbitrary without implementing
-some additional logic behind it - a bit of an overkill.
-
-BR
-
-
-Beata
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGksCgpDQydpbmcgdGhlIGFybSBtYWludGFpbmVyKQoKU29ycnkgZm9yIHRoZSBsYXRlIHJlcGx5
+LCBnb3QgZGlzdHJhY3RlZCBieSBzb21ldGhpbmcgZWxzZS4KCk9uIDEvMTMvMjAgNTozOCBQTSwg
+QWxleCBCZW5uw6llIHdyb3RlOgo+IEFsZXhhbmRydSBFbGlzZWkgPGFsZXhhbmRydS5lbGlzZWlA
+YXJtLmNvbT4gd3JpdGVzOgo+Cj4+IEhpLAo+Pgo+PiBPbiAxLzEwLzIwIDQ6MDUgUE0sIEFsZXgg
+QmVubsOpZSB3cm90ZToKPj4+IFRoaXMgd2FzIGFuIGF0dGVtcHQgdG8gcmVwbGljYXRlIGEgUUVN
+VSBidWcuIEhvd2V2ZXIgdG8gdHJpZ2dlciB0aGUKPj4+IGJ1ZyB5b3UgbmVlZCB0byBoYXZlIGFu
+IG9mZnNldCBzZXQgaW4gRUwyIHdoaWNoIGt2bS11bml0LXRlc3RzIGlzCj4+PiB1bmFibGUgdG8g
+ZG8uIEhvd2V2ZXIgaXQgZG9lcyBleGVyY2lzZSBzb21lIG1vcmUgY29ybmVyIGNhc2VzLgo+Pj4K
+Pj4+IEJ1ZzogaHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvYnVncy8xODU5MDIxCj4+IEknbSBu
+b3QgYXdhcmUgb2YgYW55IEJ1ZzogdGFncyBpbiB0aGUgTGludXgga2VybmVsLiBJZiB5b3Ugd2Fu
+dCBwZW9wbGUgdG8gZm9sbG93Cj4+IHRoZSBsaW5rIHRvIHRoZSBidWcsIGhvdyBhYm91dCByZWZl
+cmVuY2luZyBzb21ldGhpbmcgbGlrZSB0aGlzOgo+Pgo+PiAiVGhpcyB3YXMgYW4gYXR0ZW1wdCB0
+byByZXBsaWNhdGUgYSBRRU1VIGJ1ZyBbMV0uIFsuLl0KPj4KPj4gWzFdIGh0dHBzOi8vYnVncy5s
+YXVuY2hwYWQubmV0L3FlbXUvK2J1Zy8xODU5MDIxIgo+IE9LLCBJJ2xsIGZpeCB0aGF0IGluIHYy
+Lgo+Cj4+IEFsc28sIGFyZSBsYXVuY2hwYWQgYnVnIHJlcG9ydHMgcGVybWFuZW50PyBXaWxsIHRo
+ZSBsaW5rIHN0aWxsIHdvcmsgaW4KPj4gYSB5ZWFycycgdGltZT8KPiBUaGV5IHNob3VsZCBiZSAt
+IHRoZXkgYXJlIGEgdW5pcXVlIGlkIGFuZCB3ZSB1c2UgdGhlbSBpbiB0aGUgUUVNVSBzb3VyY2UK
+PiB0cmVlLgo+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxp
+bmFyby5vcmc+Cj4+PiAtLS0KPj4+ICBhcm0vdGltZXIuYyB8IDI3ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrLQo+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
+aW9uKC0pCj4+Pgo+Pj4gZGlmZiAtLWdpdCBhL2FybS90aW1lci5jIGIvYXJtL3RpbWVyLmMKPj4+
+IGluZGV4IGYzOTBlOGUuLmFlMWQyOTkgMTAwNjQ0Cj4+PiAtLS0gYS9hcm0vdGltZXIuYwo+Pj4g
+KysrIGIvYXJtL3RpbWVyLmMKPj4+IEBAIC0yMTQsMjEgKzIxNCw0NiBAQCBzdGF0aWMgdm9pZCB0
+ZXN0X3RpbWVyKHN0cnVjdCB0aW1lcl9pbmZvICppbmZvKQo+Pj4gIAkgKiBzdGlsbCByZWFkIHRo
+ZSBwZW5kaW5nIHN0YXRlIGV2ZW4gaWYgaXQncyBkaXNhYmxlZC4gKi8KPj4+ICAJc2V0X3RpbWVy
+X2lycV9lbmFibGVkKGluZm8sIGZhbHNlKTsKPj4+ICAKPj4+ICsJLyogVmVyaWZ5IGNvdW50IGdv
+ZXMgdXAgKi8KPj4+ICsJcmVwb3J0KGluZm8tPnJlYWRfY291bnRlcigpID49IG5vdywgImNvdW50
+ZXIgaW5jcmVtZW50cyIpOwo+Pj4gKwo+Pj4gIAkvKiBFbmFibGUgdGhlIHRpbWVyLCBidXQgc2No
+ZWR1bGUgaXQgZm9yIG11Y2ggbGF0ZXIgKi8KPj4+ICAJaW5mby0+d3JpdGVfY3ZhbChsYXRlcik7
+Cj4+PiAgCWluZm8tPndyaXRlX2N0bChBUkNIX1RJTUVSX0NUTF9FTkFCTEUpOwo+Pj4gIAlpc2Io
+KTsKPj4+IC0JcmVwb3J0KCFnaWNfdGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJl
+Zm9yZSIpOwo+Pj4gKwlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAibm90IHBlbmRp
+bmcgYmVmb3JlIDEwcyIpOwo+Pj4gKwo+Pj4gKwkvKiBDaGVjayB3aXRoIGEgbWF4aW11bSBwb3Nz
+aWJsZSBjdmFsICovCj4+PiArCWluZm8tPndyaXRlX2N2YWwoVUlOVDY0X01BWCk7Cj4+PiArCWlz
+YigpOwo+Pj4gKwlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAibm90IHBlbmRpbmcg
+YmVmb3JlIFVJTlQ2NF9NQVgiKTsKClRoaXMgY2hlY2sgYWxvbmUgd2FzIGVub3VnaCBmb3IgbWUg
+dG8gdHJpZ2dlciB0aGUgcWVtdSBidWcuIFdvdWxkIHlvdSBtaW5kCmV4cGxhaW5pbmcgdGhlIHJl
+YXNvbiBmb3IgcGVyZm9ybWluZyB0aGUgdGVzdCBhZ2FpbiwgYnV0IHdpdGggdGhlIHRpbWVyIGlu
+dGVycnVwdAplbmFibGVkIGF0IHRoZSBHSUMgbGV2ZWw/IERpZCB0aGUgZml4IGhhdmUgc29tZXRo
+aW5nIHRvIGRvIHdpdGggdGhlIGludGVycnVwdD8KCj4+PiArCj4+PiArCS8qIGFsc28gYnkgc2V0
+dGluZyB0dmFsICovCj4+IEFsbCB0aGUgY29tbWVudHMgaW4gdGhpcyBmaWxlIHNlZW0gdG8gc3Rh
+cnQgd2l0aCBhIGNhcGl0YWwgbGV0dGVyLgo+Pgo+Pj4gKwlpbmZvLT53cml0ZV90dmFsKHRpbWVf
+MTBzKTsKPj4+ICsJaXNiKCk7Cj4+PiArCXJlcG9ydCghZ2ljX3RpbWVyX3BlbmRpbmcoaW5mbyks
+ICJub3QgcGVuZGluZyBiZWZvcmUgMTBzICh2aWEgdHZhbCkiKTsKPj4gWW91IGNhbiByZW1vdmUg
+dGhlICIodmlhIHR2YWwpIiBwYXJ0IC0gdGhlIG1lc3NhZ2UgaXMgdW5pcXVlIGVub3VnaCB0byBm
+aWd1cmUgb3V0Cj4+IHdoaWNoIHBhcnQgb2YgdGhlIHRlc3QgaXQgcmVmZXJzIHRvLgo+IEkgYWRk
+ZWQgaXQgdG8gZGlmZmVyZW50aWF0ZSB3aXRoIHRoZSBtZXNzYWdlIGEgbGl0dGxlIGZ1cnRoZXIg
+YWJvdmUuCgpZb3UncmUgcmlnaHQsIEkgZGlkbid0IG5vdGljZSB0aGF0IHdlIGFscmVhZHkgaGF2
+ZSB0aGUgZXhhY3Qgc2FtZSBtZXNzYWdlLgoKQnV0IEkgdGhvdWdodCBzb21lIG1vcmUgYWJvdXQg
+dGhpcyB0ZXN0LCBhbmQgSSdtIG5vdCByZWFsbHkgc3VyZSB3ZSBjYW4gZG8gaXQKcmVsaWFibHku
+IEkgcmFuIHlvdXIgcGF0Y2ggb24gYW4gQU1EIFNlYXR0bGUsIHdoZXJlIHRoZSB0aW1lciBmcmVx
+dWVuY3kgaXMKMHhlZTZiMjgwLCB3aGljaCBtdWx0aXBsaWVkIGJ5IDEwIGdpdmVzIHVzIDB4OTUw
+MmY5MDAsIHdoaWNoIHdpbGwgYmUgaW50ZXJwcmV0ZWQKYXMgYSBuZWdhdGl2ZSB2YWx1ZSBiZWNh
+dXNlIFRpbWVyVmFsdWUgaXMgYSAqKnNpZ25lZCoqIDMyLWJpdCBpbnRlZ2VyLiBUaGF0IG1lYW5z
+CnRoYXQgd2UncmUgYWN0dWFsbHkgcHJvZ3JhbW1pbmcgdGhlIHRpbWVyIHRvIGZpcmUgaW4gdGhl
+ICoqcGFzdCoqLCBzbyB0aGlzIHRlc3QKZmFpbHMuIExldCdzIHNheSB3ZSBsaW1pdCB0aGUgdmFs
+dWUgdGhhdCB3ZSdyZSB3cml0aW5nIHRvIFRWQUwgdG8gSU5UMzJfTUFYLCBidXQKYmVjYXVzZSBv
+ZiBhIGhpZ2ggdGltZXIgZnJlcXVlbmN5LCB0aGUgdGltZSB3aW5kb3cgYmVmb3JlIHRoZSBpbnRl
+cnJ1cHQgaXMKYXNzZXJ0ZWQgY291bGQgYmUgdG9vIHNtYWxsLCBhbmQsIGRlcGVuZGluZyBvbiB0
+aGUgZW52aXJvbm1lbnQgYW5kIGhvdyBMaW51eApzY2hlZHVsZXMgdGFza3MsIHRoaXMgY2hlY2sg
+bWlnaHQgcmFuZG9tbHkgZmFpbC4KCj4KPj4+ICsJcmVwb3J0X2luZm8oIlRWQUwgaXMgJWQgKGRl
+bHRhIENWQUwgJWxkKSB0aWNrcyIsCj4+PiArCQkgICAgaW5mby0+cmVhZF90dmFsKCksIGluZm8t
+PnJlYWRfY3ZhbCgpIC0gaW5mby0+cmVhZF9jb3VudGVyKCkpOwo+PiBJJ20gbm90IHN1cmUgd2hh
+dCB5b3UgYXJlIHRyeWluZyB0byBhY2hpZXZlIHdpdGggdGhpcy4gWW91IGNhbiB0cmFuc2Zvcm0g
+aXQgdG8KPj4gY2hlY2sgdGhhdCBUVkFMIGlzIGluZGVlZCBwb3NpdGl2ZSBhbmQgKGFsbW9zdCkg
+ZXF1YWwgdG8gY3ZhbCAtIGNudHBjdCwgc29tZXRoaW5nCj4+IGxpa2UgdGhpczoKPj4KPj4gKwlz
+MzIgdHZhbCA9IGluZm8tPnJlYWRfdHZhbCgpOwo+PiArCXJlcG9ydCh0dmFsID4gMCAmJiB0dmFs
+IDw9IGluZm8tPnJlYWRfY3ZhbCgpIC0KPj4gaW5mby0+cmVhZF9jb3VudGVyKCksICJUVkFMIG1l
+YXN1cmVzIHRpbWUgdG8gbmV4dCBpbnRlcnJ1cHQiKTsKPiBZZXMgaXQgd2FzIHB1cmVseSBpbmZv
+cm1hdGlvbmFsIHRvIHNheSB0dmFsIGRlY3JlbWVudHMgdG93YXJkcyB0aGUgbmV4dAo+IElSUS4g
+SSBjYW4gbWFrZSBpdCBhIHB1cmUgdGVzdC4KPgo+Pj4gIAo+Pj4gKyAgICAgICAgLyogY2hlY2sg
+cGVuZGluZyBvbmNlIGN2YWwgaXMgYmVmb3JlIG5vdyAqLwo+PiBUaGlzIGNvbW1lbnQgYWRkcyBu
+b3RoaW5nIHRvIHRoZSB0ZXN0Lgo+IGRyb3BwZWQuCj4KPj4+ICAJaW5mby0+d3JpdGVfY3ZhbChu
+b3cgLSAxKTsKPj4+ICAJaXNiKCk7Cj4+PiAgCXJlcG9ydChnaWNfdGltZXJfcGVuZGluZyhpbmZv
+KSwgImludGVycnVwdCBzaWduYWwgcGVuZGluZyIpOwo+Pj4gKwlyZXBvcnRfaW5mbygiVFZBTCBp
+cyAlZCB0aWNrcyIsIGluZm8tPnJlYWRfdHZhbCgpKTsKPj4gWW91IGNhbiB0ZXN0IHRoYXQgVFZB
+TCBpcyBuZWdhdGl2ZSBoZXJlIGluc3RlYWQgb2YgcHJpbnRpbmcgdGhlIHZhbHVlLgo+IG9rLgo+
+Cj4+PiAgCj4+PiAgCS8qIERpc2FibGUgdGhlIHRpbWVyIGFnYWluIGFuZCBwcmVwYXJlIHRvIHRh
+a2UgaW50ZXJydXB0cyAqLwo+Pj4gIAlpbmZvLT53cml0ZV9jdGwoMCk7Cj4+PiAgCXNldF90aW1l
+cl9pcnFfZW5hYmxlZChpbmZvLCB0cnVlKTsKPj4+ICAJcmVwb3J0KCFnaWNfdGltZXJfcGVuZGlu
+ZyhpbmZvKSwgImludGVycnVwdCBzaWduYWwgbm8gbG9uZ2VyIHBlbmRpbmciKTsKPj4+ICAKPj4+
+ICsJLyogUUVNVSBidWcgd2hlbiBjbnR2b2ZmX2VsMiA+IDAKPj4+ICsJICogaHR0cHM6Ly9idWdz
+LmxhdW5jaHBhZC5uZXQvYnVncy8xODU5MDIxICovCj4+IFRoaXMgbG9va3MgY29uZnVzaW5nIHRv
+IG1lLiBGcm9tIHRoZSBjb21taXQgbWVzc2FnZSwgSSBnb3QgdGhhdCBrdm0tdW5pdC10ZXN0cwo+
+PiBuZWVkcyBxZW11IHRvIHNldCBhIHNwZWNpYWwgdmFsdWUgZm9yIENOVFZPRkZfRUwyLiBCdXQg
+dGhlIGNvbW1lbnRzIHNlZW1zIHRvCj4+IHN1Z2dlc3QgdGhhdCBrdm0tdW5pdC10ZXN0cyBjYW4g
+dHJpZ2dlciB0aGUgYnVnIHdpdGhvdXQgcWVtdSBkb2luZyBhbnl0aGluZwo+PiBzcGVjaWFsLiBD
+YW4geW91IGVsYWJvcmF0ZSB1bmRlciB3aGljaCBjb25kaXRpb24ga3ZtLXVuaXQtdGVzdHMgY2Fu
+Cj4+IHRyaWdnZXIgdGhlIGJ1Zz8KPiBJdCBjYW4ndCB3aXRob3V0IHNvbWUgc29ydCBvZiBtZWNo
+YW5pc20gdG8gc2V0IHRoZSBoeXBlcnZpc29yIHJlZ2lzdGVycwo+IGJlZm9yZSBydW5uaW5nIHRo
+ZSB0ZXN0LiBUaGUgUUVNVSBidWcgaXMgYW4gb3ZlcmZsb3cgd2hlbiBjdmFsIG9mIFVJTlQ2NF9N
+QVgKPiB3aXRoIGEgbm9uLXplcm8gQ05UVk9GRl9FTDIuCj4KPiBSdW5uaW5nIHVuZGVyIEtWTSB0
+aGUgaG9zdCBrZXJuZWwgd2lsbCBoYXZlIGxpa2VseSBzZXQgQ05UVk9GRl9FTDIgdG8KPiBzb21l
+IHNvcnQgb2YgdmFsdWUgd2l0aDoKPgo+IAl1cGRhdGVfdnRpbWVyX2NudHZvZmYodmNwdSwga3Zt
+X3BoeXNfdGltZXJfcmVhZCgpKTsKCkkgd2FzIGFibGUgdG8gcmVwbGljYXRlIHRoZSBidWcgYnkg
+cnVubmluZyBLVk0gdW5kZXIgcWVtdSB3aXRoIHZpcnR1YWxpemF0aW9uPW9uLAp0aGFua3MuCgo+
+Cj4+PiArCWluZm8tPndyaXRlX2N0bChBUkNIX1RJTUVSX0NUTF9FTkFCTEUpOwo+Pj4gKwlpbmZv
+LT53cml0ZV9jdmFsKFVJTlQ2NF9NQVgpOwo+PiBUaGUgb3JkZXIgaXMgd3JvbmcgLSB5b3Ugd3Jp
+dGUgQ1ZBTCBmaXJzdCwgKnRoZW4qIGVuYWJsZSB0byB0aW1lci4gT3RoZXJ3aXNlIHlvdQo+PiBt
+aWdodCBnZXQgYW4gaW50ZXJydXB0IGJlY2F1c2Ugb2YgdGhlIHByZXZpb3VzIENWQUwgdmFsdWUu
+Cj4+Cj4+IFRoZSBwcmV2aW91cyB2YWx1ZSBmb3IgQ1ZBTCB3YXMgbm93IC0xLCBzbyB5b3VyIGNo
+YW5nZSB0cmlnZ2VycyBhbiB1bndhbnRlZAo+PiBpbnRlcnJ1cHQgYWZ0ZXIgZW5hYmxpbmcgdGhl
+IHRpbWVyLiBUaGUgaW50ZXJydXB0IGhhbmRsZXIgbWFza3MgdGhlIHRpbWVyCj4+IGludGVycnVw
+dCBhdCB0aGUgdGltZXIgbGV2ZWwsIHdoaWNoIG1lYW5zIHRoYXQgYXMgZmFyIGFzIHRoZSBnaWMg
+aXMgY29uY2VybmVkIHRoZQo+PiBpbnRlcnJ1cHQgaXMgbm90IHBlbmRpbmcsIG1ha2luZyB0aGUg
+cmVwb3J0IGNhbGwgYWZ0ZXJ3YXJkcyB1c2VsZXNzLgo+Pgo+Pj4gKwlpc2IoKTsKPj4+ICsJcmVw
+b3J0KCFnaWNfdGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJlZm9yZSBVSU5UNjRf
+TUFYIChpcnFzIG9uKSIpOwo+PiBUaGlzIGNoZWNrIGNhbiBiZSBpbXByb3ZlZC4gWW91IHdhbnQg
+dG8gY2hlY2sgdGhlIHRpbWVyIENUTC5JU1RBVFVTIGhlcmUsIG5vdCB0aGUKPj4gZ2ljLiBBIGRl
+dmljZSAoaW4gdGhpcyBjYXNlLCB0aGUgdGltZXIpIGNhbiBhc3NlcnQgdGhlIGludGVycnVwdCwg
+YnV0IHRoZSBnaWMgZG9lcwo+PiBub3Qgc2FtcGxlIGl0IGltbWVkaWF0ZWx5LiBDb21lIHRvIHRo
+aW5rIG9mIGl0LCB0aGUgZW50aXJlIHRpbWVyIHRlc3QgaXMgd3JvbmcKPj4gYmVjYXVzZSBvZiB0
+aGlzLgo+IElzIGl0IHdvcnRoIHN0aWxsIGNoZWNraW5nIHRoZSBHSUMgb3IganVzdCByZXBsYWNp
+bmcgZXZlcnl0aGluZyB3aXRoCj4gY2FsbHMgdG86Cj4KPiAgIHN0YXRpYyBib29sIHRpbWVyX3Bl
+bmRpbmcoc3RydWN0IHRpbWVyX2luZm8gKmluZm8pCj4gICB7Cj4gICAgICAgICAgIHJldHVybiBp
+bmZvLT5yZWFkX2N0bCgpICYgQVJDSF9USU1FUl9DVExfSVNUQVRVUzsKPiAgIH0KCldlIHNob3Vs
+ZCBzdGlsbCBjaGVjayB0aGF0IHRoZSBHSUMgc2VlcyB0aGUgaW50ZXJydXB0IGFzIHBlbmRpbmcs
+IGJlY2F1c2Ugd2UgbmVlZAppdCB0byBpbmplY3QgaW50ZXJydXB0cyBpbiBhIGd1ZXN0LiBJJ20g
+YWxyZWFkeSB3b3JraW5nIG9uIGltcHJvdmluZyB0aGF0IFsxXS4KClsxXSBodHRwczovL3d3dy5z
+cGluaWNzLm5ldC9saXN0cy9rdm0vbXNnMjAzNjA5Lmh0bWwKClRoYW5rcywKQWxleAo+Cj4+IFRo
+YW5rcywKPj4gQWxleAo+Pj4gKwlpbmZvLT53cml0ZV9jdGwoMCk7Cj4+PiArCj4+PiAgCXJlcG9y
+dCh0ZXN0X2N2YWxfMTBtc2VjKGluZm8pLCAibGF0ZW5jeSB3aXRoaW4gMTAgbXMiKTsKPj4+ICAJ
+cmVwb3J0KGluZm8tPmlycV9yZWNlaXZlZCwgImludGVycnVwdCByZWNlaXZlZCIpOwo+Pj4gIAo+
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
