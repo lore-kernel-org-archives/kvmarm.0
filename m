@@ -1,81 +1,58 @@
-Return-Path: <SRS0=dTd4=3P=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6gnH=3Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E62CC2D0DB
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Jan 2020 11:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4482C32771
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 10:37:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0741B20700
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Jan 2020 11:56:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OS8ovI/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0741B20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 49B0220702
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 10:37:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B0220702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 815474AF13;
-	Sun, 26 Jan 2020 06:56:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B75714AF2B;
+	Mon, 27 Jan 2020 05:37:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lOpqljzoHeUE; Sun, 26 Jan 2020 06:56:09 -0500 (EST)
+	with ESMTP id fYtzvHNOukZv; Mon, 27 Jan 2020 05:37:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FF04AF33;
-	Sun, 26 Jan 2020 06:56:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82C194AF11;
+	Mon, 27 Jan 2020 05:37:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F4A4AF13
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jan 2020 06:56:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C63EE4AEBF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 05:37:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id evIdrHyEfB3O for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 Jan 2020 06:56:07 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3ACBC4AEBF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jan 2020 06:56:07 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1030620700;
- Sun, 26 Jan 2020 11:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1580039766;
- bh=GvIGv1MI/eOCaj0SZAXgD9vAtIzdzvrA7/ZPNS6pjW0=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=OS8ovI/tIj3NExuAYPpjRFKN8Eyborjxlqh7tin9jqJwd3RXunvFkl3xo/gCMk0Po
- GyzYI9TDdyAWVK+uQcJVpgmQAWrrRJkmuZXA+g1dggG5zzxAh6Tj/FgGy8Fc6LXr3V
- T+U+WHLX3/uXLFIMlJz2sxhI4Gbz6fDEwi9XBuJg=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1ivgWJ-001TX7-R1; Sun, 26 Jan 2020 11:56:03 +0000
-Date: Sun, 26 Jan 2020 11:56:02 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH 0/2] KVM: arm: fix KVM_CAP_ARM_INJECT_EXT_DABT for
- aarch32 guests
-Message-ID: <20200126115602.6e67b11b@why>
-In-Reply-To: <CADSWDzubQHvG8_c6a7E=basbtXxW-7u_ZVRz6+M7zGOAYYxz7A@mail.gmail.com>
-References: <20200121123356.203000-1-james.morse@arm.com>
- <CADSWDzubQHvG8_c6a7E=basbtXxW-7u_ZVRz6+M7zGOAYYxz7A@mail.gmail.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id 2HyxXcjlR7Jw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jan 2020 05:37:24 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D2454AEA7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 05:37:24 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C23F030E;
+ Mon, 27 Jan 2020 02:37:23 -0800 (PST)
+Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com
+ [10.1.196.63])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BE6EB3F52E;
+ Mon, 27 Jan 2020 02:37:22 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Treat emulated TVAL TimerValue as a signed 32-bit
+ integer
+Date: Mon, 27 Jan 2020 10:36:52 +0000
+Message-Id: <20200127103652.2326-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: beata.michalska@linaro.org, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,49 +69,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 24 Jan 2020 15:39:29 +0000
-Beata Michalska <beata.michalska@linaro.org> wrote:
+According to the ARM ARM, registers CNT{P,V}_TVAL_EL0 have bits [63:32]
+RES0 [1]. When reading the register, the value is truncated to the least
+significant 32 bits [2], and on writes, TimerValue is treated as a signed
+32-bit integer [1, 2].
 
-Hi Beata,
+When the guest behaves correctly and writes 32-bit values, treating TVAL
+as an unsigned 64 bit register works as expected. However, things start
+to break down when the guest writes larger values, because
+(u64)0x1_ffff_ffff = 8589934591. but (s32)0x1_ffff_ffff = -1, and the
+former will cause the timer interrupt to be asserted in the future, but
+the latter will cause it to be asserted now.  Let's treat TVAL as a
+signed 32-bit register on writes, to match the behaviour described in
+the architecture, and the behaviour experimentally exhibited by the
+virtual timer on a non-vhe host.
 
-> Hi James,
-> 
-> Thanks for the fixes - they work like a charm.
-> 
-> On Tue, 21 Jan 2020 at 12:34, James Morse <james.morse@arm.com> wrote:
-> >
-> > Beata reports that KVM_CAP_ARM_INJECT_EXT_DABT doesn't do the expected
-> > thing for aarch32 guests. We get the wrong register layout, and weren't
-> > even trying to set a 'external abort' in the first place!
-> >
-> > Both patches are intended as fixes, but patch 2 is somewhat in the eye
-> > of the beholder. I don't know why an imp-def exception was picked...
-> >  
-> On a side note - currently KVM exposes capability that is not fully supported
-> (till the fix gets applied) and there is no easy way for the user space to
-> determine whether the injection will work as expected and whether it is safe to
-> use it or not. Although this is addressing a problem that is not that common
-> (I suppose) but still it might be worth to add a way for the kernel to inform
-> the user-space that it is all good to go? There has been a 'similar' case in the
-> past with KVM_SET_USER_MEMORY_REGION, where fixes where needed
-> and those were announced through new caps. Now, I'm not sure if adding new
-> capability would be the best approach here though it seems that there is not
-> much of a choice?
+[1] Arm DDI 0487E.a, section D13.8.18
+[2] Arm DDI 0487E.a, section D11.2.4
 
-My take on this particular issue is that although the functionality is
-not perfectly working (far from it), it isn't completely broken (the
-guest does get some form of abort). Furthermore, we tend to add this
-kind of discovery mechanism when the userspace interface is broken, not
-when we have an implementation defect in the CPU emulation.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ include/kvm/arm_arch_timer.h | 2 ++
+ virt/kvm/arm/arch_timer.c    | 3 ++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-The real question is whether there anything out there that would depend
-on such broken behaviour?
-
-Thanks,
-
-	M.
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index d120e6c323e7..be912176b7a3 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -10,6 +10,8 @@
+ #include <linux/clocksource.h>
+ #include <linux/hrtimer.h>
+ 
++#define ARCH_TIMER_TVAL_MASK	((1ULL << 32) - 1)
++
+ enum kvm_arch_timers {
+ 	TIMER_PTIMER,
+ 	TIMER_VTIMER,
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index f182b2380345..5d40f17f7024 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -805,6 +805,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+ 	switch (treg) {
+ 	case TIMER_REG_TVAL:
+ 		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
++		val &= ARCH_TIMER_TVAL_MASK;
+ 		break;
+ 
+ 	case TIMER_REG_CTL:
+@@ -850,7 +851,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
+ {
+ 	switch (treg) {
+ 	case TIMER_REG_TVAL:
+-		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + val;
++		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
+ 		break;
+ 
+ 	case TIMER_REG_CTL:
 -- 
-Jazz is not dead. It just smells funny...
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
