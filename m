@@ -2,60 +2,56 @@ Return-Path: <SRS0=6gnH=3Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F839C32771
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD474C2D0DB
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:44:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 191A4214AF
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:12:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191A4214AF
+	by mail.kernel.org (Postfix) with ESMTP id 5ED3520842
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 11:44:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ED3520842
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9294E4AF2F;
-	Mon, 27 Jan 2020 06:12:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF8A4AF09;
+	Mon, 27 Jan 2020 06:44:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kOsdIEiQFYSl; Mon, 27 Jan 2020 06:12:15 -0500 (EST)
+	with ESMTP id xb1PDfT59X66; Mon, 27 Jan 2020 06:44:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6224AEF6;
-	Mon, 27 Jan 2020 06:12:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 597FC4AC07;
+	Mon, 27 Jan 2020 06:44:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC2F44AEB9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:12:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB3194AC07
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:44:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0v4y9tE6CzSA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jan 2020 06:12:12 -0500 (EST)
+ with ESMTP id fNG-GT4LF+rG for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jan 2020 06:44:36 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 929CD4AEB4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:12:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 979CE4A982
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 06:44:36 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A2BC30E;
- Mon, 27 Jan 2020 03:12:12 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C52A3F52E;
- Mon, 27 Jan 2020 03:12:11 -0800 (PST)
-Subject: Re: [PATCH] KVM: arm64: Treat emulated TVAL TimerValue as a signed
- 32-bit integer
-To: Marc Zyngier <maz@kernel.org>
-References: <20200127103652.2326-1-alexandru.elisei@arm.com>
- <5f633dfb2abe63059d75c0da58c69241@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <de0621e2-3920-3897-bde4-fecf36c9c348@arm.com>
-Date: Mon, 27 Jan 2020 11:12:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <5f633dfb2abe63059d75c0da58c69241@kernel.org>
-Content-Language: en-US
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04A9130E;
+ Mon, 27 Jan 2020 03:44:36 -0800 (PST)
+Received: from e119976-lin.cambridge.arm.com (e119976-lin.cambridge.arm.com
+ [10.1.196.248])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DBE503F52E;
+ Mon, 27 Jan 2020 03:44:34 -0800 (PST)
+From: Andrew Murray <andrew.murray@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v5 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
+ counters
+Date: Mon, 27 Jan 2020 11:44:26 +0000
+Message-Id: <1580125469-23887-1-git-send-email-andrew.murray@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: Andrew Murray <andrew.murray@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,67 +63,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGksCgpPbiAxLzI3LzIwIDExOjA3IEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gSGkgQWxleGFu
-ZHJ1LAo+Cj4gT24gMjAyMC0wMS0yNyAxMDozNiwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4g
-QWNjb3JkaW5nIHRvIHRoZSBBUk0gQVJNLCByZWdpc3RlcnMgQ05Ue1AsVn1fVFZBTF9FTDAgaGF2
-ZSBiaXRzIFs2MzozMl0KPj4gUkVTMCBbMV0uIFdoZW4gcmVhZGluZyB0aGUgcmVnaXN0ZXIsIHRo
-ZSB2YWx1ZSBpcyB0cnVuY2F0ZWQgdG8gdGhlIGxlYXN0Cj4+IHNpZ25pZmljYW50IDMyIGJpdHMg
-WzJdLCBhbmQgb24gd3JpdGVzLCBUaW1lclZhbHVlIGlzIHRyZWF0ZWQgYXMgYSBzaWduZWQKPj4g
-MzItYml0IGludGVnZXIgWzEsIDJdLgo+Pgo+PiBXaGVuIHRoZSBndWVzdCBiZWhhdmVzIGNvcnJl
-Y3RseSBhbmQgd3JpdGVzIDMyLWJpdCB2YWx1ZXMsIHRyZWF0aW5nIFRWQUwKPj4gYXMgYW4gdW5z
-aWduZWQgNjQgYml0IHJlZ2lzdGVyIHdvcmtzIGFzIGV4cGVjdGVkLiBIb3dldmVyLCB0aGluZ3Mg
-c3RhcnQKPj4gdG8gYnJlYWsgZG93biB3aGVuIHRoZSBndWVzdCB3cml0ZXMgbGFyZ2VyIHZhbHVl
-cywgYmVjYXVzZQo+PiAodTY0KTB4MV9mZmZmX2ZmZmYgPSA4NTg5OTM0NTkxLiBidXQgKHMzMikw
-eDFfZmZmZl9mZmZmID0gLTEsIGFuZCB0aGUKPj4gZm9ybWVyIHdpbGwgY2F1c2UgdGhlIHRpbWVy
-IGludGVycnVwdCB0byBiZSBhc3NlcnRlZCBpbiB0aGUgZnV0dXJlLCBidXQKPj4gdGhlIGxhdHRl
-ciB3aWxsIGNhdXNlIGl0IHRvIGJlIGFzc2VydGVkIG5vdy7CoCBMZXQncyB0cmVhdCBUVkFMIGFz
-IGEKPj4gc2lnbmVkIDMyLWJpdCByZWdpc3RlciBvbiB3cml0ZXMsIHRvIG1hdGNoIHRoZSBiZWhh
-dmlvdXIgZGVzY3JpYmVkIGluCj4+IHRoZSBhcmNoaXRlY3R1cmUsIGFuZCB0aGUgYmVoYXZpb3Vy
-IGV4cGVyaW1lbnRhbGx5IGV4aGliaXRlZCBieSB0aGUKPj4gdmlydHVhbCB0aW1lciBvbiBhIG5v
-bi12aGUgaG9zdC4KPj4KPj4gWzFdIEFybSBEREkgMDQ4N0UuYSwgc2VjdGlvbiBEMTMuOC4xOAo+
-PiBbMl0gQXJtIERESSAwNDg3RS5hLCBzZWN0aW9uIEQxMS4yLjQKPj4KPj4gU2lnbmVkLW9mZi1i
-eTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+Cj4gSHVodWgu
-Li4gTmljZSBjYXRjaCEKPgo+IEZpeGVzOiA4ZmE3NjE2MjQ4NzEgKCJLVk06IGFybS9hcm02NDog
-YXJjaF90aW1lcjogRml4IENOVFBfVFZBTCBjYWxjdWxhdGlvbiIpCj4KPiAoaG93IG1hbnkgdGlt
-ZXMgYXJlIHdlIGRvaW5nIHRvIGZpeCB0aGlzPz8/KQo+Cj4+IC0tLQo+PiDCoGluY2x1ZGUva3Zt
-L2FybV9hcmNoX3RpbWVyLmggfCAyICsrCj4+IMKgdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuY8Kg
-wqDCoCB8IDMgKystCj4+IMKgMiBmaWxlcyBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkKPj4KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmgg
-Yi9pbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oCj4+IGluZGV4IGQxMjBlNmMzMjNlNy4uYmU5
-MTIxNzZiN2EzIDEwMDY0NAo+PiAtLS0gYS9pbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oCj4+
-ICsrKyBiL2luY2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmgKPj4gQEAgLTEwLDYgKzEwLDggQEAK
-Pj4gwqAjaW5jbHVkZSA8bGludXgvY2xvY2tzb3VyY2UuaD4KPj4gwqAjaW5jbHVkZSA8bGludXgv
-aHJ0aW1lci5oPgo+Pgo+PiArI2RlZmluZSBBUkNIX1RJTUVSX1RWQUxfTUFTS8KgwqDCoCAoKDFV
-TEwgPDwgMzIpIC0gMSkKPj4gKwo+PiDCoGVudW0ga3ZtX2FyY2hfdGltZXJzIHsKPj4gwqDCoMKg
-wqAgVElNRVJfUFRJTUVSLAo+PiDCoMKgwqDCoCBUSU1FUl9WVElNRVIsCj4+IGRpZmYgLS1naXQg
-YS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jIGIvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwo+
-PiBpbmRleCBmMTgyYjIzODAzNDUuLjVkNDBmMTdmNzAyNCAxMDA2NDQKPj4gLS0tIGEvdmlydC9r
-dm0vYXJtL2FyY2hfdGltZXIuYwo+PiArKysgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCj4+
-IEBAIC04MDUsNiArODA1LDcgQEAgc3RhdGljIHU2NCBrdm1fYXJtX3RpbWVyX3JlYWQoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1LAo+PiDCoMKgwqDCoCBzd2l0Y2ggKHRyZWcpIHsKPj4gwqDCoMKgwqAg
-Y2FzZSBUSU1FUl9SRUdfVFZBTDoKPj4gwqDCoMKgwqDCoMKgwqDCoCB2YWwgPSB0aW1lci0+Y250
-X2N2YWwgLSBrdm1fcGh5c190aW1lcl9yZWFkKCkgKyB0aW1lci0+Y250dm9mZjsKPj4gK8KgwqDC
-oMKgwqDCoMKgIHZhbCAmPSBBUkNIX1RJTUVSX1RWQUxfTUFTSzsKPgo+IG5pdDogRG8gd2UgcmVh
-bGx5IG5lZWQgdGhpcyBtYXNrPyBJJ2QgcmF0aGVyIHNlZSBpdCB3cml0dGVuIGFzCj4KPiDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdmFsID0gbG93ZXJfMzJfYml0cyh2YWwpOwoKSSBk
-aWRuJ3QgcmVhbGx5IGxpa2UgdXNpbmcgdGhlIG1hc2sgZWl0aGVyLCBidXQgSSBjb3VsZG4ndCB0
-aGluayBvZiBhbnl0aGluZwpiZXR0ZXIuIFRoaXMgbG9va3MgdmVyeSBnb29kLgoKPgo+Cj4+IMKg
-wqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+Cj4+IMKgwqDCoMKgIGNhc2UgVElNRVJfUkVHX0NUTDoK
-Pj4gQEAgLTg1MCw3ICs4NTEsNyBAQCBzdGF0aWMgdm9pZCBrdm1fYXJtX3RpbWVyX3dyaXRlKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gwqB7Cj4+IMKgwqDCoMKgIHN3aXRjaCAodHJlZykgewo+
-PiDCoMKgwqDCoCBjYXNlIFRJTUVSX1JFR19UVkFMOgo+PiAtwqDCoMKgwqDCoMKgwqAgdGltZXIt
-PmNudF9jdmFsID0ga3ZtX3BoeXNfdGltZXJfcmVhZCgpIC0gdGltZXItPmNudHZvZmYgKyB2YWw7
-Cj4+ICvCoMKgwqDCoMKgwqDCoCB0aW1lci0+Y250X2N2YWwgPSBrdm1fcGh5c190aW1lcl9yZWFk
-KCkgLSB0aW1lci0+Y250dm9mZiArIChzMzIpdmFsOwo+PiDCoMKgwqDCoMKgwqDCoMKgIGJyZWFr
-Owo+Pgo+PiDCoMKgwqDCoCBjYXNlIFRJTUVSX1JFR19DVEw6Cj4KPiBPdGhlcndpc2UsIGxvb2tz
-IGdvb2QgdG8gbWUuIElmIHlvdSdyZSBPSyB3aXRoIHRoZSBhYm92ZSBjaGFuZ2UsIEknbGwKPiB0
-YWtlIGl0IGFzIGEgZml4LgoKWWVzLCBJJ20gdmVyeSBtdWNoIE9LIHdpdGggdGhlIGNoYW5nZS4K
-ClRoYW5rcywKQWxleAo+Cj4gVGhhbmtzLAo+Cj4gwqDCoMKgwqDCoMKgwqAgTS4KX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+At present ARMv8 event counters are limited to 32-bits, though by
+using the CHAIN event it's possible to combine adjacent counters to
+achieve 64-bits. The perf config1:0 bit can be set to use such a
+configuration.
+
+With the introduction of ARMv8.5-PMU support, all event counters can
+now be used as 64-bit counters. Let's add support for 64-bit event
+counters.
+
+As KVM doesn't yet support 64-bit event counters (or other features
+after PMUv3 for ARMv8.1), we also trap and emulate the Debug Feature
+Registers to limit the PMU version a guest sees to PMUv3 for ARMv8.1.
+
+Tested by running the following perf command on both guest and host
+and ensuring that the figures are very similar:
+
+perf stat -e armv8_pmuv3/inst_retired,long=1/ \
+          -e armv8_pmuv3/inst_retired,long=0/ -e cycles
+
+Changes since v4:
+
+ - Limit KVM to PMUv3 for ARMv8.1 instead of 8.4
+ - Reword second commit
+
+Changes since v3:
+
+ - Rebased onto v5.5-rc7
+ - Instead of overriding trap access handler, update read_id_reg
+
+Changes since v2:
+
+ - Rebased onto v5.5-rc4
+ - Mask 'cap' value to 'width' in cpuid_feature_cap_signed_field_width
+
+Changes since v1:
+
+ - Rebased onto v5.5-rc1
+
+
+
+Andrew Murray (3):
+  arm64: cpufeature: Extract capped fields
+  KVM: arm64: limit PMU version to PMUv3 for ARMv8.1
+  arm64: perf: Add support for ARMv8.5-PMU 64-bit counters
+
+ arch/arm64/include/asm/cpufeature.h | 16 +++++++
+ arch/arm64/include/asm/perf_event.h |  3 +-
+ arch/arm64/include/asm/sysreg.h     |  6 +++
+ arch/arm64/kernel/perf_event.c      | 86 +++++++++++++++++++++++++++++--------
+ arch/arm64/kvm/sys_regs.c           | 11 +++++
+ include/linux/perf/arm_pmu.h        |  1 +
+ 6 files changed, 105 insertions(+), 18 deletions(-)
+
+-- 
+2.7.4
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
