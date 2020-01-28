@@ -4,73 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDDBC33C9E
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 10:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4700C33CB2
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 10:35:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 750FF2468A
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 10:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B192E21739
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 10:35:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAxGI6RO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750FF2468A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NncEcveZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B192E21739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5159F4ACFA;
-	Tue, 28 Jan 2020 05:35:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7144ACDB;
+	Tue, 28 Jan 2020 05:35:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pteTncw0ebAB; Tue, 28 Jan 2020 05:35:28 -0500 (EST)
+	with ESMTP id yBXdnjsLX3vs; Tue, 28 Jan 2020 05:35:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AE064AC87;
-	Tue, 28 Jan 2020 05:35:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F3B44AC7C;
+	Tue, 28 Jan 2020 05:35:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7684AC87
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 05:35:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D7144A94D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 05:35:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6euszALxcpPF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jan 2020 05:35:26 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 089884A7FF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 05:35:26 -0500 (EST)
+ with ESMTP id twhI8M8Ro6RI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jan 2020 05:35:40 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B520D4A98A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 05:35:40 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580207725;
+ s=mimecast20190719; t=1580207740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hksWhfx/qjqLBl2kwSG6HIa1DnV2Yh8CnWY4dayzAHc=;
- b=KAxGI6ROO/L68XdlNESrogr807MaG0fNXdZcxfzCOcSt2IhD9f7T5xu71oQ4lzSknGXbXG
- XBE3bX1TTVbvtCVjXA+8n+mlZnrKXMz0Rs35Sdc8S/sVKCgXelZ+rn7C8WHp9hq7UAho9b
- rDeN7phtd1G+vYn836oZOkSk+Y3p7jc=
+ bh=zRIDXBcFA1npKL3bY9kDF0a2tZ99w/hj73UnpskP22g=;
+ b=NncEcveZ5rQ2pVAGg+JLS5BCNnelm7wULgNKz7JGRAreCpN46ieSu9DsJb8bHw4xqX4FZ6
+ sAmHvotCqkXntOLASEC84jg2mPLBeVsTZuAKe4A3PBNi7CBnktOQDESak04PojZT6VZNHs
+ aFzg7tYZ1ddUio6CBDa02oCJGJyY4Jw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-CymzZg9NPg-7tVbWGeDa5g-1; Tue, 28 Jan 2020 05:35:23 -0500
-X-MC-Unique: CymzZg9NPg-7tVbWGeDa5g-1
+ us-mta-130-BSGEQTgFPAW1HAu62B4BsA-1; Tue, 28 Jan 2020 05:35:38 -0500
+X-MC-Unique: BSGEQTgFPAW1HAu62B4BsA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CBB3DB60;
- Tue, 28 Jan 2020 10:35:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 517108017CC;
+ Tue, 28 Jan 2020 10:35:37 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D1BFF1001B08;
- Tue, 28 Jan 2020 10:35:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C03F41001B08;
+ Tue, 28 Jan 2020 10:35:31 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v3 02/14] arm: gic: Provide per-IRQ helper
- functions
-Date: Tue, 28 Jan 2020 11:34:47 +0100
-Message-Id: <20200128103459.19413-3-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 04/14] arm/arm64: gicv3: Add some
+ re-distributor defines
+Date: Tue, 28 Jan 2020 11:34:49 +0100
+Message-Id: <20200128103459.19413-5-eric.auger@redhat.com>
 In-Reply-To: <20200128103459.19413-1-eric.auger@redhat.com>
 References: <20200128103459.19413-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,163 +92,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+PROPBASER, PENDBASE and GICR_CTRL will be used for LPI management.
 
-A common theme when accessing per-IRQ parameters in the GIC distributor
-is to set fields of a certain bit width in a range of MMIO registers.
-Examples are the enabled status (one bit per IRQ), the level/edge
-configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
-
-Add a generic helper function which is able to mask and set the
-respective number of bits, given the IRQ number and the MMIO offset.
-Provide wrappers using this function to easily allow configuring an IRQ.
-
-For now assume that private IRQ numbers always refer to the current CPU.
-In a GICv2 accessing the "other" private IRQs is not easily doable (the
-registers are banked per CPU on the same MMIO address), so we impose the
-same limitation on GICv3, even though those registers are not banked
-there anymore.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
-
-initialize reg
----
- lib/arm/asm/gic-v3.h |  2 +
- lib/arm/asm/gic.h    |  8 ++++
- lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
+ lib/arm/asm/gic-v3.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 0dc838b..6beeab6 100644
+index 6beeab6..ffb2e26 100644
 --- a/lib/arm/asm/gic-v3.h
 +++ b/lib/arm/asm/gic-v3.h
-@@ -23,6 +23,8 @@
+@@ -18,6 +18,7 @@
+  * We expect to be run in Non-secure mode, thus we define the
+  * group1 enable bits with respect to that view.
+  */
++#define GICD_CTLR			0x0000
+ #define GICD_CTLR_RWP			(1U << 31)
+ #define GICD_CTLR_ARE_NS		(1U << 4)
  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
- #define GICD_CTLR_ENABLE_G1		(1U << 0)
+@@ -36,6 +37,11 @@
+ #define GICR_ICENABLER0			GICD_ICENABLER
+ #define GICR_IPRIORITYR0		GICD_IPRIORITYR
  
-+#define GICD_IROUTER			0x6000
++#define GICR_PROPBASER                  0x0070
++#define GICR_PENDBASER                  0x0078
++#define GICR_CTLR			GICD_CTLR
++#define GICR_CTLR_ENABLE_LPIS		(1UL << 0)
 +
- /* Re-Distributor registers, offsets from RD_base */
- #define GICR_TYPER			0x0008
- 
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 09826fd..21cdb58 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -74,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
- extern void gic_ipi_send_single(int irq, int cpu);
- extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
- 
-+void gic_set_irq_bit(int irq, int offset);
-+void gic_enable_irq(int irq);
-+void gic_disable_irq(int irq);
-+void gic_set_irq_priority(int irq, u8 prio);
-+void gic_set_irq_target(int irq, int cpu);
-+void gic_set_irq_group(int irq, int group);
-+int gic_get_irq_group(int irq);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 9430116..aa9cb86 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
- 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
- 	gic_common_ops->ipi_send_mask(irq, dest);
- }
-+
-+enum gic_bit_access {
-+	ACCESS_READ,
-+	ACCESS_SET,
-+	ACCESS_RMW
-+};
-+
-+static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
-+			      enum gic_bit_access access)
-+{
-+	void *base;
-+	int split = 32 / bits;
-+	int shift = (irq % split) * bits;
-+	u32 reg = 0, mask = ((1U << bits) - 1) << shift;
-+
-+	switch (gic_version()) {
-+	case 2:
-+		base = gicv2_dist_base();
-+		break;
-+	case 3:
-+		if (irq < 32)
-+			base = gicv3_sgi_base();
-+		else
-+			base = gicv3_dist_base();
-+		break;
-+	default:
-+		return 0;
-+	}
-+	base += offset + (irq / split) * 4;
-+
-+	switch (access) {
-+	case ACCESS_READ:
-+		return (readl(base) & mask) >> shift;
-+	case ACCESS_SET:
-+		reg = 0;
-+		break;
-+	case ACCESS_RMW:
-+		reg = readl(base) & ~mask;
-+		break;
-+	}
-+
-+	writel(reg | ((u32)value << shift), base);
-+
-+	return 0;
-+}
-+
-+void gic_set_irq_bit(int irq, int offset)
-+{
-+	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
-+}
-+
-+void gic_enable_irq(int irq)
-+{
-+	gic_set_irq_bit(irq, GICD_ISENABLER);
-+}
-+
-+void gic_disable_irq(int irq)
-+{
-+	gic_set_irq_bit(irq, GICD_ICENABLER);
-+}
-+
-+void gic_set_irq_priority(int irq, u8 prio)
-+{
-+	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
-+}
-+
-+void gic_set_irq_target(int irq, int cpu)
-+{
-+	if (irq < 32)
-+		return;
-+
-+	if (gic_version() == 2) {
-+		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
-+				    ACCESS_RMW);
-+
-+		return;
-+	}
-+
-+	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
-+}
-+
-+void gic_set_irq_group(int irq, int group)
-+{
-+	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
-+}
-+
-+int gic_get_irq_group(int irq)
-+{
-+	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
-+}
+ #define ICC_SGI1R_AFFINITY_1_SHIFT	16
+ #define ICC_SGI1R_AFFINITY_2_SHIFT	32
+ #define ICC_SGI1R_AFFINITY_3_SHIFT	48
 -- 
 2.20.1
 
