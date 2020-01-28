@@ -1,60 +1,95 @@
-Return-Path: <SRS0=6gnH=3Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=H5Sr=3R=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FA7C33CB1
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 15:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B33EC33CB3
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 08:54:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 173AD20674
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jan 2020 15:20:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173AD20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9ECB82468B
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jan 2020 08:54:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=thegoodpenguin-co-uk.20150623.gappssmtp.com header.i=@thegoodpenguin-co-uk.20150623.gappssmtp.com header.b="a/k2f9RD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ECB82468B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9169C4AEC3;
-	Mon, 27 Jan 2020 10:20:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 098954A95B;
+	Tue, 28 Jan 2020 03:54:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered)
+	header.i=@thegoodpenguin-co-uk.20150623.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id scSdLkcbcLtJ; Mon, 27 Jan 2020 10:20:52 -0500 (EST)
+	with ESMTP id rFlkEHWGPfXr; Tue, 28 Jan 2020 03:54:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36BD14AEC5;
-	Mon, 27 Jan 2020 10:20:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20DF04A8E8;
+	Tue, 28 Jan 2020 03:54:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E49114AEC0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 10:20:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B8C14A598
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 03:54:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tXaYmc63G35W for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jan 2020 10:20:50 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 364254AEAB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jan 2020 10:20:50 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFD9D31B;
- Mon, 27 Jan 2020 07:20:49 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF9EB3F67D;
- Mon, 27 Jan 2020 07:20:48 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH] arm: expand the timer tests
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200110160511.17821-1-alex.bennee@linaro.org>
- <8455cdf6-e5c3-bd84-5b85-33ffad581d0e@arm.com> <871rs3ntok.fsf@linaro.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c5b006e9-bff9-1d92-e1f9-98287a0cebcc@arm.com>
-Date: Mon, 27 Jan 2020 15:20:47 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id jizARF1x+DZa for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jan 2020 03:53:59 -0500 (EST)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46C334A597
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 03:53:59 -0500 (EST)
+Received: by mail-wr1-f68.google.com with SMTP id y11so15000524wrt.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jan 2020 00:53:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=thegoodpenguin-co-uk.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Kgp9Jwiz1uKaQL/OUlkTuFc8Er2g+wCKlj7MsI5NStg=;
+ b=a/k2f9RDaC3rFRttMu+hwVSU2nr+XZ+Rdsjg87QW8toXPmkR3/tTvMqzdofJQtYc+v
+ dD2XOuh8lLvC7rH0cIyxf9vU/R/RiuOgo5tovo2DQSMuH1ewph9lQfHujM4xC3ChEQAp
+ 2RDN/sAsAHJL3bGEux+oCZCWQBrA2qxxUZPek4sKiEiNPaogwLeAz1wj3pJfq0rFbUV+
+ LQbVAzJwXvBBxsidb0Qh2TRt17dvCaq1IgvufnyGjsTtLaYiJ7aXMZxLH86Se5Ajo+9X
+ bo14QaigH7CWCheby1whxsJRa22ocVwSL4cxucETxrpyCMZfNsqmRAbapJXkOhYEyzlF
+ sm/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Kgp9Jwiz1uKaQL/OUlkTuFc8Er2g+wCKlj7MsI5NStg=;
+ b=kkH5OK2fgPWEtlH9jTI/2+oPSQsMEFC3EHdgN6dKsMmeBRKh3gRwInzx1BQW5yxOeC
+ iL71E1t41FVt0IOZyyt02Rc6c8fHQzOK1HDYgTXvC+NthZq16gSStBCWYtiAQvhMV/MI
+ YE95YGwjZIm+fLfw7y2q6dj01ceeugG7ppSJhAZ4yEDNRCj4TrZwGYvizBZIGN21kmcT
+ G57aXeiSWkkTTs8Od26JviTmEual1zMbVj8H9kDwLcHz8yMpNCL+xCFVVmzWlnKxc3OK
+ vz9ZhfQeO0ttEWBFJ2yNYyW/xzkEs9OZLiTB5fIzZNPeqRbrdMtxXdvy9Pwj/G1Eep9D
+ kMfA==
+X-Gm-Message-State: APjAAAVfOrkUpiFgBNzMkLIlD4dDuIdB00bSjZwZ4RQ8DIQGIhauZack
+ kSn6Bvviu8yTMRxCsX121pGV5A==
+X-Google-Smtp-Source: APXvYqxlQbYz8+ShyJJuzTJuznkR9goNX0263z9i3QDmTgg0gUqt/myN5Fxp1PDtZqfRgz34/puwIw==
+X-Received: by 2002:a05:6000:118d:: with SMTP id
+ g13mr26196125wrx.141.1580201637988; 
+ Tue, 28 Jan 2020 00:53:57 -0800 (PST)
+Received: from big-machine ([2a00:23c5:dd80:8400:9d15:2a7c:ad89:e0d1])
+ by smtp.gmail.com with ESMTPSA id e8sm24508612wrt.7.2020.01.28.00.53.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Jan 2020 00:53:57 -0800 (PST)
+Date: Tue, 28 Jan 2020 08:53:55 +0000
+From: Andrew Murray <amurray@thegoodpenguin.co.uk>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v5 3/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
+ counters
+Message-ID: <20200128085355.GB20189@big-machine>
+References: <1580125469-23887-1-git-send-email-andrew.murray@arm.com>
+ <1580125469-23887-4-git-send-email-andrew.murray@arm.com>
+ <c948d8202b82bccbac0ec2a4f71ce94b@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <871rs3ntok.fsf@linaro.org>
-Content-Language: en-US
-Cc: linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <c948d8202b82bccbac0ec2a4f71ce94b@kernel.org>
+Cc: Andrew Murray <andrew.murray@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,134 +101,299 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGksCgpDQydpbmcgdGhlIGFybSBtYWludGFpbmVyKQoKU29ycnkgZm9yIHRoZSBsYXRlIHJlcGx5
-LCBnb3QgZGlzdHJhY3RlZCBieSBzb21ldGhpbmcgZWxzZS4KCk9uIDEvMTMvMjAgNTozOCBQTSwg
-QWxleCBCZW5uw6llIHdyb3RlOgo+IEFsZXhhbmRydSBFbGlzZWkgPGFsZXhhbmRydS5lbGlzZWlA
-YXJtLmNvbT4gd3JpdGVzOgo+Cj4+IEhpLAo+Pgo+PiBPbiAxLzEwLzIwIDQ6MDUgUE0sIEFsZXgg
-QmVubsOpZSB3cm90ZToKPj4+IFRoaXMgd2FzIGFuIGF0dGVtcHQgdG8gcmVwbGljYXRlIGEgUUVN
-VSBidWcuIEhvd2V2ZXIgdG8gdHJpZ2dlciB0aGUKPj4+IGJ1ZyB5b3UgbmVlZCB0byBoYXZlIGFu
-IG9mZnNldCBzZXQgaW4gRUwyIHdoaWNoIGt2bS11bml0LXRlc3RzIGlzCj4+PiB1bmFibGUgdG8g
-ZG8uIEhvd2V2ZXIgaXQgZG9lcyBleGVyY2lzZSBzb21lIG1vcmUgY29ybmVyIGNhc2VzLgo+Pj4K
-Pj4+IEJ1ZzogaHR0cHM6Ly9idWdzLmxhdW5jaHBhZC5uZXQvYnVncy8xODU5MDIxCj4+IEknbSBu
-b3QgYXdhcmUgb2YgYW55IEJ1ZzogdGFncyBpbiB0aGUgTGludXgga2VybmVsLiBJZiB5b3Ugd2Fu
-dCBwZW9wbGUgdG8gZm9sbG93Cj4+IHRoZSBsaW5rIHRvIHRoZSBidWcsIGhvdyBhYm91dCByZWZl
-cmVuY2luZyBzb21ldGhpbmcgbGlrZSB0aGlzOgo+Pgo+PiAiVGhpcyB3YXMgYW4gYXR0ZW1wdCB0
-byByZXBsaWNhdGUgYSBRRU1VIGJ1ZyBbMV0uIFsuLl0KPj4KPj4gWzFdIGh0dHBzOi8vYnVncy5s
-YXVuY2hwYWQubmV0L3FlbXUvK2J1Zy8xODU5MDIxIgo+IE9LLCBJJ2xsIGZpeCB0aGF0IGluIHYy
-Lgo+Cj4+IEFsc28sIGFyZSBsYXVuY2hwYWQgYnVnIHJlcG9ydHMgcGVybWFuZW50PyBXaWxsIHRo
-ZSBsaW5rIHN0aWxsIHdvcmsgaW4KPj4gYSB5ZWFycycgdGltZT8KPiBUaGV5IHNob3VsZCBiZSAt
-IHRoZXkgYXJlIGEgdW5pcXVlIGlkIGFuZCB3ZSB1c2UgdGhlbSBpbiB0aGUgUUVNVSBzb3VyY2UK
-PiB0cmVlLgo+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxp
-bmFyby5vcmc+Cj4+PiAtLS0KPj4+ICBhcm0vdGltZXIuYyB8IDI3ICsrKysrKysrKysrKysrKysr
-KysrKysrKysrLQo+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9uKC0pCj4+Pgo+Pj4gZGlmZiAtLWdpdCBhL2FybS90aW1lci5jIGIvYXJtL3RpbWVyLmMKPj4+
-IGluZGV4IGYzOTBlOGUuLmFlMWQyOTkgMTAwNjQ0Cj4+PiAtLS0gYS9hcm0vdGltZXIuYwo+Pj4g
-KysrIGIvYXJtL3RpbWVyLmMKPj4+IEBAIC0yMTQsMjEgKzIxNCw0NiBAQCBzdGF0aWMgdm9pZCB0
-ZXN0X3RpbWVyKHN0cnVjdCB0aW1lcl9pbmZvICppbmZvKQo+Pj4gIAkgKiBzdGlsbCByZWFkIHRo
-ZSBwZW5kaW5nIHN0YXRlIGV2ZW4gaWYgaXQncyBkaXNhYmxlZC4gKi8KPj4+ICAJc2V0X3RpbWVy
-X2lycV9lbmFibGVkKGluZm8sIGZhbHNlKTsKPj4+ICAKPj4+ICsJLyogVmVyaWZ5IGNvdW50IGdv
-ZXMgdXAgKi8KPj4+ICsJcmVwb3J0KGluZm8tPnJlYWRfY291bnRlcigpID49IG5vdywgImNvdW50
-ZXIgaW5jcmVtZW50cyIpOwo+Pj4gKwo+Pj4gIAkvKiBFbmFibGUgdGhlIHRpbWVyLCBidXQgc2No
-ZWR1bGUgaXQgZm9yIG11Y2ggbGF0ZXIgKi8KPj4+ICAJaW5mby0+d3JpdGVfY3ZhbChsYXRlcik7
-Cj4+PiAgCWluZm8tPndyaXRlX2N0bChBUkNIX1RJTUVSX0NUTF9FTkFCTEUpOwo+Pj4gIAlpc2Io
-KTsKPj4+IC0JcmVwb3J0KCFnaWNfdGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJl
-Zm9yZSIpOwo+Pj4gKwlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAibm90IHBlbmRp
-bmcgYmVmb3JlIDEwcyIpOwo+Pj4gKwo+Pj4gKwkvKiBDaGVjayB3aXRoIGEgbWF4aW11bSBwb3Nz
-aWJsZSBjdmFsICovCj4+PiArCWluZm8tPndyaXRlX2N2YWwoVUlOVDY0X01BWCk7Cj4+PiArCWlz
-YigpOwo+Pj4gKwlyZXBvcnQoIWdpY190aW1lcl9wZW5kaW5nKGluZm8pLCAibm90IHBlbmRpbmcg
-YmVmb3JlIFVJTlQ2NF9NQVgiKTsKClRoaXMgY2hlY2sgYWxvbmUgd2FzIGVub3VnaCBmb3IgbWUg
-dG8gdHJpZ2dlciB0aGUgcWVtdSBidWcuIFdvdWxkIHlvdSBtaW5kCmV4cGxhaW5pbmcgdGhlIHJl
-YXNvbiBmb3IgcGVyZm9ybWluZyB0aGUgdGVzdCBhZ2FpbiwgYnV0IHdpdGggdGhlIHRpbWVyIGlu
-dGVycnVwdAplbmFibGVkIGF0IHRoZSBHSUMgbGV2ZWw/IERpZCB0aGUgZml4IGhhdmUgc29tZXRo
-aW5nIHRvIGRvIHdpdGggdGhlIGludGVycnVwdD8KCj4+PiArCj4+PiArCS8qIGFsc28gYnkgc2V0
-dGluZyB0dmFsICovCj4+IEFsbCB0aGUgY29tbWVudHMgaW4gdGhpcyBmaWxlIHNlZW0gdG8gc3Rh
-cnQgd2l0aCBhIGNhcGl0YWwgbGV0dGVyLgo+Pgo+Pj4gKwlpbmZvLT53cml0ZV90dmFsKHRpbWVf
-MTBzKTsKPj4+ICsJaXNiKCk7Cj4+PiArCXJlcG9ydCghZ2ljX3RpbWVyX3BlbmRpbmcoaW5mbyks
-ICJub3QgcGVuZGluZyBiZWZvcmUgMTBzICh2aWEgdHZhbCkiKTsKPj4gWW91IGNhbiByZW1vdmUg
-dGhlICIodmlhIHR2YWwpIiBwYXJ0IC0gdGhlIG1lc3NhZ2UgaXMgdW5pcXVlIGVub3VnaCB0byBm
-aWd1cmUgb3V0Cj4+IHdoaWNoIHBhcnQgb2YgdGhlIHRlc3QgaXQgcmVmZXJzIHRvLgo+IEkgYWRk
-ZWQgaXQgdG8gZGlmZmVyZW50aWF0ZSB3aXRoIHRoZSBtZXNzYWdlIGEgbGl0dGxlIGZ1cnRoZXIg
-YWJvdmUuCgpZb3UncmUgcmlnaHQsIEkgZGlkbid0IG5vdGljZSB0aGF0IHdlIGFscmVhZHkgaGF2
-ZSB0aGUgZXhhY3Qgc2FtZSBtZXNzYWdlLgoKQnV0IEkgdGhvdWdodCBzb21lIG1vcmUgYWJvdXQg
-dGhpcyB0ZXN0LCBhbmQgSSdtIG5vdCByZWFsbHkgc3VyZSB3ZSBjYW4gZG8gaXQKcmVsaWFibHku
-IEkgcmFuIHlvdXIgcGF0Y2ggb24gYW4gQU1EIFNlYXR0bGUsIHdoZXJlIHRoZSB0aW1lciBmcmVx
-dWVuY3kgaXMKMHhlZTZiMjgwLCB3aGljaCBtdWx0aXBsaWVkIGJ5IDEwIGdpdmVzIHVzIDB4OTUw
-MmY5MDAsIHdoaWNoIHdpbGwgYmUgaW50ZXJwcmV0ZWQKYXMgYSBuZWdhdGl2ZSB2YWx1ZSBiZWNh
-dXNlIFRpbWVyVmFsdWUgaXMgYSAqKnNpZ25lZCoqIDMyLWJpdCBpbnRlZ2VyLiBUaGF0IG1lYW5z
-CnRoYXQgd2UncmUgYWN0dWFsbHkgcHJvZ3JhbW1pbmcgdGhlIHRpbWVyIHRvIGZpcmUgaW4gdGhl
-ICoqcGFzdCoqLCBzbyB0aGlzIHRlc3QKZmFpbHMuIExldCdzIHNheSB3ZSBsaW1pdCB0aGUgdmFs
-dWUgdGhhdCB3ZSdyZSB3cml0aW5nIHRvIFRWQUwgdG8gSU5UMzJfTUFYLCBidXQKYmVjYXVzZSBv
-ZiBhIGhpZ2ggdGltZXIgZnJlcXVlbmN5LCB0aGUgdGltZSB3aW5kb3cgYmVmb3JlIHRoZSBpbnRl
-cnJ1cHQgaXMKYXNzZXJ0ZWQgY291bGQgYmUgdG9vIHNtYWxsLCBhbmQsIGRlcGVuZGluZyBvbiB0
-aGUgZW52aXJvbm1lbnQgYW5kIGhvdyBMaW51eApzY2hlZHVsZXMgdGFza3MsIHRoaXMgY2hlY2sg
-bWlnaHQgcmFuZG9tbHkgZmFpbC4KCj4KPj4+ICsJcmVwb3J0X2luZm8oIlRWQUwgaXMgJWQgKGRl
-bHRhIENWQUwgJWxkKSB0aWNrcyIsCj4+PiArCQkgICAgaW5mby0+cmVhZF90dmFsKCksIGluZm8t
-PnJlYWRfY3ZhbCgpIC0gaW5mby0+cmVhZF9jb3VudGVyKCkpOwo+PiBJJ20gbm90IHN1cmUgd2hh
-dCB5b3UgYXJlIHRyeWluZyB0byBhY2hpZXZlIHdpdGggdGhpcy4gWW91IGNhbiB0cmFuc2Zvcm0g
-aXQgdG8KPj4gY2hlY2sgdGhhdCBUVkFMIGlzIGluZGVlZCBwb3NpdGl2ZSBhbmQgKGFsbW9zdCkg
-ZXF1YWwgdG8gY3ZhbCAtIGNudHBjdCwgc29tZXRoaW5nCj4+IGxpa2UgdGhpczoKPj4KPj4gKwlz
-MzIgdHZhbCA9IGluZm8tPnJlYWRfdHZhbCgpOwo+PiArCXJlcG9ydCh0dmFsID4gMCAmJiB0dmFs
-IDw9IGluZm8tPnJlYWRfY3ZhbCgpIC0KPj4gaW5mby0+cmVhZF9jb3VudGVyKCksICJUVkFMIG1l
-YXN1cmVzIHRpbWUgdG8gbmV4dCBpbnRlcnJ1cHQiKTsKPiBZZXMgaXQgd2FzIHB1cmVseSBpbmZv
-cm1hdGlvbmFsIHRvIHNheSB0dmFsIGRlY3JlbWVudHMgdG93YXJkcyB0aGUgbmV4dAo+IElSUS4g
-SSBjYW4gbWFrZSBpdCBhIHB1cmUgdGVzdC4KPgo+Pj4gIAo+Pj4gKyAgICAgICAgLyogY2hlY2sg
-cGVuZGluZyBvbmNlIGN2YWwgaXMgYmVmb3JlIG5vdyAqLwo+PiBUaGlzIGNvbW1lbnQgYWRkcyBu
-b3RoaW5nIHRvIHRoZSB0ZXN0Lgo+IGRyb3BwZWQuCj4KPj4+ICAJaW5mby0+d3JpdGVfY3ZhbChu
-b3cgLSAxKTsKPj4+ICAJaXNiKCk7Cj4+PiAgCXJlcG9ydChnaWNfdGltZXJfcGVuZGluZyhpbmZv
-KSwgImludGVycnVwdCBzaWduYWwgcGVuZGluZyIpOwo+Pj4gKwlyZXBvcnRfaW5mbygiVFZBTCBp
-cyAlZCB0aWNrcyIsIGluZm8tPnJlYWRfdHZhbCgpKTsKPj4gWW91IGNhbiB0ZXN0IHRoYXQgVFZB
-TCBpcyBuZWdhdGl2ZSBoZXJlIGluc3RlYWQgb2YgcHJpbnRpbmcgdGhlIHZhbHVlLgo+IG9rLgo+
-Cj4+PiAgCj4+PiAgCS8qIERpc2FibGUgdGhlIHRpbWVyIGFnYWluIGFuZCBwcmVwYXJlIHRvIHRh
-a2UgaW50ZXJydXB0cyAqLwo+Pj4gIAlpbmZvLT53cml0ZV9jdGwoMCk7Cj4+PiAgCXNldF90aW1l
-cl9pcnFfZW5hYmxlZChpbmZvLCB0cnVlKTsKPj4+ICAJcmVwb3J0KCFnaWNfdGltZXJfcGVuZGlu
-ZyhpbmZvKSwgImludGVycnVwdCBzaWduYWwgbm8gbG9uZ2VyIHBlbmRpbmciKTsKPj4+ICAKPj4+
-ICsJLyogUUVNVSBidWcgd2hlbiBjbnR2b2ZmX2VsMiA+IDAKPj4+ICsJICogaHR0cHM6Ly9idWdz
-LmxhdW5jaHBhZC5uZXQvYnVncy8xODU5MDIxICovCj4+IFRoaXMgbG9va3MgY29uZnVzaW5nIHRv
-IG1lLiBGcm9tIHRoZSBjb21taXQgbWVzc2FnZSwgSSBnb3QgdGhhdCBrdm0tdW5pdC10ZXN0cwo+
-PiBuZWVkcyBxZW11IHRvIHNldCBhIHNwZWNpYWwgdmFsdWUgZm9yIENOVFZPRkZfRUwyLiBCdXQg
-dGhlIGNvbW1lbnRzIHNlZW1zIHRvCj4+IHN1Z2dlc3QgdGhhdCBrdm0tdW5pdC10ZXN0cyBjYW4g
-dHJpZ2dlciB0aGUgYnVnIHdpdGhvdXQgcWVtdSBkb2luZyBhbnl0aGluZwo+PiBzcGVjaWFsLiBD
-YW4geW91IGVsYWJvcmF0ZSB1bmRlciB3aGljaCBjb25kaXRpb24ga3ZtLXVuaXQtdGVzdHMgY2Fu
-Cj4+IHRyaWdnZXIgdGhlIGJ1Zz8KPiBJdCBjYW4ndCB3aXRob3V0IHNvbWUgc29ydCBvZiBtZWNo
-YW5pc20gdG8gc2V0IHRoZSBoeXBlcnZpc29yIHJlZ2lzdGVycwo+IGJlZm9yZSBydW5uaW5nIHRo
-ZSB0ZXN0LiBUaGUgUUVNVSBidWcgaXMgYW4gb3ZlcmZsb3cgd2hlbiBjdmFsIG9mIFVJTlQ2NF9N
-QVgKPiB3aXRoIGEgbm9uLXplcm8gQ05UVk9GRl9FTDIuCj4KPiBSdW5uaW5nIHVuZGVyIEtWTSB0
-aGUgaG9zdCBrZXJuZWwgd2lsbCBoYXZlIGxpa2VseSBzZXQgQ05UVk9GRl9FTDIgdG8KPiBzb21l
-IHNvcnQgb2YgdmFsdWUgd2l0aDoKPgo+IAl1cGRhdGVfdnRpbWVyX2NudHZvZmYodmNwdSwga3Zt
-X3BoeXNfdGltZXJfcmVhZCgpKTsKCkkgd2FzIGFibGUgdG8gcmVwbGljYXRlIHRoZSBidWcgYnkg
-cnVubmluZyBLVk0gdW5kZXIgcWVtdSB3aXRoIHZpcnR1YWxpemF0aW9uPW9uLAp0aGFua3MuCgo+
-Cj4+PiArCWluZm8tPndyaXRlX2N0bChBUkNIX1RJTUVSX0NUTF9FTkFCTEUpOwo+Pj4gKwlpbmZv
-LT53cml0ZV9jdmFsKFVJTlQ2NF9NQVgpOwo+PiBUaGUgb3JkZXIgaXMgd3JvbmcgLSB5b3Ugd3Jp
-dGUgQ1ZBTCBmaXJzdCwgKnRoZW4qIGVuYWJsZSB0byB0aW1lci4gT3RoZXJ3aXNlIHlvdQo+PiBt
-aWdodCBnZXQgYW4gaW50ZXJydXB0IGJlY2F1c2Ugb2YgdGhlIHByZXZpb3VzIENWQUwgdmFsdWUu
-Cj4+Cj4+IFRoZSBwcmV2aW91cyB2YWx1ZSBmb3IgQ1ZBTCB3YXMgbm93IC0xLCBzbyB5b3VyIGNo
-YW5nZSB0cmlnZ2VycyBhbiB1bndhbnRlZAo+PiBpbnRlcnJ1cHQgYWZ0ZXIgZW5hYmxpbmcgdGhl
-IHRpbWVyLiBUaGUgaW50ZXJydXB0IGhhbmRsZXIgbWFza3MgdGhlIHRpbWVyCj4+IGludGVycnVw
-dCBhdCB0aGUgdGltZXIgbGV2ZWwsIHdoaWNoIG1lYW5zIHRoYXQgYXMgZmFyIGFzIHRoZSBnaWMg
-aXMgY29uY2VybmVkIHRoZQo+PiBpbnRlcnJ1cHQgaXMgbm90IHBlbmRpbmcsIG1ha2luZyB0aGUg
-cmVwb3J0IGNhbGwgYWZ0ZXJ3YXJkcyB1c2VsZXNzLgo+Pgo+Pj4gKwlpc2IoKTsKPj4+ICsJcmVw
-b3J0KCFnaWNfdGltZXJfcGVuZGluZyhpbmZvKSwgIm5vdCBwZW5kaW5nIGJlZm9yZSBVSU5UNjRf
-TUFYIChpcnFzIG9uKSIpOwo+PiBUaGlzIGNoZWNrIGNhbiBiZSBpbXByb3ZlZC4gWW91IHdhbnQg
-dG8gY2hlY2sgdGhlIHRpbWVyIENUTC5JU1RBVFVTIGhlcmUsIG5vdCB0aGUKPj4gZ2ljLiBBIGRl
-dmljZSAoaW4gdGhpcyBjYXNlLCB0aGUgdGltZXIpIGNhbiBhc3NlcnQgdGhlIGludGVycnVwdCwg
-YnV0IHRoZSBnaWMgZG9lcwo+PiBub3Qgc2FtcGxlIGl0IGltbWVkaWF0ZWx5LiBDb21lIHRvIHRo
-aW5rIG9mIGl0LCB0aGUgZW50aXJlIHRpbWVyIHRlc3QgaXMgd3JvbmcKPj4gYmVjYXVzZSBvZiB0
-aGlzLgo+IElzIGl0IHdvcnRoIHN0aWxsIGNoZWNraW5nIHRoZSBHSUMgb3IganVzdCByZXBsYWNp
-bmcgZXZlcnl0aGluZyB3aXRoCj4gY2FsbHMgdG86Cj4KPiAgIHN0YXRpYyBib29sIHRpbWVyX3Bl
-bmRpbmcoc3RydWN0IHRpbWVyX2luZm8gKmluZm8pCj4gICB7Cj4gICAgICAgICAgIHJldHVybiBp
-bmZvLT5yZWFkX2N0bCgpICYgQVJDSF9USU1FUl9DVExfSVNUQVRVUzsKPiAgIH0KCldlIHNob3Vs
-ZCBzdGlsbCBjaGVjayB0aGF0IHRoZSBHSUMgc2VlcyB0aGUgaW50ZXJydXB0IGFzIHBlbmRpbmcs
-IGJlY2F1c2Ugd2UgbmVlZAppdCB0byBpbmplY3QgaW50ZXJydXB0cyBpbiBhIGd1ZXN0LiBJJ20g
-YWxyZWFkeSB3b3JraW5nIG9uIGltcHJvdmluZyB0aGF0IFsxXS4KClsxXSBodHRwczovL3d3dy5z
-cGluaWNzLm5ldC9saXN0cy9rdm0vbXNnMjAzNjA5Lmh0bWwKClRoYW5rcywKQWxleAo+Cj4+IFRo
-YW5rcywKPj4gQWxleAo+Pj4gKwlpbmZvLT53cml0ZV9jdGwoMCk7Cj4+PiArCj4+PiAgCXJlcG9y
-dCh0ZXN0X2N2YWxfMTBtc2VjKGluZm8pLCAibGF0ZW5jeSB3aXRoaW4gMTAgbXMiKTsKPj4+ICAJ
-cmVwb3J0KGluZm8tPmlycV9yZWNlaXZlZCwgImludGVycnVwdCByZWNlaXZlZCIpOwo+Pj4gIAo+
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Mon, Jan 27, 2020 at 12:32:22PM +0000, Marc Zyngier wrote:
+> On 2020-01-27 11:44, Andrew Murray wrote:
+> > At present ARMv8 event counters are limited to 32-bits, though by
+> > using the CHAIN event it's possible to combine adjacent counters to
+> > achieve 64-bits. The perf config1:0 bit can be set to use such a
+> > configuration.
+> > 
+> > With the introduction of ARMv8.5-PMU support, all event counters can
+> > now be used as 64-bit counters.
+> > 
+> > Let's enable 64-bit event counters where support exists. Unless the
+> > user sets config1:0 we will adjust the counter value such that it
+> > overflows upon 32-bit overflow. This follows the same behaviour as
+> > the cycle counter which has always been (and remains) 64-bits.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > ---
+> >  arch/arm64/include/asm/perf_event.h |  3 +-
+> >  arch/arm64/include/asm/sysreg.h     |  1 +
+> >  arch/arm64/kernel/perf_event.c      | 86
+> > +++++++++++++++++++++++++++++--------
+> >  include/linux/perf/arm_pmu.h        |  1 +
+> >  4 files changed, 73 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/perf_event.h
+> > b/arch/arm64/include/asm/perf_event.h
+> > index 2bdbc79..e7765b6 100644
+> > --- a/arch/arm64/include/asm/perf_event.h
+> > +++ b/arch/arm64/include/asm/perf_event.h
+> > @@ -176,9 +176,10 @@
+> >  #define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
+> >  #define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive
+> > debug*/
+> >  #define ARMV8_PMU_PMCR_LC	(1 << 6) /* Overflow on 64 bit cycle counter
+> > */
+> > +#define ARMV8_PMU_PMCR_LP	(1 << 7) /* Long event counter enable */
+> >  #define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
+> >  #define	ARMV8_PMU_PMCR_N_MASK	0x1f
+> > -#define	ARMV8_PMU_PMCR_MASK	0x7f	 /* Mask for writable bits */
+> > +#define	ARMV8_PMU_PMCR_MASK	0xff	 /* Mask for writable bits */
+> > 
+> >  /*
+> >   * PMOVSR: counters overflow flag status reg
+> > diff --git a/arch/arm64/include/asm/sysreg.h
+> > b/arch/arm64/include/asm/sysreg.h
+> > index 1009878..30c1e18 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -675,6 +675,7 @@
+> >  #define ID_DFR0_PERFMON_SHIFT		24
+> > 
+> >  #define ID_DFR0_EL1_PMUVER_8_1		4
+> > +#define ID_DFR0_EL1_PMUVER_8_4		5
+> 
+> This doesn't seem right, see below.
+
+Yes you're right - I'll rename this to ID_AA64DFR0_EL1_PMUVER_8_4
+
+
+> 
+> >  #define ID_AA64DFR0_EL1_PMUVER_8_1	4
+> > 
+> >  #define ID_ISAR5_RDM_SHIFT		24
+> > diff --git a/arch/arm64/kernel/perf_event.c
+> > b/arch/arm64/kernel/perf_event.c
+> > index e40b656..4e27f90 100644
+> > --- a/arch/arm64/kernel/perf_event.c
+> > +++ b/arch/arm64/kernel/perf_event.c
+> > @@ -285,6 +285,17 @@ static struct attribute_group
+> > armv8_pmuv3_format_attr_group = {
+> >  #define	ARMV8_IDX_COUNTER_LAST(cpu_pmu) \
+> >  	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
+> > 
+> > +
+> > +/*
+> > + * We unconditionally enable ARMv8.5-PMU long event counter support
+> > + * (64-bit events) where supported. Indicate if this arm_pmu has long
+> > + * event counter support.
+> > + */
+> > +static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
+> > +{
+> > +	return (cpu_pmu->pmuver > ID_DFR0_EL1_PMUVER_8_4);
+> 
+> Isn't the ID_DFR0 prefix for AArch32? Although this doesn't change much
+> the final result (the values happen to be the same on both architectures),
+> it is nonetheless a bit confusing.
+
+Yes - ID_DFR0 is the AArch32 register relating to the AArch32 state, that's
+mapped onto the AArch64 ID_DFR0_EL1 register. The ID_AA64DFR0_EL1 register
+relates to the AArch64 state.
+
+
+> 
+> > +}
+> > +
+> >  /*
+> >   * We must chain two programmable counters for 64 bit events,
+> >   * except when we have allocated the 64bit cycle counter (for CPU
+> > @@ -294,9 +305,11 @@ static struct attribute_group
+> > armv8_pmuv3_format_attr_group = {
+> >  static inline bool armv8pmu_event_is_chained(struct perf_event *event)
+> >  {
+> >  	int idx = event->hw.idx;
+> > +	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
+> > 
+> >  	return !WARN_ON(idx < 0) &&
+> >  	       armv8pmu_event_is_64bit(event) &&
+> > +	       !armv8pmu_has_long_event(cpu_pmu) &&
+> >  	       (idx != ARMV8_IDX_CYCLE_COUNTER);
+> >  }
+> > 
+> > @@ -345,7 +358,7 @@ static inline void armv8pmu_select_counter(int idx)
+> >  	isb();
+> >  }
+> > 
+> > -static inline u32 armv8pmu_read_evcntr(int idx)
+> > +static inline u64 armv8pmu_read_evcntr(int idx)
+> >  {
+> >  	armv8pmu_select_counter(idx);
+> >  	return read_sysreg(pmxevcntr_el0);
+> > @@ -362,6 +375,44 @@ static inline u64 armv8pmu_read_hw_counter(struct
+> > perf_event *event)
+> >  	return val;
+> >  }
+> > 
+> > +/*
+> > + * The cycle counter is always a 64-bit counter. When ARMV8_PMU_PMCR_LP
+> > + * is set the event counters also become 64-bit counters. Unless the
+> > + * user has requested a long counter (attr.config1) then we want to
+> > + * interrupt upon 32-bit overflow - we achieve this by applying a bias.
+> > + */
+> > +static bool armv8pmu_event_needs_bias(struct perf_event *event)
+> > +{
+> > +	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
+> > +	struct hw_perf_event *hwc = &event->hw;
+> > +	int idx = hwc->idx;
+> > +
+> > +	if (armv8pmu_event_is_64bit(event))
+> > +		return false;
+> > +
+> > +	if (armv8pmu_has_long_event(cpu_pmu) ||
+> > +	    idx == ARMV8_IDX_CYCLE_COUNTER)
+> > +		return true;
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +static u64 armv8pmu_bias_long_counter(struct perf_event *event, u64
+> > value)
+> > +{
+> > +	if (armv8pmu_event_needs_bias(event))
+> > +		value |= GENMASK(63, 32);
+> > +
+> > +	return value;
+> > +}
+> > +
+> > +static u64 armv8pmu_unbias_long_counter(struct perf_event *event, u64
+> > value)
+> > +{
+> > +	if (armv8pmu_event_needs_bias(event))
+> > +		value &= ~GENMASK(63, 32);
+> > +
+> > +	return value;
+> > +}
+> > +
+> >  static u64 armv8pmu_read_counter(struct perf_event *event)
+> >  {
+> >  	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
+> > @@ -377,10 +428,10 @@ static u64 armv8pmu_read_counter(struct perf_event
+> > *event)
+> >  	else
+> >  		value = armv8pmu_read_hw_counter(event);
+> > 
+> > -	return value;
+> > +	return  armv8pmu_unbias_long_counter(event, value);
+> >  }
+> > 
+> > -static inline void armv8pmu_write_evcntr(int idx, u32 value)
+> > +static inline void armv8pmu_write_evcntr(int idx, u64 value)
+> >  {
+> >  	armv8pmu_select_counter(idx);
+> >  	write_sysreg(value, pmxevcntr_el0);
+> > @@ -405,20 +456,14 @@ static void armv8pmu_write_counter(struct
+> > perf_event *event, u64 value)
+> >  	struct hw_perf_event *hwc = &event->hw;
+> >  	int idx = hwc->idx;
+> > 
+> > +	value = armv8pmu_bias_long_counter(event, value);
+> > +
+> >  	if (!armv8pmu_counter_valid(cpu_pmu, idx))
+> >  		pr_err("CPU%u writing wrong counter %d\n",
+> >  			smp_processor_id(), idx);
+> > -	else if (idx == ARMV8_IDX_CYCLE_COUNTER) {
+> > -		/*
+> > -		 * The cycles counter is really a 64-bit counter.
+> > -		 * When treating it as a 32-bit counter, we only count
+> > -		 * the lower 32 bits, and set the upper 32-bits so that
+> > -		 * we get an interrupt upon 32-bit overflow.
+> > -		 */
+> > -		if (!armv8pmu_event_is_64bit(event))
+> > -			value |= 0xffffffff00000000ULL;
+> > +	else if (idx == ARMV8_IDX_CYCLE_COUNTER)
+> >  		write_sysreg(value, pmccntr_el0);
+> > -	} else
+> > +	else
+> >  		armv8pmu_write_hw_counter(event, value);
+> >  }
+> > 
+> > @@ -743,7 +788,8 @@ static int armv8pmu_get_event_idx(struct
+> > pmu_hw_events *cpuc,
+> >  	/*
+> >  	 * Otherwise use events counters
+> >  	 */
+> > -	if (armv8pmu_event_is_64bit(event))
+> > +	if (armv8pmu_event_is_64bit(event) &&
+> > +	    !armv8pmu_has_long_event(cpu_pmu))
+> >  		return	armv8pmu_get_chain_idx(cpuc, cpu_pmu);
+> >  	else
+> >  		return armv8pmu_get_single_idx(cpuc, cpu_pmu);
+> > @@ -815,7 +861,7 @@ static int armv8pmu_filter_match(struct perf_event
+> > *event)
+> >  static void armv8pmu_reset(void *info)
+> >  {
+> >  	struct arm_pmu *cpu_pmu = (struct arm_pmu *)info;
+> > -	u32 idx, nb_cnt = cpu_pmu->num_events;
+> > +	u32 idx, pmcr, nb_cnt = cpu_pmu->num_events;
+> > 
+> >  	/* The counter and interrupt enable registers are unknown at reset. */
+> >  	for (idx = ARMV8_IDX_CYCLE_COUNTER; idx < nb_cnt; ++idx) {
+> > @@ -830,8 +876,13 @@ static void armv8pmu_reset(void *info)
+> >  	 * Initialize & Reset PMNC. Request overflow interrupt for
+> >  	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
+> >  	 */
+> > -	armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C |
+> > -			    ARMV8_PMU_PMCR_LC);
+> > +	pmcr = ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_LC;
+> > +
+> > +	/* Enable long event counter support where available */
+> > +	if (armv8pmu_has_long_event(cpu_pmu))
+> > +		pmcr |= ARMV8_PMU_PMCR_LP;
+> > +
+> > +	armv8pmu_pmcr_write(pmcr);
+> >  }
+> > 
+> >  static int __armv8_pmuv3_map_event(struct perf_event *event,
+> > @@ -914,6 +965,7 @@ static void __armv8pmu_probe_pmu(void *info)
+> >  	if (pmuver == 0xf || pmuver == 0)
+> >  		return;
+> > 
+> > +	cpu_pmu->pmuver = pmuver;
+> 
+> And pmuver comes from ID_AA64DFR0_PMUVER_SHIFT, so the above really
+> needs fixing in the name of consistency.
+> 
+
+No problem, I'll respin next week.
+
+Thanks,
+
+Andrew Murray
+
+> >  	probe->present = true;
+> > 
+> >  	/* Read the nb of CNTx counters supported from PMNC */
+> > diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+> > index 71f525a..5b616dd 100644
+> > --- a/include/linux/perf/arm_pmu.h
+> > +++ b/include/linux/perf/arm_pmu.h
+> > @@ -80,6 +80,7 @@ struct arm_pmu {
+> >  	struct pmu	pmu;
+> >  	cpumask_t	supported_cpus;
+> >  	char		*name;
+> > +	int		pmuver;
+> >  	irqreturn_t	(*handle_irq)(struct arm_pmu *pmu);
+> >  	void		(*enable)(struct perf_event *event);
+> >  	void		(*disable)(struct perf_event *event);
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
