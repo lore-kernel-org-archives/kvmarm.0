@@ -2,57 +2,54 @@ Return-Path: <SRS0=cl91=3T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0314CC35240
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0760CC3F68F
 	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 00:10:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E67D20CC7
+	by mail.kernel.org (Postfix) with ESMTP id 80B05214D8
 	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 00:10:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E67D20CC7
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80B05214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE444AEBE;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49AB04AEC1;
 	Wed, 29 Jan 2020 19:10:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ewh6lSsa9kRb; Wed, 29 Jan 2020 19:10:30 -0500 (EST)
+	with ESMTP id r0Cc8u2y-WkL; Wed, 29 Jan 2020 19:10:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C882B4A52B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFAFE4A95C;
 	Wed, 29 Jan 2020 19:10:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BEBA4A52B
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 356E34A5C3
  for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jan 2020 19:10:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fKtxBC0qT0MW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jan 2020 19:10:27 -0500 (EST)
+ with ESMTP id 1WZbWOxugSQM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jan 2020 19:10:26 -0500 (EST)
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A9064A531
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jan 2020 19:10:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35B534A52B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jan 2020 19:10:26 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jan 2020 16:10:26 -0800
+ 29 Jan 2020 16:10:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,379,1574150400"; d="scan'208";a="261990351"
+X-IronPort-AV: E=Sophos;i="5.70,379,1574150400"; d="scan'208";a="261990342"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by fmsmga002.fm.intel.com with ESMTP; 29 Jan 2020 16:10:25 -0800
+ by fmsmga002.fm.intel.com with ESMTP; 29 Jan 2020 16:10:24 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 2/5] KVM: x86: Move init-only kvm_x86_ops to separate struct
-Date: Wed, 29 Jan 2020 16:10:20 -0800
-Message-Id: <20200130001023.24339-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 0/5] KVM: Move x86 init ops to separate struct
+Date: Wed, 29 Jan 2020 16:10:18 -0800
+Message-Id: <20200130001023.24339-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200130001023.24339-1-sean.j.christopherson@intel.com>
-References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Cc: linux-arm-kernel@lists.infradead.org, Wanpeng Li <wanpengli@tencent.com>,
  Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
@@ -80,186 +77,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the kvm_x86_ops functions that are used only within the scope of
-kvm_init() into a separate struct, kvm_x86_init_ops.  In addition to
-identifying the init-only functions without restorting to code comments,
-this also sets the stage for waiting until after ->hardware_setup() to
-set kvm_x86_ops.  Setting kvm_x86_ops after ->hardware_setup() is
-desirable as many of the hooks are not usable until ->hardware_setup()
-completes.
+The non-x86 part of this series is wholly contained in patch 01.  Compared
+to other recent kvm-wide changes, this one is very straightforward (famous
+last words).
 
-No functional change intended.
+Like a few other architectures, e.g. PPC, x86 uses a set of global hooks
+to call back into vendor code on demand.  A handlful of the x86 hooks are
+used only within the scope of kvm_init().  This series moves the init-only
+hooks to a separate struct, partly to clean up the code a bit, but mainly
+so that the runtime hooks can be made available only after the x86 vendor
+has completed its ->hardware_setup().  While working on a different series
+I spent a fair bit of time scratching my as to why a kvm_x86_ops wasn't
+working, and eventually realized VMX's callback wasn't "ready" because the
+vmcs_config hadn't yet been populated.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/kvm_host.h | 13 +++++++++----
- arch/x86/kvm/svm.c              | 15 ++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 16 +++++++++++-----
- arch/x86/kvm/x86.c              | 10 ++++++----
- 4 files changed, 36 insertions(+), 18 deletions(-)
+Due to lack of a cross-compiling setup, the non-x86 changes in patch 01
+are untested.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 77d206a93658..23afa627166a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1042,12 +1042,8 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
- }
- 
- struct kvm_x86_ops {
--	int (*cpu_has_kvm_support)(void);          /* __init */
--	int (*disabled_by_bios)(void);             /* __init */
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
--	int (*check_processor_compatibility)(void);/* __init */
--	int (*hardware_setup)(void);               /* __init */
- 	void (*hardware_unsetup)(void);            /* __exit */
- 	bool (*cpu_has_accelerated_tpr)(void);
- 	bool (*has_emulated_msr)(int index);
-@@ -1258,6 +1254,15 @@ struct kvm_x86_ops {
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
- };
- 
-+struct kvm_x86_init_ops {
-+	int (*cpu_has_kvm_support)(void);
-+	int (*disabled_by_bios)(void);
-+	int (*check_processor_compatibility)(void);
-+	int (*hardware_setup)(void);
-+
-+	struct kvm_x86_ops *runtime_ops;
-+};
-+
- struct kvm_arch_async_pf {
- 	u32 token;
- 	gfn_t gfn;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index bf0556588ad0..80c430b4967f 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7371,11 +7371,7 @@ static void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate)
- }
- 
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = has_svm,
--	.disabled_by_bios = is_disabled,
--	.hardware_setup = svm_hardware_setup,
- 	.hardware_unsetup = svm_hardware_unsetup,
--	.check_processor_compatibility = svm_check_processor_compat,
- 	.hardware_enable = svm_hardware_enable,
- 	.hardware_disable = svm_hardware_disable,
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
-@@ -7511,9 +7507,18 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
- };
- 
-+static struct kvm_x86_init_ops svm_init_ops __initdata = {
-+	.cpu_has_kvm_support = has_svm,
-+	.disabled_by_bios = is_disabled,
-+	.hardware_setup = svm_hardware_setup,
-+	.check_processor_compatibility = svm_check_processor_compat,
-+
-+	.runtime_ops = &svm_x86_ops,
-+};
-+
- static int __init svm_init(void)
- {
--	return kvm_init(&svm_x86_ops, sizeof(struct vcpu_svm),
-+	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
- 			__alignof__(struct vcpu_svm), THIS_MODULE);
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1419c53aed16..b7ffff90c2d7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7746,11 +7746,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- }
- 
- static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = cpu_has_kvm_support,
--	.disabled_by_bios = vmx_disabled_by_bios,
--	.hardware_setup = hardware_setup,
- 	.hardware_unsetup = hardware_unsetup,
--	.check_processor_compatibility = vmx_check_processor_compat,
-+
- 	.hardware_enable = hardware_enable,
- 	.hardware_disable = hardware_disable,
- 	.cpu_has_accelerated_tpr = report_flexpriority,
-@@ -7898,6 +7895,15 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
- };
- 
-+static struct kvm_x86_init_ops vmx_init_ops __initdata = {
-+	.cpu_has_kvm_support = cpu_has_kvm_support,
-+	.disabled_by_bios = vmx_disabled_by_bios,
-+	.check_processor_compatibility = vmx_check_processor_compat,
-+	.hardware_setup = hardware_setup,
-+
-+	.runtime_ops = &vmx_x86_ops,
-+};
-+
- static void vmx_cleanup_l1d_flush(void)
- {
- 	if (vmx_l1d_flush_pages) {
-@@ -7982,7 +7988,7 @@ static int __init vmx_init(void)
- 	}
- #endif
- 
--	r = kvm_init(&vmx_x86_ops, sizeof(struct vcpu_vmx),
-+	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
- 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 720fd7136712..eb36762aa2ce 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7276,8 +7276,8 @@ static struct notifier_block pvclock_gtod_notifier = {
- 
- int kvm_arch_init(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
--	struct kvm_x86_ops *ops = opaque;
- 
- 	if (kvm_x86_ops) {
- 		printk(KERN_ERR "kvm: already loaded the other module\n");
-@@ -7326,7 +7326,7 @@ int kvm_arch_init(void *opaque)
- 	if (r)
- 		goto out_free_percpu;
- 
--	kvm_x86_ops = ops;
-+	kvm_x86_ops = ops->runtime_ops;
- 
- 	kvm_mmu_set_mask_ptes(PT_USER_MASK, PT_ACCESSED_MASK,
- 			PT_DIRTY_MASK, PT64_NX_MASK, 0,
-@@ -9581,9 +9581,10 @@ void kvm_arch_hardware_disable(void)
- 
- int kvm_arch_hardware_setup(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
- 
--	r = kvm_x86_ops->hardware_setup();
-+	r = ops->hardware_setup();
- 	if (r != 0)
- 		return r;
- 
-@@ -9618,13 +9619,14 @@ void kvm_arch_hardware_unsetup(void)
- int kvm_arch_check_processor_compat(void *opaque)
- {
- 	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-+	struct kvm_x86_init_ops *ops = opaque;
- 
- 	WARN_ON(!irqs_disabled());
- 
- 	if (kvm_host_cr4_reserved_bits(c) != cr4_reserved_bits)
- 		return -EIO;
- 
--	return kvm_x86_ops->check_processor_compatibility();
-+	return ops->check_processor_compatibility();
- }
- 
- bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+The SVM changes in patch 02 are fairly well tested, e.g. fudged things
+enough to ensure KVM didn't explode on a null pointer.
+
+Patch 05 is a bit scary as a rogue dereference of kvm_x86_ops before
+->hardware_setup() will crash KVM (maybe the kernel?).  I didn't find any
+obvious ways to use kvm_x86_ops on AMD, and tested on a few different
+Intel CPUs, so I'm reasonably confident that there are no existing
+violations.
+
+Sean Christopherson (5):
+  KVM: Pass kvm_init()'s opaque param to additional arch funcs
+  KVM: x86: Move init-only kvm_x86_ops to separate struct
+  KVM: VMX: Move hardware_setup() definition below vmx_x86_ops
+  KVM: VMX: Configure runtime hooks using vmx_x86_ops
+  KVM: x86: Set kvm_x86_ops only after ->hardware_setup() completes
+
+ arch/mips/kvm/mips.c            |   4 +-
+ arch/powerpc/kvm/powerpc.c      |   4 +-
+ arch/s390/kvm/kvm-s390.c        |   4 +-
+ arch/x86/include/asm/kvm_host.h |  13 +-
+ arch/x86/kvm/svm.c              |  15 +-
+ arch/x86/kvm/vmx/nested.c       |  15 +-
+ arch/x86/kvm/vmx/nested.h       |   3 +-
+ arch/x86/kvm/vmx/vmx.c          | 345 ++++++++++++++++----------------
+ arch/x86/kvm/x86.c              |  16 +-
+ include/linux/kvm_host.h        |   4 +-
+ virt/kvm/arm/arm.c              |   4 +-
+ virt/kvm/kvm_main.c             |  18 +-
+ 12 files changed, 238 insertions(+), 207 deletions(-)
+
 -- 
 2.24.1
 
