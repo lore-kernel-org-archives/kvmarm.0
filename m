@@ -2,107 +2,75 @@ Return-Path: <SRS0=cl91=3T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092B1C33C9E
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 05:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C9DC33C9E
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 11:25:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83F552067C
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 05:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF064206D3
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jan 2020 11:25:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6R00qTG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F552067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TW7uZIfh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF064206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFF1B4ACBE;
-	Thu, 30 Jan 2020 00:44:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 555A34A830;
+	Thu, 30 Jan 2020 06:25:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BVQ-tHMnMAo4; Thu, 30 Jan 2020 00:44:17 -0500 (EST)
+	with ESMTP id xVYWpH5lAFKq; Thu, 30 Jan 2020 06:25:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 087804A968;
-	Thu, 30 Jan 2020 00:44:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 441D34A8E8;
+	Thu, 30 Jan 2020 06:25:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69C584A957
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jan 2020 00:44:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 272D04A598
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jan 2020 06:25:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kDDY+E33yhkE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jan 2020 00:44:14 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F684A597
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jan 2020 00:44:14 -0500 (EST)
+ with ESMTP id WOLRWwdo3Ap5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jan 2020 06:25:28 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7BC4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jan 2020 06:25:28 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580363054;
+ s=mimecast20190719; t=1580383527;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
- b=Y6R00qTGMkNZUDTi9Bjzix9BllX0aNbcel38FTI/KrI0Gy8ohOqOO1Bo+f8ANxQ1udmsI+
- 9gc93iPBE/sR02iBoU12Jc/3Qc6eX62uUl1dMn9j+vUyG+JNRIzIuJRkCkDUz+nQ7AQlt3
- 2i8of8hMPtwPYKMTBmpP5X7h+dsdlcs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-cNLFDy1sPk2KWSlrKQevcg-1; Thu, 30 Jan 2020 00:44:12 -0500
-Received: by mail-wm1-f70.google.com with SMTP id a10so654672wme.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jan 2020 21:44:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=b8PEF8AVAWODPDupJea+4sWEJHHfwQkjaA/7qcZmag4=;
- b=m2PEdx6O1egNIGE/pPTKf52kRMdAuIv6OOoGDoysj8NiTAbKeOevogR7isY+Tkw4sj
- n+2mU8iM/yObMFlMxzx6qDR1vw1Oldg7l2nxu+V6iINEcA+Fqx0ORIomddV3fdPjAENn
- WhQLV0EPfRBjPGRR1wJr6AmYjWh1fLzo488sc3W82/aPVUs1JH9ZzTFulS3Cg436b38a
- 4/WIJIisTKwz8sTJpFM/bWDEy65akXGI8dkVCwJpNqf7SQNF1AQy9MHydyc2tT8z9SqC
- 5kHVBOu3oCTjZMAmt7j89t5CS/W+37d0o0Edg7NmyxsxfEq9C8DZ2m6RFHuns/C4NRrL
- 7Trw==
-X-Gm-Message-State: APjAAAWd2dnzx/bckArELGcLEz7c3TXkFc4Aa141ZqUXBzsQlAfW9/pn
- uW5toZaG0P1LjpT7sUcRAcRXLwlxrZddZZ0MeuPFyAChdDJE35kWNRQnPLyK4msMWPzXkPddq6O
- lmyh3sCSWvA6aLcCcpT7dKHT0
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175381wmi.21.1580363051283; 
- Wed, 29 Jan 2020 21:44:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxvrtUyXEqgq8iYKVpAB/LAj4fC31bOc+VOTWRDvsFWxjJ6sWsl8qJGadVTcya+7iE6vbimVA==
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr3175335wmi.21.1580363050959; 
- Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Received: from [10.1.251.141] ([80.188.125.198])
- by smtp.gmail.com with ESMTPSA id 4sm4795049wmg.22.2020.01.29.21.44.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Jan 2020 21:44:10 -0800 (PST)
-Subject: Re: [PATCH 5/5] KVM: x86: Set kvm_x86_ops only after
- ->hardware_setup() completes
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200130001023.24339-1-sean.j.christopherson@intel.com>
- <20200130001023.24339-6-sean.j.christopherson@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44e0c550-7dcc-bfed-07c4-907e61d476a1@redhat.com>
-Date: Thu, 30 Jan 2020 06:44:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=RD3+Ld7Dxp10D8lHwl6kiXjd9vd6HKHz9XGO3ilgvRk=;
+ b=TW7uZIfh8x7YozKJ/q2QERwpQ0NiE+LIF72kO8rJI8JasWJ+OtCt2hnjIv5N3EuCGvCQG5
+ 5s0ACZamqFe9S/Hhm3AfsoU4gFJJHLKhX3o9sr9SePHrrmbVfsCHFUHTl3munfHwnx1da7
+ xD21hF/ucjVVrqEsMzdX3Q4o7RiW+8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-Z7hfLdmJPPalT3OyO1uCZg-1; Thu, 30 Jan 2020 06:25:23 -0500
+X-MC-Unique: Z7hfLdmJPPalT3OyO1uCZg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB762100551B;
+ Thu, 30 Jan 2020 11:25:21 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02B211001B05;
+ Thu, 30 Jan 2020 11:25:13 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Subject: [kvm-unit-tests PATCH v2 0/9] KVM: arm64: PMUv3 Event Counter Tests
+Date: Thu, 30 Jan 2020 12:25:01 +0100
+Message-Id: <20200130112510.15154-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200130001023.24339-6-sean.j.christopherson@intel.com>
-Content-Language: en-US
-X-MC-Unique: cNLFDy1sPk2KWSlrKQevcg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: Wanpeng Li <wanpengli@tencent.com>, Janosch Frank <frankja@linux.ibm.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- linux-arm-kernel@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: andrew.murray@arm.com, andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -119,16 +87,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 30/01/20 01:10, Sean Christopherson wrote:
-> Set kvm_x86_ops with the vendor's ops only after ->hardware_setup()
-> completes to "prevent" using kvm_x86_ops before they are ready, i.e. to
-> generate a null pointer fault instead of silently consuming unconfigured
-> state.
+This series implements tests exercising the PMUv3 event counters.
+It tests both the 32-bit and 64-bit versions. Overflow interrupts
+also are checked. Those tests only are written for arm64.
 
-What about even copying kvm_x86_ops by value, so that they can be
-accessed with "kvm_x86_ops.callback()" and save one memory access?
+It allowed to reveal some issues related to SW_INCR implementation
+(esp. related to 64-bit implementation), some problems related to
+32-bit <-> 64-bit transitions and consistency of enabled states
+of odd and event counters (See [1]).
 
-Paolo
+Overflow interrupt testing relies of one patch from Andre
+("arm: gic: Provide per-IRQ helper functions") to enable the
+PPI 23, coming from "arm: gic: Test SPIs and interrupt groups"
+(https://patchwork.kernel.org/cover/11234975/). Drew kindly
+provided "arm64: Provide read/write_sysreg_s".
+
+All PMU tests can be launched with:
+./run_tests.sh -g pmu
+Tests also can be launched individually. For example:
+./arm-run arm/pmu.flat -append 'chained-sw-incr'
+
+With KVM:
+- chain-promotion and chained-sw-incr are known to be failing.
+  [1] proposed a fix.
+- On TX2, I have some random failures due to MEM_ACCESS event
+  measured with a great disparity. This is not observed on
+  other machines I have access to.
+With TCG:
+- all new tests are skipped
+
+The series can be found at:
+https://github.com/eauger/kut/tree/pmu_event_counters_v2
+
+References:
+[1] [PATCH 0/4] KVM/ARM: Misc PMU fixes
+(https://www.spinics.net/lists/kvm-arm/msg38886.html)
+
+History:
+- Took into account Andre's comments except I did not
+  use cnbz in the mem_access_loop() and I did not use
+  @loop directly. Those changes had side effects I
+  cannot explain on the tests. Anyway I think this can
+  be improved later on.
+- removed [kvm-unit-tests PATCH 09/10] arm/arm64: gic:
+  Introduce setup_irq() helper
+
+RFC -> v1:
+- Use new report() proto
+- Style cleanup
+- do not warn about ARM spec recommendations
+- add a comment about PMCEID0/1 splits
+
+Andre Przywara (1):
+  arm: gic: Provide per-IRQ helper functions
+
+Andrew Jones (1):
+  arm64: Provide read/write_sysreg_s
+
+Eric Auger (7):
+  arm: pmu: Let pmu tests take a sub-test parameter
+  arm: pmu: Add a pmu struct
+  arm: pmu: Check Required Event Support
+  arm: pmu: Basic event counter Tests
+  arm: pmu: Test chained counter
+  arm: pmu: test 32-bit <-> 64-bit transitions
+  arm: pmu: Test overflow interrupts
+
+ arm/pmu.c              | 786 ++++++++++++++++++++++++++++++++++++++++-
+ arm/unittests.cfg      |  55 ++-
+ lib/arm/asm/gic-v3.h   |   2 +
+ lib/arm/asm/gic.h      |   9 +
+ lib/arm/gic.c          |  90 +++++
+ lib/arm64/asm/sysreg.h |  11 +
+ 6 files changed, 936 insertions(+), 17 deletions(-)
+
+-- 
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
