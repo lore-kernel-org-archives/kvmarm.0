@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2AEC3524B
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Feb 2020 09:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706B9C2D0B1
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Feb 2020 09:12:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DD7732087E
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Feb 2020 09:11:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7732087E
+	by mail.kernel.org (Postfix) with ESMTP id 346FF21744
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Feb 2020 09:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 346FF21744
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BCEB4A4A0;
-	Tue,  4 Feb 2020 04:11:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7BFB4A4A3;
+	Tue,  4 Feb 2020 04:12:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tP+mK7txdfuN; Tue,  4 Feb 2020 04:11:55 -0500 (EST)
+	with ESMTP id SBgkC7KsgLtg; Tue,  4 Feb 2020 04:12:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3C84A944;
-	Tue,  4 Feb 2020 04:11:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCEA74A4AA;
+	Tue,  4 Feb 2020 04:12:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F29534A4A0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Feb 2020 04:11:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 379CC4A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Feb 2020 04:12:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xCipPTMLm1YW for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Feb 2020 04:11:53 -0500 (EST)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 035D54A4E5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Feb 2020 04:11:53 -0500 (EST)
+ with ESMTP id Z+20J9+CcoRS for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Feb 2020 04:11:59 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32C564A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Feb 2020 04:11:59 -0500 (EST)
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id E921B1B4FBF684C3EF86;
- Tue,  4 Feb 2020 17:11:48 +0800 (CST)
+ by Forcepoint Email with ESMTP id E3B508283042FB7F481B;
+ Tue,  4 Feb 2020 17:11:43 +0800 (CST)
 Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
  14.3.439.0; Tue, 4 Feb 2020 17:11:37 +0800
 From: Zenghui Yu <yuzenghui@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <maz@kernel.org>
-Subject: [PATCH 5/5] irqchip/gic-v3-its: Remove superfluous WARN_ON
-Date: Tue, 4 Feb 2020 17:09:40 +0800
-Message-ID: <20200204090940.1225-6-yuzenghui@huawei.com>
+Subject: [PATCH 4/5] irqchip/gic-v4.1: Drop 'tmp' in
+ inherit_vpe_l1_table_from_rd()
+Date: Tue, 4 Feb 2020 17:09:39 +0800
+Message-ID: <20200204090940.1225-5-yuzenghui@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
 In-Reply-To: <20200204090940.1225-1-yuzenghui@huawei.com>
 References: <20200204090940.1225-1-yuzenghui@huawei.com>
@@ -70,26 +71,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-"ITS virtual pending table not cleaning" is already complained inside
-its_clear_vpend_valid(), there's no need to trigger a WARN_ON again.
+The variable 'tmp' in inherit_vpe_l1_table_from_rd() is actually
+not needed, drop it.
 
 Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index fc799ad7cd19..718946fbd382 100644
+index c1d01454eec8..fc799ad7cd19 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2849,7 +2849,6 @@ static void its_cpu_init_lpis(void)
- 		 * corrupting memory.
- 		 */
- 		val = its_clear_vpend_valid(vlpi_base, 0, 0);
--		WARN_ON(val & GICR_VPENDBASER_Dirty);
- 	}
+@@ -2415,14 +2415,12 @@ static u64 inherit_vpe_l1_table_from_rd(cpumask_t **mask)
  
- 	if (allocate_vpe_l1_table()) {
+ 	for_each_possible_cpu(cpu) {
+ 		void __iomem *base = gic_data_rdist_cpu(cpu)->rd_base;
+-		u32 tmp;
+ 
+ 		if (!base || cpu == smp_processor_id())
+ 			continue;
+ 
+ 		val = gic_read_typer(base + GICR_TYPER);
+-		tmp = compute_common_aff(val);
+-		if (tmp != aff)
++		if (aff != compute_common_aff(val))
+ 			continue;
+ 
+ 		/*
 -- 
 2.19.1
 
