@@ -6,88 +6,89 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6F1C35247
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Feb 2020 22:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31889C35247
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Feb 2020 22:28:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB786218AC
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Feb 2020 22:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A94D6214AF
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Feb 2020 22:28:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9ITKX2G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB786218AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYXduHnO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A94D6214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D6ED4A588;
-	Wed,  5 Feb 2020 17:08:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF344A4A0;
+	Wed,  5 Feb 2020 17:28:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mJfr8vU+TaLD; Wed,  5 Feb 2020 17:08:31 -0500 (EST)
+	with ESMTP id C8SOdZBPT9k1; Wed,  5 Feb 2020 17:28:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A3B74A4A0;
-	Wed,  5 Feb 2020 17:08:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 209214A4A9;
+	Wed,  5 Feb 2020 17:28:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD1FC4A4A0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Feb 2020 17:08:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C00B64A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Feb 2020 17:28:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I6CmQP28SuuP for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Feb 2020 17:08:28 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D854A418
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Feb 2020 17:08:28 -0500 (EST)
+ with ESMTP id wfQFdKBBRDFS for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Feb 2020 17:28:36 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC9EF4A418
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Feb 2020 17:28:36 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580940508;
+ s=mimecast20190719; t=1580941716;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qcqAII0Mla+8J9XCC2F7t68zZyPiZF4YHjS+Fi7LYLQ=;
- b=g9ITKX2GWWs4T9/us1xD6YU0/Y1pXLnZm77QBdBMwUfuBgfTMk/mRAtxKQbq0XEdi9t8b2
- 8m9a7QB3K3lS602ezvzVWBJlD/LguhOgk4eBOdprDAGR6NUfilcfwTvQNqL29N5vA4gjIz
- lWHW9QQ449FjvHAok3SJ0Md2HSY7Ii8=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-2VXK8TMWM9-XJvZiYHM7Tw-1; Wed, 05 Feb 2020 17:08:27 -0500
-Received: by mail-qt1-f198.google.com with SMTP id x8so2396353qtq.14
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Feb 2020 14:08:27 -0800 (PST)
+ bh=TlZ291EmGopDCG5ErV/B6q6MCWpQFGiaDWjGBWMPhvg=;
+ b=EYXduHnOunpeSVhd2v6DQ3Dh9Ih8wY2nGejwTkqwacbE2rcTsSvBkEajhHI9nXgd+VsEHm
+ 7AFThfOyjrBRzb6rjKi/VVWqYTU3MiReYZSqry6LAwd7NTlu9sAbwpsvk3PkkXYtsTX3ae
+ d+pQRAzY3YsYV6r/QsNiWWo2qRUllJs=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-WHeRNyf9PZiW5dB5cDEbeg-1; Wed, 05 Feb 2020 17:28:34 -0500
+Received: by mail-qv1-f69.google.com with SMTP id c1so2437920qvw.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Feb 2020 14:28:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=6bIsTUAiuk9WkuPnamAI4/KWATTYkjxm0pqVjMTg08w=;
- b=F2MGNDFwKFdoCQXiQ5rNefX28JEA7aG5EeiH/V0JOT8vpibOAkV2antLylfIC5d8a0
- E6Of9H5txTNAUmc/8nTIFRLpFAO0YmwML2zKJDfgLebm09qm4+fTeaAkcKLM4fXnsZFJ
- fdcTKo7jYcwOA7ttzVsdrC7xUm55lDQxdMxk77UGACOIr/x+fAfZlb7FhXHS76c3JBcC
- kFD4O3bxOsseBsPcMEqGDV4jzM9AWJtOSDGaey0ERa6LFpVaSyKoLnIErSKjCR+78dM/
- p6++Q3XL/A6ICXKhs8hWOJlXDV61Qu/3R/fsdNNcqZWXPRlaAnVW82LJm4rl5ISXosuY
- 5g2w==
-X-Gm-Message-State: APjAAAVB8whGmYrJj2aFn+zbkTbl+s8OgVVw0Z+/gC+ZWKTkn6D44qcM
- SoN1F3/1p6q0LiPvVIQYrhKI+Eg2PnaUv5yNNaLHP8NTpry9hJRsOlh3aLIzuDK0FzLhBh17a4n
- FY63gcgJF7HTpADJxqu62KYj3
-X-Received: by 2002:ac8:4e94:: with SMTP id 20mr35228154qtp.335.1580940506680; 
- Wed, 05 Feb 2020 14:08:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxhvNH1iy5q/tis+s7hwuGT0ebc3dkr1uSM1KA4FQeWbspaaAJT384pUzbSiV9AUE83qayDAQ==
-X-Received: by 2002:ac8:4e94:: with SMTP id 20mr35228131qtp.335.1580940506464; 
- Wed, 05 Feb 2020 14:08:26 -0800 (PST)
+ bh=xN2n9jkJvkSR0RH/zWMkRvEj2quGdHH6HsawLgUOQOY=;
+ b=d960bg7GNRPsaPS0vH1Xb8OiOdbJb/rcTn4z53rM/XKUphLcucr/UIlak0mT7Ir8MS
+ ZArqWhsrtmcUubP6DXAra2LgHdAPXx7NCKhU3AbcLLR0yuc8d0c5/5RMLVsN1zHVxuIT
+ xf1Lc9XsePbCmq6wOh2qZ1Quj82fkitJ1UzAju+H0NZPXkNgIlTRCCBfHf1yCQQvGeoY
+ L3Qb1JZHPdsH/49TPaHeDleXPAEmHYisiBVo+XIKCKPh+vXfreQbDwkx25m1rb1zFafJ
+ I6h7UYIDifyCnR+MYfhqtwK/gJhrZjjnmYIfNCE7EKS2ey16zUxwgA9JhVW9hVys7yEZ
+ JiCA==
+X-Gm-Message-State: APjAAAWakRwFbhCGhgIGx7l+Ec18iBbTdpxPOxytZgfFLnMcf3kznzRp
+ jZdevKkfd7mK44hMyPpZQXrcPXA6BAnxUpZGXAK9Be0Rc0ZU0UrQhZVwncj7utSSWJmzljq7IrO
+ jiFwdYZC2TDr7er8qm6gsZVfp
+X-Received: by 2002:a05:620a:a46:: with SMTP id j6mr13676qka.164.1580941714103; 
+ Wed, 05 Feb 2020 14:28:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzgDC/fBZ4GnRbk3BQEXE+eWIhbbieAb4nE+MGEKdPSLikBImrRnbk5qAuaCcwE1K66PslinA==
+X-Received: by 2002:a05:620a:a46:: with SMTP id j6mr13650qka.164.1580941713724; 
+ Wed, 05 Feb 2020 14:28:33 -0800 (PST)
 Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id t16sm458993qkg.96.2020.02.05.14.08.24
+ by smtp.gmail.com with ESMTPSA id c184sm503353qke.118.2020.02.05.14.28.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 14:08:25 -0800 (PST)
-Date: Wed, 5 Feb 2020 17:08:22 -0500
+ Wed, 05 Feb 2020 14:28:33 -0800 (PST)
+Date: Wed, 5 Feb 2020 17:28:29 -0500
 From: Peter Xu <peterx@redhat.com>
 To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v5 02/19] KVM: Reinstall old memslots if arch preparation
- fails
-Message-ID: <20200205220822.GE387680@xz-x1>
+Subject: Re: [PATCH v5 03/19] KVM: Don't free new memslot if allocation of
+ said memslot fails
+Message-ID: <20200205222829.GF387680@xz-x1>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-3-sean.j.christopherson@intel.com>
+ <20200121223157.15263-4-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200121223157.15263-3-sean.j.christopherson@intel.com>
-X-MC-Unique: 2VXK8TMWM9-XJvZiYHM7Tw-1
+In-Reply-To: <20200121223157.15263-4-sean.j.christopherson@intel.com>
+X-MC-Unique: WHeRNyf9PZiW5dB5cDEbeg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
@@ -117,16 +118,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 21, 2020 at 02:31:40PM -0800, Sean Christopherson wrote:
-> Reinstall the old memslots if preparing the new memory region fails
-> after invalidating a to-be-{re}moved memslot.
+On Tue, Jan 21, 2020 at 02:31:41PM -0800, Sean Christopherson wrote:
+> The two implementations of kvm_arch_create_memslot() in x86 and PPC are
+> both good citizens and free up all local resources if creation fails.
+> Return immediately (via a superfluous goto) instead of calling
+> kvm_free_memslot().
 > 
-> Remove the superfluous 'old_memslots' variable so that it's somewhat
-> clear that the error handling path needs to free the unused memslots,
-> not simply the 'old' memslots.
+> Note, the call to kvm_free_memslot() is effectively an expensive nop in
+> this case as there are no resources to be freed.
+
+(I failed to understand why that is expensive.. but the change looks OK)
+
 > 
-> Fixes: bc6678a33d9b9 ("KVM: introduce kvm->srcu and convert kvm_set_memory_region to SRCU update")
-> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> No functional change intended.
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
