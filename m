@@ -4,57 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A860C2D0B1
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 14:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BC5C2D0B1
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 15:12:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2966120838
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 14:42:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2966120838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 78BED20838
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 15:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78BED20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7274A3B4;
-	Thu,  6 Feb 2020 09:42:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D81914A522;
+	Thu,  6 Feb 2020 10:12:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H4M-rOtplfmB; Thu,  6 Feb 2020 09:42:18 -0500 (EST)
+	with ESMTP id hSeuoaXQew2q; Thu,  6 Feb 2020 10:12:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE34E4A51F;
-	Thu,  6 Feb 2020 09:42:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BE6C4A524;
+	Thu,  6 Feb 2020 10:12:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 998344A4E1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 09:42:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C84D14A51E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 10:12:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ku4CZZUgUXCM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Feb 2020 09:42:15 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF6AC4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 09:42:15 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 582C530E;
- Thu,  6 Feb 2020 06:42:15 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 723783F52E;
- Thu,  6 Feb 2020 06:42:14 -0800 (PST)
-Date: Thu, 6 Feb 2020 14:42:11 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH kvmtool] Add emulation for CFI compatible flash memory
-Message-ID: <20200206144211.34a27285@donnerap.cambridge.arm.com>
-In-Reply-To: <20200205171156.GA908@willie-the-truck>
-References: <20200108183212.252810-1-andre.przywara@arm.com>
- <20200205171156.GA908@willie-the-truck>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+ with ESMTP id JVTHA83MOSUV for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Feb 2020 10:12:32 -0500 (EST)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE5BA4A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 10:12:31 -0500 (EST)
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 30C342B1006464400976;
+ Thu,  6 Feb 2020 23:12:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Feb 2020
+ 23:12:18 +0800
+Subject: Re: [kvm-unit-tests PATCH v3 05/14] arm/arm64: ITS: Introspection
+ tests
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-6-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a5f8d1dc-fa1c-c5e2-e449-afac92840563@huawei.com>
+Date: Thu, 6 Feb 2020 23:12:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Cc: linux-arm-kernel@lists.infradead.org, Raphael Gault <raphael.gault@arm.com>,
- Sami Mujawar <sami.mujawar@arm.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200128103459.19413-6-eric.auger@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: andre.przywara@arm.com, thuth@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,439 +71,470 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 5 Feb 2020 17:11:57 +0000
-Will Deacon <will@kernel.org> wrote:
+Hi Eric,
 
-Hi Will,
+On 2020/1/28 18:34, Eric Auger wrote:
+> Detect the presence of an ITS as part of the GICv3 init
+> routine, initialize its base address and read few registers
+> the IIDR, the TYPER to store its dimensioning parameters.
+> Also parse the BASER registers.
+> 
+> This is our first ITS test, belonging to a new "its" group.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - updated dates and changed author
+> - squash "arm/arm64: ITS: Test BASER" into this patch but
+>    removes setup_baser which will be introduced later.
+> - only compile on aarch64
+> - restrict the new test to aarch64
+> 
+> v1 -> v2:
+> - clean GITS_TYPER macros and unused fields in typer struct
+> - remove memory attribute related macros
+> - remove everything related to memory attributes
+> - s/dev_baser/coll_baser/ in report_info
+> - add extra line
+> - removed index filed in its_baser
+> ---
+>   arm/Makefile.arm64         |   1 +
+>   arm/gic.c                  |  49 ++++++++++++++++++
+>   arm/unittests.cfg          |   7 +++
+>   lib/arm/asm/gic-v3-its.h   | 103 +++++++++++++++++++++++++++++++++++++
+>   lib/arm/gic-v3-its.c       |  88 +++++++++++++++++++++++++++++++
+>   lib/arm/gic.c              |  30 +++++++++--
+>   lib/arm64/asm/gic-v3-its.h |   1 +
+>   7 files changed, 274 insertions(+), 5 deletions(-)
+>   create mode 100644 lib/arm/asm/gic-v3-its.h
+>   create mode 100644 lib/arm/gic-v3-its.c
+>   create mode 100644 lib/arm64/asm/gic-v3-its.h
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6d3dc2c..2571ffb 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -19,6 +19,7 @@ endef
+>   cstart.o = $(TEST_DIR)/cstart64.o
+>   cflatobjs += lib/arm64/processor.o
+>   cflatobjs += lib/arm64/spinlock.o
+> +cflatobjs += lib/arm/gic-v3-its.o
+>   
+>   OBJDIRS += lib/arm64
+>   
+> diff --git a/arm/gic.c b/arm/gic.c
+> index abf08c7..4d7dd03 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -16,6 +16,7 @@
+>   #include <asm/processor.h>
+>   #include <asm/delay.h>
+>   #include <asm/gic.h>
+> +#include <asm/gic-v3-its.h>
+>   #include <asm/smp.h>
+>   #include <asm/barrier.h>
+>   #include <asm/io.h>
+> @@ -518,6 +519,50 @@ static void gic_test_mmio(void)
+>   		test_targets(nr_irqs);
+>   }
+>   
+> +#if defined(__arm__)
+> +
+> +static void test_its_introspection(void) {}
+> +
+> +#else /* __arch64__ */
+> +
+> +static void test_its_introspection(void)
+> +{
+> +	struct its_baser *dev_baser, *coll_baser;
+> +	struct its_typer *typer = &its_data.typer;
+> +
+> +	if (!gicv3_its_base()) {
+> +		report_skip("No ITS, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* IIDR */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
+> +	       "GITS_IIDR is read-only"),
+> +
+> +	/* TYPER */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
+> +	       "GITS_TYPER is read-only");
+> +
+> +	report(typer->phys_lpi, "ITS supports physical LPIs");
+> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
+> +	report_info("ITT entry size = 0x%x", typer->ite_size);
+> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
+> +		    typer->eventid_bits, typer->deviceid_bits,
+> +		    typer->collid_bits);
+> +	report(typer->eventid_bits && typer->deviceid_bits &&
+> +	       typer->collid_bits, "ID spaces");
+> +	report_info("Target address format %s",
+> +			typer->pta ? "Redist basse address" : "PE #");
 
-many thanks for having a look!
+typo: s/basse/base/
 
-> On Wed, Jan 08, 2020 at 06:32:12PM +0000, Andre Przywara wrote:
-> > From: Raphael Gault <raphael.gault@arm.com>
-> > 
-> > The EDK II UEFI firmware implementation requires some storage for the EFI
-> > variables, which is typically some flash storage.
-> > Since this is already supported on the EDK II side, we add a CFI flash
-> > emulation to kvmtool.
-> > This is backed by a file, specified via the --flash or -F command line
-> > option. Any flash writes done by the guest will immediately be reflected
-> > into this file (kvmtool mmap's the file).
-> > 
-> > This implements a CFI flash using the "Intel/Sharp extended command
-> > set", as specified in:
-> > - JEDEC JESD68.01
-> > - JEDEC JEP137B
-> > - Intel Application Note 646
-> > Some gaps in those specs have been filled by looking at real devices and
-> > other implementations (QEMU, Linux kernel driver).
-> > 
-> > At the moment this relies on DT to advertise the base address of the
-> > flash memory (mapped into the MMIO address space) and is only enabled
-> > for ARM/ARM64. The emulation itself is architecture agnostic, though.
-> > 
-> > This is one missing piece towards booting with UEFI inside ARM guests,
-> > the other is to provide writable PCI BARs, which is also WIP.
-> > 
-> > Signed-off-by: Raphael Gault <raphael.gault@arm.com>
-> > [Andre: rewriting and fixing]
-> > Signed-off-by: Andre Przywra <andre.przywara@arm.com>
-> > ---
-> >  Makefile                          |   6 +
-> >  arm/include/arm-common/kvm-arch.h |   3 +
-> >  builtin-run.c                     |   2 +
-> >  hw/cfi_flash.c                    | 547 ++++++++++++++++++++++++++++++
-> >  include/kvm/kvm-config.h          |   1 +
-> >  5 files changed, 559 insertions(+)
-> >  create mode 100644 hw/cfi_flash.c
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index 3862112c..7ed6fb5e 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -170,6 +170,7 @@ ifeq ($(ARCH), arm)
-> >  	CFLAGS		+= -march=armv7-a
-> >  
-> >  	ARCH_WANT_LIBFDT := y
-> > +	ARCH_HAS_FLASH_MEM := y
-> >  endif
-> >  
-> >  # ARM64
-> > @@ -182,6 +183,7 @@ ifeq ($(ARCH), arm64)
-> >  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> >  
-> >  	ARCH_WANT_LIBFDT := y
-> > +	ARCH_HAS_FLASH_MEM := y
-> >  endif
-> >  
-> >  ifeq ($(ARCH),mips)
-> > @@ -261,6 +263,10 @@ ifeq (y,$(ARCH_HAS_FRAMEBUFFER))
-> >  	endif
-> >  endif
-> >  
-> > +ifeq (y,$(ARCH_HAS_FLASH_MEM))
-> > +	OBJS	+= hw/cfi_flash.o
-> > +endif
-> > +
-> >  ifeq ($(call try-build,$(SOURCE_ZLIB),$(CFLAGS),$(LDFLAGS) -lz),y)
-> >  	CFLAGS_DYNOPT	+= -DCONFIG_HAS_ZLIB
-> >  	LIBS_DYNOPT	+= -lz
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index b9d486d5..cbc9e7aa 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -21,6 +21,9 @@
-> >  #define ARM_GIC_DIST_SIZE	0x10000
-> >  #define ARM_GIC_CPUI_SIZE	0x20000
-> >  
-> > +#define ARM_FLASH_MMIO_BASE	(32ULL << 20)  
-> 
-> Can you just use the hex constant (0x2000000) here please?
-> 
-> > +#define KVM_FLASH_MMIO_BASE	ARM_FLASH_MMIO_BASE
-> > +
-> >  #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
-> >  #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
-> >  #define ARM_PCI_CFG_SIZE	(1ULL << 24)
-> > diff --git a/builtin-run.c b/builtin-run.c
-> > index f8dc6c72..df8c6741 100644
-> > --- a/builtin-run.c
-> > +++ b/builtin-run.c
-> > @@ -138,6 +138,8 @@ void kvm_run_set_wrapper_sandbox(void)
-> >  			"Kernel command line arguments"),		\
-> >  	OPT_STRING('f', "firmware", &(cfg)->firmware_filename, "firmware",\
-> >  			"Firmware image to boot in virtual machine"),	\
-> > +	OPT_STRING('F', "flash", &(cfg)->flash_filename, "flash",\
-> > +			"Flash image to present to virtual machine"),	\
-> >  									\
-> >  	OPT_GROUP("Networking options:"),				\
-> >  	OPT_CALLBACK_DEFAULT('n', "network", NULL, "network params",	\
-> > diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
-> > new file mode 100644
-> > index 00000000..33cfeefe
-> > --- /dev/null
-> > +++ b/hw/cfi_flash.c
-> > @@ -0,0 +1,547 @@
-> > +#include <stdbool.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <linux/bitops.h>
-> > +#include <linux/err.h>
-> > +#include <linux/sizes.h>
-> > +#include <linux/types.h>
-> > +
-> > +#include "kvm/kvm.h"
-> > +#include "kvm/kvm-arch.h"
-> > +#include "kvm/devices.h"
-> > +#include "kvm/fdt.h"
-> > +#include "kvm/util.h"
-> > +
-> > +/* The EDK2 driver hardcodes two 16-bit chips on a 32-bit bus. */
-> > +#define CFI_NR_FLASH_CHIPS			2
-> > +//#define CFI_NR_FLASH_CHIPS			1  
-> 
-> Delete this commented define?
-> 
-> > +/* We always emulate a 32 bit bus width. */
-> > +#define CFI_BUS_WIDTH				4
-> > +
-> > +/* The *effective* size of an erase block (over all chips) */
-> > +#define FLASH_BLOCK_SIZE			SZ_64K
-> > +
-> > +#define PROGRAM_BUFF_SIZE_BITS			7
-> > +#define PROGRAM_BUFF_SIZE			(1U << PROGRAM_BUFF_SIZE_BITS)
-> > +
-> > +/* CFI commands */
-> > +#define CFI_CMD_LOCK_BLOCK			0x01
-> > +#define CFI_CMD_ALTERNATE_WORD_PROGRAM_SETUP	0x10
-> > +#define CFI_CMD_BLOCK_ERASE_SETUP		0x20
-> > +#define CFI_CMD_WORD_PROGRAM_SETUP		0x40
-> > +#define CFI_CMD_CLEAR_STATUS_REGISTER		0x50
-> > +#define CFI_CMD_LOCK_BLOCK_SETUP		0x60
-> > +#define CFI_CMD_READ_STATUS_REGISTER		0x70
-> > +#define CFI_CMD_READ_JEDEC			0x90
-> > +#define CFI_CMD_READ_CFI_QUERY			0x98
-> > +#define CFI_CMD_BUFFERED_PROGRAM_CONFIRM	0xd0
-> > +#define CFI_CMD_BLOCK_ERASE_CONFIRM		0xd0
-> > +#define CFI_CMD_UNLOCK_BLOCK			0xd0
-> > +#define CFI_CMD_BUFFERED_PROGRAM_SETUP		0xe8
-> > +#define CFI_CMD_READ_ARRAY			0xff
-> > +
-> > +/*
-> > + * CFI query table contents, as far as it is constant.
-> > + */
-> > +#define CFI_GEOM_OFFSET				0x27
-> > +static u8 cfi_query_table[] = {
-> > +		/* offset 0x10: CFI query identification string */
-> > +	'Q', 'R', 'Y',		/* ID string */
-> > +	0x01, 0x00,		/* primary command set: Intel/Sharp extended */
-> > +	0x31, 0x00,		/* address of primary extended query table */
-> > +	0x00, 0x00,		/* alternative command set: unused */
-> > +	0x00, 0x00,		/* address of alternative extended query table*/
-> > +		/* offset 0x1b: system interface information */
-> > +	0x45,			/* minimum Vcc voltage: 4.5V */
-> > +	0x55,			/* maximum Vcc voltage: 5.5V */
-> > +	0x00,			/* minimum Vpp voltage: 0.0V (unused) */
-> > +	0x00,			/* maximum Vpp voltage: 0.0V *(unused) */
-> > +	0x01,			/* timeout for single word program: 2 us */
-> > +	0x01,			/* timeout for multi-byte program: 2 us */
-> > +	0x01,			/* timeout for block erase: 2 ms */
-> > +	0x00,			/* timeout for full chip erase: not supported */
-> > +	0x00,			/* max timeout for single word program: 1x */
-> > +	0x00,			/* max timeout for mulit-byte program: 1x */
-> > +	0x00,			/* max timeout for block erase: 1x */
-> > +	0x00,			/* max timeout for chip erase: not supported */
-> > +		/* offset 0x27: flash geometry information */
-> > +	0x00,			/* size in power-of-2 bytes, filled later */
-> > +	0x06, 0x00,		/* interface description: 32 and 16 bits */
-> > +	PROGRAM_BUFF_SIZE_BITS + 1 - CFI_NR_FLASH_CHIPS, 0x00,
-> > +				/* number of multi-byte writes */
-> > +	0x01,			/* one erase block region */
-> > +	0x00, 0x00, 0x00, 0x00, /* number and size of erase blocks, filled */
-> > +		/* offset 0x31: Intel primary algorithm extended query table */
-> > +	'P', 'R', 'I',
-> > +	'1', '0',		/* version 1.0 */
-> > +	0xa0, 0x00, 0x00, 0x00, /* optional features: instant lock & pm-read */
-> > +	0x00,			/* no functions after suspend */
-> > +	0x01, 0x00,		/* only lock bit supported */
-> > +	0x50,			/* best Vcc value: 5.0V */
-> > +	0x00,			/* best Vpp value: 0.0V (unused) */
-> > +	0x01,			/* number of protection register fields */
-> > +	0x00, 0x00, 0x00, 0x00,	/* protection field 1 description */
-> > +};
-> > +
-> > +
-> > +/*
-> > + * Those states represent a subset of the CFI flash state machine.
-> > + */
-> > +enum cfi_flash_state {
-> > +	READY,
-> > +	LOCK_SETUP,
-> > +	WP_SETUP,
-> > +	BP_SETUP,
-> > +	BP_LOAD,
-> > +	ERASE_SETUP,
-> > +};
-> > +
-> > +/*
-> > + * The device can be in several **Read** modes.
-> > + * We don't implement the asynchronous burst mode.
-> > + */
-> > +enum cfi_read_mode {
-> > +	READ_ARRAY,
-> > +	READ_STATUS,
-> > +	READ_DEVICE_ID,
-> > +	READ_QUERY,
-> > +};
-> > +
-> > +struct cfi_flash_device {
-> > +	struct device_header	dev_hdr;
-> > +	u64			base_addr;
-> > +	u32			size;
-> > +
-> > +	void			*flash_memory;
-> > +	u8			program_buffer[PROGRAM_BUFF_SIZE * 4];
-> > +	unsigned long		*lock_bm;
-> > +	u64			last_address;
-> > +	unsigned int		buff_written;
-> > +	unsigned int		program_length;
-> > +
-> > +	enum cfi_flash_state	state;
-> > +	enum cfi_read_mode	read_mode;
-> > +	u16			rcr;
-> > +	u8			sr;
-> > +};
-> > +
-> > +static int pow2_size(unsigned long x)
-> > +{
-> > +	return (sizeof(x) * 8) - __builtin_clzl(x - 1);
-> > +}  
-> 
-> This isn't specific to CFI -- maybe stick it include/kvm/util.h ?
-> 
-> > +static int nr_erase_blocks(struct cfi_flash_device *sfdev)
-> > +{
-> > +	return sfdev->size / FLASH_BLOCK_SIZE;
-> > +}
-> > +
-> > +/*
-> > + * CFI queries always deal with one byte of information, possibly mirrored
-> > + * to other bytes on the bus. This is dealt with in the callers.
-> > + * The address provided is the one for 8-bit addressing, and would need to
-> > + * be adjusted for wider accesses.
-> > + */
-> > +static u8 read_cfi(struct cfi_flash_device *sfdev, u64 addr)
-> > +{
-> > +	if (addr < 0x10)		/* CFI information starts at 0x10 */
-> > +		return 0;
-> > +
-> > +	if (addr - 0x10 > sizeof(cfi_query_table)) {
-> > +		pr_debug("CFI query read access beyond the end of table");
-> > +		return 0;
-> > +	}
-> > +
-> > +	/* Fixup dynamic information in the geometry part of the table. */
-> > +	switch (addr) {
-> > +	case CFI_GEOM_OFFSET:		/* device size in bytes, power of two */
-> > +		return pow2_size(sfdev->size / CFI_NR_FLASH_CHIPS);
-> > +	case CFI_GEOM_OFFSET + 6:	/* number of erase blocks, minus one */
-> > +		return (nr_erase_blocks(sfdev) - 1) & 0xff;
-> > +	case CFI_GEOM_OFFSET + 7:
-> > +		return (nr_erase_blocks(sfdev) - 1) >> 8;
-> > +	case CFI_GEOM_OFFSET + 8:	/* erase block size, in units of 256 */
-> > +		return ((FLASH_BLOCK_SIZE / 256 ) / CFI_NR_FLASH_CHIPS) & 0xff;
-> > +	case CFI_GEOM_OFFSET + 9:
-> > +		return ((FLASH_BLOCK_SIZE / 256 ) / CFI_NR_FLASH_CHIPS) >> 8;
-> > +	}
-> > +
-> > +	return cfi_query_table[addr - 0x10];
-> > +}
-> > +
-> > +/* We only support synchronous page mode read accesses. */
-> > +static void read_flash(struct cfi_flash_device *sfdev,
-> > +		       u64 addr, u8 *buffer, int len)
-> > +{
-> > +	memcpy(buffer, sfdev->flash_memory + addr, len);
-> > +}  
-> 
-> Hmm, you open-code the memcpy when writing the flash so it's a bit weird
+> +
+> +	dev_baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	coll_baser = its_lookup_baser(GITS_BASER_TYPE_COLLECTION);
+> +	report(dev_baser && coll_baser, "detect device and collection BASER");
+> +	report_info("device baser entry_size = 0x%x", dev_baser->esz);
+> +	report_info("collection baser entry_size = 0x%x", coll_baser->esz);
 
-Not sure what you refer to exactly?
-The only open-code access I see is in the MMIO handler when doing the CFI QRY *read*, which is a very special MMIO style read access. Every other write access (word_program(), buffer_confirm()) is already using memcpy.
-What am I missing here?
+How about "device table entry_size = ..." and "collection table
+entry_size = ..."?
 
-> to have the asymmetry with reads. I don't mind what you do, but it should
-> probably be consistent.
+> +}
+> +
+> +#endif
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	if (!gic_init()) {
+> @@ -549,6 +594,10 @@ int main(int argc, char **argv)
+>   		report_prefix_push(argv[1]);
+>   		gic_test_mmio();
+>   		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_introspection();
+> +		report_prefix_pop();
+>   	} else {
+>   		report_abort("Unknown subtest '%s'", argv[1]);
+>   	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index daeb5a0..ba2b31b 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -122,6 +122,13 @@ smp = $MAX_SMP
+>   extra_params = -machine gic-version=3 -append 'active'
+>   groups = gic
+>   
+> +[its-introspection]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'its-introspection'
+> +groups = its
+> +arch = arm64
+> +
+>   # Test PSCI emulation
+>   [psci]
+>   file = psci.flat
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..815c515
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,103 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +struct its_typer {
+> +	unsigned int ite_size;
+> +	unsigned int eventid_bits;
+> +	unsigned int deviceid_bits;
+> +	unsigned int collid_bits;
+> +	bool pta;
+> +	bool phys_lpi;
+> +	bool virt_lpi;
+> +};
+> +
+> +struct its_baser {
+> +	int type;
+> +	size_t psz;
+> +	int nr_pages;
+> +	bool indirect;
+> +	phys_addr_t table_addr;
+> +	bool valid;
+> +	int esz;
+> +};
+> +
+> +#define GITS_BASER_NR_REGS              8
+> +
+> +struct its_data {
+> +	void *base;
+> +	struct its_typer typer;
+> +	struct its_baser baser[GITS_BASER_NR_REGS];
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+> +
+> +#if defined(__aarch64__)
+> +
+> +#define GITS_CTLR			0x0000
+> +#define GITS_IIDR			0x0004
+> +#define GITS_TYPER			0x0008
+> +#define GITS_CBASER			0x0080
+> +#define GITS_CWRITER			0x0088
+> +#define GITS_CREADR			0x0090
+> +#define GITS_BASER			0x0100
+> +
+> +#define GITS_TYPER_PLPIS                BIT(0)
+> +#define GITS_TYPER_VLPIS		BIT(1)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+> +#define GITS_TYPER_IDBITS		GENMASK_ULL(8, 12)
+> +#define GITS_TYPER_IDBITS_SHIFT         8
+> +#define GITS_TYPER_DEVBITS		GENMASK_ULL(13, 17)
+> +#define GITS_TYPER_DEVBITS_SHIFT        13
+> +#define GITS_TYPER_PTA                  BIT(19)
+> +#define GITS_TYPER_CIDBITS		GENMASK_ULL(32, 35)
+> +#define GITS_TYPER_CIDBITS_SHIFT	32
+> +#define GITS_TYPER_CIL			BIT(36)
+> +
+> +#define GITS_CTLR_ENABLE		(1U << 0)
+> +
+> +#define GITS_CBASER_VALID		(1UL << 63)
+> +
+> +#define GITS_BASER_VALID		BIT(63)
+> +#define GITS_BASER_INDIRECT		BIT(62)
+> +#define GITS_BASER_TYPE_SHIFT		(56)
+> +#define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+> +#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
+> +#define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+> +#define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+> +#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGES_MAX		256
+> +#define GITS_BASER_PAGES_SHIFT		(0)
+> +#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
+> +#define GITS_BASER_TYPE_NONE		0
+> +#define GITS_BASER_TYPE_DEVICE		1
+> +#define GITS_BASER_TYPE_COLLECTION	4
+> +
+> +extern void its_parse_typer(void);
+> +extern void its_init(void);
+> +extern int its_parse_baser(int i, struct its_baser *baser);
+> +extern struct its_baser *its_lookup_baser(int type);
+> +
+> +#else /* __arm__ */
+> +
+> +static inline void its_init(void) {}
+> +
+> +#endif
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..2c0ce13
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +#include <alloc_page.h>
+> +#include <asm/gic-v3-its.h>
+> +
+> +void its_parse_typer(void)
+> +{
+> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
+> +
+> +	its_data.typer.ite_size = ((typer & GITS_TYPER_ITT_ENTRY_SIZE) >>
+> +					GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) + 1;
+> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
+> +	its_data.typer.eventid_bits = ((typer & GITS_TYPER_IDBITS) >>
+> +						GITS_TYPER_IDBITS_SHIFT) + 1;
+> +	its_data.typer.deviceid_bits = ((typer & GITS_TYPER_DEVBITS) >>
+> +						GITS_TYPER_DEVBITS_SHIFT) + 1;
+> +
+> +	if (typer & GITS_TYPER_CIL)
+> +		its_data.typer.collid_bits = ((typer & GITS_TYPER_CIDBITS) >>
+> +						GITS_TYPER_CIDBITS_SHIFT) + 1;
+> +	else
+> +		its_data.typer.collid_bits = 16;
+> +
+> +	its_data.typer.virt_lpi = typer & GITS_TYPER_VLPIS;
+> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+> +}
+> +
+> +int its_parse_baser(int i, struct its_baser *baser)
+> +{
+> +	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+> +	u64 val = readq(reg_addr);
+> +
+> +	if (!val) {
+> +		memset(baser, 0, sizeof(*baser));
+> +		return -1;
+> +	}
+
+Unimplemented BASERs? How about using something like:
+
+	if (GITS_BASER_TYPE(val) == GITS_BASER_TYPE_NONE) {
+		[...]
+	}
+
+to make it a bit more explicit?
+
+But feel free to just ignore it because you're right that
+the unimplemented BASERs are RES0.
+
+
+Thanks,
+Zenghui
+
+> +
+> +	baser->valid = val & GITS_BASER_VALID;
+> +	baser->indirect = val & GITS_BASER_INDIRECT;
+> +	baser->type = GITS_BASER_TYPE(val);
+> +	baser->esz = GITS_BASER_ENTRY_SIZE(val);
+> +	baser->nr_pages = GITS_BASER_NR_PAGES(val);
+> +	baser->table_addr = val & GITS_BASER_PHYS_ADDR_MASK;
+> +	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
+> +	case GITS_BASER_PAGE_SIZE_4K:
+> +		baser->psz = SZ_4K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_16K:
+> +		baser->psz = SZ_16K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_64K:
+> +		baser->psz = SZ_64K;
+> +		break;
+> +	default:
+> +		baser->psz = SZ_64K;
+> +	}
+> +	return 0;
+> +}
+> +
+> +struct its_baser *its_lookup_baser(int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		struct its_baser *baser = &its_data.baser[i];
+> +
+> +		if (baser->type == type)
+> +			return baser;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void its_init(void)
+> +{
+> +	int i;
+> +
+> +	if (!its_data.base)
+> +		return;
+> +
+> +	its_parse_typer();
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++)
+> +		its_parse_baser(i, &its_data.baser[i]);
+> +}
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index aa9cb86..6b70b05 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,9 +6,11 @@
+>   #include <devicetree.h>
+>   #include <asm/gic.h>
+>   #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>   
+>   struct gicv2_data gicv2_data;
+>   struct gicv3_data gicv3_data;
+> +struct its_data its_data;
+>   
+>   struct gic_common_ops {
+>   	void (*enable_defaults)(void);
+> @@ -44,12 +46,13 @@ static const struct gic_common_ops gicv3_common_ops = {
+>    * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>    */
+>   static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
+>   {
+>   	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>   	struct dt_bus bus;
+> -	int node, ret, i;
+> +	int node, subnode, ret, i, len;
+> +	const void *fdt = dt_fdt();
+>   
+>   	dt_bus_init_defaults(&bus);
+>   	dt_device_init(&gic, &bus, NULL);
+> @@ -74,19 +77,35 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>   		base2[i] = ioremap(reg.addr, reg.size);
+>   	}
+>   
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode, "compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>   	return true;
+>   }
+>   
+>   int gicv2_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>   }
+>   
+>   int gicv3_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_bases[0]);
+> +			&gicv3_data.redist_bases[0], &its_data.base);
+>   }
+>   
+>   int gic_version(void)
+> @@ -104,6 +123,7 @@ int gic_init(void)
+>   		gic_common_ops = &gicv2_common_ops;
+>   	else if (gicv3_init())
+>   		gic_common_ops = &gicv3_common_ops;
+> +	its_init();
+>   	return gic_version();
+>   }
+>   
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
 > 
-> > +static bool block_is_locked(struct cfi_flash_device *sfdev, u64 addr)
-> > +{
-> > +	int block_nr = addr / FLASH_BLOCK_SIZE;
-> > +
-> > +	return test_bit(block_nr, sfdev->lock_bm);
-> > +}
-> > +
-> > +#define DEV_ID_MASK 0x7ff
-> > +static u16 read_dev_id(struct cfi_flash_device *sfdev, u64 addr)
-> > +{
-> > +	switch ((addr & DEV_ID_MASK) / CFI_BUS_WIDTH) {
-> > +	case 0x0:				/* vendor ID */
-> > +		return 0x0000;
-> > +	case 0x1:				/* device ID */
-> > +		return 0xffff;
-> > +	case 0x2:
-> > +		return block_is_locked(sfdev, addr & ~DEV_ID_MASK);
-> > +	case 0x5:
-> > +		return sfdev->rcr;
-> > +	default:			/* Ignore the other entries. */
-> > +		return 0;
-> > +	}
-> > +}
-> > +
-> > +static void lock_block(struct cfi_flash_device *sfdev, u64 addr, bool lock)
-> > +{
-> > +	int block_nr = addr / FLASH_BLOCK_SIZE;
-> > +
-> > +	if (lock)
-> > +		set_bit(block_nr, sfdev->lock_bm);
-> > +	else
-> > +		clear_bit(block_nr, sfdev->lock_bm);
-> > +}  
-> 
-> 
-> > +static void word_program(struct cfi_flash_device *sfdev,
-> > +			 u64 addr, void *data, int len)
-> > +{
-> > +	if (block_is_locked(sfdev, addr)) {
-> > +		sfdev->sr |= 0x12;
-> > +		return;
-> > +	}
-> > +
-> > +	memcpy(sfdev->flash_memory + addr, data, len);
-> > +}
-> > +
-> > +/* Reset the program buffer state to prepare for follow-up writes. */
-> > +static void buffer_setup(struct cfi_flash_device *sfdev)
-> > +{
-> > +	memset(sfdev->program_buffer, 0, sizeof(sfdev->program_buffer));
-> > +	sfdev->last_address = ~0ULL;
-> > +	sfdev->buff_written = 0;
-> > +}
-> > +
-> > +static bool buffer_program(struct cfi_flash_device *sfdev,
-> > +			   u64 addr, void *buffer, int len)
-> > +{
-> > +	unsigned int buf_addr;
-> > +
-> > +	if (sfdev->buff_written >= sfdev->program_length)
-> > +		return false;
-> > +
-> > +	/*
-> > +	 * The first word written into the buffer after the setup command
-> > +	 * happens to be the base address for the buffer.
-> > +	 * All subsequent writes need to be within this address and this
-> > +	 * address plus the buffer size, so keep this value around.
-> > +	 */
-> > +	if (sfdev->last_address == ~0ULL)
-> > +		sfdev->last_address = addr;
-> > +
-> > +	if (addr < sfdev->last_address)
-> > +		return false;
-> > +	buf_addr = addr - sfdev->last_address;
-> > +	if (buf_addr >= PROGRAM_BUFF_SIZE)
-> > +		return false;
-> > +
-> > +	memcpy(sfdev->program_buffer + buf_addr, buffer, len);
-> > +	sfdev->buff_written++;
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static void buffer_confirm(struct cfi_flash_device *sfdev)
-> > +{
-> > +	if (block_is_locked(sfdev, sfdev->last_address)) {
-> > +		sfdev->sr |= 0x12;
-> > +		return;
-> > +	}
-> > +	memcpy(sfdev->flash_memory + sfdev->last_address,
-> > +	       sfdev->program_buffer,
-> > +	       sfdev->buff_written * sizeof(u32));
-> > +}
-> > +
-> > +static void block_erase_confirm(struct cfi_flash_device *sfdev, u64 addr)
-> > +{
-> > +	if (block_is_locked(sfdev, addr)) {
-> > +		sfdev->sr |= 0x12;
-> > +		return;
-> > +	}
-> > +
-> > +	memset(sfdev->flash_memory + addr, 0xFF, FLASH_BLOCK_SIZE);
-> > +}
-> > +
-> > +static void cfi_flash_mmio(struct kvm_cpu *vcpu,
-> > +			   u64 addr, u8 *data, u32 len, u8 is_write,
-> > +			   void *context)
-> > +{
-> > +	struct cfi_flash_device *sfdev = context;
-> > +	u64 faddr = addr - sfdev->base_addr;
-> > +	u32 value;  
-> 
-> How is this serialised? There is a distinct lack of locking, atomics and
-> memory barriers in the implementation, so we really need to avoid this
-> running concurrently with itself.
 
-Ouch, thanks for pointing this out!
-I was so obsessed with EDK-2 as the primary user being single threaded that I totally missed that. Sorry for that!
-
-Given that background and to keep it simple, I now just grab a mutex when entering the MMIO handler and drop it before leaving. There is surely room for optimisation, but given the cheap nature of the handlers (changing state or accessing small memory areas) I don't think it's worth it.
-
-"Yes, sure" to all your other comments. Will send a v2 once I understood your open-code comment above.
-
-Cheers,
-Andre.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
