@@ -2,63 +2,95 @@ Return-Path: <SRS0=Is6r=32=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2872C35247
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 21:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 277BBC352A2
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 21:24:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 610C921775
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 21:21:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 610C921775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id B9D0021927
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Feb 2020 21:24:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LoDSgMsd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D0021927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2D134A542;
-	Thu,  6 Feb 2020 16:21:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3944D4A49C;
+	Thu,  6 Feb 2020 16:24:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6wo--CQY3nk8; Thu,  6 Feb 2020 16:21:24 -0500 (EST)
+	with ESMTP id EjMw5+Dcq5Rg; Thu,  6 Feb 2020 16:24:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF7524A4A4;
-	Thu,  6 Feb 2020 16:21:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3365A4A4A4;
+	Thu,  6 Feb 2020 16:24:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9EA84A4A4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 16:21:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FD334A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 16:24:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xcnaedSe-jRg for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Feb 2020 16:21:22 -0500 (EST)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18FE64A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 16:21:22 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Feb 2020 13:21:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,411,1574150400"; d="scan'208";a="250191235"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by orsmga002.jf.intel.com with ESMTP; 06 Feb 2020 13:21:20 -0800
-Date: Thu, 6 Feb 2020 13:21:20 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Peter Xu <peterx@redhat.com>
+ with ESMTP id KZltVwVnGbu2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Feb 2020 16:24:38 -0500 (EST)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC1A4A389
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Feb 2020 16:24:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581024278;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3Y2UsX0iGKeSydEQeVi48EFJ1DRsKZGjPTwGNyfBBJI=;
+ b=LoDSgMsdjWekXMYKaZ0VFsqrv5p0UVY7meKCLKHphZmxM/rhrVd7Lkbsrm5hKhgrvpMcxI
+ udvtZ6ph/IPR87fHvG6oD1+EX02vmOGtw0SvNNYaNyfUFSkHZ8osL06fKzoxS1izGxhr2L
+ oxurl2EKuezhKH30i4vHRzkL509yn04=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-XOoeUkkIPROZknUITrZu4Q-1; Thu, 06 Feb 2020 16:24:35 -0500
+Received: by mail-qt1-f199.google.com with SMTP id c10so126423qtk.18
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Feb 2020 13:24:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=mpppjCJmC0FyN5SMr7bSEAaCj98EBVmwQP8+IcdCU94=;
+ b=INu+U7xPxUXiXyraGToG519yy1KyANsfg0DLBk4OPuz1T7d3AoYpVcyL1yg6p9fZb7
+ 93rFRYlF2yFx9qfZKnk1sXGj0XJxw6j/fuEJLmpwaT4dKYIra/eL6rF23UCme9JmclW4
+ MIhOsTgT49Cz1btjBlWhhVLN1cBmBdnkJYFmGAKV3fOS0RA6uCo4CQtccxMD9+MGgLqN
+ pDAAouLU6o8EYpG63e7XUnsLgfuAkc8PxPYRmQ10yx7+sYFRRI7G/8pBLLyylHUBeOPz
+ HCgMC3m6YWpMAEKgosmD1mI8oJNJxCmFpIOvP/WGjC2ITOrq3tknh3PEcgXHmX6p47yh
+ Bw2Q==
+X-Gm-Message-State: APjAAAWjsDa0CtQ/ah5Tfz87RaVCj30KGi5eyEUFScK9dxcPld+bMAK9
+ VJqxsU0Zeo5ZbwNLx0ZRE3ni0buKkFOsyglO9PP1Rmkz0fLp1A9GJwdPpgCM7NsfeVDcqA3c2Gx
+ eQ2QijrvGfjz2xVHjiDVQypPE
+X-Received: by 2002:ae9:ebd8:: with SMTP id b207mr4579989qkg.353.1581024275410; 
+ Thu, 06 Feb 2020 13:24:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz5VOLMiLzF1LhwmvuD3bg8z0IeFMhpmxCeKGC9RcbBKEXcR3SRyFUKynAlxMw185+NrKLCqw==
+X-Received: by 2002:ae9:ebd8:: with SMTP id b207mr4579963qkg.353.1581024275206; 
+ Thu, 06 Feb 2020 13:24:35 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+ by smtp.gmail.com with ESMTPSA id v78sm278695qkb.48.2020.02.06.13.24.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Feb 2020 13:24:34 -0800 (PST)
+Date: Thu, 6 Feb 2020 16:24:31 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
 Subject: Re: [PATCH v5 15/19] KVM: Provide common implementation for generic
  dirty log functions
-Message-ID: <20200206212120.GF13067@linux.intel.com>
+Message-ID: <20200206212431.GF700495@xz-x1>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
  <20200121223157.15263-16-sean.j.christopherson@intel.com>
- <20200206200200.GC700495@xz-x1>
 MIME-Version: 1.0
+In-Reply-To: <20200121223157.15263-16-sean.j.christopherson@intel.com>
+X-MC-Unique: XOoeUkkIPROZknUITrZu4Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <20200206200200.GC700495@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
  Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
@@ -68,7 +100,7 @@ Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
  linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,89 +117,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Feb 06, 2020 at 03:02:00PM -0500, Peter Xu wrote:
-> On Tue, Jan 21, 2020 at 02:31:53PM -0800, Sean Christopherson wrote:
-> 
-> [...]
-> 
-> > -int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm, struct kvm_clear_dirty_log *log)
-> > +void kvm_arch_dirty_log_tlb_flush(struct kvm *kvm,
-> > +				  struct kvm_memory_slot *memslot)
-> 
-> If it's to flush TLB for a memslot, shall we remove the "dirty_log" in
-> the name of the function, because it has nothing to do with dirty
-> logging any more?  And...
+On Tue, Jan 21, 2020 at 02:31:53PM -0800, Sean Christopherson wrote:
 
-I kept the "dirty_log" to allow arch code to implement logic specific to a
-TLB flush during dirty logging, e.g. x86's lockdep assert on slots_lock.
-And similar to the issue with MIPS below, to deter usage of the hook for
-anything else, i.e. to nudge people to using kvm_flush_remote_tlbs()
-directly.
+[...]
 
-> >  {
-> > -	struct kvm_memslots *slots;
-> > -	struct kvm_memory_slot *memslot;
-> > -	bool flush = false;
-> > -	int r;
-> > -
-> > -	mutex_lock(&kvm->slots_lock);
-> > -
-> > -	r = kvm_clear_dirty_log_protect(kvm, log, &flush);
-> > -
-> > -	if (flush) {
-> > -		slots = kvm_memslots(kvm);
-> > -		memslot = id_to_memslot(slots, log->slot);
-> > -
-> > -		/* Let implementation handle TLB/GVA invalidation */
-> > -		kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
-> > -	}
-> > -
-> > -	mutex_unlock(&kvm->slots_lock);
-> > -	return r;
-> > +	/* Let implementation handle TLB/GVA invalidation */
-> > +	kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
-> 
-> ... This may not directly related to the current patch, but I'm
-> confused on why MIPS cannot use kvm_flush_remote_tlbs() to flush TLBs.
-> I know nothing about MIPS code, but IIUC here flush_shadow_memslot()
-> is a heavier operation that will also invalidate the shadow pages.
-> Seems to be an overkill here when we only changed write permission of
-> the PTEs?  I tried to check the first occurance (2a31b9db15353) but I
-> didn't find out any clue of it so far.
-> 
-> But that matters to this patch because if MIPS can use
-> kvm_flush_remote_tlbs(), then we probably don't need this
-> arch-specific hook any more and we can directly call
-> kvm_flush_remote_tlbs() after sync dirty log when flush==true.
+> @@ -1333,6 +1369,7 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
+>  	unsigned long i, n;
+>  	unsigned long *dirty_bitmap;
+>  	unsigned long *dirty_bitmap_buffer;
+> +	bool flush;
+>  
+>  	as_id = log->slot >> 16;
+>  	id = (u16)log->slot;
+> @@ -1356,7 +1393,9 @@ int kvm_clear_dirty_log_protect(struct kvm *kvm,
+>  	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
+>  	    return -EINVAL;
+>  
+> -	*flush = false;
+> +	kvm_arch_sync_dirty_log(kvm, memslot);
 
-Ya, the asid_flush_mask in kvm_vz_flush_shadow_all() is the only thing
-that prevents calling kvm_flush_remote_tlbs() directly, but I have no
-clue as to the important of that code.
+Do we need this even for clear dirty log?
 
-> >  }
-> >  
-> >  long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> > index 97ce6c4f7b48..0adaf4791a6d 100644
-> > --- a/arch/powerpc/kvm/book3s.c
-> > +++ b/arch/powerpc/kvm/book3s.c
-> > @@ -799,6 +799,11 @@ int kvmppc_core_check_requests(struct kvm_vcpu *vcpu)
-> >  	return vcpu->kvm->arch.kvm_ops->check_requests(vcpu);
-> >  }
-> >  
-> > +void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
-> 
-> Since at it, maybe we can start to use __weak attribute for new hooks
-> especially when it's empty for most archs?
-> 
-> E.g., define:
-> 
-> void __weak kvm_arch_sync_dirty_log(...) {}
-> 
-> In the common code, then only define it again in arch that has
-> non-empty implementation of this method?
+> +
+> +	flush = false;
+>  	dirty_bitmap_buffer = kvm_second_dirty_bitmap(memslot);
+>  	if (copy_from_user(dirty_bitmap_buffer, log->dirty_bitmap, n))
+>  		return -EFAULT;
 
-I defer to Paolo, I'm indifferent at this stage.
+-- 
+Peter Xu
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
