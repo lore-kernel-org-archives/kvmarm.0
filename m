@@ -2,77 +2,59 @@ Return-Path: <SRS0=EEll=33=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85457C352A2
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 09:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BD7C352A2
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 10:19:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04D9E20726
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 09:19:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEZssog5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04D9E20726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C9FF221741
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 10:19:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9FF221741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 927024A3A5;
-	Fri,  7 Feb 2020 04:19:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 415D14A522;
+	Fri,  7 Feb 2020 05:19:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sv2cnbEB9VvH; Fri,  7 Feb 2020 04:19:46 -0500 (EST)
+	with ESMTP id z4mgtbv6gatY; Fri,  7 Feb 2020 05:19:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F5AA4A4A0;
-	Fri,  7 Feb 2020 04:19:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7BF4A4C0;
+	Fri,  7 Feb 2020 05:19:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CD1F4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 04:19:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 684874A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 05:19:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HVNvAgVh1iIg for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Feb 2020 04:19:44 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F38C24A3A3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 04:19:43 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C315120726;
- Fri,  7 Feb 2020 09:19:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581067182;
- bh=bZEWvTQZLdRaUy7USHrKkNVLaz2p4VjHYMUiR5XFHGI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=bEZssog5Lu0LD2CLPpRPFa6dcDoegk2X8wydtKr2IINy7OlvDX2u5NbeCKpVmNJSi
- U/deL5YoCOyKkoOZ7+0F+yLCNWP6qq4xKyaN6tR6rjr1LP13XDIdfF4W3+VyhCZ6Dt
- mJjjyi3qQpOOOsEGoa+GY/8YBQ3aVUopcU6ADCk4=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1izznZ-003UlP-3F; Fri, 07 Feb 2020 09:19:41 +0000
-MIME-Version: 1.0
-Date: Fri, 07 Feb 2020 09:19:40 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id BiK2JT26UFof for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Feb 2020 05:19:30 -0500 (EST)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B07A94A418
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 05:19:30 -0500 (EST)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 9C53C2CE6D0BD3553543;
+ Fri,  7 Feb 2020 18:19:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Fri, 7 Feb 2020
+ 18:19:19 +0800
 Subject: Re: BUG: using __this_cpu_read() in preemptible [00000000] code
-In-Reply-To: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <318984f6-bc36-33a3-abc6-bf2295974b06@huawei.com>
-Message-ID: <828d3b538b7258f692f782b6798277cf@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, peterx@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <828d3b538b7258f692f782b6798277cf@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3e90c020-e7f3-61f1-3731-a489df0b1d9c@huawei.com>
+Date: Fri, 7 Feb 2020 18:19:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <828d3b538b7258f692f782b6798277cf@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -85,126 +67,86 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-On 2020-02-07 09:00, Zenghui Yu wrote:
-> Hi,
-> 
-> Running a latest preemptible kernel and some guests on it,
-> I got the following message,
-> 
-> ---8<---
-> 
-> [  630.031870] BUG: using __this_cpu_read() in preemptible [00000000]
-> code: qemu-system-aar/37270
-> [  630.031872] caller is kvm_get_running_vcpu+0x1c/0x38
-> [  630.031874] CPU: 32 PID: 37270 Comm: qemu-system-aar Kdump: loaded
-> Not tainted 5.5.0+
-> [  630.031876] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58
-> 10/29/2018
-> [  630.031876] Call trace:
-> [  630.031878]  dump_backtrace+0x0/0x200
-> [  630.031880]  show_stack+0x24/0x30
-> [  630.031882]  dump_stack+0xb0/0xf4
-> [  630.031884]  __this_cpu_preempt_check+0xc8/0xd0
-> [  630.031886]  kvm_get_running_vcpu+0x1c/0x38
-> [  630.031888]  vgic_mmio_change_active.isra.4+0x2c/0xe0
-> [  630.031890]  __vgic_mmio_write_cactive+0x80/0xc8
-> [  630.031892]  vgic_mmio_uaccess_write_cactive+0x3c/0x50
-> [  630.031894]  vgic_uaccess+0xcc/0x138
-> [  630.031896]  vgic_v3_redist_uaccess+0x7c/0xa8
-> [  630.031898]  vgic_v3_attr_regs_access+0x1a8/0x230
-> [  630.031901]  vgic_v3_set_attr+0x1b4/0x290
-> [  630.031903]  kvm_device_ioctl_attr+0xbc/0x110
-> [  630.031905]  kvm_device_ioctl+0xc4/0x108
-> [  630.031907]  ksys_ioctl+0xb4/0xd0
-> [  630.031909]  __arm64_sys_ioctl+0x28/0x38
-> [  630.031911]  el0_svc_common.constprop.1+0x7c/0x1a0
-> [  630.031913]  do_el0_svc+0x34/0xa0
-> [  630.031915]  el0_sync_handler+0x124/0x274
-> [  630.031916]  el0_sync+0x140/0x180
-> 
-> ---8<---
-> 
-> I'm now at commit 90568ecf561540fa330511e21fcd823b0c3829c6.
-> 
-> And it looks like vgic_get_mmio_requester_vcpu() was broken by
-> 7495e22bb165 ("KVM: Move running VCPU from ARM to common code").
-> 
-> Could anyone please have a look?
-
-Here you go:
-
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c 
-b/virt/kvm/arm/vgic/vgic-mmio.c
-index d656ebd5f9d4..e1735f19c924 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -190,6 +190,15 @@ unsigned long vgic_mmio_read_pending(struct 
-kvm_vcpu *vcpu,
-   * value later will give us the same value as we update the per-CPU 
-variable
-   * in the preempt notifier handlers.
-   */
-+static struct kvm_vcpu *vgic_get_mmio_requester_vcpu(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	preempt_disable();
-+	vcpu = kvm_get_running_vcpu();
-+	preempt_enable();
-+	return vcpu;
-+}
-
-  /* Must be called with irq->irq_lock held */
-  static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq 
-*irq,
-@@ -212,7 +221,7 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
-  			      gpa_t addr, unsigned int len,
-  			      unsigned long val)
-  {
--	bool is_uaccess = !kvm_get_running_vcpu();
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
-  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-  	int i;
-  	unsigned long flags;
-@@ -265,7 +274,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
-  			      gpa_t addr, unsigned int len,
-  			      unsigned long val)
-  {
--	bool is_uaccess = !kvm_get_running_vcpu();
-+	bool is_uaccess = !vgic_get_mmio_requester_vcpu();
-  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-  	int i;
-  	unsigned long flags;
-@@ -326,7 +335,7 @@ static void vgic_mmio_change_active(struct kvm_vcpu 
-*vcpu, struct vgic_irq *irq,
-  				    bool active)
-  {
-  	unsigned long flags;
--	struct kvm_vcpu *requester_vcpu = kvm_get_running_vcpu();
-+	struct kvm_vcpu *requester_vcpu = vgic_get_mmio_requester_vcpu();
-
-  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-
-
-That's basically a revert of the offending code. The comment right above
-vgic_get_mmio_requester_vcpu() explains *why* this is valid, and why
-preempt_disable() is needed.
-
-Can you please give it a shot?
-
-Thanks,
-
-          M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMi83IDE3OjE5LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gSGkgWmVu
+Z2h1aSwKPiAKPiBPbiAyMDIwLTAyLTA3IDA5OjAwLCBaZW5naHVpIFl1IHdyb3RlOgo+PiBIaSwK
+Pj4KPj4gUnVubmluZyBhIGxhdGVzdCBwcmVlbXB0aWJsZSBrZXJuZWwgYW5kIHNvbWUgZ3Vlc3Rz
+IG9uIGl0LAo+PiBJIGdvdCB0aGUgZm9sbG93aW5nIG1lc3NhZ2UsCj4+Cj4+IC0tLTg8LS0tCj4+
+Cj4+IFvCoCA2MzAuMDMxODcwXSBCVUc6IHVzaW5nIF9fdGhpc19jcHVfcmVhZCgpIGluIHByZWVt
+cHRpYmxlIFswMDAwMDAwMF0KPj4gY29kZTogcWVtdS1zeXN0ZW0tYWFyLzM3MjcwCj4+IFvCoCA2
+MzAuMDMxODcyXSBjYWxsZXIgaXMga3ZtX2dldF9ydW5uaW5nX3ZjcHUrMHgxYy8weDM4Cj4+IFvC
+oCA2MzAuMDMxODc0XSBDUFU6IDMyIFBJRDogMzcyNzAgQ29tbTogcWVtdS1zeXN0ZW0tYWFyIEtk
+dW1wOiBsb2FkZWQKPj4gTm90IHRhaW50ZWQgNS41LjArCj4+IFvCoCA2MzAuMDMxODc2XSBIYXJk
+d2FyZSBuYW1lOiBIdWF3ZWkgVGFpU2hhbiAyMjgwIC9CQzExU1BDRCwgQklPUyAxLjU4Cj4+IDEw
+LzI5LzIwMTgKPj4gW8KgIDYzMC4wMzE4NzZdIENhbGwgdHJhY2U6Cj4+IFvCoCA2MzAuMDMxODc4
+XcKgIGR1bXBfYmFja3RyYWNlKzB4MC8weDIwMAo+PiBbwqAgNjMwLjAzMTg4MF3CoCBzaG93X3N0
+YWNrKzB4MjQvMHgzMAo+PiBbwqAgNjMwLjAzMTg4Ml3CoCBkdW1wX3N0YWNrKzB4YjAvMHhmNAo+
+PiBbwqAgNjMwLjAzMTg4NF3CoCBfX3RoaXNfY3B1X3ByZWVtcHRfY2hlY2srMHhjOC8weGQwCj4+
+IFvCoCA2MzAuMDMxODg2XcKgIGt2bV9nZXRfcnVubmluZ192Y3B1KzB4MWMvMHgzOAo+PiBbwqAg
+NjMwLjAzMTg4OF3CoCB2Z2ljX21taW9fY2hhbmdlX2FjdGl2ZS5pc3JhLjQrMHgyYy8weGUwCj4+
+IFvCoCA2MzAuMDMxODkwXcKgIF9fdmdpY19tbWlvX3dyaXRlX2NhY3RpdmUrMHg4MC8weGM4Cj4+
+IFvCoCA2MzAuMDMxODkyXcKgIHZnaWNfbW1pb191YWNjZXNzX3dyaXRlX2NhY3RpdmUrMHgzYy8w
+eDUwCj4+IFvCoCA2MzAuMDMxODk0XcKgIHZnaWNfdWFjY2VzcysweGNjLzB4MTM4Cj4+IFvCoCA2
+MzAuMDMxODk2XcKgIHZnaWNfdjNfcmVkaXN0X3VhY2Nlc3MrMHg3Yy8weGE4Cj4+IFvCoCA2MzAu
+MDMxODk4XcKgIHZnaWNfdjNfYXR0cl9yZWdzX2FjY2VzcysweDFhOC8weDIzMAo+PiBbwqAgNjMw
+LjAzMTkwMV3CoCB2Z2ljX3YzX3NldF9hdHRyKzB4MWI0LzB4MjkwCj4+IFvCoCA2MzAuMDMxOTAz
+XcKgIGt2bV9kZXZpY2VfaW9jdGxfYXR0cisweGJjLzB4MTEwCj4+IFvCoCA2MzAuMDMxOTA1XcKg
+IGt2bV9kZXZpY2VfaW9jdGwrMHhjNC8weDEwOAo+PiBbwqAgNjMwLjAzMTkwN13CoCBrc3lzX2lv
+Y3RsKzB4YjQvMHhkMAo+PiBbwqAgNjMwLjAzMTkwOV3CoCBfX2FybTY0X3N5c19pb2N0bCsweDI4
+LzB4MzgKPj4gW8KgIDYzMC4wMzE5MTFdwqAgZWwwX3N2Y19jb21tb24uY29uc3Rwcm9wLjErMHg3
+Yy8weDFhMAo+PiBbwqAgNjMwLjAzMTkxM13CoCBkb19lbDBfc3ZjKzB4MzQvMHhhMAo+PiBbwqAg
+NjMwLjAzMTkxNV3CoCBlbDBfc3luY19oYW5kbGVyKzB4MTI0LzB4Mjc0Cj4+IFvCoCA2MzAuMDMx
+OTE2XcKgIGVsMF9zeW5jKzB4MTQwLzB4MTgwCj4+Cj4+IC0tLTg8LS0tCj4+Cj4+IEknbSBub3cg
+YXQgY29tbWl0IDkwNTY4ZWNmNTYxNTQwZmEzMzA1MTFlMjFmY2Q4MjNiMGMzODI5YzYuCj4+Cj4+
+IEFuZCBpdCBsb29rcyBsaWtlIHZnaWNfZ2V0X21taW9fcmVxdWVzdGVyX3ZjcHUoKSB3YXMgYnJv
+a2VuIGJ5Cj4+IDc0OTVlMjJiYjE2NSAoIktWTTogTW92ZSBydW5uaW5nIFZDUFUgZnJvbSBBUk0g
+dG8gY29tbW9uIGNvZGUiKS4KPj4KPj4gQ291bGQgYW55b25lIHBsZWFzZSBoYXZlIGEgbG9vaz8K
+PiAKPiBIZXJlIHlvdSBnbzoKPiAKPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdp
+Yy1tbWlvLmMgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8uYwo+IGluZGV4IGQ2NTZlYmQ1
+ZjlkNC4uZTE3MzVmMTljOTI0IDEwMDY0NAo+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMt
+bW1pby5jCj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPiBAQCAtMTkwLDYg
+KzE5MCwxNSBAQCB1bnNpZ25lZCBsb25nIHZnaWNfbW1pb19yZWFkX3BlbmRpbmcoc3RydWN0IAo+
+IGt2bV92Y3B1ICp2Y3B1LAo+ICDCoCAqIHZhbHVlIGxhdGVyIHdpbGwgZ2l2ZSB1cyB0aGUgc2Ft
+ZSB2YWx1ZSBhcyB3ZSB1cGRhdGUgdGhlIHBlci1DUFUgCj4gdmFyaWFibGUKPiAgwqAgKiBpbiB0
+aGUgcHJlZW1wdCBub3RpZmllciBoYW5kbGVycy4KPiAgwqAgKi8KPiArc3RhdGljIHN0cnVjdCBr
+dm1fdmNwdSAqdmdpY19nZXRfbW1pb19yZXF1ZXN0ZXJfdmNwdSh2b2lkKQo+ICt7Cj4gK8KgwqDC
+oCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHU7Cj4gKwo+ICvCoMKgwqAgcHJlZW1wdF9kaXNhYmxlKCk7
+Cj4gK8KgwqDCoCB2Y3B1ID0ga3ZtX2dldF9ydW5uaW5nX3ZjcHUoKTsKPiArwqDCoMKgIHByZWVt
+cHRfZW5hYmxlKCk7Cj4gK8KgwqDCoCByZXR1cm4gdmNwdTsKPiArfQo+IAo+ICDCoC8qIE11c3Qg
+YmUgY2FsbGVkIHdpdGggaXJxLT5pcnFfbG9jayBoZWxkICovCj4gIMKgc3RhdGljIHZvaWQgdmdp
+Y19od19pcnFfc3BlbmRpbmcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3QgCj4gdmdpY19p
+cnEgKmlycSwKPiBAQCAtMjEyLDcgKzIyMSw3IEBAIHZvaWQgdmdpY19tbWlvX3dyaXRlX3NwZW5k
+aW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIGdwYV90IGFkZHIsIHVuc2lnbmVkIGludCBsZW4sCj4gIMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBsb25nIHZhbCkKPiAgwqB7Cj4gLcKgwqDC
+oCBib29sIGlzX3VhY2Nlc3MgPSAha3ZtX2dldF9ydW5uaW5nX3ZjcHUoKTsKPiArwqDCoMKgIGJv
+b2wgaXNfdWFjY2VzcyA9ICF2Z2ljX2dldF9tbWlvX3JlcXVlc3Rlcl92Y3B1KCk7Cj4gIMKgwqDC
+oMKgIHUzMiBpbnRpZCA9IFZHSUNfQUREUl9UT19JTlRJRChhZGRyLCAxKTsKPiAgwqDCoMKgwqAg
+aW50IGk7Cj4gIMKgwqDCoMKgIHVuc2lnbmVkIGxvbmcgZmxhZ3M7Cj4gQEAgLTI2NSw3ICsyNzQs
+NyBAQCB2b2lkIHZnaWNfbW1pb193cml0ZV9jcGVuZGluZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
+Cj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBncGFfdCBhZGRyLCB1bnNp
+Z25lZCBpbnQgbGVuLAo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdW5z
+aWduZWQgbG9uZyB2YWwpCj4gIMKgewo+IC3CoMKgwqAgYm9vbCBpc191YWNjZXNzID0gIWt2bV9n
+ZXRfcnVubmluZ192Y3B1KCk7Cj4gK8KgwqDCoCBib29sIGlzX3VhY2Nlc3MgPSAhdmdpY19nZXRf
+bW1pb19yZXF1ZXN0ZXJfdmNwdSgpOwo+ICDCoMKgwqDCoCB1MzIgaW50aWQgPSBWR0lDX0FERFJf
+VE9fSU5USUQoYWRkciwgMSk7Cj4gIMKgwqDCoMKgIGludCBpOwo+ICDCoMKgwqDCoCB1bnNpZ25l
+ZCBsb25nIGZsYWdzOwo+IEBAIC0zMjYsNyArMzM1LDcgQEAgc3RhdGljIHZvaWQgdmdpY19tbWlv
+X2NoYW5nZV9hY3RpdmUoc3RydWN0IGt2bV92Y3B1IAo+ICp2Y3B1LCBzdHJ1Y3QgdmdpY19pcnEg
+KmlycSwKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBib29sIGFj
+dGl2ZSkKPiAgwqB7Cj4gIMKgwqDCoMKgIHVuc2lnbmVkIGxvbmcgZmxhZ3M7Cj4gLcKgwqDCoCBz
+dHJ1Y3Qga3ZtX3ZjcHUgKnJlcXVlc3Rlcl92Y3B1ID0ga3ZtX2dldF9ydW5uaW5nX3ZjcHUoKTsK
+PiArwqDCoMKgIHN0cnVjdCBrdm1fdmNwdSAqcmVxdWVzdGVyX3ZjcHUgPSB2Z2ljX2dldF9tbWlv
+X3JlcXVlc3Rlcl92Y3B1KCk7Cj4gCj4gIMKgwqDCoMKgIHJhd19zcGluX2xvY2tfaXJxc2F2ZSgm
+aXJxLT5pcnFfbG9jaywgZmxhZ3MpOwo+IAo+IAo+IFRoYXQncyBiYXNpY2FsbHkgYSByZXZlcnQg
+b2YgdGhlIG9mZmVuZGluZyBjb2RlLiBUaGUgY29tbWVudCByaWdodCBhYm92ZQo+IHZnaWNfZ2V0
+X21taW9fcmVxdWVzdGVyX3ZjcHUoKSBleHBsYWlucyAqd2h5KiB0aGlzIGlzIHZhbGlkLCBhbmQg
+d2h5Cj4gcHJlZW1wdF9kaXNhYmxlKCkgaXMgbmVlZGVkLgoKSSBzZWUsIHRoYW5rcyEKCj4gCj4g
+Q2FuIHlvdSBwbGVhc2UgZ2l2ZSBpdCBhIHNob3Q/CgpZZXMsIGl0IHdvcmtzIGZvciBtZToKClRl
+c3RlZC1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+CgpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
+bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
+bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
