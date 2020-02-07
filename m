@@ -2,102 +2,75 @@ Return-Path: <SRS0=EEll=33=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1B1C04EB5
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 16:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFE8C3F68F
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 16:16:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6F8DB20838
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 16:09:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfvXAHT7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8DB20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 4D18121927
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 16:16:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D18121927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8DFA4A389;
-	Fri,  7 Feb 2020 11:09:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B88594A598;
+	Fri,  7 Feb 2020 11:16:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FZE1Q6Yre8+m; Fri,  7 Feb 2020 11:09:18 -0500 (EST)
+	with ESMTP id JhLWlXTs6Cbc; Fri,  7 Feb 2020 11:15:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5EF94A523;
-	Fri,  7 Feb 2020 11:09:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D3184A4A3;
+	Fri,  7 Feb 2020 11:15:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 201B74A51F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 11:09:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A6E4A418
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 11:15:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vouvRtBeh-Bv for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Feb 2020 11:09:16 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
- [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0EA4A389
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 11:09:16 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581091756;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7N0tYww3cTYTuDfUVu7cVEqlKJlOXVPc3ePTt6l3bR0=;
- b=GfvXAHT7FeTrjCXETplPTSwWUDA3WITLMTztQs4tCMUuZNzj5UiaMAN+208dpVncUQjE4p
- znDSYIlLfzHX9IBWmLQqE08BsrxDfSoruLa0lVoNbMdgaR5oNOhZ88G28B6VnW0iYYQgN0
- YU4Pxi+CJXx81wGffKVFgMhJhkbyKVI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-H5eztlYeMRe-BNPDJ556AQ-1; Fri, 07 Feb 2020 11:09:13 -0500
-Received: by mail-wr1-f72.google.com with SMTP id j4so1482123wrs.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Feb 2020 08:09:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GPX7KhocVFe6HD6YL/9rJK/zg2VMIEIUiI5Ny18HODk=;
- b=txVYXPXTV7kSaBPsk/51SMDv66JEyFh3w9+eq8rUzL8H7W6i+juVJuvWv5EcPQC2iX
- IGk+KcPOF2ME6CvJDyltWdvokVyxJFMTUDGfAysgAPYXRthz71LsAR0qEX45DTXCfDon
- WHTxEahwWcGL/QJOpATcPOdr4zpkLw65Y7fU0IfNrj7ckdUkmPnQg7dzZ31gAqmLQ8KS
- vlkv7/hIY5GfgaXnmq09qGqLeY/ftVm8IK07AfTIkzpEJ8pfxX+EXrxezS+bb23rQ3IE
- SvibvrwA7T+oJ6+5Qtyr1jpqoEIHcqwERdkPQ0QL8EHb/xwrTfoz+6cadcEo+WrEBP0u
- Bnfg==
-X-Gm-Message-State: APjAAAX6hYDI/MV2rC2K+EBj/khj0sBtuXGUMq/EhxKQzdH6j0q2DO2S
- 8RAmBVOXWX/xJkkpI2MRh0WCtmiwFQwWb1zcCQhUvAuCMbcxJV9jEI9Hee0tnrLzZvMtF9I0bgp
- 9ESz5y3FtXvj54zn1w8zu3YChTESQzbvnmThbgxvj
-X-Received: by 2002:adf:81c2:: with SMTP id 60mr5326228wra.8.1581091752430;
- Fri, 07 Feb 2020 08:09:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz8i+O+y5j4ffE/kZCvgNUkhocxxUdJSS6Q88cwkQL2oV7RB4nr38cQmC5SN1dH7PhgmbXS5s8Jiuxotyz6JIo=
-X-Received: by 2002:adf:81c2:: with SMTP id 60mr5326202wra.8.1581091752153;
- Fri, 07 Feb 2020 08:09:12 -0800 (PST)
-MIME-Version: 1.0
+ with ESMTP id LLWWSl4Tu4Dk for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Feb 2020 11:15:56 -0500 (EST)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56A064A389
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 11:15:56 -0500 (EST)
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 07 Feb 2020 08:15:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; d="scan'208";a="226515846"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.202])
+ by fmsmga008.fm.intel.com with ESMTP; 07 Feb 2020 08:15:53 -0800
+Date: Fri, 7 Feb 2020 08:15:53 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v5 18/19] KVM: Dynamically size memslot array based on
+ number of used slots
+Message-ID: <20200207161553.GE2401@linux.intel.com>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
  <20200121223157.15263-19-sean.j.christopherson@intel.com>
  <20200206221208.GI700495@xz-x1>
- <20200207153829.GA2401@linux.intel.com> <20200207160546.GA707371@xz-x1>
+ <20200207153829.GA2401@linux.intel.com>
+ <20200207160546.GA707371@xz-x1>
+MIME-Version: 1.0
+Content-Disposition: inline
 In-Reply-To: <20200207160546.GA707371@xz-x1>
-From: Peter Xu <peterx@redhat.com>
-Date: Fri, 7 Feb 2020 11:09:01 -0500
-Message-ID: <CADLectmX7JOpzbr_BdpM+i8=T7PE-5fiedkg3jgzH6SvVbbrQg@mail.gmail.com>
-Subject: Re: [PATCH v5 18/19] KVM: Dynamically size memslot array based on
- number of used slots
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-X-MC-Unique: H5eztlYeMRe-BNPDJ556AQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
  Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
  Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
  Joerg Roedel <joro@8bytes.org>, Christian Borntraeger <borntraeger@de.ibm.com>,
  kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,56 +82,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4644268902396989493=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============4644268902396989493==
-Content-Type: multipart/alternative; boundary="0000000000003eb245059dfe9ca5"
+On Fri, Feb 07, 2020 at 11:05:46AM -0500, Peter Xu wrote:
+> On Fri, Feb 07, 2020 at 07:38:29AM -0800, Sean Christopherson wrote:
+> > On Thu, Feb 06, 2020 at 05:12:08PM -0500, Peter Xu wrote:
+> > > This patch is tested so I believe this works, however normally I need
+> > > to do similar thing with [0] otherwise gcc might complaint.  Is there
+> > > any trick behind to make this work?  Or is that because of different
+> > > gcc versions?
+> > 
+> > array[] and array[0] have the same net affect, but array[] is given special
+> > treatment by gcc to provide extra sanity checks, e.g. requires the field to
+> > be the end of the struct.  Last I checked, gcc also doesn't allow array[]
+> > in unions.  There are probably other restrictions.
+> > 
+> > But, it's precisely because of those restrictions that using array[] is
+> > preferred, as it provides extra protections, e.g. if someone moved memslots
+> > to the top of the struct it would fail to compile.
+> 
+> However...
+> 
+> xz-x1:tmp $ cat a.c
+> struct a {
+>     int s[];
+> };
+> 
+> int main(void) { }
+> xz-x1:tmp $ make a
+> cc     a.c   -o a
+> a.c:2:9: error: flexible array member in a struct with no named members
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
---0000000000003eb245059dfe9ca5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+gcc is telling you quite explicitly why it's angry.  Copy+paste from the
+internet[*]:
 
-On Fri, Feb 7, 2020 at 11:05 AM Peter Xu <peterx@redhat.com> wrote:
+  Flexible Array Member(FAM) is a feature introduced in the C99 standard of the
+  C programming language.
 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+  For the structures in C programming language from C99 standard onwards, we
+  can declare an array without a dimension and whose size is flexible in nature.
 
+  Such an array inside the structure should preferably be declared as the last 
+  member of structure and its size is variable(can be changed be at runtime).
+  
+  The structure must contain at least one more named member in addition to the
+  flexible array member. 
 
-(Maybe also after we figure out the "[]" & "[0]" issue to make sure it
-won't fail for newer gcc)
+[*] https://www.geeksforgeeks.org/flexible-array-members-structure-c/
 
---0000000000003eb245059dfe9ca5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div class=3D"gmail_default" style=3D"fon=
-t-family:courier new,monospace;font-size:large"><span style=3D"font-family:=
-Arial,Helvetica,sans-serif;font-size:small">On Fri, Feb 7, 2020 at 11:05 AM=
- Peter Xu &lt;<a href=3D"mailto:peterx@redhat.com">peterx@redhat.com</a>&gt=
-; wrote:</span><br></div></div><div class=3D"gmail_quote"><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">
-Reviewed-by: Peter Xu &lt;<a href=3D"mailto:peterx@redhat.com" target=3D"_b=
-lank">peterx@redhat.com</a>&gt;</blockquote><div><br></div><div class=3D"gm=
-ail_default" style=3D"font-family:&quot;courier new&quot;,monospace;font-si=
-ze:large">(Maybe also after we figure out the &quot;[]&quot; &amp; &quot;[0=
-]&quot; issue to make sure it won&#39;t fail for newer gcc)</div></div></di=
-v>
-
---0000000000003eb245059dfe9ca5--
-
-
---===============4644268902396989493==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+>     2 |     int s[];
+>       |         ^
+> make: *** [<builtin>: a] Error 1
+> 
+> My gcc version is 9.2.1 20190827 (Red Hat 9.2.1-1) (GCC).
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4644268902396989493==--
-
