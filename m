@@ -1,99 +1,98 @@
-Return-Path: <SRS0=EEll=33=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=+HCw=34=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B69EC35242
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 22:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A732C352A1
+	for <kvmarm@archiver.kernel.org>; Sat,  8 Feb 2020 00:18:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7B0720720
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Feb 2020 22:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E47C206CC
+	for <kvmarm@archiver.kernel.org>; Sat,  8 Feb 2020 00:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZBWHpIA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7B0720720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YLM/AWYW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E47C206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 089184A598;
-	Fri,  7 Feb 2020 17:24:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8D5C4A54B;
+	Fri,  7 Feb 2020 19:18:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fhe9+UqTWXvt; Fri,  7 Feb 2020 17:24:48 -0500 (EST)
+	with ESMTP id jJnCvDU1Ccuv; Fri,  7 Feb 2020 19:18:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB6CB4A50F;
-	Fri,  7 Feb 2020 17:24:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05A2A4A551;
+	Fri,  7 Feb 2020 19:18:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCEA14A50F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 17:24:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 462D54A542
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 19:18:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d1FYD5QuFTl7 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Feb 2020 17:24:45 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86B654A389
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 17:24:45 -0500 (EST)
+ with ESMTP id NySIJWZOzz+F for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Feb 2020 19:18:42 -0500 (EST)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22F124A535
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Feb 2020 19:18:42 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581114285;
+ s=mimecast20190719; t=1581121121;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8RjmlokPjnkH8oZxzrYec3fZUGAfizyuGXB6oCxb2rQ=;
- b=IZBWHpIAcZRy1Z7ensrxvtWOArn6t0SSsKLt7D+kio0hX62LLxvKHph7hEpR7r/zKowrvb
- m5ADt4WRbn+KfOqlaYoW9LdOEIRhEMuMuRrvoNWzmr19nLNtTo4wD3xcfHvRES26VSi32r
- 3UcrQmx+P2L3IBoqLjidLQW/9eOGxxc=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-0A_oMxaVNfKTsfvv6imluw-1; Fri, 07 Feb 2020 17:24:42 -0500
-Received: by mail-qk1-f200.google.com with SMTP id q135so442376qke.22
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Feb 2020 14:24:42 -0800 (PST)
+ bh=LFIEzo7uypY+04BO5xYReIB8V2LuQNl/7zA6bw0w6C4=;
+ b=YLM/AWYW0Ae0Bbu5V4My8wNJvDcWNF/0olu8pjss4IFWE9QqS5yUCD9CmDAn0Xz61V4F1k
+ PuwFswNcaTk29a2ov57pUzEuvoq2e+gLUSyWYtz6wnkUE7WZkxIvrstfiTEloh22zFQqO4
+ l8V9ee8zJW/XklRKtnQfXM80RaEDFKc=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-hm1gKe1vN0mvxFx_A_MdAw-1; Fri, 07 Feb 2020 19:18:37 -0500
+Received: by mail-qt1-f199.google.com with SMTP id t4so688286qtd.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Feb 2020 16:18:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=JRnjR1s6c5pJE2ossLQbJM2NZYkPQ/exCWBRJ0Gziy8=;
- b=lItpmeocQIr5XSnQ1svoFCU4d8+gOES4teyctCYKCUfbGCJUSFx4YXngBwZZT2NLCs
- BjOt4rBotFYUwZvuQN21GaVf4JH+UvwdPxlKlyssfUZi9IjYn2oooLYchhtloo9zYMKk
- aVuyPpiMvu6XtwKOyiExdWm7fxD9xPsnbfrtLWaxt7AfqO+8nv7IMrBRwJKyuUfra+G1
- 67sZSbEomRq1a4nQFoS5SG378kcvPlkyX25MiCRbCsDgZilRunMIDd3TxGWhl3v9bpmu
- jhUJ4x6uLsLzxfx6Fl6WM+4FLMDiPKtJZC4zBLo+0yIuYUsNaJ8Eltfu4lf16MdY9UTt
- g+wA==
-X-Gm-Message-State: APjAAAV1mXp60UXLimzS+GLNPbg+cYVHKiSY7eL9LRqwNomjbern3ZlV
- wgIrFK12CNhhf81bucvfpWeET3a5cDtw961/giuQoBH5gmGBfyMOCqpn3Ok1slRXkM2pwYDEfYe
- w+Bxzghay4o2jjv2zSVA1i4FO
-X-Received: by 2002:a37:c53:: with SMTP id 80mr1117251qkm.285.1581114282356;
- Fri, 07 Feb 2020 14:24:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxdmbvsmW8pfTDFhkNFpJOBOyIyACeKZQZlqIgbOpE5taqn1c19m2GAF/qQjzf2ieRiXzn8Xg==
-X-Received: by 2002:a37:c53:: with SMTP id 80mr1117228qkm.285.1581114282106;
- Fri, 07 Feb 2020 14:24:42 -0800 (PST)
+ bh=FliTqS6db2UW8mSq2D177P6p0LFTqK9NtxjpkxKtGhE=;
+ b=Rl9qBdTPWKJdaEIsg9EKJxaldWe+I/tUf0wLjeo3qZhJHAr6xylLpriY81a3x7I/KF
+ BNYrJcE7XOhQLtd4ZESN66dDLoLwgzYeio2y/4SEy3Qz4C+N9WwkfJi6jXJiccTKS/EQ
+ ysYdKUNEM6H41kGZ1RhMV1oq/+5sbCbJD++/aIkJF6s9MzgKMLrvvAjcnfw9PpYpD00R
+ itAKLZzveYPCjz6AFT4YS3E0UA4SE3UCuqVLRHQCW0RLRL1gZ9oEllh9eH0s2RUnVpOt
+ e+bDqtuhjOyrQBJGPypg81XcnB3UbR8RmvL6K3Kd/Jejee1Oi5RYLJabiSIxNu42oBv7
+ vhfw==
+X-Gm-Message-State: APjAAAW3v01rBwdiYezSTEKpXxzD4Zo63ZdXsGAzkTylib0ilVwYbMY9
+ eqUkxeOzbIX4xec7gdAl6VY6B1P+jJSHuJFbIx9LuUpENTINZ0yEBGMKW6L395I0Vj6Gjp22ZWt
+ orAzZ+cEsabArTRb6spTXMnZG
+X-Received: by 2002:a37:8cc:: with SMTP id 195mr1462273qki.456.1581121117034; 
+ Fri, 07 Feb 2020 16:18:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzAkXLXCBlBGfr3jniMMbcCpWv44CMlkznbhHCioVsTu+8iTId/2cuSvhY/ok33KerrRsEvMw==
+X-Received: by 2002:a37:8cc:: with SMTP id 195mr1462239qki.456.1581121116707; 
+ Fri, 07 Feb 2020 16:18:36 -0800 (PST)
 Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id j1sm1933090qkl.86.2020.02.07.14.24.40
+ by smtp.gmail.com with ESMTPSA id n32sm2271790qtk.66.2020.02.07.16.18.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 14:24:41 -0800 (PST)
-Date: Fri, 7 Feb 2020 17:24:38 -0500
+ Fri, 07 Feb 2020 16:18:35 -0800 (PST)
+Date: Fri, 7 Feb 2020 19:18:32 -0500
 From: Peter Xu <peterx@redhat.com>
 To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v5 17/19] KVM: Terminate memslot walks via used_slots
-Message-ID: <20200207222438.GH720553@xz-x1>
+Subject: Re: [PATCH v5 15/19] KVM: Provide common implementation for generic
+ dirty log functions
+Message-ID: <20200208001832.GA823968@xz-x1>
 References: <20200121223157.15263-1-sean.j.christopherson@intel.com>
- <20200121223157.15263-18-sean.j.christopherson@intel.com>
- <20200206210944.GD700495@xz-x1>
- <20200207183325.GI2401@linux.intel.com>
- <20200207203909.GE720553@xz-x1>
- <20200207211016.GN2401@linux.intel.com>
- <20200207214623.GF720553@xz-x1>
- <20200207220325.GO2401@linux.intel.com>
+ <20200121223157.15263-16-sean.j.christopherson@intel.com>
+ <20200206200200.GC700495@xz-x1>
+ <20200206212120.GF13067@linux.intel.com>
+ <20200206214106.GG700495@xz-x1>
+ <20200207194532.GK2401@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200207220325.GO2401@linux.intel.com>
-X-MC-Unique: 0A_oMxaVNfKTsfvv6imluw-1
+In-Reply-To: <20200207194532.GK2401@linux.intel.com>
+X-MC-Unique: hm1gKe1vN0mvxFx_A_MdAw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
@@ -123,53 +122,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Feb 07, 2020 at 02:03:25PM -0800, Sean Christopherson wrote:
-> On Fri, Feb 07, 2020 at 04:46:23PM -0500, Peter Xu wrote:
-> > On Fri, Feb 07, 2020 at 01:10:16PM -0800, Sean Christopherson wrote:
-> > > On Fri, Feb 07, 2020 at 03:39:09PM -0500, Peter Xu wrote:
-> > > > On Fri, Feb 07, 2020 at 10:33:25AM -0800, Sean Christopherson wrote:
-> > > > > On Thu, Feb 06, 2020 at 04:09:44PM -0500, Peter Xu wrote:
-> > > > > > On Tue, Jan 21, 2020 at 02:31:55PM -0800, Sean Christopherson wrote:
-> > > > > > > @@ -9652,13 +9652,13 @@ int __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa, u32 size)
-> > > > > > >  		if (IS_ERR((void *)hva))
-> > > > > > >  			return PTR_ERR((void *)hva);
-> > > > > > >  	} else {
-> > > > > > > -		if (!slot->npages)
-> > > > > > > +		if (!slot || !slot->npages)
-> > > > > > >  			return 0;
-> > > > > > >  
-> > > > > > > -		hva = 0;
-> > > > > > > +		hva = slot->userspace_addr;
-> > > > > > 
-> > > > > > Is this intended?
-> > > > > 
-> > > > > Yes.  It's possible to allow VA=0 for userspace mappings.  It's extremely
-> > > > > uncommon, but possible.  Therefore "hva == 0" shouldn't be used to
-> > > > > indicate an invalid slot.
-> > > > 
-> > > > Note that this is the deletion path in __x86_set_memory_region() not
-> > > > allocation.  IIUC userspace_addr won't even be used in follow up code
-> > > > path so it shouldn't really matter.  Or am I misunderstood somewhere?
-> > > 
-> > > No, but that's precisely why I don't want to zero out @hva, as doing so
-> > > implies that '0' indicates an invalid hva, which is wrong.
-> > > 
-> > > What if I change this to 
-> > > 
-> > > 			hva = 0xdeadull << 48;
-> > > 
-> > > and add a blurb in the changelog about stuff hva with a non-canonical value
-> > > to indicate it's being destroyed.
-> > 
-> > IMO it's fairly common to have the case where "when A is XXX then
-> > parameters B is invalid" happens in C.
+On Fri, Feb 07, 2020 at 11:45:32AM -0800, Sean Christopherson wrote:
+> +Vitaly for HyperV
 > 
-> I'm not arguing that's not the case.  My point is that there's nothing
-> special about '0', so why use it?  E.g. "hva = 1" would also be ok from a
-> functional perspective, but more obviously "wrong".
+> On Thu, Feb 06, 2020 at 04:41:06PM -0500, Peter Xu wrote:
+> > On Thu, Feb 06, 2020 at 01:21:20PM -0800, Sean Christopherson wrote:
+> > > On Thu, Feb 06, 2020 at 03:02:00PM -0500, Peter Xu wrote:
+> > > > But that matters to this patch because if MIPS can use
+> > > > kvm_flush_remote_tlbs(), then we probably don't need this
+> > > > arch-specific hook any more and we can directly call
+> > > > kvm_flush_remote_tlbs() after sync dirty log when flush==true.
+> > > 
+> > > Ya, the asid_flush_mask in kvm_vz_flush_shadow_all() is the only thing
+> > > that prevents calling kvm_flush_remote_tlbs() directly, but I have no
+> > > clue as to the important of that code.
+> > 
+> > As said above I think the x86 lockdep is really not necessary, then
+> > considering MIPS could be the only one that will use the new hook
+> > introduced in this patch...  Shall we figure that out first?
+> 
+> So I prepped a follow-up patch to make kvm_arch_dirty_log_tlb_flush() a
+> MIPS-only hook and use kvm_flush_remote_tlbs() directly for arm and x86,
+> but then I realized x86 *has* a hook to do a precise remote TLB flush.
+> There's even an existing kvm_flush_remote_tlbs_with_address() call on a
+> memslot, i.e. this exact scenario.  So arguably, x86 should be using the
+> more precise flush and should keep kvm_arch_dirty_log_tlb_flush().
+> 
+> But, the hook is only used when KVM is running as an L1 on top of HyperV,
+> and I assume dirty logging isn't used much, if at all, for L1 KVM on
+> HyperV?
+> 
+> I see three options:
+> 
+>   1. Make kvm_arch_dirty_log_tlb_flush() MIPS-only and call
+>      kvm_flush_remote_tlbs() directly for arm and x86.  Add comments to
+>      explain when an arch should implement kvm_arch_dirty_log_tlb_flush().
+> 
+>   2. Change x86 to use kvm_flush_remote_tlbs_with_address() when flushing
+>      a memslot after the dirty log is grabbed by userspace.
+> 
+>   3. Keep the resulting code as is, but add a comment in x86's
+>      kvm_arch_dirty_log_tlb_flush() to explain why it uses
+>      kvm_flush_remote_tlbs() instead of the with_address() variant.
+> 
+> I strongly prefer to (2) or (3), but I'll defer to Vitaly as to which of
+> those is preferable.
+> 
+> I don't like (1) because (a) it requires more lines code (well comments),
+> to explain why kvm_flush_remote_tlbs() is the default, and (b) it would
+> require even more comments, which would be x86-specific in generic KVM,
+> to explain why x86 doesn't use its with_address() flush, or we'd lost that
+> info altogether.
+> 
 
-I think the answer is as simple as the original author thought 0 was
-better than an arbitrary number on the stack, which I agree. :-)
+I proposed the 4th solution here:
+
+https://lore.kernel.org/kvm/20200207223520.735523-1-peterx@redhat.com/
+
+I'm not sure whether that's acceptable, but if it can, then we can
+drop the kvm_arch_dirty_log_tlb_flush() hook, or even move on to
+per-slot tlb flushing.
+
+Thanks,
 
 -- 
 Peter Xu
