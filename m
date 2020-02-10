@@ -6,56 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CB9C352A4
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 08:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF147C352A3
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 11:48:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CCECF20733
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 08:50:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCECF20733
+	by mail.kernel.org (Postfix) with ESMTP id 304B820733
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 11:48:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304B820733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84D1B4A542;
-	Mon, 10 Feb 2020 03:50:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A1B94A65C;
+	Mon, 10 Feb 2020 06:48:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V3O+E0uYVbBc; Mon, 10 Feb 2020 03:50:21 -0500 (EST)
+	with ESMTP id tmISPLmtFQvQ; Mon, 10 Feb 2020 06:48:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C8C4A8E0;
-	Mon, 10 Feb 2020 03:50:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F4B24A588;
+	Mon, 10 Feb 2020 06:48:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35FD44A542
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 03:50:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9074A51F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 06:48:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pM1sL8TPn4CA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Feb 2020 03:50:19 -0500 (EST)
+ with ESMTP id SKCixAOqN9Ls for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Feb 2020 06:48:02 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20AA84A8E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 03:50:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A314A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 06:48:02 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D28A41045;
- Mon, 10 Feb 2020 00:50:18 -0800 (PST)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
- [10.169.40.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 27F1B3F68F;
- Mon, 10 Feb 2020 00:50:12 -0800 (PST)
-From: Jianyong Wu <jianyong.wu@arm.com>
-To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
- maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
- will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com
-Subject: [RFC PATCH 9/9] arm/arm64: Add kvm capability check extension for
- ptp_kvm
-Date: Mon, 10 Feb 2020 16:49:06 +0800
-Message-Id: <20200210084906.24870-10-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200210084906.24870-1-jianyong.wu@arm.com>
-References: <20200210084906.24870-1-jianyong.wu@arm.com>
-Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67CFF1FB;
+ Mon, 10 Feb 2020 03:48:02 -0800 (PST)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2F8373F6CF;
+ Mon, 10 Feb 2020 03:48:01 -0800 (PST)
+From: Mark Rutland <mark.rutland@arm.com>
+To: maz@kernel.org
+Subject: [PATCH] kvm: arm/arm64: fold VHE entry/exit work into
+ kvm_vcpu_run_vhe()
+Date: Mon, 10 Feb 2020 11:47:57 +0000
+Message-Id: <20200210114757.2889-1-mark.rutland@arm.com>
+X-Mailer: git-send-email 2.11.0
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,43 +69,186 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let userspace check if there is kvm ptp service in host.
-Before VMs migrate to another host, VMM may check if this
-cap is available to determine the next behavior.
+With VHE, running a vCPU always requires the sequence:
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
+1. kvm_arm_vhe_guest_enter();
+2. kvm_vcpu_run_vhe();
+3. kvm_arm_vhe_guest_exit()
+
+... and as we invoke this from the shared arm/arm64 KVM code, 32-bit arm
+has to provide stubs for all three functions.
+
+To simplify the common code, and make it easier to make further
+modifications to the arm64-specific portions in the near future, let's
+fold kvm_arm_vhe_guest_enter() and kvm_arm_vhe_guest_exit() into
+kvm_vcpu_run_vhe().
+
+The 32-bit stubs for kvm_arm_vhe_guest_enter() and
+kvm_arm_vhe_guest_exit() are removed, as they are no longer used. The
+32-bit stub for kvm_vcpu_run_vhe() is left as-is.
+
+There should be no functional change as a result of this patch.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/arm/arm.c       | 1 +
- 2 files changed, 2 insertions(+)
+ arch/arm/include/asm/kvm_host.h   |  3 ---
+ arch/arm64/include/asm/kvm_host.h | 32 --------------------------------
+ arch/arm64/kvm/hyp/switch.c       | 39 +++++++++++++++++++++++++++++++++++++--
+ virt/kvm/arm/arm.c                |  2 --
+ 4 files changed, 37 insertions(+), 39 deletions(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f0a16b4adbbd..ca29f6a09c30 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1009,6 +1009,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
- #define KVM_CAP_ARM_NISV_TO_USER 177
- #define KVM_CAP_ARM_INJECT_EXT_DABT 178
-+#define KVM_CAP_ARM_KVM_PTP 179
+Hi Marc,
+
+This is a preparatory patch for the arm64 entry rework I'm doing: I need to
+move the DAIF manipulation into the same function so that I can replace that
+with a common DAIF+PMR save/restore sequence.
+
+If it's possible to queue this patch for v5.6-rc*, it would help to minimize
+conflict in the v5.7 merge window, and would be much appreciated.
+
+I've tested this on a ThunderX2 machine atop v5.6-rc1 defconfig, booting the
+host and running a test VM.
+
+Thanks,
+Mark.
+
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index c3314b286a61..a827b4d60d38 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -392,9 +392,6 @@ static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-static inline void kvm_arm_vhe_guest_enter(void) {}
+-static inline void kvm_arm_vhe_guest_exit(void) {}
+-
+ #define KVM_BP_HARDEN_UNKNOWN		-1
+ #define KVM_BP_HARDEN_WA_NEEDED		0
+ #define KVM_BP_HARDEN_NOT_REQUIRED	1
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d87aa609d2b6..57fd46acd058 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -626,38 +626,6 @@ static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+ static inline void kvm_clr_pmu_events(u32 clr) {}
+ #endif
  
+-static inline void kvm_arm_vhe_guest_enter(void)
+-{
+-	local_daif_mask();
+-
+-	/*
+-	 * Having IRQs masked via PMR when entering the guest means the GIC
+-	 * will not signal the CPU of interrupts of lower priority, and the
+-	 * only way to get out will be via guest exceptions.
+-	 * Naturally, we want to avoid this.
+-	 *
+-	 * local_daif_mask() already sets GIC_PRIO_PSR_I_SET, we just need a
+-	 * dsb to ensure the redistributor is forwards EL2 IRQs to the CPU.
+-	 */
+-	pmr_sync();
+-}
+-
+-static inline void kvm_arm_vhe_guest_exit(void)
+-{
+-	/*
+-	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
+-	 * and the GIC PMR if the host is using IRQ priorities.
+-	 */
+-	local_daif_restore(DAIF_PROCCTX_NOIRQ);
+-
+-	/*
+-	 * When we exit from the guest we change a number of CPU configuration
+-	 * parameters, such as traps.  Make sure these changes take effect
+-	 * before running the host or additional guests.
+-	 */
+-	isb();
+-}
+-
+ #define KVM_BP_HARDEN_UNKNOWN		-1
+ #define KVM_BP_HARDEN_WA_NEEDED		0
+ #define KVM_BP_HARDEN_NOT_REQUIRED	1
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index dfe8dd172512..925086b46136 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -625,7 +625,7 @@ static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ }
+ 
+ /* Switch to the guest for VHE systems running in EL2 */
+-int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
++static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+@@ -678,7 +678,42 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 
+ 	return exit_code;
+ }
+-NOKPROBE_SYMBOL(kvm_vcpu_run_vhe);
++NOKPROBE_SYMBOL(__kvm_vcpu_run_vhe);
++
++int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
++{
++	int ret;
++
++	local_daif_mask();
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 *
++	 * local_daif_mask() already sets GIC_PRIO_PSR_I_SET, we just need a
++	 * dsb to ensure the redistributor is forwards EL2 IRQs to the CPU.
++	 */
++	pmr_sync();
++
++	ret = __kvm_vcpu_run_vhe(vcpu);
++
++	/*
++	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
++	 * and the GIC PMR if the host is using IRQ priorities.
++	 */
++	local_daif_restore(DAIF_PROCCTX_NOIRQ);
++
++	/*
++	 * When we exit from the guest we change a number of CPU configuration
++	 * parameters, such as traps.  Make sure these changes take effect
++	 * before running the host or additional guests.
++	 */
++	isb();
++
++	return ret;
++}
+ 
+ /* Switch to the guest for legacy non-VHE systems */
+ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 8de4daf25097..9cad433507df 100644
+index d65a0faa46d8..eda7b624eab8 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -223,6 +223,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
-+	case KVM_CAP_ARM_KVM_PTP:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+@@ -742,9 +742,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		guest_enter_irqoff();
+ 
+ 		if (has_vhe()) {
+-			kvm_arm_vhe_guest_enter();
+ 			ret = kvm_vcpu_run_vhe(vcpu);
+-			kvm_arm_vhe_guest_exit();
+ 		} else {
+ 			ret = kvm_call_hyp_ret(__kvm_vcpu_run_nvhe, vcpu);
+ 		}
 -- 
-2.17.1
+2.11.0
 
 _______________________________________________
 kvmarm mailing list
