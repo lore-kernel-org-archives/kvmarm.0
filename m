@@ -2,78 +2,58 @@ Return-Path: <SRS0=nwVD=36=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF9BC3B186
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 16:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D92C352A3
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 16:38:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 597A120733
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 16:26:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="O249n01K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 597A120733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
+	by mail.kernel.org (Postfix) with ESMTP id 1915120842
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Feb 2020 16:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1915120842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 122A74A59B;
-	Mon, 10 Feb 2020 11:26:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD3504A5A6;
+	Mon, 10 Feb 2020 11:37:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armlinux.org.uk
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v2aQem1yeWSy; Mon, 10 Feb 2020 11:26:45 -0500 (EST)
+	with ESMTP id hPsB63DYr-ZI; Mon, 10 Feb 2020 11:37:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC97F4A800;
-	Mon, 10 Feb 2020 11:26:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 937554A7FD;
+	Mon, 10 Feb 2020 11:37:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF834A59B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 11:26:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C2284A5A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 11:37:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T8YPlJdfycXR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Feb 2020 11:26:43 -0500 (EST)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67BA14A50F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 11:26:43 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
- MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
- Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
- List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=65bdrIaYUEY07Eg6lahVGNf+sXMz7DgHQPG+97GSzoU=; b=O249n01KJyJmh5v7eoKu72Wxm
- aT6PtOrlOoyebt8IeMBdWJ+Mc0G34pwCNSbq0pYUPEVnSHE8dOnkTdb88whOVZjCsaHxz+de39iuw
- yWGdC/Muzm1L1tlo8Yjkn1SETYGGIMiFmXrUylkja4lUEkM0nU9MJ8ufgf5CDc7P0iz1Cwj0bx9rJ
- /sVJEE2hjddOOmp19LpzoXQL2y7uBEKycflnocOXeWpZIs83p15iLxzw6REUj4m/ovum6O/B7IyuY
- 8gdPpNCERbJCVPjnCguAIPq7nX4OSUNFDb7Dbgxau52hL0T9rKWjEzNmX5smg1KyJyTM8hvgHvd9N
- t9gGOlcEw==;
-Received: from shell.armlinux.org.uk
- ([2001:4d48:ad52:3201:5054:ff:fe00:4ec]:38534)
- by pandora.armlinux.org.uk with esmtpsa
- (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256) (Exim 4.90_1)
- (envelope-from <linux@armlinux.org.uk>)
- id 1j1BtO-0007mo-Kh; Mon, 10 Feb 2020 16:26:38 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
- (envelope-from <linux@shell.armlinux.org.uk>)
- id 1j1BtN-00081o-CD; Mon, 10 Feb 2020 16:26:37 +0000
-Date: Mon, 10 Feb 2020 16:26:37 +0000
-From: Russell King - ARM Linux admin <linux@armlinux.org.uk>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
-Message-ID: <20200210162637.GG25745@shell.armlinux.org.uk>
-References: <20200210141324.21090-1-maz@kernel.org>
- <20200210162523.GF25745@shell.armlinux.org.uk>
+ with ESMTP id umCw0sbx5Mgg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Feb 2020 11:37:56 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 587B14A50F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Feb 2020 11:37:56 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD3F81FB;
+ Mon, 10 Feb 2020 08:37:55 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCBAE3F68F;
+ Mon, 10 Feb 2020 08:37:54 -0800 (PST)
+Subject: Re: [PATCH 1/2] arm64: cpufeature: add cpus_have_final_cap()
+To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
+References: <20200210122708.38826-1-mark.rutland@arm.com>
+ <20200210122708.38826-2-mark.rutland@arm.com>
+From: Suzuki Kuruppassery Poulose <suzuki.poulose@arm.com>
+Message-ID: <047f1cd2-3537-6671-233c-69f1758684bf@arm.com>
+Date: Mon, 10 Feb 2020 16:37:53 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200210162523.GF25745@shell.armlinux.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Anders Berg <anders.berg@lsi.com>, Arnd Bergmann <arnd@arndb.de>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+In-Reply-To: <20200210122708.38826-2-mark.rutland@arm.com>
+Content-Language: en-US
+Cc: catalin.marinas@arm.com, maz@kernel.org, will@kernel.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -86,54 +66,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Feb 10, 2020 at 04:25:23PM +0000, Russell King - ARM Linux admin wrote:
-> On Mon, Feb 10, 2020 at 02:13:19PM +0000, Marc Zyngier wrote:
-> > KVM/arm was merged just over 7 years ago, and has lived a very quiet
-> > life so far. It mostly works if you're prepared to deal with its
-> > limitations, it has been a good prototype for the arm64 version,
-> > but it suffers a few problems:
-> > 
-> > - It is incomplete (no debug support, no PMU)
-> > - It hasn't followed any of the architectural evolutions
-> > - It has zero users (I don't count myself here)
-> > - It is more and more getting in the way of new arm64 developments
-> > 
-> > So here it is: unless someone screams and shows that they rely on
-> > KVM/arm to be maintained upsteam, I'll remove 32bit host support
-> > form the tree. One of the reasons that makes me confident nobody is
-> > using it is that I never receive *any* bug report. Yes, it is perfect.
-> > But if you depend on KVM/arm being available in mainline, please shout.
+On 10/02/2020 12:27, Mark Rutland wrote:
+> When cpus_have_const_cap() was originally introduced it was intended to
+> be safe in hyp context, where it is not safe to access the cpu_hwcaps
+> array as cpus_have_cap() did. For more details see commit:
 > 
-> It is only very recently that 64-bit ARM has really started to filter
-> down to people like me, and people like me have setup systems which
-> use 32-bit VMs under 64-bit hosts (about a year ago now.)  In fact,
-> everything that you presently see for the *.armlinux.org.uk domain now
-> runs inside several 32-bit ARM VMs under a 64-bit ARM host.
+>    a4023f682739439b ("arm64: Add hypervisor safe helper for checking constant capabilities")
 > 
-> It isn't perfect; I've found issues with qemu and libvirt.  One example
-> is the rather sub-standard RTC implementation, which means if you
-> use libvirt's managesave across a host reboot, the guests idea of
-> time-of-day freezes while it's asleep, and resumes when the guest is
-> reloaded - resulting in the guests time-of-day being rather wrong,
-> sometimes to the point that NTP gives up.  That becomes very painful
-> if you use kerberos authentication, where time-of-day is important.
+> We then made use of cpus_have_const_cap() throughout the kernel.
 > 
-> So, just because you haven't received any bug reports doesn't mean
-> there aren't any users; there certainly are, there are problems,
-> but the problems are in places other than the kernel.
+> Subsequently, we had to defer updating the static_key associated with
+> each capability in order to avoid lockdep complaints. To avoid breaking
+> kernel-wide usage of cpus_have_const_cap(), this was updated to fall
+> back to the cpu_hwcaps array if called before the static_keys were
+> updated. As the kvm hyp code was only called later than this, the
+> fallback is redundant but not functionally harmful. For more details,
+> see commit:
+> 
+>    63a1e1c95e60e798 ("arm64/cpufeature: don't use mutex in bringup path")
+> 
+> Today we have more users of cpus_have_const_cap() which are only called
+> once the relevant static keys are initialized, and it would be
+> beneficial to avoid the redundant code.
+> 
+> To that end, this patch adds a new cpus_have_final_cap(), helper which
+> is intend to be used in code which is only run once capabilities have
+> been finalized, and will never check the cpus_hwcap array. This helps
+> the compiler to generate better code as it no longer needs to generate
+> code to address and test the cpus_hwcap array. To help catch misuse,
+> cpus_have_final_cap() will BUG() if called before capabilities are
+> finalized.
+> 
+> In hyp context, BUG() will result in a hyp panic, but the specific BUG()
+> instance will not be identified in the usual way.
+> 
+> Comments are added to the various cpus_have_*_cap() helpers to describe
+> the constraints on when they can be used. For clarity cpus_have_cap() is
+> moved above the other helpers.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Suzuki Poulose <suzuki.poulose@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> ---
 
-... argh, I see, you're not removing 32-bit guest on 64-bit.  Ignore
-the above then.
+...
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 12.1Mbps down 622kbps up
-According to speedtest.net: 11.9Mbps down 500kbps up
+> +/*
+> + * Test for a capability without a runtime check.
+> + *
+> + * Before capabilities are finalized, this will BUG().
+> + * After capabilities are finalized, this is patched to avoid a runtime check.
+> + *
+> + * @num must be a compile-time constant.
+> + */
+> +static __always_inline bool cpus_have_final_cap(int num)
+> +{
+> +	if (static_branch_likely(&arm64_const_caps_ready))
+
+We have introduced system_capabilities_finalized() helper and may be
+it is a good idea to use it here, to make it more clear.
+
+Either ways :
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
