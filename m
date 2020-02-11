@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 054B8C35242
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A51C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BCEE720661
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7751E20661
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vvMLmr/v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCEE720661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIaP+L/g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7751E20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73ACB4AC77;
-	Tue, 11 Feb 2020 12:52:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D7954A946;
+	Tue, 11 Feb 2020 12:52:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OG1Ry1rFs0HL; Tue, 11 Feb 2020 12:52:19 -0500 (EST)
+	with ESMTP id yDHpWvaY-BGw; Tue, 11 Feb 2020 12:52:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6314AEEA;
-	Tue, 11 Feb 2020 12:52:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA38E4AEE1;
+	Tue, 11 Feb 2020 12:52:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA94B4AE95
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF16B4AED1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0xsLmL4MzxYc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:52:15 -0500 (EST)
+ with ESMTP id 3c4Tq+DNJEhH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:52:17 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE1884AEBD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C65F4AEDD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:14 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EDAE820578;
- Tue, 11 Feb 2020 17:52:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CCA9520661;
+ Tue, 11 Feb 2020 17:52:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443532;
- bh=KY+c3FxIs11wncD+b7KCS0+WsyvwPMVyQczqhhQ1+gQ=;
+ s=default; t=1581443533;
+ bh=X/wQyZYwzawIOlHX3kBDxTL2CEKWV4RPVgmXqLaUA74=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=vvMLmr/vlOMikhad/4fTGQJ0UeE3qQwNzV/IHmcfdpFDHkBSseWx3DesOPfKMVHr1
- QAF5Pz9ovyAB+j466+wsQvchN5bTLTDAk6RZLP5xhCFqYarOI0ROdMZujub8EzG97a
- MdmnKLKk3iItYuM45U51XPfWp0QiEb1rgzXVhxlg=
+ b=uIaP+L/gZs3nAeeSV2ON4Gc7J6dmz9xt4rCdSoAD6bsTrWq+l/2eLYH+a5/qTZdPV
+ U2OJOvBCby8QyponOUJa0sXu4AjwKH0vVIEODG2EvTKvHHg4dgCGK1EPCF9pLdwMYz
+ r1Y81wloYbxyqjSvSBGa1JM1bx3qrebj8r0i3twM=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfu-004O7k-K8; Tue, 11 Feb 2020 17:50:18 +0000
+ id 1j1Zfr-004O7k-Le; Tue, 11 Feb 2020 17:50:15 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 43/94] KVM: arm64: nv: Set a handler for the system
- instruction traps
-Date: Tue, 11 Feb 2020 17:48:47 +0000
-Message-Id: <20200211174938.27809-44-maz@kernel.org>
+Subject: [PATCH v2 38/94] KVM: arm64: nv: Implement nested Stage-2 page table
+ walk logic
+Date: Tue, 11 Feb 2020 17:48:42 +0000
+Message-Id: <20200211174938.27809-39-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,153 +95,358 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-When HCR.NV bit is set, execution of the EL2 translation regime address
-aranslation instructions and TLB maintenance instructions are trapped to
-EL2. In addition, execution of the EL1 translation regime address
-aranslation instructions and TLB maintenance instructions that are only
-accessible from EL2 and above are trapped to EL2. In these cases,
-ESR_EL2.EC will be set to 0x18.
+Based on the pseudo-code in the ARM ARM, implement a stage 2 software
+page table walker.
 
-Rework the system instruction emulation framework to handle potentially
-all system instruction traps other than MSR/MRS instructions. Those
-system instructions would be AT and TLBI instructions controlled by
-HCR_EL2.NV, AT, and TTLB bits.
-
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: squashed two patches together, redispatched various bits around]
+[maz: heavily reworked for future ARMv8.4-TTL support]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_coproc.h |  2 +-
- arch/arm64/kvm/handle_exit.c        |  2 +-
- arch/arm64/kvm/sys_regs.c           | 48 +++++++++++++++++++++++------
- 3 files changed, 41 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/esr.h        |   1 +
+ arch/arm64/include/asm/kvm_arm.h    |   2 +
+ arch/arm64/include/asm/kvm_nested.h |  13 ++
+ arch/arm64/kvm/nested.c             | 276 ++++++++++++++++++++++++++++
+ 4 files changed, 292 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-index 0185ee8b8b5e..755a6e8f907e 100644
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ b/arch/arm64/include/asm/kvm_coproc.h
-@@ -32,7 +32,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run);
-+int kvm_handle_sys(struct kvm_vcpu *vcpu, struct kvm_run *run);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index b15921dc889a..4373f4f3d58f 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -125,6 +125,7 @@
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
  
- #define kvm_coproc_table_init kvm_sys_reg_table_init
- void kvm_sys_reg_table_init(void);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index d2a73ebf9d4a..10f13bd2e319 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -275,7 +275,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC32]	= handle_smc,
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
--	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
-+	[ESR_ELx_EC_SYS64]	= kvm_handle_sys,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
- 	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index fae3f4a70eeb..026395d16c9f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1745,10 +1745,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-  * more demanding guest...
-  */
- static const struct sys_reg_desc sys_reg_descs[] = {
--	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
--
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
- 	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
-@@ -2093,6 +2089,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
- };
+ /* ISS field definitions for exceptions taken in to Hyp */
++#define ESR_ELx_FSC_ADDRSZ	(0x00)
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index cdee623ce92f..95dfef820cf1 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -261,6 +261,8 @@
+ #define VTTBR_VMID_SHIFT  (UL(48))
+ #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
  
-+#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
-+	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
-+static struct sys_reg_desc sys_insn_descs[] = {
-+	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
++#define SCTLR_EE	(UL(1) << 25)
++
+ /* Hyp System Trap Register */
+ #define HSTR_EL2_T(x)	(1 << x)
+ 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 88595447b598..3881e51d5a2d 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -17,6 +17,19 @@ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+ 
++struct kvm_s2_trans {
++	phys_addr_t output;
++	unsigned long block_size;
++	bool writable;
++	bool readable;
++	int level;
++	u32 esr;
++	u64 upper_attr;
 +};
 +
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
-@@ -2722,6 +2726,24 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return 1;
- }
- 
-+static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
-+{
-+	const struct sys_reg_desc *r;
++extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++			      struct kvm_s2_trans *result);
 +
-+	/* Search from the system instruction table. */
-+	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
-+
-+	if (likely(r)) {
-+		perform_access(vcpu, p, r);
-+	} else {
-+		kvm_err("Unsupported guest sys instruction at: %lx\n",
-+			*vcpu_pc(vcpu));
-+		print_sys_reg_instr(p);
-+		kvm_inject_undefined(vcpu);
-+	}
-+	return 1;
-+}
-+
- static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
- 				const struct sys_reg_desc *table, size_t num,
- 				unsigned long *bmap)
-@@ -2739,11 +2761,12 @@ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
- }
- 
- /**
-- * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
-+ * kvm_handle_sys-- handles a system instruction or mrs/msr instruction trap
-+		    on a guest execution
-  * @vcpu: The VCPU pointer
-  * @run:  The kvm_run struct
-  */
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
-+int kvm_handle_sys(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	struct sys_reg_params params;
- 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
-@@ -2762,10 +2785,16 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.regval = vcpu_get_reg(vcpu, Rt);
- 	params.is_write = !(esr & 1);
- 
--	ret = emulate_sys_reg(vcpu, &params);
-+	if (params.Op0 == 1) {
-+		/* System instructions */
-+		ret = emulate_sys_instr(vcpu, &params);
-+	} else {
-+		/* MRS/MSR instructions */
-+		ret = emulate_sys_reg(vcpu, &params);
-+		if (!params.is_write)
-+			vcpu_set_reg(vcpu, Rt, params.regval);
-+	}
- 
--	if (!params.is_write)
--		vcpu_set_reg(vcpu, Rt, params.regval);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 65dbc1a796a1..573bcfcfe53f 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -80,6 +80,282 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
  	return ret;
  }
  
-@@ -3217,6 +3246,7 @@ void kvm_sys_reg_table_init(void)
- 	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
- 	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
- 	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
-+	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs)));
- 
- 	/* We abuse the reset function to overwrite the table itself. */
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
++struct s2_walk_info {
++	int	     (*read_desc)(phys_addr_t pa, u64 *desc, void *data);
++	void	     *data;
++	u64	     baddr;
++	unsigned int max_pa_bits;
++	unsigned int pgshift;
++	unsigned int pgsize;
++	unsigned int ps;
++	unsigned int sl;
++	unsigned int t0sz;
++	bool	     be;
++	bool	     el1_aarch32;
++};
++
++static unsigned int ps_to_output_size(unsigned int ps)
++{
++	switch (ps) {
++	case 0: return 32;
++	case 1: return 36;
++	case 2: return 40;
++	case 3: return 42;
++	case 4: return 44;
++	case 5:
++	default:
++		return 48;
++	}
++}
++
++static u32 compute_fsc(int level, u32 fsc)
++{
++	return fsc | (level & 0x3);
++}
++
++static int esr_s2_fault(struct kvm_vcpu *vcpu, int level, u32 fsc)
++{
++	u32 esr;
++
++	esr = kvm_vcpu_get_hsr(vcpu) & ~ESR_ELx_FSC;
++	esr |= compute_fsc(level, fsc);
++	return esr;
++}
++
++static int check_base_s2_limits(struct s2_walk_info *wi,
++				int level, int input_size, int stride)
++{
++	int start_size;
++
++	/* Check translation limits */
++	switch (wi->pgsize) {
++	case SZ_64K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
++	case SZ_16K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 40))
++			return -EFAULT;
++		break;
++	case SZ_4K:
++		if (level < 0 || (level == 0 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
++	}
++
++	/* Check input size limits */
++	if (input_size > wi->max_pa_bits &&
++	    (!wi->el1_aarch32 || input_size > 40))
++		return -EFAULT;
++
++	/* Check number of entries in starting level table */
++	start_size = input_size - ((3 - level) * stride + wi->pgshift);
++	if (start_size < 1 || start_size > stride + 4)
++		return -EFAULT;
++
++	return 0;
++}
++
++/* Check if output is within boundaries */
++static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
++{
++	unsigned int output_size = ps_to_output_size(wi->ps);
++
++	if (output_size > wi->max_pa_bits)
++		output_size = wi->max_pa_bits;
++
++	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
++		return -1;
++
++	return 0;
++}
++
++/*
++ * This is essentially a C-version of the pseudo code from the ARM ARM
++ * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
++ * that pseudocode in trying to understand this.
++ *
++ * Must be called with the kvm->srcu read lock held
++ */
++static int walk_nested_s2_pgd(phys_addr_t ipa,
++			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
++{
++	int first_block_level, level, stride, input_size, base_lower_bound;
++	phys_addr_t base_addr;
++	unsigned int addr_top, addr_bottom;
++	u64 desc;  /* page table entry */
++	int ret;
++	phys_addr_t paddr;
++
++	switch (wi->pgsize) {
++	case SZ_64K:
++	case SZ_16K:
++		level = 3 - wi->sl;
++		first_block_level = 2;
++		break;
++	case SZ_4K:
++		level = 2 - wi->sl;
++		first_block_level = 1;
++		break;
++	default:
++		/* GCC is braindead */
++		unreachable();
++	}
++
++	stride = wi->pgshift - 3;
++	input_size = 64 - wi->t0sz;
++	if (input_size > 48 || input_size < 25)
++		return -EFAULT;
++
++	ret = check_base_s2_limits(wi, level, input_size, stride);
++	if (WARN_ON(ret))
++		return ret;
++
++	base_lower_bound = 3 + input_size - ((3 - level) * stride +
++			   wi->pgshift);
++	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
++
++	if (check_output_size(wi, base_addr)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		return 1;
++	}
++
++	addr_top = input_size - 1;
++
++	while (1) {
++		phys_addr_t index;
++
++		addr_bottom = (3 - level) * stride + wi->pgshift;
++		index = (ipa & GENMASK_ULL(addr_top, addr_bottom))
++			>> (addr_bottom - 3);
++
++		paddr = base_addr | index;
++		ret = wi->read_desc(paddr, &desc, wi->data);
++		if (ret < 0)
++			return ret;
++
++		/*
++		 * Handle reversedescriptors if endianness differs between the
++		 * host and the guest hypervisor.
++		 */
++		if (wi->be)
++			desc = be64_to_cpu(desc);
++		else
++			desc = le64_to_cpu(desc);
++
++		/* Check for valid descriptor at this point */
++		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++			out->upper_attr = desc;
++			return 1;
++		}
++
++		/* We're at the final level or block translation level */
++		if ((desc & 3) == 1 || level == 3)
++			break;
++
++		if (check_output_size(wi, desc)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++			out->upper_attr = desc;
++			return 1;
++		}
++
++		base_addr = desc & GENMASK_ULL(47, wi->pgshift);
++
++		level += 1;
++		addr_top = addr_bottom - 1;
++	}
++
++	if (level < first_block_level) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	/*
++	 * We don't use the contiguous bit in the stage-2 ptes, so skip check
++	 * for misprogramming of the contiguous bit.
++	 */
++
++	if (check_output_size(wi, desc)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	if (!(desc & BIT(10))) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	/* Calculate and return the result */
++	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
++		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
++	out->output = paddr;
++	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
++	out->readable = desc & (0b01 << 6);
++	out->writable = desc & (0b10 << 6);
++	out->level = level;
++	out->upper_attr = desc & GENMASK_ULL(63, 52);
++	return 0;
++}
++
++static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++{
++	struct kvm_vcpu *vcpu = data;
++
++	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
++}
++
++static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
++{
++	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
++
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		wi->pgshift = 12;	 break;
++	case VTCR_EL2_TG0_16K:
++		wi->pgshift = 14;	 break;
++	case VTCR_EL2_TG0_64K:
++	default:
++		wi->pgshift = 16;	 break;
++	}
++
++	wi->pgsize = 1UL << wi->pgshift;
++	wi->ps = (vtcr & VTCR_EL2_PS_MASK) >> VTCR_EL2_PS_SHIFT;
++	wi->sl = (vtcr & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT;
++	wi->max_pa_bits = VTCR_EL2_IPA(vtcr);
++}
++
++int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++		       struct kvm_s2_trans *result)
++{
++	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++	struct s2_walk_info wi;
++	int ret;
++
++	result->esr = 0;
++
++	if (!nested_virt_in_use(vcpu))
++		return 0;
++
++	wi.read_desc = read_guest_s2_desc;
++	wi.data = vcpu;
++	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++
++	vtcr_to_walk_info(vtcr, &wi);
++
++	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EE;
++	wi.el1_aarch32 = vcpu_mode_is_32bit(vcpu);
++
++	ret = walk_nested_s2_pgd(gipa, &wi, result);
++	if (ret)
++		result->esr |= (kvm_vcpu_get_hsr(vcpu) & ~ESR_ELx_FSC);
++
++	return ret;
++}
++
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
 -- 
 2.20.1
 
