@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C939C3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD69C3B188
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E46A4206D7
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD583206CC
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/mDxxc3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46A4206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NkNjJwlA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD583206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 984004AEF9;
-	Tue, 11 Feb 2020 12:53:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62F014AC6C;
+	Tue, 11 Feb 2020 12:53:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XXeZlumDPj3a; Tue, 11 Feb 2020 12:53:12 -0500 (EST)
+	with ESMTP id hyRS71hAse8b; Tue, 11 Feb 2020 12:53:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828C54A955;
-	Tue, 11 Feb 2020 12:53:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2C734A946;
+	Tue, 11 Feb 2020 12:53:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0580D4AE93
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0590D4AECA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hh8shGPmf0yb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:08 -0500 (EST)
+ with ESMTP id XIvqTfuUjjjS for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:12 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B6D44A957
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 163BA4A957
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:11 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6A10220578;
- Tue, 11 Feb 2020 17:53:06 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3BD7920870;
+ Tue, 11 Feb 2020 17:53:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443586;
- bh=gtQO6DnA30segjYAYUIYRQkYSFgAx9NxUhck8T27+04=;
+ s=default; t=1581443590;
+ bh=1DR8MVhjtgLl66se5UHs3QX+PvNEC+nXqVOa/l9sjS8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=n/mDxxc3ah/TZ1sf3Rb8hEdp6xg6O/JZIuWhXYpHHhctmkHjf6G86fqdSkCauCkdE
- 4g6W/HOAHsO4txgrMfKpwSMQtCyW1zZvVk6ekEM8vcSkdh2qzfg6atWMH7TqEaFn79
- Ee84VAd94Vryh+BEo0nkXfyhxCtgAwNzhpgOT6q0=
+ b=NkNjJwlA0UByXWecN+9DcEs8lWdDkVjUPPbG02Zl7ayKBPrmqK2qwcL5jnVwwaZ1p
+ vY0SmFQEzHXnq/rt5WmDpr0nRsYxtdODV13QZE1BMLgEPjxJa3UoI7sHXvrs3Am6sR
+ JC7lg1SdMFfRwI592p5qmyleo4lB/vmvedK/bAjk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfe-004O7k-8B; Tue, 11 Feb 2020 17:50:02 +0000
+ id 1j1ZgK-004O7k-AX; Tue, 11 Feb 2020 17:50:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 15/94] KVM: arm64: nv: Handle SPSR_EL2 specially
-Date: Tue, 11 Feb 2020 17:48:19 +0000
-Message-Id: <20200211174938.27809-16-maz@kernel.org>
+Subject: [PATCH v2 86/94] KVM: arm64: aarch32: Use __vcpu_sys_reg() instead of
+ raw sys_regs access
+Date: Tue, 11 Feb 2020 17:49:30 +0000
+Message-Id: <20200211174938.27809-87-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,149 +95,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SPSR_EL2 needs special attention when running nested on ARMv8.3:
-
-If taking an exception while running at vEL2 (actually EL1), the
-HW will update the SPSR_EL1 register with the EL1 mode. We need
-to track this in order to make sure that accesses to the virtual
-view of SPSR_EL2 is correct.
-
-To do so, we place an illegal value in SPSR_EL1.M, and patch it
-accordingly if required when accessing it.
+Instead of directly accessing the sysreg array, let's use convenient
+accessors that will hide the complexity of the register remapping.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 45 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c            | 23 ++++++++++++--
- 2 files changed, 66 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/switch.c    |  5 ++---
+ arch/arm64/kvm/hyp/sysreg-sr.c | 20 ++++++--------------
+ 2 files changed, 8 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 486978d0346b..26552c8571cb 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -277,11 +277,51 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 	return __is_hyp_ctxt(&vcpu->arch.ctxt);
- }
- 
-+static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
-+{
-+	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-+		/*
-+		 * Clear the .M field when writing SPSR to the CPU, so that we
-+		 * can detect when the CPU clobbered our SPSR copy during a
-+		 * local exception.
-+		 */
-+		val &= ~0xc;
-+	}
-+
-+	return val;
-+}
-+
-+static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
-+{
-+	if (__vcpu_el2_e2h_is_set(ctxt))
-+		return val;
-+
-+	/*
-+	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
-+	 * register has still the value we saved on the last write.
-+	 */
-+	if ((val & 0xc) == 0)
-+		return ctxt->sys_regs[SPSR_EL2];
-+
-+	/*
-+	 * Otherwise there was a "local" exception on the CPU,
-+	 * which from the guest's point of view was being taken from
-+	 * EL2 to EL2, although it actually happened to be from
-+	 * EL1 to EL1.
-+	 * So we need to fix the .M field in SPSR, to make it look
-+	 * like EL2, which is what the guest would expect.
-+	 */
-+	return (val & ~0x0c) | CurrentEL_EL2;
-+}
-+
- static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_mode_is_32bit(vcpu))
- 		return vcpu_read_spsr32(vcpu);
- 
-+	if (unlikely(vcpu_mode_el2(vcpu)))
-+		return vcpu_read_sys_reg(vcpu, SPSR_EL2);
-+
- 	if (vcpu->arch.sysregs_loaded_on_cpu)
- 		return read_sysreg_el1(SYS_SPSR);
- 	else
-@@ -295,6 +335,11 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index a1a9ca35347c..3deea28794e1 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -49,7 +49,7 @@ static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ 	if (!vcpu_el1_is_32bit(vcpu))
  		return;
- 	}
  
-+	if (unlikely(vcpu_mode_el2(vcpu))) {
-+		vcpu_write_sys_reg(vcpu, v, SPSR_EL2);
-+		return;
-+	}
-+
- 	if (vcpu->arch.sysregs_loaded_on_cpu)
- 		write_sysreg_el1(v, SYS_SPSR);
- 	else
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 64be9f452ad6..8c7d3d410689 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -258,11 +258,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 			goto memory_read;
- 
- 		/*
--		 * ELR_EL2 is special cased for now.
-+		 * ELR_EL2 and SPSR_EL2 are special cased for now.
- 		 */
- 		switch (reg) {
- 		case ELR_EL2:
- 			return read_sysreg_el1(SYS_ELR);
-+		case SPSR_EL2:
-+			val = read_sysreg_el1(SYS_SPSR);
-+			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
- 		}
- 
- 		/*
-@@ -319,6 +322,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
- 			return;
-+		case SPSR_EL2:
-+			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
-+			write_sysreg_el1(val, SYS_SPSR);
-+			return;
- 		}
- 
- 		/* No EL1 counterpart? We're done here.? */
-@@ -1589,6 +1596,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
+-	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
++	__vcpu_sys_reg(vcpu, FPEXC32_EL2) = read_sysreg(fpexc32_el2);
  }
  
-+static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-+
-+	return true;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -1899,7 +1918,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+ static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+@@ -470,8 +470,7 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
  
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
--	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-+	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
- 	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+-		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
+-			     fpexc32_el2);
++		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
  
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
+ 
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index afc603f800e9..b009afd87322 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -408,44 +408,36 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+ 
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *sysreg;
+-
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+-	sysreg = vcpu->arch.ctxt.sys_regs;
+-
+ 	vcpu->arch.ctxt.spsr_abt = read_sysreg(spsr_abt);
+ 	vcpu->arch.ctxt.spsr_und = read_sysreg(spsr_und);
+ 	vcpu->arch.ctxt.spsr_irq = read_sysreg(spsr_irq);
+ 	vcpu->arch.ctxt.spsr_fiq = read_sysreg(spsr_fiq);
+ 
+-	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+-	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
++	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
++	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+-		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
++		__vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
+ }
+ 
+ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *sysreg;
+-
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+-	sysreg = vcpu->arch.ctxt.sys_regs;
+-
+ 	write_sysreg(vcpu->arch.ctxt.spsr_abt, spsr_abt);
+ 	write_sysreg(vcpu->arch.ctxt.spsr_und, spsr_und);
+ 	write_sysreg(vcpu->arch.ctxt.spsr_irq, spsr_irq);
+ 	write_sysreg(vcpu->arch.ctxt.spsr_fiq, spsr_fiq);
+ 
+-	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
+-	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
++	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
++	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+-		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
++		write_sysreg(__vcpu_sys_reg(vcpu, DBGVCR32_EL2), dbgvcr32_el2);
+ }
+ 
+ /**
 -- 
 2.20.1
 
