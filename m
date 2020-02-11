@@ -2,69 +2,68 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA98BC3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F36C3B186
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8E9E12086A
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C884F208C3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qRjumTLm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E9E12086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMQDqkXy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C884F208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 433424AEC6;
-	Tue, 11 Feb 2020 12:51:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76BDE4AEAB;
+	Tue, 11 Feb 2020 12:51:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PkXBO8pejmMU; Tue, 11 Feb 2020 12:51:14 -0500 (EST)
+	with ESMTP id XuvmUD35cDTc; Tue, 11 Feb 2020 12:51:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19C84AEAC;
-	Tue, 11 Feb 2020 12:51:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4B14AE96;
+	Tue, 11 Feb 2020 12:51:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E7C4A946
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C144A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eUEg21yKwHDQ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:11 -0500 (EST)
+ with ESMTP id 0wCaQmSYyFy6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:51:14 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A518A4AEB2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4AA4A946
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:13 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B10C5206D6;
- Tue, 11 Feb 2020 17:51:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BACA1206CC;
+ Tue, 11 Feb 2020 17:51:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443471;
- bh=iD+dO0Xdz4rLOP0a58aDH/YSqaLiXx6FsLfAjEm2ro0=;
+ s=default; t=1581443473;
+ bh=nlXhKKJ34Rz7b0lfO28NB1NGDZ8MDge9YqsgbwjttLM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qRjumTLmAcaRBObhPd6R0WQ25oxocU491DJLNnCogWs6VALAJi0ofN9vY+vL0WX8Y
- L94vIZBEslq1+CJvpuXZv0kgt11sQLzHzRURz/0BM3USpzZbm4ksgSst8q5J9blNgw
- Y/nQWG1V5rCYeHmHmXXkyEVuVC13JcPMPtzf1IeY=
+ b=lMQDqkXyylqWVJB3WXIc9QU8MjkfA07meh0h1+JUfmTjizDwwpScrQC5EUy6N/mLr
+ aF0jlkq5r5qrwOXmAKtR9Zo/rc6sOZGpAB1qnbUGUH20d9xAcIsnugV/br3lvQG3vk
+ msALfpZzsDck2/20OAiLBtvekhLNJZC3HE9klI1g=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgG-004O7k-44; Tue, 11 Feb 2020 17:50:40 +0000
+ id 1j1Zfs-004O7k-9H; Tue, 11 Feb 2020 17:50:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 79/94] KVM: arm64: nv: Move nested vgic state into the
- sysreg file
-Date: Tue, 11 Feb 2020 17:49:23 +0000
-Message-Id: <20200211174938.27809-80-maz@kernel.org>
+Subject: [PATCH v2 39/94] KVM: arm64: nv: Handle shadow stage 2 page faults
+Date: Tue, 11 Feb 2020 17:48:43 +0000
+Message-Id: <20200211174938.27809-40-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,432 +94,447 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The vgic nested state needs to be accessible from the VNCR page, and
-thus needs to be part of the normal sysreg file. Let's move it there.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+If we are faulting on a shadow stage 2 translation, we first walk the
+guest hypervisor's stage 2 page table to see if it has a mapping. If
+not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+create a mapping in the shadow stage 2 page table.
+
+Note that we have to deal with two IPAs when we got a shadow stage 2
+page fault. One is the address we faulted on, and is in the L2 guest
+phys space. The other is from the guest stage-2 page table walk, and is
+in the L1 guest phys space.  To differentiate them, we rename variables
+so that fault_ipa is used for the former and ipa is used for the latter.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h  |  9 +++
- arch/arm64/kvm/sys_regs.c          | 53 ++++++++++++------
- include/kvm/arm_vgic.h             |  7 ---
- virt/kvm/arm/vgic/vgic-v3-nested.c | 88 +++++++++++++++---------------
- virt/kvm/arm/vgic/vgic-v3.c        | 18 ++++--
- virt/kvm/arm/vgic/vgic.h           | 10 ++++
- 6 files changed, 111 insertions(+), 74 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h       | 52 +++++++++++++++
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++
+ arch/arm64/include/asm/kvm_nested.h  | 18 ++++++
+ arch/arm64/kvm/nested.c              | 39 ++++++++++++
+ virt/kvm/arm/mmio.c                  | 14 ++---
+ virt/kvm/arm/mmu.c                   | 94 ++++++++++++++++++++++------
+ 6 files changed, 197 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e160cf283601..7a66abd3df7e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -272,6 +272,15 @@ enum vcpu_sysreg {
- 	VNCR(VTCR_EL2),	/* Virtualization Translation Control Register */
- 	VNCR(TPIDR_EL2),/* EL2 Software Thread ID Register */
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 8727fde21b8f..7f1fb496f435 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -423,6 +423,58 @@ static inline int kvm_set_ipa_limit(void) { return 0; }
+ static inline void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu) {}
+ static inline void kvm_init_nested(struct kvm *kvm) {}
  
-+	VNCR(ICH_LR0_EL2),
-+	ICH_LR15_EL2 = ICH_LR0_EL2 + 15,
-+	VNCR(ICH_AP0R0_EL2),
-+	ICH_AP0R3_EL2 = ICH_AP0R0_EL2 + 3,
-+	VNCR(ICH_AP1R0_EL2),
-+	ICH_AP1R3_EL2 = ICH_AP1R0_EL2 + 3,
-+	VNCR(ICH_HCR_EL2),
-+	VNCR(ICH_VMCR_EL2),
-+
- 	NR_SYS_REGS	/* Nothing after this line! */
- };
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9d426304bfb3..5a41788054b7 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1880,17 +1880,17 @@ static bool access_gic_apr(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
--	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.nested_vgic_v3;
--	u32 index, *base;
-+	u64 *base;
-+	u8 index;
- 
- 	index = r->Op2;
- 	if (r->CRm == 8)
--		base = cpu_if->vgic_ap0r;
-+		base = __ctxt_sys_reg(&vcpu->arch.ctxt, ICH_AP0R0_EL2);
- 	else
--		base = cpu_if->vgic_ap1r;
-+		base = __ctxt_sys_reg(&vcpu->arch.ctxt, ICH_AP1R0_EL2);
- 
- 	if (p->is_write)
--		base[index] = p->regval;
-+		base[index] = lower_32_bits(p->regval);
- 	else
- 		p->regval = base[index];
- 
-@@ -1901,12 +1901,10 @@ static bool access_gic_hcr(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
--	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.nested_vgic_v3;
--
- 	if (p->is_write)
--		cpu_if->vgic_hcr = p->regval;
-+		__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = lower_32_bits(p->regval);
- 	else
--		p->regval = cpu_if->vgic_hcr;
-+		p->regval = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
- 
- 	return true;
- }
-@@ -1963,12 +1961,19 @@ static bool access_gic_vmcr(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
--	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.nested_vgic_v3;
--
- 	if (p->is_write)
--		cpu_if->vgic_vmcr = p->regval;
-+		__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = (p->regval	&
-+						      (ICH_VMCR_ENG0_MASK	|
-+						       ICH_VMCR_ENG1_MASK	|
-+						       ICH_VMCR_PMR_MASK	|
-+						       ICH_VMCR_BPR0_MASK	|
-+						       ICH_VMCR_BPR1_MASK	|
-+						       ICH_VMCR_EOIM_MASK	|
-+						       ICH_VMCR_CBPR_MASK	|
-+						       ICH_VMCR_FIQ_EN_MASK	|
-+						       ICH_VMCR_ACK_CTL_MASK));
- 	else
--		p->regval = cpu_if->vgic_vmcr;
-+		p->regval = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
- 
- 	return true;
- }
-@@ -1977,17 +1982,29 @@ static bool access_gic_lr(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.nested_vgic_v3;
- 	u32 index;
-+	u64 *base;
- 
-+	base = __ctxt_sys_reg(&vcpu->arch.ctxt, ICH_LR0_EL2);
- 	index = p->Op2;
- 	if (p->CRm == 13)
- 		index += 8;
- 
--	if (p->is_write)
--		cpu_if->vgic_lr[index] = p->regval;
--	else
--		p->regval = cpu_if->vgic_lr[index];
-+	if (p->is_write) {
-+		u64 mask = (ICH_LR_VIRTUAL_ID_MASK	|
-+			    ICH_LR_GROUP		|
-+			    ICH_LR_HW			|
-+			    ICH_LR_STATE);
-+
-+		if (p->regval & ICH_LR_HW)
-+			mask |= ICH_LR_PHYS_ID_MASK;
-+		else
-+			mask |= ICH_LR_EOI;
-+
-+		base[index] = p->regval & mask;
-+	} else {
-+		p->regval = base[index];
-+	}
- 
- 	return true;
- }
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index b5c026a7e0ee..a03148ee1266 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -305,9 +305,6 @@ struct vgic_cpu {
- 
- 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
- 
--	/* CPU vif control registers for the virtual GICH interface */
--	struct vgic_v3_cpu_if	nested_vgic_v3;
--
- 	/*
- 	 * The shadow vif control register loaded to the hardware when
- 	 * running a nested L2 guest with the virtual IMO/FMO bit set.
-@@ -370,10 +367,6 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
- void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
- 
--void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
--void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
--void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
--void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
- u16 vgic_v3_get_eisr(struct kvm_vcpu *vcpu);
- u16 vgic_v3_get_elrsr(struct kvm_vcpu *vcpu);
- u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/vgic/vgic-v3-nested.c b/virt/kvm/arm/vgic/vgic-v3-nested.c
-index 94b1edb67011..51f7a521e829 100644
---- a/virt/kvm/arm/vgic/vgic-v3-nested.c
-+++ b/virt/kvm/arm/vgic/vgic-v3-nested.c
-@@ -16,11 +16,6 @@
- #define CREATE_TRACE_POINTS
- #include "vgic-nested-trace.h"
- 
--static inline struct vgic_v3_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
--{
--	return &vcpu->arch.vgic_cpu.nested_vgic_v3;
--}
--
- static inline struct vgic_v3_cpu_if *vcpu_shadow_if(struct kvm_vcpu *vcpu)
- {
- 	return &vcpu->arch.vgic_cpu.shadow_vgic_v3;
-@@ -33,12 +28,11 @@ static inline bool lr_triggers_eoi(u64 lr)
- 
- u16 vgic_v3_get_eisr(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	u16 reg = 0;
- 	int i;
- 
- 	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
--		if (lr_triggers_eoi(cpu_if->vgic_lr[i]))
-+		if (lr_triggers_eoi(__vcpu_sys_reg(vcpu, ICH_LRN(i))))
- 			reg |= BIT(i);
- 	}
- 
-@@ -47,12 +41,11 @@ u16 vgic_v3_get_eisr(struct kvm_vcpu *vcpu)
- 
- u16 vgic_v3_get_elrsr(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	u16 reg = 0;
- 	int i;
- 
- 	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
--		if (!(cpu_if->vgic_lr[i] & ICH_LR_STATE))
-+		if (!(__vcpu_sys_reg(vcpu, ICH_LRN(i)) & ICH_LR_STATE))
- 			reg |= BIT(i);
- 	}
- 
-@@ -61,14 +54,13 @@ u16 vgic_v3_get_elrsr(struct kvm_vcpu *vcpu)
- 
- u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	int nr_lr = kvm_vgic_global_state.nr_lr;
- 	u64 reg = 0;
- 
- 	if (vgic_v3_get_eisr(vcpu))
- 		reg |= ICH_MISR_EOI;
- 
--	if (cpu_if->vgic_hcr & ICH_HCR_UIE) {
-+	if (__vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_UIE) {
- 		int used_lrs;
- 
- 		used_lrs = nr_lr - hweight16(vgic_v3_get_elrsr(vcpu));
-@@ -87,13 +79,12 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
-  */
- static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
- 	struct vgic_irq *irq;
- 	int i, used_lrs = 0;
- 
- 	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
--		u64 lr = cpu_if->vgic_lr[i];
-+		u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
- 		int l1_irq;
- 
- 		if (!(lr & ICH_LR_HW))
-@@ -123,36 +114,20 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
- 	}
- 
- 	trace_vgic_create_shadow_lrs(vcpu, kvm_vgic_global_state.nr_lr,
--				     s_cpu_if->vgic_lr, cpu_if->vgic_lr);
-+				     s_cpu_if->vgic_lr,
-+				     __ctxt_sys_reg(&vcpu->arch.ctxt, ICH_LR0_EL2));
- 
- 	s_cpu_if->used_lrs = used_lrs;
- }
- 
--/*
-- * Change the shadow HWIRQ field back to the virtual value before copying over
-- * the entire shadow struct to the nested state.
-- */
--static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
--{
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
--	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
--	int lr;
--
--	for (lr = 0; lr < kvm_vgic_global_state.nr_lr; lr++) {
--		s_cpu_if->vgic_lr[lr] &= ~ICH_LR_PHYS_ID_MASK;
--		s_cpu_if->vgic_lr[lr] |= cpu_if->vgic_lr[lr] & ICH_LR_PHYS_ID_MASK;
--	}
--}
--
- void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
- 	struct vgic_irq *irq;
- 	int i;
- 
- 	for (i = 0; i < s_cpu_if->used_lrs; i++) {
--		u64 lr = cpu_if->vgic_lr[i];
-+		u64 lr = __vcpu_sys_reg(vcpu, ICH_LRN(i));
- 		int l1_irq;
- 
- 		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-@@ -178,14 +153,27 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu)
++struct kvm_s2_trans {};
++static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
 +{
-+	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.shadow_vgic_v3;
-+	int i;
-+
-+	cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-+	cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
-+
-+	for (i = 0; i < 4; i++) {
-+		cpu_if->vgic_ap0r[i] = __vcpu_sys_reg(vcpu, ICH_AP0RN(i));
-+		cpu_if->vgic_ap1r[i] = __vcpu_sys_reg(vcpu, ICH_AP1RN(i));
-+	}
-+
-+	vgic_v3_create_shadow_lr(vcpu);
++	BUG();
 +}
 +
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
++static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t ipa,
++				     struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
++					   struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline void kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u32 esr)
++{
++	BUG();
++}
++
++static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
++{
++	BUG();
++}
++
++static inline void kvm_nested_s2_flush(struct kvm *kvm) {}
++static inline void kvm_nested_s2_wp(struct kvm *kvm) {}
++static inline void kvm_nested_s2_clear(struct kvm *kvm) {}
++
++static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
  {
--	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_irq *irq;
- 	unsigned long flags;
- 
--	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
--	vgic_v3_create_shadow_lr(vcpu);
- 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
- 
- 	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
-@@ -199,26 +187,40 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- {
--	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	int i;
- 
--	__vgic_v3_save_state(vcpu_shadow_if(vcpu));
-+	__vgic_v3_save_state(s_cpu_if);
- 
--	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr,
--			      vcpu_shadow_if(vcpu)->vgic_lr);
-+	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr, s_cpu_if->vgic_lr);
- 
- 	/*
- 	 * Translate the shadow state HW fields back to the virtual ones
- 	 * before copying the shadow struct back to the nested one.
- 	 */
--	vgic_v3_fixup_shadow_lr_state(vcpu);
--	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
-+	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
-+	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
-+
-+	for (i = 0; i < 4; i++) {
-+		__vcpu_sys_reg(vcpu, ICH_AP0RN(i)) = s_cpu_if->vgic_ap0r[i];
-+		__vcpu_sys_reg(vcpu, ICH_AP1RN(i)) = s_cpu_if->vgic_ap1r[i];
-+	}
-+
-+	for (i = 0; i < kvm_vgic_global_state.nr_lr; i++) {
-+		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-+
-+		val &= ~ICH_LR_STATE;
-+		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
-+
-+		__vcpu_sys_reg(vcpu, ICH_LRN(i)) = val;
-+	}
-+
- 	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
- 			      IRQCHIP_STATE_ACTIVE, false);
+ 	struct kvm_vmid *vmid = &mmu->vmid;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 0e5f88060ecc..1ccd98b5fead 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -684,4 +684,10 @@ static inline void __hyp_text __kvm_skip_instr(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
  }
  
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
- 	bool state;
++static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
++{
++	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu &&
++		vcpu->arch.hw_mmu->nested_stage2_enabled);
++}
++
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 3881e51d5a2d..b2bf82461fa6 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -27,9 +27,27 @@ struct kvm_s2_trans {
+ 	u64 upper_attr;
+ };
  
- 	/*
-@@ -230,7 +232,7 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- 	if (!vgic_state_is_nested(vcpu))
- 		return;
++static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
++{
++	return trans->output;
++}
++
++static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
++{
++	return trans->block_size;
++}
++
++static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
++{
++	return trans->esr;
++}
++
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
  
--	state  = cpu_if->vgic_hcr & ICH_HCR_EN;
-+	state  = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) & ICH_HCR_EN;
- 	state &= vgic_v3_get_misr(vcpu);
++extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
++				    struct kvm_s2_trans *trans);
++extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 573bcfcfe53f..361c3eb2032c 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -471,6 +471,45 @@ void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- 	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index bca20528d5d1..e8c63c8d017a 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -292,10 +292,11 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
- 				     ICC_SRE_EL1_SRE);
- 		/*
- 		 * If nesting is allowed, force GICv3 onto the nested
--		 * guests as well.
-+		 * guests as well by setting the shadow state to the
-+		 * same value.
- 		 */
- 		if (nested_virt_in_use(vcpu))
--			vcpu->arch.vgic_cpu.nested_vgic_v3.vgic_sre = vgic_v3->vgic_sre;
-+			vcpu->arch.vgic_cpu.shadow_vgic_v3.vgic_sre = vgic_v3->vgic_sre;
- 		vcpu->arch.vgic_cpu.pendbaser = INITIAL_PENDBASER_VALUE;
- 	} else {
- 		vgic_v3->vgic_sre = 0;
-@@ -660,11 +661,15 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
- 
- 	/*
--	 * vgic_v3_load_nested only affects the LRs in the shadow
--	 * state, so it is fine to pass the nested state around.
-+	 * If the vgic is in nested state, populate the shadow state
-+	 * from the guest's nested state. As vgic_v3_load_nested()
-+	 * will only load LRs, let's deal with the rest of the state
-+	 * here as if it was a non-nested state. Cunning.
- 	 */
--	if (vgic_state_is_nested(vcpu))
--		cpu_if = &vcpu->arch.vgic_cpu.nested_vgic_v3;
-+	if (vgic_state_is_nested(vcpu)) {
-+		vgic_v3_create_shadow_state(vcpu);
-+		cpu_if = &vcpu->arch.vgic_cpu.shadow_vgic_v3;
++/*
++ * Returns non-zero if permission fault is handled by injecting it to the next
++ * level hypervisor.
++ */
++int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
++{
++	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
++	bool forward_fault = false;
++
++	trans->esr = 0;
++
++	if (fault_status != FSC_PERM)
++		return 0;
++
++	if (kvm_vcpu_trap_is_iabt(vcpu)) {
++		forward_fault = (trans->upper_attr & PTE_S2_XN);
++	} else {
++		bool write_fault = kvm_is_write_fault(vcpu);
++
++		forward_fault = ((write_fault && !trans->writable) ||
++				 (!write_fault && !trans->readable));
 +	}
++
++	if (forward_fault) {
++		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
++		return 1;
++	}
++
++	return 0;
++}
++
++int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
++{
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.far_el2, FAR_EL2);
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.hpfar_el2, HPFAR_EL2);
++
++	return kvm_inject_nested_sync(vcpu, esr_el2);
++}
++
+ /*
+  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+index aedfcff99ac5..7ac7b1eac1ac 100644
+--- a/virt/kvm/arm/mmio.c
++++ b/virt/kvm/arm/mmio.c
+@@ -120,7 +120,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ }
+ 
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-		 phys_addr_t fault_ipa)
++		 phys_addr_t ipa)
+ {
+ 	unsigned long data;
+ 	unsigned long rt;
+@@ -137,7 +137,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
+ 			run->exit_reason = KVM_EXIT_ARM_NISV;
+ 			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
+-			run->arm_nisv.fault_ipa = fault_ipa;
++			run->arm_nisv.fault_ipa = ipa;
+ 			return 0;
+ 		}
+ 
+@@ -164,22 +164,22 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		data = vcpu_data_guest_to_host(vcpu, vcpu_get_reg(vcpu, rt),
+ 					       len);
+ 
+-		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, &data);
++		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, ipa, &data);
+ 		kvm_mmio_write_buf(data_buf, len, data);
+ 
+-		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
++		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, ipa, len,
+ 				       data_buf);
+ 	} else {
+ 		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, len,
+-			       fault_ipa, NULL);
++			       ipa, NULL);
+ 
+-		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, fault_ipa, len,
++		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, ipa, len,
+ 				      data_buf);
+ 	}
+ 
+ 	/* Now prepare kvm_run for the potential return to userland. */
+ 	run->mmio.is_write	= is_write;
+-	run->mmio.phys_addr	= fault_ipa;
++	run->mmio.phys_addr	= ipa;
+ 	run->mmio.len		= len;
+ 	vcpu->mmio_needed	= 1;
+ 
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index bead2ad59f7d..c6db597b925c 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1388,7 +1388,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	return ret;
+ }
+ 
+-static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
++static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap,
++					phys_addr_t *fault_ipap)
+ {
+ 	kvm_pfn_t pfn = *pfnp;
+ 	gfn_t gfn = *ipap >> PAGE_SHIFT;
+@@ -1416,6 +1417,7 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+ 		mask = PTRS_PER_PMD - 1;
+ 		VM_BUG_ON((gfn & mask) != (pfn & mask));
+ 		if (pfn & mask) {
++			*fault_ipap &= PMD_MASK;
+ 			*ipap &= PMD_MASK;
+ 			kvm_release_pfn_clean(pfn);
+ 			pfn &= ~mask;
+@@ -1671,14 +1673,16 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ }
+ 
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-			  struct kvm_memory_slot *memslot, unsigned long hva,
+-			  unsigned long fault_status)
++			  struct kvm_s2_trans *nested,
++			  struct kvm_memory_slot *memslot,
++			  unsigned long hva, unsigned long fault_status)
+ {
+ 	int ret;
+-	bool write_fault, writable, force_pte = false;
++	bool write_fault, writable;
+ 	bool exec_fault, needs_exec;
+ 	unsigned long mmu_seq;
+-	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
++	phys_addr_t ipa = fault_ipa;
++	gfn_t gfn;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+ 	struct vm_area_struct *vma;
+@@ -1688,6 +1692,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	bool logging_active = memslot_is_logging(memslot);
+ 	unsigned long vma_pagesize, flags = 0;
+ 	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
++	unsigned long max_map_size = PUD_SIZE;
+ 
+ 	write_fault = kvm_is_write_fault(vcpu);
+ 	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+@@ -1715,10 +1720,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	vma_pagesize = 1ULL << vma_shift;
+ 	if (logging_active ||
+ 	    (vma->vm_flags & VM_PFNMAP) ||
+-	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+-		force_pte = true;
+-		vma_pagesize = PAGE_SIZE;
++	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize))
++		max_map_size = PAGE_SIZE;
++
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		ipa = kvm_s2_trans_output(nested);
++
++		/*
++		 * If we're about to create a shadow stage 2 entry, then we
++		 * can only create a block mapping if the guest stage 2 page
++		 * table uses at least as big a mapping.
++		 */
++		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+ 	}
++	gfn = ipa >> PAGE_SHIFT;
++
++	vma_pagesize = min(vma_pagesize, max_map_size);
  
  	/*
- 	 * If dealing with a GICv2 emulation on GICv3, VMCR_EL2.VFIQen
-@@ -718,5 +723,6 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+ 	 * The stage2 has a minimum of 2 level table (For arm64 see
+@@ -1728,8 +1745,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * 3 levels, i.e, PMD is not folded.
+ 	 */
+ 	if (vma_pagesize == PMD_SIZE ||
+-	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+-		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
++	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) {
++		gfn = (ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
++	}
+ 	up_read(&current->mm->mmap_sem);
  
- __weak void vgic_v3_sync_nested(struct kvm_vcpu *vcpu) {}
- __weak void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu) {}
-+__weak void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu) {}
- __weak void vgic_v3_load_nested(struct kvm_vcpu *vcpu) {}
- __weak void vgic_v3_put_nested(struct kvm_vcpu *vcpu) {}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c7fefd6b1c80..a8f97e95fe31 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -317,4 +317,14 @@ bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
+ 	/* We need minimum second+third level pages */
+@@ -1784,7 +1802,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
-+void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu);
-+void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
-+void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
-+void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
+-	if (vma_pagesize == PAGE_SIZE && !force_pte) {
++	if (vma_pagesize == PAGE_SIZE && max_map_size >= PMD_SIZE) {
+ 		/*
+ 		 * Only PMD_SIZE transparent hugepages(THP) are
+ 		 * currently supported. This code will need to be
+@@ -1794,7 +1812,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		 * aligned and that the block is contained within the memslot.
+ 		 */
+ 		if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
+-		    transparent_hugepage_adjust(&pfn, &fault_ipa))
++		    transparent_hugepage_adjust(&pfn, &ipa, &fault_ipa))
+ 			vma_pagesize = PMD_SIZE;
+ 	}
+ 
+@@ -1919,8 +1937,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	unsigned long fault_status;
+-	phys_addr_t fault_ipa;
++	phys_addr_t fault_ipa; /* The address we faulted on */
++	phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
+ 	struct kvm_memory_slot *memslot;
++	struct kvm_s2_trans nested_trans;
+ 	unsigned long hva;
+ 	bool is_iabt, write_fault, writable;
+ 	gfn_t gfn;
+@@ -1928,7 +1948,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+ 
+-	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
+ 	/* Synchronous External Abort? */
+@@ -1952,6 +1972,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	/* Check the stage-2 fault is trans. fault or write fault */
+ 	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+ 	    fault_status != FSC_ACCESS) {
++		/*
++		 * We must never see an address size fault on shadow stage 2
++		 * page table walk, because we would have injected an addr
++		 * size fault when we walked the nested s2 page and not
++		 * create the shadow entry.
++		 */
+ 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+ 			kvm_vcpu_trap_get_class(vcpu),
+ 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+@@ -1961,7 +1987,36 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 
+-	gfn = fault_ipa >> PAGE_SHIFT;
++	/*
++	 * We may have faulted on a shadow stage 2 page table if we are
++	 * running a nested guest.  In this case, we have to resolve the L2
++	 * IPA to the L1 IPA first, before knowing what kind of memory should
++	 * back the L1 IPA.
++	 *
++	 * If the shadow stage 2 page table walk faults, then we simply inject
++	 * this to the guest and carry on.
++	 */
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		u32 esr;
 +
-+#define ICH_LRN(n)	(ICH_LR0_EL2 + (n))
-+#define ICH_AP0RN(n)	(ICH_AP0R0_EL2 + (n))
-+#define ICH_AP1RN(n)	(ICH_AP1R0_EL2 + (n))
++		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
 +
- #endif
++		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
++
++		ipa = kvm_s2_trans_output(&nested_trans);
++	}
++
++	gfn = ipa >> PAGE_SHIFT;
+ 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -1994,13 +2049,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * faulting VA. This is always 12 bits, irrespective
+ 		 * of the page size.
+ 		 */
+-		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+-		ret = io_mem_abort(vcpu, run, fault_ipa);
++		ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
++		ret = io_mem_abort(vcpu, run, ipa);
+ 		goto out_unlock;
+ 	}
+ 
+ 	/* Userspace should not be able to register out-of-bounds IPAs */
+-	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
++	VM_BUG_ON(ipa >= kvm_phys_size(vcpu->kvm));
+ 
+ 	if (fault_status == FSC_ACCESS) {
+ 		handle_access_fault(vcpu, fault_ipa);
+@@ -2008,7 +2063,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		goto out_unlock;
+ 	}
+ 
+-	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
++	ret = user_mem_abort(vcpu, fault_ipa, &nested_trans,
++			     memslot, hva, fault_status);
+ 	if (ret == 0)
+ 		ret = 1;
+ out:
 -- 
 2.20.1
 
