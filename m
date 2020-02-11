@@ -2,69 +2,68 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 071E0C3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93269C352A3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BAD82208C3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5465620661
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0DeaAr9L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD82208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6EOLZcy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5465620661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BDA74AE93;
-	Tue, 11 Feb 2020 12:53:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0854A946;
+	Tue, 11 Feb 2020 12:53:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Nqn-Qamg9tg8; Tue, 11 Feb 2020 12:53:24 -0500 (EST)
+	with ESMTP id yth3xawo+KJE; Tue, 11 Feb 2020 12:53:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 690104AEC0;
-	Tue, 11 Feb 2020 12:53:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DC504AF16;
+	Tue, 11 Feb 2020 12:53:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A1E94AC77
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A16B4AEFE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id elXLNaQY+uyh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:22 -0500 (EST)
+ with ESMTP id OCf1Fgnd6tMj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:24 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A3F34AF18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 137BB4A5BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:24 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6F8A1206CC;
- Tue, 11 Feb 2020 17:53:19 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3269E206D7;
+ Tue, 11 Feb 2020 17:53:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443599;
- bh=vvHFl6AprWPxdXR5AIE7qOpRfP6rPjqAMgRD4Fcr3M8=;
+ s=default; t=1581443603;
+ bh=nQAHpVL2nQ+w5tVvVTUPy86BjEvLrpd6ejEhrIIhTy0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=0DeaAr9LQeT4gvQP8Gz7foVpRY07HjByBxKVOPQS8hSV4Z6p7Jt7VkFDnXB/4XAKp
- NZGSdwFq0aXYLCI1KXE+5w4LTuxtMl1rHOEdEN2rEV3ykwdQbQ9BgcbkT42yavwaY/
- S9vjViK4fiIiE0EdBu8fc63MqVgVQRbWrUiKuH1I=
+ b=E6EOLZcy2osyUIfHwfxM1Yo1Ij7GHJC+4X8MClNJdq89jKUrgLgq7PLco/rhHhXDl
+ ghOp+Y4NMlbVJWg4dSfFq4MIW6pORTSUJULq08S1v+8itBMThFwgZSOnxG4q5ruYbb
+ 0BjvB3r2BwyNpabfh2pPalzZX5MGN53jf53ihgFo=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfh-004O7k-3Q; Tue, 11 Feb 2020 17:50:05 +0000
+ id 1j1ZgO-004O7k-Uu; Tue, 11 Feb 2020 17:50:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 20/94] KVM: arm64: nv: Trap SPSR_EL1,
- ELR_EL1 and VBAR_EL1 from virtual EL2
-Date: Tue, 11 Feb 2020 17:48:24 +0000
-Message-Id: <20200211174938.27809-21-maz@kernel.org>
+Subject: [PATCH v2 94/94] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+Date: Tue, 11 Feb 2020 17:49:38 +0000
+Message-Id: <20200211174938.27809-95-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,74 +94,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+Due to the way ARMv8.4-NV suppresses traps when accessing EL2
+system registers, we can't track when the guest changes its
+HCR_EL2.TGE setting. This means we alwats trap EL1 TLBIs,
+even if they don't affect any guest.
 
-For the same reason we trap virtual memory register accesses at virtual
-EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
-introduces the HCR_EL2.NV1 bit to be able to trap on those register
-accesses in EL1. Do not set this bit until the whole nesting support is
-completed.
+This obviously has a huge impact on performance, as we handle
+TLBI traps as a normal exit, and a normal VHE host issues
+thousands of TLBIs when booting (and quite a few when running
+userspace).
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+A cheap way to reduce the overhead is to handle the limited
+case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
+the right mmu configuration in place. Just execute the decoded
+instruction right away and return to the guest.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/switch.c | 35 +++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/tlb.c    |  6 ++++--
+ arch/arm64/kvm/sys_regs.c   | 28 +++++++++-------------------
+ 3 files changed, 48 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 702692f064f4..18b14c04355a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1628,6 +1628,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d8aae4b5f089..c892fdfecf56 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -539,6 +539,38 @@ static bool __hyp_text __hyp_handle_eret(struct kvm_vcpu *vcpu)
  	return true;
  }
  
-+static bool access_elr(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
++static bool __hyp_text __hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu)
 +{
-+	if (p->is_write)
-+		vcpu->arch.ctxt.gp_regs.elr_el1 = p->regval;
-+	else
-+		p->regval = vcpu->arch.ctxt.gp_regs.elr_el1;
++	u32 instr;
++	u64 val;
++
++	/*
++	 * Ideally, we would never trap on EL1 TLB invalidations when the
++	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
++	 * don't trap writes to HCR_EL2, meaning that we can't track
++	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
++	 * the host. Oopsie...
++	 *
++	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
++	 * set, try and handle these invalidation as quickly as possible,
++	 * without fully exiting (unless this needs forwarding).
++	 */
++	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64 ||
++	    !vcpu_mode_el2(vcpu) ||
++	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
++		return false;
++
++	instr = esr_sys64_to_sysreg(kvm_vcpu_get_hsr(vcpu));
++	if (sys_reg_Op0(instr) != TLBI_Op0 ||
++	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
++		return false;
++
++	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
++	__kvm_tlb_el1_instr(NULL, val, instr);
++	__kvm_skip_instr(vcpu);
 +
 +	return true;
 +}
+ 
+ static bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
+ {
+@@ -669,6 +701,9 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
+ 	if (__hyp_handle_eret(vcpu))
+ 		return true;
+ 
++	if (__hyp_handle_tlbi_el1(vcpu))
++		return true;
 +
-+static bool access_spsr(struct kvm_vcpu *vcpu,
-+			struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1] = p->regval;
-+	else
-+		p->regval = vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1];
-+
-+	return true;
-+}
-+
- static bool access_spsr_el2(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
+ 
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 71e4e86e0981..ef52c5a58866 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -278,7 +278,8 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	if (mmu)
++		__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	/*
+ 	 * Execute the same instruction as the guest hypervisor did,
+@@ -317,5 +318,6 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
+ 	dsb(ish);
+ 	isb();
+ 
+-	__tlb_switch_to_host(mmu, &cxt);
++	if (mmu)
++		__tlb_switch_to_host(mmu, &cxt);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f20f5975633f..c464bc3d8dad 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2688,6 +2688,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  			    const struct sys_reg_desc *r)
-@@ -1783,6 +1807,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	PTRAUTH_KEY(APDB),
- 	PTRAUTH_KEY(APGA),
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++	struct kvm_s2_mmu *mmu;
  
-+	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
-+	{ SYS_DESC(SYS_ELR_EL1), access_elr},
-+
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-@@ -1811,7 +1838,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+ 	/*
+ 	 * If we're here, this is because we've trapped on a EL1 TLBI
+@@ -2706,27 +2708,15 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  
--	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 	mutex_lock(&vcpu->kvm->lock);
  
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+-	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
+-		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-		struct kvm_s2_mmu *mmu;
+-
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
+-		if (mmu)
+-			kvm_call_hyp(__kvm_tlb_el1_instr,
+-				     mmu, p->regval, sys_encoding);
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
++	if (mmu)
++		kvm_call_hyp(__kvm_tlb_el1_instr,
++			     mmu, p->regval, sys_encoding);
+ 
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
+-		if (mmu)
+-			kvm_call_hyp(__kvm_tlb_el1_instr,
+-				     mmu, p->regval, sys_encoding);
+-	} else {
+-		/*
+-		 * ARMv8.4-NV allows the guest to change TGE behind
+-		 * our back, so we always trap EL1 TLBIs from vEL2...
+-		 */
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
++	if (mmu)
+ 		kvm_call_hyp(__kvm_tlb_el1_instr,
+-			     &vcpu->kvm->arch.mmu, p->regval, sys_encoding);
+-	}
++			     mmu, p->regval, sys_encoding);
+ 
+ 	mutex_unlock(&vcpu->kvm->lock);
+ 
 -- 
 2.20.1
 
