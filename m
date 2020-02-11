@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 498EAC352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFB6C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A31020661
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA22C20661
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/dRmCwb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A31020661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKLQChaK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA22C20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B52824AED5;
-	Tue, 11 Feb 2020 12:52:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF294ACF3;
+	Tue, 11 Feb 2020 12:52:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5zisv4g1VRyP; Tue, 11 Feb 2020 12:52:29 -0500 (EST)
+	with ESMTP id tTPoYl7l3NT7; Tue, 11 Feb 2020 12:52:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94D374AEDD;
-	Tue, 11 Feb 2020 12:52:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B25694AED0;
+	Tue, 11 Feb 2020 12:52:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D59534ACF3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF4494ACF3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gs3sxIHsImXI for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id nzHAKjshEqpz for <kvmarm@lists.cs.columbia.edu>;
  Tue, 11 Feb 2020 12:52:26 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2039040456
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01F794AEE5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:26 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5480320661;
- Tue, 11 Feb 2020 17:52:23 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3410720848;
+ Tue, 11 Feb 2020 17:52:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443543;
- bh=nwuR2uWCcoRqKVX0jc68PcrHdtG3RZH2Nm1tXCXwEfo=;
+ s=default; t=1581443545;
+ bh=ZBHGkyRfdRnKRz+z/OfxfM8/L6bY0Ui9wuEIUUN1SVM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=U/dRmCwbsNRjuMAnf0BBQZsTuNSDxWEebKAwTif4CxWRts/CgY25Ak470/qhj6xlf
- 2OeUtQ036cMaTKpQO0qTSsT+6URFXid05iM9A5df8Kf5HdM1hwO/QL4GfIxr+Cgy9r
- rURnrtQ0WEETid1RYNhuI1kknJ9j4jLjerZ1PJaQ=
+ b=pKLQChaKWRGnI/aGHcuXjbhZwv+vg0a13Z+4y7hQYVPLOmnvirN75iifF7jKEd7Kz
+ 6+ZrXCjf3EAmgTDv6dxoNjc579CPSaUOO6XrP1UEK0YogRi2mauDtdTjEWIeO0UzjK
+ 2IJd473aoUoQlA8ZQyDpIUyVNOvzXy72dLZS47R4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zg8-004O7k-SI; Tue, 11 Feb 2020 17:50:33 +0000
+ id 1j1ZgJ-004O7k-NF; Tue, 11 Feb 2020 17:50:43 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 67/94] arm64: Add level-hinted TLB invalidation helper
-Date: Tue, 11 Feb 2020 17:49:11 +0000
-Message-Id: <20200211174938.27809-68-maz@kernel.org>
+Subject: [PATCH v2 85/94] KVM: arm64: Disintegrate SPSR array
+Date: Tue, 11 Feb 2020 17:49:29 +0000
+Message-Id: <20200211174938.27809-86-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -93,62 +94,228 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a level-hinted TLB invalidation helper that only gets used if
-ARMv8.4-TTL gets detected.
+As we're about to move SPSR_EL1 into the VNCR page, we need to
+disassociate it from the rest of the 32bit cruft. Let's break
+the array into individual fields.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/tlbflush.h | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h |  4 ++--
+ arch/arm64/include/asm/kvm_host.h    |  6 ++++-
+ arch/arm64/kvm/guest.c               | 19 +++++++++++----
+ arch/arm64/kvm/hyp/sysreg-sr.c       | 26 ++++++++++-----------
+ arch/arm64/kvm/regmap.c              | 35 +++++++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c            |  4 ++--
+ 6 files changed, 67 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index bc3949064725..a3f70778a325 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -10,6 +10,7 @@
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5718fbc56ba5..eed8bd48e60c 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -327,7 +327,7 @@ static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		return read_sysreg_el1(SYS_SPSR);
+ 	else
+-		return vcpu->arch.ctxt.spsr[KVM_SPSR_EL1];
++		return vcpu->arch.ctxt.spsr_el1;
+ }
  
- #ifndef __ASSEMBLY__
+ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
+@@ -345,7 +345,7 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
+ 	if (vcpu->arch.sysregs_loaded_on_cpu)
+ 		write_sysreg_el1(v, SYS_SPSR);
+ 	else
+-		vcpu->arch.ctxt.spsr[KVM_SPSR_EL1] = v;
++		vcpu->arch.ctxt.spsr_el1 = v;
+ }
  
-+#include <linux/bitfield.h>
- #include <linux/mm_types.h>
- #include <linux/sched.h>
- #include <asm/cputype.h>
-@@ -59,6 +60,35 @@
- 		__ta;						\
- 	})
- 
-+#define TLBI_TTL_MASK	GENMASK_ULL(47, 44)
-+
-+#define __tlbi_level(op, addr, level)					\
-+	do {								\
-+		u64 arg = addr;						\
-+									\
-+		if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&	\
-+		    level) {						\
-+			u64 ttl = level;				\
-+									\
-+			switch (PAGE_SIZE) {				\
-+			case SZ_4K:					\
-+				ttl |= 1 << 2;				\
-+				break;					\
-+			case SZ_16K:					\
-+				ttl |= 2 << 2;				\
-+				break;					\
-+			case SZ_64K:					\
-+				ttl |= 3 << 2;				\
-+				break;					\
-+			}						\
-+									\
-+			arg &= ~TLBI_TTL_MASK;				\
-+			arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);		\
-+		}							\
-+									\
-+		__tlbi(op,  arg);					\
-+	} while(0)
-+
  /*
-  *	TLB Invalidation
-  *	================
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index fe6d5a3bc338..111597123c17 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -336,7 +336,11 @@ enum vcpu_sysreg {
+ struct kvm_cpu_context {
+ 	struct user_pt_regs regs;	/* sp = sp_el0 */
+ 
+-	u64	spsr[KVM_NR_SPSR];
++	u64	spsr_el1;		/* aka spsr_svc */
++	u64	spsr_abt;
++	u64	spsr_und;
++	u64	spsr_irq;
++	u64	spsr_fiq;
+ 
+ 	struct user_fpsimd_state fp_regs;
+ 
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 869017e50464..9710fe55c5dd 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -130,11 +130,20 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	case KVM_REG_ARM_CORE_REG(elr_el1):
+ 		return __vcpu_elr_el1(vcpu);
+ 
+-	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
+-	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
+-		off -= KVM_REG_ARM_CORE_REG(spsr[0]);
+-		off /= 2;
+-		return &vcpu->arch.ctxt.spsr[off];
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
++		return &vcpu->arch.ctxt.spsr_el1;
++
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
++		return &vcpu->arch.ctxt.spsr_abt;
++
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_UND]):
++		return &vcpu->arch.ctxt.spsr_und;
++
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_IRQ]):
++		return &vcpu->arch.ctxt.spsr_irq;
++
++	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_FIQ]):
++		return &vcpu->arch.ctxt.spsr_fiq;
+ 
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index e5359cd39b32..afc603f800e9 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -60,7 +60,7 @@ static void __hyp_text __sysreg_save_vel1_state(struct kvm_cpu_context *ctxt)
+ 
+ 	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
+ 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
+-	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
++	ctxt->spsr_el1			= read_sysreg_el1(SYS_SPSR);
+ }
+ 
+ static void __sysreg_save_vel2_state(struct kvm_cpu_context *ctxt)
+@@ -325,7 +325,7 @@ static void __hyp_text __sysreg_restore_vel1_state(struct kvm_cpu_context *ctxt)
+ 
+ 	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
+-	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
++	write_sysreg_el1(ctxt->spsr_el1,		SYS_SPSR);
+ }
+ 
+ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+@@ -408,18 +408,17 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+ 
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *spsr, *sysreg;
++	u64 *sysreg;
+ 
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+-	spsr = vcpu->arch.ctxt.spsr;
+ 	sysreg = vcpu->arch.ctxt.sys_regs;
+ 
+-	spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
+-	spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
+-	spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
+-	spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
++	vcpu->arch.ctxt.spsr_abt = read_sysreg(spsr_abt);
++	vcpu->arch.ctxt.spsr_und = read_sysreg(spsr_und);
++	vcpu->arch.ctxt.spsr_irq = read_sysreg(spsr_irq);
++	vcpu->arch.ctxt.spsr_fiq = read_sysreg(spsr_fiq);
+ 
+ 	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+ 	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
+@@ -430,18 +429,17 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ 
+ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *spsr, *sysreg;
++	u64 *sysreg;
+ 
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+-	spsr = vcpu->arch.ctxt.spsr;
+ 	sysreg = vcpu->arch.ctxt.sys_regs;
+ 
+-	write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
+-	write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
+-	write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
+-	write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
++	write_sysreg(vcpu->arch.ctxt.spsr_abt, spsr_abt);
++	write_sysreg(vcpu->arch.ctxt.spsr_und, spsr_und);
++	write_sysreg(vcpu->arch.ctxt.spsr_irq, spsr_irq);
++	write_sysreg(vcpu->arch.ctxt.spsr_fiq, spsr_fiq);
+ 
+ 	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
+ 	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
+diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
+index b1596f314087..97c110810527 100644
+--- a/arch/arm64/kvm/regmap.c
++++ b/arch/arm64/kvm/regmap.c
+@@ -147,8 +147,20 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
+ {
+ 	int spsr_idx = vcpu_spsr32_mode(vcpu);
+ 
+-	if (!vcpu->arch.sysregs_loaded_on_cpu)
+-		return vcpu->arch.ctxt.spsr[spsr_idx];
++	if (!vcpu->arch.sysregs_loaded_on_cpu) {
++		switch (spsr_idx) {
++		case KVM_SPSR_SVC:
++			return vcpu->arch.ctxt.spsr_el1;
++		case KVM_SPSR_ABT:
++			return vcpu->arch.ctxt.spsr_abt;
++		case KVM_SPSR_UND:
++			return vcpu->arch.ctxt.spsr_und;
++		case KVM_SPSR_IRQ:
++			return vcpu->arch.ctxt.spsr_irq;
++		case KVM_SPSR_FIQ:
++			return vcpu->arch.ctxt.spsr_fiq;
++		}
++	}
+ 
+ 	switch (spsr_idx) {
+ 	case KVM_SPSR_SVC:
+@@ -171,7 +183,24 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
+ 	int spsr_idx = vcpu_spsr32_mode(vcpu);
+ 
+ 	if (!vcpu->arch.sysregs_loaded_on_cpu) {
+-		vcpu->arch.ctxt.spsr[spsr_idx] = v;
++		switch (spsr_idx) {
++		case KVM_SPSR_SVC:
++			vcpu->arch.ctxt.spsr_el1 = v;
++			break;
++		case KVM_SPSR_ABT:
++			vcpu->arch.ctxt.spsr_abt = v;
++			break;
++		case KVM_SPSR_UND:
++			vcpu->arch.ctxt.spsr_und = v;
++			break;
++		case KVM_SPSR_IRQ:
++			vcpu->arch.ctxt.spsr_irq = v;
++			break;
++		case KVM_SPSR_FIQ:
++			vcpu->arch.ctxt.spsr_fiq = v;
++			break;
++		}
++
+ 		return;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2c3e90e192b4..0d3500a11c50 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1850,9 +1850,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 		return false;
+ 
+ 	if (p->is_write)
+-		vcpu->arch.ctxt.spsr[KVM_SPSR_EL1] = p->regval;
++		vcpu->arch.ctxt.spsr_el1 = p->regval;
+ 	else
+-		p->regval = vcpu->arch.ctxt.spsr[KVM_SPSR_EL1];
++		p->regval = vcpu->arch.ctxt.spsr_el1;
+ 
+ 	return true;
+ }
 -- 
 2.20.1
 
