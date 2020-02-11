@@ -2,60 +2,58 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF91AC352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 15:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB43C3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 15:23:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 588252086A
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 15:13:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 588252086A
+	by mail.kernel.org (Postfix) with ESMTP id EFA83206DB
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 15:23:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA83206DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C616A4AEBE;
-	Tue, 11 Feb 2020 10:13:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87A644AE95;
+	Tue, 11 Feb 2020 10:23:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UqFZV42wdGnd; Tue, 11 Feb 2020 10:13:01 -0500 (EST)
+	with ESMTP id XPG0PTElh0V5; Tue, 11 Feb 2020 10:23:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98CE04ACFA;
-	Tue, 11 Feb 2020 10:13:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B824A5BD;
+	Tue, 11 Feb 2020 10:23:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5984A97D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 10:12:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2766D4A59B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 10:23:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sIxdtZQEN1lM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 10:12:58 -0500 (EST)
+ with ESMTP id UkKU8UF40oo9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 10:23:51 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C3D4A551
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 10:12:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBDC74A54B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 10:23:50 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5C08A30E;
- Tue, 11 Feb 2020 07:12:58 -0800 (PST)
-Received: from [10.1.32.161] (e121487-lin.cambridge.arm.com [10.1.32.161])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B07A3F68E;
- Tue, 11 Feb 2020 07:12:55 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78ACE30E;
+ Tue, 11 Feb 2020 07:23:50 -0800 (PST)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.71])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ 81C283F68E; Tue, 11 Feb 2020 07:23:48 -0800 (PST)
+Date: Tue, 11 Feb 2020 15:23:46 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Message-ID: <20200211152346.GD153117@arrakis.emea.arm.com>
 References: <20200210141324.21090-1-maz@kernel.org>
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Message-ID: <fee903cf-0c21-da4b-aafc-1539b0a0163d@arm.com>
-Date: Tue, 11 Feb 2020 15:12:53 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
 MIME-Version: 1.0
+Content-Disposition: inline
 In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
-Content-Language: en-US
 Cc: Anders Berg <anders.berg@lsi.com>, Russell King <linux@arm.linux.org.uk>,
- Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>
+ Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,7 +70,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2/10/20 2:13 PM, Marc Zyngier wrote:
+On Mon, Feb 10, 2020 at 02:13:19PM +0000, Marc Zyngier wrote:
 > KVM/arm was merged just over 7 years ago, and has lived a very quiet
 > life so far. It mostly works if you're prepared to deal with its
 > limitations, it has been a good prototype for the arm64 version,
@@ -104,9 +102,9 @@ On 2/10/20 2:13 PM, Marc Zyngier wrote:
 >   arm: Remove HYP/Stage-2 page-table support
 >   arm: Remove GICv3 vgic compatibility macros
 
-Acked-by: Vladimir Murzin <vladimir.murzin@arm.com>
- 
+FWIW:
 
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
