@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14AE5C352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78485C352A3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C40AA20848
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 370A320870
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xnf9tvHB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C40AA20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2ZDggBj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 370A320870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2624AE9E;
-	Tue, 11 Feb 2020 12:52:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2F74AEDC;
+	Tue, 11 Feb 2020 12:52:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BsYFP2sXHgIJ; Tue, 11 Feb 2020 12:52:01 -0500 (EST)
+	with ESMTP id 2+OHnLK4iXvu; Tue, 11 Feb 2020 12:52:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9DF84AEE4;
-	Tue, 11 Feb 2020 12:51:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D99EC4AEE2;
+	Tue, 11 Feb 2020 12:52:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5784A97D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E294AC68
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6IvEKvFfI8t2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:57 -0500 (EST)
+ with ESMTP id iSVpWxrWIdIZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:52:01 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35D8040456
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5090F4A94D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:59 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6857220661;
- Tue, 11 Feb 2020 17:51:56 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4ADF8206CC;
+ Tue, 11 Feb 2020 17:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443516;
- bh=8yWpTF4iaTUbN9LOY7/rc6Dq7R5pIpQHT5f/RMVwKY4=;
+ s=default; t=1581443518;
+ bh=jki1RLsu1jQkcwmmm8X8Fk8sx+uqtTR2fwjr2EWmrS4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Xnf9tvHBy1TruTl5Sm8GlHHWCjQ16Uyak6LpSO+GNv+TgH50Y1d4f2SZ6UHYfGhmU
- 6LXT+c6DK7oMB137K/LHYYv/oVcxJw46sLGNCExd6D32Cxt7kQi9GRnoQ/EhfegG9A
- V032SwHm1rDg1IqKgyDWO8AIyDtYm7kqmP7lMVAk=
+ b=M2ZDggBjR6GUKB7o/0PC2vyAs7STB8KsJxW++dKG3GHI6eYtHY2HGJ+rEiN81l+Bd
+ SJwAuKpcO0BGQjwtsWNWk5MRn7tKE3QdXqeXUYK9ql8zq9ukVONKRPO+sPFYN5ye41
+ 0yhF9ohWP7n4jsQKSP8tIwhB3Sv5g8QawVRxWIXA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgE-004O7k-TP; Tue, 11 Feb 2020 17:50:39 +0000
+ id 1j1Zfz-004O7k-DE; Tue, 11 Feb 2020 17:50:23 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 77/94] KVM: arm64: nv: Move sysreg reset check to boot time
-Date: Tue, 11 Feb 2020 17:49:21 +0000
-Message-Id: <20200211174938.27809-78-maz@kernel.org>
+Subject: [PATCH v2 51/94] KVM: arm64: nv: vgic-v3: Take cpu_if pointer
+ directly instead of vcpu
+Date: Tue, 11 Feb 2020 17:48:55 +0000
+Message-Id: <20200211174938.27809-52-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,145 +95,442 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Our sysreg reset check has become a bit silly, as it only checks whether
-a reset callback actually exists for a given sysreg entry, and apply the
-method if available. Doing the check at each vcpu reset is pretty dumb,
-as the tables never change. It is thus perfectly possible to do the same
-checks at boot time.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-This also allows us to introduce a sparse sys_regs[] array, something
-that will be required with ARMv8.4-NV.
+If we move the used_lrs field to the version-specific cpu interface
+structure, the following functions only operate on the struct
+vgic_v3_cpu_if and not the full vcpu:
 
+  __vgic_v3_save_state
+  __vgic_v3_restore_state
+  __vgic_v3_activate_traps
+  __vgic_v3_deactivate_traps
+  __vgic_v3_save_aprs
+  __vgic_v3_restore_aprs
+
+This is going to be very useful for nested virt, so move the used_lrs
+field and change the prototypes and implementations of these functions to
+take the cpu_if parameter directly.
+
+No functional change.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 74 +++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 38 deletions(-)
+ arch/arm/include/asm/kvm_hyp.h   | 12 ++++++------
+ arch/arm/kvm/hyp/switch.c        |  8 ++++----
+ arch/arm64/include/asm/kvm_hyp.h | 12 ++++++------
+ arch/arm64/kvm/hyp/switch.c      |  8 ++++----
+ include/kvm/arm_vgic.h           |  5 ++++-
+ virt/kvm/arm/hyp/vgic-v3-sr.c    | 33 ++++++++++----------------------
+ virt/kvm/arm/vgic/vgic-v2.c      | 10 +++++-----
+ virt/kvm/arm/vgic/vgic-v3.c      | 14 ++++++++------
+ virt/kvm/arm/vgic/vgic.c         | 25 ++++++++++++++++--------
+ 9 files changed, 64 insertions(+), 63 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 268829c73313..9d426304bfb3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3166,12 +3166,37 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+diff --git a/arch/arm/include/asm/kvm_hyp.h b/arch/arm/include/asm/kvm_hyp.h
+index 3c1b55ecc578..5d4017c4f649 100644
+--- a/arch/arm/include/asm/kvm_hyp.h
++++ b/arch/arm/include/asm/kvm_hyp.h
+@@ -103,12 +103,12 @@ void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+ void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
+ 
+-void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
+-void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+-void __vgic_v3_activate_traps(struct kvm_vcpu *vcpu);
+-void __vgic_v3_deactivate_traps(struct kvm_vcpu *vcpu);
+-void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
+-void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
++void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if);
+ 
+ asmlinkage void __vfp_save_state(struct vfp_hard_struct *vfp);
+ asmlinkage void __vfp_restore_state(struct vfp_hard_struct *vfp);
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index 0b53e79f3bfb..272facc7f3ed 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -79,16 +79,16 @@ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+ static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+-		__vgic_v3_save_state(vcpu);
+-		__vgic_v3_deactivate_traps(vcpu);
++		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
++		__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+ 	}
+ }
+ 
+ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+-		__vgic_v3_activate_traps(vcpu);
+-		__vgic_v3_restore_state(vcpu);
++		__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
++		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+ 	}
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 4899a5b74fc3..4c63a2254bf1 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -48,12 +48,12 @@
+ 
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
+-void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
+-void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+-void __vgic_v3_activate_traps(struct kvm_vcpu *vcpu);
+-void __vgic_v3_deactivate_traps(struct kvm_vcpu *vcpu);
+-void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
+-void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
++void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
++void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if);
+ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
+ void __timer_enable_traps(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 43e3a60915b1..97c5c1a791b8 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -306,8 +306,8 @@ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+ static void __hyp_text __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+-		__vgic_v3_save_state(vcpu);
+-		__vgic_v3_deactivate_traps(vcpu);
++		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
++		__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+ 	}
+ }
+ 
+@@ -315,8 +315,8 @@ static void __hyp_text __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+ static void __hyp_text __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+-		__vgic_v3_activate_traps(vcpu);
+-		__vgic_v3_restore_state(vcpu);
++		__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
++		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+ 	}
+ }
+ 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 1b477c662608..f89b81327bb0 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -270,6 +270,8 @@ struct vgic_v2_cpu_if {
+ 	u32		vgic_vmcr;
+ 	u32		vgic_apr;
+ 	u32		vgic_lr[VGIC_V2_MAX_LRS];
++
++	unsigned int used_lrs;
  };
  
-+static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-+			      bool is_32)
-+{
-+	unsigned int i;
+ struct vgic_v3_cpu_if {
+@@ -287,6 +289,8 @@ struct vgic_v3_cpu_if {
+ 	 * linking the Linux IRQ subsystem and the ITS together.
+ 	 */
+ 	struct its_vpe	its_vpe;
 +
-+	for (i = 0; i < n; i++) {
-+		if (!is_32 && table[i].reg && !table[i].reset) {
-+			kvm_err("sys_reg table %p entry %d has lacks reset\n",
-+				table, i);
-+			return 1;
-+		}
-+
-+		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
-+			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* Target specific emulation tables */
- static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
++	unsigned int used_lrs;
+ };
  
- void kvm_register_target_sys_reg_table(unsigned int target,
- 				       struct kvm_sys_reg_target_table *table)
+ struct vgic_cpu {
+@@ -296,7 +300,6 @@ struct vgic_cpu {
+ 		struct vgic_v3_cpu_if	vgic_v3;
+ 	};
+ 
+-	unsigned int used_lrs;
+ 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
+ 
+ 	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index ccf1fde9836c..2ea9a0b73fc4 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -194,10 +194,9 @@ static u32 __hyp_text __vgic_v3_read_ap1rn(int n)
+ 	return val;
+ }
+ 
+-void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
  {
-+	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
-+	    check_sysreg_table(table->table32.table, table->table32.num, true))
-+		return;
+-	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 used_lrs = cpu_if->used_lrs;
+ 
+ 	/*
+ 	 * Make sure stores to the GIC via the memory mapped interface
+@@ -230,10 +229,9 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
+ {
+-	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 used_lrs = cpu_if->used_lrs;
+ 	int i;
+ 
+ 	if (used_lrs || cpu_if->its_vpe.its_vm) {
+@@ -257,10 +255,8 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-void __hyp_text __vgic_v3_activate_traps(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
+ {
+-	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-
+ 	/*
+ 	 * VFIQEn is RES1 if ICC_SRE_EL1.SRE is 1. This causes a
+ 	 * Group0 interrupt (as generated in GICv2 mode) to be
+@@ -306,9 +302,8 @@ void __hyp_text __vgic_v3_activate_traps(struct kvm_vcpu *vcpu)
+ 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+ }
+ 
+-void __hyp_text __vgic_v3_deactivate_traps(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
+ {
+-	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 	u64 val;
+ 
+ 	if (!cpu_if->vgic_sre) {
+@@ -333,15 +328,11 @@ void __hyp_text __vgic_v3_deactivate_traps(struct kvm_vcpu *vcpu)
+ 		write_gicreg(0, ICH_HCR_EL2);
+ }
+ 
+-void __hyp_text __vgic_v3_save_aprs(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
+ {
+-	struct vgic_v3_cpu_if *cpu_if;
+ 	u64 val;
+ 	u32 nr_pre_bits;
+ 
+-	vcpu = kern_hyp_va(vcpu);
+-	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-
+ 	val = read_gicreg(ICH_VTR_EL2);
+ 	nr_pre_bits = vtr_to_nr_pre_bits(val);
+ 
+@@ -370,15 +361,11 @@ void __hyp_text __vgic_v3_save_aprs(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-void __hyp_text __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
+ {
+-	struct vgic_v3_cpu_if *cpu_if;
+ 	u64 val;
+ 	u32 nr_pre_bits;
+ 
+-	vcpu = kern_hyp_va(vcpu);
+-	cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+-
+ 	val = read_gicreg(ICH_VTR_EL2);
+ 	nr_pre_bits = vtr_to_nr_pre_bits(val);
+ 
+@@ -453,7 +440,7 @@ static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
+ 						    u32 vmcr,
+ 						    u64 *lr_val)
+ {
+-	unsigned int used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
+ 	u8 priority = GICv3_IDLE_PRIORITY;
+ 	int i, lr = -1;
+ 
+@@ -492,7 +479,7 @@ static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
+ static int __hyp_text __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu,
+ 					       int intid, u64 *lr_val)
+ {
+-	unsigned int used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
+ 	int i;
+ 
+ 	for (i = 0; i < used_lrs; i++) {
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 621cc168fe3f..ebf53a4e1296 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -56,7 +56,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+ 
+-	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
++	for (lr = 0; lr < vgic_cpu->vgic_v2.used_lrs; lr++) {
+ 		u32 val = cpuif->vgic_lr[lr];
+ 		u32 cpuid, intid = val & GICH_LR_VIRTUALID;
+ 		struct vgic_irq *irq;
+@@ -120,7 +120,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+ 
+-	vgic_cpu->used_lrs = 0;
++	cpuif->used_lrs = 0;
+ }
+ 
+ /*
+@@ -427,7 +427,7 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
+ static void save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 used_lrs = cpu_if->used_lrs;
+ 	u64 elrsr;
+ 	int i;
+ 
+@@ -448,7 +448,7 @@ static void save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+ void vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 used_lrs = vcpu->arch.vgic_cpu.vgic_v2.used_lrs;
+ 
+ 	if (!base)
+ 		return;
+@@ -463,7 +463,7 @@ void vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+ 	void __iomem *base = kvm_vgic_global_state.vctrl_base;
+-	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
++	u64 used_lrs = cpu_if->used_lrs;
+ 	int i;
+ 
+ 	if (!base)
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index f45635a6f0ec..a8732afb37e5 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -39,7 +39,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
+ 
+-	for (lr = 0; lr < vgic_cpu->used_lrs; lr++) {
++	for (lr = 0; lr < cpuif->used_lrs; lr++) {
+ 		u64 val = cpuif->vgic_lr[lr];
+ 		u32 intid, cpuid;
+ 		struct vgic_irq *irq;
+@@ -111,7 +111,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+ 
+-	vgic_cpu->used_lrs = 0;
++	cpuif->used_lrs = 0;
+ }
+ 
+ /* Requires the irq to be locked already */
+@@ -660,10 +660,10 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+ 	if (likely(cpu_if->vgic_sre))
+ 		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
+ 
+-	kvm_call_hyp(__vgic_v3_restore_aprs, vcpu);
++	kvm_call_hyp(__vgic_v3_restore_aprs, kern_hyp_va(cpu_if));
+ 
+ 	if (has_vhe())
+-		__vgic_v3_activate_traps(vcpu);
++		__vgic_v3_activate_traps(cpu_if);
+ 
+ 	WARN_ON(vgic_v4_load(vcpu));
+ }
+@@ -678,12 +678,14 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+ 
+ void vgic_v3_put(struct kvm_vcpu *vcpu)
+ {
++	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
 +
- 	target_tables[target] = table;
+ 	WARN_ON(vgic_v4_put(vcpu, false));
+ 
+ 	vgic_v3_vmcr_sync(vcpu);
+ 
+-	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
++	kvm_call_hyp(__vgic_v3_save_aprs, kern_hyp_va(cpu_if));
+ 
+ 	if (has_vhe())
+-		__vgic_v3_deactivate_traps(vcpu);
++		__vgic_v3_deactivate_traps(cpu_if);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 4cbaf0020277..a2428b42f7e2 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -801,6 +801,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	int count;
+ 	bool multi_sgi;
+ 	u8 prio = 0xff;
++	int i = 0;
+ 
+ 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+@@ -842,11 +843,14 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	vcpu->arch.vgic_cpu.used_lrs = count;
+-
+ 	/* Nuke remaining LRs */
+-	for ( ; count < kvm_vgic_global_state.nr_lr; count++)
+-		vgic_clear_lr(vcpu, count);
++	for (i = count ; i < kvm_vgic_global_state.nr_lr; i++)
++		vgic_clear_lr(vcpu, i);
++
++	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++		vcpu->arch.vgic_cpu.vgic_v2.used_lrs = count;
++	else
++		vcpu->arch.vgic_cpu.vgic_v3.used_lrs = count;
  }
  
-@@ -3483,19 +3508,13 @@ static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+ static inline bool can_access_vgic_from_kernel(void)
+@@ -864,13 +868,13 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+ 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		vgic_v2_save_state(vcpu);
+ 	else
+-		__vgic_v3_save_state(vcpu);
++		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
  }
  
- static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
--				const struct sys_reg_desc *table, size_t num,
--				unsigned long *bmap)
-+				const struct sys_reg_desc *table, size_t num)
+ /* Sync back the hardware VGIC state into our emulation after a guest's run. */
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
  {
- 	unsigned long i;
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	int used_lrs;
  
- 	for (i = 0; i < num; i++)
--		if (table[i].reset) {
--			int reg = table[i].reg;
--
-+		if (table[i].reset)
- 			table[i].reset(vcpu, &table[i]);
--			if (reg > 0 && reg < NR_SYS_REGS)
--				set_bit(reg, bmap);
--		}
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+@@ -879,7 +883,12 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	if (can_access_vgic_from_kernel())
+ 		vgic_save_state(vcpu);
+ 
+-	if (vgic_cpu->used_lrs)
++	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++		used_lrs = vcpu->arch.vgic_cpu.vgic_v2.used_lrs;
++	else
++		used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
++
++	if (used_lrs)
+ 		vgic_fold_lr_state(vcpu);
+ 	vgic_prune_ap_list(vcpu);
+ }
+@@ -889,7 +898,7 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		vgic_v2_restore_state(vcpu);
+ 	else
+-		__vgic_v3_restore_state(vcpu);
++		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
  }
  
- /**
-@@ -3958,33 +3977,19 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 	return write_demux_regids(uindices);
- }
- 
--static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n)
--{
--	unsigned int i;
--
--	for (i = 1; i < n; i++) {
--		if (cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
--			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
--			return 1;
--		}
--	}
--
--	return 0;
--}
--
- void kvm_sys_reg_table_init(void)
- {
- 	unsigned int i;
- 	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
--	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs)));
--	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs)));
--	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs)));
--	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
--	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
--	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
--	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs)));
-+	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false));
-+	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true));
-+	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true));
-+	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
-+	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
-+	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
-+	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false));
- 
- 	/* We abuse the reset function to overwrite the table itself. */
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
-@@ -4020,17 +4025,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- {
- 	size_t num;
- 	const struct sys_reg_desc *table;
--	DECLARE_BITMAP(bmap, NR_SYS_REGS) = { 0, };
- 
- 	/* Generic chip reset first (so target could override). */
--	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
-+	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
- 	table = get_target_table(vcpu->arch.target, true, &num);
--	reset_sys_reg_descs(vcpu, table, num, bmap);
--
--	for (num = 1; num < NR_SYS_REGS; num++) {
--		if (WARN(!test_bit(num, bmap),
--			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
--			break;
--	}
-+	reset_sys_reg_descs(vcpu, table, num);
- }
+ /* Flush our emulation state into the GIC hardware before entering the guest. */
 -- 
 2.20.1
 
