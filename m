@@ -4,66 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E02C35242
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C86C3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F2EBB20848
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9699020870
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IcFmD277"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2EBB20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1BBe8Vos"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9699020870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D8B4AEA4;
-	Tue, 11 Feb 2020 12:53:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 218BE4AEB5;
+	Tue, 11 Feb 2020 12:53:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3t-jGrNBFUrB; Tue, 11 Feb 2020 12:53:01 -0500 (EST)
+	with ESMTP id xeVfgew9BO24; Tue, 11 Feb 2020 12:53:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1DC84AEF7;
-	Tue, 11 Feb 2020 12:53:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02EAC4AEFD;
+	Tue, 11 Feb 2020 12:53:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 273284A551
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A507D4AE95
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 49E-cHxH-6Oz for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:52:58 -0500 (EST)
+ with ESMTP id 4mHfIMGmrFzr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:00 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA3114AEC4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A522340456
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:59 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 09BF520661;
- Tue, 11 Feb 2020 17:52:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D83FE20578;
+ Tue, 11 Feb 2020 17:52:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443577;
- bh=0Nz9UTGevazxDml65pFpWpvj0exBxapL78FXYgUMnz0=;
+ s=default; t=1581443579;
+ bh=uSp/qawlZOx/68y9N8aqpzHmqTR1tge0KqerXZ4jmX0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IcFmD277CljVD6bmP3Wy7n2VaxV2vcftE3JKZII/M6aNiw0vusETXJ/mMll8RM3iJ
- opkauox9ZD21Jr/Q/fk6qUjJT+wAVs0olyUTGYowWGA69MI8ag4U4ixvviu16p9tt4
- I14BqMlS+TphflWFD++Rq2bmdp+2ppObgLiIHPlA=
+ b=1BBe8VosogcMLhIH1Cxow3e5tH7Wwclup3MQxlYhoLyks6Vq13UX5mWOjZRxZm6z5
+ coSjZmrZOD2IAtKdQTCTgeha/vBa5ose381LtQ1g+87ETGSrL5mZHc0a/jEt/M607O
+ 53oOuEhj3X7V3/1Jl7MerCrqY3ORuFVMAlPQKoco=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfn-004O7k-F6; Tue, 11 Feb 2020 17:50:11 +0000
+ id 1j1Zfp-004O7k-OW; Tue, 11 Feb 2020 17:50:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 31/94] KVM: arm64: nv: Only toggle cache for virtual EL2
- when SCTLR_EL2 changes
-Date: Tue, 11 Feb 2020 17:48:35 +0000
-Message-Id: <20200211174938.27809-32-maz@kernel.org>
+Subject: [PATCH v2 35/94] KVM: arm64: Check advertised Stage-2 page size
+ capability
+Date: Tue, 11 Feb 2020 17:48:39 +0000
+Message-Id: <20200211174938.27809-36-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,49 +95,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
+advertise the supported Stage-2 page sizes.
 
-So far we were flushing almost the entire universe whenever a VM would
-load/unload the SCTLR_EL1 and the two versions of that register had
-different MMU enabled settings.  This turned out to be so slow that it
-prevented forward progress for a nested VM, because a scheduler timer
-tick interrupt would always be pending when we reached the nested VM.
+Let's check this at boot time.
 
-To avoid this problem, we consider the SCTLR_EL2 when evaluating if
-caches are on or off when entering virtual EL2 (because this is the
-value that we end up shadowing onto the hardware EL1 register).
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmu.h    |  2 +-
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kernel/cpufeature.c    |  8 +++++++
+ arch/arm64/kvm/reset.c            | 39 ++++++++++++++++++++++++++++---
+ virt/kvm/arm/arm.c                |  4 +---
+ 5 files changed, 47 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index ee47f7637f28..ec4de0613e7c 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -88,6 +88,7 @@ alternative_cb_end
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
- #include <asm/pgtable.h>
-+#include <asm/kvm_emulate.h>
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 0d84d50bf9ba..053a5f434b3e 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -418,7 +418,7 @@ static inline int hyp_map_aux_data(void)
  
- void kvm_update_va_mask(struct alt_instr *alt,
- 			__le32 *origptr, __le32 *updptr, int nr_inst);
-@@ -305,7 +306,10 @@ struct kvm;
+ #define kvm_phys_to_vttbr(addr)		(addr)
  
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+-static inline void kvm_set_ipa_limit(void) {}
++static inline int kvm_set_ipa_limit(void) { return 0; }
+ 
+ static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
  {
--	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
-+	if (vcpu_mode_el2(vcpu))
-+		return (__vcpu_sys_reg(vcpu, SCTLR_EL2) & 0b101) == 0b101;
-+	else
-+		return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 1bda11cc0f39..87ccceb9f5d8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -734,7 +734,7 @@ static inline int kvm_arm_have_ssbd(void)
+ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+ 
+-void kvm_set_ipa_limit(void);
++int kvm_set_ipa_limit(void);
+ 
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ struct kvm *kvm_arch_alloc_vm(void);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index f0e58450eb16..157700590aa8 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -205,6 +205,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
++	/*
++	 * Page size not being supported at Stage-2 are not fatal. You
++	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
++	 * your favourite nesting hypervisor.
++	 */
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
+ 	/*
+ 	 * We already refuse to boot CPUs that don't support our configured
+ 	 * page size, so we can only detect mismatches for a page size other
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 5c50df274239..038765d1e60d 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -348,11 +348,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	return ret;
  }
  
- static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+-void kvm_set_ipa_limit(void)
++int kvm_set_ipa_limit(void)
+ {
+-	unsigned int ipa_max, pa_max, va_max, parange;
++	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
++	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+ 
+-	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
++	/*
++	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
++	 * Stage-2. If not, things will stop very quickly.
++	 */
++	switch (PAGE_SIZE) {
++	default:
++	case SZ_4K:
++		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
++		break;
++	case SZ_16K:
++		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
++		break;
++	case SZ_64K:
++		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
++		break;
++	}
++
++	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
++	default:
++	case 1:
++		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
++		return -EINVAL;
++	case 0:
++		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
++		break;
++	case 2:
++		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
++		break;
++	}
++
++	parange = mmfr0 & 0x7;
+ 	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
+ 
+ 	/* Clamp the IPA limit to the PA size supported by the kernel */
+@@ -386,6 +417,8 @@ void kvm_set_ipa_limit(void)
+ 	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
+ 	kvm_ipa_limit = ipa_max;
+ 	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
++
++	return 0;
+ }
+ 
+ /*
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index d65a0faa46d8..d1359b2079df 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1421,9 +1421,7 @@ static inline void hyp_cpu_pm_exit(void)
+ 
+ static int init_common_resources(void)
+ {
+-	kvm_set_ipa_limit();
+-
+-	return 0;
++	return kvm_set_ipa_limit();
+ }
+ 
+ static int init_subsystems(void)
 -- 
 2.20.1
 
