@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C158FC3B188
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5EBC35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 857DC214DB
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 312BA20578
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZwWvTFc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857DC214DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="EwNNhkC9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312BA20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B0CB4AEC4;
-	Tue, 11 Feb 2020 12:53:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C4F34AC6C;
+	Tue, 11 Feb 2020 12:53:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hBcq2t0M2zSx; Tue, 11 Feb 2020 12:53:19 -0500 (EST)
+	with ESMTP id HW5CH2YHDdKV; Tue, 11 Feb 2020 12:53:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 212CB4AF00;
-	Tue, 11 Feb 2020 12:53:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD234AEFE;
+	Tue, 11 Feb 2020 12:53:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 967894A955
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFD3F4A97D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AT1JS4xDRgsN for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:16 -0500 (EST)
+ with ESMTP id CYODUZ+Ly96s for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:18 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B069B4AF00
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AA514AED0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:18 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E296D20661;
- Tue, 11 Feb 2020 17:53:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9A86E208C3;
+ Tue, 11 Feb 2020 17:53:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443594;
- bh=FUObRX1i5yYjDDdV90Q3AHebzA2hM6GwZwnuM2X/+0A=;
+ s=default; t=1581443597;
+ bh=QY0vOrEBi06uaCWEKz/JMSvWF3lSjw1/mP4A3k4YHko=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HZwWvTFctOfcTpC0Hf84F/pPsaUV0lORAgSdwrWdnSI0tHczAcA676pWGeBhKuRVa
- uR6VMyXM2eZrQUH7Ian7wZi0TiIZ/L0CT07digHlsaUS+SYn5PJ6YetRUChtCGnTjc
- jWc0o6JH04mvLnUJyCI6/ec+FeFyrrUjkEpI077A=
+ b=EwNNhkC9RVAuwBJwVCrb46vUMRF9z0KonhJQ0wgMJ1Wh3e8sJqewsHcGQBGTB+ssR
+ 1nu1+0M4mu92YujrOo7X4aIkZLJssfBMF0nlriO8FTfLWHcqDwvBu9lH3CjvnO6hc+
+ YRNkcATJNfzuuvZb3QItsYR8hXENZAIUFirPCXdM=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfd-004O7k-Lp; Tue, 11 Feb 2020 17:50:01 +0000
+ id 1j1Zfd-004O7k-3X; Tue, 11 Feb 2020 17:50:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 14/94] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-Date: Tue, 11 Feb 2020 17:48:18 +0000
-Message-Id: <20200211174938.27809-15-maz@kernel.org>
+Subject: [PATCH v2 13/94] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
+Date: Tue, 11 Feb 2020 17:48:17 +0000
+Message-Id: <20200211174938.27809-14-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,188 +94,189 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM internally uses accessor functions when reading or writing the
-guest's system registers. This takes care of accessing either the stored
-copy or using the "live" EL1 system registers when the host uses VHE.
+Extract the direct HW accessors for later reuse.
 
-With the introduction of virtual EL2 we add a bunch of EL2 system
-registers, which now must also be taken care of:
-- If the guest is running in vEL2, and we access an EL1 sysreg, we must
-  revert to the stored version of that, and not use the CPU's copy.
-- If the guest is running in vEL1, and we access an EL2 sysreg, we must
-  also use the stored version, since the CPU carries the EL1 copy.
-- Some EL2 system registers are supposed to affect the current execution
-  of the system, so we need to put them into their respective EL1
-  counterparts. For this we need to define a mapping between the two.
-  This is done using the newly introduced struct el2_sysreg_map.
-- Some EL2 system registers have a different format than their EL1
-  counterpart, so we need to translate them before writing them to the
-  CPU. This is done using an (optional) translate function in the map.
-- There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
-  which need some separate handling (SPSR_EL2 is being handled in a
-  separate patch).
-
-All of these cases are now wrapped into the existing accessor functions,
-so KVM users wouldn't need to care whether they access EL2 or EL1
-registers and also which state the guest is in.
-
-This handles what was formerly known as the "shadow state" dynamically,
-without requiring a separate copy for each vCPU EL.
-
-Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 117 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 116 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 143 +++++++++++++++++++++++---------------
+ 1 file changed, 86 insertions(+), 57 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 42a268c21f06..64be9f452ad6 100644
+index 634d3ee6799c..42a268c21f06 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -113,6 +113,56 @@ u64 translate_cnthctl(u64 cnthctl)
+@@ -113,11 +113,8 @@ u64 translate_cnthctl(u64 cnthctl)
  	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
  }
  
-+#define PURE_EL2_SYSREG(el2)						\
-+	case el2: {							\
-+		*el1r = el2;						\
-+		return true;						\
-+	}
-+
-+#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
-+	case el2: {							\
-+		*xlate = fn;						\
-+		*el1r = el1;						\
-+		return true;						\
-+	}
-+
-+static bool get_el2_mapping(unsigned int reg,
-+			    unsigned int *el1r, u64 (**xlate)(u64))
-+{
-+	switch (reg) {
-+		PURE_EL2_SYSREG(  VPIDR_EL2	);
-+		PURE_EL2_SYSREG(  VMPIDR_EL2	);
-+		PURE_EL2_SYSREG(  ACTLR_EL2	);
-+		PURE_EL2_SYSREG(  HCR_EL2	);
-+		PURE_EL2_SYSREG(  MDCR_EL2	);
-+		PURE_EL2_SYSREG(  HSTR_EL2	);
-+		PURE_EL2_SYSREG(  HACR_EL2	);
-+		PURE_EL2_SYSREG(  VTTBR_EL2	);
-+		PURE_EL2_SYSREG(  VTCR_EL2	);
-+		PURE_EL2_SYSREG(  RVBAR_EL2	);
-+		PURE_EL2_SYSREG(  RMR_EL2	);
-+		PURE_EL2_SYSREG(  TPIDR_EL2	);
-+		PURE_EL2_SYSREG(  HPFAR_EL2	);
-+		PURE_EL2_SYSREG(  ELR_EL2	);
-+		PURE_EL2_SYSREG(  SPSR_EL2	);
-+		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,   translate_sctlr  );
-+		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,   translate_cptr   );
-+		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,   translate_ttbr0  );
-+		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
-+		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,     translate_tcr    );
-+		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
-+		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
-+		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
-+		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
-+		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
-+		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
-+		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
-+		MAPPED_EL2_SYSREG(CNTHCTL_EL2, CNTKCTL_EL1, translate_cnthctl);
-+	default:
-+		return false;
-+	}
-+}
-+
- static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+-u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
++static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
  {
+-	if (!vcpu->arch.sysregs_loaded_on_cpu)
+-		goto immediate_read;
+-
  	/*
-@@ -197,9 +247,42 @@ static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- {
- 	u64 val = 0x8badf00d8badf00d;
-+	u64 (*xlate)(u64) = NULL;
-+	unsigned int el1r;
- 
--	if (!vcpu->arch.sysregs_loaded_on_cpu) {
-+	if (!vcpu->arch.sysregs_loaded_on_cpu)
- 		goto memory_read;
-+
-+	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-+		if (!is_hyp_ctxt(vcpu))
-+			goto memory_read;
-+
-+		/*
-+		 * ELR_EL2 is special cased for now.
-+		 */
-+		switch (reg) {
-+		case ELR_EL2:
-+			return read_sysreg_el1(SYS_ELR);
-+		}
-+
-+		/*
-+		 * If this register does not have an EL1 counterpart,
-+		 * then read the stored EL2 version.
-+		 */
-+		if (reg == el1r)
-+			goto memory_read;
-+
-+		/*
-+		 * If we have a non-VHE guest and that the sysreg
-+		 * requires translation to be used at EL1, use the
-+		 * in-memory copy instead.
-+		 */
-+		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-+			goto memory_read;
-+
-+		/* Get the current version of the EL1 counterpart. */
-+		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
-+		return val;
+ 	 * System registers listed in the switch are not saved on every
+ 	 * exit from the guest but are only saved on vcpu_put.
+@@ -128,40 +125,37 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 	 * thread when emulating cross-VCPU communication.
+ 	 */
+ 	switch (reg) {
+-	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
+-	case SCTLR_EL1:		return read_sysreg_s(SYS_SCTLR_EL12);
+-	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
+-	case CPACR_EL1:		return read_sysreg_s(SYS_CPACR_EL12);
+-	case TTBR0_EL1:		return read_sysreg_s(SYS_TTBR0_EL12);
+-	case TTBR1_EL1:		return read_sysreg_s(SYS_TTBR1_EL12);
+-	case TCR_EL1:		return read_sysreg_s(SYS_TCR_EL12);
+-	case ESR_EL1:		return read_sysreg_s(SYS_ESR_EL12);
+-	case AFSR0_EL1:		return read_sysreg_s(SYS_AFSR0_EL12);
+-	case AFSR1_EL1:		return read_sysreg_s(SYS_AFSR1_EL12);
+-	case FAR_EL1:		return read_sysreg_s(SYS_FAR_EL12);
+-	case MAIR_EL1:		return read_sysreg_s(SYS_MAIR_EL12);
+-	case VBAR_EL1:		return read_sysreg_s(SYS_VBAR_EL12);
+-	case CONTEXTIDR_EL1:	return read_sysreg_s(SYS_CONTEXTIDR_EL12);
+-	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
+-	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
+-	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
+-	case AMAIR_EL1:		return read_sysreg_s(SYS_AMAIR_EL12);
+-	case CNTKCTL_EL1:	return read_sysreg_s(SYS_CNTKCTL_EL12);
+-	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
+-	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
+-	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
+-	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
++	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
++	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
++	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
++	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
++	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
++	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
++	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
++	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
++	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
++	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
++	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
++	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
++	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
++	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
++	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
++	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
++	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
++	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
++	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
++	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
++	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
++	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
++	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
++	default:		return false;
  	}
  
- 	/* EL1 register can't be on the CPU if the guest is in vEL2. */
-@@ -215,9 +298,41 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+-immediate_read:
+-	return __vcpu_sys_reg(vcpu, reg);
++	return true;
+ }
  
- void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+-void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
++static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
  {
-+	u64 (*xlate)(u64) = NULL;
-+	unsigned int el1r;
-+
- 	if (!vcpu->arch.sysregs_loaded_on_cpu)
- 		goto memory_write;
- 
-+	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-+		if (!is_hyp_ctxt(vcpu))
-+			goto memory_write;
-+
-+		/*
-+		 * Always store a copy of the write to memory to avoid having
-+		 * to reverse-translate virtual EL2 system registers for a
-+		 * non-VHE guest hypervisor.
-+		 */
-+		__vcpu_sys_reg(vcpu, reg) = val;
-+
-+		switch (reg) {
-+		case ELR_EL2:
-+			write_sysreg_el1(val, SYS_ELR);
-+			return;
-+		}
-+
-+		/* No EL1 counterpart? We're done here.? */
-+		if (reg == el1r)
-+			return;
-+
-+		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-+			val = xlate(val);
-+
-+		/* Redirect this to the EL1 version of the register. */
-+		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
-+		return;
+-	if (!vcpu->arch.sysregs_loaded_on_cpu)
+-		goto immediate_write;
+-
+ 	/*
+ 	 * System registers listed in the switch are not restored on every
+ 	 * entry to the guest but are only restored on vcpu_load.
+@@ -171,32 +165,67 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 	 * set once, before running the VCPU, and never changed later.
+ 	 */
+ 	switch (reg) {
+-	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
+-	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	return;
+-	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
+-	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	return;
+-	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	return;
+-	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	return;
+-	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	return;
+-	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	return;
+-	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	return;
+-	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	return;
+-	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	return;
+-	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	return;
+-	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	return;
+-	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12); return;
+-	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
+-	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
+-	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
+-	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	return;
+-	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	return;
+-	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
+-	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
+-	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
+-	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
++	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
++	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
++	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
++	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
++	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
++	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
++	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
++	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
++	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
++	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
++	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
++	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
++	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
++	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
++	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
++	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
++	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
++	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
++	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
++	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
++	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
++	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
++	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
++	default:		return false;
 +	}
 +
- 	/* EL1 register can't be on the CPU if the guest is in vEL2. */
- 	if (unlikely(is_hyp_ctxt(vcpu)))
- 		goto memory_write;
++	return true;
++}
++
++u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
++{
++	u64 val = 0x8badf00d8badf00d;
++
++	if (!vcpu->arch.sysregs_loaded_on_cpu) {
++		goto memory_read;
+ 	}
+ 
+-immediate_write:
++	/* EL1 register can't be on the CPU if the guest is in vEL2. */
++	if (unlikely(is_hyp_ctxt(vcpu)))
++		goto memory_read;
++
++	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
++		return val;
++
++memory_read:
++	return __vcpu_sys_reg(vcpu, reg);
++}
++
++void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
++{
++	if (!vcpu->arch.sysregs_loaded_on_cpu)
++		goto memory_write;
++
++	/* EL1 register can't be on the CPU if the guest is in vEL2. */
++	if (unlikely(is_hyp_ctxt(vcpu)))
++		goto memory_write;
++
++	if (__vcpu_write_sys_reg_to_cpu(val, reg))
++		return;
++
++memory_write:
+ 	 __vcpu_sys_reg(vcpu, reg) = val;
+ }
+ 
 -- 
 2.20.1
 
