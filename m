@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF25C3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14AE5C352A3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4DC5620870
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C40AA20848
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GNA8U5qz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DC5620870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xnf9tvHB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C40AA20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 024E44AEB1;
-	Tue, 11 Feb 2020 12:52:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2624AE9E;
+	Tue, 11 Feb 2020 12:52:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WTaGNJ5RKtoI; Tue, 11 Feb 2020 12:51:59 -0500 (EST)
+	with ESMTP id BsYFP2sXHgIJ; Tue, 11 Feb 2020 12:52:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 917B54A97D;
-	Tue, 11 Feb 2020 12:51:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9DF84AEE4;
+	Tue, 11 Feb 2020 12:51:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9212A40456
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5784A97D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H+sN9nL49hB8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:55 -0500 (EST)
+ with ESMTP id 6IvEKvFfI8t2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:51:57 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 572BA4AEBE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35D8040456
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:57 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8A10120578;
- Tue, 11 Feb 2020 17:51:54 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6857220661;
+ Tue, 11 Feb 2020 17:51:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443514;
- bh=BVvwjLMYZVm7q18m99ri4igIk6u8itMAhMuWbJme6zg=;
+ s=default; t=1581443516;
+ bh=8yWpTF4iaTUbN9LOY7/rc6Dq7R5pIpQHT5f/RMVwKY4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GNA8U5qzuds0iaK+s1BHhLSVjmDMx3qEPwngRkQux8elYfDSmnI9G+Pz3OR5pwb/b
- 0utYORagW5GDM/Lzv8khaDRPGq9fu1PC5cNYfYrTAmwMdLT8bEKCff+/tX+ZrWBBL5
- dwfzDsE4KdBkRCQ4rgDQnp5TDgVIbkjSiKDDJ6fg=
+ b=Xnf9tvHBy1TruTl5Sm8GlHHWCjQ16Uyak6LpSO+GNv+TgH50Y1d4f2SZ6UHYfGhmU
+ 6LXT+c6DK7oMB137K/LHYYv/oVcxJw46sLGNCExd6D32Cxt7kQi9GRnoQ/EhfegG9A
+ V032SwHm1rDg1IqKgyDWO8AIyDtYm7kqmP7lMVAk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgO-004O7k-C5; Tue, 11 Feb 2020 17:50:48 +0000
+ id 1j1ZgE-004O7k-TP; Tue, 11 Feb 2020 17:50:39 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 93/94] KVM: arm64: nv: Fast-track 'InHost' exception returns
-Date: Tue, 11 Feb 2020 17:49:37 +0000
-Message-Id: <20200211174938.27809-94-maz@kernel.org>
+Subject: [PATCH v2 77/94] KVM: arm64: nv: Move sysreg reset check to boot time
+Date: Tue, 11 Feb 2020 17:49:21 +0000
+Message-Id: <20200211174938.27809-78-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,149 +94,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A significant part of the ARMv8.3-NV extension is to trap ERET
-instructions so that the hypervisor gets a chance to switch
-from a vEL2 L1 guest to an EL1 L2 guest.
+Our sysreg reset check has become a bit silly, as it only checks whether
+a reset callback actually exists for a given sysreg entry, and apply the
+method if available. Doing the check at each vcpu reset is pretty dumb,
+as the tables never change. It is thus perfectly possible to do the same
+checks at boot time.
 
-But this also has the unfortunate consequence of trapping ERET
-in unsuspecting circumstances, such as staying at vEL2 (interrupt
-handling while being in the guest hypervisor), or returning to host
-userspace in the case of a VHE guest.
-
-Although we already make some effort to handle these ERET quicker
-by not doing the put/load dance, it is still way too far down the
-line for it to be efficient enough.
-
-For these cases, it would ideal to ERET directly, no question asked.
-Of course, we can't do that. But the next best thing is to do it as
-early as possible, in fixup_guest_exit(), much as we would handle
-FPSIMD exceptions.
+This also allows us to introduce a sparse sys_regs[] array, something
+that will be required with ARMv8.4-NV.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 26 ++--------------
- arch/arm64/kvm/hyp/switch.c     | 54 +++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 24 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 74 +++++++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 38 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 97af080b9b52..eef7394e5256 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -78,8 +78,7 @@ static u64 get_el2_except_vector(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 268829c73313..9d426304bfb3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3166,12 +3166,37 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
+ };
  
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
--	u64 spsr, elr, mode;
--	bool direct_eret;
-+	u64 spsr, elr;
- 
- 	/*
- 	 * Forward this trap to the virtual EL2 if the virtual
-@@ -88,31 +87,10 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	if (forward_nv_traps(vcpu))
- 		return;
- 
--	/*
--	 * Going through the whole put/load motions is a waste of time
--	 * if this is a VHE guest hypervisor returning to its own
--	 * userspace, or the hypervisor performing a local exception
--	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET.
--	 */
--	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
--	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	direct_eret  = (mode == PSR_MODE_EL0t &&
--			vcpu_el2_e2h_is_set(vcpu) &&
--			vcpu_el2_tge_is_set(vcpu));
--	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
--
--	if (direct_eret) {
--		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
--		*vcpu_cpsr(vcpu) = spsr;
--		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
--		return;
--	}
--
- 	preempt_disable();
- 	kvm_arch_vcpu_put(vcpu);
- 
-+	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
- 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
- 
- 	trace_kvm_nested_eret(vcpu, elr, spsr);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 2eca04ca96b6..d8aae4b5f089 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -489,6 +489,57 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static bool __hyp_text __hyp_handle_eret(struct kvm_vcpu *vcpu)
++static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
++			      bool is_32)
 +{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	u64 spsr, mode;
++	unsigned int i;
 +
-+	/*
-+	 * Going through the whole put/load motions is a waste of time
-+	 * if this is a VHE guest hypervisor returning to its own
-+	 * userspace, or the hypervisor performing a local exception
-+	 * return. No need to save/restore registers, no need to
-+	 * switch S2 MMU. Just do the canonical ERET. Unless the trap
-+	 * has to be forwarded further down the line, of course...
-+	 */
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_ERET)
-+		return false;
++	for (i = 0; i < n; i++) {
++		if (!is_32 && table[i].reg && !table[i].reset) {
++			kvm_err("sys_reg table %p entry %d has lacks reset\n",
++				table, i);
++			return 1;
++		}
 +
-+	/*
-+	 * Let the trap forwarding be handled by the normal exception
-+	 * handling code.
-+	 */
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-+		return false;
-+
-+	spsr = read_sysreg_el1(SYS_SPSR);
-+	spsr = __fixup_spsr_el2_read(ctxt, spsr);
-+	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL0t:
-+		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+			return false;
-+		break;
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	default:
-+		return false;
++		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
++			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
++			return 1;
++		}
 +	}
 +
-+	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
-+
-+	return true;
++	return 0;
 +}
 +
-+
- static bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
+ /* Target specific emulation tables */
+ static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
+ 
+ void kvm_register_target_sys_reg_table(unsigned int target,
+ 				       struct kvm_sys_reg_target_table *table)
  {
- 	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_hsr(vcpu));
-@@ -615,6 +666,9 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
- 	if (__hyp_handle_fpsimd(vcpu))
- 		return true;
- 
-+	if (__hyp_handle_eret(vcpu))
-+		return true;
++	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
++	    check_sysreg_table(table->table32.table, table->table32.num, true))
++		return;
 +
- 	if (!__populate_fault_info(vcpu))
- 		return true;
+ 	target_tables[target] = table;
+ }
  
+@@ -3483,19 +3508,13 @@ static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+ }
+ 
+ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+-				const struct sys_reg_desc *table, size_t num,
+-				unsigned long *bmap)
++				const struct sys_reg_desc *table, size_t num)
+ {
+ 	unsigned long i;
+ 
+ 	for (i = 0; i < num; i++)
+-		if (table[i].reset) {
+-			int reg = table[i].reg;
+-
++		if (table[i].reset)
+ 			table[i].reset(vcpu, &table[i]);
+-			if (reg > 0 && reg < NR_SYS_REGS)
+-				set_bit(reg, bmap);
+-		}
+ }
+ 
+ /**
+@@ -3958,33 +3977,19 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	return write_demux_regids(uindices);
+ }
+ 
+-static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n)
+-{
+-	unsigned int i;
+-
+-	for (i = 1; i < n; i++) {
+-		if (cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
+-			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
+-			return 1;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+ void kvm_sys_reg_table_init(void)
+ {
+ 	unsigned int i;
+ 	struct sys_reg_desc clidr;
+ 
+ 	/* Make sure tables are unique and in order. */
+-	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs)));
+-	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs)));
+-	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs)));
+-	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
+-	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
+-	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
+-	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs)));
++	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false));
++	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true));
++	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true));
++	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
++	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
++	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
++	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false));
+ 
+ 	/* We abuse the reset function to overwrite the table itself. */
+ 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+@@ -4020,17 +4025,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ {
+ 	size_t num;
+ 	const struct sys_reg_desc *table;
+-	DECLARE_BITMAP(bmap, NR_SYS_REGS) = { 0, };
+ 
+ 	/* Generic chip reset first (so target could override). */
+-	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
++	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+ 
+ 	table = get_target_table(vcpu->arch.target, true, &num);
+-	reset_sys_reg_descs(vcpu, table, num, bmap);
+-
+-	for (num = 1; num < NR_SYS_REGS; num++) {
+-		if (WARN(!test_bit(num, bmap),
+-			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
+-			break;
+-	}
++	reset_sys_reg_descs(vcpu, table, num);
+ }
 -- 
 2.20.1
 
