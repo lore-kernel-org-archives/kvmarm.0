@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93269C352A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D48EBC3B188
 	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5465620661
+	by mail.kernel.org (Postfix) with ESMTP id 97C6E20848
 	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6EOLZcy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5465620661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJBh7/n4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C6E20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0854A946;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A1CE4AF09;
 	Tue, 11 Feb 2020 12:53:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yth3xawo+KJE; Tue, 11 Feb 2020 12:53:26 -0500 (EST)
+	with ESMTP id jJ-OkC2X0FDV; Tue, 11 Feb 2020 12:53:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DC504AF16;
-	Tue, 11 Feb 2020 12:53:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 835D74AEC4;
+	Tue, 11 Feb 2020 12:53:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A16B4AEFE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8184A946
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OCf1Fgnd6tMj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:24 -0500 (EST)
+ with ESMTP id dvG0vbkB9XAr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:23 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 137BB4A5BD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 148524AEDB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:22 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3269E206D7;
- Tue, 11 Feb 2020 17:53:23 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 48EC720661;
+ Tue, 11 Feb 2020 17:53:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443603;
- bh=nQAHpVL2nQ+w5tVvVTUPy86BjEvLrpd6ejEhrIIhTy0=;
+ s=default; t=1581443601;
+ bh=sE8UXFGqcupDgYc8xZ/0fIPTLUj36A79kNsMxBbXn/o=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=E6EOLZcy2osyUIfHwfxM1Yo1Ij7GHJC+4X8MClNJdq89jKUrgLgq7PLco/rhHhXDl
- ghOp+Y4NMlbVJWg4dSfFq4MIW6pORTSUJULq08S1v+8itBMThFwgZSOnxG4q5ruYbb
- 0BjvB3r2BwyNpabfh2pPalzZX5MGN53jf53ihgFo=
+ b=eJBh7/n4oMrBfqjZFf2O0DAofX+KFPP1XKEJJTDfjhF3L7LboA2R8IDJ2w/EgRP/c
+ ydpCPbog6g8EEZxa1TGFTi4JOO+qpV/xJwZjNIiBYoEjiC0Sic9Ay7x/admleXhi+K
+ +z+uqoy4UaSNUsOqnfC1ptuwMgj7lQoLfjWQYCZ4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgO-004O7k-Uu; Tue, 11 Feb 2020 17:50:49 +0000
+ id 1j1Zfj-004O7k-Ej; Tue, 11 Feb 2020 17:50:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 94/94] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date: Tue, 11 Feb 2020 17:49:38 +0000
-Message-Id: <20200211174938.27809-95-maz@kernel.org>
+Subject: [PATCH v2 24/94] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,
+ FPEN} settings
+Date: Tue, 11 Feb 2020 17:48:28 +0000
+Message-Id: <20200211174938.27809-25-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,151 +95,134 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we alwats trap EL1 TLBIs,
-even if they don't affect any guest.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
+Forward traps due to FP/ASIMD register accesses to the virtual EL2
+if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
+CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
 
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
-
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+ all the hard work actually being done by Chase Conklin]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/switch.c | 35 +++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/tlb.c    |  6 ++++--
- arch/arm64/kvm/sys_regs.c   | 28 +++++++++-------------------
- 3 files changed, 48 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 26 ++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c         | 16 ++++++++++++----
+ arch/arm64/kvm/hyp/switch.c          | 11 +++++++++--
+ 3 files changed, 47 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d8aae4b5f089..c892fdfecf56 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -539,6 +539,38 @@ static bool __hyp_text __hyp_handle_eret(struct kvm_vcpu *vcpu)
- 	return true;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 26552c8571cb..0e5f88060ecc 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -11,12 +11,14 @@
+ #ifndef __ARM64_KVM_EMULATE_H__
+ #define __ARM64_KVM_EMULATE_H__
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -392,6 +394,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ 	return mode != PSR_MODE_EL0t;
  }
  
-+static bool __hyp_text __hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu)
++static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
 +{
-+	u32 instr;
 +	u64 val;
 +
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64 ||
-+	    !vcpu_mode_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
++	if (!nested_virt_in_use(vcpu))
 +		return false;
 +
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_hsr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
++	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
 +
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		return (val & CPTR_EL2_TFP);
 +
-+	return true;
-+}
- 
- static bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
- {
-@@ -669,6 +701,9 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
- 	if (__hyp_handle_eret(vcpu))
- 		return true;
- 
-+	if (__hyp_handle_tlbi_el1(vcpu))
++	switch (FIELD_GET(CPACR_EL1_FPEN, val)) {
++	case 0b00:
++	case 0b10:
 +		return true;
++	case 0b01:
++		return vcpu_el2_tge_is_set(vcpu) && !vcpu_mode_el2(vcpu);
++	case 0b11:
++	default:		/* GCC is dumb */
++		return false;
++	}
++}
 +
- 	if (!__populate_fault_info(vcpu))
- 		return true;
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 71e4e86e0981..ef52c5a58866 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -278,7 +278,8 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
- 
- 	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -317,5 +318,6 @@ void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_enc
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(mmu, &cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f20f5975633f..c464bc3d8dad 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2688,6 +2688,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
+ static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
  {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	struct kvm_s2_mmu *mmu;
+ 	return vcpu->arch.fault.esr_el2;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 03bc69b09ed4..e813bda18c7c 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -97,11 +97,19 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ }
  
- 	/*
- 	 * If we're here, this is because we've trapped on a EL1 TLBI
-@@ -2706,27 +2708,15 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ /*
+- * Guest access to FP/ASIMD registers are routed to this handler only
+- * when the system doesn't support FP/ASIMD.
++ * This handles the cases where the system does not support FP/ASIMD or when
++ * we are running nested virtualization and the guest hypervisor is trapping
++ * FP/ASIMD accesses by its guest guest.
++ *
++ * All other handling of guest vs. host FP/ASIMD register state is handled in
++ * fixup_guest_exit().
+  */
+-static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
++static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
++	if (guest_hyp_fpsimd_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++
++	/* This is the case when the system doesn't support FP/ASIMD. */
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
+ }
+@@ -270,7 +278,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+-	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
+ 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+ };
  
- 	mutex_lock(&vcpu->kvm->lock);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 976b9661203b..ae967e274e08 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -371,11 +371,18 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ 	    hsr_ec != ESR_ELx_EC_SVE)
+ 		return false;
  
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
--		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--		struct kvm_s2_mmu *mmu;
--
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
--		if (mmu)
--			kvm_call_hyp(__kvm_tlb_el1_instr,
--				     mmu, p->regval, sys_encoding);
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-+	if (mmu)
-+		kvm_call_hyp(__kvm_tlb_el1_instr,
-+			     mmu, p->regval, sys_encoding);
+-	/* Don't handle SVE traps for non-SVE vcpus here: */
+-	if (!sve_guest)
++	/*
++	 * Don't handle SVE traps for non-SVE vcpus here. This
++	 * includes NV guests for the time beeing.
++	 */
++	if (!sve_guest) {
+ 		if (hsr_ec != ESR_ELx_EC_FP_ASIMD)
+ 			return false;
  
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
--		if (mmu)
--			kvm_call_hyp(__kvm_tlb_el1_instr,
--				     mmu, p->regval, sys_encoding);
--	} else {
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-+	if (mmu)
- 		kvm_call_hyp(__kvm_tlb_el1_instr,
--			     &vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--	}
-+			     mmu, p->regval, sys_encoding);
++		if (guest_hyp_fpsimd_traps_enabled(vcpu))
++			return false;
++	}
++
+ 	/* Valid trap.  Switch the context: */
  
- 	mutex_unlock(&vcpu->kvm->lock);
- 
+ 	if (vhe) {
 -- 
 2.20.1
 
