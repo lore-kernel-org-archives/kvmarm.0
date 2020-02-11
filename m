@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D63C352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 117FDC3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9517420578
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4B0E206CC
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zm64Xlch"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9517420578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4BPrb9D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B0E206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B3614A7D9;
-	Tue, 11 Feb 2020 12:51:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758184AE8E;
+	Tue, 11 Feb 2020 12:51:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5MP7Y+zE2jsY; Tue, 11 Feb 2020 12:51:52 -0500 (EST)
+	with ESMTP id 9xlurvW6b-kn; Tue, 11 Feb 2020 12:51:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22AB64AC88;
-	Tue, 11 Feb 2020 12:51:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53CF04AEE6;
+	Tue, 11 Feb 2020 12:51:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13BD24AE9E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D4934A5BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zs1TvEZ5xr+Q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:48 -0500 (EST)
+ with ESMTP id FiAZ4zaQg9m1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:51:52 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E23314A944
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92FE04AC77
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:51 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0DE8520870;
- Tue, 11 Feb 2020 17:51:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C3D7A21569;
+ Tue, 11 Feb 2020 17:51:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443507;
- bh=hnoUIwyz2ne+WiDjbigmpdDVGqHLmBjcecy2gPUXZoU=;
+ s=default; t=1581443510;
+ bh=utysODfDdOQMjnkhgSF20q8EYOV4H4+ozLatVEY6evg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Zm64Xlch1/gLOYjkhzVVQw1kxqDeDmAiCYKcD7gmbKV/VobY19ZoHEfhVa00p0utB
- bIMTFWsE7Rtr0LV6Cm9KXv5gO84fR+43elJpKZNUtdTLFy1BObOKcwjvNJ+ACRY2qk
- X87CjDeTDNO5FhK0o1KrenryXTWMoCTMzS1DNHOc=
+ b=Q4BPrb9DQf743LGVa0RrNVeNRbm/KI2Xj+cdbrga1cJO515K7BYldWjvaRxyysRF3
+ 1A/z8nMWlSyotGIjjIq0zxRkQ3UYOa9+nDMPf+GMUL2GhbHBseWQqgHe5seOd6WLAh
+ nTJkRWNc0h5GTI787tmi1QZqTk6lppddQXYYZCMM=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgN-004O7k-Ov; Tue, 11 Feb 2020 17:50:47 +0000
+ id 1j1Zfk-004O7k-KL; Tue, 11 Feb 2020 17:50:08 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 92/94] KVM: arm64: nv: Enable ARMv8.4-NV support
-Date: Tue, 11 Feb 2020 17:49:36 +0000
-Message-Id: <20200211174938.27809-93-maz@kernel.org>
+Subject: [PATCH v2 26/94] KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM
+ settings
+Date: Tue, 11 Feb 2020 17:48:30 +0000
+Message-Id: <20200211174938.27809-27-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,121 +94,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As all the VNCR-capable system registers are nicely separated
-from the rest of the crowd, let's set HCR_EL2.NV2 on and let
-the ball rolling.
+From: Jintack Lim <jintack.lim@linaro.org>
 
+Forward the EL1 virtual memory register traps to the virtual EL2 if they
+are not coming from the virtual EL2 and the virtual HCR_EL2.TVM or TRVM
+bit is set.
+
+This is for recursive nested virtualization.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h     |  1 +
- arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/hyp/switch.c          | 18 +++++++++++++++---
- 4 files changed, 30 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 2e5be806a5c9..d558f8ebea7e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -13,6 +13,7 @@
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b948afd20e97..7cf5096bc11a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -470,6 +470,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
  
- /* Hyp Configuration Register (HCR) bits */
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV2		(UL(1) << 45)
- #define HCR_AT		(UL(1) << 44)
- #define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 6df684e1790e..b87757f21c42 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -281,21 +281,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 
- static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
- {
--	if (!__vcpu_el2_e2h_is_set(ctxt)) {
--		/*
--		 * Clear the .M field when writing SPSR to the CPU, so that we
--		 * can detect when the CPU clobbered our SPSR copy during a
--		 * local exception.
--		 */
--		val &= ~0xc;
--	}
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++	if (!el12_reg(p)) {
++		u64 bit = p->is_write ? HCR_TVM : HCR_TRVM;
 +
-+	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-+		return val;
- 
--	return val;
-+	/*
-+	 * Clear the .M field when writing SPSR to the CPU, so that we
-+	 * can detect when the CPU clobbered our SPSR copy during a
-+	 * local exception.
-+	 */
-+	return val &= ~0xc;
- }
- 
- static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
- {
--	if (__vcpu_el2_e2h_is_set(ctxt))
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++		if (forward_traps(vcpu, bit))
++			return false;
++	}
 +
-+	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
- 		return val;
+ 	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
  
- 	/*
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index a402e762c51d..6a466bc66901 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -425,6 +425,7 @@
- #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-+#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
- 
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index c35e67241d8e..2eca04ca96b6 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -160,7 +160,13 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 			 * the EL1 virtual memory control register accesses
- 			 * as well as the AT S1 operations.
- 			 */
--			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
-+			if (enhanced_nested_virt_in_use(vcpu)) {
-+				hcr &= ~HCR_TVM;
-+			} else {
-+				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
-+			}
-+
-+			hcr |= HCR_AT | HCR_NV1;
- 		} else {
- 			/*
- 			 * For a guest hypervisor on v8.1 (VHE), allow to
-@@ -186,12 +192,18 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 
- 			/*
- 			 * If we're using the EL1 translation regime
--			 * (TGE clear, then ensure that AT S1 ops are
--			 * trapped too.
-+			 * (TGE clear), then ensure that AT S1 and
-+			 * TLBI E1 ops are trapped too.
- 			 */
- 			if (!vcpu_el2_tge_is_set(vcpu))
- 				hcr |= HCR_AT | HCR_TTLB;
- 		}
-+
-+		if (enhanced_nested_virt_in_use(vcpu)) {
-+			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
-+			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
-+				       SYS_VNCR_EL2);
-+		}
- 	} else if (nested_virt_in_use(vcpu)) {
- 		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
- 	}
+ 	if (!p->is_write) {
 -- 
 2.20.1
 
