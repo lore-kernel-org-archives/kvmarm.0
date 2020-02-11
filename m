@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8B7C35242
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF44FC352A3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 28E07206CC
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C4F420578
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cUS9QRak"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E07206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYe5WwvV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C4F420578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D40944AED8;
-	Tue, 11 Feb 2020 12:52:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22B3D4AEC7;
+	Tue, 11 Feb 2020 12:52:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z5ibPGg9l5Eb; Tue, 11 Feb 2020 12:52:23 -0500 (EST)
+	with ESMTP id KU6UYZGjr89m; Tue, 11 Feb 2020 12:52:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374534AEBD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC0E4AEEE;
 	Tue, 11 Feb 2020 12:52:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E40F4A94D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5584240456
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VoFB0Jxu36w0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:52:20 -0500 (EST)
+ with ESMTP id KfscqUGTemEo for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:52:21 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60FF84A97D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C9454AEBF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:20 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 94022206CC;
- Tue, 11 Feb 2020 17:52:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7E2FF20578;
+ Tue, 11 Feb 2020 17:52:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443537;
- bh=cczEClMTziRc0+33SLdi7SmaIvaC1h4Lkgq569j/kN0=;
+ s=default; t=1581443539;
+ bh=6SUf7Shc+/IFCYs1C6g+zQGf7SmOWSMKA9XYRA+43PI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cUS9QRakDybHd++bvcr9dWqz3wBRKWakiFBlQhOGo7R//P7MnmhMARhGDwm6pJCmU
- q5JZmbZhVmf6QN83KVupKqLv0+ZQW/ztP2wXX/pQJRGURJohmphTQzCUgZ/7QtKUIW
- 92YnZwM5fJ8FlAgntgTurAENJ4583WdFqPNS9V40=
+ b=YYe5WwvV9eLZIYh3pi0tYkueQOc1NtS75Xt9BCKB3kIlxkjSEym1Mygh4GrtSU8jq
+ wXyDAlKkUxlKfy2NE9abDL6f/XPhs2ebqlBrHggTkmJ+XnL6dYI0i9zruPhY/WbJ51
+ crVvzn4mfzSOEvzjTp3ELbbM91HQVKcOSmX6701U=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfy-004O7k-Rf; Tue, 11 Feb 2020 17:50:22 +0000
+ id 1j1Zfc-004O7k-Ib; Tue, 11 Feb 2020 17:50:00 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 50/94] KVM: arm64: nv: Load timer before the GIC
-Date: Tue, 11 Feb 2020 17:48:54 +0000
-Message-Id: <20200211174938.27809-51-maz@kernel.org>
+Subject: [PATCH v2 12/94] KVM: arm64: nv: Add EL2->EL1 translation helpers
+Date: Tue, 11 Feb 2020 17:48:16 +0000
+Message-Id: <20200211174938.27809-13-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -93,36 +93,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order for vgic_v3_load_nested to be able to observe which timer
-interrupts have the HW bit set for the current context, the timers
-must have been loaded in the new mode and the right timer mapped
-to their corresponding HW IRQs.
+Some EL2 system registers immediately affect the current execution
+of the system, so we need to use their respective EL1 counterparts.
+For this we need to define a mapping between the two.
 
-At the moment, we load the GIC first, meaning that timer interrupts
-injected to an L2 guest will never have the HW bit set (we see the
-old configuration).
+These helpers will get used in subsequent patches.
 
-Swapping the two loads solves this particular problem.
-
+Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++++
+ arch/arm64/kvm/sys_regs.c            | 48 ++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 9bb5d5f47237..14c2d94c367e 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -344,8 +344,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	vcpu->cpu = cpu;
- 	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 282e9ddbe1bc..486978d0346b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -58,6 +58,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+ int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
  
--	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-+	kvm_vgic_load(vcpu);
- 	kvm_vcpu_load_sysregs(vcpu);
- 	kvm_arch_vcpu_load_fp(vcpu);
- 	kvm_vcpu_pmu_restore_guest(vcpu);
++u64 translate_tcr(u64 tcr);
++u64 translate_cptr(u64 tcr);
++u64 translate_sctlr(u64 tcr);
++u64 translate_ttbr0(u64 tcr);
++u64 translate_cnthctl(u64 tcr);
++
+ static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+ {
+ 	return !(vcpu->arch.hcr_el2 & HCR_RW);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4b5310ea3bf8..634d3ee6799c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -65,6 +65,54 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+ 	return false;
+ }
+ 
++static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
++{
++	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
++		<< TCR_IPS_SHIFT;
++}
++
++u64 translate_tcr(u64 tcr)
++{
++	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
++	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
++	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
++	       (tcr & TCR_EL2_TG0_MASK) |
++	       (tcr & TCR_EL2_ORGN0_MASK) |
++	       (tcr & TCR_EL2_IRGN0_MASK) |
++	       (tcr & TCR_EL2_T0SZ_MASK);
++}
++
++u64 translate_cptr(u64 cptr_el2)
++{
++	u64 cpacr_el1 = 0;
++
++	if (!(cptr_el2 & CPTR_EL2_TFP))
++		cpacr_el1 |= CPACR_EL1_FPEN;
++	if (cptr_el2 & CPTR_EL2_TTA)
++		cpacr_el1 |= CPACR_EL1_TTA;
++	if (!(cptr_el2 & CPTR_EL2_TZ))
++		cpacr_el1 |= CPACR_EL1_ZEN;
++
++	return cpacr_el1;
++}
++
++u64 translate_sctlr(u64 sctlr)
++{
++	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
++	return sctlr | BIT(20);
++}
++
++u64 translate_ttbr0(u64 ttbr0)
++{
++	/* Force ASID to 0 (ASID 0 or RES0) */
++	return ttbr0 & ~GENMASK_ULL(63, 48);
++}
++
++u64 translate_cnthctl(u64 cnthctl)
++{
++	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
++}
++
+ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ {
+ 	if (!vcpu->arch.sysregs_loaded_on_cpu)
 -- 
 2.20.1
 
