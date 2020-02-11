@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1A5C3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 509ACC3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 90AFC206D7
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1257220578
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdhZW7l3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90AFC206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2iVJhng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1257220578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A074A7D9;
-	Tue, 11 Feb 2020 12:52:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD49A40456;
+	Tue, 11 Feb 2020 12:52:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4NH4o20eI0pn; Tue, 11 Feb 2020 12:52:45 -0500 (EST)
+	with ESMTP id syYBH57aek2d; Tue, 11 Feb 2020 12:52:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE70C4AC68;
-	Tue, 11 Feb 2020 12:52:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF5FA4ACFA;
+	Tue, 11 Feb 2020 12:52:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC0BB4ACFA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E73D4A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bEzX0MDZ4fiU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:52:41 -0500 (EST)
+ with ESMTP id 8twUZanSuwRM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:52:43 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6FE44AECD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B37A54AECB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:42 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 06173206D7;
- Tue, 11 Feb 2020 17:52:40 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D8B7420578;
+ Tue, 11 Feb 2020 17:52:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443560;
- bh=hU+8ZXqCJKxOobeRNU4DXaABOcyKqWOi8gVrtQCKmB4=;
+ s=default; t=1581443562;
+ bh=jf1mgKr2G0XkF+KTZXgNSKPUDy7zcmwp7k/gfZ+D5NQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=EdhZW7l3r9pBPITz5bqtPd1CMIS/aQIr6rlitozY7j+K2VybQepugwb24fh8UVjmE
- 0IKsMPOBpFsJi0tuRE/Li5AFMw54PwX/ED9WfADaS8YXOe/U39Wwb8HizuHHsiZjgY
- c1f1w5mTgRnPnA1rb0405qetcy0+BVl1Ce+jMb80=
+ b=p2iVJhngVaayQs+ogEg5UMk2fmKw+R2vLFGwPyllyZtwBwqx9GboWD7L9ZB9ohGgG
+ Ti5ou0XY5O0TcDpzHNO9uG0CannBOmmR8QQuJputpDkU5C65lYbCIwP203zNQh72SB
+ cb9LNFkv2QuYbG5/sWp10V00wNUUn6yPMAlj0TiQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zg4-004O7k-2O; Tue, 11 Feb 2020 17:50:28 +0000
+ id 1j1ZgN-004O7k-68; Tue, 11 Feb 2020 17:50:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 59/94] arm64: KVM: nv: Handle SCTLR_EL2 RES0/RES1 bits
-Date: Tue, 11 Feb 2020 17:49:03 +0000
-Message-Id: <20200211174938.27809-60-maz@kernel.org>
+Subject: [PATCH v2 91/94] KVM: arm64: nv: Allocate VNCR page when required
+Date: Tue, 11 Feb 2020 17:49:35 +0000
+Message-Id: <20200211174938.27809-92-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -93,67 +94,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Depending on the HCR_EL2.{E2H,TGE} values, SCTLR_EL2 has different
-RES0/RES1 constraints.
-
-Let's handle that.
+If running a NV guest on an ARMv8.4-NV capable system, let's
+allocate an additional page that will be used by the hypervisor
+to fulfill system register accesses.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 3 ++-
+ arch/arm64/kvm/nested.c           | 8 ++++++++
+ arch/arm64/kvm/reset.c            | 1 +
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c62080d7742c..121b3f28cae2 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -443,6 +443,37 @@ static bool access_vbar_el1(struct kvm_vcpu *vcpu,
- 	return access_rw(vcpu, p, r);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 657c2c5d1a39..a26ab0fda1a7 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -526,7 +526,8 @@ struct kvm_vcpu_arch {
+  */
+ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+ {
+-	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
++	if (unlikely(cpus_have_const_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
++		     r >= __VNCR_START__ && ctxt->vncr_array))
+ 		return &ctxt->vncr_array[r - __VNCR_START__];
  
-+static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
-+			     struct sys_reg_params *p,
-+			     const struct sys_reg_desc *r)
-+{
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
-+	if (p->is_write) {
-+		u64 val = p->regval;
-+
-+		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-+			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
-+				 BIT_ULL(17));
-+			val |=  SCTLR_EL1_RES1;
-+		} else {
-+			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
-+				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
-+				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
-+				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
-+				 GENMASK(10, 7));
-+			val |=  SCTLR_EL2_RES1;
-+		}
-+
-+		vcpu_write_sys_reg(vcpu, val, r->reg);
-+	} else {
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+ 	return (u64 *)&ctxt->sys_regs[r];
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 6adff9b433e0..58873e4c85cb 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -47,6 +47,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 	if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
+ 		return -EINVAL;
+ 
++	if (cpus_have_const_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
++		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
++		if (!vcpu->arch.ctxt.vncr_array)
++			return -ENOMEM;
 +	}
 +
-+	return true;
-+}
-+
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -2254,7 +2285,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_vpidr, VPIDR_EL2 },
- 	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_vmpidr, VMPIDR_EL2 },
+ 	mutex_lock(&kvm->lock);
  
--	{ SYS_DESC(SYS_SCTLR_EL2), access_rw, reset_val, SCTLR_EL2, 0 },
-+	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
- 	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
- 	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
- 	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
+ 	/*
+@@ -64,6 +70,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
++			free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
++			vcpu->arch.ctxt.vncr_array = NULL;
+ 		} else {
+ 			kvm->arch.nested_mmus_size = num_mmus;
+ 			ret = 0;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 07462af1b69d..ce8d8f53fcd0 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -207,6 +207,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	kfree(vcpu->arch.sve_state);
++	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+ }
+ 
+ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
 -- 
 2.20.1
 
