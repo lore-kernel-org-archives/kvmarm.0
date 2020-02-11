@@ -2,87 +2,86 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC38C35242
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 18:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C616C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 23:11:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2D60D206D6
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 18:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF9F8206DB
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 23:11:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQC9pzJc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D60D206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X/5roPCc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9F8206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A16CB4AF1D;
-	Tue, 11 Feb 2020 13:32:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 731D74A94D;
+	Tue, 11 Feb 2020 18:11:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qir4SKamqwgG; Tue, 11 Feb 2020 13:32:21 -0500 (EST)
+	with ESMTP id bOxEC+flmt2Q; Tue, 11 Feb 2020 18:11:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C5284AF20;
-	Tue, 11 Feb 2020 13:32:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B77374AE96;
+	Tue, 11 Feb 2020 18:11:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67AFC4AF13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 13:32:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AAB34A94D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 18:11:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uumanpo2lhs1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 13:32:19 -0500 (EST)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 894344AF12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 13:32:19 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581445939;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZAgyvfwf3MxzMiPOUvUmlPx5ULbWnylJ3lGwUp9IgdE=;
- b=LQC9pzJcGEpWe+qx0YPkaiWPxZscnV7B8F4l0vsgmgPPpxhknLJUUxadlOtuEfPZvsDzda
- 8mU9Kxr82rA3K9k6Y15poxITreTLchY2L+Fn7z3XT/bvzbQYlyDPrrsUTKkPZBHXYA3V9O
- eBX+Kr5+RXO0i9ollSB4nk5E4LKVUzU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-XCCwj2V_O9aRrp398QR0pA-1; Tue, 11 Feb 2020 13:32:10 -0500
-X-MC-Unique: XCCwj2V_O9aRrp398QR0pA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48518113784B;
- Tue, 11 Feb 2020 18:32:08 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C54275C1B5;
- Tue, 11 Feb 2020 18:32:03 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event
- Support
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-5-eric.auger@redhat.com>
- <CAFEAcA_V3rT+C1FCPPyjmQ8svxF1tMWWOLgZ1Vn_CNQ3N0x-KA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e3fc48f2-e31c-c70b-16fe-ca5af4a0708e@redhat.com>
-Date: Tue, 11 Feb 2020 19:32:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id 8W47OG6ZO0bn for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 18:11:11 -0500 (EST)
+Received: from mail-io1-f66.google.com (mail-io1-f66.google.com
+ [209.85.166.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A0064A65C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 18:11:11 -0500 (EST)
+Received: by mail-io1-f66.google.com with SMTP id z193so45497iof.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 15:11:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UaJqnlppmmo5Euf5kNzvGUdR8aDw1HJr8Rhq4ma/w6A=;
+ b=X/5roPCcT84wBD5huDg0ZNJBk2XZoMXWbJQaOIExytH4PmWNVlrNZw7/eoxIpMYhD3
+ sXEMZqgvsRIstpYcXAOwREEJoOwBXkW/VFx/WNCLy7wQyZw8O6bM5MbR6uauuVyxz5/c
+ PlzGqiyozt+jPc7v51mXBEgLiS6AENwgnfdHxFgjh0sscmfTvAbyu02Ggmt4mIuCtg98
+ 7vUBQunQ88lDKuN9OzLKZyA20twj1oTBgU+h6JpvUQ8Zwjc08NZA1dxx7IHtAUco7uMF
+ XBn/dSmi+OgVAxRCIHYvY8XMzv57vzVo9SHTOb756B8vJa4J7vxAl/699wbuT7XypQEy
+ s+Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UaJqnlppmmo5Euf5kNzvGUdR8aDw1HJr8Rhq4ma/w6A=;
+ b=OJN///zh4bQQ5Fhwgq4vJka8zM4EcG1VNO/krYYaz9PjNU7QxZBNauEfjoZLManXPz
+ Lonp8APkvphnyR+x9p9cnGwlOb9rRPz+44hLeHioOvXE4LjWii4RwbCsQASNPkS/hS5J
+ IgfdDJOQXqppiNVgDjksR0dH6afCShrsbw7qYEoujbZ2q7Vi4YR1wH+oXIlGCU4pt+cQ
+ BMd2kA2kUfsscBoJSQRKHrY22J13czrqKPdyA3IZb9ni4P3iA1vurhjT/zbsAVGhq297
+ wy+9ZboMLOi+XB8XG3kCpe9S8vHbWp3eDvmzu0VhSR2RphWZRfIHk+l/4HyENhAviXET
+ A7IQ==
+X-Gm-Message-State: APjAAAVXRkwSpu1mbQu+eH2uiWs7HBCs7f7pnEecotPZvrBoGpmYWs+D
+ wlKXcIa3wnf6sFvxEJkZNJvJ86NwXWzAukPrzjy6mw==
+X-Google-Smtp-Source: APXvYqwVTzuQL8eauDDOUd895nP3R94cc9Ppz2BTB7izsqKyO5GCmo8ZtahKQMLv9vLMHGWqR1LbinAzrH9rDny1va8=
+X-Received: by 2002:a02:c78f:: with SMTP id n15mr16717359jao.100.1581462670740; 
+ Tue, 11 Feb 2020 15:11:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_V3rT+C1FCPPyjmQ8svxF1tMWWOLgZ1Vn_CNQ3N0x-KA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Andre Przywara <andre.przywara@arm.com>, Andrew Murray <andrew.murray@arm.com>,
- kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger.pro@gmail.com>
+References: <20200129202441.12745-1-beata.michalska@linaro.org>
+ <20200129202441.12745-3-beata.michalska@linaro.org>
+ <20200205165739.2jkklbpmy3yrdq3q@kamzik.brq.redhat.com>
+ <CADSWDzu70AXg5pNY3sLr5GFbKtXaFmV_UgSm6TWw7oshv4vcEw@mail.gmail.com>
+ <20200207081950.4gxxlzwgjgfr6zur@kamzik.brq.redhat.com>
+In-Reply-To: <20200207081950.4gxxlzwgjgfr6zur@kamzik.brq.redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Tue, 11 Feb 2020 23:10:58 +0000
+Message-ID: <CADSWDzsmRizsoQwaLkmoJ=10BaBO5qEX4Ftpn7P8-Ui0ntfz4w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] target/arm: kvm: Handle DABT with no valid ISS
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,63 +98,367 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Peter,
+On Fri, 7 Feb 2020 at 08:20, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Thu, Feb 06, 2020 at 09:48:05PM +0000, Beata Michalska wrote:
+> > On Wed, 5 Feb 2020 at 16:57, Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Wed, Jan 29, 2020 at 08:24:41PM +0000, Beata Michalska wrote:
+> > > > On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> > > > exception with no valid ISS info to be decoded. The lack of decode info
+> > > > makes it at least tricky to emulate those instruction which is one of the
+> > > > (many) reasons why KVM will not even try to do so.
+> > > >
+> > > > Add support for handling those by requesting KVM to inject external
+> > > > dabt into the quest.
+> > > >
+> > > > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> > > > ---
+> > > >  target/arm/cpu.h     |  2 ++
+> > > >  target/arm/kvm.c     | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > >  target/arm/kvm32.c   |  3 ++
+> > > >  target/arm/kvm64.c   |  3 ++
+> > > >  target/arm/kvm_arm.h | 19 +++++++++++
+> > > >  5 files changed, 123 insertions(+)
+> > > >
+> > > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > > > index c1aedbe..e04a8d3 100644
+> > > > --- a/target/arm/cpu.h
+> > > > +++ b/target/arm/cpu.h
+> > > > @@ -558,6 +558,8 @@ typedef struct CPUARMState {
+> > > >          uint8_t has_esr;
+> > > >          uint64_t esr;
+> > > >      } serror;
+> > > > +    /* Status field for pending external dabt */
+> > > > +    uint8_t ext_dabt_pending;
+> > > >
+> > > >      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
+> > > >      uint32_t irq_line_state;
+> > > > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> > > > index 8d82889..e7bc9b7 100644
+> > > > --- a/target/arm/kvm.c
+> > > > +++ b/target/arm/kvm.c
+> > > > @@ -37,6 +37,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> > > >
+> > > >  static bool cap_has_mp_state;
+> > > >  static bool cap_has_inject_serror_esr;
+> > > > +static bool cap_has_inject_ext_dabt; /* KVM_CAP_ARM_INJECT_EXT_DABT */
+> > >
+> > > nit: the KVM_CAP_ARM_INJECT_EXT_DABT comment is unnecessary
+> >
+> > Might be - I just find it handy when looking for  related details.
+> > I will remove that one though.
+> >
+> > >
+> > > >
+> > > >  static ARMHostCPUFeatures arm_host_cpu_features;
+> > > >
+> > > > @@ -62,6 +63,12 @@ void kvm_arm_init_serror_injection(CPUState *cs)
+> > > >                                      KVM_CAP_ARM_INJECT_SERROR_ESR);
+> > > >  }
+> > > >
+> > > > +void kvm_arm_init_ext_dabt_injection(CPUState *cs)
+> > > > +{
+> > > > +    cap_has_inject_ext_dabt = kvm_check_extension(cs->kvm_state,
+> > > > +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
+> > > > +}
+> > > > +
+> > > >  bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+> > > >                                        int *fdarray,
+> > > >                                        struct kvm_vcpu_init *init)
+> > > > @@ -216,6 +223,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> > > >          ret = -EINVAL;
+> > > >      }
+> > > >
+> > > > +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER))
+> > > > +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
+> > > > +            warn_report("Failed to enable DABT NISV cap");
+> > > > +        }
+> > > > +
+> > >
+> > > Missing {} around the outer block.
+> >
+> > Checkpatch didn't complain ...
+> > Will fix that.
+> >
+> > >
+> > > As KVM_CAP_ARM_INJECT_EXT_DABT is a VM capability then I think we should
+> > > set cap_has_inject_ext_dabt here, like cap_has_mp_state gets set. I see
+> > > you've followed the pattern used for cap_has_inject_serror_esr, but that
+> > > looks wrong too since KVM_CAP_ARM_INJECT_SERROR_ESR is also a VM
+> > > capability. The way it is now we just keep setting
+> > > cap_has_inject_serror_esr to the same value, NR_VCPUS times.
+> > >
+> > You are totally right - I have completely missed that point! Thanks.
+> >
+> > > >      return ret;
+> > > >  }
+> > > >
+> > > > @@ -598,6 +610,10 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
+> > > >          events.exception.serror_esr = env->serror.esr;
+> > > >      }
+> > > >
+> > > > +    if (cap_has_inject_ext_dabt) {
+> > > > +        events.exception.ext_dabt_pending = env->ext_dabt_pending;
+> > > > +    }
+> > > > +
+> > > >      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
+> > > >      if (ret) {
+> > > >          error_report("failed to put vcpu events");
+> > > > @@ -627,6 +643,8 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
+> > > >      env->serror.has_esr = events.exception.serror_has_esr;
+> > > >      env->serror.esr = events.exception.serror_esr;
+> > > >
+> > > > +    env->ext_dabt_pending = events.exception.ext_dabt_pending;
+> > > > +
+> > >
+> > > afaict from Documentation/virt/kvm/api.txt and the KVM code you cannot
+> > > get this state. Therefore the above line (and extra stray blank line)
+> > > should be dropped.
+> > >
+> > That's true, though this is a lightweight way of resetting the vcpu state.
+> > We would have to do that otherwise to mark that this case has been handled
+> > and that the abort is no longer pending.
+>
+> There's no reason to wait until get-vcpu-events time to reset this.
+> According to the KVM documentation (and the code) the event is
+> immediately delivered at vcpu_ioctl(KVM_SET_VCPU_EVENTS) time.
+> So I think the kvm_put_vcpu_events() patch should be
+>
+>  if (env->ext_dabt_pending) {
+>      events.exception.ext_dabt_pending = env->ext_dabt_pending;
+>      env->ext_dabt_pending = 0;
+>  }
+>
+> (env->ext_dabt_pending will only be non-zero if we have the capability)
+>
+I would  expect this then to be reset only after successful ioctl call.
+Will update it.
 
-On 2/11/20 5:28 PM, Peter Maydell wrote:
-> On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> If event counters are implemented check the common events
->> required by the PMUv3 are implemented.
->>
->> Some are unconditionally required (SW_INCR, CPU_CYCLES,
->> either INST_RETIRED or INST_SPEC). Some others only are
->> required if the implementation implements some other features.
->>
->> Check those wich are unconditionally required.
->>
->> This test currently fails on TCG as neither INST_RETIRED
->> or INST_SPEC are supported.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
-> 
->> +static bool is_event_supported(uint32_t n, bool warn)
->> +{
->> +       uint64_t pmceid0 = read_sysreg(pmceid0_el0);
->> +       uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
->> +       bool supported;
->> +       uint64_t reg;
->> +
->> +       /*
->> +        * The low 32-bits of PMCEID0/1 respectly describe
->> +        * event support for events 0-31/32-63. Their High
->> +        * 32-bits describe support for extended events
->> +        * starting at 0x4000, using the same split.
->> +        */
->> +       if (n >= 0x0  && n <= 0x3F)
->> +               reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
->> +       else if  (n >= 0x4000 && n <= 0x403F)
->> +               reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
->> +       else
->> +               abort();
->> +
->> +       supported =  reg & (1UL << (n & 0x3F));
->> +
->> +       if (!supported && warn)
->> +               report_info("event %d is not supported", n);
-> 
-> As with satisfy_prerequisites(), printing this with "0x%x"
-> would probably be more helpful to most users.
-OK
+> >
+> > > >      return 0;
+> > > >  }
+> > > >
+> > > > @@ -634,6 +652,7 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+> > > >  {
+> > > >  }
+> > > >
+> > > > +
+> > >
+> > > stray blank line
+> > >
+> > > >  MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+> > > >  {
+> > > >      ARMCPU *cpu;
+> > > > @@ -699,6 +718,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> > > >              ret = EXCP_DEBUG;
+> > > >          } /* otherwise return to guest */
+> > > >          break;
+> > > > +    case KVM_EXIT_ARM_NISV:
+> > > > +        /* External DABT with no valid iss to decode */
+> > > > +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
+> > > > +                                       run->arm_nisv.fault_ipa);
+> > > > +        break;
+> > > >      default:
+> > > >          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+> > > >                        __func__, run->exit_reason);
+> > > > @@ -833,3 +857,75 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+> > > >  {
+> > > >      return (data - 32) & 0xffff;
+> > > >  }
+> > > > +
+> > > > +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> > > > +                             uint64_t fault_ipa)
+> > > > +{
+> > > > +    ARMCPU *cpu = ARM_CPU(cs);
+> > > > +    CPUARMState *env = &cpu->env;
+> > > > +    uint32_t ins, ins_fetched;
+> > >
+> > > ins_fetched is a bool
+> >
+> > Actually that's int (as per cpu_memory_rw_debug)
+>
+> But that's not the way you're using it here. It you really want to
+> ensure the return value is converted to a bool, then you could do
+>
+>  ins_fetched = !!cpu_memory_rw_debug()
+>
+> > >
+> > > > +
+> > > > +    /*
+> > > > +     * Hacky workaround for kernels that for aarch32 guests, instead of expected
+> > > > +     * external data abort, inject the IMPLEMENTATION DEFINED exception with the
+> > > > +     * lock-down. This is actually handled by the guest which results in
+> > > > +     * re-running the faulting instruction.
+> > > > +     * This intends to break the vicious cycle.
+> > > > +     */
+> > >
+> > > This doesn't seem like the right thing to do. What happens on real
+> > > hardware in this case? If an OS would get into a "vicious cycle" on
+> > > real hardware then it should get into one on KVM too.
+> > >
+> > That's the problem. that would not happen on a real hardware.
+> > We might end up here due to a KVM bug (which has been fixed recently)
+> > when the injected
+> > abort is not the one expected (as of not the one that would be
+> > triggered by hw in this
+> > particular case).
+> > Details in : https://patchwork.kernel.org/patch/11358083/
+>
+> If KVM can be fixed (and in this case already is fixed - 21aecdbd7f3a),
+> then doesn't it make more sense to just fix KVM, than to add a workaround
+> to QEMU?
+>
+This is to cover the cases (hopefully rare but still) when the host kernel
+won't get updated, leaving the issue exposed to the guest. Not sure what
+or if there is any policy regarding that in Qemu (?) There is also no mechanism
+within KVM to allow the user space to verify whether the fix is available
+or not. Capabilities are not designed for that (if I got things right) unless
+user-space interface is broken ... which is not entirely the case
+here.
+> >
+> > > > +    if (!is_a64(env)) {
+> > > > +        static uint8_t setback;
+> > > > +
+> > > > +        /*
+> > > > +         * The state has not been synchronized yet, so if this is re-occurrence
+> > > > +         * of the same abort triggered by guest, the status for pending external
+> > > > +         * abort should not get cleared yet
+> > > > +         */
+> > > > +        if (unlikely(env->ext_dabt_pending)) {
+> > > > +            if (setback) {
+> > > > +                error_report("Most probably triggered kernel issue with"
+> > > > +                             " injecting external data abort.");
+> > > > +                error_printf("Giving up trying ...\n");
+> > > > +                /* Here is where the fun comes to an end */
+> > > > +                return -EINVAL;
+> > > > +            }
+> > > > +        }
+> > > > +        setback = env->ext_dabt_pending;
+> > > > +    }
+> > > > +
+> > > > +    kvm_cpu_synchronize_state(cs);
+> > > > +   /*
+> > > > +    * ISS [23:14] is invalid so there is a limited info
+> > > > +    * on what has just happened so the only *useful* thing that can
+> > > > +    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
+> > > > +    * might be less of a value as well)
+> > > > +    */
+> > > > +
+> > > > +    /*
+> > > > +     * Get current PC before it will get updated to exception vector entry
+> > > > +     */
+> > > > +    target_ulong ins_addr = is_a64(env) ? env->pc : env->regs[15];
+> > >
+> > > ins_addr should be declared above
+> > >
+> > > But what are we doing? pc is a guest virtual address. Oh, I see...
+> > >
+> > > > +
+> > > > +    /*
+> > > > +     * Get the faulting instruction
+> > > > +     * Instructions have a fixed length of 32 bits
+> > > > +     * and are always little-endian
+> > > > +     */
+> > > > +    ins_fetched = !cpu_memory_rw_debug(cs, ins_addr, (uint8_t *) &ins,
+> > > > +                                       sizeof(uint32_t), 0);
+> > >
+> > > ... we're trying to actual walk the KVM guest's page tables. That
+> > > seems a bit odd, and the "_debug" function name used for it makes
+> > > it seem even more odd.
+> > >
+> > > > +
+> > > > +    error_report("Data abort exception with no valid ISS generated by "
+> > > > +                 "guest memory access at physical address: 0x" TARGET_FMT_lx,
+> > > > +                 (target_ulong)fault_ipa);
+> > > > +
+> > > > +    error_printf(ins_fetched ? "%s : 0x%" PRIx32 " (ins encoded)\n"  : "%s\n",
+> > > > +                 "KVM unable to emulate faulting instruction",
+> > > > +                 (!ins_fetched ? 0 : ldl_le_p(&ins)));
+> > > > +    error_printf("Injecting a data abort exception into guest.\n");
+> > >
+> > > The guest shouldn't be able to generate three lines of errors on the host
+> > > whenever it wants. That's a security bug. One trace point here seems like
+> > > the most we should do. Or, after these three lines we should kill the
+> > > guest.
+> > >
+> > You have a point here, this can indeed be exploited by the malicious
+> > guest. Not sure if killing it is necessary here.
+> > I could limit the logging though that gets tricky for aborts triggered by
+> > user-space processes which would probably leave the guest running
+> > without much of an issue there.
+> > I can y get rid of logging the additional info and keep the single
+> > statement of an instruction not being emulated but that still leaves an
+> > open door for potential exploits...
+> >
+> > > Actually, I don't think we should attempt to get the instruction at all.
+> > > We should do what the KVM documenation suggests we do when we get
+> > > this exit. We should either do a user selected action: one of suspend,
+> > > dump, restart, or inject a dabt (as is done below). The last choice hopes
+> > > that the guest will handle it in some graceful way, or that it'll crash
+> > > with all the information needed for a post-mortem crash investigation.
+> > >
+> > > And I don't think we should do the "very brave" option of trying to
+> > > emulate the instruction, even if we identify it as a valid MMIO address.
+> > > That just sounds like a huge can of worms.
+> > >
+> > > Does QEMU already have a way for users to select a
+> > > don't-know-how-to-handle-guest-exception behavior?
+> > >
+> >
+> > The function is attempting to inject the external data abort. The rest is for
+> > the aftermath analysis to easy figuring out what has happened
+> > which will not be so easy in case of user-space process triggering
+> > the DABT with no valid ISS. There is no attempt of emulating the instruction
+> > just simply saying the guest tried to access this address with this instruction
+> > which couldn't be handled. Might be excessive in some cases
+> > (like misbehaving kernel) but it also might be handy on those rare
+> > occasions when there is not much to analyze.
+> > But as per the issue you have raised above I will rework that.
+> >
+> > Not sure if there is a mechanism to specify the 'preferred' behavior though.
+>
+> I think a mechanism for a preferred behavior would be nice, because
+> all options make sense, depending on the use case. I'm not sure what
+> the right default is, though. Maybe this dabt injection, but there's
+> a good chance it'll just loop here. So maybe QEMU should just abort.
+> Aborting should be the safest default (from the host's PoV).
 
-Thanks
+I can still play around with this for a bit to make it more .. sensible,
+keeping in mind the potential risk with the current solution you have
+pointed out. I would still like to keep the abort injection as that is the
+main reason behind having this change. It might be a bit tricky,
+(time-wise)  to add the 'def behaviour' interface though.
+ Is there anything else that could potentially benefit from it ?
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
-
+BR
+Beata
+>
+> Thanks,
+> drew
+>
+>
+> >
+> > BR
+> >
+> >
+> > Beata
+> >
+> >
+> > > > +    /*
+> > > > +     * Set pending ext dabt and trigger SET_EVENTS so that
+> > > > +     * KVM can inject the abort
+> > > > +     */
+> > > > +    env->ext_dabt_pending = 1;
+> > > > +
+> > > > +    return 0;
+> > > > +}
+> > >
+> > > Thanks,
+> > > drew
+> > >
+> >
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
