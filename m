@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD69C3B188
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA75C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD583206CC
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43019206D7
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NkNjJwlA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD583206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3fqg/Od"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43019206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62F014AC6C;
-	Tue, 11 Feb 2020 12:53:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7934A955;
+	Tue, 11 Feb 2020 12:53:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hyRS71hAse8b; Tue, 11 Feb 2020 12:53:15 -0500 (EST)
+	with ESMTP id LGBbSzmNTz0l; Tue, 11 Feb 2020 12:53:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2C734A946;
-	Tue, 11 Feb 2020 12:53:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCBB44AEE8;
+	Tue, 11 Feb 2020 12:53:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0590D4AECA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 355394AEBF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XIvqTfuUjjjS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:12 -0500 (EST)
+ with ESMTP id RwpvWQwjNtx7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:14 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 163BA4A957
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E78CC4AEF6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:12 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3BD7920870;
- Tue, 11 Feb 2020 17:53:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 14B6720848;
+ Tue, 11 Feb 2020 17:53:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443590;
- bh=1DR8MVhjtgLl66se5UHs3QX+PvNEC+nXqVOa/l9sjS8=;
+ s=default; t=1581443592;
+ bh=BA3j0ebKj60uf2wq/Z+cbQXS2wtxrMbpxGeiK17XT7I=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NkNjJwlA0UByXWecN+9DcEs8lWdDkVjUPPbG02Zl7ayKBPrmqK2qwcL5jnVwwaZ1p
- vY0SmFQEzHXnq/rt5WmDpr0nRsYxtdODV13QZE1BMLgEPjxJa3UoI7sHXvrs3Am6sR
- JC7lg1SdMFfRwI592p5qmyleo4lB/vmvedK/bAjk=
+ b=T3fqg/OdNlWIEUz8//ik3hTukxQIiUsvOVWSlSJcGJzhx9fTQSVqDBswVbhGzMbWi
+ NYYR29iDTtXmfNx3Lw5Rsx3nR4mJYiGyJ8u4aubiWfa3UkJYuJ4hX00RYExyN5wY67
+ p+PCROw/QWSMrLofV/M66muQNpaAksAhRm8r5OsA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgK-004O7k-AX; Tue, 11 Feb 2020 17:50:44 +0000
+ id 1j1Zfh-004O7k-Or; Tue, 11 Feb 2020 17:50:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 86/94] KVM: arm64: aarch32: Use __vcpu_sys_reg() instead of
- raw sys_regs access
-Date: Tue, 11 Feb 2020 17:49:30 +0000
-Message-Id: <20200211174938.27809-87-maz@kernel.org>
+Subject: [PATCH v2 21/94] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+Date: Tue, 11 Feb 2020 17:48:25 +0000
+Message-Id: <20200211174938.27809-22-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,93 +94,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Instead of directly accessing the sysreg array, let's use convenient
-accessors that will hide the complexity of the register remapping.
+From: Jintack Lim <jintack.lim@linaro.org>
 
+For the same reason we trap virtual memory register accesses in virtual
+EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
+access EL1 system register state instead of the virtual EL2 one.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/switch.c    |  5 ++---
- arch/arm64/kvm/hyp/sysreg-sr.c | 20 ++++++--------------
- 2 files changed, 8 insertions(+), 17 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ arch/arm64/kvm/hyp/switch.c      | 2 ++
+ arch/arm64/kvm/sys_regs.c        | 2 +-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 084844ec0b06..a907c702de45 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -266,7 +266,7 @@
+ #define CPTR_EL2_TFP_SHIFT 10
+ 
+ /* Hyp Coprocessor Trap Register */
+-#define CPTR_EL2_TCPAC	(1 << 31)
++#define CPTR_EL2_TCPAC	(1U << 31)
+ #define CPTR_EL2_TTA	(1 << 20)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+ #define CPTR_EL2_TZ	(1 << 8)
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index a1a9ca35347c..3deea28794e1 100644
+index 48e738e90966..976b9661203b 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -49,7 +49,7 @@ static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
+@@ -105,6 +105,8 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 		val &= ~CPACR_EL1_FPEN;
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
++	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
++		val |= CPTR_EL2_TCPAC;
  
--	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
-+	__vcpu_sys_reg(vcpu, FPEXC32_EL2) = read_sysreg(fpexc32_el2);
- }
+ 	write_sysreg(val, cpacr_el1);
  
- static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
-@@ -470,8 +470,7 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 18b14c04355a..b545156c7d79 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1795,7 +1795,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(7,7),
  
- 	/* Skip restoring fpexc32 for AArch64 guests */
- 	if (!(read_sysreg(hcr_el2) & HCR_RW))
--		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
--			     fpexc32_el2);
-+		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
- 
- 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index afc603f800e9..b009afd87322 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -408,44 +408,36 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
- 
- void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
--	u64 *sysreg;
--
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	sysreg = vcpu->arch.ctxt.sys_regs;
--
- 	vcpu->arch.ctxt.spsr_abt = read_sysreg(spsr_abt);
- 	vcpu->arch.ctxt.spsr_und = read_sysreg(spsr_und);
- 	vcpu->arch.ctxt.spsr_irq = read_sysreg(spsr_irq);
- 	vcpu->arch.ctxt.spsr_fiq = read_sysreg(spsr_fiq);
- 
--	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
--	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
-+	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
-+	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
- 
- 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
--		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
-+		__vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
- }
- 
- void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- {
--	u64 *sysreg;
--
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	sysreg = vcpu->arch.ctxt.sys_regs;
--
- 	write_sysreg(vcpu->arch.ctxt.spsr_abt, spsr_abt);
- 	write_sysreg(vcpu->arch.ctxt.spsr_und, spsr_und);
- 	write_sysreg(vcpu->arch.ctxt.spsr_irq, spsr_irq);
- 	write_sysreg(vcpu->arch.ctxt.spsr_fiq, spsr_fiq);
- 
--	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
--	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
-+	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
-+	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
- 
- 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
--		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
-+		write_sysreg(__vcpu_sys_reg(vcpu, DBGVCR32_EL2), dbgvcr32_el2);
- }
- 
- /**
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+-	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
+ 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
 -- 
 2.20.1
 
