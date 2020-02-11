@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA5AC3B188
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33071C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B2A5F208C3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA5D020848
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zP+SM/od"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A5F208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqo6v8mW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5D020848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67A934A94D;
-	Tue, 11 Feb 2020 12:52:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0C744ACFA;
+	Tue, 11 Feb 2020 12:52:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rE--ZpFpVe5x; Tue, 11 Feb 2020 12:52:40 -0500 (EST)
+	with ESMTP id Lj3aQfgQFGuA; Tue, 11 Feb 2020 12:52:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 591F44AED4;
-	Tue, 11 Feb 2020 12:52:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A754AECB;
+	Tue, 11 Feb 2020 12:52:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A97274AEDB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BC5140456
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qECmmu9CUcEs for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:52:35 -0500 (EST)
+ with ESMTP id Xt9sLA6afD-c for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:52:37 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 433A940456
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EA6B4AEE1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:37 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 76D2920578;
- Tue, 11 Feb 2020 17:52:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 533C420661;
+ Tue, 11 Feb 2020 17:52:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443554;
- bh=n91T9PiB+KAQWxH9dGtjS6W4D+t/xuG08bn74uAGMJ4=;
+ s=default; t=1581443556;
+ bh=BuazaigYiOjbw5OaE0ORfLHMkxH+BvQZJ5Hej8ql+c8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=zP+SM/odg1YVn7h9rLnBXYsUwkbhjNE+WtTz9zGNP8UpmZLa5B/3Kp85c7lQE3DHH
- BcJl6MjIgCQStSezTHDrvB85YMLDXTlN3QwFOznRHIgHAbpLZHe3lXt3tBOt/ApU8Y
- Ra316iFZHnKPE8+NAAK4a8DFjYcRbYaBsilYva58=
+ b=rqo6v8mWLi2mt25ST/XQVirargdmB+2vIAEAWzqahpkBU7fm62xg5sdMjZEshKMFd
+ bRuR2+k6ll7CzKzFCndRg9N3HtclCooo0U7QN8wCmhh1G5Ga7mUOdU7JHqMqhR6uXz
+ FesE2+uURoDm2sNXe3rHhVEs/FDilbt4aSHjyLYA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zg0-004O7k-Lc; Tue, 11 Feb 2020 17:50:24 +0000
+ id 1j1Zfl-004O7k-NB; Tue, 11 Feb 2020 17:50:09 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 53/94] KVM: arm64: nv: vgic: Emulate the HW bit in software
-Date: Tue, 11 Feb 2020 17:48:57 +0000
-Message-Id: <20200211174938.27809-54-maz@kernel.org>
+Subject: [PATCH v2 28/94] KVM: arm64: nv: Emulate EL12 register accesses from
+ the virtual EL2
+Date: Tue, 11 Feb 2020 17:48:32 +0000
+Message-Id: <20200211174938.27809-29-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,123 +95,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-Should the guest hypervisor use the HW bit in the LRs, we need to
-emulate the deactivation from the L2 guest into the L1 distributor
-emulation, which is handled by L0.
+With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
+trap to EL2. Handle those traps just like we do for EL1 registers.
 
-It's all good fun.
+One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
+virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
+will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
+bit.  Therefore, add a handler for it and don't treat it as a
+non-trap-registers when preparing a shadow context.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h   |  2 ++
- include/kvm/arm_vgic.h             |  1 +
- virt/kvm/arm/hyp/vgic-v3-sr.c      |  2 +-
- virt/kvm/arm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.c           |  6 ++++--
- 5 files changed, 40 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 4c63a2254bf1..de9c184d68a5 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -48,6 +48,8 @@
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2ce85d5e7111..dd4f8fe143ba 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2057,6 +2057,23 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
+ 	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
  
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
++	{ SYS_DESC(SYS_SCTLR_EL12), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
++	{ SYS_DESC(SYS_CPACR_EL12), access_rw, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_TTBR0_EL12), access_vm_reg, reset_unknown, TTBR0_EL1 },
++	{ SYS_DESC(SYS_TTBR1_EL12), access_vm_reg, reset_unknown, TTBR1_EL1 },
++	{ SYS_DESC(SYS_TCR_EL12), access_vm_reg, reset_val, TCR_EL1, 0 },
++	{ SYS_DESC(SYS_SPSR_EL12), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL12), access_elr},
++	{ SYS_DESC(SYS_AFSR0_EL12), access_vm_reg, reset_unknown, AFSR0_EL1 },
++	{ SYS_DESC(SYS_AFSR1_EL12), access_vm_reg, reset_unknown, AFSR1_EL1 },
++	{ SYS_DESC(SYS_ESR_EL12), access_vm_reg, reset_unknown, ESR_EL1 },
++	{ SYS_DESC(SYS_FAR_EL12), access_vm_reg, reset_unknown, FAR_EL1 },
++	{ SYS_DESC(SYS_MAIR_EL12), access_vm_reg, reset_unknown, MAIR_EL1 },
++	{ SYS_DESC(SYS_AMAIR_EL12), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
++	{ SYS_DESC(SYS_VBAR_EL12), access_rw, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_CONTEXTIDR_EL12), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
++	{ SYS_DESC(SYS_CNTKCTL_EL12), access_rw, reset_val, CNTKCTL_EL1, 0 },
++
+ 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+ };
  
-+u64 __hyp_text __gic_v3_get_lr(unsigned int lr);
-+
- void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 61e8d5cb852b..c6e3634979b4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -367,6 +367,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
- void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
- 
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 2ea9a0b73fc4..8562f628a7c8 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -16,7 +16,7 @@
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
- #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
- 
--static u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
-+u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
- {
- 	switch (lr & 0xf) {
- 	case 0:
-diff --git a/virt/kvm/arm/vgic/vgic-v3-nested.c b/virt/kvm/arm/vgic/vgic-v3-nested.c
-index bfe0ccde514f..3ee3438b5e22 100644
---- a/virt/kvm/arm/vgic/vgic-v3-nested.c
-+++ b/virt/kvm/arm/vgic/vgic-v3-nested.c
-@@ -138,6 +138,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	struct vgic_irq *irq;
-+	int i;
-+
-+	for (i = 0; i < s_cpu_if->used_lrs; i++) {
-+		u64 lr = cpu_if->vgic_lr[i];
-+		int l1_irq;
-+
-+		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-+			continue;
-+
-+		/*
-+		 * If we had a HW lr programmed by the guest hypervisor, we
-+		 * need to emulate the HW effect between the guest hypervisor
-+		 * and the nested guest.
-+		 */
-+		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
-+		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
-+		if (!irq)
-+			continue; /* oh well, the guest hyp is broken */
-+
-+		lr = __gic_v3_get_lr(i);
-+		if (!(lr & ICH_LR_STATE))
-+			irq->active = false;
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 7be3b05dcd8d..dc2bf047556e 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	int used_lrs;
- 
--	/* If nesting, this is a load/put affair, not flush/sync. */
--	if (vgic_state_is_nested(vcpu))
-+	/* If nesting, emulate the HW effect from L0 to L1 */
-+	if (vgic_state_is_nested(vcpu)) {
-+		vgic_v3_sync_nested(vcpu);
- 		return;
-+	}
- 
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
 -- 
 2.20.1
 
