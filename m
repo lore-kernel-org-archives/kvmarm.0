@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B131C3B188
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F65C3B186
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C47E2208C3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE86C20661
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9QOzCk1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47E2208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECaWC7uU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE86C20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77B8B4AC77;
-	Tue, 11 Feb 2020 12:51:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F5A4AED8;
+	Tue, 11 Feb 2020 12:51:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O8aSqSsCVMU3; Tue, 11 Feb 2020 12:51:23 -0500 (EST)
+	with ESMTP id AXUKhvo4RCYR; Tue, 11 Feb 2020 12:51:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 305E74AED3;
-	Tue, 11 Feb 2020 12:51:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 522F04AEA5;
+	Tue, 11 Feb 2020 12:51:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68BD74AE93
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60AB54AEE2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ohWZypD3RFZg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:19 -0500 (EST)
+ with ESMTP id Y4O4CM1Ou9na for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:51:22 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5E664AEE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5DBC84AEC0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:21 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B354D206D7;
- Tue, 11 Feb 2020 17:51:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 85C54206CC;
+ Tue, 11 Feb 2020 17:51:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443478;
- bh=Ik3s7acYpQRtXUBC0I1kZbtJLduLroBrOt90QzyKh88=;
+ s=default; t=1581443480;
+ bh=VNVEjhnfzVzUtrBs05fM+reAaQaIItDsd0jrQQAovo4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=u9QOzCk14izQ6zcb8aQ0L873AICmdYxrjfivFqIePdpy4XlMhbikv9mY+ViG4XuYM
- Ppi7jTTEEJwscxRBWVFdVzQKZH3Zjv9uPH3O9qDnsh3NpOQqLBMKGFamQ8wqO7vHy8
- H60WbChBHqV9W2Gnj0lfIcghnmEdazX6QjpAv7V4=
+ b=ECaWC7uUe2kT8oRS+6kMRJaSvW+T9qlLb1UD1J7ffTmJgalJ4u2/8Ae6aopzxI2LZ
+ ynEDUCrle0CrsqFnWL4lYeibbBeJ4f15H4fCgsVCn9QzQd4+GC6KRcRuy9QV5S2GPw
+ GyFqXKQumuRG/F7D6ae3aYm7ufqyfttENeLmrKVQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zg7-004O7k-4o; Tue, 11 Feb 2020 17:50:31 +0000
+ id 1j1Zg6-004O7k-Hj; Tue, 11 Feb 2020 17:50:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 64/94] arm64: KVM: nv: Invalidate TLBs based on shadow S2
- TTL-like information
-Date: Tue, 11 Feb 2020 17:49:08 +0000
-Message-Id: <20200211174938.27809-65-maz@kernel.org>
+Subject: [PATCH v2 63/94] arm64: KVM: nv: Add handling of ARMv8.4-TTL TLB
+ invalidation
+Date: Tue, 11 Feb 2020 17:49:07 +0000
+Message-Id: <20200211174938.27809-64-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,201 +95,217 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to make S2 TLB invalidations more performant on NV,
-let's use a scheme derived from the ARMv8.4 TTL extension.
-
-If bits [56:55] in the descriptor are non-zero, they indicate a level
-which can be used as an invalidation range.
+Support guest-provided information information to find out about
+the range of required invalidation.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  4 ++
- arch/arm64/kvm/nested.c             | 98 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 13 ++--
- 3 files changed, 110 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/nested.c             | 56 ++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 79 +++++++++++++++++++----------
+ 3 files changed, 108 insertions(+), 28 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 620296206483..debae814fdc5 100644
+index 7cd0c5b0fec9..620296206483 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -67,6 +67,8 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+@@ -67,6 +67,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
  			    u64 control_bit);
  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-+u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
-+			 u64 addr);
- unsigned int ttl_to_size(u8 ttl);
++unsigned int ttl_to_size(u8 ttl);
  
  struct sys_reg_params;
-@@ -75,4 +77,6 @@ struct sys_reg_desc;
- void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r);
- 
-+#define KVM_NV_GUEST_MAP_SZ	GENMASK_ULL(56, 55)
-+
- #endif /* __ARM64_KVM_NESTED_H */
+ struct sys_reg_desc;
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 4cb4831d4022..6adff9b433e0 100644
+index 0ab08ee59110..4cb4831d4022 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -16,6 +16,7 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#include <linux/bitfield.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-@@ -351,6 +352,29 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+@@ -351,6 +351,62 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
  	return ret;
  }
  
-+static int read_host_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++
++unsigned int ttl_to_size(u8 ttl)
 +{
-+	u64 *va = phys_to_virt(pa);
++	int level = ttl & 3;
++	unsigned int max_size = 0;
 +
-+	*desc = *va;
-+
-+	return 0;
-+}
-+
-+static int kvm_walk_shadow_s2(struct kvm_s2_mmu *mmu, phys_addr_t gipa,
-+			      struct kvm_s2_trans *result)
-+{
-+	struct s2_walk_info wi = { };
-+
-+	wi.read_desc = read_host_s2_desc;
-+	wi.baddr = mmu->pgd_phys;
-+
-+	vtcr_to_walk_info(mmu->kvm->arch.vtcr, &wi);
-+
-+	wi.be = IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
-+
-+	return walk_nested_s2_pgd(gipa, &wi, result);
-+}
- 
- unsigned int ttl_to_size(u8 ttl)
- {
-@@ -407,6 +431,80 @@ unsigned int ttl_to_size(u8 ttl)
- 	return max_size;
- }
- 
-+/*
-+ * Compute the equivalent of the TTL field by parsing the shadow PT.
-+ * The granule size is extracted from VTCR_EL2.TG0 while the level is
-+ * retrieved from first entry carrying the level as a tag.
-+ */
-+u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
-+			 u64 addr)
-+{
-+	u64 tmp, sz = 0, vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-+	struct kvm_s2_trans out;
-+	u8 ttl, level;
-+
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		ttl = (1 << 2);
++	switch (ttl >> 2) {
++	case 0:			/* No size information */
 +		break;
-+	case VTCR_EL2_TG0_16K:
-+		ttl = (2 << 2);
++	case 1:			/* 4kB translation granule */
++		switch (level) {
++		case 0:
++			break;
++		case 1:
++			max_size = SZ_1G;
++			break;
++		case 2:
++			max_size = SZ_2M;
++			break;
++		case 3:
++			max_size = SZ_4K;
++			break;
++		}
 +		break;
-+	case VTCR_EL2_TG0_64K:
-+		ttl = (3 << 2);
++	case 2:			/* 16kB translation granule */
++		switch (level) {
++		case 0:
++		case 1:
++			break;
++		case 2:
++			max_size = SZ_32M;
++			break;
++		case 3:
++			max_size = SZ_16K;
++			break;
++		}
 +		break;
-+	default:
-+		BUG();
++	case 3:			/* 64kB translation granule */
++		switch (level) {
++		case 0:
++		case 1:
++			/* No 52bit IPA support */
++			break;
++		case 2:
++			max_size = SZ_512M;
++			break;
++		case 3:
++			max_size = SZ_64K;
++			break;
++		}
++		break;
 +	}
 +
-+	tmp = addr;
-+
-+again:
-+	/* Iteratively compute the block sizes for a particular granule size */
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		if	(sz < SZ_4K)	sz = SZ_4K;
-+		else if (sz < SZ_2M)	sz = SZ_2M;
-+		else if (sz < SZ_1G)	sz = SZ_1G;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_16K:
-+		if	(sz < SZ_16K)	sz = SZ_16K;
-+		else if (sz < SZ_32M)	sz = SZ_32M;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_64K:
-+		if	(sz < SZ_64K)	sz = SZ_64K;
-+		else if (sz < SZ_512M)	sz = SZ_512M;
-+		else			sz = 0;
-+		break;
-+	default:
-+		BUG();
-+	}
-+
-+	if (sz == 0)
-+		return 0;
-+
-+	tmp &= ~(sz - 1);
-+	out = (struct kvm_s2_trans) { };
-+	kvm_walk_shadow_s2(mmu, tmp, &out);
-+	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, out.upper_attr);
-+	if (!level)
-+		goto again;
-+
-+	ttl |= level;
-+
-+	/*
-+	 * We now have found some level information in the shadow S2. Check
-+	 * that the resulting range is actually including the original IPA.
-+	 */
-+	sz = ttl_to_size(ttl);
-+	if (addr < (tmp + sz))
-+		return ttl;
-+
-+	return 0;
++	return max_size;
 +}
 +
  /* Must be called with kvm->lock held */
  struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
  {
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1dcde0230b87..8d4e67594d87 100644
+index 121b3f28cae2..1dcde0230b87 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2589,10 +2589,13 @@ static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
- 					     u64 val)
+@@ -9,6 +9,7 @@
+  *          Christoffer Dall <c.dall@virtualopensystems.com>
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/bsearch.h>
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
+@@ -2583,59 +2584,81 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
++static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
++					     struct kvm_s2_mmu *mmu,
++					     u64 val)
++{
++	unsigned long max_size;
++	u8 ttl = 0;
++
++	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
++		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++	}
++
++	max_size = ttl_to_size(ttl);
++
++	if (!max_size) {
++		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++
++		/* Compute the maximum extent of the invalidation */
++		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
++		case VTCR_EL2_TG0_4K:
++			max_size = SZ_1G;
++			break;
++		case VTCR_EL2_TG0_16K:
++			max_size = SZ_32M;
++			break;
++		case VTCR_EL2_TG0_64K:
++			/*
++			 * No, we do not support 52bit IPA in nested yet. Once
++			 * we do, this should be 4TB.
++			 */
++			/* FIXME: remove the 52bit PA support from the IDregs */
++			max_size = SZ_512M;
++			break;
++		default:
++			BUG();
++		}
++	}
++
++	WARN_ON(!max_size);
++	return max_size;
++}
++
+ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			     const struct sys_reg_desc *r)
  {
- 	unsigned long max_size;
--	u8 ttl = 0;
-+	u8 ttl;
- 
--	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
--		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+
-+	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
-+		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
-+		ttl = get_guest_mapping_ttl(vcpu, mmu, addr);
- 	}
- 
- 	max_size = ttl_to_size(ttl);
-@@ -2633,6 +2636,8 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+ 	struct kvm_s2_mmu *mmu;
  	u64 base_addr;
- 	unsigned long max_size;
+-	int max_size;
++	unsigned long max_size;
  
-+	spin_lock(&vcpu->kvm->mmu_lock);
-+
  	/*
  	 * We drop a number of things from the supplied value:
  	 *
-@@ -2644,8 +2649,6 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	 * - NS bit: we're non-secure only.
+ 	 *
+-	 * - TTL field: We already have the granule size from the
+-	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+-	 *   guest's S2PT.
+-	 *
+ 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+ 	 *
+ 	 * And of course, adjust the IPA to be on an actual address.
  	 */
  	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
  
--	spin_lock(&vcpu->kvm->mmu_lock);
+-	/* Compute the maximum extent of the invalidation */
+-	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
+-	case VTCR_EL2_TG0_4K:
+-		max_size = SZ_1G;
+-		break;
+-	case VTCR_EL2_TG0_16K:
+-		max_size = SZ_32M;
+-		break;
+-	case VTCR_EL2_TG0_64K:
+-		/*
+-		 * No, we do not support 52bit IPA in nested yet. Once
+-		 * we do, this should be 4TB.
+-		 */
+-		/* FIXME: remove the 52bit PA support from the IDregs */
+-		max_size = SZ_512M;
+-		break;
+-	default:
+-		BUG();
+-	}
 -
+ 	spin_lock(&vcpu->kvm->mmu_lock);
+ 
  	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
- 	if (mmu) {
- 		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	spin_unlock(&vcpu->kvm->mmu_lock);
+ 
 -- 
 2.20.1
 
