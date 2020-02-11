@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C16BC352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 16:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FFDBC352A3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 16:27:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8DF320708
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 16:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CB462082F
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 16:27:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxQlVmvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8DF320708
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zgDrvETe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB462082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 203E94A97D;
-	Tue, 11 Feb 2020 11:25:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E70C4AE9A;
+	Tue, 11 Feb 2020 11:27:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pE+RoTkHSs0Z; Tue, 11 Feb 2020 11:25:07 -0500 (EST)
+	with ESMTP id ry3IbDy6zvbd; Tue, 11 Feb 2020 11:27:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A46D4AE8E;
-	Tue, 11 Feb 2020 11:25:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DF554A4FF;
+	Tue, 11 Feb 2020 11:27:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF0AF4A650
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 11:25:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABDA94A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 11:27:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hLSbEuBoWwXy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 11:25:04 -0500 (EST)
-Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com
- [209.85.167.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D374C4A578
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 11:25:04 -0500 (EST)
-Received: by mail-oi1-f195.google.com with SMTP id c16so13358340oic.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 08:25:04 -0800 (PST)
+ with ESMTP id aCEs2l+4kOJz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 11:27:27 -0500 (EST)
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com
+ [209.85.167.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B73ED4005D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 11:27:27 -0500 (EST)
+Received: by mail-oi1-f193.google.com with SMTP id l136so13357239oig.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 08:27:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YTN1aAmP6lc4kQg/pEPrAXI0XAGYx4yNSmOlFp4FG4w=;
- b=lxQlVmvVZcKdKIQTir0FJwH3pOsXoSn5/Q4tMLOxZHb6vh+J078303Z8U7gab4r+M/
- u0nOHQOoM55bwBkguDId7rDWaUhv466UTLUufW9bMy1B2UPv0baZR4jth9eVclXQQlwg
- ns/Bj2RA4Mc3yHj7MRF0DLHPNIGqXe1YZu0Bbbq1edR2+mU0MmkhgL1aOcldQsKwV8ed
- sESHd3hfq2IdjbPTIszOs4y0I8vABsJnNUzB0AebGS13LE3Z2FsIDc0KX5fJA00RYefp
- WIzcZYtT0DlJm4TAufNiRZ8Zw0u5RNE3PAR11A/fvqPnpk/HJkWZe4i1Wrf64W3IomhD
- S4Tg==
+ :cc; bh=yVHXsm2IYBbO0NyhRrtnF1/ntngEqGjIm7d0F0XQrvk=;
+ b=zgDrvETeZ98ubY0HRNgI2g9jEA8jJoX/ED4+UpFR+atEhYr56+2n8NOg6kMLgv3Rnr
+ 4n5nnpYPG0cXSdVX49tRS/ufUSm1llmPiSvhrGu+uhyJokufZD0gPCfLV1rN0EjA2/F+
+ 7ZYg5KHJTUZQRZ0I2+WAKQ1bpvITGMsZmdTRxFkJ0ruKftoWC/OF/JRQjtdOooStvflb
+ Ud8hY87RyjXX16e3GoZkH/Og2IFdB+Dd5gxqGkulEj9QE01t0D1HXpJXcvPl+fr/iFhO
+ 6oK208vi8WL/kuS8J5phalnb6fuMwPpENxZRLIVpeOnZ+hhClUWqo83ltw1HGhGlrqKC
+ Yi5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=YTN1aAmP6lc4kQg/pEPrAXI0XAGYx4yNSmOlFp4FG4w=;
- b=YPZPs+IAiy57EXetGn4TGLVmA8u8wRX2LjEje4pw8NebipTDGHGD74ivLrN/VOj9DO
- kPagoUxVFQwf+BGYdrWoJ6sPTZO3qef/uuT0hRpa7AXwu+CO7DkSAZELt4ZXacdDiZtX
- rNJ9IBexMeQACRE5QrBqDn9VGzVJbDyzpEDpIX9m9htJ84HWt4oBH+ZGo8U+fsQtlfhu
- tkvhXIrLuBiM1f5+1bA9PHlnTpjVUO2IY/W7vmmSwCszgXkZAIJvLUzpUeiild4OHHUC
- dF6nPzojG1NVcCSv6/EIlOJumuHvQsPSB+RJZqJePs1nC4wSh+sHfJEdUwUB98snRMil
- 5Q2Q==
-X-Gm-Message-State: APjAAAXqbOuWcFKmqZn8n5RVxuM7QPlXxqTv0h6IC+LPVfkDvS3V3c+3
- a4BfC8evWKmpmhgQ4fVfzibfIFlGPwkwkRTsytooCQ==
-X-Google-Smtp-Source: APXvYqzv/UP3M8yZMmNDzyJRIaKXistg0kt67KZIdKfe9JVAoy6ZnLkvmh7xAXkvGMtm+bCKNIS/Rzvw8t5EaSXvOXI=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr3426415oid.98.1581438304306;
- Tue, 11 Feb 2020 08:25:04 -0800 (PST)
+ bh=yVHXsm2IYBbO0NyhRrtnF1/ntngEqGjIm7d0F0XQrvk=;
+ b=o/Fmu6y1pod1P4eRGtuA/bXZcx+WCnOzBkEZuA6RxX1SB3LDVjWCjB/BKNEmbezn8r
+ e8DzjDKl7qo4c44Jzx31b8KGoO1Grek3Vnr5aT+7bSrgJY9D0VKkDK3n4fXg8ICXuajP
+ vh/4kD+ENaATj+P1boHa1NN//Lr2LG9pHpoWdLEqw5rAEFbMrszY32aYYIyWt1oG8RQ4
+ Xip870BKx256vvZPaVEGYBADmZBw2BmHBqqlRmKKJk/MCuNmRfttcfVidFqbDIYRjaYR
+ tHKrRpTprOTOGeq3CS6E82F0qrS8BdRzh6FRwV3Q/E07G4lafmRgiQ3QskDazSJxDRg4
+ VG4g==
+X-Gm-Message-State: APjAAAXighhp3FdvLk7KxowdILDQ/OvNgk9cTaZ84zJlgyJiy3bZCvN4
+ XjaRhN1Ky9TgDV6zS0d9tgLfSmS6gx7q+HUF0iiJVQ==
+X-Google-Smtp-Source: APXvYqxxECM3fLexhrufeAZhTAqwZXYeTdHgsZFsgc6CnwRsYHiLW7ZwJQkutazw5wzjwg+heCPClWtjmUZZrlaigT8=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr3432708oid.98.1581438447073;
+ Tue, 11 Feb 2020 08:27:27 -0800 (PST)
 MIME-Version: 1.0
 References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-7-eric.auger@redhat.com>
-In-Reply-To: <20200130112510.15154-7-eric.auger@redhat.com>
+ <20200130112510.15154-6-eric.auger@redhat.com>
+In-Reply-To: <20200130112510.15154-6-eric.auger@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Feb 2020 16:24:52 +0000
-Message-ID: <CAFEAcA_jfZKjey8komTt97Mu-oFjWyFNG2cY4-o8yFAP1oGiug@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 6/9] arm: pmu: Test chained counter
+Date: Tue, 11 Feb 2020 16:27:16 +0000
+Message-ID: <CAFEAcA9Yc9dKTCcP3fP93tQU62Q=2FYOoYGvUqfiOMY=pYV_RA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
 To: Eric Auger <eric.auger@redhat.com>
 Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
  QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
@@ -98,20 +98,39 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Thu, 30 Jan 2020 at 11:26, Eric Auger <eric.auger@redhat.com> wrote:
 >
-> Add 2 tests exercising chained counters. The first one uses
-> CPU_CYCLES and the second one uses SW_INCR.
+> Adds the following tests:
+> - event-counter-config: test event counter configuration
+> - basic-event-count:
+>   - programs counters #0 and #1 to count 2 required events
+>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
+>   to a value close enough to the 32b
+>   overflow limit so that we check the overflow bit is set
+>   after the execution of the asm loop.
+> - mem-access: counts MEM_ACCESS event on counters #0 and #1
+>   with and without 32-bit overflow.
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> +static void test_chained_sw_incr(void)
+
+> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
 > +{
-> +       uint32_t events[] = { 0x0 /* SW_INCR */, 0x0 /* SW_INCR */};
+> +       int i;
+> +
+> +       if (pmu.nb_implemented_counters < nb_events) {
+> +               report_skip("Skip test as number of counters is too small (%d)",
+> +                           pmu.nb_implemented_counters);
+> +               return false;
+> +       }
+> +
+> +       for (i = 0; i < nb_events; i++) {
+> +               if (!is_event_supported(events[i], false)) {
+> +                       report_skip("Skip test as event %d is not supported",
+> +                                   events[i]);
 
-Cut-n-paste error? This test relies on the CHAIN event but it
-isn't present in this list of events to pass to satisfy_prerequisites(),
-so I suspect the second element should be "0x1e /* CHAIN */" ?
-
-(This makes the test fail on QEMU TCG, because we don't implement
-CHAIN.)
+Event numbers are given in hex in the Arm ARM and also
+specified in hex in your test source code. I think it
+would be more helpful if the message here used "0x%x", to
+save the reader having to do the decimal-to-hex conversion
+to find the event in the spec or the test case.
 
 thanks
 -- PMM
