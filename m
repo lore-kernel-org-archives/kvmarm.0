@@ -2,68 +2,68 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ADCC3F68F
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7B3C35242
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9A9B220578
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F2A220578
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDNPjgXd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9B220578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yr1DXlJe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2A220578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 508D84AC88;
-	Tue, 11 Feb 2020 12:53:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12E504AEA0;
+	Tue, 11 Feb 2020 12:53:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jhmSXbQWTmjt; Tue, 11 Feb 2020 12:53:41 -0500 (EST)
+	with ESMTP id U9H43QqZYKl2; Tue, 11 Feb 2020 12:53:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 791CB4AF07;
-	Tue, 11 Feb 2020 12:53:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92F9C4AEE6;
+	Tue, 11 Feb 2020 12:53:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCF594A59B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35D0B4AF07
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JLk2eoINU0i4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:37 -0500 (EST)
+ with ESMTP id OeHt20dvSyPw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:38 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEFEE4AF1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B24254AF33
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:38 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1E47220870;
- Tue, 11 Feb 2020 17:53:36 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E7AA120661;
+ Tue, 11 Feb 2020 17:53:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443616;
- bh=/d4QEu6KExCVn1Nyc6BoOADlVZV4Bz226l2YxJeUdxQ=;
+ s=default; t=1581443618;
+ bh=sMIPQs20M5KCorsTrh42SFSdn+qqoWLMSQtP8k/tiuA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=fDNPjgXdR4X4fmVLG0KXib1sFo/eJ7toCHhIgi7nIdKzE8hMWc7Dp71j+BgEBUpak
- 4FPgyg+b7PchSyJiFtqaoCVZX4GQaL3WHWtHWu6rAUNzGevpbof+9qmnI1f9uaicb3
- 4X0gm0vDK18sR2RCEdbxvo/dELdcjaM6qyutqOms=
+ b=Yr1DXlJe2kSxTYkM3iqIKOSXkUxkJK8Ul4bfmnhhfjFQUbMGYcKhi03cmWE1h4ewt
+ yafwbdTxvJOLHn8ca6s/YzGI8uq68Tn+t1bun5a/JT1sTqUhY1yf+2YMvOSoF27/1k
+ qvlEhAi1aoMm/0IHeBcmYhJ3wsZBYfoJ+y5LHsWk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgI-004O7k-Hg; Tue, 11 Feb 2020 17:50:42 +0000
+ id 1j1Zft-004O7k-E0; Tue, 11 Feb 2020 17:50:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 83/94] KVM: arm64: VNCR-ize ELR_EL1
-Date: Tue, 11 Feb 2020 17:49:27 +0000
-Message-Id: <20200211174938.27809-84-maz@kernel.org>
+Subject: [PATCH v2 41/94] KVM: arm64: nv: Move last_vcpu_ran to be per s2 mmu
+Date: Tue, 11 Feb 2020 17:48:45 +0000
+Message-Id: <20200211174938.27809-42-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,102 +94,282 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ELR_EL1 being a VNCR-capable register, let's flag it as such, and
-repaint all the accesses
+last_vcpu_ran has to be per s2 mmu now that we can have multiple S2
+per VM. Let's take this opportunity to perform some cleanup.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 2 +-
- arch/arm64/include/asm/kvm_host.h    | 2 +-
- arch/arm64/kvm/guest.c               | 2 +-
- arch/arm64/kvm/hyp/sysreg-sr.c       | 4 ++--
- arch/arm64/kvm/sys_regs.c            | 4 ++--
- 5 files changed, 7 insertions(+), 7 deletions(-)
+ arch/arm/include/asm/kvm_host.h     |  6 +++---
+ arch/arm/include/asm/kvm_mmu.h      |  4 ++--
+ arch/arm64/include/asm/kvm_host.h   |  6 +++---
+ arch/arm64/include/asm/kvm_mmu.h    |  2 +-
+ arch/arm64/include/asm/kvm_nested.h |  2 +-
+ arch/arm64/kvm/nested.c             | 11 +++--------
+ virt/kvm/arm/arm.c                  | 25 ++++---------------------
+ virt/kvm/arm/mmu.c                  | 28 +++++++++++++++++++++-------
+ 8 files changed, 38 insertions(+), 46 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 16cd99ab7170..5718fbc56ba5 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -164,7 +164,7 @@ static inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 0a81c454a540..cb5e9b37a87a 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -63,15 +63,15 @@ struct kvm_s2_mmu {
+ 	pgd_t *pgd;
+ 	phys_addr_t pgd_phys;
  
- static inline unsigned long *__vcpu_elr_el1(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu->arch.ctxt.elr_el1;
-+	return (unsigned long *)__ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
- }
++	/* The last vcpu id that ran on each physical CPU */
++	int __percpu *last_vcpu_ran;
++
+ 	struct kvm *kvm;
+ };
  
- static inline unsigned long vcpu_read_elr_el1(const struct kvm_vcpu *vcpu)
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
+ 
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/* Stage-2 page table */
+ 	pgd_t *pgd;
+ 	phys_addr_t pgd_phys;
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 7f1fb496f435..1d0d5f00f0af 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -52,7 +52,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ void free_hyp_pgds(void);
+ 
+ void stage2_unmap_vm(struct kvm *kvm);
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
+@@ -420,7 +420,7 @@ static inline int hyp_map_aux_data(void)
+ 
+ static inline int kvm_set_ipa_limit(void) { return 0; }
+ 
+-static inline void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu) {}
++static inline void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu) {}
+ static inline void kvm_init_nested(struct kvm *kvm) {}
+ 
+ struct kvm_s2_trans {};
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 29ecd13ab4e2..a497e7970418 100644
+index 18e12d00c16d..36bb463dc16a 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -264,6 +264,7 @@ enum vcpu_sysreg {
- 	VNCR(CONTEXTIDR_EL1),	/* Context ID Register */
- 	VNCR(AMAIR_EL1),/* Aux Memory Attribute Indirection Register */
- 	VNCR(MDSCR_EL1),/* Monitor Debug System Control Register */
-+	VNCR(ELR_EL1),
- 	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
- 	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
- 	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
-@@ -335,7 +336,6 @@ struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
+@@ -93,6 +93,9 @@ struct kvm_s2_mmu {
+ 	 * >0: Somebody is actively using this.
+ 	 */
+ 	atomic_t refcnt;
++
++	/* The last vcpu id that ran on each physical CPU */
++	int __percpu *last_vcpu_ran;
+ };
  
- 	u64	sp_el1;
--	u64	elr_el1;
+ static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+@@ -114,9 +117,6 @@ struct kvm_arch {
+ 	/* VTCR_EL2 value for this VM */
+ 	u64    vtcr;
  
- 	u64	spsr[KVM_NR_SPSR];
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/* The maximum number of vCPUs depends on the used GIC model */
+ 	int max_vcpus;
  
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index fb416f624920..40ef6758266d 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -128,7 +128,7 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		return &vcpu->arch.ctxt.sp_el1;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 41ff6aa728e3..9c0bf878fb3b 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -159,7 +159,7 @@ void free_hyp_pgds(void);
  
- 	case KVM_REG_ARM_CORE_REG(elr_el1):
--		return &vcpu->arch.ctxt.elr_el1;
-+		return __vcpu_elr_el1(vcpu);
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+ void stage2_unmap_vm(struct kvm *kvm);
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 20c7c18e99ac..147943d876ef 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -12,7 +12,7 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
  
- 	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
- 	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 8b07be72f2e7..10ce7a6a0c6c 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -59,7 +59,7 @@ static void __hyp_text __sysreg_save_vel1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
- 
- 	ctxt->sp_el1			= read_sysreg(sp_el1);
--	ctxt->elr_el1			= read_sysreg_el1(SYS_ELR);
-+	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
- 	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
+ extern void kvm_init_nested(struct kvm *kvm);
+ extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+-extern void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu);
++extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index d7b2e17b54c3..d20f9982ffea 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -59,13 +59,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+ 		       GFP_KERNEL | __GFP_ZERO);
+ 	if (tmp) {
+-		tmp[num_mmus - 1].kvm = kvm;
+-		atomic_set(&tmp[num_mmus - 1].refcnt, 0);
+-		tmp[num_mmus - 2].kvm = kvm;
+-		atomic_set(&tmp[num_mmus - 2].refcnt, 0);
+-
+-		if (kvm_alloc_stage2_pgd(&tmp[num_mmus - 1]) ||
+-		    kvm_alloc_stage2_pgd(&tmp[num_mmus - 2])) {
++		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
++		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
+ 		} else {
+@@ -445,7 +440,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	return s2_mmu;
  }
  
-@@ -324,7 +324,7 @@ static void __hyp_text __sysreg_restore_vel1_state(struct kvm_cpu_context *ctxt)
+-void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu)
++void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+ {
+ 	mmu->vttbr = 1;
+ 	mmu->nested_stage2_enabled = false;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index dcd8d54d38ce..9bb5d5f47237 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -102,26 +102,15 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+  */
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+-	int ret, cpu;
++	int ret;
+ 
+ 	ret = kvm_arm_setup_stage2(kvm, type);
+ 	if (ret)
+ 		return ret;
+ 
+-	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+-	if (!kvm->arch.last_vcpu_ran)
+-		return -ENOMEM;
+-
+-	for_each_possible_cpu(cpu)
+-		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
+-
+-	/* Mark the initial VMID generation invalid */
+-	kvm->arch.mmu.vmid.vmid_gen = 0;
+-	kvm->arch.mmu.kvm = kvm;
+-
+-	ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
++	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu);
+ 	if (ret)
+-		goto out_fail_alloc;
++		return ret;
+ 
+ 	kvm_init_nested(kvm);
+ 
+@@ -138,9 +127,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
+-out_fail_alloc:
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+ 	return ret;
+ }
+ 
+@@ -165,9 +151,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 
+ 	kvm_vgic_destroy(kvm);
+ 
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+-
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (kvm->vcpus[i]) {
+ 			kvm_vcpu_destroy(kvm->vcpus[i]);
+@@ -346,7 +329,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (nested_virt_in_use(vcpu))
+ 		kvm_vcpu_load_hw_mmu(vcpu);
+ 
+-	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
++	last_ran = this_cpu_ptr(vcpu->arch.hw_mmu->last_vcpu_ran);
+ 	cpu_data = this_cpu_ptr(&kvm_host_data);
+ 
+ 	/*
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 054946566dc0..dc3bded72363 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -907,8 +907,9 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ }
+ 
+ /**
+- * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+- * @mmu:	The stage 2 mmu struct pointer
++ * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
++ * @kvm:	The pointer to the KVM structure
++ * @mmu:	The pointer to the s2 MMU structure
+  *
+  * Allocates only the stage-2 HW PGD level table(s) of size defined by
+  * stage2_pgd_size(mmu->kvm).
+@@ -916,10 +917,11 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+  * Note we don't need locking here as this is only called when the VM is
+  * created, which can only be done once.
+  */
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+ {
+ 	phys_addr_t pgd_phys;
+ 	pgd_t *pgd;
++	int cpu;
+ 
+ 	if (mmu->pgd != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+@@ -927,19 +929,29 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
  	}
  
- 	write_sysreg(ctxt->sp_el1,			sp_el1);
--	write_sysreg_el1(ctxt->elr_el1,			SYS_ELR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
- 	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
+ 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+-	pgd = alloc_pages_exact(stage2_pgd_size(mmu->kvm), GFP_KERNEL | __GFP_ZERO);
++	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
+ 	if (!pgd)
+ 		return -ENOMEM;
+ 
+ 	pgd_phys = virt_to_phys(pgd);
+-	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(mmu->kvm)))
++	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+ 		return -EINVAL;
+ 
++	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
++	if (!mmu->last_vcpu_ran) {
++		free_pages_exact(pgd, stage2_pgd_size(kvm));
++		return -ENOMEM;
++	}
++
++	for_each_possible_cpu(cpu)
++		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
++
++	mmu->kvm = kvm;
+ 	mmu->pgd = pgd;
+ 	mmu->pgd_phys = pgd_phys;
+ 	mmu->vmid.vmid_gen = 0;
+ 
+-	kvm_init_s2_mmu(mmu);
++	kvm_init_nested_s2_mmu(mmu);
+ 
+ 	return 0;
+ }
+@@ -1027,8 +1039,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	spin_unlock(&kvm->mmu_lock);
+ 
+ 	/* Free the HW pgd, one page at a time */
+-	if (pgd)
++	if (pgd) {
+ 		free_pages_exact(pgd, stage2_pgd_size(kvm));
++		free_percpu(mmu->last_vcpu_ran);
++	}
  }
  
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d59fc246aee3..dc1b75a37f00 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1833,9 +1833,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
- 		return false;
- 
- 	if (p->is_write)
--		vcpu->arch.ctxt.elr_el1 = p->regval;
-+		*__vcpu_elr_el1(vcpu) = p->regval;
- 	else
--		p->regval = vcpu->arch.ctxt.elr_el1;
-+		p->regval = *__vcpu_elr_el1(vcpu);
- 
- 	return true;
- }
+ static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
 -- 
 2.20.1
 
