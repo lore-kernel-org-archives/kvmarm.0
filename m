@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C86C3B187
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C70C3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9699020870
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 194FE208C3
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1BBe8Vos"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9699020870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xzyBktmC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 194FE208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 218BE4AEB5;
-	Tue, 11 Feb 2020 12:53:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9D44AEFB;
+	Tue, 11 Feb 2020 12:53:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xeVfgew9BO24; Tue, 11 Feb 2020 12:53:03 -0500 (EST)
+	with ESMTP id tetoyZqJ8n4J; Tue, 11 Feb 2020 12:53:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02EAC4AEFD;
-	Tue, 11 Feb 2020 12:53:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B2DF4AEDD;
+	Tue, 11 Feb 2020 12:53:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A507D4AE95
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7C64A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4mHfIMGmrFzr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:00 -0500 (EST)
+ with ESMTP id S1Fi0JhGM6Ol for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:04 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A522340456
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:52:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 783DC4AEFA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:03 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D83FE20578;
- Tue, 11 Feb 2020 17:52:58 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AD4DB206D7;
+ Tue, 11 Feb 2020 17:53:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443579;
- bh=uSp/qawlZOx/68y9N8aqpzHmqTR1tge0KqerXZ4jmX0=;
+ s=default; t=1581443582;
+ bh=+RRWW/hkjQ++uwcIqUV7epI4LDYcCn4wfi9/FkAslBs=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=1BBe8VosogcMLhIH1Cxow3e5tH7Wwclup3MQxlYhoLyks6Vq13UX5mWOjZRxZm6z5
- coSjZmrZOD2IAtKdQTCTgeha/vBa5ose381LtQ1g+87ETGSrL5mZHc0a/jEt/M607O
- 53oOuEhj3X7V3/1Jl7MerCrqY3ORuFVMAlPQKoco=
+ b=xzyBktmCt/WDU5W1GAQeUg6EGjoO+QxNysTaWznPdDJllLNvJIxpIC/3ChIqvqLX8
+ uDkZNKD388DUg1VD3BmTFDVDLDjBI2Vq6QwzWqYs1cnVE1cH6LYySjcI1SS6ndGU/v
+ RL1q330SYVfqEev6CBt/n1536bYbdog7YEta5f2A=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfp-004O7k-OW; Tue, 11 Feb 2020 17:50:13 +0000
+ id 1j1ZgA-004O7k-3C; Tue, 11 Feb 2020 17:50:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 35/94] KVM: arm64: Check advertised Stage-2 page size
- capability
-Date: Tue, 11 Feb 2020 17:48:39 +0000
-Message-Id: <20200211174938.27809-36-maz@kernel.org>
+Subject: [PATCH v2 69/94] arm64: KVM: Use TTL hint in when invalidating
+ stage-2 translations
+Date: Tue, 11 Feb 2020 17:49:13 +0000
+Message-Id: <20200211174938.27809-70-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,139 +95,169 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
-advertise the supported Stage-2 page sizes.
-
-Let's check this at boot time.
+Since we always have a precide idea of the level we're dealing with
+when invalidating TLBs, we can provide it to as a hint to our
+invalidation helper.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm/include/asm/kvm_mmu.h    |  2 +-
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kernel/cpufeature.c    |  8 +++++++
- arch/arm64/kvm/reset.c            | 39 ++++++++++++++++++++++++++++---
- virt/kvm/arm/arm.c                |  4 +---
- 5 files changed, 47 insertions(+), 8 deletions(-)
+ arch/arm/include/asm/stage2_pgtable.h   |  9 +++++++++
+ arch/arm64/include/asm/stage2_pgtable.h |  9 +++++++++
+ virt/kvm/arm/mmu.c                      | 27 +++++++++++++------------
+ 3 files changed, 32 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 0d84d50bf9ba..053a5f434b3e 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -418,7 +418,7 @@ static inline int hyp_map_aux_data(void)
- 
- #define kvm_phys_to_vttbr(addr)		(addr)
- 
--static inline void kvm_set_ipa_limit(void) {}
-+static inline int kvm_set_ipa_limit(void) { return 0; }
- 
- static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
- {
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1bda11cc0f39..87ccceb9f5d8 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -734,7 +734,7 @@ static inline int kvm_arm_have_ssbd(void)
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
- 
--void kvm_set_ipa_limit(void);
-+int kvm_set_ipa_limit(void);
- 
- #define __KVM_HAVE_ARCH_VM_ALLOC
- struct kvm *kvm_arch_alloc_vm(void);
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index f0e58450eb16..157700590aa8 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -205,6 +205,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
-+	/*
-+	 * Page size not being supported at Stage-2 are not fatal. You
-+	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
-+	 * your favourite nesting hypervisor.
-+	 */
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
- 	/*
- 	 * We already refuse to boot CPUs that don't support our configured
- 	 * page size, so we can only detect mismatches for a page size other
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 5c50df274239..038765d1e60d 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -348,11 +348,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	return ret;
+diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
+index aaceec7855ec..d54ad534da20 100644
+--- a/arch/arm/include/asm/stage2_pgtable.h
++++ b/arch/arm/include/asm/stage2_pgtable.h
+@@ -72,4 +72,13 @@ static inline bool kvm_stage2_has_pmd(struct kvm *kvm)
+ 	return true;
  }
  
--void kvm_set_ipa_limit(void)
-+int kvm_set_ipa_limit(void)
++/*
++ * The ARMv8.4-TTL extension doesn't apply to AArch32, so the below is
++ * only to keep things compiling.
++ */
++#define S2_NO_LEVEL_HINT	0
++#define S2_PUD_LEVEL		S2_NO_LEVEL_HINT
++#define S2_PMD_LEVEL		S2_NO_LEVEL_HINT
++#define S2_PTE_LEVEL		S2_NO_LEVEL_HINT
++
+ #endif	/* __ARM_S2_PGTABLE_H_ */
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index 326aac658b9d..7ed5c1a769a9 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -230,4 +230,13 @@ stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+ 	return (boundary - 1 < end - 1) ? boundary : end;
+ }
+ 
++/*
++ * Level values for the ARMv8.4-TTL extension, mapping PUD/PMD/PTE and
++ * the architectural page-table level.
++ */
++#define S2_NO_LEVEL_HINT	0
++#define S2_PUD_LEVEL		1
++#define S2_PMD_LEVEL		2
++#define S2_PTE_LEVEL		3
++
+ #endif	/* __ARM64_S2_PGTABLE_H_ */
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 67752c2a615f..f6ea17f55712 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -74,9 +74,10 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ 	}
+ }
+ 
+-static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
++static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
++				   int level)
  {
--	unsigned int ipa_max, pa_max, va_max, parange;
-+	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
-+	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
- 
--	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
-+	/*
-+	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
-+	 * Stage-2. If not, things will stop very quickly.
-+	 */
-+	switch (PAGE_SIZE) {
-+	default:
-+	case SZ_4K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
-+		break;
-+	case SZ_16K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
-+		break;
-+	case SZ_64K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
-+		break;
-+	}
-+
-+	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
-+	default:
-+	case 1:
-+		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
-+		return -EINVAL;
-+	case 0:
-+		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
-+		break;
-+	case 2:
-+		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
-+		break;
-+	}
-+
-+	parange = mmfr0 & 0x7;
- 	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
- 
- 	/* Clamp the IPA limit to the PA size supported by the kernel */
-@@ -386,6 +417,8 @@ void kvm_set_ipa_limit(void)
- 	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
- 	kvm_ipa_limit = ipa_max;
- 	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
-+
-+	return 0;
+-	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, 0);
++	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, level);
  }
  
  /*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index d65a0faa46d8..d1359b2079df 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1421,9 +1421,7 @@ static inline void hyp_cpu_pm_exit(void)
+@@ -118,7 +119,7 @@ static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t
+ 		return;
  
- static int init_common_resources(void)
- {
--	kvm_set_ipa_limit();
--
--	return 0;
-+	return kvm_set_ipa_limit();
+ 	pmd_clear(pmd);
+-	kvm_tlb_flush_vmid_ipa(mmu, addr);
++	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+ 	put_page(virt_to_page(pmd));
  }
  
- static int init_subsystems(void)
+@@ -138,7 +139,7 @@ static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t
+ 		return;
+ 
+ 	stage2_pud_clear(kvm, pudp);
+-	kvm_tlb_flush_vmid_ipa(mmu, addr);
++	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+ 	put_page(virt_to_page(pudp));
+ }
+ 
+@@ -180,7 +181,7 @@ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr
+ 
+ 	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, pgd, 0UL);
+ 	stage2_pgd_clear(kvm, pgd);
+-	kvm_tlb_flush_vmid_ipa(mmu, addr);
++	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+ 	stage2_pud_free(kvm, pud_table);
+ 	put_page(virt_to_page(pgd));
+ }
+@@ -192,7 +193,7 @@ static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr
+ 	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
+ 	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
+ 	stage2_pud_clear(kvm, pud);
+-	kvm_tlb_flush_vmid_ipa(mmu, addr);
++	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+ 	stage2_pmd_free(kvm, pmd_table);
+ 	put_page(virt_to_page(pud));
+ }
+@@ -202,7 +203,7 @@ static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr
+ 	pte_t *pte_table = pte_offset_kernel(pmd, 0);
+ 	VM_BUG_ON(pmd_thp_or_huge(*pmd));
+ 	pmd_clear(pmd);
+-	kvm_tlb_flush_vmid_ipa(mmu, addr);
++	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+ 	free_page((unsigned long)pte_table);
+ 	put_page(virt_to_page(pmd));
+ }
+@@ -272,7 +273,7 @@ static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
+ 			pte_t old_pte = *pte;
+ 
+ 			kvm_set_pte(pte, __pte(0));
+-			kvm_tlb_flush_vmid_ipa(mmu, addr);
++			kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
+ 
+ 			/* No need to invalidate the cache for device mappings */
+ 			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
+@@ -301,7 +302,7 @@ static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+ 				pmd_t old_pmd = *pmd;
+ 
+ 				pmd_clear(pmd);
+-				kvm_tlb_flush_vmid_ipa(mmu, addr);
++				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+ 
+ 				kvm_flush_dcache_pmd(old_pmd);
+ 
+@@ -331,7 +332,7 @@ static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+ 				pud_t old_pud = *pud;
+ 
+ 				stage2_pud_clear(kvm, pud);
+-				kvm_tlb_flush_vmid_ipa(mmu, addr);
++				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+ 				kvm_flush_dcache_pud(old_pud);
+ 				put_page(virt_to_page(pud));
+ 			} else {
+@@ -1158,7 +1159,7 @@ static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
+ 		 */
+ 		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+ 		pmd_clear(pmd);
+-		kvm_tlb_flush_vmid_ipa(mmu, addr);
++		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+ 	} else {
+ 		get_page(virt_to_page(pmd));
+ 	}
+@@ -1200,7 +1201,7 @@ static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
+ 
+ 		WARN_ON_ONCE(kvm_pud_pfn(old_pud) != kvm_pud_pfn(*new_pudp));
+ 		stage2_pud_clear(kvm, pudp);
+-		kvm_tlb_flush_vmid_ipa(mmu, addr);
++		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+ 	} else {
+ 		get_page(virt_to_page(pudp));
+ 	}
+@@ -1349,7 +1350,7 @@ static int stage2_set_pte(struct kvm_s2_mmu *mmu,
+ 			return 0;
+ 
+ 		kvm_set_pte(pte, __pte(0));
+-		kvm_tlb_flush_vmid_ipa(mmu, addr);
++		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
+ 	} else {
+ 		get_page(virt_to_page(pte));
+ 	}
 -- 
 2.20.1
 
