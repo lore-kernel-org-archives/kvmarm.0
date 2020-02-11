@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D48EBC3B188
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F52C3B187
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 97C6E20848
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36ED520848
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJBh7/n4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C6E20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2hxYCSB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36ED520848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A1CE4AF09;
-	Tue, 11 Feb 2020 12:53:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E00304AED1;
+	Tue, 11 Feb 2020 12:53:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jJ-OkC2X0FDV; Tue, 11 Feb 2020 12:53:25 -0500 (EST)
+	with ESMTP id CsPhI6Vl-Iti; Tue, 11 Feb 2020 12:53:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 835D74AEC4;
-	Tue, 11 Feb 2020 12:53:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7804AEF5;
+	Tue, 11 Feb 2020 12:53:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8184A946
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B31554A946
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dvG0vbkB9XAr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:53:23 -0500 (EST)
+ with ESMTP id VxXZdr5KsEqG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:53:26 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 148524AEDB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C86F24AF10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:53:25 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 48EC720661;
- Tue, 11 Feb 2020 17:53:21 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 07D0A20578;
+ Tue, 11 Feb 2020 17:53:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443601;
- bh=sE8UXFGqcupDgYc8xZ/0fIPTLUj36A79kNsMxBbXn/o=;
+ s=default; t=1581443605;
+ bh=6qEfnPAQpmbL6mkKK1EQQA1y8FQyNR3EaGGAZea+tbk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=eJBh7/n4oMrBfqjZFf2O0DAofX+KFPP1XKEJJTDfjhF3L7LboA2R8IDJ2w/EgRP/c
- ydpCPbog6g8EEZxa1TGFTi4JOO+qpV/xJwZjNIiBYoEjiC0Sic9Ay7x/admleXhi+K
- +z+uqoy4UaSNUsOqnfC1ptuwMgj7lQoLfjWQYCZ4=
+ b=C2hxYCSBr8A2cGVap21mWjhMt72gIg1HgqTKuOrdCTVW4rkT+XN8MmJXbILHounYV
+ sku3e/hkzreGyEo5shAsbkuwL8odH4tzmlWRDYQjnYuWjGmzmZ2r4eL+Pnl7utC925
+ U3GQaUkOsj5HYl856LkVthyKy8D1I+RdICX9srbU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1Zfj-004O7k-Ej; Tue, 11 Feb 2020 17:50:07 +0000
+ id 1j1Zg4-004O7k-ON; Tue, 11 Feb 2020 17:50:28 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 24/94] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,
- FPEN} settings
-Date: Tue, 11 Feb 2020 17:48:28 +0000
-Message-Id: <20200211174938.27809-25-maz@kernel.org>
+Subject: [PATCH v2 60/94] arm64: KVM: nv: Restrict S2 RD/WR permissions to
+ match the guest's
+Date: Tue, 11 Feb 2020 17:49:04 +0000
+Message-Id: <20200211174938.27809-61-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -95,134 +95,164 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+When mapping a page in a shadow stage-2, special care must be
+taken not to be more permissive than the guest is (writable or
+readable page when the guest hasn't set that permission).
 
-Forward traps due to FP/ASIMD register accesses to the virtual EL2
-if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
-CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
-
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
- all the hard work actually being done by Chase Conklin]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 26 ++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c         | 16 ++++++++++++----
- arch/arm64/kvm/hyp/switch.c          | 11 +++++++++--
- 3 files changed, 47 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h      | 18 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_mmu.h    | 18 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_nested.h | 10 ++++++++++
+ virt/kvm/arm/mmu.c                  | 21 ++++++++++++++++++++-
+ 4 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 26552c8571cb..0e5f88060ecc 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -11,12 +11,14 @@
- #ifndef __ARM64_KVM_EMULATE_H__
- #define __ARM64_KVM_EMULATE_H__
- 
-+#include <linux/bitfield.h>
- #include <linux/kvm_host.h>
- 
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_nested.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
- #include <asm/virt.h>
-@@ -392,6 +394,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- 	return mode != PSR_MODE_EL0t;
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 1d0d5f00f0af..be7be6583e54 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -113,6 +113,12 @@ static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+ 	return pud;
  }
  
-+static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
++static inline pud_t kvm_s2pud_revoke_read(pud_t pud)
 +{
-+	u64 val;
-+
-+	if (!nested_virt_in_use(vcpu))
-+		return false;
-+
-+	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
-+
-+	if (!vcpu_el2_e2h_is_set(vcpu))
-+		return (val & CPTR_EL2_TFP);
-+
-+	switch (FIELD_GET(CPACR_EL1_FPEN, val)) {
-+	case 0b00:
-+	case 0b10:
-+		return true;
-+	case 0b01:
-+		return vcpu_el2_tge_is_set(vcpu) && !vcpu_mode_el2(vcpu);
-+	case 0b11:
-+	default:		/* GCC is dumb */
-+		return false;
-+	}
++	WARN_ON(1);
++	return pud;
 +}
 +
- static inline u32 kvm_vcpu_get_hsr(const struct kvm_vcpu *vcpu)
+ static inline bool kvm_s2pud_exec(pud_t *pud)
  {
- 	return vcpu->arch.fault.esr_el2;
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 03bc69b09ed4..e813bda18c7c 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -97,11 +97,19 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	WARN_ON(1);
+@@ -155,6 +161,18 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+ 	return pmd;
  }
  
- /*
-- * Guest access to FP/ASIMD registers are routed to this handler only
-- * when the system doesn't support FP/ASIMD.
-+ * This handles the cases where the system does not support FP/ASIMD or when
-+ * we are running nested virtualization and the guest hypervisor is trapping
-+ * FP/ASIMD accesses by its guest guest.
-+ *
-+ * All other handling of guest vs. host FP/ASIMD register state is handled in
-+ * fixup_guest_exit().
-  */
--static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
-+static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
-+	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
++static inline pte_t kvm_s2pte_revoke_read(pte_t pte)
++{
++	pte_val(pte) &= ~L_PTE_S2_RDONLY;
++	return pte;
++}
 +
-+	/* This is the case when the system doesn't support FP/ASIMD. */
- 	kvm_inject_undefined(vcpu);
- 	return 1;
++static inline pmd_t kvm_s2pmd_revoke_read(pmd_t pmd)
++{
++	pmd_val(pmd) &= ~L_PMD_S2_RDONLY;
++	return pmd;
++}
++
+ static inline void kvm_set_s2pte_readonly(pte_t *pte)
+ {
+ 	pte_val(*pte) = (pte_val(*pte) & ~L_PTE_S2_RDWR) | L_PTE_S2_RDONLY;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 9c0bf878fb3b..b390bba466e9 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -228,6 +228,24 @@ static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+ 	return pud;
  }
-@@ -270,7 +278,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
--	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
-+	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
- 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
- };
  
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 976b9661203b..ae967e274e08 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -371,11 +371,18 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 	    hsr_ec != ESR_ELx_EC_SVE)
- 		return false;
++static inline pte_t kvm_s2pte_revoke_read(pte_t pte)
++{
++	pte_val(pte) &= ~PTE_S2_RDONLY;
++	return pte;
++}
++
++static inline pmd_t kvm_s2pmd_revoke_read(pmd_t pmd)
++{
++	pmd_val(pmd) &= ~PMD_S2_RDONLY;
++	return pmd;
++}
++
++static inline pud_t kvm_s2pud_revoke_read(pud_t pud)
++{
++	pud_val(pud) &= ~PUD_S2_RDONLY;
++	return pud;
++}
++
+ static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+ {
+ 	pteval_t old_pteval, pteval;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 45c013c0c856..7cd0c5b0fec9 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -43,6 +43,16 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
+ 	return trans->esr;
+ }
  
--	/* Don't handle SVE traps for non-SVE vcpus here: */
--	if (!sve_guest)
++static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
++{
++	return trans->readable;
++}
++
++static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
++{
++	return trans->writable;
++}
++
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
+ 
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 0086b42237af..7da72c2b7f0f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1721,7 +1721,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  unsigned long hva, unsigned long fault_status)
+ {
+ 	int ret;
+-	bool write_fault, writable;
++	bool write_fault, writable, readable = true;
+ 	bool exec_fault, needs_exec;
+ 	unsigned long mmu_seq;
+ 	phys_addr_t ipa = fault_ipa;
+@@ -1841,6 +1841,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (exec_fault && is_iomap(flags))
+ 		return -ENOEXEC;
+ 
 +	/*
-+	 * Don't handle SVE traps for non-SVE vcpus here. This
-+	 * includes NV guests for the time beeing.
++	 * Potentially reduce shadow S2 permissions to match the guest's own
++	 * S2. For exec faults, we'd only reach this point if the guest
++	 * actually allowed it (see kvm_s2_handle_perm_fault).
 +	 */
-+	if (!sve_guest) {
- 		if (hsr_ec != ESR_ELx_EC_FP_ASIMD)
- 			return false;
- 
-+		if (guest_hyp_fpsimd_traps_enabled(vcpu))
-+			return false;
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		writable &= kvm_s2_trans_writable(nested);
++		readable &= kvm_s2_trans_readable(nested);
 +	}
 +
- 	/* Valid trap.  Switch the context: */
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+@@ -1886,6 +1896,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (writable)
+ 			new_pud = kvm_s2pud_mkwrite(new_pud);
  
- 	if (vhe) {
++		if (!readable)
++			new_pud = kvm_s2pud_revoke_read(new_pud);
++
+ 		if (needs_exec)
+ 			new_pud = kvm_s2pud_mkexec(new_pud);
+ 
+@@ -1898,6 +1911,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		if (writable)
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+ 
++		if (!readable)
++			new_pmd = kvm_s2pmd_revoke_read(new_pmd);
++
+ 		if (needs_exec)
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+ 
+@@ -1910,6 +1926,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+ 
++		if (!readable)
++			new_pte = kvm_s2pte_revoke_read(new_pte);
++
+ 		if (needs_exec)
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+ 
 -- 
 2.20.1
 
