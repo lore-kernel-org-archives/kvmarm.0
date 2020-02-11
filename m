@@ -2,68 +2,69 @@ Return-Path: <SRS0=XaYj=37=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46C6C352A3
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B98DDC3F68F
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7189D20848
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76E1320661
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Feb 2020 17:51:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ge+7LsrM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7189D20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1NNVhjng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E1320661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 285C24AED8;
-	Tue, 11 Feb 2020 12:51:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D84EB4AECF;
+	Tue, 11 Feb 2020 12:51:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pCR5Ykw2XNcD; Tue, 11 Feb 2020 12:51:39 -0500 (EST)
+	with ESMTP id nOD0SHQr0iVl; Tue, 11 Feb 2020 12:51:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ED104AEC3;
-	Tue, 11 Feb 2020 12:51:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8210C4AE9E;
+	Tue, 11 Feb 2020 12:51:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A29544A7D9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 996604AEC1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VXq6ALo+yQDX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Feb 2020 12:51:36 -0500 (EST)
+ with ESMTP id D5HLAQUkGnWz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Feb 2020 12:51:39 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9939D4A944
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5269C4AEE3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Feb 2020 12:51:38 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B11DD20578;
- Tue, 11 Feb 2020 17:51:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 84ACA20661;
+ Tue, 11 Feb 2020 17:51:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581443495;
- bh=vJgCeyNhc/zjTIzrf5MG6+BOepmc9H4if6t7gh/kTSw=;
+ s=default; t=1581443497;
+ bh=c5I/DnWBHK7CF1Hug7c8EUPZyhvhzoIsYWcfsfMzPEo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ge+7LsrMQjgNYp3YORkBfaJvbrDPYo1v/5naMcnSuHcXLhaRrtON8wAkI3dHwSLkX
- 81ziN2BC0cmYcNCwOpLvcxQuA1z9tF948+ntPi8gRPCGV6VAQmWmr8JotPIGO7tyGD
- J7gUxDJX7x4va5Hm7y7Tf+CdhP24aakywn+rO2pI=
+ b=1NNVhjng+8MtN6zoASSmNHt5TCZkZPglFujZ+pmQ1HsXWEDqvuxwzYXoM7NRAuYd+
+ PdGvtwsFIRccT+3waMwUvPNFQbebRWD12fTMZjWfiatJ7WseUp48snhPHHiXjreg1z
+ 54JTpTcmoQK7v2Uvo+PqTYX+//AHEHzlP59VlY1g=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j1ZgJ-004O7k-4I; Tue, 11 Feb 2020 17:50:43 +0000
+ id 1j1ZgL-004O7k-ET; Tue, 11 Feb 2020 17:50:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 84/94] KVM: arm64: VNCR-ize SP_EL1
-Date: Tue, 11 Feb 2020 17:49:28 +0000
-Message-Id: <20200211174938.27809-85-maz@kernel.org>
+Subject: [PATCH v2 88/94] KVM: arm64: Add ARMv8.4 Enhanced Nested Virt
+ cpufeature
+Date: Tue, 11 Feb 2020 17:49:32 +0000
+Message-Id: <20200211174938.27809-89-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200211174938.27809-1-maz@kernel.org>
 References: <20200211174938.27809-1-maz@kernel.org>
@@ -94,91 +95,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SP_EL1 being a VNCR-capable register, let's flag it as such, and
-repaint all the accesses
+Add the detection code for the ARMv8.4-NV feature.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +--
- arch/arm64/kvm/guest.c            | 2 +-
- arch/arm64/kvm/hyp/sysreg-sr.c    | 4 ++--
- arch/arm64/kvm/sys_regs.c         | 5 ++---
- 4 files changed, 6 insertions(+), 8 deletions(-)
+ arch/arm/include/asm/kvm_nested.h   |  1 +
+ arch/arm64/include/asm/cpucaps.h    |  3 ++-
+ arch/arm64/include/asm/kvm_nested.h |  6 ++++++
+ arch/arm64/kernel/cpufeature.c      | 10 ++++++++++
+ 4 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a497e7970418..fe6d5a3bc338 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -265,6 +265,7 @@ enum vcpu_sysreg {
- 	VNCR(AMAIR_EL1),/* Aux Memory Attribute Indirection Register */
- 	VNCR(MDSCR_EL1),/* Monitor Debug System Control Register */
- 	VNCR(ELR_EL1),
-+	VNCR(SP_EL1),
- 	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
- 	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
- 	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
-@@ -335,8 +336,6 @@ enum vcpu_sysreg {
- struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
+diff --git a/arch/arm/include/asm/kvm_nested.h b/arch/arm/include/asm/kvm_nested.h
+index 2b89e6fa7323..1b97863ae811 100644
+--- a/arch/arm/include/asm/kvm_nested.h
++++ b/arch/arm/include/asm/kvm_nested.h
+@@ -5,6 +5,7 @@
+ #include <linux/kvm_host.h>
  
--	u64	sp_el1;
--
- 	u64	spsr[KVM_NR_SPSR];
+ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu) { return false; }
++static inline bool enhanced_nested_virt_in_use(const struct kvm_vcpu *vcpu) { return false; }
+ static inline void check_nested_vcpu_requests(struct kvm_vcpu *vcpu) {}
  
- 	struct user_fpsimd_state fp_regs;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 40ef6758266d..869017e50464 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -125,7 +125,7 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		return &vcpu->arch.ctxt.regs.pstate;
+ #endif /* __ARM_KVM_NESTED_H */
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 5736650cd0fb..565e4878e301 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -60,7 +60,8 @@
+ #define ARM64_HAS_RNG				50
+ #define ARM64_HAS_NESTED_VIRT			51
+ #define ARM64_HAS_ARMv8_4_TTL			52
++#define ARM64_HAS_ENHANCED_NESTED_VIRT		53
  
- 	case KVM_REG_ARM_CORE_REG(sp_el1):
--		return &vcpu->arch.ctxt.sp_el1;
-+		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
+-#define ARM64_NCAPS				53
++#define ARM64_NCAPS				54
  
- 	case KVM_REG_ARM_CORE_REG(elr_el1):
- 		return __vcpu_elr_el1(vcpu);
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 10ce7a6a0c6c..e5359cd39b32 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -58,7 +58,7 @@ static void __hyp_text __sysreg_save_vel1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
- 
--	ctxt->sp_el1			= read_sysreg(sp_el1);
-+	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
- 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
- 	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 3e3778d3cec6..284c794a10ac 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -11,6 +11,12 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+ 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features);
  }
-@@ -323,7 +323,7 @@ static void __hyp_text __sysreg_restore_vel1_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
- 	}
  
--	write_sysreg(ctxt->sp_el1,			sp_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
- 	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dc1b75a37f00..2c3e90e192b4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1803,11 +1803,10 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	/* SP_EL1 is NOT maintained in sys_regs array */
- 	if (p->is_write)
--		vcpu->arch.ctxt.sp_el1 = p->regval;
-+		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
- 	else
--		p->regval = vcpu->arch.ctxt.sp_el1;
-+		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
- 
- 	return true;
- }
++static inline bool enhanced_nested_virt_in_use(const struct kvm_vcpu *vcpu)
++{
++	return cpus_have_const_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
++		nested_virt_in_use(vcpu);
++}
++
+ extern void kvm_init_nested(struct kvm *kvm);
+ extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+ extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index aada8c3eff1e..546aceb70c3f 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1454,6 +1454,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.field_pos = ID_AA64MMFR2_NV_SHIFT,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.desc = "Enhanced Nested Virtualization Support",
++		.capability = ARM64_HAS_ENHANCED_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_NV_SHIFT,
++		.min_field_value = 2,
++	},
+ #endif	/* CONFIG_ARM64_VHE */
+ 	{
+ 		.desc = "32-bit EL0 Support",
 -- 
 2.20.1
 
