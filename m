@@ -2,80 +2,61 @@ Return-Path: <SRS0=3/RW=4B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25A6C2BA83
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Feb 2020 14:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50057C2BA83
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Feb 2020 15:12:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 499D820873
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Feb 2020 14:22:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSeAbcjQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 499D820873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D5D1F2168B
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Feb 2020 15:12:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D1F2168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E682F4AC87;
-	Thu, 13 Feb 2020 09:22:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F2094A522;
+	Thu, 13 Feb 2020 10:12:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Sr0G5w-bDETn; Thu, 13 Feb 2020 09:22:12 -0500 (EST)
+	with ESMTP id yuRrH9HQLC5h; Thu, 13 Feb 2020 10:12:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7D834AC70;
-	Thu, 13 Feb 2020 09:22:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D794A598;
+	Thu, 13 Feb 2020 10:12:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1187B4A578
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 09:22:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB99D4A522
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 10:12:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c+qPuDAuETjZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Feb 2020 09:22:11 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBED94A576
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 09:22:10 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A312F222C2;
- Thu, 13 Feb 2020 14:22:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581603729;
- bh=6VfGSAC1HNOSPZvAehIj0dyrn4ZvRctoIk3FH92JPYI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=kSeAbcjQ8QOxAe4QgIbYkEwyQm3vrPqRAkJtjE0GbKOtRmcwL4e4Um3YxtPHyFnrh
- sMbizg7K02UaBIu2Fg5l9afFMJ+YXwXAZ+pOfkgKZPgX3I8z6mAeRgXjKDavzXGviQ
- cFL3ig+yq/2tfGch9ygjX6/xRILMKkgI2klDov8I=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j2FNX-004qXJ-U9; Thu, 13 Feb 2020 14:22:08 +0000
-MIME-Version: 1.0
-Date: Thu, 13 Feb 2020 14:22:07 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id RUIOgnUqQXIX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Feb 2020 10:12:05 -0500 (EST)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 632064A500
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 10:12:05 -0500 (EST)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 87457483DF8DF9ECD8F4;
+ Thu, 13 Feb 2020 23:11:59 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
+ 23:11:52 +0800
 Subject: Re: [PATCH v2 3/6] irqchip/gic-v4.1: Ensure L2 vPE table is allocated
  at RD level
-In-Reply-To: <20200206075711.1275-4-yuzenghui@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200206075711.1275-1-yuzenghui@huawei.com>
  <20200206075711.1275-4-yuzenghui@huawei.com>
-Message-ID: <2f6a27ac57aef9b948952c210c9a5882@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- tglx@linutronix.de, jason@lakedaemon.net, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <2f6a27ac57aef9b948952c210c9a5882@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <b1cdce3f-0c0e-8b78-0fe0-f4114190caa3@huawei.com>
+Date: Thu, 13 Feb 2020 23:11:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <2f6a27ac57aef9b948952c210c9a5882@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Cc: jason@lakedaemon.net, linux-kernel@vger.kernel.org, tglx@linutronix.de,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -89,93 +70,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
-
-On 2020-02-06 07:57, Zenghui Yu wrote:
-> In GICv4, we will ensure that level2 vPE table memory is allocated
-> for the specified vpe_id on all v4 ITS, in its_alloc_vpe_table().
-> This still works well for the typical GICv4.1 implementation, where
-> the new vPE table is shared between the ITSs and the RDs.
-> 
-> To make it explicit, let us introduce allocate_vpe_l2_table() to
-> make sure that the L2 tables are allocated on all v4.1 RDs. We're
-> likely not need to allocate memory in it because the vPE table is
-> shared and (L2 table is) already allocated at ITS level, except
-> for the case where the ITS doesn't share anything (say SVPET == 0,
-> practically unlikely but architecturally allowed).
-> 
-> The implementation of allocate_vpe_l2_table() is mostly copied from
-> its_alloc_table_entry().
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 80 ++++++++++++++++++++++++++++++++
->  1 file changed, 80 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 0f1fe56ce0af..ae4e7b355b46 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -2443,6 +2443,72 @@ static u64 
-> inherit_vpe_l1_table_from_rd(cpumask_t **mask)
->  	return 0;
->  }
-> 
-> +static bool allocate_vpe_l2_table(int cpu, u32 id)
-> +{
-> +	void __iomem *base = gic_data_rdist_cpu(cpu)->rd_base;
-> +	u64 val, gpsz, npg;
-> +	unsigned int psz, esz, idx;
-> +	struct page *page;
-> +	__le64 *table;
-> +
-> +	if (!gic_rdists->has_rvpeid)
-> +		return true;
-> +
-> +	val  = gits_read_vpropbaser(base + SZ_128K + GICR_VPROPBASER);
-
-Having rebased the rest of the GICv4.1 series on top of -rc1, I've hit a 
-small
-issue right here. I run a FVP model that only spawns 4 CPUs, while the 
-DT has
-8 of them. This means that online_cpus = 4, and possible_cpus = 8.
-
-So in my case, half of the RDs have base == NULL, and things stop 
-quickly.
-
-I plan to queue the following:
-
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index d85dc8dcb0ad..7656b353a95f 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2526,6 +2526,10 @@ static bool allocate_vpe_l2_table(int cpu, u32 
-id)
-  	if (!gic_rdists->has_rvpeid)
-  		return true;
-
-+	/* Skip non-present CPUs */
-+	if (!base)
-+		return true;
-+
-  	val  = gicr_read_vpropbaser(base + SZ_128K + GICR_VPROPBASER);
-
-  	esz  = FIELD_GET(GICR_VPROPBASER_4_1_ENTRY_SIZE, val) + 1;
-
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMi8xMyAyMjoyMiwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFpl
+bmdodWksCj4gCj4gT24gMjAyMC0wMi0wNiAwNzo1NywgWmVuZ2h1aSBZdSB3cm90ZToKPj4gSW4g
+R0lDdjQsIHdlIHdpbGwgZW5zdXJlIHRoYXQgbGV2ZWwyIHZQRSB0YWJsZSBtZW1vcnkgaXMgYWxs
+b2NhdGVkCj4+IGZvciB0aGUgc3BlY2lmaWVkIHZwZV9pZCBvbiBhbGwgdjQgSVRTLCBpbiBpdHNf
+YWxsb2NfdnBlX3RhYmxlKCkuCj4+IFRoaXMgc3RpbGwgd29ya3Mgd2VsbCBmb3IgdGhlIHR5cGlj
+YWwgR0lDdjQuMSBpbXBsZW1lbnRhdGlvbiwgd2hlcmUKPj4gdGhlIG5ldyB2UEUgdGFibGUgaXMg
+c2hhcmVkIGJldHdlZW4gdGhlIElUU3MgYW5kIHRoZSBSRHMuCj4+Cj4+IFRvIG1ha2UgaXQgZXhw
+bGljaXQsIGxldCB1cyBpbnRyb2R1Y2UgYWxsb2NhdGVfdnBlX2wyX3RhYmxlKCkgdG8KPj4gbWFr
+ZSBzdXJlIHRoYXQgdGhlIEwyIHRhYmxlcyBhcmUgYWxsb2NhdGVkIG9uIGFsbCB2NC4xIFJEcy4g
+V2UncmUKPj4gbGlrZWx5IG5vdCBuZWVkIHRvIGFsbG9jYXRlIG1lbW9yeSBpbiBpdCBiZWNhdXNl
+IHRoZSB2UEUgdGFibGUgaXMKPj4gc2hhcmVkIGFuZCAoTDIgdGFibGUgaXMpIGFscmVhZHkgYWxs
+b2NhdGVkIGF0IElUUyBsZXZlbCwgZXhjZXB0Cj4+IGZvciB0aGUgY2FzZSB3aGVyZSB0aGUgSVRT
+IGRvZXNuJ3Qgc2hhcmUgYW55dGhpbmcgKHNheSBTVlBFVCA9PSAwLAo+PiBwcmFjdGljYWxseSB1
+bmxpa2VseSBidXQgYXJjaGl0ZWN0dXJhbGx5IGFsbG93ZWQpLgo+Pgo+PiBUaGUgaW1wbGVtZW50
+YXRpb24gb2YgYWxsb2NhdGVfdnBlX2wyX3RhYmxlKCkgaXMgbW9zdGx5IGNvcGllZCBmcm9tCj4+
+IGl0c19hbGxvY190YWJsZV9lbnRyeSgpLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBaZW5naHVpIFl1
+IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KPj4gLS0tCj4+IMKgZHJpdmVycy9pcnFjaGlwL2lycS1n
+aWMtdjMtaXRzLmMgfCA4MCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+PiDCoDEg
+ZmlsZSBjaGFuZ2VkLCA4MCBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2lycWNoaXAvaXJxLWdpYy12My1pdHMuYyAKPj4gYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12
+My1pdHMuYwo+PiBpbmRleCAwZjFmZTU2Y2UwYWYuLmFlNGU3YjM1NWI0NiAxMDA2NDQKPj4gLS0t
+IGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPj4gKysrIGIvZHJpdmVycy9pcnFj
+aGlwL2lycS1naWMtdjMtaXRzLmMKPj4gQEAgLTI0NDMsNiArMjQ0Myw3MiBAQCBzdGF0aWMgdTY0
+IAo+PiBpbmhlcml0X3ZwZV9sMV90YWJsZV9mcm9tX3JkKGNwdW1hc2tfdCAqKm1hc2spCj4+IMKg
+wqDCoMKgIHJldHVybiAwOwo+PiDCoH0KPj4KPj4gK3N0YXRpYyBib29sIGFsbG9jYXRlX3ZwZV9s
+Ml90YWJsZShpbnQgY3B1LCB1MzIgaWQpCj4+ICt7Cj4+ICvCoMKgwqAgdm9pZCBfX2lvbWVtICpi
+YXNlID0gZ2ljX2RhdGFfcmRpc3RfY3B1KGNwdSktPnJkX2Jhc2U7Cj4+ICvCoMKgwqAgdTY0IHZh
+bCwgZ3BzeiwgbnBnOwo+PiArwqDCoMKgIHVuc2lnbmVkIGludCBwc3osIGVzeiwgaWR4Owo+PiAr
+wqDCoMKgIHN0cnVjdCBwYWdlICpwYWdlOwo+PiArwqDCoMKgIF9fbGU2NCAqdGFibGU7Cj4+ICsK
+Pj4gK8KgwqDCoCBpZiAoIWdpY19yZGlzdHMtPmhhc19ydnBlaWQpCj4+ICvCoMKgwqDCoMKgwqDC
+oCByZXR1cm4gdHJ1ZTsKPj4gKwo+PiArwqDCoMKgIHZhbMKgID0gZ2l0c19yZWFkX3Zwcm9wYmFz
+ZXIoYmFzZSArIFNaXzEyOEsgKyBHSUNSX1ZQUk9QQkFTRVIpOwo+IAo+IEhhdmluZyByZWJhc2Vk
+IHRoZSByZXN0IG9mIHRoZSBHSUN2NC4xIHNlcmllcyBvbiB0b3Agb2YgLXJjMSwgSSd2ZSBoaXQg
+YSAKPiBzbWFsbAo+IGlzc3VlIHJpZ2h0IGhlcmUuIEkgcnVuIGEgRlZQIG1vZGVsIHRoYXQgb25s
+eSBzcGF3bnMgNCBDUFVzLCB3aGlsZSB0aGUgCj4gRFQgaGFzCj4gOCBvZiB0aGVtLiBUaGlzIG1l
+YW5zIHRoYXQgb25saW5lX2NwdXMgPSA0LCBhbmQgcG9zc2libGVfY3B1cyA9IDguCj4gCj4gU28g
+aW4gbXkgY2FzZSwgaGFsZiBvZiB0aGUgUkRzIGhhdmUgYmFzZSA9PSBOVUxMLCBhbmQgdGhpbmdz
+IHN0b3AgcXVpY2tseS4KCkFoLCBzbyB0aGlzIG1heSBhbHNvIGJlIHdoeSB3ZSBjaGVjayAnIWJh
+c2UnIGZvciBlYWNoIHBvc3NpYmxlIENQVSBpbgppbmhlcml0X3ZwZV9sMV90YWJsZV9mcm9tX3Jk
+KCkuIEkgZGlkbid0IHRoaW5rIGFib3V0IGl0IGF0IHRoYXQgdGltZS4KCj4gCj4gSSBwbGFuIHRv
+IHF1ZXVlIHRoZSBmb2xsb3dpbmc6Cj4gCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaXJxY2hpcC9p
+cnEtZ2ljLXYzLWl0cy5jIAo+IGIvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPiBp
+bmRleCBkODVkYzhkY2IwYWQuLjc2NTZiMzUzYTk1ZiAxMDA2NDQKPiAtLS0gYS9kcml2ZXJzL2ly
+cWNoaXAvaXJxLWdpYy12My1pdHMuYwo+ICsrKyBiL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYz
+LWl0cy5jCj4gQEAgLTI1MjYsNiArMjUyNiwxMCBAQCBzdGF0aWMgYm9vbCBhbGxvY2F0ZV92cGVf
+bDJfdGFibGUoaW50IGNwdSwgdTMyIGlkKQo+ICDCoMKgwqDCoCBpZiAoIWdpY19yZGlzdHMtPmhh
+c19ydnBlaWQpCj4gIMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHRydWU7Cj4gCj4gK8KgwqDCoCAv
+KiBTa2lwIG5vbi1wcmVzZW50IENQVXMgKi8KPiArwqDCoMKgIGlmICghYmFzZSkKPiArwqDCoMKg
+wqDCoMKgwqAgcmV0dXJuIHRydWU7Cj4gKwo+ICDCoMKgwqDCoCB2YWzCoCA9IGdpY3JfcmVhZF92
+cHJvcGJhc2VyKGJhc2UgKyBTWl8xMjhLICsgR0lDUl9WUFJPUEJBU0VSKTsKPiAKPiAgwqDCoMKg
+wqAgZXN6wqAgPSBGSUVMRF9HRVQoR0lDUl9WUFJPUEJBU0VSXzRfMV9FTlRSWV9TSVpFLCB2YWwp
+ICsgMTsKClRoYW5rcyBmb3IgZml4aW5nIHRoZSBzZWNvbmQgYnVnIGZvciB0aGlzIHBhdGNoIDot
+KQoKClplbmdodWkKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
+czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
