@@ -2,59 +2,56 @@ Return-Path: <SRS0=Bd71=4C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BD5C35242
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 04:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5395DC3B195
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 07:47:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AE65E2168B
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 04:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE65E2168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E229C20873
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 07:47:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E229C20873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 021404A946;
-	Thu, 13 Feb 2020 23:23:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FD54A51D;
+	Fri, 14 Feb 2020 02:47:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H13TjyN8Ahys; Thu, 13 Feb 2020 23:23:33 -0500 (EST)
+	with ESMTP id AZewOllyy5Y1; Fri, 14 Feb 2020 02:47:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A874A542;
-	Thu, 13 Feb 2020 23:23:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 725034A588;
+	Fri, 14 Feb 2020 02:47:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DD294A542
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 23:23:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8909C4A51D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 02:47:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ouVjeoSWqDmw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Feb 2020 23:23:31 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29E6A4A528
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Feb 2020 23:23:31 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 992601FB;
- Thu, 13 Feb 2020 20:23:30 -0800 (PST)
-Received: from [10.162.16.95] (p8cg001049571a15.blr.arm.com [10.162.16.95])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B9E03F6CF;
- Thu, 13 Feb 2020 20:23:28 -0800 (PST)
-Subject: Re: [PATCH 0/6] Introduce ID_PFR2 and other CPU feature changes
-To: linux-arm-kernel@lists.infradead.org
-References: <1580215149-21492-1-git-send-email-anshuman.khandual@arm.com>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <45ce930c-81b3-3161-ced6-34a8c8623ac8@arm.com>
-Date: Fri, 14 Feb 2020 09:53:25 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ with ESMTP id srYSAhdsU3rc for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Feb 2020 02:47:01 -0500 (EST)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDE184A50F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 02:47:00 -0500 (EST)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id AE1BC97FD32AAA201A4F;
+ Fri, 14 Feb 2020 15:46:55 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 14 Feb 2020 15:46:48 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <maz@kernel.org>, <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>, 
+ <suzuki.poulose@arm.com>
+Subject: [PATCH] KVM: arm64: Fix spelling mistake "Tmers" -> "Timers"
+Date: Fri, 14 Feb 2020 15:46:25 +0800
+Message-ID: <20200214074625.1913-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <1580215149-21492-1-git-send-email-anshuman.khandual@arm.com>
-Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,48 +68,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+What we're interested in is obviously the "Arch Timers" access trap.
+Fix the typo.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9f2165937f7d..b1bbb1e2db8f 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1889,7 +1889,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 
+ 	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
+ 
+-	/* Arch Tmers */
++	/* Arch Timers */
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_TVAL), access_arch_timer },
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_CTL), access_arch_timer },
+ 
+-- 
+2.19.1
 
 
-On 01/28/2020 06:09 PM, Anshuman Khandual wrote:
-> This series is primarily motivated from an adhoc list from Mark Rutland
-> during our ID_ISAR6 discussion [1]. Besides, it also includes a patch
-> which does macro replacement for various open bits shift encodings in
-> various CPU ID registers. This series is based on linux-next 20200124.
-> 
-> [1] https://patchwork.kernel.org/patch/11287805/
-> 
-> Is there anything else apart from these changes which can be accommodated
-> in this series, please do let me know. Thank you.
-
-Just a gentle ping. Any updates, does this series looks okay ? Is there
-anything else related to CPU ID register feature bits, which can be added
-up here. FWIW, the series still applies on v5.6-rc1.
-
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-kernel@vger.kernel.org
-> 
-> Anshuman Khandual (6):
->   arm64/cpufeature: Introduce ID_PFR2 CPU register
->   arm64/cpufeature: Add DIT and CSV2 feature bits in ID_PFR0 register
->   arm64/cpufeature: Add remaining feature bits in ID_MMFR4 register
->   arm64/cpufeature: Define an explicit ftr_id_isar0[] for ID_ISAR0 register
->   arm64/cpufeature: Drop TraceFilt feature exposure from ID_DFR0 register
->   arm64/cpufeature: Replace all open bits shift encodings with macros
-> 
->  arch/arm64/include/asm/cpu.h    |  1 +
->  arch/arm64/include/asm/sysreg.h | 51 +++++++++++++++++++
->  arch/arm64/kernel/cpufeature.c  | 87 ++++++++++++++++++++++-----------
->  arch/arm64/kernel/cpuinfo.c     |  1 +
->  arch/arm64/kvm/sys_regs.c       |  2 +-
->  5 files changed, 112 insertions(+), 30 deletions(-)
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
