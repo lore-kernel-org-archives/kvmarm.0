@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A64C2BA83
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 15:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2355C2BA83
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 15:21:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 320C424649
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 15:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DD9D24654
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 15:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcIq9xxR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320C424649
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIHFxtiK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD9D24654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54EB4AEC8;
-	Fri, 14 Feb 2020 10:21:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6AE4AEB5;
+	Fri, 14 Feb 2020 10:21:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xpy4KIuUPHva; Fri, 14 Feb 2020 10:21:14 -0500 (EST)
+	with ESMTP id GWliARpmRIWl; Fri, 14 Feb 2020 10:21:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A4A4AEAC;
-	Fri, 14 Feb 2020 10:21:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E99D4A578;
+	Fri, 14 Feb 2020 10:21:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B98EC4A536
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 10:21:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3683F4AEB0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 10:21:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pj6fRg5EQFdC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Feb 2020 10:21:10 -0500 (EST)
+ with ESMTP id uX5kJV4H2VDP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Feb 2020 10:21:13 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFF004AC6C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 10:21:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 295A84AEBE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 10:21:13 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DB4AC2467C;
- Fri, 14 Feb 2020 15:21:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 50A352168B;
+ Fri, 14 Feb 2020 15:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581693670;
- bh=OU3i052ZF//Wu4rkWcKgh+KLFM8jnoqZQPBXrJ+hcAM=;
+ s=default; t=1581693672;
+ bh=T0HXT57QkCmJWt2fIEDW9u7ILipbmmqwzalNG/8iegk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FcIq9xxR596Ms+iMP+w7cYCAq+GGR/SV3k/b6TnemUnUtm/+crWs5BsINrqli26fB
- 6A508Us+oDAOvvP/WNocCdoGlSNStsgK4bYcQ0flnrjiBkZYMxNqYz3THWcnuZ0Sza
- qEYHtLiRhRYknoW2EaQvIGNqAdoUwtlOe+C2u1Z4=
+ b=VIHFxtiKtfU38kguCWl1J3BlJ4DXk9xpOHfdQoivMDlsUcmfEDEb2MgpkMJkpgI7V
+ bKbuWvPlo5PlZIDDvXPJhYKyJKN4lQrShJN7+gkPWcJU/8ykAOsCsB4VNAVbu7yC5M
+ OG34l3GhSlncEeFYgehQrCHBxn1gRsjj0NMFo0so=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j2cPq-0057sw-74; Fri, 14 Feb 2020 14:58:02 +0000
+ id 1j2cPj-0057sw-4Y; Fri, 14 Feb 2020 14:57:55 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 20/20] KVM: arm64: GICv4.1: Expose HW-based SGIs in debugfs
-Date: Fri, 14 Feb 2020 14:57:36 +0000
-Message-Id: <20200214145736.18550-21-maz@kernel.org>
+Subject: [PATCH v4 12/20] irqchip/gic-v4.1: Add VSGI property setup
+Date: Fri, 14 Feb 2020 14:57:28 +0000
+Message-Id: <20200214145736.18550-13-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214145736.18550-1-maz@kernel.org>
 References: <20200214145736.18550-1-maz@kernel.org>
@@ -96,53 +96,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The vgic-state debugfs file could do with showing the pending state
-of the HW-backed SGIs. Plug it into the low-level code.
+Add the SGI configuration entry point for KVM to use.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/vgic/vgic-debug.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
+ include/linux/irqchip/arm-gic-v4.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-index cc12fe9b2df3..b13a9e3f99dd 100644
---- a/virt/kvm/arm/vgic/vgic-debug.c
-+++ b/virt/kvm/arm/vgic/vgic-debug.c
-@@ -178,6 +178,8 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			    struct kvm_vcpu *vcpu)
- {
- 	char *type;
-+	bool pending;
-+
- 	if (irq->intid < VGIC_NR_SGIS)
- 		type = "SGI";
- 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
-@@ -190,6 +192,16 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
- 		print_header(s, irq, vcpu);
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 99b33f60ac63..f3f06c5c7e54 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+ 	return irq_set_vcpu_affinity(irq, &info);
+ }
  
-+	pending = irq->pending_latch;
-+	if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-+		int err;
++int its_prop_update_vsgi(int irq, u8 priority, bool group)
++{
++	struct its_cmd_info info = {
++		.cmd_type = PROP_UPDATE_SGI,
++		{
++			.priority	= priority,
++			.group		= group,
++		},
++	};
 +
-+		err = irq_get_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    &pending);
-+		WARN_ON_ONCE(err);
-+	}
++	return irq_set_vcpu_affinity(irq, &info);
++}
 +
- 	seq_printf(s, "       %s %4d "
- 		      "    %2d "
- 		      "%d%d%d%d%d%d%d "
-@@ -201,7 +213,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		      "\n",
- 			type, irq->intid,
- 			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
--			irq->pending_latch,
-+			pending,
- 			irq->line_level,
- 			irq->active,
- 			irq->enabled,
+ int its_init_v4(struct irq_domain *domain,
+ 		const struct irq_domain_ops *vpe_ops,
+ 		const struct irq_domain_ops *sgi_ops)
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index 9fbd0418f569..46c167a6349f 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -129,6 +129,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+ int its_get_vlpi(int irq, struct its_vlpi_map *map);
+ int its_unmap_vlpi(int irq);
+ int its_prop_update_vlpi(int irq, u8 config, bool inv);
++int its_prop_update_vsgi(int irq, u8 priority, bool group);
+ 
+ struct irq_domain_ops;
+ int its_init_v4(struct irq_domain *domain,
 -- 
 2.20.1
 
