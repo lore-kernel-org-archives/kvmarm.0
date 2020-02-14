@@ -4,65 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B119C3B1A1
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 14:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8B6C3B19F
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 14:58:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 45AFD24654
+	by mail.kernel.org (Postfix) with ESMTP id C6D9424681
 	for <kvmarm@archiver.kernel.org>; Fri, 14 Feb 2020 14:58:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1klaWZn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45AFD24654
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWzX1W1n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D9424681
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04B984AECB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 717AF4AEAF;
 	Fri, 14 Feb 2020 09:58:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ynAX4mtK28wl; Fri, 14 Feb 2020 09:57:59 -0500 (EST)
+	with ESMTP id X2XdGd7ir6e0; Fri, 14 Feb 2020 09:58:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D910E4AEE8;
-	Fri, 14 Feb 2020 09:57:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0344E4AEEA;
+	Fri, 14 Feb 2020 09:57:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C6FC4A95D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 09:57:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FFA44AE9F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 09:57:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FApnXmMwuD3r for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Feb 2020 09:57:55 -0500 (EST)
+ with ESMTP id RGuae24DsuTL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Feb 2020 09:57:56 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F2504AEB4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 09:57:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E40E4AEB5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Feb 2020 09:57:53 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A969224692;
- Fri, 14 Feb 2020 14:57:50 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 866042469A;
+ Fri, 14 Feb 2020 14:57:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581692270;
- bh=fyex6SWQtmObmQDnx9rTc43JzJ9Hd/h6doziUVXHQnE=;
+ s=default; t=1581692272;
+ bh=e2zVYki0pGyroLA9GfqVl31JuEivIYApM5ERsSmzFao=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=o1klaWZnMXb/rQAhNOsma68qM0PhUbxsvMslAmT9pOu0Rj4QQGlnqabKBhC0Kxsja
- v4bSVHma0QFQUiS6aFnIdWCP14sXTSyKlikCywgedf7O3gKLW1OpPWZvU2i0blzqA4
- 4Wvr2+B7lUJlAjoXNgDNGyFWZ4C6poBRGwOP+1SU=
+ b=fWzX1W1nsLdWf6QDLkogVPIGq8r/TyaExJeTvHqqNXCozeRdlc5jjDylTXkizlG3z
+ qHM4tKTazOGWlAFL0YO+LwndJRothjO3UIz7q/OG5So5pQu0Q6T2TtxHFxvKpiyKFW
+ dH/NXsZabyptGV4MgmR0jDPQS93gYf7Gywfx4qmw=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j2cPd-0057sw-3V; Fri, 14 Feb 2020 14:57:49 +0000
+ id 1j2cPe-0057sw-R0; Fri, 14 Feb 2020 14:57:51 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 06/20] irqchip/gic-v4.1: Add initial SGI configuration
-Date: Fri, 14 Feb 2020 14:57:22 +0000
-Message-Id: <20200214145736.18550-7-maz@kernel.org>
+Subject: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state SGI
+ callbacks
+Date: Fri, 14 Feb 2020 14:57:24 +0000
+Message-Id: <20200214145736.18550-9-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214145736.18550-1-maz@kernel.org>
 References: <20200214145736.18550-1-maz@kernel.org>
@@ -96,153 +97,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The GICv4.1 ITS has yet another new command (VSGI) which allows
-a VPE-targeted SGI to be configured (or have its pending state
-cleared). Add support for this command and plumb it into the
-activate irqdomain callback so that it is ready to be used.
+To implement the get/set_irqchip_state callbacks (limited to the
+PENDING state), we have to use a particular set of hacks:
+
+- Reading the pending state is done by using a pair of new redistributor
+  registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 interrupts
+  state to be retrieved.
+- Setting the pending state is done by generating it as we'd otherwise do
+  for a guest (writing to GITS_SGIR)
+- Clearing the pending state is done by emiting a VSGI command with the
+  "clear" bit set.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c   | 76 +++++++++++++++++++++++++++++-
- include/linux/irqchip/arm-gic-v3.h |  3 +-
- 2 files changed, 77 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 56 ++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h | 14 ++++++++
+ 2 files changed, 70 insertions(+)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 6121c8f2a8ce..229e4ae9c59b 100644
+index 1e448d9a16ea..a9753435c4ff 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -354,6 +354,15 @@ struct its_cmd_desc {
- 		struct {
- 			struct its_vpe *vpe;
- 		} its_invdb_cmd;
-+
-+		struct {
-+			struct its_vpe *vpe;
-+			u8 sgi;
-+			u8 priority;
-+			bool enable;
-+			bool group;
-+			bool clear;
-+		} its_vsgi_cmd;
- 	};
- };
- 
-@@ -502,6 +511,31 @@ static void its_encode_db(struct its_cmd_block *cmd, bool db)
- 	its_mask_encode(&cmd->raw_cmd[2], db, 63, 63);
+@@ -3915,11 +3915,67 @@ static int its_sgi_set_affinity(struct irq_data *d,
+ 	return -EINVAL;
  }
  
-+static void its_encode_sgi_intid(struct its_cmd_block *cmd, u8 sgi)
++static int its_sgi_set_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which,
++				     bool state)
 +{
-+	its_mask_encode(&cmd->raw_cmd[0], sgi, 35, 32);
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
++
++	if (state) {
++		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++		struct its_node *its = find_4_1_its();
++		u64 val;
++
++		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
++		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
++		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
++	} else {
++		its_configure_sgi(d, true);
++	}
++
++	return 0;
 +}
 +
-+static void its_encode_sgi_priority(struct its_cmd_block *cmd, u8 prio)
-+{
-+	its_mask_encode(&cmd->raw_cmd[0], prio >> 4, 23, 20);
-+}
-+
-+static void its_encode_sgi_group(struct its_cmd_block *cmd, bool grp)
-+{
-+	its_mask_encode(&cmd->raw_cmd[0], grp, 10, 10);
-+}
-+
-+static void its_encode_sgi_clear(struct its_cmd_block *cmd, bool clr)
-+{
-+	its_mask_encode(&cmd->raw_cmd[0], clr, 9, 9);
-+}
-+
-+static void its_encode_sgi_enable(struct its_cmd_block *cmd, bool en)
-+{
-+	its_mask_encode(&cmd->raw_cmd[0], en, 8, 8);
-+}
-+
- static inline void its_fixup_cmd(struct its_cmd_block *cmd)
- {
- 	/* Let's fixup BE commands */
-@@ -867,6 +901,26 @@ static struct its_vpe *its_build_invdb_cmd(struct its_node *its,
- 	return valid_vpe(its, desc->its_invdb_cmd.vpe);
- }
- 
-+static struct its_vpe *its_build_vsgi_cmd(struct its_node *its,
-+					  struct its_cmd_block *cmd,
-+					  struct its_cmd_desc *desc)
-+{
-+	if (WARN_ON(!is_v4_1(its)))
-+		return NULL;
-+
-+	its_encode_cmd(cmd, GITS_CMD_VSGI);
-+	its_encode_vpeid(cmd, desc->its_vsgi_cmd.vpe->vpe_id);
-+	its_encode_sgi_intid(cmd, desc->its_vsgi_cmd.sgi);
-+	its_encode_sgi_priority(cmd, desc->its_vsgi_cmd.priority);
-+	its_encode_sgi_group(cmd, desc->its_vsgi_cmd.group);
-+	its_encode_sgi_clear(cmd, desc->its_vsgi_cmd.clear);
-+	its_encode_sgi_enable(cmd, desc->its_vsgi_cmd.enable);
-+
-+	its_fixup_cmd(cmd);
-+
-+	return valid_vpe(its, desc->its_vsgi_cmd.vpe);
-+}
-+
- static u64 its_cmd_ptr_to_offset(struct its_node *its,
- 				 struct its_cmd_block *ptr)
- {
-@@ -3823,6 +3877,21 @@ static struct irq_chip its_vpe_4_1_irq_chip = {
- 	.irq_set_vcpu_affinity	= its_vpe_4_1_set_vcpu_affinity,
- };
- 
-+static void its_configure_sgi(struct irq_data *d, bool clear)
++static int its_sgi_get_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which, bool *val)
 +{
 +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+	struct its_cmd_desc desc;
++	void __iomem *base = gic_data_rdist_cpu(vpe->col_idx)->rd_base + SZ_128K;
++	u32 count = 1000000;	/* 1s! */
++	u32 status;
 +
-+	desc.its_vsgi_cmd.vpe = vpe;
-+	desc.its_vsgi_cmd.sgi = d->hwirq;
-+	desc.its_vsgi_cmd.priority = vpe->sgi_config[d->hwirq].priority;
-+	desc.its_vsgi_cmd.enable = vpe->sgi_config[d->hwirq].enabled;
-+	desc.its_vsgi_cmd.group = vpe->sgi_config[d->hwirq].group;
-+	desc.its_vsgi_cmd.clear = clear;
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
 +
-+	its_send_single_vcommand(find_4_1_its(), its_build_vsgi_cmd, &desc);
++	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
++	do {
++		status = readl_relaxed(base + GICR_VSGIPENDR);
++		if (!(status & GICR_VSGIPENDR_BUSY))
++			goto out;
++
++		count--;
++		if (!count) {
++			pr_err_ratelimited("Unable to get SGI status\n");
++			goto out;
++		}
++		cpu_relax();
++		udelay(1);
++	} while(count);
++
++out:
++	*val = !!(status & (1 << d->hwirq));
++
++	return 0;
 +}
 +
- static int its_sgi_set_affinity(struct irq_data *d,
- 				const struct cpumask *mask_val,
- 				bool force)
-@@ -3868,13 +3937,18 @@ static void its_sgi_irq_domain_free(struct irq_domain *domain,
- static int its_sgi_irq_domain_activate(struct irq_domain *domain,
- 				       struct irq_data *d, bool reserve)
- {
-+	/* Write out the initial SGI configuration */
-+	its_configure_sgi(d, false);
- 	return 0;
- }
+ static struct irq_chip its_sgi_irq_chip = {
+ 	.name			= "GICv4.1-sgi",
+ 	.irq_mask		= its_sgi_mask_irq,
+ 	.irq_unmask		= its_sgi_unmask_irq,
+ 	.irq_set_affinity	= its_sgi_set_affinity,
++	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
++	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
+ };
  
- static void its_sgi_irq_domain_deactivate(struct irq_domain *domain,
- 					  struct irq_data *d)
- {
--	/* Nothing to do */
-+	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-+
-+	vpe->sgi_config[d->hwirq].enabled = false;
-+	its_configure_sgi(d, true);
- }
- 
- static struct irq_domain_ops its_sgi_domain_ops = {
+ static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
 diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index c29a02678a6f..a89578884263 100644
+index a89578884263..64da945486ac 100644
 --- a/include/linux/irqchip/arm-gic-v3.h
 +++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -502,8 +502,9 @@
- #define GITS_CMD_VMAPTI			GITS_CMD_GICv4(GITS_CMD_MAPTI)
- #define GITS_CMD_VMOVI			GITS_CMD_GICv4(GITS_CMD_MOVI)
- #define GITS_CMD_VSYNC			GITS_CMD_GICv4(GITS_CMD_SYNC)
--/* VMOVP and INVDB are the odd ones, as they dont have a physical counterpart */
-+/* VMOVP, VSGI and INVDB are the odd ones, as they dont have a physical counterpart */
- #define GITS_CMD_VMOVP			GITS_CMD_GICv4(2)
-+#define GITS_CMD_VSGI			GITS_CMD_GICv4(3)
- #define GITS_CMD_INVDB			GITS_CMD_GICv4(0xe)
+@@ -345,6 +345,15 @@
+ #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
+ #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
  
++#define GICR_VSGIR			0x0080
++
++#define GICR_VSGIR_VPEID		GENMASK(15, 0)
++
++#define GICR_VSGIPENDR			0x0088
++
++#define GICR_VSGIPENDR_BUSY		(1U << 31)
++#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
++
  /*
+  * ITS registers, offsets from ITS_base
+  */
+@@ -368,6 +377,11 @@
+ 
+ #define GITS_TRANSLATER			0x10040
+ 
++#define GITS_SGIR			0x20020
++
++#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
++#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
++
+ #define GITS_CTLR_ENABLE		(1U << 0)
+ #define GITS_CTLR_ImDe			(1U << 1)
+ #define	GITS_CTLR_ITS_NUMBER_SHIFT	4
 -- 
 2.20.1
 
