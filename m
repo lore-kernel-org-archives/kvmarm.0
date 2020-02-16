@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBDD7C76199
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5A1C7619B
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8319424125
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D6B920857
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYxhksCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8319424125
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtNr/Z3K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6B920857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29EAA4AF3C;
-	Sun, 16 Feb 2020 13:53:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0969A4AF48;
+	Sun, 16 Feb 2020 13:53:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qAnNzz+9Y21h; Sun, 16 Feb 2020 13:53:45 -0500 (EST)
+	with ESMTP id a0LqU23FupMp; Sun, 16 Feb 2020 13:53:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4CAA4AF34;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14DC4AF39;
 	Sun, 16 Feb 2020 13:53:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE0B4AF18
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 336EE4AF1F
  for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gkoHJWoGVSdQ for <kvmarm@lists.cs.columbia.edu>;
- Sun, 16 Feb 2020 13:53:42 -0500 (EST)
+ with ESMTP id piLTRuvWhArB for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 16 Feb 2020 13:53:41 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29AAF4AF23
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F31824ACF6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:40 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 58EBC227BF;
- Sun, 16 Feb 2020 18:53:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DD1E0208C4;
+ Sun, 16 Feb 2020 18:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581879221;
- bh=BvQSfVvLdl4GubQpJ8c/Z9TaTldmEdsJf0jTn09JBTw=;
+ s=default; t=1581879220;
+ bh=W0DXE0Y6+7MX/BeEDfPtsK4Pl3uK+rz6OmCb9Cb4oyc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=tYxhksCPcnovlVeMpKaFvqUxfv1muYM0/uepZFu9pzwOEHAIC++GgcHvZHxtt7iXo
- +6VX4q1bcJycqZ/FreYqr16DXP8UbDF5KRZVuLCLGEKDmudu+DD7LkmHGi7OxljzVp
- VLRdYmHVWeBFCDK1cxTl9lmeuJKmLlHoqdjVK0vc=
+ b=PtNr/Z3Kz1m00IzB61aegM9IO8i7TZ+S/jUqTW2WuN3qQbylw+ZgE7hsMi4JKjY7T
+ QmMAbqFuwFmq0BsQD3QVoNIn2l+MNKRfxJg9jxODUB4pIOcn4vNKyAeosQhNCXX2QX
+ RnRgDKtfVTQCfv8OF6LWWfYlZv2FwfIyVz73sUEc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j3P2x-005iWD-K5; Sun, 16 Feb 2020 18:53:39 +0000
+ id 1j3P2w-005iWD-86; Sun, 16 Feb 2020 18:53:38 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 4/5] KVM: arm64: Limit the debug architecture to ARMv8.0
-Date: Sun, 16 Feb 2020 18:53:23 +0000
-Message-Id: <20200216185324.32596-5-maz@kernel.org>
+Subject: [PATCH 1/5] KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
+Date: Sun, 16 Feb 2020 18:53:20 +0000
+Message-Id: <20200216185324.32596-2-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200216185324.32596-1-maz@kernel.org>
 References: <20200216185324.32596-1-maz@kernel.org>
@@ -90,28 +90,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let's not pretend we support anything but ARMv8.0 as far as the
-debug architecture is concerned.
+The AArch32 CP14 DBGDIDR has bit 15 set to RES1, which our current
+emulation doesn't set. Just add the missing bit.
 
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 06b2d0dc6c73..43087b50a211 100644
+index 3e909b117f0c..da82c4b03aab 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1094,6 +1094,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 				 FEATURE(ID_AA64ISAR1_GPI));
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
-+		/* Limit debug to ARMv8.0 */
-+		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-+		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
- 		/* Limit PMU to ARMv8.1 */
- 		val &= ~FEATURE(ID_AA64DFR0_PMUVER);
- 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 4);
+@@ -1658,7 +1658,7 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+ 		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
+ 			     (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
+ 			     (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20)
+-			     | (6 << 16) | (el3 << 14) | (el3 << 12));
++			     | (6 << 16) | (1 << 15) | (el3 << 14) | (el3 << 12));
+ 		return true;
+ 	}
+ }
 -- 
 2.20.1
 
