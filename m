@@ -2,68 +2,67 @@ Return-Path: <SRS0=vR/6=4E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C97FC76199
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F81C76199
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5CD4720857
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FCC120857
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 18:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxpmM6Am"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD4720857
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mX4Ho7ZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FCC120857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1952A4AEF6;
-	Sun, 16 Feb 2020 13:53:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7DC4ACF6;
+	Sun, 16 Feb 2020 13:53:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Gnp3Rgc30lAU; Sun, 16 Feb 2020 13:53:46 -0500 (EST)
+	with ESMTP id bIfB-4ZBDgOs; Sun, 16 Feb 2020 13:53:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EADEA4AF36;
-	Sun, 16 Feb 2020 13:53:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EC594AF27;
+	Sun, 16 Feb 2020 13:53:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AAAAF4AF1C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BCC94AF1C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kWRHkvo2bA0m for <kvmarm@lists.cs.columbia.edu>;
- Sun, 16 Feb 2020 13:53:42 -0500 (EST)
+ with ESMTP id c-tE9j5a4ln8 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 16 Feb 2020 13:53:41 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A01234AF1B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 268B54AF19
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 13:53:41 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CD98524125;
- Sun, 16 Feb 2020 18:53:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 514722086A;
+ Sun, 16 Feb 2020 18:53:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581879221;
- bh=oXOY45B0ay/QrkVsrHg4dNSnoA3eobeplPmN8P58bQg=;
+ s=default; t=1581879220;
+ bh=sOrUNfgGhb/0cFC+oq2qNi6ipOyDmpg18HkTEB25a4U=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TxpmM6AmMudS9VIjtp5puwQ26etTs9NujwgtEHtPCDV011pPUdT9E8xwCn38Umawf
- py212W7AUT8MuEZf5ikqL9+L1EdUDHf4o3C5xstd3PoxaqFZeX5Btrzz3QcJqJlwai
- F+Ff6HKL3nr4N7TPF8F/3GKU7z25YuHFw/RqgRYQ=
+ b=mX4Ho7ZTmuTSbJa/EQNSw1ezEFfbdgTpqqOwx81qENOkIMb9Pu/p985h8TOKTzlSk
+ vwtPwq0Y/bFZ5iwafEAMY4Au5gYrHSS1L+2S4VQN2ITOuQZiKlACzQXDkWiLiJFquv
+ qAU9ys8hRr6GRqTNusOudY8JdHyhBMok2xaUBTec=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j3P2y-005iWD-55; Sun, 16 Feb 2020 18:53:40 +0000
+ id 1j3P2w-005iWD-M1; Sun, 16 Feb 2020 18:53:38 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 5/5] KVM: arm64: Upgrade PMU support to ARMv8.4
-Date: Sun, 16 Feb 2020 18:53:24 +0000
-Message-Id: <20200216185324.32596-6-maz@kernel.org>
+Subject: [PATCH 2/5] KVM: arm64: Refactor filtering of ID registers
+Date: Sun, 16 Feb 2020 18:53:21 +0000
+Message-Id: <20200216185324.32596-3-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200216185324.32596-1-maz@kernel.org>
 References: <20200216185324.32596-1-maz@kernel.org>
@@ -91,58 +90,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
-pretty easy. All that is required is support for PMMIR_EL1, which
-is read-only, and for which returning 0 is a valid option.
+Our current ID register filtering is starting to be a mess of if()
+statements, and isn't going to get any saner.
 
-Let's just do that and adjust what we return to the guest.
+Let's turn it into a switch(), which has a chance of being more
+readable.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
- arch/arm64/kvm/sys_regs.c       | 9 ++++++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b91570ff9db1..16d91ed51d06 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -312,6 +312,8 @@
- #define SYS_PMINTENSET_EL1		sys_reg(3, 0, 9, 14, 1)
- #define SYS_PMINTENCLR_EL1		sys_reg(3, 0, 9, 14, 2)
- 
-+#define SYS_PMMIR_EL1			sys_reg(3, 0, 9, 14, 6)
-+
- #define SYS_MAIR_EL1			sys_reg(3, 0, 10, 2, 0)
- #define SYS_AMAIR_EL1			sys_reg(3, 0, 10, 3, 0)
- 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 43087b50a211..4eee61fb94be 100644
+index da82c4b03aab..682fedd7700f 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1097,9 +1097,11 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		/* Limit debug to ARMv8.0 */
- 		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
- 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
--		/* Limit PMU to ARMv8.1 */
--		val &= ~FEATURE(ID_AA64DFR0_PMUVER);
--		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 4);
-+		/* Limit PMU to ARMv8.4 */
-+		if (FIELD_GET(FEATURE(ID_AA64DFR0_PMUVER), val) > 5) {
-+			val &= ~FEATURE(ID_AA64DFR0_PMUVER);
-+			val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 5);
-+		}
- 		break;
+@@ -9,6 +9,7 @@
+  *          Christoffer Dall <c.dall@virtualopensystems.com>
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/bsearch.h>
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
+@@ -1070,6 +1071,8 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
++
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		struct sys_reg_desc const *r, bool raz)
+@@ -1078,13 +1081,18 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+ 	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+ 
+-	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
+-		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+-	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+-		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
++	switch (id) {
++	case SYS_ID_AA64PFR0_EL1:
++		if (!vcpu_has_sve(vcpu))
++			val &= ~FEATURE(ID_AA64PFR0_SVE);
++		break;
++	case SYS_ID_AA64ISAR1_EL1:
++		if (!vcpu_has_ptrauth(vcpu))
++			val &= ~(FEATURE(ID_AA64ISAR1_APA) |
++				 FEATURE(ID_AA64ISAR1_API) |
++				 FEATURE(ID_AA64ISAR1_GPA) |
++				 FEATURE(ID_AA64ISAR1_GPI));
++		break;
  	}
  
-@@ -1524,6 +1526,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
- 	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, NULL, PMINTENSET_EL1 },
-+	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
- 
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+ 	return val;
 -- 
 2.20.1
 
