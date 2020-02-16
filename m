@@ -1,81 +1,82 @@
-Return-Path: <SRS0=VO0i=4D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=vR/6=4E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CEFEC2BA83
-	for <kvmarm@archiver.kernel.org>; Sat, 15 Feb 2020 13:01:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0E6C2BA83
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1CBB02083B
-	for <kvmarm@archiver.kernel.org>; Sat, 15 Feb 2020 13:01:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E95E22086A
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpqoOBzx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CBB02083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ypq+hzlS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E95E22086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A18FD4A982;
-	Sat, 15 Feb 2020 08:01:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F3C4AEE2;
+	Sun, 16 Feb 2020 03:19:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OyhcxiAAs0Fq; Sat, 15 Feb 2020 08:01:02 -0500 (EST)
+	with ESMTP id tJ5fOlmdYFXQ; Sun, 16 Feb 2020 03:19:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DF6E4AEBC;
-	Sat, 15 Feb 2020 08:01:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 260C64AEC6;
+	Sun, 16 Feb 2020 03:19:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5336E4A982
- for <kvmarm@lists.cs.columbia.edu>; Sat, 15 Feb 2020 08:01:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D1DB4AEFE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:18:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8b0X3tLyZdZM for <kvmarm@lists.cs.columbia.edu>;
- Sat, 15 Feb 2020 08:00:59 -0500 (EST)
+ with ESMTP id tSH5CondDPoo for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 16 Feb 2020 03:18:57 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66DF64A7E4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 15 Feb 2020 08:00:59 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 418FA4A591
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:18:57 -0500 (EST)
+Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3DDB12083B;
- Sat, 15 Feb 2020 13:00:58 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6DFE8206E2;
+ Sun, 16 Feb 2020 08:18:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581771658;
- bh=IlVg+7WZjLz8i78gKlPFmvAGVxAOutix+9XWCG/zJNU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=OpqoOBzxtuhp34xWuSv1WvEvv+xj2BGRWrM9Oxrh4jTTuI7hPgtj60P1aF16NwBMA
- j8zwqPSkJSmIGMnY2aG5hU4Whc47ARjBQqr+XDDWVmfV/OnvA10nrt+WqSSlo0EUDQ
- hCEhxaaeR+IouzIhP5EaIGOv8YIsjwrsvR2M5xBg=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j2x44-005RoV-HQ; Sat, 15 Feb 2020 13:00:56 +0000
-Date: Sat, 15 Feb 2020 13:00:55 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Filtering PMU events
-Message-ID: <20200215130055.0995efe7@why>
-In-Reply-To: <20200214183615.25498-1-maz@kernel.org>
-References: <20200214183615.25498-1-maz@kernel.org>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ s=default; t=1581841136;
+ bh=uOm/w1LvbUniJRU6oBgmKsoo2r45zuKfYTZIlp+VEas=;
+ h=From:To:Cc:Subject:Date:From;
+ b=ypq+hzlSBgo7vT86/XBQ4S1ZCTw/nfY/YpzHJWYAJgU4W9vpVdIiTo4WBFLNVMWaa
+ mEqd5SQZXKay8YUlKOrH1RnE0OOB9BYS2j2C7wKWxIhrDOoaqf93tmzYSMMHhaUfex
+ v4qv2x5ntxN9kHpg/8qF9RTGzwDANyHfQEpVF5aw=
+From: Mike Rapoport <rppt@kernel.org>
+To: linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/13] mm: remove __ARCH_HAS_5LEVEL_HACK
+Date: Sun, 16 Feb 2020 10:18:30 +0200
+Message-Id: <20200216081843.28670-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, Robin.Murphy@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Robin Murphy <Robin.Murphy@arm.com>
+Cc: Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>, linux-sh@vger.kernel.org,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mm@kvack.org,
+ Paul Mackerras <paulus@samba.org>, linux-hexagon@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Jonas Bonn <jonas@southpole.se>, linux-arch@vger.kernel.org,
+ Brian Cain <bcain@codeaurora.org>, Marc Zyngier <maz@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
+ Mike Rapoport <rppt@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ uclinux-h8-devel@lists.sourceforge.jp, Fenghua Yu <fenghua.yu@intel.com>,
+ Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
+ Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+ openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
+ Guan Xuetao <gxt@pku.edu.cn>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@c-s.fr>, Tony Luck <tony.luck@intel.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Michael Ellerman <mpe@ellerman.id.au>, nios2-dev@lists.rocketboards.org,
+ Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
+ Mike Rapoport <rppt@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,49 +93,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 14 Feb 2020 18:36:13 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+From: Mike Rapoport <rppt@linux.ibm.com>
 
-> It is at times necessary to prevent a guest from being able to sample
-> certain events if multiple CPUs share resources such as a cache level.
-> In this case, it would be interesting if the VMM could simply prevent
-> certain events from being counted instead of simply not exposing a PMU.
-> 
-> Given that most events are not architected, there is no easy way
-> to designate which events shouldn't be counted other than specifying
-> the raw event number.
-> 
-> Since I have no idea whether it is better to use an event whitelist
-> or blacklist, the proposed API takes a cue from the x86 version and
-> allows either allowing or denying counting of ranges of events.
-> The event space being pretty large (16bits on ARMv8.1), the default
-> policy is set by the first filter that gets installed (default deny if
-> we first allow, default allow if we first deny).
-> 
-> The filter state is global to the guest, despite the PMU being per
-> CPU. I'm not sure whether it would be worth it making it CPU-private.
-> 
-> Anyway, I'd be interesting in comments on how people would use this.
-> I'll try to push a patch against kvmtool that implement this shortly
-> (what I have currently is a harcoded set of hacks).
+Hi,
 
-I now have a small extension to kvmtool allowing a --pmu-filter option
-to be passed on the command line (see [1]).
+These patches convert several architectures to use page table folding and
+remove __ARCH_HAS_5LEVEL_HACK along with include/asm-generic/5level-fixup.h.
 
-I've also pushed out an update[2] to the kernel side of things, making
-the filtering of the cycle counter consistent and documenting that
-neither SW_INCR nor CHAIN could be filtered with this mechanism (but
-this is of course up for discussion).
+The changes are mostly about mechanical replacement of pgd accessors with p4d
+ones and the addition of higher levels to page table traversals.
 
-Thanks,
+All the patches were sent separately to the respective arch lists and
+maintainers hence the "v2" prefix.
 
-	M.
+Geert Uytterhoeven (1):
+  sh: fault: Modernize printing of kernel messages
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/commit/?h=pmu-filter
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-event-filter
+Mike Rapoport (12):
+  arm/arm64: add support for folded p4d page tables
+  h8300: remove usage of __ARCH_USE_5LEVEL_HACK
+  hexagon: remove __ARCH_USE_5LEVEL_HACK
+  ia64: add support for folded p4d page tables
+  nios2: add support for folded p4d page tables
+  openrisc: add support for folded p4d page tables
+  powerpc: add support for folded p4d page tables
+  sh: drop __pXd_offset() macros that duplicate pXd_index() ones
+  sh: add support for folded p4d page tables
+  unicore32: remove __ARCH_USE_5LEVEL_HACK
+  asm-generic: remove pgtable-nop4d-hack.h
+  mm: remove __ARCH_HAS_5LEVEL_HACK and include/asm-generic/5level-fixup.h
+
+ arch/arm/include/asm/kvm_mmu.h                |   5 +-
+ arch/arm/include/asm/pgtable.h                |   1 -
+ arch/arm/include/asm/stage2_pgtable.h         |  15 +-
+ arch/arm/lib/uaccess_with_memcpy.c            |   9 +-
+ arch/arm/mach-sa1100/assabet.c                |   2 +-
+ arch/arm/mm/dump.c                            |  29 ++-
+ arch/arm/mm/fault-armv.c                      |   7 +-
+ arch/arm/mm/fault.c                           |  28 ++-
+ arch/arm/mm/idmap.c                           |   3 +-
+ arch/arm/mm/init.c                            |   2 +-
+ arch/arm/mm/ioremap.c                         |  12 +-
+ arch/arm/mm/mm.h                              |   2 +-
+ arch/arm/mm/mmu.c                             |  35 ++-
+ arch/arm/mm/pgd.c                             |  40 +++-
+ arch/arm64/include/asm/kvm_mmu.h              |  10 +-
+ arch/arm64/include/asm/pgalloc.h              |  10 +-
+ arch/arm64/include/asm/pgtable-types.h        |   5 +-
+ arch/arm64/include/asm/pgtable.h              |  37 ++--
+ arch/arm64/include/asm/stage2_pgtable.h       |  48 +++-
+ arch/arm64/kernel/hibernate.c                 |  44 +++-
+ arch/arm64/mm/fault.c                         |   9 +-
+ arch/arm64/mm/hugetlbpage.c                   |  15 +-
+ arch/arm64/mm/kasan_init.c                    |  26 ++-
+ arch/arm64/mm/mmu.c                           |  52 +++--
+ arch/arm64/mm/pageattr.c                      |   7 +-
+ arch/h8300/include/asm/pgtable.h              |   1 -
+ arch/hexagon/include/asm/fixmap.h             |   4 +-
+ arch/hexagon/include/asm/pgtable.h            |   1 -
+ arch/ia64/include/asm/pgalloc.h               |   4 +-
+ arch/ia64/include/asm/pgtable.h               |  17 +-
+ arch/ia64/mm/fault.c                          |   7 +-
+ arch/ia64/mm/hugetlbpage.c                    |  18 +-
+ arch/ia64/mm/init.c                           |  28 ++-
+ arch/nios2/include/asm/pgtable.h              |   3 +-
+ arch/nios2/mm/fault.c                         |   9 +-
+ arch/nios2/mm/ioremap.c                       |   6 +-
+ arch/openrisc/include/asm/pgtable.h           |   1 -
+ arch/openrisc/mm/fault.c                      |  10 +-
+ arch/openrisc/mm/init.c                       |   4 +-
+ arch/powerpc/include/asm/book3s/32/pgtable.h  |   1 -
+ arch/powerpc/include/asm/book3s/64/hash.h     |   4 +-
+ arch/powerpc/include/asm/book3s/64/pgalloc.h  |   4 +-
+ arch/powerpc/include/asm/book3s/64/pgtable.h  |  58 +++--
+ arch/powerpc/include/asm/book3s/64/radix.h    |   6 +-
+ arch/powerpc/include/asm/nohash/32/pgtable.h  |   1 -
+ arch/powerpc/include/asm/nohash/64/pgalloc.h  |   2 +-
+ .../include/asm/nohash/64/pgtable-4k.h        |  32 +--
+ arch/powerpc/include/asm/nohash/64/pgtable.h  |   6 +-
+ arch/powerpc/include/asm/pgtable.h            |   8 +
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  59 ++++-
+ arch/powerpc/lib/code-patching.c              |   7 +-
+ arch/powerpc/mm/book3s32/mmu.c                |   2 +-
+ arch/powerpc/mm/book3s32/tlb.c                |   4 +-
+ arch/powerpc/mm/book3s64/hash_pgtable.c       |   4 +-
+ arch/powerpc/mm/book3s64/radix_pgtable.c      |  19 +-
+ arch/powerpc/mm/book3s64/subpage_prot.c       |   6 +-
+ arch/powerpc/mm/hugetlbpage.c                 |  28 ++-
+ arch/powerpc/mm/kasan/kasan_init_32.c         |   8 +-
+ arch/powerpc/mm/mem.c                         |   4 +-
+ arch/powerpc/mm/nohash/40x.c                  |   4 +-
+ arch/powerpc/mm/nohash/book3e_pgtable.c       |  15 +-
+ arch/powerpc/mm/pgtable.c                     |  25 ++-
+ arch/powerpc/mm/pgtable_32.c                  |  28 ++-
+ arch/powerpc/mm/pgtable_64.c                  |  10 +-
+ arch/powerpc/mm/ptdump/hashpagetable.c        |  20 +-
+ arch/powerpc/mm/ptdump/ptdump.c               |  22 +-
+ arch/powerpc/xmon/xmon.c                      |  17 +-
+ arch/sh/include/asm/pgtable-2level.h          |   1 -
+ arch/sh/include/asm/pgtable-3level.h          |   1 -
+ arch/sh/include/asm/pgtable_32.h              |   5 +-
+ arch/sh/include/asm/pgtable_64.h              |   5 +-
+ arch/sh/kernel/io_trapped.c                   |   7 +-
+ arch/sh/mm/cache-sh4.c                        |   4 +-
+ arch/sh/mm/cache-sh5.c                        |   7 +-
+ arch/sh/mm/fault.c                            |  65 ++++--
+ arch/sh/mm/hugetlbpage.c                      |  28 ++-
+ arch/sh/mm/init.c                             |  15 +-
+ arch/sh/mm/kmap.c                             |   2 +-
+ arch/sh/mm/tlbex_32.c                         |   6 +-
+ arch/sh/mm/tlbex_64.c                         |   7 +-
+ arch/unicore32/include/asm/pgtable.h          |   1 -
+ arch/unicore32/kernel/hibernate.c             |   4 +-
+ include/asm-generic/5level-fixup.h            |  58 -----
+ include/asm-generic/pgtable-nop4d-hack.h      |  64 ------
+ include/asm-generic/pgtable-nopud.h           |   4 -
+ include/linux/mm.h                            |   6 -
+ mm/kasan/init.c                               |  11 -
+ mm/memory.c                                   |   8 -
+ virt/kvm/arm/mmu.c                            | 209 +++++++++++++++---
+ 89 files changed, 988 insertions(+), 500 deletions(-)
+ delete mode 100644 include/asm-generic/5level-fixup.h
+ delete mode 100644 include/asm-generic/pgtable-nop4d-hack.h
 
 -- 
-Jazz is not dead. It just smells funny...
+2.24.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
