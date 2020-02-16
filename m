@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BAAC2BA83
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E0BC76199
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CC255206E2
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F3AB2086A
+	for <kvmarm@archiver.kernel.org>; Sun, 16 Feb 2020 08:19:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrGzuxCA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC255206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="E7NgpYxe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F3AB2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 856E94AF24;
-	Sun, 16 Feb 2020 03:19:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A3324AF1A;
+	Sun, 16 Feb 2020 03:19:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sR4Dhukr00-Q; Sun, 16 Feb 2020 03:19:17 -0500 (EST)
+	with ESMTP id hHk3R+uZhfvi; Sun, 16 Feb 2020 03:19:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED3C4AF18;
-	Sun, 16 Feb 2020 03:19:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B3EF4AEEA;
+	Sun, 16 Feb 2020 03:19:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90FDA4AF15
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:19:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC1284AEDA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:19:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fBt4Owe7Ek9M for <kvmarm@lists.cs.columbia.edu>;
- Sun, 16 Feb 2020 03:19:15 -0500 (EST)
+ with ESMTP id y-YKjGhtgrTc for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 16 Feb 2020 03:19:24 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A19944AF00
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:19:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF2114AEBF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Feb 2020 03:19:24 -0500 (EST)
 Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 307B924649;
- Sun, 16 Feb 2020 08:19:05 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 629D7227BF;
+ Sun, 16 Feb 2020 08:19:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581841154;
- bh=4sQuAppJ9V8uQLBiWjuxN6eOuFTm+NWRpi38gIPMGaA=;
+ s=default; t=1581841164;
+ bh=RG9Zl/BpZrqRN3HuSpCwlDUS57jnnyLncIWtzvxDXVc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IrGzuxCA83oW5cfkOQW52qTCQfOb6o9wxjHpc3wOuyz4EK2kMGqIUugemS+6YI4BO
- V3FyRmzLm47eolAh1sBEeZ4pMx8QjAHnGXET3Fp7oLSet5xZdlNokN0IZY1S1YV/J/
- v4ptml2vFK1l6zTGw2jXz8ycZs4NLPGZ6CY+3Gu8=
+ b=E7NgpYxeaRSk2/SkAj913cCKZNh269SIJFOVrDrXlknPSNUJxpvOV0l7j6vCXR2f/
+ OCoJEWhUoAUwhNP8E/NbtN6OucddnhQTEvOLMreR0idLL+UjJJrch5vg4ZTY86nb+b
+ 7VeNMLFilsTsmHJnHb6l4U7xfZZEZ4A89h1E+1OY=
 From: Mike Rapoport <rppt@kernel.org>
 To: linux-kernel@vger.kernel.org
-Subject: [PATCH v2 02/13] h8300: remove usage of __ARCH_USE_5LEVEL_HACK
-Date: Sun, 16 Feb 2020 10:18:32 +0200
-Message-Id: <20200216081843.28670-3-rppt@kernel.org>
+Subject: [PATCH v2 03/13] hexagon: remove __ARCH_USE_5LEVEL_HACK
+Date: Sun, 16 Feb 2020 10:18:33 +0200
+Message-Id: <20200216081843.28670-4-rppt@kernel.org>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20200216081843.28670-1-rppt@kernel.org>
 References: <20200216081843.28670-1-rppt@kernel.org>
@@ -97,30 +97,44 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Mike Rapoport <rppt@linux.ibm.com>
 
-h8300 is a nommu architecture and does not require fixup for upper layers
-of the page tables because it is already handled by the generic nommu
-implementation.
+The hexagon architecture has 2 level page tables and as such most of the
+page table folding is already implemented in asm-generic/pgtable-nopmd.h.
 
-Remove definition of __ARCH_USE_5LEVEL_HACK in
-arch/h8300/include/asm/pgtable.h
+Fixup the only place in arch/hexagon to unfold the p4d level and remove
+__ARCH_USE_5LEVEL_HACK.
 
 Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
 ---
- arch/h8300/include/asm/pgtable.h | 1 -
- 1 file changed, 1 deletion(-)
+ arch/hexagon/include/asm/fixmap.h  | 4 ++--
+ arch/hexagon/include/asm/pgtable.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/h8300/include/asm/pgtable.h b/arch/h8300/include/asm/pgtable.h
-index 4d00152fab58..f00828720dc4 100644
---- a/arch/h8300/include/asm/pgtable.h
-+++ b/arch/h8300/include/asm/pgtable.h
-@@ -1,7 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef _H8300_PGTABLE_H
- #define _H8300_PGTABLE_H
+diff --git a/arch/hexagon/include/asm/fixmap.h b/arch/hexagon/include/asm/fixmap.h
+index 933dac167504..97b1b062e750 100644
+--- a/arch/hexagon/include/asm/fixmap.h
++++ b/arch/hexagon/include/asm/fixmap.h
+@@ -16,7 +16,7 @@
+ #include <asm-generic/fixmap.h>
+ 
+ #define kmap_get_fixmap_pte(vaddr) \
+-	pte_offset_kernel(pmd_offset(pud_offset(pgd_offset_k(vaddr), \
+-				(vaddr)), (vaddr)), (vaddr))
++	pte_offset_kernel(pmd_offset(pud_offset(p4d_offset(pgd_offset_k(vaddr), \
++				(vaddr)), (vaddr)), (vaddr)), (vaddr))
+ 
+ #endif
+diff --git a/arch/hexagon/include/asm/pgtable.h b/arch/hexagon/include/asm/pgtable.h
+index 2fec20ad939e..83b544936eed 100644
+--- a/arch/hexagon/include/asm/pgtable.h
++++ b/arch/hexagon/include/asm/pgtable.h
+@@ -12,7 +12,6 @@
+  * Page table definitions for Qualcomm Hexagon processor.
+  */
+ #include <asm/page.h>
 -#define __ARCH_USE_5LEVEL_HACK
- #include <asm-generic/pgtable-nopud.h>
- #include <asm-generic/pgtable.h>
- extern void paging_init(void);
+ #include <asm-generic/pgtable-nopmd.h>
+ 
+ /* A handy thing to have if one has the RAM. Declared in head.S */
 -- 
 2.24.0
 
