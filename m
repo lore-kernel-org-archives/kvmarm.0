@@ -2,80 +2,145 @@ Return-Path: <SRS0=AIE7=4F=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4119CC34021
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Feb 2020 18:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C44C34022
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Feb 2020 18:35:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BAC1C207FD
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Feb 2020 18:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 936942467E
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Feb 2020 18:35:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="A9vcyWM1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC1C207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="wD6kWsmU";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="L/dMGdFL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936942467E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7B94AF52;
-	Mon, 17 Feb 2020 13:00:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B3E4AF54;
+	Mon, 17 Feb 2020 13:35:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@marvell.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@marvell.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SVENUki3An+j; Mon, 17 Feb 2020 13:00:15 -0500 (EST)
+	with ESMTP id ieePZzF8ndfS; Mon, 17 Feb 2020 13:35:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 507DB4AF4D;
-	Mon, 17 Feb 2020 13:00:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4E444AF3C;
+	Mon, 17 Feb 2020 13:35:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E17BA4AF47
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Feb 2020 13:00:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8454AF29
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Feb 2020 13:35:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zHRjamFUmh6p for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Feb 2020 13:00:13 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05CA34A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Feb 2020 13:00:13 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DBAA3207FD;
- Mon, 17 Feb 2020 18:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581962412;
- bh=N4IaW7dJRmwJgdZkZ+ORETnJlyDW9qtyXif08JJnFaE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=A9vcyWM1I1hyR8h+F9be43m2NDJdYDzfr3Jk4E16UwflHq2bKAnqUpqKSYDCrKPVt
- ZY3sUGVq+MJmJdKQ00JDoYLChTZjbH2TSbRsZWR7X23+jjZkbtDvkoSl1/pdmgw4Mm
- 67Dhpm+aIyl38XH+/zeiiGveb6jsacMbcxINtsCI=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j3kgk-005z8z-1d; Mon, 17 Feb 2020 18:00:10 +0000
-MIME-Version: 1.0
-Date: Mon, 17 Feb 2020 18:00:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Tomasz Nowicki <tnowicki@marvell.com>
-Subject: Re: [PATCH 0/2] KVM: arm/arm64: Fixes for scheudling htimer of
+ with ESMTP id SvYH8tj1Lero for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Feb 2020 13:35:46 -0500 (EST)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com
+ [67.231.156.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B4604AF07
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Feb 2020 13:35:46 -0500 (EST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+ by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01HIUxDf032516; Mon, 17 Feb 2020 10:35:41 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pfpt0818;
+ bh=15xYWZeFBjk4Rhv9AQ469MhHFA+IXhOHiZk+CVfsMco=;
+ b=wD6kWsmU8JML0ZVsWw4SdMqzkcMp0aPlphjfPw6QAjVwQX7dCDheQpDEE50i2wx7cNZL
+ gVZab/d4cCAe7IYGTX9PprXr1b6wAfF5BSMEVzrMrJneYwkZcS9D4DX6oF6UlCoIHUUn
+ ebF4JDZNX7ysG2ZnUa3/TbpjAADZEvEQeXoI1/9UUFvCKNp3qzspZ+5fBGHGpNIiz51b
+ +sZPo/1+Y+nELK/w1c1/W7VdxUDTuF4pGmUmRLcWqRFuJaLeu73F87QVa6MfITZaHpPj
+ ZwoeQSEx1pBYaudFepmlsKfJ387QpWVQsQBlyxv9Y1GcbII/eyIa5Ygv4coyX47pvFnX Og== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+ by mx0b-0016f401.pphosted.com with ESMTP id 2y6h1t00ku-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Mon, 17 Feb 2020 10:35:41 -0800
+Received: from SC-EXCH01.marvell.com (10.93.176.81) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 17 Feb
+ 2020 10:35:39 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by SC-EXCH01.marvell.com (10.93.176.81) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Mon, 17 Feb 2020 10:35:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aOSqU/qtpgi3rVRd5ljSpEkiwNmzFCWbiFCvKKqoSsv0hFgYb1RLPGWEU5XDeLE1erAxuH+w6eZnDEcsQBHU/OHBUzX6LrNv5Z7AsRfgh6MudtcjRRqmOBo6oO7X4z1eJBKsG/OSKeIZksk2n4QKiL8EMnofT9vzZyCn6AmpN+qMXLGLIWljJNoUEk3bWfWZ7QweUbGJxIWUxO2GpQ7yO1Pyh/ONiqpFy2xxsfGQ506A5ahGmszKwNsauEFYj6jwuWaPQby/CbGirtCdjx5JZbvXCyi1hLb88NoCISSIOnU1mMnpQfD3gAFdiX7Co1YZXli7vXdn2VOz5ppLYe/Tbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=15xYWZeFBjk4Rhv9AQ469MhHFA+IXhOHiZk+CVfsMco=;
+ b=l06X9+LEqR6FNiHWWpQWVqKZyeTYDzHYFjmoT1d3AnxYhp6BRmWLK6DF3fv7qBBbUUp8LSRwgvjuclYngRzxm+k5DHJSO+XnRJLTdjDYhFrE+nvY46nyy7QxQ2eCCdvxUwWLFzOBbPi9CfOTLzaDhDUrrpPS3DEIvwhiRY3RFcGZYVKha5x7mb5prxY1rqMpmTnOxdF6L3JbQTumwVCZZrsdeXzEsBVZSUSQLBccUQtTOmTqRgHX+xO2L7HBAfFWV71lGNJb/VWdVz+vm1pjzqBE7lAWZL2MJbZ/q5CGFJZfk8jyokcSKWKKUUdaC6CHH/KT1+t31rcdPxd44v7VdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=15xYWZeFBjk4Rhv9AQ469MhHFA+IXhOHiZk+CVfsMco=;
+ b=L/dMGdFL8zlJp19OwPG3PaEZFPsHpDaFuUYLDFk50cy9ywxa366WvqZkOvnTqGdlyOuZdDH3VTbwyMAA1V1ss+ozWLwUcZfZ2bTs8htRtLpIaxwIniLNuHU566/GKIfBOiI9BeI86GyxEWEi8aof9G3zHmFGt+CZVuozAFPcIJ4=
+Received: from DM6PR18MB2969.namprd18.prod.outlook.com (20.179.52.17) by
+ DM6PR18MB2377.namprd18.prod.outlook.com (20.179.107.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.23; Mon, 17 Feb 2020 18:35:37 +0000
+Received: from DM6PR18MB2969.namprd18.prod.outlook.com
+ ([fe80::d890:b3b7:629e:352c]) by DM6PR18MB2969.namprd18.prod.outlook.com
+ ([fe80::d890:b3b7:629e:352c%6]) with mapi id 15.20.2729.031; Mon, 17 Feb 2020
+ 18:35:37 +0000
+Subject: Re: Re: [PATCH 0/2] KVM: arm/arm64: Fixes for scheudling htimer of
  emulated timers
-In-Reply-To: <20200217145438.23289-1-tnowicki@marvell.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200217145438.23289-1-tnowicki@marvell.com>
-Message-ID: <f70d41fd006319e3d62224c410d62e20@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: tnowicki@marvell.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- christoffer.dall@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- gkulkarni@marvell.com, rrichter@marvell.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <f70d41fd006319e3d62224c410d62e20@kernel.org>
+From: Tomasz Nowicki <tnowicki@marvell.com>
+Message-ID: <0753e1a3-3b5e-3e55-d684-3ec3f9033f4e@marvell.com>
+Date: Mon, 17 Feb 2020 19:35:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <f70d41fd006319e3d62224c410d62e20@kernel.org>
+Content-Language: en-US
+X-ClientProxiedBy: MN2PR07CA0026.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::36) To DM6PR18MB2969.namprd18.prod.outlook.com
+ (2603:10b6:5:170::17)
+MIME-Version: 1.0
+Received: from [10.11.201.210] (108.20.23.69) by
+ MN2PR07CA0026.namprd07.prod.outlook.com (2603:10b6:208:1a0::36) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.22 via Frontend
+ Transport; Mon, 17 Feb 2020 18:35:34 +0000
+X-Originating-IP: [108.20.23.69]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c9dc87d2-f725-4692-45fc-08d7b3d82e56
+X-MS-TrafficTypeDiagnostic: DM6PR18MB2377:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR18MB2377F724D350CE986A0B2082D2160@DM6PR18MB2377.namprd18.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 0316567485
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(346002)(39860400002)(376002)(366004)(396003)(136003)(189003)(199004)(478600001)(6666004)(52116002)(31696002)(86362001)(16526019)(956004)(2616005)(5660300002)(186003)(26005)(316002)(4326008)(81166006)(107886003)(2906002)(66946007)(16576012)(66476007)(66556008)(31686004)(4744005)(36756003)(8676002)(6486002)(8936002)(53546011)(81156014)(6916009);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR18MB2377;
+ H:DM6PR18MB2969.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bIlidpwKcpsb9AfGQZ+W4XYjbNk++g8wQVxqv+Utpa2hZ396kkNdFjZf7EFD45ZQcZbTZ4cgspbpNB2S4/8ExXEVo6i+YWxV0AL18jML0EXOVPmH5tOT4bum5x+wGjxMXm2GgcMokXzVObssz0SzkP5rxyPzMOW6niEZyh6RKM8eSL6hHRh+a+M7Pld5uGikplAkZB6TMO2XIwlpSazy7acnkxhyy1xXM2XMYtWsLc/w960QCWKnQ5TM41N7fv7RdaQmlZOtEeA5ugTKDNY2GJEEWhJKRx1M1PhyboFfDIJDrVJxJR/1OXh6lmkP7nTktevPQhpNY5BgqhCvAW/W4kvxr69ZvesfRz//Y2EGUsz/hQ7dIrURcrBmGnXZARZ6Izcr9mcClbzQCA90XtAoT4h0CVyrLkBAAglbVx+SOEHFKUmgvFx1iYLmoanwEHOn
+X-MS-Exchange-AntiSpam-MessageData: zKq46SFJ9Q7jAW/yojX5Nj02UXaROsxvwpQCRHQbc+vJraKkidWHfoO6Z/lkiBeSebedWWc9wgaGqwlzNH++aopPXn/NN0nKrNOH3aYN7JKW3hedtM9+y0COn0zjJlVPXK2uCA5OABtQqwbfrdDdpA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9dc87d2-f725-4692-45fc-08d7b3d82e56
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2020 18:35:36.9817 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Dt3mp4Kkwzcly+ACG7Nu7AXiocaxSmaRzinM+qM5MRS0YlIwamTYfOdqLhc1ESggn4UZCMeVrKQdup1ccIA4WA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR18MB2377
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-17_12:2020-02-17,
+ 2020-02-17 signatures=0
 Cc: gkulkarni@marvell.com, kvm@vger.kernel.org, rrichter@marvell.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -94,18 +159,19 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-02-17 14:54, Tomasz Nowicki wrote:
-> This small series contains two fixes which were found while testing
-> Marc's ARM NV patch set, where we are going to have at most 4 timers
-> and the two are purely emulated.
+On 17.02.2020 19:00, Marc Zyngier wrote:
+> ----------------------------------------------------------------------
+> On 2020-02-17 14:54, Tomasz Nowicki wrote:
+>> This small series contains two fixes which were found while testing
+>> Marc's ARM NV patch set, where we are going to have at most 4 timers
+>> and the two are purely emulated.
+> 
+> What are these patches fixing? the NV series? or mainline?
+> 
 
-What are these patches fixing? the NV series? or mainline?
+Both, but found when testing NV.
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Tomasz
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
