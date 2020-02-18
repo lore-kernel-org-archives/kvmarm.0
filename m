@@ -2,57 +2,67 @@ Return-Path: <SRS0=SKU0=4G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D7DC34026
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FC9C34026
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:10:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 86BC52176D
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:06:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86BC52176D
+	by mail.kernel.org (Postfix) with ESMTP id AB1CD24649
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:10:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4yfUNd2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1CD24649
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFF6E4AF05;
-	Tue, 18 Feb 2020 08:06:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 508A34AF05;
+	Tue, 18 Feb 2020 08:10:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Hmx7CGAfB5uK; Tue, 18 Feb 2020 08:06:23 -0500 (EST)
+	with ESMTP id NF68pFBk4xYu; Tue, 18 Feb 2020 08:10:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9364ACD5;
-	Tue, 18 Feb 2020 08:06:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F89F4AEE3;
+	Tue, 18 Feb 2020 08:10:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9CA4A500
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:06:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4385A4AED8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:10:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7UmaD6wkg9m1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 08:06:21 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B79C14A4FF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:06:21 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42A471FB;
- Tue, 18 Feb 2020 05:06:21 -0800 (PST)
-Received: from localhost (unknown [10.37.6.21])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA29D3F703;
- Tue, 18 Feb 2020 05:06:20 -0800 (PST)
-Date: Tue, 18 Feb 2020 13:06:19 +0000
-From: Mark Brown <broonie@kernel.org>
+ with ESMTP id B0uwGSRBy7qv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 08:09:59 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 312B64AEBF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:09:59 -0500 (EST)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BFC6E22B48;
+ Tue, 18 Feb 2020 13:09:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582031398;
+ bh=iZo3lTLBwRcWtzxFLrZ/PPJnn8uh6OcUqPq9jjsb7JA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=q4yfUNd2ekp8WaDMi4EHhuP7kkTy6FeIq4j9nZhBSiGeI8FgwgthCX44opkrJF105
+ r4fwPJMIXRjX5aWMGOZ97P6mKlv1dh92/HCk5v15p/vsOio01JKmrqIBfjC29HV/3n
+ D217w48s1M8X0uDmhykbLBtSmKpfLN6cAy+gur7U=
+Date: Tue, 18 Feb 2020 13:09:53 +0000
+From: Will Deacon <will@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH] arm64: kvm: Modernize annotation for __bp_harden_hyp_vecs
-Message-ID: <20200218130619.GE4232@sirena.org.uk>
+Message-ID: <20200218130953.GD20212@willie-the-truck>
 References: <20200218124456.10615-1-broonie@kernel.org>
  <49f7de5f1d86e7edcc34edb55d5011be@kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 In-Reply-To: <49f7de5f1d86e7edcc34edb55d5011be@kernel.org>
-X-Cookie: No alcohol, dogs or horses.
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -65,59 +75,43 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============5221229050155861885=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
---===============5221229050155861885==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uCPdOCrL+PnN2Vxy"
-Content-Disposition: inline
-
-
---uCPdOCrL+PnN2Vxy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
 On Tue, Feb 18, 2020 at 12:56:52PM +0000, Marc Zyngier wrote:
-
 > I'd really appreciate it if you could send these as a series, instead of
 > an isolated patch every other day.
 
-OK, I can do that for the KVM stuff - I've been actively trying to keep
-the patches separate where there's no dependencies between them as it
-avoids things getting caught up in review for more complicated stuff or
-cases where someone decides they want extra cleanup while we're at it
-which is especially useful when only some of the series is needed for
-building on top of as is the case here.
+Same for the non-KVM parts, please :)
 
---uCPdOCrL+PnN2Vxy
-Content-Type: application/pgp-signature; name="signature.asc"
+I *think* the current ones to track are:
 
------BEGIN PGP SIGNATURE-----
+[PATCH v2] arm64: sdei: Annotate SDEI entry points using new style annotat
+[PATCH 1/2] arm64: crypto: Modernize some extra assembly annotations
+[PATCH 2/2] arm64: crypto: Modernize names for AES function macros
+[PATCH] arm64: entry: Annotate ret_from_fork as code
+[PATCH] arm64: head: Annotate stext and preserve_boot_args as code
+[PATCH 1/3] arm64: entry-ftrace.S: Convert to modern annotations for assem
+[PATCH 2/3] arm64: ftrace: Correct annotation of ftrace_caller assembly
+[PATCH 3/3] arm64: ftrace: Modernise annotation of return_to_handler
+[PATCH] arm64: vdso: Convert to modern assembler annotations
+[PATCH] arm64: vdso32: Convert to modern assembler annotations
+[PATCH] arm64: entry: Annotate vector table and handlers as code
+[PATCH] arm64: head.S: Convert to modern annotations for assembly function
+[PATCH] arm64: kernel: Convert to modern annotations for assembly data
+[PATCH] arm64: kernel: Convert to modern annotations for assembly function
+[PATCH] arm64: entry: Additional annotation conversions for entry.S
+[PATCH v2] arm64: kvm: Annotate assembly using modern annoations
+[PATCH v6 00/11] arm64: Branch Target Identification support
+[PATCH] arm64: kvm: Modernize annotation for __bp_harden_hyp_vecs
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl5L4UoACgkQJNaLcl1U
-h9Dy+Qf9GtBbjh9KlVQIqVkbd9XQ9t365dTvsoYYQBMzI3q3zvTgOVzlg+O0vUt+
-3Xy+PBFLuw4/ynJeAWfB3GcG2OaAroDsGBEDzkXA5jJ0zOKbq9MuuNmLr07mRVgX
-Jim7fz0J2QJ7VjRkb6SgRBd5zAQeMY/fWt53I0UqjA3eQbAEf7UScXoj5/6yFpfw
-YlR+2i98aXNlb300X/SRGiAYAZLX/krKjUfgO/6jEvZJ3IQsviY7b0mUttRx4ovI
-7m2j3E1eyVGBFlRBhD/0aWV5V/ps6YQjkHzOo3qe2d6UUB0f9zLSYSOQUy3o5ppQ
-CBRwusKcBn6OS3v+4HedGMaGa5m0rg==
-=O8oy
------END PGP SIGNATURE-----
+but it's a bit much to follow, especially as there are three trees
+involved in the above!
 
---uCPdOCrL+PnN2Vxy--
-
---===============5221229050155861885==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============5221229050155861885==--
