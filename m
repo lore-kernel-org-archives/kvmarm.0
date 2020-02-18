@@ -2,60 +2,89 @@ Return-Path: <SRS0=SKU0=4G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A90C34026
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C077EC34042
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 15:31:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 55CFA2173E
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 13:45:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55CFA2173E
+	by mail.kernel.org (Postfix) with ESMTP id 4B5FD22B48
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 15:31:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="x5AF/AGM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5FD22B48
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93DD24AF16;
-	Tue, 18 Feb 2020 08:45:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE2224AEE2;
+	Tue, 18 Feb 2020 10:31:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4xriZ0-bsC3S; Tue, 18 Feb 2020 08:45:55 -0500 (EST)
+	with ESMTP id 2NHVlFSmk-ES; Tue, 18 Feb 2020 10:31:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 848724AF3E;
-	Tue, 18 Feb 2020 08:45:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58CC44AF27;
+	Tue, 18 Feb 2020 10:31:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 749EB4AF1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:45:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B603A4AEE2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 10:31:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uo-LYp61ZmFH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 08:45:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ACAC4AF16
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 08:45:52 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D2B21FB;
- Tue, 18 Feb 2020 05:45:51 -0800 (PST)
-Received: from localhost (unknown [10.37.6.21])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93CAA3F6CF;
- Tue, 18 Feb 2020 05:45:50 -0800 (PST)
-Date: Tue, 18 Feb 2020 13:45:49 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] arm64: kvm: Modernize annotation for __bp_harden_hyp_vecs
-Message-ID: <20200218134549.GG4232@sirena.org.uk>
-References: <20200218124456.10615-1-broonie@kernel.org>
- <49f7de5f1d86e7edcc34edb55d5011be@kernel.org>
- <20200218130619.GE4232@sirena.org.uk>
- <20200218131436.GE20212@willie-the-truck>
+ with ESMTP id DtFgWSEWXnSd for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 10:31:06 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20A6C4ACD5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 10:31:06 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id F0E2121D56;
+ Tue, 18 Feb 2020 15:31:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582039865;
+ bh=udD8rg+CA1YXTU1bGuclVUv2oJiw9GqsIWaBCOxNdkY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=x5AF/AGM3GG8YvanUK7HIQtXlKCLUtGoHnBAU6G0RgsLdoxiMWiXNNUICKUVIhClY
+ E0S8c7Fw/IOYpqEzVexuhhSQqGhCCe4K70fsrElaAvDAp71ybRX7Lhh4fO4brQFxTs
+ GDHWWM7SpQCkbKt/rCF7tnfxBJD9CQwsDqCsnok0=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j44py-006FQ4-UG; Tue, 18 Feb 2020 15:31:03 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200218131436.GE20212@willie-the-truck>
-X-Cookie: No alcohol, dogs or horses.
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Tue, 18 Feb 2020 15:31:02 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
+ SGI callbacks
+In-Reply-To: <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-9-maz@kernel.org>
+ <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+ <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+Message-ID: <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net,
+ rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,65 +96,390 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2734428783482223438=="
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Zenghui,
 
---===============2734428783482223438==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xjyYRNSh/RebjC6o"
-Content-Disposition: inline
+On 2020-02-18 09:27, Marc Zyngier wrote:
+> Hi Zenghui,
+> 
+> On 2020-02-18 07:00, Zenghui Yu wrote:
+>> Hi Marc,
 
+[...]
 
---xjyYRNSh/RebjC6o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>> There might be a race on reading the 'vpe->col_idx' against a 
+>> concurrent
+>> vPE schedule (col_idx will be modified in its_vpe_set_affinity)? Will 
+>> we
+>> end up accessing the GICR_VSGI* registers of the old redistributor,
+>> while the vPE is now resident on the new one? Or is it harmful?
+> 
+> Very well spotted. There is a potential problem if old and new RDs are 
+> not part
+> of the same CommonLPIAff group.
+> 
+>> The same question for direct_lpi_inv(), where 'vpe->col_idx' will be
+>> used in irq_to_cpuid().
+> 
+> Same problem indeed. We need to ensure that no VMOVP operation can 
+> occur whilst
+> we use col_idx to access a redistributor. This means a vPE lock of some 
+> sort
+> that will protect the affinity.
+> 
+> But I think there is a slightly more general problem here, which we 
+> failed to
+> see initially: the same issue exists for physical LPIs, as col_map[] 
+> can be
+> updated (its_set_affinity()) in parallel with a direct invalidate.
+> 
+> The good old invalidation through the ITS does guarantee that the two 
+> operation
+> don't overlap, but direct invalidation breaks it.
+> 
+> Let me have a think about it.
 
-On Tue, Feb 18, 2020 at 01:14:37PM +0000, Will Deacon wrote:
-> On Tue, Feb 18, 2020 at 01:06:19PM +0000, Mark Brown wrote:
+So I've thought about it, wrote a patch, and I don't really like the 
+look of it.
+This is pretty invasive, and we end-up serializing a lot more than we 
+used to
+(the repurposing of vlpi_lock to a general "lpi mapping lock" is 
+probably too
+coarse).
 
-> > OK, I can do that for the KVM stuff - I've been actively trying to keep
-> > the patches separate where there's no dependencies between them as it
-> > avoids things getting caught up in review for more complicated stuff or
-> > cases where someone decides they want extra cleanup while we're at it
-> > which is especially useful when only some of the series is needed for
-> > building on top of as is the case here.
+It of course needs splitting over at least three patches, but it'd be 
+good if
+you could have a look (applies on top of the whole series).
 
-> I get what you're saying, but I still it find it much easier to get a
-> series of independent but functionally-related patches with a cover letter.
-> I usually end up cherry-picking the ones that are ready to go, so then
-> there's no need to respin those.
+Thanks,
 
-I see - I'd not seen that happening with the arch/arm64 stuff, more the
-opposite, so I was working on that basis.
+         M.
 
---xjyYRNSh/RebjC6o
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/drivers/irqchip/irq-gic-v3-its.c 
+b/drivers/irqchip/irq-gic-v3-its.c
+index 7656b353a95f..0ed286dba827 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -144,7 +144,7 @@ struct event_lpi_map {
+  	u16			*col_map;
+  	irq_hw_number_t		lpi_base;
+  	int			nr_lpis;
+-	raw_spinlock_t		vlpi_lock;
++	raw_spinlock_t		map_lock;
+  	struct its_vm		*vm;
+  	struct its_vlpi_map	*vlpi_maps;
+  	int			nr_vlpis;
+@@ -240,15 +240,33 @@ static struct its_vlpi_map *get_vlpi_map(struct 
+irq_data *d)
+  	return NULL;
+  }
 
------BEGIN PGP SIGNATURE-----
+-static int irq_to_cpuid(struct irq_data *d)
++static int irq_to_cpuid_lock(struct irq_data *d, unsigned long *flags)
+  {
+-	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+  	struct its_vlpi_map *map = get_vlpi_map(d);
++	int cpu;
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl5L6owACgkQJNaLcl1U
-h9BP8wf9ERM0KFYfeZGYds7VE6HIIEp0LpNTUPTZHOnKSFsozVEHdLLxG3JmxL7D
-SWKHdAPHvPqeRNTzG1IiGQluuKtXTmtJQOfN+iOt3EVF9oUK58foxw35s5GyROQJ
-9o/J/jLAKqpkXqKl0d0wIO8EdDqnwnkjHO/eJRWTPQS5RCSPPDBsC02Oag8jrA5y
-lhBblLjm5B46hNl0iuFIA04emH7XFCI8vBG1KStDkeuLn8+2IxMa17//BjZPx7oT
-IHZ0ZMujmSleMbBeDbAzPnvev82fDvpuMJI5PCIx//BSwt9FFdRMe4zUD7RZCDxu
-6DcbCbwJ7x+tB/Sx+11kDPA+kjrPLA==
-=uX0C
------END PGP SIGNATURE-----
+-	if (map)
+-		return map->vpe->col_idx;
++	if (map) {
++		raw_spin_lock_irqsave(&map->vpe->vpe_lock, *flags);
++		cpu = map->vpe->col_idx;
++	} else {
++		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++		raw_spin_lock_irqsave(&its_dev->event_map.map_lock, *flags);
++		cpu = its_dev->event_map.col_map[its_get_event_id(d)];
++	}
 
---xjyYRNSh/RebjC6o--
+-	return its_dev->event_map.col_map[its_get_event_id(d)];
++	return cpu;
++}
++
++static void irq_to_cpuid_unlock(struct irq_data *d, unsigned long 
+flags)
++{
++	struct its_vlpi_map *map = get_vlpi_map(d);
++
++	if (map) {
++		raw_spin_unlock_irqrestore(&map->vpe->vpe_lock, flags);
++	} else {
++		struct its_device *its_dev = irq_data_get_irq_chip_data(d);
++		raw_spin_unlock_irqrestore(&its_dev->event_map.map_lock, flags);
++	}
+  }
 
---===============2734428783482223438==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+  static struct its_collection *valid_col(struct its_collection *col)
+@@ -1384,6 +1402,8 @@ static void direct_lpi_inv(struct irq_data *d)
+  {
+  	struct its_vlpi_map *map = get_vlpi_map(d);
+  	void __iomem *rdbase;
++	unsigned long flags;
++	int cpu;
+  	u64 val;
 
+  	if (map) {
+@@ -1399,10 +1419,12 @@ static void direct_lpi_inv(struct irq_data *d)
+  	}
+
+  	/* Target the redistributor this LPI is currently routed to */
+-	rdbase = per_cpu_ptr(gic_rdists->rdist, irq_to_cpuid(d))->rd_base;
++	cpu = irq_to_cpuid_lock(d, &flags);
++	rdbase = per_cpu_ptr(gic_rdists->rdist, cpu)->rd_base;
+  	gic_write_lpir(val, rdbase + GICR_INVLPIR);
+
+  	wait_for_syncr(rdbase);
++	irq_to_cpuid_unlock(d, flags);
+  }
+
+  static void lpi_update_config(struct irq_data *d, u8 clr, u8 set)
+@@ -1471,11 +1493,11 @@ static void its_unmask_irq(struct irq_data *d)
+  static int its_set_affinity(struct irq_data *d, const struct cpumask 
+*mask_val,
+  			    bool force)
+  {
+-	unsigned int cpu;
+  	const struct cpumask *cpu_mask = cpu_online_mask;
+  	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+  	struct its_collection *target_col;
+-	u32 id = its_get_event_id(d);
++	unsigned int from, cpu;
++	unsigned long flags;
+
+  	/* A forwarded interrupt should use irq_set_vcpu_affinity */
+  	if (irqd_is_forwarded_to_vcpu(d))
+@@ -1496,12 +1518,16 @@ static int its_set_affinity(struct irq_data *d, 
+const struct cpumask *mask_val,
+  		return -EINVAL;
+
+  	/* don't set the affinity when the target cpu is same as current one 
+*/
+-	if (cpu != its_dev->event_map.col_map[id]) {
++	from = irq_to_cpuid_lock(d, &flags);
++	if (cpu != from) {
++		u32 id = its_get_event_id(d);
++
+  		target_col = &its_dev->its->collections[cpu];
+  		its_send_movi(its_dev, target_col, id);
+  		its_dev->event_map.col_map[id] = cpu;
+  		irq_data_update_effective_affinity(d, cpumask_of(cpu));
+  	}
++	irq_to_cpuid_unlock(d, flags);
+
+  	return IRQ_SET_MASK_OK_DONE;
+  }
+@@ -1636,7 +1662,7 @@ static int its_vlpi_map(struct irq_data *d, struct 
+its_cmd_info *info)
+  	if (!info->map)
+  		return -EINVAL;
+
+-	raw_spin_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.map_lock);
+
+  	if (!its_dev->event_map.vm) {
+  		struct its_vlpi_map *maps;
+@@ -1685,7 +1711,7 @@ static int its_vlpi_map(struct irq_data *d, struct 
+its_cmd_info *info)
+  	}
+
+  out:
+-	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.map_lock);
+  	return ret;
+  }
+
+@@ -1695,7 +1721,7 @@ static int its_vlpi_get(struct irq_data *d, struct 
+its_cmd_info *info)
+  	struct its_vlpi_map *map;
+  	int ret = 0;
+
+-	raw_spin_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.map_lock);
+
+  	map = get_vlpi_map(d);
+
+@@ -1708,7 +1734,7 @@ static int its_vlpi_get(struct irq_data *d, struct 
+its_cmd_info *info)
+  	*info->map = *map;
+
+  out:
+-	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.map_lock);
+  	return ret;
+  }
+
+@@ -1718,7 +1744,7 @@ static int its_vlpi_unmap(struct irq_data *d)
+  	u32 event = its_get_event_id(d);
+  	int ret = 0;
+
+-	raw_spin_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.map_lock);
+
+  	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d)) {
+  		ret = -EINVAL;
+@@ -1748,7 +1774,7 @@ static int its_vlpi_unmap(struct irq_data *d)
+  	}
+
+  out:
+-	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.map_lock);
+  	return ret;
+  }
+
+@@ -3193,7 +3219,7 @@ static struct its_device *its_create_device(struct 
+its_node *its, u32 dev_id,
+  	dev->event_map.col_map = col_map;
+  	dev->event_map.lpi_base = lpi_base;
+  	dev->event_map.nr_lpis = nr_lpis;
+-	raw_spin_lock_init(&dev->event_map.vlpi_lock);
++	raw_spin_lock_init(&dev->event_map.map_lock);
+  	dev->device_id = dev_id;
+  	INIT_LIST_HEAD(&dev->entry);
+
+@@ -3560,6 +3586,7 @@ static int its_vpe_set_affinity(struct irq_data 
+*d,
+  {
+  	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+  	int from, cpu = cpumask_first(mask_val);
++	unsigned long flags;
+
+  	/*
+  	 * Changing affinity is mega expensive, so let's be as lazy as
+@@ -3567,6 +3594,7 @@ static int its_vpe_set_affinity(struct irq_data 
+*d,
+  	 * into the proxy device, we need to move the doorbell
+  	 * interrupt to its new location.
+  	 */
++	raw_spin_lock_irqsave(&vpe->vpe_lock, flags);
+  	if (vpe->col_idx == cpu)
+  		goto out;
+
+@@ -3586,6 +3614,7 @@ static int its_vpe_set_affinity(struct irq_data 
+*d,
+
+  out:
+  	irq_data_update_effective_affinity(d, cpumask_of(cpu));
++	raw_spin_unlock_irqrestore(&vpe->vpe_lock, flags);
+
+  	return IRQ_SET_MASK_OK_DONE;
+  }
+@@ -3695,11 +3724,15 @@ static void its_vpe_send_inv(struct irq_data *d)
+
+  	if (gic_rdists->has_direct_lpi) {
+  		void __iomem *rdbase;
++		unsigned long flags;
++		int cpu;
+
+  		/* Target the redistributor this VPE is currently known on */
+-		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
++		cpu = irq_to_cpuid_lock(d, &flags);
++		rdbase = per_cpu_ptr(gic_rdists->rdist, cpu)->rd_base;
+  		gic_write_lpir(d->parent_data->hwirq, rdbase + GICR_INVLPIR);
+  		wait_for_syncr(rdbase);
++		irq_to_cpuid_unlock(d, flags);
+  	} else {
+  		its_vpe_send_cmd(vpe, its_send_inv);
+  	}
+@@ -3735,14 +3768,18 @@ static int its_vpe_set_irqchip_state(struct 
+irq_data *d,
+
+  	if (gic_rdists->has_direct_lpi) {
+  		void __iomem *rdbase;
++		unsigned long flags;
++		int cpu;
+
+-		rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
++		cpu = irq_to_cpuid_lock(d, &flags);
++		rdbase = per_cpu_ptr(gic_rdists->rdist, cpu)->rd_base;
+  		if (state) {
+  			gic_write_lpir(vpe->vpe_db_lpi, rdbase + GICR_SETLPIR);
+  		} else {
+  			gic_write_lpir(vpe->vpe_db_lpi, rdbase + GICR_CLRLPIR);
+  			wait_for_syncr(rdbase);
+  		}
++		irq_to_cpuid_unlock(d, flags);
+  	} else {
+  		if (state)
+  			its_vpe_send_cmd(vpe, its_send_int);
+@@ -3854,14 +3891,17 @@ static void its_vpe_4_1_deschedule(struct 
+its_vpe *vpe,
+  static void its_vpe_4_1_invall(struct its_vpe *vpe)
+  {
+  	void __iomem *rdbase;
++	unsigned long flags;
+  	u64 val;
+
+  	val  = GICR_INVALLR_V;
+  	val |= FIELD_PREP(GICR_INVALLR_VPEID, vpe->vpe_id);
+
+  	/* Target the redistributor this vPE is currently known on */
++	raw_spin_lock_irqsave(&vpe->vpe_lock, flags);
+  	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
+  	gic_write_lpir(val, rdbase + GICR_INVALLR);
++	raw_spin_unlock_irqrestore(&vpe->vpe_lock, flags);
+  }
+
+  static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void 
+*vcpu_info)
+@@ -3960,13 +4000,17 @@ static int its_sgi_get_irqchip_state(struct 
+irq_data *d,
+  				     enum irqchip_irq_state which, bool *val)
+  {
+  	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+-	void __iomem *base = gic_data_rdist_cpu(vpe->col_idx)->rd_base + 
+SZ_128K;
++	void __iomem *base;
++	unsigned long flags;
+  	u32 count = 1000000;	/* 1s! */
+  	u32 status;
++	int cpu;
+
+  	if (which != IRQCHIP_STATE_PENDING)
+  		return -EINVAL;
+
++	cpu = irq_to_cpuid_lock(d, &flags);
++	base = gic_data_rdist_cpu(cpu)->rd_base + SZ_128K;
+  	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
+  	do {
+  		status = readl_relaxed(base + GICR_VSGIPENDR);
+@@ -3983,6 +4027,7 @@ static int its_sgi_get_irqchip_state(struct 
+irq_data *d,
+  	} while(count);
+
+  out:
++	irq_to_cpuid_unlock(d, flags);
+  	*val = !!(status & (1 << d->hwirq));
+
+  	return 0;
+@@ -4102,6 +4147,7 @@ static int its_vpe_init(struct its_vpe *vpe)
+  		return -ENOMEM;
+  	}
+
++	raw_spin_lock_init(&vpe->vpe_lock);
+  	vpe->vpe_id = vpe_id;
+  	vpe->vpt_page = vpt_page;
+  	if (gic_rdists->has_rvpeid)
+diff --git a/include/linux/irqchip/arm-gic-v4.h 
+b/include/linux/irqchip/arm-gic-v4.h
+index 46c167a6349f..fc43a63875a3 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -60,6 +60,7 @@ struct its_vpe {
+  		};
+  	};
+
++	raw_spinlock_t		vpe_lock;
+  	/*
+  	 * This collection ID is used to indirect the target
+  	 * redistributor for this VPE. The ID itself isn't involved in
+
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============2734428783482223438==--
