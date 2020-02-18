@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE25DC3404C
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFE5C3404F
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:07:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5255924125
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:07:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5255924125
+	by mail.kernel.org (Postfix) with ESMTP id 5B44F24654
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B44F24654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93F3E4AF18;
-	Tue, 18 Feb 2020 16:07:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CFFB4AF73;
+	Tue, 18 Feb 2020 16:07:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sdhZy9CGwBxL; Tue, 18 Feb 2020 16:07:49 -0500 (EST)
+	with ESMTP id xMsIs9JeDisR; Tue, 18 Feb 2020 16:07:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD114AF66;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AECC4AF33;
 	Tue, 18 Feb 2020 16:07:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DF9C4AF48
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C8E4AF18
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 16:07:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VBUOFzgPfihy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 16:07:46 -0500 (EST)
+ with ESMTP id xqdcmOVwNvs7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 16:07:47 -0500 (EST)
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99B934AEF6
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5D174AF02
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 16:07:46 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,15 +41,14 @@ Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  18 Feb 2020 13:07:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,457,1574150400"; d="scan'208";a="253856393"
+X-IronPort-AV: E=Sophos;i="5.70,457,1574150400"; d="scan'208";a="253856397"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga002.jf.intel.com with ESMTP; 18 Feb 2020 13:07:44 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v6 01/22] KVM: x86: Allocate new rmap and large page tracking
- when moving memslot
-Date: Tue, 18 Feb 2020 13:07:15 -0800
-Message-Id: <20200218210736.16432-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v6 02/22] KVM: Reinstall old memslots if arch preparation fails
+Date: Tue, 18 Feb 2020 13:07:16 -0800
+Message-Id: <20200218210736.16432-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200218210736.16432-1-sean.j.christopherson@intel.com>
 References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
@@ -80,97 +79,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Reallocate a rmap array and recalcuate large page compatibility when
-moving an existing memslot to correctly handle the alignment properties
-of the new memslot.  The number of rmap entries required at each level
-is dependent on the alignment of the memslot's base gfn with respect to
-that level, e.g. moving a large-page aligned memslot so that it becomes
-unaligned will increase the number of rmap entries needed at the now
-unaligned level.
+Reinstall the old memslots if preparing the new memory region fails
+after invalidating a to-be-{re}moved memslot.
 
-Not updating the rmap array is the most obvious bug, as KVM accesses
-garbage data beyond the end of the rmap.  KVM interprets the bad data as
-pointers, leading to non-canonical #GPs, unexpected #PFs, etc...
+Remove the superfluous 'old_memslots' variable so that it's somewhat
+clear that the error handling path needs to free the unused memslots,
+not simply the 'old' memslots.
 
-  general protection fault: 0000 [#1] SMP
-  CPU: 0 PID: 1909 Comm: move_memory_reg Not tainted 5.4.0-rc7+ #139
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  RIP: 0010:rmap_get_first+0x37/0x50 [kvm]
-  Code: <48> 8b 3b 48 85 ff 74 ec e8 6c f4 ff ff 85 c0 74 e3 48 89 d8 5b c3
-  RSP: 0018:ffffc9000021bbc8 EFLAGS: 00010246
-  RAX: ffff00617461642e RBX: ffff00617461642e RCX: 0000000000000012
-  RDX: ffff88827400f568 RSI: ffffc9000021bbe0 RDI: ffff88827400f570
-  RBP: 0010000000000000 R08: ffffc9000021bd00 R09: ffffc9000021bda8
-  R10: ffffc9000021bc48 R11: 0000000000000000 R12: 0030000000000000
-  R13: 0000000000000000 R14: ffff88827427d700 R15: ffffc9000021bce8
-  FS:  00007f7eda014700(0000) GS:ffff888277a00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007f7ed9216ff8 CR3: 0000000274391003 CR4: 0000000000162eb0
-  Call Trace:
-   kvm_mmu_slot_set_dirty+0xa1/0x150 [kvm]
-   __kvm_set_memory_region.part.64+0x559/0x960 [kvm]
-   kvm_set_memory_region+0x45/0x60 [kvm]
-   kvm_vm_ioctl+0x30f/0x920 [kvm]
-   do_vfs_ioctl+0xa1/0x620
-   ksys_ioctl+0x66/0x70
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x4c/0x170
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  RIP: 0033:0x7f7ed9911f47
-  Code: <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 21 6f 2c 00 f7 d8 64 89 01 48
-  RSP: 002b:00007ffc00937498 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-  RAX: ffffffffffffffda RBX: 0000000001ab0010 RCX: 00007f7ed9911f47
-  RDX: 0000000001ab1350 RSI: 000000004020ae46 RDI: 0000000000000004
-  RBP: 000000000000000a R08: 0000000000000000 R09: 00007f7ed9214700
-  R10: 00007f7ed92149d0 R11: 0000000000000246 R12: 00000000bffff000
-  R13: 0000000000000003 R14: 00007f7ed9215000 R15: 0000000000000000
-  Modules linked in: kvm_intel kvm irqbypass
-  ---[ end trace 0c5f570b3358ca89 ]---
-
-The disallow_lpage tracking is more subtle.  Failure to update results
-in KVM creating large pages when it shouldn't, either due to stale data
-or again due to indexing beyond the end of the metadata arrays, which
-can lead to memory corruption and/or leaking data to guest/userspace.
-
-Note, the arrays for the old memslot are freed by the unconditional call
-to kvm_free_memslot() in __kvm_set_memory_region().
-
-Fixes: 05da45583de9b ("KVM: MMU: large page support")
-Cc: stable@vger.kernel.org
+Fixes: bc6678a33d9b9 ("KVM: introduce kvm->srcu and convert kvm_set_memory_region to SRCU update")
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ virt/kvm/kvm_main.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fbabb2f06273..5c3fb4d7b4db 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9857,6 +9857,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- {
- 	int i;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 67ae2d5c37b2..ac9c7c103453 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -999,7 +999,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	unsigned long npages;
+ 	struct kvm_memory_slot *slot;
+ 	struct kvm_memory_slot old, new;
+-	struct kvm_memslots *slots = NULL, *old_memslots;
++	struct kvm_memslots *slots;
+ 	int as_id, id;
+ 	enum kvm_mr_change change;
  
-+	/*
-+	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
-+	 * old arrays will be freed by __kvm_set_memory_region() if installing
-+	 * the new memslot is successful.
-+	 */
-+	memset(&slot->arch, 0, sizeof(slot->arch));
-+
- 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
- 		struct kvm_lpage_info *linfo;
- 		unsigned long ugfn;
-@@ -9938,6 +9945,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
- 				enum kvm_mr_change change)
- {
-+	if (change == KVM_MR_MOVE)
-+		return kvm_arch_create_memslot(kvm, memslot,
-+					       mem->memory_size >> PAGE_SHIFT);
-+
+@@ -1107,7 +1107,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		slot = id_to_memslot(slots, id);
+ 		slot->flags |= KVM_MEMSLOT_INVALID;
+ 
+-		old_memslots = install_new_memslots(kvm, as_id, slots);
++		/*
++		 * We can re-use the old memslots, the only difference from the
++		 * newly installed memslots is the invalid flag, which will get
++		 * dropped by update_memslots anyway.  We'll also revert to the
++		 * old memslots if preparing the new memory region fails.
++		 */
++		slots = install_new_memslots(kvm, as_id, slots);
+ 
+ 		/* From this point no new shadow pages pointing to a deleted,
+ 		 * or moved, memslot will be created.
+@@ -1117,13 +1123,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		 *	- kvm_is_visible_gfn (mmu_check_root)
+ 		 */
+ 		kvm_arch_flush_shadow_memslot(kvm, slot);
+-
+-		/*
+-		 * We can re-use the old_memslots from above, the only difference
+-		 * from the currently installed memslots is the invalid flag.  This
+-		 * will get overwritten by update_memslots anyway.
+-		 */
+-		slots = old_memslots;
+ 	}
+ 
+ 	r = kvm_arch_prepare_memory_region(kvm, &new, mem, change);
+@@ -1137,15 +1136,17 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	}
+ 
+ 	update_memslots(slots, &new, change);
+-	old_memslots = install_new_memslots(kvm, as_id, slots);
++	slots = install_new_memslots(kvm, as_id, slots);
+ 
+ 	kvm_arch_commit_memory_region(kvm, mem, &old, &new, change);
+ 
+ 	kvm_free_memslot(kvm, &old, &new);
+-	kvfree(old_memslots);
++	kvfree(slots);
  	return 0;
- }
  
+ out_slots:
++	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
++		slots = install_new_memslots(kvm, as_id, slots);
+ 	kvfree(slots);
+ out_free:
+ 	kvm_free_memslot(kvm, &new, &old);
 -- 
 2.24.1
 
