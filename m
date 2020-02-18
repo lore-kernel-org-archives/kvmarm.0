@@ -2,65 +2,88 @@ Return-Path: <SRS0=SKU0=4G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0B9C34026
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 08:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983A2C34033
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 09:27:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA63B20658
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 08:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA63B20658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 1E60521D7D
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 09:27:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1haDJBj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E60521D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E4ED4AF6E;
-	Tue, 18 Feb 2020 03:47:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E93BA4AF65;
+	Tue, 18 Feb 2020 04:27:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tYzGjQUx6ZRY; Tue, 18 Feb 2020 03:47:14 -0500 (EST)
+	with ESMTP id 0ceyd78lUb7R; Tue, 18 Feb 2020 04:27:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B3B4AF2D;
-	Tue, 18 Feb 2020 03:47:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF4F4AF6C;
+	Tue, 18 Feb 2020 04:27:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F00F04AF26
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 03:47:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0078E4AF65
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 04:27:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o8IlUwcKFS+q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 03:47:12 -0500 (EST)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58FFE4AF18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 03:47:09 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 91E34EA84E46E844F2CB;
- Tue, 18 Feb 2020 16:46:58 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Tue, 18 Feb 2020
- 16:46:51 +0800
-Subject: Re: [PATCH v4 15/20] KVM: arm64: GICv4.1: Add direct injection
- capability to SGI registers
-To: Marc Zyngier <maz@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-References: <20200214145736.18550-1-maz@kernel.org>
- <20200214145736.18550-16-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <5e744173-5d7a-98b7-e44d-d1f8c47b3e3c@huawei.com>
-Date: Tue, 18 Feb 2020 16:46:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id ixdcVzKweXiz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 04:27:48 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDBDC4AF64
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 04:27:47 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A8FD9206EF;
+ Tue, 18 Feb 2020 09:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582018066;
+ bh=JfpnX0/9AXLX0SUbepC6ix94WfC2VqtqT6BShq+yOfY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=i1haDJBjVgMh5Z7iwcxqIPg/WGXs7z0EMLSEMdnH/za4diZ8awNNMtjwGtabI/lIp
+ VqU2FVFh4bDIRMvJpSNwBU0pVTDG/F9SEdf0JMsf1n237Pn+/e0cHW7rCudfCcUM3F
+ UNa9nlJINV2tawUiRWnD29FGW09j4zoy/Fj888bY=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j3zAP-006BEh-0t; Tue, 18 Feb 2020 09:27:45 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200214145736.18550-16-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Date: Tue, 18 Feb 2020 09:27:44 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
+ SGI callbacks
+In-Reply-To: <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-9-maz@kernel.org>
+ <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+Message-ID: <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net,
+ rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
- Thomas Gleixner <tglx@linutronix.de>
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,240 +100,177 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Zenghui,
 
-On 2020/2/14 22:57, Marc Zyngier wrote:
-> Most of the GICv3 emulation code that deals with SGIs now has to be
-> aware of the v4.1 capabilities in order to benefit from it.
+On 2020-02-18 07:00, Zenghui Yu wrote:
+> Hi Marc,
 > 
-> Add such support, keyed on the interrupt having the hw flag set and
-> being a SGI.
+> On 2020/2/14 22:57, Marc Zyngier wrote:
+>> To implement the get/set_irqchip_state callbacks (limited to the
+>> PENDING state), we have to use a particular set of hacks:
+>> 
+>> - Reading the pending state is done by using a pair of new 
+>> redistributor
+>>    registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 
+>> interrupts
+>>    state to be retrieved.
+>> - Setting the pending state is done by generating it as we'd otherwise 
+>> do
+>>    for a guest (writing to GITS_SGIR)
+>> - Clearing the pending state is done by emiting a VSGI command with 
+>> the
+>>    "clear" bit set.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>   drivers/irqchip/irq-gic-v3-its.c   | 56 
+>> ++++++++++++++++++++++++++++++
+>>   include/linux/irqchip/arm-gic-v3.h | 14 ++++++++
+>>   2 files changed, 70 insertions(+)
+>> 
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
+>> b/drivers/irqchip/irq-gic-v3-its.c
+>> index 1e448d9a16ea..a9753435c4ff 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -3915,11 +3915,67 @@ static int its_sgi_set_affinity(struct 
+>> irq_data *d,
+>>   	return -EINVAL;
+>>   }
+>>   +static int its_sgi_set_irqchip_state(struct irq_data *d,
+>> +				     enum irqchip_irq_state which,
+>> +				     bool state)
+>> +{
+>> +	if (which != IRQCHIP_STATE_PENDING)
+>> +		return -EINVAL;
+>> +
+>> +	if (state) {
+>> +		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+>> +		struct its_node *its = find_4_1_its();
+>> +		u64 val;
+>> +
+>> +		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
+>> +		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
+>> +		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
+>> +	} else {
+>> +		its_configure_sgi(d, true);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int its_sgi_get_irqchip_state(struct irq_data *d,
+>> +				     enum irqchip_irq_state which, bool *val)
+>> +{
+>> +	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+>> +	void __iomem *base = gic_data_rdist_cpu(vpe->col_idx)->rd_base + 
+>> SZ_128K;
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   virt/kvm/arm/vgic/vgic-mmio-v3.c | 15 +++++-
->   virt/kvm/arm/vgic/vgic-mmio.c    | 88 ++++++++++++++++++++++++++++++--
->   2 files changed, 96 insertions(+), 7 deletions(-)
+> There might be a race on reading the 'vpe->col_idx' against a 
+> concurrent
+> vPE schedule (col_idx will be modified in its_vpe_set_affinity)? Will 
+> we
+> end up accessing the GICR_VSGI* registers of the old redistributor,
+> while the vPE is now resident on the new one? Or is it harmful?
+
+Very well spotted. There is a potential problem if old and new RDs are 
+not part
+of the same CommonLPIAff group.
+
+> The same question for direct_lpi_inv(), where 'vpe->col_idx' will be
+> used in irq_to_cpuid().
+
+Same problem indeed. We need to ensure that no VMOVP operation can occur 
+whilst
+we use col_idx to access a redistributor. This means a vPE lock of some 
+sort
+that will protect the affinity.
+
+But I think there is a slightly more general problem here, which we 
+failed to
+see initially: the same issue exists for physical LPIs, as col_map[] can 
+be
+updated (its_set_affinity()) in parallel with a direct invalidate.
+
+The good old invalidation through the ITS does guarantee that the two 
+operation
+don't overlap, but direct invalidation breaks it.
+
+Let me have a think about it.
+
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index ebc218840fc2..de89da76a379 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -6,6 +6,7 @@
->   #include <linux/irqchip/arm-gic-v3.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/interrupt.h>
->   #include <kvm/iodev.h>
->   #include <kvm/arm_vgic.h>
->   
-> @@ -942,8 +943,18 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
->   		 * generate interrupts of either group.
->   		 */
->   		if (!irq->group || allow_group1) {
-> -			irq->pending_latch = true;
-> -			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +			if (!irq->hw) {
-> +				irq->pending_latch = true;
-> +				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +			} else {
-> +				/* HW SGI? Ask the GIC to inject it */
-> +				int err;
-> +				err = irq_set_irqchip_state(irq->host_irq,
-> +							    IRQCHIP_STATE_PENDING,
-> +							    true);
-> +				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> +				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			}
->   		} else {
->   			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->   		}
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index d656ebd5f9d4..0a1fb61e5b89 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> @@ -5,6 +5,8 @@
->   
->   #include <linux/bitops.h>
->   #include <linux/bsearch.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/irq.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
->   #include <kvm/iodev.h>
-> @@ -59,6 +61,11 @@ unsigned long vgic_mmio_read_group(struct kvm_vcpu *vcpu,
->   	return value;
->   }
->   
-> +static void vgic_update_vsgi(struct vgic_irq *irq)
-> +{
-> +	WARN_ON(its_prop_update_vsgi(irq->host_irq, irq->priority, irq->group));
-> +}
-> +
->   void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
->   			   unsigned int len, unsigned long val)
->   {
-> @@ -71,7 +78,12 @@ void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->   		irq->group = !!(val & BIT(i));
-> -		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +			vgic_update_vsgi(irq);
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +		} else {
-> +			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +		}
->   
->   		vgic_put_irq(vcpu->kvm, irq);
->   	}
-> @@ -113,7 +125,21 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
->   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> -		if (vgic_irq_is_mapped_level(irq)) {
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +			if (!irq->enabled) {
-> +				struct irq_data *data;
-> +
-> +				irq->enabled = true;
-> +				data = &irq_to_desc(irq->host_irq)->irq_data;
-> +				while (irqd_irq_disabled(data))
-> +					enable_irq(irq->host_irq);
-> +			}
-> +
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +
-> +			continue;
-> +		} else if (vgic_irq_is_mapped_level(irq)) {
->   			bool was_high = irq->line_level;
->   
->   			/*
-> @@ -148,6 +174,8 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
->   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid) && irq->enabled)
-> +			disable_irq_nosync(irq->host_irq);
->   
->   		irq->enabled = false;
->   
-> @@ -167,10 +195,22 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->   	for (i = 0; i < len * 8; i++) {
->   		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->   		unsigned long flags;
-> +		bool val;
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> -		if (irq_is_pending(irq))
-> -			value |= (1U << i);
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +			int err;
-> +
-> +			val = false;
-> +			err = irq_get_irqchip_state(irq->host_irq,
-> +						    IRQCHIP_STATE_PENDING,
-> +						    &val);
-> +			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> +		} else {
-> +			val = irq_is_pending(irq);
-> +		}
-> +
-> +		value |= ((u32)val << i);
->   		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->   
->   		vgic_put_irq(vcpu->kvm, irq);
-> @@ -227,6 +267,21 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->   		}
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> +
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +			/* HW SGI? Ask the GIC to inject it */
-> +			int err;
-> +			err = irq_set_irqchip_state(irq->host_irq,
-> +						    IRQCHIP_STATE_PENDING,
-> +						    true);
-> +			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> +
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +
-> +			continue;
-> +		}
-> +
->   		if (irq->hw)
->   			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
->   		else
+>> +	u32 count = 1000000;	/* 1s! */
+>> +	u32 status;
+>> +
+>> +	if (which != IRQCHIP_STATE_PENDING)
+>> +		return -EINVAL;
+>> +
+>> +	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
+>> +	do {
+>> +		status = readl_relaxed(base + GICR_VSGIPENDR);
+>> +		if (!(status & GICR_VSGIPENDR_BUSY))
+>> +			goto out;
+>> +
+>> +		count--;
+>> +		if (!count) {
+>> +			pr_err_ratelimited("Unable to get SGI status\n");
+>> +			goto out;
+>> +		}
+>> +		cpu_relax();
+>> +		udelay(1);
+>> +	} while(count);
+>> +
+>> +out:
+>> +	*val = !!(status & (1 << d->hwirq));
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   static struct irq_chip its_sgi_irq_chip = {
+>>   	.name			= "GICv4.1-sgi",
+>>   	.irq_mask		= its_sgi_mask_irq,
+>>   	.irq_unmask		= its_sgi_unmask_irq,
+>>   	.irq_set_affinity	= its_sgi_set_affinity,
+>> +	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
+>> +	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
+>>   };
+>>     static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h 
+>> b/include/linux/irqchip/arm-gic-v3.h
+>> index a89578884263..64da945486ac 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -345,6 +345,15 @@
+>>   #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
+>>   #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
+>>   +#define GICR_VSGIR			0x0080
+>> +
+>> +#define GICR_VSGIR_VPEID		GENMASK(15, 0)
+>> +
+>> +#define GICR_VSGIPENDR			0x0088
+>> +
+>> +#define GICR_VSGIPENDR_BUSY		(1U << 31)
+>> +#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
+>> +
+>>   /*
+>>    * ITS registers, offsets from ITS_base
+>>    */
+>> @@ -368,6 +377,11 @@
+>>     #define GITS_TRANSLATER			0x10040
+>>   +#define GITS_SGIR			0x20020
+>> +
+>> +#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
+>> +#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
+> 
+> The spec says vINTID field is [3:0] of the GITS_SGIR.
 
-Should we consider taking the GICv4.1 support into uaccess_{read/write}
-callbacks for GICR_ISPENDR0 so that userspace can properly save/restore
-the pending state of GICv4.1 vSGIs?
-
-I *think* we can do it because on restoration, GICD_CTLR(.nASSGIreq) is
-restored before GICR_ISPENDR0.  So we know whether we're restoring
-pending for vSGIs, and we can restore it to the HW level if v4.1 is
-supported by GIC. Otherwise restore it by the normal way.
-
-And saving is easy with the get_irqchip_state callback, right?
-
-> @@ -281,6 +336,20 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
->   
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->   
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +			/* HW SGI? Ask the GIC to inject it */
-
-"Ask the GIC to clear its pending state" :-)
-
+Indeed, well spotted again!
 
 Thanks,
-Zenghui
 
-> +			int err;
-> +			err = irq_set_irqchip_state(irq->host_irq,
-> +						    IRQCHIP_STATE_PENDING,
-> +						    false);
-> +			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> +
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +
-> +			continue;
-> +		}
-> +
->   		if (irq->hw)
->   			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
->   		else
-> @@ -330,8 +399,15 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->   
->   	raw_spin_lock_irqsave(&irq->irq_lock, flags);
->   
-> -	if (irq->hw) {
-> +	if (irq->hw && !vgic_irq_is_sgi(irq->intid)) {
->   		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
-> +	} else if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +		/*
-> +		 * GICv4.1 VSGI feature doesn't track an active state,
-> +		 * so let's not kid ourselves, there is nothing we can
-> +		 * do here.
-> +		 */
-> +		irq->active = false;
->   	} else {
->   		u32 model = vcpu->kvm->arch.vgic.vgic_model;
->   		u8 active_source;
-> @@ -505,6 +581,8 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
->   		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->   		/* Narrow the priority range to what we actually support */
->   		irq->priority = (val >> (i * 8)) & GENMASK(7, 8 - VGIC_PRI_BITS);
-> +		if (irq->hw && vgic_irq_is_sgi(irq->intid))
-> +			vgic_update_vsgi(irq);
->   		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->   
->   		vgic_put_irq(vcpu->kvm, irq);
-> 
-
+          M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
