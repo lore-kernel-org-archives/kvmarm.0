@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D78C34049
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7273C3404B
 	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 19:59:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF2342467B
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 19:59:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF2342467B
+	by mail.kernel.org (Postfix) with ESMTP id 7B93D2465A
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 19:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B93D2465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B3C24AED9;
-	Tue, 18 Feb 2020 14:59:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 371234AF63;
+	Tue, 18 Feb 2020 14:59:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Naok-TQTK57V; Tue, 18 Feb 2020 14:59:29 -0500 (EST)
+	with ESMTP id vgstZ5-tzYHB; Tue, 18 Feb 2020 14:59:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69AED4AF97;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87AD94AFA5;
 	Tue, 18 Feb 2020 14:59:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 240E14AE92
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7D3A4AE8E
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 14:59:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X-lbRew9jLZc for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id YLFBLVV-0T23 for <kvmarm@lists.cs.columbia.edu>;
  Tue, 18 Feb 2020 14:59:27 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67CB24AF63
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 14:59:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FB974AF61
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 14:59:27 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E7DE31B;
- Tue, 18 Feb 2020 11:59:25 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 673131045;
+ Tue, 18 Feb 2020 11:59:27 -0800 (PST)
 Received: from localhost (unknown [10.37.6.21])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A57833F68F;
- Tue, 18 Feb 2020 11:59:24 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE5963F68F;
+ Tue, 18 Feb 2020 11:59:26 -0800 (PST)
 From: Mark Brown <broonie@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>,
@@ -48,10 +48,10 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Julien Thierry <julien.thierry.kdev@gmail.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 14/18] arm64: kvm: Modernize annotation for
- __bp_harden_hyp_vecs
-Date: Tue, 18 Feb 2020 19:58:38 +0000
-Message-Id: <20200218195842.34156-15-broonie@kernel.org>
+Subject: [PATCH 15/18] arm64: kvm: Modernize __smccc_workaround_1_smc_start
+ annotations
+Date: Tue, 18 Feb 2020 19:58:39 +0000
+Message-Id: <20200218195842.34156-16-broonie@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200218195842.34156-1-broonie@kernel.org>
 References: <20200218195842.34156-1-broonie@kernel.org>
@@ -74,112 +74,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We have recently introduced new macros for annotating assembly symbols
-for things that aren't C functions, SYM_CODE_START() and SYM_CODE_END(),
-in an effort to clarify and simplify our annotations of assembly files.
+In an effort to clarify and simplify the annotation of assembly functions
+in the kernel new macros have been introduced. These replace ENTRY and
+ENDPROC with separate annotations for standard C callable functions,
+data and code with different calling conventions.
 
-Using these for __bp_harden_hyp_vecs is more involved than for most symbols
-as this symbol is annotated quite unusually as rather than just have the
-explicit symbol we define _start and _end symbols which we then use to
+Using these for __smccc_workaround_1_smc is more involved than for most
+symbols as this symbol is annotated quite unusually, rather than just have
+the explicit symbol we define _start and _end symbols which we then use to
 compute the length. This does not play at all nicely with the new style
-macros. Since the size of the vectors is a known constant which won't vary
-the simplest thing to do is simply to drop the separate _start and _end
-symbols and just use a #define for the size.
+macros. Instead define a constant for the size of the function and use that
+in both the C code and for .org based size checks in the assembly code.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 9 ++++-----
- arch/arm64/include/asm/mmu.h     | 4 +++-
- arch/arm64/kernel/cpu_errata.c   | 2 +-
- arch/arm64/kvm/hyp/hyp-entry.S   | 6 ++++--
- 4 files changed, 12 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h |  4 ++++
+ arch/arm64/kernel/cpu_errata.c   | 14 ++++++--------
+ arch/arm64/kvm/hyp/hyp-entry.S   |  6 ++++--
+ 3 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 53d846f1bfe7..b5f723cf9599 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -480,7 +480,7 @@ static inline void *kvm_get_hyp_vector(void)
- 	int slot = -1;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 44a243754c1b..7c7eeeaab9fa 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -36,6 +36,8 @@
+  */
+ #define KVM_VECTOR_PREAMBLE	(2 * AARCH64_INSN_SIZE)
  
- 	if (cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR) && data->fn) {
--		vect = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs_start));
-+		vect = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
- 		slot = data->hyp_vectors_slot;
- 	}
- 
-@@ -509,14 +509,13 @@ static inline int kvm_map_vectors(void)
- 	 *  HBP +  HEL2 -> use hardened vertors and use exec mapping
- 	 */
- 	if (cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR)) {
--		__kvm_bp_vect_base = kvm_ksym_ref(__bp_harden_hyp_vecs_start);
-+		__kvm_bp_vect_base = kvm_ksym_ref(__bp_harden_hyp_vecs);
- 		__kvm_bp_vect_base = kern_hyp_va(__kvm_bp_vect_base);
- 	}
- 
- 	if (cpus_have_const_cap(ARM64_HARDEN_EL2_VECTORS)) {
--		phys_addr_t vect_pa = __pa_symbol(__bp_harden_hyp_vecs_start);
--		unsigned long size = (__bp_harden_hyp_vecs_end -
--				      __bp_harden_hyp_vecs_start);
-+		phys_addr_t vect_pa = __pa_symbol(__bp_harden_hyp_vecs);
-+		unsigned long size = __BP_HARDEN_HYP_VECS_SZ;
- 
- 		/*
- 		 * Always allocate a spare vector slot, as we don't
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index e4d862420bb4..a3324d6ccbfe 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -13,6 +13,7 @@
- #define TTBR_ASID_MASK	(UL(0xffff) << 48)
- 
- #define BP_HARDEN_EL2_SLOTS 4
-+#define __BP_HARDEN_HYP_VECS_SZ (BP_HARDEN_EL2_SLOTS * SZ_2K)
- 
++#define __SMCCC_WORKAROUND_1_SMC_SZ 36
++
  #ifndef __ASSEMBLY__
  
-@@ -45,7 +46,8 @@ struct bp_hardening_data {
+ #include <linux/mm.h>
+@@ -75,6 +77,8 @@ extern void __vgic_v3_init_lrs(void);
  
- #if (defined(CONFIG_HARDEN_BRANCH_PREDICTOR) ||	\
-      defined(CONFIG_HARDEN_EL2_VECTORS))
--extern char __bp_harden_hyp_vecs_start[], __bp_harden_hyp_vecs_end[];
+ extern u32 __kvm_get_mdcr_el2(void);
+ 
++extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
 +
-+extern char __bp_harden_hyp_vecs[];
- extern atomic_t arm64_el2_vector_last_slot;
- #endif  /* CONFIG_HARDEN_BRANCH_PREDICTOR || CONFIG_HARDEN_EL2_VECTORS */
- 
+ /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
+ #define __hyp_this_cpu_ptr(sym)						\
+ 	({								\
 diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index 703ad0a84f99..0af2201cefda 100644
+index 0af2201cefda..6a2ca339741c 100644
 --- a/arch/arm64/kernel/cpu_errata.c
 +++ b/arch/arm64/kernel/cpu_errata.c
-@@ -119,7 +119,7 @@ extern char __smccc_workaround_1_smc_end[];
+@@ -11,6 +11,7 @@
+ #include <asm/cpu.h>
+ #include <asm/cputype.h>
+ #include <asm/cpufeature.h>
++#include <asm/kvm_asm.h>
+ #include <asm/smp_plat.h>
+ 
+ static bool __maybe_unused
+@@ -113,9 +114,6 @@ atomic_t arm64_el2_vector_last_slot = ATOMIC_INIT(-1);
+ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
+ 
+ #ifdef CONFIG_KVM_INDIRECT_VECTORS
+-extern char __smccc_workaround_1_smc_start[];
+-extern char __smccc_workaround_1_smc_end[];
+-
  static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
  				const char *hyp_vecs_end)
  {
--	void *dst = lm_alias(__bp_harden_hyp_vecs_start + slot * SZ_2K);
-+	void *dst = lm_alias(__bp_harden_hyp_vecs + slot * SZ_2K);
- 	int i;
+@@ -163,9 +161,6 @@ static void install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 	raw_spin_unlock(&bp_lock);
+ }
+ #else
+-#define __smccc_workaround_1_smc_start		NULL
+-#define __smccc_workaround_1_smc_end		NULL
+-
+ static void install_bp_hardening_cb(bp_hardening_cb_t fn,
+ 				      const char *hyp_vecs_start,
+ 				      const char *hyp_vecs_end)
+@@ -239,11 +234,14 @@ static int detect_harden_bp_fw(void)
+ 		smccc_end = NULL;
+ 		break;
  
- 	for (i = 0; i < SZ_2K; i += 0x80)
++#if IS_ENABLED(CONFIG_KVM_ARM_HOST)
+ 	case SMCCC_CONDUIT_SMC:
+ 		cb = call_smc_arch_workaround_1;
+-		smccc_start = __smccc_workaround_1_smc_start;
+-		smccc_end = __smccc_workaround_1_smc_end;
++		smccc_start = __smccc_workaround_1_smc;
++		smccc_end = __smccc_workaround_1_smc +
++			__SMCCC_WORKAROUND_1_SMC_SZ;
+ 		break;
++#endif
+ 
+ 	default:
+ 		return -1;
 diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 0aea8f9ab23d..1e2ab928a92f 100644
+index 1e2ab928a92f..c2a13ab3c471 100644
 --- a/arch/arm64/kvm/hyp/hyp-entry.S
 +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -312,11 +312,13 @@ alternative_cb_end
- .endm
- 
- 	.align	11
--ENTRY(__bp_harden_hyp_vecs_start)
-+SYM_CODE_START(__bp_harden_hyp_vecs)
- 	.rept BP_HARDEN_EL2_SLOTS
- 	generate_vectors
- 	.endr
--ENTRY(__bp_harden_hyp_vecs_end)
-+1:	.org __bp_harden_hyp_vecs + __BP_HARDEN_HYP_VECS_SZ
-+	.org 1b
-+SYM_CODE_END(__bp_harden_hyp_vecs)
+@@ -322,7 +322,7 @@ SYM_CODE_END(__bp_harden_hyp_vecs)
  
  	.popsection
  
+-ENTRY(__smccc_workaround_1_smc_start)
++SYM_CODE_START(__smccc_workaround_1_smc)
+ 	esb
+ 	sub	sp, sp, #(8 * 4)
+ 	stp	x2, x3, [sp, #(8 * 0)]
+@@ -332,5 +332,7 @@ ENTRY(__smccc_workaround_1_smc_start)
+ 	ldp	x2, x3, [sp, #(8 * 0)]
+ 	ldp	x0, x1, [sp, #(8 * 2)]
+ 	add	sp, sp, #(8 * 4)
+-ENTRY(__smccc_workaround_1_smc_end)
++1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
++	.org 1b
++SYM_CODE_END(__smccc_workaround_1_smc)
+ #endif
 -- 
 2.20.1
 
