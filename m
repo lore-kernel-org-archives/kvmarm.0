@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 360FEC34026
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 18:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDCEC34047
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 18:15:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8BF12070B
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 18:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8BF12070B
+	by mail.kernel.org (Postfix) with ESMTP id 84554208C4
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 18:15:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84554208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 276824AF29;
-	Tue, 18 Feb 2020 13:01:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54224AF29;
+	Tue, 18 Feb 2020 13:15:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CLx6ka4Hx+Gm; Tue, 18 Feb 2020 13:01:19 -0500 (EST)
+	with ESMTP id o7NCGf6W-2Ul; Tue, 18 Feb 2020 13:15:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 279604AF3E;
-	Tue, 18 Feb 2020 13:01:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC0014AF2D;
+	Tue, 18 Feb 2020 13:15:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 600234AF29
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 13:01:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DBA94AF21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 13:15:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DS+Pz2YFhRps for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 13:01:16 -0500 (EST)
+ with ESMTP id 9cvWGc8Z+YJC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 13:15:16 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E5384AED5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 13:01:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 620264AF0E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 13:15:16 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDFA331B;
- Tue, 18 Feb 2020 10:01:15 -0800 (PST)
-Received: from [10.1.196.37] (e121345-lin.cambridge.arm.com [10.1.196.37])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ADC4E3F68F;
- Tue, 18 Feb 2020 10:01:14 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8CE831B;
+ Tue, 18 Feb 2020 10:15:15 -0800 (PST)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C3603F68F;
+ Tue, 18 Feb 2020 10:15:14 -0800 (PST)
 Subject: Re: [PATCH 1/5] KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
-To: James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
+To: Robin Murphy <robin.murphy@arm.com>, Marc Zyngier <maz@kernel.org>
 References: <20200216185324.32596-1-maz@kernel.org>
  <20200216185324.32596-2-maz@kernel.org>
  <c1bd5c57-666e-0d54-1e7c-e45d0535ffe3@arm.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <a02252f6-1e9a-2a35-9944-f23e161583ab@arm.com>
-Date: Tue, 18 Feb 2020 18:01:13 +0000
+ <a02252f6-1e9a-2a35-9944-f23e161583ab@arm.com>
+From: James Morse <james.morse@arm.com>
+Message-ID: <bf599b74-6ead-8722-d4d4-870a0cabc213@arm.com>
+Date: Tue, 18 Feb 2020 18:15:13 +0000
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <c1bd5c57-666e-0d54-1e7c-e45d0535ffe3@arm.com>
+In-Reply-To: <a02252f6-1e9a-2a35-9944-f23e161583ab@arm.com>
 Content-Language: en-GB
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
@@ -67,52 +68,39 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 18/02/2020 5:43 pm, James Morse wrote:
-> Hi Marc,
-> 
-> $subject typo: ~/DBGBIDR/DBGDIDR/
-> 
-> On 16/02/2020 18:53, Marc Zyngier wrote:
->> The AArch32 CP14 DBGDIDR has bit 15 set to RES1, which our current
->> emulation doesn't set. Just add the missing bit.
-> 
-> So it does.
-> 
-> Reviewed-by: James Morse <james.morse@arm.com>
-> 
-> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 3e909b117f0c..da82c4b03aab 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1658,7 +1658,7 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
->>   		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
->>   			     (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
->>   			     (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20)
->> -			     | (6 << 16) | (el3 << 14) | (el3 << 12));
->> +			     | (6 << 16) | (1 << 15) | (el3 << 14) | (el3 << 12));
-> 
-> Hmmm, where el3 is:
-> | u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
-> 
-> Aren't we depending on the compilers 'true' being 1 here?
-
-Pretty much, but thankfully the only compilers we support are C compilers:
-
-"The result of the logical negation operator ! is 0 if the value of its 
-operand compares unequal to 0, 1 if the value of its operand compares 
-equal to 0. The result has type int."
-
-And now I have you to thank for flashbacks to bitwise logical operators 
-in Visual Basic... :P
-
-Robin.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgUm9iaW4sCgpPbiAxOC8wMi8yMDIwIDE4OjAxLCBSb2JpbiBNdXJwaHkgd3JvdGU6Cj4gT24g
+MTgvMDIvMjAyMCA1OjQzIHBtLCBKYW1lcyBNb3JzZSB3cm90ZToKPj4gT24gMTYvMDIvMjAyMCAx
+ODo1MywgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gVGhlIEFBcmNoMzIgQ1AxNCBEQkdESURSIGhh
+cyBiaXQgMTUgc2V0IHRvIFJFUzEsIHdoaWNoIG91ciBjdXJyZW50Cj4+PiBlbXVsYXRpb24gZG9l
+c24ndCBzZXQuIEp1c3QgYWRkIHRoZSBtaXNzaW5nIGJpdC4KCj4+PiBkaWZmIC0tZ2l0IGEvYXJj
+aC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4+IGlu
+ZGV4IDNlOTA5YjExN2YwYy4uZGE4MmM0YjAzYWFiIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02
+NC9rdm0vc3lzX3JlZ3MuYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+Pj4g
+QEAgLTE2NTgsNyArMTY1OCw3IEBAIHN0YXRpYyBib29sIHRyYXBfZGJnaWRyKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSwKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBwLT5yZWd2YWwgPSAoKCgoZGZyID4+
+IElEX0FBNjRERlIwX1dSUFNfU0hJRlQpICYgMHhmKSA8PCAyOCkgfAo+Pj4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICgoKGRmciA+PiBJRF9BQTY0REZSMF9CUlBTX1NISUZU
+KSAmIDB4ZikgPDwgMjQpIHwKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAoKChkZnIgPj4gSURfQUE2NERGUjBfQ1RYX0NNUFNfU0hJRlQpICYgMHhmKSA8PCAyMCkKPj4+
+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8ICg2IDw8IDE2KSB8IChlbDMgPDwg
+MTQpIHwgKGVsMyA8PCAxMikpOwo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHwgKDYgPDwgMTYpIHwgKDEgPDwgMTUpIHwgKGVsMyA8PCAxNCkgfCAoZWwzIDw8IDEyKSk7Cj4+
+Cj4+IEhtbW0sIHdoZXJlIGVsMyBpczoKPj4gfCB1MzIgZWwzID0gISFjcHVpZF9mZWF0dXJlX2V4
+dHJhY3RfdW5zaWduZWRfZmllbGQocGZyLCBJRF9BQTY0UEZSMF9FTDNfU0hJRlQpOwo+Pgo+PiBB
+cmVuJ3Qgd2UgZGVwZW5kaW5nIG9uIHRoZSBjb21waWxlcnMgJ3RydWUnIGJlaW5nIDEgaGVyZT8K
+PiAKPiBQcmV0dHkgbXVjaCwgYnV0IHRoYW5rZnVsbHkgdGhlIG9ubHkgY29tcGlsZXJzIHdlIHN1
+cHBvcnQgYXJlIEMgY29tcGlsZXJzOgo+IAo+ICJUaGUgcmVzdWx0IG9mIHRoZSBsb2dpY2FsIG5l
+Z2F0aW9uIG9wZXJhdG9yICEgaXMgMCBpZiB0aGUgdmFsdWUgb2YgaXRzIG9wZXJhbmQgY29tcGFy
+ZXMKPiB1bmVxdWFsIHRvIDAsIDEgaWYgdGhlIHZhbHVlIG9mIGl0cyBvcGVyYW5kIGNvbXBhcmVz
+IGVxdWFsIHRvIDAuIFRoZSByZXN1bHQgaGFzIHR5cGUgaW50LiIKCkV4Y2VsbGVudC4gSSB0aG91
+Z2h0IHRoaXMgd2FzIHRoZSBzb3J0IG9mIHRoaW5nIHRoYXQgY291bGRuJ3QgYmUgZGVwZW5kZWQg
+b24hCgoKPiBBbmQgbm93IEkgaGF2ZSB5b3UgdG8gdGhhbmsgZm9yIGZsYXNoYmFja3MgdG8gYml0
+d2lzZSBsb2dpY2FsIG9wZXJhdG9ycyBpbiBWaXN1YWwgQmFzaWMuLi4gOlAKCi4uLiBzb3JyeT8K
+CgoKVGhhbmtzLAoKSmFtZXMKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
