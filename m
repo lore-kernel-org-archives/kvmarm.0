@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A78EC34031
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 23:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8857DC3404C
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 23:54:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1E0482068F
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 23:54:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E0482068F
+	by mail.kernel.org (Postfix) with ESMTP id 4CB8324655
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 23:54:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB8324655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A58C34AF75;
-	Tue, 18 Feb 2020 18:54:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B804AF3C;
+	Tue, 18 Feb 2020 18:54:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IgkuyPTMa5WU; Tue, 18 Feb 2020 18:54:47 -0500 (EST)
+	with ESMTP id AASjq+lzc34Q; Tue, 18 Feb 2020 18:54:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A034C4AF76;
-	Tue, 18 Feb 2020 18:54:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4584AED7;
+	Tue, 18 Feb 2020 18:54:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 993F14AF2F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 18:54:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EFE74AF3B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 18:54:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v6JFBUCv7+LG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Feb 2020 18:54:41 -0500 (EST)
+ with ESMTP id payxVWdlF9O4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Feb 2020 18:54:42 -0500 (EST)
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C0654AF41
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 907D54AF4D
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 18:54:41 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,14 +41,14 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  18 Feb 2020 15:54:39 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; d="scan'208";a="224313159"
+X-IronPort-AV: E=Sophos;i="5.70,458,1574150400"; d="scan'208";a="224313165"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
- by orsmga007.jf.intel.com with ESMTP; 18 Feb 2020 15:54:38 -0800
+ by orsmga007.jf.intel.com with ESMTP; 18 Feb 2020 15:54:39 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 2/9] KVM: x86: Move init-only kvm_x86_ops to separate struct
-Date: Tue, 18 Feb 2020 15:54:30 -0800
-Message-Id: <20200218235437.20533-3-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 4/9] KVM: VMX: Configure runtime hooks using vmx_x86_ops
+Date: Tue, 18 Feb 2020 15:54:32 -0800
+Message-Id: <20200218235437.20533-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200218235437.20533-1-sean.j.christopherson@intel.com>
 References: <20200218235437.20533-1-sean.j.christopherson@intel.com>
@@ -79,186 +79,140 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the kvm_x86_ops functions that are used only within the scope of
-kvm_init() into a separate struct, kvm_x86_init_ops.  In addition to
-identifying the init-only functions without restorting to code comments,
-this also sets the stage for waiting until after ->hardware_setup() to
-set kvm_x86_ops.  Setting kvm_x86_ops after ->hardware_setup() is
-desirable as many of the hooks are not usable until ->hardware_setup()
-completes.
-
-No functional change intended.
+Configure VMX's runtime hooks by modifying vmx_x86_ops directly instead
+of using on the global kvm_x86_ops.  This sets the stage for waiting
+until after ->hardware_setup() to set kvm_x86_ops with the vendor's
+implementation.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 13 +++++++++----
- arch/x86/kvm/svm.c              | 15 ++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 16 +++++++++++-----
- arch/x86/kvm/x86.c              | 10 ++++++----
- 4 files changed, 36 insertions(+), 18 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 15 ++++++++-------
+ arch/x86/kvm/vmx/nested.h |  3 ++-
+ arch/x86/kvm/vmx/vmx.c    | 27 ++++++++++++++-------------
+ 3 files changed, 24 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4dffbc10d3f8..55e72b0e592b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1042,12 +1042,8 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 657c2eda357c..07db28f5087d 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6160,7 +6160,8 @@ void nested_vmx_hardware_unsetup(void)
+ 	}
  }
  
- struct kvm_x86_ops {
--	int (*cpu_has_kvm_support)(void);          /* __init */
--	int (*disabled_by_bios)(void);             /* __init */
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
--	int (*check_processor_compatibility)(void);/* __init */
--	int (*hardware_setup)(void);               /* __init */
- 	void (*hardware_unsetup)(void);            /* __exit */
- 	bool (*cpu_has_accelerated_tpr)(void);
- 	bool (*has_emulated_msr)(int index);
-@@ -1258,6 +1254,15 @@ struct kvm_x86_ops {
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
- };
- 
-+struct kvm_x86_init_ops {
-+	int (*cpu_has_kvm_support)(void);
-+	int (*disabled_by_bios)(void);
-+	int (*check_processor_compatibility)(void);
-+	int (*hardware_setup)(void);
-+
-+	struct kvm_x86_ops *runtime_ops;
-+};
-+
- struct kvm_arch_async_pf {
- 	u32 token;
- 	gfn_t gfn;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index a3e32d61d60c..b1faf6c33541 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7375,11 +7375,7 @@ static void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate)
- }
- 
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = has_svm,
--	.disabled_by_bios = is_disabled,
--	.hardware_setup = svm_hardware_setup,
- 	.hardware_unsetup = svm_hardware_unsetup,
--	.check_processor_compatibility = svm_check_processor_compat,
- 	.hardware_enable = svm_hardware_enable,
- 	.hardware_disable = svm_hardware_disable,
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
-@@ -7515,9 +7511,18 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
- };
- 
-+static struct kvm_x86_init_ops svm_init_ops __initdata = {
-+	.cpu_has_kvm_support = has_svm,
-+	.disabled_by_bios = is_disabled,
-+	.hardware_setup = svm_hardware_setup,
-+	.check_processor_compatibility = svm_check_processor_compat,
-+
-+	.runtime_ops = &svm_x86_ops,
-+};
-+
- static int __init svm_init(void)
+-__init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
++__init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
++				     int (*exit_handlers[])(struct kvm_vcpu *))
  {
--	return kvm_init(&svm_x86_ops, sizeof(struct vcpu_svm),
-+	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
- 			__alignof__(struct vcpu_svm), THIS_MODULE);
- }
+ 	int i;
  
+@@ -6196,12 +6197,12 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+ 	exit_handlers[EXIT_REASON_INVVPID]	= handle_invvpid;
+ 	exit_handlers[EXIT_REASON_VMFUNC]	= handle_vmfunc;
+ 
+-	kvm_x86_ops->check_nested_events = vmx_check_nested_events;
+-	kvm_x86_ops->get_nested_state = vmx_get_nested_state;
+-	kvm_x86_ops->set_nested_state = vmx_set_nested_state;
+-	kvm_x86_ops->get_vmcs12_pages = nested_get_vmcs12_pages;
+-	kvm_x86_ops->nested_enable_evmcs = nested_enable_evmcs;
+-	kvm_x86_ops->nested_get_evmcs_version = nested_get_evmcs_version;
++	ops->check_nested_events = vmx_check_nested_events;
++	ops->get_nested_state = vmx_get_nested_state;
++	ops->set_nested_state = vmx_set_nested_state;
++	ops->get_vmcs12_pages = nested_get_vmcs12_pages;
++	ops->nested_enable_evmcs = nested_enable_evmcs;
++	ops->nested_get_evmcs_version = nested_get_evmcs_version;
+ 
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index fc874d4ead0f..e356871a7cfa 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -20,7 +20,8 @@ void vmx_leave_nested(struct kvm_vcpu *vcpu);
+ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
+ 				bool apicv);
+ void nested_vmx_hardware_unsetup(void);
+-__init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
++__init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
++				     int (*exit_handlers[])(struct kvm_vcpu *));
+ void nested_vmx_set_vmcs_shadowing_bitmap(void);
+ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
+ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9a6664886f2e..01aed5386ed2 100644
+index 168386f8c9da..098203b6508f 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7729,11 +7729,8 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- }
+@@ -7767,10 +7767,10 @@ static __init int hardware_setup(void)
+ 	 * using the APIC_ACCESS_ADDR VMCS field.
+ 	 */
+ 	if (!flexpriority_enabled)
+-		kvm_x86_ops->set_apic_access_page_addr = NULL;
++		vmx_x86_ops.set_apic_access_page_addr = NULL;
  
- static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
--	.cpu_has_kvm_support = cpu_has_kvm_support,
--	.disabled_by_bios = vmx_disabled_by_bios,
--	.hardware_setup = hardware_setup,
- 	.hardware_unsetup = hardware_unsetup,
--	.check_processor_compatibility = vmx_check_processor_compat,
-+
- 	.hardware_enable = hardware_enable,
- 	.hardware_disable = hardware_disable,
- 	.cpu_has_accelerated_tpr = report_flexpriority,
-@@ -7881,6 +7878,15 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
- };
+ 	if (!cpu_has_vmx_tpr_shadow())
+-		kvm_x86_ops->update_cr8_intercept = NULL;
++		vmx_x86_ops.update_cr8_intercept = NULL;
  
-+static struct kvm_x86_init_ops vmx_init_ops __initdata = {
-+	.cpu_has_kvm_support = cpu_has_kvm_support,
-+	.disabled_by_bios = vmx_disabled_by_bios,
-+	.check_processor_compatibility = vmx_check_processor_compat,
-+	.hardware_setup = hardware_setup,
-+
-+	.runtime_ops = &vmx_x86_ops,
-+};
-+
- static void vmx_cleanup_l1d_flush(void)
- {
- 	if (vmx_l1d_flush_pages) {
-@@ -7965,7 +7971,7 @@ static int __init vmx_init(void)
+ 	if (enable_ept && !cpu_has_vmx_ept_2m_page())
+ 		kvm_disable_largepages();
+@@ -7778,8 +7778,8 @@ static __init int hardware_setup(void)
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
+ 	    && enable_ept) {
+-		kvm_x86_ops->tlb_remote_flush = hv_remote_flush_tlb;
+-		kvm_x86_ops->tlb_remote_flush_with_range =
++		vmx_x86_ops.tlb_remote_flush = hv_remote_flush_tlb;
++		vmx_x86_ops.tlb_remote_flush_with_range =
+ 				hv_remote_flush_tlb_with_range;
  	}
  #endif
+@@ -7794,7 +7794,7 @@ static __init int hardware_setup(void)
  
--	r = kvm_init(&vmx_x86_ops, sizeof(struct vcpu_vmx),
-+	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
- 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
- 	if (r)
- 		return r;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bdd0a613b374..315297dec85c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7285,8 +7285,8 @@ static struct notifier_block pvclock_gtod_notifier = {
+ 	if (!cpu_has_vmx_apicv()) {
+ 		enable_apicv = 0;
+-		kvm_x86_ops->sync_pir_to_irr = NULL;
++		vmx_x86_ops.sync_pir_to_irr = NULL;
+ 	}
  
- int kvm_arch_init(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
--	struct kvm_x86_ops *ops = opaque;
+ 	if (cpu_has_vmx_tsc_scaling()) {
+@@ -7818,10 +7818,10 @@ static __init int hardware_setup(void)
+ 		enable_pml = 0;
  
- 	if (kvm_x86_ops) {
- 		printk(KERN_ERR "kvm: already loaded the other module\n");
-@@ -7335,7 +7335,7 @@ int kvm_arch_init(void *opaque)
- 	if (r)
- 		goto out_free_percpu;
+ 	if (!enable_pml) {
+-		kvm_x86_ops->slot_enable_log_dirty = NULL;
+-		kvm_x86_ops->slot_disable_log_dirty = NULL;
+-		kvm_x86_ops->flush_log_dirty = NULL;
+-		kvm_x86_ops->enable_log_dirty_pt_masked = NULL;
++		vmx_x86_ops.slot_enable_log_dirty = NULL;
++		vmx_x86_ops.slot_disable_log_dirty = NULL;
++		vmx_x86_ops.flush_log_dirty = NULL;
++		vmx_x86_ops.enable_log_dirty_pt_masked = NULL;
+ 	}
  
--	kvm_x86_ops = ops;
-+	kvm_x86_ops = ops->runtime_ops;
+ 	if (!cpu_has_vmx_preemption_timer())
+@@ -7849,9 +7849,9 @@ static __init int hardware_setup(void)
+ 	}
  
- 	kvm_mmu_set_mask_ptes(PT_USER_MASK, PT_ACCESSED_MASK,
- 			PT_DIRTY_MASK, PT64_NX_MASK, 0,
-@@ -9593,9 +9593,10 @@ void kvm_arch_hardware_disable(void)
+ 	if (!enable_preemption_timer) {
+-		kvm_x86_ops->set_hv_timer = NULL;
+-		kvm_x86_ops->cancel_hv_timer = NULL;
+-		kvm_x86_ops->request_immediate_exit = __kvm_request_immediate_exit;
++		vmx_x86_ops.set_hv_timer = NULL;
++		vmx_x86_ops.cancel_hv_timer = NULL;
++		vmx_x86_ops.request_immediate_exit = __kvm_request_immediate_exit;
+ 	}
  
- int kvm_arch_hardware_setup(void *opaque)
- {
-+	struct kvm_x86_init_ops *ops = opaque;
- 	int r;
+ 	kvm_set_posted_intr_wakeup_handler(wakeup_handler);
+@@ -7867,7 +7867,8 @@ static __init int hardware_setup(void)
+ 		nested_vmx_setup_ctls_msrs(&vmcs_config.nested,
+ 					   vmx_capability.ept, enable_apicv);
  
--	r = kvm_x86_ops->hardware_setup();
-+	r = ops->hardware_setup();
- 	if (r != 0)
- 		return r;
- 
-@@ -9630,13 +9631,14 @@ void kvm_arch_hardware_unsetup(void)
- int kvm_arch_check_processor_compat(void *opaque)
- {
- 	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-+	struct kvm_x86_init_ops *ops = opaque;
- 
- 	WARN_ON(!irqs_disabled());
- 
- 	if (kvm_host_cr4_reserved_bits(c) != cr4_reserved_bits)
- 		return -EIO;
- 
--	return kvm_x86_ops->check_processor_compatibility();
-+	return ops->check_processor_compatibility();
- }
- 
- bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+-		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
++		r = nested_vmx_hardware_setup(&vmx_x86_ops,
++					      kvm_vmx_exit_handlers);
+ 		if (r)
+ 			return r;
+ 	}
 -- 
 2.24.1
 
