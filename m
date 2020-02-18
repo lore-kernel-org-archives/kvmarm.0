@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C155EC34050
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09742C3404C
 	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:08:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7AC1F2176D
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:08:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC1F2176D
+	by mail.kernel.org (Postfix) with ESMTP id B13842176D
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Feb 2020 21:08:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13842176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15C054AF75;
-	Tue, 18 Feb 2020 16:08:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DA5B4AF6D;
+	Tue, 18 Feb 2020 16:08:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8MWu1A4PR8Bt; Tue, 18 Feb 2020 16:07:59 -0500 (EST)
+	with ESMTP id JkF4+SrkCCaq; Tue, 18 Feb 2020 16:07:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC474AF9E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B44AE4AF80;
 	Tue, 18 Feb 2020 16:07:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90A104AEEC
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A46F4AF46
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 16:07:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4bvoSHXRvHfA for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id EYtl+HiDQ6o7 for <kvmarm@lists.cs.columbia.edu>;
  Tue, 18 Feb 2020 16:07:48 -0500 (EST)
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B95E4AF4D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFE064AF43
  for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Feb 2020 16:07:47 -0500 (EST)
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -41,15 +41,14 @@ Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
  18 Feb 2020 13:07:45 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,457,1574150400"; d="scan'208";a="253856419"
+X-IronPort-AV: E=Sophos;i="5.70,457,1574150400"; d="scan'208";a="253856411"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
  by orsmga002.jf.intel.com with ESMTP; 18 Feb 2020 13:07:45 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v6 08/22] KVM: Refactor error handling for setting memory
- region
-Date: Tue, 18 Feb 2020 13:07:22 -0800
-Message-Id: <20200218210736.16432-9-sean.j.christopherson@intel.com>
+Subject: [PATCH v6 06/22] KVM: Drop kvm_arch_create_memslot()
+Date: Tue, 18 Feb 2020 13:07:20 -0800
+Message-Id: <20200218210736.16432-7-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200218210736.16432-1-sean.j.christopherson@intel.com>
 References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
@@ -75,75 +74,179 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-UmVwbGFjZSBhIGJpZyBwaWxlIG8nIGdvdG9zIHdpdGggcmV0dXJucyB0byBtYWtlIGl0IG1vcmUg
-b2J2aW91cyB3aGF0CmVycm9yIGNvZGUgaXMgYmVpbmcgcmV0dXJuZWQsIGFuZCB0byBwcmVwYXJl
-IGZvciByZWZhY3RvcmluZyB0aGUKZnVuY3Rpb25hbCwgaS5lLiBwb3N0LWNoZWNrcywgcG9ydGlv
-biBvZiBfX2t2bV9zZXRfbWVtb3J5X3JlZ2lvbigpLgoKUmV2aWV3ZWQtYnk6IEphbm9zY2ggRnJh
-bmsgPGZyYW5ramFAbGludXguaWJtLmNvbT4KUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUt
-RGF1ZMOpIDxmNGJ1Z0BhbXNhdC5vcmc+ClJldmlld2VkLWJ5OiBQZXRlciBYdSA8cGV0ZXJ4QHJl
-ZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW4uai5jaHJp
-c3RvcGhlcnNvbkBpbnRlbC5jb20+Ci0tLQogdmlydC9rdm0va3ZtX21haW4uYyB8IDQwICsrKysr
-KysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxOCBp
-bnNlcnRpb25zKCspLCAyMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9rdm1f
-bWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYwppbmRleCA0MmVjNGRhYzk5YjMuLmNhMzk3OTky
-ZTg3OSAxMDA2NDQKLS0tIGEvdmlydC9rdm0va3ZtX21haW4uYworKysgYi92aXJ0L2t2bS9rdm1f
-bWFpbi5jCkBAIC0xMDA1LDM0ICsxMDA1LDMzIEBAIGludCBfX2t2bV9zZXRfbWVtb3J5X3JlZ2lv
-bihzdHJ1Y3Qga3ZtICprdm0sCiAKIAlyID0gY2hlY2tfbWVtb3J5X3JlZ2lvbl9mbGFncyhtZW0p
-OwogCWlmIChyKQotCQlnb3RvIG91dDsKKwkJcmV0dXJuIHI7CiAKLQlyID0gLUVJTlZBTDsKIAlh
-c19pZCA9IG1lbS0+c2xvdCA+PiAxNjsKIAlpZCA9ICh1MTYpbWVtLT5zbG90OwogCiAJLyogR2Vu
-ZXJhbCBzYW5pdHkgY2hlY2tzICovCiAJaWYgKG1lbS0+bWVtb3J5X3NpemUgJiAoUEFHRV9TSVpF
-IC0gMSkpCi0JCWdvdG8gb3V0OworCQlyZXR1cm4gLUVJTlZBTDsKIAlpZiAobWVtLT5ndWVzdF9w
-aHlzX2FkZHIgJiAoUEFHRV9TSVpFIC0gMSkpCi0JCWdvdG8gb3V0OworCQlyZXR1cm4gLUVJTlZB
-TDsKIAkvKiBXZSBjYW4gcmVhZCB0aGUgZ3Vlc3QgbWVtb3J5IHdpdGggX194eHhfdXNlcigpIGxh
-dGVyIG9uLiAqLwogCWlmICgoaWQgPCBLVk1fVVNFUl9NRU1fU0xPVFMpICYmCiAJICAgICgobWVt
-LT51c2Vyc3BhY2VfYWRkciAmIChQQUdFX1NJWkUgLSAxKSkgfHwKIAkgICAgICFhY2Nlc3Nfb2so
-KHZvaWQgX191c2VyICopKHVuc2lnbmVkIGxvbmcpbWVtLT51c2Vyc3BhY2VfYWRkciwKIAkJCW1l
-bS0+bWVtb3J5X3NpemUpKSkKLQkJZ290byBvdXQ7CisJCXJldHVybiAtRUlOVkFMOwogCWlmIChh
-c19pZCA+PSBLVk1fQUREUkVTU19TUEFDRV9OVU0gfHwgaWQgPj0gS1ZNX01FTV9TTE9UU19OVU0p
-Ci0JCWdvdG8gb3V0OworCQlyZXR1cm4gLUVJTlZBTDsKIAlpZiAobWVtLT5ndWVzdF9waHlzX2Fk
-ZHIgKyBtZW0tPm1lbW9yeV9zaXplIDwgbWVtLT5ndWVzdF9waHlzX2FkZHIpCi0JCWdvdG8gb3V0
-OworCQlyZXR1cm4gLUVJTlZBTDsKIAogCXNsb3QgPSBpZF90b19tZW1zbG90KF9fa3ZtX21lbXNs
-b3RzKGt2bSwgYXNfaWQpLCBpZCk7CiAJYmFzZV9nZm4gPSBtZW0tPmd1ZXN0X3BoeXNfYWRkciA+
-PiBQQUdFX1NISUZUOwogCW5wYWdlcyA9IG1lbS0+bWVtb3J5X3NpemUgPj4gUEFHRV9TSElGVDsK
-IAogCWlmIChucGFnZXMgPiBLVk1fTUVNX01BWF9OUl9QQUdFUykKLQkJZ290byBvdXQ7CisJCXJl
-dHVybiAtRUlOVkFMOwogCiAJbmV3ID0gb2xkID0gKnNsb3Q7CiAKQEAgLTEwNDksMjAgKzEwNDgs
-MTggQEAgaW50IF9fa3ZtX3NldF9tZW1vcnlfcmVnaW9uKHN0cnVjdCBrdm0gKmt2bSwKIAkJCWlm
-ICgobmV3LnVzZXJzcGFjZV9hZGRyICE9IG9sZC51c2Vyc3BhY2VfYWRkcikgfHwKIAkJCSAgICAo
-bnBhZ2VzICE9IG9sZC5ucGFnZXMpIHx8CiAJCQkgICAgKChuZXcuZmxhZ3MgXiBvbGQuZmxhZ3Mp
-ICYgS1ZNX01FTV9SRUFET05MWSkpCi0JCQkJZ290byBvdXQ7CisJCQkJcmV0dXJuIC1FSU5WQUw7
-CiAKIAkJCWlmIChiYXNlX2dmbiAhPSBvbGQuYmFzZV9nZm4pCiAJCQkJY2hhbmdlID0gS1ZNX01S
-X01PVkU7CiAJCQllbHNlIGlmIChuZXcuZmxhZ3MgIT0gb2xkLmZsYWdzKQogCQkJCWNoYW5nZSA9
-IEtWTV9NUl9GTEFHU19PTkxZOwotCQkJZWxzZSB7IC8qIE5vdGhpbmcgdG8gY2hhbmdlLiAqLwot
-CQkJCXIgPSAwOwotCQkJCWdvdG8gb3V0OwotCQkJfQorCQkJZWxzZSAvKiBOb3RoaW5nIHRvIGNo
-YW5nZS4gKi8KKwkJCQlyZXR1cm4gMDsKIAkJfQogCX0gZWxzZSB7CiAJCWlmICghb2xkLm5wYWdl
-cykKLQkJCWdvdG8gb3V0OworCQkJcmV0dXJuIC1FSU5WQUw7CiAKIAkJY2hhbmdlID0gS1ZNX01S
-X0RFTEVURTsKIAkJbmV3LmJhc2VfZ2ZuID0gMDsKQEAgLTEwNzEsMjkgKzEwNjgsMjkgQEAgaW50
-IF9fa3ZtX3NldF9tZW1vcnlfcmVnaW9uKHN0cnVjdCBrdm0gKmt2bSwKIAogCWlmICgoY2hhbmdl
-ID09IEtWTV9NUl9DUkVBVEUpIHx8IChjaGFuZ2UgPT0gS1ZNX01SX01PVkUpKSB7CiAJCS8qIENo
-ZWNrIGZvciBvdmVybGFwcyAqLwotCQlyID0gLUVFWElTVDsKIAkJa3ZtX2Zvcl9lYWNoX21lbXNs
-b3Qoc2xvdCwgX19rdm1fbWVtc2xvdHMoa3ZtLCBhc19pZCkpIHsKIAkJCWlmIChzbG90LT5pZCA9
-PSBpZCkKIAkJCQljb250aW51ZTsKIAkJCWlmICghKChiYXNlX2dmbiArIG5wYWdlcyA8PSBzbG90
-LT5iYXNlX2dmbikgfHwKIAkJCSAgICAgIChiYXNlX2dmbiA+PSBzbG90LT5iYXNlX2dmbiArIHNs
-b3QtPm5wYWdlcykpKQotCQkJCWdvdG8gb3V0OworCQkJCXJldHVybiAtRUVYSVNUOwogCQl9CiAJ
-fQogCi0JciA9IC1FTk9NRU07Ci0KIAkvKiBBbGxvY2F0ZS9mcmVlIHBhZ2UgZGlydHkgYml0bWFw
-IGFzIG5lZWRlZCAqLwogCWlmICghKG5ldy5mbGFncyAmIEtWTV9NRU1fTE9HX0RJUlRZX1BBR0VT
-KSkKIAkJbmV3LmRpcnR5X2JpdG1hcCA9IE5VTEw7CiAJZWxzZSBpZiAoIW5ldy5kaXJ0eV9iaXRt
-YXApIHsKLQkJaWYgKGt2bV9jcmVhdGVfZGlydHlfYml0bWFwKCZuZXcpIDwgMCkKLQkJCWdvdG8g
-b3V0OworCQlyID0ga3ZtX2NyZWF0ZV9kaXJ0eV9iaXRtYXAoJm5ldyk7CisJCWlmIChyKQorCQkJ
-cmV0dXJuIHI7CiAJfQogCiAJc2xvdHMgPSBrdnphbGxvYyhzaXplb2Yoc3RydWN0IGt2bV9tZW1z
-bG90cyksIEdGUF9LRVJORUxfQUNDT1VOVCk7Ci0JaWYgKCFzbG90cykKKwlpZiAoIXNsb3RzKSB7
-CisJCXIgPSAtRU5PTUVNOwogCQlnb3RvIG91dF9iaXRtYXA7CisJfQogCW1lbWNweShzbG90cywg
-X19rdm1fbWVtc2xvdHMoa3ZtLCBhc19pZCksIHNpemVvZihzdHJ1Y3Qga3ZtX21lbXNsb3RzKSk7
-CiAKIAlpZiAoKGNoYW5nZSA9PSBLVk1fTVJfREVMRVRFKSB8fCAoY2hhbmdlID09IEtWTV9NUl9N
-T1ZFKSkgewpAQCAtMTE0NCw3ICsxMTQxLDYgQEAgaW50IF9fa3ZtX3NldF9tZW1vcnlfcmVnaW9u
-KHN0cnVjdCBrdm0gKmt2bSwKIG91dF9iaXRtYXA6CiAJaWYgKG5ldy5kaXJ0eV9iaXRtYXAgJiYg
-IW9sZC5kaXJ0eV9iaXRtYXApCiAJCWt2bV9kZXN0cm95X2RpcnR5X2JpdG1hcCgmbmV3KTsKLW91
-dDoKIAlyZXR1cm4gcjsKIH0KIEVYUE9SVF9TWU1CT0xfR1BMKF9fa3ZtX3NldF9tZW1vcnlfcmVn
-aW9uKTsKLS0gCjIuMjQuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Remove kvm_arch_create_memslot() now that all arch implementations are
+effectively nops.  Removing kvm_arch_create_memslot() eliminates the
+possibility for arch specific code to allocate memory prior to setting
+a memslot, which sets the stage for simplifying kvm_free_memslot().
+
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/mips/kvm/mips.c       |  6 ------
+ arch/powerpc/kvm/powerpc.c |  6 ------
+ arch/s390/kvm/kvm-s390.c   |  6 ------
+ arch/x86/kvm/x86.c         |  6 ------
+ include/linux/kvm_host.h   |  2 --
+ virt/kvm/arm/mmu.c         |  6 ------
+ virt/kvm/kvm_main.c        | 21 +++++++--------------
+ 7 files changed, 7 insertions(+), 46 deletions(-)
+
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 71244bf87c3a..b3243d87097f 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -188,12 +188,6 @@ long kvm_arch_dev_ioctl(struct file *filp, unsigned int ioctl,
+ 	return -ENOIOCTLCMD;
+ }
+ 
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
+-{
+-	return 0;
+-}
+-
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+ 	/* Flush whole GPA */
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 4e0f7a77920d..48abf1b9ad58 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -691,12 +691,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ 	kvmppc_core_free_memslot(kvm, free, dont);
+ }
+ 
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
+-{
+-	return 0;
+-}
+-
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				   struct kvm_memory_slot *memslot,
+ 				   const struct kvm_userspace_memory_region *mem,
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index d7ff30e45589..6638024e440d 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4507,12 +4507,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ 	return VM_FAULT_SIGBUS;
+ }
+ 
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
+-{
+-	return 0;
+-}
+-
+ /* Section: memory related */
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				   struct kvm_memory_slot *memslot,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 04167c00deb1..dfca4d9edea7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9852,12 +9852,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ 	kvm_page_track_free_memslot(free, dont);
+ }
+ 
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
+-{
+-	return 0;
+-}
+-
+ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+ 				      unsigned long npages)
+ {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e89eb67356cb..2fd0cf4ac03d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -671,8 +671,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			    const struct kvm_userspace_memory_region *mem);
+ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ 			   struct kvm_memory_slot *dont);
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages);
+ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				struct kvm_memory_slot *memslot,
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 19c961ac4e3c..1d97410b3470 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -2354,12 +2354,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ {
+ }
+ 
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
+-{
+-	return 0;
+-}
+-
+ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+ {
+ }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 68d5329b4ae5..fba171260ccb 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1040,12 +1040,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	new.base_gfn = base_gfn;
+ 	new.npages = npages;
+ 	new.flags = mem->flags;
++	new.userspace_addr = mem->userspace_addr;
+ 
+ 	if (npages) {
+ 		if (!old.npages)
+ 			change = KVM_MR_CREATE;
+ 		else { /* Modify an existing slot. */
+-			if ((mem->userspace_addr != old.userspace_addr) ||
++			if ((new.userspace_addr != old.userspace_addr) ||
+ 			    (npages != old.npages) ||
+ 			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
+ 				goto out;
+@@ -1080,22 +1081,14 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		}
+ 	}
+ 
+-	/* Free page dirty bitmap if unneeded */
+-	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
+-		new.dirty_bitmap = NULL;
+-
+ 	r = -ENOMEM;
+-	if (change == KVM_MR_CREATE) {
+-		new.userspace_addr = mem->userspace_addr;
+ 
+-		if (kvm_arch_create_memslot(kvm, &new, npages))
+-			goto out;
+-	}
+-
+-	/* Allocate page dirty bitmap if needed */
+-	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
++	/* Allocate/free page dirty bitmap as needed */
++	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
++		new.dirty_bitmap = NULL;
++	else if (!new.dirty_bitmap) {
+ 		if (kvm_create_dirty_bitmap(&new) < 0)
+-			goto out_free;
++			goto out;
+ 	}
+ 
+ 	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+-- 
+2.24.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
