@@ -2,73 +2,69 @@ Return-Path: <SRS0=1n5P=4H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C951C34047
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B62C34047
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:19:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CE87A2465D
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:18:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE87A2465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id D460024656
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:19:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D460024656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5297E4AF14;
-	Wed, 19 Feb 2020 10:18:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77DCB4AF1B;
+	Wed, 19 Feb 2020 10:19:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BzECz-aiNIO9; Wed, 19 Feb 2020 10:18:19 -0500 (EST)
+	with ESMTP id EAfTv8rxigBx; Wed, 19 Feb 2020 10:19:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3A14AC86;
-	Wed, 19 Feb 2020 10:18:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C7014AEFC;
+	Wed, 19 Feb 2020 10:19:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D384AC86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:18:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F094AEE0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:19:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g3axmz84MYHS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Feb 2020 10:18:16 -0500 (EST)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D17FE4AC77
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:18:15 -0500 (EST)
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 19 Feb 2020 07:18:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,459,1574150400"; d="scan'208";a="235919620"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.202])
- by orsmga003.jf.intel.com with ESMTP; 19 Feb 2020 07:18:14 -0800
-Date: Wed, 19 Feb 2020 07:18:14 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Subject: Re: [PATCH v6 21/22] KVM: x86/mmu: Use ranged-based TLB flush for
- dirty log memslot flush
-Message-ID: <20200219151814.GC15888@linux.intel.com>
-References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
- <20200218210736.16432-22-sean.j.christopherson@intel.com>
- <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
+ with ESMTP id GMnVRP9EiZTB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Feb 2020 10:19:07 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D65F34AC77
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:19:06 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 8FBB9C63BB00B34477CF;
+ Wed, 19 Feb 2020 23:18:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Wed, 19 Feb 2020
+ 23:18:19 +0800
+Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
+ SGI callbacks
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: Marc Zyngier <maz@kernel.org>
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-9-maz@kernel.org>
+ <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+ <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+ <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
+ <8db95a86-0981-710b-6c82-be7f7f844151@huawei.com>
+Message-ID: <8c538d2e-5ec8-0fd0-8999-e43a847df4c1@huawei.com>
+Date: Wed, 19 Feb 2020 23:18:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Christian Borntraeger <borntraeger@de.ibm.com>,
- kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+In-Reply-To: <8db95a86-0981-710b-6c82-be7f7f844151@huawei.com>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert
+ Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,37 +76,20 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Feb 19, 2020 at 12:22:58PM +0300, Sergei Shtylyov wrote:
-> Hello!
-> 
-> On 19.02.2020 0:07, Sean Christopherson wrote:
-> 
-> >Use the with_address() variant to when performing a TLB flush for a
->                                  ^^ is it really needed here?
-
-Doh, thanks.  The subject also has a typo, it should be "range-based", not
-"ranged-based".
-
-> >specific memslot via kvm_arch_flush_remote_tlbs_memslot(), i.e. when
-> >flushing after clearing dirty bits during KVM_{GET,CLEAR}_DIRTY_LOG.
-> >This aligns all dirty log memslot-specific TLB flushes to use the
-> >with_address() variant and paves the way for consolidating the relevant
-> >code.
-> >
-> >Note, moving to the with_address() variant only affects functionality
-> >when running as a HyperV guest.
-> >
-> >Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> [...]
-> 
-> MBR, Sergei
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC8yLzE5IDE5OjUwLCBaZW5naHVpIFl1IHdyb3RlOgo+IDMuIGl0IGxvb2tzIGxpa2Ug
+S1ZNIG1ha2VzIHRoZSBhc3N1bXB0aW9uIHRoYXQgdGhlIHBlci1SRCBNTUlPIHJlZ2lvbgo+IHdp
+bGwgb25seSBiZSBhY2Nlc3NlZCBieSB0aGUgYXNzb2NpYXRlZCBWQ1BVP8KgIEJ1dCBJIHRoaW5r
+IHRoaXMncyBub3QKPiByZXN0cmljdGVkIGJ5IHRoZSBhcmNoaXRlY3R1cmUsIHdlIGNhbiBkbyBp
+dCBiZXR0ZXIuwqAgT3IgSSd2ZSBqdXN0Cj4gbWlzc2VkIHNvbWUgaW1wb3J0YW50IHBvaW50cyBo
+ZXJlLgoKKEFmdGVyIHNvbWUgYmFzaWMgdGVzdHMsIEtWTSBhY3R1YWxseSBkb2VzIHRoZSByaWdo
+dCB0aGluZyEpClNvIEkgbXVzdCBoYXZlIHNvbWUgbWlzLXVuZGVyc3RhbmRpbmcgb24gdGhpcyBw
+b2ludCwgcGxlYXNlCmlnbm9yZSBpdC4gIEknbGwgZGlnIGl0IGZ1cnRoZXIgbXlzZWxmLCBzb3Jy
+eSBmb3IgdGhlIG5vaXN5LgoKClRoYW5rcywKWmVuZ2h1aQoKX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
+bGlzdGluZm8va3ZtYXJtCg==
