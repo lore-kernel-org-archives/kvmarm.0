@@ -2,82 +2,73 @@ Return-Path: <SRS0=1n5P=4H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE9AC34047
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C951C34047
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:18:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACE6324656
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:09:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE6324656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arndb.de
+	by mail.kernel.org (Postfix) with ESMTP id CE87A2465D
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:18:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE87A2465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FF94AECA;
-	Wed, 19 Feb 2020 10:09:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5297E4AF14;
+	Wed, 19 Feb 2020 10:18:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aHuLtYClmlYh; Wed, 19 Feb 2020 10:09:38 -0500 (EST)
+	with ESMTP id BzECz-aiNIO9; Wed, 19 Feb 2020 10:18:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0D364AECC;
-	Wed, 19 Feb 2020 10:09:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3A14AC86;
+	Wed, 19 Feb 2020 10:18:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABCBD4AF06
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:09:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D384AC86
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:18:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ABEMUi7EEQip for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Feb 2020 10:09:36 -0500 (EST)
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BD7F4A5A8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:09:36 -0500 (EST)
-Received: from mail-qv1-f47.google.com ([209.85.219.47]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1MY64R-1iwQdf42VJ-00YSCX for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb
- 2020 16:09:35 +0100
-Received: by mail-qv1-f47.google.com with SMTP id ek2so328525qvb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 07:09:34 -0800 (PST)
-X-Gm-Message-State: APjAAAWpBgT14RiKdg8tISW/nfObdYjSsDeKGT2WsikfrF9365RqR07o
- UoB77BBvRMHKC39exMRmqWaF4/w15tMtCVmuK8o=
-X-Google-Smtp-Source: APXvYqy3rlxWW3PibWcS7Utz29Jg0Z9gTgANCeAjjrXu+xhh/WzI1/Ni7Mlpywm71HMgkez+fQvQf5f2uWJlSlHGL2o=
-X-Received: by 2002:ad4:52eb:: with SMTP id p11mr20046350qvu.211.1582124973474; 
- Wed, 19 Feb 2020 07:09:33 -0800 (PST)
+ with ESMTP id g3axmz84MYHS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Feb 2020 10:18:16 -0500 (EST)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D17FE4AC77
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:18:15 -0500 (EST)
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Feb 2020 07:18:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,459,1574150400"; d="scan'208";a="235919620"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.202])
+ by orsmga003.jf.intel.com with ESMTP; 19 Feb 2020 07:18:14 -0800
+Date: Wed, 19 Feb 2020 07:18:14 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Subject: Re: [PATCH v6 21/22] KVM: x86/mmu: Use ranged-based TLB flush for
+ dirty log memslot flush
+Message-ID: <20200219151814.GC15888@linux.intel.com>
+References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
+ <20200218210736.16432-22-sean.j.christopherson@intel.com>
+ <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
 MIME-Version: 1.0
-References: <20200210141324.21090-1-maz@kernel.org>
-In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 19 Feb 2020 16:09:17 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3V=ur4AgLfat2cSyw8GrkCS2t06eqkzC-gXcc0xBpEPw@mail.gmail.com>
-Message-ID: <CAK8P3a3V=ur4AgLfat2cSyw8GrkCS2t06eqkzC-gXcc0xBpEPw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
-To: Marc Zyngier <maz@kernel.org>
-X-Provags-ID: V03:K1:rYhaW/mapOw1kUSmxBUvDxvB2czEcYJ3IWZJOf7upuecuwb/F7l
- UvZd1mwCowmGNjAzmExh3JC70OuT3kLNsU/5D71Dc/mNSw5Qv604FqRojwS0PdNleY32YLF
- c3UsQIgxwFsscI+fyKOEJWrH+8wNZ2XOZL5sbtiNP/n63sqgUVhdSkMmhml99owi0+PMGeu
- dGlK4WYyWwdBchit+NFfA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9uLQ0Uuebh0=:M9NJHUqbRTjYlKJQ389EL8
- PijLpnxmblKzcAzkNpUbTJKYroSe0IvN0NYN7txOYMykydx5GIbqSXNT7310iVySr24qn/A+6
- omf6FKLD1x95BbEHNRRXzIUk5xkPOMd1FEhvR7KhNM38zSBmm5catO0/XjQRQ+Xpnj2iJuoQ3
- BJa3SXWbkST4Uj0ED3ED5y3+RijgCySnvjSWj2ILKNsa+e8Fp0UHe+bdIsRZBP6a2V8cXmc14
- MBSAjYZZtyhsevrjeoH4r4ZjphwMQc5OvNmsbP8BMH1qHxr/mtXZNyqqUs+BSj37arQZMVcef
- 2STCNamOED5SvU80APzhwqi/z+MSiSLLDNYF9FD8SBU4GjU1Av73uss48f0uTmWVmOQbN87ht
- sPY2SAid1wFtWeCfhicUmiD96rEzMFlpULBY3DPdnjdnccZiiJP4QvySjJ5m4srArvVIN2FN8
- 4FEBpPVIlxXZwkLquVqsqqLx/cHTn7UeHOjCaKhYqvhZOd0knNtF5AjOLS+/hRCTKI108G/P9
- A2UCRRyB/atPoRyTJ6b0h7Xwb6sjy9oQ2KmGfaecO5WsvTKe/opX3TNGQSd3bxeDedtD/VdLU
- FGqixAw4ITDEl035IOyvPjn3D2J+69ut8CLsrHlCXZxkUhzpS6Glp1yzrglL6HKcWpkaQ6HfL
- Abk/kY4JX+caNgZd0kPYK0drpNkOHCIHnTKYFIRZ1TcL8rwj/D2z/Q420BCXVD2wgfScOVPd2
- 0BRKqCoQ2gMRavNdNEEtkmzltYqHlWNj33mZbHSNwvUxEQIsrgw0/fB+RNMlPiprqhH/kZbVo
- VVvFSGhp7xpUWMCXLLtr1Qwl/urMhp3d4tCrtlNF8G2kG/LqmA=
-Cc: jailhouse-dev@googlegroups.com, Anders Berg <anders.berg@lsi.com>,
- Russell King <linux@arm.linux.org.uk>, kvm list <kvm@vger.kernel.org>,
- jean-philippe.brucker@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <fdb72ab9-18d4-5719-2863-78cde4e97fae@cogentembedded.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Christian Borntraeger <borntraeger@de.ibm.com>,
+ kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,42 +85,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Feb 10, 2020 at 3:13 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> KVM/arm was merged just over 7 years ago, and has lived a very quiet
-> life so far. It mostly works if you're prepared to deal with its
-> limitations, it has been a good prototype for the arm64 version,
-> but it suffers a few problems:
->
-> - It is incomplete (no debug support, no PMU)
-> - It hasn't followed any of the architectural evolutions
-> - It has zero users (I don't count myself here)
-> - It is more and more getting in the way of new arm64 developments
->
-> So here it is: unless someone screams and shows that they rely on
-> KVM/arm to be maintained upsteam, I'll remove 32bit host support
-> form the tree. One of the reasons that makes me confident nobody is
-> using it is that I never receive *any* bug report. Yes, it is perfect.
-> But if you depend on KVM/arm being available in mainline, please shout.
->
-> To reiterate: 32bit guest support for arm64 stays, of course. Only
-> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
-> arm64, and cleanup all the now unnecessary abstractions.
->
-> The patches have been generated with the -D option to avoid spamming
-> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
-> my kernel.org repository.
+On Wed, Feb 19, 2020 at 12:22:58PM +0300, Sergei Shtylyov wrote:
+> Hello!
+> 
+> On 19.02.2020 0:07, Sean Christopherson wrote:
+> 
+> >Use the with_address() variant to when performing a TLB flush for a
+>                                  ^^ is it really needed here?
 
-Just one more thought before it's gone: is there any shared code
-(header files?) that is used by the jailhouse hypervisor?
+Doh, thanks.  The subject also has a typo, it should be "range-based", not
+"ranged-based".
 
-If there is, are there any plans to merge that into the mainline kernel
-for arm32 in the near future?
-
-I'm guessing the answer to at least one of those questions is 'no', so
-we don't need to worry about it, but it seems better to ask.
-
-      Arnd
+> >specific memslot via kvm_arch_flush_remote_tlbs_memslot(), i.e. when
+> >flushing after clearing dirty bits during KVM_{GET,CLEAR}_DIRTY_LOG.
+> >This aligns all dirty log memslot-specific TLB flushes to use the
+> >with_address() variant and paves the way for consolidating the relevant
+> >code.
+> >
+> >Note, moving to the with_address() variant only affects functionality
+> >when running as a HyperV guest.
+> >
+> >Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> [...]
+> 
+> MBR, Sergei
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
