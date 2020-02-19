@@ -6,65 +6,60 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B62C34047
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A087BC34047
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:47:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D460024656
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:19:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D460024656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 257522464E
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 15:47:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 257522464E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77DCB4AF1B;
-	Wed, 19 Feb 2020 10:19:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A02A94AC89;
+	Wed, 19 Feb 2020 10:47:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EAfTv8rxigBx; Wed, 19 Feb 2020 10:19:09 -0500 (EST)
+	with ESMTP id qNQPR7QAKYaQ; Wed, 19 Feb 2020 10:47:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C7014AEFC;
-	Wed, 19 Feb 2020 10:19:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED1A4AEEA;
+	Wed, 19 Feb 2020 10:47:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F094AEE0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:19:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D6E14AC89
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:47:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GMnVRP9EiZTB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Feb 2020 10:19:07 -0500 (EST)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D65F34AC77
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:19:06 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 8FBB9C63BB00B34477CF;
- Wed, 19 Feb 2020 23:18:27 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Wed, 19 Feb 2020
- 23:18:19 +0800
-Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
- SGI callbacks
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-References: <20200214145736.18550-1-maz@kernel.org>
- <20200214145736.18550-9-maz@kernel.org>
- <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
- <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
- <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
- <8db95a86-0981-710b-6c82-be7f7f844151@huawei.com>
-Message-ID: <8c538d2e-5ec8-0fd0-8999-e43a847df4c1@huawei.com>
-Date: Wed, 19 Feb 2020 23:18:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id 6V2XuKV1vJ1Z for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Feb 2020 10:47:05 -0500 (EST)
+Received: from goliath.siemens.de (goliath.siemens.de [192.35.17.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DC884A5A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 10:47:05 -0500 (EST)
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 01JFkkEi023113
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Feb 2020 16:46:46 +0100
+Received: from [139.25.68.37] ([139.25.68.37])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 01JFkgTh026670;
+ Wed, 19 Feb 2020 16:46:42 +0100
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+To: Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>
+References: <20200210141324.21090-1-maz@kernel.org>
+ <CAK8P3a3V=ur4AgLfat2cSyw8GrkCS2t06eqkzC-gXcc0xBpEPw@mail.gmail.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <ea7bc1d0-0a11-8ed6-da70-d603d8107bf6@siemens.com>
+Date: Wed, 19 Feb 2020 16:46:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <8db95a86-0981-710b-6c82-be7f7f844151@huawei.com>
+In-Reply-To: <CAK8P3a3V=ur4AgLfat2cSyw8GrkCS2t06eqkzC-gXcc0xBpEPw@mail.gmail.com>
 Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Robert
- Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: jailhouse-dev@googlegroups.com, Anders Berg <anders.berg@lsi.com>,
+ Russell King <linux@arm.linux.org.uk>, kvm list <kvm@vger.kernel.org>,
+ jean-philippe.brucker@arm.com,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,20 +71,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMC8yLzE5IDE5OjUwLCBaZW5naHVpIFl1IHdyb3RlOgo+IDMuIGl0IGxvb2tzIGxpa2Ug
-S1ZNIG1ha2VzIHRoZSBhc3N1bXB0aW9uIHRoYXQgdGhlIHBlci1SRCBNTUlPIHJlZ2lvbgo+IHdp
-bGwgb25seSBiZSBhY2Nlc3NlZCBieSB0aGUgYXNzb2NpYXRlZCBWQ1BVP8KgIEJ1dCBJIHRoaW5r
-IHRoaXMncyBub3QKPiByZXN0cmljdGVkIGJ5IHRoZSBhcmNoaXRlY3R1cmUsIHdlIGNhbiBkbyBp
-dCBiZXR0ZXIuwqAgT3IgSSd2ZSBqdXN0Cj4gbWlzc2VkIHNvbWUgaW1wb3J0YW50IHBvaW50cyBo
-ZXJlLgoKKEFmdGVyIHNvbWUgYmFzaWMgdGVzdHMsIEtWTSBhY3R1YWxseSBkb2VzIHRoZSByaWdo
-dCB0aGluZyEpClNvIEkgbXVzdCBoYXZlIHNvbWUgbWlzLXVuZGVyc3RhbmRpbmcgb24gdGhpcyBw
-b2ludCwgcGxlYXNlCmlnbm9yZSBpdC4gIEknbGwgZGlnIGl0IGZ1cnRoZXIgbXlzZWxmLCBzb3Jy
-eSBmb3IgdGhlIG5vaXN5LgoKClRoYW5rcywKWmVuZ2h1aQoKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+On 19.02.20 16:09, Arnd Bergmann wrote:
+> On Mon, Feb 10, 2020 at 3:13 PM Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> KVM/arm was merged just over 7 years ago, and has lived a very quiet
+>> life so far. It mostly works if you're prepared to deal with its
+>> limitations, it has been a good prototype for the arm64 version,
+>> but it suffers a few problems:
+>>
+>> - It is incomplete (no debug support, no PMU)
+>> - It hasn't followed any of the architectural evolutions
+>> - It has zero users (I don't count myself here)
+>> - It is more and more getting in the way of new arm64 developments
+>>
+>> So here it is: unless someone screams and shows that they rely on
+>> KVM/arm to be maintained upsteam, I'll remove 32bit host support
+>> form the tree. One of the reasons that makes me confident nobody is
+>> using it is that I never receive *any* bug report. Yes, it is perfect.
+>> But if you depend on KVM/arm being available in mainline, please shout.
+>>
+>> To reiterate: 32bit guest support for arm64 stays, of course. Only
+>> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+>> arm64, and cleanup all the now unnecessary abstractions.
+>>
+>> The patches have been generated with the -D option to avoid spamming
+>> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+>> my kernel.org repository.
+> 
+> Just one more thought before it's gone: is there any shared code
+> (header files?) that is used by the jailhouse hypervisor?
+> 
+> If there is, are there any plans to merge that into the mainline kernel
+> for arm32 in the near future?
+> 
+> I'm guessing the answer to at least one of those questions is 'no', so
+> we don't need to worry about it, but it seems better to ask.
+
+Good that you mention it: There is one thing we share on ARM (and 
+ARM64), and that is the hypervisor enabling stub, to install our own 
+vectors. If that was to be removed as well, we would have to patch it 
+back downstream. So far, we only carry few EXPORT_SYMBOL patches for 
+essential enabling.
+
+That said, I was also starting to think about how long we will continue 
+to support Jailhouse on 32-bit ARM. We currently have no supported SoC 
+there that comes with an SMMU, and I doubt to see one still showing up. 
+So, Jailhouse on ARM is really just a testing/demo case, maybe useful 
+(but I didn't get concrete feedback) for cleaner collaborative AMP for 
+real-time purposes, without security concerns. I assume 32-bit ARM will 
+never be part of what would be proposed of Jailhouse for upstream.
+
+Jan
+
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
