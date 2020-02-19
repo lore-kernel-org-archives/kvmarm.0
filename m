@@ -2,84 +2,70 @@ Return-Path: <SRS0=1n5P=4H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BA9C34047
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 13:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E480C34047
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 13:53:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F108224656
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 13:24:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B087F2176D
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Feb 2020 13:53:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrDKTg0K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F108224656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=agner.ch header.i=@agner.ch header.b="v7bnLInY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B087F2176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=agner.ch
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E56A4AEEA;
-	Wed, 19 Feb 2020 08:24:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E924A528;
+	Wed, 19 Feb 2020 08:53:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@agner.ch
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4KdAw9oiAyxG; Wed, 19 Feb 2020 08:24:44 -0500 (EST)
+	with ESMTP id R4uXyFWQOsD0; Wed, 19 Feb 2020 08:53:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 807514AF1F;
-	Wed, 19 Feb 2020 08:24:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C9494ACBE;
+	Wed, 19 Feb 2020 08:53:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 585DD4AEEA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 08:24:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E94F4A51F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 08:53:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XRI3lQNuu8pm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Feb 2020 08:24:42 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EA164AED9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 08:24:42 -0500 (EST)
-Received: from hump (unknown [147.67.241.226])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 02D8B24654;
- Wed, 19 Feb 2020 13:24:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1582118681;
- bh=WeK8iDiz+u7KGQl8xdyYvIuPvj8pRW13k3gZGmGmUOU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CrDKTg0KsoKO1U07yyagx89/mJ6hieOjLuM/lo6w3mB9Y9R+aQAidXZSv/ywuM3au
- r4bYkFE2ZGGFM/SSIBeOb3LJun+6yquvbVIUq2PH+U+U65CCtHToRoSUxXZ4LnlfNf
- XO/4CZv966+4qxBk+L+tbRqcMNDfbzR2x3+83oH0=
-Date: Wed, 19 Feb 2020 14:24:20 +0100
-From: Mike Rapoport <rppt@kernel.org>
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH v2 07/13] powerpc: add support for folded p4d page tables
-Message-ID: <20200219132420.GA5559@hump>
-References: <20200216081843.28670-1-rppt@kernel.org>
- <20200216081843.28670-8-rppt@kernel.org>
- <5b7c3929-5833-8ceb-85c8-a8e92e6a138e@c-s.fr>
+ with ESMTP id SwIqa0wZ4K5w for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Feb 2020 08:53:34 -0500 (EST)
+Received: from mail.kmu-office.ch (mail.kmu-office.ch [178.209.48.109])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ACAE4A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Feb 2020 08:53:34 -0500 (EST)
+Received: from webmail.kmu-office.ch (unknown [IPv6:2a02:418:6a02::a3])
+ by mail.kmu-office.ch (Postfix) with ESMTPSA id BCFA25C4EA4;
+ Wed, 19 Feb 2020 14:53:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
+ t=1582120412;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=584CG7iV8fP/g0uoqGFCOFV1KmVRFzk005+5LCc+GNE=;
+ b=v7bnLInYHzR7HlgS/jkPQ1zoPX1Zto/O0QTrCToF9nd44H+EiGKqZnQ5zYGGYvFvVytEzh
+ TeyHfp/ZV3fYGEa9vhIZtLPF2IZtILdUE+fFkNnVsaV3Fou/bQViT0gN3EWVVUymAmgvvB
+ /C2F7WFrsCH3J+1gGL4+2DMAMglkDO0=
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <5b7c3929-5833-8ceb-85c8-a8e92e6a138e@c-s.fr>
-Cc: Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
- Geert Uytterhoeven <geert+renesas@glider.be>, linux-sh@vger.kernel.org,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mm@kvack.org,
- Paul Mackerras <paulus@samba.org>, linux-hexagon@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Jonas Bonn <jonas@southpole.se>, linux-arch@vger.kernel.org,
- Brian Cain <bcain@codeaurora.org>, Marc Zyngier <maz@kernel.org>,
- Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
- Mike Rapoport <rppt@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- uclinux-h8-devel@lists.sourceforge.jp, Fenghua Yu <fenghua.yu@intel.com>,
- Arnd Bergmann <arnd@arndb.de>, kvm-ppc@vger.kernel.org,
- Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
- openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
- Guan Xuetao <gxt@pku.edu.cn>, linux-arm-kernel@lists.infradead.org,
- Tony Luck <tony.luck@intel.com>, Yoshinori Sato <ysato@users.sourceforge.jp>,
- linux-kernel@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
- nios2-dev@lists.rocketboards.org, Andrew Morton <akpm@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org
+Date: Wed, 19 Feb 2020 14:53:32 +0100
+From: Stefan Agner <stefan@agner.ch>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
+In-Reply-To: <20200210141324.21090-1-maz@kernel.org>
+References: <20200210141324.21090-1-maz@kernel.org>
+User-Agent: Roundcube Webmail/1.4.1
+Message-ID: <69845f739bbd91e73cd82e7c4683ab5a@agner.ch>
+X-Sender: stefan@agner.ch
+Cc: Anders Berg <anders.berg@lsi.com>, Russell King <linux@arm.linux.org.uk>,
+ Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,87 +77,140 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Feb 19, 2020 at 01:07:55PM +0100, Christophe Leroy wrote:
-> =
+On 2020-02-10 15:13, Marc Zyngier wrote:
+> KVM/arm was merged just over 7 years ago, and has lived a very quiet
+> life so far. It mostly works if you're prepared to deal with its
+> limitations, it has been a good prototype for the arm64 version,
+> but it suffers a few problems:
+> 
+> - It is incomplete (no debug support, no PMU)
+> - It hasn't followed any of the architectural evolutions
+> - It has zero users (I don't count myself here)
+> - It is more and more getting in the way of new arm64 developments
+> 
+> So here it is: unless someone screams and shows that they rely on
+> KVM/arm to be maintained upsteam, I'll remove 32bit host support
+> form the tree. One of the reasons that makes me confident nobody is
+> using it is that I never receive *any* bug report. Yes, it is perfect.
 
-> Le 16/02/2020 =E0 09:18, Mike Rapoport a =E9crit=A0:
-> > diff --git a/arch/powerpc/mm/ptdump/ptdump.c b/arch/powerpc/mm/ptdump/p=
-tdump.c
-> > index 206156255247..7bd4b81d5b5d 100644
-> > --- a/arch/powerpc/mm/ptdump/ptdump.c
-> > +++ b/arch/powerpc/mm/ptdump/ptdump.c
-> > @@ -277,9 +277,9 @@ static void walk_pmd(struct pg_state *st, pud_t *pu=
-d, unsigned long start)
-> >   	}
-> >   }
-> > -static void walk_pud(struct pg_state *st, pgd_t *pgd, unsigned long st=
-art)
-> > +static void walk_pud(struct pg_state *st, p4d_t *p4d, unsigned long st=
-art)
-> >   {
-> > -	pud_t *pud =3D pud_offset(pgd, 0);
-> > +	pud_t *pud =3D pud_offset(p4d, 0);
-> >   	unsigned long addr;
-> >   	unsigned int i;
-> > @@ -293,6 +293,22 @@ static void walk_pud(struct pg_state *st, pgd_t *p=
-gd, unsigned long start)
-> >   	}
-> >   }
-> > +static void walk_p4d(struct pg_state *st, pgd_t *pgd, unsigned long st=
-art)
-> > +{
-> > +	p4d_t *p4d =3D p4d_offset(pgd, 0);
-> > +	unsigned long addr;
-> > +	unsigned int i;
-> > +
-> > +	for (i =3D 0; i < PTRS_PER_P4D; i++, p4d++) {
-> > +		addr =3D start + i * P4D_SIZE;
-> > +		if (!p4d_none(*p4d) && !p4d_is_leaf(*p4d))
-> > +			/* p4d exists */
-> > +			walk_pud(st, p4d, addr);
-> > +		else
-> > +			note_page(st, addr, 2, p4d_val(*p4d));
-> =
+Not entirely true:
+https://lore.kernel.org/m/e2f7196ca6c70c55463a45b490f6731a@agner.ch
 
-> Level 2 is already used by walk_pud().
-> =
+But, after that was fixed, it actually was perfect :-D
+https://blog.printk.io/2016/09/kvm-with-kvmtool-on-armv7/
 
-> I think you have to increment the level used in walk_pud() and walk_pmd()
-> and walk_pte()
+That said, I never used it in a real-world application, so from my side
+removing it is fine.
 
-Thanks for catching this!
-I'll fix the numbers in the next version.
- =
+--
+Stefan
 
-> > +	}
-> > +}
-> > +
-> >   static void walk_pagetables(struct pg_state *st)
-> >   {
-> >   	unsigned int i;
-> > @@ -306,7 +322,7 @@ static void walk_pagetables(struct pg_state *st)
-> >   	for (i =3D pgd_index(addr); i < PTRS_PER_PGD; i++, pgd++, addr +=3D =
-PGDIR_SIZE) {
-> >   		if (!pgd_none(*pgd) && !pgd_is_leaf(*pgd))
-> >   			/* pgd exists */
-> > -			walk_pud(st, pgd, addr);
-> > +			walk_p4d(st, pgd, addr);
-> >   		else
-> >   			note_page(st, addr, 1, pgd_val(*pgd));
-> >   	}
-> =
-
-> Christophe
-
--- =
-
-Sincerely yours,
-Mike.
+> But if you depend on KVM/arm being available in mainline, please shout.
+> 
+> To reiterate: 32bit guest support for arm64 stays, of course. Only
+> 32bit host goes. Once this is merged, I plan to move virt/kvm/arm to
+> arm64, and cleanup all the now unnecessary abstractions.
+> 
+> The patches have been generated with the -D option to avoid spamming
+> everyone with huge diffs, and there is a kvm-arm/goodbye branch in
+> my kernel.org repository.
+> 
+> Marc Zyngier (5):
+>   arm: Unplug KVM from the build system
+>   arm: Remove KVM from config files
+>   arm: Remove 32bit KVM host support
+>   arm: Remove HYP/Stage-2 page-table support
+>   arm: Remove GICv3 vgic compatibility macros
+> 
+>  Documentation/virt/kvm/arm/hyp-abi.txt |    5 +
+>  arch/arm/Kconfig                       |    2 -
+>  arch/arm/Makefile                      |    1 -
+>  arch/arm/configs/axm55xx_defconfig     |    2 -
+>  arch/arm/include/asm/arch_gicv3.h      |  114 --
+>  arch/arm/include/asm/kvm_arm.h         |  239 ----
+>  arch/arm/include/asm/kvm_asm.h         |   77 --
+>  arch/arm/include/asm/kvm_coproc.h      |   36 -
+>  arch/arm/include/asm/kvm_emulate.h     |  372 ------
+>  arch/arm/include/asm/kvm_host.h        |  459 --------
+>  arch/arm/include/asm/kvm_hyp.h         |  127 ---
+>  arch/arm/include/asm/kvm_mmu.h         |  435 -------
+>  arch/arm/include/asm/kvm_ras.h         |   14 -
+>  arch/arm/include/asm/pgtable-3level.h  |   20 -
+>  arch/arm/include/asm/pgtable.h         |    9 -
+>  arch/arm/include/asm/sections.h        |    6 +-
+>  arch/arm/include/asm/stage2_pgtable.h  |   75 --
+>  arch/arm/include/asm/virt.h            |   12 -
+>  arch/arm/include/uapi/asm/kvm.h        |  314 -----
+>  arch/arm/kernel/asm-offsets.c          |   11 -
+>  arch/arm/kernel/vmlinux-xip.lds.S      |    8 -
+>  arch/arm/kernel/vmlinux.lds.S          |    8 -
+>  arch/arm/kernel/vmlinux.lds.h          |   10 -
+>  arch/arm/kvm/Kconfig                   |   59 -
+>  arch/arm/kvm/Makefile                  |   43 -
+>  arch/arm/kvm/coproc.c                  | 1455 ------------------------
+>  arch/arm/kvm/coproc.h                  |  130 ---
+>  arch/arm/kvm/coproc_a15.c              |   39 -
+>  arch/arm/kvm/coproc_a7.c               |   42 -
+>  arch/arm/kvm/emulate.c                 |  166 ---
+>  arch/arm/kvm/guest.c                   |  387 -------
+>  arch/arm/kvm/handle_exit.c             |  175 ---
+>  arch/arm/kvm/hyp/Makefile              |   34 -
+>  arch/arm/kvm/hyp/banked-sr.c           |   70 --
+>  arch/arm/kvm/hyp/cp15-sr.c             |   72 --
+>  arch/arm/kvm/hyp/entry.S               |  121 --
+>  arch/arm/kvm/hyp/hyp-entry.S           |  295 -----
+>  arch/arm/kvm/hyp/s2-setup.c            |   22 -
+>  arch/arm/kvm/hyp/switch.c              |  242 ----
+>  arch/arm/kvm/hyp/tlb.c                 |   68 --
+>  arch/arm/kvm/hyp/vfp.S                 |   57 -
+>  arch/arm/kvm/init.S                    |  157 ---
+>  arch/arm/kvm/interrupts.S              |   36 -
+>  arch/arm/kvm/irq.h                     |   16 -
+>  arch/arm/kvm/reset.c                   |   86 --
+>  arch/arm/kvm/trace.h                   |   86 --
+>  arch/arm/kvm/vgic-v3-coproc.c          |   27 -
+>  arch/arm/mach-exynos/Kconfig           |    2 +-
+>  arch/arm/mm/mmu.c                      |   26 -
+>  49 files changed, 7 insertions(+), 6262 deletions(-)
+>  delete mode 100644 arch/arm/include/asm/kvm_arm.h
+>  delete mode 100644 arch/arm/include/asm/kvm_asm.h
+>  delete mode 100644 arch/arm/include/asm/kvm_coproc.h
+>  delete mode 100644 arch/arm/include/asm/kvm_emulate.h
+>  delete mode 100644 arch/arm/include/asm/kvm_host.h
+>  delete mode 100644 arch/arm/include/asm/kvm_hyp.h
+>  delete mode 100644 arch/arm/include/asm/kvm_mmu.h
+>  delete mode 100644 arch/arm/include/asm/kvm_ras.h
+>  delete mode 100644 arch/arm/include/asm/stage2_pgtable.h
+>  delete mode 100644 arch/arm/include/uapi/asm/kvm.h
+>  delete mode 100644 arch/arm/kvm/Kconfig
+>  delete mode 100644 arch/arm/kvm/Makefile
+>  delete mode 100644 arch/arm/kvm/coproc.c
+>  delete mode 100644 arch/arm/kvm/coproc.h
+>  delete mode 100644 arch/arm/kvm/coproc_a15.c
+>  delete mode 100644 arch/arm/kvm/coproc_a7.c
+>  delete mode 100644 arch/arm/kvm/emulate.c
+>  delete mode 100644 arch/arm/kvm/guest.c
+>  delete mode 100644 arch/arm/kvm/handle_exit.c
+>  delete mode 100644 arch/arm/kvm/hyp/Makefile
+>  delete mode 100644 arch/arm/kvm/hyp/banked-sr.c
+>  delete mode 100644 arch/arm/kvm/hyp/cp15-sr.c
+>  delete mode 100644 arch/arm/kvm/hyp/entry.S
+>  delete mode 100644 arch/arm/kvm/hyp/hyp-entry.S
+>  delete mode 100644 arch/arm/kvm/hyp/s2-setup.c
+>  delete mode 100644 arch/arm/kvm/hyp/switch.c
+>  delete mode 100644 arch/arm/kvm/hyp/tlb.c
+>  delete mode 100644 arch/arm/kvm/hyp/vfp.S
+>  delete mode 100644 arch/arm/kvm/init.S
+>  delete mode 100644 arch/arm/kvm/interrupts.S
+>  delete mode 100644 arch/arm/kvm/irq.h
+>  delete mode 100644 arch/arm/kvm/reset.c
+>  delete mode 100644 arch/arm/kvm/trace.h
+>  delete mode 100644 arch/arm/kvm/vgic-v3-coproc.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
