@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2A9C11D12
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Feb 2020 16:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BC8C11D0C
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Feb 2020 16:59:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A26FA208E4
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Feb 2020 16:59:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A26FA208E4
+	by mail.kernel.org (Postfix) with ESMTP id D5A5220722
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Feb 2020 16:59:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A5220722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A3564AF4A;
-	Thu, 20 Feb 2020 11:59:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F14E4AF39;
+	Thu, 20 Feb 2020 11:59:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id A+EgVPtWdUYJ; Thu, 20 Feb 2020 11:59:08 -0500 (EST)
+	with ESMTP id lUrZcC2I9YZz; Thu, 20 Feb 2020 11:59:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2076D4AF83;
-	Thu, 20 Feb 2020 11:59:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A0464AF8C;
+	Thu, 20 Feb 2020 11:59:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BFD4AF4A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Feb 2020 11:59:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E774AF4A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Feb 2020 11:59:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MjJzszuyzCvP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Feb 2020 11:59:05 -0500 (EST)
+ with ESMTP id dh0w8BEgC4Yd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Feb 2020 11:59:07 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 981FB4AEAF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Feb 2020 11:59:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97F5F4AF70
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Feb 2020 11:59:07 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 48BA4328;
- Thu, 20 Feb 2020 08:59:05 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54FCF31B;
+ Thu, 20 Feb 2020 08:59:07 -0800 (PST)
 Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE1153F68F;
- Thu, 20 Feb 2020 08:59:03 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05B783F68F;
+ Thu, 20 Feb 2020 08:59:05 -0800 (PST)
 From: James Morse <james.morse@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/3] KVM: arm64: define our own swab32() to avoid a uapi
- static inline
-Date: Thu, 20 Feb 2020 16:58:38 +0000
-Message-Id: <20200220165839.256881-3-james.morse@arm.com>
+Subject: [PATCH 3/3] arm64: Ask the compiler to __always_inline functions used
+ by KVM at HYP
+Date: Thu, 20 Feb 2020 16:58:39 +0000
+Message-Id: <20200220165839.256881-4-james.morse@arm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200220165839.256881-1-james.morse@arm.com>
 References: <20200220165839.256881-1-james.morse@arm.com>
@@ -71,63 +71,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM uses swab32() when mediating GIC MMIO accesses if the GICV is badly
-aligned, and the host and guest differ in endianness.
+KVM uses some of the static-inline helpers like icache_is_vipt() from
+its HYP code. This assumes the function is inlined so that the code is
+mapped to EL2. The compiler may decide not to inline these, and the
+out-of-line version may not be in the __hyp_text section.
 
-arm64 doesn't provide a __arch_swab32(), so __fswab32() is always backed
-by the macro implementation that the compiler reduces to a single
-instruction. But the static-inline causes problems for KVM if the compiler
-chooses not to inline this function, it may not be located in the
-__hyp_text where __vgic_v2_perform_cpuif_access() needs it.
-
-Create our own __kvm_swab32() macro that calls ___constant_swab32()
-directly. This way we know it will always be inlined.
+Add the additional __always_ hint to these static-inlines that are used
+by KVM.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h         | 7 +++++++
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 4 ++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/cache.h      | 2 +-
+ arch/arm64/include/asm/cacheflush.h | 2 +-
+ arch/arm64/include/asm/cpufeature.h | 8 ++++----
+ arch/arm64/include/asm/io.h         | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index a3a6a2ba9a63..fe57f60f06a8 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -47,6 +47,13 @@
- #define read_sysreg_el2(r)	read_sysreg_elx(r, _EL2, _EL1)
- #define write_sysreg_el2(v,r)	write_sysreg_elx(v, r, _EL2, _EL1)
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index 806e9dc2a852..a4d1b5f771f6 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -69,7 +69,7 @@ static inline int icache_is_aliasing(void)
+ 	return test_bit(ICACHEF_ALIASING, &__icache_flags);
+ }
  
-+/*
-+ * Without an __arch_swab32(), we fall back to ___constant_swab32(), but the
-+ * static inline can allow the compiler to out-of-line this. KVM always wants
-+ * the macro version as its always inlined.
-+ */
-+#define __kvm_swab32(x)	___constant_swab32(x)
-+
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+-static inline int icache_is_vpipt(void)
++static __always_inline int icache_is_vpipt(void)
+ {
+ 	return test_bit(ICACHEF_VPIPT, &__icache_flags);
+ }
+diff --git a/arch/arm64/include/asm/cacheflush.h b/arch/arm64/include/asm/cacheflush.h
+index 665c78e0665a..e6cca3d4acf7 100644
+--- a/arch/arm64/include/asm/cacheflush.h
++++ b/arch/arm64/include/asm/cacheflush.h
+@@ -145,7 +145,7 @@ extern void copy_to_user_page(struct vm_area_struct *, struct page *,
+ #define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE 1
+ extern void flush_dcache_page(struct page *);
  
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 29ee1feba4eb..4f3a087e36d5 100644
---- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -69,14 +69,14 @@ int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 		u32 data = vcpu_get_reg(vcpu, rd);
- 		if (__is_be(vcpu)) {
- 			/* guest pre-swabbed data, undo this for writel() */
--			data = swab32(data);
-+			data = __kvm_swab32(data);
- 		}
- 		writel_relaxed(data, addr);
- 	} else {
- 		u32 data = readl_relaxed(addr);
- 		if (__is_be(vcpu)) {
- 			/* guest expects swabbed data */
--			data = swab32(data);
-+			data = __kvm_swab32(data);
- 		}
- 		vcpu_set_reg(vcpu, rd, data);
- 	}
+-static inline void __flush_icache_all(void)
++static __always_inline void __flush_icache_all(void)
+ {
+ 	if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+ 		return;
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 42ce41eef274..2a746b99e937 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -435,13 +435,13 @@ cpuid_feature_extract_signed_field(u64 features, int field)
+ 	return cpuid_feature_extract_signed_field_width(features, field, 4);
+ }
+ 
+-static inline unsigned int __attribute_const__
++static __always_inline unsigned int __attribute_const__
+ cpuid_feature_extract_unsigned_field_width(u64 features, int field, int width)
+ {
+ 	return (u64)(features << (64 - width - field)) >> (64 - width);
+ }
+ 
+-static inline unsigned int __attribute_const__
++static __always_inline unsigned int __attribute_const__
+ cpuid_feature_extract_unsigned_field(u64 features, int field)
+ {
+ 	return cpuid_feature_extract_unsigned_field_width(features, field, 4);
+@@ -564,7 +564,7 @@ static inline bool system_supports_mixed_endian(void)
+ 	return val == 0x1;
+ }
+ 
+-static inline bool system_supports_fpsimd(void)
++static __always_inline bool system_supports_fpsimd(void)
+ {
+ 	return !cpus_have_const_cap(ARM64_HAS_NO_FPSIMD);
+ }
+@@ -575,7 +575,7 @@ static inline bool system_uses_ttbr0_pan(void)
+ 		!cpus_have_const_cap(ARM64_HAS_PAN);
+ }
+ 
+-static inline bool system_supports_sve(void)
++static __always_inline bool system_supports_sve(void)
+ {
+ 	return IS_ENABLED(CONFIG_ARM64_SVE) &&
+ 		cpus_have_const_cap(ARM64_SVE);
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 4e531f57147d..6facd1308e7c 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -34,7 +34,7 @@ static inline void __raw_writew(u16 val, volatile void __iomem *addr)
+ }
+ 
+ #define __raw_writel __raw_writel
+-static inline void __raw_writel(u32 val, volatile void __iomem *addr)
++static __always_inline void __raw_writel(u32 val, volatile void __iomem *addr)
+ {
+ 	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
+ }
+@@ -69,7 +69,7 @@ static inline u16 __raw_readw(const volatile void __iomem *addr)
+ }
+ 
+ #define __raw_readl __raw_readl
+-static inline u32 __raw_readl(const volatile void __iomem *addr)
++static __always_inline u32 __raw_readl(const volatile void __iomem *addr)
+ {
+ 	u32 val;
+ 	asm volatile(ALTERNATIVE("ldr %w0, [%1]",
 -- 
 2.24.1
 
