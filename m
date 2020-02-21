@@ -6,92 +6,91 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD05C35646
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Feb 2020 17:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E67C35646
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Feb 2020 17:48:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DEFD824650
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Feb 2020 17:43:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63244206E2
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Feb 2020 17:48:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CwEu5SNq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEFD824650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IAFhURPx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63244206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3134AECE;
-	Fri, 21 Feb 2020 12:43:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7AFA4AEE0;
+	Fri, 21 Feb 2020 12:48:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KdF4gK1SP0d1; Fri, 21 Feb 2020 12:43:42 -0500 (EST)
+	with ESMTP id MdQztTvcMJm3; Fri, 21 Feb 2020 12:48:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28E9C4AECF;
-	Fri, 21 Feb 2020 12:43:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE7AD4AED6;
+	Fri, 21 Feb 2020 12:48:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B4854AECA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 12:43:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 996C44AED4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 12:48:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SY8JSDapGu3i for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Feb 2020 12:43:40 -0500 (EST)
+ with ESMTP id QcM8xExrGWdp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Feb 2020 12:48:04 -0500 (EST)
 Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
  [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C8F04AEA3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 12:43:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BBA944AECF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 12:48:04 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582307020;
+ s=mimecast20190719; t=1582307284;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DRklp/EGbzKFbnLcWYfCTJYwspK96XjQokoDYirC2jo=;
- b=CwEu5SNqPbnkKVYFS1f81c12pLL0xamgYlmINLUdYLySmeTvlbmyI5TffrgHlVYMlz86Ag
- VCE9AE813HFBsv2MJwvjjPBVf9huudGTtteQe12aNVhkl98tXK6RsRMmJN064X0AA6a5Lr
- 2a5YU0XoiWgLa0XlDHjaJ7RXQSDu5Ww=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-TwHHgCXwMUeDxns0z9TpmQ-1; Fri, 21 Feb 2020 12:43:38 -0500
-X-MC-Unique: TwHHgCXwMUeDxns0z9TpmQ-1
-Received: by mail-wr1-f71.google.com with SMTP id n23so1319725wra.20
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 09:43:38 -0800 (PST)
+ bh=RrMvZJoVJBWqnzqNr9KyLlzqZ46CEJlOdAIqg//g6XU=;
+ b=IAFhURPxVTpM8k7fij5Loh0n4UD1VEj9uLkcRld2TW6q03gaVe+x6zO2ysGSOSVLIMyGN9
+ 9akeOMcgv6Y19p27zyb2wil7NBmGibnpYTdZRFOsjblXmkJ1FJMwI5iMzK4aTM4+NnkklZ
+ L5lGGVYNwZuXNhVVwzcmwnKRHn1gdu8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-4eMg5SRBOoeLC5LMhGQfNg-1; Fri, 21 Feb 2020 12:47:56 -0500
+X-MC-Unique: 4eMg5SRBOoeLC5LMhGQfNg-1
+Received: by mail-wr1-f70.google.com with SMTP id 90so1339725wrq.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Feb 2020 09:47:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DRklp/EGbzKFbnLcWYfCTJYwspK96XjQokoDYirC2jo=;
- b=D8SCeIwybPlMGZSafgCa2w+No/TyoMycjNy1f5BKJbZH0x13N6oUV1fXd4NiyP6GJL
- 7xbNdRfYXOxxIpUFLogGZcf5MU44++NeM17Kan21Of8xdQz51EPGgg86IZd4JIp2WByE
- lP8eItk1JEgLrdmzqG//4foEE4TGw99Q0WIMytUbVboMzxIaRxNG2pGpFbCQ3hgT2nTm
- eEuJobEIWcE7Qe+EnYbxCw0JiwhMxJOvVbfIJWZPLV4JvJtiL9hbqYezqqa+Pv1izDCi
- hMTYqUewEEQWOY4sBfJJ9LD0ee1F9OnRf86omjvoHClLKCQMD7mqbQ7ii5tHK0vi0Qm5
- rycQ==
-X-Gm-Message-State: APjAAAXTFUQU7i+3QJBOirQqBK5JlIZMYK0E0Azql80IlaY/5cA+USoy
- jQTqf3oWL5/wYamDy5rqPeOs/QNvNy05fBJGTz18KUNO2/4DCarsiZMAdlf0JYsyfmKTAZ02avy
- WZO+3cIBji9uolEibMv0psvIW
-X-Received: by 2002:a5d:4289:: with SMTP id k9mr51197005wrq.280.1582307017033; 
- Fri, 21 Feb 2020 09:43:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx2hj716qxeeRUnhWk7oLWJU5fIlTs2+zZOl+uuyj1LRQkzfullhSLke4OG8g9MBweopRblWg==
-X-Received: by 2002:a5d:4289:: with SMTP id k9mr51196974wrq.280.1582307016828; 
- Fri, 21 Feb 2020 09:43:36 -0800 (PST)
+ bh=RrMvZJoVJBWqnzqNr9KyLlzqZ46CEJlOdAIqg//g6XU=;
+ b=SLXXvEXWyBuumPpEuACT2uS+oCITKgozFW5jNCobtYwqxDfMg2UCw2xVlPIZvu5EHH
+ C4HrN3EWEN5Qropbd1EQQTzGLqDkRJvPUIwuGutyQqXsfKO+ONZKnvJ/C+kmrCxf8sDB
+ xqNJvvNIslPxOAhGGuUTolfwHwN9EZgnzaEO5V490P31MVTXT/Y4628sFpqWQ/MeJeul
+ y641oN3z5jxkiy7pwFtLyCDpHf6pFTx808inF9IR2BECm+zyvWp5pGKZBfkEvH7hIxd3
+ VmmbjVP5VqyIbNIplsuajFK2DiWb/tMQ9S434YhFBUB8CTsrwLIWZq4UDM/HGMtLsfk1
+ Hrww==
+X-Gm-Message-State: APjAAAXoJ80mAfeJcpt3pfwZJJ1vvUfI2joOlbFYh8VppATwiI5xE9xu
+ taG2JrYWEWYZgx/PXRqzops7yMqvE1rqhR6bVY/P5Jmv3YG8BUKQLSSHflF8T7OEHvWJM/orXRw
+ N0BAS/TzzUTOS32lJCYmUkmNa
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr49225912wrm.349.1582307275646; 
+ Fri, 21 Feb 2020 09:47:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzI29TQnMTxhegOPTR5SZPy7HDTeZP8mdmwqeW3b3wvRv6t/VcN7GX1ZnOVCmuZ9M9Iv9A8Vg==
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr49225876wrm.349.1582307275388; 
+ Fri, 21 Feb 2020 09:47:55 -0800 (PST)
 Received: from [192.168.178.40] ([151.20.135.128])
- by smtp.gmail.com with ESMTPSA id l131sm4908318wmf.31.2020.02.21.09.43.35
+ by smtp.gmail.com with ESMTPSA id x6sm4531952wmi.44.2020.02.21.09.47.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Feb 2020 09:43:36 -0800 (PST)
-Subject: Re: [PATCH v6 14/22] KVM: Clean up local variable usage in
- __kvm_set_memory_region()
+ Fri, 21 Feb 2020 09:47:54 -0800 (PST)
+Subject: Re: [PATCH v6 17/22] KVM: Terminate memslot walks via used_slots
 To: Sean Christopherson <sean.j.christopherson@intel.com>
 References: <20200218210736.16432-1-sean.j.christopherson@intel.com>
- <20200218210736.16432-15-sean.j.christopherson@intel.com>
+ <20200218210736.16432-18-sean.j.christopherson@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1467b8cd-3631-b5da-b285-dbdf31b75af7@redhat.com>
-Date: Fri, 21 Feb 2020 18:43:34 +0100
+Message-ID: <216d647a-e598-d5d6-e20f-9c44c9ca157f@redhat.com>
+Date: Fri, 21 Feb 2020 18:47:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200218210736.16432-15-sean.j.christopherson@intel.com>
+In-Reply-To: <20200218210736.16432-18-sean.j.christopherson@intel.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -121,19 +120,19 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 18/02/20 22:07, Sean Christopherson wrote:
-> -sorted by update_memslots(), and the old
->  	 * memslot needs to be referenced after calling update_memslots(), e.g.
-> -	 * to free its resources and for arch specific behavior.
-> +	 * to free its resources and for arch specific behavior.  Kill @tmp
-> +	 * after making a copy to deter potentially dangerous usage.
->  	 */
-> -	old = *slot;
-> +	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
-> +	old = *tmp;
-> +	tmp = NULL;
-> +
+>  	tmp = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+> -	old = *tmp;
+> -	tmp = NULL;
+> +	if (tmp) {
+> +		old = *tmp;
+> +		tmp = NULL;
+> +	} else {
+> +		memset(&old, 0, sizeof(old));
+> +		old.id = id;
+> +	}
+>  
 
-Also: old = *id_to_memslot(...).
+So much for my previous brilliant suggestion. :)
 
 Paolo
 
