@@ -2,84 +2,132 @@ Return-Path: <SRS0=MUVm=4M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F6DC35DEB
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF086C35DEA
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:51:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 02CAB2176D
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44D732080D
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:51:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4bdpUEo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02CAB2176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cern.onmicrosoft.com header.i=@cern.onmicrosoft.com header.b="treHLM/w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D732080D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cern.ch
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B484B0C0;
-	Mon, 24 Feb 2020 18:47:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A64B04B040;
+	Mon, 24 Feb 2020 18:51:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@cern.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id josZqCHmMDWS; Mon, 24 Feb 2020 18:47:47 -0500 (EST)
+	with ESMTP id yt0jcULnqHGi; Mon, 24 Feb 2020 18:51:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B905E4B0C3;
-	Mon, 24 Feb 2020 18:47:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76D7E4B0A9;
+	Mon, 24 Feb 2020 18:51:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 039174B0BF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 18:47:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17BD44AF95
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 04:26:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id le6NhLo5KQCe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Feb 2020 18:47:46 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E04904B0BC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 18:47:45 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B20512176D;
- Mon, 24 Feb 2020 23:47:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1582588064;
- bh=/n/ld7pGO6VfKm6KFJGv3owq/0ZZ5rbRhDEektoQtMg=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=d4bdpUEoxsXsiOQwhLaGxmXFFebooW84w5sMWUW8znmIGzDsOaI88EsxYF44NM13U
- q7OEU/H1tCMzwPy7WHbjkKF1Qd9nlG2XUYTqep75eN7KMri4pkcx2TKryMrmQs31ER
- mh42sauNuo7wznRqeE2QFiVMxWc5c55Qr50pxu9s=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j6NRu-007gKg-QY; Mon, 24 Feb 2020 23:47:42 +0000
+ with ESMTP id oRcJxf63oRlw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Feb 2020 04:26:44 -0500 (EST)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com
+ (mail-vi1eur05on2076.outbound.protection.outlook.com [40.107.21.76])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 053784AF8C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 04:26:43 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eLhB7iH5YDJQd/UPqkLrfmxKIxhuOEeRo6o8Gcea5ND0iEi6k7xi2hbTiBGcZD6y9L8ZIeZ7GxgbKqzuCARa7/dxorkh2FV0tXrKJ8Ra3ueH2QOrhQR2BVB9ND61nTS6hiqe52Hw857jN0gmuASJvbtl52mlJGUcpB2VhpnKZ3Dqw7UEFFnx46aiueqYaDFc9MbpOdSY7X8GibnhUFK14SWvLTiaNrgW0TRlPxoyU6EH2PvLqam6QUHSR+kw1fqJbcKG+OWGwxp35cemaWPZDxuu4U7JyGfSybZXsBGdp7BbXCLhaHHQ+/HKYILfLsUnsj5/tYpZ96zDQo9S5zqmXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tmGwAKElI2u+A0z/EETBIou5ic5kIe13D9NL0wb7U2M=;
+ b=CGZrT9/zeWLslICwnV47CvnyCi4tEwQUvjqq4frvluTbtOh5IsXbUWZuRHjfuSArjnFQ7V8qGqVtI2g+xSErDkkqpOSMvLUpueUfM/Y9a9cvMUxhhRbsXuIIRghZMWr0aoiTyBh0F+ZkCM8+Y3hBx6wkGKIKjlk/4z7TKSRnyf7C+/w9hY+f31izRZKM57PBovCQDJhle01mAgeJWMacphqeZc477gRYs6vLNoJsWtMM5xovPP/PM0OZc9LqnyZrXo8PTjlcKfMmfh2jHrdSdSA+MTMjrhYqLuJajloIZjDMLL7d3s9hytgzdiyLTjnyRxL1AizGgpggJZlBlsKWag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 188.184.36.50) smtp.rcpttodomain=kernel.org smtp.mailfrom=cern.ch;
+ dmarc=bestguesspass action=none header.from=cern.ch; dkim=none (message not
+ signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cern.onmicrosoft.com; 
+ s=selector2-cern-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tmGwAKElI2u+A0z/EETBIou5ic5kIe13D9NL0wb7U2M=;
+ b=treHLM/wuTE3F8KbK3ygj/ORGGmbE9HBEQqYgWyAmRwvSPW5jnP+JZ60wkplYx3/8FOYO8MRW3svCyvPlLsPYQKPlKNIaLUHO55uV6xCD9MQs9BFPL7WD+jRjhSKWoD25d/Kj3n/1EbzSGqtTHjsNsdj0qDL4wKrkQGEOj305CA=
+Received: from AM0PR06CA0026.eurprd06.prod.outlook.com (2603:10a6:208:ab::39)
+ by HE1PR0601MB2617.eurprd06.prod.outlook.com (2603:10a6:3:4c::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.22; Mon, 24 Feb
+ 2020 09:26:42 +0000
+Received: from VE1EUR02FT030.eop-EUR02.prod.protection.outlook.com
+ (2a01:111:f400:7e06::205) by AM0PR06CA0026.outlook.office365.com
+ (2603:10a6:208:ab::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend
+ Transport; Mon, 24 Feb 2020 09:26:42 +0000
+Authentication-Results: spf=pass (sender IP is 188.184.36.50)
+ smtp.mailfrom=cern.ch; kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=bestguesspass action=none
+ header.from=cern.ch;
+Received-SPF: Pass (protection.outlook.com: domain of cern.ch designates
+ 188.184.36.50 as permitted sender) receiver=protection.outlook.com;
+ client-ip=188.184.36.50; helo=cernmxgwlb4.cern.ch;
+Received: from cernmxgwlb4.cern.ch (188.184.36.50) by
+ VE1EUR02FT030.mail.protection.outlook.com (10.152.12.127) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2750.18 via Frontend Transport; Mon, 24 Feb 2020 09:26:41 +0000
+Received: from cernfe04.cern.ch (188.184.36.41) by cernmxgwlb4.cern.ch
+ (188.184.36.50) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 24 Feb
+ 2020 10:26:40 +0100
+Received: from pcbe13614.localnet (2001:1458:202:121::100:40) by smtp.cern.ch
+ (2001:1458:201:66::100:14) with Microsoft SMTP Server (TLS) id
+ 14.3.487.0; Mon, 24 Feb 2020 10:26:38 +0100
+From: Federico Vaga <federico.vaga@cern.ch>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: Re: [PATCH 3/7] docs: fix broken references to text files
+Date: Mon, 24 Feb 2020 10:26:39 +0100
+Message-ID: <3929512.qvrp2sLpzG@pcbe13614>
+In-Reply-To: <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
+References: <cover.1582361737.git.mchehab+huawei@kernel.org>
+ <5cfeed6df208b74913312a1c97235ee615180f91.1582361737.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Date: Mon, 24 Feb 2020 23:47:42 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] irqchip/gic-v3-its: Clear Valid before writing any bits
- else in VPENDBASER
-In-Reply-To: <20200224025029.92-1-yuzenghui@huawei.com>
-References: <20200224025029.92-1-yuzenghui@huawei.com>
-Message-ID: <bb7cdb29eda9cf160bcf85a58a9fc63d@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- wanghaibin.wang@huawei.com, jiayanlei@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Yanlei Jia <jiayanlei@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-Originating-IP: [2001:1458:202:121::100:40]
+X-EOPAttributedMessage: 0
+X-Forefront-Antispam-Report: CIP:188.184.36.50; IPV:; CTRY:CH; EFV:NLI;
+ SFV:NSPM;
+ SFS:(10009020)(376002)(39860400002)(136003)(346002)(396003)(199004)(189003)(186003)(9686003)(16526019)(33716001)(26005)(2906002)(478600001)(9576002)(426003)(8676002)(44832011)(3450700001)(336012)(246002)(53546011)(8936002)(7416002)(4326008)(86362001)(7636002)(356004)(70206006)(316002)(54906003)(70586007)(5660300002)(39026012);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:HE1PR0601MB2617; H:cernmxgwlb4.cern.ch; FPR:;
+ SPF:Pass; LANG:en; PTR:cernmx11.cern.ch; A:1; MX:1; 
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 07a24c03-738e-4624-7506-08d7b90ba88c
+X-MS-TrafficTypeDiagnostic: HE1PR0601MB2617:
+X-Microsoft-Antispam-PRVS: <HE1PR0601MB2617DD6A6BADE420AB7F4408EFEC0@HE1PR0601MB2617.eurprd06.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-Forefront-PRVS: 032334F434
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0qIX6XFVupoujn6tnMIXACZrhD5q3UXodzvYwqyh0hsK1Lsu+/pJ+LkIjl/NeexA/acueRAQl6tWpe3CFd900UWE/3Dp2zl9mkWVMfYl1qYpVkPmqLAGWnMEDEKi64JQPs3cOzEfTL3WjHbAxZ5gqNC3mLax0dvKusUdgcmqXKLya466pUHPmvk05PkmAw4VpLa35W1pVnc1avg4zQD+W+XccjzAi6cB/jeg95xVwyZEdY7wigcHbjHbZjeUw5bGbym667i307aOvjm5Vli7k+a11ZX1tZ2pjiiBWvLEYzJaJJQ2pSEH9ApQf6ZUYQ5f7TlyJmnEtMyipzP+fXgRIINxHtYghfwKLsQ7Fb2NPkqtE2mY/QN0LGNAE519BJMKJ2V6htEDDIZVXfSjSq9NkQg4un3jbv63EjF6kc6RkQ3fn2TRPhmkbiqtoHaEDIQdUEz7oStS5w1dmTB8Bw7vHuPaRBQq1lv0uJabtpvDjKCWQdNtDjiBIr3Z5wRpVLzv
+X-OriginatorOrg: cern.ch
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2020 09:26:41.7248 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07a24c03-738e-4624-7506-08d7b90ba88c
+X-MS-Exchange-CrossTenant-Id: c80d3499-4a40-4a8c-986e-abce017d6b19
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=c80d3499-4a40-4a8c-986e-abce017d6b19; Ip=[188.184.36.50];
+ Helo=[cernmxgwlb4.cern.ch]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0601MB2617
+X-Mailman-Approved-At: Mon, 24 Feb 2020 18:51:41 -0500
+Cc: linux-arch@vger.kernel.org, linux-nfs@vger.kernel.org, kvm@vger.kernel.org,
+ Jonathan Corbet <corbet@lwn.net>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ linux-unionfs@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-mm@kvack.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: federico.vaga@cern.ch
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -88,64 +136,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zenghui,
+On Saturday, February 22, 2020 10:00:03 AM CET Mauro Carvalho Chehab wrote:
+> Several references got broken due to txt to ReST conversion.
+> =
 
-On 2020-02-24 02:50, Zenghui Yu wrote:
-> The Valid bit must be cleared before changing anything else when 
-> writing
-> GICR_VPENDBASER to avoid the UNPREDICTABLE behavior. This is exactly 
-> what
-> we've done on 32bit arm, but not on arm64.
+> Several of them can be automatically fixed with:
+> =
 
-I'm not quite sure how you decide that Valid must be cleared before 
-changing
-anything else. The reason why we do it on 32bit is that we cannot update
-the full 64bit register at once, so we start by clearing Valid so that
-we can update the rest. arm64 doesn't require that.
+> 	scripts/documentation-file-ref-check --fix
+> =
 
-For the rest of discussion, let's ignore GICv4.1 32bit support (I'm
-pretty sure nobody cares about that).
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
 
-> This works fine on GICv4 where we only clear Valid for a vPE 
-> deschedule.
-> With the introduction of GICv4.1, we might also need to talk something 
-> else
-> (e.g., PendingLast, Doorbell) to the redistributor when clearing the 
-> Valid.
-> Let's port the 32bit gicr_write_vpendbaser() to arm64 so that hardware 
-> can
-> do the right thing after descheduling the vPE.
 
-The spec says that:
+>  26) If any ioctl's are added by the patch, then also update
+> -    ``Documentation/ioctl/ioctl-number.rst``.
+> +    ``Documentation/userspace-api/ioctl/ioctl-number.rst``.
+> =
 
-"For a write that writes GICR_VPENDBASER.Valid from 1 to 0, if
-GICR_VPENDBASER.PendingLast is written as 1 then 
-GICR_VPENDBASER.PendingLast
-takes an UNKNOWN value and GICR_VPENDBASER.Doorbell is treated as being 
-0."
+>  27) If your modified source code depends on or uses any of the kernel
+>      APIs or features that are related to the following ``Kconfig`` symbo=
+ls,
+> diff --git a/Documentation/translations/it_IT/process/submit-checklist.rst
+> b/Documentation/translations/it_IT/process/submit-checklist.rst index
+> 995ee69fab11..3e575502690f 100644
+> --- a/Documentation/translations/it_IT/process/submit-checklist.rst
+> +++ b/Documentation/translations/it_IT/process/submit-checklist.rst
+> @@ -117,7 +117,7 @@ sottomissione delle patch, in particolare
+>      sorgenti che ne spieghi la logica: cosa fanno e perch=E9.
+> =
 
-and
+>  25) Se la patch aggiunge nuove chiamate ioctl, allora aggiornate
+> -    ``Documentation/ioctl/ioctl-number.rst``.
+> +    ``Documentation/userspace-api/ioctl/ioctl-number.rst``.
 
-"When GICR_VPENDBASER.Valid is written from 1 to 0, if there are 
-outstanding
-enabled pending interrupts GICR_VPENDBASER.Doorbell is treated as 0."
 
-which indicate that PendingLast/Doorbell have to be written at the same 
-time
-as we clear Valid. Can you point me to the bit of the v4.1 spec that 
-makes
-this "clear Valid before doing anything else" requirement explicit?
+Acked-By: Federico Vaga <federico.vaga@vaga.pv.it>
 
-Thanks,
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
