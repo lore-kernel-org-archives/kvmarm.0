@@ -2,84 +2,81 @@ Return-Path: <SRS0=MUVm=4M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84B3C35671
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 13:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F6DC35DEB
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:47:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 62D432072D
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 13:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02CAB2176D
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Feb 2020 23:47:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKnBAFyI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62D432072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4bdpUEo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02CAB2176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4E14B008;
-	Mon, 24 Feb 2020 08:22:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B484B0C0;
+	Mon, 24 Feb 2020 18:47:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d+NErSpsN7po; Mon, 24 Feb 2020 08:22:13 -0500 (EST)
+	with ESMTP id josZqCHmMDWS; Mon, 24 Feb 2020 18:47:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2904AFF8;
-	Mon, 24 Feb 2020 08:22:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B905E4B0C3;
+	Mon, 24 Feb 2020 18:47:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 860324AFC0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 08:22:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 039174B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 18:47:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BB981jD+vQza for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Feb 2020 08:22:11 -0500 (EST)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DDEB4AF9A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 08:22:11 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582550531;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AQSjOCN08tuHWwFl/AFZaF1M6yIcbXibQI3Uq0KWdfM=;
- b=VKnBAFyIRCtNeajpZXCSPoyK1odu8kmGYYF8Z/8SIYQXhQktsmmgPpWiDKDEZaR4HEbxJ4
- ItT4k7nKHQeRQ3nS6T/lZKwvN4Ehu+ap8mnVJcG8dTPFOuwFY3Oma0MFyy3fmcFHMxsHAT
- 6CjU/ZvXPZX+MdhWPf+LDRZ21ONZ0qs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-vny8QQvLOrO2Y37m0onvfA-1; Mon, 24 Feb 2020 08:22:07 -0500
-X-MC-Unique: vny8QQvLOrO2Y37m0onvfA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id le6NhLo5KQCe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Feb 2020 18:47:46 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E04904B0BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Feb 2020 18:47:45 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2DDC1005F6C;
- Mon, 24 Feb 2020 13:22:04 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 21E4C5C554;
- Mon, 24 Feb 2020 13:22:02 +0000 (UTC)
-Date: Mon, 24 Feb 2020 14:22:00 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 0/3] KVM: arm64: Ask the compiler to __always_inline
- functions used by KVM at HYP
-Message-ID: <20200224132200.ho7hgmnah2zfh27x@kamzik.brq.redhat.com>
-References: <20200220165839.256881-1-james.morse@arm.com>
- <cb56f509ea0a4a9e1809af76f319daa2@kernel.org>
+ by mail.kernel.org (Postfix) with ESMTPSA id B20512176D;
+ Mon, 24 Feb 2020 23:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582588064;
+ bh=/n/ld7pGO6VfKm6KFJGv3owq/0ZZ5rbRhDEektoQtMg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=d4bdpUEoxsXsiOQwhLaGxmXFFebooW84w5sMWUW8znmIGzDsOaI88EsxYF44NM13U
+ q7OEU/H1tCMzwPy7WHbjkKF1Qd9nlG2XUYTqep75eN7KMri4pkcx2TKryMrmQs31ER
+ mh42sauNuo7wznRqeE2QFiVMxWc5c55Qr50pxu9s=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j6NRu-007gKg-QY; Mon, 24 Feb 2020 23:47:42 +0000
 MIME-Version: 1.0
-In-Reply-To: <cb56f509ea0a4a9e1809af76f319daa2@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Sami Tolvanen <samitolvanen@google.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Mon, 24 Feb 2020 23:47:42 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] irqchip/gic-v3-its: Clear Valid before writing any bits
+ else in VPENDBASER
+In-Reply-To: <20200224025029.92-1-yuzenghui@huawei.com>
+References: <20200224025029.92-1-yuzenghui@huawei.com>
+Message-ID: <bb7cdb29eda9cf160bcf85a58a9fc63d@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ wanghaibin.wang@huawei.com, jiayanlei@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Yanlei Jia <jiayanlei@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,66 +88,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Feb 21, 2020 at 12:55:16PM +0000, Marc Zyngier wrote:
-> Hi James,
-> 
-> On 2020-02-20 16:58, James Morse wrote:
-> > Hello!
-> > 
-> > It turns out KVM relies on the inline hint being honoured by the
-> > compiler
-> > in quite a few more places than expected. Something about the Shadow
-> > Call
-> > Stack support[0] causes the compiler to avoid inline-ing and to place
-> > these functions outside the __hyp_text. This ruins KVM's day.
-> > 
-> > Add the simon-says __always_inline annotation to all the static
-> > inlines that KVM calls from HYP code.
-> > 
-> > This series based on v5.6-rc2.
-> 
-> Many thanks for going through all this.
-> 
-> I'm happy to take it if Catalin or Will ack the arm64 patches.
-> It case we decide to go the other way around:
-> 
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> 
-> One thing I'd like to look into though is a compile-time check that
-> nothing in the hyp_text section has a reference to a non-hyp_text
-> symbol.
-> 
-> We already have checks around non-init symbols pointing to init symbols,
-> and I was wondering if we could reuse this for fun and profit...
+Hi Zenghui,
 
-Hi Marc,
+On 2020-02-24 02:50, Zenghui Yu wrote:
+> The Valid bit must be cleared before changing anything else when 
+> writing
+> GICR_VPENDBASER to avoid the UNPREDICTABLE behavior. This is exactly 
+> what
+> we've done on 32bit arm, but not on arm64.
 
-I recall that you've suggested that before, and I even tried it around
-that time [*]. I wasn't happy enough with it to post a proper patch
-though.
+I'm not quite sure how you decide that Valid must be cleared before 
+changing
+anything else. The reason why we do it on 32bit is that we cannot update
+the full 64bit register at once, so we start by clearing Valid so that
+we can update the rest. arm64 doesn't require that.
 
-[*] https://lists.cs.columbia.edu/pipermail/kvmarm/2018-May/031629.html
+For the rest of discussion, let's ignore GICv4.1 32bit support (I'm
+pretty sure nobody cares about that).
+
+> This works fine on GICv4 where we only clear Valid for a vPE 
+> deschedule.
+> With the introduction of GICv4.1, we might also need to talk something 
+> else
+> (e.g., PendingLast, Doorbell) to the redistributor when clearing the 
+> Valid.
+> Let's port the 32bit gicr_write_vpendbaser() to arm64 so that hardware 
+> can
+> do the right thing after descheduling the vPE.
+
+The spec says that:
+
+"For a write that writes GICR_VPENDBASER.Valid from 1 to 0, if
+GICR_VPENDBASER.PendingLast is written as 1 then 
+GICR_VPENDBASER.PendingLast
+takes an UNKNOWN value and GICR_VPENDBASER.Doorbell is treated as being 
+0."
+
+and
+
+"When GICR_VPENDBASER.Valid is written from 1 to 0, if there are 
+outstanding
+enabled pending interrupts GICR_VPENDBASER.Doorbell is treated as 0."
+
+which indicate that PendingLast/Doorbell have to be written at the same 
+time
+as we clear Valid. Can you point me to the bit of the v4.1 spec that 
+makes
+this "clear Valid before doing anything else" requirement explicit?
 
 Thanks,
-drew
 
-> 
-> Thanks,
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
