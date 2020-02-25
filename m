@@ -2,95 +2,80 @@ Return-Path: <SRS0=K0wf=4N=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0880DC35E15
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Feb 2020 21:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD029C4BA09
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Feb 2020 23:52:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 76C4320675
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Feb 2020 21:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A46524656
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Feb 2020 23:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yoshi.email header.i=@yoshi.email header.b="YHrpnCxN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76C4320675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=yoshi.email
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjnL35vs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A46524656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D34174AF83;
-	Tue, 25 Feb 2020 16:40:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4BF24AFC0;
+	Tue, 25 Feb 2020 18:52:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@yoshi.email
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J5zQjHhDHsMB; Tue, 25 Feb 2020 16:40:52 -0500 (EST)
+	with ESMTP id PnpvtS2mWudC; Tue, 25 Feb 2020 18:52:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 700084AF91;
-	Tue, 25 Feb 2020 16:40:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 411994AFBB;
+	Tue, 25 Feb 2020 18:52:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD3884AFB3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Feb 2020 16:34:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21E134AFC0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Feb 2020 18:52:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F86tTMJHuYVb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Feb 2020 16:34:18 -0500 (EST)
-Received: from mail-gateway-shared10.cyon.net (mail-gateway-shared10.cyon.net
- [194.126.200.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E142F4AF9F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Feb 2020 16:34:17 -0500 (EST)
-Received: from s054.cyon.net ([149.126.4.63])
- by mail-gateway-shared10.cyon.net with esmtpsa
- (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256) (Exim)
- (envelope-from <takashi@yoshi.email>) id 1j6hqG-0005uW-UR
- for kvmarm@lists.cs.columbia.edu; Tue, 25 Feb 2020 22:34:16 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=yoshi.email
- ; s=default;
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:References
- :In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=bd08lAU9EPaR2C3HgVOGxelz02fzgVEw+80l6RjKaag=; b=YHrpnCxN9rxURR9v9fTQTSMsEl
- NTtNQ1lq/hrBxIXNB3E6ExLidrqSFbU5nI1LnqMfvR9nCdtnEibFDgdFkvOkDpiIy8vrqnqw4Ge4L
- v00H/lhyKcMnFoiPwakSZbgahLv4+q8bZszY11pN3Tx65LQee3E/+R4F0tJzQHWE4ZUiNLs/BFwCW
- 6okJlP3e9N19Crpk00436h+wH3S6+q9mNnvLwsYQYD8BIWbPFrQe1PSfGKcTdjO7yunGyCGe9Hjvj
- ocijjbh6nlnPGsrFAatkRwYkOiDY+TNiv/Ddpz7VW7wyw8Qh2e1Fm3YGhNGHuAl6zpZ40q/nJOi2C
- yowxasLw==;
-Received: from [10.20.10.233] (port=65206 helo=mail.cyon.ch)
- by s054.cyon.net with esmtpa (Exim 4.92)
- (envelope-from <takashi@yoshi.email>)
- id 1j6hqF-00DkIe-It; Tue, 25 Feb 2020 22:34:11 +0100
-Date: Tue, 25 Feb 2020 22:34:09 +0100
-From: Takashi Yoshi <takashi@yoshi.email>
-To: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC PATCH 0/5] Removing support for 32bit KVM/arm host
-Message-ID: <20200225223409.0fef2003.takashi@yoshi.email>
-In-Reply-To: <CAK8P3a3iaDqU7RRpoL2XyempBiKN8k22rNAM7C23n8JNpPm4qw@mail.gmail.com>
-References: <20200210141324.21090-1-maz@kernel.org>
- <20200222154030.5625fa5f.takashi@yoshi.email>
- <CAK8P3a3iaDqU7RRpoL2XyempBiKN8k22rNAM7C23n8JNpPm4qw@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; armv7a-unknown-linux-gnueabihf)
+ with ESMTP id naHtcEtarmzJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Feb 2020 18:52:44 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 174784AFBB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Feb 2020 18:52:44 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C2A972176D;
+ Tue, 25 Feb 2020 23:52:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582674762;
+ bh=JAt+10w4pTyb4WokWSXrkj9e3fSa/lhHsi0hfJmHzm4=;
+ h=From:To:Cc:Subject:Date:From;
+ b=NjnL35vslyxSCJUxthm5XL7N4rxz1Bcbz4GG7ueerJlpLMMVellcTFHHVM9CYy4UF
+ FezQFKCvMqN6Gko5oGLbxDnPFk4AVuLnRq85o05SS1Kwb+fhs1poi8wIVFf5ORUAPg
+ FR36RKugApWByKPyix1o4ozVHaRYxW7iVpTBWm8I=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j6k0G-007xuY-S4; Tue, 25 Feb 2020 23:52:41 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm fixes for 5.6
+Date: Tue, 25 Feb 2020 23:52:18 +0000
+Message-Id: <20200225235223.12839-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-AntiAbuse: This header was added to track abuse,
- please include it with any abuse report
-X-AntiAbuse: Primary Hostname - s054.cyon.net
-X-AntiAbuse: Original Domain - lists.cs.columbia.edu
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - yoshi.email
-X-Get-Message-Sender-Via: s054.cyon.net: authenticated_id: takashi@yoshi.email
-X-Authenticated-Sender: s054.cyon.net: takashi@yoshi.email
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-OutGoing-Spam-Status: No, score=-1.1
-X-Mailman-Approved-At: Tue, 25 Feb 2020 16:40:51 -0500
-Cc: Anders Berg <anders.berg@lsi.com>, Russell King <linux@arm.linux.org.uk>,
- kvm list <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, jcline@redhat.com,
+ mark.rutland@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Jeremy Cline <jcline@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,180 +92,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Dear Arnd
+Paolo,
 
-Please excuse my late response.
+This is a small update containing a number of fixes, the most important ones
+making sure we force the inlining of any helper that gets used by the EL2 code
+(James identified that some bad things happen with CLang and the Shadow Call
+Stack extention).
 
-On Sat, 22 Feb 2020 22:31:40 +0100 Arnd Bergmann <arnd@arndb.de> wrote:
+Please pull,
 
-> On Sat, Feb 22, 2020 at 3:40 PM Takashi Yoshi <takashi@yoshi.email>
-> wrote:
-> > On Monday, 10.02.2020, 14:13 +0000 Marc Zyngier wrote:
-> > > KVM/arm was merged just over 7 years ago, and has lived a very
-> > > quiet life so far. It mostly works if you're prepared to deal
-> > > with its limitations, it has been a good prototype for the arm64
-> > > version, but it suffers a few problems:
-> > >
-> > > - It is incomplete (no debug support, no PMU)
-> > > - It hasn't followed any of the architectural evolutions
-> > > - It has zero users (I don't count myself here)
-> >
-> > I might not be an important user, but I have been for multiple years
-> > and still am a regular user of KVM/arm32 on different devices.
-> >
-> > I use KVM on my Tegra K1 Chromebook for app development and have
-> > multiple SBCs at home on which I run VMs on using KVM+libvirt.
-> >
-> > Sure, neither of these devices has many resources available, but
-> > they are working fine. I would love to keep them in service since I
-> > haven't found arm64-based replacements that don't require hours
-> > upon hours of tinkering to just get a basic OS installation running
-> > with a mainline kernel.
-> >
-> > As an example that they can still be of use in 2020 I'd like to
-> > point out that one of the SBCs is running my DNS resolver, LDAP
-> > server, RSS reader, IRC bouncer, and shared todo list just fine,
-> > each in their separate VM.
-> 
-> Thank you for providing an important data point to this question.
-> 
-> > > - It is more and more getting in the way of new arm64 developments
-> > >
-> > > So here it is: unless someone screams and shows that they rely on
-> > > KVM/arm to be maintained upsteam, I'll remove 32bit host support
-> > > form the tree.
-> >
-> > *scream*
-> >
-> > > One of the reasons that makes me confident nobody is
-> > > using it is that I never receive *any* bug report. Yes, it is
-> > > perfect.
-> >
-> > This assumption is deeply flawed. Most users (including me) are not
-> > subscribed to this mailing list and will never find this thread at
-> > all. I myself stumbled upon this discussion just by chance while I
-> > was browsing the web trying to find something completely unrelated.
-> >
-> > I've been using KVM on x86, ppc and arm for many years, yet I never
-> > felt the need to report a bug on the mailing list.
-> > (This is to be interpreted as a compliment to the great work the
-> > devs of KVM have done!)
-> >
-> > Just going by the number of bugs reported on a developers mailing
-> > list is not going to paint an accurate picture.
-> >
-> > I am convinced that I'm not the only one relying on KVM/arm32 in the
-> > mainline kernel and would ask you to please reconsider keeping
-> > arm32 in the mainline kernel for a few more years until adequate
-> > arm64 replacements are available on the market and have gained
-> > proper support in the mainline kernel.
-> 
-> Can you provide some more information about how you use KVM on 32-bit
-> machines, to make it possible to better estimate how many others might
-> do the same,
+	M.
 
-Sure.
-First of all I own different ARM boards. Currently I virtualise on
-Banana Pi M1 (1GB), cubox-i (2GB) and my Acer Chromebook (4GB).
+The following changes since commit 4a267aa707953a9a73d1f5dc7f894dd9024a92be:
 
-The Chromebook is my travel laptop on which I have three VMs on (LAMP,
-PostgreSQL, kernel testing) which I primarily use to develop against.
+  KVM: arm64: Treat emulated TVAL TimerValue as a signed 32-bit integer (2020-01-28 13:09:31 +0000)
 
-The others are "home servers", they run all kinds of things for my home
-(incl. DNS, LDAP, RSS-Reader, Wiki, Music-Database, RDBMS,
-Task-Management).
+are available in the Git repository at:
 
-> and how long you will need to upgrade to newer kernels for?
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.6-1
 
-I don't really have a strict policy regarding when to upgrade kernels.
-I just run whatever gets patched and works.
+for you to fetch changes up to e43f1331e2ef913b8c566920c9af75e0ccdd1d3f:
 
-Sometimes this is the latest stable release, most of the time this is
-the last longterm release.
+  arm64: Ask the compiler to __always_inline functions used by KVM at HYP (2020-02-22 11:01:47 +0000)
 
-> In particular:
-> 
-> - What is the smallest amount of physical RAM that you have to found
-> to make a usable ARM/KVM host? 
+----------------------------------------------------------------
+KVM/arm fixes for 5.6, take #1
 
-Not sure if I can answer this question adequately as the smallest of my
-ARM32 boards have at least 1GB of RAM, which works for sure.
+- Fix compilation on 32bit
+- Move  VHE guest entry/exit into the VHE-specific entry code
+- Make sure all functions called by the non-VHE HYP code is tagged as __always_inline
 
-Since you're asking about the smallest amount I did some experiments.
-I spun up the testing VM on my Chromebook. It consists of a basic
-Gentoo userland currently running on a "reduced" 4.19 kernel (I'm sure
-it could be stripped further if one was determined enough).
+----------------------------------------------------------------
+James Morse (3):
+      KVM: arm64: Ask the compiler to __always_inline functions used at HYP
+      KVM: arm64: Define our own swab32() to avoid a uapi static inline
+      arm64: Ask the compiler to __always_inline functions used by KVM at HYP
 
-When I boot it up and log in the qemu-system process on the host uses
-100MB. The memory usage (incl. cache) inside the VM is only 50 MB,
-though.
+Jeremy Cline (1):
+      KVM: arm/arm64: Fix up includes for trace.h
 
-Adding a few MB for the actual application one would want to run to
-these 100MB, I calculate with 160MB for a "lightweight" VM.
+Mark Rutland (1):
+      kvm: arm/arm64: Fold VHE entry/exit work into kvm_vcpu_run_vhe()
 
-This would mean that one could run 2-3 such VMs in just 512MB which I
-would count as "usable".
-
-If you were conservative with memory and used a lightweight distro, like
-Alpine, OpenWrt or built your own using Buildroot, I could imagine that
-you can make a nice little home router with virtualized DHCP server,
-DNS server (for home network) + resolver, TFTP and possibly VPN in
-512MB.
-(Sounds like a cool experiment for the next time im bored :P)
-
-
-A very different use case could be to host unikernels using e.g.
-Solo5 (https://github.com/Solo5/solo5) whose hvt backend also uses KVM.
-I, unfortunately, don't have any experience with unikernels, but I
-assume that they consume a lot less memory than a full Linux VM.
-
-
-> Note that the 4GB configuration of the Tegra K1 (an rk3288)
-> Chromebooks seems to be extremely rare in other devices, while most
-> new 32-bit SBCs come with 1GB or less these days.
-
-I agree that 4GB seems to be really rare in 32-bit land outside of
-laptops like Chromebooks or Novena, but I don't agree that most 32-bit
-SBCs are so low specced.
-
-There are quite a few 2GB boards out there:
-ODROID U2/U3/X2/XU/XU3/XU4/HC1/HC2, Cubieboard 3/4/5, HummingBoard,
-CuBox i4/Pulse, ASUS TinkerBoard (S), Lenovo G66 TV-Box, Radxa ROCK PRO
-/ Rock2, Nvidia Jetson TK1, Banana Pi M2U/M3, Firefly RK3288,
-BeagleBoard X15, OrangePi Plus 2E, Utilite, Wandboard, ClearFog,
-NetGate SC3100, and probably a lot more can be had with 2GB RAM.
-
-(If I were to buy an SBC for virtualization, I'd get one of these :-))
-
-Also lets not forget all the powerful smartphones out there which could
-be used as virtualizers using postmarketos.org.
-
-> - How often do you update the host kernels on those 32-bit machines
-> that you still use to newer releases? 
-
-I usually track the latest longterm branch (but I wait a bit before
-jumping to a new longterm). So at the moment the majority is running
-4.19.x, but I'm in the process of upgrading to 5.4.x now that most of
-the annoying bugs should be fixed ;-)
-
-> What is the oldest/newest you run at the moment?
-
-Oldest: 4.15.18 (because of an annoying regression that's likely never
-going to get fixed)
-Newest: 5.4.20
-
-> - Are you able to move the host installation to a distribution with a
-> long-term stable release cycle such as Debian, Ubuntu that gives you
-> a ~five year support after a kernel release?
-
-I could do that, but I would like to avoid being dependent on an old
-kernel as from personal experience even on so-called "longterm"
-releases regressions do slip in and tend not to get fixed if they're
-not too severe, especially in old distro kernels.
-
-Kind regards,
-
-- Yoshi
+ arch/arm/include/asm/kvm_host.h          |  3 --
+ arch/arm64/include/asm/arch_gicv3.h      |  2 +-
+ arch/arm64/include/asm/cache.h           |  2 +-
+ arch/arm64/include/asm/cacheflush.h      |  2 +-
+ arch/arm64/include/asm/cpufeature.h      | 10 +++----
+ arch/arm64/include/asm/io.h              |  4 +--
+ arch/arm64/include/asm/kvm_emulate.h     | 48 ++++++++++++++++----------------
+ arch/arm64/include/asm/kvm_host.h        | 32 ---------------------
+ arch/arm64/include/asm/kvm_hyp.h         |  7 +++++
+ arch/arm64/include/asm/kvm_mmu.h         |  3 +-
+ arch/arm64/include/asm/virt.h            |  2 +-
+ arch/arm64/kvm/hyp/switch.c              | 39 ++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  4 +--
+ virt/kvm/arm/arm.c                       |  2 --
+ virt/kvm/arm/trace.h                     |  1 +
+ 15 files changed, 84 insertions(+), 77 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
