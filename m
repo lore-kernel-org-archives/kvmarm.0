@@ -2,60 +2,86 @@ Return-Path: <SRS0=iQbv=4Q=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E59C3F2CD
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Feb 2020 16:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA14C3F2CD
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Feb 2020 17:36:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 946A724697
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Feb 2020 16:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 946A724697
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8FC9D2051A
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Feb 2020 17:36:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CtX6NHqG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC9D2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D18B4AF63;
-	Fri, 28 Feb 2020 11:51:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1860B4AFE0;
+	Fri, 28 Feb 2020 12:36:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bviBm6aUJRpe; Fri, 28 Feb 2020 11:51:29 -0500 (EST)
+	with ESMTP id bzfthj6i0Zqi; Fri, 28 Feb 2020 12:35:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C67644AFEC;
-	Fri, 28 Feb 2020 11:51:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E014AFE8;
+	Fri, 28 Feb 2020 12:35:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CE514AFD5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Feb 2020 11:51:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF714AFE0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Feb 2020 12:35:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MvB4BNGLJd4j for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Feb 2020 11:51:26 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3D0E4AF63
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Feb 2020 11:51:26 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3BD731B;
- Fri, 28 Feb 2020 08:51:25 -0800 (PST)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F3CE83F73B;
- Fri, 28 Feb 2020 08:51:24 -0800 (PST)
-Date: Fri, 28 Feb 2020 16:51:22 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v5 2/3] KVM: arm64: limit PMU version to PMUv3 for ARMv8.1
-Message-ID: <20200228165122.GL36089@lakrids.cambridge.arm.com>
-References: <1580125469-23887-1-git-send-email-andrew.murray@arm.com>
- <1580125469-23887-3-git-send-email-andrew.murray@arm.com>
+ with ESMTP id hLXrrxgR9a-M for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Feb 2020 12:35:55 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9292B4AFDB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Feb 2020 12:35:55 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4BD512051A;
+ Fri, 28 Feb 2020 17:35:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582911354;
+ bh=VKhozoDerPi8gC4TBNvSd+KP8dQLu3JJCi2pZhPZpoI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=CtX6NHqGoWLf8H/hN0qy3HV3OSTq4MlkeiMi0d98W2EYtv5RCxma+mb+ePaWSiaAa
+ KBtPs973mpzxuEvGpfzGD/uZ73FOneRL0Uq6GLb8DY93TOVvoFmyIkOqRxDYa1N2tY
+ vYN7NKPJZMWyWfONKaIz0+SBMP6wv/1VXBL99rwc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j7jYG-008obq-Hk; Fri, 28 Feb 2020 17:35:52 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1580125469-23887-3-git-send-email-andrew.murray@arm.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Date: Fri, 28 Feb 2020 17:35:52 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 13/18] arm64: kvm: Annotate assembly using modern
+ annoations
+In-Reply-To: <20200218195842.34156-14-broonie@kernel.org>
+References: <20200218195842.34156-1-broonie@kernel.org>
+ <20200218195842.34156-14-broonie@kernel.org>
+Message-ID: <af4e6c640321dfa9e320ad1079aad603@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: broonie@kernel.org, herbert@gondor.apana.org.au,
+ davem@davemloft.net, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-crypto@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,77 +93,39 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 27, 2020 at 11:44:28AM +0000, Andrew Murray wrote:
-> We currently expose the PMU version of the host to the guest via
-> emulation of the DFR0_EL1 and AA64DFR0_EL1 debug feature registers.
-> However many of the features offered beyond PMUv3 for 8.1 are not
-> supported in KVM. Examples of this include support for the PMMIR
-> registers (added in PMUv3 for ARMv8.4) and 64-bit event counters
-> added in (PMUv3 for ARMv8.5).
+On 2020-02-18 19:58, Mark Brown wrote:
+> In an effort to clarify and simplify the annotation of assembly 
+> functions
+> in the kernel new macros have been introduced. These replace ENTRY and
+> ENDPROC with separate annotations for standard C callable functions,
+> data and code with different calling conventions.  Update the more
+> straightforward annotations in the kvm code to the new macros.
 > 
-> Let's trap the Debug Feature Registers in order to limit
-> PMUVer/PerfMon in the Debug Feature Registers to PMUv3 for ARMv8.1
-> to avoid unexpected behaviour.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/include/asm/sysreg.h |  5 +++++
->  arch/arm64/kvm/sys_regs.c       | 11 +++++++++++
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 6e919fa..1009878 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -672,6 +672,11 @@
->  #define ID_AA64DFR0_TRACEVER_SHIFT	4
->  #define ID_AA64DFR0_DEBUGVER_SHIFT	0
->  
-> +#define ID_DFR0_PERFMON_SHIFT		24
-> +
-> +#define ID_DFR0_EL1_PMUVER_8_1		4
-> +#define ID_AA64DFR0_EL1_PMUVER_8_1	4
-> +
->  #define ID_ISAR5_RDM_SHIFT		24
->  #define ID_ISAR5_CRC32_SHIFT		16
->  #define ID_ISAR5_SHA2_SHIFT		12
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9f21659..3f0f3cc 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1085,6 +1085,17 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
->  			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
->  			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
-> +	} else if (id == SYS_ID_AA64DFR0_EL1) {
-> +		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		val = cpuid_feature_cap_signed_field_width(val,
-> +						ID_AA64DFR0_PMUVER_SHIFT,
-> +						4, ID_AA64DFR0_EL1_PMUVER_8_1);
-> +	} else if (id == SYS_ID_DFR0_EL1) {
-> +		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		val = cpuid_feature_cap_signed_field_width(val,
-> +						ID_DFR0_PERFMON_SHIFT,
-> +						4, ID_DFR0_EL1_PMUVER_8_1);
-> +
+>  arch/arm64/kvm/hyp-init.S      |  8 ++++----
+>  arch/arm64/kvm/hyp.S           |  4 ++--
+>  arch/arm64/kvm/hyp/fpsimd.S    |  8 ++++----
+>  arch/arm64/kvm/hyp/hyp-entry.S | 15 ++++++++-------
+>  4 files changed, 18 insertions(+), 17 deletions(-)
 
-Unfortunately, ID_AA64DFR0_EL1.PMUVer and ID_DFR0_EL1.PerfMon don't
-follow the usual ID scheme, and cannot be treated as signed fields.
+For the three KVM/arm patches:
 
-Per ARM DDI 0487E.a, page D13-2825, they follow an alternative scheme
-that is treated as unsigned, with 0xF additionally being treated as an
-architected PMU version not being implemented. For KVM we'll want to
-convert 0xF to 0x0.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-I'll respin these patches accordingly.
+I'd expect this to go as a whole via the arm64 tree, but I can also
+cherry-pick them if necessary.
 
 Thanks,
-Mark.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
