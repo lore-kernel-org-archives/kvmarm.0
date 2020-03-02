@@ -1,82 +1,96 @@
 Return-Path: <SRS0=2z/n=4T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E98C3F2D2
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Mar 2020 12:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 955EBC3F2CD
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Mar 2020 16:04:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C8102187F
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Mar 2020 12:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17EB52146E
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Mar 2020 16:04:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="dzgfqg0/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C8102187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER8y9PoR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17EB52146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1690D4AF63;
-	Mon,  2 Mar 2020 07:12:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 846604AF90;
+	Mon,  2 Mar 2020 11:04:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wAwOlVaXnkST; Mon,  2 Mar 2020 07:12:52 -0500 (EST)
+	with ESMTP id dxErxaEt28eB; Mon,  2 Mar 2020 11:04:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8144AF8A;
-	Mon,  2 Mar 2020 07:12:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 312E84AF21;
+	Mon,  2 Mar 2020 11:04:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A61CF4AF8A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2020 07:12:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59D874AF21
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2020 11:04:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id flE2ozSxiOT0 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2020 07:12:49 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B698C4AF82
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2020 07:12:49 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9AD112173E;
- Mon,  2 Mar 2020 12:12:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1583151168;
- bh=Lymq4yucP910jG3yAZt3+nbi5KerTQ3U6G6bpUjy4to=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dzgfqg0/uVS23vSco9JoTIf3WbWIp+BhFrKQRBlscAYzmJYe1JdXz3LW0em6JDra0
- tHlUlPG/PDhJIX9GqwoQxKCaqE0RTbt1LDJzflgr3/znEysTywuYph/kfJ5dwTwg0Y
- onrCNZAOCAvxq/Pfy0xNMTkNhDf65AnnCIt5R2bQ=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j8jwE-009N9H-TY; Mon, 02 Mar 2020 12:12:47 +0000
+ with ESMTP id d9pcdJK9wa65 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2020 11:04:54 -0500 (EST)
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com
+ [209.85.215.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1DBA4AEEC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2020 11:04:53 -0500 (EST)
+Received: by mail-pg1-f193.google.com with SMTP id y30so10093pga.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2020 08:04:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=sSa1eH4ZH11eFODx5TI1xPwlwerRZwEVTtJkpUSazx4=;
+ b=ER8y9PoRQhbCZIOnspmjvj6Yim3isUv+qfgVqV9XDPWoQJIIVMGxnAWNuChmsuBwAK
+ psZeaRDXpoonLyW7DgqSvEeev/tohJTYObx4VPfJpm6ESC2wrOk1ncqqy8/UKYJCzKhZ
+ HkJeyWMs5q1+IzB0qHHPimOztMz5AxB6OSiWlvTFgCEDfsCyRSv0jVk5FoediOw7Hoka
+ FaWwCWg2BUZgf40STze3GymJvAwuHReyUGXCjZid6yPhTP+TDu/a1qNF0ytgSUvhaQD2
+ Q9ykPUhyS/BQX54QCo1iy0O5etCf+XNojzTGiauDe0sMc0X4d6125AUO5SAjc1UWT2H+
+ 5gRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=sSa1eH4ZH11eFODx5TI1xPwlwerRZwEVTtJkpUSazx4=;
+ b=XnbLaZ9Fh2lJEa4GcA46I7uPruhUv5pYLuW+rVCN+8AqerHpNmL4LNhI+/rCHBs+PU
+ 7HL5/6McuIh8QCXUSfAYe78iHcI8FS2hXiMp/oUG/dU3DHsw2pkkl3wxcI8lLnCr0/KC
+ FufufEWQ8FJ6By6LcKO++v3M0SQiD+kby1ySe2tmWDRrdPLWsRjHnYWAsbK7MxjzPO63
+ 6BL4+SBISkBshKAf4L/pOzRCxSdhFm+jAmgJYmnBZnbBF58e3FV72f55peF2eCZbN96B
+ 2Qrdq3/REFr6CMOTVst+dg1yhgRrHcgdCLDzfmq29gtok/NPl/JShKKBIqpcIT6nKtai
+ f8qA==
+X-Gm-Message-State: ANhLgQ3lCXdaZKGl6erifT2s+n4F/jRemLSWhZDcZFplDtUH+KEtxM2L
+ K2dR9X5jSW/pjUkWUmQWuRz6fXbxTqNt1YM2il45PDTpiE8=
+X-Google-Smtp-Source: APXvYqyoj1lJ5davJoBfWPGpKAgYAezAZUIETTPTIC0FrrimfcQ3rVOOzB3PC985fOYZtEvRmD67zWE/XIeiMCtgV5s=
+X-Received: by 2002:a5e:cb07:: with SMTP id p7mr12603773iom.243.1583158891259; 
+ Mon, 02 Mar 2020 06:21:31 -0800 (PST)
 MIME-Version: 1.0
-Date: Mon, 02 Mar 2020 12:12:46 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] irqchip/gic-v4.1: Wait for completion of redistributor's
- INVALL operation
-In-Reply-To: <20200302092145.899-1-yuzenghui@huawei.com>
-References: <20200302092145.899-1-yuzenghui@huawei.com>
-Message-ID: <c46464a4c570e4aa12231bbd5ddefc07@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, tglx@linutronix.de, jason@lakedaemon.net,
- wanghaibin.wang@huawei.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: jason@lakedaemon.net, linux-kernel@vger.kernel.org, tglx@linutronix.de,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20200214145736.18550-1-maz@kernel.org>
+ <20200214145736.18550-9-maz@kernel.org>
+ <4b7f71f1-5e7f-e6af-f47d-7ed0d3a8739f@huawei.com>
+ <75597af0d2373ac4d92d8162a1338cbb@kernel.org>
+ <19a7c193f0e4b97343e822a35f0911ed@kernel.org>
+ <3d725ede-6631-59fb-1a10-9fb9890f3df6@huawei.com>
+ <dd9f1224b3b21ad793862406bd8855ba@kernel.org>
+ <54c52057161f925c818446953050c951@kernel.org>
+ <4f8f3958-2976-b0a7-8d17-440ecaba0fc8@huawei.com>
+ <db819547d4be8daa458bcd56aac2efcd@kernel.org>
+In-Reply-To: <db819547d4be8daa458bcd56aac2efcd@kernel.org>
+From: Bill Barrow <billbarrow2888@gmail.com>
+Date: Mon, 2 Mar 2020 14:21:20 +0000
+Message-ID: <CAD5xw9rOg-cRnqxVtoSzxfG5cQQxBZpj=SVJ+m19CCLASd9e8w@mail.gmail.com>
+Subject: Re: [PATCH v4 08/20] irqchip/gic-v4.1: Plumb get/set_irqchip_state
+ SGI callbacks
+To: Marc Zyngier <maz@kernel.org>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,48 +102,249 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: multipart/mixed; boundary="===============4820938914917584356=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-03-02 09:21, Zenghui Yu wrote:
-> In GICv4.1, we emulate a guest-issued INVALL command by a direct write
-> to GICR_INVALLR.  Before we finish the emulation and go back to guest,
-> let's make sure the physical invalidate operation is actually completed
-> and no stale data will be left in redistributor. Per the specification,
-> this can be achieved by polling the GICR_SYNCR.Busy bit (to zero).
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 83b1186ffcad..fc8c2970cee4 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3784,6 +3784,8 @@ static void its_vpe_4_1_invall(struct its_vpe 
-> *vpe)
->  	/* Target the redistributor this vPE is currently known on */
->  	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
->  	gic_write_lpir(val, rdbase + GICR_INVALLR);
-> +
-> +	wait_for_syncr(rdbase);
->  }
-> 
->  static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void 
-> *vcpu_info)
+--===============4820938914917584356==
+Content-Type: multipart/alternative; boundary="000000000000562895059fdfe748"
 
-Yup, well spotted. I'll add that to the series.
+--000000000000562895059fdfe748
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks,
+What  the hell?
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+
+On Mon, 2 Mar 2020 at 12:09, Marc Zyngier <maz@kernel.org> wrote:
+
+> Hi Zenghui,
+>
+> On 2020-03-02 08:18, Zenghui Yu wrote:
+> > On 2020/3/2 3:00, Marc Zyngier wrote:
+> >> On 2020-02-28 19:37, Marc Zyngier wrote:
+> >>> On 2020-02-20 03:11, Zenghui Yu wrote:
+> >>
+> >>>> Do we really need to grab the vpe_lock for those which are belong to
+> >>>> the same irqchip with its_vpe_set_affinity()? The IRQ core code
+> >>>> should
+> >>>> already ensure the mutual exclusion among them, wrong?
+> >>>
+> >>> I've been trying to think about that, but jet-lag keeps getting in
+> >>> the way.
+> >>> I empirically think that you are right, but I need to go and check
+> >>> the various
+> >>> code paths to be sure. Hopefully I'll have a bit more brain space
+> >>> next week.
+> >>
+> >> So I slept on it and came back to my senses. The only case we actually
+> >> need
+> >> to deal with is when an affinity change impacts *another* interrupt.
+> >>
+> >> There is only two instances of this issue:
+> >>
+> >> - vLPIs have their *physical* affinity impacted by the affinity of the
+> >>    vPE. Their virtual affinity is of course unchanged, but the
+> >> physical
+> >>    one becomes important with direct invalidation. Taking a per-VPE
+> >> lock
+> >>    in such context should address the issue.
+> >>
+> >> - vSGIs have the exact same issue, plus the matter of requiring some
+> >>    *extra* one when reading the pending state, which requires a RMW
+> >>    on two different registers. This requires an extra per-RD lock.
+> >
+> > Agreed with both!
+> >
+> >>
+> >> My original patch was stupidly complex, and the irq_desc lock is
+> >> perfectly enough to deal with anything that only affects the interrupt
+> >> state itself.
+> >>
+> >> GICv4 + direct invalidation for vLPIs breaks this by bypassing the
+> >> serialization initially provided by the ITS, as the RD is completely
+> >> out of band. The per-vPE lock brings back this serialization.
+> >>
+> >> I've updated the branch, which seems to run OK on D05. I still need
+> >> to run the usual tests on the FVP model though.
+> >
+> > I have pulled the latest branch and it looks good to me, except for
+> > one remaining concern:
+> >
+> > GICR_INV{LPI, ALL}R + GICR_SYNCR can also be accessed concurrently
+> > by multiple direct invalidation, should we also use the per-RD lock
+> > to ensure mutual exclusion?  It looks not so harmful though, as this
+> > will only increase one's polling time against the Busy bit (in my
+> > view).
+> >
+> > But I point it out again for confirmation.
+>
+> I was about to say that it doesn't really matter because it is only a
+> performance optimisation (and we're noty quite there yet), until I
+> spotted
+> this great nugget in the spec:
+>
+> <quote>
+> Writing GICR_INVLPIR or GICR_INVALLR when GICR_SYNCR.Busy==1 is
+> CONSTRAINED
+> UNPREDICTABLE:
+> - The write is IGNORED .
+> - The invalidate specified by the write is performed.
+> </quote>
+>
+> So we really need some form of mutual exclusion on a per-RD basis to
+> ensure
+> that no two invalidations occur at the same time, ensuring that Busy
+> clears
+> between the two.
+>
+> Thanks for the heads up,
+>
+>          M.
+> --
+> Jazz is not dead. It just smells funny...
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
+
+--000000000000562895059fdfe748
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">What=C2=A0 the hell?<div><br></div></div><br><div class=3D=
+"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, 2 Mar 2020 at 1=
+2:09, Marc Zyngier &lt;<a href=3D"mailto:maz@kernel.org">maz@kernel.org</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi Z=
+enghui,<br>
+<br>
+On 2020-03-02 08:18, Zenghui Yu wrote:<br>
+&gt; On 2020/3/2 3:00, Marc Zyngier wrote:<br>
+&gt;&gt; On 2020-02-28 19:37, Marc Zyngier wrote:<br>
+&gt;&gt;&gt; On 2020-02-20 03:11, Zenghui Yu wrote:<br>
+&gt;&gt; <br>
+&gt;&gt;&gt;&gt; Do we really need to grab the vpe_lock for those which are=
+ belong to<br>
+&gt;&gt;&gt;&gt; the same irqchip with its_vpe_set_affinity()? The IRQ core=
+ code <br>
+&gt;&gt;&gt;&gt; should<br>
+&gt;&gt;&gt;&gt; already ensure the mutual exclusion among them, wrong?<br>
+&gt;&gt;&gt; <br>
+&gt;&gt;&gt; I&#39;ve been trying to think about that, but jet-lag keeps ge=
+tting in <br>
+&gt;&gt;&gt; the way.<br>
+&gt;&gt;&gt; I empirically think that you are right, but I need to go and c=
+heck <br>
+&gt;&gt;&gt; the various<br>
+&gt;&gt;&gt; code paths to be sure. Hopefully I&#39;ll have a bit more brai=
+n space <br>
+&gt;&gt;&gt; next week.<br>
+&gt;&gt; <br>
+&gt;&gt; So I slept on it and came back to my senses. The only case we actu=
+ally <br>
+&gt;&gt; need<br>
+&gt;&gt; to deal with is when an affinity change impacts *another* interrup=
+t.<br>
+&gt;&gt; <br>
+&gt;&gt; There is only two instances of this issue:<br>
+&gt;&gt; <br>
+&gt;&gt; - vLPIs have their *physical* affinity impacted by the affinity of=
+ the<br>
+&gt;&gt;=C2=A0 =C2=A0 vPE. Their virtual affinity is of course unchanged, b=
+ut the <br>
+&gt;&gt; physical<br>
+&gt;&gt;=C2=A0 =C2=A0 one becomes important with direct invalidation. Takin=
+g a per-VPE <br>
+&gt;&gt; lock<br>
+&gt;&gt;=C2=A0 =C2=A0 in such context should address the issue.<br>
+&gt;&gt; <br>
+&gt;&gt; - vSGIs have the exact same issue, plus the matter of requiring so=
+me<br>
+&gt;&gt;=C2=A0 =C2=A0 *extra* one when reading the pending state, which req=
+uires a RMW<br>
+&gt;&gt;=C2=A0 =C2=A0 on two different registers. This requires an extra pe=
+r-RD lock.<br>
+&gt; <br>
+&gt; Agreed with both!<br>
+&gt; <br>
+&gt;&gt; <br>
+&gt;&gt; My original patch was stupidly complex, and the irq_desc lock is<b=
+r>
+&gt;&gt; perfectly enough to deal with anything that only affects the inter=
+rupt<br>
+&gt;&gt; state itself.<br>
+&gt;&gt; <br>
+&gt;&gt; GICv4 + direct invalidation for vLPIs breaks this by bypassing the=
+<br>
+&gt;&gt; serialization initially provided by the ITS, as the RD is complete=
+ly<br>
+&gt;&gt; out of band. The per-vPE lock brings back this serialization.<br>
+&gt;&gt; <br>
+&gt;&gt; I&#39;ve updated the branch, which seems to run OK on D05. I still=
+ need<br>
+&gt;&gt; to run the usual tests on the FVP model though.<br>
+&gt; <br>
+&gt; I have pulled the latest branch and it looks good to me, except for<br=
+>
+&gt; one remaining concern:<br>
+&gt; <br>
+&gt; GICR_INV{LPI, ALL}R + GICR_SYNCR can also be accessed concurrently<br>
+&gt; by multiple direct invalidation, should we also use the per-RD lock<br=
+>
+&gt; to ensure mutual exclusion?=C2=A0 It looks not so harmful though, as t=
+his<br>
+&gt; will only increase one&#39;s polling time against the Busy bit (in my =
+<br>
+&gt; view).<br>
+&gt; <br>
+&gt; But I point it out again for confirmation.<br>
+<br>
+I was about to say that it doesn&#39;t really matter because it is only a<b=
+r>
+performance optimisation (and we&#39;re noty quite there yet), until I <br>
+spotted<br>
+this great nugget in the spec:<br>
+<br>
+&lt;quote&gt;<br>
+Writing GICR_INVLPIR or GICR_INVALLR when GICR_SYNCR.Busy=3D=3D1 is <br>
+CONSTRAINED<br>
+UNPREDICTABLE:<br>
+- The write is IGNORED .<br>
+- The invalidate specified by the write is performed.<br>
+&lt;/quote&gt;<br>
+<br>
+So we really need some form of mutual exclusion on a per-RD basis to <br>
+ensure<br>
+that no two invalidations occur at the same time, ensuring that Busy <br>
+clears<br>
+between the two.<br>
+<br>
+Thanks for the heads up,<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0M.<br>
+-- <br>
+Jazz is not dead. It just smells funny...<br>
+_______________________________________________<br>
+kvmarm mailing list<br>
+<a href=3D"mailto:kvmarm@lists.cs.columbia.edu" target=3D"_blank">kvmarm@li=
+sts.cs.columbia.edu</a><br>
+<a href=3D"https://lists.cs.columbia.edu/mailman/listinfo/kvmarm" rel=3D"no=
+referrer" target=3D"_blank">https://lists.cs.columbia.edu/mailman/listinfo/=
+kvmarm</a><br>
+</blockquote></div>
+
+--000000000000562895059fdfe748--
+
+--===============4820938914917584356==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============4820938914917584356==--
