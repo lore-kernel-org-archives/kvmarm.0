@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9070C3F2DA
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E03C3F2D9
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:34:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7127B2146E
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA2072146E
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:34:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSc3dUU0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7127B2146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKT2wJ5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2072146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AE994A830;
-	Wed,  4 Mar 2020 15:34:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A23E54AFFC;
+	Wed,  4 Mar 2020 15:34:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tf1A0YKJ9YW0; Wed,  4 Mar 2020 15:34:49 -0500 (EST)
+	with ESMTP id 3OAeygzLiapY; Wed,  4 Mar 2020 15:34:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828914AFDB;
-	Wed,  4 Mar 2020 15:34:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE2254AFAC;
+	Wed,  4 Mar 2020 15:34:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49A5C4AEA0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:34:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2E214AEA0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:34:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t+UcOqY8AkaH for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2020 15:34:43 -0500 (EST)
+ with ESMTP id yKd-iem58hxD for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2020 15:34:48 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 310C24AF97
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:34:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC79F4A830
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:34:44 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5D57424654;
- Wed,  4 Mar 2020 20:34:42 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DDA9F24658;
+ Wed,  4 Mar 2020 20:34:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1583354082;
- bh=eM2bdHK9tkPqOHBhhFZJA4RYlbZPHuULIL3M97M75UI=;
+ s=default; t=1583354084;
+ bh=j8zBrkFAZYg8aOlrVLwQ6xdlqxDuQgnwUjV/YeOSDME=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZSc3dUU0C+X1yJpOrZGVIzRVMlp/VLNlg41C0G7C3nOZeQsUNeX2J51AhdipCjQv2
- EWS5mw+G9XpFOJNHgomwgLY9BTF4P3D9cJdDmeXdZIht8mV1dcX+nS9jNxKUQGMXpy
- R2LrsWfVWEkX+FpvgVTq3P4cHB2aNnmEoz39FAtQ=
+ b=mKT2wJ5CATASQrCVHIrXAS4mZnE7h3hbQZ4OGF9DK/S4YNdjPBHCanpr/KJ5b4doR
+ 7Vov2W70kxrE3d/mpqx5KMosTBEfdYtim4pqxOIDSUY3qWHg2yjMJ0tXkIdSdD94cb
+ D7oh2IjKPIjxmA/NVeZOMcSDeJj5qBmHtRVE4Of8=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j9aj2-00A59R-KN; Wed, 04 Mar 2020 20:34:40 +0000
+ id 1j9aj4-00A59R-4t; Wed, 04 Mar 2020 20:34:42 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 04/23] irqchip/gic-v4.1: Wait for completion of
- redistributor's INVALL operation
-Date: Wed,  4 Mar 2020 20:33:11 +0000
-Message-Id: <20200304203330.4967-5-maz@kernel.org>
+Subject: [PATCH v5 06/23] irqchip/gic-v4.1: Advertise support v4.1 to KVM
+Date: Wed,  4 Mar 2020 20:33:13 +0000
+Message-Id: <20200304203330.4967-7-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200304203330.4967-1-maz@kernel.org>
 References: <20200304203330.4967-1-maz@kernel.org>
@@ -97,34 +96,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+Tell KVM that we support v4.1. Nothing uses this information so far.
 
-In GICv4.1, we emulate a guest-issued INVALL command by a direct write
-to GICR_INVALLR.  Before we finish the emulation and go back to guest,
-let's make sure the physical invalidate operation is actually completed
-and no stale data will be left in redistributor. Per the specification,
-this can be achieved by polling the GICR_SYNCR.Busy bit (to zero).
-
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200302092145.899-1-yuzenghui@huawei.com
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/irqchip/irq-gic-v3-its.c       | 9 ++++++++-
+ drivers/irqchip/irq-gic-v3.c           | 2 ++
+ include/linux/irqchip/arm-gic-common.h | 2 ++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 1af713990123..c84370245bea 100644
+index fc5788584df7..bcc1a0957cda 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3827,6 +3827,8 @@ static void its_vpe_4_1_invall(struct its_vpe *vpe)
- 	/* Target the redistributor this vPE is currently known on */
- 	rdbase = per_cpu_ptr(gic_rdists->rdist, vpe->col_idx)->rd_base;
- 	gic_write_lpir(val, rdbase + GICR_INVALLR);
+@@ -4870,6 +4870,7 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+ 	struct device_node *of_node;
+ 	struct its_node *its;
+ 	bool has_v4 = false;
++	bool has_v4_1 = false;
+ 	int err;
+ 
+ 	gic_rdists = rdists;
+@@ -4890,8 +4891,14 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+ 	if (err)
+ 		return err;
+ 
+-	list_for_each_entry(its, &its_nodes, entry)
++	list_for_each_entry(its, &its_nodes, entry) {
+ 		has_v4 |= is_v4(its);
++		has_v4_1 |= is_v4_1(its);
++	}
 +
-+	wait_for_syncr(rdbase);
++	/* Don't bother with inconsistent systems */
++	if (WARN_ON(!has_v4_1 && rdists->has_rvpeid))
++		rdists->has_rvpeid = false;
+ 
+ 	if (has_v4 & rdists->has_vlpis) {
+ 		if (its_init_vpe_domain() ||
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index ba405becab53..03e4eadefb00 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -1785,6 +1785,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
+ 		gic_v3_kvm_info.vcpu = r;
+ 
+ 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
++	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+ 	gic_set_kvm_info(&gic_v3_kvm_info);
  }
  
- static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
+@@ -2100,6 +2101,7 @@ static void __init gic_acpi_setup_kvm_info(void)
+ 	}
+ 
+ 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
++	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
+ 	gic_set_kvm_info(&gic_v3_kvm_info);
+ }
+ 
+diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+index b9850f5f1906..fa8c0455c352 100644
+--- a/include/linux/irqchip/arm-gic-common.h
++++ b/include/linux/irqchip/arm-gic-common.h
+@@ -32,6 +32,8 @@ struct gic_kvm_info {
+ 	struct resource vctrl;
+ 	/* vlpi support */
+ 	bool		has_v4;
++	/* rvpeid support */
++	bool		has_v4_1;
+ };
+ 
+ const struct gic_kvm_info *gic_get_kvm_info(void);
 -- 
 2.20.1
 
