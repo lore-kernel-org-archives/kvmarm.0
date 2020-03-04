@@ -4,52 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A039AC3F2D1
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 18:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04887C3F2CE
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 18:02:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5ECA424673
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 18:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ECA424673
+	by mail.kernel.org (Postfix) with ESMTP id B947024658
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 18:02:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B947024658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 199784AF67;
-	Wed,  4 Mar 2020 13:02:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 630054AF67;
+	Wed,  4 Mar 2020 13:02:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XiCg7YE+ELHb; Wed,  4 Mar 2020 13:02:24 -0500 (EST)
+	with ESMTP id pjmKVglqobvF; Wed,  4 Mar 2020 13:02:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 078E74AF52;
-	Wed,  4 Mar 2020 13:02:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 389724AF58;
+	Wed,  4 Mar 2020 13:02:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A12E4AF46
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 13:02:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7B254AEC2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 13:02:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7RSGzmGc-rUz for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2020 13:02:22 -0500 (EST)
+ with ESMTP id zjBerS9Hv7YB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2020 13:02:50 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 063B04AC68
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 13:02:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9144C4AF46
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 13:02:50 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B521C31B;
- Wed,  4 Mar 2020 10:02:21 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2676531B;
+ Wed,  4 Mar 2020 10:02:50 -0800 (PST)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 604163F6C4;
- Wed,  4 Mar 2020 10:02:20 -0800 (PST)
-Date: Wed, 4 Mar 2020 18:02:15 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6AAD3F6C4;
+ Wed,  4 Mar 2020 10:02:48 -0800 (PST)
+Date: Wed, 4 Mar 2020 18:02:46 +0000
 From: Andre Przywara <andre.przywara@arm.com>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/9] arm: pmu: Add a pmu struct
-Message-ID: <20200304180158.4d9e3b8c@donnerap.cambridge.arm.com>
-In-Reply-To: <20200130112510.15154-4-eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event
+ Support
+Message-ID: <20200304180246.20725ceb@donnerap.cambridge.arm.com>
+In-Reply-To: <20200130112510.15154-5-eric.auger@redhat.com>
 References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-4-eric.auger@redhat.com>
+ <20200130112510.15154-5-eric.auger@redhat.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -72,81 +74,153 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 30 Jan 2020 12:25:04 +0100
+On Thu, 30 Jan 2020 12:25:05 +0100
 Eric Auger <eric.auger@redhat.com> wrote:
 
-> This struct aims at storing information potentially used by
-> all tests such as the pmu version, the read-only part of the
-> PMCR, the number of implemented event counters, ...
+Hi,
+
+> If event counters are implemented check the common events
+> required by the PMUv3 are implemented.
+> 
+> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+> either INST_RETIRED or INST_SPEC). Some others only are
+> required if the implementation implements some other features.
+> 
+> Check those wich are unconditionally required.
+> 
+> This test currently fails on TCG as neither INST_RETIRED
+> or INST_SPEC are supported.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - fix is_event_supported()
+> - fix boolean condition for PMU v4
+> - fix PMCEID0 definition
+> 
+> RFC ->v1:
+> - add a comment to explain the PMCEID0/1 splits
+> ---
+>  arm/pmu.c         | 62 +++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  6 +++++
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index d24857e..4a26a76 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>  	: "cc");
+>  }
+> +
+> +/* event counter tests only implemented for aarch64 */
+> +static void test_event_introspection(void) {}
+> +
+>  #elif defined(__aarch64__)
+>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+> @@ -139,6 +143,61 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr)
+>  	: "cc");
+>  }
+> +
+> +#define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
+> +
+> +static bool is_event_supported(uint32_t n, bool warn)
+> +{
+> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+> +	bool supported;
+> +	uint64_t reg;
+> +
+> +	/*
+> +	 * The low 32-bits of PMCEID0/1 respectly describe
+> +	 * event support for events 0-31/32-63. Their High
+> +	 * 32-bits describe support for extended events
+> +	 * starting at 0x4000, using the same split.
+> +	 */
+> +	if (n >= 0x0  && n <= 0x3F)
+> +		reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
+> +	else if  (n >= 0x4000 && n <= 0x403F)
+> +		reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
+> +	else
+> +		abort();
+> +
+> +	supported =  reg & (1UL << (n & 0x3F));
+> +
+> +	if (!supported && warn)
+> +		report_info("event %d is not supported", n);
+> +	return supported;
+> +}
+> +
+> +static void test_event_introspection(void)
+> +{
+> +	bool required_events;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* PMUv3 requires an implementation includes some common events */
+> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+> +
+> +	if (pmu.version == 0x4) {
 
-As I stated already in v1:
+I think this should read >= 0x4, since those requirements are stacked on top of the prevision revision's requirements. Even better with some symbolic name.
+
+With that fixed:
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
 Cheers,
 Andre
 
-> ---
->  arm/pmu.c | 30 +++++++++++++++++++++++++-----
->  1 file changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index e5e012d..d24857e 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -33,7 +33,14 @@
+> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+> +		required_events = required_events &&
+> +				  is_event_supported(0x23, true) &&
+> +				  is_event_supported(0x24, true);
+> +	}
+> +
+> +	report(required_events, "Check required events are implemented");
+> +}
+> +
+>  #endif
 >  
->  #define NR_SAMPLES 10
+>  /*
+> @@ -326,6 +385,9 @@ int main(int argc, char *argv[])
+>  		       "Monotonically increasing cycle count");
+>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>  		pmccntr64_test();
+> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_event_introspection();
+>  	} else {
+>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 79f0d7a..4433ef3 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -66,6 +66,12 @@ file = pmu.flat
+>  groups = pmu
+>  extra_params = -append 'cycle-counter 0'
 >  
-> -static unsigned int pmu_version;
-> +struct pmu {
-> +	unsigned int version;
-> +	unsigned int nb_implemented_counters;
-> +	uint32_t pmcr_ro;
-> +};
+> +[pmu-event-introspection]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'event-introspection'
 > +
-> +static struct pmu pmu;
-> +
->  #if defined(__arm__)
->  #define ID_DFR0_PERFMON_SHIFT 24
->  #define ID_DFR0_PERFMON_MASK  0xf
-> @@ -265,7 +272,7 @@ static bool check_cpi(int cpi)
->  static void pmccntr64_test(void)
->  {
->  #ifdef __arm__
-> -	if (pmu_version == 0x3) {
-> +	if (pmu.version == 0x3) {
->  		if (ERRATA(9e3f7a296940)) {
->  			write_sysreg(0xdead, PMCCNTR64);
->  			report(read_sysreg(PMCCNTR64) == 0xdead, "pmccntr64");
-> @@ -278,9 +285,22 @@ static void pmccntr64_test(void)
->  /* Return FALSE if no PMU found, otherwise return TRUE */
->  static bool pmu_probe(void)
->  {
-> -	pmu_version = get_pmu_version();
-> -	report_info("PMU version: %d", pmu_version);
-> -	return pmu_version != 0 && pmu_version != 0xf;
-> +	uint32_t pmcr;
-> +
-> +	pmu.version = get_pmu_version();
-> +	report_info("PMU version: %d", pmu.version);
-> +
-> +	if (pmu.version == 0 || pmu.version == 0xF)
-> +		return false;
-> +
-> +	pmcr = get_pmcr();
-> +	pmu.pmcr_ro = pmcr & 0xFFFFFF80;
-> +	pmu.nb_implemented_counters =
-> +		(pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
-> +	report_info("Implements %d event counters",
-> +		    pmu.nb_implemented_counters);
-> +
-> +	return true;
->  }
->  
->  int main(int argc, char *argv[])
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+>  #file = pmu.flat
 
 _______________________________________________
 kvmarm mailing list
