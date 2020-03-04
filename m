@@ -4,65 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9344FC3F2D7
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD374C3F2D8
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:36:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 49E68217F4
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60A4B21775
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Mar 2020 20:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHH0IQBP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49E68217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dw9bBzcr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A4B21775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCC8D4AFCC;
-	Wed,  4 Mar 2020 15:36:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 170404AF7C;
+	Wed,  4 Mar 2020 15:36:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mx6W1AtcVcad; Wed,  4 Mar 2020 15:36:34 -0500 (EST)
+	with ESMTP id oKMyo6a6wJ73; Wed,  4 Mar 2020 15:36:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFC914AF9E;
-	Wed,  4 Mar 2020 15:36:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E18934AFCF;
+	Wed,  4 Mar 2020 15:36:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D9FA4AF97
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:36:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56BE54A830
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:36:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BuyrCvrBKo12 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2020 15:36:32 -0500 (EST)
+ with ESMTP id V2zLYeVDfJz5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2020 15:36:34 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29CFA4AF9E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:36:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 236C84A5A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2020 15:36:34 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5B17021556;
- Wed,  4 Mar 2020 20:36:31 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 40D902465D;
+ Wed,  4 Mar 2020 20:36:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1583354191;
- bh=JnkgxepdjxdrRmFpIc3nf6/D+CDNPr99CWMmiM/NM2c=;
+ s=default; t=1583354193;
+ bh=n0pcf7YcYxmyQlB4S+lYiDAk0Lna0wYAp0XT2ZXgOkc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qHH0IQBP0hVolOeTPmygrs6BbiPkawX8dLsTJzRLj0xYSAFy5CGcI3bVMTwIpv0G/
- zZTj1U+FszlxewNlndoz1y066JYeFa43hdP9TWLGq690P8DZ7GgLBhgwb7zHareg9p
- InFKI3fxiGckjbQmcebII+SFr+82z1G7YY+7mEsQ=
+ b=Dw9bBzcrzT2Jaf+4pBxkr/a9ZSZuLPeMgGnGRI9Jphqvu3McjWRo8rRkzz6VIKhtx
+ J68JA08a2+ZbIW/DsX1vUkLLrL83C8zvlrzylcvVaBHrnWyJvCNJsyxkRDSEyDjjKu
+ 63BoyR2xzFV0L7N5fEVd4//pilVfzF+5l95b7gHM=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1j9ajD-00A59R-Nh; Wed, 04 Mar 2020 20:34:51 +0000
+ id 1j9aj8-00A59R-Hw; Wed, 04 Mar 2020 20:34:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 17/23] KVM: arm64: GICv4.1: Let doorbells be auto-enabled
-Date: Wed,  4 Mar 2020 20:33:24 +0000
-Message-Id: <20200304203330.4967-18-maz@kernel.org>
+Subject: [PATCH v5 11/23] irqchip/gic-v4.1: Plumb get/set_irqchip_state SGI
+ callbacks
+Date: Wed,  4 Mar 2020 20:33:18 +0000
+Message-Id: <20200304203330.4967-12-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200304203330.4967-1-maz@kernel.org>
 References: <20200304203330.4967-1-maz@kernel.org>
@@ -96,43 +98,152 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As GICv4.1 understands the life cycle of doorbells (instead of
-just randomly firing them at the most inconvenient time), just
-enable them at irq_request time, and be done with it.
+To implement the get/set_irqchip_state callbacks (limited to the
+PENDING state), we have to use a particular set of hacks:
+
+- Reading the pending state is done by using a pair of new redistributor
+  registers (GICR_VSGIR, GICR_VSGIPENDR), which allow the 16 interrupts
+  state to be retrieved.
+- Setting the pending state is done by generating it as we'd otherwise do
+  for a guest (writing to GITS_SGIR).
+- Clearing the pending state is done by emiting a VSGI command with the
+  "clear" bit set.
+
+This requires some interesting locking though:
+- When talking to the redistributor, we must make sure that the VPE
+  affinity doesn't change, hence taking the VPE lock.
+- At the same time, we must ensure that nobody accesses the same
+  redistributor's GICR_VSGI*R registers for a different VPE, which
+  would corrupt the reading of the pending bits. We thus take the
+  per-RD spinlock. Much fun.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/arm/vgic/vgic-v4.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c   | 73 ++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h | 14 ++++++
+ 2 files changed, 87 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 1eb0f8c76219..c2fcde104ea2 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -141,6 +141,7 @@ int vgic_v4_init(struct kvm *kvm)
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index c93f178914ee..fb2b836c31ff 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3962,11 +3962,84 @@ static int its_sgi_set_affinity(struct irq_data *d,
+ 	return -EINVAL;
+ }
  
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		int irq = dist->its_vm.vpes[i]->irq;
-+		unsigned long irq_flags = DB_IRQ_FLAGS;
- 
- 		/*
- 		 * Don't automatically enable the doorbell, as we're
-@@ -148,8 +149,14 @@ int vgic_v4_init(struct kvm *kvm)
- 		 * blocked. Also disable the lazy disabling, as the
- 		 * doorbell could kick us out of the guest too
- 		 * early...
-+		 *
-+		 * On GICv4.1, the doorbell is managed in HW and must
-+		 * be left enabled.
- 		 */
--		irq_set_status_flags(irq, DB_IRQ_FLAGS);
-+		if (kvm_vgic_global_state.has_gicv4_1)
-+			irq_flags &= ~IRQ_NOAUTOEN;
-+		irq_set_status_flags(irq, irq_flags);
++static int its_sgi_set_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which,
++				     bool state)
++{
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
 +
- 		ret = request_irq(irq, vgic_v4_doorbell_handler,
- 				  0, "vcpu", vcpu);
- 		if (ret) {
++	if (state) {
++		struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++		struct its_node *its = find_4_1_its();
++		u64 val;
++
++		val  = FIELD_PREP(GITS_SGIR_VPEID, vpe->vpe_id);
++		val |= FIELD_PREP(GITS_SGIR_VINTID, d->hwirq);
++		writeq_relaxed(val, its->sgir_base + GITS_SGIR - SZ_128K);
++	} else {
++		its_configure_sgi(d, true);
++	}
++
++	return 0;
++}
++
++static int its_sgi_get_irqchip_state(struct irq_data *d,
++				     enum irqchip_irq_state which, bool *val)
++{
++	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
++	void __iomem *base;
++	unsigned long flags;
++	u32 count = 1000000;	/* 1s! */
++	u32 status;
++	int cpu;
++
++	if (which != IRQCHIP_STATE_PENDING)
++		return -EINVAL;
++
++	/*
++	 * Locking galore! We can race against two different events:
++	 *
++	 * - Concurent vPE affinity change: we must make sure it cannot
++         *   happen, or we'll talk to the wrong redistributor. This is
++         *   identical to what happens with vLPIs.
++	 *
++	 * - Concurrent VSGIPENDR access: As it involves accessing two
++         *   MMIO registers, this must be made atomic one way or another.
++	 */
++	cpu = vpe_to_cpuid_lock(vpe, &flags);
++	raw_spin_lock(&gic_data_rdist_cpu(cpu)->rd_lock);
++	base = gic_data_rdist_cpu(cpu)->rd_base + SZ_128K;
++	writel_relaxed(vpe->vpe_id, base + GICR_VSGIR);
++	do {
++		status = readl_relaxed(base + GICR_VSGIPENDR);
++		if (!(status & GICR_VSGIPENDR_BUSY))
++			goto out;
++
++		count--;
++		if (!count) {
++			pr_err_ratelimited("Unable to get SGI status\n");
++			goto out;
++		}
++		cpu_relax();
++		udelay(1);
++	} while(count);
++
++out:
++	raw_spin_unlock(&gic_data_rdist_cpu(cpu)->rd_lock);
++	vpe_to_cpuid_unlock(vpe, flags);
++	*val = !!(status & (1 << d->hwirq));
++
++	return 0;
++}
++
+ static struct irq_chip its_sgi_irq_chip = {
+ 	.name			= "GICv4.1-sgi",
+ 	.irq_mask		= its_sgi_mask_irq,
+ 	.irq_unmask		= its_sgi_unmask_irq,
+ 	.irq_set_affinity	= its_sgi_set_affinity,
++	.irq_set_irqchip_state	= its_sgi_set_irqchip_state,
++	.irq_get_irqchip_state	= its_sgi_get_irqchip_state,
+ };
+ 
+ static int its_sgi_irq_domain_alloc(struct irq_domain *domain,
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index fd3be49ac9a5..830d2abf14b3 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -345,6 +345,15 @@
+ #define GICR_VPENDBASER_4_1_VGRP1EN	(1ULL << 58)
+ #define GICR_VPENDBASER_4_1_VPEID	GENMASK_ULL(15, 0)
+ 
++#define GICR_VSGIR			0x0080
++
++#define GICR_VSGIR_VPEID		GENMASK(15, 0)
++
++#define GICR_VSGIPENDR			0x0088
++
++#define GICR_VSGIPENDR_BUSY		(1U << 31)
++#define GICR_VSGIPENDR_PENDING		GENMASK(15, 0)
++
+ /*
+  * ITS registers, offsets from ITS_base
+  */
+@@ -368,6 +377,11 @@
+ 
+ #define GITS_TRANSLATER			0x10040
+ 
++#define GITS_SGIR			0x20020
++
++#define GITS_SGIR_VPEID			GENMASK_ULL(47, 32)
++#define GITS_SGIR_VINTID		GENMASK_ULL(7, 0)
++
+ #define GITS_CTLR_ENABLE		(1U << 0)
+ #define GITS_CTLR_ImDe			(1U << 1)
+ #define	GITS_CTLR_ITS_NUMBER_SHIFT	4
 -- 
 2.20.1
 
