@@ -2,63 +2,105 @@ Return-Path: <SRS0=Em7b=4W=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B682CC3F2CD
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Mar 2020 11:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B897AC3F2D7
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Mar 2020 12:17:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 41B3D208C3
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Mar 2020 11:10:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B3D208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 489E9208CD
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Mar 2020 12:17:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 489E9208CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81AEF4AEBB;
-	Thu,  5 Mar 2020 06:10:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA1994AEBB;
+	Thu,  5 Mar 2020 07:17:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2oY3F1bjF0Mj; Thu,  5 Mar 2020 06:10:42 -0500 (EST)
+	with ESMTP id JcZKWxIJFORy; Thu,  5 Mar 2020 07:17:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 175354AEB1;
-	Thu,  5 Mar 2020 06:10:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A74E74AEBC;
+	Thu,  5 Mar 2020 07:17:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E7354AE9E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2020 06:10:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D8954A95D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2020 04:43:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yPEvVgTL8xAx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Mar 2020 06:10:38 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A62D74AE9F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2020 06:10:38 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33FA831B;
- Thu,  5 Mar 2020 03:10:38 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C02B33F6C4;
- Thu,  5 Mar 2020 03:10:36 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 8/9] arm: gic: Provide per-IRQ helper
- functions
-To: Andrew Jones <drjones@redhat.com>, Eric Auger <eric.auger@redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-9-eric.auger@redhat.com>
- <20200305095529.hkdyhghkofquat75@kamzik.brq.redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <80417be0-b897-2e09-ad56-05ae6b6a5fd6@arm.com>
-Date: Thu, 5 Mar 2020 11:10:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id iOArfvqI4gAV for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Mar 2020 04:43:45 -0500 (EST)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de
+ [85.220.165.71])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C145D4A588
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2020 04:43:45 -0500 (EST)
+Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
+ by metis.ext.pengutronix.de with esmtps
+ (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mfe@pengutronix.de>)
+ id 1j9n2b-0003Jp-1c; Thu, 05 Mar 2020 10:43:41 +0100
+Received: from mfe by pty.hi.pengutronix.de with local (Exim 4.89)
+ (envelope-from <mfe@pengutronix.de>)
+ id 1j9n2P-0007e4-2o; Thu, 05 Mar 2020 10:43:29 +0100
+Date: Thu, 5 Mar 2020 10:43:29 +0100
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH v6 0/6] KASan for arm
+Message-ID: <20200305094328.sizz4vm4wamywdct@pengutronix.de>
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <20191114181243.q37rxoo3seds6oxy@pengutronix.de>
+ <7322163f-e08e-a6b7-b143-e9d59917ee5b@gmail.com>
+ <20191115070842.2x7psp243nfo76co@pengutronix.de>
+ <20191115114416.ba6lmwb7q4gmepzc@pengutronix.de>
+ <60bda4a9-f4f8-3641-2612-17fab3173b29@gmail.com>
+ <CACRpkdYJR3gQCb4WXwF4tGzk+tT7jMcV9=nDK0PFkeh+0G11bA@mail.gmail.com>
+ <2639dfb0-9e48-cc0f-27e5-34308f790293@gmail.com>
+ <CACRpkdZ8JA=DXOxzYwyvBxCMd2Q5uzLTn87AVK7wdrxHFo5ydQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305095529.hkdyhghkofquat75@kamzik.brq.redhat.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, andre.przywara@arm.com, andrew.murray@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Content-Disposition: inline
+In-Reply-To: <CACRpkdZ8JA=DXOxzYwyvBxCMd2Q5uzLTn87AVK7wdrxHFo5ydQ@mail.gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-IRC: #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 10:40:52 up 111 days, 59 min, 138 users, load average: 0.50, 0.16, 
+ 0.05
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de);
+ SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.cs.columbia.edu
+X-Mailman-Approved-At: Thu, 05 Mar 2020 07:17:52 -0500
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Florian Fainelli <f.fainelli@gmail.com>, Rob Landley <rob@landley.net>,
+ Jonathan Corbet <corbet@lwn.net>, Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, philip@cog.systems,
+ Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Dmitry Vyukov <dvyukov@google.com>, Nicolas Pitre <nico@fluxnic.net>,
+ Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Sascha Hauer <kernel@pengutronix.de>,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,210 +117,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On 20-03-05 09:43, Linus Walleij wrote:
+> Hi Florian,
+> 
+> On Fri, Jan 17, 2020 at 8:55 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
+> 
+> > Let me submit and rebase v7 get the auto builders some days to see if it
+> > exposes a new build issue and then we toss it to RMK's patch tracker and
+> > fix bugs from there?
+> 
+> Sorry for hammering, can we get some initial patches going into
+> Russell's patch tracker here? I can sign them off and put them in
+> if you don't have time.
 
-I'm going to reiterate the comments I posted on this exact same patch sent by
-Andre [1], and add a few new ones.
+I've tested the branch on several imx6 based boards with different
+toolchains. Some boards booting normal and some of them are lost in
+space... I didn't debugged it yet just wanted to inform you.
 
-[1] https://www.spinics.net/lists/arm-kernel/msg767690.html
+Regards,
+  Marco
 
-On 3/5/20 9:55 AM, Andrew Jones wrote:
-> On Thu, Jan 30, 2020 at 12:25:09PM +0100, Eric Auger wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
->>
->> A common theme when accessing per-IRQ parameters in the GIC distributor
->> is to set fields of a certain bit width in a range of MMIO registers.
->> Examples are the enabled status (one bit per IRQ), the level/edge
->> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
->>
->> Add a generic helper function which is able to mask and set the
->> respective number of bits, given the IRQ number and the MMIO offset.
->> Provide wrappers using this function to easily allow configuring an IRQ.
->>
->> For now assume that private IRQ numbers always refer to the current CPU.
->> In a GICv2 accessing the "other" private IRQs is not easily doable (the
->> registers are banked per CPU on the same MMIO address), so we impose the
->> same limitation on GICv3, even though those registers are not banked
->> there anymore.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Missing Eric's s-b.
->
->> ---
->>
->> initialize reg
->> ---
->>  lib/arm/asm/gic-v3.h |  2 +
->>  lib/arm/asm/gic.h    |  9 +++++
->>  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 101 insertions(+)
->>
->> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
->> index 347be2f..4a445a5 100644
->> --- a/lib/arm/asm/gic-v3.h
->> +++ b/lib/arm/asm/gic-v3.h
->> @@ -23,6 +23,8 @@
->>  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
->>  #define GICD_CTLR_ENABLE_G1		(1U << 0)
->>  
->> +#define GICD_IROUTER			0x6000
->> +
->>  /* Re-Distributor registers, offsets from RD_base */
->>  #define GICR_TYPER			0x0008
->>  
->> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
->> index 1fc10a0..21cdb58 100644
->> --- a/lib/arm/asm/gic.h
->> +++ b/lib/arm/asm/gic.h
->> @@ -15,6 +15,7 @@
->>  #define GICD_IIDR			0x0008
->>  #define GICD_IGROUPR			0x0080
->>  #define GICD_ISENABLER			0x0100
->> +#define GICD_ICENABLER			0x0180
->>  #define GICD_ISPENDR			0x0200
->>  #define GICD_ICPENDR			0x0280
->>  #define GICD_ISACTIVER			0x0300
->> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
->>  extern void gic_ipi_send_single(int irq, int cpu);
->>  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
->>  
->> +void gic_set_irq_bit(int irq, int offset);
->> +void gic_enable_irq(int irq);
->> +void gic_disable_irq(int irq);
->> +void gic_set_irq_priority(int irq, u8 prio);
->> +void gic_set_irq_target(int irq, int cpu);
->> +void gic_set_irq_group(int irq, int group);
->> +int gic_get_irq_group(int irq);
->> +
->>  #endif /* !__ASSEMBLY__ */
->>  #endif /* _ASMARM_GIC_H_ */
->> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
->> index 9430116..aa9cb86 100644
->> --- a/lib/arm/gic.c
->> +++ b/lib/arm/gic.c
->> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->>  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
->>  	gic_common_ops->ipi_send_mask(irq, dest);
->>  }
->> +
->> +enum gic_bit_access {
->> +	ACCESS_READ,
->> +	ACCESS_SET,
->> +	ACCESS_RMW
->> +};
->> +
->> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
->> +			      enum gic_bit_access access)
->> +{
->> +	void *base;
->> +	int split = 32 / bits;
->> +	int shift = (irq % split) * bits;
->> +	u32 reg = 0, mask = ((1U << bits) - 1) << shift;
->> +
->> +	switch (gic_version()) {
->> +	case 2:
->> +		base = gicv2_dist_base();
->> +		break;
->> +	case 3:
->> +		if (irq < 32)
->> +			base = gicv3_sgi_base();
->> +		else
->> +			base = gicv3_dist_base();
->> +		break;
->> +	default:
->> +		return 0;
->> +	}
->> +	base += offset + (irq / split) * 4;
->> +
->> +	switch (access) {
->> +	case ACCESS_READ:
->> +		return (readl(base) & mask) >> shift;
->> +	case ACCESS_SET:
->> +		reg = 0;
->> +		break;
->> +	case ACCESS_RMW:
->> +		reg = readl(base) & ~mask;
->> +		break;
->> +	}
->> +
->> +	writel(reg | ((u32)value << shift), base);
->> +
->> +	return 0;
->> +}
-
-This function looks a bit out of place:
-- the function name has a verb in the past tense ('masked'), which makes me think
-it should return a bool, but the function actually performs an access to a GIC
-register.
-- the return value is an u8, but it returns an u32 on a read, because readl
-returns an u32.
-- the semantics of the function and the return value change based on the access
-parameter; worse yet, the return value on a write is completely ignored by the
-callers and the value parameter is ignored on reads.
-
-And a few new niggles:
-- the accessor functions are hard to read: git_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET). What the 1's represent is not obvious without reading the gic_masked_irq_bits functions.
-- Andrew introduced a function to check the IRQ state at the GIC level [2]. The function is clear and nice to read because it has no indirection. How about we follow this pattern for all the accessors below and we remove the calls to gic_masked_irq_bits entirely? 
-
-[2] https://www.spinics.net/lists/kvm/msg207073.html
-
-Thanks,
-Alex
-
->> +
->> +void gic_set_irq_bit(int irq, int offset)
->> +{
->> +	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
->> +}
->> +
->> +void gic_enable_irq(int irq)
->> +{
->> +	gic_set_irq_bit(irq, GICD_ISENABLER);
->> +}
->> +
->> +void gic_disable_irq(int irq)
->> +{
->> +	gic_set_irq_bit(irq, GICD_ICENABLER);
->> +}
->> +
->> +void gic_set_irq_priority(int irq, u8 prio)
->> +{
->> +	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
->> +}
->> +
->> +void gic_set_irq_target(int irq, int cpu)
->> +{
->> +	if (irq < 32)
->> +		return;
->> +
->> +	if (gic_version() == 2) {
->> +		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
->> +				    ACCESS_RMW);
->> +
->> +		return;
->> +	}
->> +
->> +	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
->> +}
->> +
->> +void gic_set_irq_group(int irq, int group)
->> +{
->> +	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
->> +}
->> +
->> +int gic_get_irq_group(int irq)
->> +{
->> +	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
->> +}
->> -- 
->> 2.20.1
->>
->>
-> Looks good to me.
->
 > Thanks,
-> drew
->
+> Linus Walleij
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
