@@ -1,84 +1,65 @@
-Return-Path: <SRS0=IHVC=42=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Utlv=43=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 364AEC18E5A
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Mar 2020 18:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A66C10F27
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 08:26:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C235020578
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Mar 2020 18:17:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSU3G+k3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C235020578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 8739424677
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 08:26:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8739424677
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E05F4A542;
-	Mon,  9 Mar 2020 14:17:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC6A74A2E5;
+	Tue, 10 Mar 2020 04:26:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8c91cn-zvisY; Mon,  9 Mar 2020 14:17:19 -0400 (EDT)
+	with ESMTP id Ug0+rDzFUIOG; Tue, 10 Mar 2020 04:26:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B4AE4A4FC;
-	Mon,  9 Mar 2020 14:17:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 553A24A528;
+	Tue, 10 Mar 2020 04:26:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 033394A4BE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2020 14:17:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 481D54A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 04:26:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IXRbz7IzdV0A for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Mar 2020 14:17:17 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D2040152
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2020 14:17:16 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583777836;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AcKeyBIFIAYs+7QT/qIbpPBFwomeSgcpZFyE84PAy9U=;
- b=VSU3G+k3jYMCEh0nhlOfo56jW3B95anDs4i0c79127vQUo+YCJ/Wkcp3/u1Y16d+93siyI
- 0YQV0M/+UJ5Lt2n85b36d3baQRXaAouxBtP+IshTHOma7iaXCU+SjFnG0XHw69FxQ4kzCy
- +TnznGn+exSBB8D3HAfdPDxaoUcRdco=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-v-Lmv5crPmyT1kNrDWhytg-1; Mon, 09 Mar 2020 14:17:14 -0400
-X-MC-Unique: v-Lmv5crPmyT1kNrDWhytg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2AA1107ACC9;
- Mon,  9 Mar 2020 18:17:12 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B58D460C05;
- Mon,  9 Mar 2020 18:17:10 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200309124837.19908-1-maz@kernel.org>
- <20200309124837.19908-3-maz@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
-Date: Mon, 9 Mar 2020 19:17:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id zSwmOVDpB2r6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Mar 2020 04:26:29 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E7B14A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 04:26:29 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id E5E52B5FFA0075FDFCFE;
+ Tue, 10 Mar 2020 16:26:25 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.230) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0;
+ Tue, 10 Mar 2020 16:26:19 +0800
+Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small
+ chunks
+To: Marc Zyngier <maz@kernel.org>
+References: <20200309085727.1106-1-zhukeqian1@huawei.com>
+ <4b85699ec1d354cc73f5302560231f86@misterjones.org>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
+Date: Tue, 10 Mar 2020 16:26:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20200309124837.19908-3-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Cc: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <4b85699ec1d354cc73f5302560231f86@misterjones.org>
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>, Jay
+ Zhou <jianjay.zhou@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,78 +78,160 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-On 3/9/20 1:48 PM, Marc Zyngier wrote:
-> Add a small blurb describing how the event filtering API gets used.
+On 2020/3/9 19:45, Marc Zyngier wrote:
+> Kegian,
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst | 40 +++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
+> In the future, please Cc me on  your KVM/arm64 patches, as well as
+> all the reviewers mentioned in the MAINTAINERS file.
 > 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 9963e680770a..7262c0469856 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.  If using the PMUv3 with an in-kernel
->  virtual GIC implementation, this must be done after initializing the in-kernel
->  irqchip.
->  
-> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
-> +---------------------------------------
-> +
-> +:Parameters: in kvm_device_attr.addr the address for a PMU event filter is a
-> +             pointer to a struct kvm_pmu_event_filter
-> +
-> +:Returns:
-> +
-> +	 =======  ======================================================
-> +	 -ENODEV: PMUv3 not supported or GIC not initialized
-> +	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
-> +	 	  configured as required prior to calling this attribute
-> +	 -EBUSY:  PMUv3 already initialized
-maybe document -EINVAL?
-> +	 =======  ======================================================
-> +
-> +Request the installation of a PMU event filter describe as follows:
-s/describe/described
-> +
-> +struct kvm_pmu_event_filter {
-> +	__u16	base_event;
-> +	__u16	nevents;
-> +
-> +#define KVM_PMU_EVENT_ALLOW	0
-> +#define KVM_PMU_EVENT_DENY	1
-> +
-> +	__u8	action;
-> +	__u8	pad[3];
-> +};
-> +
-> +A filter range is defined as the range [@base_event, @base_event + @nevents[,
-> +together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). The
-> +first registered range defines the global policy (global ALLOW if the first
-> +@action is DENY, global DENY if the first @action is ALLOW). Multiple ranges
-> +can be programmed, and must fit within the 16bit space defined by the ARMv8.1
-> +PMU architecture.
-what about before 8.1 where the range was 10 bits? Should it be tested
-in the code?
+> On 2020-03-09 08:57, Keqian Zhu wrote:
+>> There is already support of enabling dirty log graually
+> 
+> gradually?
+> 
+Yeah, gradually. :)
+>> in small chunks for x86. This adds support for arm64.
+>>
+>> Under the Huawei Kunpeng 920 2.6GHz platform, I did some
+>> tests with a 128G linux VM and counted the time taken of
+> 
+> Linux
+Thanks.
+> 
+>> memory_global_dirty_log_start, here is the numbers:
+>>
+>> VM Size        Before    After optimization
+>> 128G           527ms     4ms
+> 
+> What does this benchmark do? Can you please provide a pointer to it?
+> 
+I will explain this in following text.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>> Cc: Jay Zhou <jianjay.zhou@huawei.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Peter Xu <peterx@redhat.com>
+>> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+>> ---
+>>  Documentation/virt/kvm/api.rst    |  2 +-
+>>  arch/arm64/include/asm/kvm_host.h |  4 ++++
+>>  virt/kvm/arm/mmu.c                | 30 ++++++++++++++++++++++--------
+>>  3 files changed, 27 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 0adef66585b1..89d4f2680af1 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -5735,7 +5735,7 @@ will be initialized to 1 when created.  This
+>> also improves performance because
+>>  dirty logging can be enabled gradually in small chunks on the first call
+>>  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
+>>  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
+>> -x86 for now).
+>> +x86 and arm64 for now).
+> 
+> What is this based on? I can't find this in -next, and you provide no
+> context whatsoever.
+This is based on branch "queue" of git://git.kernel.org/pub/scm/virt/kvm/kvm.git
+> 
+> I assume this is related to this:
+> https://lore.kernel.org/kvm/20200227013227.1401-1-jianjay.zhou@huawei.com/
+> 
+Yes, you are right.
 
-nitpicking: It is not totally obvious what does happen if the user space
-sets a deny filter on a range and then an allow filter on the same
-range. it is supported but may be worth telling so? Also explain the the
-default filtering remains "allow" by default?
-> +
-> +Restrictions: Event 0 (SW_INCR) is never filtered, as it doesn't count a
-> +hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
-> +isn't strictly speaking an event. Filtering the cycle counter is possible
-> +using event 0x11 (CPU_CYCLES).
-Thanks
+The background is that in [https://patchwork.kernel.org/cover/10702447/], Paolo
+made an optimization for dirty log sync used by VM migration. Currently the dirty
+log sync logic is getting and clearing dirty log at the same time for each KVM
+memslot. This will lead to obvious problem for large guests.
 
-Eric
-> +
->  
->  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->  =================================
+As described by Paolo, "First, and less important, it can take kvm->mmu_lock for
+an extended period of time.  Second, its user can actually see many false positives
+in some cases." There will be enough time for guests mark page dirty again between
+Qemu synchronizes dirty log and actually sends these page, so both guests and Qemu
+will suffer unnecessary overhead.
+
+Paolo introduced a new KVM ioctl. "The new KVM_CLEAR_DIRTY_LOG ioctl can operate
+on a 64-page granularity rather than requiring to sync a full memslot. This way
+the mmu_lock is taken for small amounts of time, and only a small amount of time
+will pass between write protection of pages and the sending of their content."
+
+The changes made by Paolo have been merge to mainline kernel. And the userspace
+counterpart (Qemu) also has been updated.
+
+After that, Jay Zhou declared an optimization about enable dirty log (The link you
+paste above) based on Paolo's work. When enabling dirty log, we dont need to write
+protect PTEs now. All PTEs will be write protected after first round RAM sending.
+
+> Is there a userspace counterpart to it?
 > 
+As this KVM/x86 related changes have not been merged to mainline kernel, some little
+modification is needed on mainline Qemu.
+
+As I tested this patch on a 128GB RAM Linux VM with no huge pages, the time of enabling
+dirty log will decrease obviously.
+
+>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
+>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
+>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>> b/arch/arm64/include/asm/kvm_host.h
+>> index d87aa609d2b6..0deb2ac7d091 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -16,6 +16,7 @@
+>>  #include <linux/jump_label.h>
+>>  #include <linux/kvm_types.h>
+>>  #include <linux/percpu.h>
+>> +#include <linux/kvm.h>
+>>  #include <asm/arch_gicv3.h>
+>>  #include <asm/barrier.h>
+>>  #include <asm/cpufeature.h>
+>> @@ -45,6 +46,9 @@
+>>  #define KVM_REQ_VCPU_RESET    KVM_ARCH_REQ(2)
+>>  #define KVM_REQ_RECORD_STEAL    KVM_ARCH_REQ(3)
+>>
+>> +#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>> +                    KVM_DIRTY_LOG_INITIALLY_SET)
+>> +
+>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>
+>>  extern unsigned int kvm_sve_max_vl;
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index e3b9ee268823..5c7ca84dec85 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1438,9 +1438,11 @@ static void stage2_wp_ptes(pmd_t *pmd,
+>> phys_addr_t addr, phys_addr_t end)
+>>   * @pud:    pointer to pud entry
+>>   * @addr:    range start address
+>>   * @end:    range end address
+>> + * @wp_ptes:    write protect ptes or not
+>>   */
+>>  static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+>> -               phys_addr_t addr, phys_addr_t end)
+>> +               phys_addr_t addr, phys_addr_t end,
+>> +               bool wp_ptes)
+> 
+> If you are going to pass extra parameters like this, make it at least
+> extensible (unsigned long flags, for example).
+> 
+OK, I will use flags in formal patch.
+>>  {
+>>      pmd_t *pmd;
+>>      phys_addr_t next;
+>> @@ -1453,7 +1455,7 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+>>              if (pmd_thp_or_huge(*pmd)) {
+>>                  if (!kvm_s2pmd_readonly(pmd))
+>>                      kvm_set_s2pmd_readonly(pmd);
+>> -            } else {
+>> +            } else if (wp_ptes) {
+>>                  stage2_wp_ptes(pmd, addr, next);
+>>              }
+>>          }
+[...]
+
+Thanks,
+keqian
 
 _______________________________________________
 kvmarm mailing list
