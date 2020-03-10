@@ -2,60 +2,85 @@ Return-Path: <SRS0=Utlv=43=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDE4C10F27
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 17:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB31C10F27
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 17:30:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 569B22146E
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 17:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 569B22146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9EAF22146E
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 17:30:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSFUNLqW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAF22146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AECE34A3B4;
-	Tue, 10 Mar 2020 13:28:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 244374A576;
+	Tue, 10 Mar 2020 13:30:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tmM2yXXGAyT1; Tue, 10 Mar 2020 13:28:20 -0400 (EDT)
+	with ESMTP id ROj8xNpbvEXV; Tue, 10 Mar 2020 13:30:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C3D4A3BF;
-	Tue, 10 Mar 2020 13:28:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4AA24A32E;
+	Tue, 10 Mar 2020 13:30:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D92894A32E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 13:28:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 808394A32E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 13:30:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pDducI50o6aP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Mar 2020 13:28:18 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84A8F40A52
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 13:28:18 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCD8A1FB;
- Tue, 10 Mar 2020 10:28:17 -0700 (PDT)
-Received: from [10.1.196.37] (e121345-lin.cambridge.arm.com [10.1.196.37])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8AC13F67D;
- Tue, 10 Mar 2020 10:28:16 -0700 (PDT)
-Subject: Re: [PATCHv6 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
- counters
-To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-References: <20200302181752.14251-1-mark.rutland@arm.com>
- <20200303190742.GD7649@lakrids.cambridge.arm.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <2713672f-bd82-ba8d-5fae-777ef5e754eb@arm.com>
-Date: Tue, 10 Mar 2020 17:28:15 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ with ESMTP id jn0Vj2eJjU2f for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Mar 2020 13:30:39 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 838F940A52
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 13:30:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583861439;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=r6RWW66Auc2Rk/GNuUgSAGvLduNQwWlqc2HkVeIS1zc=;
+ b=VSFUNLqW/O9LJUofrtIlTkuYYbhqffy23fquzBQjQK9Yr1xQ6EyLq8rXHCvcqU/4bCaAB/
+ Tug8NcmqVTtgXiZKd7WTcVpWkwPHeeafRVOoVlhiM/oR8dmeAp++vZdUsZUKW0hLn5H1v2
+ kyJHUePkVR6u4h22Gs0waMGTvb0P6LU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-4H-srkrCPfWDrBsXlrJ0_w-1; Tue, 10 Mar 2020 13:30:35 -0400
+X-MC-Unique: 4H-srkrCPfWDrBsXlrJ0_w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45FEE107ACC4;
+ Tue, 10 Mar 2020 17:30:33 +0000 (UTC)
+Received: from [10.36.117.85] (ovpn-117-85.ams2.redhat.com [10.36.117.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 14EF110013A1;
+ Tue, 10 Mar 2020 17:30:30 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
+To: Marc Zyngier <maz@kernel.org>
+References: <20200309124837.19908-1-maz@kernel.org>
+ <20200309124837.19908-3-maz@kernel.org>
+ <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
+ <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <867c7926-df43-7ab0-d20a-211a59d7612d@redhat.com>
+Date: Tue, 10 Mar 2020 18:30:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200303190742.GD7649@lakrids.cambridge.arm.com>
-Content-Language: en-GB
-Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- maz@kernel.org
+In-Reply-To: <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,59 +92,125 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 03/03/2020 7:07 pm, Mark Rutland wrote:
-> On Mon, Mar 02, 2020 at 06:17:49PM +0000, Mark Rutland wrote:
->> This is a respin of Andrew Murray's series to enable support for 64-bit
->> counters as introduced in ARMv8.5.
+Hi Marc,
+
+On 3/10/20 12:54 PM, Marc Zyngier wrote:
+> On 2020-03-09 18:17, Auger Eric wrote:
+>> Hi Marc,
 >>
->> I've given this a spin on (ARMv8.2) hardware, to test that there are no
->> regressions, but I have not had the chance to test in an ARMv8.5 model (which I
->> beleive Andrew had previously tested).
-> 
-> Bad news; this is broken. :(
-> 
-> While perf-stat works as expected, perf-record doesn't get samples for
-> any of the programmable counters.
-> 
-> In ARMv8.4 mode I can do:
-> 
-> | / # perf record -a -c 1 -e armv8_pmuv3/inst_retired/ true
-> | [ perf record: Woken up 1 times to write data ]
-> | [ perf record: Captured and wrote 0.023 MB perf.data (367 samples) ]
-> | / # perf record -a -c 1 -e armv8_pmuv3/inst_retired,long/ true
-> | [ perf record: Woken up 1 times to write data ]
-> | [ perf record: Captured and wrote 0.022 MB perf.data (353 samples) ]
-> 
-> ... so regular 32-bit and chained events work correctly.
-> 
-> But in ARMv8.5 mode I get no samples in either case:
-> 
-> | / # perf record -a -c 1 -e armv8_pmuv3/inst_retired/ true
-> | [ perf record: Woken up 1 times to write data ]
-> | [ perf record: Captured and wrote 0.008 MB perf.data ]
-> | / # perf report | grep samples
-> | Error:
-> | The perf.data file has no samples!
-> | / # perf record -a -c 1 -e armv8_pmuv3/inst_retired,long/ true
-> | [ perf record: Woken up 1 times to write data ]
-> | [ perf record: Captured and wrote 0.008 MB perf.data ]
-> | / # perf report | grep samples
-> | Error:
-> | The perf.data file has no samples!
-> 
-> I'll have to trace the driver to see what's going on. I suspect we've
-> missed some bias handling, but it's possible that this is a model bug.
+>> On 3/9/20 1:48 PM, Marc Zyngier wrote:
+>>> Add a small blurb describing how the event filtering API gets used.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>> =A0Documentation/virt/kvm/devices/vcpu.rst | 40 +++++++++++++++++++++++=
+++
+>>> =A01 file changed, 40 insertions(+)
+>>>
+>>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
+>>> b/Documentation/virt/kvm/devices/vcpu.rst
+>>> index 9963e680770a..7262c0469856 100644
+>>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>>> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.=A0 If using
+>>> the PMUv3 with an in-kernel
+>>> =A0virtual GIC implementation, this must be done after initializing the
+>>> in-kernel
+>>> =A0irqchip.
+>>>
+>>> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
+>>> +---------------------------------------
+>>> +
+>>> +:Parameters: in kvm_device_attr.addr the address for a PMU event
+>>> filter is a
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pointer to a struct kvm_pmu_event=
+_filter
+>>> +
+>>> +:Returns:
+>>> +
+>>> +=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>> +=A0=A0=A0=A0 -ENODEV: PMUv3 not supported or GIC not initialized
+>>> +=A0=A0=A0=A0 -ENXIO:=A0 PMUv3 not properly configured or in-kernel irq=
+chip not
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 configured as required prior to calling=
+ this attribute
+>>> +=A0=A0=A0=A0 -EBUSY:=A0 PMUv3 already initialized
+>> maybe document -EINVAL?
+> =
 
-For the record, further evidence has indeed pointed to there being a bug 
-in the model's implementation of ARMv8.5-PMU. It's been raised with the 
-models team, so we'll have wait and see what they say...
+> Yup, definitely.
+> =
 
-Robin.
+>>> +=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>> +
+>>> +Request the installation of a PMU event filter describe as follows:
+>> s/describe/described
+>>> +
+>>> +struct kvm_pmu_event_filter {
+>>> +=A0=A0=A0 __u16=A0=A0=A0 base_event;
+>>> +=A0=A0=A0 __u16=A0=A0=A0 nevents;
+>>> +
+>>> +#define KVM_PMU_EVENT_ALLOW=A0=A0=A0 0
+>>> +#define KVM_PMU_EVENT_DENY=A0=A0=A0 1
+>>> +
+>>> +=A0=A0=A0 __u8=A0=A0=A0 action;
+>>> +=A0=A0=A0 __u8=A0=A0=A0 pad[3];
+>>> +};
+>>> +
+>>> +A filter range is defined as the range [@base_event, @base_event +
+>>> @nevents[,
+>>> +together with an @action (KVM_PMU_EVENT_ALLOW or
+>>> KVM_PMU_EVENT_DENY). The
+>>> +first registered range defines the global policy (global ALLOW if
+>>> the first
+>>> +@action is DENY, global DENY if the first @action is ALLOW).
+>>> Multiple ranges
+>>> +can be programmed, and must fit within the 16bit space defined by
+>>> the ARMv8.1
+>>> +PMU architecture.
+>> what about before 8.1 where the range was 10 bits? Should it be tested
+>> in the code?
+> =
+
+> It's a good point. We could test that upon installing the filter and limit
+> the bitmap allocation to the minimum.
+> =
+
+>> nitpicking: It is not totally obvious what does happen if the user space
+>> sets a deny filter on a range and then an allow filter on the same
+>> range. it is supported but may be worth telling so? Also explain the the
+>> default filtering remains "allow" by default?
+> =
+
+> Overlapping filters are easy: the last one wins. And yes, no filter means
+> just that: no filter.
+Actually the point I wanted to put forward is
+1) set allow filter on range [0-a] -> default setting is deny and allow
+[0-a] only
+2) deny deny filter on rang [0-a] -> there is no "real" active filtering
+anymore but default behavior still is deny. ie. you do not destroy the
+bitmap on the last filter removal but on the VM removal.
+
+Thanks
+
+Eric
+
+> =
+
+> Thanks,
+> =
+
+> =A0=A0=A0=A0=A0=A0=A0 M.
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
