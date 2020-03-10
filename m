@@ -2,83 +2,84 @@ Return-Path: <SRS0=Utlv=43=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB4CC18E5B
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 11:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 354B6C10F27
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 11:56:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3206D2464B
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 11:54:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA2912468C
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Mar 2020 11:56:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3UGAoUo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3206D2464B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fj5t5XMn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA2912468C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E11D4A597;
-	Tue, 10 Mar 2020 07:54:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D36F4A500;
+	Tue, 10 Mar 2020 07:56:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TOSAqOYI503L; Tue, 10 Mar 2020 07:54:54 -0400 (EDT)
+	with ESMTP id 1KLwyaghtwdo; Tue, 10 Mar 2020 07:56:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF64F4A4A0;
-	Tue, 10 Mar 2020 07:54:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 325954A51F;
+	Tue, 10 Mar 2020 07:56:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F63A4A4A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 07:54:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 877C24A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 07:56:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZJjdPKFJJslj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Mar 2020 07:54:52 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DD094A1B0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 07:54:52 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 2PvpZ6DPl0+2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Mar 2020 07:56:53 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 741D14A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2020 07:56:53 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583841413;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mkbbEKW7QEXShSOEzrtREPglmDREmtovE720FoZTixg=;
+ b=Fj5t5XMnV1YL3LKRFGqEAgpyYeGy+0kCX5hX/oCGEi5TvUlqDCI86rrK+ae2NIbDFcR0cV
+ 2Bpe26cp46cro89qnTLFmGl7hICkLxv5F7RhBCMLKUNm5ZZNDi1YUidXMmSDyJtqLgg1Cn
+ 4Aa1c7+OrnbjHd7mkgFZ4PCvxBFdKHw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-7XoWPANpNouHhszEpiwCag-1; Tue, 10 Mar 2020 07:56:51 -0400
+X-MC-Unique: 7XoWPANpNouHhszEpiwCag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 49D5B2464B;
- Tue, 10 Mar 2020 11:54:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1583841291;
- bh=oHt26cI0evbqGQu3N7YOlcKoUwgoa88DrVqzHJqkdEw=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=j3UGAoUogik5p9i5EPRsvGFc8i4r+/KdQnG9teAjKg3+Ld3RyOoDWINtKMATN8Z9k
- kZ1UniPntVhawKyyaOl0XqSyHRs1u016YYBMkpBKfVXVZ82CFWwQRJlWU3vPvA6akY
- 00fJiFeTZYd2IGtSz1+9hLWDFvkvESMmIdfjsvl0=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jBdTF-00BYBZ-DK; Tue, 10 Mar 2020 11:54:49 +0000
-MIME-Version: 1.0
-Date: Tue, 10 Mar 2020 11:54:49 +0000
-From: Marc Zyngier <maz@kernel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F13800EBD;
+ Tue, 10 Mar 2020 11:56:49 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58D325C545;
+ Tue, 10 Mar 2020 11:56:44 +0000 (UTC)
+Date: Tue, 10 Mar 2020 12:56:42 +0100
+From: Andrew Jones <drjones@redhat.com>
 To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Document PMU filtering API
-In-Reply-To: <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
-References: <20200309124837.19908-1-maz@kernel.org>
- <20200309124837.19908-3-maz@kernel.org>
- <7943c896-013b-d9cb-ba89-2040b46437fe@redhat.com>
-Message-ID: <07f4ef9b5ff6c6c5086c9723c64c035f@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com,
- mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH v4 03/13] arm/arm64: gic: Introduce
+ setup_irq() helper
+Message-ID: <20200310115642.vr7rx3gacl6xpjrf@kamzik.brq.redhat.com>
+References: <20200309102420.24498-1-eric.auger@redhat.com>
+ <20200309102420.24498-4-eric.auger@redhat.com>
+ <20200309105601.3hm2kfhuufgxoydl@kamzik.brq.redhat.com>
+ <3e1e2c24-2f30-03f2-ca9c-a2d99aba0740@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <3e1e2c24-2f30-03f2-ca9c-a2d99aba0740@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,102 +91,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-03-09 18:17, Auger Eric wrote:
-> Hi Marc,
-> 
-> On 3/9/20 1:48 PM, Marc Zyngier wrote:
->> Add a small blurb describing how the event filtering API gets used.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  Documentation/virt/kvm/devices/vcpu.rst | 40 
->> +++++++++++++++++++++++++
->>  1 file changed, 40 insertions(+)
->> 
->> diff --git a/Documentation/virt/kvm/devices/vcpu.rst 
->> b/Documentation/virt/kvm/devices/vcpu.rst
->> index 9963e680770a..7262c0469856 100644
->> --- a/Documentation/virt/kvm/devices/vcpu.rst
->> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->> @@ -55,6 +55,46 @@ Request the initialization of the PMUv3.  If using 
->> the PMUv3 with an in-kernel
->>  virtual GIC implementation, this must be done after initializing the 
->> in-kernel
->>  irqchip.
->> 
->> +1.3 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_FILTER
->> +---------------------------------------
->> +
->> +:Parameters: in kvm_device_attr.addr the address for a PMU event 
->> filter is a
->> +             pointer to a struct kvm_pmu_event_filter
->> +
->> +:Returns:
->> +
->> +	 =======  ======================================================
->> +	 -ENODEV: PMUv3 not supported or GIC not initialized
->> +	 -ENXIO:  PMUv3 not properly configured or in-kernel irqchip not
->> +	 	  configured as required prior to calling this attribute
->> +	 -EBUSY:  PMUv3 already initialized
-> maybe document -EINVAL?
+On Tue, Mar 10, 2020 at 12:00:19PM +0100, Auger Eric wrote:
+> Hi Drew,
+> On 3/9/20 11:56 AM, Andrew Jones wrote:
+> > On Mon, Mar 09, 2020 at 11:24:10AM +0100, Eric Auger wrote:
+> >> ipi_enable() code would be reusable for other interrupts
+> >> than IPI. Let's rename it setup_irq() and pass an interrupt
+> >> handler pointer.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v2 -> v3:
+> >> - do not export setup_irq anymore
+> >> ---
+> >>  arm/gic.c | 20 +++++++-------------
+> >>  1 file changed, 7 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/arm/gic.c b/arm/gic.c
+> >> index fcf4c1f..abf08c7 100644
+> >> --- a/arm/gic.c
+> >> +++ b/arm/gic.c
+> >> @@ -34,6 +34,7 @@ static struct gic *gic;
+> >>  static int acked[NR_CPUS], spurious[NR_CPUS];
+> >>  static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
+> >>  static cpumask_t ready;
+> >> +typedef void (*handler_t)(struct pt_regs *regs __unused);
+> > 
+> > This is just irq_handler_fn, which is already defined in processor.h.
+> > We don't need the __unused, not since 6b07148d06b1 ("Replace -Wextra
+> > with a saner list of warning flags").
+> Shall I duplicate it into ./lib/arm/asm/processor.h as well?
 
-Yup, definitely.
-
->> +	 =======  ======================================================
->> +
->> +Request the installation of a PMU event filter describe as follows:
-> s/describe/described
->> +
->> +struct kvm_pmu_event_filter {
->> +	__u16	base_event;
->> +	__u16	nevents;
->> +
->> +#define KVM_PMU_EVENT_ALLOW	0
->> +#define KVM_PMU_EVENT_DENY	1
->> +
->> +	__u8	action;
->> +	__u8	pad[3];
->> +};
->> +
->> +A filter range is defined as the range [@base_event, @base_event + 
->> @nevents[,
->> +together with an @action (KVM_PMU_EVENT_ALLOW or KVM_PMU_EVENT_DENY). 
->> The
->> +first registered range defines the global policy (global ALLOW if the 
->> first
->> +@action is DENY, global DENY if the first @action is ALLOW). Multiple 
->> ranges
->> +can be programmed, and must fit within the 16bit space defined by the 
->> ARMv8.1
->> +PMU architecture.
-> what about before 8.1 where the range was 10 bits? Should it be tested
-> in the code?
-
-It's a good point. We could test that upon installing the filter and 
-limit
-the bitmap allocation to the minimum.
-
-> nitpicking: It is not totally obvious what does happen if the user 
-> space
-> sets a deny filter on a range and then an allow filter on the same
-> range. it is supported but may be worth telling so? Also explain the 
-> the
-> default filtering remains "allow" by default?
-
-Overlapping filters are easy: the last one wins. And yes, no filter 
-means
-just that: no filter.
+Yes, please do
 
 Thanks,
+drew
+> 
+> Thanks
+> 
+> Eric
+> > 
+> >>  
+> >>  static void nr_cpu_check(int nr)
+> >>  {
+> >> @@ -215,20 +216,20 @@ static void ipi_test_smp(void)
+> >>  	report_prefix_pop();
+> >>  }
+> >>  
+> >> -static void ipi_enable(void)
+> >> +static void setup_irq(handler_t handler)
+> >>  {
+> >>  	gic_enable_defaults();
+> >>  #ifdef __arm__
+> >> -	install_exception_handler(EXCPTN_IRQ, ipi_handler);
+> >> +	install_exception_handler(EXCPTN_IRQ, handler);
+> >>  #else
+> >> -	install_irq_handler(EL1H_IRQ, ipi_handler);
+> >> +	install_irq_handler(EL1H_IRQ, handler);
+> >>  #endif
+> >>  	local_irq_enable();
+> >>  }
+> >>  
+> >>  static void ipi_send(void)
+> >>  {
+> >> -	ipi_enable();
+> >> +	setup_irq(ipi_handler);
+> >>  	wait_on_ready();
+> >>  	ipi_test_self();
+> >>  	ipi_test_smp();
+> >> @@ -238,7 +239,7 @@ static void ipi_send(void)
+> >>  
+> >>  static void ipi_recv(void)
+> >>  {
+> >> -	ipi_enable();
+> >> +	setup_irq(ipi_handler);
+> >>  	cpumask_set_cpu(smp_processor_id(), &ready);
+> >>  	while (1)
+> >>  		wfi();
+> >> @@ -295,14 +296,7 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+> >>  static void run_active_clear_test(void)
+> >>  {
+> >>  	report_prefix_push("active");
+> >> -	gic_enable_defaults();
+> >> -#ifdef __arm__
+> >> -	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
+> >> -#else
+> >> -	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
+> >> -#endif
+> >> -	local_irq_enable();
+> >> -
+> >> +	setup_irq(ipi_clear_active_handler);
+> >>  	ipi_test_self();
+> >>  	report_prefix_pop();
+> >>  }
+> >> -- 
+> >> 2.20.1
+> >>
+> 
+> 
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
