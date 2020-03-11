@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06498C18E5C
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE48C10F27
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF9EE2465B
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85B8621D56
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNWNybLn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF9EE2465B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XwIKlAoa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B8621D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5549E4A542;
-	Wed, 11 Mar 2020 09:52:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD4B4A542;
+	Wed, 11 Mar 2020 09:52:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Pcfa-tAUjDjw; Wed, 11 Mar 2020 09:52:10 -0400 (EDT)
+	with ESMTP id wJlHA1s5pixu; Wed, 11 Mar 2020 09:52:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E089C4A551;
-	Wed, 11 Mar 2020 09:52:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1173A4A7F1;
+	Wed, 11 Mar 2020 09:52:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EFC04A7FE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D32904A542
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OJroeinPBZr1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 09:52:08 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3521F4A542
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:08 -0400 (EDT)
+ with ESMTP id yiN7H2xIQAl6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 09:52:15 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFA34A551
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:15 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583934728;
+ s=mimecast20190719; t=1583934735;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LThBuzxpBIGnDg2AAuFd9Pk7/QYWy2R/aXM3izuVepc=;
- b=NNWNybLnbm/Y/YBkarHlGcJ1zdApgre4r8LiKE7SZx6kShYQcDij1J7Pz2nBX11olpW3Vj
- yjT8D65FMAKLRN4vTJUyt/Gje8xau6puM1LF41y+hvTXfiuvQCDEfmtbKDfPYQxRkS48DL
- gfqIW1unuyhAG3YR7DTtHgSo1VV7GRE=
+ bh=V+xBC2RXQ5rqxWP6/1TDovGW7bQFrd1e4rfk5KfHEUI=;
+ b=XwIKlAoaEUUiqqtIIdnvn0/hxeB0R4FgS1T7NtqrW4sNgy0uKGyTH49yVfDJaSmR2fnVrp
+ eAXCjHRXDn3v3TY78p1et98JPTZoAk3VHg3CrWypd4YINsRD17FbhZiIFhZu0P5tw2alm3
+ dVO9uO3k5ccaj0UQtjE4cQ3McIN/w6Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-5TdW9Vt9PyOmE9Sbna0gyA-1; Wed, 11 Mar 2020 09:52:06 -0400
-X-MC-Unique: 5TdW9Vt9PyOmE9Sbna0gyA-1
+ us-mta-460-AX4EL4XJNcmX8yVAV6MS5w-1; Wed, 11 Mar 2020 09:52:14 -0400
+X-MC-Unique: AX4EL4XJNcmX8yVAV6MS5w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E037E1005509;
- Wed, 11 Mar 2020 13:52:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 704AA189F760;
+ Wed, 11 Mar 2020 13:52:12 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B98E55C13D;
- Wed, 11 Mar 2020 13:52:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 746CD5C13D;
+ Wed, 11 Mar 2020 13:52:05 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v6 07/13] arm/arm64: ITS: its_enable_defaults
-Date: Wed, 11 Mar 2020 14:51:11 +0100
-Message-Id: <20200311135117.9366-8-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v6 08/13] arm/arm64: ITS: Device and collection
+ Initialization
+Date: Wed, 11 Mar 2020 14:51:12 +0100
+Message-Id: <20200311135117.9366-9-eric.auger@redhat.com>
 In-Reply-To: <20200311135117.9366-1-eric.auger@redhat.com>
 References: <20200311135117.9366-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,140 +91,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-its_enable_defaults() enable LPIs at redistributor level
-and ITS level.
+Introduce an helper functions to register
+- a new device, characterized by its device id and the
+  max number of event IDs that dimension its ITT (Interrupt
+  Translation Table).  The function allocates the ITT.
 
-gicv3_enable_defaults must be called before.
+- a new collection, characterized by its ID and the
+  target processing engine (PE).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
 ---
-v5 -> v6:
-- gicv3_lpi_set/get_config introduced before this patch
-- dist/redist in commit msg
-- Added Zenghui's R-b
-
-v4 -> v5:
-- some reformattings moved to earlier patch
-- add assert(!gicv3_redist_base()) in alloc_lpi_tables()
-- revert the usage of for_each_present_cpu()
 
 v3 -> v4:
-- use GITS_BASER_INDIRECT & GITS_BASER_VALID in its_setup_baser()
-- don't parse BASERs again in its_enable_defaults
-- rename its_setup_baser into its_baser_alloc_table
-- All allocations moved to the init function
-- squashed "arm/arm64: gicv3: Enable/Disable LPIs at re-distributor level"
-  into this patch
-- introduce gicv3_lpi_rdist_enable and gicv3_lpi_rdist_disable
-- pend and prop table bases stored as virt addresses
-- move some init functions from enable() to its_init
-- removed GICR_PROPBASER_IDBITS_MASK
-- introduced LPI_OFFSET
-- lpi_prop becomes u8 *
-- gicv3_lpi_set_config/get_config became macro
-- renamed gicv3_lpi_set_pending_table_bit into gicv3_lpi_set_clr_pending
+- remove unused its_baser variable from its_create_device()
+- use get_order()
+- device->itt becomes a GVA instead of GPA
 
 v2 -> v3:
-- introduce its_setup_baser in this patch
-- squash "arm/arm64: ITS: Init the command queue" in this patch.
----
- lib/arm/asm/gic-v3.h       |  6 ++++++
- lib/arm/gic-v3.c           | 25 +++++++++++++++++++++++++
- lib/arm64/asm/gic-v3-its.h |  1 +
- lib/arm64/gic-v3-its.c     | 13 +++++++++++++
- 4 files changed, 45 insertions(+)
+- s/report_abort/assert
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index fedffa8..cb72922 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -57,6 +57,10 @@
- #define LPI_PROP_DEFAULT_PRIO		0xa0
- #define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
- 
-+#define LPI_ID_BASE			8192
-+#define LPI(lpi)			((lpi) + LPI_ID_BASE)
-+#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
-+
- #include <asm/arch_gicv3.h>
- 
- #ifndef __ASSEMBLY__
-@@ -93,6 +97,8 @@ extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
- extern void gicv3_set_redist_base(size_t stride);
- extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
- extern void gicv3_lpi_alloc_tables(void);
-+extern void gicv3_lpi_rdist_enable(int redist);
-+extern void gicv3_lpi_rdist_disable(int redist);
- 
- static inline void gicv3_do_wait_for_rwp(void *base)
- {
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index 6cf1d1d..a7e2cb8 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -199,4 +199,29 @@ void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
- 		byte &= ~mask;
- 	*ptr = byte;
- }
-+
-+static void gicv3_lpi_rdist_ctrl(u32 redist, bool set)
-+{
-+	void *ptr;
-+	u64 val;
-+
-+	assert(redist < nr_cpus);
-+
-+	ptr = gicv3_data.redist_base[redist];
-+	val = readl(ptr + GICR_CTLR);
-+	if (set)
-+		val |= GICR_CTLR_ENABLE_LPIS;
-+	else
-+		val &= ~GICR_CTLR_ENABLE_LPIS;
-+	writel(val,  ptr + GICR_CTLR);
-+}
-+
-+void gicv3_lpi_rdist_enable(int redist)
-+{
-+	gicv3_lpi_rdist_ctrl(redist, true);
-+}
-+void gicv3_lpi_rdist_disable(int redist)
-+{
-+	gicv3_lpi_rdist_ctrl(redist, false);
-+}
- #endif /* __aarch64__ */
+v1 -> v2:
+- s/nb_/nr_
+---
+ lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
+ lib/arm64/gic-v3-its.c     | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
+
 diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-index d46669b..fec6767 100644
+index fec6767..8c4ed31 100644
 --- a/lib/arm64/asm/gic-v3-its.h
 +++ b/lib/arm64/asm/gic-v3-its.h
-@@ -88,5 +88,6 @@ extern struct its_data its_data;
- extern void its_parse_typer(void);
+@@ -27,6 +27,19 @@ struct its_baser {
+ };
+ 
+ #define GITS_BASER_NR_REGS              8
++#define GITS_MAX_DEVICES		8
++#define GITS_MAX_COLLECTIONS		8
++
++struct its_device {
++	u32 device_id;	/* device ID */
++	u32 nr_ites;	/* Max Interrupt Translation Entries */
++	void *itt;	/* Interrupt Translation Table GVA */
++};
++
++struct its_collection {
++	u64 target_address;
++	u16 col_id;
++};
+ 
+ struct its_data {
+ 	void *base;
+@@ -35,6 +48,10 @@ struct its_data {
+ 	struct its_baser coll_baser;
+ 	struct its_cmd_block *cmd_base;
+ 	struct its_cmd_block *cmd_write;
++	struct its_device devices[GITS_MAX_DEVICES];
++	u32 nr_devices;		/* Allocated Devices */
++	struct its_collection collections[GITS_MAX_COLLECTIONS];
++	u32 nr_collections;	/* Allocated Collections */
+ };
+ 
+ extern struct its_data its_data;
+@@ -89,5 +106,7 @@ extern void its_parse_typer(void);
  extern void its_init(void);
  extern int its_baser_lookup(int i, struct its_baser *baser);
-+extern void its_enable_defaults(void);
+ extern void its_enable_defaults(void);
++extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
++extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
  
  #endif /* _ASMARM64_GIC_V3_ITS_H_ */
 diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-index 4c9c0db..c431f31 100644
+index c431f31..442dcf0 100644
 --- a/lib/arm64/gic-v3-its.c
 +++ b/lib/arm64/gic-v3-its.c
-@@ -97,3 +97,16 @@ void its_init(void)
- 	its_cmd_queue_init();
- }
+@@ -110,3 +110,41 @@ void its_enable_defaults(void)
  
-+/* must be called after gicv3_enable_defaults */
-+void its_enable_defaults(void)
+ 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+ }
++
++struct its_device *its_create_device(u32 device_id, int nr_ites)
 +{
-+	int i;
++	struct its_device *new;
++	unsigned long n;
 +
-+	/* Allocate LPI config and pending tables */
-+	gicv3_lpi_alloc_tables();
++	assert(its_data.nr_devices < GITS_MAX_DEVICES);
 +
-+	for (i = 0; i < nr_cpus; i++)
-+		gicv3_lpi_rdist_enable(i);
++	new = &its_data.devices[its_data.nr_devices];
 +
-+	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
++	new->device_id = device_id;
++	new->nr_ites = nr_ites;
++
++	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
++	new->itt = alloc_pages(get_order(n));
++
++	its_data.nr_devices++;
++	return new;
++}
++
++struct its_collection *its_create_collection(u32 col_id, u32 pe)
++{
++	struct its_collection *new;
++
++	assert(its_data.nr_collections < GITS_MAX_COLLECTIONS);
++
++	new = &its_data.collections[its_data.nr_collections];
++
++	new->col_id = col_id;
++
++	if (its_data.typer.pta)
++		new->target_address = (u64)gicv3_data.redist_base[pe];
++	else
++		new->target_address = pe << 16;
++
++	its_data.nr_collections++;
++	return new;
 +}
 -- 
 2.20.1
