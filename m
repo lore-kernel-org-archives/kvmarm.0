@@ -6,71 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D5CC10F27
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 213EAC10F27
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:51:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A80A22522
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9DC021D56
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:51:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3y++5XN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A80A22522
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRB0IDFu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DC021D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E1FA4A591;
-	Wed, 11 Mar 2020 09:51:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 722764A7FE;
+	Wed, 11 Mar 2020 09:51:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J3fHkK1GyoCz; Wed, 11 Mar 2020 09:51:49 -0400 (EDT)
+	with ESMTP id jP+WfvI65dQw; Wed, 11 Mar 2020 09:51:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44C9D4A541;
-	Wed, 11 Mar 2020 09:51:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B38D4A541;
+	Wed, 11 Mar 2020 09:51:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 874094A4FC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:51:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3C474A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:51:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PtEIRxa5Sd+0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 09:51:47 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF8904A4F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:51:47 -0400 (EDT)
+ with ESMTP id UwMhAw1jYBGF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 09:51:54 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 236BD4A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:51:54 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583934707;
+ s=mimecast20190719; t=1583934714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S1He/Rpf4JLCiKi93YfAGw3px9JkkCyAWLJbg5rNbYc=;
- b=B3y++5XN7JpRnacDV1HnfqU9XDPLwfVMGr3b122yLArbW2uHathxr4IEhH43Kr/BBEno7G
- xLIUMWuw4AeXiRbZMuXFDNBzjV0jylrU0le+HV+U0Sv6b6Ct44ychDD/5GZ/SbubU/bBQm
- Mv6RXiqs1erBTYx4BwpzOT9zFzWO8UA=
+ bh=HV5vvbw31wyEYrQ32o2dc0uwSfN4maLDv7794Qu4y+I=;
+ b=WRB0IDFuovugYtXwM9yStPSFwYRqyz5KTXk/XiDaoPglRTIq1TLT2YaqxDD/Vulcs1as8N
+ w8EXwkky6YAizcNS9GShSrtlKm/PeatGcTpwV6ZvZBLS/bxd9u0YIRcaAS+1axubo0yfCa
+ Ou3liSuwa5XW/sK9ySUfI5RLLnLf8/w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-Y8tlArngP2eITKWtybUnnQ-1; Wed, 11 Mar 2020 09:51:43 -0400
-X-MC-Unique: Y8tlArngP2eITKWtybUnnQ-1
+ us-mta-335-gfMbWxfiNsewb4CrSNSEmA-1; Wed, 11 Mar 2020 09:51:52 -0400
+X-MC-Unique: gfMbWxfiNsewb4CrSNSEmA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B410E6A6;
- Wed, 11 Mar 2020 13:51:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D3D7189F762;
+ Wed, 11 Mar 2020 13:51:50 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 265CE5C13D;
- Wed, 11 Mar 2020 13:51:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4371F5C13D;
+ Wed, 11 Mar 2020 13:51:42 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v6 03/13] arm/arm64: gic: Introduce setup_irq()
- helper
-Date: Wed, 11 Mar 2020 14:51:07 +0100
-Message-Id: <20200311135117.9366-4-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v6 04/13] arm/arm64: gicv3: Add some
+ re-distributor defines
+Date: Wed, 11 Mar 2020 14:51:08 +0100
+Message-Id: <20200311135117.9366-5-eric.auger@redhat.com>
 In-Reply-To: <20200311135117.9366-1-eric.auger@redhat.com>
 References: <20200311135117.9366-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,93 +91,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ipi_enable() code would be reusable for other interrupts
-than IPI. Let's rename it setup_irq() and pass an interrupt
-handler pointer.
+PROPBASER, PENDBASE and GICR_CTRL will be used for LPI management.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
 ---
 
-v4 -> v5:
-- s/handler_t/irq_handler_t
-- also add irq_handler_fn in lib/arm/asm/processor.h
-
-v2 -> v3:
-- do not export setup_irq anymore
+v3 -> v4:
+- replace some spaces by tabs and added Zenghui's R-b
 ---
- arm/gic.c               | 19 ++++++-------------
- lib/arm/asm/processor.h |  2 ++
- 2 files changed, 8 insertions(+), 13 deletions(-)
+ lib/arm/asm/gic-v3.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index fcf4c1f..2f904b0 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -215,20 +215,20 @@ static void ipi_test_smp(void)
- 	report_prefix_pop();
- }
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index e2736a1..47df051 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -18,6 +18,7 @@
+  * We expect to be run in Non-secure mode, thus we define the
+  * group1 enable bits with respect to that view.
+  */
++#define GICD_CTLR			0x0000
+ #define GICD_CTLR_RWP			(1U << 31)
+ #define GICD_CTLR_ARE_NS		(1U << 4)
+ #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+@@ -38,6 +39,11 @@
+ #define GICR_ICACTIVER0			GICD_ICACTIVER
+ #define GICR_IPRIORITYR0		GICD_IPRIORITYR
  
--static void ipi_enable(void)
-+static void setup_irq(irq_handler_fn handler)
- {
- 	gic_enable_defaults();
- #ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_handler);
-+	install_exception_handler(EXCPTN_IRQ, handler);
- #else
--	install_irq_handler(EL1H_IRQ, ipi_handler);
-+	install_irq_handler(EL1H_IRQ, handler);
- #endif
- 	local_irq_enable();
- }
- 
- static void ipi_send(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -238,7 +238,7 @@ static void ipi_send(void)
- 
- static void ipi_recv(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -295,14 +295,7 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
- static void run_active_clear_test(void)
- {
- 	report_prefix_push("active");
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
--#endif
--	local_irq_enable();
--
-+	setup_irq(ipi_clear_active_handler);
- 	ipi_test_self();
- 	report_prefix_pop();
- }
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index 1e1132d..e26ef89 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -26,7 +26,9 @@ enum vector {
- 	EXCPTN_MAX,
- };
- 
-+typedef void (*irq_handler_fn)(struct pt_regs *regs);
- typedef void (*exception_fn)(struct pt_regs *);
++#define GICR_PROPBASER			0x0070
++#define GICR_PENDBASER			0x0078
++#define GICR_CTLR			GICD_CTLR
++#define GICR_CTLR_ENABLE_LPIS		(1UL << 0)
 +
- extern void install_exception_handler(enum vector v, exception_fn fn);
- 
- extern void show_regs(struct pt_regs *regs);
+ #define ICC_SGI1R_AFFINITY_1_SHIFT	16
+ #define ICC_SGI1R_AFFINITY_2_SHIFT	32
+ #define ICC_SGI1R_AFFINITY_3_SHIFT	48
 -- 
 2.20.1
 
