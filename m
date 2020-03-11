@@ -2,61 +2,83 @@ Return-Path: <SRS0=5IFU=44=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A06CDC10F27
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 09:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3C4C10F27
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 09:29:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2C728208E4
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 09:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C728208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 276C120828
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 09:29:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ID3LIYB1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276C120828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A73494A578;
-	Wed, 11 Mar 2020 05:09:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FB9F4A4CD;
+	Wed, 11 Mar 2020 05:29:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WEJwv81svWty; Wed, 11 Mar 2020 05:09:25 -0400 (EDT)
+	with ESMTP id rgWfJoGj+HEv; Wed, 11 Mar 2020 05:29:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6680F4A551;
-	Wed, 11 Mar 2020 05:09:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BA604A523;
+	Wed, 11 Mar 2020 05:29:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 141A34A551
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:09:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 435694A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:29:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 96g-9x45wkt5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 05:09:22 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82F364A534
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:09:22 -0400 (EDT)
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id D9CCC96868EE027D56DF;
- Wed, 11 Mar 2020 17:09:13 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
- 17:09:04 +0800
-Subject: Re: [kvm-unit-tests PATCH v5 09/13] arm/arm64: ITS: Commands
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+ with ESMTP id x-e9LtIrveFl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 05:29:50 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 731824A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:29:50 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583918990;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ix9LwiKc2VbnbLgLL58Tn9BHzYsE3/SmD8MGOyWV27c=;
+ b=ID3LIYB1/By6Iv/cwPtVWV4wPQv5hIW3Ziy6Zul6WO74IdOIrQNvWqFwXm5g5xFkraWAk1
+ 3dBPmfXGKLJPAjukq0HUEQNR5/p3x/rIOrVTbEEzidZJmLBG3vb7aF+Q5qmPy38cfnOgU8
+ TVGXNRYp9MXzg7jsjG8D3FWCYkrb0TI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-1aNQM2RzMpOmBJtH5jZ7oQ-1; Wed, 11 Mar 2020 05:29:46 -0400
+X-MC-Unique: 1aNQM2RzMpOmBJtH5jZ7oQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5543A19057A2;
+ Wed, 11 Mar 2020 09:29:44 +0000 (UTC)
+Received: from [10.36.118.12] (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61EAD91844;
+ Wed, 11 Mar 2020 09:29:38 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v5 06/13] arm/arm64: ITS: Introspection
+ tests
+To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
 References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-10-eric.auger@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <ad7d4011-0b8e-978d-54e7-d44cd4e34ed7@huawei.com>
-Date: Wed, 11 Mar 2020 17:09:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ <20200310145410.26308-7-eric.auger@redhat.com>
+ <83ffda30-e0dc-7fbf-1775-bc45a308acb4@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <7fc207fe-b761-6d24-0c14-896154023420@redhat.com>
+Date: Wed, 11 Mar 2020 10:29:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200310145410.26308-10-eric.auger@redhat.com>
+In-Reply-To: <83ffda30-e0dc-7fbf-1775-bc45a308acb4@huawei.com>
 Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Cc: andre.przywara@arm.com, thuth@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -69,181 +91,28 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 2020/3/10 22:54, Eric Auger wrote:
-> Implement main ITS commands. The code is largely inherited from
-> the ITS driver.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v3 -> v4:
-> - device's itt now is a VGA
-> - pass verbose to choose whether we shall print the cmd
-> - use printf instead of report_info
-> 
-> v2 -> v3:
-> - do not use report() anymore
-> - assert if cmd_write exceeds the queue capacity
-> 
-> v1 -> v2:
-> - removed its_print_cmd_state
-> ---
->   arm/Makefile.arm64         |   2 +-
->   lib/arm64/asm/gic-v3-its.h |  57 +++++
->   lib/arm64/gic-v3-its-cmd.c | 463 +++++++++++++++++++++++++++++++++++++
->   3 files changed, 521 insertions(+), 1 deletion(-)
->   create mode 100644 lib/arm64/gic-v3-its-cmd.c
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 60182ae..dfd0c56 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -19,7 +19,7 @@ endef
->   cstart.o = $(TEST_DIR)/cstart64.o
->   cflatobjs += lib/arm64/processor.o
->   cflatobjs += lib/arm64/spinlock.o
-> -cflatobjs += lib/arm64/gic-v3-its.o
-> +cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
->   
->   OBJDIRS += lib/arm64
->   
-> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> index 3da548b..889d6ce 100644
-> --- a/lib/arm64/asm/gic-v3-its.h
-> +++ b/lib/arm64/asm/gic-v3-its.h
-> @@ -102,6 +102,28 @@ extern struct its_data its_data;
->   #define GITS_BASER_TYPE_DEVICE		1
->   #define GITS_BASER_TYPE_COLLECTION	4
->   
-> +/*
-> + * ITS commands
-> + */
-> +#define GITS_CMD_MAPD			0x08
-> +#define GITS_CMD_MAPC			0x09
-> +#define GITS_CMD_MAPTI			0x0a
-> +/* older GIC documentation used MAPVI for this command */
-> +#define GITS_CMD_MAPVI			GITS_CMD_MAPTI
-
-You can drop it.
-
-> +#define GITS_CMD_MAPI			0x0b
-> +#define GITS_CMD_MOVI			0x01
-> +#define GITS_CMD_DISCARD		0x0f
-> +#define GITS_CMD_INV			0x0c
-> +#define GITS_CMD_MOVALL			0x0e
-> +#define GITS_CMD_INVALL			0x0d
-> +#define GITS_CMD_INT			0x03
-> +#define GITS_CMD_CLEAR			0x04
-> +#define GITS_CMD_SYNC			0x05
-> +
-> +struct its_cmd_block {
-> +	u64 raw_cmd[4];
-> +};
-> +
->   extern void its_parse_typer(void);
->   extern void its_init(void);
->   extern int its_baser_lookup(int i, struct its_baser *baser);
-> @@ -109,4 +131,39 @@ extern void its_enable_defaults(void);
->   extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
->   extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->   
-> +extern void __its_send_mapd(struct its_device *dev, int valid, bool verbose);
-> +extern void __its_send_mapc(struct its_collection *col, int valid, bool verbose);
-> +extern void __its_send_mapti(struct its_device *dev, u32 irq_id, u32 event_id,
-> +			     struct its_collection *col, bool verbose);
-> +extern void __its_send_int(struct its_device *dev, u32 event_id, bool verbose);
-> +extern void __its_send_inv(struct its_device *dev, u32 event_id, bool verbose);
-> +extern void __its_send_discard(struct its_device *dev, u32 event_id, bool verbose);
-> +extern void __its_send_clear(struct its_device *dev, u32 event_id, bool verbose);
-> +extern void __its_send_invall(struct its_collection *col, bool verbose);
-> +extern void __its_send_movi(struct its_device *dev, struct its_collection *col,
-> +			    u32 id, bool verbose);
-> +extern void __its_send_sync(struct its_collection *col, bool verbose);
-> +
-> +#define its_send_mapd(dev, valid)			__its_send_mapd(dev, valid, true)
-> +#define its_send_mapc(col, valid)			__its_send_mapc(col, valid, true)
-> +#define its_send_mapti(dev, irqid, eventid, col)	__its_send_mapti(dev, irqid, eventid, col, true)
-> +#define its_send_int(dev, eventid)			__its_send_int(dev, eventid, true)
-> +#define its_send_inv(dev, eventid)			__its_send_inv(dev, eventid, true)
-> +#define its_send_discard(dev, eventid)			__its_send_discard(dev, eventid, true)
-> +#define its_send_clear(dev, eventid)			__its_send_clear(dev, eventid, true)
-> +#define its_send_invall(col)				__its_send_invall(col, true)
-> +#define its_send_movi(dev, col, id)			__its_send_movi(dev, col, id, true)
-> +#define its_send_sync(col)				__its_send_sync(col, true)
-> +
-> +#define its_send_mapd_nv(dev, valid)			__its_send_mapd(dev, valid, false)
-> +#define its_send_mapc_nv(col, valid)			__its_send_mapc(col, valid, false)
-> +#define its_send_mapti_nv(dev, irqid, eventid, col)	__its_send_mapti(dev, irqid, eventid, col, false)
-> +#define its_send_int_nv(dev, eventid)			__its_send_int(dev, eventid, false)
-> +#define its_send_inv_nv(dev, eventid)			__its_send_inv(dev, eventid, false)
-> +#define its_send_discard_nv(dev, eventid)		__its_send_discard(dev, eventid, false)
-> +#define its_send_clear_nv(dev, eventid)			__its_send_clear(dev, eventidn false)
-> +#define its_send_invall_nv(col)				__its_send_invall(col, false)
-> +#define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, false)
-> +#define its_send_sync_nv(col)				__its_send_sync(col, false)
-
-(not verbose? Naming is always difficult ;-).)
-
-[...]
-
-> +
-> +static void its_build_invall_cmd(struct its_cmd_block *cmd,
-> +			      struct its_cmd_desc *desc)
-> +{
-> +	its_encode_cmd(cmd, GITS_CMD_INVALL);
-> +	its_encode_collection(cmd, desc->its_invall_cmd.col->col_id);
-> +	its_fixup_cmd(cmd);
-> +	if (desc->verbose)
-> +		printf("INVALL col_id=%d\n", desc->its_invall_cmd.col->col_id);
-> +}
-> +
-> +static void its_build_clear_cmd(struct its_cmd_block *cmd,
-> +				struct its_cmd_desc *desc)
-> +{
-> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
-> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
-> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
-> +	its_fixup_cmd(cmd);
-> +	if (desc->verbose)
-> +		printf("CLEAR col_id=%d\n", desc->its_invall_cmd.col->col_id);
-
-its_invall_cmd.col->col_id?
-
-Don't you want to print the arguments (DeviceID and EventID) as you've
-done for other commands?
-
-> +}
-> +
-> +static void its_build_discard_cmd(struct its_cmd_block *cmd,
-> +				  struct its_cmd_desc *desc)
-> +{
-> +	its_encode_cmd(cmd, GITS_CMD_DISCARD);
-> +	its_encode_devid(cmd, desc->its_discard_cmd.dev->device_id);
-> +	its_encode_event_id(cmd, desc->its_discard_cmd.event_id);
-> +	its_fixup_cmd(cmd);
-> +	if (desc->verbose)
-> +		printf("DISCARD col_id=%d\n", desc->its_invall_cmd.col->col_id);
-
-The same question here.
-
-[...]
-
-And afaict, there's some fixes for the Linux ITS driver since the RFC
-version of this series. Please have a check if you can.
-
-
-Thanks,
-Zenghui
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgWmVuZ2h1aSwKCk9uIDMvMTEvMjAgOTozNyBBTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiBIaSBF
+cmljLAo+IAo+IE9uIDIwMjAvMy8xMCAyMjo1NCwgRXJpYyBBdWdlciB3cm90ZToKPj4gKyNkZWZp
+bmUgR0lUU19UWVBFUl9QTFBJU8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBCSVQoMCkK
+Pj4gKyNkZWZpbmUgR0lUU19UWVBFUl9WTFBJU8KgwqDCoMKgwqDCoMKgIEJJVCgxKQo+PiArI2Rl
+ZmluZSBHSVRTX1RZUEVSX0lUVF9FTlRSWV9TSVpFwqDCoMKgIEdFTk1BU0tfVUxMKDcsIDQpCj4+
+ICsjZGVmaW5lIEdJVFNfVFlQRVJfSVRUX0VOVFJZX1NJWkVfU0hJRlTCoMKgwqAgNAo+PiArI2Rl
+ZmluZSBHSVRTX1RZUEVSX0lEQklUU8KgwqDCoMKgwqDCoMKgIEdFTk1BU0tfVUxMKDgsIDEyKQo+
+IAo+IE5vdGUgdGhhdCB0aGlzIHNob3VsZCBiZSBHRU5NQVNLX1VMTCgxMiwgOCkuCmRlZmluaXRp
+dmVseQoKRXJpYwo+IAo+PiArI2RlZmluZSBHSVRTX1RZUEVSX0lEQklUU19TSElGVMKgwqDCoMKg
+wqDCoMKgwqAgOAo+PiArI2RlZmluZSBHSVRTX1RZUEVSX0RFVkJJVFPCoMKgwqDCoMKgwqDCoCBH
+RU5NQVNLX1VMTCgxMywgMTcpCj4gCj4gKDE3LCAxMykKPiAKPj4gKyNkZWZpbmUgR0lUU19UWVBF
+Ul9ERVZCSVRTX1NISUZUwqDCoMKgwqDCoMKgwqAgMTMKPj4gKyNkZWZpbmUgR0lUU19UWVBFUl9Q
+VEHCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEJJVCgxOSkKPj4gKyNkZWZpbmUg
+R0lUU19UWVBFUl9DSURCSVRTwqDCoMKgwqDCoMKgwqAgR0VOTUFTS19VTEwoMzIsIDM1KQo+IAo+
+ICgzNSwgMzIpCj4gCj4+ICsjZGVmaW5lIEdJVFNfVFlQRVJfQ0lEQklUU19TSElGVMKgwqDCoCAz
+Mgo+PiArI2RlZmluZSBHSVRTX1RZUEVSX0NJTMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQklUKDM2
+KQo+IAo+IEFuZCBwbGVhc2UgdXNlIHRhYiBmb3IgYWxsIG9mIHRoZW0uCj4gCj4gCj4gVGhhbmtz
+LAo+IFplbmdodWkKPiAKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
+dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
