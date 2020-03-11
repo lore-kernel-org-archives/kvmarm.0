@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876AFC10F27
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3516C18E5B
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C98421D7E
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D5C721D56
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 13:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RAbFsJ75"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C98421D7E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGK3nkPS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5C721D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E96164A534;
-	Wed, 11 Mar 2020 09:52:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 255B74A4A0;
+	Wed, 11 Mar 2020 09:52:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nvbf8fmdZPxh; Wed, 11 Mar 2020 09:52:34 -0400 (EDT)
+	with ESMTP id GqrHAPvwUSQV; Wed, 11 Mar 2020 09:52:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 789964AED8;
-	Wed, 11 Mar 2020 09:52:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A73CB4A542;
+	Wed, 11 Mar 2020 09:52:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07EF84A542
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 230234A51D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cs+1yeWmYS-R for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 09:52:31 -0400 (EDT)
+ with ESMTP id P4vczpUX7wfp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 09:52:41 -0400 (EDT)
 Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
  [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D05014A4A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E82A4A534
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 09:52:41 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583934751;
+ s=mimecast20190719; t=1583934760;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pyoUxJMAJISr2R1CUtM36kjsIf74x1hkGn7NNC+WmAU=;
- b=RAbFsJ75rMSYj0N0m2Jgzi5yeIdQKUjyOuZuHzVWyosi6X0INLWOs+FTEfNB6ebRmVJIUc
- r1L2uz4Jo0AsUcviolcCkv+q1NDDl2ItHIb2m/pokIG4ZfRsjdqQBEIkcMGEhejDvbpUzp
- t1H/3Kiq85vu7nj/zwMcmZ0ZZXfrd+s=
+ bh=zECjVFYjuMESRPqHn8ki0Be8AU/6x/A1tFUhMH7auRI=;
+ b=KGK3nkPSvgHcW/21Npf1X3bEqqidUmFIEVrbJdTAAerhfmGRlJQ4ashIZihIh4L8wNmh5B
+ Rw6cp86pFV520KCDbRhEWGkS608mE+svZU/V2OACXCoYk+gK/9DsXwRRpcF+nJYBjD7X01
+ uzonnYtb/xqMg6ImCHEQEH6KSISXOp0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-kF_QB7ZjOD-2Rbfe_POy4Q-1; Wed, 11 Mar 2020 09:52:24 -0400
-X-MC-Unique: kF_QB7ZjOD-2Rbfe_POy4Q-1
+ us-mta-487-teRRPK9LPK6iCUCLmwaQvA-1; Wed, 11 Mar 2020 09:52:37 -0400
+X-MC-Unique: teRRPK9LPK6iCUCLmwaQvA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02CD41005516;
- Wed, 11 Mar 2020 13:52:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E21D800D4E;
+ Wed, 11 Mar 2020 13:52:35 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6EB339296C;
- Wed, 11 Mar 2020 13:52:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A61A09296C;
+ Wed, 11 Mar 2020 13:52:28 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v6 10/13] arm/arm64: ITS: INT functional tests
-Date: Wed, 11 Mar 2020 14:51:14 +0100
-Message-Id: <20200311135117.9366-11-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v6 12/13] arm/arm64: ITS: migration tests
+Date: Wed, 11 Mar 2020 14:51:16 +0100
+Message-Id: <20200311135117.9366-13-eric.auger@redhat.com>
 In-Reply-To: <20200311135117.9366-1-eric.auger@redhat.com>
 References: <20200311135117.9366-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,311 +91,199 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Triggers LPIs through the INT command.
-
-the test checks the LPI hits the right CPU and triggers
-the right LPI intid, ie. the translation is correct.
-
-Updates to the config table also are tested, along with inv
-and invall commands.
+This test maps LPIs (populates the device table, the collection table,
+interrupt translation tables, configuration table), migrates and make
+sure the translation is correct on the destination.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v5 -> v6:
-- removed collection-unmap test
-- moved the collection invalidation after the MAPCs
-
 v4 -> v5:
-- move the test stub from the header to arm/gic.c
+- move stub from header to arm/gic.c
 
 v3 -> v4:
-- assert in lpi_handler if the interrupt is not an LPI
-- remove check_lpi_stats from its_prerequisites()
-
-v2 -> v3:
-- add comments
-- keep the report_skip in case there aren't 4 vcpus to be able to
-  run other tests in the its category.
-- fix the prefix pop
-- move its_event and its_stats to arm/gic.c
+- assert in its_get_device/collection if the id is not found
 ---
- arm/gic.c         | 215 +++++++++++++++++++++++++++++++++++++++++++---
- arm/unittests.cfg |   7 ++
- 2 files changed, 211 insertions(+), 11 deletions(-)
+ arm/gic.c                  | 58 ++++++++++++++++++++++++++++++++++----
+ arm/unittests.cfg          |  8 ++++++
+ lib/arm64/asm/gic-v3-its.h |  3 ++
+ lib/arm64/gic-v3-its.c     | 22 +++++++++++++++
+ 4 files changed, 85 insertions(+), 6 deletions(-)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index 649ed81..5f1e595 100644
+index 5f1e595..6ecfdbc 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -159,6 +159,85 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 	}
- }
- 
-+static void setup_irq(irq_handler_fn handler)
-+{
-+	gic_enable_defaults();
-+#ifdef __arm__
-+	install_exception_handler(EXCPTN_IRQ, handler);
-+#else
-+	install_irq_handler(EL1H_IRQ, handler);
-+#endif
-+	local_irq_enable();
-+}
-+
-+#if defined(__aarch64__)
-+struct its_event {
-+	int cpu_id;
-+	int lpi_id;
-+};
-+
-+struct its_stats {
-+	struct its_event expected;
-+	struct its_event observed;
-+};
-+
-+static struct its_stats lpi_stats;
-+
-+static void lpi_handler(struct pt_regs *regs __unused)
-+{
-+	u32 irqstat = gic_read_iar();
-+	int irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+	assert(irqnr >= 8192);
-+	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
-+	lpi_stats.observed.cpu_id = smp_processor_id();
-+	lpi_stats.observed.lpi_id = irqnr;
-+	smp_wmb(); /* pairs with rmb in check_lpi_stats */
-+}
-+
-+static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
-+{
-+	lpi_stats.expected.cpu_id = exp_cpu_id;
-+	lpi_stats.expected.lpi_id = exp_lpi_id;
-+	lpi_stats.observed.cpu_id = -1;
-+	lpi_stats.observed.lpi_id = -1;
-+	smp_wmb(); /* pairs with rmb in handler */
-+}
-+
-+static void check_lpi_stats(const char *msg)
-+{
-+	bool pass = false;
-+
-+	mdelay(100);
-+	smp_rmb(); /* pairs with wmb in lpi_handler */
-+	if (lpi_stats.observed.cpu_id != lpi_stats.expected.cpu_id ||
-+	    lpi_stats.observed.lpi_id != lpi_stats.expected.lpi_id) {
-+		if (lpi_stats.observed.cpu_id == -1 &&
-+		    lpi_stats.observed.lpi_id == -1) {
-+			report_info("No LPI received whereas (cpuid=%d, intid=%d) "
-+				    "was expected", lpi_stats.expected.cpu_id,
-+				    lpi_stats.expected.lpi_id);
-+		} else {
-+			report_info("Unexpected LPI (cpuid=%d, intid=%d)",
-+				    lpi_stats.observed.cpu_id,
-+				    lpi_stats.observed.lpi_id);
-+		}
-+	} else {
-+		pass = true;
-+	}
-+	report(pass, "%s", msg);
-+}
-+
-+static void secondary_lpi_test(void)
-+{
-+	setup_irq(lpi_handler);
-+	cpumask_set_cpu(smp_processor_id(), &ready);
-+	while (1)
-+		wfi();
-+}
-+#endif
-+
- static void gicv2_ipi_send_self(void)
- {
- 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
-@@ -216,17 +295,6 @@ static void ipi_test_smp(void)
- 	report_prefix_pop();
- }
- 
--static void setup_irq(irq_handler_fn handler)
--{
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, handler);
--#else
--	install_irq_handler(EL1H_IRQ, handler);
--#endif
--	local_irq_enable();
--}
--
- static void ipi_send(void)
- {
- 	setup_irq(ipi_handler);
-@@ -521,6 +589,7 @@ static void gic_test_mmio(void)
- #if defined(__arm__)
+@@ -590,6 +590,7 @@ static void gic_test_mmio(void)
  
  static void test_its_introspection(void) {}
-+static void test_its_trigger(void) {}
+ static void test_its_trigger(void) {}
++static void test_its_migration(void) {}
  
  #else /* __aarch64__ */
  
-@@ -559,6 +628,126 @@ static void test_its_introspection(void)
- 	report_info("collection table entry_size = 0x%x", coll_baser->esz);
+@@ -658,13 +659,19 @@ static int its_prerequisites(int nb_cpus)
+ 	return 0;
  }
  
-+static int its_prerequisites(int nb_cpus)
-+{
-+	int cpu;
-+
-+	if (!gicv3_its_base()) {
-+		report_skip("No ITS, skip ...");
+-static void test_its_trigger(void)
++/*
++ * Setup the configuration for those mappings:
++ * dev_id=2 event=20 -> vcpu 3, intid=8195
++ * dev_id=7 event=255 -> vcpu 2, intid=8196
++ * LPIs ready to hit
++ */
++static int its_setup1(void)
+ {
+ 	struct its_collection *col3, *col2;
+ 	struct its_device *dev2, *dev7;
+ 
+ 	if (its_prerequisites(4))
+-		return;
 +		return -1;
-+	}
-+
-+	if (nr_cpus < nb_cpus) {
-+		report_skip("Test requires at least %d vcpus", nb_cpus);
-+		return -1;
-+	}
-+
-+	stats_reset();
-+
-+	setup_irq(lpi_handler);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		smp_boot_secondary(cpu, secondary_lpi_test);
-+	}
-+	wait_on_ready();
-+
-+	its_enable_defaults();
-+
+ 
+ 	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+ 	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+@@ -675,14 +682,10 @@ static void test_its_trigger(void)
+ 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+ 	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+ 
+-	report_prefix_push("int");
+ 	/*
+ 	 * dev=2, eventid=20  -> lpi= 8195, col=3
+ 	 * dev=7, eventid=255 -> lpi= 8196, col=2
+-	 * Trigger dev2, eventid=20 and dev7, eventid=255
+-	 * Check both LPIs hit
+ 	 */
+-
+ 	its_send_mapd(dev2, true);
+ 	its_send_mapd(dev7, true);
+ 
+@@ -694,6 +697,22 @@ static void test_its_trigger(void)
+ 
+ 	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
+ 	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
 +	return 0;
 +}
 +
 +static void test_its_trigger(void)
 +{
-+	struct its_collection *col3, *col2;
++	struct its_collection *col3;
 +	struct its_device *dev2, *dev7;
 +
-+	if (its_prerequisites(4))
++	if (its_setup1())
 +		return;
 +
-+	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
-+
-+	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
-+	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
-+
-+	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
-+	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
++	col3 = its_get_collection(3);
++	dev2 = its_get_device(2);
++	dev7 = its_get_device(7);
 +
 +	report_prefix_push("int");
-+	/*
-+	 * dev=2, eventid=20  -> lpi= 8195, col=3
-+	 * dev=7, eventid=255 -> lpi= 8196, col=2
-+	 * Trigger dev2, eventid=20 and dev7, eventid=255
-+	 * Check both LPIs hit
-+	 */
+ 
+ 	lpi_stats_expect(3, 8195);
+ 	its_send_int(dev2, 20);
+@@ -748,6 +767,29 @@ static void test_its_trigger(void)
+ 	check_lpi_stats("no LPI after device unmap");
+ 	report_prefix_pop();
+ }
 +
-+	its_send_mapd(dev2, true);
-+	its_send_mapd(dev7, true);
++static void test_its_migration(void)
++{
++	struct its_device *dev2, *dev7;
 +
-+	its_send_mapc(col3, true);
-+	its_send_mapc(col2, true);
++	if (its_setup1())
++		return;
 +
-+	its_send_invall(col2);
-+	its_send_invall(col3);
++	dev2 = its_get_device(2);
++	dev7 = its_get_device(7);
 +
-+	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
-+	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
++	puts("Now migrate the VM, then press a key to continue...\n");
++	(void)getchar();
++	report_info("Migration complete");
 +
 +	lpi_stats_expect(3, 8195);
 +	its_send_int(dev2, 20);
-+	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
++	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 en PE #3 after migration");
 +
 +	lpi_stats_expect(2, 8196);
 +	its_send_int(dev7, 255);
-+	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("inv/invall");
-+
-+	/*
-+	 * disable 8195, check dev2/eventid=20 does not trigger the
-+	 * corresponding LPI
-+	 */
-+	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
-+	its_send_inv(dev2, 20);
-+
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
-+
-+	/*
-+	 * re-enable the LPI but willingly do not call invall
-+	 * so the change in config is not taken into account.
-+	 * The LPI should not hit
-+	 */
-+	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
-+
-+	/* Now call the invall and check the LPI hits */
-+	its_send_invall(col3);
-+	lpi_stats_expect(3, 8195);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_push("mapd valid=false");
-+	/*
-+	 * Unmap device 2 and check the eventid 20 formerly
-+	 * attached to it does not hit anymore
-+	 */
-+
-+	its_send_mapd(dev2, false);
-+	lpi_stats_expect(-1, -1);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats("no LPI after device unmap");
-+	report_prefix_pop();
++	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
 +}
  #endif
  
  int main(int argc, char **argv)
-@@ -592,6 +781,10 @@ int main(int argc, char **argv)
+@@ -785,6 +827,10 @@ int main(int argc, char **argv)
  		report_prefix_push(argv[1]);
- 		gic_test_mmio();
+ 		test_its_trigger();
  		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-trigger")) {
++	} else if (!strcmp(argv[1], "its-migration")) {
 +		report_prefix_push(argv[1]);
-+		test_its_trigger();
++		test_its_migration();
 +		report_prefix_pop();
  	} else if (strcmp(argv[1], "its-introspection") == 0) {
  		report_prefix_push(argv[1]);
  		test_its_introspection();
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 23d378e..b9a7a2c 100644
+index b9a7a2c..480adec 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -129,6 +129,13 @@ extra_params = -machine gic-version=3 -append 'its-introspection'
+@@ -136,6 +136,14 @@ extra_params = -machine gic-version=3 -append 'its-trigger'
  groups = its
  arch = arm64
  
-+[its-trigger]
++[its-migration]
 +file = gic.flat
 +smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'its-trigger'
-+groups = its
++accel = kvm
++extra_params = -machine gic-version=3 -append 'its-migration'
++groups = its migration
 +arch = arm64
 +
  # Test PSCI emulation
  [psci]
  file = psci.flat
+diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+index 614a8bb..872953c 100644
+--- a/lib/arm64/asm/gic-v3-its.h
++++ b/lib/arm64/asm/gic-v3-its.h
+@@ -164,4 +164,7 @@ extern void __its_send_sync(struct its_collection *col, bool verbose);
+ #define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, false)
+ #define its_send_sync_nv(col)				__its_send_sync(col, false)
+ 
++extern struct its_device *its_get_device(u32 id);
++extern struct its_collection *its_get_collection(u32 id);
++
+ #endif /* _ASMARM64_GIC_V3_ITS_H_ */
+diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+index 442dcf0..9c9fa60 100644
+--- a/lib/arm64/gic-v3-its.c
++++ b/lib/arm64/gic-v3-its.c
+@@ -148,3 +148,25 @@ struct its_collection *its_create_collection(u32 col_id, u32 pe)
+ 	its_data.nr_collections++;
+ 	return new;
+ }
++
++struct its_device *its_get_device(u32 id)
++{
++	int i;
++
++	for (i = 0; i < GITS_MAX_DEVICES; i++) {
++		if (its_data.devices[i].device_id == id)
++			return &its_data.devices[i];
++	}
++	assert(0);
++}
++
++struct its_collection *its_get_collection(u32 id)
++{
++	int i;
++
++	for (i = 0; i < GITS_MAX_COLLECTIONS; i++) {
++		if (its_data.collections[i].col_id == id)
++			return &its_data.collections[i];
++	}
++	assert(0);
++}
 -- 
 2.20.1
 
