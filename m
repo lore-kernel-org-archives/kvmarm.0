@@ -2,79 +2,153 @@ Return-Path: <SRS0=5IFU=44=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09496C10F29
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4B7C18E5A
 	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 11:01:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE31221655
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 11:00:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE31221655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id A801821655
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 11:01:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DXUwmDsa";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="E0of12/4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A801821655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 587814AEE1;
-	Wed, 11 Mar 2020 07:00:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60A324A3A5;
+	Wed, 11 Mar 2020 07:01:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@marvell.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@marvell.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bf-SaHgOoHij; Wed, 11 Mar 2020 07:00:56 -0400 (EDT)
+	with ESMTP id tqrlQeEBiaKf; Wed, 11 Mar 2020 07:00:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D62874A5C6;
-	Wed, 11 Mar 2020 07:00:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5D64A7FE;
+	Wed, 11 Mar 2020 07:00:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6ADA4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 03:35:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8ECC4A418
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:18:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fBhGK2GWGfTV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 03:35:08 -0400 (EDT)
-Received: from huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B5094A1B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 03:35:07 -0400 (EDT)
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 8A9A3905D61B99ACD7FD;
- Wed, 11 Mar 2020 15:35:03 +0800 (CST)
-Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 11 Mar 2020 15:35:02 +0800
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.90]) by
- dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
- Wed, 11 Mar 2020 15:34:56 +0800
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To: zhukeqian <zhukeqian1@huawei.com>, Marc Zyngier <maz@kernel.org>
-Subject: RE: [RFC] KVM: arm64: support enabling dirty log graually in small
- chunks
-Thread-Topic: [RFC] KVM: arm64: support enabling dirty log graually in small
- chunks
-Thread-Index: AQHV9fES7bnu3RiLvUOZvoLEbVPgkKg/noOAgAFalYCAAFE+gIABLpcAgACIxzA=
-Date: Wed, 11 Mar 2020 07:34:55 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
-References: <20200309085727.1106-1-zhukeqian1@huawei.com>
- <4b85699ec1d354cc73f5302560231f86@misterjones.org>
- <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
- <a642a79ea9190542a9098e4c9dc5a9f2@kernel.org>
- <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
-In-Reply-To: <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
+ with ESMTP id aMAICywhRX17 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 05:18:46 -0400 (EDT)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com
+ [67.231.156.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A56BD4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 05:18:46 -0400 (EDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+ by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02B96GAF029149; Wed, 11 Mar 2020 02:18:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ h=date : from : to :
+ cc : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pfpt0818; bh=QzLOescWEVxZpG3gRQKush8+1AsCO0Y0iAOQCv12VG4=;
+ b=DXUwmDsaBfNUsTTF2Z8Kk580bBUFiyPDSVkfHp1bC4gHDhW+lOZK33lhmZdifULmfVWB
+ CrvZY+v5QVqJIE/x/5pEgLXrz+mKWRbhNBfWyyHEKN1UeQr8inRQ65g9Z7wzWRA9Kc95
+ f/CoAxXD7j2WnEURg/fmUe53EuBVmAuKB9h/Is9WrHX3BqnpxX0gLAPdQuINH+RwdGJ1
+ Mz3j+Pelyj/CdAC/G9JvEPzZdYV5i3eqEWodevxQd0oOe+lzC16CW51+lGrTTdawC7SV
+ uqvP2Cssmr7eCNWXSrdbVQc0zH6hIZqV4QkUNFiTvDPLNjbzSowVP3i6rmptrlIv1loD iw== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+ by mx0b-0016f401.pphosted.com with ESMTP id 2yp04ft313-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Wed, 11 Mar 2020 02:18:27 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 11 Mar
+ 2020 02:18:25 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Wed, 11 Mar 2020 02:18:25 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RcwuSWso4AxZwJZNEpfgl2ROM2wrNf144kPeDFSgiEH44PsIib+zoKrJePE8kRMpdDUIPvAAslh2oFq5ukyt6NXAvEtDrBTi4KBONIvZJsfSQ4GhTbFQYfb2/CyIa22HWoWfLEZAEqK4JBb6z302GHCwGRcoOuUz88vPViUzWP3zyQha+OJaJLvNOjVq3c3znZNTuPBa8M/q0OiqDosMZjGJiiNA+2WhmKFdanlz4Xmgt+chkOCVW0ev2rubcZJ7EMk7bkrgtlrNWabtAvOMZgMUkn0yzhXrYK94ccXwi2FaD8OJDyLAnfhd1pnWZN/DCKq7PUB+oIR1W9I1063ycw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QzLOescWEVxZpG3gRQKush8+1AsCO0Y0iAOQCv12VG4=;
+ b=Rxe4QZ+KMb4xCB6qD7YfSewnLVO6PRTNEBwmedR1U46OP3FPUmmEOcUBx7b3v0W4XFd0FeKCt+GqIDAM3/eUazxMqSsdSPKYWPWmPyTB6hMxvgmbXrV6LOuhh/hfrL4vZqSWjnz3XX0Aew1iPPwQbyuPcREygOHqseD+3f1xv6C0A0ExB2tuiRVGVbBAqsMztbtTXwVzplax0J8jeE8yvQkIS/E0IDx7OjWLimAhFnEJ7bOLwGXO4KBBmbe699wDr9G2qGI7Tw01EXy51uA7ysCCv44PMPk++Z5pp27ZPkWhxt2Hr8Qai7Czode417Fka7ABYeIscPExvYGPieDYOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QzLOescWEVxZpG3gRQKush8+1AsCO0Y0iAOQCv12VG4=;
+ b=E0of12/4FqgrF00gueL4jilerXgQw+F3/zW0IcqmItlXzFf3S7OsMDm3ixz6R5ML1UULzxSoWve6PjuS3ivaK/jynenSeMd7bA26NwEtDL/yHpZqAPgZzxjl+eQBp9Xpyy7A4NH4dI7d416bxjR8iMmlyGvPqffxPr3G/plpmHo=
+Received: from MN2PR18MB3408.namprd18.prod.outlook.com (2603:10b6:208:165::10)
+ by MN2PR18MB3688.namprd18.prod.outlook.com (2603:10b6:208:260::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14; Wed, 11 Mar
+ 2020 09:18:24 +0000
+Received: from MN2PR18MB3408.namprd18.prod.outlook.com
+ ([fe80::30c4:52fe:fdf8:faff]) by MN2PR18MB3408.namprd18.prod.outlook.com
+ ([fe80::30c4:52fe:fdf8:faff%7]) with mapi id 15.20.2793.018; Wed, 11 Mar 2020
+ 09:18:24 +0000
+Date: Wed, 11 Mar 2020 10:18:15 +0100
+From: Robert Richter <rrichter@marvell.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 03/32] irqchip/gic-v3: Workaround Cavium TX1 erratum
+ when reading GICD_TYPER2
+Message-ID: <20200311091814.kp4xfsofalutlbv6@rric.localdomain>
+References: <20191224111055.11836-1-maz@kernel.org>
+ <20191224111055.11836-4-maz@kernel.org>
+ <20200309221137.5pjh4vkc62ft3h2a@rric.localdomain>
+ <b1b7db1f0e1c47b7d9e2dfbbe3409b77@kernel.org>
+ <20200311084515.5vbfudbls3cj2cre@rric.localdomain>
+ <74682a83c75bc8e517462d181e6c24c7@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <74682a83c75bc8e517462d181e6c24c7@kernel.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-ClientProxiedBy: HE1PR0102CA0063.eurprd01.prod.exchangelabs.com
+ (2603:10a6:7:7d::40) To MN2PR18MB3408.namprd18.prod.outlook.com
+ (2603:10b6:208:165::10)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from rric.localdomain (31.208.96.227) by
+ HE1PR0102CA0063.eurprd01.prod.exchangelabs.com (2603:10a6:7:7d::40) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.15 via Frontend
+ Transport; Wed, 11 Mar 2020 09:18:21 +0000
+X-Originating-IP: [31.208.96.227]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b10614f1-e795-4184-8ec5-08d7c59d264a
+X-MS-TrafficTypeDiagnostic: MN2PR18MB3688:
+X-Microsoft-Antispam-PRVS: <MN2PR18MB3688495E4FA0DBBB0B1B0953D9FC0@MN2PR18MB3688.namprd18.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0339F89554
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(346002)(39850400004)(396003)(376002)(366004)(136003)(199004)(5660300002)(4326008)(86362001)(66946007)(66556008)(66476007)(26005)(956004)(9686003)(316002)(8676002)(8936002)(478600001)(81166006)(81156014)(55016002)(16526019)(7416002)(186003)(2906002)(7696005)(1076003)(52116002)(54906003)(6666004)(53546011)(6506007)(6916009);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:MN2PR18MB3688;
+ H:MN2PR18MB3408.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bQWrEsPg95/beV1ooE8BhYf1rSkMcMGKiJtUfKn4P0yUs8mzlD8u7oVh7Wnovp9NLl5PT8lCGsBv7aza1rpwn+R+MHnHSxphwt1n9KFd2koT/IntxuDsSkGjPV2ihjBozloJXpJ3SwcyY54XtARDqJBHjB0kUO1J65AEXqp/emEpZ0leDPjw7Elin5lEPWh911PoMkY8SapUlTcp/zom7m7d3LyUia4bG8SywnbANCTIUpECyrY0KPktZrmsprIHbAyl5QBbbo+APQZZZ5gx6CZjW3HyWasee45k7FGaaXmfo/w1Jr0M1bAP4SgnTcz8FR+Zqz3fXALexrRO6UtcO1FFa5DbHns2moQwtrIjVF6ytoPeCMGtipsG4S7ln8aqQ/6cluHGSvhxRcIQjtf/nmormyjGV8uwbkHkky6+z1knafuhg0K5odQfFGBk5cMw
+X-MS-Exchange-AntiSpam-MessageData: 7WtyD512l4kCxqX5B7gVk485urlzTIX96HblqGjh9sdRB7xNYCzNBMWP6CI5XFGNjaIQ8dHGCeeu/qLVeHDEsXsEppTRxAJbFib3ihY0qdNv8VqxXv+7eOpC00QS0F16NOI3IdnZjBWwBJl8F3Tt7A==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b10614f1-e795-4184-8ec5-08d7c59d264a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 09:18:24.0251 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vpaoQNTNd0N+8QwjBvxH8XSFZ4gUlny0ykYjd5o7M4LrLKnanyvk988m3dNa1Em0IKuanA8uwQfvCeORVK6Y9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3688
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-11_02:2020-03-10,
+ 2020-03-11 signatures=0
 X-Mailman-Approved-At: Wed, 11 Mar 2020 07:00:49 -0400
-Cc: "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org,
+ Andrew Murray <Andrew.Murray@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,93 +165,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-> -----Original Message-----
-> From: zhukeqian
-> Sent: Wednesday, March 11, 2020 3:20 PM
-> To: Marc Zyngier <maz@kernel.org>
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
-> linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Zhoujian (jay)
-> <jianjay.zhou@huawei.com>; Sean Christopherson
-> <sean.j.christopherson@intel.com>; Paolo Bonzini <pbonzini@redhat.com>;
-> James Morse <james.morse@arm.com>; Julien Thierry
-> <julien.thierry.kdev@gmail.com>; Suzuki K Poulose <suzuki.poulose@arm.com>
-> Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small chunks
+On 11.03.20 09:03:48, Marc Zyngier wrote:
+> Hi Robert,
 > 
-> Hi Marc,
+> On 2020-03-11 08:45, Robert Richter wrote:
+> > Hi Marc,
+> > 
+> > On 10.03.20 11:41:09, Marc Zyngier wrote:
+> > > On 2020-03-09 22:11, Robert Richter wrote:
+> > > > On 24.12.19 11:10:26, Marc Zyngier wrote:
+> > 
+> > > > > @@ -1502,6 +1512,12 @@ static const struct gic_quirk gic_quirks[] = {
+> > > > >  		.mask	= 0xffffffff,
+> > > > >  		.init	= gic_enable_quirk_hip06_07,
+> > > > >  	},
+> > > > > +	{
+> > > > > +		.desc	= "GICv3: Cavium TX1 GICD_TYPER2 erratum",
+> > > >
+> > > > There is no errata number yet.
+> > > 
+> > > Please let me know when/if you obtain one.
+> > 
+> > GIC-38539: GIC faults when accessing reserved GICD_TYPER2 register
+> > 
+> > Applies to (covered with iidr mask below):
+> > 
+> >  ThunderX: CN88xx
+> >  OCTEON TX: CN83xx, CN81xx
+> >  OCTEON TX2: CN93xx, CN96xx, CN98xx, CNF95xx*
+> > 
+> > Issue: Access to GIC reserved registers results in an exception.
+> > Notes:
+> > 1) This applies to other reserved registers too.
+> > 2) The errata number is unique over all IP blocks, so a macro
+> >    CAVIUM_ERRATUM_38539 is ok.
 > 
-> On 2020/3/10 21:16, Marc Zyngier wrote:
-> > On 2020-03-10 08:26, zhukeqian wrote:
-> >> Hi Marc,
-> >>
-> >> On 2020/3/9 19:45, Marc Zyngier wrote:
-> >>> Kegian,
-> >
-> > [...]
-> >
-> >>> Is there a userspace counterpart to it?
-> >>>
-> >> As this KVM/x86 related changes have not been merged to mainline
-> >> kernel, some little modification is needed on mainline Qemu.
-> >
-> > Could you please point me to these changes?
-> I made some changes locally listed below.
+> Great, thanks a lot for chasing this. One question though: does this
+> apply to the distributor only? Or to all reserved registers regardless
+> of the architectural block they are in?
+
+It is the whole GIC IP block covered by GICv3 spec. It was implemented
+during a very early state of the spec and the RES0 requirement was
+added later to reserved registers. CN8xxx GIC CSR access checking is
+stricter implemented, so if no register is present, an access results
+in a fault other than simply returning a RAZ/WI.
+
+Thanks,
+
+-Robert
+
 > 
-> However, Qemu can choose to enable KVM_DIRTY_LOG_INITIALLY_SET or not.
-> Here I made no judgement on dirty_log_manual_caps because I just want to
-> verify the optimization of this patch.
+> It won't change the workaround for now, but knowing the scope of the
+> erratum will help future developments.
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
-> 439a4efe52..1611f644a4 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2007,14 +2007,16 @@ static int kvm_init(MachineState *ms)
->      s->coalesced_pio = s->coalesced_mmio &&
->                         kvm_check_extension(s,
-> KVM_CAP_COALESCED_PIO);
+> Thanks,
 > 
-> -    s->manual_dirty_log_protect =
-> +    uint64_t dirty_log_manual_caps =
->          kvm_check_extension(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> -    if (s->manual_dirty_log_protect) {
-> -        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
-> +    if (dirty_log_manual_caps) {
-> +        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
-> +                                dirty_log_manual_caps);
->          if (ret) {
->              warn_report("Trying to enable
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
->                          "but failed.  Falling back to the legacy mode. ");
-> -            s->manual_dirty_log_protect = false;
-> +        } else {
-> +            s->manual_dirty_log_protect = true;
->          }
->      }
-
-FYI: I had submitted a patch to the Qemu community some days ago:
-https://patchwork.kernel.org/patch/11419191/
-
-> >
-> >> As I tested this patch on a 128GB RAM Linux VM with no huge pages,
-> >> the time of enabling dirty log will decrease obviously.
-> >
-> > I'm not sure how realistic that is. Not having huge pages tends to
-> > lead to pretty bad performance in general...
-> Sure, this has no effect on guests which are all of huge pages.
-> 
-> For my understanding, once a guest has normal pages (maybe are initialized at
-> beginning or dissloved from huge pages), it can benefit from this patch.
-
-Yes, I agree.
-
-
-
-Regards,
-Jay Zhou
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
