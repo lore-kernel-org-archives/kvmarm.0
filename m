@@ -2,83 +2,52 @@ Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC9CC10DCE
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FA5C10DCE
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:52:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4DC8320736
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:52:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b/vhPXqY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DC8320736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 730AE20736
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:52:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 730AE20736
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C051B4A4F7;
-	Thu, 12 Mar 2020 05:52:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 235B24A576;
+	Thu, 12 Mar 2020 05:52:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g72fHRPVlaA4; Thu, 12 Mar 2020 05:52:30 -0400 (EDT)
+	with ESMTP id WNfTzEX+OJqI; Thu, 12 Mar 2020 05:52:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB4F4A50F;
-	Thu, 12 Mar 2020 05:52:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5EF44A51D;
+	Thu, 12 Mar 2020 05:52:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 649704A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:52:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2986D4A49C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:40:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E2gHHtiWOIqu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 05:52:28 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1615D4A32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:52:28 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584006747;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zG8vPwXr3fW379kNEBs9k2zxUAhuYclstIC5n/OmTcY=;
- b=b/vhPXqYYMPntaKThNrjs0cdotHtowm7mHi1sfI8pzgA2TkmRQ7LisHKFwWNsgvjb53S61
- hVTuRmZIfLTku29lMyMqfHMUaNbrFa4TZd+WVTFYf4W4S8G5UIdXy/5igSOaVlJ6r8TJe0
- f6vsYGjSxQ2bTlqcc7kDYyLEU34inDQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-0hKgPFkoNW-VDLxp0GcLmg-1; Thu, 12 Mar 2020 05:52:26 -0400
-X-MC-Unique: 0hKgPFkoNW-VDLxp0GcLmg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F1B7800D4E;
- Thu, 12 Mar 2020 09:52:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BBE8360BEC;
- Thu, 12 Mar 2020 09:52:22 +0000 (UTC)
-Date: Thu, 12 Mar 2020 10:52:20 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v3 1/2] target/arm: kvm: Inject events at the last stage
- of sync
-Message-ID: <20200312095220.bb6xdezdujufnfzg@kamzik.brq.redhat.com>
-References: <20200312003401.29017-1-beata.michalska@linaro.org>
- <20200312003401.29017-2-beata.michalska@linaro.org>
+ with ESMTP id vBaoxlY-fx+z for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 05:40:04 -0400 (EDT)
+Received: from ns207790.ip-94-23-215.eu (poy.remlab.net [94.23.215.26])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 415DC4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:40:04 -0400 (EDT)
+Received: from basile.remlab.net (ip6-localhost [IPv6:::1])
+ by ns207790.ip-94-23-215.eu (Postfix) with ESMTP id 983595FD7F;
+ Thu, 12 Mar 2020 10:40:02 +0100 (CET)
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] arm64: move kimage_vaddr to .rodata
+Date: Thu, 12 Mar 2020 11:40:02 +0200
+Message-Id: <20200312094002.153302-1-remi@remlab.net>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200312003401.29017-2-beata.michalska@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+X-Mailman-Approved-At: Thu, 12 Mar 2020 05:52:50 -0400
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,26 +59,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 12, 2020 at 12:34:00AM +0000, Beata Michalska wrote:
-> KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
-> As such this should be the last step of sync to avoid potential overwriting
-> of whatever changes KVM might have done.
-> 
-> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> ---
->  target/arm/kvm32.c | 15 ++++++++++-----
->  target/arm/kvm64.c | 15 ++++++++++-----
->  2 files changed, 20 insertions(+), 10 deletions(-)
->
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+RnJvbTogUmVtaSBEZW5pcy1Db3VybW9udCA8cmVtaS5kZW5pcy5jb3VybW9udEBodWF3ZWkuY29t
+PgoKVGhpcyBkYXR1bSBpcyBub3QgcmVmZXJlbmNlZCBmcm9tIC5pZG1hcC50ZXh0OiBpdCBkb2Vz
+IG5vdCBuZWVkIHRvIGJlCm1hcHBlZCBpbiBpZG1hcC4gTGV0cyBtb3ZlIGl0IHRvIC5yb2RhdGEg
+YXMgaXQgaXMgbmV2ZXIgd3JpdHRlbiB0byBhZnRlcgplYXJseSBib290IG9mIHRoZSBwcmltYXJ5
+IENQVS4KKE1heWJlIC5kYXRhLnJvX2FmdGVyX2luaXQgd291bGQgYmUgY2xlYW5lciB0aG91Z2g/
+KQoKU2lnbmVkLW9mZi1ieTogUsOpbWkgRGVuaXMtQ291cm1vbnQgPHJlbWlAcmVtbGFiLm5ldD4K
+LS0tCiBhcmNoL2FybTY0L2tlcm5lbC9oZWFkLlMgfCAxMiArKysrKysrLS0tLS0KIDEgZmlsZSBj
+aGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJj
+aC9hcm02NC9rZXJuZWwvaGVhZC5TIGIvYXJjaC9hcm02NC9rZXJuZWwvaGVhZC5TCmluZGV4IDZl
+MDhlZTJiNGQ1NS4uOGU1YzBlMDA0MGU0IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9o
+ZWFkLlMKKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvaGVhZC5TCkBAIC00NTcsMTcgKzQ1NywxOSBA
+QCBTWU1fRlVOQ19TVEFSVF9MT0NBTChfX3ByaW1hcnlfc3dpdGNoZWQpCiAJYglzdGFydF9rZXJu
+ZWwKIFNZTV9GVU5DX0VORChfX3ByaW1hcnlfc3dpdGNoZWQpCiAKKwkucHVzaHNlY3Rpb24gIi5y
+b2RhdGEiLCAiYSIKK1NZTV9EQVRBX1NUQVJUKGtpbWFnZV92YWRkcikKKwkucXVhZAkJX3RleHQg
+LSBURVhUX09GRlNFVAorU1lNX0RBVEFfRU5EKGtpbWFnZV92YWRkcikKK0VYUE9SVF9TWU1CT0wo
+a2ltYWdlX3ZhZGRyKQorCS5wb3BzZWN0aW9uCisKIC8qCiAgKiBlbmQgZWFybHkgaGVhZCBzZWN0
+aW9uLCBiZWdpbiBoZWFkIGNvZGUgdGhhdCBpcyBhbHNvIHVzZWQgZm9yCiAgKiBob3RwbHVnIGFu
+ZCBuZWVkcyB0byBoYXZlIHRoZSBzYW1lIHByb3RlY3Rpb25zIGFzIHRoZSB0ZXh0IHJlZ2lvbgog
+ICovCiAJLnNlY3Rpb24gIi5pZG1hcC50ZXh0IiwiYXd4IgogCi1TWU1fREFUQV9TVEFSVChraW1h
+Z2VfdmFkZHIpCi0JLnF1YWQJCV90ZXh0IC0gVEVYVF9PRkZTRVQKLVNZTV9EQVRBX0VORChraW1h
+Z2VfdmFkZHIpCi1FWFBPUlRfU1lNQk9MKGtpbWFnZV92YWRkcikKLQogLyoKICAqIElmIHdlJ3Jl
+IGZvcnR1bmF0ZSBlbm91Z2ggdG8gYm9vdCBhdCBFTDIsIGVuc3VyZSB0aGF0IHRoZSB3b3JsZCBp
+cwogICogc2FuZSBiZWZvcmUgZHJvcHBpbmcgdG8gRUwxLgotLSAKMi4yNS4xCgpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0
+Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5l
+ZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
