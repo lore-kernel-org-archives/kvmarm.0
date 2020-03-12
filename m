@@ -2,78 +2,83 @@ Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F465C2BB1D
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9919C1975A
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 16:33:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E7C6B2067C
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 334E8206FA
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 16:33:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS5zSKk4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7C6B2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHzgIens"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334E8206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A126E4A5A8;
-	Thu, 12 Mar 2020 11:44:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A724AEBD;
+	Thu, 12 Mar 2020 12:33:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PyzXIO6HpAqR; Thu, 12 Mar 2020 11:44:57 -0400 (EDT)
+	with ESMTP id PZUNIULzpM7R; Thu, 12 Mar 2020 12:33:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B2BB4AF07;
-	Thu, 12 Mar 2020 11:44:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4D834A7F0;
+	Thu, 12 Mar 2020 12:33:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E7A54AF07
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 522DC4A51F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 12:33:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ulwWqbXbHtvd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 11:44:55 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E9D4AF14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:55 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584027895;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JKpqkyg24HBYZMYaHdI/WtnrKZbcyivTfzakH3GMn20=;
- b=SS5zSKk4vgwgIKzbQ7y2OYrvl/ve5v5FOUaCln/BNtFTRlFVjbAzc5bhAX1jleX66sR6VV
- Z+F8p9p1hgcNch3woC0tRE97/lfCbbyvUWBgDChPIJ558EDOWC0/BfJn7/DBW6EGg5Ax9v
- Gf1WWIMNuSxs7HboqfIJ1X5Oyw5gPlw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-UFJlH_GWPHSbdtbRDWfAXg-1; Thu, 12 Mar 2020 11:44:53 -0400
-X-MC-Unique: UFJlH_GWPHSbdtbRDWfAXg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E24618018CB;
- Thu, 12 Mar 2020 15:44:51 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2C3C35C1B5;
- Thu, 12 Mar 2020 15:44:46 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v3 12/12] arm: pmu: Test overflow interrupts
-Date: Thu, 12 Mar 2020 16:43:01 +0100
-Message-Id: <20200312154301.9130-13-eric.auger@redhat.com>
-In-Reply-To: <20200312154301.9130-1-eric.auger@redhat.com>
-References: <20200312154301.9130-1-eric.auger@redhat.com>
+ with ESMTP id sTDGC3gKTesZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 12:33:03 -0400 (EDT)
+Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
+ [209.85.210.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 681904A4F6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 12:33:03 -0400 (EDT)
+Received: by mail-ot1-f66.google.com with SMTP id t28so4299431ott.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 09:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0VRQIv4qXD7Q5fEXczD6vOATnHwuTS2cyDP1QenEnps=;
+ b=MHzgIensqHxS/3cxZERb3e3XdvDQgU1GjlryxvGwB1bgIgw+JbE+enfvDyonB3f8gM
+ JnpcV1DAUyKyX/ipEBnESgQBXOyxs84B6XQxy+w0hpy5q1f1lZskT8gMhWafZvCjU8vu
+ pfaICmM0xEccLFKpQA3tllm635JBBL4l1XiERi+YDqAA2nRE+uDOKOYw3BhigSmmecMW
+ yYEK73tlWmhBkpy6JwrrrtlzJ9P5ca8iy3GnFCEHPh6InXhLe/93sysmRKRGxtAeulvr
+ FRD50l9e9HlVFC+QSVcP5AWWDo0O0huF8PLvuiBMGcu7+5ghCc1TOR+howe0OaLTKGnH
+ DqRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0VRQIv4qXD7Q5fEXczD6vOATnHwuTS2cyDP1QenEnps=;
+ b=tRbnmxywU29i5WMlflpIlymbVaeXDTu6P6nGBFe2+egsQhZ8d2SJk4IVy0Gb6GO294
+ 5BUSqPh/talBQRoh4zA4TFxnh5OhcFQUNlJ7MG3S3Ead9tlDXxlZ1k8vyd+Jy6x8GR/3
+ +UEl90tgHz86ksJWgWGVdYo0x1trDKAHAoBLhf+kiPCCdZtJXuPbVWnTkgXOy4kL+E+1
+ JiSxVS8JCkW076Z7Do4U3rj5ff/mcDm2Xs9UAoKx+L50Nt6youYDwAHGs856Ihz8Lq9b
+ itw8XUkSVdkWlMLj3HBFgIczAUJz3ieeH/smR0v3tDRELO1/Yj//o8bxypw7DYryHaSq
+ lEdg==
+X-Gm-Message-State: ANhLgQ3irg7OZnH23/dSvTw0pQMKW2Pmmz1woLmBHI7eQiNkwQTGXUc2
+ +A0CIQ6DOIopLLkiYJvSTmXFn+A+Cpo7NH9WvlRT2w==
+X-Google-Smtp-Source: ADFU+vsQTL+6pcesecAzObSP/AMwX5+2/sIepkjwZse514F/Bluy0l5CbOVfSwNDL3YK6i4MXxcyW+23beeY+Qb7fMs=
+X-Received: by 2002:a9d:6f88:: with SMTP id h8mr7105904otq.91.1584030782701;
+ Thu, 12 Mar 2020 09:33:02 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: andrew.murray@arm.com, andre.przywara@arm.com
+References: <20200312003401.29017-1-beata.michalska@linaro.org>
+ <20200312003401.29017-2-beata.michalska@linaro.org>
+In-Reply-To: <20200312003401.29017-2-beata.michalska@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Mar 2020 16:32:51 +0000
+Message-ID: <CAFEAcA_5avBsNJUDh6o8vGfm4DGcFA-iT-UNG5h8M+hPDOif9g@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] target/arm: kvm: Inject events at the last stage
+ of sync
+To: Beata Michalska <beata.michalska@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,237 +95,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Test overflows for MEM_ACCESS and SW_INCR events. Also tests
-overflows with 64-bit events.
+On Thu, 12 Mar 2020 at 00:34, Beata Michalska
+<beata.michalska@linaro.org> wrote:
+>
+> KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
+> As such this should be the last step of sync to avoid potential overwriting
+> of whatever changes KVM might have done.
+>
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Hi; I'm going to take patch 1 into target-arm.next since it
+seems worth having on its own and I'm doing a pullreq today
+anyway. Andrew's given you feedback on patch 2.
 
----
-
-v2 -> v3:
-- added prefix pop
-- added pmu_stats.unexpected
-- added pmu- prefix
-- remove traces in irq_handler()
-
-v1 -> v2:
-- inline setup_irq() code
----
- arm/pmu.c         | 139 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |   6 ++
- 2 files changed, 145 insertions(+)
-
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 79c2a0f..628249c 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -59,12 +59,20 @@
- #define PRE_OVERFLOW		0xFFFFFFF0
- #define PRE_OVERFLOW2		0xFFFFFFDC
- 
-+#define PMU_PPI			23
-+
- struct pmu {
- 	unsigned int version;
- 	unsigned int nb_implemented_counters;
- 	uint32_t pmcr_ro;
- };
- 
-+struct pmu_stats {
-+	unsigned long bitmap;
-+	uint32_t interrupts[32];
-+	bool unexpected;
-+};
-+
- static struct pmu pmu;
- 
- #if defined(__arm__)
-@@ -146,6 +154,7 @@ static void test_sw_incr(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
- static void test_chain_promotion(void) {}
-+static void test_overflow_interrupt(void) {}
- 
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -276,6 +285,43 @@ asm volatile(
- 	: "x9", "x10", "cc");
- }
- 
-+static struct pmu_stats pmu_stats;
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	uint32_t irqstat, irqnr;
-+
-+	irqstat = gic_read_iar();
-+	irqnr = gic_iar_irqnr(irqstat);
-+
-+	if (irqnr == PMU_PPI) {
-+		unsigned long overflows = read_sysreg(pmovsclr_el0);
-+		int i;
-+
-+		for (i = 0; i < 32; i++) {
-+			if (test_and_clear_bit(i, &overflows)) {
-+				pmu_stats.interrupts[i]++;
-+				pmu_stats.bitmap |= 1 << i;
-+			}
-+		}
-+		write_sysreg(ALL_SET, pmovsclr_el0);
-+	} else {
-+		pmu_stats.unexpected = true;
-+	}
-+	gic_write_eoir(irqstat);
-+}
-+
-+static void pmu_reset_stats(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < 32; i++)
-+		pmu_stats.interrupts[i] = 0;
-+
-+	pmu_stats.bitmap = 0;
-+	pmu_stats.unexpected = false;
-+}
-+
- static void pmu_reset(void)
- {
- 	/* reset all counters, counting disabled at PMCR level*/
-@@ -286,6 +332,7 @@ static void pmu_reset(void)
- 	write_sysreg(ALL_SET, pmovsclr_el0);
- 	/* disable overflow interrupts on all counters */
- 	write_sysreg(ALL_SET, pmintenclr_el1);
-+	pmu_reset_stats();
- 	isb();
- }
- 
-@@ -730,6 +777,94 @@ static void test_chain_promotion(void)
- 			read_sysreg(pmovsclr_el0));
- }
- 
-+static bool expect_interrupts(uint32_t bitmap)
-+{
-+	int i;
-+
-+	if (pmu_stats.bitmap ^ bitmap || pmu_stats.unexpected)
-+		return false;
-+
-+	for (i = 0; i < 32; i++) {
-+		if (test_and_clear_bit(i, &pmu_stats.bitmap))
-+			if (pmu_stats.interrupts[i] != 1)
-+				return false;
-+	}
-+	return true;
-+}
-+
-+static void test_overflow_interrupt(void)
-+{
-+	uint32_t events[] = {MEM_ACCESS, SW_INCR};
-+	void *addr = malloc(PAGE_SIZE);
-+	int i;
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+		return;
-+
-+	gic_enable_defaults();
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+	local_irq_enable();
-+	gic_enable_irq(23);
-+
-+	pmu_reset();
-+
-+	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-+	isb();
-+
-+	/* interrupts are disabled */
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0), "no overflow interrupt received");
-+
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i = 0; i < 100; i++)
-+		write_sysreg(0x2, pmswinc_el0);
-+
-+	set_pmcr(pmu.pmcr_ro);
-+	report(expect_interrupts(0), "no overflow interrupt received");
-+
-+	/* enable interrupts */
-+
-+	pmu_reset_stats();
-+
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-+	write_sysreg(ALL_SET, pmintenset_el1);
-+	isb();
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i = 0; i < 100; i++)
-+		write_sysreg(0x3, pmswinc_el0);
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro);
-+	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
-+	report(expect_interrupts(0x3),
-+		"overflow interrupts expected on #0 and #1");
-+
-+	/* promote to 64-b */
-+
-+	pmu_reset_stats();
-+
-+	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	isb();
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0),
-+		"no overflow interrupt expected on 32b boundary");
-+
-+	/* overflow on odd counter */
-+	pmu_reset_stats();
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, ALL_SET);
-+	isb();
-+	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0x2),
-+		"expect overflow interrupt on odd counter");
-+}
- #endif
- 
- /*
-@@ -932,6 +1067,10 @@ int main(int argc, char *argv[])
- 		report_prefix_push(argv[1]);
- 		test_chain_promotion();
- 		report_prefix_pop();
-+	} else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_overflow_interrupt();
-+		report_prefix_pop();
- 	} else {
- 		report_abort("Unknown sub-test '%s'", argv[1]);
- 	}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 1b0c8c8..455fd10 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -114,6 +114,12 @@ groups = pmu
- arch = arm64
- extra_params = -append 'pmu-chain-promotion'
- 
-+[pmu-overflow-interrupt]
-+file = pmu.flat
-+groups = pmu
-+arch = arm64
-+extra_params = -append 'pmu-overflow-interrupt'
-+
- # Test PMU support (TCG) with -icount IPC=1
- #[pmu-tcg-icount-1]
- #file = pmu.flat
--- 
-2.20.1
-
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
