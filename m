@@ -2,82 +2,85 @@ Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42168C10DCE
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 10:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 626A3C2BB1D
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:17:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE86620674
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 10:25:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E74F32067C
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:17:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zp2qM+1Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE86620674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MpyPdlUl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74F32067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 217C54A4A9;
-	Thu, 12 Mar 2020 06:25:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 692CD4A4AA;
+	Thu, 12 Mar 2020 07:17:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P9fbxVgYaX6J; Thu, 12 Mar 2020 06:25:40 -0400 (EDT)
+	with ESMTP id cdFekebvGrkR; Thu, 12 Mar 2020 07:17:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8F24A541;
-	Thu, 12 Mar 2020 06:25:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85DE4A4E5;
+	Thu, 12 Mar 2020 07:17:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0A484A4A9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 06:25:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80B8F4A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:17:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XU7fJTBi4huM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 06:25:38 -0400 (EDT)
+ with ESMTP id Zo7S0SaVz6md for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 07:17:13 -0400 (EDT)
 Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
  [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C4A4A3B4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 06:25:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FEB94A389
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:17:13 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584008738;
+ s=mimecast20190719; t=1584011833;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=G7jEyYLokTrruOrRCqepmYEHqJ5Ok6mSEIyyRqTgfXY=;
- b=Zp2qM+1ZPpXWuWUSvbsLEWCJRuYy4K1+NXU/WP7IseybMi2vwzDhlwx6JOfi6bWK8ImnDg
- u3uk/gECJ9LI5rnEGPEKBXxf7fj0l+eWgig1LwY/UU7aRuHBVSJ2f2wOKvRkjD4A94h5lH
- pxf4Kn+vHMYQu/E4Ze4/cfiPS1kOsoU=
+ bh=zCjz3Bgm0/Ul3j+NgrdxbQve6e+WlQQ1jJUuqiID9l4=;
+ b=MpyPdlUlzWDXkFU7Dfo85bjGBPAdyUy6LqAgYhnm3tcHXupmAn5KgD6/gzko10vd1e3srX
+ nq7q3dQArhoKMZzjDeCau8YPWZqUrd9A7xwEFCBZ7J42R/ZhCX6avFl3+Izu85XGiyZXUy
+ utjJA1gC1+0C/5Cc0aArULWUtI7fELE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-SmhC-fIdPJ25Vq-0GBqtsg-1; Thu, 12 Mar 2020 06:25:35 -0400
-X-MC-Unique: SmhC-fIdPJ25Vq-0GBqtsg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-298-fkev6FX8PRq-uvXGN0-Msw-1; Thu, 12 Mar 2020 07:16:59 -0400
+X-MC-Unique: fkev6FX8PRq-uvXGN0-Msw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A985107B791;
- Thu, 12 Mar 2020 10:25:34 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 963998F37D;
- Thu, 12 Mar 2020 10:25:32 +0000 (UTC)
-Date: Thu, 12 Mar 2020 11:25:30 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v3 2/2] target/arm: kvm: Handle DABT with no valid ISS
-Message-ID: <20200312102530.a55grtyfrnx2glj4@kamzik.brq.redhat.com>
-References: <20200312003401.29017-1-beata.michalska@linaro.org>
- <20200312003401.29017-3-beata.michalska@linaro.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E95100550E;
+ Thu, 12 Mar 2020 11:16:57 +0000 (UTC)
+Received: from [10.36.118.12] (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BA0151001902;
+ Thu, 12 Mar 2020 11:16:52 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
+To: Andrew Jones <drjones@redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-6-eric.auger@redhat.com>
+ <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <7d774de0-fb95-5b66-1eca-2c3839706372@redhat.com>
+Date: Thu, 12 Mar 2020 12:16:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200312003401.29017-3-beata.michalska@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, andre.przywara@arm.com, andrew.murray@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,315 +97,390 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 12, 2020 at 12:34:01AM +0000, Beata Michalska wrote:
-> On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
-> exception with no valid ISS info to be decoded. The lack of decode info
-> makes it at least tricky to emulate those instruction which is one of the
-> (many) reasons why KVM will not even try to do so.
+Hi Drew,
+
+On 3/5/20 10:42 AM, Andrew Jones wrote:
+> On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
+>> Adds the following tests:
+>> - event-counter-config: test event counter configuration
+>> - basic-event-count:
+>>   - programs counters #0 and #1 to count 2 required events
+>>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
+>>   to a value close enough to the 32b
+>>   overflow limit so that we check the overflow bit is set
+>>   after the execution of the asm loop.
+>> - mem-access: counts MEM_ACCESS event on counters #0 and #1
+>>   with and without 32-bit overflow.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - fix PMCNTENSET_EL0 and PMCNTENCLR_EL0 op0
+>> - print PMEVTYPER SH
+>> - properly clobber used regs and add "cc"
+>> - simplify mem_access_loop
+>> ---
+>>  arm/pmu.c         | 269 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  arm/unittests.cfg |  18 ++++
+>>  2 files changed, 287 insertions(+)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index 4a26a76..1b0101f 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -18,9 +18,15 @@
+>>  #include "asm/barrier.h"
+>>  #include "asm/sysreg.h"
+>>  #include "asm/processor.h"
+>> +#include <bitops.h>
+>> +#include <asm/gic.h>
+>>  
+>>  #define PMU_PMCR_E         (1 << 0)
+>> +#define PMU_PMCR_P         (1 << 1)
+>>  #define PMU_PMCR_C         (1 << 2)
+>> +#define PMU_PMCR_D         (1 << 3)
+>> +#define PMU_PMCR_X         (1 << 4)
+>> +#define PMU_PMCR_DP        (1 << 5)
+>>  #define PMU_PMCR_LC        (1 << 6)
+>>  #define PMU_PMCR_N_SHIFT   11
+>>  #define PMU_PMCR_N_MASK    0x1f
+>> @@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>  
+>>  /* event counter tests only implemented for aarch64 */
+>>  static void test_event_introspection(void) {}
+>> +static void test_event_counter_config(void) {}
+>> +static void test_basic_event_count(void) {}
+>> +static void test_mem_access(void) {}
+>>  
+>>  #elif defined(__aarch64__)
+>>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>> @@ -145,6 +154,33 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>  }
+>>  
+>>  #define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
+>> +#define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
+>> +#define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+>> +
+>> +#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
+>> +#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
+>> +
+>> +#define regn_el0(__reg, __n) __reg ## __n  ## _el0
+>> +#define write_regn(__reg, __n, __val) \
+>> +	write_sysreg((__val), __reg ## __n ## _el0)
+>> +
+>> +#define read_regn(__reg, __n) \
+>> +	read_sysreg(__reg ## __n ## _el0)
+>> +
+>> +#define print_pmevtyper(__s, __n) do { \
+>> +	uint32_t val; \
+>> +	val = read_regn(pmevtyper, __n);\
+>> +	report_info("%s pmevtyper%d=0x%x, eventcount=0x%x (p=%ld, u=%ld nsk=%ld, nsu=%ld, nsh=%ld m=%ld, mt=%ld, sh=%ld)", \
+>> +			(__s), (__n), val, val & 0xFFFF,	\
+>> +			(BIT_MASK(31) & val) >> 31,		\
+>> +			(BIT_MASK(30) & val) >> 30,		\
+>> +			(BIT_MASK(29) & val) >> 29,		\
+>> +			(BIT_MASK(28) & val) >> 28,		\
+>> +			(BIT_MASK(27) & val) >> 27,		\
+>> +			(BIT_MASK(26) & val) >> 26,		\
+>> +			(BIT_MASK(25) & val) >> 25);		\
+>> +			(BIT_MASK(24) & val) >> 24);		\
+>> +	} while (0)
+>>  
+>>  static bool is_event_supported(uint32_t n, bool warn)
+>>  {
+>> @@ -198,6 +234,230 @@ static void test_event_introspection(void)
+>>  	report(required_events, "Check required events are implemented");
+>>  }
+>>  
+>> +/*
+>> + * Extra instructions inserted by the compiler would be difficult to compensate
+>> + * for, so hand assemble everything between, and including, the PMCR accesses
+>> + * to start and stop counting. isb instructions are inserted to make sure
+>> + * pmccntr read after this function returns the exact instructions executed
+>> + * in the controlled block. Loads @loop times the data at @address into x9.
+>> + */
+>> +static void mem_access_loop(void *addr, int loop, uint32_t pmcr)
+>> +{
+>> +asm volatile(
+>> +	"       msr     pmcr_el0, %[pmcr]\n"
+>> +	"       isb\n"
+>> +	"       mov     x10, %[loop]\n"
+>> +	"1:     sub     x10, x10, #1\n"
+>> +	"       ldr x9, [%[addr]]\n"
+>> +	"       cmp     x10, #0x0\n"
+>> +	"       b.gt    1b\n"
+>> +	"       msr     pmcr_el0, xzr\n"
+>> +	"       isb\n"
+>> +	:
+>> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
+>> +	: "x9", "x10", "cc");
+>> +}
+>> +
+>> +static void pmu_reset(void)
+>> +{
+>> +	/* reset all counters, counting disabled at PMCR level*/
+>> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+>> +	/* Disable all counters */
+>> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+>> +	/* clear overflow reg */
+>> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+>> +	/* disable overflow interrupts on all counters */
+>> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+>> +	isb();
 > 
-> Add support for handling those by requesting KVM to inject external
-> dabt into the quest.
+> Is there a test we can do here to ensure the PMU was succesfully reset and
+> assert if not? Reset is a critical part of each test prep, so we should be
+> sure it has been done.
+we can read the regs we have just written (?). In case the reset were to
+fail, the subsequent test would fail anyway.
+
+Thanks
+
+Eric
 > 
-> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> ---
->  target/arm/cpu.h     |  3 ++
->  target/arm/kvm.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/kvm32.c   | 26 +++++++++++++++++
->  target/arm/kvm64.c   | 36 +++++++++++++++++++++++
->  target/arm/kvm_arm.h | 22 ++++++++++++++
->  5 files changed, 168 insertions(+)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 4ffd991..45fdd2e 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -560,6 +560,9 @@ typedef struct CPUARMState {
->          uint64_t esr;
->      } serror;
->  
-> +    uint8_t ext_dabt_pending:1; /* Request for injecting ext DABT */
-> +    uint8_t ext_dabt_raised:1; /* Tracking/verifying injection of ext DABT */
-> +
-
-Why the bit-fields? We don't use them anywhere else in cpu.h, and that's
-probably because they're not portable. We should just use bools.
-
->      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
->      uint32_t irq_line_state;
->  
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 85860e6..8b7b708 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -39,6 +39,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->  
->  static bool cap_has_mp_state;
->  static bool cap_has_inject_serror_esr;
-> +static bool cap_has_inject_ext_dabt;
->  
->  static ARMHostCPUFeatures arm_host_cpu_features;
->  
-> @@ -244,6 +245,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->          ret = -EINVAL;
->      }
->  
-> +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
-> +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
-> +            warn_report("Failed to enable DABT NISV cap");
-> +        } else {
-> +            /* Set status for supporting the external dabt injection */
-> +            cap_has_inject_ext_dabt = kvm_check_extension(s,
-> +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
-> +        }
-> +    }
-> +
->      return ret;
->  }
->  
-> @@ -703,9 +714,20 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
->          events.exception.serror_esr = env->serror.esr;
->      }
->  
-> +    if (cap_has_inject_ext_dabt) {
-> +        events.exception.ext_dabt_pending = env->ext_dabt_pending;
-> +    }
-> +
->      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
->      if (ret) {
->          error_report("failed to put vcpu events");
-> +    } else if (env->ext_dabt_pending) {
-> +        /*
-> +         * Mark that the external DABT has been injected,
-> +         * if one has been requested
-> +         */
-> +        env->ext_dabt_raised = env->ext_dabt_pending;
-> +        env->ext_dabt_pending = 0;
->      }
->  
->      return ret;
-> @@ -737,6 +759,30 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
->  
->  void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
->  {
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    if (unlikely(env->ext_dabt_raised)) {
-> +        /*
-> +         * Verifying that the ext DABT has been properly injected,
-> +         * otherwise risking indefinitely re-running the faulting instruction
-> +         * Covering a very narrow case for kernels 5.5..5.5.4
-
-I'm still not convinced that QEMU needs to add workarounds for broken KVM,
-when KVM can be fixed, and even is already fixed. If you really want to
-keep it, then can you break this patch into two, splitting the dabt
-injection out from the workaround?
-
-> +         * when injected abort was misconfigured to be
-> +         * an IMPLEMENTATION DEFINED exception (for 32-bit EL1)
-> +         */
-> +        if (!arm_feature(env, ARM_FEATURE_AARCH64) &&
-> +            unlikely(kvm_arm_verify_ext_dabt_pending(cs))) {
-> +
-> +            error_report("Data abort exception with no valid ISS generated by "
-> +                   "guest memory access. KVM unable to emulate faulting "
-> +                   "instruction. Failed to inject an external data abort "
-> +                   "into the guest.");
-> +            abort();
-> +       }
-> +       /* Clear the status */
-> +       env->ext_dabt_raised = 0;
-> +    }
-> +
->  }
->  
->  MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-> @@ -819,6 +865,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->              ret = EXCP_DEBUG;
->          } /* otherwise return to guest */
->          break;
-> +    case KVM_EXIT_ARM_NISV:
-> +        /* External DABT with no valid iss to decode */
-> +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
-> +                                       run->arm_nisv.fault_ipa);
-> +        break;
->      default:
->          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
->                        __func__, run->exit_reason);
-> @@ -953,3 +1004,33 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
->  {
->      return (data - 32) & 0xffff;
->  }
-> +
-> +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-> +                             uint64_t fault_ipa)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +
-> +   /*
-> +    * ISS [23:14] is invalid so there is a limited info
-> +    * on what has just happened so the only *useful* thing that can
-> +    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
-> +    * might be less of a value as well)
-> +    */
-> +
-> +    /*
-> +     * Set pending ext dabt and trigger SET_EVENTS so that
-> +     * KVM can inject the abort
-> +     */
-> +    if (cap_has_inject_ext_dabt) {
-> +        kvm_cpu_synchronize_state(cs);
-> +        env->ext_dabt_pending = 1;
-> +    } else {
-> +        error_report("Data abort exception triggered by guest memory access "
-> +                     "at physical address: 0x"  TARGET_FMT_lx,
-> +                     (target_ulong)fault_ipa);
-> +        error_printf("KVM unable to emulate faulting instruction.\n");
-
-return -1;
-
-> +    }
-> +
-> +    return cap_has_inject_ext_dabt ? 0 : -1;
-
-return 0;
-
-> +}
-> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-> index f271181..4795a7d 100644
-> --- a/target/arm/kvm32.c
-> +++ b/target/arm/kvm32.c
-> @@ -564,3 +564,29 @@ void kvm_arm_pmu_init(CPUState *cs)
->  {
->      qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
->  }
-> +
-> +
-> +#define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
-> +#define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
-> +
-> +#define DFSR_FSC(v)   (((v) >> 6 | (v)) & 0x1F)
-> +#define DFSC_EXTABT(lpae) (lpae) ? 0x10 : 0x08
-> +
-> +int kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-> +{
-> +    uint32_t dfsr_val;
-> +
-> +    if (!kvm_get_one_reg(cs, ARM_REG_DFSR, &dfsr_val)) {
-> +
-
-extra line
-
-> +        ARMCPU *cpu = ARM_CPU(cs);
-> +        CPUARMState *env = &cpu->env;
-> +        uint32_t ttbcr;
-> +        int lpae = 0;
-> +
-> +        if (!kvm_get_one_reg(cs, ARM_REG_TTBCR, &ttbcr)) {
-> +            lpae = arm_feature(env, ARM_FEATURE_LPAE) && (ttbcr & TTBCR_EAE);
-> +        }
-> +        return DFSR_FSC(dfsr_val) != DFSC_EXTABT(lpae);
-> +    }
-> +    return 1;
-> +}
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index be5b31c..2f8ffc6 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -1430,3 +1430,39 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
->  
->      return false;
->  }
-> +
-> +
-> +#define ARM64_REG_ESR_EL1 ARM64_SYS_REG(3, 0, 5, 2, 0)
-> +#define ARM64_REG_TCR_EL1 ARM64_SYS_REG(3, 0, 2, 0, 2)
-> +
-> +#define ESR_DFSC(aarch64, v)    \
-> +    ((aarch64) ? ((v) & 0x3F)   \
-> +               : (((v) >> 6 | (v)) & 0x1F))
-> +
-> +#define ESR_DFSC_EXTABT(aarch64, lpae) \
-> +    ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
-> +
-> +int kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-> +{
-> +    uint64_t dfsr_val;
-> +
-> +    if (!kvm_get_one_reg(cs, ARM64_REG_ESR_EL1, &dfsr_val)) {
-> +        ARMCPU *cpu = ARM_CPU(cs);
-> +        CPUARMState *env = &cpu->env;
-> +        int aarch64_mode = arm_feature(env, ARM_FEATURE_AARCH64);
-> +        int lpae = 0;
-> +
-> +        if (!aarch64_mode) {
-> +
-
-extra line
-
-> +            uint64_t ttbcr;
-> +
-> +            if (!kvm_get_one_reg(cs, ARM64_REG_TCR_EL1, &ttbcr)) {
-> +                lpae = arm_feature(env, ARM_FEATURE_LPAE)
-> +                        && (ttbcr & TTBCR_EAE);
-> +            }
-> +        }
-> +        return ESR_DFSC(aarch64_mode, dfsr_val) !=
-> +                ESR_DFSC_EXTABT(aarch64_mode, lpae) ;
-                  ^ extra space
-
-> +    }
-> +    return 1;
-> +}
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index ae9e075..777c9bf 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -450,6 +450,28 @@ struct kvm_guest_debug_arch;
->  void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
->  
->  /**
-> + * kvm_arm_handle_dabt_nisv
-                              ^ missing :
-> + * @cs: CPUState
-> + * @esr_iss: ISS encoding (limited) for the exception from Data Abort
-> + *           ISV bit set to '0b0' -> no valid instruction syndrome
-> + * @fault_ipa: faulting address for the synch data abort
-> + *
-> + * Returns: 0 if the exception has been handled
-                                                  , < 0 otherwise
-
-> + */
-> +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-> +                             uint64_t fault_ipa);
-> +
-> +/**
-> + * kvm_arm_verify_ext_dabt_pending
-                                     ^ missing :
-> + * @cs: CPUState
-> + *
-> + * Verify the fault status code wrt the Ext DABT injection
-> + *
-> + * Returns: 0 if the fault status code is as expected, non-zero otherwise
-
-I'd return a boolean from a function like this, true when verified and
-false otherwise.
-
-> + */
-> +int kvm_arm_verify_ext_dabt_pending(CPUState *cs);
-> +
-> +/**
->   * its_class_name:
->   *
->   * Return the ITS class name to use depending on whether KVM acceleration
-> -- 
-> 2.7.4
-> 
->
-
-Thanks,
-drew 
+>> +}
+>> +
+>> +static void test_event_counter_config(void)
+>> +{
+>> +	int i;
+>> +
+>> +	if (!pmu.nb_implemented_counters) {
+>> +		report_skip("No event counter, skip ...");
+>> +		return;
+>> +	}
+>> +
+>> +	pmu_reset();
+>> +
+>> +	/*
+>> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
+>> +	 * select counter 0
+>> +	 */
+>> +	write_sysreg(1, PMSELR_EL0);
+>> +	/* program this counter to count unsupported event */
+>> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
+>> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
+>> +	report((read_regn(pmevtyper, 1) & 0xFFF) == 0xEA,
+>> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
+>> +	report((read_regn(pmevcntr, 1) == 0xdeadbeef),
+>> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
+>> +
+>> +	/* try to configure an unsupported event within the range [0x0, 0x3F] */
+>> +	for (i = 0; i <= 0x3F; i++) {
+>> +		if (!is_event_supported(i, false))
+>> +			break;
+>> +	}
+>> +	if (i > 0x3F) {
+>> +		report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
+>> +		return;
+>> +	}
+>> +
+>> +	/* select counter 0 */
+>> +	write_sysreg(0, PMSELR_EL0);
+>> +	/* program this counter to count unsupported event */
+>> +	write_sysreg(i, PMXEVCNTR_EL0);
+>> +	/* read the counter value */
+>> +	read_sysreg(PMXEVCNTR_EL0);
+>> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
+>> +		"read of a counter programmed with unsupported event");
+>> +
+>> +}
+>> +
+>> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
+>> +{
+>> +	int i;
+>> +
+>> +	if (pmu.nb_implemented_counters < nb_events) {
+>> +		report_skip("Skip test as number of counters is too small (%d)",
+>> +			    pmu.nb_implemented_counters);
+>> +		return false;
+>> +	}
+>> +
+>> +	for (i = 0; i < nb_events; i++) {
+>> +		if (!is_event_supported(events[i], false)) {
+>> +			report_skip("Skip test as event %d is not supported",
+>> +				    events[i]);
+>> +			return false;
+>> +		}
+>> +	}
+>> +	return true;
+>> +}
+>> +
+>> +static void test_basic_event_count(void)
+>> +{
+>> +	uint32_t implemented_counter_mask, non_implemented_counter_mask;
+>> +	uint32_t counter_mask;
+>> +	uint32_t events[] = {
+>> +		0x11,	/* CPU_CYCLES */
+>> +		0x8,	/* INST_RETIRED */
+>> +	};
+>> +
+>> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+>> +		return;
+>> +
+>> +	implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
+>> +	non_implemented_counter_mask = ~(BIT(31) | implemented_counter_mask);
+>> +	counter_mask = implemented_counter_mask | non_implemented_counter_mask;
+>> +
+>> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+>> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+>> +
+>> +	/* disable all counters */
+>> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+>> +	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
+>> +		"pmcntenclr: disable all counters");
+>> +
+>> +	/*
+>> +	 * clear cycle and all event counters and allow counter enablement
+>> +	 * through PMCNTENSET. LC is RES1.
+>> +	 */
+>> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+>> +	isb();
+>> +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
+>> +
+>> +	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
+>> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
+>> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
+>> +		"counter #0 preset to 0xFFFFFFF0");
+>> +	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
+>> +
+>> +	/*
+>> +	 * Enable all implemented counters and also attempt to enable
+>> +	 * not supported counters. Counting still is disabled by !PMCR.E
+>> +	 */
+>> +	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
+>> +
+>> +	/* check only those implemented are enabled */
+>> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+>> +		(read_sysreg_s(PMCNTENSET_EL0) == implemented_counter_mask),
+>> +		"pmcntenset: enabled implemented_counters");
+>> +
+>> +	/* Disable all counters but counters #0 and #1 */
+>> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
+>> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+>> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
+>> +		"pmcntenset: just enabled #0 and #1");
+>> +
+>> +	/* clear overflow register */
+>> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+>> +	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
+>> +
+>> +	/* disable overflow interrupts on all counters*/
+>> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+>> +	report(!read_sysreg(pmintenclr_el1),
+>> +		"pmintenclr_el1=0, all interrupts disabled");
+>> +
+>> +	/* enable overflow interrupts on all event counters */
+>> +	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
+>> +		     pmintenset_el1);
+>> +	report(read_sysreg(pmintenset_el1) == implemented_counter_mask,
+>> +		"overflow interrupts enabled on all implemented counters");
+>> +
+>> +	/* Set PMCR.E, execute asm code and unset PMCR.E */
+>> +	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +
+>> +	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
+>> +		    read_regn(pmevcntr, 0));
+>> +	report_info("counter #1 is 0x%lx (INST_RETIRED)",
+>> +		    read_regn(pmevcntr, 1));
+>> +
+>> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+>> +	report(read_sysreg(pmovsclr_el0) & 0x1,
+>> +		"check overflow happened on #0 only");
+>> +}
+>> +
+>> +static void test_mem_access(void)
+>> +{
+>> +	void *addr = malloc(PAGE_SIZE);
+>> +	uint32_t events[] = {
+>> +		0x13,   /* MEM_ACCESS */
+>> +		0x13,   /* MEM_ACCESS */
+>> +	};
+>> +
+>> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+>> +		return;
+>> +
+>> +	pmu_reset();
+>> +
+>> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+>> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+>> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> +	isb();
+>> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
+>> +	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
+>> +	/* We may measure more than 20 mem access depending on the core */
+>> +	report((read_regn(pmevcntr, 0) == read_regn(pmevcntr, 1)) &&
+>> +	       (read_regn(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
+>> +	       "Ran 20 mem accesses");
+>> +
+>> +	pmu_reset();
+>> +
+>> +	write_regn(pmevcntr, 0, 0xFFFFFFFA);
+>> +	write_regn(pmevcntr, 1, 0xFFFFFFF0);
+>> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> +	isb();
+>> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+>> +	report(read_sysreg(pmovsclr_el0) == 0x3,
+>> +	       "Ran 20 mem accesses with expected overflows on both counters");
+>> +	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
+>> +			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
+>> +			read_sysreg(pmovsclr_el0));
+>> +}
+>> +
+>>  #endif
+>>  
+>>  /*
+>> @@ -388,6 +648,15 @@ int main(int argc, char *argv[])
+>>  	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>>  		report_prefix_push(argv[1]);
+>>  		test_event_introspection();
+>> +	} else if (strcmp(argv[1], "event-counter-config") == 0) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_event_counter_config();
+>> +	} else if (strcmp(argv[1], "basic-event-count") == 0) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_basic_event_count();
+>> +	} else if (strcmp(argv[1], "mem-access") == 0) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_mem_access();
+>>  	} else {
+>>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>>  	}
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index 4433ef3..7a59403 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -72,6 +72,24 @@ groups = pmu
+>>  arch = arm64
+>>  extra_params = -append 'event-introspection'
+>>  
+>> +[pmu-event-counter-config]
+>> +file = pmu.flat
+>> +groups = pmu
+>> +arch = arm64
+>> +extra_params = -append 'event-counter-config'
+>> +
+>> +[pmu-basic-event-count]
+>> +file = pmu.flat
+>> +groups = pmu
+>> +arch = arm64
+>> +extra_params = -append 'basic-event-count'
+>> +
+>> +[pmu-mem-access]
+>> +file = pmu.flat
+>> +groups = pmu
+>> +arch = arm64
+>> +extra_params = -append 'mem-access'
+>> +
+>>  # Test PMU support (TCG) with -icount IPC=1
+>>  #[pmu-tcg-icount-1]
+>>  #file = pmu.flat
+>> -- 
+>> 2.20.1
+>>
+>>
 
 _______________________________________________
 kvmarm mailing list
