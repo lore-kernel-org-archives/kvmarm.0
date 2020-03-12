@@ -2,71 +2,65 @@ Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B7FC2BAEE
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 01:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15D7C2BB1D
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 06:30:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2887520739
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 01:45:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2887520739
+	by mail.kernel.org (Postfix) with ESMTP id 9DBCD206CD
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 06:30:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DBCD206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 125644A576;
-	Wed, 11 Mar 2020 21:45:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3164A51E;
+	Thu, 12 Mar 2020 02:30:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G8O89TXSYlQ7; Wed, 11 Mar 2020 21:45:42 -0400 (EDT)
+	with ESMTP id fTmXnc2t8tS1; Thu, 12 Mar 2020 02:30:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36014A50F;
-	Wed, 11 Mar 2020 21:45:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA5DE4A51D;
+	Thu, 12 Mar 2020 02:30:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5521F4A389
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 21:45:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6CC34A51D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 02:30:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YCrUxT4WB0GC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 21:45:39 -0400 (EDT)
+ with ESMTP id nC222UybLH4c for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 02:30:42 -0400 (EDT)
 Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9850B40456
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 21:45:39 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 9DD712E01B64EC9C1957;
- Thu, 12 Mar 2020 09:45:36 +0800 (CST)
-Received: from [127.0.0.1] (10.173.221.230) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0;
- Thu, 12 Mar 2020 09:45:26 +0800
-Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small
- chunks
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, Marc Zyngier <maz@kernel.org>
-References: <20200309085727.1106-1-zhukeqian1@huawei.com>
- <4b85699ec1d354cc73f5302560231f86@misterjones.org>
- <64925c8b-af3d-beb5-bc9b-66ef1e47f92d@huawei.com>
- <a642a79ea9190542a9098e4c9dc5a9f2@kernel.org>
- <9ddefc54-dd5b-0555-0aaa-00a3a23febcf@huawei.com>
- <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
-From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <3238d495-8c13-4fbb-8e3d-c34e560ec9af@huawei.com>
-Date: Thu, 12 Mar 2020 09:45:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4313A4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 02:30:42 -0400 (EDT)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 48A521524AFDBEDCB9A7;
+ Thu, 12 Mar 2020 14:30:37 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Mar 2020
+ 14:30:30 +0800
+Subject: Re: [PATCH v5 01/23] irqchip/gic-v3: Use SGIs without active state if
+ offered
+To: Marc Zyngier <maz@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-2-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
+Date: Thu, 12 Mar 2020 14:30:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7474BB64495@DGGEMM528-MBX.china.huawei.com>
-X-Originating-IP: [10.173.221.230]
+In-Reply-To: <20200304203330.4967-2-maz@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
-Cc: "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,108 +72,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jay,
+Hi Marc,
 
-On 2020/3/11 15:34, Zhoujian (jay) wrote:
+On 2020/3/5 4:33, Marc Zyngier wrote:
+> To allow the direct injection of SGIs into a guest, the GICv4.1
+> architecture has to sacrifice the Active state so that SGIs look
+> a lot like LPIs (they are injected by the same mechanism).
 > 
+> In order not to break existing software, the architecture gives
+> offers guests OSs the choice: SGIs with or without an active
+> state. It is the hypervisors duty to honor the guest's choice.
 > 
->> -----Original Message-----
->> From: zhukeqian
->> Sent: Wednesday, March 11, 2020 3:20 PM
->> To: Marc Zyngier <maz@kernel.org>
->> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
->> linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Zhoujian (jay)
->> <jianjay.zhou@huawei.com>; Sean Christopherson
->> <sean.j.christopherson@intel.com>; Paolo Bonzini <pbonzini@redhat.com>;
->> James Morse <james.morse@arm.com>; Julien Thierry
->> <julien.thierry.kdev@gmail.com>; Suzuki K Poulose <suzuki.poulose@arm.com>
->> Subject: Re: [RFC] KVM: arm64: support enabling dirty log graually in small chunks
->>
->> Hi Marc,
->>
->> On 2020/3/10 21:16, Marc Zyngier wrote:
->>> On 2020-03-10 08:26, zhukeqian wrote:
->>>> Hi Marc,
->>>>
->>>> On 2020/3/9 19:45, Marc Zyngier wrote:
->>>>> Kegian,
->>>
->>> [...]
->>>
->>>>> Is there a userspace counterpart to it?
->>>>>
->>>> As this KVM/x86 related changes have not been merged to mainline
->>>> kernel, some little modification is needed on mainline Qemu.
->>>
->>> Could you please point me to these changes?
->> I made some changes locally listed below.
->>
->> However, Qemu can choose to enable KVM_DIRTY_LOG_INITIALLY_SET or not.
->> Here I made no judgement on dirty_log_manual_caps because I just want to
->> verify the optimization of this patch.
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
->> 439a4efe52..1611f644a4 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -2007,14 +2007,16 @@ static int kvm_init(MachineState *ms)
->>      s->coalesced_pio = s->coalesced_mmio &&
->>                         kvm_check_extension(s,
->> KVM_CAP_COALESCED_PIO);
->>
->> -    s->manual_dirty_log_protect =
->> +    uint64_t dirty_log_manual_caps =
->>          kvm_check_extension(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
->> -    if (s->manual_dirty_log_protect) {
->> -        ret = kvm_vm_enable_cap(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
->> +    if (dirty_log_manual_caps) {
->> +        ret = kvm_vm_enable_cap(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
->> +                                dirty_log_manual_caps);
->>          if (ret) {
->>              warn_report("Trying to enable
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
->>                          "but failed.  Falling back to the legacy mode. ");
->> -            s->manual_dirty_log_protect = false;
->> +        } else {
->> +            s->manual_dirty_log_protect = true;
->>          }
->>      }
-> 
-> FYI: I had submitted a patch to the Qemu community some days ago:
-> https://patchwork.kernel.org/patch/11419191/
-This is very helpful, thanks.
-> 
->>>
->>>> As I tested this patch on a 128GB RAM Linux VM with no huge pages,
->>>> the time of enabling dirty log will decrease obviously.
->>>
->>> I'm not sure how realistic that is. Not having huge pages tends to
->>> lead to pretty bad performance in general...
->> Sure, this has no effect on guests which are all of huge pages.
->>
->> For my understanding, once a guest has normal pages (maybe are initialized at
->> beginning or dissloved from huge pages), it can benefit from this patch.
-> 
-> Yes, I agree.
-> 
-I will send PATCH v1 soon.
-> 
-> 
-> Regards,
-> Jay Zhou
-> 
-> .
->
+> For this, the architecture offers a discovery bit indicating whether
+> the GIC supports GICv4.1 SGIs (GICD_TYPER2.nASSGIcap), and another
+> bit indicating whether the guest wants Active-less SGIs or not
+> (controlled by GICD_CTLR.nASSGIreq).
+
+I still can't find the description of these two bits in IHI0069F.
+Are they actually architected and will be available in the future
+version of the spec?  I want to confirm it again since this has a
+great impact on the KVM code, any pointers?
+
+
 Thanks,
-Keqian
+Zenghui
 
 _______________________________________________
 kvmarm mailing list
