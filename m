@@ -6,69 +6,71 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA847C2BB1D
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C812C10DCE
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 92E182067C
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA74D206FA
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 15:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHnJ7ZlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E182067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KO3lDoee"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA74D206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CC2F4AEDE;
-	Thu, 12 Mar 2020 11:44:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8458E4AF0A;
+	Thu, 12 Mar 2020 11:44:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0oqKQn9BtSoL; Thu, 12 Mar 2020 11:44:37 -0400 (EDT)
+	with ESMTP id Ty2xTk3em8nn; Thu, 12 Mar 2020 11:44:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F1304AEF0;
-	Thu, 12 Mar 2020 11:44:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E8A4AEE1;
+	Thu, 12 Mar 2020 11:44:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D961B4AEE6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB1C4AEE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1JLJzdQV1JrD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 11:44:34 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B19F74AEDE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:34 -0400 (EDT)
+ with ESMTP id 99bsk09neAfQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 11:44:43 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96EFE4AEDE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 11:44:43 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584027874;
+ s=mimecast20190719; t=1584027883;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aFpJASfu2ht2gDqiYkt5EXxaGYzykEHenqKpcZ6I3ns=;
- b=jHnJ7ZlOER4ci08FQjP31aPlcOdwdv3w+0+eNdc5uHzrGEouuhLepzg83IXI8tPY+o0zQ8
- l/4QAKqBASWAurYlyQFdexUz9rStef6CE4eIcp9XKm/woB31t6gVOYmf8oOotiW6c71sc1
- O2IUS1ViP5uKmAZZNVuvBSUBm3iUdU4=
+ bh=XarQ6PV/N2BikZiOVzMV46m8k60fx8JOioXu8+pZywQ=;
+ b=KO3lDoeeS3qyuW9RDERjshH45Zkwr8uLna+1wugPvzw3V3a2Rq8+h078VyfdtQ87g8VGd0
+ NR2b1rwK7QvkWOfj3i40HzHks2rwu5Wsftz1s6rq1OOlRLA8nKanLHAlDjhZuB+wzZgRBw
+ 0xGXmi2DUDQvvSWsWwa0/D062CwfueU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-zBMcV4IrO9OY-tiSY3O0sw-1; Thu, 12 Mar 2020 11:44:33 -0400
-X-MC-Unique: zBMcV4IrO9OY-tiSY3O0sw-1
+ us-mta-408-UAZ-rGDKN1ODer1zvlhl9w-1; Thu, 12 Mar 2020 11:44:41 -0400
+X-MC-Unique: UAZ-rGDKN1ODer1zvlhl9w-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 787EC192299E;
- Thu, 12 Mar 2020 15:44:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2165F19251D1;
+ Thu, 12 Mar 2020 15:44:40 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E25FB5C1B5;
- Thu, 12 Mar 2020 15:44:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A2775C1B5;
+ Thu, 12 Mar 2020 15:44:31 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v3 09/12] arm: pmu: Test chained counters
-Date: Thu, 12 Mar 2020 16:42:58 +0100
-Message-Id: <20200312154301.9130-10-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 10/12] arm: pmu: test 32-bit <-> 64-bit
+ transitions
+Date: Thu, 12 Mar 2020 16:42:59 +0100
+Message-Id: <20200312154301.9130-11-eric.auger@redhat.com>
 In-Reply-To: <20200312154301.9130-1-eric.auger@redhat.com>
 References: <20200312154301.9130-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -90,8 +92,10 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add 2 tests exercising chained counters. The first one uses
-CPU_CYCLES and the second one uses SW_INCR.
+Test configurations where we transit from 32b to 64b
+counters and conversely. Also tests configuration where
+chain counters are configured but only one counter is
+enabled.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
@@ -99,161 +103,194 @@ Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 v2 -> v3:
 - added prefix pop
-- added pmu prefix to the test names
-- defines, event array ...
 ---
- arm/pmu.c         | 97 +++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg | 12 ++++++
- 2 files changed, 109 insertions(+)
+ arm/pmu.c         | 138 ++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |   6 ++
+ 2 files changed, 144 insertions(+)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index c954c71..ccca31b 100644
+index ccca31b..79c2a0f 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -47,6 +47,7 @@
- #define INST_PREC		0x1B
- #define STALL_FRONTEND		0x23
- #define STALL_BACKEND		0x24
-+#define CHAIN			0x1E
+@@ -57,6 +57,7 @@
+ #define ALL_SET			0xFFFFFFFF
+ #define ALL_CLEAR		0x0
+ #define PRE_OVERFLOW		0xFFFFFFF0
++#define PRE_OVERFLOW2		0xFFFFFFDC
  
- #define COMMON_EVENTS_LOW	0x0
- #define COMMON_EVENTS_HIGH	0x3F
-@@ -141,6 +142,8 @@ static void test_event_counter_config(void) {}
- static void test_basic_event_count(void) {}
- static void test_mem_access(void) {}
+ struct pmu {
+ 	unsigned int version;
+@@ -144,6 +145,7 @@ static void test_mem_access(void) {}
  static void test_sw_incr(void) {}
-+static void test_chained_counters(void) {}
-+static void test_chained_sw_incr(void) {}
+ static void test_chained_counters(void) {}
+ static void test_chained_sw_incr(void) {}
++static void test_chain_promotion(void) {}
  
  #elif defined(__aarch64__)
  #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -507,6 +510,92 @@ static void test_sw_incr(void)
- 		"overflow reg after 100 SW_INCR");
+@@ -596,6 +598,138 @@ static void test_chained_sw_incr(void)
+ 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
  }
  
-+static void test_chained_counters(void)
++static void test_chain_promotion(void)
 +{
-+	uint32_t events[] = {CPU_CYCLES, CHAIN};
++	uint32_t events[] = {MEM_ACCESS, CHAIN};
++	void *addr = malloc(PAGE_SIZE);
 +
 +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
 +		return;
 +
++	/* Only enable CHAIN counter */
 +	pmu_reset();
-+
-+	write_regn_el0(pmevtyper, 0, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
 +	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	/* enable counters #0 and #1 */
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	write_sysreg_s(0x2, PMCNTENSET_EL0);
++	isb();
++
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report(!read_regn_el0(pmevcntr, 0),
++		"chain counter not counting if even counter is disabled");
++
++	/* Only enable even counter */
++	pmu_reset();
 +	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
++	write_sysreg_s(0x1, PMCNTENSET_EL0);
++	isb();
 +
-+	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
++		"odd counter did not increment on overflow if disabled");
++	report_info("MEM_ACCESS counter #0 has value %ld",
++		    read_regn_el0(pmevcntr, 0));
++	report_info("CHAIN counter #1 has value %ld",
++		    read_regn_el0(pmevcntr, 1));
++	report_info("overflow counter %ld", read_sysreg(pmovsclr_el0));
 +
-+	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
-+	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
-+
-+	/* test 64b overflow */
-+
++	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
 +	pmu_reset();
 +	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
++	isb();
 +
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, 0x1);
-+	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-+	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 incremented");
-+	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
 +
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, ALL_SET);
++	/* disable the CHAIN event */
++	write_sysreg_s(0x2, PMCNTENCLR_EL0);
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
++	report(read_sysreg(pmovsclr_el0) == 0x1,
++		"should have triggered an overflow on #0");
++	report(!read_regn_el0(pmevcntr, 1),
++		"CHAIN counter #1 shouldn't have incremented");
 +
-+	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-+	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-+	report(read_sysreg(pmovsclr_el0) == 0x2,
-+		"check no overflow is recorded");
-+}
-+
-+static void test_chained_sw_incr(void)
-+{
-+	uint32_t events[] = {SW_INCR, CHAIN};
-+	int i;
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+		return;
++	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled */
 +
 +	pmu_reset();
++	write_sysreg_s(0x1, PMCNTENSET_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
++	isb();
++	report_info("counter #0 = 0x%lx, counter #1 = 0x%lx overflow=0x%lx",
++		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
++		    read_sysreg(pmovsclr_el0));
 +
-+	write_regn_el0(pmevtyper, 0, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
++
++	/* enable the CHAIN event */
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	isb();
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
++
++	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
++		"CHAIN counter #1 should have incremented and no overflow expected");
++
++	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
++		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
++
++	/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
++	pmu_reset();
++	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
++	isb();
++
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
++
++	/* 0 becomes CHAINED */
++	write_sysreg_s(0x0, PMCNTENSET_EL0);
 +	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	/* enable counters #0 and #1 */
 +	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	write_regn_el0(pmevcntr, 1, 0x0);
 +
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i = 0; i < 100; i++)
-+		write_sysreg(0x1, pmswinc_el0);
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("MEM_ACCESS counter #0 has value 0x%lx",
++		    read_regn_el0(pmevcntr, 0));
 +
-+	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
-+		"overflow reg after 100 SW_INCR/CHAIN");
-+	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
++	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
++		"CHAIN counter #1 should have incremented and no overflow expected");
 +
-+	/* 64b SW_INCR and overflow on CHAIN counter*/
++	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
++		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
++
++	/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
 +	pmu_reset();
-+
-+	write_regn_el0(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 1, ALL_SET);
++	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
++	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
 +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i = 0; i < 100; i++)
-+		write_sysreg(0x1, pmswinc_el0);
 +
-+	report((read_sysreg(pmovsclr_el0) == 0x2) &&
-+		(read_regn_el0(pmevcntr, 1) == 0) &&
-+		(read_regn_el0(pmevcntr, 0) == 84),
-+		"overflow reg after 100 SW_INCR/CHAIN");
-+	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("counter #0=0x%lx, counter #1=0x%lx",
++			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
++
++	write_sysreg_s(0x0, PMCNTENSET_EL0);
++	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++
++	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
++	report(read_sysreg(pmovsclr_el0) == 1,
++		"overflow is expected on counter 0");
++	report_info("counter #0=0x%lx, counter #1=0x%lx overflow=0x%lx",
++			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
++			read_sysreg(pmovsclr_el0));
 +}
 +
  #endif
  
  /*
-@@ -697,6 +786,14 @@ int main(int argc, char *argv[])
+@@ -794,6 +928,10 @@ int main(int argc, char *argv[])
  		report_prefix_push(argv[1]);
- 		test_sw_incr();
+ 		test_chained_sw_incr();
  		report_prefix_pop();
-+	} else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
++	} else if (strcmp(argv[1], "pmu-chain-promotion") == 0) {
 +		report_prefix_push(argv[1]);
-+		test_chained_counters();
-+		report_prefix_pop();
-+	} else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_chained_sw_incr();
++		test_chain_promotion();
 +		report_prefix_pop();
  	} else {
  		report_abort("Unknown sub-test '%s'", argv[1]);
  	}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 175afe6..d31dcbf 100644
+index d31dcbf..1b0c8c8 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -96,6 +96,18 @@ groups = pmu
+@@ -108,6 +108,12 @@ groups = pmu
  arch = arm64
- extra_params = -append 'pmu-sw-incr'
+ extra_params = -append 'pmu-chained-sw-incr'
  
-+[pmu-chained-counters]
++[pmu-chain-promotion]
 +file = pmu.flat
 +groups = pmu
 +arch = arm64
-+extra_params = -append 'pmu-chained-counters'
-+
-+[pmu-chained-sw-incr]
-+file = pmu.flat
-+groups = pmu
-+arch = arm64
-+extra_params = -append 'pmu-chained-sw-incr'
++extra_params = -append 'pmu-chain-promotion'
 +
  # Test PMU support (TCG) with -icount IPC=1
  #[pmu-tcg-icount-1]
