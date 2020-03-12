@@ -2,66 +2,88 @@ Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D71C6C1975A
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA1BC10DCE
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:28:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69ED4206F1
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:20:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69ED4206F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 69F35206F1
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 09:28:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ol9RmPgG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F35206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8B7A4A32E;
-	Thu, 12 Mar 2020 05:20:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 075FE4A49C;
+	Thu, 12 Mar 2020 05:28:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8jDqtkH2JZ1F; Thu, 12 Mar 2020 05:20:12 -0400 (EDT)
+	with ESMTP id 2uX+BANstbym; Thu, 12 Mar 2020 05:28:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 971874A4F7;
-	Thu, 12 Mar 2020 05:20:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FC794A4F6;
+	Thu, 12 Mar 2020 05:28:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F3784A4E5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:20:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A844A483
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:28:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dSs2iKBE3CZ1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 05:20:11 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72C4E4A32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:20:08 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id EDEF9ED6D8587C08CEB4;
- Thu, 12 Mar 2020 17:20:04 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 12 Mar 2020
- 17:19:54 +0800
-Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
- tests
-To: Marc Zyngier <maz@kernel.org>, Auger Eric <eric.auger@redhat.com>
-References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-11-eric.auger@redhat.com>
- <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
- <46f0ed1d-3bda-f91b-e2b0-addf1c61c373@redhat.com>
- <301a8b402ff7e480e927b0f8f8b093f2@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <7fb9f81f-6520-526d-7031-d3d08cb1dd6a@huawei.com>
-Date: Thu, 12 Mar 2020 17:19:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id lbhEderoc5+w for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 05:28:09 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 743524A418
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 05:28:09 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 573C02067C;
+ Thu, 12 Mar 2020 09:28:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1584005288;
+ bh=xIGhcP4cmy8ksAfngF2mgtlMwAvRWwnp7zQoi+vTB4E=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Ol9RmPgG6uECdyzvoJTJo5SYZdG3qUpPKzQsdoTc8vSPi02q+vlQsNS79HFJvFY0P
+ 0Bt+3mFe1NYvQql0pNZYnoazTijrKPAIcTY1AT5Eu00rdYs4Ap8/DE67DiNqleKLci
+ vvQIo661e24v88EVbUp5uC/4dVvXkB8QiCJNjk2E=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jCK8M-00CAj6-I0; Thu, 12 Mar 2020 09:28:06 +0000
 MIME-Version: 1.0
-In-Reply-To: <301a8b402ff7e480e927b0f8f8b093f2@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, andre.przywara@arm.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com
+Date: Thu, 12 Mar 2020 09:28:06 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v5 01/23] irqchip/gic-v3: Use SGIs without active state if
+ offered
+In-Reply-To: <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-2-maz@kernel.org>
+ <63f6530a-9369-31e6-88d0-5337173495b9@huawei.com>
+Message-ID: <51b2c74fdbcca049cc01be6d78c7c693@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net,
+ rrichter@marvell.com, tglx@linutronix.de, eric.auger@redhat.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,100 +100,44 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020/3/11 22:00, Marc Zyngier wrote:
-> That is still a problem with the ITS. There is no architectural way
-> to report an error, even if the error numbers are architected...
+Hi Zenghui,
+
+On 2020-03-12 06:30, Zenghui Yu wrote:
+> Hi Marc,
 > 
-> One thing we could do though is to implement the stall model (as described
-> in 5.3.2). It still doesn't give us the error, but at least the command
-> queue would stop on detecting an error.
+> On 2020/3/5 4:33, Marc Zyngier wrote:
+>> To allow the direct injection of SGIs into a guest, the GICv4.1
+>> architecture has to sacrifice the Active state so that SGIs look
+>> a lot like LPIs (they are injected by the same mechanism).
+>> 
+>> In order not to break existing software, the architecture gives
+>> offers guests OSs the choice: SGIs with or without an active
+>> state. It is the hypervisors duty to honor the guest's choice.
+>> 
+>> For this, the architecture offers a discovery bit indicating whether
+>> the GIC supports GICv4.1 SGIs (GICD_TYPER2.nASSGIcap), and another
+>> bit indicating whether the guest wants Active-less SGIs or not
+>> (controlled by GICD_CTLR.nASSGIreq).
+> 
+> I still can't find the description of these two bits in IHI0069F.
+> Are they actually architected and will be available in the future
+> version of the spec?  I want to confirm it again since this has a
+> great impact on the KVM code, any pointers?
 
-It would be interesting to see the buggy guest's behavior under the
-stall mode. I've used the following diff (absolutely *not* a formal
-patch, don't handle CREADR.Stalled and CWRITER.Retry at all) to have
-a try, and caught another command error in the 'its-trigger' test.
+Damn. The bits *are* in the engineering spec version 19 (unfortunately
+not a public document, but I believe you should have access to it).
 
-logs/its-trigger.log:
-" INT dev_id=2 event_id=20
-lib/arm64/gic-v3-its-cmd.c:194: assert failed: false: INT timeout! "
+If the bits have effectively been removed from the spec, I'll drop the
+GICv4.1 code from the 5.7 queue until we find a way to achieve the same
+level of support.
 
-dmesg:
-[13297.711958] ------------[ cut here ]------------
-[13297.711964] ITS command error encoding 0x10307
+I've emailed people inside ARM to find out.
 
-It's the last INT test in test_its_trigger() who has triggered this
-error, Eric?
+Thanks,
 
-
-Thanks.
-
----8<---
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9d53f545a3d5..5717f5da0f22 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -179,6 +179,7 @@ struct vgic_its {
-  	u64			cbaser;
-  	u32			creadr;
-  	u32			cwriter;
-+	bool			stalled;
-
-  	/* migration ABI revision in use */
-  	u32			abi_rev;
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index d53d34a33e35..72422b75e627 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1519,6 +1519,9 @@ static void vgic_its_process_commands(struct kvm 
-*kvm, struct vgic_its *its)
-  	if (!its->enabled)
-  		return;
-
-+	if (unlikely(its->stalled))
-+		return;
-+
-  	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
-
-  	while (its->cwriter != its->creadr) {
-@@ -1531,9 +1534,34 @@ static void vgic_its_process_commands(struct kvm 
-*kvm, struct vgic_its *its)
-  		 * According to section 6.3.2 in the GICv3 spec we can just
-  		 * ignore that command then.
-  		 */
--		if (!ret)
--			vgic_its_handle_command(kvm, its, cmd_buf);
-+		if (ret)
-+			goto done;
-+
-+		ret = vgic_its_handle_command(kvm, its, cmd_buf);
-+
-+		/*
-+		 * Choose the stall mode on detection of command errors.
-+		 * Guest still can't get the architected error numbers though...
-+		 */
-+		if (ret) {
-+			/* GITS_CREADR.Stalled is set to 1. */
-+			its->stalled = true;
-+
-+			/*
-+			 * GITS_TYPER.SEIS is 0 atm, no System error will be
-+			 * generated.  Instead report error encodings at ITS
-+			 * level.
-+			 */
-+			WARN_RATELIMIT(ret, "ITS command error encoding 0x%x", ret);
-+
-+			/*
-+			 * GITS_CREADR is not incremented and continues to
-+			 * point to the entry that triggered the error.
-+			 */
-+			break;
-+		}
-
-+done:
-  		its->creadr += ITS_CMD_SIZE;
-  		if (its->creadr == ITS_CMD_BUFFER_SIZE(its->cbaser))
-  			its->creadr = 0;
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
