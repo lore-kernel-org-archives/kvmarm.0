@@ -1,87 +1,82 @@
-Return-Path: <SRS0=5IFU=44=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=wch9=45=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 798CBC10F27
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 14:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDACC0044D
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 00:34:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BD0DD206BE
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Mar 2020 14:50:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 540B8206B1
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 00:34:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMA0dl2R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD0DD206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LZ24bt60"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540B8206B1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F69F4A4E1;
-	Wed, 11 Mar 2020 10:50:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 772EB4A4A9;
+	Wed, 11 Mar 2020 20:34:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kPgoCKgfiWZn; Wed, 11 Mar 2020 10:50:32 -0400 (EDT)
+	with ESMTP id DMBgF5dxTycH; Wed, 11 Mar 2020 20:34:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4266B4A49C;
-	Wed, 11 Mar 2020 10:50:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75A2F4A4C0;
+	Wed, 11 Mar 2020 20:34:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3528E4A49C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 10:50:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B7B84A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 20:34:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w7pc0rBc1rXm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2020 10:50:29 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DF234A1FA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 10:50:29 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583938228;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jsKkDSgyQz2pLGCyrcLc9VQw/vTQBxdYWH0tEharUX4=;
- b=KMA0dl2RUcu71p74VSTLGIKHCzx+Shl8OgC8o61o14sjtFsDUye9LDwHREIHac72+BKgHN
- DIftFelWD73i9bwLJsq5WjR/F0p8p+AfFTqjnbzB/4MkGvg3YIVe81uXhlQmmzBITWaDMi
- ZONuhOYgZ/gob6oN26V1Ca9PBZ2BpRM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-5QHxOei5MXatAU_1bhWitw-1; Wed, 11 Mar 2020 10:50:24 -0400
-X-MC-Unique: 5QHxOei5MXatAU_1bhWitw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36D458017DF;
- Wed, 11 Mar 2020 14:50:23 +0000 (UTC)
-Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B24C10013A1;
- Wed, 11 Mar 2020 14:50:18 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v6 06/13] arm/arm64: ITS: Introspection
- tests
-To: Andrew Jones <drjones@redhat.com>
-References: <20200311135117.9366-1-eric.auger@redhat.com>
- <20200311135117.9366-7-eric.auger@redhat.com>
- <20200311143331.yesdkxuobng3qzuu@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <94f73aef-9898-d551-f440-5dff2c3d2a63@redhat.com>
-Date: Wed, 11 Mar 2020 15:50:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200311143331.yesdkxuobng3qzuu@kamzik.brq.redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+ with ESMTP id ixVdVnbSCwCo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2020 20:34:31 -0400 (EDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68EB64A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 20:34:31 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id x11so392912wrv.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2020 17:34:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=o4wfwFzslWSogfShuzT1GXszAi31gOgslMZWdjvKfVo=;
+ b=LZ24bt60gTmcfYWHhCsEWR4BHFJlkp3DexMhVT/j5ERjOXSeJ37pMmiuMRlvTyT7HK
+ JqpQwkpYsoYVg3uGyXCiVNaquC3kh6E1EVRQ952U+YKVIwfRqXBsUz6VmM94LX0p0oBh
+ nRI/aGFhUkoPn4hMALZanetw/RwDSngToHjwFpqPCujnSOAxmkiyj6G/8adAECNCDw8E
+ q8w1NVeD/wH3ifi2WPvz6qL7utV0dSr2gvuV48lPi2cAL5ZY6jegHjElhMBSsNleheVB
+ +gOjMLxEUqWPZ9ZNmQX7fffkC2dMnRioNxTEI2iZx3NP+9XvKBxojtF3/fKZ7IZYPh4g
+ 8v0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=o4wfwFzslWSogfShuzT1GXszAi31gOgslMZWdjvKfVo=;
+ b=MV/AWS4v3udovZjjL3zn9LI2j+aPPpA68DX7xidDTnVEJJ4kAS2u1fXLnXFQWdLXxM
+ rw4b6frQq9SSxQqByJM0Unga274gSu/WdlhVDLKyIzKNl3ouvUzqNkUE5JCNccxrOV8q
+ i6JV0+ttYgp034FIf82uhSeS1TH+4T8hVF2ZdxZB/zWrBQXcNil5/h3gGwfVZsz68POT
+ D2CdAwWm8bzgY21Ef2oOCs9eg6hW7u1FebQes0OxdZmbOXscTWM+jlduMEDkgm4ODeuF
+ OieqzDcCzpdQzvtan61TdaLkDje7HQa8txPDfUIiNtQP8PHw9iT0XwTa5SD2ARrjw4t7
+ 40Iw==
+X-Gm-Message-State: ANhLgQ3jB0VPKmbGFfm4d2F9nmRHheuth3ilu3mlg6oqOceIgJkID5Jl
+ J9JsJaaz1pAaaWgVoHo2uK5zow==
+X-Google-Smtp-Source: ADFU+vt+E4lrioPh1o0AmDdDMyHFD+dBDBxBKjY6ZhFem7kPpgR30rCCSCoB7F1MEwVLdmqsXmPQ8A==
+X-Received: by 2002:adf:94c2:: with SMTP id 60mr7155516wrr.396.1583973270323; 
+ Wed, 11 Mar 2020 17:34:30 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-139-146-66.range86-139.btcentralplus.com. [86.139.146.66])
+ by smtp.gmail.com with ESMTPSA id o5sm10909988wmb.8.2020.03.11.17.34.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Mar 2020 17:34:29 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Thu, 12 Mar 2020 00:33:59 +0000
+Message-Id: <20200312003401.29017-1-beata.michalska@linaro.org>
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,214 +88,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-On 3/11/20 3:33 PM, Andrew Jones wrote:
-> On Wed, Mar 11, 2020 at 02:51:10PM +0100, Eric Auger wrote:
->> Detect the presence of an ITS as part of the GICv3 init
->> routine, initialize its base address and read few registers
->> the IIDR, the TYPER to store its dimensioning parameters.
->> Parse the BASER registers. As part of the init sequence we
->> also init all the requested tables.
->>
->> This is our first ITS test, belonging to a new "its" group.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v5 -> v6:
->> - fix some GENMASK_ULL and tabs
->>
->> v4 -> v5:
->> - Moved test_its_introspection() stub from
->>   lib/arm/asm/gic-v3-its.h back to arm/gic.c
->> - 32b its_init does report_abort()
->> - remove kerneldoc style comment
->> - remove alloc_lpi_tables from its_init()
->>
->> v3 -> v4:
->> - fixed some typos, refine trace msgs
->> - move its files to lib/arm64 instead of lib/arm
->> - create lib/arm/asm/gic-v3-its.h containing stubs
->> - rework gic_get_dt_bases
->> - rework baser parsing
->> - move table allocation to init routine
->> - use get_order()
->>
->> v2 -> v3:
->> - updated dates and changed author
->> - squash "arm/arm64: ITS: Test BASER" into this patch but
->>   removes setup_baser which will be introduced later.
->> - only compile on aarch64
->> - restrict the new test to aarch64
->>
->> v1 -> v2:
->> - clean GITS_TYPER macros and unused fields in typer struct
->> - remove memory attribute related macros
->> - remove everything related to memory attributes
->> - s/dev_baser/coll_baser/ in report_info
->> - add extra line
->> - removed index filed in its_baser
->> ---
->>  arm/Makefile.arm64         |  1 +
->>  arm/gic.c                  | 48 ++++++++++++++++++
->>  arm/unittests.cfg          |  7 +++
->>  lib/arm/asm/gic-v3-its.h   | 22 +++++++++
->>  lib/arm/gic.c              | 34 +++++++++++--
->>  lib/arm64/asm/gic-v3-its.h | 92 +++++++++++++++++++++++++++++++++++
->>  lib/arm64/gic-v3-its.c     | 99 ++++++++++++++++++++++++++++++++++++++
->>  7 files changed, 298 insertions(+), 5 deletions(-)
->>  create mode 100644 lib/arm/asm/gic-v3-its.h
->>  create mode 100644 lib/arm64/asm/gic-v3-its.h
->>  create mode 100644 lib/arm64/gic-v3-its.c
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index 6d3dc2c..60182ae 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -19,6 +19,7 @@ endef
->>  cstart.o = $(TEST_DIR)/cstart64.o
->>  cflatobjs += lib/arm64/processor.o
->>  cflatobjs += lib/arm64/spinlock.o
->> +cflatobjs += lib/arm64/gic-v3-its.o
->>  
->>  OBJDIRS += lib/arm64
->>  
->> diff --git a/arm/gic.c b/arm/gic.c
->> index 2f904b0..649ed81 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -16,6 +16,7 @@
->>  #include <asm/processor.h>
->>  #include <asm/delay.h>
->>  #include <asm/gic.h>
->> +#include <asm/gic-v3-its.h>
->>  #include <asm/smp.h>
->>  #include <asm/barrier.h>
->>  #include <asm/io.h>
->> @@ -517,6 +518,49 @@ static void gic_test_mmio(void)
->>  		test_targets(nr_irqs);
->>  }
->>  
->> +#if defined(__arm__)
->> +
->> +static void test_its_introspection(void) {}
->> +
->> +#else /* __aarch64__ */
->> +
->> +static void test_its_introspection(void)
->> +{
->> +	struct its_baser *dev_baser = &its_data.device_baser;
->> +	struct its_baser *coll_baser = &its_data.coll_baser;
->> +	struct its_typer *typer = &its_data.typer;
->> +
->> +	if (!gicv3_its_base()) {
->> +		report_skip("No ITS, skip ...");
->> +		return;
->> +	}
->> +
->> +	/* IIDR */
->> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
->> +	       "GITS_IIDR is read-only"),
->> +
->> +	/* TYPER */
->> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
->> +	       "GITS_TYPER is read-only");
->> +
->> +	report(typer->phys_lpi, "ITS supports physical LPIs");
->> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
->> +	report_info("ITT entry size = 0x%x", typer->ite_size);
->> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
->> +		    typer->eventid_bits, typer->deviceid_bits,
->> +		    typer->collid_bits);
->> +	report(typer->eventid_bits && typer->deviceid_bits &&
->> +	       typer->collid_bits, "ID spaces");
->> +	report_info("Target address format %s",
->> +			typer->pta ? "Redist base address" : "PE #");
->> +
->> +	report(dev_baser && coll_baser, "detect device and collection BASER");
->> +	report_info("device table entry_size = 0x%x", dev_baser->esz);
->> +	report_info("collection table entry_size = 0x%x", coll_baser->esz);
->> +}
->> +
->> +#endif
->> +
->>  int main(int argc, char **argv)
->>  {
->>  	if (!gic_init()) {
->> @@ -548,6 +592,10 @@ int main(int argc, char **argv)
->>  		report_prefix_push(argv[1]);
->>  		gic_test_mmio();
->>  		report_prefix_pop();
->> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
->> +		report_prefix_push(argv[1]);
->> +		test_its_introspection();
->> +		report_prefix_pop();
->>  	} else {
->>  		report_abort("Unknown subtest '%s'", argv[1]);
->>  	}
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 017958d..23d378e 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -122,6 +122,13 @@ smp = $MAX_SMP
->>  extra_params = -machine gic-version=3 -append 'active'
->>  groups = gic
->>  
->> +[its-introspection]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +extra_params = -machine gic-version=3 -append 'its-introspection'
->> +groups = its
->> +arch = arm64
->> +
->>  # Test PSCI emulation
->>  [psci]
->>  file = psci.flat
->> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
->> new file mode 100644
->> index 0000000..2167099
->> --- /dev/null
->> +++ b/lib/arm/asm/gic-v3-its.h
->> @@ -0,0 +1,22 @@
->> +/*
->> + * ITS 32-bit stubs
->> + *
->> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.
->> + */
->> +
->> +#ifndef _ASMARM_GIC_V3_ITS_H_
->> +#define _ASMARM_GIC_V3_ITS_H_
->> +
->> +/* dummy its_data struct to allow gic_get_dt_bases() call */
->> +struct its_data {
->> +	void *base;
->> +};
->> +
->> +static inline void its_init(void)
->> +{
->> +	report_abort("not supported on 32-bit");
-> 
-> This is supposed to be an assert_msg() (no report_* functions in lib
-> code), but it should never fire anyway, because the test code should
-> just not call its_init() on 32-bit arm. I.e. the assert is there not
-> to report to test runners what's going on, but to stop developers
-> from calling it when they shouldn't.
-> 
-> I can fix stuff like this up myself on merge to arm/queue though.
-OK. Let's see if someone has other comments. In the positive I will respin.
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-Thanks
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
 
-Eric
-> 
+This patchset relies on KVM to insert the external data abort into the guest.
+
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
+
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
+
+
+Beata Michalska (2):
+  target/arm: kvm: Inject events at the last stage of sync
+  target/arm: kvm: Handle DABT with no valid ISS
+
+ target/arm/cpu.h     |  3 ++
+ target/arm/kvm.c     | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c   | 41 ++++++++++++++++++++++----
+ target/arm/kvm64.c   | 51 +++++++++++++++++++++++++++++----
+ target/arm/kvm_arm.h | 22 ++++++++++++++
+ 5 files changed, 188 insertions(+), 10 deletions(-)
+
+-- 
+2.7.4
 
 _______________________________________________
 kvmarm mailing list
