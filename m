@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626A3C2BB1D
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83CFC1975A
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:19:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E74F32067C
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DDEF20691
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Mar 2020 11:19:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MpyPdlUl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74F32067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L6WbJN65"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DDEF20691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 692CD4A4AA;
-	Thu, 12 Mar 2020 07:17:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD41D4A7D9;
+	Thu, 12 Mar 2020 07:19:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cdFekebvGrkR; Thu, 12 Mar 2020 07:17:15 -0400 (EDT)
+	with ESMTP id 0FCjusevRHD9; Thu, 12 Mar 2020 07:19:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85DE4A4E5;
-	Thu, 12 Mar 2020 07:17:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 459D34A536;
+	Thu, 12 Mar 2020 07:19:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80B8F4A4AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:17:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A382A4A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:19:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zo7S0SaVz6md for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2020 07:17:13 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FEB94A389
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:17:13 -0400 (EDT)
+ with ESMTP id kKam+3ftMYMY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2020 07:19:32 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 396334A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2020 07:19:32 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584011833;
+ s=mimecast20190719; t=1584011972;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zCjz3Bgm0/Ul3j+NgrdxbQve6e+WlQQ1jJUuqiID9l4=;
- b=MpyPdlUlzWDXkFU7Dfo85bjGBPAdyUy6LqAgYhnm3tcHXupmAn5KgD6/gzko10vd1e3srX
- nq7q3dQArhoKMZzjDeCau8YPWZqUrd9A7xwEFCBZ7J42R/ZhCX6avFl3+Izu85XGiyZXUy
- utjJA1gC1+0C/5Cc0aArULWUtI7fELE=
+ bh=QFoEmrGBNcTv0DkM3wQ8/I8+nHOb44y6HtJi42cCJD0=;
+ b=L6WbJN65biNvqxPYB4WtlcbSlyzopQK1yT1HcD68T6yIAms+855j0NUW3OyXSRPu1ZfRpK
+ cOzR/jtdid0cGUKBj7sERcYjKTSO7VBIzfDgfgcddvsXPfE78e9WHb1Pi1XEL2zryvG5Ym
+ lpEuDWqMza06uYRK5zexGemk6s0Du+k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-fkev6FX8PRq-uvXGN0-Msw-1; Thu, 12 Mar 2020 07:16:59 -0400
-X-MC-Unique: fkev6FX8PRq-uvXGN0-Msw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-445-AHdALYxEMk-yP3olkGud2Q-1; Thu, 12 Mar 2020 07:19:28 -0400
+X-MC-Unique: AHdALYxEMk-yP3olkGud2Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E95100550E;
- Thu, 12 Mar 2020 11:16:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BE54801E66;
+ Thu, 12 Mar 2020 11:19:26 +0000 (UTC)
 Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA0151001902;
- Thu, 12 Mar 2020 11:16:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 27F9F8D56C;
+ Thu, 12 Mar 2020 11:19:20 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
 To: Andrew Jones <drjones@redhat.com>
 References: <20200130112510.15154-1-eric.auger@redhat.com>
  <20200130112510.15154-6-eric.auger@redhat.com>
- <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+ <20200305093339.wavpi6xmqv5aedwx@kamzik.brq.redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7d774de0-fb95-5b66-1eca-2c3839706372@redhat.com>
-Date: Thu, 12 Mar 2020 12:16:50 +0100
+Message-ID: <949eb139-6562-cd61-d57c-337ae6d6590c@redhat.com>
+Date: Thu, 12 Mar 2020 12:19:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+In-Reply-To: <20200305093339.wavpi6xmqv5aedwx@kamzik.brq.redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, andre.przywara@arm.com, andrew.murray@arm.com,
  kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
@@ -99,7 +99,7 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Drew,
 
-On 3/5/20 10:42 AM, Andrew Jones wrote:
+On 3/5/20 10:33 AM, Andrew Jones wrote:
 > On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
 >> Adds the following tests:
 >> - event-counter-config: test event counter configuration
@@ -172,6 +172,16 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +
 >> +#define read_regn(__reg, __n) \
 >> +	read_sysreg(__reg ## __n ## _el0)
+> 
+> You can delete regn_el0() since you don't use it anyway.
+> 
+> The el0 should probably be in the macro names,
+> 
+> write_regn_el0()
+> read_regn_el0()
+> 
+> Also they could go in lib/arm64/asm/sysreg.h
+> 
 >> +
 >> +#define print_pmevtyper(__s, __n) do { \
 >> +	uint32_t val; \
@@ -209,6 +219,9 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +	"       mov     x10, %[loop]\n"
 >> +	"1:     sub     x10, x10, #1\n"
 >> +	"       ldr x9, [%[addr]]\n"
+> 
+> indent is wrong for line above
+> 
 >> +	"       cmp     x10, #0x0\n"
 >> +	"       b.gt    1b\n"
 >> +	"       msr     pmcr_el0, xzr\n"
@@ -229,17 +242,6 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +	/* disable overflow interrupts on all counters */
 >> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
 >> +	isb();
-> 
-> Is there a test we can do here to ensure the PMU was succesfully reset and
-> assert if not? Reset is a critical part of each test prep, so we should be
-> sure it has been done.
-we can read the regs we have just written (?). In case the reset were to
-fail, the subsequent test would fail anyway.
-
-Thanks
-
-Eric
-> 
 >> +}
 >> +
 >> +static void test_event_counter_config(void)
@@ -315,6 +317,12 @@ Eric
 >> +		0x11,	/* CPU_CYCLES */
 >> +		0x8,	/* INST_RETIRED */
 >> +	};
+> 
+> #define CPU_CYCLES 0x11
+> #define INST_RETIRED 0x8
+> 
+> then no need for the comments and ...
+> 
 >> +
 >> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
 >> +		return;
@@ -325,6 +333,10 @@ Eric
 >> +
 >> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
 >> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> 
+> ... here we can see what we're doing more clearing using the defines
+> instead of array members.
+> 
 >> +
 >> +	/* disable all counters */
 >> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
@@ -358,6 +370,10 @@ Eric
 >> +
 >> +	/* Disable all counters but counters #0 and #1 */
 >> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
+> 
+> First time you've used ~ to define a mask. I prefer this to all the
+> 0xFFF..'s, but I prefer consistency and defines even more.
+> 
 >> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
 >> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
 >> +		"pmcntenset: just enabled #0 and #1");
@@ -397,14 +413,33 @@ Eric
 >> +		0x13,   /* MEM_ACCESS */
 >> +		0x13,   /* MEM_ACCESS */
 >> +	};
+> 
+> #define MEM_ACCESS 0x13
+> 
 >> +
 >> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> 
+> No need to check the same event twice. Just call satisfy_prerequisites
+> with ((uint32_t []){ MEM_ACCESS }, 1)
+satisfy_prerequisites also test the number of implemented counters match
+the ARRAY_SIZE.
+
+In Practice most of my tests use 2 counters. I could skip the tests if
+we don't have 2 counters.
+
+But well ...
+
+Eric
+> 
 >> +		return;
 >> +
 >> +	pmu_reset();
 >> +
 >> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
 >> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> 
+> Same comment on using defines rather than array members.
+> 
 >> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
 >> +	isb();
 >> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
@@ -445,6 +480,11 @@ Eric
 >> +	} else if (strcmp(argv[1], "mem-access") == 0) {
 >> +		report_prefix_push(argv[1]);
 >> +		test_mem_access();
+> 
+> missing the pops. I know they're not necessary since we finish the tests
+> afterwards, but the universe must stay balanced. Where there's a yin, we
+> should put a yang.
+> 
 >>  	} else {
 >>  		report_abort("Unknown sub-test '%s'", argv[1]);
 >>  	}
@@ -481,6 +521,13 @@ Eric
 >> 2.20.1
 >>
 >>
+> 
+> I only skimmed this looking for style/framework issues. I'd prefer more
+> defines in general to all the hex, but I won't insist on that.
+> 
+> Thanks,
+> drew
+> 
 
 _______________________________________________
 kvmarm mailing list
