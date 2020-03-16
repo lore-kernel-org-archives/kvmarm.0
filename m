@@ -2,78 +2,60 @@ Return-Path: <SRS0=WgPl=5B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A293EC0044D
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 09:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A786EC18E5B
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 10:50:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1D487205ED
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 09:39:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="skCk830b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D487205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	by mail.kernel.org (Postfix) with ESMTP id 395EC2051A
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 10:50:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 395EC2051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 556924A523;
-	Mon, 16 Mar 2020 05:39:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B434B085;
+	Mon, 16 Mar 2020 06:50:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VTMU6LBYoZQI; Mon, 16 Mar 2020 05:39:30 -0400 (EDT)
+	with ESMTP id 94pmWsI54O7x; Mon, 16 Mar 2020 06:50:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CC124A551;
-	Mon, 16 Mar 2020 05:39:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 774974A523;
+	Mon, 16 Mar 2020 06:50:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EFFF94A523
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 05:39:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 208114A523
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 06:50:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9sFsRLRiDmaM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Mar 2020 05:39:25 -0400 (EDT)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com
- [207.171.184.29])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D3E34A1B0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 05:39:25 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1584351566; x=1615887566;
- h=from:to:cc:subject:date:message-id;
- bh=qSfJ6u84LZu6czX0X2ef4AdDkN6oHZIFm1K2WciznEs=;
- b=skCk830byYs2FhEyfpqcrJG1p7DiQNjaGZFJOzDkAfGhr4Yqi4lI192U
- ML23PvTXjAisLqPi6lAlPMsUUPel1bT3xMspIEehjGSZMQdS8Qu8pi8ak
- 0E/MkfirYsg+6QVDFZ/LQ4ifYTDrPvWsEgGhkXNn0yhGjkKyftP5hl4im g=;
-IronPort-SDR: xsYhxKPGjqk2aAysy+zQY9HiQRGEhcQrSC6cz8QMXDMAK4Bl9ABga5RZJdQs+98Mauhlz0Fl+1
- EnHgnQILdeOw==
-X-IronPort-AV: E=Sophos;i="5.70,559,1574121600"; d="scan'208";a="31381162"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
- email-inbound-relay-2c-87a10be6.us-west-2.amazon.com) ([10.47.23.38])
- by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP;
- 16 Mar 2020 09:39:23 +0000
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com
- (pdx2-ws-svc-lb17-vlan3.amazon.com [10.247.140.70])
- by email-inbound-relay-2c-87a10be6.us-west-2.amazon.com (Postfix) with ESMTPS
- id F1E8DA175E; Mon, 16 Mar 2020 09:39:21 +0000 (UTC)
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com (localhost [127.0.0.1])
- by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
- 02G9dI8G005147; Mon, 16 Mar 2020 10:39:18 +0100
-Received: (from karahmed@localhost)
- by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Submit) id
- 02G9dHYs005143; Mon, 16 Mar 2020 10:39:17 +0100
-From: KarimAllah Ahmed <karahmed@amazon.de>
-To: linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Use the correct timer for accessing CNT
-Date: Mon, 16 Mar 2020 10:39:06 +0100
-Message-Id: <1584351546-5018-1-git-send-email-karahmed@amazon.de>
-X-Mailer: git-send-email 2.7.4
-Cc: KarimAllah Ahmed <karahmed@amazon.de>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id 43wh42Jn8z1J for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Mar 2020 06:50:10 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21AF840456
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 06:50:10 -0400 (EDT)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 1798D6017481BD96D1A2;
+ Mon, 16 Mar 2020 18:50:02 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Mon, 16 Mar 2020
+ 18:49:53 +0800
+Subject: Re: [PATCH] KVM: arm64: Use the correct timer for accessing CNT
+To: KarimAllah Ahmed <karahmed@amazon.de>, <linux-kernel@vger.kernel.org>
+References: <1584351546-5018-1-git-send-email-karahmed@amazon.de>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <7ed91b9b-e968-770c-28f9-0ca479359657@huawei.com>
+Date: Mon, 16 Mar 2020 18:49:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <1584351546-5018-1-git-send-email-karahmed@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,44 +67,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use the physical timer object when reading the physical timer counter
-instead of using the virtual timer object. This is only visible when
-reading it from user-space as kvm_arm_timer_get_reg() is only executed on
-the get register patch from user-space.
+Hi,
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
----
- virt/kvm/arm/arch_timer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 2020/3/16 17:39, KarimAllah Ahmed wrote:
+> Use the physical timer object when reading the physical timer counter
+> instead of using the virtual timer object. This is only visible when
+> reading it from user-space as kvm_arm_timer_get_reg() is only executed on
+> the get register patch from user-space.
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 0d9438e..93bd59b 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -788,7 +788,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
- 					  vcpu_ptimer(vcpu), TIMER_REG_CTL);
- 	case KVM_REG_ARM_PTIMER_CNT:
- 		return kvm_arm_timer_read(vcpu,
--					  vcpu_vtimer(vcpu), TIMER_REG_CNT);
-+					  vcpu_ptimer(vcpu), TIMER_REG_CNT);
- 	case KVM_REG_ARM_PTIMER_CVAL:
- 		return kvm_arm_timer_read(vcpu,
- 					  vcpu_ptimer(vcpu), TIMER_REG_CVAL);
--- 
-2.7.4
+s/patch/path/
+
+I think the physical counter hasn't yet been accessed by the current
+userspace, wrong?
+
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
+
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+
+And this might also deserve:
+
+Fixes: 84135d3d18da ("KVM: arm/arm64: consolidate arch timer trap handlers")
+
+
+Thanks.
+
+> ---
+>   virt/kvm/arm/arch_timer.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 0d9438e..93bd59b 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -788,7 +788,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
+>   					  vcpu_ptimer(vcpu), TIMER_REG_CTL);
+>   	case KVM_REG_ARM_PTIMER_CNT:
+>   		return kvm_arm_timer_read(vcpu,
+> -					  vcpu_vtimer(vcpu), TIMER_REG_CNT);
+> +					  vcpu_ptimer(vcpu), TIMER_REG_CNT);
+>   	case KVM_REG_ARM_PTIMER_CVAL:
+>   		return kvm_arm_timer_read(vcpu,
+>   					  vcpu_ptimer(vcpu), TIMER_REG_CVAL);
+> 
 
 _______________________________________________
 kvmarm mailing list
