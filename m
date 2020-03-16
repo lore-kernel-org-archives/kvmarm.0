@@ -2,62 +2,87 @@ Return-Path: <SRS0=WgPl=5B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D528C0044D
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 12:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE4EC0044D
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 17:25:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 235FA205ED
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 12:39:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 235FA205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D7D8620409
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Mar 2020 17:25:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sqjpa4oz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D8620409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0084B08A;
-	Mon, 16 Mar 2020 08:39:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 369E64A2E5;
+	Mon, 16 Mar 2020 13:25:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5+AsS7KcA1fX; Mon, 16 Mar 2020 08:39:05 -0400 (EDT)
+	with ESMTP id ScKlppTiJKyj; Mon, 16 Mar 2020 13:25:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC784B083;
-	Mon, 16 Mar 2020 08:39:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2D44A4AA;
+	Mon, 16 Mar 2020 13:25:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CBEB4B080
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 08:39:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F5F4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 13:25:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4c-8U9D1lrjn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Mar 2020 08:39:03 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1A8A4A523
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 08:39:02 -0400 (EDT)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 7A402E500B6ABF9507E3;
- Mon, 16 Mar 2020 20:38:48 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Mon, 16 Mar 2020
- 20:38:38 +0800
-Subject: Re: [PATCH] KVM: arm64: Use the correct timer for accessing CNT
-To: Marc Zyngier <maz@kernel.org>
-References: <1584351546-5018-1-git-send-email-karahmed@amazon.de>
- <7ed91b9b-e968-770c-28f9-0ca479359657@huawei.com>
- <a8b72d6c0a28e0554050e98d011f32d9@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <a9fd7e22-f46a-fd47-26ee-44d2d36783fd@huawei.com>
-Date: Mon, 16 Mar 2020 20:38:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id GPg9PMUoaMDT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Mar 2020 13:25:02 -0400 (EDT)
+Received: from us-smtp-delivery-74.mimecast.com
+ (us-smtp-delivery-74.mimecast.com [216.205.24.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BCB940456
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 13:25:02 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584379501;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q1akQPS81W+giPhP70+us9oHf1EnbPYJV9QWBzC/Xbo=;
+ b=Sqjpa4oz8Vy/b0U/ZC4dXt/LW1yboW/8mMogxOrwdQCVgbDND/NoyBfFVka9wVF4jLwph+
+ U9Jchre8IX9FGApvk/F7G+8l2jy183lj4IYkVJ+JBVrN+FOVTJpK5MsyZIbOAgFBq7tPdZ
+ cHqzvGUsw1AhfcAr759/VlqzVrZ/Aig=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-Zh47tl5WOg-Nn-jxg_VU_w-1; Mon, 16 Mar 2020 13:24:57 -0400
+X-MC-Unique: Zh47tl5WOg-Nn-jxg_VU_w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0168CCF12C;
+ Mon, 16 Mar 2020 17:10:27 +0000 (UTC)
+Received: from [10.36.118.12] (ovpn-118-12.ams2.redhat.com [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FCEC5C1B2;
+ Mon, 16 Mar 2020 17:10:22 +0000 (UTC)
+Subject: Re: [PATCH v5 02/23] irqchip/gic-v4.1: Skip absent CPUs while
+ iterating over redistributors
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-3-maz@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e17a13d5-e28f-5fad-3c27-2ba75f22fc27@redhat.com>
+Date: Mon, 16 Mar 2020 18:10:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <a8b72d6c0a28e0554050e98d011f32d9@kernel.org>
+In-Reply-To: <20200304203330.4967-3-maz@kernel.org>
 Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: KarimAllah Ahmed <karahmed@amazon.de>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
+ Thomas Gleixner <tglx@linutronix.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,51 +94,47 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Marc
 
-On 2020/3/16 19:09, Marc Zyngier wrote:
-> Hi Zenghui,
+On 3/4/20 9:33 PM, Marc Zyngier wrote:
+> In a system that is only sparsly populated with CPUs, we can end-up with
+sparsely
+> redistributors structures that are not initialized. Let's make sure we
+redistributor structures
+> don't try and access those when iterating over them (in this case when
+> checking we have a L2 VPE table).
 > 
-> On 2020-03-16 10:49, Zenghui Yu wrote:
->> Hi,
->>
->> On 2020/3/16 17:39, KarimAllah Ahmed wrote:
->>> Use the physical timer object when reading the physical timer counter
->>> instead of using the virtual timer object. This is only visible when
->>> reading it from user-space as kvm_arm_timer_get_reg() is only 
->>> executed on
->>> the get register patch from user-space.
->>
->> s/patch/path/
->>
->> I think the physical counter hasn't yet been accessed by the current
->> userspace, wrong?
+> Fixes: 4e6437f12d6e ("irqchip/gic-v4.1: Ensure L2 vPE table is allocated at RD level")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> I don't think userspace can access it, as the ONE_REG API only exposes 
-> the virtual
-> timer so far, and userspace is much better off just reading the counter 
-> directly
-> (it has access to the virtual counter, and the guarantee that cntvoff is 
-> 0 in this
-> context).
-
-Yeah, I see. The physical timer registers are all ignored in
-walk_one_sys_reg() and won't be exposed.
-
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 83b1186ffcad..da883a691028 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -2452,6 +2452,10 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
+>  	if (!gic_rdists->has_rvpeid)
+>  		return true;
+>  
+> +	/* Skip non-present CPUs */
+> +	if (!base)
+> +		return true;
+> +
+>  	val  = gicr_read_vpropbaser(base + SZ_128K + GICR_VPROPBASER);
+>  
+>  	esz  = FIELD_GET(GICR_VPROPBASER_4_1_ENTRY_SIZE, val) + 1;
 > 
-> But as we move towards a situation where we can save/restore the 
-> physical timer
-> just like the virtual one, we're going to use this path and hit this bug.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks for the explanation.
-
-
-Zenghui
+Eric
 
 _______________________________________________
 kvmarm mailing list
