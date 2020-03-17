@@ -2,61 +2,85 @@ Return-Path: <SRS0=FDwM=5C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1C5C18E5B
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Mar 2020 02:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E946EC2BB1D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Mar 2020 08:37:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1100520674
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Mar 2020 02:49:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1100520674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 6625C20719
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Mar 2020 08:37:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFx6GMy6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6625C20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FF154A4AA;
-	Mon, 16 Mar 2020 22:49:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A58E4A125;
+	Tue, 17 Mar 2020 04:36:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vOOscIinLht8; Mon, 16 Mar 2020 22:49:36 -0400 (EDT)
+	with ESMTP id 2JTV-s8gN0MO; Tue, 17 Mar 2020 04:36:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3349E4A4C0;
-	Mon, 16 Mar 2020 22:49:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E74F4AF1F;
+	Tue, 17 Mar 2020 04:36:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B94E4A4A4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 22:49:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AD704A32E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2020 04:36:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jWDF8Rm0wpBS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Mar 2020 22:49:33 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73DB44A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2020 22:49:33 -0400 (EDT)
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id AC9D0E0409BF2661E9C8;
- Tue, 17 Mar 2020 10:49:28 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Tue, 17 Mar 2020
- 10:49:20 +0800
-Subject: Re: [PATCH v5 16/23] irqchip/gic-v4.1: Eagerly vmap vPEs
-To: Marc Zyngier <maz@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
+ with ESMTP id dBqK+lozX3QU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Mar 2020 04:36:55 -0400 (EDT)
+Received: from us-smtp-delivery-74.mimecast.com
+ (us-smtp-delivery-74.mimecast.com [63.128.21.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C31C34A125
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2020 04:36:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584434215;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2j8iTagAgwDVubh8DPg2ar7MFNgcBjiOBebGJ7tz5fg=;
+ b=PFx6GMy6XUOoh/OgjH1QnxSIQ8inh6+GdnbNoc+r4imtAwZcGTq+nH7CzqpszJ626/A3u7
+ We6DrxlIzmc43kQxwqdVsUwd1RP2wVExwuKF75+tm9JqWbIAUqndm+ZjyjbApVF5zrOQB2
+ oLTZz79JcqeDbAy+qJ74RpgqrsFC3aM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-5LHvM1ieNRWBCv24GAwrCw-1; Tue, 17 Mar 2020 04:36:48 -0400
+X-MC-Unique: 5LHvM1ieNRWBCv24GAwrCw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80539800D4E;
+ Tue, 17 Mar 2020 08:36:46 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CDD05C1BB;
+ Tue, 17 Mar 2020 08:36:42 +0000 (UTC)
+Subject: Re: [PATCH v5 09/23] irqchip/gic-v4.1: Add initial SGI configuration
+To: Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-17-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <2817cb89-4cc2-549f-6e40-91d941aa8a5f@huawei.com>
-Date: Tue, 17 Mar 2020 10:49:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ <20200304203330.4967-10-maz@kernel.org>
+ <4ccc36c5-1e0a-b4f6-b014-8691fdb50c84@redhat.com>
+ <aed58073-0494-ee38-4d2f-287888ed8840@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d40dc34f-c5cf-1091-c20d-f2c02a906964@redhat.com>
+Date: Tue, 17 Mar 2020 09:36:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-17-maz@kernel.org>
+In-Reply-To: <aed58073-0494-ee38-4d2f-287888ed8840@huawei.com>
 Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
  Thomas Gleixner <tglx@linutronix.de>
@@ -71,144 +95,248 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Zenghui,
 
-On 2020/3/5 4:33, Marc Zyngier wrote:
-> Now that we have HW-accelerated SGIs being delivered to VPEs, it
-> becomes required to map the VPEs on all ITSs instead of relying
-> on the lazy approach that we would use when using the ITS-list
-> mechanism.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On 3/17/20 3:02 AM, Zenghui Yu wrote:
+> Hi Eric,
+> =
 
-Before GICv4.1, we use vlpi_count to evaluate whether the vPE has been
-mapped on the specified ITS, and use this refcount to only issue VMOVP
-to those involved ITSes. It's broken after this patch.
+> On 2020/3/17 1:53, Auger Eric wrote:
+>> Hi Marc,
+>>
+>> On 3/4/20 9:33 PM, Marc Zyngier wrote:
+>>> The GICv4.1 ITS has yet another new command (VSGI) which allows
+>>> a VPE-targeted SGI to be configured (or have its pending state
+>>> cleared). Add support for this command and plumb it into the
+>>> activate irqdomain callback so that it is ready to be used.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+>>> ---
+>>> =A0 drivers/irqchip/irq-gic-v3-its.c=A0=A0 | 79 +++++++++++++++++++++++=
+++++++-
+>>> =A0 include/linux/irqchip/arm-gic-v3.h |=A0 3 +-
+>>> =A0 2 files changed, 80 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/irqchip/irq-gic-v3-its.c
+>>> b/drivers/irqchip/irq-gic-v3-its.c
+>>> index 112b452fcb40..e0db3f906f87 100644
+>>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>>> @@ -380,6 +380,15 @@ struct its_cmd_desc {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 struct {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct its_vpe *vpe;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 } its_invdb_cmd;
+>>> +
+>>> +=A0=A0=A0=A0=A0=A0=A0 struct {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct its_vpe *vpe;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u8 sgi;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u8 priority;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool enable;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool group;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool clear;
+>>> +=A0=A0=A0=A0=A0=A0=A0 } its_vsgi_cmd;
+>>> =A0=A0=A0=A0=A0 };
+>>> =A0 };
+>>> =A0 @@ -528,6 +537,31 @@ static void its_encode_db(struct its_cmd_block
+>>> *cmd, bool db)
+>>> =A0=A0=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[2], db, 63, 63);
+>>> =A0 }
+>>> =A0 +static void its_encode_sgi_intid(struct its_cmd_block *cmd, u8 sgi)
+>>> +{
+>>> +=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[0], sgi, 35, 32);
+>>> +}
+>>> +
+>>> +static void its_encode_sgi_priority(struct its_cmd_block *cmd, u8 prio)
+>>> +{
+>>> +=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[0], prio >> 4, 23, 20);
+>>> +}
+>>> +
+>>> +static void its_encode_sgi_group(struct its_cmd_block *cmd, bool grp)
+>>> +{
+>>> +=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[0], grp, 10, 10);
+>>> +}
+>>> +
+>>> +static void its_encode_sgi_clear(struct its_cmd_block *cmd, bool clr)
+>>> +{
+>>> +=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[0], clr, 9, 9);
+>>> +}
+>>> +
+>>> +static void its_encode_sgi_enable(struct its_cmd_block *cmd, bool en)
+>>> +{
+>>> +=A0=A0=A0 its_mask_encode(&cmd->raw_cmd[0], en, 8, 8);
+>>> +}
+>>> +
+>>> =A0 static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+>>> =A0 {
+>>> =A0=A0=A0=A0=A0 /* Let's fixup BE commands */
+>>> @@ -893,6 +927,26 @@ static struct its_vpe
+>>> *its_build_invdb_cmd(struct its_node *its,
+>>> =A0=A0=A0=A0=A0 return valid_vpe(its, desc->its_invdb_cmd.vpe);
+>>> =A0 }
+>>> =A0 +static struct its_vpe *its_build_vsgi_cmd(struct its_node *its,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct=
+ its_cmd_block *cmd,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct=
+ its_cmd_desc *desc)
+>>> +{
+>>> +=A0=A0=A0 if (WARN_ON(!is_v4_1(its)))
+>>> +=A0=A0=A0=A0=A0=A0=A0 return NULL;
+>>> +
+>>> +=A0=A0=A0 its_encode_cmd(cmd, GITS_CMD_VSGI);
+>>> +=A0=A0=A0 its_encode_vpeid(cmd, desc->its_vsgi_cmd.vpe->vpe_id);
+>>> +=A0=A0=A0 its_encode_sgi_intid(cmd, desc->its_vsgi_cmd.sgi);
+>>> +=A0=A0=A0 its_encode_sgi_priority(cmd, desc->its_vsgi_cmd.priority);
+>>> +=A0=A0=A0 its_encode_sgi_group(cmd, desc->its_vsgi_cmd.group);
+>>> +=A0=A0=A0 its_encode_sgi_clear(cmd, desc->its_vsgi_cmd.clear);
+>>> +=A0=A0=A0 its_encode_sgi_enable(cmd, desc->its_vsgi_cmd.enable);
+>>> +
+>>> +=A0=A0=A0 its_fixup_cmd(cmd);
+>>> +
+>>> +=A0=A0=A0 return valid_vpe(its, desc->its_vsgi_cmd.vpe);
+>>> +}
+>>> +
+>>> =A0 static u64 its_cmd_ptr_to_offset(struct its_node *its,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct its_cmd_b=
+lock *ptr)
+>>> =A0 {
+>>> @@ -3870,6 +3924,21 @@ static struct irq_chip its_vpe_4_1_irq_chip =3D {
+>>> =A0=A0=A0=A0=A0 .irq_set_vcpu_affinity=A0=A0=A0 =3D its_vpe_4_1_set_vcp=
+u_affinity,
+>>> =A0 };
+>>> =A0 +static void its_configure_sgi(struct irq_data *d, bool clear)
+>>> +{
+>>> +=A0=A0=A0 struct its_vpe *vpe =3D irq_data_get_irq_chip_data(d);
+>>> +=A0=A0=A0 struct its_cmd_desc desc;
+>>> +
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.vpe =3D vpe;
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.sgi =3D d->hwirq;
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.priority =3D vpe->sgi_config[d->hwirq].pri=
+ority;
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.enable =3D vpe->sgi_config[d->hwirq].enabl=
+ed;
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.group =3D vpe->sgi_config[d->hwirq].group;
+>>> +=A0=A0=A0 desc.its_vsgi_cmd.clear =3D clear;
+>>> +
+>>> +=A0=A0=A0 its_send_single_vcommand(find_4_1_its(), its_build_vsgi_cmd,
+>>> &desc);
+>> I see we pick up the first 4.1 ITS with find_4_1_its(). Can it happen
+>> that not all of them have a mapping for that vPEID and if so we should
+>> rather use one that has this mapping?
+> =
 
-We may need to re-evaluate "whether the vPE is mapped" now that we're at
-GICv4.1, otherwise *no* VMOVP will be issued on the v4.1 capable machine
-(I mean those without single VMOVP support).
+> It can't happen in GICv4.1, and you may find the answer in patch #16
+> ("Eagerly vmap vPEs").=A0 I also failed to follow this logic the first
+> time looking at it [*], so I think it may worth adding some comments
+> on top of find_4_1_its()?
+> =
 
-What I'm saying is something like below (only an idea, it even can't
-compile), any thoughts?
+> [*]
+> https://lore.kernel.org/lkml/c94061be-d029-69c8-d34f-4d21081d5aba@huawei.=
+com/
 
+OK thank you for the pointer. Slowly moving forward ... ;-)
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index 2e12bc52e3a2..3450b5e847ca 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -198,7 +198,8 @@ static u16 get_its_list(struct its_vm *vm)
-  		if (!is_v4(its))
-  			continue;
+Eric
+> =
 
--		if (vm->vlpi_count[its->list_nr])
-+		if (vm->vlpi_count[its->list_nr] ||
-+		    gic_requires_eager_mapping())
-  			__set_bit(its->list_nr, &its_list);
-  	}
+> =
 
-@@ -1295,7 +1296,8 @@ static void its_send_vmovp(struct its_vpe *vpe)
-  		if (!is_v4(its))
-  			continue;
+>>
+>> The spec says:
+>> The ITS controls must only be used on an ITS that has a mapping for that
+>> vPEID.
+>> Where multiple ITSs have a mapping for the vPEID, any ITS with a mapping
+>> may be used.
+>>
+>>> +}
+>>> +
+>>> =A0 static int its_sgi_set_affinity(struct irq_data *d,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 const struct cpumas=
+k *mask_val,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bool force)
+>>> @@ -3915,13 +3984,21 @@ static void its_sgi_irq_domain_free(struct
+>>> irq_domain *domain,
+>>> =A0 static int its_sgi_irq_domain_activate(struct irq_domain *domain,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 struct irq_data *d, bool reserve)
+>>> =A0 {
+>>> +=A0=A0=A0 /* Write out the initial SGI configuration */
+>>> +=A0=A0=A0 its_configure_sgi(d, false);
+>>> =A0=A0=A0=A0=A0 return 0;
+>>> =A0 }
+>>> =A0 =A0 static void its_sgi_irq_domain_deactivate(struct irq_domain *do=
+main,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 s=
+truct irq_data *d)
+>>> =A0 {
+>>> -=A0=A0=A0 /* Nothing to do */
+>>> +=A0=A0=A0 struct its_vpe *vpe =3D irq_data_get_irq_chip_data(d);
+>>> +
+>>> +=A0=A0=A0 /* First disable the SGI */
+>>> +=A0=A0=A0 vpe->sgi_config[d->hwirq].enabled =3D false;
+>>> +=A0=A0=A0 its_configure_sgi(d, false);
+>>> +=A0=A0=A0 /* Now clear the potential pending bit (yes, this is clunky)=
+ */
+>> nit: Without carefuly reading the VSGI cmd notes, it is difficult to
+>> understand why those 2 steps are needed: maybe replace this comment by
+>> something like:
+>> to change the config, clear must be set to false. Then clear is set and
+>> this leaves the config unchanged. Both steps cannot be done concurrently.
+>>
+>> "
+> =
 
--		if (!vpe->its_vm->vlpi_count[its->list_nr])
-+		if (!vpe->its_vm->vlpi_count[its->list_nr] &&
-+		    !gic_requires_eager_mapping())
-  			continue;
+> I think it makes sense.
+> =
 
-  		desc.its_vmovp_cmd.col = &its->collections[col_id];
+> =
 
+> Thanks,
+> Zenghui
+> =
 
-Thanks,
-Zenghui
+>>> +=A0=A0=A0 its_configure_sgi(d, true);
+>>> =A0 }
+>>> =A0 =A0 static struct irq_domain_ops its_sgi_domain_ops =3D {
+>>> diff --git a/include/linux/irqchip/arm-gic-v3.h
+>>> b/include/linux/irqchip/arm-gic-v3.h
+>>> index b28acfa71f82..fd3be49ac9a5 100644
+>>> --- a/include/linux/irqchip/arm-gic-v3.h
+>>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>>> @@ -502,8 +502,9 @@
+>>> =A0 #define GITS_CMD_VMAPTI=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_G=
+ICv4(GITS_CMD_MAPTI)
+>>> =A0 #define GITS_CMD_VMOVI=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_GI=
+Cv4(GITS_CMD_MOVI)
+>>> =A0 #define GITS_CMD_VSYNC=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_GI=
+Cv4(GITS_CMD_SYNC)
+>>> -/* VMOVP and INVDB are the odd ones, as they dont have a physical
+>>> counterpart */
+>>> +/* VMOVP, VSGI and INVDB are the odd ones, as they dont have a
+>>> physical counterpart */
+>>> =A0 #define GITS_CMD_VMOVP=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_GI=
+Cv4(2)
+>>> +#define GITS_CMD_VSGI=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_GICv4(=
+3)
+>>> =A0 #define GITS_CMD_INVDB=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 GITS_CMD_GI=
+Cv4(0xe)
+>>> =A0 =A0 /*
+>>>
+>> Thanks
+>>
+>> Eric
+>>
+>>
+>> .
+>>
+> =
 
-> ---
->   drivers/irqchip/irq-gic-v3-its.c | 39 +++++++++++++++++++++++++-------
->   1 file changed, 31 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index b65fba67bd85..6277b3e3731f 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -1586,12 +1586,31 @@ static int its_irq_set_irqchip_state(struct irq_data *d,
->   	return 0;
->   }
->   
-> +/*
-> + * Two favourable cases:
-> + *
-> + * (a) Either we have a GICv4.1, and all vPEs have to be mapped at all times
-> + *     for vSGI delivery
-> + *
-> + * (b) Or the ITSs do not use a list map, meaning that VMOVP is cheap enough
-> + *     and we're better off mapping all VPEs always
-> + *
-> + * If neither (a) nor (b) is true, then we map vPEs on demand.
-> + *
-> + */
-> +static bool gic_requires_eager_mapping(void)
-> +{
-> +	if (!its_list_map || gic_rdists->has_rvpeid)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->   static void its_map_vm(struct its_node *its, struct its_vm *vm)
->   {
->   	unsigned long flags;
->   
-> -	/* Not using the ITS list? Everything is always mapped. */
-> -	if (!its_list_map)
-> +	if (gic_requires_eager_mapping())
->   		return;
->   
->   	raw_spin_lock_irqsave(&vmovp_lock, flags);
-> @@ -1625,7 +1644,7 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
->   	unsigned long flags;
->   
->   	/* Not using the ITS list? Everything is always mapped. */
-> -	if (!its_list_map)
-> +	if (gic_requires_eager_mapping())
->   		return;
->   
->   	raw_spin_lock_irqsave(&vmovp_lock, flags);
-> @@ -4260,8 +4279,12 @@ static int its_vpe_irq_domain_activate(struct irq_domain *domain,
->   	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->   	struct its_node *its;
->   
-> -	/* If we use the list map, we issue VMAPP on demand... */
-> -	if (its_list_map)
-> +	/*
-> +	 * If we use the list map, we issue VMAPP on demand... Unless
-> +	 * we're on a GICv4.1 and we eagerly map the VPE on all ITSs
-> +	 * so that VSGIs can work.
-> +	 */
-> +	if (!gic_requires_eager_mapping())
->   		return 0;
->   
->   	/* Map the VPE to the first possible CPU */
-> @@ -4287,10 +4310,10 @@ static void its_vpe_irq_domain_deactivate(struct irq_domain *domain,
->   	struct its_node *its;
->   
->   	/*
-> -	 * If we use the list map, we unmap the VPE once no VLPIs are
-> -	 * associated with the VM.
-> +	 * If we use the list map on GICv4.0, we unmap the VPE once no
-> +	 * VLPIs are associated with the VM.
->   	 */
-> -	if (its_list_map)
-> +	if (!gic_requires_eager_mapping())
->   		return;
->   
->   	list_for_each_entry(its, &its_nodes, entry) {
-> 
 
 _______________________________________________
 kvmarm mailing list
