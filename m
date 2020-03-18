@@ -2,65 +2,60 @@ Return-Path: <SRS0=woTa=5D=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D3FC10DCE
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Mar 2020 06:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30ED4C10DCE
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Mar 2020 10:52:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D2D3120768
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Mar 2020 06:35:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D3120768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id A37DB20768
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Mar 2020 10:52:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A37DB20768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D7424A523;
-	Wed, 18 Mar 2020 02:35:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBAF24B097;
+	Wed, 18 Mar 2020 06:52:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gPHo-p4XKMKE; Wed, 18 Mar 2020 02:35:23 -0400 (EDT)
+	with ESMTP id Q-KvscCKGld6; Wed, 18 Mar 2020 06:52:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 056614B08B;
-	Wed, 18 Mar 2020 02:35:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C18254B094;
+	Wed, 18 Mar 2020 06:52:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D9AF4A51D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2020 02:35:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95E214A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2020 06:52:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YBNZZGwjpgek for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Mar 2020 02:35:20 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5638B4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2020 02:35:20 -0400 (EDT)
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 687BA464783BCDA51C81;
- Wed, 18 Mar 2020 14:35:13 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Wed, 18 Mar 2020
- 14:35:07 +0800
-Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
- selection in the distributor
-To: Marc Zyngier <maz@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-21-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
-Date: Wed, 18 Mar 2020 14:34:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id X3MxXNcbUz2A for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Mar 2020 06:52:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DE864A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2020 06:52:00 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C06B41FB;
+ Wed, 18 Mar 2020 03:51:59 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB1AF3F534;
+ Wed, 18 Mar 2020 03:51:58 -0700 (PDT)
+Date: Wed, 18 Mar 2020 10:51:56 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCHv6 0/3] arm64: perf: Add support for ARMv8.5-PMU 64-bit
+ counters
+Message-ID: <20200318105156.GB16012@lakrids.cambridge.arm.com>
+References: <20200302181752.14251-1-mark.rutland@arm.com>
+ <20200317231431.GM20788@willie-the-truck>
 MIME-Version: 1.0
-In-Reply-To: <20200304203330.4967-21-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Jason Cooper <jason@lakedaemon.net>, Robert Richter <rrichter@marvell.com>,
- Thomas Gleixner <tglx@linutronix.de>
+Content-Disposition: inline
+In-Reply-To: <20200317231431.GM20788@willie-the-truck>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+Cc: catalin.marinas@arm.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,177 +67,43 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 2020/3/5 4:33, Marc Zyngier wrote:
-> The GICv4.1 architecture gives the hypervisor the option to let
-> the guest choose whether it wants the good old SGIs with an
-> active state, or the new, HW-based ones that do not have one.
+On Tue, Mar 17, 2020 at 11:14:31PM +0000, Will Deacon wrote:
+> On Mon, Mar 02, 2020 at 06:17:49PM +0000, Mark Rutland wrote:
+> > This is a respin of Andrew Murray's series to enable support for 64-bit
+> > counters as introduced in ARMv8.5.
+> > 
+> > I've given this a spin on (ARMv8.2) hardware, to test that there are no
+> > regressions, but I have not had the chance to test in an ARMv8.5 model (which I
+> > beleive Andrew had previously tested).
+> > 
+> > Since v5 [1]:
+> > * Don't treat perfmon ID fields as signed
+> > * Fix up ID field names
+> > * Explicitly compare ARMV8.5 PMU value
 > 
-> For this, plumb the configuration of SGIs into the GICv3 MMIO
-> handling, present the GICD_TYPER2.nASSGIcap to the guest,
-> and handle the GICD_CTLR.nASSGIreq setting.
-> 
-> In order to be able to deal with the restore of a guest, also
-> apply the GICD_CTLR.nASSGIreq setting at first run so that we
-> can move the restored SGIs to the HW if that's what the guest
-> had selected in a previous life.
+> I'm betting on your issue being a model bug, so I've queued this on top of
+> Robin's enable/disable rework. Please take a look at for-next/perf [1] in
+> case I screwed it up.
 
-I'm okay with the restore path.  But it seems that we still fail to
-save the pending state of vSGI - software pending_latch of HW-based
-vSGIs will not be updated (and always be false) because we directly
-inject them through ITS, so vgic_v3_uaccess_read_pending() can't
-tell the correct pending state to user-space (the correct one should
-be latched in HW).
+From a cursory review, that all looks good to me.
 
-It would be good if we can sync the hardware state into pending_latch
-at an appropriate time (just before save), but not sure if we can...
-
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 ++++++++++++++++++++++++++++++--
->   virt/kvm/arm/vgic/vgic-v3.c      |  2 ++
->   2 files changed, 48 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index de89da76a379..442f3b8c2559 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -3,6 +3,7 @@
->    * VGICv3 MMIO handling functions
->    */
->   
-> +#include <linux/bitfield.h>
->   #include <linux/irqchip/arm-gic-v3.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
-> @@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->   		if (vgic->enabled)
->   			value |= GICD_CTLR_ENABLE_SS_G1;
->   		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-> +		if (kvm_vgic_global_state.has_gicv4_1 && vgic->nassgireq)
-
-Looking at how we handle the GICD_CTLR.nASSGIreq setting, I think
-"nassgireq==true" already indicates "has_gicv4_1==true".  So this
-can be simplified.
-
-But I wonder that should we use nassgireq to *only* keep track what
-the guest had written into the GICD_CTLR.nASSGIreq.  If not, we may
-lose the guest-request bit after migration among hosts with different
-has_gicv4_1 settings.
-
-
-The remaining patches all look good to me :-). I will wait for you to
-confirm these two concerns.
-
+I'll poke if the issue turns out to be anything beyond a model bug. but
+I agree it seems that's all it is.
 
 Thanks,
-Zenghui
+Mark.
 
-> +			value |= GICD_CTLR_nASSGIreq;
->   		break;
->   	case GICD_TYPER:
->   		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
-> @@ -81,6 +84,10 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
->   			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
->   		}
->   		break;
-> +	case GICD_TYPER2:
-> +		if (kvm_vgic_global_state.has_gicv4_1)
-> +			value = GICD_TYPER2_nASSGIcap;
-> +		break;
->   	case GICD_IIDR:
->   		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
->   			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
-> @@ -98,17 +105,43 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
->   				    unsigned long val)
->   {
->   	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> -	bool was_enabled = dist->enabled;
->   
->   	switch (addr & 0x0c) {
-> -	case GICD_CTLR:
-> +	case GICD_CTLR: {
-> +		bool was_enabled, is_hwsgi;
-> +
-> +		mutex_lock(&vcpu->kvm->lock);
-> +
-> +		was_enabled = dist->enabled;
-> +		is_hwsgi = dist->nassgireq;
-> +
->   		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
->   
-> +		/* Not a GICv4.1? No HW SGIs */
-> +		if (!kvm_vgic_global_state.has_gicv4_1)
-> +			val &= ~GICD_CTLR_nASSGIreq;
-> +
-> +		/* Dist stays enabled? nASSGIreq is RO */
-> +		if (was_enabled && dist->enabled) {
-> +			val &= ~GICD_CTLR_nASSGIreq;
-> +			val |= FIELD_PREP(GICD_CTLR_nASSGIreq, is_hwsgi);
-> +		}
-> +
-> +		/* Switching HW SGIs? */
-> +		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
-> +		if (is_hwsgi != dist->nassgireq)
-> +			vgic_v4_configure_vsgis(vcpu->kvm);
-> +
->   		if (!was_enabled && dist->enabled)
->   			vgic_kick_vcpus(vcpu->kvm);
-> +
-> +		mutex_unlock(&vcpu->kvm->lock);
->   		break;
-> +	}
->   	case GICD_TYPER:
-> +	case GICD_TYPER2:
->   	case GICD_IIDR:
-> +		/* This is at best for documentation purposes... */
->   		return;
->   	}
->   }
-> @@ -117,10 +150,21 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
->   					   gpa_t addr, unsigned int len,
->   					   unsigned long val)
->   {
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
->   	switch (addr & 0x0c) {
->   	case GICD_IIDR:
->   		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
->   			return -EINVAL;
-> +		return 0;
-> +	case GICD_CTLR:
-> +		/* Not a GICv4.1? No HW SGIs */
-> +		if (!kvm_vgic_global_state.has_gicv4_1)
-> +			val &= ~GICD_CTLR_nASSGIreq;
-> +
-> +		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
-> +		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
-> +		return 0;
->   	}
->   
->   	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 1bc09b523486..2c9fc13e2c59 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
->   		goto out;
->   	}
->   
-> +	if (kvm_vgic_global_state.has_gicv4_1)
-> +		vgic_v4_configure_vsgis(kvm);
->   	dist->ready = true;
->   
->   out:
 > 
-
+> Thanks,
+> 
+> Will
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/log/?h=for-next/perf
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
