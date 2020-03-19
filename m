@@ -2,88 +2,88 @@ Return-Path: <SRS0=Wnhb=5E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01872C4332B
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 19:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 258ADC4332E
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 20:13:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7FA7F2072D
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 19:52:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA7832071C
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 20:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkSTKb4u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA7F2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EoZIsUgz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA7832071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E96DA4B0A0;
-	Thu, 19 Mar 2020 15:52:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E87BF4B091;
+	Thu, 19 Mar 2020 16:13:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tvr9y1lXYxES; Thu, 19 Mar 2020 15:52:47 -0400 (EDT)
+	with ESMTP id pT+qlH1-THtX; Thu, 19 Mar 2020 16:13:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D10F64B091;
-	Thu, 19 Mar 2020 15:52:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C45C4B093;
+	Thu, 19 Mar 2020 16:13:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D77B4B08E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 15:52:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D38304B090
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 16:13:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4EguR7z1aI9d for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Mar 2020 15:52:45 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 419594A4E5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 15:52:45 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id RtyODPx+8s8W for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Mar 2020 16:13:43 -0400 (EDT)
+Received: from us-smtp-delivery-74.mimecast.com
+ (us-smtp-delivery-74.mimecast.com [63.128.21.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0541D4A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 16:13:42 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584648822;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pz2meSx8kaekzriSFaRshTQDd/5d8cqR1w2EnkHzmmU=;
+ b=EoZIsUgzFmxt1C0WYQIon7NNc9+jhNvu8Xv9LGOLNPuCI7brionPplu8POghwonlrxV36X
+ eF6yYv5moRcloiOtxT+5mv5d+aFz5DwtUEGLGT5x22DIyVpkeOcvhggZMXRq2fKct/YKHi
+ U/Vr+0z1lQvI1RLnh+6RwBz1nQIdyoQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-NAifi9mdM5O2JzklWPrenA-1; Thu, 19 Mar 2020 16:13:37 -0400
+X-MC-Unique: NAifi9mdM5O2JzklWPrenA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 19B8A206D7;
- Thu, 19 Mar 2020 19:52:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1584647564;
- bh=UMFRuMeWN29pb4882uOYxANHVABCplgj+koAb1z+2dE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=qkSTKb4utIarMQd8CDJcC0r66jjv4E6Grgajl0GaZ2NsWZFpgnSsxvNw5d1trhyVf
- m/hfAowH8zpNjr3UjCBAXtljDdoHJ8gci0Db/rlJFpoF62Ej37wABUnI3eg2J6bWh9
- n0uwur1NEU7m4GqQdTUpOURPTJro6MWBSuqnHrzk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jF1Dd-00E46F-Ts; Thu, 19 Mar 2020 19:52:42 +0000
-MIME-Version: 1.0
-Date: Thu, 19 Mar 2020 19:52:41 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Auger Eric <eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30392801E5C;
+ Thu, 19 Mar 2020 20:13:35 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BD1B60BF1;
+ Thu, 19 Mar 2020 20:13:31 +0000 (UTC)
 Subject: Re: [PATCH v5 19/23] KVM: arm64: GICv4.1: Allow SGIs to switch
  between HW and SW interrupts
-In-Reply-To: <8a6cf87a-7eee-5502-3b54-093ea0ab5e2d@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200304203330.4967-1-maz@kernel.org>
  <20200304203330.4967-20-maz@kernel.org>
  <8a6cf87a-7eee-5502-3b54-093ea0ab5e2d@redhat.com>
-Message-ID: <877ba4711c6b9456314ea580b9c4718c@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, lorenzo.pieralisi@arm.com, jason@lakedaemon.net,
- rrichter@marvell.com, tglx@linutronix.de, yuzenghui@huawei.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <877ba4711c6b9456314ea580b9c4718c@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9fb8c267-5483-f260-6e37-5e8734b38928@redhat.com>
+Date: Thu, 19 Mar 2020 21:13:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <877ba4711c6b9456314ea580b9c4718c@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
- Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,91 +95,26 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+Hi Marc,
 
-On 2020-03-19 16:16, Auger Eric wrote:
-> Hi Marc,
-> 
-> On 3/4/20 9:33 PM, Marc Zyngier wrote:
->> In order to let a guest buy in the new, active-less SGIs, we
->> need to be able to switch between the two modes.
->> 
->> Handle this by stopping all guest activity, transfer the state
->> from one mode to the other, and resume the guest. Nothing calls
->> this code so far, but a later patch will plug it into the MMIO
->> emulation.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  include/kvm/arm_vgic.h      |  3 ++
->>  virt/kvm/arm/vgic/vgic-v4.c | 94 
->> +++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic/vgic.h    |  1 +
->>  3 files changed, 98 insertions(+)
->> 
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 63457908c9c4..69f4164d6477 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -231,6 +231,9 @@ struct vgic_dist {
->>  	/* distributor enabled */
->>  	bool			enabled;
->> 
->> +	/* Wants SGIs without active state */
->> +	bool			nassgireq;
->> +
->>  	struct vgic_irq		*spis;
->> 
->>  	struct vgic_io_device	dist_iodev;
->> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
->> index c2fcde104ea2..a65dc1c85363 100644
->> --- a/virt/kvm/arm/vgic/vgic-v4.c
->> +++ b/virt/kvm/arm/vgic/vgic-v4.c
->> @@ -97,6 +97,100 @@ static irqreturn_t vgic_v4_doorbell_handler(int 
->> irq, void *info)
->>  	return IRQ_HANDLED;
->>  }
->> 
->> +static void vgic_v4_sync_sgi_config(struct its_vpe *vpe, struct 
->> vgic_irq *irq)
->> +{
->> +	vpe->sgi_config[irq->intid].enabled	= irq->enabled;
->> +	vpe->sgi_config[irq->intid].group 	= irq->group;
->> +	vpe->sgi_config[irq->intid].priority	= irq->priority;
->> +}
->> +
->> +static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
->> +{
->> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->> +	int i;
->> +
->> +	/*
->> +	 * With GICv4.1, every virtual SGI can be directly injected. So
->> +	 * let's pretend that they are HW interrupts, tied to a host
->> +	 * IRQ. The SGI code will do its magic.
->> +	 */
->> +	for (i = 0; i < VGIC_NR_SGIS; i++) {
->> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
->> +		struct irq_desc *desc;
->> +		int ret;
-> Is is safe without holding the irq->irq_lock?
+On 3/19/20 8:52 PM, Marc Zyngier wrote:
+> The assumption here is that we're coming vgic_v4_configure_vsgis(),
+> which starts
+> by stopping the whole guest. My guess is that it should be safe enough, but
+> maybe you are thinking of something else?
+I don't have a specific case in mind. Just preferred asking to make
+sure. Usually when touching those fields we take the lock (that's also
+the case in vgic_debug_show for instance).
 
-The assumption here is that we're coming vgic_v4_configure_vsgis(), 
-which starts
-by stopping the whole guest. My guess is that it should be safe enough, 
-but
-maybe you are thinking of something else?
+Thanks
 
-Thanks,
+Eric
 
-          M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
