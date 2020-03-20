@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1102DC43332
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206BAC4332B
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BBF5A20788
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D26A920789
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="etmef10b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF5A20788
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="z2Yqt3I6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26A920789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7496B4B0AE;
-	Fri, 20 Mar 2020 14:51:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DC324B0DE;
+	Fri, 20 Mar 2020 14:51:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RvXTBpX2uLaN; Fri, 20 Mar 2020 14:51:17 -0400 (EDT)
+	with ESMTP id d3XhJdqNLFNG; Fri, 20 Mar 2020 14:51:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 593F14B0BA;
-	Fri, 20 Mar 2020 14:51:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7615E4B0B1;
+	Fri, 20 Mar 2020 14:51:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1974A5A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9FD04B0AE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3iNNVTd4-n2Y for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Mar 2020 14:51:15 -0400 (EDT)
+ with ESMTP id BfLXJoTbfYEF for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2020 14:51:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06ECE4B0B4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C14AA4B0B0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 24B7520777;
- Fri, 20 Mar 2020 18:51:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id F151B20782;
+ Fri, 20 Mar 2020 18:51:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1584730274;
- bh=iTTRLc1asMC1ToqC0uIdVxXfNuG7Jq07huQ5778OZ54=;
+ s=default; t=1584730276;
+ bh=mXJ5ROXftUjjdole7L8HRdVMp0YjNsFfy7jYyDtY/Nc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=etmef10b0rZ6ycQ9UCakUs5CEtjIJp3wZnEhBoVxoqvyIwikwH8BuAiVv+tjP43lF
- BKf5ZLCV8F/ZB6ybrsLVPfLTpUZjJGtaP07jnmssBITiEN/2Ogoo75h+Jlhj9utyHE
- 25KT5ZpHDd+up18873CRO9Z7fX5fzlIXvZl0ISfI=
+ b=z2Yqt3I6eeoQoxSqZfnqRzZ6oc7H6RJFdchMRIUfTQQOUDadrG36iS8gCPleJ2og+
+ VTdEieKv8YHQDVHNy5XBGIbW1KEz8stNkcrjBMyKClx1YuVaTmaQA+K1YQHkmTgCje
+ +ojOHsC5YeQ1Jn47PznTlRRGLeWVm4qLnPSB1x50=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jFMKA-00EKAx-V0; Fri, 20 Mar 2020 18:24:51 +0000
+ id 1jFMK5-00EKAx-2F; Fri, 20 Mar 2020 18:24:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 21/23] KVM: arm64: GICv4.1: Reload VLPI configuration on
- distributor enable/disable
-Date: Fri, 20 Mar 2020 18:24:04 +0000
-Message-Id: <20200320182406.23465-22-maz@kernel.org>
+Subject: [PATCH v6 15/23] irqchip/gic-v4.1: Add VSGI property setup
+Date: Fri, 20 Mar 2020 18:23:58 +0000
+Message-Id: <20200320182406.23465-16-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200320182406.23465-1-maz@kernel.org>
 References: <20200320182406.23465-1-maz@kernel.org>
@@ -95,85 +94,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Each time a Group-enable bit gets flipped, the state of these bits
-needs to be forwarded to the hardware. This is a pretty heavy
-handed operation, requiring all vcpus to reload their GICv4
-configuration. It is thus implemented as a new request type.
-
-These enable bits are programmed into the HW by setting the VGrp{0,1}En
-fields of GICR_VPENDBASER when the vPEs are made resident again.
-
-Of course, we only support Group-1 for now...
+Add the SGI configuration entry point for KVM to use.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Link: https://lore.kernel.org/r/20200304203330.4967-22-maz@kernel.org
+Link: https://lore.kernel.org/r/20200304203330.4967-16-maz@kernel.org
 ---
- arch/arm/include/asm/kvm_host.h   | 1 +
- arch/arm64/include/asm/kvm_host.h | 1 +
- virt/kvm/arm/arm.c                | 8 ++++++++
- virt/kvm/arm/vgic/vgic-mmio-v3.c  | 5 ++++-
- 4 files changed, 14 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v4.c       | 13 +++++++++++++
+ include/linux/irqchip/arm-gic-v4.h |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index a827b4d60d38..3da57e863df6 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -39,6 +39,7 @@
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
- #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
- #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
-+#define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 57fd46acd058..32c8a675e5a4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -44,6 +44,7 @@
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
- #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
- #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
-+#define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index eda7b624eab8..4d864f857ac8 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -625,6 +625,14 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
- 			kvm_update_stolen_time(vcpu);
-+
-+		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
-+			/* The distributor enable bits were changed */
-+			preempt_disable();
-+			vgic_v4_put(vcpu, false);
-+			vgic_v4_load(vcpu);
-+			preempt_enable();
-+		}
- 	}
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 99b33f60ac63..0c18714ae13e 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -320,6 +320,19 @@ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+ 	return irq_set_vcpu_affinity(irq, &info);
  }
  
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 905032a03886..e72dcc454247 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -132,7 +132,10 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 		if (is_hwsgi != dist->nassgireq)
- 			vgic_v4_configure_vsgis(vcpu->kvm);
++int its_prop_update_vsgi(int irq, u8 priority, bool group)
++{
++	struct its_cmd_info info = {
++		.cmd_type = PROP_UPDATE_VSGI,
++		{
++			.priority	= priority,
++			.group		= group,
++		},
++	};
++
++	return irq_set_vcpu_affinity(irq, &info);
++}
++
+ int its_init_v4(struct irq_domain *domain,
+ 		const struct irq_domain_ops *vpe_ops,
+ 		const struct irq_domain_ops *sgi_ops)
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index b120a01952fe..6976b8331b60 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -134,6 +134,7 @@ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+ int its_get_vlpi(int irq, struct its_vlpi_map *map);
+ int its_unmap_vlpi(int irq);
+ int its_prop_update_vlpi(int irq, u8 config, bool inv);
++int its_prop_update_vsgi(int irq, u8 priority, bool group);
  
--		if (!was_enabled && dist->enabled)
-+		if (kvm_vgic_global_state.has_gicv4_1 &&
-+		    was_enabled != dist->enabled)
-+			kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_RELOAD_GICv4);
-+		else if (!was_enabled && dist->enabled)
- 			vgic_kick_vcpus(vcpu->kvm);
- 
- 		mutex_unlock(&vcpu->kvm->lock);
+ struct irq_domain_ops;
+ int its_init_v4(struct irq_domain *domain,
 -- 
 2.20.1
 
