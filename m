@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF147C4332E
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98507C4332B
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A5AE220787
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5673920775
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="no7qmA/q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AE220787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xRywJMOc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5673920775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C03F4B0B0;
-	Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFE934B09B;
+	Fri, 20 Mar 2020 14:51:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Td1T2edcD4Fn; Fri, 20 Mar 2020 14:51:07 -0400 (EDT)
+	with ESMTP id 1pqhQm6Ls0kj; Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9523E4B0B5;
-	Fri, 20 Mar 2020 14:51:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C60F04B0B4;
+	Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 714064B0A1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 49F2D4B09B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lSW-LW-Lg1ja for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Mar 2020 14:51:05 -0400 (EDT)
+ with ESMTP id XwKGQ2r3qEyE for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2020 14:51:07 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6D3A4B099
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D37CC4B0AB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:06 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 23C7820777;
- Fri, 20 Mar 2020 18:51:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0D9F220782;
+ Fri, 20 Mar 2020 18:51:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1584730264;
- bh=kAIzACrtRqp9+cmWye+/gG0nioUQJDXbGtlJnlocbk8=;
+ s=default; t=1584730266;
+ bh=EWeIoPIU5pLdBJ+TnbGihaGZ67SAvlzjvyRxT2kCXUQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=no7qmA/qSpU+1LBwiH1p6Vs05EFTnBMwvxJGh5s/eJm7eXpQmzuI+DeJ8CglWQSOG
- IrdZ61wodsxRzuIBlrTu0a/5yX45OCMvXCpXxYbr7zBLV0HJ7LkhOylAeNRpd8177q
- CUCooJMAlD0r8zWnfEL7XnRk/INk8T8ri3ZkR0g4=
+ b=xRywJMOcARzfVMSMVWzxClwxpGtzjMFwmKOMKNpmdjuLWc+Cgn2Hu3ZpBS7mWXMqg
+ hBr0nBpBbNJ3jOqyJjNiIx+kjeuY22JcPX3Q3rwq2rYhg3Pm9kPXoPgjgARvriJbRc
+ U3Woic7hqdyDnCmV6qkS6DDg4+S35/Cei+yqNFHE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jFMK3-00EKAx-Bx; Fri, 20 Mar 2020 18:24:43 +0000
+ id 1jFMKA-00EKAx-7T; Fri, 20 Mar 2020 18:24:50 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 13/23] irqchip/gic-v4.1: Move doorbell management to the
- GICv4 abstraction layer
-Date: Fri, 20 Mar 2020 18:23:56 +0000
-Message-Id: <20200320182406.23465-14-maz@kernel.org>
+Subject: [PATCH v6 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+Date: Fri, 20 Mar 2020 18:24:03 +0000
+Message-Id: <20200320182406.23465-21-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200320182406.23465-1-maz@kernel.org>
 References: <20200320182406.23465-1-maz@kernel.org>
@@ -95,213 +95,141 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to hide some of the differences between v4.0 and v4.1, move
-the doorbell management out of the KVM code, and into the GICv4-specific
-layer. This allows the calling code to ask for the doorbell when blocking,
-and otherwise to leave the doorbell permanently disabled.
+The GICv4.1 architecture gives the hypervisor the option to let
+the guest choose whether it wants the good old SGIs with an
+active state, or the new, HW-based ones that do not have one.
 
-This matches the v4.1 code perfectly, and only results in a minor
-refactoring of the v4.0 code.
+For this, plumb the configuration of SGIs into the GICv3 MMIO
+handling, present the GICD_TYPER2.nASSGIcap to the guest,
+and handle the GICD_CTLR.nASSGIreq setting.
+
+In order to be able to deal with the restore of a guest, also
+apply the GICD_CTLR.nASSGIreq setting at first run so that we
+can move the restored SGIs to the HW if that's what the guest
+had selected in a previous life.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Link: https://lore.kernel.org/r/20200304203330.4967-14-maz@kernel.org
+Link: https://lore.kernel.org/r/20200304203330.4967-21-maz@kernel.org
 ---
- drivers/irqchip/irq-gic-v4.c       | 45 +++++++++++++++++++++++++++---
- include/kvm/arm_vgic.h             |  1 +
- include/linux/irqchip/arm-gic-v4.h |  3 +-
- virt/kvm/arm/vgic/vgic-v3.c        |  4 ++-
- virt/kvm/arm/vgic/vgic-v4.c        | 34 ++++++++++------------
- 5 files changed, 61 insertions(+), 26 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 49 ++++++++++++++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-v3.c      |  2 ++
+ 2 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index c01910d53f9e..117ba6db023d 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -87,6 +87,11 @@ static struct irq_domain *gic_domain;
- static const struct irq_domain_ops *vpe_domain_ops;
- static const struct irq_domain_ops *sgi_domain_ops;
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index f4da9d1a6bff..905032a03886 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -3,6 +3,7 @@
+  * VGICv3 MMIO handling functions
+  */
  
-+static bool has_v4_1(void)
-+{
-+	return !!sgi_domain_ops;
-+}
-+
- int its_alloc_vcpu_irqs(struct its_vm *vm)
++#include <linux/bitfield.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+@@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 		if (vgic->enabled)
+ 			value |= GICD_CTLR_ENABLE_SS_G1;
+ 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
++		if (vgic->nassgireq)
++			value |= GICD_CTLR_nASSGIreq;
+ 		break;
+ 	case GICD_TYPER:
+ 		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
+@@ -81,6 +84,10 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
+ 		}
+ 		break;
++	case GICD_TYPER2:
++		if (kvm_vgic_global_state.has_gicv4_1)
++			value = GICD_TYPER2_nASSGIcap;
++		break;
+ 	case GICD_IIDR:
+ 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
+ 			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
+@@ -98,17 +105,43 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+ 				    unsigned long val)
  {
- 	int vpe_base_irq, i;
-@@ -139,18 +144,50 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
- 	return irq_set_vcpu_affinity(vpe->irq, info);
- }
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	bool was_enabled = dist->enabled;
  
--int its_schedule_vpe(struct its_vpe *vpe, bool on)
-+int its_make_vpe_non_resident(struct its_vpe *vpe, bool db)
+ 	switch (addr & 0x0c) {
+-	case GICD_CTLR:
++	case GICD_CTLR: {
++		bool was_enabled, is_hwsgi;
++
++		mutex_lock(&vcpu->kvm->lock);
++
++		was_enabled = dist->enabled;
++		is_hwsgi = dist->nassgireq;
++
+ 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
+ 
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
++
++		/* Dist stays enabled? nASSGIreq is RO */
++		if (was_enabled && dist->enabled) {
++			val &= ~GICD_CTLR_nASSGIreq;
++			val |= FIELD_PREP(GICD_CTLR_nASSGIreq, is_hwsgi);
++		}
++
++		/* Switching HW SGIs? */
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		if (is_hwsgi != dist->nassgireq)
++			vgic_v4_configure_vsgis(vcpu->kvm);
++
+ 		if (!was_enabled && dist->enabled)
+ 			vgic_kick_vcpus(vcpu->kvm);
++
++		mutex_unlock(&vcpu->kvm->lock);
+ 		break;
++	}
+ 	case GICD_TYPER:
++	case GICD_TYPER2:
+ 	case GICD_IIDR:
++		/* This is at best for documentation purposes... */
+ 		return;
+ 	}
+ }
+@@ -117,10 +150,22 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+ 					   gpa_t addr, unsigned int len,
+ 					   unsigned long val)
  {
--	struct its_cmd_info info;
-+	struct irq_desc *desc = irq_to_desc(vpe->irq);
-+	struct its_cmd_info info = { };
- 	int ret;
- 
- 	WARN_ON(preemptible());
- 
--	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
-+	info.cmd_type = DESCHEDULE_VPE;
-+	if (has_v4_1()) {
-+		/* GICv4.1 can directly deal with doorbells */
-+		info.req_db = db;
-+	} else {
-+		/* Undo the nested disable_irq() calls... */
-+		while (db && irqd_irq_disabled(&desc->irq_data))
-+			enable_irq(vpe->irq);
-+	}
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
 +
-+	ret = its_send_vpe_cmd(vpe, &info);
-+	if (!ret)
-+		vpe->resident = false;
+ 	switch (addr & 0x0c) {
++	case GICD_TYPER2:
+ 	case GICD_IIDR:
+ 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+ 			return -EINVAL;
++		return 0;
++	case GICD_CTLR:
++		/* Not a GICv4.1? No HW SGIs */
++		if (!kvm_vgic_global_state.has_gicv4_1)
++			val &= ~GICD_CTLR_nASSGIreq;
 +
-+	return ret;
-+}
-+
-+int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
-+{
-+	struct its_cmd_info info = { };
-+	int ret;
-+
-+	WARN_ON(preemptible());
-+
-+	info.cmd_type = SCHEDULE_VPE;
-+	if (has_v4_1()) {
-+		info.g0en = g0en;
-+		info.g1en = g1en;
-+	} else {
-+		/* Disabled the doorbell, as we're about to enter the guest */
-+		disable_irq_nosync(vpe->irq);
-+	}
- 
- 	ret = its_send_vpe_cmd(vpe, &info);
- 	if (!ret)
--		vpe->resident = on;
-+		vpe->resident = true;
- 
- 	return ret;
- }
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9d53f545a3d5..63457908c9c4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -70,6 +70,7 @@ struct vgic_global {
- 
- 	/* Hardware has GICv4? */
- 	bool			has_gicv4;
-+	bool			has_gicv4_1;
- 
- 	/* GIC system register CPU interface */
- 	struct static_key_false gicv3_cpuif;
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index b4dbf899460b..8b42d9d9b17e 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -125,7 +125,8 @@ struct its_cmd_info {
- 
- int its_alloc_vcpu_irqs(struct its_vm *vm);
- void its_free_vcpu_irqs(struct its_vm *vm);
--int its_schedule_vpe(struct its_vpe *vpe, bool on);
-+int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
-+int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
- int its_invall_vpe(struct its_vpe *vpe);
- int its_map_vlpi(int irq, struct its_vlpi_map *map);
- int its_get_vlpi(int irq, struct its_vlpi_map *map);
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index f45635a6f0ec..1bc09b523486 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -595,7 +595,9 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	/* GICv4 support? */
- 	if (info->has_v4) {
- 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
--		kvm_info("GICv4 support %sabled\n",
-+		kvm_vgic_global_state.has_gicv4_1 = info->has_v4_1 && gicv4_enable;
-+		kvm_info("GICv4%s support %sabled\n",
-+			 kvm_vgic_global_state.has_gicv4_1 ? ".1" : "",
- 			 gicv4_enable ? "en" : "dis");
++		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
++		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
++		return 0;
  	}
  
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 46f875589c47..1eb0f8c76219 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -67,10 +67,10 @@
-  * it. And if we've migrated our vcpu from one CPU to another, we must
-  * tell the ITS (so that the messages reach the right redistributor).
-  * This is done in two steps: first issue a irq_set_affinity() on the
-- * irq corresponding to the vcpu, then call its_schedule_vpe(). You
-- * must be in a non-preemptible context. On exit, another call to
-- * its_schedule_vpe() tells the redistributor that we're done with the
-- * vcpu.
-+ * irq corresponding to the vcpu, then call its_make_vpe_resident().
-+ * You must be in a non-preemptible context. On exit, a call to
-+ * its_make_vpe_non_resident() tells the redistributor that we're done
-+ * with the vcpu.
-  *
-  * Finally, the doorbell handling: Each vcpu is allocated an interrupt
-  * which will fire each time a VLPI is made pending whilst the vcpu is
-@@ -86,7 +86,8 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
- 	struct kvm_vcpu *vcpu = info;
+ 	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 1bc09b523486..2c9fc13e2c59 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 		goto out;
+ 	}
  
- 	/* We got the message, no need to fire again */
--	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
-+	if (!kvm_vgic_global_state.has_gicv4_1 &&
-+	    !irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
- 		disable_irq_nosync(irq);
++	if (kvm_vgic_global_state.has_gicv4_1)
++		vgic_v4_configure_vsgis(kvm);
+ 	dist->ready = true;
  
- 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
-@@ -199,19 +200,11 @@ void vgic_v4_teardown(struct kvm *kvm)
- int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
--	struct irq_desc *desc = irq_to_desc(vpe->irq);
- 
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	/*
--	 * If blocking, a doorbell is required. Undo the nested
--	 * disable_irq() calls...
--	 */
--	while (need_db && irqd_irq_disabled(&desc->irq_data))
--		enable_irq(vpe->irq);
--
--	return its_schedule_vpe(vpe, false);
-+	return its_make_vpe_non_resident(vpe, need_db);
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
-@@ -232,18 +225,19 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
- 	if (err)
- 		return err;
- 
--	/* Disabled the doorbell, as we're about to enter the guest */
--	disable_irq_nosync(vpe->irq);
--
--	err = its_schedule_vpe(vpe, true);
-+	err = its_make_vpe_resident(vpe, false, vcpu->kvm->arch.vgic.enabled);
- 	if (err)
- 		return err;
- 
- 	/*
- 	 * Now that the VPE is resident, let's get rid of a potential
--	 * doorbell interrupt that would still be pending.
-+	 * doorbell interrupt that would still be pending. This is a
-+	 * GICv4.0 only "feature"...
- 	 */
--	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
-+	if (!kvm_vgic_global_state.has_gicv4_1)
-+		err = irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
-+
-+	return err;
- }
- 
- static struct vgic_its *vgic_get_its(struct kvm *kvm,
+ out:
 -- 
 2.20.1
 
