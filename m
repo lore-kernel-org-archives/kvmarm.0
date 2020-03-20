@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DE1C4332B
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 16:10:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89312C4332E
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 16:10:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CDE4420739
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 16:10:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D34020781
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 16:10:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OuwHJrKb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE4420739
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xfc3f3UD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D34020781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F524B0AB;
-	Fri, 20 Mar 2020 12:10:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA7CB4B0AE;
+	Fri, 20 Mar 2020 12:10:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S+84Ppgad0ZJ; Fri, 20 Mar 2020 12:10:15 -0400 (EDT)
+	with ESMTP id MhXxCT-VhfFf; Fri, 20 Mar 2020 12:10:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0A84B091;
-	Fri, 20 Mar 2020 12:10:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 898BC4B0A8;
+	Fri, 20 Mar 2020 12:10:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54BEC4B088
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 12:10:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FF294B083
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 12:10:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NBw0vOGthMHa for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Mar 2020 12:10:13 -0400 (EDT)
+ with ESMTP id bF5reGk2us8b for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2020 12:10:19 -0400 (EDT)
 Received: from us-smtp-delivery-74.mimecast.com
  (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4424A4A5A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 12:10:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18D104B091
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 12:10:19 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584720613;
+ s=mimecast20190719; t=1584720618;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zc5dOSpxvMWZU+BrXme6a55ApTzuxXuYUv1VDiCsFc0=;
- b=OuwHJrKb/bnnmmB3KKI/1eX6CeeYFagr3zSghw/OqiB1EgNhvjLT0N6pjpzAdUPEHZoLRB
- futn3Uhj9r7t36G4d594pkyzoZebFJ1GFQnh/QIClmqVq3zMsyWjoWnreH3U/EeNGJh8IK
- c+SNsO661spotVJ6C88Nrbuzo9eyHq4=
+ bh=GhcONvFcpeB62AOVeOzwruBzMWpD+P7Fed42L4CFLw0=;
+ b=Xfc3f3UDYNioowY3ko/s5z9tZ+O8AR8Ly0kVTBHbd6UM86CDXgnD6zLCdYYaQytm/DbeNI
+ 4VataS4NutORvnS/pOxacVXcLnkxgoroKxwasx4Xh5CUcQyEzARs6X8j8NrL0SUhmTzpgK
+ OXkBFnL5wFhg9uzuCoES43ewhf4PNAs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-p2UsQlYKMza0vdO3B2TNNQ-1; Fri, 20 Mar 2020 12:10:09 -0400
-X-MC-Unique: p2UsQlYKMza0vdO3B2TNNQ-1
+ us-mta-36-t6pTOVUEPGCvPanWYuHxtA-1; Fri, 20 Mar 2020 12:10:15 -0400
+X-MC-Unique: t6pTOVUEPGCvPanWYuHxtA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 344DD802567;
- Fri, 20 Mar 2020 16:10:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01F4A1005510;
+ Fri, 20 Mar 2020 16:10:13 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DCC6A5C3FD;
- Fri, 20 Mar 2020 16:09:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 934971E6;
+ Fri, 20 Mar 2020 16:10:07 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -70,9 +70,9 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
  yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
  robin.murphy@arm.com
-Subject: [PATCH v10 03/13] iommu/arm-smmu-v3: Maintain a SID->device structure
-Date: Fri, 20 Mar 2020 17:09:22 +0100
-Message-Id: <20200320160932.27222-4-eric.auger@redhat.com>
+Subject: [PATCH v10 04/13] iommu/smmuv3: Dynamically allocate s1_cfg and s2_cfg
+Date: Fri, 20 Mar 2020 17:09:23 +0100
+Message-Id: <20200320160932.27222-5-eric.auger@redhat.com>
 In-Reply-To: <20200320160932.27222-1-eric.auger@redhat.com>
 References: <20200320160932.27222-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -94,190 +94,240 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+In preparation for the introduction of nested stages
+let's turn s1_cfg and s2_cfg fields into pointers which are
+dynamically allocated depending on the smmu_domain stage.
 
-When handling faults from the event or PRI queue, we need to find the
-struct device associated to a SID. Add a rb_tree to keep track of SIDs.
+In nested mode, both stages will coexist and s1_cfg will
+be allocated when the guest configuration gets passed.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 112 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 111 insertions(+), 1 deletion(-)
+ drivers/iommu/arm-smmu-v3.c | 94 ++++++++++++++++++++-----------------
+ 1 file changed, 52 insertions(+), 42 deletions(-)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index a7222dd5b117..3d726e97934f 100644
+index 3d726e97934f..8b3083c5f27b 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -677,6 +677,16 @@ struct arm_smmu_device {
+@@ -719,10 +719,8 @@ struct arm_smmu_domain {
+ 	atomic_t			nr_ats_masters;
  
- 	/* IOMMU core code handle */
- 	struct iommu_device		iommu;
-+
-+	struct rb_root			streams;
-+	struct mutex			streams_mutex;
-+
-+};
-+
-+struct arm_smmu_stream {
-+	u32				id;
-+	struct arm_smmu_master		*master;
-+	struct rb_node			node;
- };
+ 	enum arm_smmu_domain_stage	stage;
+-	union {
+-		struct arm_smmu_s1_cfg	s1_cfg;
+-		struct arm_smmu_s2_cfg	s2_cfg;
+-	};
++	struct arm_smmu_s1_cfg		*s1_cfg;
++	struct arm_smmu_s2_cfg		*s2_cfg;
  
- /* SMMU private data for each master */
-@@ -687,6 +697,7 @@ struct arm_smmu_master {
- 	struct list_head		domain_head;
- 	u32				*sids;
- 	unsigned int			num_sids;
-+	struct arm_smmu_stream		*streams;
- 	bool				ats_enabled;
- 	unsigned int			ssid_bits;
- };
-@@ -1967,6 +1978,32 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
- 	return 0;
- }
+ 	struct iommu_domain		domain;
  
-+__maybe_unused
-+static struct arm_smmu_master *
-+arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
-+{
-+	struct rb_node *node;
-+	struct arm_smmu_stream *stream;
-+	struct arm_smmu_master *master = NULL;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	node = smmu->streams.rb_node;
-+	while (node) {
-+		stream = rb_entry(node, struct arm_smmu_stream, node);
-+		if (stream->id < sid) {
-+			node = node->rb_right;
-+		} else if (stream->id > sid) {
-+			node = node->rb_left;
-+		} else {
-+			master = stream->master;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return master;
-+}
-+
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
- {
-@@ -2912,6 +2949,69 @@ static bool arm_smmu_sid_in_range(struct arm_smmu_device *smmu, u32 sid)
- 	return sid < limit;
- }
+@@ -1598,9 +1596,9 @@ static __le64 *arm_smmu_get_cd_ptr(struct arm_smmu_domain *smmu_domain,
+ 	unsigned int idx;
+ 	struct arm_smmu_l1_ctx_desc *l1_desc;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg.cdcfg;
++	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg->cdcfg;
  
-+static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
-+				  struct arm_smmu_master *master)
-+{
-+	int i;
-+	int ret = 0;
-+	struct arm_smmu_stream *new_stream, *cur_stream;
-+	struct rb_node **new_node, *parent_node = NULL;
-+
-+	master->streams = kcalloc(master->num_sids,
-+				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
-+	if (!master->streams)
-+		return -ENOMEM;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < master->num_sids && !ret; i++) {
-+		new_stream = &master->streams[i];
-+		new_stream->id = master->sids[i];
-+		new_stream->master = master;
-+
-+		new_node = &(smmu->streams.rb_node);
-+		while (*new_node) {
-+			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
-+					      node);
-+			parent_node = *new_node;
-+			if (cur_stream->id > new_stream->id) {
-+				new_node = &((*new_node)->rb_left);
-+			} else if (cur_stream->id < new_stream->id) {
-+				new_node = &((*new_node)->rb_right);
-+			} else {
-+				dev_warn(master->dev,
-+					 "stream %u already in tree\n",
-+					 cur_stream->id);
-+				ret = -EINVAL;
-+				break;
-+			}
-+		}
-+
-+		if (!ret) {
-+			rb_link_node(&new_stream->node, parent_node, new_node);
-+			rb_insert_color(&new_stream->node, &smmu->streams);
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return ret;
-+}
-+
-+static void arm_smmu_remove_master(struct arm_smmu_device *smmu,
-+				   struct arm_smmu_master *master)
-+{
-+	int i;
-+
-+	if (!master->streams)
-+		return;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < master->num_sids; i++)
-+		rb_erase(&master->streams[i].node, &smmu->streams);
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	kfree(master->streams);
-+}
-+
- static struct iommu_ops arm_smmu_ops;
+-	if (smmu_domain->s1_cfg.s1fmt == STRTAB_STE_0_S1FMT_LINEAR)
++	if (smmu_domain->s1_cfg->s1fmt == STRTAB_STE_0_S1FMT_LINEAR)
+ 		return cdcfg->cdtab + ssid * CTXDESC_CD_DWORDS;
  
- static int arm_smmu_add_device(struct device *dev)
-@@ -2979,15 +3079,21 @@ static int arm_smmu_add_device(struct device *dev)
- 	if (ret)
- 		goto err_disable_pasid;
+ 	idx = ssid >> CTXDESC_SPLIT;
+@@ -1635,7 +1633,7 @@ static int arm_smmu_write_ctx_desc(struct arm_smmu_domain *smmu_domain,
+ 	__le64 *cdptr;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
  
-+	ret = arm_smmu_insert_master(smmu, master);
-+	if (ret)
-+		goto err_unlink;
-+
- 	group = iommu_group_get_for_dev(dev);
- 	if (IS_ERR(group)) {
- 		ret = PTR_ERR(group);
--		goto err_unlink;
-+		goto err_remove_master;
+-	if (WARN_ON(ssid >= (1 << smmu_domain->s1_cfg.s1cdmax)))
++	if (WARN_ON(ssid >= (1 << smmu_domain->s1_cfg->s1cdmax)))
+ 		return -E2BIG;
+ 
+ 	cdptr = arm_smmu_get_cd_ptr(smmu_domain, ssid);
+@@ -1700,7 +1698,7 @@ static int arm_smmu_alloc_cd_tables(struct arm_smmu_domain *smmu_domain)
+ 	size_t l1size;
+ 	size_t max_contexts;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
++	struct arm_smmu_s1_cfg *cfg = smmu_domain->s1_cfg;
+ 	struct arm_smmu_ctx_desc_cfg *cdcfg = &cfg->cdcfg;
+ 
+ 	max_contexts = 1 << cfg->s1cdmax;
+@@ -1748,7 +1746,7 @@ static void arm_smmu_free_cd_tables(struct arm_smmu_domain *smmu_domain)
+ 	int i;
+ 	size_t size, l1size;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg.cdcfg;
++	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg->cdcfg;
+ 
+ 	if (cdcfg->l1_desc) {
+ 		size = CTXDESC_L2_ENTRIES * (CTXDESC_CD_DWORDS << 3);
+@@ -1839,17 +1837,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
  	}
  
- 	iommu_group_put(group);
- 	return 0;
+ 	if (smmu_domain) {
+-		switch (smmu_domain->stage) {
+-		case ARM_SMMU_DOMAIN_S1:
+-			s1_cfg = &smmu_domain->s1_cfg;
+-			break;
+-		case ARM_SMMU_DOMAIN_S2:
+-		case ARM_SMMU_DOMAIN_NESTED:
+-			s2_cfg = &smmu_domain->s2_cfg;
+-			break;
+-		default:
+-			break;
+-		}
++		s1_cfg = smmu_domain->s1_cfg;
++		s2_cfg = smmu_domain->s2_cfg;
+ 	}
  
-+err_remove_master:
-+	arm_smmu_remove_master(smmu, master);
- err_unlink:
- 	iommu_device_unlink(&smmu->iommu, dev);
- err_disable_pasid:
-@@ -3011,6 +3117,7 @@ static void arm_smmu_remove_device(struct device *dev)
- 	smmu = master->smmu;
- 	arm_smmu_detach_dev(master);
- 	iommu_group_remove_device(dev);
-+	arm_smmu_remove_master(smmu, master);
- 	iommu_device_unlink(&smmu->iommu, dev);
- 	arm_smmu_disable_pasid(master);
- 	kfree(master);
-@@ -3365,6 +3472,9 @@ static int arm_smmu_init_structures(struct arm_smmu_device *smmu)
+ 	if (val & STRTAB_STE_0_V) {
+@@ -2286,11 +2275,11 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+-		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
+ 		cmd.tlbi.vmid	= 0;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+-		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+ 	}
+ 
+ 	/*
+@@ -2324,10 +2313,10 @@ static void arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
+ 
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+-		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+-		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+ 	}
+ 
+ 	if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+@@ -2477,22 +2466,24 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
  {
- 	int ret;
+ 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
++	struct arm_smmu_s1_cfg *s1_cfg = smmu_domain->s1_cfg;
++	struct arm_smmu_s2_cfg *s2_cfg = smmu_domain->s2_cfg;
  
-+	mutex_init(&smmu->streams_mutex);
-+	smmu->streams = RB_ROOT;
+ 	iommu_put_dma_cookie(domain);
+ 	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
+ 
+ 	/* Free the CD and ASID, if we allocated them */
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+-		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+-
+-		if (cfg->cdcfg.cdtab) {
++	if (s1_cfg) {
++		if (s1_cfg->cdcfg.cdtab) {
+ 			arm_smmu_free_cd_tables(smmu_domain);
+-			arm_smmu_bitmap_free(smmu->asid_map, cfg->cd.asid);
++			arm_smmu_bitmap_free(smmu->asid_map, s1_cfg->cd.asid);
+ 		}
+-	} else {
+-		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+-		if (cfg->vmid)
+-			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
++		kfree(s1_cfg);
++	}
++	if (s2_cfg) {
++		if (s2_cfg->vmid)
++			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
++		kfree(s2_cfg);
+ 	}
+ 
+ 	kfree(smmu_domain);
+@@ -2505,15 +2496,21 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
+ 	int ret;
+ 	int asid;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
++	struct arm_smmu_s1_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+ 	typeof(&pgtbl_cfg->arm_lpae_s1_cfg.tcr) tcr = &pgtbl_cfg->arm_lpae_s1_cfg.tcr;
+ 
++	if (!cfg)
++		return -ENOMEM;
 +
- 	ret = arm_smmu_init_queues(smmu);
+ 	asid = arm_smmu_bitmap_alloc(smmu->asid_map, smmu->asid_bits);
+-	if (asid < 0)
+-		return asid;
++	if (asid < 0) {
++		ret = asid;
++		goto out_free_cfg;
++	}
+ 
+ 	cfg->s1cdmax = master->ssid_bits;
+ 
++	smmu_domain->s1_cfg = cfg;
+ 	ret = arm_smmu_alloc_cd_tables(smmu_domain);
  	if (ret)
- 		return ret;
+ 		goto out_free_asid;
+@@ -2544,6 +2541,9 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
+ 	arm_smmu_free_cd_tables(smmu_domain);
+ out_free_asid:
+ 	arm_smmu_bitmap_free(smmu->asid_map, asid);
++out_free_cfg:
++	kfree(cfg);
++	smmu_domain->s1_cfg = NULL;
+ 	return ret;
+ }
+ 
+@@ -2551,14 +2551,19 @@ static int arm_smmu_domain_finalise_s2(struct arm_smmu_domain *smmu_domain,
+ 				       struct arm_smmu_master *master,
+ 				       struct io_pgtable_cfg *pgtbl_cfg)
+ {
+-	int vmid;
++	int vmid, ret;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
++	struct arm_smmu_s2_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+ 	typeof(&pgtbl_cfg->arm_lpae_s2_cfg.vtcr) vtcr;
+ 
++	if (!cfg)
++		return -ENOMEM;
++
+ 	vmid = arm_smmu_bitmap_alloc(smmu->vmid_map, smmu->vmid_bits);
+-	if (vmid < 0)
+-		return vmid;
++	if (vmid < 0) {
++		ret = vmid;
++		goto out_free_cfg;
++	}
+ 
+ 	vtcr = &pgtbl_cfg->arm_lpae_s2_cfg.vtcr;
+ 	cfg->vmid	= (u16)vmid;
+@@ -2570,7 +2575,12 @@ static int arm_smmu_domain_finalise_s2(struct arm_smmu_domain *smmu_domain,
+ 			  FIELD_PREP(STRTAB_STE_2_VTCR_S2SH0, vtcr->sh) |
+ 			  FIELD_PREP(STRTAB_STE_2_VTCR_S2TG, vtcr->tg) |
+ 			  FIELD_PREP(STRTAB_STE_2_VTCR_S2PS, vtcr->ps);
++	smmu_domain->s2_cfg = cfg;
+ 	return 0;
++
++out_free_cfg:
++	kfree(cfg);
++	return ret;
+ }
+ 
+ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+@@ -2848,10 +2858,10 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+ 		ret = -ENXIO;
+ 		goto out_unlock;
+ 	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1 &&
+-		   master->ssid_bits != smmu_domain->s1_cfg.s1cdmax) {
++		   master->ssid_bits != smmu_domain->s1_cfg->s1cdmax) {
+ 		dev_err(dev,
+ 			"cannot attach to incompatible domain (%u SSID bits != %u)\n",
+-			smmu_domain->s1_cfg.s1cdmax, master->ssid_bits);
++			smmu_domain->s1_cfg->s1cdmax, master->ssid_bits);
+ 		ret = -EINVAL;
+ 		goto out_unlock;
+ 	}
 -- 
 2.20.1
 
