@@ -2,80 +2,114 @@ Return-Path: <SRS0=NdW8=5F=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05117C4332B
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 09:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 655B8C4332E
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 09:26:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AEFE620739
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 09:25:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD71820739
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 09:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWw8R5oh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEFE620739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tbq+fbIO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD71820739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 697F24A4A9;
-	Fri, 20 Mar 2020 05:25:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 596584A4A3;
+	Fri, 20 Mar 2020 05:26:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lR8fp2R+TYYX; Fri, 20 Mar 2020 05:25:45 -0400 (EDT)
+	with ESMTP id xxr5S7JmUL0j; Fri, 20 Mar 2020 05:26:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D7934A534;
-	Fri, 20 Mar 2020 05:25:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58F964A534;
+	Fri, 20 Mar 2020 05:26:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D5D34B08A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 05:25:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27DA94A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 05:26:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vwtiOo+Cltd8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Mar 2020 05:25:42 -0400 (EDT)
-Received: from us-smtp-delivery-74.mimecast.com
- (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E494A4A9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 05:25:42 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584696342;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a5t+K99nOllz6/nKHgn1LHqrPr5sxfTVf2PPG+27oSQ=;
- b=fWw8R5oh8VulmNcr/Sav5pjNBNhHAyK06olHPFhiV1G3o58cuu7NESX8ouVktPHRnY0E8o
- vqUH2zKNsEOrFq7ZhxO8SpGsJGO0OgT0y9ChqpzrzykDtJYM4Cer32e7Mb9728BXYl6pNH
- XbmitK53osmgVPUHix3yeoxxqwJf2II=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-vLEtzNdIOh6WSnEv-oVOsA-1; Fri, 20 Mar 2020 05:25:40 -0400
-X-MC-Unique: vLEtzNdIOh6WSnEv-oVOsA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CA15DB60;
- Fri, 20 Mar 2020 09:25:39 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 744D95C1D8;
- Fri, 20 Mar 2020 09:25:33 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-Date: Fri, 20 Mar 2020 10:24:28 +0100
-Message-Id: <20200320092428.20880-14-eric.auger@redhat.com>
-In-Reply-To: <20200320092428.20880-1-eric.auger@redhat.com>
-References: <20200320092428.20880-1-eric.auger@redhat.com>
+ with ESMTP id qbRC8qCg0kZg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2020 05:26:54 -0400 (EDT)
+Received: from mail-lj1-f194.google.com (mail-lj1-f194.google.com
+ [209.85.208.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D87F74A49F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 05:26:53 -0400 (EDT)
+Received: by mail-lj1-f194.google.com with SMTP id a2so5641959ljk.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 02:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Xb2+TkejQMyeRgV2FN7crNaJyjiX8rMU6p7e/O+WXs0=;
+ b=tbq+fbIOQCPDoIaCZyKPTLUNOGRkJRUrZkJZAQgonMZpLrWXjWX7Qtc+As8KQ5LXdG
+ sTWgnaH15HiCIBzv4PNxsm/oEkGNFwjnF3FFhpvXSm2a0Cxoxbi+DZihSyN5j3+h8RZA
+ UJfIbNdNm5vzWcpNFnkp8nIYwubgVmtCTwheuBGl5A1KEQZR2w4QGAul1X4jx6ilWgqq
+ e7W+zpYkxhoss0ivMVNoGTH87T4HRNDcMqQ9J+tvCiQOWHZa8Eiqjd0kgx0tQ864WYn9
+ jAXVKp5AI3xJmdEDtOJgME9RmxQvtjMvVByhDfeX3DY3a7HmxlcC82UHbIwmjWXnUIH0
+ Y5uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Xb2+TkejQMyeRgV2FN7crNaJyjiX8rMU6p7e/O+WXs0=;
+ b=NOHqiBx5RUlZYGDlHGG51bWCOeeE3rhc80uirgOkyZXUeqJ+kYkfWC5br/LjHSxUz6
+ lkMxBk9C9UASiJeuA02k2bsITtZFrf0hD/DxJWtyF7i6RfwoEILdU7z3J3Cvv6EOxRY1
+ rBg9eKIUP63GWR8uSl+dsjZMoXqiqQJCPiCYXWGIq6WupZscooy1vZpsWyJbNLmlCViT
+ 1tZ6gMMxKODLAFYNFtnMbyPnvHQ16lqc0ExY5w0hZLsOTF//Vy7IU22cyKNHDGr5rRyK
+ SjTzpSZM30jTC6nZZJl/RlCJdfmqTJKxznkse6luOe4u1hcCU7fEF5+urJtTwiciRS2X
+ NUdQ==
+X-Gm-Message-State: ANhLgQ1SAK+MRbRWRqjGju+mZV3dn4H3ftBUm/K4Jd2i6S56lp2rm25q
+ ymSUhfL+9PMVhVZh+2IYRXpobI9qfR2VbOFlpoucmw==
+X-Google-Smtp-Source: ADFU+vtuJ0t8Nqq40yxEBdJE/UuZY+X1aSolICR4o1I8kWzUt2hZ40fB2rvEyc9S2cEgGGbq33gRugkfewIJCU8F73I=
+X-Received: by 2002:a2e:8ecf:: with SMTP id e15mr4982788ljl.223.1584696412508; 
+ Fri, 20 Mar 2020 02:26:52 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: andre.przywara@arm.com, thuth@redhat.com
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <20191114181243.q37rxoo3seds6oxy@pengutronix.de>
+ <7322163f-e08e-a6b7-b143-e9d59917ee5b@gmail.com>
+ <20191115070842.2x7psp243nfo76co@pengutronix.de>
+ <20191115114416.ba6lmwb7q4gmepzc@pengutronix.de>
+ <60bda4a9-f4f8-3641-2612-17fab3173b29@gmail.com>
+ <CACRpkdYJR3gQCb4WXwF4tGzk+tT7jMcV9=nDK0PFkeh+0G11bA@mail.gmail.com>
+ <2639dfb0-9e48-cc0f-27e5-34308f790293@gmail.com>
+ <CACRpkdZ8JA=DXOxzYwyvBxCMd2Q5uzLTn87AVK7wdrxHFo5ydQ@mail.gmail.com>
+ <20200305094328.sizz4vm4wamywdct@pengutronix.de>
+In-Reply-To: <20200305094328.sizz4vm4wamywdct@pengutronix.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 20 Mar 2020 10:26:40 +0100
+Message-ID: <CACRpkdYzSZY0r=YYiosvi2CA7mia5oiXAWUkbYSqjU1PZ_6w=g@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Marco Felsch <m.felsch@pengutronix.de>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Florian Fainelli <f.fainelli@gmail.com>, Rob Landley <rob@landley.net>,
+ Jonathan Corbet <corbet@lwn.net>, Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, philip@cog.systems,
+ Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Dmitry Vyukov <dvyukov@google.com>, Nicolas Pitre <nico@fluxnic.net>,
+ Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Sascha Hauer <kernel@pengutronix.de>,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,255 +126,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add two new migration tests. One testing the migration of
-a topology where collection were unmapped. The second test
-checks the migration of the pending table.
+On Thu, Mar 5, 2020 at 10:44 AM Marco Felsch <m.felsch@pengutronix.de> wrote:
+> On 20-03-05 09:43, Linus Walleij wrote:
+> > Hi Florian,
+> >
+> > On Fri, Jan 17, 2020 at 8:55 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
+> >
+> > > Let me submit and rebase v7 get the auto builders some days to see if it
+> > > exposes a new build issue and then we toss it to RMK's patch tracker and
+> > > fix bugs from there?
+> >
+> > Sorry for hammering, can we get some initial patches going into
+> > Russell's patch tracker here? I can sign them off and put them in
+> > if you don't have time.
+>
+> I've tested the branch on several imx6 based boards with different
+> toolchains. Some boards booting normal and some of them are lost in
+> space... I didn't debugged it yet just wanted to inform you.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Hm. I will bring up the KASan stack on more boards.
 
----
+If the system is anywhere close to being low on memory they
+will naturally crash, this is an unavoidable side effect of KASan
+or anything else that just chew of a big chunk of memory, that I ran into,
+as I was booting from initramfs on very memory
+constrained systems.
 
-v6 -> v7:
-- test_migrate_unmapped_collection now uses pe0=0. Otherwise,
-  depending on SMP value it collides with collections created
-  by setup1()
-- use of for_each_present_cpu
-
-v5 -> v6:
-- s/Set the PTZ/Clear the PTZ
-- Move the collection inval after MAPC
-- remove the unmap collection test
-
-v4 -> v5:
-- move stub from header to arm/gic.c
-
-v3 -> v4:
-- do not talk about odd/even CPUs, use pe0 and pe1
-- comment the delay
-
-v2 -> v3:
-- tests belong to both its and migration groups
-- use LPI(i)
-- gicv3_lpi_set_pending_table_bit renamed into gicv3_lpi_set_clr_pending
----
- arm/gic.c         | 138 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  16 ++++++
- 2 files changed, 154 insertions(+)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index 6ecfdbc..2c661dc 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -193,6 +193,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
- 	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
- 	lpi_stats.observed.cpu_id = smp_processor_id();
- 	lpi_stats.observed.lpi_id = irqnr;
-+	acked[lpi_stats.observed.cpu_id]++;
- 	smp_wmb(); /* pairs with rmb in check_lpi_stats */
- }
- 
-@@ -236,6 +237,22 @@ static void secondary_lpi_test(void)
- 	while (1)
- 		wfi();
- }
-+
-+static void check_lpi_hits(int *expected, const char *msg)
-+{
-+	bool pass = true;
-+	int i;
-+
-+	for_each_present_cpu(i) {
-+		if (acked[i] != expected[i]) {
-+			report_info("expected %d LPIs on PE #%d, %d observed",
-+				    expected[i], i, acked[i]);
-+			pass = false;
-+			break;
-+		}
-+	}
-+	report(pass, "%s", msg);
-+}
- #endif
- 
- static void gicv2_ipi_send_self(void)
-@@ -591,6 +608,8 @@ static void gic_test_mmio(void)
- static void test_its_introspection(void) {}
- static void test_its_trigger(void) {}
- static void test_its_migration(void) {}
-+static void test_its_pending_migration(void) {}
-+static void test_migrate_unmapped_collection(void) {}
- 
- #else /* __aarch64__ */
- 
-@@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
- 
-+static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-+		    struct its_collection *col)
-+{
-+	assert(dev && col);
-+
-+	its_send_mapti(dev, physid, eventid, col);
-+	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-+}
-+
- /*
-  * Setup the configuration for those mappings:
-  * dev_id=2 event=20 -> vcpu 3, intid=8195
-@@ -790,6 +818,108 @@ static void test_its_migration(void)
- 	its_send_int(dev7, 255);
- 	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
- }
-+
-+static void test_migrate_unmapped_collection(void)
-+{
-+	struct its_collection *col;
-+	struct its_device *dev2, *dev7;
-+	int pe0 = 0;
-+	u8 config;
-+
-+	if (its_setup1())
-+		return;
-+
-+	col = its_create_collection(pe0, pe0);
-+	dev2 = its_get_device(2);
-+	dev7 = its_get_device(7);
-+
-+	/* MAPTI with the collection unmapped */
-+	set_lpi(dev2, 0, 8192, col);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
-+
-+	/* on the destination, map the collection */
-+	its_send_mapc(col, true);
-+	its_send_invall(col);
-+
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
-+
-+	config = gicv3_lpi_get_config(8192);
-+	report(config == LPI_PROP_DEFAULT,
-+	       "Config of LPI 8192 was properly migrated");
-+
-+	lpi_stats_expect(pe0, 8192);
-+	its_send_int(dev2, 0);
-+	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
-+}
-+
-+static void test_its_pending_migration(void)
-+{
-+	struct its_device *dev;
-+	struct its_collection *collection[2];
-+	int *expected = malloc(nr_cpus * sizeof(int));
-+	int pe0 = nr_cpus - 1, pe1 = nr_cpus - 2;
-+	u64 pendbaser;
-+	void *ptr;
-+	int i;
-+
-+	if (its_prerequisites(4))
-+		return;
-+
-+	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-+	its_send_mapd(dev, true);
-+
-+	collection[0] = its_create_collection(pe0, pe0);
-+	collection[1] = its_create_collection(pe1, pe1);
-+	its_send_mapc(collection[0], true);
-+	its_send_mapc(collection[1], true);
-+
-+	/* disable lpi at redist level */
-+	gicv3_lpi_rdist_disable(pe0);
-+	gicv3_lpi_rdist_disable(pe1);
-+
-+	/* lpis are interleaved inbetween the 2 PEs */
-+	for (i = 0; i < 256; i++) {
-+		struct its_collection *col = i % 2 ? collection[0] :
-+						     collection[1];
-+		int vcpu = col->target_address >> 16;
-+
-+		its_send_mapti(dev, LPI(i), i, col);
-+		gicv3_lpi_set_config(LPI(i), LPI_PROP_DEFAULT);
-+		gicv3_lpi_set_clr_pending(vcpu, LPI(i), true);
-+	}
-+	its_send_invall(collection[0]);
-+	its_send_invall(collection[1]);
-+
-+	/* Clear the PTZ bit on each pendbaser */
-+
-+	expected[pe0] = 128;
-+	expected[pe1] = 128;
-+
-+	ptr = gicv3_data.redist_base[pe0] + GICR_PENDBASER;
-+	pendbaser = readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	ptr = gicv3_data.redist_base[pe1] + GICR_PENDBASER;
-+	pendbaser = readq(ptr);
-+	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-+
-+	gicv3_lpi_rdist_enable(pe0);
-+	gicv3_lpi_rdist_enable(pe1);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
-+
-+	/* let's wait for the 256 LPIs to be handled */
-+	mdelay(1000);
-+
-+	check_lpi_hits(expected, "128 LPIs on both PE0 and PE1 after migration");
-+}
- #endif
- 
- int main(int argc, char **argv)
-@@ -831,6 +961,14 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_migration();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-pending-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_pending_migration();
-+		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-+		report_prefix_push(argv[1]);
-+		test_migrate_unmapped_collection();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") == 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 480adec..b96f0a1 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -144,6 +144,22 @@ extra_params = -machine gic-version=3 -append 'its-migration'
- groups = its migration
- arch = arm64
- 
-+[its-pending-migration]
-+file = gic.flat
-+smp = $MAX_SMP
-+accel = kvm
-+extra_params = -machine gic-version=3 -append 'its-pending-migration'
-+groups = its migration
-+arch = arm64
-+
-+[its-migrate-unmapped-collection]
-+file = gic.flat
-+smp = $MAX_SMP
-+accel = kvm
-+extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-+groups = its migration
-+arch = arm64
-+
- # Test PSCI emulation
- [psci]
- file = psci.flat
--- 
-2.20.1
-
+Yours,
+Linus Walleij
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
