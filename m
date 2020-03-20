@@ -4,66 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98507C4332B
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BE3C43333
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5673920775
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6218920782
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 18:51:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xRywJMOc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5673920775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xtjCKHEK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6218920782
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFE934B09B;
-	Fri, 20 Mar 2020 14:51:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD844B0B1;
+	Fri, 20 Mar 2020 14:51:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1pqhQm6Ls0kj; Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
+	with ESMTP id o-iqK6cQM5YM; Fri, 20 Mar 2020 14:51:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C60F04B0B4;
-	Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D994B0B5;
+	Fri, 20 Mar 2020 14:51:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49F2D4B09B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CBEC4A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XwKGQ2r3qEyE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Mar 2020 14:51:07 -0400 (EDT)
+ with ESMTP id SNKedXk1-exZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2020 14:51:09 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D37CC4B0AB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E329A4B0D1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2020 14:51:08 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0D9F220782;
- Fri, 20 Mar 2020 18:51:06 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E6E3E20784;
+ Fri, 20 Mar 2020 18:51:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1584730266;
- bh=EWeIoPIU5pLdBJ+TnbGihaGZ67SAvlzjvyRxT2kCXUQ=;
+ s=default; t=1584730268;
+ bh=pNoFPXIj2ETz1tZjIWZDHdqC7T92YYDtCjMix50dI7s=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=xRywJMOcARzfVMSMVWzxClwxpGtzjMFwmKOMKNpmdjuLWc+Cgn2Hu3ZpBS7mWXMqg
- hBr0nBpBbNJ3jOqyJjNiIx+kjeuY22JcPX3Q3rwq2rYhg3Pm9kPXoPgjgARvriJbRc
- U3Woic7hqdyDnCmV6qkS6DDg4+S35/Cei+yqNFHE=
+ b=xtjCKHEKkLg+Cymtu4RaWDUU7WMF4faohptSeA/ejHcCH4xTJf8f29XVDOVWQA0Py
+ HIzTIgT4u0vhbkoMDI9XezWaGJ1bKkV0aTM0YlndE12/agDBK2nT1gW/MaCNu4LLJv
+ DOIVO+7XUflo0ikf2b1huVtpRmiMjk0FM6B1PiWQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jFMKA-00EKAx-7T; Fri, 20 Mar 2020 18:24:50 +0000
+ id 1jFMK6-00EKAx-2I; Fri, 20 Mar 2020 18:24:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
- selection in the distributor
-Date: Fri, 20 Mar 2020 18:24:03 +0000
-Message-Id: <20200320182406.23465-21-maz@kernel.org>
+Subject: [PATCH v6 16/23] irqchip/gic-v4.1: Eagerly vmap vPEs
+Date: Fri, 20 Mar 2020 18:23:59 +0000
+Message-Id: <20200320182406.23465-17-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200320182406.23465-1-maz@kernel.org>
 References: <20200320182406.23465-1-maz@kernel.org>
@@ -95,141 +94,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The GICv4.1 architecture gives the hypervisor the option to let
-the guest choose whether it wants the good old SGIs with an
-active state, or the new, HW-based ones that do not have one.
-
-For this, plumb the configuration of SGIs into the GICv3 MMIO
-handling, present the GICD_TYPER2.nASSGIcap to the guest,
-and handle the GICD_CTLR.nASSGIreq setting.
-
-In order to be able to deal with the restore of a guest, also
-apply the GICD_CTLR.nASSGIreq setting at first run so that we
-can move the restored SGIs to the HW if that's what the guest
-had selected in a previous life.
+Now that we have HW-accelerated SGIs being delivered to VPEs, it
+becomes required to map the VPEs on all ITSs instead of relying
+on the lazy approach that we would use when using the ITS-list
+mechanism.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Link: https://lore.kernel.org/r/20200304203330.4967-21-maz@kernel.org
+Link: https://lore.kernel.org/r/20200304203330.4967-17-maz@kernel.org
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 49 ++++++++++++++++++++++++++++++--
- virt/kvm/arm/vgic/vgic-v3.c      |  2 ++
- 2 files changed, 49 insertions(+), 2 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 52 ++++++++++++++++++++++++++------
+ 1 file changed, 42 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index f4da9d1a6bff..905032a03886 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -3,6 +3,7 @@
-  * VGICv3 MMIO handling functions
-  */
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 7ad46ff5f0b9..039a1429da07 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -189,6 +189,15 @@ static DEFINE_IDA(its_vpeid_ida);
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
  
-+#include <linux/bitfield.h>
- #include <linux/irqchip/arm-gic-v3.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-@@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 		if (vgic->enabled)
- 			value |= GICD_CTLR_ENABLE_SS_G1;
- 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-+		if (vgic->nassgireq)
-+			value |= GICD_CTLR_nASSGIreq;
- 		break;
- 	case GICD_TYPER:
- 		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
-@@ -81,6 +84,10 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 			value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
- 		}
- 		break;
-+	case GICD_TYPER2:
-+		if (kvm_vgic_global_state.has_gicv4_1)
-+			value = GICD_TYPER2_nASSGIcap;
-+		break;
- 	case GICD_IIDR:
- 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
- 			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
-@@ -98,17 +105,43 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 				    unsigned long val)
++/*
++ * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
++ * always have vSGIs mapped.
++ */
++static bool require_its_list_vmovp(struct its_vm *vm, struct its_node *its)
++{
++	return (gic_rdists->has_rvpeid || vm->vlpi_count[its->list_nr]);
++}
++
+ static u16 get_its_list(struct its_vm *vm)
  {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--	bool was_enabled = dist->enabled;
+ 	struct its_node *its;
+@@ -198,7 +207,7 @@ static u16 get_its_list(struct its_vm *vm)
+ 		if (!is_v4(its))
+ 			continue;
  
- 	switch (addr & 0x0c) {
--	case GICD_CTLR:
-+	case GICD_CTLR: {
-+		bool was_enabled, is_hwsgi;
-+
-+		mutex_lock(&vcpu->kvm->lock);
-+
-+		was_enabled = dist->enabled;
-+		is_hwsgi = dist->nassgireq;
-+
- 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
- 
-+		/* Not a GICv4.1? No HW SGIs */
-+		if (!kvm_vgic_global_state.has_gicv4_1)
-+			val &= ~GICD_CTLR_nASSGIreq;
-+
-+		/* Dist stays enabled? nASSGIreq is RO */
-+		if (was_enabled && dist->enabled) {
-+			val &= ~GICD_CTLR_nASSGIreq;
-+			val |= FIELD_PREP(GICD_CTLR_nASSGIreq, is_hwsgi);
-+		}
-+
-+		/* Switching HW SGIs? */
-+		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
-+		if (is_hwsgi != dist->nassgireq)
-+			vgic_v4_configure_vsgis(vcpu->kvm);
-+
- 		if (!was_enabled && dist->enabled)
- 			vgic_kick_vcpus(vcpu->kvm);
-+
-+		mutex_unlock(&vcpu->kvm->lock);
- 		break;
-+	}
- 	case GICD_TYPER:
-+	case GICD_TYPER2:
- 	case GICD_IIDR:
-+		/* This is at best for documentation purposes... */
- 		return;
+-		if (vm->vlpi_count[its->list_nr])
++		if (require_its_list_vmovp(vm, its))
+ 			__set_bit(its->list_nr, &its_list);
  	}
+ 
+@@ -1295,7 +1304,7 @@ static void its_send_vmovp(struct its_vpe *vpe)
+ 		if (!is_v4(its))
+ 			continue;
+ 
+-		if (!vpe->its_vm->vlpi_count[its->list_nr])
++		if (!require_its_list_vmovp(vpe->its_vm, its))
+ 			continue;
+ 
+ 		desc.its_vmovp_cmd.col = &its->collections[col_id];
+@@ -1586,12 +1595,31 @@ static int its_irq_set_irqchip_state(struct irq_data *d,
+ 	return 0;
  }
-@@ -117,10 +150,22 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 					   gpa_t addr, unsigned int len,
- 					   unsigned long val)
+ 
++/*
++ * Two favourable cases:
++ *
++ * (a) Either we have a GICv4.1, and all vPEs have to be mapped at all times
++ *     for vSGI delivery
++ *
++ * (b) Or the ITSs do not use a list map, meaning that VMOVP is cheap enough
++ *     and we're better off mapping all VPEs always
++ *
++ * If neither (a) nor (b) is true, then we map vPEs on demand.
++ *
++ */
++static bool gic_requires_eager_mapping(void)
++{
++	if (!its_list_map || gic_rdists->has_rvpeid)
++		return true;
++
++	return false;
++}
++
+ static void its_map_vm(struct its_node *its, struct its_vm *vm)
  {
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+
- 	switch (addr & 0x0c) {
-+	case GICD_TYPER2:
- 	case GICD_IIDR:
- 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
- 			return -EINVAL;
-+		return 0;
-+	case GICD_CTLR:
-+		/* Not a GICv4.1? No HW SGIs */
-+		if (!kvm_vgic_global_state.has_gicv4_1)
-+			val &= ~GICD_CTLR_nASSGIreq;
-+
-+		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
-+		dist->nassgireq = val & GICD_CTLR_nASSGIreq;
-+		return 0;
- 	}
+ 	unsigned long flags;
  
- 	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 1bc09b523486..2c9fc13e2c59 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -540,6 +540,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		goto out;
- 	}
+-	/* Not using the ITS list? Everything is always mapped. */
+-	if (!its_list_map)
++	if (gic_requires_eager_mapping())
+ 		return;
  
-+	if (kvm_vgic_global_state.has_gicv4_1)
-+		vgic_v4_configure_vsgis(kvm);
- 	dist->ready = true;
+ 	raw_spin_lock_irqsave(&vmovp_lock, flags);
+@@ -1625,7 +1653,7 @@ static void its_unmap_vm(struct its_node *its, struct its_vm *vm)
+ 	unsigned long flags;
  
- out:
+ 	/* Not using the ITS list? Everything is always mapped. */
+-	if (!its_list_map)
++	if (gic_requires_eager_mapping())
+ 		return;
+ 
+ 	raw_spin_lock_irqsave(&vmovp_lock, flags);
+@@ -4282,8 +4310,12 @@ static int its_vpe_irq_domain_activate(struct irq_domain *domain,
+ 	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+ 	struct its_node *its;
+ 
+-	/* If we use the list map, we issue VMAPP on demand... */
+-	if (its_list_map)
++	/*
++	 * If we use the list map, we issue VMAPP on demand... Unless
++	 * we're on a GICv4.1 and we eagerly map the VPE on all ITSs
++	 * so that VSGIs can work.
++	 */
++	if (!gic_requires_eager_mapping())
+ 		return 0;
+ 
+ 	/* Map the VPE to the first possible CPU */
+@@ -4309,10 +4341,10 @@ static void its_vpe_irq_domain_deactivate(struct irq_domain *domain,
+ 	struct its_node *its;
+ 
+ 	/*
+-	 * If we use the list map, we unmap the VPE once no VLPIs are
+-	 * associated with the VM.
++	 * If we use the list map on GICv4.0, we unmap the VPE once no
++	 * VLPIs are associated with the VM.
+ 	 */
+-	if (its_list_map)
++	if (!gic_requires_eager_mapping())
+ 		return;
+ 
+ 	list_for_each_entry(its, &its_nodes, entry) {
 -- 
 2.20.1
 
