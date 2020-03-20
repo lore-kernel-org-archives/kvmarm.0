@@ -1,90 +1,67 @@
-Return-Path: <SRS0=Wnhb=5E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=NdW8=5F=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C52C4332B
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 20:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4706C4332E
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 02:31:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2BDFB20777
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Mar 2020 20:38:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BM6t8CL/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BDFB20777
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 2CBEC2051A
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Mar 2020 02:31:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CBEC2051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B414B093;
-	Thu, 19 Mar 2020 16:38:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D8514A4FC;
+	Thu, 19 Mar 2020 22:31:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EI-lQWvFqspp; Thu, 19 Mar 2020 16:38:53 -0400 (EDT)
+	with ESMTP id GigXwE2H1xQl; Thu, 19 Mar 2020 22:31:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B6BB4B094;
-	Thu, 19 Mar 2020 16:38:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ACB44A534;
+	Thu, 19 Mar 2020 22:31:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF2CB4A524
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 16:38:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DD624A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 22:31:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tdJEfByGYVKB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Mar 2020 16:38:50 -0400 (EDT)
-Received: from us-smtp-delivery-74.mimecast.com
- (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C88334A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 16:38:50 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584650330;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uShTuto7PeNwwk0OxuI8oVZpBKc3YZzPGr0sD1pMJCE=;
- b=BM6t8CL//aO2riviIg4quLXsT27IWskLvohYeDr9AUUjoXqemlGSSpNzQ5CJEUA8ys1N+e
- ISAn9J2JimOyu/flxEECUgt6ZTrZ7xExtQGUq7FWh4g7z7/EIY2w5bcz8IN+qn9ks3j89V
- 2yR5V7yC2zRIYu0lddJU3E2ZLNOEB3o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-iwln2pr0NWmBbDRRtDVBdA-1; Thu, 19 Mar 2020 16:38:48 -0400
-X-MC-Unique: iwln2pr0NWmBbDRRtDVBdA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D355189F781;
- Thu, 19 Mar 2020 20:38:46 +0000 (UTC)
-Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CD8B11036B46;
- Thu, 19 Mar 2020 20:38:42 +0000 (UTC)
-Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
- selection in the distributor
-To: Marc Zyngier <maz@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id IdjE7YAaW1et for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Mar 2020 22:31:35 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B22B64A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2020 22:31:34 -0400 (EDT)
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 2AC509635A3A5CBCEBBC;
+ Fri, 20 Mar 2020 10:31:31 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Fri, 20 Mar 2020
+ 10:31:22 +0800
+Subject: Re: [PATCH v5 16/23] irqchip/gic-v4.1: Eagerly vmap vPEs
+To: Marc Zyngier <maz@kernel.org>
 References: <20200304203330.4967-1-maz@kernel.org>
- <20200304203330.4967-21-maz@kernel.org>
- <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
- <4a06fae9c93e10351276d173747d17f4@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <49995ec9-3970-1f62-5dfc-118563ca00fc@redhat.com>
-Date: Thu, 19 Mar 2020 21:38:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ <20200304203330.4967-17-maz@kernel.org>
+ <2817cb89-4cc2-549f-6e40-91d941aa8a5f@huawei.com>
+ <d45e7ddfd51d4d8229e02efc42c8da04@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <2f667113-8241-dce6-0a5e-3acb5ef9cf7f@huawei.com>
+Date: Fri, 20 Mar 2020 10:31:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <4a06fae9c93e10351276d173747d17f4@kernel.org>
+In-Reply-To: <d45e7ddfd51d4d8229e02efc42c8da04@kernel.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Robert Richter <rrichter@marvell.com>,
- Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ linux-kernel@vger.kernel.org, Robert
+ Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,162 +73,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-On 3/19/20 1:10 PM, Marc Zyngier wrote:
-> Hi Zenghui,
-> =
-
-> On 2020-03-18 06:34, Zenghui Yu wrote:
->> Hi Marc,
->>
->> On 2020/3/5 4:33, Marc Zyngier wrote:
->>> The GICv4.1 architecture gives the hypervisor the option to let
->>> the guest choose whether it wants the good old SGIs with an
->>> active state, or the new, HW-based ones that do not have one.
->>>
->>> For this, plumb the configuration of SGIs into the GICv3 MMIO
->>> handling, present the GICD_TYPER2.nASSGIcap to the guest,
->>> and handle the GICD_CTLR.nASSGIreq setting.
->>>
->>> In order to be able to deal with the restore of a guest, also
->>> apply the GICD_CTLR.nASSGIreq setting at first run so that we
->>> can move the restored SGIs to the HW if that's what the guest
->>> had selected in a previous life.
->>
->> I'm okay with the restore path.=A0 But it seems that we still fail to
->> save the pending state of vSGI - software pending_latch of HW-based
->> vSGIs will not be updated (and always be false) because we directly
->> inject them through ITS, so vgic_v3_uaccess_read_pending() can't
->> tell the correct pending state to user-space (the correct one should
->> be latched in HW).
->>
->> It would be good if we can sync the hardware state into pending_latch
->> at an appropriate time (just before save), but not sure if we can...
-> =
-
-> The problem is to find the "appropriate time". It would require to define
-> a point in the save sequence where we transition the state from HW to
-> SW. I'm not keen on adding more state than we already have.
-
-may be we could use a dedicated device group/attr as we have for the ITS
-save tables? the user space would choose.
-
-Thanks
-
-Eric
-> =
-
-> But what we can do is to just ask the HW to give us the right state
-> on userspace access, at all times. How about this:
-> =
-
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 48fd9fc229a2..281fe7216c59 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -305,8 +305,18 @@ static unsigned long
-> vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> =A0=A0=A0=A0=A0 */
-> =A0=A0=A0=A0 for (i =3D 0; i < len * 8; i++) {
-> =A0=A0=A0=A0=A0=A0=A0=A0 struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm,=
- vcpu, intid + i);
-> +=A0=A0=A0=A0=A0=A0=A0 bool state =3D irq->pending_latch;
-> =
-
-> -=A0=A0=A0=A0=A0=A0=A0 if (irq->pending_latch)
-> +=A0=A0=A0=A0=A0=A0=A0 if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int err;
-> +
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 err =3D irq_get_irqchip_state(irq->hos=
-t_irq,
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0 IRQCHIP_STATE_PENDING,
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0 &state);
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARN_ON(err);
-> +=A0=A0=A0=A0=A0=A0=A0 }
-> +
-> +=A0=A0=A0=A0=A0=A0=A0 if (state)
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D (1U << i);
-> =
-
-> =A0=A0=A0=A0=A0=A0=A0=A0 vgic_put_irq(vcpu->kvm, irq);
-> =
-
-> I can add this to "KVM: arm64: GICv4.1: Add direct injection capability
-> to SGI registers".
-> =
-
->>
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>> =A0 virt/kvm/arm/vgic/vgic-mmio-v3.c | 48 +++++++++++++++++++++++++++++=
-+--
->>> =A0 virt/kvm/arm/vgic/vgic-v3.c=A0=A0=A0=A0=A0 |=A0 2 ++
->>> =A0 2 files changed, 48 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> index de89da76a379..442f3b8c2559 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> @@ -3,6 +3,7 @@
->>> =A0=A0 * VGICv3 MMIO handling functions
->>> =A0=A0 */
->>> =A0 +#include <linux/bitfield.h>
->>> =A0 #include <linux/irqchip/arm-gic-v3.h>
->>> =A0 #include <linux/kvm.h>
->>> =A0 #include <linux/kvm_host.h>
->>> @@ -70,6 +71,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct
->>> kvm_vcpu *vcpu,
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 if (vgic->enabled)
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ENABLE_SS_=
-G1;
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 value |=3D GICD_CTLR_ARE_NS | GICD_CTLR_DS;
->>> +=A0=A0=A0=A0=A0=A0=A0 if (kvm_vgic_global_state.has_gicv4_1 && vgic->n=
-assgireq)
->>
->> Looking at how we handle the GICD_CTLR.nASSGIreq setting, I think
->> "nassgireq=3D=3Dtrue" already indicates "has_gicv4_1=3D=3Dtrue".=A0 So t=
-his
->> can be simplified.
-> =
-
-> Indeed. I've now dropped the has_gicv4.1 check.
-> =
-
->> But I wonder that should we use nassgireq to *only* keep track what
->> the guest had written into the GICD_CTLR.nASSGIreq.=A0 If not, we may
->> lose the guest-request bit after migration among hosts with different
->> has_gicv4_1 settings.
-> =
-
-> I'm unsure of what you're suggesting here. If userspace tries to set
-> GICD_CTLR.nASSGIreq on a non-4.1 host, this bit will not latch.
-> Userspace can check that at restore time. Or we could fail the
-> userspace write, which is a bit odd (the bit is otherwise RES0).
-> =
-
-> Could you clarify your proposal?
-> =
-
->> The remaining patches all look good to me :-). I will wait for you to
->> confirm these two concerns.
-> =
-
-> Thanks,
-> =
-
-> =A0=A0=A0=A0=A0=A0=A0 M.
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMy8xOSAxODo1NSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDIw
+MjAtMDMtMTcgMDI6NDksIFplbmdodWkgWXUgd3JvdGU6Cj4+IEhpIE1hcmMsCj4+Cj4+IE9uIDIw
+MjAvMy81IDQ6MzMsIE1hcmMgWnluZ2llciB3cm90ZToKPj4+IE5vdyB0aGF0IHdlIGhhdmUgSFct
+YWNjZWxlcmF0ZWQgU0dJcyBiZWluZyBkZWxpdmVyZWQgdG8gVlBFcywgaXQKPj4+IGJlY29tZXMg
+cmVxdWlyZWQgdG8gbWFwIHRoZSBWUEVzIG9uIGFsbCBJVFNzIGluc3RlYWQgb2YgcmVseWluZwo+
+Pj4gb24gdGhlIGxhenkgYXBwcm9hY2ggdGhhdCB3ZSB3b3VsZCB1c2Ugd2hlbiB1c2luZyB0aGUg
+SVRTLWxpc3QKPj4+IG1lY2hhbmlzbS4KPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdp
+ZXIgPG1hekBrZXJuZWwub3JnPgo+Pgo+PiBCZWZvcmUgR0lDdjQuMSwgd2UgdXNlIHZscGlfY291
+bnQgdG8gZXZhbHVhdGUgd2hldGhlciB0aGUgdlBFIGhhcyBiZWVuCj4+IG1hcHBlZCBvbiB0aGUg
+c3BlY2lmaWVkIElUUywgYW5kIHVzZSB0aGlzIHJlZmNvdW50IHRvIG9ubHkgaXNzdWUgVk1PVlAK
+Pj4gdG8gdGhvc2UgaW52b2x2ZWQgSVRTZXMuIEl0J3MgYnJva2VuIGFmdGVyIHRoaXMgcGF0Y2gu
+Cj4+Cj4+IFdlIG1heSBuZWVkIHRvIHJlLWV2YWx1YXRlICJ3aGV0aGVyIHRoZSB2UEUgaXMgbWFw
+cGVkIiBub3cgdGhhdCB3ZSdyZSBhdAo+PiBHSUN2NC4xLCBvdGhlcndpc2UgKm5vKiBWTU9WUCB3
+aWxsIGJlIGlzc3VlZCBvbiB0aGUgdjQuMSBjYXBhYmxlIG1hY2hpbmUKPj4gKEkgbWVhbiB0aG9z
+ZSB3aXRob3V0IHNpbmdsZSBWTU9WUCBzdXBwb3J0KS4KPj4KPj4gV2hhdCBJJ20gc2F5aW5nIGlz
+IHNvbWV0aGluZyBsaWtlIGJlbG93IChvbmx5IGFuIGlkZWEsIGl0IGV2ZW4gY2FuJ3QKPj4gY29t
+cGlsZSksIGFueSB0aG91Z2h0cz8KPj4KPj4KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaXJxY2hp
+cC9pcnEtZ2ljLXYzLWl0cy5jIAo+PiBiL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYzLWl0cy5j
+Cj4+IGluZGV4IDJlMTJiYzUyZTNhMi4uMzQ1MGI1ZTg0N2NhIDEwMDY0NAo+PiAtLS0gYS9kcml2
+ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYwo+PiArKysgYi9kcml2ZXJzL2lycWNoaXAvaXJx
+LWdpYy12My1pdHMuYwo+PiBAQCAtMTk4LDcgKzE5OCw4IEBAIHN0YXRpYyB1MTYgZ2V0X2l0c19s
+aXN0KHN0cnVjdCBpdHNfdm0gKnZtKQo+PiDCoMKgwqDCoMKgwqDCoMKgIGlmICghaXNfdjQoaXRz
+KSkKPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOwo+Pgo+PiAtwqDCoMKgwqDC
+oMKgwqAgaWYgKHZtLT52bHBpX2NvdW50W2l0cy0+bGlzdF9ucl0pCj4+ICvCoMKgwqDCoMKgwqDC
+oCBpZiAodm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSB8fAo+PiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBnaWNfcmVxdWlyZXNfZWFnZXJfbWFwcGluZygpKQo+PiDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgX19zZXRfYml0KGl0cy0+bGlzdF9uciwgJml0c19saXN0KTsKPj4gwqDCoMKgwqAg
+fQo+Pgo+PiBAQCAtMTI5NSw3ICsxMjk2LDggQEAgc3RhdGljIHZvaWQgaXRzX3NlbmRfdm1vdnAo
+c3RydWN0IGl0c192cGUgKnZwZSkKPj4gwqDCoMKgwqDCoMKgwqDCoCBpZiAoIWlzX3Y0KGl0cykp
+Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb250aW51ZTsKPj4KPj4gLcKgwqDCoMKgwqDC
+oMKgIGlmICghdnBlLT5pdHNfdm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSkKPj4gK8KgwqDC
+oMKgwqDCoMKgIGlmICghdnBlLT5pdHNfdm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSAmJgo+
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAhZ2ljX3JlcXVpcmVzX2VhZ2VyX21hcHBpbmcoKSkK
+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOwo+Pgo+PiDCoMKgwqDCoMKgwqDC
+oMKgIGRlc2MuaXRzX3Ztb3ZwX2NtZC5jb2wgPSAmaXRzLT5jb2xsZWN0aW9uc1tjb2xfaWRdOwo+
+IAo+IEl0IHRvb2sgbWUgYSB3aGlsZSB0byB3cmFwIG15IGhlYWQgYXJvdW5kIHRoYXQgb25lLCBi
+dXQgeW91J3JlIGFzIHVzdWFsIAo+IHNwb3Qgb24uCj4gCj4gVGhlIHVzZSBvZiBnaWNfcmVxdWly
+ZXNfZWFnZXJfbWFwcGluZygpIGlzIGEgYml0IGNvbmZ1c2luZyBoZXJlLCBhcyBpdCAKPiBpc24n
+dAo+IHNvIG11Y2ggdGhhdCB0aGUgVlBFIGlzIGVhZ2VybHkgbWFwcGVkLCBidXQgdGhlIHByZWRp
+Y2F0ZSBvbiB3aGljaCB3ZSAKPiBldmFsdWF0ZQo+IHRoZSBuZWVkIGZvciBhIFZNT1ZQLiBIb3cg
+YWJvdXQgdGhpczoKPiAKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMt
+aXRzLmMgCj4gYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYwo+IGluZGV4IGNkNjQ1
+MWUxOTBjOS4uMzQ4ZjdhOTA5YTY5IDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvaXJxY2hpcC9pcnEt
+Z2ljLXYzLWl0cy5jCj4gKysrIGIvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPiBA
+QCAtMTg5LDYgKzE4OSwxNSBAQCBzdGF0aWMgREVGSU5FX0lEQShpdHNfdnBlaWRfaWRhKTsKPiAg
+wqAjZGVmaW5lIGdpY19kYXRhX3JkaXN0X3JkX2Jhc2UoKcKgwqDCoCAoZ2ljX2RhdGFfcmRpc3Qo
+KS0+cmRfYmFzZSkKPiAgwqAjZGVmaW5lIGdpY19kYXRhX3JkaXN0X3ZscGlfYmFzZSgpwqDCoMKg
+IChnaWNfZGF0YV9yZGlzdF9yZF9iYXNlKCkgKyAKPiBTWl8xMjhLKQo+IAo+ICsvKgo+ICsgKiBT
+a2lwIElUU3MgdGhhdCBoYXZlIG5vIHZMUElzIG1hcHBlZCwgdW5sZXNzIHdlJ3JlIG9uIEdJQ3Y0
+LjEsIGFzIHdlCj4gKyAqIGFsd2F5cyBoYXZlIHZTR0lzIG1hcHBlZC4KPiArICovCj4gK3N0YXRp
+YyBib29sIHJlcXVpcmVfaXRzX2xpc3Rfdm1vdnAoc3RydWN0IGl0c192bSAqdm0sIHN0cnVjdCBp
+dHNfbm9kZSAKPiAqaXRzKQo+ICt7Cj4gK8KgwqDCoCByZXR1cm4gKGdpY19yZGlzdHMtPmhhc19y
+dnBlaWQgfHwgdm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSk7Cj4gK30KPiArCj4gIMKgc3Rh
+dGljIHUxNiBnZXRfaXRzX2xpc3Qoc3RydWN0IGl0c192bSAqdm0pCj4gIMKgewo+ICDCoMKgwqDC
+oCBzdHJ1Y3QgaXRzX25vZGUgKml0czsKPiBAQCAtMTk4LDcgKzIwNyw3IEBAIHN0YXRpYyB1MTYg
+Z2V0X2l0c19saXN0KHN0cnVjdCBpdHNfdm0gKnZtKQo+ICDCoMKgwqDCoMKgwqDCoMKgIGlmICgh
+aXNfdjQoaXRzKSkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOwo+IAo+IC3C
+oMKgwqDCoMKgwqDCoCBpZiAodm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSkKPiArwqDCoMKg
+wqDCoMKgwqAgaWYgKHJlcXVpcmVfaXRzX2xpc3Rfdm1vdnAodm0sIGl0cykpCj4gIMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBfX3NldF9iaXQoaXRzLT5saXN0X25yLCAmaXRzX2xpc3QpOwo+ICDC
+oMKgwqDCoCB9Cj4gCj4gQEAgLTEyOTUsNyArMTMwNCw3IEBAIHN0YXRpYyB2b2lkIGl0c19zZW5k
+X3Ztb3ZwKHN0cnVjdCBpdHNfdnBlICp2cGUpCj4gIMKgwqDCoMKgwqDCoMKgwqAgaWYgKCFpc192
+NChpdHMpKQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udGludWU7Cj4gCj4gLcKgwqDC
+oMKgwqDCoMKgIGlmICghdnBlLT5pdHNfdm0tPnZscGlfY291bnRbaXRzLT5saXN0X25yXSkKPiAr
+wqDCoMKgwqDCoMKgwqAgaWYgKCFyZXF1aXJlX2l0c19saXN0X3Ztb3ZwKHZwZS0+aXRzX3ZtLCBp
+dHMpKQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29udGludWU7Cj4gCj4gIMKgwqDCoMKg
+wqDCoMKgwqAgZGVzYy5pdHNfdm1vdnBfY21kLmNvbCA9ICZpdHMtPmNvbGxlY3Rpb25zW2NvbF9p
+ZF07CgpJbmRlZWQgdGhpcyBsb29rcyBtdWNoIGNsZWFyZXIuIFdlJ3JlIGFjdHVhbGx5IGV2YWx1
+YXRpbmcgdGhlIG5lZWQKZm9yIGlzc3VpbmcgVk1PVlAgdG8gYSBzcGVjaWZpZWQgSVRTLCBvbiBz
+eXN0ZW0gdXNpbmcgaXRzX2xpc3RfbWFwCmZlYXR1cmUgKHRob3VnaCB3ZSBldmFsdWF0ZSBpdCBi
+eSBjaGVja2luZyB3aGV0aGVyIHRoZSB2UEUgaXMgbWFwcGVkCm9uIHRoaXMgSVRTKS4KCgpUaGFu
+a3MsClplbmdodWkKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
+czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
