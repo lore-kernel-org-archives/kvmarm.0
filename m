@@ -2,99 +2,81 @@ Return-Path: <SRS0=nG5+=5I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D321C4332B
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF18C4332B
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:32:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B4FE120781
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D609C206F9
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mkqtchy0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4FE120781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w8JoIfan"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D609C206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 394534A5A0;
-	Mon, 23 Mar 2020 07:08:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D1944B0B2;
+	Mon, 23 Mar 2020 07:32:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FPl-A6zEfXWu; Mon, 23 Mar 2020 07:08:19 -0400 (EDT)
+	with ESMTP id Q55V4eiOvMSe; Mon, 23 Mar 2020 07:32:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FF6F4A4FC;
-	Mon, 23 Mar 2020 07:08:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48F9D4A4CD;
+	Mon, 23 Mar 2020 07:32:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E95F4A531
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 06:43:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C44674A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 07:32:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2sl-4yO-QJ0j for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Mar 2020 06:43:15 -0400 (EDT)
-Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com
- [209.85.167.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5066F4A418
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 06:43:15 -0400 (EDT)
-Received: by mail-oi1-f193.google.com with SMTP id k9so1628058oia.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 03:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=0QRTakxDjt17+QbOfoF/nJLB5wa9CfWEqfeO6UL7A9Q=;
- b=Mkqtchy0zxJninQWfll89zOOjsYmBoc3rZCZBjn7fUqZuuqSehGKryfcmVCQiZ57oR
- UuURLphNu0OxHWTJoJHgMrJhE6UQMwZZULwp9CSo50LLGz6pq+3n/BB9awfgt/EQK1TU
- 6C2aYRAWStATz7k3OH1ioEa1jhrm1b3/OYz4vzR0Guy1RomC+SAAGuY6sIF674//xis0
- ptSmsvnq+qh6D7n8N2WrJrvZptMfDGf7KPRijv9yHC09PMgy9pwDmAPnmSj2Cjx7BNCe
- qOFyNGQNuOSjiKDnNlPE+/1YjB9ABQb4SNVEWWtyx/b8RpnZJNw49gZFtL8dhd92hMLE
- fO6A==
+ with ESMTP id NVsYSyDA+wJ9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Mar 2020 07:32:40 -0400 (EDT)
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
+ [209.85.128.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B02F84A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 07:32:40 -0400 (EDT)
+Received: by mail-wm1-f67.google.com with SMTP id c187so14235622wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 04:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=OFr1tIi8cNqRn/vqOmjCgvVbUW9BNVMVGSEGEidMUQo=;
+ b=w8JoIfan95I4XznIjXQzVeNo8l6Xh0dvD7b1TIGqibhY+C7dgyZ/uXfIkOs0/tLca3
+ mu5gXprM3b/6ukW0OSYSqSj2gDCyiKxXm4nAMftPVr0s4SNfld/kLo8Tt2Q7XnFf1JWc
+ VSLpLWnfJjB/LpDlmkuCEmW9fxNDKJw2TwyD9jhaROX0AHoKXWd98KK0p3YVV/VOIFVO
+ Xwi0Qi9/+noDPudjzi3zC1ALa+dYBodZl3uAsU6PxxIVp/Nz6O4Tr/4Y92ydDyzY6uZP
+ a4QUMBMN9CD8+8HMKbQ8QSgg5FMODQV8g6/I4ALDRRRB+xkMfJfqOvG4mc+EVC5gUtfi
+ 0NYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=0QRTakxDjt17+QbOfoF/nJLB5wa9CfWEqfeO6UL7A9Q=;
- b=KZqBs8C6e2n6hH0m489mnjjGM8ZaAFtJPlZK5/67fLLJovZU8PPbufdaNsyjsvZAI2
- SPg2CEDuwcbzQn72lMUMEPK9gQTWmv2aTJzHiWWzgGifcgtjku9fYWbjShwfCTfx5S69
- 3J/y7Wd66JsswV44HVnpCY/mRc+Wxzfk1s9pawrzyhynwzWVjexUXgEBfMA3TH2FV6N+
- kSUBRn6C5lFAt6wzGe3Ri0tLgL4v7n9/FSQ7Gb02Xt4ZD/eAr1xZyGiX4kMkZpvFjTGe
- rJV5jSFNwzIK+uqecdNOlwp3YOEXYCpgJ4fXck4LfKwugf5Hep4eYyaeh9xL/5AkB8yk
- pbUg==
-X-Gm-Message-State: ANhLgQ2XeKhY8Rsgv1H9rzk8X/QwvF872327zAoMokv+Eo8kFvSZ1SE2
- KVGbNYx6BcfnA9AlH+Iqrqc=
-X-Google-Smtp-Source: ADFU+vusQ0bIDosF3d8XW0u+epiuBZKDMJ1VEy7spDyO83bgoMIk+zuc0Riukv54RfoXOjcDlCHGkw==
-X-Received: by 2002:a05:6808:8cd:: with SMTP id
- k13mr17210009oij.34.1584960194658; 
- Mon, 23 Mar 2020 03:43:14 -0700 (PDT)
-Received: from ewr1-t1.small.x86-01 ([2604:1380:0:7b00::1])
- by smtp.gmail.com with ESMTPSA id 1sm1288804otd.31.2020.03.23.03.43.13
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=OFr1tIi8cNqRn/vqOmjCgvVbUW9BNVMVGSEGEidMUQo=;
+ b=AOkg8Db3h5MQMgzuS1uvde4fdCRzy+uxL8QJlWEKzGkFU5wUnDQT2oPA4ve4K/m3as
+ BowhkHf6ByyL36PR9hJyCB9FqoPn5VBK8ofPyNCJExfseqykFCwVAhaLxXSi3rGMGtsQ
+ gIZ35IoFflTG6Ik+X4iTQAIgHOTXxmO+3ZS+qb45ikEb9Waziw9iMC4a7WigFGBC4MDi
+ /nRLcH/m6UXSZPAfefxzoLG9DWxkQSozr5msBM4Z0C5YIa6hl4R1lcg94m5w0tuWNv1S
+ 9HJe7RYhRVPKbRQnzol1cHtkxbw+fepYa0vKgfoxPv8E8nOaAam5qH4zn6I3kK5Mwgyu
+ wlqw==
+X-Gm-Message-State: ANhLgQ3WpBhJlu6CfKhvEI8HdJbnbR/gdC0Ltbvq3bLHaXQRF+4QXe3k
+ p4Gvk+fLvVId3GgautYjTHqSxA==
+X-Google-Smtp-Source: ADFU+vs5uuL1ljUGZORUF1InMnoZRV6esXLM/Dyeo1IxxDurQzZriTdXiOenXhOSg3ZO2nbmBuSNIg==
+X-Received: by 2002:a1c:9904:: with SMTP id b4mr26621677wme.34.1584963159658; 
+ Mon, 23 Mar 2020 04:32:39 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-177-220-180.range86-177.btcentralplus.com. [86.177.220.180])
+ by smtp.gmail.com with ESMTPSA id 98sm23288473wrk.52.2020.03.23.04.32.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 03:43:13 -0700 (PDT)
-Date: Mon, 23 Mar 2020 10:43:11 +0000
-From: Lev Aronsky <aronsky@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Add support for IDSR exits to userspace
-Message-ID: <20200323104311.GA1948@ewr1-t1.small.x86-01>
-References: <20200322093650.50621-1-aronsky@gmail.com>
- <61ae80130b47dc23d00d5010eccee0b2@kernel.org>
- <20200322142010.GA3337@ewr1-t1.small.x86-01>
- <d19c6aad8de7bfa182b7872ebeec57b5@kernel.org>
- <20200323082217.GA1509@ewr1-t1.small.x86-01>
- <d2c184326523ffe5b2e700b25b07b6a8@kernel.org>
- <20200323094127.GA1013@ewr1-t1.small.x86-01>
- <194c542d3d7941661f3042e6336f94d8@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <194c542d3d7941661f3042e6336f94d8@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Mailman-Approved-At: Mon, 23 Mar 2020 07:08:17 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ Mon, 23 Mar 2020 04:32:39 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Mon, 23 Mar 2020 11:32:25 +0000
+Message-Id: <20200323113227.3169-1-beata.michalska@linaro.org>
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,45 +88,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Mar 23, 2020 at 10:26:18AM +0000, Marc Zyngier wrote:
-> On 2020-03-23 09:41, Lev Aronsky wrote:
-> > On Mon, Mar 23, 2020 at 09:07:12AM +0000, Marc Zyngier wrote:
-> > > On 2020-03-23 08:22, Lev Aronsky wrote:
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-[...]
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-> > > 
-> > > I'm pretty sure this wouldn't work with HW virtualization. I suspect
-> > > this would UNDEF directly on the CPU, leading to an exception being
-> > > taken
-> > > at EL1 without intervention of the hypervisor. Which makes sense as
-> > > you'd
-> > > be executing an instruction that the CPU really doesn't implement.
-> > 
-> > Yes, that seems to be what's happening. We'll have to think of a
-> > different mechanism for trapping access from user-mode straight to the
-> > hypervisor - or, alternatively, move our custom code into the kernel. I
-> > know it's a bit off-topic, but thank you for your advice!
-> 
-> One possibility would be trap accesses to a special page (magic device?),
-> but that requires cooperation from the OS kernel as well. There is hardly
-> anything else that would guarantee a trap directly from EL0 to EL2 (EL1
-> can always get in the way).
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
 
-These are the times I miss the simplicity of CPUID and VMCALL/VMMCALL on
-x86... A special page might work - we are already doing some minor
-patches in the kernel, adding a single EL0-accessible page might be
-the way to go. Thanks.
+This patchset relies on KVM to insert the external data abort into the guest.
 
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
+
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
+
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
+
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle potential issue with dabt injection
+
+ target/arm/cpu.h     |  3 ++
+ target/arm/kvm.c     | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c   | 25 ++++++++++++++++
+ target/arm/kvm64.c   | 34 ++++++++++++++++++++++
+ target/arm/kvm_arm.h | 21 ++++++++++++++
+ 5 files changed, 165 insertions(+)
+
+-- 
+2.7.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
