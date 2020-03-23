@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D912C4332B
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379E7C54FCE
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 512702074D
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E09C320735
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 13:35:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btEvOdqZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512702074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRrPTNW/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E09C320735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 084F14B0CB;
-	Mon, 23 Mar 2020 09:35:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 994EE4B0B5;
+	Mon, 23 Mar 2020 09:35:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ucOayuUuL9Bs; Mon, 23 Mar 2020 09:35:43 -0400 (EDT)
+	with ESMTP id WTnVIxBFsJBx; Mon, 23 Mar 2020 09:35:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82C1C4B0D2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F2E64B0D6;
 	Mon, 23 Mar 2020 09:35:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3771E4A534
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:48:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 014A64A534
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:48:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OL2TNPZNYbiC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Mar 2020 08:48:11 -0400 (EDT)
+ with ESMTP id UrFSrAX-dmAX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Mar 2020 08:48:47 -0400 (EDT)
 Received: from us-smtp-delivery-74.mimecast.com
- (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64B0C4A4C0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:48:11 -0400 (EDT)
+ (us-smtp-delivery-74.mimecast.com [216.205.24.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 189BA4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:48:47 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584967691;
+ s=mimecast20190719; t=1584967726;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B8wQahKGoRUIUJ5ZWFkVo9acPARo3TGrEWALHtiunpg=;
- b=btEvOdqZ9D7AaaGA3iliV9DU+70UMVihkk/dazaJbhkM2Jae9c1IbsMLvwfxg6whyL2Zn8
- m+kh8KFM2CpmVQIcF6yxNuHYSMPRny1qc5aIiT/bN6frZRX9uas8X7JLIG1s+MoIv5y5wZ
- 0cD3eBbirBh1byy2u38sZ/w+rlW5DJE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-uz7PP1ocNmeAwWuKbTpnPA-1; Mon, 23 Mar 2020 08:48:09 -0400
-X-MC-Unique: uz7PP1ocNmeAwWuKbTpnPA-1
-Received: by mail-wr1-f71.google.com with SMTP id h17so7335758wru.16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 05:48:09 -0700 (PDT)
+ bh=jT01buco6uzW21meg0B5Msg/Bm4GIl6gV7g2Ambj934=;
+ b=TRrPTNW/R1NsO3LwnelNOuoDFR+wCYTOqfKYhNeWyriNxid9WzWNQrjNim2cWGB0I0uHhh
+ y8GDBT/atb8qLOcDdbdzdK2OgzKphQWgSjh+a0HxeVmbJbDtNctkijkCFIh8WQK+KOJzJq
+ heRVxcFw0At/9ZPF21pQUUt8dOMjQFc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-4ZHkjmy5O2GFEebBji7xRA-1; Mon, 23 Mar 2020 08:48:45 -0400
+X-MC-Unique: 4ZHkjmy5O2GFEebBji7xRA-1
+Received: by mail-wm1-f72.google.com with SMTP id g9so1899089wmh.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 05:48:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
  :message-id:mime-version;
- bh=oZZMumaLZJu5X3TxC1ggPEB/siyDp674fd3PHOwNKOk=;
- b=J1FDCr1nE6gbNNi+WttiOTyJZJVMcPNfT8aAKvFbqyTQLV/GefRabpLOHCMq9nlqS1
- l9b5dWAFPSVHoCy78RL7rYLW0cv+Atx1odEOYPKZzz0bgWrDUYoJLWSXiNPiE1ElJbWF
- HIkbB+EekDreHkuYkUwzUMoz+5l1xR9C/ZtOCJDMTIvADeb3yGYCE6x05fpV/wn68rZO
- X4/o7zTSvoZfF0HN2j/3t6gdM/pBh/6u5Vqmb8cFuNG3aFJ/sjRssixfOl9yxeGTplJ1
- cGztueRbkyZmwaCP4JzTW+vEyZl7+C9ELJQLUyJKzOpgRNnHp/8DBHcu+VNWO34DF/zZ
- hsyg==
-X-Gm-Message-State: ANhLgQ0y5uh2Rcm7NGagE4UlOxZV+3BpFOPno8N8hd9k+WwCTzqNIkHQ
- B090PPdS2JMur/iaXzYyUsaTloPaf8uF9Kv+gfPjbhxgnN3AvlXms+D+mrV9bfYKFQsWQqh++kJ
- 4NDSgZIvohwlH5dFoOw7f/j6A
-X-Received: by 2002:adf:decf:: with SMTP id i15mr26153363wrn.277.1584967688272; 
- Mon, 23 Mar 2020 05:48:08 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtzfkKiGqY46hQmyiE1uEEqN2+GnJhVE7scycSa3L2yRyeY3La61RQMFCIJXOpzJGHNoWPMLQ==
-X-Received: by 2002:adf:decf:: with SMTP id i15mr26153331wrn.277.1584967688007; 
- Mon, 23 Mar 2020 05:48:08 -0700 (PDT)
+ bh=wF/Z91rii7js9BxWiPX/IJSf6cOn716YQpoQOgnhvlY=;
+ b=Mkammpv9bsOKZjPYBtdBMdlQCRrTCsHJCofzJcOPqAnuBaMERvrpro+EO0KoBwcwqh
+ LaUJy88EepY+BzBudwiu7oH9y15nnfomnTtZ83OIfnTKMtxhjSrTwsLIn2fQYK7fpqEK
+ OpXdv4nlU0LNqhKiy7thqKvu0sZUwYBxYdw8AZnUOn7GrNiODQMEVESHXRJhjZUBOJ7p
+ EO1mgtXsZYOkmgo1ScxSd+ufODNeErkxsg+e6U/XxFlDocK+Uh07k+SRa0+i/XUaIQUW
+ G6/axcrIxGAsxcnBc32rBKmWbyfRcR7rQk+RyTcAnry+oP44L5gYSM0/MUe9d8v+OVXi
+ dVQg==
+X-Gm-Message-State: ANhLgQ0zK1nX15ox2l2eYzHGhzVdlEp5ybhbn6sKxYQ8fLdkqT+An78+
+ bgELmeWjt+INyHKjXe8epxsuKoyoFL4OUt2Yri1IF6CqFqBl65P6Fvtfl7gL2wOO+ZbxlljDjMq
+ 4RkeOK3DSKH5o0w8is2WCLavx
+X-Received: by 2002:a1c:5544:: with SMTP id j65mr25700709wmb.60.1584967724307; 
+ Mon, 23 Mar 2020 05:48:44 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsE+BwUdC/3N3MhWCg3gX3gw8CdW/xveukJtA9Qqd5DxMyzUeCK03I5juokdRkfNo1dgo0DkQ==
+X-Received: by 2002:a1c:5544:: with SMTP id j65mr25700677wmb.60.1584967724024; 
+ Mon, 23 Mar 2020 05:48:44 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id m12sm15324212wmi.3.2020.03.23.05.48.06
+ by smtp.gmail.com with ESMTPSA id j39sm24686004wre.11.2020.03.23.05.48.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 05:48:07 -0700 (PDT)
+ Mon, 23 Mar 2020 05:48:43 -0700 (PDT)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: Sean Christopherson <sean.j.christopherson@intel.com>,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 8/9] KVM: VMX: Annotate vmx_x86_ops as __initdata
-In-Reply-To: <20200321202603.19355-9-sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v3 9/9] KVM: SVM: Annotate svm_x86_ops as __initdata
+In-Reply-To: <20200321202603.19355-10-sean.j.christopherson@intel.com>
 References: <20200321202603.19355-1-sean.j.christopherson@intel.com>
- <20200321202603.19355-9-sean.j.christopherson@intel.com>
-Date: Mon, 23 Mar 2020 13:48:05 +0100
-Message-ID: <877dzb9r0a.fsf@vitty.brq.redhat.com>
+ <20200321202603.19355-10-sean.j.christopherson@intel.com>
+Date: Mon, 23 Mar 2020 13:48:41 +0100
+Message-ID: <874kuf9qza.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -119,30 +119,30 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> Tag vmx_x86_ops with __initdata now the the struct is copied by value
+> Tag svm_x86_ops with __initdata now the the struct is copied by value to
 
-Typo, "now that the struct".
+Same typo, "now that the struct".
 
-> to a common x86 instance of kvm_x86_ops as part of kvm_init().
+> a common x86 instance of kvm_x86_ops as part of kvm_init().
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 2 +-
+>  arch/x86/kvm/svm.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index fac22e316417..eae90379d0d1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7668,7 +7668,7 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->  	return supported & BIT(bit);
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index b61bb306602b..ab2a1cf6c188 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7350,7 +7350,7 @@ static void svm_pre_update_apicv_exec_ctrl(struct kvm *kvm, bool activate)
+>  	avic_update_access_page(kvm, activate);
 >  }
 >  
-> -static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
-> +static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.hardware_unsetup = hardware_unsetup,
->  
->  	.hardware_enable = hardware_enable,
+> -static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+> +static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.hardware_unsetup = svm_hardware_teardown,
+>  	.hardware_enable = svm_hardware_enable,
+>  	.hardware_disable = svm_hardware_disable,
 
 Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
