@@ -2,86 +2,71 @@ Return-Path: <SRS0=nG5+=5I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61BA3C4332B
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E067FC3F2CD
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 12:40:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 177C2206F9
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 11:32:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pp5Wxvr4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177C2206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 73AC620663
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Mar 2020 12:40:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73AC620663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E3D4B08C;
-	Mon, 23 Mar 2020 07:32:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE69F4B09A;
+	Mon, 23 Mar 2020 08:40:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1K4eT+mwXBew; Mon, 23 Mar 2020 07:32:51 -0400 (EDT)
+	with ESMTP id E-ZsADer+rdh; Mon, 23 Mar 2020 08:40:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84EA64B0B4;
-	Mon, 23 Mar 2020 07:32:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB0D4B09B;
+	Mon, 23 Mar 2020 08:40:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 412FA4A4CD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 07:32:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6045A4A534
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:40:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3XlVwWguPBS6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Mar 2020 07:32:49 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECAB24A4C0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 07:32:48 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id w10so16613153wrm.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 04:32:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=GaQ4g7QDEtdpn1PcCIastdRRg2zyGK27S8LR99mMZas=;
- b=pp5Wxvr4Du/WTB/gu8fud7xlb9//dvkQWp56p0gUIaU5tZLc8OcBvoOQZW2tT618lJ
- VYTZUsBnWGv2YeqaOBHyh7+diBDCDd/DrDaRXWZu+XRDRpY/ALv9XhMzxY8DFwmwNyRj
- 3Dx0FxRVGn3K6aGDjGViEaeAge2/JyCvMyZ2uPpXiVn9RysWkSSvtescOI38GR+1sFnm
- BgSotaIfWdIuFSd5YRdKr1LcB1VKVzAoBwGYhvv7ucGwZEliPojAKD/coHiEEHyqIzB9
- XYTjxg2VMK0cr/JObPhajaaP9R+HlR9eXbllhI+wrVb8kC953+FPM4LNxwLNzOQmUwq7
- /Wxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=GaQ4g7QDEtdpn1PcCIastdRRg2zyGK27S8LR99mMZas=;
- b=K7ShhkuipJCdkqThE+qunifQidNyABzxieY/FJ1PYMygfKiu4q/9SEyDyZrE6IG8Ml
- MEUOnQgI3d55vVz6PvaBg56DIkO55TwZml+WOKMiAUBoecZHJ8XQ59PkCzMNmfxZkIXa
- qmY95Y5OML+CLzpBlgcmImNmFwzprvV2PkJDVmoBmtAZ/yPwOun3hju1Kjmd6B1n31aD
- D6CjhILHWc9RC2vAm/vAE2CQVziYsMquh72ZpaPrKTkzCVzJj0jr4yCYBoUJM9Y/E91C
- km0Kd4GAxs/KTwJunYb0Z+UeHlTsJmNdOWJl4lc1VS0Mcx4O5IURTeau9zmOfGda3Ecw
- UwPA==
-X-Gm-Message-State: ANhLgQ1UT6PMUOPwScupzdTS0YungSqSh085VO4b1mmKIDDhE+hDKZMC
- TFXqucebu7QRFIyzFYkDAyrH4w==
-X-Google-Smtp-Source: ADFU+vsOcGT8FPzB3DYWs/C49iFKAqnkMZEt6BDxCCOqDkEUbZ28pNBMWV27aakJoJ5VSFa9o4lvuw==
-X-Received: by 2002:adf:b60d:: with SMTP id f13mr1183897wre.12.1584963168016; 
- Mon, 23 Mar 2020 04:32:48 -0700 (PDT)
-Received: from moi-limbo-9350.home
- (host86-177-220-180.range86-177.btcentralplus.com. [86.177.220.180])
- by smtp.gmail.com with ESMTPSA id 98sm23288473wrk.52.2020.03.23.04.32.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Mar 2020 04:32:47 -0700 (PDT)
-From: Beata Michalska <beata.michalska@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/2] target/arm: kvm: Handle potential issue with dabt
- injection
-Date: Mon, 23 Mar 2020 11:32:27 +0000
-Message-Id: <20200323113227.3169-3-beata.michalska@linaro.org>
-In-Reply-To: <20200323113227.3169-1-beata.michalska@linaro.org>
-References: <20200323113227.3169-1-beata.michalska@linaro.org>
-Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 2RqxvhSkTXgJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Mar 2020 08:40:23 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD3584A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2020 08:40:22 -0400 (EDT)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 63E252ECE21C08DF8A96;
+ Mon, 23 Mar 2020 20:40:18 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Mon, 23 Mar 2020
+ 20:40:11 +0800
+Subject: Re: [PATCH v5 20/23] KVM: arm64: GICv4.1: Plumb SGI implementation
+ selection in the distributor
+To: Marc Zyngier <maz@kernel.org>
+References: <20200304203330.4967-1-maz@kernel.org>
+ <20200304203330.4967-21-maz@kernel.org>
+ <72832f51-bbde-8502-3e03-189ac20a0143@huawei.com>
+ <4a06fae9c93e10351276d173747d17f4@kernel.org>
+ <1c9fdfc8-bdb2-88b6-4bdc-2b9254dfa55c@huawei.com>
+ <256b58a9679412c96600217f316f424f@kernel.org>
+ <cf5d7cf3-076f-47a7-83cf-717a619dc13e@huawei.com>
+ <1c10593ac5b75f37c6853fbc74daa481@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <49fedfb3-ea4a-a18b-f453-86f43be7f18f@huawei.com>
+Date: Mon, 23 Mar 2020 20:40:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <1c10593ac5b75f37c6853fbc74daa481@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Robert
+ Richter <rrichter@marvell.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,195 +78,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Injecting external data abort through KVM might trigger
-an issue on kernels that do not get updated to include the KVM fix.
-For those and aarch32 guests, the injected abort gets misconfigured
-to be an implementation defined exception. This leads to the guest
-repeatedly re-running the faulting instruction.
-
-Add support for handling that case.
-[
-  Fixed-by: 018f22f95e8a
-	('KVM: arm: Fix DFSR setting for non-LPAE aarch32 guests')
-  Fixed-by: 21aecdbd7f3a
-	('KVM: arm: Make inject_abt32() inject an external abort instead')
-]
-
-Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
----
- target/arm/cpu.h     |  1 +
- target/arm/kvm.c     | 30 +++++++++++++++++++++++++++++-
- target/arm/kvm32.c   | 25 +++++++++++++++++++++++++
- target/arm/kvm64.c   | 34 ++++++++++++++++++++++++++++++++++
- target/arm/kvm_arm.h | 10 ++++++++++
- 5 files changed, 99 insertions(+), 1 deletion(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 4f834c1..868afc6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -561,6 +561,7 @@ typedef struct CPUARMState {
-     } serror;
- 
-     uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
-+    uint8_t ext_dabt_raised; /* Tracking/verifying injection of ext DABT */
- 
-     /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
-     uint32_t irq_line_state;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index c088589..58ad734 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -721,7 +721,12 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-     if (ret) {
-         error_report("failed to put vcpu events");
--    } else {
-+    } else if (env->ext_dabt_pending) {
-+        /*
-+         * Mark that the external DABT has been injected,
-+         * if one has been requested
-+         */
-+        env->ext_dabt_raised = env->ext_dabt_pending;
-         /* Clear instantly if the call was successful */
-         env->ext_dabt_pending = 0;
-     }
-@@ -755,6 +760,29 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
- 
- void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- {
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+
-+    if (unlikely(env->ext_dabt_raised)) {
-+        /*
-+         * Verifying that the ext DABT has been properly injected,
-+         * otherwise risking indefinitely re-running the faulting instruction
-+         * Covering a very narrow case for kernels 5.5..5.5.4
-+         * when injected abort was misconfigured to be
-+         * an IMPLEMENTATION DEFINED exception (for 32-bit EL1)
-+         */
-+        if (!arm_feature(env, ARM_FEATURE_AARCH64) &&
-+            unlikely(!kvm_arm_verify_ext_dabt_pending(cs))) {
-+
-+            error_report("Data abort exception with no valid ISS generated by "
-+                   "guest memory access. KVM unable to emulate faulting "
-+                   "instruction. Failed to inject an external data abort "
-+                   "into the guest.");
-+            abort();
-+       }
-+       /* Clear the status */
-+       env->ext_dabt_raised = 0;
-+    }
- }
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index f271181..86c4fe7 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -564,3 +564,28 @@ void kvm_arm_pmu_init(CPUState *cs)
- {
-     qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
- }
-+
-+#define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
-+#define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
-+
-+#define DFSR_FSC(v)   (((v) >> 6 | (v)) & 0x1F)
-+#define DFSC_EXTABT(lpae) (lpae) ? 0x10 : 0x08
-+
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-+{
-+    uint32_t dfsr_val;
-+
-+    if (!kvm_get_one_reg(cs, ARM_REG_DFSR, &dfsr_val)) {
-+        ARMCPU *cpu = ARM_CPU(cs);
-+        CPUARMState *env = &cpu->env;
-+        uint32_t ttbcr;
-+        int lpae = 0;
-+
-+        if (!kvm_get_one_reg(cs, ARM_REG_TTBCR, &ttbcr)) {
-+            lpae = arm_feature(env, ARM_FEATURE_LPAE) && (ttbcr & TTBCR_EAE);
-+        }
-+        return !(DFSR_FSC(dfsr_val) != DFSC_EXTABT(lpae));
-+    }
-+    return false;
-+}
-+
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index be5b31c..18594e9 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -1430,3 +1430,37 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
- 
-     return false;
- }
-+
-+#define ARM64_REG_ESR_EL1 ARM64_SYS_REG(3, 0, 5, 2, 0)
-+#define ARM64_REG_TCR_EL1 ARM64_SYS_REG(3, 0, 2, 0, 2)
-+
-+#define ESR_DFSC(aarch64, v)    \
-+    ((aarch64) ? ((v) & 0x3F)   \
-+               : (((v) >> 6 | (v)) & 0x1F))
-+
-+#define ESR_DFSC_EXTABT(aarch64, lpae) \
-+    ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
-+
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-+{
-+    uint64_t dfsr_val;
-+
-+    if (!kvm_get_one_reg(cs, ARM64_REG_ESR_EL1, &dfsr_val)) {
-+        ARMCPU *cpu = ARM_CPU(cs);
-+        CPUARMState *env = &cpu->env;
-+        int aarch64_mode = arm_feature(env, ARM_FEATURE_AARCH64);
-+        int lpae = 0;
-+
-+        if (!aarch64_mode) {
-+            uint64_t ttbcr;
-+
-+            if (!kvm_get_one_reg(cs, ARM64_REG_TCR_EL1, &ttbcr)) {
-+                lpae = arm_feature(env, ARM_FEATURE_LPAE)
-+                        && (ttbcr & TTBCR_EAE);
-+            }
-+        }
-+        return !(ESR_DFSC(aarch64_mode, dfsr_val) !=
-+                ESR_DFSC_EXTABT(aarch64_mode, lpae));
-+    }
-+    return false;
-+}
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 39472d5..f2dc6a2 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -461,6 +461,16 @@ void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
- int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-                              uint64_t fault_ipa);
- /**
-+ * kvm_arm_verify_ext_dabt_pending:
-+ * @cs: CPUState
-+ *
-+ * Verify the fault status code wrt the Ext DABT injection
-+ *
-+ * Returns: true if the fault status code is as expected, false otherwise
-+ */
-+bool kvm_arm_verify_ext_dabt_pending(CPUState *cs);
-+
-+/**
-  * its_class_name:
-  *
-  * Return the ITS class name to use depending on whether KVM acceleration
--- 
-2.7.4
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMy8yMyAxNjoyNSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFpl
+bmdodWksCj4gCj4gWy4uLl0KPiAKPj4+IEFuZCBhY3R1YWxseSwgbWF5YmUgd2UgY2FuIGhhbmRs
+ZSB0aGF0IHByZXR0eSBjaGVhcGx5LiBJZiB1c2Vyc3BhY2UKPj4+IHRyaWVzIHRvIHJlc3RvcmUg
+R0lDRF9UWVBFUjIgdG8gYSB2YWx1ZSB0aGF0IGlzbid0IHdoYXQgS1ZNIGNhbgo+Pj4gb2ZmZXIs
+IHdlIGp1c3QgcmV0dXJuIGFuIGVycm9yLiBFeGFjdGx5IGxpa2Ugd2UgZG8gZm9yIEdJQ0RfSUlE
+Ui4KPj4+IEhlbmNlIHRoZSBmb2xsb3dpbmcgcGF0Y2g6Cj4+Pgo+Pj4gZGlmZiAtLWdpdCBhL3Zp
+cnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12My5jIAo+Pj4gYi92aXJ0L2t2bS9hcm0vdmdpYy92
+Z2ljLW1taW8tdjMuYwo+Pj4gaW5kZXggMjhiNjM5ZmQxYWJjLi5lNzJkY2M0NTQyNDcgMTAwNjQ0
+Cj4+PiAtLS0gYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8tdjMuYwo+Pj4gKysrIGIvdmly
+dC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYzLmMKPj4+IEBAIC0xNTYsNiArMTU2LDcgQEAgc3Rh
+dGljIGludCB2Z2ljX21taW9fdWFjY2Vzc193cml0ZV92M19taXNjKHN0cnVjdCAKPj4+IGt2bV92
+Y3B1ICp2Y3B1LAo+Pj4gwqDCoMKgwqDCoCBzdHJ1Y3QgdmdpY19kaXN0ICpkaXN0ID0gJnZjcHUt
+Pmt2bS0+YXJjaC52Z2ljOwo+Pj4KPj4+IMKgwqDCoMKgwqAgc3dpdGNoIChhZGRyICYgMHgwYykg
+ewo+Pj4gK8KgwqDCoCBjYXNlIEdJQ0RfVFlQRVIyOgo+Pj4gwqDCoMKgwqDCoCBjYXNlIEdJQ0Rf
+SUlEUjoKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAodmFsICE9IHZnaWNfbW1pb19yZWFkX3Yz
+X21pc2ModmNwdSwgYWRkciwgbGVuKSkKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJl
+dHVybiAtRUlOVkFMOwo+Pj4KPj4+IEJlaW5nIGEgUk8gcmVnaXN0ZXIsIHdyaXRpbmcgc29tZXRo
+aW5nIHRoYXQgaXNuJ3QgY29tcGF0aWJsZSB3aXRoIHRoZQo+Pj4gcG9zc2libGUgYmVoYXZpb3Vy
+IG9mIHRoZSBoeXBlcnZpc29yIHdpbGwganVzdCByZXR1cm4gYW4gZXJyb3IuCj4+Cj4+IFRoaXMg
+aXMgcmVhbGx5IGEgbmljZSBwb2ludCB0byBhZGRyZXNzIG15IGNvbmNlcm4hIEknbSBoYXBweSB0
+byBzZWUKPj4gdGhpcyBpbiB2NiBub3cuCj4+Cj4+Pgo+Pj4gV2hhdCBkbyB5b3UgdGhpbms/Cj4+
+Cj4+IEkgYWdyZWVkIHdpdGggeW91LCB3aXRoIGEgYml0IG5lcnZvdXMgdGhvdWdoLiBTb21lIG9s
+ZCBndWVzdHMgKHdoaWNoCj4+IGhhdmUgbm8ga25vd2xlZGdlIGFib3V0IEdJQ3Y0LjEgdlNHSXMg
+YW5kIGRvbid0IGNhcmUgYWJvdXQgbkFTU0dJY2FwCj4+IGF0IGFsbCkgd2lsbCBhbHNvIGZhaWwg
+dG8gbWlncmF0ZSBmcm9tIEEgdG8gQiwganVzdCBiZWNhdXNlIG5vdyB3ZQo+PiBwcmVzZW50IHR3
+byBkaWZmZXJlbnQgKHVudXNlZCkgR0lDRF9UWVBFUjIgcmVnaXN0ZXJzIHRvIHRoZW0uCj4+Cj4+
+IElzIGl0IGEgbGl0dGxlIHVuZmFpciB0byB0aGVtIDotKSA/Cj4gCj4gSSBuZXZlciBwcmV0ZW5k
+ZWQgdG8gYmUgZmFpciEgOy0pCj4gCj4gSSdtIGhhcHB5IHRvIHByZXZlbnQgbWlncmF0aW5nIGZy
+b20gYSB2NC4xIHN5c3RlbSAoQSkgdG8gYSB2NC4wCj4gc3lzdGVtIChCKS4gQXMgc29vbiBhcyB0
+aGUgZ3Vlc3QgaGFzIHJ1biwgaXQgaXNuJ3Qgc2FmZSB0byBkbyBzbwo+IChpdCBtYXkgaGF2ZSBy
+ZWFkIFRZUEVSMiwgYW5kIG5vdyBrbm93cyBhYm91dCB2U0dJcykuIFdlICpjb3VsZCoKPiB0cmFj
+ayB0aGlzIGFuZCBmaW5kIHdheXMgdG8gbWlncmF0ZSB0aGlzIHN0YXRlIGFzIHdlbGwsIGJ1dCBp
+dAo+IGZlZWxzIGZyYWdpbGUuCj4gCj4gTWlncmF0aW5nIGZyb20gQiB0byBBIGlzIG1vcmUgYXBw
+ZWFsaW5nLiBJdCBzaG91bGQgYmUgcG9zc2libGUgdG8KPiBkbyBzbyB3aXRob3V0IG11Y2ggZGlm
+ZmljdWx0eSAoanVzdCBjaGVjayB0aGF0IHRoZSBuQVNTR0ljYXAgYml0Cj4gaXMgZWl0aGVyIDAg
+b3IgZXF1YWwgdG8gS1ZNJ3MgdmlldyBvZiB0aGUgY2FwYWJpbGl0eSkuCj4gCj4gQnV0IG92ZXJh
+bGwgSSBzZXJpb3VzbHkgZG91YnQgd2UgY2FuIGVhc2lseSBtaWdyYXRlIGd1ZXN0cyBhY3Jvc3MK
+PiB2ZXJ5IGRpZmZlcmVudCBIVy4gV2UndmUgYmVlbiB0YWxraW5nIGFib3V0IHRoaXMgZm9yIHll
+YXJzLCBhbmQKPiB3ZSBzdGlsbCBkb24ndCBoYXZlIGEgZ29vZCBzb2x1dGlvbiBmb3IgaXQgZ2l2
+ZW4gdGhlIGRpdmVyc2l0eQo+IG9mIHRoZSBlY29zeXN0ZW0uLi4gOi0vCgpGYWlyIGVub3VnaC4g
+VGhhbmtzIGZvciB5b3VyIGRldGFpbGVkIGV4cGxhbmF0aW9uIQoKClplbmdodWkKCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
+c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
+LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
