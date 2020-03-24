@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70111C43331
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Mar 2020 10:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08475C41621
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Mar 2020 10:34:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 233D9208D6
+	by mail.kernel.org (Postfix) with ESMTP id B5D4B208E4
 	for <kvmarm@archiver.kernel.org>; Tue, 24 Mar 2020 10:34:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zt9FY9xd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 233D9208D6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMEi9NMh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D4B208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC0EB4B08D;
-	Tue, 24 Mar 2020 06:34:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C6DF4A4E5;
+	Tue, 24 Mar 2020 06:34:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Aieot4A62fks; Tue, 24 Mar 2020 06:34:06 -0400 (EDT)
+	with ESMTP id koxx-QKox-hG; Tue, 24 Mar 2020 06:34:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B705B4B09F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDEA64B0BF;
 	Tue, 24 Mar 2020 06:34:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7BD4B09D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Mar 2020 06:34:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9B94B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Mar 2020 06:34:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IMJvhiIGiqmf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Mar 2020 06:34:02 -0400 (EDT)
+ with ESMTP id iSBP2-rtTnim for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Mar 2020 06:34:03 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7552A4A4CD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Mar 2020 06:34:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 754424B08D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Mar 2020 06:34:03 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 94B9F20870;
- Tue, 24 Mar 2020 10:34:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A4DFA208C3;
+ Tue, 24 Mar 2020 10:34:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1585046041;
- bh=twI+FrhMAk/LCQP/xGXohCa10/7aYbpXUmUJDbB9Bfc=;
+ s=default; t=1585046042;
+ bh=+F1u1um5t/m+LxG9xGeYmNkSrgynmuQNeITqQeSRvKE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=zt9FY9xddS08bQoH+uIDFiRKNTrG15fNN/iWBNJA1jSMAbh9TlygGM/8ScZZiRpyf
- xBusuhmGDlKbUKnBFehqhxlHo8H+Ri2XM31+SGLOTdqBJtCa+6bsOETHBF/mt1FEg0
- QqanZY8CBPn2iAEA3iqJE65jwMeDqW3Yvm3HBAMY=
+ b=kMEi9NMhR6XSUQomnE0nHAYJQXPjuUK7Y2Lps59RemToFM6uKSTsjyMC0oW+x2AeU
+ lweeWVBVUYbb1qnFy8dib9p8cDRkr97Ppml7dAS3xb36fjX3q8V8wj0afgAsAfCzlY
+ 7p8k9WOMitBhTTZHUXhVJqvdaDBg5KqisqpTN83k=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jGgsh-00FE8V-IV; Tue, 24 Mar 2020 10:34:00 +0000
+ id 1jGgsi-00FE8V-UW; Tue, 24 Mar 2020 10:34:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 1/7] arm: Unplug KVM from the build system
-Date: Tue, 24 Mar 2020 10:33:44 +0000
-Message-Id: <20200324103350.138077-2-maz@kernel.org>
+Subject: [PATCH v2 2/7] arm: Remove KVM from config files
+Date: Tue, 24 Mar 2020 10:33:45 +0000
+Message-Id: <20200324103350.138077-3-maz@kernel.org>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200324103350.138077-1-maz@kernel.org>
 References: <20200324103350.138077-1-maz@kernel.org>
@@ -103,8 +103,8 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we're about to drop KVM/arm on the floor, carefully unplug
-it from the build system.
+Only one platform is building KVM by default. How crazy! Remove
+it whilst nobody is watching.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: Olof Johansson <olof@lixom.net>
@@ -115,46 +115,19 @@ Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: Linus Walleij <linus.walleij@linaro.org>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/Kconfig             | 2 --
- arch/arm/Makefile            | 1 -
- arch/arm/mach-exynos/Kconfig | 2 +-
- 3 files changed, 1 insertion(+), 4 deletions(-)
+ arch/arm/configs/axm55xx_defconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 97864aabc2a6..a07bec7f4d8d 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -2091,5 +2091,3 @@ source "drivers/firmware/Kconfig"
- if CRYPTO
- source "arch/arm/crypto/Kconfig"
- endif
--
--source "arch/arm/kvm/Kconfig"
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index db857d07114f..b4ce96f55ddd 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -278,7 +278,6 @@ core-$(CONFIG_FPE_NWFPE)	+= arch/arm/nwfpe/
- core-$(CONFIG_FPE_FASTFPE)	+= $(patsubst $(srctree)/%,%,$(wildcard $(srctree)/arch/arm/fastfpe/))
- core-$(CONFIG_VFP)		+= arch/arm/vfp/
- core-$(CONFIG_XEN)		+= arch/arm/xen/
--core-$(CONFIG_KVM_ARM_HOST) 	+= arch/arm/kvm/
- core-$(CONFIG_VDSO)		+= arch/arm/vdso/
- 
- # If we have a machine-specific directory, then include it in the build.
-diff --git a/arch/arm/mach-exynos/Kconfig b/arch/arm/mach-exynos/Kconfig
-index cbbe03e96de8..76838255b5fa 100644
---- a/arch/arm/mach-exynos/Kconfig
-+++ b/arch/arm/mach-exynos/Kconfig
-@@ -21,7 +21,7 @@ menuconfig ARCH_EXYNOS
- 	select EXYNOS_SROM
- 	select EXYNOS_PM_DOMAINS if PM_GENERIC_DOMAINS
- 	select GPIOLIB
--	select HAVE_ARM_ARCH_TIMER if ARCH_EXYNOS5 && VIRTUALIZATION
-+	select HAVE_ARM_ARCH_TIMER if ARCH_EXYNOS5
- 	select HAVE_ARM_SCU if SMP
- 	select HAVE_S3C2410_I2C if I2C
- 	select HAVE_S3C2410_WATCHDOG if WATCHDOG
+diff --git a/arch/arm/configs/axm55xx_defconfig b/arch/arm/configs/axm55xx_defconfig
+index 6ea7dafa4c9e..46075216ee6d 100644
+--- a/arch/arm/configs/axm55xx_defconfig
++++ b/arch/arm/configs/axm55xx_defconfig
+@@ -236,5 +236,3 @@ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_SHA256=y
+ # CONFIG_CRYPTO_ANSI_CPRNG is not set
+-CONFIG_VIRTUALIZATION=y
+-CONFIG_KVM=y
 -- 
 2.25.0
 
