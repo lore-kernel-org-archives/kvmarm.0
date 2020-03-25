@@ -2,105 +2,86 @@ Return-Path: <SRS0=r+CV=5K=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03397C54FCF
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 17:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB7FBC43331
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 21:21:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7A6812077D
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 17:10:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B99520719
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 21:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dI5HyYSG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A6812077D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgPl37mm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B99520719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EA2C4B09B;
-	Wed, 25 Mar 2020 13:10:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD8D4A2E5;
+	Wed, 25 Mar 2020 17:21:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h2dp3yU5HdAs; Wed, 25 Mar 2020 13:10:03 -0400 (EDT)
+	with ESMTP id UrYOm0nijud3; Wed, 25 Mar 2020 17:21:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8C74B08D;
-	Wed, 25 Mar 2020 13:10:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E5E4B086;
+	Wed, 25 Mar 2020 17:21:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8B24B086
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD744A500
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 17:20:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rax4icmxxZbZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
+ with ESMTP id 5EeA2W-aeBHS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Mar 2020 17:20:58 -0400 (EDT)
 Received: from us-smtp-delivery-74.mimecast.com
  (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A0004A49F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25B194A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 17:20:58 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585156200;
+ s=mimecast20190719; t=1585171257;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vevCBANHYn2Lnc4NylQjd/uYKWuxOb7yWJMgri8X8CA=;
- b=dI5HyYSG8peRvBLcKJE7RvFcKpwoY3IZgL+TsBqmiuOz5oTPm1T0QXIpDNFe9faW3ooHOr
- XZtRpgs9+ZFzITuk1IHestWiJcS91EnxOzvbG7RvhaokYEtluXoeoG0K1WfU86rfSZigtH
- LXTh4swPsjq5bD1s3Ypkvlp3uaOnxbs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-znsO0_HcPGKg2sY_I9mvSw-1; Wed, 25 Mar 2020 13:09:59 -0400
-X-MC-Unique: znsO0_HcPGKg2sY_I9mvSw-1
-Received: by mail-wr1-f72.google.com with SMTP id o18so1448445wrx.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 10:09:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vevCBANHYn2Lnc4NylQjd/uYKWuxOb7yWJMgri8X8CA=;
- b=XyE4+E2h3UIsjzHTVW4+SRIKSfLvcYAvbpSLmJdlKOa/56Jy3gwW2tuEWJYdpWxH6J
- ulmZOYwsyUbS6s1+iJ7JuyrEdHa/7SQAmfAHMr667AxWtOhduXWHXh6uFeT/Hmyffmqn
- o+TbGeRygCO1r7J9y7CQ0aKDAS83ovRkuje8TojGq5jlJ8gD8Q9p0DxOf5Ainoz/fL8w
- CYvDQcUB8sMBd1XJY0mfCJgg8Gp667NJloOsYtRmidok1k1tWajiVaNnDTHZdvnMwt5b
- Jd/cGZb+I2f11vPAu7h8A2rIV58IW2mGSbfQolcQ3Pn8/Mt9/6Gvke/sCxql56Bj55r1
- Thxg==
-X-Gm-Message-State: ANhLgQ1oHx6IN92cCFJ0q8BURJEZyxM+vcE9rg3tdJqrypnQRchY23/i
- 4oTgEyw+vJ6cGa8l2cb+X0tPg4AUaUGwQLYPsKRijkuxL8NjseQxmNDFz86PXSyDMVFSGIfsjJm
- rFZ9VAfpmlBvfnpwpp6QGWG8c
-X-Received: by 2002:a1c:ab54:: with SMTP id u81mr4174244wme.166.1585156195993; 
- Wed, 25 Mar 2020 10:09:55 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsDeuPAf6z2VeRFRt7ZJYFWF9FC4OwqXVMD3tFXVyspIst/9JsJ8aRkJ29STSyG+27J7ShG6g==
-X-Received: by 2002:a1c:ab54:: with SMTP id u81mr4174213wme.166.1585156195636; 
- Wed, 25 Mar 2020 10:09:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e4f4:3c00:2b79:d6dc?
- ([2001:b07:6468:f312:e4f4:3c00:2b79:d6dc])
- by smtp.gmail.com with ESMTPSA id q8sm35205395wrc.8.2020.03.25.10.09.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Mar 2020 10:09:54 -0700 (PDT)
-Subject: Re: [PATCH 3/4] kvm: Replace vcpu->swait with rcuwait
-To: Davidlohr Bueso <dave@stgolabs.net>, tglx@linutronix.de
-References: <20200324044453.15733-1-dave@stgolabs.net>
- <20200324044453.15733-4-dave@stgolabs.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
-Date: Wed, 25 Mar 2020 18:09:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=5OAiw4H8RHcYJgUDa0Alkcr13a5bPAHpwGb7bMq8gRE=;
+ b=RgPl37mmOfy51RpzmAtBx2ZFtxK/fHrk21eNZDT+ydKtFwuNU88TsAkUdNIQ7N8g4HUrr9
+ 24/EqQSH4Va58F5hOmNMYJFnrjpR99eZjD3w/chgKEqVFHllyUg0Fv8TfK9+BrQmMLC+TH
+ frwqPhcGk39FE1PzyjGqIg7o6Lir7wc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-TBF9AnAZOf6sXTlQ7Bb0AA-1; Wed, 25 Mar 2020 17:20:53 -0400
+X-MC-Unique: TBF9AnAZOf6sXTlQ7Bb0AA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFE36107ACCD;
+ Wed, 25 Mar 2020 21:20:51 +0000 (UTC)
+Received: from [10.36.113.142] (ovpn-113-142.ams2.redhat.com [10.36.113.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 57E20100EBAA;
+ Wed, 25 Mar 2020 21:20:45 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v7 08/13] arm/arm64: ITS: Device and
+ collection Initialization
+To: Zenghui Yu <yuzenghui@huawei.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-9-eric.auger@redhat.com>
+ <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
+Date: Wed, 25 Mar 2020 22:20:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200324044453.15733-4-dave@stgolabs.net>
+In-Reply-To: <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
- torvalds@linux-foundation.org, bigeasy@linutronix.de,
- linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,32 +93,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 24/03/20 05:44, Davidlohr Bueso wrote:
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 71244bf87c3a..e049fcb3dffb 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -290,8 +290,7 @@ static enum hrtimer_restart kvm_mips_comparecount_wakeup(struct hrtimer *timer)
->  	kvm_mips_callbacks->queue_timer_int(vcpu);
->  
->  	vcpu->arch.wait = 0;
-> -	if (swq_has_sleeper(&vcpu->wq))
-> -		swake_up_one(&vcpu->wq);
-> +	rcuwait_wake_up(&vcpu->wait)
-
-This is missing a semicolon.  (KVM MIPS is known not to compile and will
-be changed to "depends on BROKEN" in 5.7).
-
-Paolo
-
->  	return kvm_mips_count_timeout(vcpu);
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgWmVuZ2h1aSwKCk9uIDMvMjUvMjAgOToxMCBBTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiBIaSBF
+cmljLAo+IAo+IE9uIDIwMjAvMy8yMCAxNzoyNCwgRXJpYyBBdWdlciB3cm90ZToKPj4gSW50cm9k
+dWNlIGFuIGhlbHBlciBmdW5jdGlvbnMgdG8gcmVnaXN0ZXIKPj4gLSBhIG5ldyBkZXZpY2UsIGNo
+YXJhY3Rlcml6ZWQgYnkgaXRzIGRldmljZSBpZCBhbmQgdGhlCj4+IMKgwqAgbWF4IG51bWJlciBv
+ZiBldmVudCBJRHMgdGhhdCBkaW1lbnNpb24gaXRzIElUVCAoSW50ZXJydXB0Cj4+IMKgwqAgVHJh
+bnNsYXRpb24gVGFibGUpLsKgIFRoZSBmdW5jdGlvbiBhbGxvY2F0ZXMgdGhlIElUVC4KPj4KPj4g
+LSBhIG5ldyBjb2xsZWN0aW9uLCBjaGFyYWN0ZXJpemVkIGJ5IGl0cyBJRCBhbmQgdGhlCj4+IMKg
+wqAgdGFyZ2V0IHByb2Nlc3NpbmcgZW5naW5lIChQRSkuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IEVy
+aWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KPj4KPj4gLS0tCj4+Cj4+IHYzIC0+IHY0
+Ogo+PiAtIHJlbW92ZSB1bnVzZWQgaXRzX2Jhc2VyIHZhcmlhYmxlIGZyb20gaXRzX2NyZWF0ZV9k
+ZXZpY2UoKQo+PiAtIHVzZSBnZXRfb3JkZXIoKQo+PiAtIGRldmljZS0+aXR0IGJlY29tZXMgYSBH
+VkEgaW5zdGVhZCBvZiBHUEEKPj4KPj4gdjIgLT4gdjM6Cj4+IC0gcy9yZXBvcnRfYWJvcnQvYXNz
+ZXJ0Cj4+Cj4+IHYxIC0+IHYyOgo+PiAtIHMvbmJfL25yXwo+PiAtLS0KPj4gwqAgbGliL2FybTY0
+L2FzbS9naWMtdjMtaXRzLmggfCAxOSArKysrKysrKysrKysrKysrKysrCj4+IMKgIGxpYi9hcm02
+NC9naWMtdjMtaXRzLmPCoMKgwqDCoCB8IDM4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrCj4+IMKgIDIgZmlsZXMgY2hhbmdlZCwgNTcgaW5zZXJ0aW9ucygrKQo+Pgo+PiBk
+aWZmIC0tZ2l0IGEvbGliL2FybTY0L2FzbS9naWMtdjMtaXRzLmggYi9saWIvYXJtNjQvYXNtL2dp
+Yy12My1pdHMuaAo+PiBpbmRleCA0NjgzMDExLi5hZGNiNjQyIDEwMDY0NAo+PiAtLS0gYS9saWIv
+YXJtNjQvYXNtL2dpYy12My1pdHMuaAo+PiArKysgYi9saWIvYXJtNjQvYXNtL2dpYy12My1pdHMu
+aAo+PiBAQCAtMzEsNiArMzEsMTkgQEAgc3RydWN0IGl0c19iYXNlciB7Cj4+IMKgIH07Cj4+IMKg
+IMKgICNkZWZpbmUgR0lUU19CQVNFUl9OUl9SRUdTwqDCoMKgwqDCoMKgwqAgOAo+PiArI2RlZmlu
+ZSBHSVRTX01BWF9ERVZJQ0VTwqDCoMKgwqDCoMKgwqAgOAo+PiArI2RlZmluZSBHSVRTX01BWF9D
+T0xMRUNUSU9OU8KgwqDCoMKgwqDCoMKgIDgKPj4gKwo+PiArc3RydWN0IGl0c19kZXZpY2Ugewo+
+PiArwqDCoMKgIHUzMiBkZXZpY2VfaWQ7wqDCoMKgIC8qIGRldmljZSBJRCAqLwo+PiArwqDCoMKg
+IHUzMiBucl9pdGVzO8KgwqDCoCAvKiBNYXggSW50ZXJydXB0IFRyYW5zbGF0aW9uIEVudHJpZXMg
+Ki8KPj4gK8KgwqDCoCB2b2lkICppdHQ7wqDCoMKgIC8qIEludGVycnVwdCBUcmFuc2xhdGlvbiBU
+YWJsZSBHVkEgKi8KPj4gK307Cj4+ICsKPj4gK3N0cnVjdCBpdHNfY29sbGVjdGlvbiB7Cj4+ICvC
+oMKgwqAgdTY0IHRhcmdldF9hZGRyZXNzOwo+PiArwqDCoMKgIHUxNiBjb2xfaWQ7Cj4+ICt9Owo+
+PiDCoCDCoCBzdHJ1Y3QgaXRzX2RhdGEgewo+PiDCoMKgwqDCoMKgIHZvaWQgKmJhc2U7Cj4+IEBA
+IC0zOSw2ICs1MiwxMCBAQCBzdHJ1Y3QgaXRzX2RhdGEgewo+PiDCoMKgwqDCoMKgIHN0cnVjdCBp
+dHNfYmFzZXIgY29sbF9iYXNlcjsKPj4gwqDCoMKgwqDCoCBzdHJ1Y3QgaXRzX2NtZF9ibG9jayAq
+Y21kX2Jhc2U7Cj4+IMKgwqDCoMKgwqAgc3RydWN0IGl0c19jbWRfYmxvY2sgKmNtZF93cml0ZTsK
+Pj4gK8KgwqDCoCBzdHJ1Y3QgaXRzX2RldmljZSBkZXZpY2VzW0dJVFNfTUFYX0RFVklDRVNdOwo+
+PiArwqDCoMKgIHUzMiBucl9kZXZpY2VzO8KgwqDCoMKgwqDCoMKgIC8qIEFsbG9jYXRlZCBEZXZp
+Y2VzICovCj4+ICvCoMKgwqAgc3RydWN0IGl0c19jb2xsZWN0aW9uIGNvbGxlY3Rpb25zW0dJVFNf
+TUFYX0NPTExFQ1RJT05TXTsKPj4gK8KgwqDCoCB1MzIgbnJfY29sbGVjdGlvbnM7wqDCoMKgIC8q
+IEFsbG9jYXRlZCBDb2xsZWN0aW9ucyAqLwo+PiDCoCB9Owo+PiDCoCDCoCBleHRlcm4gc3RydWN0
+IGl0c19kYXRhIGl0c19kYXRhOwo+PiBAQCAtOTMsNSArMTEwLDcgQEAgZXh0ZXJuIHZvaWQgaXRz
+X3BhcnNlX3R5cGVyKHZvaWQpOwo+PiDCoCBleHRlcm4gdm9pZCBpdHNfaW5pdCh2b2lkKTsKPj4g
+wqAgZXh0ZXJuIGludCBpdHNfYmFzZXJfbG9va3VwKGludCBpLCBzdHJ1Y3QgaXRzX2Jhc2VyICpi
+YXNlcik7Cj4+IMKgIGV4dGVybiB2b2lkIGl0c19lbmFibGVfZGVmYXVsdHModm9pZCk7Cj4+ICtl
+eHRlcm4gc3RydWN0IGl0c19kZXZpY2UgKml0c19jcmVhdGVfZGV2aWNlKHUzMiBkZXZfaWQsIGlu
+dCBucl9pdGVzKTsKPj4gK2V4dGVybiBzdHJ1Y3QgaXRzX2NvbGxlY3Rpb24gKml0c19jcmVhdGVf
+Y29sbGVjdGlvbih1MzIgY29sX2lkLCB1MzIKPj4gdGFyZ2V0X3BlKTsKPiAKPiBNYXliZSB1c2Ug
+J3UxNiBjb2xfaWQnPwpmYWlyIGVub3VnaC4gQXQgdGhpcyBwb2ludCwgbm90IHN1cmUgdGhpcyBp
+cyB3b3J0aCBhIHJlc3BpbiB0aG91Z2ggOy0pCj4gCj4gQmVzaWRlcywKPiBSZXZpZXdlZC1ieTog
+WmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+ClRoYW5rcyEKCkVyaWMKCgoKCj4gCj4g
+Cj4gVGhhbmtzCj4gCj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
