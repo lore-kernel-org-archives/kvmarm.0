@@ -2,84 +2,105 @@ Return-Path: <SRS0=r+CV=5K=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8E5C1975A
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 15:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03397C54FCF
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 17:10:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED0A52076A
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 15:17:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A6812077D
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Mar 2020 17:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qNFbj0zm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0A52076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dI5HyYSG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A6812077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758EB4A531;
-	Wed, 25 Mar 2020 11:17:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EA2C4B09B;
+	Wed, 25 Mar 2020 13:10:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MwNV97YbHxnz; Wed, 25 Mar 2020 11:17:02 -0400 (EDT)
+	with ESMTP id h2dp3yU5HdAs; Wed, 25 Mar 2020 13:10:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 536A24A551;
-	Wed, 25 Mar 2020 11:17:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8C74B08D;
+	Wed, 25 Mar 2020 13:10:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D44994A531
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 11:17:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8B24B086
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i1K1Go85yvtA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Mar 2020 11:17:00 -0400 (EDT)
-Received: from mail-io1-f65.google.com (mail-io1-f65.google.com
- [209.85.166.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBFB24A4CD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 11:16:59 -0400 (EDT)
-Received: by mail-io1-f65.google.com with SMTP id c19so2583961ioo.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 08:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9RGHKxNbbnl/s4SmG5NdZhXSU8xB6QWkp3vD/nnEXdQ=;
- b=qNFbj0zmmpZYr7uKM8J7jzwlFkp3/oK+09Jtl7asSlyGxlS486Kezm77V/3MtSEMno
- fW3hVmHhXU14kpel4gG/Z1xg3nfey4dplu4o/+bakM/f/A6kmsxu4C1cpL5Z6sUn40YB
- 0C7NGCxv3ElTOlSTJC1GFoJ0q2dtqQ+x4cCTgUtL5yFplF3RXvadbMMu4HLjKgHhheIf
- eMNW98F2Jq27GqXdXBx/hAZuAQhzwfW7wsegTJ4grlpjKr5ei2UUTUiIhQggLdBRGMPp
- irTc6RIOFoBUg3uxmc0dn60FeF2yyp+0Gg3qbnBnmxNuVTB1dHL3QkO8BAQfB7ptTfbN
- klOQ==
+ with ESMTP id Rax4icmxxZbZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
+Received: from us-smtp-delivery-74.mimecast.com
+ (us-smtp-delivery-74.mimecast.com [63.128.21.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A0004A49F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 13:10:01 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585156200;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vevCBANHYn2Lnc4NylQjd/uYKWuxOb7yWJMgri8X8CA=;
+ b=dI5HyYSG8peRvBLcKJE7RvFcKpwoY3IZgL+TsBqmiuOz5oTPm1T0QXIpDNFe9faW3ooHOr
+ XZtRpgs9+ZFzITuk1IHestWiJcS91EnxOzvbG7RvhaokYEtluXoeoG0K1WfU86rfSZigtH
+ LXTh4swPsjq5bD1s3Ypkvlp3uaOnxbs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-znsO0_HcPGKg2sY_I9mvSw-1; Wed, 25 Mar 2020 13:09:59 -0400
+X-MC-Unique: znsO0_HcPGKg2sY_I9mvSw-1
+Received: by mail-wr1-f72.google.com with SMTP id o18so1448445wrx.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Mar 2020 10:09:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9RGHKxNbbnl/s4SmG5NdZhXSU8xB6QWkp3vD/nnEXdQ=;
- b=VkRKqRhyfMWZ1UegUqxSE1E9UXqCDzmiONlR7A2CuAHGEVQbRWP0ofn7yYXcJ43n/c
- oM0fjIAX7K2XXj/cmL8RLbCJnvMzdzIicUI7xJRbHfxXWrqByiHiP/X0vfMFdM4vwzU8
- Duoddx4jMfwZLjPJp/ZkbQup8SoiM5Pgs2EBRFvyFCOdl9vYGSfg/Et/qLqegygP7yJ9
- BT1+KBeg3PXHpChYAydaLh4Ow1+K0DzKUXLSTVqle84jrpG0cOeoQhqt+CalL8YRGkv4
- 3YhOwdeVqtZDFkiVwd+Nepj4YKUrPjQe17IaFp0o+hJP/5LeGl4ko90epqjQiPygDF5m
- 7D8g==
-X-Gm-Message-State: ANhLgQ1ua17/x+MEgwMxEea30vppBlCOLh/BI755y5XhVmPjRqHmlFNP
- oHyVUNWX4M0dQ89FEqMXj0ipA22eQmRrSGcWrIBtsw==
-X-Google-Smtp-Source: ADFU+vtiYL30PNCMxaUigbiLawILpk5RA5aaHfFoG4N3RszvvhUgvausmB69gR+PBEN213OVwHhebz5+d6npj6zlDjw=
-X-Received: by 2002:a02:2944:: with SMTP id p65mr3247806jap.89.1585149419207; 
- Wed, 25 Mar 2020 08:16:59 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vevCBANHYn2Lnc4NylQjd/uYKWuxOb7yWJMgri8X8CA=;
+ b=XyE4+E2h3UIsjzHTVW4+SRIKSfLvcYAvbpSLmJdlKOa/56Jy3gwW2tuEWJYdpWxH6J
+ ulmZOYwsyUbS6s1+iJ7JuyrEdHa/7SQAmfAHMr667AxWtOhduXWHXh6uFeT/Hmyffmqn
+ o+TbGeRygCO1r7J9y7CQ0aKDAS83ovRkuje8TojGq5jlJ8gD8Q9p0DxOf5Ainoz/fL8w
+ CYvDQcUB8sMBd1XJY0mfCJgg8Gp667NJloOsYtRmidok1k1tWajiVaNnDTHZdvnMwt5b
+ Jd/cGZb+I2f11vPAu7h8A2rIV58IW2mGSbfQolcQ3Pn8/Mt9/6Gvke/sCxql56Bj55r1
+ Thxg==
+X-Gm-Message-State: ANhLgQ1oHx6IN92cCFJ0q8BURJEZyxM+vcE9rg3tdJqrypnQRchY23/i
+ 4oTgEyw+vJ6cGa8l2cb+X0tPg4AUaUGwQLYPsKRijkuxL8NjseQxmNDFz86PXSyDMVFSGIfsjJm
+ rFZ9VAfpmlBvfnpwpp6QGWG8c
+X-Received: by 2002:a1c:ab54:: with SMTP id u81mr4174244wme.166.1585156195993; 
+ Wed, 25 Mar 2020 10:09:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsDeuPAf6z2VeRFRt7ZJYFWF9FC4OwqXVMD3tFXVyspIst/9JsJ8aRkJ29STSyG+27J7ShG6g==
+X-Received: by 2002:a1c:ab54:: with SMTP id u81mr4174213wme.166.1585156195636; 
+ Wed, 25 Mar 2020 10:09:55 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e4f4:3c00:2b79:d6dc?
+ ([2001:b07:6468:f312:e4f4:3c00:2b79:d6dc])
+ by smtp.gmail.com with ESMTPSA id q8sm35205395wrc.8.2020.03.25.10.09.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 25 Mar 2020 10:09:54 -0700 (PDT)
+Subject: Re: [PATCH 3/4] kvm: Replace vcpu->swait with rcuwait
+To: Davidlohr Bueso <dave@stgolabs.net>, tglx@linutronix.de
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
+Date: Wed, 25 Mar 2020 18:09:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200323113227.3169-1-beata.michalska@linaro.org>
- <20200323113227.3169-3-beata.michalska@linaro.org>
- <fdf4d6f2-ecab-6358-9f74-480f1fa6fdef@linaro.org>
-In-Reply-To: <fdf4d6f2-ecab-6358-9f74-480f1fa6fdef@linaro.org>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Wed, 25 Mar 2020 15:16:48 +0000
-Message-ID: <CADSWDzsuGXBwZLm-rJ7ULbODVk4SgoNvXHqJM_BR-gYJNeMB+w@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] target/arm: kvm: Handle potential issue with dabt
- injection
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200324044453.15733-4-dave@stgolabs.net>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
+ torvalds@linux-foundation.org, bigeasy@linutronix.de,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,22 +117,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 23 Mar 2020 at 18:44, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 3/23/20 4:32 AM, Beata Michalska wrote:
-> >      uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
-> > +    uint8_t ext_dabt_raised; /* Tracking/verifying injection of ext DABT */
->
-> Is there a reason these are uint8_t and not bool?
->
->
-The ext_dabt_pending is reflecting the KVM type.
-The ext_dabt_raised is following that one.
+On 24/03/20 05:44, Davidlohr Bueso wrote:
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 71244bf87c3a..e049fcb3dffb 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -290,8 +290,7 @@ static enum hrtimer_restart kvm_mips_comparecount_wakeup(struct hrtimer *timer)
+>  	kvm_mips_callbacks->queue_timer_int(vcpu);
+>  
+>  	vcpu->arch.wait = 0;
+> -	if (swq_has_sleeper(&vcpu->wq))
+> -		swake_up_one(&vcpu->wq);
+> +	rcuwait_wake_up(&vcpu->wait)
 
-BR
-Beata
-> r~
+This is missing a semicolon.  (KVM MIPS is known not to compile and will
+be changed to "depends on BROKEN" in 5.7).
+
+Paolo
+
+>  	return kvm_mips_count_timeout(vcpu);
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
