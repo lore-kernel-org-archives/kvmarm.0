@@ -2,61 +2,70 @@ Return-Path: <SRS0=88wp=5M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9893C43331
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Mar 2020 16:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF186C2D0ED
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Mar 2020 16:59:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3758E20716
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Mar 2020 16:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3758E20716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 553C3206E6
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Mar 2020 16:59:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0W/GFfj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 553C3206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97EA14A534;
-	Fri, 27 Mar 2020 12:12:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF2CA4A578;
+	Fri, 27 Mar 2020 12:59:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id C8VETOidi2pb; Fri, 27 Mar 2020 12:12:02 -0400 (EDT)
+	with ESMTP id KVmmdqZ2qnPB; Fri, 27 Mar 2020 12:59:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 527944A522;
-	Fri, 27 Mar 2020 12:12:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C52534A5A0;
+	Fri, 27 Mar 2020 12:59:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 645824A4FC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2020 12:12:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABCA74A578
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2020 12:59:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iIEdSbZMa-tc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Mar 2020 12:12:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 348A14A4E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2020 12:12:00 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B42E31FB;
- Fri, 27 Mar 2020 09:11:59 -0700 (PDT)
-Received: from [172.16.1.108] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 42F6A3F71F;
- Fri, 27 Mar 2020 09:11:57 -0700 (PDT)
+ with ESMTP id DmhNDHsznVb1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Mar 2020 12:59:42 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4B5B4A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2020 12:59:42 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 88AE8206E6;
+ Fri, 27 Mar 2020 16:59:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1585328381;
+ bh=MvORsB1dXvIVi4W8/BF44aEMuNPoatu951ma4R+Bhj4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Z0W/GFfjVghNGtgiyX/lazsrRNOG8cF7ZTfPdUa9Whbcb6+vCtT+MV7NU3NJGMMPS
+ YS5wzuPN1pf0X4Le2OxCBz+OVqoBQWXP4l6++a732vJdT5WJKVUKgYNt1IMmiRiJ7K
+ bVYUEumFyaZ7E+SvP9FdCNdDrAwCGbghojU7ipJU=
+Date: Fri, 27 Mar 2020 16:59:36 +0000
+From: Will Deacon <will@kernel.org>
+To: James Morse <james.morse@arm.com>
 Subject: Re: [RFC PATCH] arm64: unify WORKAROUND_SPECULATIVE_AT_{NVHE,VHE}
-To: Andrew Scull <ascull@google.com>
+Message-ID: <20200327165935.GA8048@willie-the-truck>
 References: <20200327143941.195626-1-ascull@google.com>
-From: James Morse <james.morse@arm.com>
-Openpgp: preference=signencrypt
-Message-ID: <a8cc7a17-cb84-3e52-15f4-87b27a01876b@arm.com>
-Date: Fri, 27 Mar 2020 16:11:56 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <a8cc7a17-cb84-3e52-15f4-87b27a01876b@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200327143941.195626-1-ascull@google.com>
-Content-Language: en-US
-Cc: qwandor@google.com, Marc Zyngier <maz@kernel.org>,
- Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
- wedsonaf@google.com, linux-arm-kernel@lists.infradead.org, dbrazdil@google.com,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu, tabba@google.com
+Content-Disposition: inline
+In-Reply-To: <a8cc7a17-cb84-3e52-15f4-87b27a01876b@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: qwandor@google.com, Marc Zyngier <maz@kernel.org>, tabba@google.com,
+ Steven Price <steven.price@arm.com>, wedsonaf@google.com, dbrazdil@google.com,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,61 +82,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
+Hi James,
 
-On 3/27/20 2:39 PM, Andrew Scull wrote:
-> Errata 1165522, 1319367 and 1530923 each allow TLB entries to be
-> allocated as a result of a speculative AT instruction. In order to
-> avoid mandating VHE on certain affected CPUs, apply the workaround to
-> both the nVHE and the VHE case for all affected CPUs.
-
-You're booting a VHE capable system without VHE, and need KVM?
-Do tell!
-
-Would enabling the nVHE workaround on a VHE capable part solve your problem?
-Merging the errata has some side effects...
-
-
-> ---
-> I'm not able to test the workarounds properly for the affected CPUs but
-> have built and booted under qemu configs with and without VHE as well as
-> the workaround being enabled and disabled.
+On Fri, Mar 27, 2020 at 04:11:56PM +0000, James Morse wrote:
+> On 3/27/20 2:39 PM, Andrew Scull wrote:
+> > Errata 1165522, 1319367 and 1530923 each allow TLB entries to be
+> > allocated as a result of a speculative AT instruction. In order to
+> > avoid mandating VHE on certain affected CPUs, apply the workaround to
+> > both the nVHE and the VHE case for all affected CPUs.
 > 
-> As there exist work arounds for nVHE and VHE, it doesn't appear to be a
-> technical limitation that meant VHE was being mandated. Please correct
-> me if this understanding is inaccurate. Thanks!
+> You're booting a VHE capable system without VHE, and need KVM?
+> Do tell!
 
-The affected VHE parts came first. Then came those that didn't have VHE at all.
+I'll stick my neck out for this part...
 
+Basically, we're looking at enabling virtualisation on Android through
+KVM and we're going to be upstreaming more of this as it gets going.
+One of the goals of this work is to provide an environment where virtual
+machines can run in isolation from the KVM host; in such a design, the
+guest memory must not be accessible to the host, so this doesn't lend
+itself at all to VHE. Our current work is focussing on extending the nVHE
+__hyp_text so that things like stage-2 page table and vCPU state is all
+handled there, with a stage-2 put over the host kernel to prevent access
+to guest memory. The host is still responsible for scheduling vCPUs, so
+a compromised host can cause a DoS but it's the data integrity that we
+really care about. We're looking at implementing this on top of the SPCI
+spec from Arm, where the VMs are a lot less dynamic than a traditional
+KVM invocation but implement message passing and shared memory interfaces
+so that we can still use things like virtio. We're also aiming to support
+SPCI partitions alongside traditional VMs, although the stage-2 must still
+be handled at EL2 for both types of guest.
 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 7672a978926c..2c1436fc0830 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -118,7 +118,7 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
->  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
->  
-> -	if (!cpus_have_const_cap(ARM64_WORKAROUND_SPECULATIVE_AT_NVHE)) {
-> +	if (!cpus_have_const_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
->  		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
->  		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
->  	} else	if (!ctxt->__hyp_running_vcpu) {
+It's a bit like a Type-1.5 hypervisor ;)
 
-The comment just below here:
-|		/*
-|		 * Must only be done for guest registers, hence the context
-|		 * test. We're coming from the host, so SCTLR.M is already
-|		 * set. Pairs with __activate_traps_nvhe().
-|		 */
+Anyway, there's plenty to do, but one of the exercises is removing some of
+the artificial Kconfig dependencies we have on VHE. This erratum workaround
+is one of them, but there are others such as SVE and Pointer Auth.
 
-The VHE parts aren't going to run __activate_traps_nvhe(), so you skip restoring
-the guest's SCTLR_EL1 and TCR_EL1...
+> Would enabling the nVHE workaround on a VHE capable part solve your problem?
 
+Could do, but it seems a bit weird to enable the workarounds independently
+once both VHE and nVHE are supported. We probably need to use has_vhe() to
+distinguish the two paths, rather than rely on the presence of the
+workaround as a proxy for that.
 
-Thanks,
-
-James
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
