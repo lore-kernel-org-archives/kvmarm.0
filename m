@@ -2,62 +2,65 @@ Return-Path: <SRS0=6NFX=5P=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C45B6C2D0E5
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 12:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D49C2D0ED
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 12:21:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 55A6820716
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 12:06:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55A6820716
+	by mail.kernel.org (Postfix) with ESMTP id 32B0420714
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 12:21:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32B0420714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C30784B1CD;
-	Mon, 30 Mar 2020 08:06:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7268A4B1D3;
+	Mon, 30 Mar 2020 08:21:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZIz8r+kmMmMo; Mon, 30 Mar 2020 08:06:52 -0400 (EDT)
+	with ESMTP id r6zSKd4tvpls; Mon, 30 Mar 2020 08:21:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 929A24B1D3;
-	Mon, 30 Mar 2020 08:06:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 419354B1D4;
+	Mon, 30 Mar 2020 08:21:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E70614B1C7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 08:06:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDB584B1CD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 08:21:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0p5Eo1cmEEDh for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Mar 2020 08:06:50 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DB934B0A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 08:06:50 -0400 (EDT)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 9F0A01416568A269222E;
- Mon, 30 Mar 2020 20:06:44 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
- 20:06:36 +0800
-Subject: Re: [kvm-unit-tests PATCH v7 13/13] arm/arm64: ITS: pending table
- migration test
-To: Eric Auger <eric.auger@redhat.com>
+ with ESMTP id 1974y26mAQGp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Mar 2020 08:21:09 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4C934B1BE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 08:21:08 -0400 (EDT)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 4EDC38D557AA0DF61F53;
+ Mon, 30 Mar 2020 20:21:05 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
+ 20:20:58 +0800
+Subject: Re: [kvm-unit-tests PATCH v7 06/13] arm/arm64: ITS: Introspection
+ tests
+To: Andrew Jones <drjones@redhat.com>, Auger Eric <eric.auger@redhat.com>
 References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-14-eric.auger@redhat.com>
+ <20200320092428.20880-7-eric.auger@redhat.com>
+ <947a79f5-1f79-532b-9ec7-6fd539ccd183@huawei.com>
+ <8878be7f-7653-b427-cd0d-722f82fb6b65@redhat.com>
+ <20200330091139.i2d6vv64f5diamlz@kamzik.brq.redhat.com>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <296c574b-810c-9c90-a613-df732a9ac193@huawei.com>
-Date: Mon, 30 Mar 2020 20:06:35 +0800
+Message-ID: <9f3951c9-8ff6-531f-e9a5-abafdab5fef8@huawei.com>
+Date: Mon, 30 Mar 2020 20:20:57 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200320092428.20880-14-eric.auger@redhat.com>
+In-Reply-To: <20200330091139.i2d6vv64f5diamlz@kamzik.brq.redhat.com>
 Content-Language: en-US
 X-Originating-IP: [10.173.222.27]
 X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
+Cc: thuth@redhat.com, kvm@vger.kernel.org, andre.przywara@arm.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -70,169 +73,28 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 2020/3/20 17:24, Eric Auger wrote:
-> Add two new migration tests. One testing the migration of
-> a topology where collection were unmapped. The second test
-> checks the migration of the pending table.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
-[...]
-
-> @@ -659,6 +678,15 @@ static int its_prerequisites(int nb_cpus)
->   	return 0;
->   }
->   
-> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> +		    struct its_collection *col)
-> +{
-> +	assert(dev && col);
-> +
-> +	its_send_mapti(dev, physid, eventid, col);
-> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-> +}
-
-I'd say we can just drop this helper and open-code it anywhere
-necessarily. The name 'set_lpi' doesn't tell me too much about
-what has been implemented inside the helper.
-
-> +
->   /*
->    * Setup the configuration for those mappings:
->    * dev_id=2 event=20 -> vcpu 3, intid=8195
-> @@ -790,6 +818,108 @@ static void test_its_migration(void)
->   	its_send_int(dev7, 255);
->   	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
->   }
-> +
-> +static void test_migrate_unmapped_collection(void)
-> +{
-> +	struct its_collection *col;
-> +	struct its_device *dev2, *dev7;
-> +	int pe0 = 0;
-> +	u8 config;
-> +
-> +	if (its_setup1())
-> +		return;
-> +
-> +	col = its_create_collection(pe0, pe0);
-> +	dev2 = its_get_device(2);
-> +	dev7 = its_get_device(7);
-> +
-> +	/* MAPTI with the collection unmapped */
-> +	set_lpi(dev2, 0, 8192, col);
-
-... and it's only invoked here.
-
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report_info("Migration complete");
-> +
-> +	/* on the destination, map the collection */
-> +	its_send_mapc(col, true);
-> +	its_send_invall(col);
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
-> +
-> +	config = gicv3_lpi_get_config(8192);
-> +	report(config == LPI_PROP_DEFAULT,
-> +	       "Config of LPI 8192 was properly migrated");
-> +
-> +	lpi_stats_expect(pe0, 8192);
-> +	its_send_int(dev2, 0);
-> +	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
-> +}
-> +
-> +static void test_its_pending_migration(void)
-> +{
-> +	struct its_device *dev;
-> +	struct its_collection *collection[2];
-> +	int *expected = malloc(nr_cpus * sizeof(int));
-> +	int pe0 = nr_cpus - 1, pe1 = nr_cpus - 2;
-> +	u64 pendbaser;
-> +	void *ptr;
-> +	int i;
-> +
-> +	if (its_prerequisites(4))
-> +		return;
-> +
-> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	its_send_mapd(dev, true);
-> +
-> +	collection[0] = its_create_collection(pe0, pe0);
-> +	collection[1] = its_create_collection(pe1, pe1);
-> +	its_send_mapc(collection[0], true);
-> +	its_send_mapc(collection[1], true);
-> +
-> +	/* disable lpi at redist level */
-> +	gicv3_lpi_rdist_disable(pe0);
-> +	gicv3_lpi_rdist_disable(pe1);
-> +
-> +	/* lpis are interleaved inbetween the 2 PEs */
-> +	for (i = 0; i < 256; i++) {
-> +		struct its_collection *col = i % 2 ? collection[0] :
-> +						     collection[1];
-> +		int vcpu = col->target_address >> 16;
-> +
-> +		its_send_mapti(dev, LPI(i), i, col);
-> +		gicv3_lpi_set_config(LPI(i), LPI_PROP_DEFAULT);
-> +		gicv3_lpi_set_clr_pending(vcpu, LPI(i), true);
-> +	}
-> +	its_send_invall(collection[0]);
-> +	its_send_invall(collection[1]);
-> +
-> +	/* Clear the PTZ bit on each pendbaser */
-> +
-> +	expected[pe0] = 128;
-> +	expected[pe1] = 128;
-
-Do we need to initialize expected[] for other PEs? Or it has always
-been zeroed by the kvm-unit-tests implementation of malloc()?
-
-> +
-> +	ptr = gicv3_data.redist_base[pe0] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	ptr = gicv3_data.redist_base[pe1] + GICR_PENDBASER;
-> +	pendbaser = readq(ptr);
-> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> +
-> +	gicv3_lpi_rdist_enable(pe0);
-> +	gicv3_lpi_rdist_enable(pe1);
-
-I don't know how the migration gets implemented in kvm-unit-tests.
-But is there any guarantee that the LPIs will only be triggered on the
-destination side? As once the EnableLPIs bit becomes 1, VGIC will start
-reading the pending bit in guest memory and potentially injecting LPIs
-into the target vcpu (in the source side).
-
-> +
-> +	puts("Now migrate the VM, then press a key to continue...\n");
-> +	(void)getchar();
-> +	report_info("Migration complete");
-> +
-> +	/* let's wait for the 256 LPIs to be handled */
-> +	mdelay(1000);
-> +
-> +	check_lpi_hits(expected, "128 LPIs on both PE0 and PE1 after migration");
-> +}
-
-
-Thanks,
-Zenghui
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgRHJldywKCk9uIDIwMjAvMy8zMCAxNzoxMSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+IE9uIE1v
+biwgTWFyIDMwLCAyMDIwIGF0IDEwOjQ2OjU3QU0gKzAyMDAsIEF1Z2VyIEVyaWMgd3JvdGU6Cj4+
+IEhpIFplbmdodWksCj4+Cj4+IE9uIDMvMzAvMjAgMTA6MzAgQU0sIFplbmdodWkgWXUgd3JvdGU6
+CgpbLi4uXQoKPj4+IE90aGVyd2lzZSBJIHRoaW5rIHdlIHdpbGwgZW5kLXVwIHdpdGggbWVtb3J5
+IGNvcnJ1cHRpb24gd2hlbiB3cml0aW5nCj4+PiB0aGUgY29tbWFuZCBxdWV1ZS7CoCBCdXQgaXQg
+c2VlbXMgdGhhdCBldmVyeXRoaW5nIGp1c3Qgd29ya3MgZmluZSAuLi4KPj4+IFNvIEknbSByZWFs
+bHkgY29uZnVzZWQgaGVyZSA6LS8KPj4gSSB3YXMgdG9sZCBieSBQYW9sbyB0aGF0IHRoZSBWQS9Q
+QSBtZW1vcnkgbWFwIGlzIGZsYXQgaW4ga3ZtdW5pdCB0ZXN0Lgo+IAo+IFdoYXQgZG9lcyBmbGF0
+IG1lYW4/IGt2bS11bml0LXRlc3RzLCBhdCBsZWFzdCBhcm0vYXJtNjQsIGRvZXMgcHJlcGFyZQo+
+IGFuIGlkZW50aXR5IG1hcCBvZiBhbGwgcGh5c2ljYWwgbWVtb3J5LCB3aGljaCBleHBsYWlucyB3
+aHkgdGhlIGFib3ZlCj4gaXMgd29ya2luZy4gSXQncyBkb2luZyB2aXJ0X3RvX3BoeXMoc29tZS12
+aXJ0LWFkZHIpLCB3aGljaCBnZXRzIGEKPiBwaHlzIGFkZHIsIGJ1dCB3aGVuIHRoZSBJVFMgdXNl
+cyBpdCBhcyBhIHZpcnQgYWRkciBpdCB3b3JrcyBiZWNhdXNlCj4gd2UgKmFsc28qIGhhdmUgYSB2
+aXJ0IGFkZHIgPT0gcGh5cyBhZGRyIG1hcHBpbmcgaW4gdGhlIGRlZmF1bHQgcGFnZQo+IHRhYmxl
+LCB3aGljaCBpcyBuYW1lZCAiaWRtYXAiIGZvciBnb29kIHJlYXNvbi4KClRoYW5rcyBmb3IgdGhl
+IGV4cGxhbmF0aW9uIDotKS4gSSB3aWxsIGhhdmUgYSBsb29rIGF0IHRoZSBhcm0vYXJtNjQgbW0K
+Y29kZSB0byBsZWFybiBpdC4KCgpUaGFua3MsClplbmdodWkKCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
+c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
+L2xpc3RpbmZvL2t2bWFybQo=
