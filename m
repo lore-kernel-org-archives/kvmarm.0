@@ -2,83 +2,62 @@ Return-Path: <SRS0=6NFX=5P=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6F3C43331
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 09:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE95C2D0E9
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 09:23:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A146720776
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 09:14:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D6r9RsZ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A146720776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C774720776
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Mar 2020 09:22:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C774720776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 285624B1B9;
-	Mon, 30 Mar 2020 05:14:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AABB4B143;
+	Mon, 30 Mar 2020 05:22:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4UPIY34pwley; Mon, 30 Mar 2020 05:14:06 -0400 (EDT)
+	with ESMTP id u4IzC0D9LMrw; Mon, 30 Mar 2020 05:22:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE00B4B1C8;
-	Mon, 30 Mar 2020 05:14:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2471E4B1F3;
+	Mon, 30 Mar 2020 05:22:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A764B1B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 05:14:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADD74B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 05:22:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lQfsBDmcfcRH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Mar 2020 05:14:04 -0400 (EDT)
-Received: from us-smtp-delivery-74.mimecast.com
- (us-smtp-delivery-74.mimecast.com [63.128.21.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F283F4B1A1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 05:14:03 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1585559643;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=G3YtU9cQSu/MJLCZpAjz+jBQ87NL+MN25O2wNM+ILfI=;
- b=D6r9RsZ2FfLQYOYQGcLbqs5I9yxYXGAmQq5FmECRELYk+gpLnsvRDILP3AL2bD/Q9Q4u2h
- ZkCMd3sRLi37Ba2NkstitPwwUpMaoDVlV4Ge/Z7MEpJsdO8FJzWY3sVWgdI0bSny2reuJ1
- mlMWvoGeB6rvOaVY8S5qcPzT3InWCQw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-htfeA-L7OCOCs7vXl5OVkQ-1; Mon, 30 Mar 2020 05:13:59 -0400
-X-MC-Unique: htfeA-L7OCOCs7vXl5OVkQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23080801A06;
- Mon, 30 Mar 2020 09:13:58 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.172])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C066D1036D00;
- Mon, 30 Mar 2020 09:13:51 +0000 (UTC)
-Date: Mon, 30 Mar 2020 11:13:48 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v7 08/13] arm/arm64: ITS: Device and
- collection Initialization
-Message-ID: <20200330091348.izdzq5ekc47vg2y3@kamzik.brq.redhat.com>
+ with ESMTP id xWGtNYyJAcGR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Mar 2020 05:22:56 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C71124B0B8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Mar 2020 05:22:55 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3476A1E97E7AB0E559FA;
+ Mon, 30 Mar 2020 17:22:47 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Mon, 30 Mar 2020
+ 17:22:39 +0800
+Subject: Re: [kvm-unit-tests PATCH v7 09/13] arm/arm64: ITS: Commands
+To: Eric Auger <eric.auger@redhat.com>
 References: <20200320092428.20880-1-eric.auger@redhat.com>
- <20200320092428.20880-9-eric.auger@redhat.com>
- <63f3d8aa-c1e3-f40f-32a1-fb6d22e70541@huawei.com>
- <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
+ <20200320092428.20880-10-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <84493416-7b0d-df3e-df56-cedcbdd72010@huawei.com>
+Date: Mon, 30 Mar 2020 17:22:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <c5ce7101-9ea3-8b04-7ec0-cb27dfbdc116@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+In-Reply-To: <20200320092428.20880-10-eric.auger@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, andre.przywara@arm.com, thuth@redhat.com,
  kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -91,129 +70,132 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 25, 2020 at 10:20:43PM +0100, Auger Eric wrote:
-> Hi Zenghui,
-> =
+Hi Eric,
 
-> On 3/25/20 9:10 AM, Zenghui Yu wrote:
-> > Hi Eric,
-> > =
+On 2020/3/20 17:24, Eric Auger wrote:
+> Implement main ITS commands. The code is largely inherited from
+> the ITS driver.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> > On 2020/3/20 17:24, Eric Auger wrote:
-> >> Introduce an helper functions to register
-> >> - a new device, characterized by its device id and the
-> >> =A0=A0 max number of event IDs that dimension its ITT (Interrupt
-> >> =A0=A0 Translation Table).=A0 The function allocates the ITT.
-> >>
-> >> - a new collection, characterized by its ID and the
-> >> =A0=A0 target processing engine (PE).
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v3 -> v4:
-> >> - remove unused its_baser variable from its_create_device()
-> >> - use get_order()
-> >> - device->itt becomes a GVA instead of GPA
-> >>
-> >> v2 -> v3:
-> >> - s/report_abort/assert
-> >>
-> >> v1 -> v2:
-> >> - s/nb_/nr_
-> >> ---
-> >> =A0 lib/arm64/asm/gic-v3-its.h | 19 +++++++++++++++++++
-> >> =A0 lib/arm64/gic-v3-its.c=A0=A0=A0=A0 | 38 ++++++++++++++++++++++++++=
-++++++++++++
-> >> =A0 2 files changed, 57 insertions(+)
-> >>
-> >> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> >> index 4683011..adcb642 100644
-> >> --- a/lib/arm64/asm/gic-v3-its.h
-> >> +++ b/lib/arm64/asm/gic-v3-its.h
-> >> @@ -31,6 +31,19 @@ struct its_baser {
-> >> =A0 };
-> >> =A0 =A0 #define GITS_BASER_NR_REGS=A0=A0=A0=A0=A0=A0=A0 8
-> >> +#define GITS_MAX_DEVICES=A0=A0=A0=A0=A0=A0=A0 8
-> >> +#define GITS_MAX_COLLECTIONS=A0=A0=A0=A0=A0=A0=A0 8
-> >> +
-> >> +struct its_device {
-> >> +=A0=A0=A0 u32 device_id;=A0=A0=A0 /* device ID */
-> >> +=A0=A0=A0 u32 nr_ites;=A0=A0=A0 /* Max Interrupt Translation Entries =
-*/
-> >> +=A0=A0=A0 void *itt;=A0=A0=A0 /* Interrupt Translation Table GVA */
-> >> +};
-> >> +
-> >> +struct its_collection {
-> >> +=A0=A0=A0 u64 target_address;
-> >> +=A0=A0=A0 u16 col_id;
-> >> +};
-> >> =A0 =A0 struct its_data {
-> >> =A0=A0=A0=A0=A0 void *base;
-> >> @@ -39,6 +52,10 @@ struct its_data {
-> >> =A0=A0=A0=A0=A0 struct its_baser coll_baser;
-> >> =A0=A0=A0=A0=A0 struct its_cmd_block *cmd_base;
-> >> =A0=A0=A0=A0=A0 struct its_cmd_block *cmd_write;
-> >> +=A0=A0=A0 struct its_device devices[GITS_MAX_DEVICES];
-> >> +=A0=A0=A0 u32 nr_devices;=A0=A0=A0=A0=A0=A0=A0 /* Allocated Devices */
-> >> +=A0=A0=A0 struct its_collection collections[GITS_MAX_COLLECTIONS];
-> >> +=A0=A0=A0 u32 nr_collections;=A0=A0=A0 /* Allocated Collections */
-> >> =A0 };
-> >> =A0 =A0 extern struct its_data its_data;
-> >> @@ -93,5 +110,7 @@ extern void its_parse_typer(void);
-> >> =A0 extern void its_init(void);
-> >> =A0 extern int its_baser_lookup(int i, struct its_baser *baser);
-> >> =A0 extern void its_enable_defaults(void);
-> >> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
-> >> +extern struct its_collection *its_create_collection(u32 col_id, u32
-> >> target_pe);
-> > =
+[...]
 
-> > Maybe use 'u16 col_id'?
-> fair enough. At this point, not sure this is worth a respin though ;-)
+> +/* ITS COMMANDS */
+> +
+> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
+> +{
+> +	cmd->raw_cmd[0] &= ~0xffUL;
+> +	cmd->raw_cmd[0] |= cmd_nr;
+> +}
+> +
+> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
+> +{
+> +	cmd->raw_cmd[0] &= BIT_ULL(32) - 1;
+> +	cmd->raw_cmd[0] |= ((u64)devid) << 32;
+> +}
+> +
+> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
+> +{
+> +	cmd->raw_cmd[1] &= ~0xffffffffUL;
+> +	cmd->raw_cmd[1] |= id;
+> +}
+> +
+> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
+> +{
+> +	cmd->raw_cmd[1] &= 0xffffffffUL;
+> +	cmd->raw_cmd[1] |= ((u64)phys_id) << 32;
+> +}
+> +
+> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
+> +{
+> +	cmd->raw_cmd[1] &= ~0x1fUL;
+> +	cmd->raw_cmd[1] |= size & 0x1f;
+> +}
+> +
+> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
+> +{
+> +	cmd->raw_cmd[2] &= ~0xffffffffffffUL;
+> +	cmd->raw_cmd[2] |= itt_addr & 0xffffffffff00UL;
+> +}
+> +
+> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
+> +{
+> +	cmd->raw_cmd[2] &= ~(1UL << 63);
+> +	cmd->raw_cmd[2] |= ((u64)!!valid) << 63;
+> +}
+> +
+> +static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
+> +{
+> +	cmd->raw_cmd[2] &= ~(0xfffffffffUL << 16);
+> +	cmd->raw_cmd[2] |= (target_addr & (0xffffffffUL << 16));
+> +}
+> +
+> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+> +{
+> +	cmd->raw_cmd[2] &= ~0xffffUL;
+> +	cmd->raw_cmd[2] |= col;
+> +}
 
-I'd like all the virt_to_phys calls removed where there are not necessary,
-which was pointed out in a different patch. This can be fixed up at the
-same time.
+The command encoding can be refactored like:
 
-Thanks,
-drew
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4d36f136d57aea6f6440886106e246bb7e5918d8
 
-> > =
+which will look much clearer.
 
-> > Besides,
-> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> Thanks!
-> =
+[...]
 
-> Eric
-> =
+> +static void its_send_single_command(its_cmd_builder_t builder,
+> +				    struct its_cmd_desc *desc)
+> +{
+> +	struct its_cmd_block *cmd, *next_cmd;
+> +
+> +	cmd = its_allocate_entry();
+> +	builder(cmd, desc);
+> +	next_cmd = its_post_commands();
+> +
+> +	its_wait_for_range_completion(cmd, next_cmd);
+> +}
+> +
+> +
 
-> =
+extra line.
 
-> =
+> +static void its_build_mapd_cmd(struct its_cmd_block *cmd,
+> +			       struct its_cmd_desc *desc)
+> +{
+> +	unsigned long itt_addr;
+> +	u8 size = 12; /* 4096 eventids */
 
-> =
+Maybe use desc->its_mapd_cmd.dev->nr_ites instead as we already have it?
 
-> > =
+> +
+> +	itt_addr = (unsigned long)(virt_to_phys(desc->its_mapd_cmd.dev->itt));
+> +	itt_addr = ALIGN(itt_addr, ITS_ITT_ALIGN);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_MAPD);
+> +	its_encode_devid(cmd, desc->its_mapd_cmd.dev->device_id);
+> +	its_encode_size(cmd, size - 1);
+> +	its_encode_itt(cmd, itt_addr);
+> +	its_encode_valid(cmd, desc->its_mapd_cmd.valid);
+> +	its_fixup_cmd(cmd);
+> +	if (desc->verbose)
+> +		printf("ITS: MAPD devid=%d size = 0x%x itt=0x%lx valid=%d\n",
+> +			desc->its_mapd_cmd.dev->device_id,
+> +			size, itt_addr, desc->its_mapd_cmd.valid);
+> +
 
-> > =
+extra line.
 
-> > Thanks
-> > =
+All of these are trivial things and feel free to ignore them,
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 
-> > =
 
-> =
-
-> =
-
+Thanks
 
 _______________________________________________
 kvmarm mailing list
