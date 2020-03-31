@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06F3C10F26
-	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4403C43331
+	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:17:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9945520848
-	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A45920848
+	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vzmbFusa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9945520848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0uvoOZEL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A45920848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 537134B0BA;
-	Tue, 31 Mar 2020 08:17:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 438A24B0B9;
+	Tue, 31 Mar 2020 08:17:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id A9sSNwVHSt1L; Tue, 31 Mar 2020 08:17:18 -0400 (EDT)
+	with ESMTP id o6ucZf2hpWxQ; Tue, 31 Mar 2020 08:17:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C4A4B096;
-	Tue, 31 Mar 2020 08:17:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E967B4B0CC;
+	Tue, 31 Mar 2020 08:17:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127CE4B0A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:17:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 672564A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:17:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5MkeFiy2E0M0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Mar 2020 08:17:13 -0400 (EDT)
+ with ESMTP id 2EEWYjyi5yUa for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Mar 2020 08:17:18 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 243C24B09C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:17:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277B94B092
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:17:17 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 44E6520B1F;
- Tue, 31 Mar 2020 12:17:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 538632137B;
+ Tue, 31 Mar 2020 12:17:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1585657032;
- bh=+F1u1um5t/m+LxG9xGeYmNkSrgynmuQNeITqQeSRvKE=;
+ s=default; t=1585657036;
+ bh=ugisv1NLx5lkMOol7N8eoN+aF+PTHkSjV2ZOtSqDBPo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=vzmbFusaxH/B6n5QhrhgfP4yLNd6PcCstx9D+5j4RZWY3MjO7/5w2R8rwIc3zeBYT
- ppEgKyoCQ+mb+/2w9g5FFu/DFAbWeZjclTEYWE2r9YFA2em/f3kQb8YPwExW06nRk9
- VobqBqmCyYjaM0Gl68Abww4amlstQJwjl8RJO0ZA=
+ b=0uvoOZELJANgaBXQnSCnrix8hDA4r/J7puLVsrL/bgudkw8rxtxsgnY0eIcoqJtW7
+ /7/ZIvOeTHrHjj/rYgmcQZUq9HopQKz1xkqluzDF0jIbcmV4LYpNxe0NQhgy5c55eI
+ exNZxiu3jhDgaIOtz53mh2sMCCqSnJ/BiG+fzDzc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jJFpO-00HBlI-Fi; Tue, 31 Mar 2020 13:17:10 +0100
+ id 1jJFpS-00HBlI-5Z; Tue, 31 Mar 2020 13:17:14 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 03/15] arm: Remove KVM from config files
-Date: Tue, 31 Mar 2020 13:16:33 +0100
-Message-Id: <20200331121645.388250-4-maz@kernel.org>
+Subject: [PATCH 06/15] arm: Remove GICv3 vgic compatibility macros
+Date: Tue, 31 Mar 2020 13:16:36 +0100
+Message-Id: <20200331121645.388250-7-maz@kernel.org>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200331121645.388250-1-maz@kernel.org>
 References: <20200331121645.388250-1-maz@kernel.org>
@@ -99,8 +99,8 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Only one platform is building KVM by default. How crazy! Remove
-it whilst nobody is watching.
+We used to use a set of macros to provide support of vgic-v3 to 32bit
+without duplicating everything. We don't need it anymore, so drop it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: Olof Johansson <olof@lixom.net>
@@ -111,19 +111,148 @@ Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: Linus Walleij <linus.walleij@linaro.org>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/configs/axm55xx_defconfig | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm/include/asm/arch_gicv3.h | 114 ------------------------------
+ 1 file changed, 114 deletions(-)
 
-diff --git a/arch/arm/configs/axm55xx_defconfig b/arch/arm/configs/axm55xx_defconfig
-index 6ea7dafa4c9e..46075216ee6d 100644
---- a/arch/arm/configs/axm55xx_defconfig
-+++ b/arch/arm/configs/axm55xx_defconfig
-@@ -236,5 +236,3 @@ CONFIG_CRYPTO_GCM=y
- CONFIG_CRYPTO_XCBC=y
- CONFIG_CRYPTO_SHA256=y
- # CONFIG_CRYPTO_ANSI_CPRNG is not set
--CONFIG_VIRTUALIZATION=y
--CONFIG_KVM=y
+diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
+index c815477b4303..413abfb42989 100644
+--- a/arch/arm/include/asm/arch_gicv3.h
++++ b/arch/arm/include/asm/arch_gicv3.h
+@@ -38,71 +38,6 @@
+ #define ICC_AP1R2			__ICC_AP1Rx(2)
+ #define ICC_AP1R3			__ICC_AP1Rx(3)
+ 
+-#define ICC_HSRE			__ACCESS_CP15(c12, 4, c9, 5)
+-
+-#define ICH_VSEIR			__ACCESS_CP15(c12, 4, c9, 4)
+-#define ICH_HCR				__ACCESS_CP15(c12, 4, c11, 0)
+-#define ICH_VTR				__ACCESS_CP15(c12, 4, c11, 1)
+-#define ICH_MISR			__ACCESS_CP15(c12, 4, c11, 2)
+-#define ICH_EISR			__ACCESS_CP15(c12, 4, c11, 3)
+-#define ICH_ELRSR			__ACCESS_CP15(c12, 4, c11, 5)
+-#define ICH_VMCR			__ACCESS_CP15(c12, 4, c11, 7)
+-
+-#define __LR0(x)			__ACCESS_CP15(c12, 4, c12, x)
+-#define __LR8(x)			__ACCESS_CP15(c12, 4, c13, x)
+-
+-#define ICH_LR0				__LR0(0)
+-#define ICH_LR1				__LR0(1)
+-#define ICH_LR2				__LR0(2)
+-#define ICH_LR3				__LR0(3)
+-#define ICH_LR4				__LR0(4)
+-#define ICH_LR5				__LR0(5)
+-#define ICH_LR6				__LR0(6)
+-#define ICH_LR7				__LR0(7)
+-#define ICH_LR8				__LR8(0)
+-#define ICH_LR9				__LR8(1)
+-#define ICH_LR10			__LR8(2)
+-#define ICH_LR11			__LR8(3)
+-#define ICH_LR12			__LR8(4)
+-#define ICH_LR13			__LR8(5)
+-#define ICH_LR14			__LR8(6)
+-#define ICH_LR15			__LR8(7)
+-
+-/* LR top half */
+-#define __LRC0(x)			__ACCESS_CP15(c12, 4, c14, x)
+-#define __LRC8(x)			__ACCESS_CP15(c12, 4, c15, x)
+-
+-#define ICH_LRC0			__LRC0(0)
+-#define ICH_LRC1			__LRC0(1)
+-#define ICH_LRC2			__LRC0(2)
+-#define ICH_LRC3			__LRC0(3)
+-#define ICH_LRC4			__LRC0(4)
+-#define ICH_LRC5			__LRC0(5)
+-#define ICH_LRC6			__LRC0(6)
+-#define ICH_LRC7			__LRC0(7)
+-#define ICH_LRC8			__LRC8(0)
+-#define ICH_LRC9			__LRC8(1)
+-#define ICH_LRC10			__LRC8(2)
+-#define ICH_LRC11			__LRC8(3)
+-#define ICH_LRC12			__LRC8(4)
+-#define ICH_LRC13			__LRC8(5)
+-#define ICH_LRC14			__LRC8(6)
+-#define ICH_LRC15			__LRC8(7)
+-
+-#define __ICH_AP0Rx(x)			__ACCESS_CP15(c12, 4, c8, x)
+-#define ICH_AP0R0			__ICH_AP0Rx(0)
+-#define ICH_AP0R1			__ICH_AP0Rx(1)
+-#define ICH_AP0R2			__ICH_AP0Rx(2)
+-#define ICH_AP0R3			__ICH_AP0Rx(3)
+-
+-#define __ICH_AP1Rx(x)			__ACCESS_CP15(c12, 4, c9, x)
+-#define ICH_AP1R0			__ICH_AP1Rx(0)
+-#define ICH_AP1R1			__ICH_AP1Rx(1)
+-#define ICH_AP1R2			__ICH_AP1Rx(2)
+-#define ICH_AP1R3			__ICH_AP1Rx(3)
+-
+-/* A32-to-A64 mappings used by VGIC save/restore */
+-
+ #define CPUIF_MAP(a32, a64)			\
+ static inline void write_ ## a64(u32 val)	\
+ {						\
+@@ -113,21 +48,6 @@ static inline u32 read_ ## a64(void)		\
+ 	return read_sysreg(a32); 		\
+ }						\
+ 
+-#define CPUIF_MAP_LO_HI(a32lo, a32hi, a64)	\
+-static inline void write_ ## a64(u64 val)	\
+-{						\
+-	write_sysreg(lower_32_bits(val), a32lo);\
+-	write_sysreg(upper_32_bits(val), a32hi);\
+-}						\
+-static inline u64 read_ ## a64(void)		\
+-{						\
+-	u64 val = read_sysreg(a32lo);		\
+-						\
+-	val |=	(u64)read_sysreg(a32hi) << 32;	\
+-						\
+-	return val; 				\
+-}
+-
+ CPUIF_MAP(ICC_PMR, ICC_PMR_EL1)
+ CPUIF_MAP(ICC_AP0R0, ICC_AP0R0_EL1)
+ CPUIF_MAP(ICC_AP0R1, ICC_AP0R1_EL1)
+@@ -138,40 +58,6 @@ CPUIF_MAP(ICC_AP1R1, ICC_AP1R1_EL1)
+ CPUIF_MAP(ICC_AP1R2, ICC_AP1R2_EL1)
+ CPUIF_MAP(ICC_AP1R3, ICC_AP1R3_EL1)
+ 
+-CPUIF_MAP(ICH_HCR, ICH_HCR_EL2)
+-CPUIF_MAP(ICH_VTR, ICH_VTR_EL2)
+-CPUIF_MAP(ICH_MISR, ICH_MISR_EL2)
+-CPUIF_MAP(ICH_EISR, ICH_EISR_EL2)
+-CPUIF_MAP(ICH_ELRSR, ICH_ELRSR_EL2)
+-CPUIF_MAP(ICH_VMCR, ICH_VMCR_EL2)
+-CPUIF_MAP(ICH_AP0R3, ICH_AP0R3_EL2)
+-CPUIF_MAP(ICH_AP0R2, ICH_AP0R2_EL2)
+-CPUIF_MAP(ICH_AP0R1, ICH_AP0R1_EL2)
+-CPUIF_MAP(ICH_AP0R0, ICH_AP0R0_EL2)
+-CPUIF_MAP(ICH_AP1R3, ICH_AP1R3_EL2)
+-CPUIF_MAP(ICH_AP1R2, ICH_AP1R2_EL2)
+-CPUIF_MAP(ICH_AP1R1, ICH_AP1R1_EL2)
+-CPUIF_MAP(ICH_AP1R0, ICH_AP1R0_EL2)
+-CPUIF_MAP(ICC_HSRE, ICC_SRE_EL2)
+-CPUIF_MAP(ICC_SRE, ICC_SRE_EL1)
+-
+-CPUIF_MAP_LO_HI(ICH_LR15, ICH_LRC15, ICH_LR15_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR14, ICH_LRC14, ICH_LR14_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR13, ICH_LRC13, ICH_LR13_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR12, ICH_LRC12, ICH_LR12_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR11, ICH_LRC11, ICH_LR11_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR10, ICH_LRC10, ICH_LR10_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR9, ICH_LRC9, ICH_LR9_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR8, ICH_LRC8, ICH_LR8_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR7, ICH_LRC7, ICH_LR7_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR6, ICH_LRC6, ICH_LR6_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR5, ICH_LRC5, ICH_LR5_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR4, ICH_LRC4, ICH_LR4_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR3, ICH_LRC3, ICH_LR3_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR2, ICH_LRC2, ICH_LR2_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR1, ICH_LRC1, ICH_LR1_EL2)
+-CPUIF_MAP_LO_HI(ICH_LR0, ICH_LRC0, ICH_LR0_EL2)
+-
+ #define read_gicreg(r)                 read_##r()
+ #define write_gicreg(v, r)             write_##r(v)
+ 
 -- 
 2.25.0
 
