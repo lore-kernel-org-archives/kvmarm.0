@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE8F3C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC91C2D0F2
 	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:21:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 85EA0207FF
+	by mail.kernel.org (Postfix) with ESMTP id 97B44208FE
 	for <kvmarm@archiver.kernel.org>; Tue, 31 Mar 2020 12:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/NekY8P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85EA0207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="t0Cn0Vwr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97B44208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FB464A4C0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 410F14B0A0;
 	Tue, 31 Mar 2020 08:21:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QD0W8QG8QHNX; Tue, 31 Mar 2020 08:21:16 -0400 (EDT)
+	with ESMTP id m5GW6vQ4AKnm; Tue, 31 Mar 2020 08:21:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D81354A500;
-	Tue, 31 Mar 2020 08:21:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01894B0C0;
+	Tue, 31 Mar 2020 08:21:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9314D4A3B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:21:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9E484B0BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:21:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yVxP12qDa3UV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Mar 2020 08:21:13 -0400 (EDT)
+ with ESMTP id vLktlDUa7sXj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Mar 2020 08:21:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BF7F4B08B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:21:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EA034B099
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2020 08:21:11 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9AC3820848;
- Tue, 31 Mar 2020 12:21:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AB36720838;
+ Tue, 31 Mar 2020 12:21:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1585657272;
- bh=9fCHAkMoiiddlhQb83wx009bB2uYszYSBPdTeD5V5Yo=;
+ s=default; t=1585657270;
+ bh=wnzV/F6mCAYcCSGb/Jfjo81v1JTkv7dKNhV/AjLXAic=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=g/NekY8PyHV7GWzURC8RiTrdK+xwrRAhqDSUF2DhOdkzgRtavpMhyc+1ChbzO73W9
- 1WKA2T7HJcqrKyzRR5ytgpS3MD7d6Zvbhex3aCb9i41tk/DYgOsTbOUH1tbx2sW38q
- r7m4qdHhlk4KUubcg7Ij0hCeV2NTJLphNTd1kemE=
+ b=t0Cn0VwrWJjLC93mUNa98Lc45aFiYd886oVhPfInz4MKO5b7Howj1mgZB2UIqoaNC
+ aeq12ZiebJgPmmLmfelfBxlmkeNxLGNTgp2282wIhfkC/hbUbeJ2yMjs8ilxFY6Nz1
+ wpiG0uNTNs1VnUnvoXUvGRdECq1AI2BWkm/PHsRU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jJFpa-00HBlI-Vb; Tue, 31 Mar 2020 13:17:23 +0100
+ id 1jJFpc-00HBlI-2I; Tue, 31 Mar 2020 13:17:24 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 14/15] KVM: arm64: GICv4.1: Allow non-trapping WFI when using
- HW SGIs
-Date: Tue, 31 Mar 2020 13:16:44 +0100
-Message-Id: <20200331121645.388250-15-maz@kernel.org>
+Subject: [PATCH 15/15] KVM: arm64: GICv4.1: Expose HW-based SGIs in debugfs
+Date: Tue, 31 Mar 2020 13:16:45 +0100
+Message-Id: <20200331121645.388250-16-maz@kernel.org>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200331121645.388250-1-maz@kernel.org>
 References: <20200331121645.388250-1-maz@kernel.org>
@@ -100,33 +99,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Just like for VLPIs, it is beneficial to avoid trapping on WFI when the
-vcpu is using the GICv4.1 SGIs.
-
-Add such a check to vcpu_clear_wfx_traps().
+The vgic-state debugfs file could do with showing the pending state
+of the HW-backed SGIs. Plug it into the low-level code.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Link: https://lore.kernel.org/r/20200304203330.4967-23-maz@kernel.org
+Link: https://lore.kernel.org/r/20200304203330.4967-24-maz@kernel.org
 ---
- arch/arm64/include/asm/kvm_emulate.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-debug.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f658dda12364..a30b4eec7cb4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -89,7 +89,8 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index cc12fe9b2df3..b13a9e3f99dd 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -178,6 +178,8 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 			    struct kvm_vcpu *vcpu)
  {
- 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
--	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count))
-+	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
-+	    vcpu->kvm->arch.vgic.nassgireq)
- 		vcpu->arch.hcr_el2 &= ~HCR_TWI;
- 	else
- 		vcpu->arch.hcr_el2 |= HCR_TWI;
+ 	char *type;
++	bool pending;
++
+ 	if (irq->intid < VGIC_NR_SGIS)
+ 		type = "SGI";
+ 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
+@@ -190,6 +192,16 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
+ 		print_header(s, irq, vcpu);
+ 
++	pending = irq->pending_latch;
++	if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
++		int err;
++
++		err = irq_get_irqchip_state(irq->host_irq,
++					    IRQCHIP_STATE_PENDING,
++					    &pending);
++		WARN_ON_ONCE(err);
++	}
++
+ 	seq_printf(s, "       %s %4d "
+ 		      "    %2d "
+ 		      "%d%d%d%d%d%d%d "
+@@ -201,7 +213,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 		      "\n",
+ 			type, irq->intid,
+ 			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
+-			irq->pending_latch,
++			pending,
+ 			irq->line_level,
+ 			irq->active,
+ 			irq->enabled,
 -- 
 2.25.0
 
