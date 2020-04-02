@@ -1,80 +1,64 @@
-Return-Path: <SRS0=qvC8=5R=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=xSqk=5S=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B5EC2D0F3
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Apr 2020 16:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00451C2D0F4
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 02:33:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1A4C220719
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Apr 2020 16:58:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLTl6mXI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A4C220719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7E0C420721
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 02:33:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E0C420721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C21F44B0F8;
-	Wed,  1 Apr 2020 12:58:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE79B4B116;
+	Wed,  1 Apr 2020 22:33:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Iog0NIKBaYLZ; Wed,  1 Apr 2020 12:58:35 -0400 (EDT)
+	with ESMTP id xOZTQqH1+xqC; Wed,  1 Apr 2020 22:33:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8B464B10B;
-	Wed,  1 Apr 2020 12:58:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A1BE4B120;
+	Wed,  1 Apr 2020 22:33:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2CE94B0F3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Apr 2020 12:58:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65C714B120
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Apr 2020 22:33:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E-5a+1Xad+J4 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Apr 2020 12:58:32 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE9384B0F5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Apr 2020 12:58:32 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EFDF820719;
- Wed,  1 Apr 2020 16:58:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1585760312;
- bh=1VnEWEuVBOL5E3YcqQhiydYDdUG2n1hdJCQbR18YrBo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=lLTl6mXIqSe+j3KVbVAutMBaFeah0MsW0rLw/cBSMe39O/7YRSCmUz0j0ZS+IkkQt
- JiJECtLGFwwxJG5ZPSKd5jUtW+vnsiIg0/2uhPRpiZj0mOAgS6OqI0McZizHIjiARN
- t6ys/6rpJCKoJUnh1xo3J72aq6zf28LFbDzoC+jk=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jJghC-00Haev-6L; Wed, 01 Apr 2020 17:58:30 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: PSCI: Forbid 64bit functions for 32bit guests
-Date: Wed,  1 Apr 2020 17:58:16 +0100
-Message-Id: <20200401165816.530281-3-maz@kernel.org>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200401165816.530281-1-maz@kernel.org>
-References: <20200401165816.530281-1-maz@kernel.org>
+ with ESMTP id 3fTVTfXoNQqS for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Apr 2020 22:33:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E58914B116
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Apr 2020 22:33:19 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5664F30E;
+ Wed,  1 Apr 2020 19:33:19 -0700 (PDT)
+Received: from [10.163.1.8] (unknown [10.163.1.8])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D50E93F71E;
+ Wed,  1 Apr 2020 19:33:16 -0700 (PDT)
+Subject: Re: [PATCH 0/6] Introduce ID_PFR2 and other CPU feature changes
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1580215149-21492-1-git-send-email-anshuman.khandual@arm.com>
+ <45ce930c-81b3-3161-ced6-34a8c8623ac8@arm.com>
+ <CAFEAcA_yZ55rOD1x+FE9wYO8HXx9seK72ZCmnWjtDVr_95-whg@mail.gmail.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <c2b672ca-9b74-89f8-388c-555bbcbd57ba@arm.com>
+Date: Thu, 2 Apr 2020 08:03:09 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Christoffer.Dall@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+In-Reply-To: <CAFEAcA_yZ55rOD1x+FE9wYO8HXx9seK72ZCmnWjtDVr_95-whg@mail.gmail.com>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,81 +75,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Implementing (and even advertising) 64bit PSCI functions to 32bit
-guests is at least a bit odd, if not altogether violating the
-spec which says ("5.2.1 Register usage in arguments and return values"):
+On 02/14/2020 09:28 PM, Peter Maydell wrote:
+> On Fri, 14 Feb 2020 at 04:23, Anshuman Khandual
+> <anshuman.khandual@arm.com> wrote:
+>>
+>>
+>>
+>> On 01/28/2020 06:09 PM, Anshuman Khandual wrote:
+>>> This series is primarily motivated from an adhoc list from Mark Rutland
+>>> during our ID_ISAR6 discussion [1]. Besides, it also includes a patch
+>>> which does macro replacement for various open bits shift encodings in
+>>> various CPU ID registers. This series is based on linux-next 20200124.
+>>>
+>>> [1] https://patchwork.kernel.org/patch/11287805/
+>>>
+>>> Is there anything else apart from these changes which can be accommodated
+>>> in this series, please do let me know. Thank you.
+>>
+>> Just a gentle ping. Any updates, does this series looks okay ? Is there
+>> anything else related to CPU ID register feature bits, which can be added
+>> up here. FWIW, the series still applies on v5.6-rc1.
 
-"Adherence to the SMC Calling Conventions implies that any AArch32
-caller of an SMC64 function will get a return code of 0xFFFFFFFF(int32).
-This matches the NOT_SUPPORTED error code used in PSCI"
+Sorry for the delay in response, was distracted on some other patches.
 
-Tighten the implementation by pretending these functions are not
-there for 32bit guests.
+> 
+> I just ran into some "32-bit KVM doesn't expose all the ID
+> registers to userspace via the ONE_REG API" issues today.
+> I don't know if they'd be reasonable as something to include
+> in this patchset or if they're unrelated.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/psci.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+IMHO, they are bit unrelated.
 
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 69ff4a51ceb5..122795cdd984 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -199,6 +199,21 @@ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
- 		vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
- }
- 
-+static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
-+{
-+	switch(fn) {
-+	case PSCI_0_2_FN64_CPU_SUSPEND:
-+	case PSCI_0_2_FN64_CPU_ON:
-+	case PSCI_0_2_FN64_AFFINITY_INFO:
-+		/* Disallow these functions for 32bit guests */
-+		if (vcpu_mode_is_32bit(vcpu))
-+			return PSCI_RET_NOT_SUPPORTED;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -206,6 +221,10 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 	unsigned long val;
- 	int ret = 1;
- 
-+	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
-+	if (val)
-+		goto out;
-+
- 	switch (psci_fn) {
- 	case PSCI_0_2_FN_PSCI_VERSION:
- 		/*
-@@ -273,6 +292,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
-+out:
- 	smccc_set_retval(vcpu, val, 0, 0, 0);
- 	return ret;
- }
-@@ -290,6 +310,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
- 		break;
- 	case PSCI_1_0_FN_PSCI_FEATURES:
- 		feature = smccc_get_arg1(vcpu);
-+		val = kvm_psci_check_allowed_function(vcpu, feature);
-+		if (val)
-+			break;
-+
- 		switch(feature) {
- 		case PSCI_0_2_FN_PSCI_VERSION:
- 		case PSCI_0_2_FN_CPU_SUSPEND:
--- 
-2.25.0
+> 
+> Anyway, missing stuff I have noticed specifically:
+>  * MVFR2
+>  * ID_MMFR4
+>  * ID_ISAR6
+> 
+> More generally I would have expected all these 32-bit registers
+> to exist and read-as-zero for the purpose of the ONE_REG APIs,
+> because that's what the architecture says is supposed to happen
+> and it means we have compatibility and QEMU doesn't gradually
+> build up lots of "kernel doesn't support this yet" conditionals...
+> I think we get this right for 64-bit KVM, but can we do it for
+> 32-bit as well?
 
+I am not very familiar with 32-bit KVM but will definitely keep these
+suggestions noted for later, also try and accommodate if possible.
+
+> thanks
+> -- PMM
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
