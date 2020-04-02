@@ -2,59 +2,84 @@ Return-Path: <SRS0=xSqk=5S=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBA3C2D0F3
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 13:48:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A5FC2D0F3
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 14:41:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0FCF12072E
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 13:48:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FCF12072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 653D620784
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Apr 2020 14:41:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SRxHE2xH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653D620784
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A54C54B148;
-	Thu,  2 Apr 2020 09:48:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 102CB4B164;
+	Thu,  2 Apr 2020 10:41:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id STiBhpGULuOM; Thu,  2 Apr 2020 09:48:21 -0400 (EDT)
+	with ESMTP id hXJCxCMX2KXD; Thu,  2 Apr 2020 10:41:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87B144B157;
-	Thu,  2 Apr 2020 09:48:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3EE44B15D;
+	Thu,  2 Apr 2020 10:41:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ACC24B148
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2020 09:48:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B66D4B159
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2020 10:41:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DdmRcoKKbyjm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Apr 2020 09:48:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B524B145
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2020 09:48:19 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 964B930E;
- Thu,  2 Apr 2020 06:48:19 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BFFD3F52E;
- Thu,  2 Apr 2020 06:48:19 -0700 (PDT)
-Date: Thu, 2 Apr 2020 15:48:17 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: PSCI: Forbid 64bit functions for 32bit
- guests
-Message-ID: <20200402134817.GG3650@e113682-lin.lund.arm.com>
-References: <20200401165816.530281-1-maz@kernel.org>
- <20200401165816.530281-3-maz@kernel.org>
+ with ESMTP id yjFvMXDy8QhN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Apr 2020 10:41:27 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88B0B4B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2020 10:41:27 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585838487;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LQlIPwSA6eO8FaNGqaPVKwSvrWhWEma0a4EepOgZn9Y=;
+ b=SRxHE2xHo6MwBPHWu79tFhGLGd+Rfik79qgtkL4tc34VNZMYNQAbW5O0zHggZ0OdnMXO52
+ CdG75jI3MZzMukDps1XweOgiH/hNnG5FbqE1Jcgm8soNy1JuH3/MqRfbTQ8WWGRP8m800F
+ 6QNoOQ0yXal+8quQdCriIaee6O6yxvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-jcwdGm7hNY6oM0oaAdC1ag-1; Thu, 02 Apr 2020 10:41:25 -0400
+X-MC-Unique: jcwdGm7hNY6oM0oaAdC1ag-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94C7419067E7;
+ Thu,  2 Apr 2020 14:41:23 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78A36D768E;
+ Thu,  2 Apr 2020 14:41:15 +0000 (UTC)
+Date: Thu, 2 Apr 2020 16:41:12 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [kvm-unit-tests PATCH v7 10/13] arm/arm64: ITS: INT functional
+ tests
+Message-ID: <20200402144112.u6nwzkqe7mt3rr6c@kamzik.brq.redhat.com>
+References: <20200320092428.20880-1-eric.auger@redhat.com>
+ <20200320092428.20880-11-eric.auger@redhat.com>
+ <f7f1d7c4-2321-9123-2394-528af737bfa7@huawei.com>
+ <fa4e14f6-20ee-982f-0eda-74b101cddf7a@redhat.com>
+ <114f8bba-a1e0-0367-a1b4-e875718d8dba@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200401165816.530281-3-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <114f8bba-a1e0-0367-a1b4-e875718d8dba@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,89 +91,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 01, 2020 at 05:58:16PM +0100, Marc Zyngier wrote:
-> Implementing (and even advertising) 64bit PSCI functions to 32bit
-> guests is at least a bit odd, if not altogether violating the
-> spec which says ("5.2.1 Register usage in arguments and return values"):
-> 
-> "Adherence to the SMC Calling Conventions implies that any AArch32
-> caller of an SMC64 function will get a return code of 0xFFFFFFFF(int32).
-> This matches the NOT_SUPPORTED error code used in PSCI"
-> 
-> Tighten the implementation by pretending these functions are not
-> there for 32bit guests.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/arm/psci.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index 69ff4a51ceb5..122795cdd984 100644
-> --- a/virt/kvm/arm/psci.c
-> +++ b/virt/kvm/arm/psci.c
-> @@ -199,6 +199,21 @@ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
->  		vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
->  }
->  
-> +static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
-> +{
-> +	switch(fn) {
-> +	case PSCI_0_2_FN64_CPU_SUSPEND:
-> +	case PSCI_0_2_FN64_CPU_ON:
-> +	case PSCI_0_2_FN64_AFFINITY_INFO:
-> +		/* Disallow these functions for 32bit guests */
-> +		if (vcpu_mode_is_32bit(vcpu))
-> +			return PSCI_RET_NOT_SUPPORTED;
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -206,6 +221,10 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  	unsigned long val;
->  	int ret = 1;
->  
-> +	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
-> +	if (val)
-> +		goto out;
-> +
->  	switch (psci_fn) {
->  	case PSCI_0_2_FN_PSCI_VERSION:
->  		/*
-> @@ -273,6 +292,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  		break;
->  	}
->  
-> +out:
->  	smccc_set_retval(vcpu, val, 0, 0, 0);
->  	return ret;
->  }
-> @@ -290,6 +310,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
->  		break;
->  	case PSCI_1_0_FN_PSCI_FEATURES:
->  		feature = smccc_get_arg1(vcpu);
-> +		val = kvm_psci_check_allowed_function(vcpu, feature);
-> +		if (val)
-> +			break;
-> +
->  		switch(feature) {
->  		case PSCI_0_2_FN_PSCI_VERSION:
->  		case PSCI_0_2_FN_CPU_SUSPEND:
-> -- 
-> 2.25.0
-> 
+On Thu, Apr 02, 2020 at 08:40:42PM +0800, Zenghui Yu wrote:
+> Hi Eric,
+> =
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> On 2020/4/2 16:50, Auger Eric wrote:
+> > Hi Zenghui,
+> > =
+
+> > On 3/30/20 12:43 PM, Zenghui Yu wrote:
+> > > Hi Eric,
+> > > =
+
+> > > On 2020/3/20 17:24, Eric Auger wrote:
+> > > > Triggers LPIs through the INT command.
+> > > > =
+
+> > > > the test checks the LPI hits the right CPU and triggers
+> > > > the right LPI intid, ie. the translation is correct.
+> > > > =
+
+> > > > Updates to the config table also are tested, along with inv
+> > > > and invall commands.
+> > > > =
+
+> > > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > > =
+
+> > > [...]
+> > > =
+
+> > > So I've tested this series and found that the "INT" test will sometim=
+es
+> > > fail.
+> > > =
+
+> > > "not ok 12 - gicv3: its-migration: dev2/eventid=3D20 triggers LPI 819=
+5 en
+> > > PE #3 after migration
+> > > not ok 13 - gicv3: its-migration: dev7/eventid=3D255 triggers LPI 819=
+6 on
+> > > PE #2 after migration"
+> > > =
+
+> > >  From logs:
+> > > "INFO: gicv3: its-migration: Migration complete
+> > > INT dev_id=3D2 event_id=3D20
+> > > INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D3,
+> > > intid=3D8195) was expected
+> > > FAIL: gicv3: its-migration: dev2/eventid=3D20 triggers LPI 8195 en PE=
+ #3
+> > > after migration
+> > > INT dev_id=3D7 event_id=3D255
+> > > INFO: gicv3: its-migration: No LPI received whereas (cpuid=3D2,
+> > > intid=3D8196) was expected
+> > > FAIL: gicv3: its-migration: dev7/eventid=3D255 triggers LPI 8196 on P=
+E #2
+> > > after migration"
+> > > =
+
+> > > > +static void check_lpi_stats(const char *msg)
+> > > > +{
+> > > > +=A0=A0=A0 bool pass =3D false;
+> > > > +
+> > > > +=A0=A0=A0 mdelay(100);
+> > > =
+
+> > > After changing this to 'mdelay(1000)', the above error doesn't show up
+> > > anymore. But it sounds strange that 100ms is not enough to deliver a
+> > > single LPI. I haven't dig it further but will get back here later.
+> > =
+
+> > Did you find some time to investigate this issue. Changing 100 to 1000
+> > has a huge impact on the overall test duration and I don't think it is
+> > sensible. Could you see what is your minimal value that pass the tests?
+> =
+
+> I can reproduce this issue with a very *low* probability so I failed
+> to investigate it :-(.  (It might because the LPI was delivered to a
+> busy vcpu...)
+> =
+
+> You can leave it as it is until someone else complain about it again.
+> Or take the similar approach as check_acked() - wait up to 5s for the
+> interrupt to be delivered, and bail out as soon as we see it.
+
+I think the check_acked approach would be the best approach.
+
+Thanks,
+drew
+
+> =
+
+> =
+
+> Thanks,
+> Zenghui
+> =
+
+> =
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
