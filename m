@@ -2,85 +2,86 @@ Return-Path: <SRS0=EFuC=5T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43531C2BA18
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 08:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 367B9C2D0E8
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 08:24:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE5E921582
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 08:02:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B421D20721
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 08:24:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4CRYcBs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE5E921582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vqiw/iFe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B421D20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65D8B4B15C;
-	Fri,  3 Apr 2020 04:02:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0123D4B162;
+	Fri,  3 Apr 2020 04:24:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s940amCLP2Rb; Fri,  3 Apr 2020 04:02:14 -0400 (EDT)
+	with ESMTP id SJ1f3PCyDIFv; Fri,  3 Apr 2020 04:24:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5809C4B15B;
-	Fri,  3 Apr 2020 04:02:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB4E04B161;
+	Fri,  3 Apr 2020 04:24:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 652394B15B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 04:02:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEA7E4B160
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 04:24:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kKLdaWLk+cL2 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Apr 2020 04:02:10 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 649B14B158
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 04:02:10 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id CtehUeljx2zC for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Apr 2020 04:24:00 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2FD04B15E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 04:23:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1585902239;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NTncJUoNdeKHAO92tzeCBJ8GvfQ7t10bHlzh4JiTrfM=;
+ b=Vqiw/iFewuoDzv5J5SjgNqxPlp0mSf4WUtSCVdZZg3WacQz4ol+rFbTZekx9zjdVNy3TY9
+ N1WO/GObPrFb5ubKkDmKWP6QqRRxA4V60mYkkVKjh1Ml3udbAjGC5fRZLGg1T+tALWmIin
+ xQVEI6osV/2QhH5x9XsEx7pG6S809Gs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-o0skrVGVN0GWSitMPoWZCA-1; Fri, 03 Apr 2020 04:23:55 -0400
+X-MC-Unique: o0skrVGVN0GWSitMPoWZCA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4A45A2080C;
- Fri,  3 Apr 2020 08:02:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1585900929;
- bh=VAs8ug0wumKZqSGb+BllMltelj99c60YkpCVImFIGs4=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=J4CRYcBs4n7tf2rcgY9u12fxsdAWat8hQaLGWNTe1MOA8OawQpHxqtovX+6NJ3CI8
- /lSr3syulXGxjuMHMpKZJVqqbsk+oBt4JEMswVCoLxlkH0YFYDNiaZfGi/dQWrvZeH
- UbeFXnS42iO62kLMmuQdSWxId8aooEqLt+/VO/28=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jKHHD-000R05-FQ; Fri, 03 Apr 2020 09:02:07 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A5DD8017CE;
+ Fri,  3 Apr 2020 08:23:54 +0000 (UTC)
+Received: from [10.36.112.58] (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E75C05C1D6;
+ Fri,  3 Apr 2020 08:23:50 +0000 (UTC)
+Subject: Re: [PATCH kvm-unit-tests] fixup! arm/arm64: ITS: pending table
+ migration test
+To: Andrew Jones <drjones@redhat.com>
+References: <20200402145227.20109-1-eric.auger@redhat.com>
+ <20200402180148.490026-1-drjones@redhat.com>
+ <a13e00e8-b699-103a-af6c-7807b67f8c70@redhat.com>
+ <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <84973989-d751-2f33-8de5-c83b0f71065d@redhat.com>
+Date: Fri, 3 Apr 2020 10:23:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Date: Fri, 03 Apr 2020 09:02:07 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: George Cherian <gcherian@marvell.com>
-Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-In-Reply-To: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
-References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
-Message-ID: <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gcherian@marvell.com, Dave.Martin@arm.com,
- alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com,
- james.morse@arm.com, jintack@cs.columbia.edu, julien.thierry.kdev@gmail.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com,
- areddy3@marvell.com, gkulkarni@marvell.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, Ganapatrao Kulkarni <gkulkarni@marvell.com>,
- kvm@vger.kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com,
- linux-arm-kernel@lists.infradead.org, Anil Kumar Reddy H <areddy3@marvell.com>
+In-Reply-To: <20200403073754.6q6njhh25s2zutic@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,78 +93,121 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi George,
-
-On 2020-04-03 08:27, George Cherian wrote:
-> Hi Marc,
+Hi Drew,
+On 4/3/20 9:37 AM, Andrew Jones wrote:
+> On Fri, Apr 03, 2020 at 07:07:10AM +0200, Auger Eric wrote:
+>> Hi Drew,
+>>
+>> On 4/2/20 8:01 PM, Andrew Jones wrote:
+>>> [ Without the fix this test would hang, as timeouts don't work with
+>>>   the migration scripts (yet). Use errata to skip instead of hang. ]
+>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>>> ---
+>>>  arm/gic.c  | 18 ++++++++++++++++--
+>>>  errata.txt |  1 +
+>>>  2 files changed, 17 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arm/gic.c b/arm/gic.c
+>>> index ddf0f9d09b14..c0781f8c2c80 100644
+>>> --- a/arm/gic.c
+>>> +++ b/arm/gic.c
+>>> @@ -12,6 +12,7 @@
+>>>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>>>   */
+>>>  #include <libcflat.h>
+>>> +#include <errata.h>
+>>>  #include <asm/setup.h>
+>>>  #include <asm/processor.h>
+>>>  #include <asm/delay.h>
+>>> @@ -812,13 +813,23 @@ static void test_its_migration(void)
+>>>  	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+>>>  }
+>>>  
+>>> +#define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
+>>> +
+>>>  static void test_migrate_unmapped_collection(void)
+>>>  {
+>>> -	struct its_collection *col;
+>>> -	struct its_device *dev2, *dev7;
+>>> +	struct its_collection *col = NULL;
+>>> +	struct its_device *dev2 = NULL, *dev7 = NULL;
+>>> +	bool test_skipped = false;
+>>>  	int pe0 = 0;
+>>>  	u8 config;
+>>>  
+>>> +	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
+>>> +		report_skip("Skipping test, as this test hangs without the fix. "
+>>> +			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
+>>> +		test_skipped = true;
+>>> +		goto do_migrate;
+>> out of curiosity why do you still do the migration and not directly return.
 > 
-> On 2/11/20 9:48 AM, Marc Zyngier wrote:
->> This is a major rework of the NV series that I posted over 6 months
->> ago[1], and a lot has changed since then:
->> 
->> - Early ARMv8.4-NV support
->> - ARMv8.4-TTL support in host and guest
->> - ARMv8.5-GTG support in host and guest
->> - Lots of comments addressed after the review
->> - Rebased on v5.6-rc1
->> - Way too many patches
->> 
->> In my defence, the whole of the NV code is still smaller that the
->> 32bit KVM/arm code I'm about to remove, so I feel less bad inflicting
->> this on everyone! ;-)
->> 
->> >From a functionality perspective, you can expect a L2 guest to work,
->> but don't even think of L3, as we only partially emulate the
->> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug, PMU,
->> as well as anything that would require a Stage-1 PTW. What we want to
->> achieve is that with NV disabled, there is no performance overhead and
->> no regression.
->> 
->> The series is roughly divided in 5 parts: exception handling, memory
->> virtualization, interrupts and timers for ARMv8.3, followed by the
->> ARMv8.4 support. There are of course some dependencies, but you'll
->> hopefully get the gist of it.
->> 
->> For the most courageous of you, I've put out a branch[2]. Of course,
->> you'll need some userspace. Andre maintains a hacked version of
->> kvmtool[3] that takes a --nested option, allowing the guest to be
->> started at EL2. You can run the whole stack in the Foundation
->> model. Don't be in a hurry ;-).
->> 
-> The full series was tested on both Foundation model as well as Marvell 
-> ThunderX3
-> Emulation Platform.
-> Basic boot testing done for Guest Hypervisor and Guest Guest.
+> That won't work for the same reason the migration failure doesn't work.
+> The problem is with the migration scripts not completing when a migration
+> test doesn't successfully migrate. I plan to fix that when I get a bit of
+> time, and when I do, I'll post a patch removing this errata as well, as
+> it will no longer be needed to avoid test hangs. Anybody testing on a
+> kernel without the kernel fix after the migration scripts are fixed will
+> just get an appropriate FAIL instead.
+
+OK Got it
+
+Thanks
+
+Eric
 > 
-> Tested-by:  George Cherian <george.cherian@marvell.com>
+> Thanks,
+> drew
+> 
+>>
+>> Besides, what caused the migration to fail without 8c58be34494b is
+>> bypassed so:
+>>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Tested-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> Thank you for the fixup
+>>
+>> Eric
+>>
+>>> +	}
+>>> +
+>>>  	if (its_setup1())
+>>>  		return;
+>>>  
+>>> @@ -830,9 +841,12 @@ static void test_migrate_unmapped_collection(void)
+>>>  	its_send_mapti(dev2, 8192, 0, col);
+>>>  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
+>>>  
+>>> +do_migrate:
+>>>  	puts("Now migrate the VM, then press a key to continue...\n");
+>>>  	(void)getchar();
+>>>  	report_info("Migration complete");
+>>> +	if (test_skipped)
+>>> +		return;
+>>>  
+>>>  	/* on the destination, map the collection */
+>>>  	its_send_mapc(col, true);
+>>> diff --git a/errata.txt b/errata.txt
+>>> index 7d6abc2a7bf6..b66afaa9c079 100644
+>>> --- a/errata.txt
+>>> +++ b/errata.txt
+>>> @@ -5,4 +5,5 @@
+>>>  9e3f7a296940    : 4.9                           : arm64: KVM: pmu: Fix AArch32 cycle counter access
+>>>  7b6b46311a85    : 4.11                          : KVM: arm/arm64: Emulate the EL1 phys timer registers
+>>>  6c7a5dce22b3    : 4.12                          : KVM: arm/arm64: fix races in kvm_psci_vcpu_on
+>>> +8c58be34494b    : 5.6                           : KVM: arm/arm64: vgic-its: Fix restoration of unmapped collections
+>>>  #---------------:-------------------------------:---------------------------------------------------
+>>>
+>>
+>>
+> 
 
-Thanks for having given this a go.
-
-However, without more details, it is pretty hard to find out what you 
-have tested.
-What sort of guest have you booted, with what configuration, what 
-workloads did you
-run in the L2 guests and what are the architectural features that TX3 
-implements?
-
-The last point is specially important, as the NV architecture spans two 
-major
-revisions of the architecture and affects tons of other extensions that 
-are
-themselves optional. Without any detail on that front, I have no idea 
-what the
-coverage of your testing is.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
