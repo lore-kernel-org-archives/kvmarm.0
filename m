@@ -7,74 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E2BC2BA1A
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E95C2BA80
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E03B8206F5
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 232D22070E
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQ2jQCIB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E03B8206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axxVR5v+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232D22070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB4F4B191;
-	Sat,  4 Apr 2020 10:38:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1EBB4B1EC;
+	Sat,  4 Apr 2020 10:38:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nw1e7WI-c6Hy; Sat,  4 Apr 2020 10:37:59 -0400 (EDT)
+	with ESMTP id PHIqdFsQYc+W; Sat,  4 Apr 2020 10:38:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82C9A4B1EC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B311B4B1F5;
 	Sat,  4 Apr 2020 10:37:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0090B4B188
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21CD44B1E1
  for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LYwUGLGmFVrA for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 3rwLIpTG5lxO for <kvmarm@lists.cs.columbia.edu>;
  Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16FD04B191
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8454B1CE
  for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586011075;
+ s=mimecast20190719; t=1586011076;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UcAnXTLK05SgTXUHXQBKYPlI5GJyG0mw92B1RM6BqXM=;
- b=FQ2jQCIB7/O+8KkkIi/xlSbF3Av+8QgxTZhpYClC1LOpUqLdUqVfn4eUxnzeqSD3QCI9mg
- eZK9FfIuwBUitpg13JKzL9eC5mxAGQlxXQiyC+Alom6OyRaXNAkSa9FEQfyBsFmyYMd2mm
- ixPHtn/P0sUMw6g/odYPWoGbPv4x6pQ=
+ bh=4TH7o6uPii+FVWXIRQDwrHwi8uTL0Zd9SNThpzh1Yhs=;
+ b=axxVR5v+RL5nxtCS+ru3FnMTEtQpustGR9fQVFKCglWZqyLQQJTcaxAsqgwqjA4fsWgBB2
+ y+9J6UxaJ24KDMMa7BlZQqptjJsr3Y6xPG/OAUMhxhehpEp2e8bUaw66eXWC8+dccjoVdW
+ NmLSD/l6TAgWVeA5/xopP4Qyk/CTXyY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-Amhc2xJtMUmRaY-ktwU_mQ-1; Sat, 04 Apr 2020 10:37:53 -0400
-X-MC-Unique: Amhc2xJtMUmRaY-ktwU_mQ-1
+ us-mta-321-jqwY0IBlPfCljN1pw65vkw-1; Sat, 04 Apr 2020 10:37:53 -0400
+X-MC-Unique: jqwY0IBlPfCljN1pw65vkw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1A798024D0;
- Sat,  4 Apr 2020 14:37:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CD5B107B113;
+ Sat,  4 Apr 2020 14:37:41 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E30F09B912;
- Sat,  4 Apr 2020 14:37:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 42CBA9B912;
+ Sat,  4 Apr 2020 14:37:35 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: pbonzini@redhat.com
-Subject: [PULL kvm-unit-tests 04/39] arm64: timer: Add ISB before reading the
- counter value
-Date: Sat,  4 Apr 2020 16:36:56 +0200
-Message-Id: <20200404143731.208138-5-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 01/39] Makefile: Use no-stack-protector compiler
+ options
+Date: Sat,  4 Apr 2020 16:36:53 +0200
+Message-Id: <20200404143731.208138-2-drjones@redhat.com>
 In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
 References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,58 +95,45 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Reads of the physical counter and the virtual counter registers "can occur
-speculatively and out of order relative to other instructions executed on
-the same PE" [1, 2].
+Let's fix the typos so that the -fno-stack-protector and
+-fno-stack-protector-all compiler options are actually used.
 
-There is no theoretical limit to the number of instructions that the CPU
-can reorder and we use the counter value to program the timer to fire in
-the future. Add an ISB before reading the counter to make sure the read
-instruction is not reordered too long in the past with regard to the
-instruction that programs the timer alarm, thus causing the timer to fire
-unexpectedly. This matches what Linux does (see
-arch/arm64/include/asm/arch_timer.h).
+Tested by compiling for arm64, x86_64 and ppc64 little endian. Before the
+patch, the arguments were missing from the gcc invocation; after the patch,
+they were present. Also fixes a compilation error that I was seeing with
+aarch64 gcc version 9.2.0, where the linker was complaining about an
+undefined reference to the symbol __stack_chk_guard.
 
-Because we use the counter value to program the timer, we create a register
-dependency [3] between the value that we read and the value that we write to
-CVAL and thus we don't need a barrier after the read. Linux does things
-differently because the read needs to be ordered with regard to a memory
-load (more information in commit 75a19a0202db ("arm64: arch_timer: Ensure
-counter register reads occur with seqlock held")).
-
-This also matches what we already do in get_cntvct from
-lib/arm{,64}/asm/processor.h.
-
-[1] ARM DDI 0487E.a, section D11.2.1
-[2] ARM DDI 0487E.a, section D11.2.2
-[3] ARM DDI 0486E.a, section B2.3.2
-
+Fixes: e5c73790f5f0 ("build: don't reevaluate cc-option shell command")
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Drew Jones <drjones@redhat.com>
+CC: Laurent Vivier <lvivier@redhat.com>
+CC: Thomas Huth <thuth@redhat.com>
+CC: David Hildenbrand <david@redhat.com>
+CC: Janosch Frank <frankja@linux.ibm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/timer.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arm/timer.c b/arm/timer.c
-index c6ea108cfa4b..e758e84855c3 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -30,6 +30,7 @@ static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
+diff --git a/Makefile b/Makefile
+index 767b6c6a51d0..754ed65ecd2f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -55,8 +55,8 @@ COMMON_CFLAGS += -Wignored-qualifiers -Werror
  
- static u64 read_vtimer_counter(void)
- {
-+	isb();
- 	return read_sysreg(cntvct_el0);
- }
- 
-@@ -68,6 +69,7 @@ static void write_vtimer_ctl(u64 val)
- 
- static u64 read_ptimer_counter(void)
- {
-+	isb();
- 	return read_sysreg(cntpct_el0);
- }
- 
+ frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
+ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+-fnostack_protector := $(call cc-option, -fno-stack-protector, "")
+-fnostack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
++fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
++fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
+ wno_frame_address := $(call cc-option, -Wno-frame-address, "")
+ fno_pic := $(call cc-option, -fno-pic, "")
+ no_pie := $(call cc-option, -no-pie, "")
 -- 
 2.25.1
 
