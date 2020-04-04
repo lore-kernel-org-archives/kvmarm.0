@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4785C2BA15
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5977EC2BA19
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A06D12070E
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 134A4206F5
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="auP+C6mB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A06D12070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dexae9W/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134A4206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A0C34B232;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2C7C4B1D8;
 	Sat,  4 Apr 2020 10:38:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SNQFf0lDlZgu; Sat,  4 Apr 2020 10:38:28 -0400 (EDT)
+	with ESMTP id K6IjNZYOvVuv; Sat,  4 Apr 2020 10:38:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79FFE4B203;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 907A54B22D;
 	Sat,  4 Apr 2020 10:38:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 610184B222
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A65F4B200
  for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:38:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0E5ezNbHI6yM for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id RHQVgdRjQ9cj for <kvmarm@lists.cs.columbia.edu>;
  Sat,  4 Apr 2020 10:38:24 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D4E94B223
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B2864B225
  for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:38:24 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1586011104;
@@ -47,33 +46,35 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QVuFrhT8TJhNSCuR94NxSXlIlj1+1lGH/d1K+jA+epw=;
- b=auP+C6mBQeEdV61AHrMcaSymW5IV9vkCFHf+KfOmMHq37/R6vKP14L0ddm1ERhIJA2XnlP
- kBnVnxgaXvFmaoxH4Vphn3z0diYAkLV9+ZZuEFRUjEBVESYbjJL/qz/b9kcqmIEdxBH/+Q
- E0dm4l3eLka4HYlaoItf/j+PMhWr4t4=
+ bh=jy3EuHQ8mrgm29Jc3heu5uVEvCyCy6E0d+tEjOyDI0g=;
+ b=Dexae9W/N2+Z2FxoD1LCDZfnvw/3xiwGTV5xzHQK2rRt8QneV1XqtLiDEg8tKQ9OjH8MIt
+ IWylLr1FGrofEyk3jMrIhEQfnRYvmIps9Y51BO/wPc+axO3bRWVsaSd4+Etn/r9ocBqYFq
+ 96IcOTjTezWgGUaacQ24q7xUEluC07c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-lLBibGidP72HqiBnmG9P-w-1; Sat, 04 Apr 2020 10:38:22 -0400
-X-MC-Unique: lLBibGidP72HqiBnmG9P-w-1
+ us-mta-186-iHCQ4S7VPaW9pGzK5X48WQ-1; Sat, 04 Apr 2020 10:38:20 -0400
+X-MC-Unique: iHCQ4S7VPaW9pGzK5X48WQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B54318AB2D4;
- Sat,  4 Apr 2020 14:38:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81CE71147D3;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C33F8017F4;
  Sat,  4 Apr 2020 14:38:19 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36E4A9B912;
+ Sat,  4 Apr 2020 14:38:15 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: pbonzini@redhat.com
-Subject: [PULL kvm-unit-tests 17/39] arm: pmu: Don't check PMCR.IMP anymore
-Date: Sat,  4 Apr 2020 16:37:09 +0200
-Message-Id: <20200404143731.208138-18-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 16/39] arm: pmu: Let pmu tests take a sub-test
+ parameter
+Date: Sat,  4 Apr 2020 16:37:08 +0200
+Message-Id: <20200404143731.208138-17-drjones@redhat.com>
 In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
 References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,89 +93,91 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@redhat.com>
 
-check_pmcr() checks the IMP field is different than 0.
-However A zero IMP field is permitted by the architecture,
-meaning the MIDR_EL1 should be looked at instead. This
-causes TCG to fail this test on '-cpu max' because in
-that case PMCR.IMP is set equal to MIDR_EL1.Implementer
-which is 0.
-
-So let's remove the check_pmcr() test and just print PMCR
-info in the pmu_probe() function.
+As we intend to introduce more PMU tests, let's add
+a sub-test parameter that will allow to categorize
+them. Existing tests are in the cycle-counter category.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/pmu.c | 39 ++++++++++++++-------------------------
- 1 file changed, 14 insertions(+), 25 deletions(-)
+ arm/pmu.c         | 25 ++++++++++++++++---------
+ arm/unittests.cfg |  7 ++++---
+ 2 files changed, 20 insertions(+), 12 deletions(-)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index 0122f0a8a8a9..44f3543cfa49 100644
+index d5a03a6ff0b3..0122f0a8a8a9 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -134,29 +134,6 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
- }
- #endif
- 
--/*
-- * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
-- * null. Also print out a couple other interesting fields for diagnostic
-- * purposes. For example, as of fall 2016, QEMU TCG mode doesn't implement
-- * event counters and therefore reports zero event counters, but hopefully
-- * support for at least the instructions event will be added in the future and
-- * the reported number of event counters will become nonzero.
-- */
--static bool check_pmcr(void)
--{
--	uint32_t pmcr;
--
--	pmcr = get_pmcr();
--
--	report_info("PMU implementer/ID code/counters: %#x(\"%c\")/%#x/%d",
--		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
--		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
--		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK,
--		    (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
--
--	return ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) != 0;
--}
--
- /*
-  * Ensure that the cycle counter progresses between back-to-back reads.
-  */
-@@ -278,9 +255,22 @@ static void pmccntr64_test(void)
- /* Return FALSE if no PMU found, otherwise return TRUE */
- static bool pmu_probe(void)
+@@ -287,22 +287,29 @@ int main(int argc, char *argv[])
  {
-+	uint32_t pmcr;
-+
- 	pmu_version = get_pmu_version();
-+	if (pmu_version == 0 || pmu_version == 0xf)
-+		return false;
-+
- 	report_info("PMU version: %d", pmu_version);
--	return pmu_version != 0 && pmu_version != 0xf;
-+
-+	pmcr = get_pmcr();
-+	report_info("PMU implementer/ID code/counters: %#x(\"%c\")/%#x/%d",
-+		    (pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK,
-+		    ((pmcr >> PMU_PMCR_IMP_SHIFT) & PMU_PMCR_IMP_MASK) ? : ' ',
-+		    (pmcr >> PMU_PMCR_ID_SHIFT) & PMU_PMCR_ID_MASK,
-+		    (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK);
-+
-+	return true;
- }
+ 	int cpi = 0;
  
- int main(int argc, char *argv[])
-@@ -301,7 +291,6 @@ int main(int argc, char *argv[])
- 		report_prefix_push(argv[1]);
- 		if (argc > 2)
- 			cpi = atol(argv[2]);
--		report(check_pmcr(), "Control register");
- 		report(check_cycles_increase(),
- 		       "Monotonically increasing cycle count");
- 		report(check_cpi(cpi), "Cycle/instruction ratio");
+-	if (argc > 1)
+-		cpi = atol(argv[1]);
+-
+ 	if (!pmu_probe()) {
+ 		printf("No PMU found, test skipped...\n");
+ 		return report_summary();
+ 	}
+ 
+-	report_prefix_push("pmu");
++	if (argc < 2)
++		report_abort("no test specified");
+ 
+-	report(check_pmcr(), "Control register");
+-	report(check_cycles_increase(),
+-	       "Monotonically increasing cycle count");
+-	report(check_cpi(cpi), "Cycle/instruction ratio");
++	report_prefix_push("pmu");
+ 
+-	pmccntr64_test();
++	if (strcmp(argv[1], "cycle-counter") == 0) {
++		report_prefix_push(argv[1]);
++		if (argc > 2)
++			cpi = atol(argv[2]);
++		report(check_pmcr(), "Control register");
++		report(check_cycles_increase(),
++		       "Monotonically increasing cycle count");
++		report(check_cpi(cpi), "Cycle/instruction ratio");
++		pmccntr64_test();
++		report_prefix_pop();
++	} else {
++		report_abort("Unknown sub-test '%s'", argv[1]);
++	}
+ 
+ 	return report_summary();
+ }
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 017958d28ffd..fe6515c6b2dc 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -61,21 +61,22 @@ file = pci-test.flat
+ groups = pci
+ 
+ # Test PMU support
+-[pmu]
++[pmu-cycle-counter]
+ file = pmu.flat
+ groups = pmu
++extra_params = -append 'cycle-counter 0'
+ 
+ # Test PMU support (TCG) with -icount IPC=1
+ #[pmu-tcg-icount-1]
+ #file = pmu.flat
+-#extra_params = -icount 0 -append '1'
++#extra_params = -icount 0 -append 'cycle-counter 1'
+ #groups = pmu
+ #accel = tcg
+ 
+ # Test PMU support (TCG) with -icount IPC=256
+ #[pmu-tcg-icount-256]
+ #file = pmu.flat
+-#extra_params = -icount 8 -append '256'
++#extra_params = -icount 8 -append 'cycle-counter 256'
+ #groups = pmu
+ #accel = tcg
+ 
 -- 
 2.25.1
 
