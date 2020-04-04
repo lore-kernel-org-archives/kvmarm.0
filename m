@@ -2,72 +2,76 @@ Return-Path: <SRS0=dc8k=5U=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C4F1C2BA2B
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7738AC2BA1B
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EB3ED206F5
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3143B206F5
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHZqxQGb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB3ED206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9OMcbSB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3143B206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64AAC4B200;
-	Sat,  4 Apr 2020 10:38:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E04464B1F8;
+	Sat,  4 Apr 2020 10:38:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l4jyYnhz9j0v; Sat,  4 Apr 2020 10:38:03 -0400 (EDT)
+	with ESMTP id zhShCIxAPolo; Sat,  4 Apr 2020 10:38:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13DD94B1F9;
-	Sat,  4 Apr 2020 10:38:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 394214B1FF;
+	Sat,  4 Apr 2020 10:38:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7ED4B191
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC934B208
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:38:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GH9QFTwPb9os for <kvmarm@lists.cs.columbia.edu>;
- Sat,  4 Apr 2020 10:37:57 -0400 (EDT)
+ with ESMTP id E9icYoAusK2Z for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  4 Apr 2020 10:38:02 -0400 (EDT)
 Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDBA4B1DF
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 286084B1EA
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:59 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586011076;
+ s=mimecast20190719; t=1586011079;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=+ZfjS5WVKE89dM9IIdzKrNx4ck9ojKPYZar0T+gS4i4=;
- b=KHZqxQGbVktdTh6ROM2JWiCKlIbhNTHgsRuV65ikoT3/Ja76o8VoctzrhQBwVwFr1NQPSW
- UECynMS5uFjkZ/aT96xaYruPBbrelFM7I9Raz5Uf6MhfKgzkPfVUfXfiz8ZUnMVBoRX50U
- xhu4ANQV1MV5RcA/XkiXzFMoOa+LDbg=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dKH8kqeRHPgwOpfK642cVQ9Bs8jNBiXwoN4mILH3dyQ=;
+ b=G9OMcbSBojgp2LmQ/tex5A3w8isKAhHBHcGeEluKddNrMg1lWQ5UKjn7hLJ/yVhGlzndnn
+ WYOgA2IblUSIaBfD2ekJX2UNfiafg6OKxuyG53pq7p5+8BteLUJFD1+/X3ZusMlOw0+qcf
+ xXHCGAu1gtcymV3cmBSbdmSSLG0TWvI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-RhwhUHFIPYGMr4ejWcg7_A-1; Sat, 04 Apr 2020 10:37:53 -0400
-X-MC-Unique: RhwhUHFIPYGMr4ejWcg7_A-1
+ us-mta-30--RQ6u3H-Nea8gZAmXtbi-Q-1; Sat, 04 Apr 2020 10:37:56 -0400
+X-MC-Unique: -RQ6u3H-Nea8gZAmXtbi-Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0405800D4E;
- Sat,  4 Apr 2020 14:37:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDD9418AB2C2;
+ Sat,  4 Apr 2020 14:37:55 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 201EE9B912;
- Sat,  4 Apr 2020 14:37:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 16CFB9B912;
+ Sat,  4 Apr 2020 14:37:53 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: pbonzini@redhat.com
-Subject: [PULL kvm-unit-tests 00/39] arm/arm64: The old and new
-Date: Sat,  4 Apr 2020 16:36:52 +0200
-Message-Id: <20200404143731.208138-1-drjones@redhat.com>
+Subject: [PULL kvm-unit-tests 07/39] arm64: timer: Wait for the GIC to sample
+ timer interrupt state
+Date: Sat,  4 Apr 2020 16:36:59 +0200
+Message-Id: <20200404143731.208138-8-drjones@redhat.com>
+In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
+References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
@@ -87,110 +91,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-This pull request is a repost of an older request, plus it
-contains Eric's new PMU and ITS tests.
+There is a delay between the timer asserting the interrupt and the GIC
+sampling the interrupt state. Let's take that into account when we are
+checking if the timer interrupt is pending (or not) at the GIC level.
 
-Thanks,
-drew
+An interrupt can be pending or active and pending [1,2]. Let's be precise
+and check that the interrupt is actually pending, not active and pending.
 
+[1] ARM IHI 0048B.b, section 1.4.1
+[2] ARM IHI 0069E, section 1.2.2
 
-The following changes since commit ce27fa2c7cd4d07859a9a2e81c7ff641897818d1:
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/timer.c       | 43 ++++++++++++++++++++++++++++++++++++++-----
+ arm/unittests.cfg |  2 +-
+ 2 files changed, 39 insertions(+), 6 deletions(-)
 
-  x86: vmx: skip atomic_switch_overflow_msrs_test on bare metal (2020-03-31 13:01:41 -0400)
-
-are available in the Git repository at:
-
-  https://github.com/rhdrjones/kvm-unit-tests arm/queue
-
-for you to fetch changes up to de582149c5be94a1ff7d3d8ee3526501b26c7f03:
-
-  arm/arm64: ITS: pending table migration test (2020-04-04 10:03:44 +0200)
-
-----------------------------------------------------------------
-Alexandru Elisei (10):
-      Makefile: Use no-stack-protector compiler options
-      arm/arm64: psci: Don't run C code without stack or vectors
-      arm64: timer: Add ISB after register writes
-      arm64: timer: Add ISB before reading the counter value
-      arm64: timer: Make irq_received volatile
-      arm64: timer: EOIR the interrupt after masking the timer
-      arm64: timer: Wait for the GIC to sample timer interrupt state
-      arm64: timer: Check the timer interrupt state
-      arm64: timer: Test behavior when timer disabled or masked
-      arm/arm64: Perform dcache clean + invalidate after turning MMU off
-
-Andrew Jones (2):
-      arm64: timer: Speed up gic-timer-state check
-      arm64: Provide read/write_sysreg_s
-
-Eric Auger (24):
-      arm: pmu: Let pmu tests take a sub-test parameter
-      arm: pmu: Don't check PMCR.IMP anymore
-      arm: pmu: Add a pmu struct
-      arm: pmu: Introduce defines for PMU versions
-      arm: pmu: Check Required Event Support
-      arm: pmu: Basic event counter Tests
-      arm: pmu: Test SW_INCR event count
-      arm: pmu: Test chained counters
-      arm: pmu: test 32-bit <-> 64-bit transitions
-      arm: gic: Introduce gic_irq_set_clr_enable() helper
-      arm: pmu: Test overflow interrupts
-      libcflat: Add other size defines
-      page_alloc: Introduce get_order()
-      arm/arm64: gic: Introduce setup_irq() helper
-      arm/arm64: gicv3: Add some re-distributor defines
-      arm/arm64: gicv3: Set the LPI config and pending tables
-      arm/arm64: ITS: Introspection tests
-      arm/arm64: ITS: its_enable_defaults
-      arm/arm64: ITS: Device and collection Initialization
-      arm/arm64: ITS: Commands
-      arm/arm64: ITS: INT functional tests
-      arm/run: Allow Migration tests
-      arm/arm64: ITS: migration tests
-      arm/arm64: ITS: pending table migration test
-
-Zenghui Yu (3):
-      arm/arm64: gic: Move gic_state enumeration to asm/gic.h
-      arm64: timer: Use the proper RDist register name in GICv3
-      arm64: timer: Use existing helpers to access counter/timers
-
- Makefile                   |   4 +-
- arm/Makefile.arm64         |   1 +
- arm/Makefile.common        |   2 +-
- arm/cstart.S               |  22 ++
- arm/cstart64.S             |  23 ++
- arm/gic.c                  | 482 ++++++++++++++++++++++++--
- arm/pmu.c                  | 831 +++++++++++++++++++++++++++++++++++++++++++--
- arm/psci.c                 |  14 +-
- arm/run                    |   2 +-
- arm/timer.c                |  82 +++--
- arm/unittests.cfg          | 101 +++++-
- errata.txt                 |   1 +
- lib/alloc_page.c           |   7 +-
- lib/alloc_page.h           |   1 +
- lib/arm/asm/gic-v3-its.h   |  27 ++
- lib/arm/asm/gic-v3.h       |  33 ++
- lib/arm/asm/gic.h          |  13 +
- lib/arm/asm/processor.h    |  15 +
- lib/arm/gic-v3.c           |  78 +++++
- lib/arm/gic.c              | 116 ++++++-
- lib/arm/io.c               |  28 ++
- lib/arm/setup.c            |   8 +
- lib/arm64/asm/gic-v3-its.h | 174 ++++++++++
- lib/arm64/asm/processor.h  |  12 +
- lib/arm64/asm/sysreg.h     |  17 +
- lib/arm64/gic-v3-its-cmd.c | 459 +++++++++++++++++++++++++
- lib/arm64/gic-v3-its.c     | 171 ++++++++++
- lib/bitops.h               |   3 +
- lib/libcflat.h             |   3 +
- 29 files changed, 2635 insertions(+), 95 deletions(-)
- create mode 100644 lib/arm/asm/gic-v3-its.h
- create mode 100644 lib/arm64/asm/gic-v3-its.h
- create mode 100644 lib/arm64/gic-v3-its-cmd.c
- create mode 100644 lib/arm64/gic-v3-its.c
-
+diff --git a/arm/timer.c b/arm/timer.c
+index b6f9dd10162d..ba7e8c6a90ed 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -8,6 +8,7 @@
+ #include <libcflat.h>
+ #include <devicetree.h>
+ #include <errata.h>
++#include <asm/delay.h>
+ #include <asm/processor.h>
+ #include <asm/gic.h>
+ #include <asm/io.h>
+@@ -16,6 +17,14 @@
+ #define ARCH_TIMER_CTL_IMASK   (1 << 1)
+ #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+ 
++enum gic_state {
++	GIC_STATE_INACTIVE,
++	GIC_STATE_PENDING,
++	GIC_STATE_ACTIVE,
++	GIC_STATE_ACTIVE_PENDING,
++};
++
++static void *gic_isactiver;
+ static void *gic_ispendr;
+ static void *gic_isenabler;
+ static void *gic_icenabler;
+@@ -174,9 +183,28 @@ static void irq_handler(struct pt_regs *regs)
+ 	info->irq_received = true;
+ }
+ 
+-static bool gic_timer_pending(struct timer_info *info)
++static enum gic_state gic_timer_state(struct timer_info *info)
+ {
+-	return readl(gic_ispendr) & (1 << PPI(info->irq));
++	enum gic_state state = GIC_STATE_INACTIVE;
++	int i;
++	bool pending, active;
++
++	/* Wait for up to 1s for the GIC to sample the interrupt. */
++	for (i = 0; i < 10; i++) {
++		pending = readl(gic_ispendr) & (1 << PPI(info->irq));
++		active = readl(gic_isactiver) & (1 << PPI(info->irq));
++		if (!active && !pending)
++			state = GIC_STATE_INACTIVE;
++		if (pending)
++			state = GIC_STATE_PENDING;
++		if (active)
++			state = GIC_STATE_ACTIVE;
++		if (active && pending)
++			state = GIC_STATE_ACTIVE_PENDING;
++		mdelay(100);
++	}
++
++	return state;
+ }
+ 
+ static bool test_cval_10msec(struct timer_info *info)
+@@ -225,15 +253,18 @@ static void test_timer(struct timer_info *info)
+ 	/* Enable the timer, but schedule it for much later */
+ 	info->write_cval(later);
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+-	report(!gic_timer_pending(info), "not pending before");
++	report(gic_timer_state(info) == GIC_STATE_INACTIVE,
++			"not pending before");
+ 
+ 	info->write_cval(now - 1);
+-	report(gic_timer_pending(info), "interrupt signal pending");
++	report(gic_timer_state(info) == GIC_STATE_PENDING,
++			"interrupt signal pending");
+ 
+ 	/* Disable the timer again and prepare to take interrupts */
+ 	info->write_ctl(0);
+ 	set_timer_irq_enabled(info, true);
+-	report(!gic_timer_pending(info), "interrupt signal no longer pending");
++	report(gic_timer_state(info) == GIC_STATE_INACTIVE,
++			"interrupt signal no longer pending");
+ 
+ 	report(test_cval_10msec(info), "latency within 10 ms");
+ 	report(info->irq_received, "interrupt received");
+@@ -307,11 +338,13 @@ static void test_init(void)
+ 
+ 	switch (gic_version()) {
+ 	case 2:
++		gic_isactiver = gicv2_dist_base() + GICD_ISACTIVER;
+ 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+ 		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+ 		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
+ 		break;
+ 	case 3:
++		gic_isactiver = gicv3_sgi_base() + GICD_ISACTIVER;
+ 		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
+ 		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
+ 		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index daeb5a09ad39..1f1bb24d9d13 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -132,7 +132,7 @@ groups = psci
+ [timer]
+ file = timer.flat
+ groups = timer
+-timeout = 2s
++timeout = 8s
+ arch = arm64
+ 
+ # Exit tests
 -- 
 2.25.1
 
