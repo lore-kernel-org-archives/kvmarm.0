@@ -1,61 +1,79 @@
-Return-Path: <SRS0=EFuC=5T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=dc8k=5U=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4342CC43331
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 14:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B194DC2BA19
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04EFA2077D
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Apr 2020 14:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04EFA2077D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 31E39206F5
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:38:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q5dJRyAo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E39206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9234B0E8;
-	Fri,  3 Apr 2020 10:02:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6388A4B1EB;
+	Sat,  4 Apr 2020 10:37:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BmaJ5AwwpCxJ; Fri,  3 Apr 2020 10:02:15 -0400 (EDT)
+	with ESMTP id XSgJeuAF2AFs; Sat,  4 Apr 2020 10:37:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6CB4B0EC;
-	Fri,  3 Apr 2020 10:02:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69CD34B1DF;
+	Sat,  4 Apr 2020 10:37:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EDB24B14B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 10:02:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBD154B1E3
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xpbbtyMZXDN1 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Apr 2020 10:02:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE0204B0E8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Apr 2020 10:02:12 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE3B431B;
- Fri,  3 Apr 2020 07:02:12 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A11DF3F52E;
- Fri,  3 Apr 2020 07:02:11 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: arm64: PSCI: Forbid 64bit functions for 32bit
- guests
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200401165816.530281-1-maz@kernel.org>
- <20200401165816.530281-3-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9c188c7e-5038-eb51-af1d-b3f54b070e6d@arm.com>
-Date: Fri, 3 Apr 2020 15:02:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ with ESMTP id Fk723-8vVWUR for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 148624B188
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:37:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586011075;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Euu3Q40ZKuRWEaooJhTwQlVK70xJGz+tBDjXBAOUp2U=;
+ b=Q5dJRyAoXwx7ZODsuaMB03Vm3ZG1t+k+oM0VNa4/EuupMy/t7pl+IcPNOvo8ZROj/EdVWn
+ 3RBUWcwb92lRXKY9E5uS3T8lGrtX5rSmfbiOeQHm9XtVdl8T3gsdra0qKWa3ENi1AHD8YB
+ basY5aujSMY3HynHHO89ZW5JUeDlNE4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189--hQdh5ltMr2zW6mDooqKXg-1; Sat, 04 Apr 2020 10:37:53 -0400
+X-MC-Unique: -hQdh5ltMr2zW6mDooqKXg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3743518AB2E3;
+ Sat,  4 Apr 2020 14:37:51 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2549F9B912;
+ Sat,  4 Apr 2020 14:37:48 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: pbonzini@redhat.com
+Subject: [PULL kvm-unit-tests 05/39] arm64: timer: Make irq_received volatile
+Date: Sat,  4 Apr 2020 16:36:57 +0200
+Message-Id: <20200404143731.208138-6-drjones@redhat.com>
+In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
+References: <20200404143731.208138-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200401165816.530281-3-maz@kernel.org>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,92 +90,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello,
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-On 4/1/20 5:58 PM, Marc Zyngier wrote:
-> Implementing (and even advertising) 64bit PSCI functions to 32bit
-> guests is at least a bit odd, if not altogether violating the
-> spec which says ("5.2.1 Register usage in arguments and return values"):
->
-> "Adherence to the SMC Calling Conventions implies that any AArch32
-> caller of an SMC64 function will get a return code of 0xFFFFFFFF(int32).
-> This matches the NOT_SUPPORTED error code used in PSCI"
->
-> Tighten the implementation by pretending these functions are not
-> there for 32bit guests.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/arm/psci.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index 69ff4a51ceb5..122795cdd984 100644
-> --- a/virt/kvm/arm/psci.c
-> +++ b/virt/kvm/arm/psci.c
-> @@ -199,6 +199,21 @@ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
->  		vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
->  }
->  
-> +static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
-> +{
-> +	switch(fn) {
-> +	case PSCI_0_2_FN64_CPU_SUSPEND:
-> +	case PSCI_0_2_FN64_CPU_ON:
-> +	case PSCI_0_2_FN64_AFFINITY_INFO:
+The irq_received field is modified by the interrupt handler. Make it
+volatile so that the compiler doesn't reorder accesses with regard to
+the instruction that will be causing the interrupt.
 
-I checked in ARM DEN 0022D, those are indeed the only 3 functions that KVM
-implements and have a different function ID based on the calling convention.
+Suggested-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +		/* Disallow these functions for 32bit guests */
-> +		if (vcpu_mode_is_32bit(vcpu))
-> +			return PSCI_RET_NOT_SUPPORTED;
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -206,6 +221,10 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  	unsigned long val;
->  	int ret = 1;
->  
-> +	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
-> +	if (val)
-> +		goto out;
-> +
->  	switch (psci_fn) {
->  	case PSCI_0_2_FN_PSCI_VERSION:
->  		/*
-> @@ -273,6 +292,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  		break;
->  	}
->  
-> +out:
->  	smccc_set_retval(vcpu, val, 0, 0, 0);
->  	return ret;
->  }
-> @@ -290,6 +310,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
->  		break;
->  	case PSCI_1_0_FN_PSCI_FEATURES:
->  		feature = smccc_get_arg1(vcpu);
-> +		val = kvm_psci_check_allowed_function(vcpu, feature);
-> +		if (val)
-> +			break;
-> +
->  		switch(feature) {
->  		case PSCI_0_2_FN_PSCI_VERSION:
->  		case PSCI_0_2_FN_CPU_SUSPEND:
+diff --git a/arm/timer.c b/arm/timer.c
+index e758e84855c3..82f891147b35 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -109,7 +109,7 @@ static void write_ptimer_ctl(u64 val)
+ struct timer_info {
+ 	u32 irq;
+ 	u32 irq_flags;
+-	bool irq_received;
++	volatile bool irq_received;
+ 	u64 (*read_counter)(void);
+ 	u64 (*read_cval)(void);
+ 	void (*write_cval)(u64);
+-- 
+2.25.1
 
-The patch makes sense to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
