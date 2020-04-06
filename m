@@ -1,78 +1,97 @@
-Return-Path: <SRS0=dc8k=5U=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=tdS3=5W=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B255C2BA15
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23B0C2BA18
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 06:29:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 269652070E
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Apr 2020 14:39:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBhbQtRJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269652070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 7808920719
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 06:29:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7808920719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B8F54B284;
-	Sat,  4 Apr 2020 10:39:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D45734B1F8;
+	Mon,  6 Apr 2020 02:29:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qJnoFjTm1oQ6; Sat,  4 Apr 2020 10:39:39 -0400 (EDT)
+	with ESMTP id rZW5+nKUPdqr; Mon,  6 Apr 2020 02:29:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8659E4B295;
-	Sat,  4 Apr 2020 10:39:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8A14B1FC;
+	Mon,  6 Apr 2020 02:29:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26BAA4B179
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:39:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85EB04B1F8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 02:29:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bUOK1AAsGy8t for <kvmarm@lists.cs.columbia.edu>;
- Sat,  4 Apr 2020 10:39:35 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DEBC4B27B
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Apr 2020 10:39:35 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586011175;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tCVC87LkZJzjp0nWYU+R4308nabVVB1yt9ifphXuw5Y=;
- b=SBhbQtRJXLmW/caB3xJUGn8vr/UbAw+uI8E0efnUiAlPQbEjrdVtkvtYQzFpuHUcfxU8Lo
- rCdv3iZL/yX8/eLBi9VRWDQx1m08G1BbinQJedwWMiUBhPE15A3ehfZZ6/B3MMoHVSQZ6j
- WWsjyOGPaf3ma6uGUiTeGZ1vmGA0AJU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-DRO7e7xkPU6k4HhiPkLdSA-1; Sat, 04 Apr 2020 10:39:28 -0400
-X-MC-Unique: DRO7e7xkPU6k4HhiPkLdSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD3BEDB22;
- Sat,  4 Apr 2020 14:39:27 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 824B89B912;
- Sat,  4 Apr 2020 14:39:26 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: pbonzini@redhat.com
-Subject: [PULL kvm-unit-tests 37/39] arm/run: Allow Migration tests
-Date: Sat,  4 Apr 2020 16:37:29 +0200
-Message-Id: <20200404143731.208138-38-drjones@redhat.com>
-In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
-References: <20200404143731.208138-1-drjones@redhat.com>
+ with ESMTP id XMBlB1buDABp for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Apr 2020 02:29:38 -0400 (EDT)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B1754B164
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 02:29:38 -0400 (EDT)
+IronPort-SDR: QE6J1zfJ1n86iYl4qGx1qo3+v85Fiy0gFDzuwIgMaonTX30aUnwn+0VBMZ3DuRLMSVW8dbATpK
+ 9pJPpQr2arsQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 05 Apr 2020 23:29:36 -0700
+IronPort-SDR: 7e5L34Y+rt3E7GG9GfybLo7T4EOEtglNQ7+WMHvNTxahyFk7KZ5UFlI+0W46C7I61/CGt+apdu
+ m0aSTz8EJbJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,350,1580803200"; d="scan'208";a="285778220"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by fmsmga002.fm.intel.com with ESMTP; 05 Apr 2020 23:29:36 -0700
+Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 5 Apr 2020 23:29:36 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 5 Apr 2020 23:29:36 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.138]) with mapi id 14.03.0439.000;
+ Mon, 6 Apr 2020 14:29:32 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com"
+ <jacob.jun.pan@linux.intel.com>, "jean-philippe.brucker@arm.com"
+ <jean-philippe.brucker@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, 
+ "robin.murphy@arm.com" <robin.murphy@arm.com>
+Subject: RE: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
+ type
+Thread-Topic: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
+ type
+Thread-Index: AQHV/tNxynbYpV5vT0iLn8klxfIfp6hkUe3A//995QCAB+uK0A==
+Date: Mon, 6 Apr 2020 06:29:32 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A222F4C@SHSMSX104.ccr.corp.intel.com>
+References: <20200320161911.27494-1-eric.auger@redhat.com>
+ <20200320161911.27494-5-eric.auger@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21DBDF@SHSMSX104.ccr.corp.intel.com>
+ <893039be-265a-8c70-8e48-74122d9857de@redhat.com>
+In-Reply-To: <893039be-265a-8c70-8e48-74122d9857de@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Jiang, Dave" <dave.jiang@intel.com>,
+ "Raj, Ashok" <ashok.raj@intel.com>,
+ "marc.zyngier@arm.com" <marc.zyngier@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,96 +108,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@redhat.com>
+Hi Eric,
+> From: Auger Eric <eric.auger@redhat.com>
+> Sent: Wednesday, April 1, 2020 9:31 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; eric.auger.pro@gmail.com; iommu@lists.linux-
+> Subject: Re: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
+> type
+> 
+> Hi Yi,
+> 
+> On 4/1/20 3:18 PM, Liu, Yi L wrote:
+> > Hi Eric,
+> >
+> > Just curious about your plan on this patch, I just heard my colleague
+> > would like to reference the functions from this patch in his dsa driver work.
+> 
+> Well I intend to respin until somebody tells me it is completely vain or dead follows.
+> Joking aside, feel free to embed it in any series it would be beneficial to, just please
+> cc me in case code diverges.
 
-Let's link getchar.o to use puts and getchar from the
-tests.
+got it. Please also cc me in future version. :-)
 
-Then allow tests belonging to the migration group to
-trigger the migration from the test code by putting
-"migrate" into the uart. Then the code can wait for the
-migration completion by using getchar().
-
-The __getchar implement is minimalist as it just reads the
-data register. It is just meant to read the single character
-emitted at the end of the migration by the runner script.
-
-It is not meant to read more data (FIFOs are not enabled).
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/Makefile.common |  2 +-
- arm/run             |  2 +-
- lib/arm/io.c        | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 2 deletions(-)
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index b8988f214d3b..a123e85d21bc 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -32,7 +32,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
- asm-offsets = lib/$(ARCH)/asm-offsets.h
- include $(SRCDIR)/scripts/asm-offsets.mak
- 
--cflatobjs += lib/util.o
-+cflatobjs += lib/util.o lib/getchar.o
- cflatobjs += lib/alloc_phys.o
- cflatobjs += lib/alloc_page.o
- cflatobjs += lib/vmalloc.o
-diff --git a/arm/run b/arm/run
-index 277db9bb4a02..a390ca5ae0ba 100755
---- a/arm/run
-+++ b/arm/run
-@@ -61,6 +61,6 @@ fi
- M+=",accel=$ACCEL"
- command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
- command+=" -display none -serial stdio -kernel"
--command="$(timeout_cmd) $command"
-+command="$(migration_cmd) $(timeout_cmd) $command"
- 
- run_qemu $command "$@"
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index 99fd31560084..343e10822263 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -87,6 +87,34 @@ void puts(const char *s)
- 	spin_unlock(&uart_lock);
- }
- 
-+static int do_getchar(void)
-+{
-+	int c;
-+
-+	spin_lock(&uart_lock);
-+	c = readb(uart0_base);
-+	spin_unlock(&uart_lock);
-+
-+	return c ?: -1;
-+}
-+
-+/*
-+ * Minimalist implementation for migration completion detection.
-+ * Without FIFOs enabled on the QEMU UART device we just read
-+ * the data register: we cannot read more than 16 characters.
-+ */
-+int __getchar(void)
-+{
-+	int c = do_getchar();
-+	static int count;
-+
-+	if (c != -1)
-+		++count;
-+
-+	assert(count < 16);
-+
-+	return c;
-+}
- 
- /*
-  * Defining halt to take 'code' as an argument guarantees that it will
--- 
-2.25.1
+Regards,
+Yi Liu
 
 _______________________________________________
 kvmarm mailing list
