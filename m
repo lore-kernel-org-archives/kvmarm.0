@@ -2,55 +2,82 @@ Return-Path: <SRS0=tdS3=5W=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE5FC2BA19
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 15:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA30C2BA1E
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 15:14:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0AAEE2487B
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 15:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AAEE2487B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id ECD0E2339E
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Apr 2020 15:14:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="QR7kZD8x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD0E2339E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 503BD4B189;
-	Mon,  6 Apr 2020 11:04:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 934854B183;
+	Mon,  6 Apr 2020 11:14:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7ddNJL5IRpCv; Mon,  6 Apr 2020 11:04:06 -0400 (EDT)
+	with ESMTP id qGMsVHOew3Xc; Mon,  6 Apr 2020 11:14:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D43674A4E5;
-	Mon,  6 Apr 2020 11:04:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9B24B18D;
+	Mon,  6 Apr 2020 11:14:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB024B12E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 11:04:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B06F4B154
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 11:14:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yty0dnJJfhlW for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Apr 2020 11:04:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9861C4A4E5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 11:04:03 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 242E11FB;
- Mon,  6 Apr 2020 08:04:03 -0700 (PDT)
-Received: from melchizedek.cambridge.arm.com (melchizedek.cambridge.arm.com
- [10.1.196.50])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3758D3F73D;
- Mon,  6 Apr 2020 08:04:02 -0700 (PDT)
-From: James Morse <james.morse@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
-Date: Mon,  6 Apr 2020 16:03:55 +0100
-Message-Id: <20200406150355.4859-1-james.morse@arm.com>
-X-Mailer: git-send-email 2.19.1
+ with ESMTP id fCH4a42yuXyP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Apr 2020 11:14:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DB984B12E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Apr 2020 11:14:39 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BD36322206;
+ Mon,  6 Apr 2020 15:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1586186077;
+ bh=HLTjh6deKNcgUl2LBBzz4egKGS8y0szuWCPXV1N1ims=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=QR7kZD8xTGeRVGb70bx4v5zgrIKTwEE4rX8OONXSp38sWYVsxnY+TOT+O5HFft9r/
+ fngLf+D07utVU9AdAQ3aJmxgS2bdQU+A2h13rDxPJ2+cbCsfQFML8c8bTMlBFXNyOx
+ XiDwgmgxnugQK4310p2UlYtvjAsXi02e1W26Sokg=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jLTSN-00187d-Tp; Mon, 06 Apr 2020 16:14:36 +0100
 MIME-Version: 1.0
-Cc: Marc Zyngier <maz@kernel.org>, Andre Przywara <andre.przywara@arm.com>
+Date: Mon, 06 Apr 2020 16:14:35 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Julien Grall <julien@xen.org>
+Subject: Re: I{S,C}ACTIVER implemention question
+In-Reply-To: <c90bdfa0-00cf-170b-4319-e270e8aaef7e@xen.org>
+References: <c90bdfa0-00cf-170b-4319-e270e8aaef7e@xen.org>
+Message-ID: <2a201532b992fca74b4f193f53fc71f9@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: julien@xen.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ sstabellini@kernel.org, George.Dunlap@eu.citrix.com, Bertrand.Marquis@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Stefano Stabellini <sstabellini@kernel.org>, George.Dunlap@eu.citrix.com,
+ Bertrand Marquis <Bertrand.Marquis@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,221 +89,236 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_arch_timer_get_input_level() needs to get the arch_timer_context for
-a particular vcpu, and uses kvm_get_running_vcpu() to find it.
+Hi Julien,
 
-kvm_arch_timer_get_input_level() may be called to handle a user-space
-write to the redistributor, where the vcpu is not loaded. This causes
-kvm_get_running_vcpu() to return NULL:
-| Unable to handle kernel paging request at virtual address 0000000000001ec0
-| Mem abort info:
-|   ESR = 0x96000004
-|   EC = 0x25: DABT (current EL), IL = 32 bits
-|   SET = 0, FnV = 0
-|   EA = 0, S1PTW = 0
-| Data abort info:
-|   ISV = 0, ISS = 0x00000004
-|   CM = 0, WnR = 0
-| user pgtable: 4k pages, 48-bit VAs, pgdp=000000003cbf9000
-| [0000000000001ec0] pgd=0000000000000000
-| Internal error: Oops: 96000004 [#1] PREEMPT SMP
-| Modules linked in: r8169 realtek efivarfs ip_tables x_tables
-| CPU: 1 PID: 2615 Comm: qemu-system-aar Not tainted 5.6.0-rc7 #30
-| Hardware name: Marvell mvebu_armada-37xx/mvebu_armada-37xx, BIOS 2018.03-devel-18.12.3-gc9aa92c-armbian 02/20/2019
-| pstate: 00000085 (nzcv daIf -PAN -UAO)
-| pc : kvm_arch_timer_get_input_level+0x1c/0x68
-| lr : kvm_arch_timer_get_input_level+0x1c/0x68
+Thanks for the heads up.
 
-| Call trace:
-|  kvm_arch_timer_get_input_level+0x1c/0x68
-|  vgic_get_phys_line_level+0x3c/0x90
-|  vgic_mmio_write_senable+0xe4/0x130
-|  vgic_uaccess+0xe0/0x100
-|  vgic_v3_redist_uaccess+0x5c/0x80
-|  vgic_v3_attr_regs_access+0xf0/0x200
-|  nvgic_v3_set_attr+0x234/0x250
-|  kvm_device_ioctl_attr+0xa4/0xf8
-|  kvm_device_ioctl+0x7c/0xc0
-|  ksys_ioctl+0x1fc/0xc18
-|  __arm64_sys_ioctl+0x24/0x30
-|  do_el0_svc+0x7c/0x148
-|  el0_sync_handler+0x138/0x258
-|  el0_sync+0x140/0x180
-| Code: 910003fd f9000bf3 2a0003f3 97ff650c (b95ec001)
-| ---[ end trace 81287612d93f1e70 ]---
-| note: qemu-system-aar[2615] exited with preempt_count 1
+On 2020-04-06 14:16, Julien Grall wrote:
+> Hi,
+> 
+> Xen community is currently reviewing a new implementation for reading
+> I{S,C}ACTIVER registers (see [1]).
+> 
+> The implementation is based on vgic_mmio_read_active() in KVM, i.e the
+> active state of the interrupts is based on the vGIC state stored in
+> memory.
+> 
+> While reviewing the patch on xen-devel, I noticed a potential deadlock
+> at least with Xen implementation. I know that Xen vGIC and KVM vGIC
+> are quite different, so I looked at the implementation to see how this
+> is dealt.
+> 
+> With my limited knowledge of KVM, I wasn't able to rule it out. I am
+> curious to know if I missed anything.
+> 
+> vCPU A may read the active state of an interrupt routed to vCPU B.
+> When vCPU A is reading the state, it will read the state stored in
+> memory.
+> 
+> The only way the memory state can get synced with the HW state is when
+> vCPU B exit guest context.
+> 
+> AFAICT, vCPU B will not exit when deactivating HW mapped interrupts
+> and virtual edge interrupts. So vCPU B may run for an abritrary long
+> time before been exiting and syncing the memory state with the HW
+> state.
 
-Loading the vcpu doesn't make a lot of sense for handling a device ioctl(),
-so instead pass the vcpu through to kvm_arch_timer_get_input_level(). Its
-not clear that an intid makes much sense without the paired vcpu.
+So while I agree that this is definitely not ideal, I don't think we 
+end-up
+with a deadlock (or rather a livelock) either. That's because we are 
+guaranteed
+to exit eventually if only because the kernel's own timer interrupt (or 
+any
+other host interrupt routed to the same physical CPU) will fire and get 
+us
+out of there. On its own, this is enough to allow the polling vcpu to 
+make
+forward progress.
 
-Suggested-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: James Morse <james.morse@arm.com>
----
- include/kvm/arm_arch_timer.h  | 2 +-
- include/kvm/arm_vgic.h        | 8 +++-----
- virt/kvm/arm/arch_timer.c     | 3 +--
- virt/kvm/arm/vgic/vgic-mmio.c | 2 +-
- virt/kvm/arm/vgic/vgic-v2.c   | 2 +-
- virt/kvm/arm/vgic/vgic-v3.c   | 2 +-
- virt/kvm/arm/vgic/vgic.c      | 8 ++++----
- virt/kvm/arm/vgic/vgic.h      | 2 +-
- 8 files changed, 13 insertions(+), 16 deletions(-)
+Now, it is obvious that we should improve on the current situation. I 
+just
+hacked together a patch that provides the same guarantees as the one we
+already have on the write side (kick all vcpus out of the guest, 
+snapshot
+the state, kick everyone back in). I boot-tested it, so it is obviously 
+perfect
+and won't eat your data at all! ;-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index d120e6c..42a016a 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -92,7 +92,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
- void kvm_timer_init_vhe(void);
- 
--bool kvm_arch_timer_get_input_level(int vintid);
-+bool kvm_arch_timer_get_input_level(int vintid, struct kvm_vcpu *vcpu);
- 
- #define vcpu_timer(v)	(&(v)->arch.timer_cpu)
- #define vcpu_get_timer(v,t)	(&vcpu_timer(v)->timers[(t)])
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9d53f54..41e91b3 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -130,11 +130,9 @@ struct vgic_irq {
- 	 * state of the input level of mapped level-triggered IRQ faster than
- 	 * peaking into the physical GIC.
- 	 *
--	 * Always called in non-preemptible section and the functions can use
--	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
--	 * IRQs.
-+	 * Always called in non-preemptible section.
- 	 */
--	bool (*get_input_level)(int vintid);
-+	bool (*get_input_level)(int vintid, struct kvm_vcpu *vcpu);
- 
- 	void *owner;			/* Opaque pointer to reserve an interrupt
- 					   for in-kernel devices. */
-@@ -344,7 +342,7 @@ void kvm_vgic_init_cpu_hardware(void);
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level, void *owner);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid, bool (*get_input_level)(int vindid));
-+			  u32 vintid, bool (*get_input_level)(int vindid, struct kvm_vcpu *vcpu));
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 0d9438e..ca0e87b 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -1021,9 +1021,8 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--bool kvm_arch_timer_get_input_level(int vintid)
-+bool kvm_arch_timer_get_input_level(int vintid, struct kvm_vcpu *vcpu)
- {
--	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 	struct arch_timer_context *timer;
- 
- 	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 97fb2a4..37ee2f8 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -121,7 +121,7 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
- 			 * the guest might have changed the state of the device
- 			 * while the interrupt was disabled at the VGIC level.
- 			 */
--			irq->line_level = vgic_get_phys_line_level(irq);
-+			irq->line_level = vgic_get_phys_line_level(irq, vcpu);
- 			/*
- 			 * Deactivate the physical interrupt so the GIC will let
- 			 * us know when it is asserted again.
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 621cc16..e126f25 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -110,7 +110,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 		 * told when the interrupt becomes asserted again.
- 		 */
- 		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
--			irq->line_level = vgic_get_phys_line_level(irq);
-+			irq->line_level = vgic_get_phys_line_level(irq, vcpu);
- 
- 			if (!irq->line_level)
- 				vgic_irq_set_phys_active(irq, false);
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index f45635a..ff861fa 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -101,7 +101,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 		 * told when the interrupt becomes asserted again.
- 		 */
- 		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
--			irq->line_level = vgic_get_phys_line_level(irq);
-+			irq->line_level = vgic_get_phys_line_level(irq, vcpu);
- 
- 			if (!irq->line_level)
- 				vgic_irq_set_phys_active(irq, false);
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 99b02ca..d113b5b 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -176,14 +176,14 @@ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
- 				      pending));
- }
- 
--bool vgic_get_phys_line_level(struct vgic_irq *irq)
-+bool vgic_get_phys_line_level(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- {
- 	bool line_level;
- 
- 	BUG_ON(!irq->hw);
- 
- 	if (irq->get_input_level)
--		return irq->get_input_level(irq->intid);
-+		return irq->get_input_level(irq->intid, vcpu);
- 
- 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
- 				      IRQCHIP_STATE_PENDING,
-@@ -479,7 +479,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- /* @irq->irq_lock must be held */
- static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 			    unsigned int host_irq,
--			    bool (*get_input_level)(int vindid))
-+			    bool (*get_input_level)(int vindid, struct kvm_vcpu *vcpu))
- {
- 	struct irq_desc *desc;
- 	struct irq_data *data;
-@@ -512,7 +512,7 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
- }
- 
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid, bool (*get_input_level)(int vindid))
-+			  u32 vintid, bool (*get_input_level)(int vindid, struct kvm_vcpu *vcpu))
- {
- 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
- 	unsigned long flags;
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index c7fefd6..622865e 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -163,7 +163,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
--bool vgic_get_phys_line_level(struct vgic_irq *irq);
-+bool vgic_get_phys_line_level(struct vgic_irq *irq, struct kvm_vcpu *vcpu);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
- void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+Thanks,
+
+         M.
+
++
++/*
++ * If we are fiddling with an IRQ's active state, we have to make sure 
+the IRQ
++ * is not queued on some running VCPU's LRs, because then the change to 
+the
++ * active state can be overwritten when the VCPU's state is synced 
+coming back
++ * from the guest.
++ *
++ * For shared interrupts as well as GICv3 private interrupts, we have 
+to
++ * stop all the VCPUs because interrupts can be migrated while we don't 
+hold
++ * the IRQ locks and we don't want to be chasing moving targets.
++ *
++ * For GICv2 private interrupts we don't have to do anything because
++ * userspace accesses to the VGIC state already require all VCPUs to be
++ * stopped, and only the VCPU itself can modify its private interrupts
++ * active state, which guarantees that the VCPU is not running.
++ */
++static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 
+intid)
++{
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	    intid > VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_halt_guest(vcpu->kvm);
++}
++
++/* See vgic_access_active_prepare */
++static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
++{
++	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	    intid > VGIC_NR_PRIVATE_IRQS)
++		kvm_arm_resume_guest(vcpu->kvm);
++}
++
++static unsigned long __vgic_mmio_read_active(struct kvm_vcpu *vcpu,
++					     gpa_t addr, unsigned int len)
+  {
+  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+  	u32 value = 0;
+@@ -359,6 +390,10 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu 
+*vcpu,
+  	for (i = 0; i < len * 8; i++) {
+  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+
++		/*
++		 * Even for HW interrupts, don't evaluate the HW state as
++		 * all the guest is interested in is the virtual state.
++		 */
+  		if (irq->active)
+  			value |= (1U << i);
+
+@@ -368,6 +403,29 @@ unsigned long vgic_mmio_read_active(struct kvm_vcpu 
+*vcpu,
+  	return value;
+  }
+
++unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	u32 val;
++
++	mutex_lock(&vcpu->kvm->lock);
++	vgic_access_active_prepare(vcpu, intid);
++
++	val = __vgic_mmio_read_active(vcpu, addr, len);
++
++	vgic_access_active_finish(vcpu, intid);
++	mutex_unlock(&vcpu->kvm->lock);
++
++	return val;
++}
++
++unsigned long vgic_uaccess_read_active(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
++{
++	return __vgic_mmio_read_active(vcpu, addr, len);
++}
++
+  /* Must be called with irq->irq_lock held */
+  static void vgic_hw_irq_change_active(struct kvm_vcpu *vcpu, struct 
+vgic_irq *irq,
+  				      bool active, bool is_uaccess)
+@@ -426,36 +484,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu 
+*vcpu, struct vgic_irq *irq,
+  		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+  }
+
+-/*
+- * If we are fiddling with an IRQ's active state, we have to make sure 
+the IRQ
+- * is not queued on some running VCPU's LRs, because then the change to 
+the
+- * active state can be overwritten when the VCPU's state is synced 
+coming back
+- * from the guest.
+- *
+- * For shared interrupts, we have to stop all the VCPUs because 
+interrupts can
+- * be migrated while we don't hold the IRQ locks and we don't want to 
+be
+- * chasing moving targets.
+- *
+- * For private interrupts we don't have to do anything because 
+userspace
+- * accesses to the VGIC state already require all VCPUs to be stopped, 
+and
+- * only the VCPU itself can modify its private interrupts active state, 
+which
+- * guarantees that the VCPU is not running.
+- */
+-static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 
+intid)
+-{
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+-	    intid > VGIC_NR_PRIVATE_IRQS)
+-		kvm_arm_halt_guest(vcpu->kvm);
+-}
+-
+-/* See vgic_change_active_prepare */
+-static void vgic_change_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+-{
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
+-	    intid > VGIC_NR_PRIVATE_IRQS)
+-		kvm_arm_resume_guest(vcpu->kvm);
+-}
+-
+  static void __vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
+  				      gpa_t addr, unsigned int len,
+  				      unsigned long val)
+@@ -477,11 +505,11 @@ void vgic_mmio_write_cactive(struct kvm_vcpu 
+*vcpu,
+  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+
+  	mutex_lock(&vcpu->kvm->lock);
+-	vgic_change_active_prepare(vcpu, intid);
++	vgic_access_active_prepare(vcpu, intid);
+
+  	__vgic_mmio_write_cactive(vcpu, addr, len, val);
+
+-	vgic_change_active_finish(vcpu, intid);
++	vgic_access_active_finish(vcpu, intid);
+  	mutex_unlock(&vcpu->kvm->lock);
+  }
+
+@@ -514,11 +542,11 @@ void vgic_mmio_write_sactive(struct kvm_vcpu 
+*vcpu,
+  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+
+  	mutex_lock(&vcpu->kvm->lock);
+-	vgic_change_active_prepare(vcpu, intid);
++	vgic_access_active_prepare(vcpu, intid);
+
+  	__vgic_mmio_write_sactive(vcpu, addr, len, val);
+
+-	vgic_change_active_finish(vcpu, intid);
++	vgic_access_active_finish(vcpu, intid);
+  	mutex_unlock(&vcpu->kvm->lock);
+  }
+
+
 -- 
-2.7.4
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
