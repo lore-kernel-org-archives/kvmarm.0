@@ -2,101 +2,79 @@ Return-Path: <SRS0=0SjI=5Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3666DC2D0EA
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 12:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1A1C2BA1A
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 14:19:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B82322074F
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 12:14:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82322074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A49A620780
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 14:19:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lnbn2Omz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49A620780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C7504B1AC;
-	Wed,  8 Apr 2020 08:14:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 243DD4B17B;
+	Wed,  8 Apr 2020 10:19:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w77u8eL-LrFZ; Wed,  8 Apr 2020 08:14:30 -0400 (EDT)
+	with ESMTP id uGkDkuwwBT1J; Wed,  8 Apr 2020 10:19:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1334B1FD;
-	Wed,  8 Apr 2020 08:14:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D92684B190;
+	Wed,  8 Apr 2020 10:19:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8EC4B1D9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 08:14:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BE94B159
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 10:19:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5lDFlIdrk5Zw for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Apr 2020 08:14:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D46134B1AC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 08:14:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81D0B31B;
- Wed,  8 Apr 2020 05:14:27 -0700 (PDT)
-Received: from [192.168.3.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 217EF3F73D;
- Wed,  8 Apr 2020 05:14:25 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>
-References: <20200406150355.4859-1-james.morse@arm.com>
- <20200408110726.4d81bc3b@why>
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
- tPfEG0KnRL9CWvftyHseWTnU2Gi7hKNwhRkC0oBL5Er2hhNpoi8x4VcsxQ6bHG5/dA7ctvL6
- kYvKAZw4X2Y3GTbAZIOLf+leNPiF9175S8pvqMPi0qu67RWZD5H/uT/TfLpvmmOlRzNiXMBm
- kGvewkBpL3R2clHquv7pB6KLoY3uvjFhZfEedqSqTwBVu/JVZZO7tvYCJPfyY5JG9+BjPmr+
- REe2gS6w/4DJ4D8oMWKoY3r6ZpHx3YS2hWZFUYiCYovPxfj5+bOr78sg3JleEd0OB0yYtzTT
- esiNlQpCo0oOevwHR+jUiaZevM4xCyt23L2G+euzdRsUZcK/M6qYf41Dy6Afqa+PxgMEiDto
- ITEH3Dv+zfzwdeqCuNU0VOGrQZs/vrKOUmU/QDlYL7G8OIg5Ekheq4N+Ay+3EYCROXkstQnf
- YYxRn5F1oeVeqoh1LgGH7YN9H9LeIajwBD8OgiZDVsmb67DdF6EQtklH0ycBcVodG1zTCfqM
- AavYMfhldNMBg4vaLh0cJ/3ZXZNIyDlV372GmxSJJiidxDm7E1PkgdfCnHk+pD8YeITmSNyb
- 7qeU08Hqqh4ui8SSeUp7+yie9zBhJB5vVBJoO5D0MikZAODIDwARAQABzS1BbmRyZSBQcnp5
- d2FyYSAoQVJNKSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT7CwXsEEwECACUCGwMGCwkIBwMC
- BhUIAgkKCwQWAgMBAh4BAheABQJTWSV8AhkBAAoJEAL1yD+ydue63REP/1tPqTo/f6StS00g
- NTUpjgVqxgsPWYWwSLkgkaUZn2z9Edv86BLpqTY8OBQZ19EUwfNehcnvR+Olw+7wxNnatyxo
- D2FG0paTia1SjxaJ8Nx3e85jy6l7N2AQrTCFCtFN9lp8Pc0LVBpSbjmP+Peh5Mi7gtCBNkpz
- KShEaJE25a/+rnIrIXzJHrsbC2GwcssAF3bd03iU41J1gMTalB6HCtQUwgqSsbG8MsR/IwHW
- XruOnVp0GQRJwlw07e9T3PKTLj3LWsAPe0LHm5W1Q+euoCLsZfYwr7phQ19HAxSCu8hzp43u
- zSw0+sEQsO+9wz2nGDgQCGepCcJR1lygVn2zwRTQKbq7Hjs+IWZ0gN2nDajScuR1RsxTE4WR
- lj0+Ne6VrAmPiW6QqRhliDO+e82riI75ywSWrJb9TQw0+UkIQ2DlNr0u0TwCUTcQNN6aKnru
- ouVt3qoRlcD5MuRhLH+ttAcmNITMg7GQ6RQajWrSKuKFrt6iuDbjgO2cnaTrLbNBBKPTG4oF
- D6kX8Zea0KvVBagBsaC1CDTDQQMxYBPDBSlqYCb/b2x7KHTvTAHUBSsBRL6MKz8wwruDodTM
- 4E4ToV9URl4aE/msBZ4GLTtEmUHBh4/AYwk6ACYByYKyx5r3PDG0iHnJ8bV0OeyQ9ujfgBBP
- B2t4oASNnIOeGEEcQ2rjzsFNBFNPCKMBEACm7Xqafb1Dp1nDl06aw/3O9ixWsGMv1Uhfd2B6
- it6wh1HDCn9HpekgouR2HLMvdd3Y//GG89irEasjzENZPsK82PS0bvkxxIHRFm0pikF4ljIb
- 6tca2sxFr/H7CCtWYZjZzPgnOPtnagN0qVVyEM7L5f7KjGb1/o5EDkVR2SVSSjrlmNdTL2Rd
- zaPqrBoxuR/y/n856deWqS1ZssOpqwKhxT1IVlF6S47CjFJ3+fiHNjkljLfxzDyQXwXCNoZn
- BKcW9PvAMf6W1DGASoXtsMg4HHzZ5fW+vnjzvWiC4pXrcP7Ivfxx5pB+nGiOfOY+/VSUlW/9
- GdzPlOIc1bGyKc6tGREH5lErmeoJZ5k7E9cMJx+xzuDItvnZbf6RuH5fg3QsljQy8jLlr4S6
- 8YwxlObySJ5K+suPRzZOG2+kq77RJVqAgZXp3Zdvdaov4a5J3H8pxzjj0yZ2JZlndM4X7Msr
- P5tfxy1WvV4Km6QeFAsjcF5gM+wWl+mf2qrlp3dRwniG1vkLsnQugQ4oNUrx0ahwOSm9p6kM
- CIiTITo+W7O9KEE9XCb4vV0ejmLlgdDV8ASVUekeTJkmRIBnz0fa4pa1vbtZoi6/LlIdAEEt
- PY6p3hgkLLtr2GRodOW/Y3vPRd9+rJHq/tLIfwc58ZhQKmRcgrhtlnuTGTmyUqGSiMNfpwAR
- AQABwsFfBBgBAgAJBQJTTwijAhsMAAoJEAL1yD+ydue64BgP/33QKczgAvSdj9XTC14wZCGE
- U8ygZwkkyNf021iNMj+o0dpLU48PIhHIMTXlM2aiiZlPWgKVlDRjlYuc9EZqGgbOOuR/pNYA
- JX9vaqszyE34JzXBL9DBKUuAui8z8GcxRcz49/xtzzP0kH3OQbBIqZWuMRxKEpRptRT0wzBL
- O31ygf4FRxs68jvPCuZjTGKELIo656/Hmk17cmjoBAJK7JHfqdGkDXk5tneeHCkB411p9WJU
- vMO2EqsHjobjuFm89hI0pSxlUoiTL0Nuk9Edemjw70W4anGNyaQtBq+qu1RdjUPBvoJec7y/
- EXJtoGxq9Y+tmm22xwApSiIOyMwUi9A1iLjQLmngLeUdsHyrEWTbEYHd2sAM2sqKoZRyBDSv
- ejRvZD6zwkY/9nRqXt02H1quVOP42xlkwOQU6gxm93o/bxd7S5tEA359Sli5gZRaucpNQkwd
- KLQdCvFdksD270r4jU/rwR2R/Ubi+txfy0dk2wGBjl1xpSf0Lbl/KMR5TQntELfLR4etizLq
- Xpd2byn96Ivi8C8u9zJruXTueHH8vt7gJ1oax3yKRGU5o2eipCRiKZ0s/T7fvkdq+8beg9ku
- fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
-Date: Wed, 8 Apr 2020 13:13:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ with ESMTP id uttpUoLkNdrI for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Apr 2020 10:19:41 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23ED34B149
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 10:19:41 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 125E62074F;
+ Wed,  8 Apr 2020 14:19:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1586355580;
+ bh=maNVyBfu8ItLwyKOhrh/TRhv8mzBKc1ELxLvZuhL170=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Lnbn2Omzi2MippQjx2Qz4HU42rFftYa7piXsNUj1JsbLia6A/8wuGN5Ds4VKxBzEW
+ R0aDA+UZM1bFZFjVVqLQvTQZX2nLSMMxH1f8iBC8dyLWlmtyqERTFmstDyqEuEvXFm
+ UsC1paAuXHuF8IYKVkFiYjdU15cYQkpLW7/1rW8w=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jMBYI-001fX7-9A; Wed, 08 Apr 2020 15:19:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200408110726.4d81bc3b@why>
-Content-Language: en-US
+Date: Wed, 08 Apr 2020 15:19:38 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
+In-Reply-To: <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
+References: <20200406150355.4859-1-james.morse@arm.com>
+ <20200408110726.4d81bc3b@why> <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
+Message-ID: <92de4dc6e0c065eec528bb21c2d870cf@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, james.morse@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -109,112 +87,87 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/04/2020 11:07, Marc Zyngier wrote:
-
-Hi Marc,
-
-> Hi James,
-> 
-> Thanks for looking into this.
-> 
-> On Mon,  6 Apr 2020 16:03:55 +0100
-> James Morse <james.morse@arm.com> wrote:
-> 
->> kvm_arch_timer_get_input_level() needs to get the arch_timer_context for
->> a particular vcpu, and uses kvm_get_running_vcpu() to find it.
->>
->> kvm_arch_timer_get_input_level() may be called to handle a user-space
->> write to the redistributor, where the vcpu is not loaded. This causes
->> kvm_get_running_vcpu() to return NULL:
->> | Unable to handle kernel paging request at virtual address 0000000000001ec0
->> | Mem abort info:
->> |   ESR = 0x96000004
->> |   EC = 0x25: DABT (current EL), IL = 32 bits
->> |   SET = 0, FnV = 0
->> |   EA = 0, S1PTW = 0
->> | Data abort info:
->> |   ISV = 0, ISS = 0x00000004
->> |   CM = 0, WnR = 0
->> | user pgtable: 4k pages, 48-bit VAs, pgdp=000000003cbf9000
->> | [0000000000001ec0] pgd=0000000000000000
->> | Internal error: Oops: 96000004 [#1] PREEMPT SMP
->> | Modules linked in: r8169 realtek efivarfs ip_tables x_tables
->> | CPU: 1 PID: 2615 Comm: qemu-system-aar Not tainted 5.6.0-rc7 #30
->> | Hardware name: Marvell mvebu_armada-37xx/mvebu_armada-37xx, BIOS 2018.03-devel-18.12.3-gc9aa92c-armbian 02/20/2019
->> | pstate: 00000085 (nzcv daIf -PAN -UAO)
->> | pc : kvm_arch_timer_get_input_level+0x1c/0x68
->> | lr : kvm_arch_timer_get_input_level+0x1c/0x68
->>
->> | Call trace:
->> |  kvm_arch_timer_get_input_level+0x1c/0x68
->> |  vgic_get_phys_line_level+0x3c/0x90
->> |  vgic_mmio_write_senable+0xe4/0x130
->> |  vgic_uaccess+0xe0/0x100
->> |  vgic_v3_redist_uaccess+0x5c/0x80
->> |  vgic_v3_attr_regs_access+0xf0/0x200
->> |  nvgic_v3_set_attr+0x234/0x250
->> |  kvm_device_ioctl_attr+0xa4/0xf8
->> |  kvm_device_ioctl+0x7c/0xc0
->> |  ksys_ioctl+0x1fc/0xc18
->> |  __arm64_sys_ioctl+0x24/0x30
->> |  do_el0_svc+0x7c/0x148
->> |  el0_sync_handler+0x138/0x258
->> |  el0_sync+0x140/0x180
->> | Code: 910003fd f9000bf3 2a0003f3 97ff650c (b95ec001)
->> | ---[ end trace 81287612d93f1e70 ]---
->> | note: qemu-system-aar[2615] exited with preempt_count 1
->>
->> Loading the vcpu doesn't make a lot of sense for handling a device ioctl(),
->> so instead pass the vcpu through to kvm_arch_timer_get_input_level(). Its
->> not clear that an intid makes much sense without the paired vcpu.
-> 
-> I don't fully agree with the analysis, Remember we are looking at the
-> state of the physical interrupt associated with a virtual interrupt, so
-> the vcpu doesn't quite make sense here if it isn't loaded.
-
-But wasn't it that this function is meant to specifically deal with this
-*without* going to the hardware (which is costly, hence this
-optimisation)? Because for the timer we *can* work out the logical IRQ
-line state by examining our saved state? And this is what we do in
-kvm_timer_should_fire(), when timer_ctx->loaded is false.
-
-Which for me this sounds like the right thing to do in this situation:
-the VCPU (and the timer) is not loaded, so we check our saved state and
-construct the logical line level. We just need a valid VCPU struct to
-achieve this, and hope for the virtual timer to be already initialised.
-
-Do I miss something here?
-
-Also to me it sound like the interface for this function is slightly
-lacking, because just an intid is not enough to uniquely identify an
-IRQ. It was just fine so far because of this special use case.
-
-Cheers,
-Andre
-
-> 
-> What does it mean to look at the HW timer when we are not in the right
-> context? For all we know, it is completely random (the only guarantee
-> we have is that it is disabled, actually).
-> 
-> My gut feeling is that this is another instance where we should provide
-> specific userspace accessors that would only deal with the virtual
-> state, and leave anything that deals with the physical state of the
-> interrupt to be exercised only by the guest.
-> 
-> Does it make sense?
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgQW5kcmUsCgpPbiAyMDIwLTA0LTA4IDEzOjEzLCBBbmRyw6kgUHJ6eXdhcmEgd3JvdGU6Cj4g
+T24gMDgvMDQvMjAyMCAxMTowNywgTWFyYyBaeW5naWVyIHdyb3RlOgo+IAo+IEhpIE1hcmMsCj4g
+Cj4+IEhpIEphbWVzLAo+PiAKPj4gVGhhbmtzIGZvciBsb29raW5nIGludG8gdGhpcy4KPj4gCj4+
+IE9uIE1vbiwgIDYgQXByIDIwMjAgMTY6MDM6NTUgKzAxMDAKPj4gSmFtZXMgTW9yc2UgPGphbWVz
+Lm1vcnNlQGFybS5jb20+IHdyb3RlOgo+PiAKPj4+IGt2bV9hcmNoX3RpbWVyX2dldF9pbnB1dF9s
+ZXZlbCgpIG5lZWRzIHRvIGdldCB0aGUgYXJjaF90aW1lcl9jb250ZXh0IAo+Pj4gZm9yCj4+PiBh
+IHBhcnRpY3VsYXIgdmNwdSwgYW5kIHVzZXMga3ZtX2dldF9ydW5uaW5nX3ZjcHUoKSB0byBmaW5k
+IGl0Lgo+Pj4gCj4+PiBrdm1fYXJjaF90aW1lcl9nZXRfaW5wdXRfbGV2ZWwoKSBtYXkgYmUgY2Fs
+bGVkIHRvIGhhbmRsZSBhIHVzZXItc3BhY2UKPj4+IHdyaXRlIHRvIHRoZSByZWRpc3RyaWJ1dG9y
+LCB3aGVyZSB0aGUgdmNwdSBpcyBub3QgbG9hZGVkLiBUaGlzIGNhdXNlcwo+Pj4ga3ZtX2dldF9y
+dW5uaW5nX3ZjcHUoKSB0byByZXR1cm4gTlVMTDoKPj4+IHwgVW5hYmxlIHRvIGhhbmRsZSBrZXJu
+ZWwgcGFnaW5nIHJlcXVlc3QgYXQgdmlydHVhbCBhZGRyZXNzIAo+Pj4gMDAwMDAwMDAwMDAwMWVj
+MAo+Pj4gfCBNZW0gYWJvcnQgaW5mbzoKPj4+IHwgICBFU1IgPSAweDk2MDAwMDA0Cj4+PiB8ICAg
+RUMgPSAweDI1OiBEQUJUIChjdXJyZW50IEVMKSwgSUwgPSAzMiBiaXRzCj4+PiB8ICAgU0VUID0g
+MCwgRm5WID0gMAo+Pj4gfCAgIEVBID0gMCwgUzFQVFcgPSAwCj4+PiB8IERhdGEgYWJvcnQgaW5m
+bzoKPj4+IHwgICBJU1YgPSAwLCBJU1MgPSAweDAwMDAwMDA0Cj4+PiB8ICAgQ00gPSAwLCBXblIg
+PSAwCj4+PiB8IHVzZXIgcGd0YWJsZTogNGsgcGFnZXMsIDQ4LWJpdCBWQXMsIHBnZHA9MDAwMDAw
+MDAzY2JmOTAwMAo+Pj4gfCBbMDAwMDAwMDAwMDAwMWVjMF0gcGdkPTAwMDAwMDAwMDAwMDAwMDAK
+Pj4+IHwgSW50ZXJuYWwgZXJyb3I6IE9vcHM6IDk2MDAwMDA0IFsjMV0gUFJFRU1QVCBTTVAKPj4+
+IHwgTW9kdWxlcyBsaW5rZWQgaW46IHI4MTY5IHJlYWx0ZWsgZWZpdmFyZnMgaXBfdGFibGVzIHhf
+dGFibGVzCj4+PiB8IENQVTogMSBQSUQ6IDI2MTUgQ29tbTogcWVtdS1zeXN0ZW0tYWFyIE5vdCB0
+YWludGVkIDUuNi4wLXJjNyAjMzAKPj4+IHwgSGFyZHdhcmUgbmFtZTogTWFydmVsbCBtdmVidV9h
+cm1hZGEtMzd4eC9tdmVidV9hcm1hZGEtMzd4eCwgQklPUyAKPj4+IDIwMTguMDMtZGV2ZWwtMTgu
+MTIuMy1nYzlhYTkyYy1hcm1iaWFuIDAyLzIwLzIwMTkKPj4+IHwgcHN0YXRlOiAwMDAwMDA4NSAo
+bnpjdiBkYUlmIC1QQU4gLVVBTykKPj4+IHwgcGMgOiBrdm1fYXJjaF90aW1lcl9nZXRfaW5wdXRf
+bGV2ZWwrMHgxYy8weDY4Cj4+PiB8IGxyIDoga3ZtX2FyY2hfdGltZXJfZ2V0X2lucHV0X2xldmVs
+KzB4MWMvMHg2OAo+Pj4gCj4+PiB8IENhbGwgdHJhY2U6Cj4+PiB8ICBrdm1fYXJjaF90aW1lcl9n
+ZXRfaW5wdXRfbGV2ZWwrMHgxYy8weDY4Cj4+PiB8ICB2Z2ljX2dldF9waHlzX2xpbmVfbGV2ZWwr
+MHgzYy8weDkwCj4+PiB8ICB2Z2ljX21taW9fd3JpdGVfc2VuYWJsZSsweGU0LzB4MTMwCj4+PiB8
+ICB2Z2ljX3VhY2Nlc3MrMHhlMC8weDEwMAo+Pj4gfCAgdmdpY192M19yZWRpc3RfdWFjY2Vzcysw
+eDVjLzB4ODAKPj4+IHwgIHZnaWNfdjNfYXR0cl9yZWdzX2FjY2VzcysweGYwLzB4MjAwCj4+PiB8
+ICBudmdpY192M19zZXRfYXR0cisweDIzNC8weDI1MAo+Pj4gfCAga3ZtX2RldmljZV9pb2N0bF9h
+dHRyKzB4YTQvMHhmOAo+Pj4gfCAga3ZtX2RldmljZV9pb2N0bCsweDdjLzB4YzAKPj4+IHwgIGtz
+eXNfaW9jdGwrMHgxZmMvMHhjMTgKPj4+IHwgIF9fYXJtNjRfc3lzX2lvY3RsKzB4MjQvMHgzMAo+
+Pj4gfCAgZG9fZWwwX3N2YysweDdjLzB4MTQ4Cj4+PiB8ICBlbDBfc3luY19oYW5kbGVyKzB4MTM4
+LzB4MjU4Cj4+PiB8ICBlbDBfc3luYysweDE0MC8weDE4MAo+Pj4gfCBDb2RlOiA5MTAwMDNmZCBm
+OTAwMGJmMyAyYTAwMDNmMyA5N2ZmNjUwYyAoYjk1ZWMwMDEpCj4+PiB8IC0tLVsgZW5kIHRyYWNl
+IDgxMjg3NjEyZDkzZjFlNzAgXS0tLQo+Pj4gfCBub3RlOiBxZW11LXN5c3RlbS1hYXJbMjYxNV0g
+ZXhpdGVkIHdpdGggcHJlZW1wdF9jb3VudCAxCj4+PiAKPj4+IExvYWRpbmcgdGhlIHZjcHUgZG9l
+c24ndCBtYWtlIGEgbG90IG9mIHNlbnNlIGZvciBoYW5kbGluZyBhIGRldmljZSAKPj4+IGlvY3Rs
+KCksCj4+PiBzbyBpbnN0ZWFkIHBhc3MgdGhlIHZjcHUgdGhyb3VnaCB0byBrdm1fYXJjaF90aW1l
+cl9nZXRfaW5wdXRfbGV2ZWwoKS4gCj4+PiBJdHMKPj4+IG5vdCBjbGVhciB0aGF0IGFuIGludGlk
+IG1ha2VzIG11Y2ggc2Vuc2Ugd2l0aG91dCB0aGUgcGFpcmVkIHZjcHUuCj4+IAo+PiBJIGRvbid0
+IGZ1bGx5IGFncmVlIHdpdGggdGhlIGFuYWx5c2lzLCBSZW1lbWJlciB3ZSBhcmUgbG9va2luZyBh
+dCB0aGUKPj4gc3RhdGUgb2YgdGhlIHBoeXNpY2FsIGludGVycnVwdCBhc3NvY2lhdGVkIHdpdGgg
+YSB2aXJ0dWFsIGludGVycnVwdCwgCj4+IHNvCj4+IHRoZSB2Y3B1IGRvZXNuJ3QgcXVpdGUgbWFr
+ZSBzZW5zZSBoZXJlIGlmIGl0IGlzbid0IGxvYWRlZC4KPiAKPiBCdXQgd2Fzbid0IGl0IHRoYXQg
+dGhpcyBmdW5jdGlvbiBpcyBtZWFudCB0byBzcGVjaWZpY2FsbHkgZGVhbCB3aXRoIAo+IHRoaXMK
+PiAqd2l0aG91dCogZ29pbmcgdG8gdGhlIGhhcmR3YXJlICh3aGljaCBpcyBjb3N0bHksIGhlbmNl
+IHRoaXMKPiBvcHRpbWlzYXRpb24pPyBCZWNhdXNlIGZvciB0aGUgdGltZXIgd2UgKmNhbiogd29y
+ayBvdXQgdGhlIGxvZ2ljYWwgSVJRCj4gbGluZSBzdGF0ZSBieSBleGFtaW5pbmcgb3VyIHNhdmVk
+IHN0YXRlPyBBbmQgdGhpcyBpcyB3aGF0IHdlIGRvIGluCj4ga3ZtX3RpbWVyX3Nob3VsZF9maXJl
+KCksIHdoZW4gdGltZXJfY3R4LT5sb2FkZWQgaXMgZmFsc2UuCgpZZXMsIGJ1dCB0aGF0J3MganVz
+dCBhIHNwZWNpYWxpemF0aW9uIG9mIGEgbW9yZSBnZW5lcmljIGludGVyZmFjZSwgd2hpY2ggCmlz
+CiJpbnNwZWN0IHRoZSBzdGF0ZSBvZiB0aGlzICpwaHlzaWNhbCogaW50aWQiLiBUaGUgZmFjdCB0
+aGF0IHdlIGFyZSBhYmxlIAp0byBkbwppdCBpbiBhIHNwZWNpYWwgd2F5IGZvciB0aGUgdGltZXIg
+ZG9lc24ndCBjaGFuZ2UgdGhlIG5hdHVyZSBvZiB0aGUgCmludGVyZmFjZS4KCj4gV2hpY2ggZm9y
+IG1lIHRoaXMgc291bmRzIGxpa2UgdGhlIHJpZ2h0IHRoaW5nIHRvIGRvIGluIHRoaXMgc2l0dWF0
+aW9uOgo+IHRoZSBWQ1BVIChhbmQgdGhlIHRpbWVyKSBpcyBub3QgbG9hZGVkLCBzbyB3ZSBjaGVj
+ayBvdXIgc2F2ZWQgc3RhdGUgYW5kCj4gY29uc3RydWN0IHRoZSBsb2dpY2FsIGxpbmUgbGV2ZWwu
+IFdlIGp1c3QgbmVlZCBhIHZhbGlkIFZDUFUgc3RydWN0IHRvCj4gYWNoaWV2ZSB0aGlzLCBhbmQg
+aG9wZSBmb3IgdGhlIHZpcnR1YWwgdGltZXIgdG8gYmUgYWxyZWFkeSBpbml0aWFsaXNlZC4KPiAK
+PiBEbyBJIG1pc3Mgc29tZXRoaW5nIGhlcmU/CgpZZXMuIFlvdSBhcmUgbWlzc2luZyB0aGF0IHRo
+ZSAqaW50ZXJmYWNlKiBpcyBnZW5lcmljLCBhbmQgeW91IGNhbiAKcmVwbGFjZQppdCB3aXRoIGFu
+eXRoaW5nIHlvdSB3YW50LiBDYXNlIGluIHBvaW50LCB3aGF0IHdlIGRvIHdoZW4gCmdldF9pbnB1
+dF9sZXZlbAppcyBOVUxMLgoKPiBBbHNvIHRvIG1lIGl0IHNvdW5kIGxpa2UgdGhlIGludGVyZmFj
+ZSBmb3IgdGhpcyBmdW5jdGlvbiBpcyBzbGlnaHRseQo+IGxhY2tpbmcsIGJlY2F1c2UganVzdCBh
+biBpbnRpZCBpcyBub3QgZW5vdWdoIHRvIHVuaXF1ZWx5IGlkZW50aWZ5IGFuCj4gSVJRLiBJdCB3
+YXMganVzdCBmaW5lIHNvIGZhciBiZWNhdXNlIG9mIHRoaXMgc3BlY2lhbCB1c2UgY2FzZS4KClRo
+aXMgaXMgYSAqcGh5c2ljYWwqIGludGlkLiBJdCBjYW4gb25seSBtZWFuIG9uZSBzaW5nbGUgdGhp
+bmcsIGFuZCBpdApvbmx5IG1ha2VzIHNlbnNlIGluIHRoZSBjb250ZXh0IG9mIGEgdmNwdSBpZiB0
+aGUgZGV2aWNlIGdldHMgCmNvbnRleHQtc3dpdGNoZWQuCgpJIGNhbiByZW1vdmUgdGhlIGFib3Zl
+IGZhc3QgcGF0aCBlbnRpcmVseSwgYW5kIGV2ZXJ5dGhpbmcgd2lsbCBzdGlsbCAKd29yawp0aGUg
+c2FtZSB3YXksIHdpdGhvdXQgaGF2aW5nIHRvIHBhc3MgYW55IHZjcHUsIGJlY2F1c2UgdGhlICpj
+b250ZXh0KiBpcwp3aGF0IG1hdHRlcnMuCgpUaGFua3MsCgogICAgICAgICBNLgotLSAKSmF6eiBp
+cyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
+bGlzdGluZm8va3ZtYXJtCg==
