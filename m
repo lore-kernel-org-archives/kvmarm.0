@@ -1,102 +1,81 @@
-Return-Path: <SRS0=lOre=5X=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=0SjI=5Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C307C2BA80
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Apr 2020 15:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3E7C2D0EA
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 10:07:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 863FD20747
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Apr 2020 15:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B56EE20747
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 10:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UGk5Jp/4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863FD20747
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZdUr9CJT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56EE20747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FAC4B0B1;
-	Tue,  7 Apr 2020 11:29:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44A8F4B209;
+	Wed,  8 Apr 2020 06:07:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id edjZoPYCH4Hu; Tue,  7 Apr 2020 11:29:08 -0400 (EDT)
+	with ESMTP id QCS9TCGGxUi7; Wed,  8 Apr 2020 06:07:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B534A3A5;
-	Tue,  7 Apr 2020 11:29:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 286544B20A;
+	Wed,  8 Apr 2020 06:07:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C504A3A5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Apr 2020 11:29:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 360424B208
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 06:07:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cXt53PCVJXIJ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Apr 2020 11:29:04 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBCC14A2E5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Apr 2020 11:29:04 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586273344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gWUgiHbWY/VnfopGlKJ1NN6MztUwrlxf5LJ/Y6VfBgk=;
- b=UGk5Jp/4OCuE6qmQQRyfo+AJuSmW8jt9v2O5BNAN0UyXLJ7okBohb/R7GsYIe3KtoH9vik
- d2IsTMB265prQ1LQG0EGN3JiwLS5OhKwGKYn/f+JlFGfnSdXwy66jZMsKw3wQj9BOTGJAt
- NdaeiPHakJ7ngPYYaic6xp9yDi72JRk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-Ok6GT1JMMka1LMzOY1kuXw-1; Tue, 07 Apr 2020 11:29:00 -0400
-X-MC-Unique: Ok6GT1JMMka1LMzOY1kuXw-1
-Received: by mail-wr1-f72.google.com with SMTP id q9so2102767wrw.22
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Apr 2020 08:29:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=gWUgiHbWY/VnfopGlKJ1NN6MztUwrlxf5LJ/Y6VfBgk=;
- b=gALcIadKAy9UWyo+5yIvmI9/39hlHtwa+r6In6Qy5lkNY0hNf75Zdt4sKVhNae6u2X
- s1Tzx2+jU9WYpJr4sTdsVkGKD5NUWbHIqfRtX+810+8qGK2rcLmvWNPkFyIRf6kMH1RP
- jAsZQRhVPqYI3aCxf1QhSNzNqZI9Pb0TAt14Q1eOOiRws6Fpn8XtTyOl8cMXXDN6/oXs
- yYchxhH/hPV8GPK1steYv5SrDrdX+BUQVcoCNnC7gYaxQDRNlyoxBvbKFk/Nea3mB9r0
- QMuZMby2BqY+9e+6hmx5+6uo5fhODE8mQfKwyEhaELH9ew75AIq+KSiUk+LbpKXONTFP
- oGSw==
-X-Gm-Message-State: AGi0PubgPLx6x8SdrMAo0KUAoj49LpIXueX3AkeA5T/NilD5vwhyMEiP
- nwRoQOy3HPeDA0XJ414eBWeMHZSLjldzHOM6GU/FJkpVEKLmFJuyYiblwTrPIVgnL24vm1gW17O
- 1yHBmaJWgebP7SzvGcWQFS9zC
-X-Received: by 2002:a05:600c:2245:: with SMTP id
- a5mr3021907wmm.171.1586273339158; 
- Tue, 07 Apr 2020 08:28:59 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ6y8t8M3s1o6shGbsX5ew9e/lrfMaPAL2jkphzu7vRXsUNpkEsjGyjrf4I5PbpdhL9PhsXFQ==
-X-Received: by 2002:a05:600c:2245:: with SMTP id
- a5mr3021882wmm.171.1586273338848; 
- Tue, 07 Apr 2020 08:28:58 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id v9sm21292630wrv.18.2020.04.07.08.28.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Apr 2020 08:28:58 -0700 (PDT)
-Subject: Re: [PULL kvm-unit-tests 00/39] arm/arm64: The old and new
-To: Andrew Jones <drjones@redhat.com>
-References: <20200404143731.208138-1-drjones@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bbee7fe4-56c2-f958-cddc-18b92d8e4380@redhat.com>
-Date: Tue, 7 Apr 2020 17:28:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ with ESMTP id yTU5XpcBHDTE for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Apr 2020 06:07:31 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06F6D4B207
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 06:07:30 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id DA7DF20747;
+ Wed,  8 Apr 2020 10:07:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1586340450;
+ bh=o95FC0wItSEUj4ltL7xhaHqV/b3LwS/7FFNIVb55PqU=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ZdUr9CJT22PsyZGxq1jI9+Bcn2cP5QjpegA/anb6qQOmn2TywTlMhD7rlx9hOxpOd
+ VAcGj+pSYzH+7/tBdde2/cn3a03DTEg5fSfF7b0BcRyzb57AQDVCF+9Uzt8ZRbdPMH
+ ooi75Lfb2JjxDwN1yTum52AZyZYcoAqdrKBs0cMg=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jM7cF-001cDz-UQ; Wed, 08 Apr 2020 11:07:28 +0100
+Date: Wed, 8 Apr 2020 11:07:26 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
+Message-ID: <20200408110726.4d81bc3b@why>
+In-Reply-To: <20200406150355.4859-1-james.morse@arm.com>
+References: <20200406150355.4859-1-james.morse@arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200404143731.208138-1-drjones@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,116 +92,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/04/20 16:36, Andrew Jones wrote:
-> Hi Paolo,
-> 
-> This pull request is a repost of an older request, plus it
-> contains Eric's new PMU and ITS tests.
-> 
-> Thanks,
-> drew
-> 
-> 
-> The following changes since commit ce27fa2c7cd4d07859a9a2e81c7ff641897818d1:
-> 
->   x86: vmx: skip atomic_switch_overflow_msrs_test on bare metal (2020-03-31 13:01:41 -0400)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/rhdrjones/kvm-unit-tests arm/queue
-> 
-> for you to fetch changes up to de582149c5be94a1ff7d3d8ee3526501b26c7f03:
-> 
->   arm/arm64: ITS: pending table migration test (2020-04-04 10:03:44 +0200)
-> 
-> ----------------------------------------------------------------
-> Alexandru Elisei (10):
->       Makefile: Use no-stack-protector compiler options
->       arm/arm64: psci: Don't run C code without stack or vectors
->       arm64: timer: Add ISB after register writes
->       arm64: timer: Add ISB before reading the counter value
->       arm64: timer: Make irq_received volatile
->       arm64: timer: EOIR the interrupt after masking the timer
->       arm64: timer: Wait for the GIC to sample timer interrupt state
->       arm64: timer: Check the timer interrupt state
->       arm64: timer: Test behavior when timer disabled or masked
->       arm/arm64: Perform dcache clean + invalidate after turning MMU off
-> 
-> Andrew Jones (2):
->       arm64: timer: Speed up gic-timer-state check
->       arm64: Provide read/write_sysreg_s
-> 
-> Eric Auger (24):
->       arm: pmu: Let pmu tests take a sub-test parameter
->       arm: pmu: Don't check PMCR.IMP anymore
->       arm: pmu: Add a pmu struct
->       arm: pmu: Introduce defines for PMU versions
->       arm: pmu: Check Required Event Support
->       arm: pmu: Basic event counter Tests
->       arm: pmu: Test SW_INCR event count
->       arm: pmu: Test chained counters
->       arm: pmu: test 32-bit <-> 64-bit transitions
->       arm: gic: Introduce gic_irq_set_clr_enable() helper
->       arm: pmu: Test overflow interrupts
->       libcflat: Add other size defines
->       page_alloc: Introduce get_order()
->       arm/arm64: gic: Introduce setup_irq() helper
->       arm/arm64: gicv3: Add some re-distributor defines
->       arm/arm64: gicv3: Set the LPI config and pending tables
->       arm/arm64: ITS: Introspection tests
->       arm/arm64: ITS: its_enable_defaults
->       arm/arm64: ITS: Device and collection Initialization
->       arm/arm64: ITS: Commands
->       arm/arm64: ITS: INT functional tests
->       arm/run: Allow Migration tests
->       arm/arm64: ITS: migration tests
->       arm/arm64: ITS: pending table migration test
-> 
-> Zenghui Yu (3):
->       arm/arm64: gic: Move gic_state enumeration to asm/gic.h
->       arm64: timer: Use the proper RDist register name in GICv3
->       arm64: timer: Use existing helpers to access counter/timers
-> 
->  Makefile                   |   4 +-
->  arm/Makefile.arm64         |   1 +
->  arm/Makefile.common        |   2 +-
->  arm/cstart.S               |  22 ++
->  arm/cstart64.S             |  23 ++
->  arm/gic.c                  | 482 ++++++++++++++++++++++++--
->  arm/pmu.c                  | 831 +++++++++++++++++++++++++++++++++++++++++++--
->  arm/psci.c                 |  14 +-
->  arm/run                    |   2 +-
->  arm/timer.c                |  82 +++--
->  arm/unittests.cfg          | 101 +++++-
->  errata.txt                 |   1 +
->  lib/alloc_page.c           |   7 +-
->  lib/alloc_page.h           |   1 +
->  lib/arm/asm/gic-v3-its.h   |  27 ++
->  lib/arm/asm/gic-v3.h       |  33 ++
->  lib/arm/asm/gic.h          |  13 +
->  lib/arm/asm/processor.h    |  15 +
->  lib/arm/gic-v3.c           |  78 +++++
->  lib/arm/gic.c              | 116 ++++++-
->  lib/arm/io.c               |  28 ++
->  lib/arm/setup.c            |   8 +
->  lib/arm64/asm/gic-v3-its.h | 174 ++++++++++
->  lib/arm64/asm/processor.h  |  12 +
->  lib/arm64/asm/sysreg.h     |  17 +
->  lib/arm64/gic-v3-its-cmd.c | 459 +++++++++++++++++++++++++
->  lib/arm64/gic-v3-its.c     | 171 ++++++++++
->  lib/bitops.h               |   3 +
->  lib/libcflat.h             |   3 +
->  29 files changed, 2635 insertions(+), 95 deletions(-)
->  create mode 100644 lib/arm/asm/gic-v3-its.h
->  create mode 100644 lib/arm64/asm/gic-v3-its.h
->  create mode 100644 lib/arm64/gic-v3-its-cmd.c
->  create mode 100644 lib/arm64/gic-v3-its.c
-> 
+Hi James,
 
-Pulled, thanks.
+Thanks for looking into this.
 
-Paolo
+On Mon,  6 Apr 2020 16:03:55 +0100
+James Morse <james.morse@arm.com> wrote:
 
+> kvm_arch_timer_get_input_level() needs to get the arch_timer_context for
+> a particular vcpu, and uses kvm_get_running_vcpu() to find it.
+> 
+> kvm_arch_timer_get_input_level() may be called to handle a user-space
+> write to the redistributor, where the vcpu is not loaded. This causes
+> kvm_get_running_vcpu() to return NULL:
+> | Unable to handle kernel paging request at virtual address 0000000000001ec0
+> | Mem abort info:
+> |   ESR = 0x96000004
+> |   EC = 0x25: DABT (current EL), IL = 32 bits
+> |   SET = 0, FnV = 0
+> |   EA = 0, S1PTW = 0
+> | Data abort info:
+> |   ISV = 0, ISS = 0x00000004
+> |   CM = 0, WnR = 0
+> | user pgtable: 4k pages, 48-bit VAs, pgdp=000000003cbf9000
+> | [0000000000001ec0] pgd=0000000000000000
+> | Internal error: Oops: 96000004 [#1] PREEMPT SMP
+> | Modules linked in: r8169 realtek efivarfs ip_tables x_tables
+> | CPU: 1 PID: 2615 Comm: qemu-system-aar Not tainted 5.6.0-rc7 #30
+> | Hardware name: Marvell mvebu_armada-37xx/mvebu_armada-37xx, BIOS 2018.03-devel-18.12.3-gc9aa92c-armbian 02/20/2019
+> | pstate: 00000085 (nzcv daIf -PAN -UAO)
+> | pc : kvm_arch_timer_get_input_level+0x1c/0x68
+> | lr : kvm_arch_timer_get_input_level+0x1c/0x68
+> 
+> | Call trace:
+> |  kvm_arch_timer_get_input_level+0x1c/0x68
+> |  vgic_get_phys_line_level+0x3c/0x90
+> |  vgic_mmio_write_senable+0xe4/0x130
+> |  vgic_uaccess+0xe0/0x100
+> |  vgic_v3_redist_uaccess+0x5c/0x80
+> |  vgic_v3_attr_regs_access+0xf0/0x200
+> |  nvgic_v3_set_attr+0x234/0x250
+> |  kvm_device_ioctl_attr+0xa4/0xf8
+> |  kvm_device_ioctl+0x7c/0xc0
+> |  ksys_ioctl+0x1fc/0xc18
+> |  __arm64_sys_ioctl+0x24/0x30
+> |  do_el0_svc+0x7c/0x148
+> |  el0_sync_handler+0x138/0x258
+> |  el0_sync+0x140/0x180
+> | Code: 910003fd f9000bf3 2a0003f3 97ff650c (b95ec001)
+> | ---[ end trace 81287612d93f1e70 ]---
+> | note: qemu-system-aar[2615] exited with preempt_count 1
+> 
+> Loading the vcpu doesn't make a lot of sense for handling a device ioctl(),
+> so instead pass the vcpu through to kvm_arch_timer_get_input_level(). Its
+> not clear that an intid makes much sense without the paired vcpu.
+
+I don't fully agree with the analysis, Remember we are looking at the
+state of the physical interrupt associated with a virtual interrupt, so
+the vcpu doesn't quite make sense here if it isn't loaded.
+
+What does it mean to look at the HW timer when we are not in the right
+context? For all we know, it is completely random (the only guarantee
+we have is that it is disabled, actually).
+
+My gut feeling is that this is another instance where we should provide
+specific userspace accessors that would only deal with the virtual
+state, and leave anything that deals with the physical state of the
+interrupt to be exercised only by the guest.
+
+Does it make sense?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
