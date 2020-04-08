@@ -2,80 +2,89 @@ Return-Path: <SRS0=0SjI=5Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1A1C2BA1A
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 14:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265C6C2D0F4
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 16:23:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A49A620780
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 14:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A2B220784
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Apr 2020 16:23:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lnbn2Omz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49A620780
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3LVCc26"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2B220784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 243DD4B17B;
-	Wed,  8 Apr 2020 10:19:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 225734B194;
+	Wed,  8 Apr 2020 12:23:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uGkDkuwwBT1J; Wed,  8 Apr 2020 10:19:43 -0400 (EDT)
+	with ESMTP id LiGrgrzPi+Gu; Wed,  8 Apr 2020 12:23:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D92684B190;
-	Wed,  8 Apr 2020 10:19:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B2A14B19D;
+	Wed,  8 Apr 2020 12:23:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BE94B159
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 10:19:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DB484B127
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 11:46:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uttpUoLkNdrI for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Apr 2020 10:19:41 -0400 (EDT)
+ with ESMTP id EZoY1WjPh4Pj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Apr 2020 11:46:32 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23ED34B149
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 10:19:41 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C5274B0D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Apr 2020 11:46:32 -0400 (EDT)
+Received: from mail.kernel.org (ip5f5ad4d8.dynamic.kabel-deutschland.de
+ [95.90.212.216])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 125E62074F;
- Wed,  8 Apr 2020 14:19:40 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E436F20769;
+ Wed,  8 Apr 2020 15:46:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586355580;
- bh=maNVyBfu8ItLwyKOhrh/TRhv8mzBKc1ELxLvZuhL170=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Lnbn2Omzi2MippQjx2Qz4HU42rFftYa7piXsNUj1JsbLia6A/8wuGN5Ds4VKxBzEW
- R0aDA+UZM1bFZFjVVqLQvTQZX2nLSMMxH1f8iBC8dyLWlmtyqERTFmstDyqEuEvXFm
- UsC1paAuXHuF8IYKVkFiYjdU15cYQkpLW7/1rW8w=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jMBYI-001fX7-9A; Wed, 08 Apr 2020 15:19:38 +0100
+ s=default; t=1586360791;
+ bh=NGLDDtyN8RZKYu/2cTSKBLZPkCz8Mr0c9YVBRHz1zys=;
+ h=From:To:Cc:Subject:Date:From;
+ b=I3LVCc26/VdF24AsOrt+PHJ6A8shQrFjca47izBLXO8vl1fetOmpTsay+HfFnjRDn
+ ELpq2el4OVbLL0QQpHim4bJ4r72BlEiJ9tHPbEFlZ/E6g9CVUSW9fzJZn0GNpSqQLs
+ eoPTB+ArHDBqNWFtK9BnG7DerSf9cD29j4b39qq4=
+Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
+ (envelope-from <mchehab@kernel.org>)
+ id 1jMCuK-000cAH-Vl; Wed, 08 Apr 2020 17:46:28 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Subject: [PATCH 00/35] Documentation fixes for Kernel 5.8
+Date: Wed,  8 Apr 2020 17:45:52 +0200
+Message-Id: <cover.1586359676.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.25.2
 MIME-Version: 1.0
-Date: Wed, 08 Apr 2020 15:19:38 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
-In-Reply-To: <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
-References: <20200406150355.4859-1-james.morse@arm.com>
- <20200408110726.4d81bc3b@why> <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
-Message-ID: <92de4dc6e0c065eec528bb21c2d870cf@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, james.morse@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Mailman-Approved-At: Wed, 08 Apr 2020 12:23:24 -0400
+Cc: kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+ Linus Walleij <linus.walleij@linaro.org>, dri-devel@lists.freedesktop.org,
+ linux-unionfs@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+ kvmarm@lists.cs.columbia.edu, linux-arch@vger.kernel.org,
+ Rob Herring <robh@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ linux-scsi@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+ Kishon Vijay Abraham I <kishon@ti.com>, Matthias Kaehlcke <mka@chromium.org>,
+ Sandeep Maheswaram <sanm@codeaurora.org>, MPT-FusionLinux.pdl@broadcom.com,
+ linux-media@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-afs@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ ecryptfs@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ Stephen Boyd <swboyd@chromium.org>, Maxime Ripard <maxime@cerno.tech>,
+ linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+ Matthias Brugger <mbrugger@suse.com>, Yuti Amonkar <yamonkar@cadence.com>,
+ linux-ide@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+ freedreno@lists.freedesktop.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-crypto@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>, linux-fsdevel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, ocfs2-devel@oss.oracle.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,87 +96,229 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQW5kcmUsCgpPbiAyMDIwLTA0LTA4IDEzOjEzLCBBbmRyw6kgUHJ6eXdhcmEgd3JvdGU6Cj4g
-T24gMDgvMDQvMjAyMCAxMTowNywgTWFyYyBaeW5naWVyIHdyb3RlOgo+IAo+IEhpIE1hcmMsCj4g
-Cj4+IEhpIEphbWVzLAo+PiAKPj4gVGhhbmtzIGZvciBsb29raW5nIGludG8gdGhpcy4KPj4gCj4+
-IE9uIE1vbiwgIDYgQXByIDIwMjAgMTY6MDM6NTUgKzAxMDAKPj4gSmFtZXMgTW9yc2UgPGphbWVz
-Lm1vcnNlQGFybS5jb20+IHdyb3RlOgo+PiAKPj4+IGt2bV9hcmNoX3RpbWVyX2dldF9pbnB1dF9s
-ZXZlbCgpIG5lZWRzIHRvIGdldCB0aGUgYXJjaF90aW1lcl9jb250ZXh0IAo+Pj4gZm9yCj4+PiBh
-IHBhcnRpY3VsYXIgdmNwdSwgYW5kIHVzZXMga3ZtX2dldF9ydW5uaW5nX3ZjcHUoKSB0byBmaW5k
-IGl0Lgo+Pj4gCj4+PiBrdm1fYXJjaF90aW1lcl9nZXRfaW5wdXRfbGV2ZWwoKSBtYXkgYmUgY2Fs
-bGVkIHRvIGhhbmRsZSBhIHVzZXItc3BhY2UKPj4+IHdyaXRlIHRvIHRoZSByZWRpc3RyaWJ1dG9y
-LCB3aGVyZSB0aGUgdmNwdSBpcyBub3QgbG9hZGVkLiBUaGlzIGNhdXNlcwo+Pj4ga3ZtX2dldF9y
-dW5uaW5nX3ZjcHUoKSB0byByZXR1cm4gTlVMTDoKPj4+IHwgVW5hYmxlIHRvIGhhbmRsZSBrZXJu
-ZWwgcGFnaW5nIHJlcXVlc3QgYXQgdmlydHVhbCBhZGRyZXNzIAo+Pj4gMDAwMDAwMDAwMDAwMWVj
-MAo+Pj4gfCBNZW0gYWJvcnQgaW5mbzoKPj4+IHwgICBFU1IgPSAweDk2MDAwMDA0Cj4+PiB8ICAg
-RUMgPSAweDI1OiBEQUJUIChjdXJyZW50IEVMKSwgSUwgPSAzMiBiaXRzCj4+PiB8ICAgU0VUID0g
-MCwgRm5WID0gMAo+Pj4gfCAgIEVBID0gMCwgUzFQVFcgPSAwCj4+PiB8IERhdGEgYWJvcnQgaW5m
-bzoKPj4+IHwgICBJU1YgPSAwLCBJU1MgPSAweDAwMDAwMDA0Cj4+PiB8ICAgQ00gPSAwLCBXblIg
-PSAwCj4+PiB8IHVzZXIgcGd0YWJsZTogNGsgcGFnZXMsIDQ4LWJpdCBWQXMsIHBnZHA9MDAwMDAw
-MDAzY2JmOTAwMAo+Pj4gfCBbMDAwMDAwMDAwMDAwMWVjMF0gcGdkPTAwMDAwMDAwMDAwMDAwMDAK
-Pj4+IHwgSW50ZXJuYWwgZXJyb3I6IE9vcHM6IDk2MDAwMDA0IFsjMV0gUFJFRU1QVCBTTVAKPj4+
-IHwgTW9kdWxlcyBsaW5rZWQgaW46IHI4MTY5IHJlYWx0ZWsgZWZpdmFyZnMgaXBfdGFibGVzIHhf
-dGFibGVzCj4+PiB8IENQVTogMSBQSUQ6IDI2MTUgQ29tbTogcWVtdS1zeXN0ZW0tYWFyIE5vdCB0
-YWludGVkIDUuNi4wLXJjNyAjMzAKPj4+IHwgSGFyZHdhcmUgbmFtZTogTWFydmVsbCBtdmVidV9h
-cm1hZGEtMzd4eC9tdmVidV9hcm1hZGEtMzd4eCwgQklPUyAKPj4+IDIwMTguMDMtZGV2ZWwtMTgu
-MTIuMy1nYzlhYTkyYy1hcm1iaWFuIDAyLzIwLzIwMTkKPj4+IHwgcHN0YXRlOiAwMDAwMDA4NSAo
-bnpjdiBkYUlmIC1QQU4gLVVBTykKPj4+IHwgcGMgOiBrdm1fYXJjaF90aW1lcl9nZXRfaW5wdXRf
-bGV2ZWwrMHgxYy8weDY4Cj4+PiB8IGxyIDoga3ZtX2FyY2hfdGltZXJfZ2V0X2lucHV0X2xldmVs
-KzB4MWMvMHg2OAo+Pj4gCj4+PiB8IENhbGwgdHJhY2U6Cj4+PiB8ICBrdm1fYXJjaF90aW1lcl9n
-ZXRfaW5wdXRfbGV2ZWwrMHgxYy8weDY4Cj4+PiB8ICB2Z2ljX2dldF9waHlzX2xpbmVfbGV2ZWwr
-MHgzYy8weDkwCj4+PiB8ICB2Z2ljX21taW9fd3JpdGVfc2VuYWJsZSsweGU0LzB4MTMwCj4+PiB8
-ICB2Z2ljX3VhY2Nlc3MrMHhlMC8weDEwMAo+Pj4gfCAgdmdpY192M19yZWRpc3RfdWFjY2Vzcysw
-eDVjLzB4ODAKPj4+IHwgIHZnaWNfdjNfYXR0cl9yZWdzX2FjY2VzcysweGYwLzB4MjAwCj4+PiB8
-ICBudmdpY192M19zZXRfYXR0cisweDIzNC8weDI1MAo+Pj4gfCAga3ZtX2RldmljZV9pb2N0bF9h
-dHRyKzB4YTQvMHhmOAo+Pj4gfCAga3ZtX2RldmljZV9pb2N0bCsweDdjLzB4YzAKPj4+IHwgIGtz
-eXNfaW9jdGwrMHgxZmMvMHhjMTgKPj4+IHwgIF9fYXJtNjRfc3lzX2lvY3RsKzB4MjQvMHgzMAo+
-Pj4gfCAgZG9fZWwwX3N2YysweDdjLzB4MTQ4Cj4+PiB8ICBlbDBfc3luY19oYW5kbGVyKzB4MTM4
-LzB4MjU4Cj4+PiB8ICBlbDBfc3luYysweDE0MC8weDE4MAo+Pj4gfCBDb2RlOiA5MTAwMDNmZCBm
-OTAwMGJmMyAyYTAwMDNmMyA5N2ZmNjUwYyAoYjk1ZWMwMDEpCj4+PiB8IC0tLVsgZW5kIHRyYWNl
-IDgxMjg3NjEyZDkzZjFlNzAgXS0tLQo+Pj4gfCBub3RlOiBxZW11LXN5c3RlbS1hYXJbMjYxNV0g
-ZXhpdGVkIHdpdGggcHJlZW1wdF9jb3VudCAxCj4+PiAKPj4+IExvYWRpbmcgdGhlIHZjcHUgZG9l
-c24ndCBtYWtlIGEgbG90IG9mIHNlbnNlIGZvciBoYW5kbGluZyBhIGRldmljZSAKPj4+IGlvY3Rs
-KCksCj4+PiBzbyBpbnN0ZWFkIHBhc3MgdGhlIHZjcHUgdGhyb3VnaCB0byBrdm1fYXJjaF90aW1l
-cl9nZXRfaW5wdXRfbGV2ZWwoKS4gCj4+PiBJdHMKPj4+IG5vdCBjbGVhciB0aGF0IGFuIGludGlk
-IG1ha2VzIG11Y2ggc2Vuc2Ugd2l0aG91dCB0aGUgcGFpcmVkIHZjcHUuCj4+IAo+PiBJIGRvbid0
-IGZ1bGx5IGFncmVlIHdpdGggdGhlIGFuYWx5c2lzLCBSZW1lbWJlciB3ZSBhcmUgbG9va2luZyBh
-dCB0aGUKPj4gc3RhdGUgb2YgdGhlIHBoeXNpY2FsIGludGVycnVwdCBhc3NvY2lhdGVkIHdpdGgg
-YSB2aXJ0dWFsIGludGVycnVwdCwgCj4+IHNvCj4+IHRoZSB2Y3B1IGRvZXNuJ3QgcXVpdGUgbWFr
-ZSBzZW5zZSBoZXJlIGlmIGl0IGlzbid0IGxvYWRlZC4KPiAKPiBCdXQgd2Fzbid0IGl0IHRoYXQg
-dGhpcyBmdW5jdGlvbiBpcyBtZWFudCB0byBzcGVjaWZpY2FsbHkgZGVhbCB3aXRoIAo+IHRoaXMK
-PiAqd2l0aG91dCogZ29pbmcgdG8gdGhlIGhhcmR3YXJlICh3aGljaCBpcyBjb3N0bHksIGhlbmNl
-IHRoaXMKPiBvcHRpbWlzYXRpb24pPyBCZWNhdXNlIGZvciB0aGUgdGltZXIgd2UgKmNhbiogd29y
-ayBvdXQgdGhlIGxvZ2ljYWwgSVJRCj4gbGluZSBzdGF0ZSBieSBleGFtaW5pbmcgb3VyIHNhdmVk
-IHN0YXRlPyBBbmQgdGhpcyBpcyB3aGF0IHdlIGRvIGluCj4ga3ZtX3RpbWVyX3Nob3VsZF9maXJl
-KCksIHdoZW4gdGltZXJfY3R4LT5sb2FkZWQgaXMgZmFsc2UuCgpZZXMsIGJ1dCB0aGF0J3MganVz
-dCBhIHNwZWNpYWxpemF0aW9uIG9mIGEgbW9yZSBnZW5lcmljIGludGVyZmFjZSwgd2hpY2ggCmlz
-CiJpbnNwZWN0IHRoZSBzdGF0ZSBvZiB0aGlzICpwaHlzaWNhbCogaW50aWQiLiBUaGUgZmFjdCB0
-aGF0IHdlIGFyZSBhYmxlIAp0byBkbwppdCBpbiBhIHNwZWNpYWwgd2F5IGZvciB0aGUgdGltZXIg
-ZG9lc24ndCBjaGFuZ2UgdGhlIG5hdHVyZSBvZiB0aGUgCmludGVyZmFjZS4KCj4gV2hpY2ggZm9y
-IG1lIHRoaXMgc291bmRzIGxpa2UgdGhlIHJpZ2h0IHRoaW5nIHRvIGRvIGluIHRoaXMgc2l0dWF0
-aW9uOgo+IHRoZSBWQ1BVIChhbmQgdGhlIHRpbWVyKSBpcyBub3QgbG9hZGVkLCBzbyB3ZSBjaGVj
-ayBvdXIgc2F2ZWQgc3RhdGUgYW5kCj4gY29uc3RydWN0IHRoZSBsb2dpY2FsIGxpbmUgbGV2ZWwu
-IFdlIGp1c3QgbmVlZCBhIHZhbGlkIFZDUFUgc3RydWN0IHRvCj4gYWNoaWV2ZSB0aGlzLCBhbmQg
-aG9wZSBmb3IgdGhlIHZpcnR1YWwgdGltZXIgdG8gYmUgYWxyZWFkeSBpbml0aWFsaXNlZC4KPiAK
-PiBEbyBJIG1pc3Mgc29tZXRoaW5nIGhlcmU/CgpZZXMuIFlvdSBhcmUgbWlzc2luZyB0aGF0IHRo
-ZSAqaW50ZXJmYWNlKiBpcyBnZW5lcmljLCBhbmQgeW91IGNhbiAKcmVwbGFjZQppdCB3aXRoIGFu
-eXRoaW5nIHlvdSB3YW50LiBDYXNlIGluIHBvaW50LCB3aGF0IHdlIGRvIHdoZW4gCmdldF9pbnB1
-dF9sZXZlbAppcyBOVUxMLgoKPiBBbHNvIHRvIG1lIGl0IHNvdW5kIGxpa2UgdGhlIGludGVyZmFj
-ZSBmb3IgdGhpcyBmdW5jdGlvbiBpcyBzbGlnaHRseQo+IGxhY2tpbmcsIGJlY2F1c2UganVzdCBh
-biBpbnRpZCBpcyBub3QgZW5vdWdoIHRvIHVuaXF1ZWx5IGlkZW50aWZ5IGFuCj4gSVJRLiBJdCB3
-YXMganVzdCBmaW5lIHNvIGZhciBiZWNhdXNlIG9mIHRoaXMgc3BlY2lhbCB1c2UgY2FzZS4KClRo
-aXMgaXMgYSAqcGh5c2ljYWwqIGludGlkLiBJdCBjYW4gb25seSBtZWFuIG9uZSBzaW5nbGUgdGhp
-bmcsIGFuZCBpdApvbmx5IG1ha2VzIHNlbnNlIGluIHRoZSBjb250ZXh0IG9mIGEgdmNwdSBpZiB0
-aGUgZGV2aWNlIGdldHMgCmNvbnRleHQtc3dpdGNoZWQuCgpJIGNhbiByZW1vdmUgdGhlIGFib3Zl
-IGZhc3QgcGF0aCBlbnRpcmVseSwgYW5kIGV2ZXJ5dGhpbmcgd2lsbCBzdGlsbCAKd29yawp0aGUg
-c2FtZSB3YXksIHdpdGhvdXQgaGF2aW5nIHRvIHBhc3MgYW55IHZjcHUsIGJlY2F1c2UgdGhlICpj
-b250ZXh0KiBpcwp3aGF0IG1hdHRlcnMuCgpUaGFua3MsCgogICAgICAgICBNLgotLSAKSmF6eiBp
-cyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+Hi Jon,
+
+I have a large list of patches this time for the Documentation/. So, I'm
+starting sending them a little earier. Yet, those are meant to be applied
+after the end of the merge window. They're based on today's linux-next,
+with has only 49 patches pending to be applied upstream touching
+Documentation/, so I don't expect much conflicts if applied early at
+-rc cycle.
+
+Most of the patches here were already submitted, but weren't
+merged yet at next. So, it seems that nobody picked them yet.
+
+In any case, most of those patches here are independent from 
+the others.
+
+The number of doc build warnings have been rising with time.
+The main goal with this series is to get rid of most Sphinx warnings
+and other errors.
+
+Patches 1 to 5: fix broken references detected by this tool:
+
+        ./scripts/documentation-file-ref-check
+
+The other patches fix other random errors due to tags being
+mis-interpreted or mis-used.
+
+You should notice that several patches touch kernel-doc scripts.
+IMHO, some of the warnings are actually due to kernel-doc being
+too pedantic. So, I ended by improving some things at the toolset,
+in order to make it smarter. That's the case of those patches:
+
+	docs: scripts/kernel-doc: accept blank lines on parameter description
+	scripts: kernel-doc: accept negation like !@var
+	scripts: kernel-doc: proper handle @foo->bar()
+
+The last 4 patches address problems with PDF building.
+
+The first one address a conflict that will rise during the merge
+window: Documentation/media will be removed. Instead of
+just drop it from the list of PDF documents, I opted to drop the
+entire list, as conf.py will auto-generate from the sources:
+
+	docs: LaTeX/PDF: drop list of documents
+
+Also, right now, PDF output is broken due to a namespace conflict 
+at I2c (two pdf outputs there will have the same name).
+
+	docs: i2c: rename i2c.svg to i2c_bus.svg
+
+The third PDF patch is not really a fix, but it helps a lot to identify
+if the build succeeded or not, by placing the final PDF output on
+a separate dir:
+
+	docs: Makefile: place final pdf docs on a separate dir
+
+Finally, the last one solves a bug since the first supported Sphinx
+version, with also impacts PDF output: basically while nested tables
+are valid with ReST notation, the toolset only started supporting
+it on PDF output since version 2.4:
+
+	docs: update recommended Sphinx version to 2.4.4
+
+PS.: Due to the large number of C/C, I opted to keep a smaller
+set of C/C at this first e-mail (only e-mails with "L:" tag from
+MAINTAINERS file).
+
+Mauro Carvalho Chehab (35):
+  MAINTAINERS: dt: update display/allwinner file entry
+  docs: dt: fix broken reference to phy-cadence-torrent.yaml
+  docs: fix broken references to text files
+  docs: fix broken references for ReST files that moved around
+  docs: filesystems: fix renamed references
+  docs: amu: supress some Sphinx warnings
+  docs: arm64: booting.rst: get rid of some warnings
+  docs: pci: boot-interrupts.rst: improve html output
+  futex: get rid of a kernel-docs build warning
+  firewire: firewire-cdev.hL get rid of a docs warning
+  scripts: kernel-doc: proper handle @foo->bar()
+  lib: bitmap.c: get rid of some doc warnings
+  ata: libata-core: fix a doc warning
+  fs: inode.c: get rid of docs warnings
+  docs: ras: get rid of some warnings
+  docs: ras: don't need to repeat twice the same thing
+  docs: watch_queue.rst: supress some Sphinx warnings
+  scripts: kernel-doc: accept negation like !@var
+  docs: infiniband: verbs.c: fix some documentation warnings
+  docs: scripts/kernel-doc: accept blank lines on parameter description
+  docs: spi: spi.h: fix a doc building warning
+  docs: drivers: fix some warnings at base/platform.c when building docs
+  docs: fusion: mptbase.c: get rid of a doc build warning
+  docs: mm: slab.h: fix a broken cross-reference
+  docs mm: userfaultfd.rst: use ``foo`` for literals
+  docs: mm: userfaultfd.rst: use a cross-reference for a section
+  docs: vm: index.rst: add an orphan doc to the building system
+  docs: dt: qcom,dwc3.txt: fix cross-reference for a converted file
+  MAINTAINERS: dt: fix pointers for ARM Integrator, Versatile and
+    RealView
+  docs: dt: fix a broken reference for a file converted to json
+  powerpc: docs: cxl.rst: mark two section titles as such
+  docs: LaTeX/PDF: drop list of documents
+  docs: i2c: rename i2c.svg to i2c_bus.svg
+  docs: Makefile: place final pdf docs on a separate dir
+  docs: update recommended Sphinx version to 2.4.4
+
+ Documentation/ABI/stable/sysfs-devices-node   |   2 +-
+ Documentation/ABI/testing/procfs-smaps_rollup |   2 +-
+ Documentation/Makefile                        |   6 +-
+ Documentation/PCI/boot-interrupts.rst         |  34 +--
+ Documentation/admin-guide/cpu-load.rst        |   2 +-
+ Documentation/admin-guide/mm/userfaultfd.rst  | 209 +++++++++---------
+ Documentation/admin-guide/nfs/nfsroot.rst     |   2 +-
+ Documentation/admin-guide/ras.rst             |  18 +-
+ Documentation/arm64/amu.rst                   |   5 +
+ Documentation/arm64/booting.rst               |  36 +--
+ Documentation/conf.py                         |  38 ----
+ .../bindings/net/qualcomm-bluetooth.txt       |   2 +-
+ .../bindings/phy/ti,phy-j721e-wiz.yaml        |   2 +-
+ .../devicetree/bindings/usb/qcom,dwc3.txt     |   4 +-
+ .../doc-guide/maintainer-profile.rst          |   2 +-
+ .../driver-api/driver-model/device.rst        |   4 +-
+ .../driver-api/driver-model/overview.rst      |   2 +-
+ Documentation/filesystems/dax.txt             |   2 +-
+ Documentation/filesystems/dnotify.txt         |   2 +-
+ .../filesystems/ramfs-rootfs-initramfs.rst    |   2 +-
+ Documentation/filesystems/sysfs.rst           |   2 +-
+ Documentation/i2c/{i2c.svg => i2c_bus.svg}    |   2 +-
+ Documentation/i2c/summary.rst                 |   2 +-
+ Documentation/memory-barriers.txt             |   2 +-
+ Documentation/powerpc/cxl.rst                 |   2 +
+ .../powerpc/firmware-assisted-dump.rst        |   2 +-
+ Documentation/process/adding-syscalls.rst     |   2 +-
+ Documentation/process/submit-checklist.rst    |   2 +-
+ Documentation/sphinx/requirements.txt         |   2 +-
+ .../it_IT/process/adding-syscalls.rst         |   2 +-
+ .../it_IT/process/submit-checklist.rst        |   2 +-
+ .../translations/ko_KR/memory-barriers.txt    |   2 +-
+ .../translations/zh_CN/filesystems/sysfs.txt  |   8 +-
+ .../zh_CN/process/submit-checklist.rst        |   2 +-
+ Documentation/virt/kvm/arm/pvtime.rst         |   2 +-
+ Documentation/virt/kvm/devices/vcpu.rst       |   2 +-
+ Documentation/virt/kvm/hypercalls.rst         |   4 +-
+ Documentation/virt/kvm/mmu.rst                |   2 +-
+ Documentation/virt/kvm/review-checklist.rst   |   2 +-
+ Documentation/vm/index.rst                    |   1 +
+ Documentation/watch_queue.rst                 |  34 ++-
+ MAINTAINERS                                   |   7 +-
+ arch/powerpc/include/uapi/asm/kvm_para.h      |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |   2 +-
+ drivers/ata/libata-core.c                     |   2 +-
+ drivers/base/core.c                           |   2 +-
+ drivers/base/platform.c                       |   6 +-
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |   2 +-
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |   2 +-
+ .../allwinner/sun8i-ss/sun8i-ss-cipher.c      |   2 +-
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |   2 +-
+ drivers/gpu/drm/Kconfig                       |   2 +-
+ drivers/gpu/drm/drm_ioctl.c                   |   2 +-
+ drivers/gpu/drm/msm/disp/dpu1/dpu_kms.h       |   2 +-
+ drivers/hwtracing/coresight/Kconfig           |   2 +-
+ drivers/infiniband/core/verbs.c               |   7 +-
+ drivers/media/v4l2-core/v4l2-fwnode.c         |   2 +-
+ drivers/message/fusion/mptbase.c              |   8 +-
+ fs/Kconfig                                    |   2 +-
+ fs/Kconfig.binfmt                             |   2 +-
+ fs/adfs/Kconfig                               |   2 +-
+ fs/affs/Kconfig                               |   2 +-
+ fs/afs/Kconfig                                |   6 +-
+ fs/bfs/Kconfig                                |   2 +-
+ fs/cramfs/Kconfig                             |   2 +-
+ fs/ecryptfs/Kconfig                           |   2 +-
+ fs/fat/Kconfig                                |   8 +-
+ fs/fuse/Kconfig                               |   2 +-
+ fs/fuse/dev.c                                 |   2 +-
+ fs/hfs/Kconfig                                |   2 +-
+ fs/hpfs/Kconfig                               |   2 +-
+ fs/inode.c                                    |   6 +-
+ fs/isofs/Kconfig                              |   2 +-
+ fs/namespace.c                                |   2 +-
+ fs/notify/inotify/Kconfig                     |   2 +-
+ fs/ntfs/Kconfig                               |   2 +-
+ fs/ocfs2/Kconfig                              |   2 +-
+ fs/overlayfs/Kconfig                          |   6 +-
+ fs/proc/Kconfig                               |   4 +-
+ fs/romfs/Kconfig                              |   2 +-
+ fs/sysfs/dir.c                                |   2 +-
+ fs/sysfs/file.c                               |   2 +-
+ fs/sysfs/mount.c                              |   2 +-
+ fs/sysfs/symlink.c                            |   2 +-
+ fs/sysv/Kconfig                               |   2 +-
+ fs/udf/Kconfig                                |   2 +-
+ include/linux/kobject.h                       |   2 +-
+ include/linux/kobject_ns.h                    |   2 +-
+ include/linux/mm.h                            |   4 +-
+ include/linux/relay.h                         |   2 +-
+ include/linux/slab.h                          |   2 +-
+ include/linux/spi/spi.h                       |   1 +
+ include/linux/sysfs.h                         |   2 +-
+ include/uapi/linux/ethtool_netlink.h          |   2 +-
+ include/uapi/linux/firewire-cdev.h            |   2 +-
+ include/uapi/linux/kvm.h                      |   4 +-
+ include/uapi/rdma/rdma_user_ioctl_cmds.h      |   2 +-
+ kernel/futex.c                                |   3 +
+ kernel/relay.c                                |   2 +-
+ lib/bitmap.c                                  |  27 +--
+ lib/kobject.c                                 |   4 +-
+ mm/gup.c                                      |  12 +-
+ scripts/kernel-doc                            |  41 ++--
+ tools/include/uapi/linux/kvm.h                |   4 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c              |   2 +-
+ virt/kvm/arm/vgic/vgic.h                      |   4 +-
+ 106 files changed, 373 insertions(+), 338 deletions(-)
+ rename Documentation/i2c/{i2c.svg => i2c_bus.svg} (99%)
+
+-- 
+2.25.2
+
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
