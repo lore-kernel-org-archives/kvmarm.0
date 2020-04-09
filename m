@@ -2,83 +2,82 @@ Return-Path: <SRS0=LaKu=5Z=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E61C9C2D0EA
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Apr 2020 08:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D16C2BB1D
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Apr 2020 08:27:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 691E220692
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Apr 2020 08:08:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B338620784
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Apr 2020 08:27:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J1SZXJcV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691E220692
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9aJo5AU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B338620784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFAE44B13A;
-	Thu,  9 Apr 2020 04:08:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63C6D4B104;
+	Thu,  9 Apr 2020 04:27:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WsoSH1vNoF22; Thu,  9 Apr 2020 04:08:41 -0400 (EDT)
+	with ESMTP id 38c8HkyaJcHF; Thu,  9 Apr 2020 04:27:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F8484B147;
-	Thu,  9 Apr 2020 04:08:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E274F4B159;
+	Thu,  9 Apr 2020 04:27:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22CDF4B13E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 04:08:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 667164B14A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 04:27:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rj0QWp1Y4FMY for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2020 04:08:38 -0400 (EDT)
+ with ESMTP id 2EPf-emhqUg8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2020 04:27:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC9CA4B13A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 04:08:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4F7A4B104
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 04:27:10 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8108220692;
- Thu,  9 Apr 2020 08:08:37 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B964120784;
+ Thu,  9 Apr 2020 08:27:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586419717;
- bh=ZYPF+rqovQLCUsclK6F4X9TtrIH2oOg/81gTxOxeTgg=;
+ s=default; t=1586420829;
+ bh=nCDNU4IlgiFK5b54p5i4/sKzgnH90+gZuGoD5pEuGJ4=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=J1SZXJcVZQ7/9n8KUsYnObss5o5bQv9Bod/OTeAZR8Ee6db01n5Gylh0gYLTA++j5
- iFtLaRcpoIpbHzIRTF5TEp4WdHIZgorpkr/xoqJkVqpkweltXge9pHibnTqFQqSuSy
- +JgZc5XV7Ips4tm112z57o/y/xiOf6BY5aSGdh9Q=
+ b=Y9aJo5AUWaQuszvfGfnXk5dN6FBi6IFFk8qqm8O7xKAPKSfsJwMiGSxGjxXr/ljM1
+ qAJX5Zt68OT3cGQz8xnCgYTE6F7PUAGu5F5M3gR7g1q+EzYGbOWB140zXXpz7yknmx
+ y84FuWlxdp2GXaL9aETF3n3ei+e48tBA1sLxf/ko=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jMSEl-001qYZ-O9; Thu, 09 Apr 2020 09:08:35 +0100
-Date: Thu, 9 Apr 2020 09:08:34 +0100
+ id 1jMSWh-001qkp-SG; Thu, 09 Apr 2020 09:27:08 +0100
+Date: Thu, 9 Apr 2020 09:27:06 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?Q?Andr=C3=A9?= Przywara <andre.przywara@arm.com>
+To: James Morse <james.morse@arm.com>
 Subject: Re: [PATCH] KVM: arm64: arch_timer shouldn't assume the vcpu is loaded
-Message-ID: <20200409090834.7d655d8f@why>
-In-Reply-To: <d49f5180-aa5a-a04c-836a-0b30336d1d7c@arm.com>
+Message-ID: <20200409092706.74e6bd1d@why>
+In-Reply-To: <cc6bed09-33dd-027a-126f-ed22389c1624@arm.com>
 References: <20200406150355.4859-1-james.morse@arm.com>
  <20200408110726.4d81bc3b@why>
- <281d91cb-6818-4393-55ce-6207c04d744b@arm.com>
- <92de4dc6e0c065eec528bb21c2d870cf@kernel.org>
- <d49f5180-aa5a-a04c-836a-0b30336d1d7c@arm.com>
+ <cc6bed09-33dd-027a-126f-ed22389c1624@arm.com>
 Organization: Approximate
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, james.morse@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, andre.przywara@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,111 +89,258 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gV2VkLCA4IEFwciAyMDIwIDE3OjUwOjA5ICswMTAwCkFuZHLDqSBQcnp5d2FyYSA8YW5kcmUu
-cHJ6eXdhcmFAYXJtLmNvbT4gd3JvdGU6Cgo+IE9uIDA4LzA0LzIwMjAgMTU6MTksIE1hcmMgWnlu
-Z2llciB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+ID4gT24gMjAyMC0wNC0wOCAxMzoxMywgQW5k
-csOpIFByenl3YXJhIHdyb3RlOiAgCj4gPj4gT24gMDgvMDQvMjAyMCAxMTowNywgTWFyYyBaeW5n
-aWVyIHdyb3RlOgo+ID4+Cj4gPj4gSGkgTWFyYywKPiA+PiAgCj4gPj4+IEhpIEphbWVzLAo+ID4+
-Pgo+ID4+PiBUaGFua3MgZm9yIGxvb2tpbmcgaW50byB0aGlzLgo+ID4+Pgo+ID4+PiBPbiBNb24s
-wqAgNiBBcHIgMjAyMCAxNjowMzo1NSArMDEwMAo+ID4+PiBKYW1lcyBNb3JzZSA8amFtZXMubW9y
-c2VAYXJtLmNvbT4gd3JvdGU6Cj4gPj4+ICAKPiA+Pj4+IGt2bV9hcmNoX3RpbWVyX2dldF9pbnB1
-dF9sZXZlbCgpIG5lZWRzIHRvIGdldCB0aGUgYXJjaF90aW1lcl9jb250ZXh0Cj4gPj4+PiBmb3IK
-PiA+Pj4+IGEgcGFydGljdWxhciB2Y3B1LCBhbmQgdXNlcyBrdm1fZ2V0X3J1bm5pbmdfdmNwdSgp
-IHRvIGZpbmQgaXQuCj4gPj4+Pgo+ID4+Pj4ga3ZtX2FyY2hfdGltZXJfZ2V0X2lucHV0X2xldmVs
-KCkgbWF5IGJlIGNhbGxlZCB0byBoYW5kbGUgYSB1c2VyLXNwYWNlCj4gPj4+PiB3cml0ZSB0byB0
-aGUgcmVkaXN0cmlidXRvciwgd2hlcmUgdGhlIHZjcHUgaXMgbm90IGxvYWRlZC4gVGhpcyBjYXVz
-ZXMKPiA+Pj4+IGt2bV9nZXRfcnVubmluZ192Y3B1KCkgdG8gcmV0dXJuIE5VTEw6Cj4gPj4+PiB8
-IFVuYWJsZSB0byBoYW5kbGUga2VybmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwgYWRkcmVz
-cwo+ID4+Pj4gMDAwMDAwMDAwMDAwMWVjMAo+ID4+Pj4gfCBNZW0gYWJvcnQgaW5mbzoKPiA+Pj4+
-IHzCoMKgIEVTUiA9IDB4OTYwMDAwMDQKPiA+Pj4+IHzCoMKgIEVDID0gMHgyNTogREFCVCAoY3Vy
-cmVudCBFTCksIElMID0gMzIgYml0cwo+ID4+Pj4gfMKgwqAgU0VUID0gMCwgRm5WID0gMAo+ID4+
-Pj4gfMKgwqAgRUEgPSAwLCBTMVBUVyA9IDAKPiA+Pj4+IHwgRGF0YSBhYm9ydCBpbmZvOgo+ID4+
-Pj4gfMKgwqAgSVNWID0gMCwgSVNTID0gMHgwMDAwMDAwNAo+ID4+Pj4gfMKgwqAgQ00gPSAwLCBX
-blIgPSAwCj4gPj4+PiB8IHVzZXIgcGd0YWJsZTogNGsgcGFnZXMsIDQ4LWJpdCBWQXMsIHBnZHA9
-MDAwMDAwMDAzY2JmOTAwMAo+ID4+Pj4gfCBbMDAwMDAwMDAwMDAwMWVjMF0gcGdkPTAwMDAwMDAw
-MDAwMDAwMDAKPiA+Pj4+IHwgSW50ZXJuYWwgZXJyb3I6IE9vcHM6IDk2MDAwMDA0IFsjMV0gUFJF
-RU1QVCBTTVAKPiA+Pj4+IHwgTW9kdWxlcyBsaW5rZWQgaW46IHI4MTY5IHJlYWx0ZWsgZWZpdmFy
-ZnMgaXBfdGFibGVzIHhfdGFibGVzCj4gPj4+PiB8IENQVTogMSBQSUQ6IDI2MTUgQ29tbTogcWVt
-dS1zeXN0ZW0tYWFyIE5vdCB0YWludGVkIDUuNi4wLXJjNyAjMzAKPiA+Pj4+IHwgSGFyZHdhcmUg
-bmFtZTogTWFydmVsbCBtdmVidV9hcm1hZGEtMzd4eC9tdmVidV9hcm1hZGEtMzd4eCwgQklPUwo+
-ID4+Pj4gMjAxOC4wMy1kZXZlbC0xOC4xMi4zLWdjOWFhOTJjLWFybWJpYW4gMDIvMjAvMjAxOQo+
-ID4+Pj4gfCBwc3RhdGU6IDAwMDAwMDg1IChuemN2IGRhSWYgLVBBTiAtVUFPKQo+ID4+Pj4gfCBw
-YyA6IGt2bV9hcmNoX3RpbWVyX2dldF9pbnB1dF9sZXZlbCsweDFjLzB4NjgKPiA+Pj4+IHwgbHIg
-OiBrdm1fYXJjaF90aW1lcl9nZXRfaW5wdXRfbGV2ZWwrMHgxYy8weDY4Cj4gPj4+Pgo+ID4+Pj4g
-fCBDYWxsIHRyYWNlOgo+ID4+Pj4gfMKgIGt2bV9hcmNoX3RpbWVyX2dldF9pbnB1dF9sZXZlbCsw
-eDFjLzB4NjgKPiA+Pj4+IHzCoCB2Z2ljX2dldF9waHlzX2xpbmVfbGV2ZWwrMHgzYy8weDkwCj4g
-Pj4+PiB8wqAgdmdpY19tbWlvX3dyaXRlX3NlbmFibGUrMHhlNC8weDEzMAo+ID4+Pj4gfMKgIHZn
-aWNfdWFjY2VzcysweGUwLzB4MTAwCj4gPj4+PiB8wqAgdmdpY192M19yZWRpc3RfdWFjY2Vzcysw
-eDVjLzB4ODAKPiA+Pj4+IHzCoCB2Z2ljX3YzX2F0dHJfcmVnc19hY2Nlc3MrMHhmMC8weDIwMAo+
-ID4+Pj4gfMKgIG52Z2ljX3YzX3NldF9hdHRyKzB4MjM0LzB4MjUwCj4gPj4+PiB8wqAga3ZtX2Rl
-dmljZV9pb2N0bF9hdHRyKzB4YTQvMHhmOAo+ID4+Pj4gfMKgIGt2bV9kZXZpY2VfaW9jdGwrMHg3
-Yy8weGMwCj4gPj4+PiB8wqAga3N5c19pb2N0bCsweDFmYy8weGMxOAo+ID4+Pj4gfMKgIF9fYXJt
-NjRfc3lzX2lvY3RsKzB4MjQvMHgzMAo+ID4+Pj4gfMKgIGRvX2VsMF9zdmMrMHg3Yy8weDE0OAo+
-ID4+Pj4gfMKgIGVsMF9zeW5jX2hhbmRsZXIrMHgxMzgvMHgyNTgKPiA+Pj4+IHzCoCBlbDBfc3lu
-YysweDE0MC8weDE4MAo+ID4+Pj4gfCBDb2RlOiA5MTAwMDNmZCBmOTAwMGJmMyAyYTAwMDNmMyA5
-N2ZmNjUwYyAoYjk1ZWMwMDEpCj4gPj4+PiB8IC0tLVsgZW5kIHRyYWNlIDgxMjg3NjEyZDkzZjFl
-NzAgXS0tLQo+ID4+Pj4gfCBub3RlOiBxZW11LXN5c3RlbS1hYXJbMjYxNV0gZXhpdGVkIHdpdGgg
-cHJlZW1wdF9jb3VudCAxCj4gPj4+Pgo+ID4+Pj4gTG9hZGluZyB0aGUgdmNwdSBkb2Vzbid0IG1h
-a2UgYSBsb3Qgb2Ygc2Vuc2UgZm9yIGhhbmRsaW5nIGEgZGV2aWNlCj4gPj4+PiBpb2N0bCgpLAo+
-ID4+Pj4gc28gaW5zdGVhZCBwYXNzIHRoZSB2Y3B1IHRocm91Z2ggdG8KPiA+Pj4+IGt2bV9hcmNo
-X3RpbWVyX2dldF9pbnB1dF9sZXZlbCgpLiBJdHMKPiA+Pj4+IG5vdCBjbGVhciB0aGF0IGFuIGlu
-dGlkIG1ha2VzIG11Y2ggc2Vuc2Ugd2l0aG91dCB0aGUgcGFpcmVkIHZjcHUuICAKPiA+Pj4KPiA+
-Pj4gSSBkb24ndCBmdWxseSBhZ3JlZSB3aXRoIHRoZSBhbmFseXNpcywgUmVtZW1iZXIgd2UgYXJl
-IGxvb2tpbmcgYXQgdGhlCj4gPj4+IHN0YXRlIG9mIHRoZSBwaHlzaWNhbCBpbnRlcnJ1cHQgYXNz
-b2NpYXRlZCB3aXRoIGEgdmlydHVhbCBpbnRlcnJ1cHQsIHNvCj4gPj4+IHRoZSB2Y3B1IGRvZXNu
-J3QgcXVpdGUgbWFrZSBzZW5zZSBoZXJlIGlmIGl0IGlzbid0IGxvYWRlZC4gIAo+ID4+Cj4gPj4g
-QnV0IHdhc24ndCBpdCB0aGF0IHRoaXMgZnVuY3Rpb24gaXMgbWVhbnQgdG8gc3BlY2lmaWNhbGx5
-IGRlYWwgd2l0aCB0aGlzCj4gPj4gKndpdGhvdXQqIGdvaW5nIHRvIHRoZSBoYXJkd2FyZSAod2hp
-Y2ggaXMgY29zdGx5LCBoZW5jZSB0aGlzCj4gPj4gb3B0aW1pc2F0aW9uKT8gQmVjYXVzZSBmb3Ig
-dGhlIHRpbWVyIHdlICpjYW4qIHdvcmsgb3V0IHRoZSBsb2dpY2FsIElSUQo+ID4+IGxpbmUgc3Rh
-dGUgYnkgZXhhbWluaW5nIG91ciBzYXZlZCBzdGF0ZT8gQW5kIHRoaXMgaXMgd2hhdCB3ZSBkbyBp
-bgo+ID4+IGt2bV90aW1lcl9zaG91bGRfZmlyZSgpLCB3aGVuIHRpbWVyX2N0eC0+bG9hZGVkIGlz
-IGZhbHNlLiAgCj4gPiAKPiA+IFllcywgYnV0IHRoYXQncyBqdXN0IGEgc3BlY2lhbGl6YXRpb24g
-b2YgYSBtb3JlIGdlbmVyaWMgaW50ZXJmYWNlLCB3aGljaCBpcwo+ID4gImluc3BlY3QgdGhlIHN0
-YXRlIG9mIHRoaXMgKnBoeXNpY2FsKiBpbnRpZCIuIFRoZSBmYWN0IHRoYXQgd2UgYXJlIGFibGUK
-PiA+IHRvIGRvCj4gPiBpdCBpbiBhIHNwZWNpYWwgd2F5IGZvciB0aGUgdGltZXIgZG9lc24ndCBj
-aGFuZ2UgdGhlIG5hdHVyZSBvZiB0aGUKPiA+IGludGVyZmFjZS4gIAo+IAo+IAo+ID4gICAKPiA+
-PiBXaGljaCBmb3IgbWUgdGhpcyBzb3VuZHMgbGlrZSB0aGUgcmlnaHQgdGhpbmcgdG8gZG8gaW4g
-dGhpcyBzaXR1YXRpb246Cj4gPj4gdGhlIFZDUFUgKGFuZCB0aGUgdGltZXIpIGlzIG5vdCBsb2Fk
-ZWQsIHNvIHdlIGNoZWNrIG91ciBzYXZlZCBzdGF0ZSBhbmQKPiA+PiBjb25zdHJ1Y3QgdGhlIGxv
-Z2ljYWwgbGluZSBsZXZlbC4gV2UganVzdCBuZWVkIGEgdmFsaWQgVkNQVSBzdHJ1Y3QgdG8KPiA+
-PiBhY2hpZXZlIHRoaXMsIGFuZCBob3BlIGZvciB0aGUgdmlydHVhbCB0aW1lciB0byBiZSBhbHJl
-YWR5IGluaXRpYWxpc2VkLgo+ID4+Cj4gPj4gRG8gSSBtaXNzIHNvbWV0aGluZyBoZXJlPyAgCj4g
-PiAKPiA+IFllcy4gWW91IGFyZSBtaXNzaW5nIHRoYXQgdGhlICppbnRlcmZhY2UqIGlzIGdlbmVy
-aWMsIGFuZCB5b3UgY2FuIHJlcGxhY2UKPiA+IGl0IHdpdGggYW55dGhpbmcgeW91IHdhbnQuIENh
-c2UgaW4gcG9pbnQsIHdoYXQgd2UgZG8gd2hlbiBnZXRfaW5wdXRfbGV2ZWwKPiA+IGlzIE5VTEwu
-Cj4gPiAgIAo+ID4+IEFsc28gdG8gbWUgaXQgc291bmQgbGlrZSB0aGUgaW50ZXJmYWNlIGZvciB0
-aGlzIGZ1bmN0aW9uIGlzIHNsaWdodGx5Cj4gPj4gbGFja2luZywgYmVjYXVzZSBqdXN0IGFuIGlu
-dGlkIGlzIG5vdCBlbm91Z2ggdG8gdW5pcXVlbHkgaWRlbnRpZnkgYW4KPiA+PiBJUlEuIEl0IHdh
-cyBqdXN0IGZpbmUgc28gZmFyIGJlY2F1c2Ugb2YgdGhpcyBzcGVjaWFsIHVzZSBjYXNlLiAgCj4g
-PiAKPiA+IFRoaXMgaXMgYSAqcGh5c2ljYWwqIGludGlkLiAgIAo+IAo+IFdhaXQsIEkgYW0gY29u
-ZnVzZWQsIHRoZSB0eXBlIGRlY2xhcmF0aW9uIGluIHN0cnVjdCB2Z2ljX2lycSBzYXlzOgo+IC4u
-Lgo+ICAgICAgICAgYm9vbCAoKmdldF9pbnB1dF9sZXZlbCkoaW50IHZpbnRpZCk7Cj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl4KPiBBbHNvIGluIHZnaWMuYzp2Z2ljX2dl
-dF9waHlzX2xpbmVfbGV2ZWwoKSB3ZSBjYWxsCj4gaXJxLT5nZXRfaW5wdXRfbGV2ZWwoaXJxLT5p
-bnRpZCksIHdoaWNoIGlzIHRoZSB2aXJ0dWFsIGludGlkLgoKWWVhaCwgdGhhdCdzIG5vdCBncmVh
-dCBpbmRlZWQuIEl0IGlzIGEgY3VubmluZyBzaG9ydGN1dCB0byBnZXQgdG8gdGhlCnRpbWVyLCBi
-dXQgdGhhdCByZWFsbHkgc2hvdWxkIGJlIHRoZSBob3N0IGlycS4KCj4gQnV0IEkgc2VlIHRoYXQg
-dGhlIHBoeXNpY2FsIGludGlkIG1ha2VzIG1vcmUgc2Vuc2UgaGVyZSAoaW4gdGhlIHNwaXJpdAo+
-IG9mOiBwcm92aWRlIGEgc2hvcnRjdXQgZm9yIHBva2luZyB0aGUgR0lDIGZvciB0aGUgYXNzb2Np
-YXRlZCBod2lycSksIGJ1dAo+IHNob3VsZG4ndCB3ZSB0aGVuIHBhc3MgYXQgbGVhc3QgaXJxLT5o
-d2ludGlkICh3aGljaCBqdXN0IGhhcHBlbnMgdG8gYmUKPiB0aGUgc2FtZSBpbiB0aGUgYXJjaCB0
-aW1lciBjYXNlKT8KCmh3aW50aWQgaXNuJ3QgcmVhbGx5IHNvbWV0aGluZyB3ZSBzaG91bGQgY29u
-c2lkZXIsIGFzIGl0IGlzIGFuCmltcGxlbWVudGF0aW9uIGRldGFpbCBvZiB0aGUgcGh5c2ljYWwg
-R0lDIGFuZCBsaXN0IHJlZ2lzdGVycy4gSXQgaXMKdG9vIGxvdy1sZXZlbCB0byBiZSBnZW5lcmFs
-bHkgdXNlZnVsLiBUaGUgaG9zdF9pcnEgZmllbGQsIG9uIHRoZSBvdGhlcgpoYW5kLCBpcyBhIGJl
-dHRlciBpbmZvcm1hdGlvbiBzb3VyY2UsIGFuZCB0aGUgdGltZXIgYWxyZWFkeSBoYXMgdGhpcwpz
-dGFzaGVkLgoKT3ZlcmFsbCwgd2UgY291bGQganVzdCBwYXNzIHRoZSBwb2ludGVyIHRvIHRoZSB2
-Z2ljX2lycSwgYW5kIGxldCB0aGUKaGVscGVyIGRvIHdoYXRldmVyIGl0IG5lZWRzIHRvIHNvcnQg
-aXQgb3V0LiBBZnRlciBhbGwsIGl0IGlzIHN1cHBvc2VkCnRvIGJlIGZhc3RlciB0aGFuIGdvaW5n
-IHRvIHRoZSBHSUMsIHNvIHdlIGNhbiBoYXZlIGEgYml0IG9mIGxlZXdheSBoZXJlLgoKTm90IGEg
-YmlnIGRlYWwsIGFzIHRoaXMgaXNuJ3QgdGhlIHBhcnQgdGhhdCBpcyBicm9rZW4gQVRNLgoKVGhh
-bmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4uLgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi James,
+
+On Wed, 8 Apr 2020 12:16:01 +0100
+James Morse <james.morse@arm.com> wrote:
+
+> Hi Marc,
+> 
+> On 08/04/2020 11:07, Marc Zyngier wrote:
+> > On Mon,  6 Apr 2020 16:03:55 +0100
+> > James Morse <james.morse@arm.com> wrote:
+> >   
+> >> kvm_arch_timer_get_input_level() needs to get the arch_timer_context for
+> >> a particular vcpu, and uses kvm_get_running_vcpu() to find it.
+> >>
+> >> kvm_arch_timer_get_input_level() may be called to handle a user-space
+> >> write to the redistributor, where the vcpu is not loaded. This causes
+> >> kvm_get_running_vcpu() to return NULL:
+> >> | Unable to handle kernel paging request at virtual address 0000000000001ec0
+> >> | Mem abort info:
+> >> |   ESR = 0x96000004
+> >> |   EC = 0x25: DABT (current EL), IL = 32 bits
+> >> |   SET = 0, FnV = 0
+> >> |   EA = 0, S1PTW = 0
+> >> | Data abort info:
+> >> |   ISV = 0, ISS = 0x00000004
+> >> |   CM = 0, WnR = 0
+> >> | user pgtable: 4k pages, 48-bit VAs, pgdp=000000003cbf9000
+> >> | [0000000000001ec0] pgd=0000000000000000
+> >> | Internal error: Oops: 96000004 [#1] PREEMPT SMP
+> >> | Modules linked in: r8169 realtek efivarfs ip_tables x_tables
+> >> | CPU: 1 PID: 2615 Comm: qemu-system-aar Not tainted 5.6.0-rc7 #30
+> >> | Hardware name: Marvell mvebu_armada-37xx/mvebu_armada-37xx, BIOS 2018.03-devel-18.12.3-gc9aa92c-armbian 02/20/2019
+> >> | pstate: 00000085 (nzcv daIf -PAN -UAO)
+> >> | pc : kvm_arch_timer_get_input_level+0x1c/0x68
+> >> | lr : kvm_arch_timer_get_input_level+0x1c/0x68
+> >>
+> >> | Call trace:
+> >> |  kvm_arch_timer_get_input_level+0x1c/0x68
+> >> |  vgic_get_phys_line_level+0x3c/0x90
+> >> |  vgic_mmio_write_senable+0xe4/0x130
+> >> |  vgic_uaccess+0xe0/0x100
+> >> |  vgic_v3_redist_uaccess+0x5c/0x80
+> >> |  vgic_v3_attr_regs_access+0xf0/0x200
+> >> |  nvgic_v3_set_attr+0x234/0x250
+> >> |  kvm_device_ioctl_attr+0xa4/0xf8
+> >> |  kvm_device_ioctl+0x7c/0xc0
+> >> |  ksys_ioctl+0x1fc/0xc18
+> >> |  __arm64_sys_ioctl+0x24/0x30
+> >> |  do_el0_svc+0x7c/0x148
+> >> |  el0_sync_handler+0x138/0x258
+> >> |  el0_sync+0x140/0x180
+> >> | Code: 910003fd f9000bf3 2a0003f3 97ff650c (b95ec001)
+> >> | ---[ end trace 81287612d93f1e70 ]---
+> >> | note: qemu-system-aar[2615] exited with preempt_count 1
+> >>
+> >> Loading the vcpu doesn't make a lot of sense for handling a device ioctl(),
+> >> so instead pass the vcpu through to kvm_arch_timer_get_input_level(). Its
+> >> not clear that an intid makes much sense without the paired vcpu.  
+> > 
+> > I don't fully agree with the analysis, Remember we are looking at the
+> > state of the physical interrupt associated with a virtual interrupt, so
+> > the vcpu doesn't quite make sense here if it isn't loaded.
+> > 
+> > What does it mean to look at the HW timer when we are not in the right
+> > context? For all we know, it is completely random (the only guarantee
+> > we have is that it is disabled, actually).  
+> 
+> > My gut feeling is that this is another instance where we should provide
+> > specific userspace accessors that would only deal with the virtual
+> > state, and leave anything that deals with the physical state of the
+> > interrupt to be exercised only by the guest.  
+> 
+> > Does it make sense?  
+> 
+> Broadly, yes. Specifically ... I'm not familiar enough with this code to work out where
+> such a change should go!
+> 
+> ~20 mins of grepping later~
+> 
+> Remove REGISTER_DESC_WITH_LENGTH() so that uaccess helpers have to be provided, and forbid
+> NULL for the ur/uw values in REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED()...?
+
+I'd suggest something like this (untested, of course):
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index d63881f60e1a..f51c6e939c76 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -409,10 +409,12 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		NULL, vgic_mmio_uaccess_write_v2_group, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
+-		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
++		vgic_mmio_read_enable, vgic_mmio_write_senable,
++		NULL, vgic_uaccess_write_senable, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
+-		vgic_mmio_read_enable, vgic_mmio_write_cenable, NULL, NULL, 1,
++		vgic_mmio_read_enable, vgic_mmio_write_cenable,
++		NULL, vgic_uaccess_write_cenable, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending, NULL, NULL, 1,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 77c8ba1a2535..a9c45048fadb 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -538,10 +538,12 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 		vgic_mmio_read_group, vgic_mmio_write_group, NULL, NULL, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
+-		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
++		vgic_mmio_read_enable, vgic_mmio_write_senable,
++		NULL, vgic_uaccess_write_senable, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
+-		vgic_mmio_read_enable, vgic_mmio_write_cenable, NULL, NULL, 1,
++		vgic_mmio_read_enable, vgic_mmio_write_cenable,
++	       NULL, vgic_uaccess_write_cenable, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+@@ -609,11 +611,13 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IGROUPR0,
+ 		vgic_mmio_read_group, vgic_mmio_write_group, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_ISENABLER0,
+-		vgic_mmio_read_enable, vgic_mmio_write_senable, 4,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISENABLER0,
++		vgic_mmio_read_enable, vgic_mmio_write_senable,
++		NULL, vgic_uaccess_write_senable, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_ICENABLER0,
+-		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICENABLER0,
++		vgic_mmio_read_enable, vgic_mmio_write_cenable,
++		NULL, vgic_uaccess_write_cenable, 4,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISPENDR0,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 4012cd68ac93..2ca11b05b17b 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -184,6 +184,48 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+ 	}
+ }
+ 
++int vgic_uaccess_write_senable(struct kvm_vcpu *vcpu,
++			       gpa_t addr, unsigned int len,
++			       unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	int i;
++	unsigned long flags;
++
++	for_each_set_bit(i, &val, len * 8) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		raw_spin_lock_irqsave(&irq->irq_lock, flags);
++		irq->enabled = true;
++		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++
++		vgic_put_irq(vcpu->kvm, irq);
++	}
++
++	return 0;
++}
++
++int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
++			       gpa_t addr, unsigned int len,
++			       unsigned long val)
++{
++	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++	int i;
++	unsigned long flags;
++
++	for_each_set_bit(i, &val, len * 8) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		raw_spin_lock_irqsave(&irq->irq_lock, flags);
++		irq->enabled = false;
++		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++
++		vgic_put_irq(vcpu->kvm, irq);
++	}
++
++	return 0;
++}
++
+ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 				     gpa_t addr, unsigned int len)
+ {
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 30713a44e3fa..327d0a6938e4 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -138,6 +138,14 @@ void vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+ 			     gpa_t addr, unsigned int len,
+ 			     unsigned long val);
+ 
++int vgic_uaccess_write_senable(struct kvm_vcpu *vcpu,
++			       gpa_t addr, unsigned int len,
++			       unsigned long val);
++
++int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
++			       gpa_t addr, unsigned int len,
++			       unsigned long val);
++
+ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 				     gpa_t addr, unsigned int len);
+ 
+
+
+> 
+> Or if that is too invasive, something like, (totally, untested):
+> ----------------%<----------------
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 97fb2a40e6ba..30ae5f29e429 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -113,10 +113,11 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
+>                 struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> 
+>                 raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> -               if (vgic_irq_is_mapped_level(irq)) {
+> +               if (kvm_running_vcpu() && vgic_irq_is_mapped_level(irq)) {
+>                         bool was_high = irq->line_level;
+> 
+>                         /*
+> +                        * Unless we are running due to a user-space access,
+>                          * We need to update the state of the interrupt because
+>                          * the guest might have changed the state of the device
+>                          * while the interrupt was disabled at the VGIC level.
+> ----------------%<----------------
+
+Huh, nice try! ;-) Unfortunately, I think there is more than the enable
+register that suffers from a similar problem (see how the pending
+register write is also accessing the HW state, even if accessed from
+userspace).
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
