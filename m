@@ -8,74 +8,75 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57CDC2BA2B
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DF2C2BB55
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:43:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 672E720787
+	by mail.kernel.org (Postfix) with ESMTP id EE76620787
 	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:43:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anypSvL3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 672E720787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k0zKh1py"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE76620787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 148964B1A1;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46C6A4B1D6;
 	Fri, 10 Apr 2020 03:43:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V31LnefQIM2Q; Fri, 10 Apr 2020 03:43:56 -0400 (EDT)
+	with ESMTP id Cz5KLXZRJgK2; Fri, 10 Apr 2020 03:43:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B04F4B1B2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20BA74B1B6;
 	Fri, 10 Apr 2020 03:43:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 775904B14A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 23:54:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D75E4B14A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 23:56:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QnrIPNRi-dG3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2020 23:54:22 -0400 (EDT)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 598364B147
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 23:54:22 -0400 (EDT)
-Received: by mail-pg1-f178.google.com with SMTP id k191so461100pgc.13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2020 20:54:22 -0700 (PDT)
+ with ESMTP id gUSNamXbWqo6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2020 23:56:40 -0400 (EDT)
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
+ [209.85.214.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7690B4B147
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2020 23:56:40 -0400 (EDT)
+Received: by mail-pl1-f175.google.com with SMTP id t4so263286plq.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2020 20:56:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MVNHl8ZYPBjPp5ynGu7XA1fsdeRM/3jDxhZmbvgU1e4=;
- b=anypSvL3upk0MAF1Tfyk00TfNL5GQZ8vevHKsiqh7UvTg+qzxoxQgnPaCbYu6PfCLn
- 0sMShIkh8eJvSanxewIVo66u3WyqXIzOO+aJL5DO4/sFRre2uD4cxkKDpHXt7e6llRh7
- cje4w6NrGwPj7BWphkx+VvgAQQMnc1lw/ZmuNJ3hWuKdoAc9dfkuHVZtHBW2RWUeKOgL
- wgJdsb/6tja3gIBZIzpK4zXbBlZvP8jjYrOUgLtjVnI7WDicw9XeAPeWfU64t+IrI0Vs
- O43hIXz0W+ElOBC5urpj0WnHenSS7i4gXDbfDiE18Pi6aFgJv9+P53SNsBGyc/ZIoT9/
- jQiw==
+ :cc; bh=LUBOPzfAetNSR8BCew1KrCqC64hkQ/+V5xFI4/AtUZY=;
+ b=k0zKh1py7ez2vEXKKqFmXos7LMRP21xyPQbes8Xgww9YP+xnA3UJtkuQNp+bm62RqE
+ ajtLmJp8l3ATV2eghEarvxJ7rxPgWfA2tbr/LjwjScG7hvtE8G9Ya+mYQeO51spLzN68
+ tsNIvgrEedV6YMrMYnmrXAsBl5Q7fqCi96IebYqBleQ5oNENi2HsSF6kxSrZBYEnimUn
+ yfIYEXK3IWLMVB/ytRUztiW7NQkWw1CT0We0SwoC8CR9RO0lamRR09VRg8+Ors8MzBk0
+ OKUer9MQlNrjsDHqNZDsjbZMPci3BNZSdvCT00MpCl5q4AEUa1hcR1kbEwO8o+eAvv0D
+ JbMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=MVNHl8ZYPBjPp5ynGu7XA1fsdeRM/3jDxhZmbvgU1e4=;
- b=pHmQw6YVj68NQ7K/BtdEJFVJ8OONxFDq7k29fJ6OqNlS/bhWZtxg3BJCa9C9pD6PN6
- IneS/4sWb1+eJmbK6nhWvPcn4E94ENnsAGxuD1jrQji4aT7crK9XC2Jp4gaQY6eRpn0k
- 2nMmXOZs0CzzeOr305X+wSaAonE+l8frmp42keKdEKOtJKNjeERwUd/hadVU4W0eLxP/
- eMQ95xQX//GMyKmCkm/TqYMBF/axSwTT4rPDsFy2sfuSDGKK2EielNPV1aQLvyVX/ZYU
- 3WeHHiDj4WXnYMx8gmJeTb+WtZjbyUNOPlHgjxJECi4oa84RPDKWTEpZ7bYQalBv1n7A
- mFrg==
-X-Gm-Message-State: AGi0PuZEpuIXIXJor8YQsynUfAKNw/W2F9wkS4qBHjjyqIVKm07YUvge
- K5YxtsBJwqe+WaJA9++Cjsg8GzOErcbf+kRWLCE=
-X-Google-Smtp-Source: APiQypKlXMme6WN2BengKpJW9xkiTJf2OghzarDKKYx+CcWmA8FP+kGaNbHMcM4Ltr2kIJdLIudBHPwG4v3PQe/GW0A=
-X-Received: by 2002:a62:6dc1:: with SMTP id i184mr3063905pfc.25.1586490861043; 
- Thu, 09 Apr 2020 20:54:21 -0700 (PDT)
+ bh=LUBOPzfAetNSR8BCew1KrCqC64hkQ/+V5xFI4/AtUZY=;
+ b=uhlnHRxXeMBT0zeLyioeJQUtRMcMD/9B3AzdeZAU1M7z0Ifn7K5UjTXJJ4unMEJ1rE
+ /ZYAS3azeM952J47ae9yV+1Ezd6rSOIE+XIdAxylYDaoHeEMrp9Kjht4e/wZhu2ZLOqS
+ 7LxEdgj832eVGx+u1u29C8Rubkr51Fi9AMROlaNpgDrJeabhFzDmPUZaX900XfNZLLqC
+ ZnrB8y/ndeCwQo/LLj4eFytPS8q5Bw1cHbA1AdLkX8ZGxrwglqXKuL8hLsMzyDVxjvTn
+ ijDoAGXJbuI/wX5usCEhcY4nP3R/9doCjFboyEVgy0cIt6hdRYp7d6KFwY8qXO2tV/DZ
+ wPXQ==
+X-Gm-Message-State: AGi0Pub6wxuSZQpTbupRJZW5+vS1xV/hRklXwIOEgJKWocfVJwsjX8IL
+ RBNDbL3hN2UeCvqXYlLKpCk+jwgSEdbX9ijQ07s=
+X-Google-Smtp-Source: APiQypIgi9AV+0GlesE4hTiVUswHLA/3j/OYr0SAls811CE+zAB/EuHn35RgNCKCGFEgQQxZw4inzFBE3Eqv2GNi6Y8=
+X-Received: by 2002:a17:90a:aa95:: with SMTP id
+ l21mr3149898pjq.4.1586490999508; 
+ Thu, 09 Apr 2020 20:56:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
  <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
 In-Reply-To: <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
 From: Javier Romero <xavinux@gmail.com>
-Date: Fri, 10 Apr 2020 00:54:10 -0300
-Message-ID: <CAEX+82Lxv=Hrc3eDfUReSXpxv174swvmbnD1fXCgpxuzB_6NbQ@mail.gmail.com>
+Date: Fri, 10 Apr 2020 00:56:28 -0300
+Message-ID: <CAEX+82LXHgxm5dfj11couvG=SsTAb4dgYCirtyqZozJbD6dj9w@mail.gmail.com>
 Subject: Re: Contribution to KVM.
 To: like.xu@intel.com
 X-Mailman-Approved-At: Fri, 10 Apr 2020 03:43:52 -0400
@@ -91,14 +92,14 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4102120347055436862=="
+Content-Type: multipart/mixed; boundary="===============4121390091194531756=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============4102120347055436862==
-Content-Type: multipart/alternative; boundary="00000000000036423505a2e7b083"
+--===============4121390091194531756==
+Content-Type: multipart/alternative; boundary="00000000000077113005a2e7b869"
 
---00000000000036423505a2e7b083
+--00000000000077113005a2e7b869
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -145,21 +146,32 @@ El vie., 10 abr. 2020 00:34, Xu, Like <like.xu@intel.com> escribi=C3=B3:
 >
 >
 
---00000000000036423505a2e7b083
+--00000000000077113005a2e7b869
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div dir=3D"auto">Hi Like Xu,</div><div dir=3D"auto"><br>=
-</div><div dir=3D"auto">Thank you for your time to answer.=C2=A0</div><div =
-dir=3D"auto"><br></div><div dir=3D"auto">Yes, I can also test KVM in an Int=
-el platform, have a Pixelbook with a Core i7 processor and 16 GB of RAM at =
-disposal to start working.</div><div dir=3D"auto"><br></div><div dir=3D"aut=
-o">Thanks for your attention.</div><div dir=3D"auto"><br></div><div dir=3D"=
-auto">Regards,</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr">E=
-l vie., 10 abr. 2020 00:34, Xu, Like &lt;<a href=3D"mailto:like.xu@intel.co=
-m">like.xu@intel.com</a>&gt; escribi=C3=B3:<br></div><blockquote class=3D"g=
-mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
-eft:1ex">On 2020/4/10 5:29, Javier Romero wrote:<br>
+<div dir=3D"auto"><div dir=3D"auto" style=3D""><div dir=3D"auto" style=3D""=
+><font face=3D"sans-serif"><span style=3D"font-size:12.8px">Hi Like Xu,</sp=
+an></font></div><div dir=3D"auto" style=3D""><font face=3D"sans-serif"><spa=
+n style=3D"font-size:12.8px"><br></span></font></div><div dir=3D"auto" styl=
+e=3D""><font face=3D"sans-serif"><span style=3D"font-size:12.8px">Thank you=
+ for your time to answer.=C2=A0</span></font></div><div dir=3D"auto" style=
+=3D""><font face=3D"sans-serif"><span style=3D"font-size:12.8px"><br></span=
+></font></div><div dir=3D"auto" style=3D""><font face=3D"sans-serif"><span =
+style=3D"font-size:12.8px">Yes, I can also test KVM in an Intel platform, h=
+ave a Pixelbook with a Core i7 processor and 16 GB of RAM at disposal to st=
+art working.</span></font></div><div dir=3D"auto" style=3D""><font face=3D"=
+sans-serif"><span style=3D"font-size:12.8px"><br></span></font></div><div d=
+ir=3D"auto" style=3D""><font face=3D"sans-serif"><span style=3D"font-size:1=
+2.8px">Thanks for your attention.</span></font></div><div dir=3D"auto" styl=
+e=3D""><font face=3D"sans-serif"><span style=3D"font-size:12.8px"><br></spa=
+n></font></div><div dir=3D"auto" style=3D""><font face=3D"sans-serif"><span=
+ style=3D"font-size:12.8px">Regards,</span></font></div></div></div><br><di=
+v class=3D"gmail_quote"><div dir=3D"ltr">El vie., 10 abr. 2020 00:34, Xu, L=
+ike &lt;<a href=3D"mailto:like.xu@intel.com">like.xu@intel.com</a>&gt; escr=
+ibi=C3=B3:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
+ .8ex;border-left:1px #ccc solid;padding-left:1ex">On 2020/4/10 5:29, Javie=
+r Romero wrote:<br>
 &gt; Hello,<br>
 &gt;<br>
 &gt;=C2=A0 =C2=A0My name is Javier, live in Argentina and work as a cloud e=
@@ -193,9 +205,9 @@ Like Xu<br>
 <br>
 </blockquote></div>
 
---00000000000036423505a2e7b083--
+--00000000000077113005a2e7b869--
 
---===============4102120347055436862==
+--===============4121390091194531756==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -206,4 +218,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============4102120347055436862==--
+--===============4121390091194531756==--
