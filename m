@@ -7,79 +7,81 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D69CEC2BB85
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1CBC2BA2B
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:44:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8818920787
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2194420787
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 07:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nIpqgyHb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8818920787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YTCccdod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2194420787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 424484B1CE;
-	Fri, 10 Apr 2020 03:43:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 641F94B1DF;
+	Fri, 10 Apr 2020 03:44:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QKf2jF4V4CD6; Fri, 10 Apr 2020 03:43:58 -0400 (EDT)
+	with ESMTP id yVzmByZv5jKy; Fri, 10 Apr 2020 03:43:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EEBC4B1B8;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E89C4B19D;
 	Fri, 10 Apr 2020 03:43:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E45FD4B0FB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 00:43:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D04B64B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 00:49:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dEKcBSuz2OsI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Apr 2020 00:43:47 -0400 (EDT)
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com
- [209.85.210.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B44D34B0F4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 00:43:47 -0400 (EDT)
-Received: by mail-pf1-f196.google.com with SMTP id q3so565809pff.13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2020 21:43:47 -0700 (PDT)
+ with ESMTP id ReBQ9Swi5lnR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Apr 2020 00:49:22 -0400 (EDT)
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com
+ [209.85.215.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4BBC4B086
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 00:49:22 -0400 (EDT)
+Received: by mail-pg1-f195.google.com with SMTP id g6so518429pgs.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2020 21:49:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=rRpbgDANI8vDrTtjTJENSHjACfupvu/DpiY4PQxKbDI=;
- b=nIpqgyHbvMAMKy2VqyXmbM4uLzHVz6C/g9PZ9c1m/tpwLKwNlJb3ega6O39WQRQdK9
- pAWpux6ra2ePXgTVk9g67BthOpd9jgnA8+9mrG/lMIq1KkFEtM5uNeMnZlGDj/WWWP1m
- g1IvF9u5qL1fFaZokOOB/RFk92NAH64nxg906PqfXBPBjv5W+3OMZMhoDEZ1ScHCE0Ah
- NS+lH2lXeSLvQKjNjPgLUwrFW0iwIXGkvaLhYtXOLm1vYjaGGW1R/ZSbtVuXQZtjDaWx
- e1E9byWCc8FIyQ4SIcouIS0Sr/6WA/aC3oMRo5Sd9ObBa5vSDyQ4vgr8A41xf7n+tPOO
- IRGQ==
+ bh=mgQP5fmEp3MLJlgjlz6jaeSibt5vSyFPfuJ0XoZcVIE=;
+ b=YTCccdodR7/n1FEyARWl3Q04RpXd2xuQdfe6IsTM12uKGt3usSyb2eI5D/mUXyhg+C
+ xuGZYqPVKMhumQ92IfZVyl92N4kyqYQfGA3a91Wg3UaISaKEKqMCoZeKJjDY9wRafAE6
+ PkbaMayND2HOLKolooArZg6Mq2xIo0mfnSbXvwYLzgzPN9IiFqgjfjT8foeD2QzjbX5Y
+ v2lrgetZH/0qCp+TuiaFSKpAowRrruA7Te0oBpmMf1XmmJsLb9m98HA+h5hnguqYbzgR
+ xCI0zpEBq2WE4tNV8g/dhJpyIFjCOeENUnGHlWUuXCRLYK3FxdG7SaPXHQg+C4swiXuU
+ Muqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=rRpbgDANI8vDrTtjTJENSHjACfupvu/DpiY4PQxKbDI=;
- b=EDeinGm41wRGW1vVfyFYVP/ns6AivLjrkCVnMlKWcGjRwxXHtWOHaB4Zu9p+LqWPHs
- hYM1v9PYN18OyTJ7N4vBwF4u1nXi82iFtDpE94bwKDTUiGxt+F7dpNnJfU25wVl95OAR
- awY5YBb/0WzTj7xdyEjyBIHpCo2zYapKYeKIipj7+AtUjRgBc29qbf+ocj8OjRRmZos+
- GPer8mtACV/0N/ENeNY9G4ODrEaG3tkrWwX4v1eykk3Nr2GZlVEoR34ZYSqR4SdfwqdY
- mAcz0Qj7mKu+Tnf46eoe/88p56mu3jeHTG5LvVaRC3hwlIM2Jewt86QYITUPOmkAkiz0
- aR+w==
-X-Gm-Message-State: AGi0PuaGJiOdCho0ReTLNqgqqidRnwd65iedglRak4xd/IH9O+ltan7r
- inVq0pg+eleDeuT2iudl2CCpz/pAINnFRWOGFw8=
-X-Google-Smtp-Source: APiQypKnPTbJEfArWAgzMfDQYIpR0U8LgpeRAwObfBfYM1F9/inERKEjnh80fZP3e7G857uo1syih/ToxJUnuVb7UVs=
-X-Received: by 2002:a62:648f:: with SMTP id y137mr3358952pfb.199.1586493826879; 
- Thu, 09 Apr 2020 21:43:46 -0700 (PDT)
+ bh=mgQP5fmEp3MLJlgjlz6jaeSibt5vSyFPfuJ0XoZcVIE=;
+ b=L2yqnYmXr9yXrJEZ5JPE0ob0OEMScCoPe96N4oc8QUzrDPG7yNoyIoaE4f9M64UFry
+ Agfi8YrtiM6MZQWaKNoQBHUXXqwuJjg7gjzzaLlj7VKg9XM7QLh1z6IFSdEH7BvTltv6
+ +3GhkDtH+/uvkU/R8rWepE6PbfVbUs5octrc2/CYvZyvOH7wbU7WoOfF4rvJAuk8fSPp
+ Z9VzRVUM0J2gD7EORJkJqSAhJPosAFrnoKjjgXCgNn4kGEm9V0PAi8T/aEiMObPDcndY
+ uPrtlpwEyGGCMl6totx1Q5MPhVLyGp+MVjAnuMeIzJB8xs5dX9werbEhRQFoCLuxEOC4
+ T/Bw==
+X-Gm-Message-State: AGi0PubbS3ncEUVgaJDa+jqeB0cKuVj+Yd7OYNWKUDeglovw5vynbt2+
+ gGXb5dLWEOTA0aEwdZeOXBoAuKr5jlUyOK1+npc=
+X-Google-Smtp-Source: APiQypLgdOSROqVPX4hxkv96w6ogMSeFmpGa0LlYofDEikdwsEdgCSZlL+LUYeyIdfrENnWxg8/peU7nWNBv4uzIIm0=
+X-Received: by 2002:a63:8e44:: with SMTP id k65mr2728717pge.452.1586494161789; 
+ Thu, 09 Apr 2020 21:49:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
  <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
-In-Reply-To: <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
+ <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
+In-Reply-To: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
 From: Javier Romero <xavinux@gmail.com>
-Date: Fri, 10 Apr 2020 01:43:35 -0300
-Message-ID: <CAEX+82J+xRA1B10ApcviZ04=ZZ+YNth83p428bHgOHmaV1iTuA@mail.gmail.com>
+Date: Fri, 10 Apr 2020 01:49:10 -0300
+Message-ID: <CAEX+82L-Kc6W1KOgPGo3JTxvjnOGsjDWm0Z3-c59EDdL4jO+Yw@mail.gmail.com>
 Subject: Re: Contribution to KVM.
-To: like.xu@intel.com
+To: Nadav Amit <nadav.amit@gmail.com>
 X-Mailman-Approved-At: Fri, 10 Apr 2020 03:43:52 -0400
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: like.xu@intel.com, Liran Alon <liran.alon@oracle.com>,
+ kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,25 +98,32 @@ Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTGlrZSBYdSwKClRoYW5rIHlvdSBmb3IgeW91ciB0aW1lIHRvIGFuc3dlci4KCk9mIGNvdXJz
-ZSBJIGNhbiBhbHNvIHRlc3QgS1ZNIG9uIGFuIEludGVsIFBsYXRmb3JtIGlmIHRoaXMgY2FuIGJl
-CnVzZWZ1bCwgaGF2ZSBhIFBpeGVsYm9vayBsYXB0b3Agd2l0aCBhIENvcmUgaTcgcHJvY2Vzc29y
-IGFuZCAxNiBHQiBvZgpSQU0gYXQgZGlzcG9zYWwgOkQKClRoYW5rcyBmb3IgeW91ciBhdHRlbnRp
-b24uCgpSZWdhcmRzLAoKCkphdmllciBSb21lcm8KCgpFbCB2aWUuLCAxMCBhYnIuIDIwMjAgYSBs
-YXMgMDozNCwgWHUsIExpa2UgKDxsaWtlLnh1QGludGVsLmNvbT4pIGVzY3JpYmnDszoKPgo+IE9u
-IDIwMjAvNC8xMCA1OjI5LCBKYXZpZXIgUm9tZXJvIHdyb3RlOgo+ID4gSGVsbG8sCj4gPgo+ID4g
-ICBNeSBuYW1lIGlzIEphdmllciwgbGl2ZSBpbiBBcmdlbnRpbmEgYW5kIHdvcmsgYXMgYSBjbG91
-ZCBlbmdpbmVlci4KPiA+Cj4gPiBIYXZlIGJlZW4gd29ya2luZyB3aXRoIExpbnV4IHNlcnZlcnMg
-Zm9yIHRoZSBsYXN0IDEwIHllYXJzIGluIGFuCj4gPiBJbnRlcm5ldCBTZXJ2aWNlIFByb3ZpZGVy
-IGFuZCBJJ20gaW50ZXJlc3RlZCBpbiBjb250cmlidXRpbmcgdG8gS1ZNCj4gV2VsY29tZSwgSSdt
-IGEgbmV3YmllIGFzIHdlbGwuCj4gPiBtYXliZSB3aXRoIHRlc3RpbmcgYXMgYSBzdGFydCBwb2lu
-dC4KPiBZb3UgbWF5IHRyeSB0aGUgaHR0cDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vdmlydC9r
-dm0va3ZtLXVuaXQtdGVzdHMuZ2l0Cj4gYW5kIHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bSBp
-biB0aGUga2VybmVsIHRyZWUuCj4gPgo+ID4gSWYgaXQgY2FuIGJlIHVzZWZ1bCB0byB0ZXN0IEtW
-TSBvbiBBUk0sIEkgaGF2ZSBhIFJhc3BiZXJyeSBQSSAzIGF0IGRpc3Bvc2FsLgo+IElmIHlvdSB0
-ZXN0IEtWTSBvbiBJbnRlbCBwbGF0Zm9ybXMsIHlvdSB3aWxsIGRlZmluaXRlbHkgZ2V0IHN1cHBv
-cnQgZnJvbSBtZSA6RC4KPgo+IFRoYW5rcywKPiBMaWtlIFh1Cj4gPgo+ID4gVGhhbmtzIGZvciB5
-b3VyIGtpbmQgYXR0ZW50aW9uLgo+ID4KPiA+IEJlc3QgUmVnYXJkcywKPiA+Cj4gPgo+ID4KPiA+
-IEphdmllciBSb21lcm8KPgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+SGkgTmFkYXYsCgpUaGFuayB5b3UgZm9yIHlvdXIgYW5zd2VyLAoKV2lsbCBhbHNvIHRha2UgYSBs
+b29rIGF0IHRoZSB0ZXN0IGJ1ZyB5b3Ugc3VnZ2VzdGVkLgoKUmVnYXJkcywKCgpKYXZpZXIgUm9t
+ZXJvCgoKCkVsIHZpZS4sIDEwIGFici4gMjAyMCBhIGxhcyAwOjUzLCBOYWRhdiBBbWl0ICg8bmFk
+YXYuYW1pdEBnbWFpbC5jb20+KSBlc2NyaWJpw7M6Cj4KPiA+IE9uIEFwciA5LCAyMDIwLCBhdCA4
+OjM0IFBNLCBYdSwgTGlrZSA8bGlrZS54dUBpbnRlbC5jb20+IHdyb3RlOgo+ID4KPiA+IE9uIDIw
+MjAvNC8xMCA1OjI5LCBKYXZpZXIgUm9tZXJvIHdyb3RlOgo+ID4+IEhlbGxvLAo+ID4+Cj4gPj4g
+IE15IG5hbWUgaXMgSmF2aWVyLCBsaXZlIGluIEFyZ2VudGluYSBhbmQgd29yayBhcyBhIGNsb3Vk
+IGVuZ2luZWVyLgo+ID4+Cj4gPj4gSGF2ZSBiZWVuIHdvcmtpbmcgd2l0aCBMaW51eCBzZXJ2ZXJz
+IGZvciB0aGUgbGFzdCAxMCB5ZWFycyBpbiBhbgo+ID4+IEludGVybmV0IFNlcnZpY2UgUHJvdmlk
+ZXIgYW5kIEknbSBpbnRlcmVzdGVkIGluIGNvbnRyaWJ1dGluZyB0byBLVk0KPiA+IFdlbGNvbWUs
+IEknbSBhIG5ld2JpZSBhcyB3ZWxsLgo+ID4+IG1heWJlIHdpdGggdGVzdGluZyBhcyBhIHN0YXJ0
+IHBvaW50Lgo+ID4gWW91IG1heSB0cnkgdGhlIGh0dHA6Ly9naXQua2VybmVsLm9yZy9wdWIvc2Nt
+L3ZpcnQva3ZtL2t2bS11bml0LXRlc3RzLmdpdAo+ID4gYW5kIHRvb2xzL3Rlc3Rpbmcvc2VsZnRl
+c3RzL2t2bSBpbiB0aGUga2VybmVsIHRyZWUuCj4gPj4gSWYgaXQgY2FuIGJlIHVzZWZ1bCB0byB0
+ZXN0IEtWTSBvbiBBUk0sIEkgaGF2ZSBhIFJhc3BiZXJyeSBQSSAzIGF0IGRpc3Bvc2FsLgo+ID4g
+SWYgeW91IHRlc3QgS1ZNIG9uIEludGVsIHBsYXRmb3JtcywgeW91IHdpbGwgZGVmaW5pdGVseSBn
+ZXQgc3VwcG9ydCBmcm9tIG1lIDpELgo+Cj4gSWYgeW91IGFyZSBsb29raW5nIGZvciBzb21ldGhp
+bmcgc3BlY2lmaWMsIGhlcmUgYXJlIHR3byBpc3N1ZXMgd2l0aAo+IHJlbGF0aXZlbHkgbGltaXRl
+ZCBzY29wZSwgd2hpY2ggQUZBSUsgd2VyZSBub3QgcmVzb2x2ZWQ6Cj4KPiAxLiBTaGFkb3cgVk1D
+UyBidWcsIHdoaWNoIGlzIGFsc28gYSB0ZXN0IGJ1ZyBbMV0uIFlvdSBjYW4gc3RhcnQgYnkgZml4
+aW5nCj4gICAgdGhlIHRlc3QgYW5kIHRoZW4gZml4IEtWTS4KPgo+IDIuIFRyeSB0byBydW4gdGhl
+IHRlc3RzIHdpdGggbW9yZSB0aGFuIDRHQiBvZiBtZW1vcnkuIFRoZSBsYXN0IHRpbWUgSSB0cmll
+ZAo+ICAgIChhY3R1YWxseSBieSBydW5uaW5nIHRoZSB0ZXN0IG9uIGJhcmUgbWV0YWwpLCB0aGUg
+SU5JVCB0ZXN0IHRoYXQgTGlyYW4KPiAgICB3cm90ZSBmYWlsZWQuCj4KPiBSZWdhcmRzLAo+IE5h
+ZGF2Cj4KPiBbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtLzMyMzVEQkIwLTBEQzAtNDE4
+Qy1CQzQ1LUE0Qjc4NjEyRTI3M0BnbWFpbC5jb20vVC8jdQpfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0
+cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9s
+aXN0aW5mby9rdm1hcm0K
