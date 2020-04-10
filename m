@@ -2,103 +2,98 @@ Return-Path: <SRS0=QOrb=52=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F472C2BB86
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0F9C2BB85
 	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 11:19:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 01EA720753
+	by mail.kernel.org (Postfix) with ESMTP id 743B720753
 	for <kvmarm@archiver.kernel.org>; Fri, 10 Apr 2020 11:19:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dRu2yvzr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01EA720753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OTKASfAN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 743B720753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B14F44B17D;
-	Fri, 10 Apr 2020 07:19:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AB194B181;
+	Fri, 10 Apr 2020 07:19:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DdQSJtap3xVS; Fri, 10 Apr 2020 07:19:04 -0400 (EDT)
+	with ESMTP id 1nj+UCEvIszg; Fri, 10 Apr 2020 07:19:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBB194B190;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9D524B19B;
 	Fri, 10 Apr 2020 07:19:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 602D44B0B1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 06:20:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF2884B139
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 06:45:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1RBA4UayX0yK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Apr 2020 06:20:13 -0400 (EDT)
-Received: from userp2120.oracle.com (userp2120.oracle.com [156.151.31.85])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2861B4B085
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 06:20:13 -0400 (EDT)
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAJ9uQ119046;
- Fri, 10 Apr 2020 10:20:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=0G0SXSp0q/0L37C/DIXgGFdVawxsFUeBphgmgshcH20=;
- b=dRu2yvzr9ImMxm/HezfSd47lhuWROUTjEHynGyR9DBy7nO7bmMkoLmhuAJWwJON6FeTU
- hqE1oAJdHElx7hx7WYUGlG396cFo1Anke7DS6SKEWEpx5o1bDW6JLIJstAGKX/jM/AtZ
- KCyNOBtNt9falHzZOYrq78goxfzlGBrB7m9ZKJ+hk5fSZO1l6A2ZIsNxFzKWdwtLnh3j
- fCr2WRife1z/QU5/BTdn0qi9sqR2o0EtBdxbpIO2mVsyTA4vYcYUGk+tRk5qwLahwGEz
- N0kasfuYXdPzfIx6X9lisMIYlkdJoQwm6NAJylIMphHdujLrqzTeaelXFUcfMzAfu4SL qg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 309gw4hr7u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 10 Apr 2020 10:20:09 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03AAHWhC105800;
- Fri, 10 Apr 2020 10:20:09 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 3091m714hy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 10 Apr 2020 10:20:09 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03AAK7NV008352;
- Fri, 10 Apr 2020 10:20:07 GMT
-Received: from [192.168.14.112] (/79.180.216.197)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 10 Apr 2020 03:20:07 -0700
-Subject: Re: Contribution to KVM.
-To: Nadav Amit <nadav.amit@gmail.com>, Javier Romero <xavinux@gmail.com>
-References: <CAEX+82KTJecx_aSHAPN9ZkS_YDiDfyEM9b6ji4wabmSZ6O516Q@mail.gmail.com>
- <c86002a6-d613-c0be-a672-cca8e9c83e1c@intel.com>
- <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <9d46406f-c483-746b-058f-cceda22f1029@oracle.com>
-Date: Fri, 10 Apr 2020 13:20:03 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+ with ESMTP id NR86Cp6fPg9F for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Apr 2020 06:45:49 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BF8A4B13D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 06:45:49 -0400 (EDT)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
+ [209.85.128.46])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2A20D214D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 10:45:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1586515548;
+ bh=UqujX8a43UgZ2wUq7+fHBdtk9fNTH/dOK9O/vJ62NsM=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=OTKASfANggkF37DxhfvdvwCPeTVJkE4IDlUmSzTKdXah4Elde0A1NoLT3z8pLzf+B
+ aGPqOGTJrRgdOS5OX2sB7sklYAOnq5zqlZiHUQ5jNBFdiSaXCOYsPLSc7yKe3WKXg1
+ cyRaJgVZRtEAdDkp4vIUasg3udPuVbRYmqYtmDgg=
+Received: by mail-wm1-f46.google.com with SMTP id e26so2097560wmk.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2020 03:45:48 -0700 (PDT)
+X-Gm-Message-State: AGi0Puamf/qJhH2P8rEAVPfIsJKSQ10qiSBTKEwwAK6+jV62CuIgC1Qn
+ gmrN+Lj2DKTLcw22PNirueVBA1kQjU1+ca0/iDd6hw==
+X-Google-Smtp-Source: APiQypLdUVvA7CnaTTssOnJwPrxl1HW+oM2zu/RKuq6utGp1zVYRYHMkZBBXsZe+0MrT9FW/+152MfO9CABs8P181vo=
+X-Received: by 2002:a7b:c050:: with SMTP id u16mr4992457wmc.68.1586515545554; 
+ Fri, 10 Apr 2020 03:45:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2E118FCA-7AB1-480F-8F49-3EFD77CC2992@gmail.com>
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- malwarescore=0
- mlxlogscore=999 phishscore=0 spamscore=0 adultscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9586
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 bulkscore=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1011
- suspectscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004100085
+References: <20200117224839.23531-1-f.fainelli@gmail.com>
+ <20200117224839.23531-8-f.fainelli@gmail.com>
+In-Reply-To: <20200117224839.23531-8-f.fainelli@gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 10 Apr 2020 12:45:34 +0200
+X-Gmail-Original-Message-ID: <CAKv+Gu_6wWhi418=GpMjfMpE2E+XHbL-DYKT8MJ1jE3+VybrAg@mail.gmail.com>
+Message-ID: <CAKv+Gu_6wWhi418=GpMjfMpE2E+XHbL-DYKT8MJ1jE3+VybrAg@mail.gmail.com>
+Subject: Re: [PATCH v7 7/7] ARM: Enable KASan for ARM
+To: Florian Fainelli <f.fainelli@gmail.com>
 X-Mailman-Approved-At: Fri, 10 Apr 2020 07:19:01 -0400
-Cc: like.xu@intel.com, kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ Jonathan Corbet <corbet@lwn.net>, Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ bcm-kernel-feedback-list@broadcom.com, Dmitry Vyukov <dvyukov@google.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, Philip Derrin <philip@cog.systems>,
+ Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Nicolas Pitre <nico@fluxnic.net>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Thomas Garnier <thgarnie@google.com>, Rob Landley <rob@landley.net>,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Andrey Ryabinin <ryabinin@virtuozzo.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,27 +105,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-On 10/04/2020 6:52, Nadav Amit wrote:
-> 2. Try to run the tests with more than 4GB of memory. The last time I tried
->     (actually by running the test on bare metal), the INIT test that Liran
->     wrote failed.
+On Fri, 17 Jan 2020 at 23:52, Florian Fainelli <f.fainelli@gmail.com> wrote:
 >
-Wasn't this test failure fixed with kvm-unit-test commit fc47ccc19612 
-("x86: vmx: Verify pending LAPIC INIT event consume when exit on VMX_INIT")?
-If not, can you provide the details of this new failure? As I thought 
-this commit address the previous issue you have reported when running 
-this test
-on bare-metal.
+> From: Andrey Ryabinin <ryabinin@virtuozzo.com>
+>
+> This patch enables the kernel address sanitizer for ARM. XIP_KERNEL has
+> not been tested and is therefore not allowed.
+>
+> Acked-by: Dmitry Vyukov <dvyukov@google.com>
+> Tested-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>  Documentation/dev-tools/kasan.rst     | 4 ++--
+>  arch/arm/Kconfig                      | 9 +++++++++
+>  arch/arm/boot/compressed/Makefile     | 1 +
+>  drivers/firmware/efi/libstub/Makefile | 3 ++-
+>  4 files changed, 14 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/dev-tools/kasan.rst b/Documentation/dev-tools/kasan.rst
+> index e4d66e7c50de..6acd949989c3 100644
+> --- a/Documentation/dev-tools/kasan.rst
+> +++ b/Documentation/dev-tools/kasan.rst
+> @@ -21,8 +21,8 @@ global variables yet.
+>
+>  Tag-based KASAN is only supported in Clang and requires version 7.0.0 or later.
+>
+> -Currently generic KASAN is supported for the x86_64, arm64, xtensa and s390
+> -architectures, and tag-based KASAN is supported only for arm64.
+> +Currently generic KASAN is supported for the x86_64, arm, arm64, xtensa and
+> +s390 architectures, and tag-based KASAN is supported only for arm64.
+>
+>  Usage
+>  -----
+> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+> index 96dab76da3b3..70a7eb50984e 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -65,6 +65,7 @@ config ARM
+>         select HAVE_ARCH_BITREVERSE if (CPU_32v7M || CPU_32v7) && !CPU_32v6
+>         select HAVE_ARCH_JUMP_LABEL if !XIP_KERNEL && !CPU_ENDIAN_BE32 && MMU
+>         select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
+> +       select HAVE_ARCH_KASAN if MMU && !XIP_KERNEL
+>         select HAVE_ARCH_MMAP_RND_BITS if MMU
+>         select HAVE_ARCH_SECCOMP_FILTER if AEABI && !OABI_COMPAT
+>         select HAVE_ARCH_THREAD_STRUCT_WHITELIST
+> @@ -212,6 +213,14 @@ config ARCH_MAY_HAVE_PC_FDC
+>  config ZONE_DMA
+>         bool
+>
+> +config KASAN_SHADOW_OFFSET
+> +       hex
+> +       depends on KASAN
+> +       default 0x1f000000 if PAGE_OFFSET=0x40000000
+> +       default 0x5f000000 if PAGE_OFFSET=0x80000000
+> +       default 0x9f000000 if PAGE_OFFSET=0xC0000000
+> +       default 0xffffffff
+> +
+>  config ARCH_SUPPORTS_UPROBES
+>         def_bool y
+>
+> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+> index 83991a0447fa..efda24b00a44 100644
+> --- a/arch/arm/boot/compressed/Makefile
+> +++ b/arch/arm/boot/compressed/Makefile
+> @@ -25,6 +25,7 @@ endif
+>
+>  GCOV_PROFILE           := n
+>  KASAN_SANITIZE         := n
+> +CFLAGS_KERNEL          += -D__SANITIZE_ADDRESS__
+>
+>  # Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
+>  KCOV_INSTRUMENT                := n
+> diff --git a/drivers/firmware/efi/libstub/Makefile b/drivers/firmware/efi/libstub/Makefile
+> index c35f893897e1..c8b36824189b 100644
+> --- a/drivers/firmware/efi/libstub/Makefile
+> +++ b/drivers/firmware/efi/libstub/Makefile
+> @@ -20,7 +20,8 @@ cflags-$(CONFIG_ARM64)                := $(subst $(CC_FLAGS_FTRACE),,$(KBUILD_CFLAGS)) \
+>                                    -fpie $(DISABLE_STACKLEAK_PLUGIN)
+>  cflags-$(CONFIG_ARM)           := $(subst $(CC_FLAGS_FTRACE),,$(KBUILD_CFLAGS)) \
+>                                    -fno-builtin -fpic \
+> -                                  $(call cc-option,-mno-single-pic-base)
+> +                                  $(call cc-option,-mno-single-pic-base) \
+> +                                  -D__SANITIZE_ADDRESS__
+>
 
-Thanks,
--Liran
+I am not too crazy about this need to unconditionally 'enable' KASAN
+on the command line like this, in order to be able to disable it again
+when CONFIG_KASAN=y.
 
+Could we instead add something like this at the top of
+arch/arm/boot/compressed/string.c?
+
+#ifdef CONFIG_KASAN
+#undef memcpy
+#undef memmove
+#undef memset
+void *__memcpy(void *__dest, __const void *__src, size_t __n) __alias(memcpy);
+void *__memmove(void *__dest, __const void *__src, size_t count)
+__alias(memmove);
+void *__memset(void *s, int c, size_t count) __alias(memset);
+#endif
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
