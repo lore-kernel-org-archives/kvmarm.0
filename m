@@ -2,94 +2,58 @@ Return-Path: <SRS0=x7ye=53=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B548C2BB85
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Apr 2020 09:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63881C2BA2B
+	for <kvmarm@archiver.kernel.org>; Sat, 11 Apr 2020 12:16:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E4E922137B
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Apr 2020 09:24:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="UiRa/RX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E922137B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id E6DF020692
+	for <kvmarm@archiver.kernel.org>; Sat, 11 Apr 2020 12:16:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DF020692
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B6D34B221;
-	Sat, 11 Apr 2020 05:24:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 295AD4B196;
+	Sat, 11 Apr 2020 08:16:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kqnYPeyPX5D9; Sat, 11 Apr 2020 05:24:02 -0400 (EDT)
+	with ESMTP id 65AeH+3D2Ny5; Sat, 11 Apr 2020 08:16:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69BF94B1D0;
-	Sat, 11 Apr 2020 05:24:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17CD44B167;
+	Sat, 11 Apr 2020 08:16:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 972E34B18C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 05:24:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD7A4B15F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 08:16:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qedhmV1AejLL for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Apr 2020 05:24:00 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A92C4B16D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 05:24:00 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 64B6B20857;
- Sat, 11 Apr 2020 09:23:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586597039;
- bh=K90rgXY4TWpAkIW5KZCWi0jhW+x/kY4ZiXFZIllEs2M=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=UiRa/RX4NHEViHO5ccU94Pb69h0ReC90LoUClRg83c7t3C5hRykS+47XYO75Io4iL
- QowIYv6pUSwZ5qUkJdmhOPyV1IDkAsBcy5+insjLhJ28goWRSy0QiJvnhrG/UROtyv
- vKHPVASCOiu14AB3sTGI3i0R3Kc7Zvyi/OZT4fZg=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=big-swifty.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jNCMn-002LiR-Nk; Sat, 11 Apr 2020 10:23:57 +0100
-Date: Sat, 11 Apr 2020 10:23:56 +0100
-Message-ID: <86r1wus7df.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Zengtao (B)" <prime.zeng@hisilicon.com>
-Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
-References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
- <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com,
- Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com,
- christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu,
- julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Ganapatrao Kulkarni <gkulkarni@marvell.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "andre.przywara@arm.com" <andre.przywara@arm.com>,
- George Cherian <gcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Anil Kumar Reddy H <areddy3@marvell.com>,
- "Dave.Martin@arm.com" <Dave.Martin@arm.com>
+ with ESMTP id lXMRe8AWlWp1 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 11 Apr 2020 08:16:33 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9FBD64B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 08:16:33 -0400 (EDT)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 2AAC2DD93474802C528B;
+ Sat, 11 Apr 2020 20:16:30 +0800 (CST)
+Received: from huawei.com (10.151.151.243) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Sat, 11 Apr 2020
+ 20:16:20 +0800
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+To: <maz@kernel.org>, <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>, 
+ <suzuki.poulose@arm.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: handle the right RAS SEA(Synchronous External Abort) type
+Date: Sat, 11 Apr 2020 20:17:40 +0800
+Message-ID: <20200411121740.37615-1-gengdongjiu@huawei.com>
+X-Mailer: git-send-email 2.18.0.huawei.25
+MIME-Version: 1.0
+X-Originating-IP: [10.151.151.243]
+X-CFilter-Loop: Reflected
+Cc: linuxarm@huawei.com, gengdongjiu@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,29 +70,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Zengtao,
+When the RAS Extension is implemented, b0b011000, 0b011100,
+0b011101, 0b011110, and 0b011111, are not used and reserved
+to the DFSC[5:0] of ESR_ELx, but the code still checks these
+unused bits, so remove them.
 
-On Sat, 11 Apr 2020 05:10:05 +0100,
-"Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
-> 
-> Hi Marc:
-> 
-> Since it's a very large patch series, I want to test it on my platform
->  which don't support nv, and want to make sure if this patch series
-> affects the existed virtualization functions or not.
->  
-> Any suggestion about the test focus?
+If the handling of guest ras data error fails, it should
+inject data instead of SError to let the guest recover as
+much as possible.
 
-Not really. Given that the NV patches affect absolutely every
-architectural parts of KVM/arm64, everything needs careful
-testing. But more than testing, it needs reviewing.
+CC: Xiang Zheng <zhengxiang9@huawei.com>
+CC: Xiaofei Tan <tanxiaofei@huawei.com>
+CC: James Morse <james.morse@arm.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+Abort DFSC of ESR_EL2, below web site[1] has clarified:
+"When the RAS Extension is implemented, 0b011000, 0b011100, 0b011101, 0b011110, and 0b011111, are reserved."
 
-Thanks,
+[1]: https://developer.arm.com/docs/ddi0595/b/aarch64-system-registers/esr_el2
+---
+ arch/arm64/include/asm/kvm_emulate.h | 5 -----
+ virt/kvm/arm/mmu.c                   | 2 +-
+ 2 files changed, 1 insertion(+), 6 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index a30b4eec7cb4..857fbc79d678 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -380,11 +380,6 @@ static __always_inline bool kvm_vcpu_dabt_isextabt(const struct kvm_vcpu *vcpu)
+ 	case FSC_SEA_TTW1:
+ 	case FSC_SEA_TTW2:
+ 	case FSC_SEA_TTW3:
+-	case FSC_SECC:
+-	case FSC_SECC_TTW0:
+-	case FSC_SECC_TTW1:
+-	case FSC_SECC_TTW2:
+-	case FSC_SECC_TTW3:
+ 		return true;
+ 	default:
+ 		return false;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index e3b9ee268823..3c7972ed7fc5 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1926,7 +1926,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			return 1;
+ 
+ 		if (unlikely(!is_iabt)) {
+-			kvm_inject_vabt(vcpu);
++			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+ 			return 1;
+ 		}
+ 	}
 -- 
-Jazz is not dead, it just smells funny.
+2.18.0.huawei.25
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
