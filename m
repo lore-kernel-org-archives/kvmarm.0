@@ -1,107 +1,62 @@
-Return-Path: <SRS0=25CW=54=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=hjn/=55=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD10C2BA19
-	for <kvmarm@archiver.kernel.org>; Sun, 12 Apr 2020 00:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 097EAC2BA19
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 03:33:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0240720CC7
-	for <kvmarm@archiver.kernel.org>; Sun, 12 Apr 2020 00:33:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kV/LeCGT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0240720CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 806C7206C3
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 03:33:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 806C7206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CDAF4B2F8;
-	Sat, 11 Apr 2020 20:33:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED10D4B12B;
+	Sun, 12 Apr 2020 23:33:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b8lkB10KFkSj; Sat, 11 Apr 2020 20:33:53 -0400 (EDT)
+	with ESMTP id JUFYwhrhQrsA; Sun, 12 Apr 2020 23:33:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5936E4B2B2;
-	Sat, 11 Apr 2020 20:33:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C63F84B0D0;
+	Sun, 12 Apr 2020 23:33:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 484664B2B2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 20:33:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF0704B0D0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Apr 2020 23:33:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MkWTQwKnCFVC for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Apr 2020 20:33:51 -0400 (EDT)
-Received: from mail-lf1-f65.google.com (mail-lf1-f65.google.com
- [209.85.167.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A8764B2AA
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 20:33:51 -0400 (EDT)
-Received: by mail-lf1-f65.google.com with SMTP id r17so3952432lff.2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Apr 2020 17:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zsyaQJSTyWtQU6SNb3d/B5KGEXk22uVClxXXTgsbd6E=;
- b=kV/LeCGT51tDEQA6jixYwmFJMhwu+sfWPjZdgnLCFvMfPYUoeMciBwTxKz8slhIA9Q
- QWA2SQ0DoEF4KcBJ2ugrGlY6oybNlOP3mTjUj02Wr0RrkcNl2xtc81cOXyImM4uRmfCh
- qHFe6s3jbXCLQZHpY1gfAD4pb0z7WUFQaZtVlYfD3husYMs4QPBsa7IqM7dVgNiBcm0j
- l+CqzwLgWhQyQ6lYBMOXmRaHGTqL3jxOCcQSriocgol9p2VvpZTL7/pWWZWy4UhhPTI8
- w07GlQOHtAFmejubyEhftiSAWmxQa3xOjY0uZlHCLUd6DBp11BdB5BddyZZUhdfxf268
- Yyrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zsyaQJSTyWtQU6SNb3d/B5KGEXk22uVClxXXTgsbd6E=;
- b=uYhaXBkTltZWXOAiD+8PwBpT14cUTIOc7qW43DPLiU5Y0fKr+i+8gQ4cZHElV5DNLJ
- h6DRmKhM2VfNJtGBCTPQicwPeDFho4CWHBuFc6EfkDL1q32kl1kq119KqxDml6tf/qSO
- J74qdjW9GdTK6baqiblOIE79YQCZJdPmMZNK0CdwIkStSNCyIxjHmRlT/amBbhhTdOP9
- jUr01eTX55Z6HlXqqF5lSCeldce5iZ0Cpbt9S1e39iz15Ja07A0m7NlSwu1a3OEjyONs
- isAgEUN0FL30+OsmJ1dW5eiZ03OTbt1onBldEPFGPRupPO5VsXPa6VqmxDKUxbSoem5v
- QGQw==
-X-Gm-Message-State: AGi0PubQ2Ejk6SodA6BCWYjYmJFeykOoHzscWfZV5Ul1M+RTWb3GYm+t
- gj7LFLpgcTTSz+BhtisLKZHl96AG4omjjTL1Ra2rvQ==
-X-Google-Smtp-Source: APiQypL4dP3s3w7dYreIWE/U9Pw7ftEq+ZzcH56ILtKHt9LXITsoPKEt+dyrtZrmqSv0ag9Tqx6r+iOrde8l3AYonrY=
-X-Received: by 2002:a19:48c3:: with SMTP id v186mr6282470lfa.194.1586651629741; 
- Sat, 11 Apr 2020 17:33:49 -0700 (PDT)
+ with ESMTP id 02r6eF0HQ7gs for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 12 Apr 2020 23:33:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 835A64B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Apr 2020 23:33:08 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E24C530E;
+ Sun, 12 Apr 2020 20:33:07 -0700 (PDT)
+Received: from [10.163.1.49] (unknown [10.163.1.49])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 089B43F6C4;
+ Sun, 12 Apr 2020 20:33:04 -0700 (PDT)
+Subject: Re: [PATCH 1/6] arm64/cpufeature: Introduce ID_PFR2 CPU register
+To: Will Deacon <will@kernel.org>
+References: <1580215149-21492-1-git-send-email-anshuman.khandual@arm.com>
+ <1580215149-21492-2-git-send-email-anshuman.khandual@arm.com>
+ <20200409125431.GB13078@willie-the-truck>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <8b905244-c296-3859-b515-711550bef3a2@arm.com>
+Date: Mon, 13 Apr 2020 09:02:57 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20200117224839.23531-1-f.fainelli@gmail.com>
- <20200117224839.23531-8-f.fainelli@gmail.com>
- <CAKv+Gu_6wWhi418=GpMjfMpE2E+XHbL-DYKT8MJ1jE3+VybrAg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu_6wWhi418=GpMjfMpE2E+XHbL-DYKT8MJ1jE3+VybrAg@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 12 Apr 2020 02:33:38 +0200
-Message-ID: <CACRpkdbR2VG422X0-nhOeWtS3Mhm7M1+RKMozBZbg0Jv5c_TTQ@mail.gmail.com>
-Subject: Re: [PATCH v7 7/7] ARM: Enable KASan for ARM
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- David Howells <dhowells@redhat.com>,
- Masahiro Yamada <yamada.masahiro@socionext.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- Florian Fainelli <f.fainelli@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Abbott Liu <liuwenliang@huawei.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
- bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>,
- Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, Philip Derrin <philip@cog.systems>,
- Jinbum Park <jinb.park7@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
- Dmitry Vyukov <dvyukov@google.com>, Nicolas Pitre <nico@fluxnic.net>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- Thomas Garnier <thgarnie@google.com>, Rob Landley <rob@landley.net>,
- Philippe Ombredanne <pombredanne@nexb.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Andrey Ryabinin <ryabinin@virtuozzo.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+In-Reply-To: <20200409125431.GB13078@willie-the-truck>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -118,40 +73,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 10, 2020 at 12:45 PM Ard Biesheuvel <ardb@kernel.org> wrote:
 
-> > +CFLAGS_KERNEL          += -D__SANITIZE_ADDRESS__
-(...)
-> > -                                  $(call cc-option,-mno-single-pic-base)
-> > +                                  $(call cc-option,-mno-single-pic-base) \
-> > +                                  -D__SANITIZE_ADDRESS__
->
-> I am not too crazy about this need to unconditionally 'enable' KASAN
-> on the command line like this, in order to be able to disable it again
-> when CONFIG_KASAN=y.
->
-> Could we instead add something like this at the top of
-> arch/arm/boot/compressed/string.c?
->
-> #ifdef CONFIG_KASAN
-> #undef memcpy
-> #undef memmove
-> #undef memset
-> void *__memcpy(void *__dest, __const void *__src, size_t __n) __alias(memcpy);
-> void *__memmove(void *__dest, __const void *__src, size_t count)
-> __alias(memmove);
-> void *__memset(void *s, int c, size_t count) __alias(memset);
-> #endif
 
-I obviously missed this before I sent out my new version of the series.
-It bothers me too.
+On 04/09/2020 06:24 PM, Will Deacon wrote:
+> On Tue, Jan 28, 2020 at 06:09:04PM +0530, Anshuman Khandual wrote:
+>> This adds basic building blocks required for ID_PFR2 CPU register which
+>> provides information about the AArch32 programmers model which must be
+>> interpreted along with ID_PFR0 and ID_PFR1 CPU registers.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/include/asm/cpu.h    |  1 +
+>>  arch/arm64/include/asm/sysreg.h |  4 ++++
+>>  arch/arm64/kernel/cpufeature.c  | 11 +++++++++++
+>>  arch/arm64/kernel/cpuinfo.c     |  1 +
+>>  arch/arm64/kvm/sys_regs.c       |  2 +-
+>>  5 files changed, 18 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
+>> index b4a40535a3d8..464e828a994d 100644
+>> --- a/arch/arm64/include/asm/cpu.h
+>> +++ b/arch/arm64/include/asm/cpu.h
+>> @@ -46,6 +46,7 @@ struct cpuinfo_arm64 {
+>>  	u32		reg_id_mmfr3;
+>>  	u32		reg_id_pfr0;
+>>  	u32		reg_id_pfr1;
+>> +	u32		reg_id_pfr2;
+>>  
+>>  	u32		reg_mvfr0;
+>>  	u32		reg_mvfr1;
+>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>> index b91570ff9db1..054aab7ebf1b 100644
+>> --- a/arch/arm64/include/asm/sysreg.h
+>> +++ b/arch/arm64/include/asm/sysreg.h
+>> @@ -151,6 +151,7 @@
+>>  #define SYS_MVFR0_EL1			sys_reg(3, 0, 0, 3, 0)
+>>  #define SYS_MVFR1_EL1			sys_reg(3, 0, 0, 3, 1)
+>>  #define SYS_MVFR2_EL1			sys_reg(3, 0, 0, 3, 2)
+>> +#define SYS_ID_PFR2_EL1			sys_reg(3, 0, 0, 3, 4)
+>>  
+>>  #define SYS_ID_AA64PFR0_EL1		sys_reg(3, 0, 0, 4, 0)
+>>  #define SYS_ID_AA64PFR1_EL1		sys_reg(3, 0, 0, 4, 1)
+>> @@ -717,6 +718,9 @@
+>>  #define ID_ISAR6_DP_SHIFT		4
+>>  #define ID_ISAR6_JSCVT_SHIFT		0
+>>  
+>> +#define ID_PFR2_SSBS_SHIFT		4
+>> +#define ID_PFR2_CSV3_SHIFT		0
+>> +
+>>  #define MVFR0_FPROUND_SHIFT		28
+>>  #define MVFR0_FPSHVEC_SHIFT		24
+>>  #define MVFR0_FPSQRT_SHIFT		20
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 0b6715625cf6..c1e837fc8f97 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -348,6 +348,12 @@ static const struct arm64_ftr_bits ftr_id_pfr0[] = {
+>>  	ARM64_FTR_END,
+>>  };
+>>  
+>> +static const struct arm64_ftr_bits ftr_id_pfr2[] = {
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_PFR2_SSBS_SHIFT, 4, 0),
+>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_PFR2_CSV3_SHIFT, 4, 0),
+> 
+> Why is CSV3 strict here, but not when we see if in aa64pfr0? I think it
+> should be non-strict in both cases.
 
-I will try this approach when I prepare the next iteration.
+Sure, will do.
 
-Thanks a lot!
-
-Yours,
-Linus Walleij
+> 
+> Will
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
