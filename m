@@ -2,61 +2,87 @@ Return-Path: <SRS0=hjn/=55=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097EAC2BA19
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 03:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8171BC2BBC7
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 08:56:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 806C7206C3
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 03:33:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 806C7206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 133A520775
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Apr 2020 08:56:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqkvWJwn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 133A520775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED10D4B12B;
-	Sun, 12 Apr 2020 23:33:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEDB4B1B8;
+	Mon, 13 Apr 2020 04:56:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JUFYwhrhQrsA; Sun, 12 Apr 2020 23:33:10 -0400 (EDT)
+	with ESMTP id yzqFrVuWrwYG; Mon, 13 Apr 2020 04:56:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C63F84B0D0;
-	Sun, 12 Apr 2020 23:33:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D55E4B1BD;
+	Mon, 13 Apr 2020 04:56:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF0704B0D0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Apr 2020 23:33:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAA14B13B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 04:56:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 02r6eF0HQ7gs for <kvmarm@lists.cs.columbia.edu>;
- Sun, 12 Apr 2020 23:33:08 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 835A64B0BA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Apr 2020 23:33:08 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E24C530E;
- Sun, 12 Apr 2020 20:33:07 -0700 (PDT)
-Received: from [10.163.1.49] (unknown [10.163.1.49])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 089B43F6C4;
- Sun, 12 Apr 2020 20:33:04 -0700 (PDT)
-Subject: Re: [PATCH 1/6] arm64/cpufeature: Introduce ID_PFR2 CPU register
-To: Will Deacon <will@kernel.org>
-References: <1580215149-21492-1-git-send-email-anshuman.khandual@arm.com>
- <1580215149-21492-2-git-send-email-anshuman.khandual@arm.com>
- <20200409125431.GB13078@willie-the-truck>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <8b905244-c296-3859-b515-711550bef3a2@arm.com>
-Date: Mon, 13 Apr 2020 09:02:57 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ with ESMTP id P6QlsGLhfzpI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2020 04:56:20 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F76D4B0D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 04:56:20 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 46B5920692;
+ Mon, 13 Apr 2020 08:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1586768179;
+ bh=GyaHe3+UWAOxENedBfck6FDz0o/OWfUlsXv987iJQNY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=AqkvWJwnZMdH4yXR42mVJxFY/122uUYZTeh7KQvVG+ONwnyKmUxp9fytp/Gh8FWWT
+ AI4cBPOoNZVA6p9TtCZIWKf00hKXhEUZB/OdlcC0LTrjyfenJ6jTsMxmZad3EKR4Ht
+ PvT2YKdfwvlUky+dnidjFPIYDuwnuPS8JBFpAneI=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jNut7-002oec-J1; Mon, 13 Apr 2020 09:56:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200409125431.GB13078@willie-the-truck>
-Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Date: Mon, 13 Apr 2020 09:56:17 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: Re: [PATCH] KVM: Optimize kvm_arch_vcpu_ioctl_run function
+In-Reply-To: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com>
+References: <20200413034523.110548-1-tianjia.zhang@linux.alibaba.com>
+Message-ID: <17097df45c7fe76ee3c09ac180b844d2@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: tianjia.zhang@linux.alibaba.com, pbonzini@redhat.com,
+ sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com,
+ jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, x86@kernel.org, hpa@zytor.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org, joro@8bytes.org, x86@kernel.org,
+ linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+ kvmarm@lists.cs.columbia.edu, mingo@redhat.com, bp@alien8.de,
+ linux-arm-kernel@lists.infradead.org, hpa@zytor.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, tglx@linutronix.de, jmattson@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,90 +94,85 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Tianjia,
 
-
-On 04/09/2020 06:24 PM, Will Deacon wrote:
-> On Tue, Jan 28, 2020 at 06:09:04PM +0530, Anshuman Khandual wrote:
->> This adds basic building blocks required for ID_PFR2 CPU register which
->> provides information about the AArch32 programmers model which must be
->> interpreted along with ID_PFR0 and ID_PFR1 CPU registers.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/include/asm/cpu.h    |  1 +
->>  arch/arm64/include/asm/sysreg.h |  4 ++++
->>  arch/arm64/kernel/cpufeature.c  | 11 +++++++++++
->>  arch/arm64/kernel/cpuinfo.c     |  1 +
->>  arch/arm64/kvm/sys_regs.c       |  2 +-
->>  5 files changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
->> index b4a40535a3d8..464e828a994d 100644
->> --- a/arch/arm64/include/asm/cpu.h
->> +++ b/arch/arm64/include/asm/cpu.h
->> @@ -46,6 +46,7 @@ struct cpuinfo_arm64 {
->>  	u32		reg_id_mmfr3;
->>  	u32		reg_id_pfr0;
->>  	u32		reg_id_pfr1;
->> +	u32		reg_id_pfr2;
->>  
->>  	u32		reg_mvfr0;
->>  	u32		reg_mvfr1;
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index b91570ff9db1..054aab7ebf1b 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -151,6 +151,7 @@
->>  #define SYS_MVFR0_EL1			sys_reg(3, 0, 0, 3, 0)
->>  #define SYS_MVFR1_EL1			sys_reg(3, 0, 0, 3, 1)
->>  #define SYS_MVFR2_EL1			sys_reg(3, 0, 0, 3, 2)
->> +#define SYS_ID_PFR2_EL1			sys_reg(3, 0, 0, 3, 4)
->>  
->>  #define SYS_ID_AA64PFR0_EL1		sys_reg(3, 0, 0, 4, 0)
->>  #define SYS_ID_AA64PFR1_EL1		sys_reg(3, 0, 0, 4, 1)
->> @@ -717,6 +718,9 @@
->>  #define ID_ISAR6_DP_SHIFT		4
->>  #define ID_ISAR6_JSCVT_SHIFT		0
->>  
->> +#define ID_PFR2_SSBS_SHIFT		4
->> +#define ID_PFR2_CSV3_SHIFT		0
->> +
->>  #define MVFR0_FPROUND_SHIFT		28
->>  #define MVFR0_FPSHVEC_SHIFT		24
->>  #define MVFR0_FPSQRT_SHIFT		20
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index 0b6715625cf6..c1e837fc8f97 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -348,6 +348,12 @@ static const struct arm64_ftr_bits ftr_id_pfr0[] = {
->>  	ARM64_FTR_END,
->>  };
->>  
->> +static const struct arm64_ftr_bits ftr_id_pfr2[] = {
->> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_PFR2_SSBS_SHIFT, 4, 0),
->> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_PFR2_CSV3_SHIFT, 4, 0),
+On 2020-04-13 04:45, Tianjia Zhang wrote:
+> kvm_arch_vcpu_ioctl_run() is only called in the file kvm_main.c,
+> where vcpu->run is the kvm_run parameter, so it has been replaced.
 > 
-> Why is CSV3 strict here, but not when we see if in aa64pfr0? I think it
-> should be non-strict in both cases.
-
-Sure, will do.
-
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/x86.c | 8 ++++----
+>  virt/kvm/arm/arm.c | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> Will
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3bf2ecafd027..70e3f4abbd4d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8726,18 +8726,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> *vcpu, struct kvm_run *kvm_run)
+>  		r = -EAGAIN;
+>  		if (signal_pending(current)) {
+>  			r = -EINTR;
+> -			vcpu->run->exit_reason = KVM_EXIT_INTR;
+> +			kvm_run->exit_reason = KVM_EXIT_INTR;
+>  			++vcpu->stat.signal_exits;
+>  		}
+>  		goto out;
+>  	}
 > 
+> -	if (vcpu->run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+> +	if (kvm_run->kvm_valid_regs & ~KVM_SYNC_X86_VALID_FIELDS) {
+>  		r = -EINVAL;
+>  		goto out;
+>  	}
+> 
+> -	if (vcpu->run->kvm_dirty_regs) {
+> +	if (kvm_run->kvm_dirty_regs) {
+>  		r = sync_regs(vcpu);
+>  		if (r != 0)
+>  			goto out;
+> @@ -8767,7 +8767,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu
+> *vcpu, struct kvm_run *kvm_run)
+> 
+>  out:
+>  	kvm_put_guest_fpu(vcpu);
+> -	if (vcpu->run->kvm_valid_regs)
+> +	if (kvm_run->kvm_valid_regs)
+>  		store_regs(vcpu);
+>  	post_kvm_run_save(vcpu);
+>  	kvm_sigset_deactivate(vcpu);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 48d0ec44ad77..ab9d7966a4c8 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -659,7 +659,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu,
+> struct kvm_run *run)
+>  		return ret;
+> 
+>  	if (run->exit_reason == KVM_EXIT_MMIO) {
+> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+> +		ret = kvm_handle_mmio_return(vcpu, run);
+>  		if (ret)
+>  			return ret;
+>  	}
+
+Do you have any number supporting the idea that you are optimizing 
+anything
+here? Performance, code size, register pressure or any other relevant 
+metric?
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
