@@ -2,84 +2,55 @@ Return-Path: <SRS0=7dZW=56=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D66C2BB85
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC333C2BA19
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:48:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5AA692076A
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:11:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="uuJSa5gi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA692076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 6E7AD2064A
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:48:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7AD2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05BE44B1FA;
-	Tue, 14 Apr 2020 05:11:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A664B142;
+	Tue, 14 Apr 2020 05:48:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hE886L+ZeheI; Tue, 14 Apr 2020 05:11:37 -0400 (EDT)
+	with ESMTP id HmxU2VKMcs6c; Tue, 14 Apr 2020 05:48:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD07C4B1E9;
-	Tue, 14 Apr 2020 05:11:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 823254B156;
+	Tue, 14 Apr 2020 05:48:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 605B44B1F0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 19:10:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C87CA4B142
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 05:48:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXqSeFo2GjfE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2020 19:10:21 -0400 (EDT)
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
- [209.85.215.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 405A64B1B4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 19:10:21 -0400 (EDT)
-Received: by mail-pg1-f202.google.com with SMTP id u187so9886826pgu.14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 16:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=vuPWpOEpABdmh/1VI4/up8dAs2XH63GBNImm7d32EIk=;
- b=uuJSa5giC8TYDkne2taIdNZXmrgXcjt5CgpmGdHhNkQ5j9v4VYPqCbuOp/KxDtbpN/
- 4cEve/TUCY86wv/6A7knM+8e9X2X26bBtQI1pCE3hfpB0tNpS2C6uuPLmBbXCsDUsLCt
- yGMJ+F5vrbUcoQa3o341Dx9C5iCe89I30q1guImO4DyqZb4diH3XCeHvbcpviNeozcws
- gj+8/im9ix9ynfMpIso42JYQXromt7QpwqYKI74mEYsJhq5j9oGEAXhJZ135kR2imQDD
- 3m4Qjg55XxOsQiFJaEkVMAaVkGz41KeMuqSEUp5ld97t/FXZdGOxaDPNmBYTGbIKMZAN
- aCVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=vuPWpOEpABdmh/1VI4/up8dAs2XH63GBNImm7d32EIk=;
- b=pu/LZz5FyhMeOKTPOOCdVjwI7Jllyzm5mL2ObA8QGAAHGXTbe+E4RHO0LdIpsAEkv8
- rEAI9IkziKzuTsKAUsQXMgshVNRF2Z57MFHBVIAc0fbXIC24ZX5h+dYxuy9zhW2e5a+x
- U7aySkEioCMkgUfEzqT8wqOsm+GRoZg7k3XBEwld7IM31xFcQM1QX2Aebadp281RV2Vd
- AKZMUuuTsVwBEJi4GOWfeN+Yg9lJJtg/FOfSUQEv8Qg4ReeS8B+WwV2lZFMRF9zkdNaL
- WlIn8P0rgw3sk61/2vgv4dkn05lB+/7llAp9uJXyg6N169TD+T1jPhfH1QQL7fAI1s2Q
- K+iw==
-X-Gm-Message-State: AGi0PuahTI0piOMmV/gdZpIL1NUqH1hKg/xUQTHx0u8NpfZF6dS8Uwhy
- f+xecDxA0iH57EXacWPwetHxxFN31F/m
-X-Google-Smtp-Source: APiQypLAo/3dWG3aUJ9m8iimrYZneDDZJRDeReO1X+fvoW4FdoVomY39iYtNWeyL4ijSeh5b/qrZUHHF+4CD
-X-Received: by 2002:a63:b256:: with SMTP id t22mr18355736pgo.92.1586819420186; 
- Mon, 13 Apr 2020 16:10:20 -0700 (PDT)
-Date: Mon, 13 Apr 2020 16:10:16 -0700
-Message-Id: <20200413231016.250737-1-maskray@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.0.110.g2183baf09c-goog
-Subject: [PATCH] arm64: kvm: Delete duplicated label: in invalid_vector
-From: Fangrui Song <maskray@google.com>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
- linux-kernel@vger.kernel.org
-X-Mailman-Approved-At: Tue, 14 Apr 2020 05:11:35 -0400
-Cc: Fangrui Song <maskray@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Nick Desaulniers <ndesaulniers@google.com>, clang-built-linux@googlegroups.com,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+ with ESMTP id mMEepwLo7NZA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 05:48:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5247D4B140
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 05:48:48 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8A331FB;
+ Tue, 14 Apr 2020 02:48:47 -0700 (PDT)
+Received: from p8cg001049571a15.arm.com (unknown [10.163.1.49])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 26F5A3F6C4;
+ Tue, 14 Apr 2020 02:48:43 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH V2 00/16] arm64/cpufeature: Introduce ID_PFR2, ID_DFR1,
+ ID_MMFR5 and other changes
+Date: Tue, 14 Apr 2020 15:18:14 +0530
+Message-Id: <1586857710-17154-1-git-send-email-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: catalin.marinas@arm.com, Anshuman Khandual <anshuman.khandual@arm.com>,
+ linux-kernel@vger.kernel.org, maz@kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,37 +62,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SYM_CODE_START defines \label , so it is redundant to define \label again.
-A redefinition at the same place is accepted by GNU as
-(https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=159fbb6088f17a341bcaaac960623cab881b4981)
-but rejected by the clang integrated assembler.
+This series is primarily motivated from an adhoc list from Mark Rutland
+during our previous ID_ISAR6 discussion [1]. The current proposal also
+accommodates some more suggestions from Will and Suzuki.
 
-Fixes: 617a2f392c92 ("arm64: kvm: Annotate assembly using modern annoations")
-Link: https://github.com/ClangBuiltLinux/linux/issues/988
-Signed-off-by: Fangrui Song <maskray@google.com>
----
- arch/arm64/kvm/hyp/hyp-entry.S | 1 -
- 1 file changed, 1 deletion(-)
+This series adds missing 32 bit system registers (ID_PFR2, ID_DFR1 and
+ID_MMFR5), adds missing features bits on all existing system registers
+(32 and 64 bit) and some other miscellaneous changes. While here it also
+includes a patch which does macro replacement for various open bits shift
+encodings for various CPU ID registers. There is a slight re-order of the
+patches here as compared to the previous version (V1).
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index c2a13ab3c471..9c5cfb04170e 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -198,7 +198,6 @@ SYM_CODE_END(__hyp_panic)
- .macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- SYM_CODE_START(\label)
--\label:
- 	b \target
- SYM_CODE_END(\label)
- .endm
+This series is based on v5.7-rc1. All feature bits enabled here can be
+referred in ARM DDI 0487F.a specification. Though I have tried to select
+appropriate values for each new feature being added here, there might be
+some inconsistencies (or mistakes). In which case, please do let me know
+if anything needs to change. Thank you.
+
+[1] https://patchwork.kernel.org/patch/11287805/
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com> 
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+
+Changes in V2:
+
+- Added Suggested-by tag from Mark Rutland for all changes he had proposed
+- Added comment for SpecSEI feature on why it is HIGHER_SAFE per Suzuki
+- Added a patch which makes ID_AA64DFR0_DOUBLELOCK a signed feature per Suzuki
+- Added ID_DFR1 and ID_MMFR5 system register definitions per Will
+- Added remaining features bits for relevant 64 bit system registers per Will
+- Changed commit message on [PATCH 5/7] regarding TraceFilt feature per Suzuki
+- Changed ID_PFR2.CSV3 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will
+- Changed ID_PFR0.CSV2 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will 
+- Changed some commit messages
+
+Changes in V1: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=234093)
+
+Anshuman Khandual (16):
+  arm64/cpufeature: Add explicit ftr_id_isar0[] for ID_ISAR0 register
+  arm64/cpufeature: Drop TraceFilt feature exposure from ID_DFR0 register
+  arm64/cpufeature: Make doublelock a signed feature in ID_AA64DFR0
+  arm64/cpufeature: Introduce ID_PFR2 CPU register
+  arm64/cpufeature: Introduce ID_DFR1 CPU register
+  arm64/cpufeature: Introduce ID_MMFR5 CPU register
+  arm64/cpufeature: Add remaining feature bits in ID_PFR0 register
+  arm64/cpufeature: Add remaining feature bits in ID_MMFR4 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64ISAR0 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64PFR0 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64PFR1 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR0 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR1 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR2 register
+  arm64/cpufeature: Add remaining feature bits in ID_AA64DFR0 register
+  arm64/cpufeature: Replace all open bits shift encodings with macros
+
+ arch/arm64/include/asm/cpu.h    |   3 +
+ arch/arm64/include/asm/sysreg.h |  90 ++++++++++++++++++++
+ arch/arm64/kernel/cpufeature.c  | 141 +++++++++++++++++++++++++-------
+ arch/arm64/kernel/cpuinfo.c     |   3 +
+ arch/arm64/kvm/sys_regs.c       |   6 +-
+ 5 files changed, 211 insertions(+), 32 deletions(-)
+
 -- 
-2.26.0.110.g2183baf09c-goog
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
