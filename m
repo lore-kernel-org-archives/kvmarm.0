@@ -4,83 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42807C2BB86
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F08C3815B
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 13:43:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CA2492063A
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B5582075E
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 13:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="w3390RS3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA2492063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="wvTuJ2Kv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5582075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70C8B4B1DC;
-	Tue, 14 Apr 2020 09:15:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95E184B1C9;
+	Tue, 14 Apr 2020 09:43:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IFd+Bg7nr8Aw; Tue, 14 Apr 2020 09:15:15 -0400 (EDT)
+	with ESMTP id v82DF4iPetyT; Tue, 14 Apr 2020 09:43:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 363D54B1AA;
-	Tue, 14 Apr 2020 09:15:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F6374B16B;
+	Tue, 14 Apr 2020 09:43:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB1D04B1AA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 09:15:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F02044B16B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 09:43:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NhU2sh8NmFTE for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Apr 2020 09:15:12 -0400 (EDT)
+ with ESMTP id 44E-gDygC3Sp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 09:43:17 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE8924B0CA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 09:15:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CA0A4B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 09:43:17 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 993552075E;
- Tue, 14 Apr 2020 13:15:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 61A3320644;
+ Tue, 14 Apr 2020 13:43:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586870110;
- bh=v0a5YinYfPspIVz+q0NHgE/kUU23yUEY3inKhdoX4tU=;
+ s=default; t=1586871796;
+ bh=3koUbGe2LBHalbakeLDQom7EXe+LBTn/mZU+H8wy818=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=w3390RS3SR8v6HZfOEkZCrpHMCPLgbTFJk2j24PRa75T/76LECBlHWumjlVFr0KQt
- IOQF4ZkQGozqEMqhJMSKG1XR3b5udb0nV9muqMutN7bn/yOq95DbwY8+nEVqhJ4uLm
- d3glyW9gRNB4lcZpGcAtrdqQrBuS2VORrG3uSas0=
+ b=wvTuJ2KvMEs7RpYKRjMqdZ7Noxqbzu3FUz84V073BNWMVq4DecOZ7bcI5eY7Vk3os
+ UeYuUradQiVbk4CiVsGslmtxQBXxWNaJ74F/n0jD7EObUMUgymqHhHdC2jwmmnxKuS
+ Bd8vCxQYxboemoA0+5ye6cxU6zTkDdzw7K0EVOAA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jOLPA-0039rd-KC; Tue, 14 Apr 2020 14:15:08 +0100
-Date: Tue, 14 Apr 2020 14:15:07 +0100
+ id 1jOLqM-003Abw-Jl; Tue, 14 Apr 2020 14:43:14 +0100
+Date: Tue, 14 Apr 2020 14:43:13 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic-v3: Retire all pending LPIs on
- vcpu destroy
-Message-ID: <20200414141507.0d0a0f93@why>
-In-Reply-To: <a1c67c96-56f0-2976-ba1b-0991972254b3@huawei.com>
-References: <20200414030349.625-1-yuzenghui@huawei.com>
- <20200414030349.625-2-yuzenghui@huawei.com>
- <20200414115417.451f8b66@why>
- <a1c67c96-56f0-2976-ba1b-0991972254b3@huawei.com>
+To: =?UTF-8?Q?Andr=C3=A9?= Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm: vgic: Synchronize the whole guest on
+ GIC{D,R}_I{S,C}ACTIVER read
+Message-ID: <20200414144313.1f9645cd@why>
+In-Reply-To: <fddef0b7-3db7-89aa-5aac-4f08380ed00d@arm.com>
+References: <20200414103517.2824071-1-maz@kernel.org>
+ <20200414103517.2824071-2-maz@kernel.org>
+ <fddef0b7-3db7-89aa-5aac-4f08380ed00d@arm.com>
 Organization: Approximate
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- wanghaibin.wang@huawei.com, yezengruan@huawei.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com,
+ eric.auger@redhat.com, julien@xen.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,105 +92,103 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 14 Apr 2020 19:17:49 +0800
-Zenghui Yu <yuzenghui@huawei.com> wrote:
-
-> Hi Marc,
-> 
-> On 2020/4/14 18:54, Marc Zyngier wrote:
-> > On Tue, 14 Apr 2020 11:03:47 +0800
-> > Zenghui Yu <yuzenghui@huawei.com> wrote:
-> > 
-> > Hi Zenghui,
-> >   
-> >> It's likely that the vcpu fails to handle all virtual interrupts if
-> >> userspace decides to destroy it, leaving the pending ones stay in the
-> >> ap_list. If the un-handled one is a LPI, its vgic_irq structure will
-> >> be eventually leaked because of an extra refcount increment in
-> >> vgic_queue_irq_unlock().
-> >>
-> >> This was detected by kmemleak on almost every guest destroy, the
-> >> backtrace is as follows:
-> >>
-> >> unreferenced object 0xffff80725aed5500 (size 128):
-> >> comm "CPU 5/KVM", pid 40711, jiffies 4298024754 (age 166366.512s)
-> >> hex dump (first 32 bytes):
-> >> 00 00 00 00 00 00 00 00 08 01 a9 73 6d 80 ff ff ...........sm...
-> >> c8 61 ee a9 00 20 ff ff 28 1e 55 81 6c 80 ff ff .a... ..(.U.l...
-> >> backtrace:
-> >> [<000000004bcaa122>] kmem_cache_alloc_trace+0x2dc/0x418
-> >> [<0000000069c7dabb>] vgic_add_lpi+0x88/0x418
-> >> [<00000000bfefd5c5>] vgic_its_cmd_handle_mapi+0x4dc/0x588
-> >> [<00000000cf993975>] vgic_its_process_commands.part.5+0x484/0x1198
-> >> [<000000004bd3f8e3>] vgic_its_process_commands+0x50/0x80
-> >> [<00000000b9a65b2b>] vgic_mmio_write_its_cwriter+0xac/0x108
-> >> [<0000000009641ebb>] dispatch_mmio_write+0xd0/0x188
-> >> [<000000008f79d288>] __kvm_io_bus_write+0x134/0x240
-> >> [<00000000882f39ac>] kvm_io_bus_write+0xe0/0x150
-> >> [<0000000078197602>] io_mem_abort+0x484/0x7b8
-> >> [<0000000060954e3c>] kvm_handle_guest_abort+0x4cc/0xa58
-> >> [<00000000e0d0cd65>] handle_exit+0x24c/0x770
-> >> [<00000000b44a7fad>] kvm_arch_vcpu_ioctl_run+0x460/0x1988
-> >> [<0000000025fb897c>] kvm_vcpu_ioctl+0x4f8/0xee0
-> >> [<000000003271e317>] do_vfs_ioctl+0x160/0xcd8
-> >> [<00000000e7f39607>] ksys_ioctl+0x98/0xd8
-> >>
-> >> Fix it by retiring all pending LPIs in the ap_list on the destroy path.
-> >>
-> >> p.s. I can also reproduce it on a normal guest shutdown. It is because
-> >> userspace still send LPIs to vcpu (through KVM_SIGNAL_MSI ioctl) while
-> >> the guest is being shutdown and unable to handle it. A little strange
-> >> though and haven't dig further...  
-> > 
-> > What userspace are you using? You'd hope that the VMM would stop
-> > processing I/Os when destroying the guest. But we still need to handle
-> > it anyway, and I thing this fix makes sense.  
-> 
-> I'm using Qemu (master) for debugging. Looks like an interrupt
-> corresponding to a virtio device configuration change, triggered after
-> all other devices had freed their irqs. Not sure if it's expected.
-> 
-> >>
-> >> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> >> ---
-> >>   virt/kvm/arm/vgic/vgic-init.c | 6 ++++++
-> >>   1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> >> index a963b9d766b7..53ec9b9d9bc4 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-init.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> >> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
-> >>   {
-> >>   	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;  
-> >>   >> +	/*  
-> >> +	 * Retire all pending LPIs on this vcpu anyway as we're
-> >> +	 * going to destroy it.
-> >> +	 */
-> >> +	vgic_flush_pending_lpis(vcpu);
-> >> +
-> >>   	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
-> >>   }  
-> >>   > > I guess that at this stage, the INIT_LIST_HEAD() is superfluous, right?  
-> 
-> I was just thinking that the ap_list_head may not be empty (besides LPI,
-> with other active or pending interrupts), so leave it unchanged.
-
-It isn't clear what purpose this serves (the vcpus are about to be
-freed, and so are the ap_lists), but I guess it doesn't hurt either.
-I'll queue both patches.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAxNCBBcHIgMjAyMCAxMjoxNjoyNyArMDEwMApBbmRyw6kgUHJ6eXdhcmEgPGFuZHJl
+LnByenl3YXJhQGFybS5jb20+IHdyb3RlOgoKPiBPbiAxNC8wNC8yMDIwIDExOjM1LCBNYXJjIFp5
+bmdpZXIgd3JvdGU6Cj4gPiBXaGVuIGEgZ3Vlc3QgdHJpZXMgdG8gcmVhZCB0aGUgYWN0aXZlIHN0
+YXRlIG9mIGl0cyBpbnRlcnJ1cHRzLAo+ID4gd2UgY3VycmVudGx5IGp1c3QgcmV0dXJuIHdoYXRl
+dmVyIHN0YXRlIHdlIGhhdmUgaW4gbWVtb3J5LiBUaGlzCj4gPiBtZWFucyB0aGF0IGlmIHN1Y2gg
+YW4gaW50ZXJydXB0IGxpdmVzIGluIGEgTGlzdCBSZWdpc3RlciBvbiBhbm90aGVyCj4gPiBDUFUs
+IHdlIGZhaWwgdG8gb2JzZXJ0dmUgdGhlIGxhdGVzdCBhY3RpdmUgc3RhdGUgZm9yIHRoaXMgaW50
+ZXJydXB0LiAgCj4gCj4gICAgICAgICAgICAgICAgICAgXl5eXl5eXl4KPiAKPiA+IEluIG9yZGVy
+IHRvIHJlbWVkeSB0aGlzLCBzdG9wIGFsbCB0aGUgb3RoZXIgdmNwdXMgc28gdGhhdCB0aGV5IGV4
+aXQKPiA+IGFuZCB3ZSBjYW4gb2JzZXJ2ZSB0aGUgbW9zdCByZWNlbnQgdmFsdWUgZm9yIHRoZSBz
+dGF0ZS4gIAo+IAo+IE1heWJlIHdvcnRoIG1lbnRpb25pbmcgdGhhdCB0aGlzIGNvcGllcyB0aGUg
+YXBwcm9hY2ggd2UgYWxyZWFkeSBkZWFsCj4gd2l0aCB3cml0ZSBhY2Nlc3NlcyAoc3BsaXQgdXNl
+cmxhbmQgYW5kIGd1ZXNzIGFjY2Vzc29ycykuIFRoaXMgaXMgaW4gdGhlCj4gY292ZXIgbGV0dGVy
+LCBidXQgdW50aWwgSSBmb3VuZCBpdCB0aGVyZSBpdCB0b29rIG1lIGEgd2hpbGUgdG8gZ3Jhc3AK
+PiB3aGF0IHRoaXMgcGF0Y2ggcmVhbGx5IGRvZXMuCgpGYWlyIGVub3VnaC4KCj4gCj4gPiAKPiA+
+IFJlcG9ydGVkLWJ5OiBKdWxpZW4gR3JhbGwgPGp1bGllbkB4ZW4ub3JnPgo+ID4gU2lnbmVkLW9m
+Zi1ieTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4KPiA+IC0tLQo+ID4gIHZpcnQva3Zt
+L2FybS92Z2ljL3ZnaWMtbW1pby12Mi5jIHwgICA0ICstCj4gPiAgdmlydC9rdm0vYXJtL3ZnaWMv
+dmdpYy1tbWlvLXYzLmMgfCAgIDQgKy0KPiA+ICB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8u
+YyAgICB8IDEwMCArKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tCj4gPiAgdmlydC9rdm0v
+YXJtL3ZnaWMvdmdpYy1tbWlvLmggICAgfCAgIDMgKwo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgNzEg
+aW5zZXJ0aW9ucygrKSwgNDAgZGVsZXRpb25zKC0pCj4gPiAKPiA+IGRpZmYgLS1naXQgYS92aXJ0
+L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8tdjIuYyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1p
+by12Mi5jCj4gPiBpbmRleCA1OTQ1ZjA2MmQ3NDkuLmQ2Mzg4MWY2MGUxYSAxMDA2NDQKPiA+IC0t
+LSBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12Mi5jCj4gPiArKysgYi92aXJ0L2t2bS9h
+cm0vdmdpYy92Z2ljLW1taW8tdjIuYwo+ID4gQEAgLTQyMiwxMSArNDIyLDExIEBAIHN0YXRpYyBj
+b25zdCBzdHJ1Y3QgdmdpY19yZWdpc3Rlcl9yZWdpb24gdmdpY192Ml9kaXN0X3JlZ2lzdGVyc1td
+ID0gewo+ID4gIAkJVkdJQ19BQ0NFU1NfMzJiaXQpLAo+ID4gIAlSRUdJU1RFUl9ERVNDX1dJVEhf
+QklUU19QRVJfSVJRKEdJQ19ESVNUX0FDVElWRV9TRVQsCj4gPiAgCQl2Z2ljX21taW9fcmVhZF9h
+Y3RpdmUsIHZnaWNfbW1pb193cml0ZV9zYWN0aXZlLAo+ID4gLQkJTlVMTCwgdmdpY19tbWlvX3Vh
+Y2Nlc3Nfd3JpdGVfc2FjdGl2ZSwgMSwKPiA+ICsJCXZnaWNfdWFjY2Vzc19yZWFkX2FjdGl2ZSwg
+dmdpY19tbWlvX3VhY2Nlc3Nfd3JpdGVfc2FjdGl2ZSwgMSwKPiA+ICAJCVZHSUNfQUNDRVNTXzMy
+Yml0KSwKPiA+ICAJUkVHSVNURVJfREVTQ19XSVRIX0JJVFNfUEVSX0lSUShHSUNfRElTVF9BQ1RJ
+VkVfQ0xFQVIsCj4gPiAgCQl2Z2ljX21taW9fcmVhZF9hY3RpdmUsIHZnaWNfbW1pb193cml0ZV9j
+YWN0aXZlLAo+ID4gLQkJTlVMTCwgdmdpY19tbWlvX3VhY2Nlc3Nfd3JpdGVfY2FjdGl2ZSwgMSwK
+PiA+ICsJCXZnaWNfdWFjY2Vzc19yZWFkX2FjdGl2ZSwgdmdpY19tbWlvX3VhY2Nlc3Nfd3JpdGVf
+Y2FjdGl2ZSwgMSwKPiA+ICAJCVZHSUNfQUNDRVNTXzMyYml0KSwKPiA+ICAJUkVHSVNURVJfREVT
+Q19XSVRIX0JJVFNfUEVSX0lSUShHSUNfRElTVF9QUkksCj4gPiAgCQl2Z2ljX21taW9fcmVhZF9w
+cmlvcml0eSwgdmdpY19tbWlvX3dyaXRlX3ByaW9yaXR5LCBOVUxMLCBOVUxMLAo+ID4gZGlmZiAt
+LWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12My5jIGIvdmlydC9rdm0vYXJtL3Zn
+aWMvdmdpYy1tbWlvLXYzLmMKPiA+IGluZGV4IGU3MmRjYzQ1NDI0Ny4uNzdjOGJhMWEyNTM1IDEw
+MDY0NAo+ID4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLXYzLmMKPiA+ICsrKyBi
+L3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtbW1pby12My5jCj4gPiBAQCAtNTUzLDExICs1NTMsMTEg
+QEAgc3RhdGljIGNvbnN0IHN0cnVjdCB2Z2ljX3JlZ2lzdGVyX3JlZ2lvbiB2Z2ljX3YzX2Rpc3Rf
+cmVnaXN0ZXJzW10gPSB7Cj4gPiAgCQlWR0lDX0FDQ0VTU18zMmJpdCksCj4gPiAgCVJFR0lTVEVS
+X0RFU0NfV0lUSF9CSVRTX1BFUl9JUlFfU0hBUkVEKEdJQ0RfSVNBQ1RJVkVSLAo+ID4gIAkJdmdp
+Y19tbWlvX3JlYWRfYWN0aXZlLCB2Z2ljX21taW9fd3JpdGVfc2FjdGl2ZSwKPiA+IC0JCU5VTEws
+IHZnaWNfbW1pb191YWNjZXNzX3dyaXRlX3NhY3RpdmUsIDEsCj4gPiArCQl2Z2ljX3VhY2Nlc3Nf
+cmVhZF9hY3RpdmUsIHZnaWNfbW1pb191YWNjZXNzX3dyaXRlX3NhY3RpdmUsIDEsCj4gPiAgCQlW
+R0lDX0FDQ0VTU18zMmJpdCksCj4gPiAgCVJFR0lTVEVSX0RFU0NfV0lUSF9CSVRTX1BFUl9JUlFf
+U0hBUkVEKEdJQ0RfSUNBQ1RJVkVSLAo+ID4gIAkJdmdpY19tbWlvX3JlYWRfYWN0aXZlLCB2Z2lj
+X21taW9fd3JpdGVfY2FjdGl2ZSwKPiA+IC0JCU5VTEwsIHZnaWNfbW1pb191YWNjZXNzX3dyaXRl
+X2NhY3RpdmUsCj4gPiArCQl2Z2ljX3VhY2Nlc3NfcmVhZF9hY3RpdmUsIHZnaWNfbW1pb191YWNj
+ZXNzX3dyaXRlX2NhY3RpdmUsCj4gPiAgCQkxLCBWR0lDX0FDQ0VTU18zMmJpdCksCj4gPiAgCVJF
+R0lTVEVSX0RFU0NfV0lUSF9CSVRTX1BFUl9JUlFfU0hBUkVEKEdJQ0RfSVBSSU9SSVRZUiwKPiA+
+ICAJCXZnaWNfbW1pb19yZWFkX3ByaW9yaXR5LCB2Z2ljX21taW9fd3JpdGVfcHJpb3JpdHksIE5V
+TEwsIE5VTEwsCj4gPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMg
+Yi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8uYwo+ID4gaW5kZXggMjE5OTMwMjU5N2ZhLi40
+MDEyY2Q2OGFjOTMgMTAwNjQ0Cj4gPiAtLS0gYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLW1taW8u
+Ywo+ID4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1tbWlvLmMKPiA+IEBAIC0zNDgsOCAr
+MzQ4LDM5IEBAIHZvaWQgdmdpY19tbWlvX3dyaXRlX2NwZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAq
+dmNwdSwKPiA+ICAJfQo+ID4gIH0KPiA+ICAKPiA+IC11bnNpZ25lZCBsb25nIHZnaWNfbW1pb19y
+ZWFkX2FjdGl2ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gPiAtCQkJCSAgICBncGFfdCBhZGRy
+LCB1bnNpZ25lZCBpbnQgbGVuKQo+ID4gKwo+ID4gKy8qCj4gPiArICogSWYgd2UgYXJlIGZpZGRs
+aW5nIHdpdGggYW4gSVJRJ3MgYWN0aXZlIHN0YXRlLCB3ZSBoYXZlIHRvIG1ha2Ugc3VyZSB0aGUg
+SVJRCj4gPiArICogaXMgbm90IHF1ZXVlZCBvbiBzb21lIHJ1bm5pbmcgVkNQVSdzIExScywgYmVj
+YXVzZSB0aGVuIHRoZSBjaGFuZ2UgdG8gdGhlCj4gPiArICogYWN0aXZlIHN0YXRlIGNhbiBiZSBv
+dmVyd3JpdHRlbiB3aGVuIHRoZSBWQ1BVJ3Mgc3RhdGUgaXMgc3luY2VkIGNvbWluZyBiYWNrCj4g
+PiArICogZnJvbSB0aGUgZ3Vlc3QuCj4gPiArICoKPiA+ICsgKiBGb3Igc2hhcmVkIGludGVycnVw
+dHMgYXMgd2VsbCBhcyBHSUN2MyBwcml2YXRlIGludGVycnVwdHMsIHdlIGhhdmUgdG8KPiA+ICsg
+KiBzdG9wIGFsbCB0aGUgVkNQVXMgYmVjYXVzZSBpbnRlcnJ1cHRzIGNhbiBiZSBtaWdyYXRlZCB3
+aGlsZSB3ZSBkb24ndCBob2xkCj4gPiArICogdGhlIElSUSBsb2NrcyBhbmQgd2UgZG9uJ3Qgd2Fu
+dCB0byBiZSBjaGFzaW5nIG1vdmluZyB0YXJnZXRzLgo+ID4gKyAqCj4gPiArICogRm9yIEdJQ3Yy
+IHByaXZhdGUgaW50ZXJydXB0cyB3ZSBkb24ndCBoYXZlIHRvIGRvIGFueXRoaW5nIGJlY2F1c2UK
+PiA+ICsgKiB1c2Vyc3BhY2UgYWNjZXNzZXMgdG8gdGhlIFZHSUMgc3RhdGUgYWxyZWFkeSByZXF1
+aXJlIGFsbCBWQ1BVcyB0byBiZQo+ID4gKyAqIHN0b3BwZWQsIGFuZCBvbmx5IHRoZSBWQ1BVIGl0
+c2VsZiBjYW4gbW9kaWZ5IGl0cyBwcml2YXRlIGludGVycnVwdHMKPiA+ICsgKiBhY3RpdmUgc3Rh
+dGUsIHdoaWNoIGd1YXJhbnRlZXMgdGhhdCB0aGUgVkNQVSBpcyBub3QgcnVubmluZy4KPiA+ICsg
+Ki8KPiA+ICtzdGF0aWMgdm9pZCB2Z2ljX2FjY2Vzc19hY3RpdmVfcHJlcGFyZShzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUsIHUzMiBpbnRpZCkKPiA+ICt7Cj4gPiArCWlmICh2Y3B1LT5rdm0tPmFyY2gu
+dmdpYy52Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMyB8fAo+ID4gKwkgICAg
+aW50aWQgPiBWR0lDX05SX1BSSVZBVEVfSVJRUykgIAo+IAo+IEkgdW5kZXJzdGFuZCB0aGF0IHRo
+aXMgaXMganVzdCBtb3ZlZCBmcm9tIGV4aXN0aW5nIGNvZGUgYmVsb3csIGJ1dAo+IHNob3VsZG4n
+dCB0aGF0IGVpdGhlciByZWFkICJpbnRpZCA+PSBWR0lDX05SX1BSSVZBVEVfSVJRUyIgb3IKPiAi
+aW50aWQgPiBWR0lDX01BWF9QUklWQVRFIj8KCk5pY2UgY2F0Y2guIFRoaXMgd2FzIGludHJvZHVj
+ZWQgaW4gYWJkNzIyOTYyNmI5MyAoIktWTTogYXJtL2FybTY0OgpTaW1wbGlmeSBhY3RpdmVfY2hh
+bmdlX3ByZXBhcmUgYW5kIHBsdWcgcmFjZSIpLCB3aGlsZSB3ZSBoYWQgdGhlCm9wcG9zaXRlIGNv
+bmRpdGlvbiBiZWZvcmUgdGhhdC4KClRoaXMgbWVhbnMgdGhhdCBvbiBHSUN2MiwgR0lDRF9JW0NT
+XUFDVElWRVIgd3JpdGVzIGFyZSB1bnJlbGlhYmxlIGZvcgppbnRpZHMgMzItNjMgKHdlIG1heSBm
+YWlsIHRvIGNsZWFyIGFuIGFjdGl2ZSBiaXQgaWYgaXQgaXMgc2V0IGluCmFub3RoZXIgdmNwdSdz
+IExScywgZm9yIGV4YW1wbGUpLgoKSSdsbCBhZGQgYW4gZXh0cmEgcGF0Y2ggZm9yIHRoaXMuCgpU
+aGFua3MsCgoJTS4KLS0gCkphenogaXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4u
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
