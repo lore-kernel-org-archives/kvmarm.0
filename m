@@ -2,87 +2,61 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AC5C2BB85
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 08:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8439C3815B
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EC72620737
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 08:56:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zPVuO2lg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC72620737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 730E720775
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 09:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 730E720775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88FB04B16C;
-	Wed, 15 Apr 2020 04:56:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA7A34B231;
+	Wed, 15 Apr 2020 05:23:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RdQiSfAQTq4G; Wed, 15 Apr 2020 04:56:03 -0400 (EDT)
+	with ESMTP id 7l+JDoleAwJq; Wed, 15 Apr 2020 05:23:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2B74B1D9;
-	Wed, 15 Apr 2020 04:56:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0103A4B209;
+	Wed, 15 Apr 2020 05:23:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68D424B1BC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 04:56:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5CBA4B211
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 17:15:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eFhbuOsIhT7H for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 04:56:00 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A58C34B0FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 04:56:00 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 900C520737;
- Wed, 15 Apr 2020 08:55:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586940959;
- bh=lL08kyfy+9y5wE4bT7FrtRAP9e6Jx76z4bGDZo1tk4s=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=zPVuO2lg9Bf7O4AyeHVkBbTdBcjJ0l9TTPg+WqJ1AqZYtX9Ksbab4hxQBuS6PhOcz
- nG946f+z2ldlNfsBvYalLoWeuksyMjcQaVfN7Vrfos3ZdMA9haxjGQx7k25dNYi8JR
- 3SG+qQmED0JCKXDh2wrsKH9jJipvG+N1lrNGpk3o=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jOdpt-003Rlm-Ss; Wed, 15 Apr 2020 09:55:58 +0100
+ with ESMTP id iyfsizjdP8q3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 17:15:00 -0400 (EDT)
+Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECCC64B107
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 17:14:59 -0400 (EDT)
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id 45390ABBE;
+ Tue, 14 Apr 2020 21:14:57 +0000 (UTC)
+Date: Tue, 14 Apr 2020 14:12:43 -0700
+From: Davidlohr Bueso <dave@stgolabs.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 3/4] kvm: Replace vcpu->swait with rcuwait
+Message-ID: <20200414211243.7vehybdrvbzmbduu@linux-p48b>
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+ <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
 MIME-Version: 1.0
-Date: Wed, 15 Apr 2020 09:55:57 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 3/8] arm64: cpufeature: Add CPU capability for AArch32 EL1
- support
-In-Reply-To: <20200414213114.2378-4-will@kernel.org>
-References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-4-will@kernel.org>
-Message-ID: <1b76993491176577567a0960a435dac0@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- suzuki.poulose@arm.com, mark.rutland@arm.com, anshuman.khandual@arm.com,
- catalin.marinas@arm.com, saiprakash.ranjan@codeaurora.org,
- dianders@chromium.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Sai Prakash Ranjan <saiprakash.ranjan@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Doug Anderson <dianders@chromium.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Mailman-Approved-At: Wed, 15 Apr 2020 05:23:47 -0400
+Cc: kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
+ torvalds@linux-foundation.org, bigeasy@linutronix.de,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org, tglx@linutronix.de,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,32 +73,29 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+On Wed, 25 Mar 2020, Paolo Bonzini wrote:
 
-On 2020-04-14 22:31, Will Deacon wrote:
-> Although we emit a "SANITY CHECK" warning and taint the kernel if we
-> detect a CPU mismatch for AArch32 support at EL1, we still online the
-> CPU with disastrous consequences for any running 32-bit VMs.
-> 
-> Introduce a capability for AArch32 support at EL1 so that late onlining
-> of incompatible CPUs is forbidden.
-> 
-> Signed-off-by: Will Deacon <will@kernel.org>
+>On 24/03/20 05:44, Davidlohr Bueso wrote:
+>> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+>> index 71244bf87c3a..e049fcb3dffb 100644
+>> --- a/arch/mips/kvm/mips.c
+>> +++ b/arch/mips/kvm/mips.c
+>> @@ -290,8 +290,7 @@ static enum hrtimer_restart kvm_mips_comparecount_wakeup(struct hrtimer *timer)
+>>	kvm_mips_callbacks->queue_timer_int(vcpu);
+>>
+>>	vcpu->arch.wait = 0;
+>> -	if (swq_has_sleeper(&vcpu->wq))
+>> -		swake_up_one(&vcpu->wq);
+>> +	rcuwait_wake_up(&vcpu->wait)
+>
+>This is missing a semicolon.  (KVM MIPS is known not to compile and will
+>be changed to "depends on BROKEN" in 5.7).
 
-Definitely an improvement over the current situation, as the direct read
-of ID_AA64PFR0 was always a bit dodgy. Given that I'm pretty sure these 
-new
-braindead SoCs are going to run an older version of the kernel, should 
-we
-Cc stable for this?
+Do you want me to send another version with this fix or do you prefer
+fixing it when/if picked up?
 
-Otherwise:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+Davidlohr
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
