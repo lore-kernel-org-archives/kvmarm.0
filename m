@@ -2,81 +2,83 @@ Return-Path: <SRS0=7dZW=56=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE69C2BA19
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 10:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B9BC2BBC7
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 10:54:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 14D3C20732
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 10:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D42A2072D
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 10:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tx0vGA0n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D3C20732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fc/LMjA9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D42A2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E05CB4B211;
-	Tue, 14 Apr 2020 06:35:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CADBB4B16B;
+	Tue, 14 Apr 2020 06:54:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fJdNkx6+2Buz; Tue, 14 Apr 2020 06:35:50 -0400 (EDT)
+	with ESMTP id Wk7VVfs5MdZW; Tue, 14 Apr 2020 06:54:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF3CF4B216;
-	Tue, 14 Apr 2020 06:35:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4B834B208;
+	Tue, 14 Apr 2020 06:54:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 210444B129
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 06:35:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D47E4B169
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 06:54:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZEoo1QbzI83N for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Apr 2020 06:35:47 -0400 (EDT)
+ with ESMTP id jSIYdIjtAE1x for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 06:54:22 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E02FF4B199
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 06:35:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE6B44B15C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 06:54:21 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1BB3420768;
- Tue, 14 Apr 2020 10:35:46 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B89F5206D5;
+ Tue, 14 Apr 2020 10:54:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586860546;
- bh=NVTcS4M3W2GAMJXvOMw3zliKwogWP1yBKoVbcb6l+tQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=tx0vGA0nKjnY+xVexchLPhRZ68yHwo91kRos/yoHjFOB5qtPjkakO8a0Zm64t4BKP
- CzdJt74+rUa5mg+hQgnuULnIs7gF+2U3TBCmTqtL0qok+vfpRRQzQuuIHOE+5pYqTs
- baBPIgeLLsWR7pWhIUBGekh6LcL/q6BT57nrg6LY=
+ s=default; t=1586861660;
+ bh=xFUIZbH4BsMb5b7OW+ZPT+Rdm2ffQ8mGwuPjUuQdWTQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Fc/LMjA9ksRxtgC05kP1DEhmyrhWWuxz0ZFh9ZoPsYbw1EHTL/8mPb9NocwA75h+t
+ xNXeTRBParT4VdvVX1hzfdLEM9lyP6cCbxLOpORbZnYpL+JqedeJ3dfWJen18yaPE+
+ jup9HN8GQRTkR4FzVGqjCIneRQiwgLD0OhQjMxeQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ helo=why) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jOIuu-0036te-78; Tue, 14 Apr 2020 11:35:44 +0100
+ id 1jOJCs-0037HZ-SM; Tue, 14 Apr 2020 11:54:19 +0100
+Date: Tue, 14 Apr 2020 11:54:17 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH 3/3] KVM: arm: vgic-v2: Only use the virtual state when
- userspace accesses pending bits
-Date: Tue, 14 Apr 2020 11:35:17 +0100
-Message-Id: <20200414103517.2824071-4-maz@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200414103517.2824071-1-maz@kernel.org>
-References: <20200414103517.2824071-1-maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic-v3: Retire all pending LPIs on
+ vcpu destroy
+Message-ID: <20200414115417.451f8b66@why>
+In-Reply-To: <20200414030349.625-2-yuzenghui@huawei.com>
+References: <20200414030349.625-1-yuzenghui@huawei.com>
+ <20200414030349.625-2-yuzenghui@huawei.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com,
- eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ wanghaibin.wang@huawei.com, yezengruan@huawei.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Julien Grall <julien@xen.org>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,122 +95,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There is no point in accessing the HW when writing to any of the
-ISPENDR/ICPENDR registers from userspace, as only the guest should
-be allowed to change the HW state.
+On Tue, 14 Apr 2020 11:03:47 +0800
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 
-Introduce new userspace-specific accessors that deal solely with
-the virtual state. Note that the API differs from that of GICv3,
-where userspace exclusively uses ISPENDR to set the state. Too
-bad we can't reuse it.
+Hi Zenghui,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  6 +++--
- virt/kvm/arm/vgic/vgic-mmio.c    | 41 ++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h    |  8 +++++++
- 3 files changed, 53 insertions(+), 2 deletions(-)
+> It's likely that the vcpu fails to handle all virtual interrupts if
+> userspace decides to destroy it, leaving the pending ones stay in the
+> ap_list. If the un-handled one is a LPI, its vgic_irq structure will
+> be eventually leaked because of an extra refcount increment in
+> vgic_queue_irq_unlock().
+> 
+> This was detected by kmemleak on almost every guest destroy, the
+> backtrace is as follows:
+> 
+> unreferenced object 0xffff80725aed5500 (size 128):
+> comm "CPU 5/KVM", pid 40711, jiffies 4298024754 (age 166366.512s)
+> hex dump (first 32 bytes):
+> 00 00 00 00 00 00 00 00 08 01 a9 73 6d 80 ff ff ...........sm...
+> c8 61 ee a9 00 20 ff ff 28 1e 55 81 6c 80 ff ff .a... ..(.U.l...
+> backtrace:
+> [<000000004bcaa122>] kmem_cache_alloc_trace+0x2dc/0x418
+> [<0000000069c7dabb>] vgic_add_lpi+0x88/0x418
+> [<00000000bfefd5c5>] vgic_its_cmd_handle_mapi+0x4dc/0x588
+> [<00000000cf993975>] vgic_its_process_commands.part.5+0x484/0x1198
+> [<000000004bd3f8e3>] vgic_its_process_commands+0x50/0x80
+> [<00000000b9a65b2b>] vgic_mmio_write_its_cwriter+0xac/0x108
+> [<0000000009641ebb>] dispatch_mmio_write+0xd0/0x188
+> [<000000008f79d288>] __kvm_io_bus_write+0x134/0x240
+> [<00000000882f39ac>] kvm_io_bus_write+0xe0/0x150
+> [<0000000078197602>] io_mem_abort+0x484/0x7b8
+> [<0000000060954e3c>] kvm_handle_guest_abort+0x4cc/0xa58
+> [<00000000e0d0cd65>] handle_exit+0x24c/0x770
+> [<00000000b44a7fad>] kvm_arch_vcpu_ioctl_run+0x460/0x1988
+> [<0000000025fb897c>] kvm_vcpu_ioctl+0x4f8/0xee0
+> [<000000003271e317>] do_vfs_ioctl+0x160/0xcd8
+> [<00000000e7f39607>] ksys_ioctl+0x98/0xd8
+> 
+> Fix it by retiring all pending LPIs in the ap_list on the destroy path.
+> 
+> p.s. I can also reproduce it on a normal guest shutdown. It is because
+> userspace still send LPIs to vcpu (through KVM_SIGNAL_MSI ioctl) while
+> the guest is being shutdown and unable to handle it. A little strange
+> though and haven't dig further...
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index f51c6e939c76..a016f07adc28 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -417,10 +417,12 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		NULL, vgic_uaccess_write_cenable, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
--		vgic_mmio_read_pending, vgic_mmio_write_spending, NULL, NULL, 1,
-+		vgic_mmio_read_pending, vgic_mmio_write_spending,
-+		NULL, vgic_uaccess_write_spending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
--		vgic_mmio_read_pending, vgic_mmio_write_cpending, NULL, NULL, 1,
-+		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-+		NULL, vgic_uaccess_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 2ca11b05b17b..4b95fcae704f 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 	}
- }
- 
-+int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+	unsigned long flags;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		irq->pending_latch = true;
-+		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+
-+	return 0;
-+}
-+
- /* Must be called with irq->irq_lock held */
- static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 				 bool is_uaccess)
-@@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 	}
- }
- 
-+int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+	unsigned long flags;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		irq->pending_latch = false;
-+		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+
-+	return 0;
-+}
- 
- /*
-  * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 327d0a6938e4..fefcca2b14dc 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -157,6 +157,14 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
- 
-+int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val);
-+
-+int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val);
-+
- unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- 				    gpa_t addr, unsigned int len);
- 
+What userspace are you using? You'd hope that the VMM would stop
+processing I/Os when destroying the guest. But we still need to handle
+it anyway, and I thing this fix makes sense.
+
+> 
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-init.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index a963b9d766b7..53ec9b9d9bc4 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  
+> +	/*
+> +	 * Retire all pending LPIs on this vcpu anyway as we're
+> +	 * going to destroy it.
+> +	 */
+> +	vgic_flush_pending_lpis(vcpu);
+> +
+>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+>  }
+>  
+
+I guess that at this stage, the INIT_LIST_HEAD() is superfluous, right?
+
+Otherwise, looks good. If you agree with the above, I can fix that
+locally, no need to resend this patch.
+
+Thanks,
+
+	M.
 -- 
-2.25.1
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
