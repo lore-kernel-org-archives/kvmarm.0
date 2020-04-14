@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C87CEC2BA19
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EC6C3815B
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:36:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 81B2C2075E
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:36:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E4B921582
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/yCmpCc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81B2C2075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="EsjR1/Yi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4B921582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A7934B0B3;
-	Tue, 14 Apr 2020 11:36:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54C2F4B1DC;
+	Tue, 14 Apr 2020 11:36:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S3lV8f1EicHu; Tue, 14 Apr 2020 11:36:40 -0400 (EDT)
+	with ESMTP id IFfM8EQFDe0J; Tue, 14 Apr 2020 11:36:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17DE84B1DE;
-	Tue, 14 Apr 2020 11:36:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A3F04B0ED;
+	Tue, 14 Apr 2020 11:36:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA6A14B1D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:36:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9645B4B0E2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:36:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HCt1RKDoc9tm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Apr 2020 11:36:37 -0400 (EDT)
+ with ESMTP id 89oSKYKqGFaM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 11:36:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB4734B0B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:36:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DF2B4B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:36:47 -0400 (EDT)
 Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8C03320678;
- Tue, 14 Apr 2020 15:36:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5B6B42076D;
+ Tue, 14 Apr 2020 15:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586878596;
- bh=ybPPvADQAq307A0mTIfstOnJj2n8fbsD+ITheeuQdo0=;
+ s=default; t=1586878606;
+ bh=fvLukdwkQTHO+51q3DGLoikuRIRMlioJ2DyvNE+LsyM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=t/yCmpCcn8sCzGMmKhQcslmtaEsbx0+I+UZtglQV6ojnIQromBlhZlaLBILJGAd6y
- 4Vn8iZPrK0sW8k+OougefKf9e1ZgbFEiDkY2u2fJZMlwXYYyOiu+omc8hiEdMujXQD
- 1OSJEg4mIUApPR9xNP/PjDEgG9IK6jvSzBnwpCpg=
+ b=EsjR1/Yifkflit9+eKwFZLCCJFB8DergOAGiV4wfeGmM/V7L4EnrXxVxok0npwk6h
+ WiBKvp5y1ti7RWPhFlbhCg0/KvxW5loI8ag/8FCL6WW1nK8DMZtzMhuoVRHVMUmF6W
+ Av3cMdSJVEJr8PZ+JmDhYERiuyxHsfJxjLsfIVRk=
 From: Mike Rapoport <rppt@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v4 09/14] sh: fault: Modernize printing of kernel messages
-Date: Tue, 14 Apr 2020 18:34:50 +0300
-Message-Id: <20200414153455.21744-10-rppt@kernel.org>
+Subject: [PATCH v4 10/14] sh: drop __pXd_offset() macros that duplicate
+ pXd_index() ones
+Date: Tue, 14 Apr 2020 18:34:51 +0300
+Message-Id: <20200414153455.21744-11-rppt@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200414153455.21744-1-rppt@kernel.org>
 References: <20200414153455.21744-1-rppt@kernel.org>
@@ -94,113 +95,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Geert Uytterhoeven <geert+renesas@glider.be>
+From: Mike Rapoport <rppt@linux.ibm.com>
 
-  - Convert from printk() to pr_*(),
-  - Add missing continuations,
-  - Use "%llx" to format u64,
-  - Join multiple prints in show_fault_oops() into a single print.
+The __pXd_offset() macros are identical to the pXd_index() macros and there
+is no point to keep both of them. All architectures define and use
+pXd_index() so let's keep only those to make mips consistent with the rest
+of the kernel.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
 ---
- arch/sh/mm/fault.c | 39 ++++++++++++++++++---------------------
- 1 file changed, 18 insertions(+), 21 deletions(-)
+ arch/sh/include/asm/pgtable_32.h | 5 ++---
+ arch/sh/include/asm/pgtable_64.h | 5 ++---
+ arch/sh/mm/init.c                | 6 +++---
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/arch/sh/mm/fault.c b/arch/sh/mm/fault.c
-index 5f23d7907597..7b74e18b71d7 100644
---- a/arch/sh/mm/fault.c
-+++ b/arch/sh/mm/fault.c
-@@ -47,10 +47,10 @@ static void show_pte(struct mm_struct *mm, unsigned long addr)
- 			pgd = swapper_pg_dir;
- 	}
+diff --git a/arch/sh/include/asm/pgtable_32.h b/arch/sh/include/asm/pgtable_32.h
+index 29274f0e428e..4acce5f2cbf9 100644
+--- a/arch/sh/include/asm/pgtable_32.h
++++ b/arch/sh/include/asm/pgtable_32.h
+@@ -407,13 +407,12 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
+ /* to find an entry in a page-table-directory. */
+ #define pgd_index(address)	(((address) >> PGDIR_SHIFT) & (PTRS_PER_PGD-1))
+ #define pgd_offset(mm, address)	((mm)->pgd + pgd_index(address))
+-#define __pgd_offset(address)	pgd_index(address)
  
--	printk(KERN_ALERT "pgd = %p\n", pgd);
-+	pr_alert("pgd = %p\n", pgd);
- 	pgd += pgd_index(addr);
--	printk(KERN_ALERT "[%08lx] *pgd=%0*Lx", addr,
--	       (u32)(sizeof(*pgd) * 2), (u64)pgd_val(*pgd));
-+	pr_alert("[%08lx] *pgd=%0*llx", addr, (u32)(sizeof(*pgd) * 2),
-+		 (u64)pgd_val(*pgd));
+ /* to find an entry in a kernel page-table-directory */
+ #define pgd_offset_k(address)	pgd_offset(&init_mm, address)
  
- 	do {
- 		pud_t *pud;
-@@ -61,33 +61,33 @@ static void show_pte(struct mm_struct *mm, unsigned long addr)
- 			break;
+-#define __pud_offset(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD-1))
+-#define __pmd_offset(address)	(((address) >> PMD_SHIFT) & (PTRS_PER_PMD-1))
++#define pud_index(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD-1))
++#define pmd_index(address)	(((address) >> PMD_SHIFT) & (PTRS_PER_PMD-1))
  
- 		if (pgd_bad(*pgd)) {
--			printk("(bad)");
-+			pr_cont("(bad)");
- 			break;
- 		}
+ /* Find an entry in the third-level page table.. */
+ #define pte_index(address)	((address >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
+diff --git a/arch/sh/include/asm/pgtable_64.h b/arch/sh/include/asm/pgtable_64.h
+index 1778bc5971e7..27cc282ec6c0 100644
+--- a/arch/sh/include/asm/pgtable_64.h
++++ b/arch/sh/include/asm/pgtable_64.h
+@@ -46,14 +46,13 @@ static __inline__ void set_pte(pte_t *pteptr, pte_t pteval)
  
- 		pud = pud_offset(pgd, addr);
- 		if (PTRS_PER_PUD != 1)
--			printk(", *pud=%0*Lx", (u32)(sizeof(*pud) * 2),
--			       (u64)pud_val(*pud));
-+			pr_cont(", *pud=%0*llx", (u32)(sizeof(*pud) * 2),
-+				(u64)pud_val(*pud));
+ /* To find an entry in a generic PGD. */
+ #define pgd_index(address) (((address) >> PGDIR_SHIFT) & (PTRS_PER_PGD-1))
+-#define __pgd_offset(address) pgd_index(address)
+ #define pgd_offset(mm, address) ((mm)->pgd+pgd_index(address))
  
- 		if (pud_none(*pud))
- 			break;
+ /* To find an entry in a kernel PGD. */
+ #define pgd_offset_k(address) pgd_offset(&init_mm, address)
  
- 		if (pud_bad(*pud)) {
--			printk("(bad)");
-+			pr_cont("(bad)");
- 			break;
- 		}
+-#define __pud_offset(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD-1))
+-#define __pmd_offset(address)	(((address) >> PMD_SHIFT) & (PTRS_PER_PMD-1))
++#define pud_index(address)	(((address) >> PUD_SHIFT) & (PTRS_PER_PUD-1))
++/* #define pmd_index(address)	(((address) >> PMD_SHIFT) & (PTRS_PER_PMD-1)) */
  
- 		pmd = pmd_offset(pud, addr);
- 		if (PTRS_PER_PMD != 1)
--			printk(", *pmd=%0*Lx", (u32)(sizeof(*pmd) * 2),
--			       (u64)pmd_val(*pmd));
-+			pr_cont(", *pmd=%0*llx", (u32)(sizeof(*pmd) * 2),
-+				(u64)pmd_val(*pmd));
+ /*
+  * PMD level access routines. Same notes as above.
+diff --git a/arch/sh/mm/init.c b/arch/sh/mm/init.c
+index b9de2d4fa57e..f445ba630790 100644
+--- a/arch/sh/mm/init.c
++++ b/arch/sh/mm/init.c
+@@ -172,9 +172,9 @@ void __init page_table_range_init(unsigned long start, unsigned long end,
+ 	unsigned long vaddr;
  
- 		if (pmd_none(*pmd))
- 			break;
+ 	vaddr = start;
+-	i = __pgd_offset(vaddr);
+-	j = __pud_offset(vaddr);
+-	k = __pmd_offset(vaddr);
++	i = pgd_index(vaddr);
++	j = pud_index(vaddr);
++	k = pmd_index(vaddr);
+ 	pgd = pgd_base + i;
  
- 		if (pmd_bad(*pmd)) {
--			printk("(bad)");
-+			pr_cont("(bad)");
- 			break;
- 		}
- 
-@@ -96,11 +96,11 @@ static void show_pte(struct mm_struct *mm, unsigned long addr)
- 			break;
- 
- 		pte = pte_offset_kernel(pmd, addr);
--		printk(", *pte=%0*Lx", (u32)(sizeof(*pte) * 2),
--		       (u64)pte_val(*pte));
-+		pr_cont(", *pte=%0*llx", (u32)(sizeof(*pte) * 2),
-+			(u64)pte_val(*pte));
- 	} while (0);
- 
--	printk("\n");
-+	pr_cont("\n");
- }
- 
- static inline pmd_t *vmalloc_sync_one(pgd_t *pgd, unsigned long address)
-@@ -188,14 +188,11 @@ show_fault_oops(struct pt_regs *regs, unsigned long address)
- 	if (!oops_may_print())
- 		return;
- 
--	printk(KERN_ALERT "BUG: unable to handle kernel ");
--	if (address < PAGE_SIZE)
--		printk(KERN_CONT "NULL pointer dereference");
--	else
--		printk(KERN_CONT "paging request");
--
--	printk(KERN_CONT " at %08lx\n", address);
--	printk(KERN_ALERT "PC:");
-+	pr_alert("BUG: unable to handle kernel %s at %08lx\n",
-+		 address < PAGE_SIZE ? "NULL pointer dereference"
-+				     : "paging request",
-+		 address);
-+	pr_alert("PC:");
- 	printk_address(regs->pc, 1);
- 
- 	show_pte(NULL, address);
+ 	for ( ; (i < PTRS_PER_PGD) && (vaddr != end); pgd++, i++) {
 -- 
 2.25.1
 
