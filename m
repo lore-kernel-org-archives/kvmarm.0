@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D8AC352BE
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 416C7C2BA19
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:37:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B51D8206D5
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:37:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAD3920767
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 15:37:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bdUR+zWF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51D8206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="VU/Llyju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD3920767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DEFB4B0CE;
-	Tue, 14 Apr 2020 11:37:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A091C4B0FD;
+	Tue, 14 Apr 2020 11:37:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oOG39U7o8xqb; Tue, 14 Apr 2020 11:37:09 -0400 (EDT)
+	with ESMTP id mLhvixzWrjSC; Tue, 14 Apr 2020 11:37:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E514B1B9;
-	Tue, 14 Apr 2020 11:37:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA1FF4B1E5;
+	Tue, 14 Apr 2020 11:37:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CF174B0CE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:37:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63A964B1B9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:37:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3M8NVMWa+mDq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Apr 2020 11:37:07 -0400 (EDT)
+ with ESMTP id 8VmeZk6kkINa for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 11:37:17 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 385044B0B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:37:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E6B94B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 11:37:17 -0400 (EDT)
 Received: from aquarius.haifa.ibm.com (nesher1.haifa.il.ibm.com [195.110.40.7])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1A2EB2084D;
- Tue, 14 Apr 2020 15:36:56 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DF1522085B;
+ Tue, 14 Apr 2020 15:37:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586878626;
- bh=QsIMkwgxGDmoafySFK25hUU8rvRZJH7p/k2n8MmR7Ws=;
+ s=default; t=1586878636;
+ bh=y5upl5y5kDKcOZZTB6xnGHWCDtOJ5v9v3QvgjuKGYnA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bdUR+zWFwCOI/Xm6DSb0qQaXfyaTlf+6Y69j/ySn/8n5SL+894WXl0hDbi7CTBFkB
- OH34skovQtOYjlBeb9r9WRFMUU7YvhOUJon8f2tVCBezF/S8tLj0XI+Z0cvAD1FJhX
- GSbbCOxTEG+QNyPdVaL2eY/Kxsqba8gGlpuLQ2sc=
+ b=VU/LlyjuZjD2xgCfZA7m8dLQDTyPj28OI08DI540xTc3wP1fJsitV67hiVVil7eVJ
+ aSNmRqUVKgNW+oW2T/ecAsUG7/P9Ym38a5dxBUPtF2JQyqCeN7tx/o7OYsA14TDjOD
+ JatvJvEQqBS9dHMIx3mUATBkVLOVSm36w2YSGeaE=
 From: Mike Rapoport <rppt@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v4 12/14] unicore32: remove __ARCH_USE_5LEVEL_HACK
-Date: Tue, 14 Apr 2020 18:34:53 +0300
-Message-Id: <20200414153455.21744-13-rppt@kernel.org>
+Subject: [PATCH v4 13/14] asm-generic: remove pgtable-nop4d-hack.h
+Date: Tue, 14 Apr 2020 18:34:54 +0300
+Message-Id: <20200414153455.21744-14-rppt@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200414153455.21744-1-rppt@kernel.org>
 References: <20200414153455.21744-1-rppt@kernel.org>
@@ -96,48 +96,108 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Mike Rapoport <rppt@linux.ibm.com>
 
-The unicore32 architecture has 2 level page tables and
-asm-generic/pgtable-nopmd.h and explicit casts from pud_t to pgd_t for page
-table folding.
+No architecture defines __ARCH_USE_5LEVEL_HACK and therefore
+pgtable-nop4d-hack.h will be never actually included.
 
-Add p4d walk in the only place that actually unfolds the pud level and
-remove __ARCH_USE_5LEVEL_HACK.
+Remove it.
 
 Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
 ---
- arch/unicore32/include/asm/pgtable.h | 1 -
- arch/unicore32/kernel/hibernate.c    | 4 +++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ include/asm-generic/pgtable-nop4d-hack.h | 64 ------------------------
+ include/asm-generic/pgtable-nopud.h      |  4 --
+ 2 files changed, 68 deletions(-)
+ delete mode 100644 include/asm-generic/pgtable-nop4d-hack.h
 
-diff --git a/arch/unicore32/include/asm/pgtable.h b/arch/unicore32/include/asm/pgtable.h
-index 3b8731b3a937..826f49edd94e 100644
---- a/arch/unicore32/include/asm/pgtable.h
-+++ b/arch/unicore32/include/asm/pgtable.h
-@@ -9,7 +9,6 @@
- #ifndef __UNICORE_PGTABLE_H__
- #define __UNICORE_PGTABLE_H__
+diff --git a/include/asm-generic/pgtable-nop4d-hack.h b/include/asm-generic/pgtable-nop4d-hack.h
+deleted file mode 100644
+index 829bdb0d6327..000000000000
+--- a/include/asm-generic/pgtable-nop4d-hack.h
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _PGTABLE_NOP4D_HACK_H
+-#define _PGTABLE_NOP4D_HACK_H
+-
+-#ifndef __ASSEMBLY__
+-#include <asm-generic/5level-fixup.h>
+-
+-#define __PAGETABLE_PUD_FOLDED 1
+-
+-/*
+- * Having the pud type consist of a pgd gets the size right, and allows
+- * us to conceptually access the pgd entry that this pud is folded into
+- * without casting.
+- */
+-typedef struct { pgd_t pgd; } pud_t;
+-
+-#define PUD_SHIFT	PGDIR_SHIFT
+-#define PTRS_PER_PUD	1
+-#define PUD_SIZE	(1UL << PUD_SHIFT)
+-#define PUD_MASK	(~(PUD_SIZE-1))
+-
+-/*
+- * The "pgd_xxx()" functions here are trivial for a folded two-level
+- * setup: the pud is never bad, and a pud always exists (as it's folded
+- * into the pgd entry)
+- */
+-static inline int pgd_none(pgd_t pgd)		{ return 0; }
+-static inline int pgd_bad(pgd_t pgd)		{ return 0; }
+-static inline int pgd_present(pgd_t pgd)	{ return 1; }
+-static inline void pgd_clear(pgd_t *pgd)	{ }
+-#define pud_ERROR(pud)				(pgd_ERROR((pud).pgd))
+-
+-#define pgd_populate(mm, pgd, pud)		do { } while (0)
+-#define pgd_populate_safe(mm, pgd, pud)		do { } while (0)
+-/*
+- * (puds are folded into pgds so this doesn't get actually called,
+- * but the define is needed for a generic inline function.)
+- */
+-#define set_pgd(pgdptr, pgdval)	set_pud((pud_t *)(pgdptr), (pud_t) { pgdval })
+-
+-static inline pud_t *pud_offset(pgd_t *pgd, unsigned long address)
+-{
+-	return (pud_t *)pgd;
+-}
+-
+-#define pud_val(x)				(pgd_val((x).pgd))
+-#define __pud(x)				((pud_t) { __pgd(x) })
+-
+-#define pgd_page(pgd)				(pud_page((pud_t){ pgd }))
+-#define pgd_page_vaddr(pgd)			(pud_page_vaddr((pud_t){ pgd }))
+-
+-/*
+- * allocating and freeing a pud is trivial: the 1-entry pud is
+- * inside the pgd, so has no extra memory associated with it.
+- */
+-#define pud_alloc_one(mm, address)		NULL
+-#define pud_free(mm, x)				do { } while (0)
+-#define __pud_free_tlb(tlb, x, a)		do { } while (0)
+-
+-#undef  pud_addr_end
+-#define pud_addr_end(addr, end)			(end)
+-
+-#endif /* __ASSEMBLY__ */
+-#endif /* _PGTABLE_NOP4D_HACK_H */
+diff --git a/include/asm-generic/pgtable-nopud.h b/include/asm-generic/pgtable-nopud.h
+index d3776cb494c0..ad05c1684bfc 100644
+--- a/include/asm-generic/pgtable-nopud.h
++++ b/include/asm-generic/pgtable-nopud.h
+@@ -4,9 +4,6 @@
  
--#define __ARCH_USE_5LEVEL_HACK
- #include <asm-generic/pgtable-nopmd.h>
- #include <asm/cpu-single.h>
+ #ifndef __ASSEMBLY__
  
-diff --git a/arch/unicore32/kernel/hibernate.c b/arch/unicore32/kernel/hibernate.c
-index f3812245cc00..ccad051a79b6 100644
---- a/arch/unicore32/kernel/hibernate.c
-+++ b/arch/unicore32/kernel/hibernate.c
-@@ -33,9 +33,11 @@ struct swsusp_arch_regs swsusp_arch_regs_cpu0;
- static pmd_t *resume_one_md_table_init(pgd_t *pgd)
- {
- 	pud_t *pud;
-+	p4d_t *p4d;
- 	pmd_t *pmd_table;
+-#ifdef __ARCH_USE_5LEVEL_HACK
+-#include <asm-generic/pgtable-nop4d-hack.h>
+-#else
+ #include <asm-generic/pgtable-nop4d.h>
  
--	pud = pud_offset(pgd, 0);
-+	p4d = p4d_offset(pgd, 0);
-+	pud = pud_offset(p4d, 0);
- 	pmd_table = pmd_offset(pud, 0);
+ #define __PAGETABLE_PUD_FOLDED 1
+@@ -65,5 +62,4 @@ static inline pud_t *pud_offset(p4d_t *p4d, unsigned long address)
+ #define pud_addr_end(addr, end)			(end)
  
- 	return pmd_table;
+ #endif /* __ASSEMBLY__ */
+-#endif /* !__ARCH_USE_5LEVEL_HACK */
+ #endif /* _PGTABLE_NOPUD_H */
 -- 
 2.25.1
 
