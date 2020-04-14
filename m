@@ -2,130 +2,91 @@ Return-Path: <SRS0=7dZW=56=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF04C2BA19
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DFBC352BE
 	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:11:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7FB03206D5
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:11:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C9D82074D
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Apr 2020 09:11:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuYqFbiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FB03206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wj+mC8hl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9D82074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B77984B1DD;
-	Tue, 14 Apr 2020 05:11:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45E7A4B1E5;
+	Tue, 14 Apr 2020 05:11:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JoV4+3pg8KFh; Tue, 14 Apr 2020 05:11:36 -0400 (EDT)
+	with ESMTP id T6cpybIfopLy; Tue, 14 Apr 2020 05:11:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3474B1E2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9E484B1EF;
 	Tue, 14 Apr 2020 05:11:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23BF64B16D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 17:34:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C4844B1BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 01:40:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HvLm246TNKSe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2020 17:34:23 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D241A4B153
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 17:34:22 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id d17so4945619wrg.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2020 14:34:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WDLpX6un52/AMwecGbJF0+8vb65HmQ8qFANqOY0XK7Y=;
- b=IuYqFbiHvSBMhlKLU88FQD6ph6l8u5128kLqE8SenvYihQJEPGmJINrkyvIh6vpW2u
- /atBvA75QL7UmEbyidSfCXE9VeE6SdB9IhYX6B3aHhwgMX0tmJ1dGgq1iHOBxSuH5Ezk
- VCWc51OJuo2eWBiWuYxF2kVCeRK0CX7KJ1dT2S+MSOGnulH5DMjtn5pZ88A/Y0yof0T2
- UcJ+AiMZeX97qHo6+sK6kWsJjsp0iuoGeKviv5k/BbU7JcMcpQXEn6SjrQEbaon0dw6S
- y7IERsJ3FCFJptrbidN9ACEH4G0Eg5BXm3yzzlYa9opYGLDAD1VPzulRpYMvxfhhzH+p
- vOlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=WDLpX6un52/AMwecGbJF0+8vb65HmQ8qFANqOY0XK7Y=;
- b=clD9veJ/ziUTOHiUXHp/SA3zrX4fFj6B3tYXTmzOijQkPzEDwAcwQIHSvIwY1j8AFr
- NWxVsRSX0TYdGOBQmP60da9vGbC2V/lHVONQAUQ+nDLZ0XZnVBgpV9+6mfp6P7zDGVVJ
- ZiU3J15NS6kFooEUMdnfGikrdiIzeBnNh6o18jl0zvTuPlkD8TGdcouehwAvtOv2Rbgn
- TTKLi3WlFnf+7ZuD8fjbBZdlk/79flbGv2ElAngL+jpmkKbonabFcFUDTfd52yQkGBYd
- lKe8tp5guvnUiFOJOwYGdSWCAxZ1G6Nym9UkVcCOV5FQhr5MBVZystGK7I7rpMdnhAn0
- 7eRw==
-X-Gm-Message-State: AGi0Pub5CyLwV/67uraZ624d3nOYp6ozOX4+2Uy8d/yTHIBZvaMylBIN
- yqJmf0APbt2bDNwx7BCDL0Q=
-X-Google-Smtp-Source: APiQypIaudaXPJ6rENC31BASdvEjjHEOZ24liPPj6hbZ7Im0hP2KXUJDynYo1n+j8lgnYgsqwzYqNQ==
-X-Received: by 2002:a5d:5230:: with SMTP id i16mr14472562wra.71.1586813661849; 
- Mon, 13 Apr 2020 14:34:21 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id b11sm16503963wrq.26.2020.04.13.14.34.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Apr 2020 14:34:21 -0700 (PDT)
-Subject: Re: [PATCH] kvm_host: unify VM_STAT and VCPU_STAT definitions in a
- single place
-To: Emanuele Giuseppe Esposito <eesposit@redhat.com>, kvm@vger.kernel.org
-References: <20200413140332.22896-1-eesposit@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <03a481a8-bcf2-8755-d113-71ef393508bf@amsat.org>
-Date: Mon, 13 Apr 2020 23:34:18 +0200
+ with ESMTP id g06HFzTBGOFg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2020 01:40:18 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D18404B153
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2020 01:40:18 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586842818;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SzGXdrr02xEETNvxPooAet3btKkqhAyq5AZ2occpcYA=;
+ b=Wj+mC8hlWnzFvG62ngzT+7jpxsWtNqQM86gBZsL9wR/sa+D68i5/dYURLXJc0K131nvkjW
+ NPEwGvqFGsKxcx9OO2RrH8yV/g+HTV850u1kL1eEyrPnBmeLN5pRhT+7yGOiAhxWxDcHS4
+ BV6zI7jmBRyhk8iBDIXaHat8bbyU1fE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-yw5T7HaGOEe6nG4ifQYWoA-1; Tue, 14 Apr 2020 01:40:10 -0400
+X-MC-Unique: yw5T7HaGOEe6nG4ifQYWoA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FED98017F5;
+ Tue, 14 Apr 2020 05:40:08 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-77.bne.redhat.com [10.64.54.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53B5B18A8E;
+ Tue, 14 Apr 2020 05:39:59 +0000 (UTC)
+Subject: Re: [PATCH RFCv1 0/7] Support Async Page Fault
+To: Marc Zyngier <maz@kernel.org>
+References: <20200410085820.758686-1-gshan@redhat.com>
+ <d2882e806ad2f9793437160093c8d3fa@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <6a1d7e8b-da10-409f-16d0-354004566a1a@redhat.com>
+Date: Tue, 14 Apr 2020 15:39:56 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200413140332.22896-1-eesposit@redhat.com>
+In-Reply-To: <d2882e806ad2f9793437160093c8d3fa@kernel.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 X-Mailman-Approved-At: Tue, 14 Apr 2020 05:11:35 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, David Hildenbrand <david@redhat.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, kvmarm@lists.cs.columbia.edu,
- linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>, kvm-ppc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+Cc: catalin.marinas@arm.com, shan.gavin@gmail.com, sudeep.holla@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -134,91 +95,129 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Emanuele,
+Hi Marc,
 
-On 4/13/20 4:03 PM, Emanuele Giuseppe Esposito wrote:
-> The macros VM_STAT and VCPU_STAT are redundantly implemented in multiple
-> files, each used by a different architecure to initialize the debugfs
-> entries for statistics. Since they all have the same purpose, they can be
-> unified in a single common definition in include/linux/kvm_host.h
+On 4/10/20 10:52 PM, Marc Zyngier wrote:
+> Hi Gavin,
 > 
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> ---
->  arch/arm64/kvm/guest.c    | 23 +++++++--------
->  arch/mips/kvm/mips.c      | 61 +++++++++++++++++++--------------------
->  arch/powerpc/kvm/book3s.c |  3 --
->  arch/powerpc/kvm/booke.c  |  3 --
->  arch/s390/kvm/kvm-s390.c  |  3 --
->  arch/x86/kvm/x86.c        |  3 --
->  include/linux/kvm_host.h  |  3 ++
->  7 files changed, 43 insertions(+), 56 deletions(-)
+> On 2020-04-10 09:58, Gavin Shan wrote:
+>> There are two stages of page faults and the stage one page fault is
+>> handled by guest itself. The guest is trapped to host when the page
+>> fault is caused by stage 2 page table, for example missing. The guest
+>> is suspended until the requested page is populated. To populate the
+>> requested page can be costly and might be related to IO activities
+>> if the page was swapped out previously. In this case, the guest has
+>> to suspend for a few of milliseconds at least, regardless of the
+>> overall system load.
+>>
+>> The series adds support to asychornous page fault to improve above
+>> situation. If it's costly to populate the requested page, a signal
+>> (PAGE_NOT_PRESENT) is sent to guest so that the faulting process can
+>> be rescheduled if it can be. Otherwise, it is put into power-saving
+>> mode. Another signal (PAGE_READY) is sent to guest once the requested
+>> page is populated so that the faulting process can be waken up either
+>> from either waiting state or power-saving state.
+>>
+>> In order to fulfil the control flow and convey signals between host
+>> and guest. A IMPDEF system register (SYS_ASYNC_PF_EL1) is introduced.
+>> The register accepts control block's physical address, plus requested
+>> features. Also, the signal is sent using data abort with the specific
+>> IMPDEF Data Fault Status Code (DFSC). The specific signal is stored
+>> in the control block by host, to be consumed by guest.
+>>
+>> Todo
+>> ====
+>> * CONFIG_KVM_ASYNC_PF_SYNC is disabled for now because the exception
+>>    injection can't work in nested mode. It might be something to be
+>>    improved in future.
+>> * KVM_ASYNC_PF_SEND_ALWAYS is disabled even with CONFIG_PREEMPTION
+>>    because it's simply not working reliably.
+>> * Tracepoints, which should something to be done in short term.
+>> * kvm-unit-test cases.
+>> * More testing and debugging are needed. Sometimes, the guest can be
+>>    stuck and the root cause needs to be figured out.
 > 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 23ebe51410f0..3e3aee8b37c0 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -29,20 +29,17 @@
->  
->  #include "trace.h"
->  
-> -#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
-> -#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
-> -
->  struct kvm_stats_debugfs_item debugfs_entries[] = {
-> -	VCPU_STAT(halt_successful_poll),
-> -	VCPU_STAT(halt_attempted_poll),
-> -	VCPU_STAT(halt_poll_invalid),
-> -	VCPU_STAT(halt_wakeup),
-> -	VCPU_STAT(hvc_exit_stat),
-> -	VCPU_STAT(wfe_exit_stat),
-> -	VCPU_STAT(wfi_exit_stat),
-> -	VCPU_STAT(mmio_exit_user),
-> -	VCPU_STAT(mmio_exit_kernel),
-> -	VCPU_STAT(exits),
-> +	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll) },
-> +	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll) },
-> +	{ "halt_poll_invalid", VCPU_STAT(halt_poll_invalid) },
-> +	{ "halt_wakeup", VCPU_STAT(halt_wakeup) },
-> +	{ "hvc_exit_stat", VCPU_STAT(hvc_exit_stat) },
-> +	{ "wfe_exit_stat", VCPU_STAT(wfe_exit_stat) },
-> +	{ "wfi_exit_stat", VCPU_STAT(wfi_exit_stat) },
-> +	{ "mmio_exit_user", VCPU_STAT(mmio_exit_user) },
-> +	{ "mmio_exit_kernel", VCPU_STAT(mmio_exit_kernel) },
-> +	{ "exits", VCPU_STAT(exits) },
->  	{ NULL }
->  };
->  
-[...]
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 6d58beb65454..e02d38c7fff1 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1130,6 +1130,9 @@ struct kvm_stats_debugfs_item {
->  #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
->  	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
->  
-> +#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
-> +#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
-
-I find this macro expanding into multiple fields odd... Maybe a matter
-of taste. Sugggestion, have the macro define the full structure, as in
-the arm64 arch:
-
-#define VM_STAT(n, x, ...) { n, offsetof(struct kvm, stat.x),
-KVM_STAT_VM, ## __VA_ARGS__ }
-
-Ditto for VCPU_STAT().
-
-> +
->  extern struct kvm_stats_debugfs_item debugfs_entries[];
->  extern struct dentry *kvm_debugfs_dir;
->  
+> Let me add another few things:
 > 
+> - KVM/arm is (supposed to be) an architectural hypervisor. It means
+>    that one of the design goal is to have as few differences as possible
+>    from the actual hardware. I'm not keen on deviating from it (next
+>    thing you know, you'll add all the PV horror from Xen, HV, VMware...).
+> 
+> - The idea of butchering the arm64 mm subsystem to handle a new exotic
+>    style of exceptions is not something I am looking forward to. We
+>    might as well PV the whole MMU, Xen style, and be done with it. I'll
+>    let the arm64 maintainers comment on this though.
+> 
+
+Thanks for your comments. The feature won't be enabled on guest side until
+CONFIG_KVM_GUEST is enabled. More details can be found from PATCH[7/7]. So
+it would be one specific features supported by KVM. I'm not familiar with
+xen and would like to learn how MMU is para-virtualized there. Do you have
+documents recommended to start with? Otherwise, I will try google later.
+
+> - We don't add IMPDEF sysregs, period. That's reserved for the HW. If
+>    you want to trap, there's the HVC instruction to that effect.
+> 
+
+Yes, HVC can be used for trapping as PV stolen time did. However, I guess
+it's guarded by specification? For example, the para-virtualized time calls
+are specified by DEN0057A, as highlighted in include/linux/arm-smccc.h.
+
+/* Paravirtualised time calls (defined by ARM DEN0057A) */
+#define ARM_SMCCC_HV_PV_TIME_FEATURES                           \
+         ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,                 \
+                            ARM_SMCCC_SMC_64,                    \
+                            ARM_SMCCC_OWNER_STANDARD_HYP,        \
+                            0x20)
+
+#define ARM_SMCCC_HV_PV_TIME_ST                                 \
+         ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,                 \
+                            ARM_SMCCC_SMC_64,                    \
+                            ARM_SMCCC_OWNER_STANDARD_HYP,        \
+                            0x21)
+
+I really don't understand how IMPDEF sysreg is used by hardware vendors.
+Do we have an existing functionality, which depends on IMPDEF sysreg?
+I was thinking the IMPDEF sysreg can be used by software either, but
+it seems I'm wrong.
+
+> - If this is such a great improvement, where are the performance
+>    numbers?
+> 
+
+Yep, Ineed. I'm still looking for appropriate workload currently and hopefully,
+I can share performance data in RFCv2 :)
+
+> - The fact that it apparently cannot work with nesting nor with
+>    preemption tends to indicate that it isn't future proof.
+> 
+
+I didn't make myself clear about the nesting. The data abort exception is injected
+by tweaking ELR_EL1/SPSR_EL1 if the guest is runing in 64-bits and EL1 mode. These
+registers are loaded when the guest gets chance to run. However, it's impossible to
+inject two (nested) data abort exception at once. It's something different from nested
+VM.
+
+There was a hot discusson about the preemption support. It's something in the TODO list
+and needs to be sorted out in future.
+
+https://lore.kernel.org/patchwork/patch/1206121/
+
+
+> Thanks,
+> 
+> 	M.
+> 
+
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
