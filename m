@@ -2,58 +2,58 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B39C38A29
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A898C2BA19
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:38:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3183F21556
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:32:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3183F21556
+	by mail.kernel.org (Postfix) with ESMTP id 0CDD020857
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CDD020857
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A77E74B261;
-	Wed, 15 Apr 2020 06:32:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F18E4B1D9;
+	Wed, 15 Apr 2020 06:38:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HqU1GozLgTEP; Wed, 15 Apr 2020 06:32:03 -0400 (EDT)
+	with ESMTP id gfmPrFSPb5F3; Wed, 15 Apr 2020 06:38:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B11F4B1FB;
-	Wed, 15 Apr 2020 06:32:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 462274B123;
+	Wed, 15 Apr 2020 06:38:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05DCE4B1FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:32:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1CF4B123
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:38:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1-QQU1hW8b+m for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 06:32:00 -0400 (EDT)
+ with ESMTP id tTn+kKVX1m9C for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Apr 2020 06:38:49 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC944B18D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:32:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56BF04B113
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:38:49 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D90B1063;
- Wed, 15 Apr 2020 03:32:00 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E636A1063;
+ Wed, 15 Apr 2020 03:38:48 -0700 (PDT)
 Received: from [10.37.12.1] (unknown [10.37.12.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A70563F68F;
- Wed, 15 Apr 2020 03:31:58 -0700 (PDT)
-Subject: Re: [PATCH 5/8] arm64: cpufeature: Factor out checking of AArch32
- features
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C788E3F68F;
+ Wed, 15 Apr 2020 03:38:46 -0700 (PDT)
+Subject: Re: [PATCH 6/8] arm64: cpufeature: Relax AArch32 system checks if EL1
+ is 64-bit only
 To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-6-will@kernel.org>
+ <20200414213114.2378-7-will@kernel.org>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <95817087-122e-0392-9474-c17ad1f926d2@arm.com>
-Date: Wed, 15 Apr 2020 11:36:48 +0100
+Message-ID: <b648691c-e9cd-f0eb-2ed2-50451a4bceb8@arm.com>
+Date: Wed, 15 Apr 2020 11:43:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200414213114.2378-6-will@kernel.org>
+In-Reply-To: <20200414213114.2378-7-will@kernel.org>
 Content-Language: en-US
 Cc: saiprakash.ranjan@codeaurora.org, anshuman.khandual@arm.com, maz@kernel.org,
  linux-kernel@vger.kernel.org, dianders@chromium.org, catalin.marinas@arm.com,
@@ -75,45 +75,20 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 04/14/2020 10:31 PM, Will Deacon wrote:
-> update_cpu_features() is pretty large, so split out the checking of the
-> AArch32 features into a separate function and call it after checking the
-> AArch64 features.
+> If AArch32 is not supported at EL1, the AArch32 feature register fields
+> no longer advertise support for some system features:
+> 
+>    * ISAR4.SMC
+>    * PFR1.{Virt_frac, Sec_frac, Virtualization, Security, ProgMod}
+> 
+> In which case, we don't need to emit "SANITY CHECK" failures for all of
+> them.
+> 
+> Add logic to relax the strictness of individual feature register fields
+> at runtime and use this for the fields above if 32-bit EL1 is not
+> supported.
 > 
 > Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->   arch/arm64/kernel/cpufeature.c | 108 +++++++++++++++++++--------------
->   1 file changed, 61 insertions(+), 47 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 7dfcdd9e75c1..32828a77acc3 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -715,6 +715,65 @@ static int check_update_ftr_reg(u32 sys_id, int cpu, u64 val, u64 boot)
->   	return 1;
->   }
->   
-> +static int update_32bit_cpu_features(int cpu, struct cpuinfo_arm64 *info,
-> +				     struct cpuinfo_arm64 *boot)
-> +{
-
-...
-
-> -
->   	if (id_aa64pfr0_sve(info->reg_id_aa64pfr0)) {
->   		taint |= check_update_ftr_reg(SYS_ZCR_EL1, cpu,
->   					info->reg_zcr, boot->reg_zcr);
-> @@ -845,6 +857,8 @@ void update_cpu_features(int cpu,
->   			sve_update_vq_map();
->   	}
->   
-> +	taint |= update_32bit_cpu_features(cpu, info, boot);
-> +
-
-This relies on the assumption that the id_aa64pfr0 has been sanitised. 
-It may be worth adding a comment to make sure people (hacking the
-kernel) don't move this around and break that dependency.
-
-Either ways:
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
