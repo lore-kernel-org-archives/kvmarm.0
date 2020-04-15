@@ -2,62 +2,56 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 822A6C3815B
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 076D1C3815B
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 152C620737
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 152C620737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A70D720737
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70D720737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EBDF4B1FB;
-	Wed, 15 Apr 2020 06:46:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2FB44B1D7;
+	Wed, 15 Apr 2020 06:58:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pBK4+yDbouMg; Wed, 15 Apr 2020 06:46:14 -0400 (EDT)
+	with ESMTP id PPsLE5e8tvdJ; Wed, 15 Apr 2020 06:58:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E6E14B1CC;
-	Wed, 15 Apr 2020 06:46:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 126274B163;
+	Wed, 15 Apr 2020 06:58:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 486684B1BD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:46:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F17D4B158
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:58:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4pleQ2D+JO2b for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 06:46:12 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 237254B1B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:46:12 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 716E81063;
- Wed, 15 Apr 2020 03:46:11 -0700 (PDT)
-Received: from [10.37.12.1] (unknown [10.37.12.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C5C73F68F;
- Wed, 15 Apr 2020 03:46:09 -0700 (PDT)
-Subject: Re: [PATCH 7/8] arm64: cpufeature: Relax checks for AArch32 support
- at EL[0-2]
-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-8-will@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <714f124c-7eb7-b750-e98c-63da64ddae75@arm.com>
-Date: Wed, 15 Apr 2020 11:50:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ with ESMTP id 1tsc++wJWsg1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Apr 2020 06:58:14 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CAC54B118
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:58:13 -0400 (EDT)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 6A0BE3045232E8082CF7;
+ Wed, 15 Apr 2020 18:58:06 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 15 Apr 2020 18:58:00 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: arm64: Drop PTE_S2_MEMATTR_MASK
+Date: Wed, 15 Apr 2020 18:57:46 +0800
+Message-ID: <20200415105746.314-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <20200414213114.2378-8-will@kernel.org>
-Content-Language: en-US
-Cc: saiprakash.ranjan@codeaurora.org, anshuman.khandual@arm.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, dianders@chromium.org, catalin.marinas@arm.com,
- kernel-team@android.com
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,37 +63,38 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/14/2020 10:31 PM, Will Deacon wrote:
-> We don't need to be quite as strict about mismatched AArch32 support,
-> which is good because the friendly hardware folks have been busy
-> mismatching this to their hearts' content.
-> 
->    * We don't care about EL2 or EL3 (there are silly comments concerning
->      the latter, so remove those)
-> 
->    * EL1 support is gated by the ARM64_HAS_32BIT_EL1 capability and handled
->      gracefully when a mismatch occurs
-> 
->    * EL1 support is gated by the ARM64_HAS_32BIT_EL0 capability and handled
+The only user of PTE_S2_MEMATTR_MASK macro had been removed since
+commit a501e32430d4 ("arm64: Clean up the default pgprot setting").
+It has been about six years and no one has used it again.
 
-s/EL1/EL0
+Let's drop it.
 
->      gracefully when a mismatch occurs
-> 
-> Relax the AArch32 checks to FTR_NONSTRICT.
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ arch/arm64/include/asm/pgtable-hwdef.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-Agreed. We should do something similar for the features exposed by the
-ELF_HWCAP, of course in a separate series.
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 6bf5e650da78..99315bdca0e6 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -190,7 +190,6 @@
+  * Memory Attribute override for Stage-2 (MemAttr[3:0])
+  */
+ #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
+-#define PTE_S2_MEMATTR_MASK	(_AT(pteval_t, 0xf) << 2)
+ 
+ /*
+  * EL2/HYP PTE/PMD definitions
+-- 
+2.19.1
 
-> 
-> Signed-off-by: Will Deacon <will@kernel.org>
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
