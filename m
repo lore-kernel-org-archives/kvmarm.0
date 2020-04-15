@@ -2,68 +2,60 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C85C3815B
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EA4C2BA19
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 11:32:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D770720784
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1HhYnu9M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D770720784
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8BBA520737
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 11:32:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BBA520737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66D714B167;
-	Wed, 15 Apr 2020 06:58:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F2824B166;
+	Wed, 15 Apr 2020 07:32:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dDt3uSh0TTCz; Wed, 15 Apr 2020 06:58:52 -0400 (EDT)
+	with ESMTP id vFqym7FQ4GMK; Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 487444B1D7;
-	Wed, 15 Apr 2020 06:58:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA1714B10D;
+	Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21B9A4B167
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:58:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 353D64B0FD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XvIrcKKwLANL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 06:58:50 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37DA24B163
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 06:58:50 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8202320737;
- Wed, 15 Apr 2020 10:58:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586948329;
- bh=CREoP6ow54O+9uP6Nr3jiB5GlPGFSrwpvxq54PH6zc0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=1HhYnu9MIHu7uBu8iCaGrYgjMczZnXow3gS6bknWEk7L7PWw+q2APHOMia1+mGGLl
- SeoGP0GOp/cUK6gieqe9hrTGnTwDXpsnQ4vKEuUWPGomRvlRUSVx75sQcfMiG5xmdY
- mIKao2F9HAVTn5ug8w4JpxJQ8EpXIeSKzfpfVzLg=
-Date: Wed, 15 Apr 2020 11:58:44 +0100
-From: Will Deacon <will@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
+ with ESMTP id AKLWpBuFVNEa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Apr 2020 07:32:46 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 165364B0FA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 07:32:46 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8470B1063;
+ Wed, 15 Apr 2020 04:32:45 -0700 (PDT)
+Received: from [10.37.12.1] (unknown [10.37.12.1])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCAB13F68F;
+ Wed, 15 Apr 2020 04:32:42 -0700 (PDT)
 Subject: Re: [PATCH 7/8] arm64: cpufeature: Relax checks for AArch32 support
  at EL[0-2]
-Message-ID: <20200415105843.GE12621@willie-the-truck>
+To: will@kernel.org
 References: <20200414213114.2378-1-will@kernel.org>
  <20200414213114.2378-8-will@kernel.org>
  <714f124c-7eb7-b750-e98c-63da64ddae75@arm.com>
+ <20200415105843.GE12621@willie-the-truck>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <d1f538ec-e956-c136-d0f8-54e7351a28a9@arm.com>
+Date: Wed, 15 Apr 2020 12:37:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <714f124c-7eb7-b750-e98c-63da64ddae75@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200415105843.GE12621@willie-the-truck>
+Content-Language: en-US
 Cc: saiprakash.ranjan@codeaurora.org, anshuman.khandual@arm.com, maz@kernel.org,
  linux-kernel@vger.kernel.org, dianders@chromium.org, catalin.marinas@arm.com,
  kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
@@ -79,38 +71,42 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 15, 2020 at 11:50:58AM +0100, Suzuki K Poulose wrote:
-> On 04/14/2020 10:31 PM, Will Deacon wrote:
-> > We don't need to be quite as strict about mismatched AArch32 support,
-> > which is good because the friendly hardware folks have been busy
-> > mismatching this to their hearts' content.
-> > 
-> >    * We don't care about EL2 or EL3 (there are silly comments concerning
-> >      the latter, so remove those)
-> > 
-> >    * EL1 support is gated by the ARM64_HAS_32BIT_EL1 capability and handled
-> >      gracefully when a mismatch occurs
-> > 
-> >    * EL1 support is gated by the ARM64_HAS_32BIT_EL0 capability and handled
+On 04/15/2020 11:58 AM, Will Deacon wrote:
+> On Wed, Apr 15, 2020 at 11:50:58AM +0100, Suzuki K Poulose wrote:
+>> On 04/14/2020 10:31 PM, Will Deacon wrote:
+>>> We don't need to be quite as strict about mismatched AArch32 support,
+>>> which is good because the friendly hardware folks have been busy
+>>> mismatching this to their hearts' content.
+>>>
+>>>     * We don't care about EL2 or EL3 (there are silly comments concerning
+>>>       the latter, so remove those)
+>>>
+>>>     * EL1 support is gated by the ARM64_HAS_32BIT_EL1 capability and handled
+>>>       gracefully when a mismatch occurs
+>>>
+>>>     * EL1 support is gated by the ARM64_HAS_32BIT_EL0 capability and handled
+>>
+>> s/EL1/EL0
+>>
+>>>       gracefully when a mismatch occurs
+>>>
+>>> Relax the AArch32 checks to FTR_NONSTRICT.
+>>
+>> Agreed. We should do something similar for the features exposed by the
+>> ELF_HWCAP, of course in a separate series.
 > 
-> s/EL1/EL0
-> 
-> >      gracefully when a mismatch occurs
-> > 
-> > Relax the AArch32 checks to FTR_NONSTRICT.
-> 
-> Agreed. We should do something similar for the features exposed by the
-> ELF_HWCAP, of course in a separate series.
+> Hmm, I didn't think we needed to touch the HWCAPs, as they're derived from
+> the sanitised feature register values. What am I missing?
 
-Hmm, I didn't think we needed to touch the HWCAPs, as they're derived from
-the sanitised feature register values. What am I missing?
+sorry, that was cryptic. I was suggesting to relax the ftr fields to
+NONSTRICT for the fields covered by ELF HWCAPs (and other CPU hwcaps).
 
-Will
+Suzuki
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
