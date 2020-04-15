@@ -2,64 +2,105 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EA4C2BA19
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 11:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC66CC2BB55
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 12:11:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BBA520737
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 11:32:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BBA520737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 48F49206F9
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 12:11:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPs7s5Bj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F49206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F2824B166;
-	Wed, 15 Apr 2020 07:32:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A71994B110;
+	Wed, 15 Apr 2020 08:11:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vFqym7FQ4GMK; Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
+	with ESMTP id eFrVK3oFsQFi; Wed, 15 Apr 2020 08:11:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA1714B10D;
-	Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C65914B123;
+	Wed, 15 Apr 2020 08:11:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 353D64B0FD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 07:32:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92DDF4B123
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 08:11:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AKLWpBuFVNEa for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 07:32:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 165364B0FA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 07:32:46 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8470B1063;
- Wed, 15 Apr 2020 04:32:45 -0700 (PDT)
-Received: from [10.37.12.1] (unknown [10.37.12.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCAB13F68F;
- Wed, 15 Apr 2020 04:32:42 -0700 (PDT)
-Subject: Re: [PATCH 7/8] arm64: cpufeature: Relax checks for AArch32 support
- at EL[0-2]
-To: will@kernel.org
-References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-8-will@kernel.org>
- <714f124c-7eb7-b750-e98c-63da64ddae75@arm.com>
- <20200415105843.GE12621@willie-the-truck>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <d1f538ec-e956-c136-d0f8-54e7351a28a9@arm.com>
-Date: Wed, 15 Apr 2020 12:37:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ with ESMTP id jqZbv9St-c23 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Apr 2020 08:11:43 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 792834B110
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 08:11:43 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586952703;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7z2lxhqtqRac6OWBHZcztpuLVVDTo4I3uiQvbh1thqo=;
+ b=fPs7s5BjNPIR/RA3hQkHQyTAl649bLZIiGzUKhrw7roorZGsjKZtVdU2wZj5ebhiG0ndK1
+ NoNHmGW0ONe9E95vqOQR7/8st+QGK082Co+6j0q6FQzy9w725QRqBCZOT/Kod5hOxl5+KZ
+ ond6sr2IPbR8CgkK6o0fheQviEIU0js=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159--qLN0zT_OMGWTcXjVSZcaw-1; Wed, 15 Apr 2020 08:11:39 -0400
+X-MC-Unique: -qLN0zT_OMGWTcXjVSZcaw-1
+Received: by mail-wm1-f69.google.com with SMTP id h184so2087964wmf.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 05:11:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3g8pOUWTOZg7Xu60Mt7A1x/Ov3i7r+YKQXs6UW5HczM=;
+ b=aXAVLXb782Fvup0g/MdxupXP0I8VUr3khVMnzSAhSqy61P/CU/oe9UA6KNFVHgA6eI
+ +HV2lzm3khNhzAYMmCk1VjrpDfT881WAqh3BIgv8SZubePtCPKP6lJ1Hl7E+mo3mfuNT
+ QBn1Lj5NFJ/TMCA84Cu/wJzDkmdCwRAMjbm+ebgaMA4mCBWvwDyTFJkob5zthR610UST
+ O2c27Gff81C8/nQ7KrytB14z0FNTspjUf+WVDbcVVGWRxr+0ldH7RzaJdfXdk+gTkGmd
+ hpQdRukDQ8FYenE9F/FvD6CG/lMIIxu+vbeUvW6qlsfWi/ZLp6YgHcey3w4YctAG2fch
+ xTCw==
+X-Gm-Message-State: AGi0PuYGxn6Zx4mnRbZRkwTeVwBA8geQ5+wucVUG2JuPyYAxlrZfc0nQ
+ UQkIuU2YgNKOwp8iluFBxkkYoE+pLsUWHvb47NrpEL847OB4fXHf9P0XLBDZL3xCv4oJ0rNaGzx
+ MMOBLaqdxWd2HptrHB2iQVcqR
+X-Received: by 2002:a5d:688f:: with SMTP id h15mr29234462wru.352.1586952698408; 
+ Wed, 15 Apr 2020 05:11:38 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKdWpo7ENEPbDqHP93vSXvdpZwuSMQZ1BbP1xfwyNZcod/63Icpez1n6CuR5oR+nIQbYmcMPw==
+X-Received: by 2002:a5d:688f:: with SMTP id h15mr29234435wru.352.1586952698180; 
+ Wed, 15 Apr 2020 05:11:38 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9066:4f2:9fbd:f90e?
+ ([2001:b07:6468:f312:9066:4f2:9fbd:f90e])
+ by smtp.gmail.com with ESMTPSA id q8sm22064722wmg.22.2020.04.15.05.11.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 05:11:37 -0700 (PDT)
+Subject: Re: [PATCH 3/4] kvm: Replace vcpu->swait with rcuwait
+To: Davidlohr Bueso <dave@stgolabs.net>
+References: <20200324044453.15733-1-dave@stgolabs.net>
+ <20200324044453.15733-4-dave@stgolabs.net>
+ <a6b23828-aa50-bea0-1d2d-03e2871239d4@redhat.com>
+ <20200414211243.7vehybdrvbzmbduu@linux-p48b>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b2f87633-8eef-4f84-5e65-a80523ca34f8@redhat.com>
+Date: Wed, 15 Apr 2020 14:11:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200415105843.GE12621@willie-the-truck>
+In-Reply-To: <20200414211243.7vehybdrvbzmbduu@linux-p48b>
 Content-Language: en-US
-Cc: saiprakash.ranjan@codeaurora.org, anshuman.khandual@arm.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, dianders@chromium.org, catalin.marinas@arm.com,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
+ torvalds@linux-foundation.org, bigeasy@linutronix.de,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org, tglx@linutronix.de,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,42 +112,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/15/2020 11:58 AM, Will Deacon wrote:
-> On Wed, Apr 15, 2020 at 11:50:58AM +0100, Suzuki K Poulose wrote:
->> On 04/14/2020 10:31 PM, Will Deacon wrote:
->>> We don't need to be quite as strict about mismatched AArch32 support,
->>> which is good because the friendly hardware folks have been busy
->>> mismatching this to their hearts' content.
->>>
->>>     * We don't care about EL2 or EL3 (there are silly comments concerning
->>>       the latter, so remove those)
->>>
->>>     * EL1 support is gated by the ARM64_HAS_32BIT_EL1 capability and handled
->>>       gracefully when a mismatch occurs
->>>
->>>     * EL1 support is gated by the ARM64_HAS_32BIT_EL0 capability and handled
->>
->> s/EL1/EL0
->>
->>>       gracefully when a mismatch occurs
->>>
->>> Relax the AArch32 checks to FTR_NONSTRICT.
->>
->> Agreed. We should do something similar for the features exposed by the
->> ELF_HWCAP, of course in a separate series.
-> 
-> Hmm, I didn't think we needed to touch the HWCAPs, as they're derived from
-> the sanitised feature register values. What am I missing?
+On 14/04/20 23:12, Davidlohr Bueso wrote:
+> On Wed, 25 Mar 2020, Paolo Bonzini wrote:
+> =
 
-sorry, that was cryptic. I was suggesting to relax the ftr fields to
-NONSTRICT for the fields covered by ELF HWCAPs (and other CPU hwcaps).
+>> On 24/03/20 05:44, Davidlohr Bueso wrote:
+>>> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+>>> index 71244bf87c3a..e049fcb3dffb 100644
+>>> --- a/arch/mips/kvm/mips.c
+>>> +++ b/arch/mips/kvm/mips.c
+>>> @@ -290,8 +290,7 @@ static enum hrtimer_restart
+>>> kvm_mips_comparecount_wakeup(struct hrtimer *timer)
+>>> =A0=A0=A0=A0kvm_mips_callbacks->queue_timer_int(vcpu);
+>>>
+>>> =A0=A0=A0=A0vcpu->arch.wait =3D 0;
+>>> -=A0=A0=A0 if (swq_has_sleeper(&vcpu->wq))
+>>> -=A0=A0=A0=A0=A0=A0=A0 swake_up_one(&vcpu->wq);
+>>> +=A0=A0=A0 rcuwait_wake_up(&vcpu->wait)
+>>
+>> This is missing a semicolon.=A0 (KVM MIPS is known not to compile and wi=
+ll
+>> be changed to "depends on BROKEN" in 5.7).
+> =
 
-Suzuki
+> Do you want me to send another version with this fix or do you prefer
+> fixing it when/if picked up?
+
+It's up to the TIP tree people, but sending a fixed version is probably
+the best way to get their attention. :)
+
+I can also queue it myself (for 5.7 even) if I get an Acked-by from
+Peter though.
+
+Paolo
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
