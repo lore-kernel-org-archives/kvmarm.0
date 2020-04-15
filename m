@@ -2,73 +2,79 @@ Return-Path: <SRS0=fBez=57=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8C1C2BB85
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 17:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C290C2BB85
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 17:06:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 283AC206F9
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 17:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D11BA20784
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Apr 2020 17:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cp7XRASH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 283AC206F9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="yychbi2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11BA20784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6D574B21D;
-	Wed, 15 Apr 2020 13:00:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76D0F4B155;
+	Wed, 15 Apr 2020 13:06:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZsE0Wwvr0A2f; Wed, 15 Apr 2020 13:00:38 -0400 (EDT)
+	with ESMTP id AWzhbc9uBPnh; Wed, 15 Apr 2020 13:06:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66C104B213;
-	Wed, 15 Apr 2020 13:00:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 893524B21F;
+	Wed, 15 Apr 2020 13:06:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E345D4B213
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 13:00:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 245C24B15D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 11:56:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XkTNc2VXh8-T for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2020 13:00:36 -0400 (EDT)
+ with ESMTP id 0nTz39wtbMoW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Apr 2020 11:56:05 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB80D4B155
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 13:00:35 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0AE31206F9;
- Wed, 15 Apr 2020 17:00:32 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4E254B12B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 11:56:04 -0400 (EDT)
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com
+ [209.85.166.169])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id D8F5820857
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 15:56:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1586970034;
- bh=MgOckoa6oaXylsn5YDxRnw+SO2S8/uU9ZQM4CMMYhm0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cp7XRASHgNQMYStqM9ccE+H4cbmpnvWsouW1/UcDJzRy7Tj4nwWnYlg5nCtAE246T
- bvnQx6CzbbqsPvaDF8ASoMzrXi3scNKrNh/PmIe+hw+3dcNqI/VHdWiAfYOEXE8JtC
- JaG0B9RXKq7wg2MukI0p2o4VLkjDuFNms4+4269M=
-Date: Wed, 15 Apr 2020 18:00:29 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/8] arm64: cpufeature: Add CPU capability for AArch32
- EL1 support
-Message-ID: <20200415170029.GA19615@willie-the-truck>
-References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-4-will@kernel.org>
- <1b76993491176577567a0960a435dac0@kernel.org>
+ s=default; t=1586966163;
+ bh=n4WL1T858zal6SWux0kcghyeb03YcdCK83LPyQqpmOU=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=yychbi2M7PdL4U/sur0ERyt44GK4CFegqPUkaZ1u5iy/BuUdzfAp14ANUWaR8RxPY
+ bwqjQ64EQpRgDtmlgXu9BiUK0xgrFqQTt18ZLPPLIvp0DI+7bea4NZZSwk2qL2/iIK
+ 8cJC/FT8JDPZpcoYDkmf2w2RhK7MSepi/7zMldDI=
+Received: by mail-il1-f169.google.com with SMTP id i75so3745698ild.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2020 08:56:03 -0700 (PDT)
+X-Gm-Message-State: AGi0PubbL6Bcs9DwGwTUaoMX78CiOaYkW2KanPk9yGCKfmf/Lj3XLrYv
+ JJU7RQY/ImNan4p0aoMIcX4aqBm+3YKOZjMNsT4=
+X-Google-Smtp-Source: APiQypJO2rcsOAPOZwNgYyBGwSD18Rro24rIIN5xJo2IrgJIuBFWlXuwcbqq2VlhdS3Pf3dN91LZUXXkZ6WIB4fz4EM=
+X-Received: by 2002:a92:5a4c:: with SMTP id o73mr5693957ilb.218.1586966163228; 
+ Wed, 15 Apr 2020 08:56:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1b76993491176577567a0960a435dac0@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Sai Prakash Ranjan <saiprakash.ranjan@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Doug Anderson <dianders@chromium.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20200221165532.90618-1-andre.przywara@arm.com>
+ <2d3bad43-10a5-3ee1-72e7-e1da1d6c65dd@arm.com>
+ <CAMj1kXGUiCLvmJUwrxCc8aHdE30WWfa95ou-tEM8Kv0nj2GdDA@mail.gmail.com>
+In-Reply-To: <CAMj1kXGUiCLvmJUwrxCc8aHdE30WWfa95ou-tEM8Kv0nj2GdDA@mail.gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 15 Apr 2020 17:55:51 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXF6iw47MM_tg5izB9KC-N2zrnQbhwT2TVPOuKdpOBX=ow@mail.gmail.com>
+Message-ID: <CAMj1kXF6iw47MM_tg5izB9KC-N2zrnQbhwT2TVPOuKdpOBX=ow@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v3] Add emulation for CFI compatible flash memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>, sami.mujawar@arm.com
+X-Mailman-Approved-At: Wed, 15 Apr 2020 13:06:31 -0400
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Raphael Gault <raphael.gault@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,29 +91,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Wed, 15 Apr 2020 at 17:43, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> On Tue, 7 Apr 2020 at 17:15, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >
+> > I've tested this patch by running badblocks and fio on a flash device inside a
+> > guest, everything worked as expected.
+> >
+> > I've also looked at the flowcharts for device operation from Intel Application
+> > Note 646, pages 12-21, and they seem implemented correctly.
+> >
+> > A few minor issues below.
+> >
+> > On 2/21/20 4:55 PM, Andre Przywara wrote:
+> > > From: Raphael Gault <raphael.gault@arm.com>
+> > >
+> > > The EDK II UEFI firmware implementation requires some storage for the EFI
+> > > variables, which is typically some flash storage.
+> > > Since this is already supported on the EDK II side, we add a CFI flash
+> > > emulation to kvmtool.
+> > > This is backed by a file, specified via the --flash or -F command line
+> > > option. Any flash writes done by the guest will immediately be reflected
+> > > into this file (kvmtool mmap's the file).
+> > > The flash will be limited to the nearest power-of-2 size, so only the
+> > > first 2 MB of a 3 MB file will be used.
+> > >
+> > > This implements a CFI flash using the "Intel/Sharp extended command
+> > > set", as specified in:
+> > > - JEDEC JESD68.01
+> > > - JEDEC JEP137B
+> > > - Intel Application Note 646
+> > > Some gaps in those specs have been filled by looking at real devices and
+> > > other implementations (QEMU, Linux kernel driver).
+> > >
+> > > At the moment this relies on DT to advertise the base address of the
+> > > flash memory (mapped into the MMIO address space) and is only enabled
+> > > for ARM/ARM64. The emulation itself is architecture agnostic, though.
+> > >
+> > > This is one missing piece toward a working UEFI boot with kvmtool on
+> > > ARM guests, the other is to provide writable PCI BARs, which is WIP.
+> > >
+>
+> I have given this a spin with UEFI built for kvmtool, and it appears
+> to be working correctly. However, I noticed that it is intolerably
+> slow, which seems to be caused by the fact that both array mode and
+> command mode (or whatever it is called in the CFI spec) are fully
+> emulated, whereas in the QEMU implementation (for instance), the
+> region is actually exposed to the guest using a read-only KVM memslot
+> in array mode, and so the read accesses are made natively.
+>
+> It is also causing problems in the UEFI implementation, as we can no
+> longer use unaligned accesses to read from the region, which is
+> something the code currently relies on (and which works fine on actual
+> hardware as long as you use normal non-cacheable mappings)
+>
 
-On Wed, Apr 15, 2020 at 09:55:57AM +0100, Marc Zyngier wrote:
-> On 2020-04-14 22:31, Will Deacon wrote:
-> > Although we emit a "SANITY CHECK" warning and taint the kernel if we
-> > detect a CPU mismatch for AArch32 support at EL1, we still online the
-> > CPU with disastrous consequences for any running 32-bit VMs.
-> > 
-> > Introduce a capability for AArch32 support at EL1 so that late onlining
-> > of incompatible CPUs is forbidden.
-> > 
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> 
-> Definitely an improvement over the current situation, as the direct read
-> of ID_AA64PFR0 was always a bit dodgy. Given that I'm pretty sure these new
-> braindead SoCs are going to run an older version of the kernel, should we
-> Cc stable for this?
-
-I don't think there's a real need for -stable given that we do at least
-taint the kernel. That's likely to annoy vendors enough to backport this
-themselves ;)
-
-Will
+Actually, the issue is not alignment. The issue is with instructions
+with multiple outputs, which means you cannot do an ordinary memcpy()
+from the NOR region using ldp instructions, aligned or not.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
