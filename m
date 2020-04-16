@@ -2,71 +2,63 @@ Return-Path: <SRS0=0qdQ=6A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 572FAC2BB55
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Apr 2020 11:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC96C2BB55
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Apr 2020 12:08:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D067C21D95
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Apr 2020 11:58:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="URf8tVUp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D067C21D95
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7F2F020767
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Apr 2020 12:08:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2F020767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56EB24B141;
-	Thu, 16 Apr 2020 07:58:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F245F4B241;
+	Thu, 16 Apr 2020 08:08:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4yNb206HoLjr; Thu, 16 Apr 2020 07:58:30 -0400 (EDT)
+	with ESMTP id 7+IE3M5IclJw; Thu, 16 Apr 2020 08:08:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 576984B155;
-	Thu, 16 Apr 2020 07:58:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D07774B1FE;
+	Thu, 16 Apr 2020 08:08:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 741674B153
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2020 07:58:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7FD04B155
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2020 08:08:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vd0s9d+4bWig for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Apr 2020 07:58:28 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8384A4B141
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2020 07:58:28 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 84BA521D7F;
- Thu, 16 Apr 2020 11:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587038307;
- bh=C02HcDV/4ymZNiH43m0bSPRVlDyWt+JoeqGraHiMLd0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=URf8tVUpg0dmW48kXtETXHP24CfevH1ltJdpvaAbByZa5tCvk27qPG9Kfjtvb4RAs
- tlGYb9cWL6gOnGvPrPDx0n8WM9ShN8U2ZjoQEDehefBb+vVe2Mnw3CPY3McZnvoZ9w
- Bg39tBl0Nx4JN2v/pxk4wIRYnLg1kI+62/88Of/0=
-Date: Thu, 16 Apr 2020 12:58:22 +0100
-From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH 8/8] arm64: cpufeature: Add an overview comment for the
- cpufeature framework
-Message-ID: <20200416115817.GB32443@willie-the-truck>
-References: <20200414213114.2378-1-will@kernel.org>
- <20200414213114.2378-9-will@kernel.org>
+ with ESMTP id jQ-ficNGr3O9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Apr 2020 08:08:18 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 513294B141
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2020 08:08:18 -0400 (EDT)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 0B70046E24AE8485149C;
+ Thu, 16 Apr 2020 20:08:06 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Thu, 16 Apr 2020
+ 20:07:55 +0800
+Subject: Re: [PATCH] KVM: handle the right RAS SEA(Synchronous External Abort)
+ type
+To: James Morse <james.morse@arm.com>
+References: <20200411121740.37615-1-gengdongjiu@huawei.com>
+ <0fa259ab-0e2f-a8b3-783d-24a725b4cc5d@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <65414dc5-1cd7-003d-7c6a-5da62c6a4a1d@huawei.com>
+Date: Thu, 16 Apr 2020 20:07:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200414213114.2378-9-will@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Sai Prakash Ranjan <saiprakash.ranjan@codeaurora.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Doug Anderson <dianders@chromium.org>,
- Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com
+In-Reply-To: <0fa259ab-0e2f-a8b3-783d-24a725b4cc5d@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, linuxarm@huawei.com,
+ catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,25 +75,101 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Suzuki,
+Hi James
 
-On Tue, Apr 14, 2020 at 10:31:14PM +0100, Will Deacon wrote:
-> Now that Suzuki isn't within throwing distance, I thought I'd better add
-> a rough overview comment to cpufeature.c so that it doesn't take me days
-> to remember how it works next time.
+On 2020/4/14 20:18, James Morse wrote:
+> Hi Geng,
 > 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/kernel/cpufeature.c | 43 ++++++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+> On 11/04/2020 13:17, Dongjiu Geng wrote:
+>> When the RAS Extension is implemented, b0b011000, 0b011100,
+>> 0b011101, 0b011110, and 0b011111, are not used and reserved
+>> to the DFSC[5:0] of ESR_ELx, but the code still checks these
+>> unused bits, so remove them.
+> 
+> They aren't unused: CPUs without the RAS extensions may still generate these.
+> 
+> kvm_handle_guest_abort() wants to know if this is an external abort.
+> KVM doesn't really care if the CPU has the RAS extensions or not, its the arch code's job
+> to sort all that out.
 
-Any chance you can look at this one, please? I don't trust myself to get
-all of the details right here! I'm also wondering whether we should mention
-something about KVM and the guest view of the registers.
+No, handle_guest_sea() ---> ghes_notify_sea  ---> apei driver
 
-What do you think?
+If it is an  external abort, it will call apei driver to handle it, but it should be only SEA will call the apei driver.
+other type of external abort should not call apei driver.
+I am not see arch code sort all that out.
 
-Will
+        /* Synchronous External Abort? */
+        if (kvm_vcpu_dabt_isextabt(vcpu)) {
+                /*
+                 * For RAS the host kernel may handle this abort.
+                 * There is no need to pass the error into the guest.
+                 */
+                if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
+                        return 1;
+         }
+
+> 
+> 
+>> If the handling of guest ras data error fails, it should
+>> inject data instead of SError to let the guest recover as
+>> much as possible.
+
+In some hardware platform, it supports RAS, but the RAS error address will be not recorded, so it is better to inject a data abort instead of SError for thtat platform.
+because guest will try to do recovery for the Synchronous data abort, such as kill the error application. But for SError, guest will be panic.
+
+> 
+> (I don't quite follow your point here).
+> 
+> If KVM injected a synchronous external abort due to a RAS error here, then you wouldn't be
+> able to support firmware-first RAS with Qemu. I don't think this is what you want.
+> 
+> 
+> The handling is (and should be) decoupled.
+> 
+> KVM guests aren't special. Whatever happens for a normal user-space process is what should
+> happen here. KVM is just doing the plumbing:
+> 
+> When the hypervisor takes an external abort due to the guest, it should plumb the error
+> into the arch code to be handled. This is what would happen for a normal EL0 process.
+> This is what do_sea() and kvm_handle_guest_sea() do with apei_claim_sea().
+> 
+> If the RAS code says it handled this error, then we can continue. For user-space, we
+> return to user-space. For a guest, we return to the guest. (for user-space this piece is
+> not quite complete in mainline, see:
+> https://lore.kernel.org/linux-acpi/20200228174817.74278-4-james.morse@arm.com/ )
+> 
+> This first part happens even if the errors are notified by IRQs, or found in a polled buffer.
+> 
+> The RAS code may have 'handled' the memory by unmapping it, and marking the corresponding
+> page as HWPOISONed. If user-space tries to access this, it will be give an
+> SIGBUS:MCEERR_AR. If a guest tries to do this, the same things happens. (The signal goes
+> to Qemu).
+> (See do_page_fault()s use of the MCEERR si_code's, and kvm_send_hwpoison_signal)
+> 
+> This second part is the same regardless of how the kernel discovered the RAS error in the
+> first place.
+> 
+> 
+> If the RAS code says it did not handle this error, it means it wasn't a RAS error, or your
+> platform doesn't support RAS. For an external-abort there is very little the hypervisor
+> can do in this situation. It does what KVM has always done: inject an asynchronous
+> external abort.
+> This should only happen if the host has failed to handle the error. KVM's use of
+> asynchronous abort is the simplest one size fits all.
+> 
+> Are you seeing this happen? If so, what are the circumstances. Did the host handle the
+> error? (if not: why not!)
+
+Yes, some platform supports RAS but will not record the error address, so the host has failed to handle the error.
+
+> 
+> 
+> Thanks,
+> 
+> James
+> .
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
