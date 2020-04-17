@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A488FC352BE
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4FFC2D0EF
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5D4CD21D91
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83C0821D6C
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="LvJdt4xd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4CD21D91
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="SBJTzZpq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C0821D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04F144B169;
-	Fri, 17 Apr 2020 09:58:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8734B296;
+	Fri, 17 Apr 2020 09:58:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 34JKW+pT4y5o; Fri, 17 Apr 2020 09:58:17 -0400 (EDT)
+	with ESMTP id 570ZYtiXOwPI; Fri, 17 Apr 2020 09:58:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFCC54B1AF;
-	Fri, 17 Apr 2020 09:58:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD9A4B256;
+	Fri, 17 Apr 2020 09:58:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93C034B28D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 09:58:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 015234B1FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 09:58:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AqmlPk39X4DK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Apr 2020 09:58:14 -0400 (EDT)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78A144B1AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 09:58:14 -0400 (EDT)
-Received: by mail-wm1-f74.google.com with SMTP id f81so851597wmf.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:58:14 -0700 (PDT)
+ with ESMTP id 1vDuVhrLsDNx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Apr 2020 09:58:18 -0400 (EDT)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 567024B177
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 09:58:17 -0400 (EDT)
+Received: by mail-wr1-f74.google.com with SMTP id u4so1036566wrm.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:58:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=tAH4dP3n0b960oSUROayMJLmuvt/xqsz9m5CG7jOidw=;
- b=LvJdt4xdRTGYNB177WOdvPO6dL0DHtKKyX9AnqcRnYN8dSlGa8oVXMVCVEEj6tMVpS
- +bHuwE1tr05+QDVHFjOhNfIGZnvqHiyhr65hQnOaGpQjNoTtErJDmzbNqjJzK3YdYzsU
- MqUFRgYJ/k3W9JACsmzJrQW1oCpXFXBpUdqmYYV8jrkmuevLTx9UCtATyVnG04y+TlzB
- lEVsJUgIqEbY5YXMyzzKpLnAItW2WzHJeET8YIePChObFF7e5aLdapwxDyodHyax7nTO
- M84F2yjMWGphZxof45HDw7SaOLgqAUY2v0kBx0JhG5W5HEnxmXNjkXIV1+HgAMEANDM4
- HZFQ==
+ :cc; bh=bJqUnSoWANSCWdbLRNIEnNYKcollKcvJOm58uLKYs6E=;
+ b=SBJTzZpqCfVVDK5i4j/zbD162RUvdE9yu8jsPueUd6aFKELwola3+IW/af2Dvtdgc+
+ 1R2S+7T5w4aHwPVYlSZlGul/vyLQVjPxmQvSwu3tJYiiH0s1QW8eSDrISgnQq4WtVpWr
+ oN0mXIQYRm12dKfvjseW84ngKSDvG7mTIMkdlSJISNr95k5QUlE8/2jlxwWNMzzd0E3e
+ o7k7FJ7EDhn98mabrOFitCOXOygpLx600AZl8DRsoa5g4OnwWpTq+zIZ/Gq76H9ZOJIO
+ 7fSkH/gID4qrvXC8CXj48kuR4ZAZJdVhUNyfcmhwhNCIj/ewHI29VXZ7e1aRCHgqhgst
+ KxCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=tAH4dP3n0b960oSUROayMJLmuvt/xqsz9m5CG7jOidw=;
- b=TEPlXpNe3qm8LptQyzzxC1bepDrmd6QZ4U9mwwp6JSf9bwJ8MPwNpes9LZgpF3ylFG
- xXubcDCG9X2sbV86LDslDhJ9D65Kvraf2rEauUcli2J9qabMN/a8CMZphIv13V8kYOqg
- NyOf1SiIUgLLaKDjhVQuqIdiau6W6VnVN+GfHUaXxUc6zhM1HieF+KKuIGA2K2EoOxfC
- 1iycOPwz2L/+pxtOCpq7dzt2RvrfXuwBbQrs0M/OBWsrmD/iEV0UHk6NhoEBftSLYxIG
- dDv6212Cd5zYA67fgIVw/nXZ7KNCVHiFVzbyMZZzlIXC8Uiy/um2ikGn5pBvdCovNWP2
- V2tQ==
-X-Gm-Message-State: AGi0Pub9Zb4v5ho0NXI07L/nM7eK77tvwBQtrXv0DQ2SQjBk5QVHp4/6
- 6Ry0f+RFFho1sXO42qdLsDV3TkJJYg==
-X-Google-Smtp-Source: APiQypKdV4DvptVz8Ul3c4iTqopqAYi8BWfI+hprtYn6dmiCtxTEaIb8AZAOiIK/y+9DpnFnqM8AWf2Sbw==
-X-Received: by 2002:adf:f784:: with SMTP id q4mr4073517wrp.102.1587131893561; 
- Fri, 17 Apr 2020 06:58:13 -0700 (PDT)
-Date: Fri, 17 Apr 2020 14:58:00 +0100
+ bh=bJqUnSoWANSCWdbLRNIEnNYKcollKcvJOm58uLKYs6E=;
+ b=pbyo1q8+eh9WfAUKsp7o+qxVTqEyGSK+6VQDmqqb710LQCDqCVjmofyQxdKy+BF0ma
+ altq4GW6JiRhiqrVP8sQBTo3esXGWoTFODr1PBlvMFPJr3gmBWAUIqXlIlP2Cs4HVCBG
+ dAgMw5KnZAE3RcdaKrODDt5WevXtJATh7Npr4WMqIHYcDR7vwNXEso+vqXfQcax4VePp
+ TYJbHmGQI8oNg293XrdWHorK6gm83kCtFjtga+8KrROqzd5+hROszErzbV9xeqK2C+Qd
+ yG5XaI/iprW1YhIGobhPqDS2h0f9AzZ5GYz9V3w54KyCh0EJkz/oKVj6HueG+UfjDkkY
+ gUmg==
+X-Gm-Message-State: AGi0PubY274cdroBIBGnLec+F7nCMdNdUBgDvRXnIVDIoW30gpYAemSh
+ dBpuKL7m3ScZNzfr9UHv9IBOO3eHiw==
+X-Google-Smtp-Source: APiQypIMhqMA1UdKORBgj5iC56kau/PG1ijt5pgb5Hz+uO0ojlGc/zqOaNOoSHftOUSvHHni/LCB3Ucw6g==
+X-Received: by 2002:adf:e711:: with SMTP id c17mr2439841wrm.334.1587131896431; 
+ Fri, 17 Apr 2020 06:58:16 -0700 (PDT)
+Date: Fri, 17 Apr 2020 14:58:01 +0100
 In-Reply-To: <20200417135801.82871-1-tabba@google.com>
-Message-Id: <20200417135801.82871-4-tabba@google.com>
+Message-Id: <20200417135801.82871-5-tabba@google.com>
 Mime-Version: 1.0
 References: <20200417135801.82871-1-tabba@google.com>
 X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
-Subject: [PATCH v2 3/4] KVM: arm64: Change CONFIG_KVM to a menuconfig entry
+Subject: [PATCH v2 4/4] KVM: arm64: Clean up kvm makefiles
 From: Fuad Tabba <tabba@google.com>
 To: catalin.marinas@arm.com, maz@kernel.org, julien.thierry.kdev@gmail.com, 
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu
@@ -95,70 +95,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Will Deacon <will@kernel.org>
+Consolidate references to the CONFIG_KVM configuration item to encompass
+entire folders rather than per line.
 
-Changing CONFIG_KVM to be a 'menuconfig' entry in Kconfig mean that we
-can straightforwardly enumerate optional features, such as the virtual
-PMU device as dependent options.
-
-Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/Kconfig | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/Makefile     | 40 ++++++++++++-------------------------
+ arch/arm64/kvm/hyp/Makefile | 15 ++++----------
+ 2 files changed, 17 insertions(+), 38 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index d2cf4f099454..f1c1f981482c 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -3,7 +3,6 @@
- # KVM configuration
- #
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index a5334b91729a..5354ca1b1bfb 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -10,30 +10,16 @@ KVM=../../../virt/kvm
+ obj-$(CONFIG_KVM) += kvm.o
+ obj-$(CONFIG_KVM) += hyp/
  
--source "virt/kvm/Kconfig"
- source "virt/lib/Kconfig"
+-kvm-$(CONFIG_KVM) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+-kvm-$(CONFIG_KVM) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
+-kvm-$(CONFIG_KVM) += arm.o mmu.o mmio.o
+-kvm-$(CONFIG_KVM) += psci.o perf.o
+-kvm-$(CONFIG_KVM) += hypercalls.o
+-kvm-$(CONFIG_KVM) += pvtime.o
+-
+-kvm-$(CONFIG_KVM) += inject_fault.o regmap.o va_layout.o
+-kvm-$(CONFIG_KVM) += hyp.o hyp-init.o handle_exit.o
+-kvm-$(CONFIG_KVM) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+-kvm-$(CONFIG_KVM) += vgic-sys-reg-v3.o fpsimd.o pmu.o
+-kvm-$(CONFIG_KVM) += aarch32.o
+-kvm-$(CONFIG_KVM) += arch_timer.o
+-kvm-$(CONFIG_KVM)  += pmu-emul.o
+-
+-kvm-$(CONFIG_KVM) += vgic/vgic.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-init.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-irqfd.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v2.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v3.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v4.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v2.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v3.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-kvm-device.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-its.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-debug.o
++kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
++	 $(KVM)/vfio.o $(KVM)/irqchip.o \
++	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
++	 inject_fault.o regmap.o va_layout.o hyp.o hyp-init.o handle_exit.o \
++	 guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o \
++	 vgic-sys-reg-v3.o fpsimd.o pmu.o pmu-emul.o \
++	 aarch32.o arch_timer.o \
++	 vgic/vgic.o vgic/vgic-init.o \
++	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
++	 vgic/vgic-v3.o vgic/vgic-v4.o \
++	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
++	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
++	 vgic/vgic-its.o vgic/vgic-debug.o
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 8229e47ba870..529aecbd0231 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -6,17 +6,10 @@
+ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+ 		$(DISABLE_STACKLEAK_PLUGIN)
  
- menuconfig VIRTUALIZATION
-@@ -18,7 +17,7 @@ menuconfig VIRTUALIZATION
- 
- if VIRTUALIZATION
- 
--config KVM
-+menuconfig KVM
- 	bool "Kernel-based Virtual Machine (KVM) support"
- 	depends on OF
- 	# for TASKSTATS/TASK_DELAY_ACCT:
-@@ -33,7 +32,6 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
--	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-@@ -47,13 +45,21 @@ config KVM
- 
- 	  If unsure, say N.
- 
-+if KVM
+-obj-$(CONFIG_KVM) += vgic-v3-sr.o
+-obj-$(CONFIG_KVM) += timer-sr.o
+-obj-$(CONFIG_KVM) += aarch32.o
+-obj-$(CONFIG_KVM) += vgic-v2-cpuif-proxy.o
+-obj-$(CONFIG_KVM) += sysreg-sr.o
+-obj-$(CONFIG_KVM) += debug-sr.o
+-obj-$(CONFIG_KVM) += entry.o
+-obj-$(CONFIG_KVM) += switch.o
+-obj-$(CONFIG_KVM) += fpsimd.o
+-obj-$(CONFIG_KVM) += tlb.o
+-obj-$(CONFIG_KVM) += hyp-entry.o
++obj-$(CONFIG_KVM) += hyp.o
 +
-+source "virt/kvm/Kconfig"
-+
- config KVM_ARM_PMU
--	bool
-+	bool "Virtual Performance Monitoring Unit (PMU) support"
-+	depends on HW_PERF_EVENTS
-+	default y
- 	---help---
- 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
- 	  virtual machines.
++hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
++  	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
  
- config KVM_INDIRECT_VECTORS
--       def_bool KVM && (HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS)
-+	def_bool HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS
-+
-+endif # KVM
- 
- endif # VIRTUALIZATION
+ # KVM code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
 -- 
 2.26.1.301.g55bc3eb7cb9-goog
 
