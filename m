@@ -2,89 +2,83 @@ Return-Path: <SRS0=Fj5y=6B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB07FC38A29
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 10:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4141C352BE
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 10:39:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 49619208E4
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 10:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31CCF21D94
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 10:39:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KhY03ZlM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49619208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fJJve5VC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31CCF21D94
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0ACA4B260;
-	Fri, 17 Apr 2020 06:26:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E3234B259;
+	Fri, 17 Apr 2020 06:39:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gNNStb5xooNM; Fri, 17 Apr 2020 06:26:29 -0400 (EDT)
+	with ESMTP id CwS9ZxDjWoe6; Fri, 17 Apr 2020 06:39:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B04B04B252;
-	Fri, 17 Apr 2020 06:26:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4F34B129;
+	Fri, 17 Apr 2020 06:39:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC5C64B235
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:26:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7E54B11B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:39:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aw5soOYexTim for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Apr 2020 06:26:27 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D8034B1AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:26:27 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6961721D95;
- Fri, 17 Apr 2020 10:26:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587119186;
- bh=oW28VIx5XmqwFX5wQzbrLvIwt9N3aKct2/dyVLRXO8Q=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KhY03ZlMX29C4p1+Z4vrGH2tV89xCZeDPT21ASW7dZ+xTIY51CNUSLCNvmPxMpul1
- xRcQl5Ju1wrNXoErNfm340O7lam+pLTEPVrsWqIbd1/k+8HZVAeAhWbqtmTEFUMkOm
- BpfF/zWkzSqI79moc1XKO1smVODANyBgYLxay8Fw=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jPOCW-0048tL-G6; Fri, 17 Apr 2020 11:26:24 +0100
+ with ESMTP id mfCfYqBYOjpm for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Apr 2020 06:39:37 -0400 (EDT)
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com
+ [209.85.167.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 915F74B10E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 06:39:37 -0400 (EDT)
+Received: by mail-oi1-f195.google.com with SMTP id t199so1671681oif.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 03:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5nzwvwmfOZPiP8MgyjxaZA/nsHP01MUTiYZMGpB1IQw=;
+ b=fJJve5VChNmbNEyE4RssX36h1BaQECR7okQfuRd5/lvgpeqnRSSFMf6UHUJN51TZoy
+ yBxm6Xp6Hf3beJCVLLZbmUa7H0buGWYWXf2RJai0DwtdXAGyeP794kyaG9EPYred/1W5
+ RA5qtgjP7YLlnUqvMXUCX03/EPPbOLsBe4ga2HxOWBg3UB1EfV4egxSUUoqgXpHAc5Eq
+ zNlpEGdcpprWXkQP8R0Lacvnt2Z1jo1DCqxrfql6f+2ERjxnXb9XD80nfWypdWP8cJII
+ 2fVmtq6XXSPs9XtIIGOlUCYGOdX78yTvcl71NFjS8gsyHV22VjrhlwQAaBRSi3PFuOT3
+ NE/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5nzwvwmfOZPiP8MgyjxaZA/nsHP01MUTiYZMGpB1IQw=;
+ b=XJTnqCNsNEfUB7NdchYqH92NItmgT8seO1wFwx//rXI2rFV5rj3Jk0gaOjdivIiCcU
+ +4iY+jr5t7yHtx9ZfPApWOCRwk3MnkecWfJak+wZYxz5XgNqXd+zIkOQwU7wyy8LC3Sz
+ q3zHak+ZdElgFrCeh6ZMvihyXUoWFIzri/vWFLM0EsPW9sdmTdQ5jqkgKEeve82xkJRe
+ aFEVTnwVhH+OXaEg9fSoNMW0L+FSA1A3+TA4nzZG4yjLL+DxeY0XXyr2DUur8ztmb5EH
+ VMjzfACPS/A3zoiO/tQX1km9/CrSDp8FeA/XYFkk5iDg/aEVYcFl4WA3a/rhHfZpikaE
+ 0WQQ==
+X-Gm-Message-State: AGi0PuaJyfBBJFMyBysp1M+M7S5ZfCtzbVJ3W4AWlp3cQKJ9Eegej/T4
+ 64dQ+cVZrp4fhTkqhQVoLF4sqPQjdvbAgEZ86uMeFg==
+X-Google-Smtp-Source: APiQypKpsoCGBM8B+5ULU2Kgg0ztLFZk9VQ9Z2Ac/7fK1Wbv+hVQnub17Ti7V4wympxWG8jlVVSUhGkZZaXj36jfJ7A=
+X-Received: by 2002:aca:dc56:: with SMTP id t83mr1572060oig.48.1587119977020; 
+ Fri, 17 Apr 2020 03:39:37 -0700 (PDT)
 MIME-Version: 1.0
-Date: Fri, 17 Apr 2020 11:26:24 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: zhukeqian <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2] KVM/arm64: Support enabling dirty log gradually in
- small chunks
-In-Reply-To: <44ce4553-5215-2290-5956-2e6c577d030b@huawei.com>
-References: <20200413122023.52583-1-zhukeqian1@huawei.com>
- <20200416160833.728017e9@why>
- <44ce4553-5215-2290-5956-2e6c577d030b@huawei.com>
-Message-ID: <f3d4c6963f98b10f78640f0c99f867b6@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, will@kernel.org, suzuki.poulose@arm.com,
- sean.j.christopherson@intel.com, jianjay.zhou@huawei.com,
- wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Jay Zhou <jianjay.zhou@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20200323113227.3169-1-beata.michalska@linaro.org>
+ <20200323113227.3169-2-beata.michalska@linaro.org>
+In-Reply-To: <20200323113227.3169-2-beata.michalska@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Apr 2020 11:39:25 +0100
+Message-ID: <CAFEAcA_uWS+cVRk=BKra8AhsD+B1syVzhXeCMttSKwQDdo=j3w@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] target/arm: kvm: Handle DABT with no valid ISS
+To: Beata Michalska <beata.michalska@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,177 +90,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-04-17 10:46, zhukeqian wrote:
-> Hi Marc,
-> 
-> On 2020/4/16 23:08, Marc Zyngier wrote:
->> On Mon, 13 Apr 2020 20:20:23 +0800
->> Keqian Zhu <zhukeqian1@huawei.com> wrote:
->> 
->>> There is already support of enabling dirty log graually in small 
->>> chunks
->> 
->> gradually
->> 
->>> for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually 
->>> in
->>> small chunks"). This adds support for arm64.
->>> 
->>> x86 still writes protect all huge pages when 
->>> DIRTY_LOG_INITIALLY_ALL_SET
->>> is eanbled. However, for arm64, both huge pages and normal pages can 
->>> be
->> 
->> enabled
->> 
->>> write protected gradually by userspace.
->>> 
->>> Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 
->>> 128G
->>> Linux VMs with different page size. The memory pressure is 127G in 
->>> each
->>> case. The time taken of memory_global_dirty_log_start in QEMU is 
->>> listed
->>> below:
->>> 
->>> Page Size      Before    After Optimization
->>>   4K            650ms         1.8ms
->>>   2M             4ms          1.8ms
->>>   1G             2ms          1.8ms
->> 
->> These numbers are different from what you have advertised before. What
->> changed?
-> In patch RFC, the numbers is got when memory pressure is 100G, so the 
-> number
-> is bigger here.
+On Mon, 23 Mar 2020 at 11:32, Beata Michalska
+<beata.michalska@linaro.org> wrote:
+>
+> On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> exception with no valid ISS info to be decoded. The lack of decode info
+> makes it at least tricky to emulate those instruction which is one of the
+> (many) reasons why KVM will not even try to do so.
+>
+> Add support for handling those by requesting KVM to inject external
+> dabt into the quest.
+>
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> ---
+>  target/arm/cpu.h     |  2 ++
+>  target/arm/kvm.c     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/kvm_arm.h | 11 +++++++++++
+>  3 files changed, 67 insertions(+)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 4ffd991..4f834c1 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -560,6 +560,8 @@ typedef struct CPUARMState {
+>          uint64_t esr;
+>      } serror;
+>
+> +    uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
 
-OK.
+I was trying to work out whether we need to migrate this state,
+and I'm not sure. Andrew, do you know? I think this comes down
+to "at what points in QEMU's kvm run loop can migration kick in",
+and specifically if we get a KVM_EXIT_ARM_NISV do we definitely
+go round the loop and KVM_RUN again without ever checking
+to see if we should do a migration ?
 
->> 
->>> 
->>> Besides the time reduction, the biggest income is that we will 
->>> minimize
->> 
->> s/income/improvement/
->> 
->>> the performance side effect (because of dissloving huge pages and 
->>> marking
->> 
->> dissolving
-> embarrassed for these misspell :(
-
-No need to be embarrassed. I do a lot worse, at all times. That is why 
-you
-and I need other people to review our patches and fix things! ;-)
-
->> 
->>> memslots dirty) on guest after enabling dirty log.
->>> 
->>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->>> ---
->>>  Documentation/virt/kvm/api.rst    |  2 +-
->>>  arch/arm64/include/asm/kvm_host.h |  3 +++
->>>  virt/kvm/arm/mmu.c                | 12 ++++++++++--
->>>  3 files changed, 14 insertions(+), 3 deletions(-)
->>> 
->>> diff --git a/Documentation/virt/kvm/api.rst 
->>> b/Documentation/virt/kvm/api.rst
->>> index efbbe570aa9b..0017f63fa44f 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This 
->>> also improves performance because
->>>  dirty logging can be enabled gradually in small chunks on the first 
->>> call
->>>  to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
->>>  KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
->>> -x86 for now).
->>> +x86 and arm64 for now).
->>> 
->>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the 
->>> name
->>>  KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs 
->>> that make
->>> diff --git a/arch/arm64/include/asm/kvm_host.h 
->>> b/arch/arm64/include/asm/kvm_host.h
->>> index 32c8a675e5a4..a723f84fab83 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -46,6 +46,9 @@
->>>  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>>  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->>> 
->>> +#define KVM_DIRTY_LOG_MANUAL_CAPS   
->>> (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->>> +				     KVM_DIRTY_LOG_INITIALLY_SET)
->>> +
->>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>> 
->>>  extern unsigned int kvm_sve_max_vl;
->>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>> index e3b9ee268823..1077f653a611 100644
->>> --- a/virt/kvm/arm/mmu.c
->>> +++ b/virt/kvm/arm/mmu.c
->>> @@ -2265,8 +2265,16 @@ void kvm_arch_commit_memory_region(struct kvm 
->>> *kvm,
->>>  	 * allocated dirty_bitmap[], dirty pages will be be tracked while 
->>> the
->>>  	 * memory slot is write protected.
->>>  	 */
->>> -	if (change != KVM_MR_DELETE && mem->flags & 
->>> KVM_MEM_LOG_DIRTY_PAGES)
->>> -		kvm_mmu_wp_memory_region(kvm, mem->slot);
->>> +	if (change != KVM_MR_DELETE && mem->flags & 
->>> KVM_MEM_LOG_DIRTY_PAGES) {
->>> +		/*
->>> +		 * If we're with initial-all-set, we don't need to write
->>> +		 * protect any pages because they're all reported as dirty.
->>> +		 * Huge pages and normal pages will be write protect gradually.
->>> +		 */
->>> +		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
->>> +			kvm_mmu_wp_memory_region(kvm, mem->slot);
->>> +		}
->>> +	}
->>>  }
->>> 
->>>  int kvm_arch_prepare_memory_region(struct kvm *kvm,
->> 
->> As it is, it is pretty good. The one thing that isn't clear to me is
->> why we have a difference in behaviour between x86 and arm64. What
->> prevents x86 from having the same behaviour as arm64?
-> I am also not very clear about the difference. Maybe there is historic 
-> reason.
-> 
-> Before introducing DIRTY_LOG_INITIALLY_ALL_SET, all pages will be write
-> protected when starting dirty log, but only normal pages are needed
-> to be write protected again during dirty log sync, because huge pages 
-> will
-> be dissolved to normal pages.
-> 
-> For that x86 uses different routine to write protect huge pages and
-> normal pages,
-> and arm64 uses same routine to do this, so arm64 still write protect 
-> all
-> pages again during dirty log sync, but x86 didn't.
-> 
-> So I think that x86 can write protect huge pages gradually too, just 
-> need to add
-> some code legs in dirty log sync.
-
-Fair enough. It'd be good if you could investigate this as well. In the 
-meantime,
-I'll queue this patch for a spin in -next.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
