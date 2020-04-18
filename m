@@ -1,63 +1,78 @@
-Return-Path: <SRS0=Fj5y=6B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HxNd=6C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E49C2D0EF
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 16:48:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A48C2D0EF
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 11:53:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DB63120771
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Apr 2020 16:48:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB63120771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 312F620780
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 11:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312F620780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EABA4B153;
-	Fri, 17 Apr 2020 12:48:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EB7D4B162;
+	Sat, 18 Apr 2020 07:53:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MgaQ7UuGt4qT; Fri, 17 Apr 2020 12:48:40 -0400 (EDT)
+	with ESMTP id PNBUxYxeHszX; Sat, 18 Apr 2020 07:53:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98C614B189;
-	Fri, 17 Apr 2020 12:48:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E37A44B1F1;
+	Sat, 18 Apr 2020 07:53:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB454B153
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 12:48:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E24634B250
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 22:49:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jjYLEUtUIaN8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Apr 2020 12:48:37 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D30874B14C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 12:48:37 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64671C14;
- Fri, 17 Apr 2020 09:48:37 -0700 (PDT)
-Received: from [192.168.0.14] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A5553F6C4;
- Fri, 17 Apr 2020 09:48:35 -0700 (PDT)
-Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state when
- userspace accesses pending bits
+ with ESMTP id 1DPmEJ35pI+h for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Apr 2020 22:49:30 -0400 (EDT)
+Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C46CA4B228
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 22:49:29 -0400 (EDT)
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 97116A319AD7B1B2AC2E;
+ Sat, 18 Apr 2020 10:49:25 +0800 (CST)
+Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.234]) by
+ DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0487.000;
+ Sat, 18 Apr 2020 10:49:24 +0800
+From: "Zengtao (B)" <prime.zeng@hisilicon.com>
 To: Marc Zyngier <maz@kernel.org>
-References: <20200417083319.3066217-1-maz@kernel.org>
- <20200417083319.3066217-5-maz@kernel.org>
- <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com> <20200417134140.0a901749@why>
-From: James Morse <james.morse@arm.com>
-Message-ID: <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
-Date: Fri, 17 Apr 2020 17:48:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Subject: RE: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Thread-Topic: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Thread-Index: AdYJhvrCKEKaxySRQua1lfr4U9NN2v//iESA//MqKcCAGX9aAP/4ImVggBBPsoCAAVt7AP/+wAyA
+Date: Sat, 18 Apr 2020 02:49:23 +0000
+Message-ID: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+ <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+ <86r1wus7df.wl-maz@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+ <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
+In-Reply-To: <20200417160602.26706917@why>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.74.221.187]
 MIME-Version: 1.0
-In-Reply-To: <20200417134140.0a901749@why>
-Content-Language: en-GB
-Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
- Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-CFilter-Loop: Reflected
+X-Mailman-Approved-At: Sat, 18 Apr 2020 07:53:20 -0400
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ Ganapatrao Kulkarni <gkulkarni@marvell.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "andre.przywara@arm.com" <andre.przywara@arm.com>,
+ George Cherian <gcherian@marvell.com>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Anil Kumar Reddy H <areddy3@marvell.com>,
+ "Dave.Martin@arm.com" <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,165 +89,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 17/04/2020 13:41, Marc Zyngier wrote:
-> On Fri, 17 Apr 2020 12:22:10 +0100 James Morse <james.morse@arm.com> wrote:
->> On 17/04/2020 09:33, Marc Zyngier wrote:
->>> There is no point in accessing the HW when writing to any of the
->>> ISPENDR/ICPENDR registers from userspace, as only the guest should
->>> be allowed to change the HW state.
->>>
->>> Introduce new userspace-specific accessors that deal solely with
->>> the virtual state. Note that the API differs from that of GICv3,
->>> where userspace exclusively uses ISPENDR to set the state. Too
->>> bad we can't reuse it.  
-
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->>> index 6e30034d1464..f1927ae02d2e 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->>> @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,  
->>
->>> +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
->>> +				gpa_t addr, unsigned int len,
->>> +				unsigned long val)
->>> +{
->>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->>> +	int i;
->>> +	unsigned long flags;
->>> +
->>> +	for_each_set_bit(i, &val, len * 8) {
->>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
->>
->> vgic_mmio_write_spending() has:
->> |	/* GICD_ISPENDR0 SGI bits are WI *
->>
->> and bales out early. Is GIC_DIST_PENDING_SET the same register?
->> (If so, shouldn't that be true for PPI too?)
+ -----Original Message-----
+> From: Marc Zyngier [mailto:maz@kernel.org]
+> Sent: Friday, April 17, 2020 11:06 PM
+> To: Zengtao (B)
+> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
+> andre.przywara@arm.com; christoffer.dall@arm.com;
+> james.morse@arm.com; jintack@cs.columbia.edu;
+> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
+> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
+> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
+> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+> Virtualization support
 > 
-> Hmmm. It's a bit more complicated (surprisingly).
+> On Thu, 16 Apr 2020 19:22:21 +0100
+> Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Yes, the SGI pending bits are WI from the guest perspective (as
-> required by the spec).
-
-> But we still need to be able to restore them
-> from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
-> Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
-> GICv2 (if you migrated with a pending SGI, you cannot restore it...).
-
-Fun! It looks like the ioctl() would succeed, but nothing happened. Once you restart the
-guest one CPU may wait forever for the victim to respond.
-
-
-> Now, there is still a bug here, in the sense that we need to indicate
-> which vcpu is the source of the SGI (this is a GICv2-special).
-> Unfortunately, we don't have a way to communicate this architecturally.
-> The only option we have is to make it up (as a self-SGI, for example).
-> But this is pretty broken at the architectural level TBH.
-> On the other hand, PPIs are just fine.
-
-Yup, wrong spec, I was looking at the same register in GICv3! It looks like the GICv3 text
-is there because those registers live in the redistributor instead... duh!
-
-
->>> @@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,  
->>
->>> +int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
->>> +				gpa_t addr, unsigned int len,
->>> +				unsigned long val)
->>> +{
->>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->>> +	int i;
->>> +	unsigned long flags;
->>> +
->>> +	for_each_set_bit(i, &val, len * 8) {
->>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);  
->>
->> Same dumb question about GICD_ICPENDR0!?
+> > Hi Zengtao,
+> >
+> > On 2020-04-16 02:38, Zengtao (B) wrote:
+> > > Hi Marc:
+> > >
+> > > Got it.
+> > > Really a bit patch set :)
+> >
+> > Well, yeah... ;-)
+> >
+> > >
+> > > BTW, I have done a basic kvm unit test
+> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
+> > > The psci test failed for some reason, I can't understand why, this
+> > > is only the test result.(find the patch by git bisect + kvm test)
+> >
+> > That it is that mechanical, we should be able to quickly nail that one.
+> >
+> > > My platform: Hisilicon D06 board.
+> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
+> > > Could you help to take a look?
+> >
+> > I'll have a look tomorrow. I'm in the middle of refactoring the series
+> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
+> > vs non-VHE issue.
 > 
-> Not dumb at all! Given that we previously allowed this to be accessed
-> from userspace (well, before we broke it again), it should be able to
-> clear *something*. If we adopt the self-SGI behaviour as above, we will
-> get away with it.
+> So I've repeatedly tried with the current state of the NV patches[1],
+> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
+> (vim3l). PSCI is pretty happy, although I can only test with at most 8
+> vcpus (GICv2 gets in the way).
 > 
-> Here's what I'm proposing to add to this patch, together with a
-> Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
+> Can you please:
 > 
-> Nobody is using GICv2, obviously... :-/
+> - post the detailed error by running the PSCI unit test on its own
+I tried to trace the error, and I found in kernel function kvm_mpidr_to_vcpu,
+casually, mpidr returns zero and we can't get the expected vcpu, and psci
+ test failed due to this.
+And as I mentioned in my last before, the psci error is introduced by the
+ patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
+Maybe you have to try tens of times to reproduce. :)
+Deep into the patch itself, I don't find any connection between the patch
+and the issue.
 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> index f1927ae02d2e..974cdcf2f232 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> - test with the current state of the patches
+I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the 
+error still exist.
 
-> @@ -334,6 +322,15 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
->  
->  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->  		irq->pending_latch = true;
-> +
-> +		/*
-> +		 * GICv2 SGIs are terribly broken. We can't restore
-> +		 * the source of the interrupt, so just pick the vcpu
-> +		 * itself as the source...
+Thanks.
+zengtao
 
-Makes sense, this way you can't have an SGI coming from an offline CPU!
-
-
-> +		 */
-> +		if (is_vgic_v2_sgi(vcpu, irq))
-> +			irq->source |= BIT(vcpu->vcpu_id);
-> +
->  		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
->  
->  		vgic_put_irq(vcpu->kvm, irq);
-
-> @@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
->  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
->  
->  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> -		irq->pending_latch = false;
-> +		/*
-> +		 * More fun with GICv2 SGIs! If we're clearing one of them
-> +		 * from userspace, which source vcpu to clear?  Let's pick
-> +		 * the target vcpu itself (consistent whith the way we
-> +		 * populate them on the ISPENDR side), and only clear the
-> +		 * pending state if no sources are left (insert expletive
-> +		 * here).
-
-But I'm not so sure about this. Doesn't this mean that user-space can't clear pending-SGI?
-Only if its pending due to self-SGI. I'm not sure when user-space would want to do this,
-so it may not matter.
-
-Using ffs() you could clear the lowest pending source, I assume if its pending, there is
-likely only one source. If not, user-space can eventually clear pending SGI with at most
-nr-vcpu calls ... and ffs() could double up as the missing expletive!
-
-(but if user-space never actually does this, then we should do the simplest thing)
+> 
 
 
-> +		 */
-> +		if (is_vgic_v2_sgi(vcpu, irq)) {
-> +			irq->source &= ~BIT(vcpu->vcpu_id);
-> +			if (!irq->source)
-> +				irq->pending_latch = false;
-> +		} else {
-> +			irq->pending_latch = false;
-> +		}
-> +
->  		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->  
->  		vgic_put_irq(vcpu->kvm, irq);
-
-Otherwise looks good to me,
-
-
-Thanks,
-
-James
-
-[0]
-https://static.docs.arm.com/ihi0069/f/IHI0069F_gic_architecture_specification_v3_and_v4.1.pdf
+> Thanks,
+> 
+> 	M.
+> 
+> [1]
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/l
+> og/?h=kvm-arm64/nv-5.7-rc1-WIP
+> --
+> Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
