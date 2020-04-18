@@ -2,77 +2,87 @@ Return-Path: <SRS0=HxNd=6C=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A48C2D0EF
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 11:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A6DC2BA19
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 22:56:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 312F620780
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 11:53:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312F620780
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
+	by mail.kernel.org (Postfix) with ESMTP id 2BF282072C
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Apr 2020 22:56:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z4vkZdXU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BF282072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EB7D4B162;
-	Sat, 18 Apr 2020 07:53:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FDE54B265;
+	Sat, 18 Apr 2020 18:56:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PNBUxYxeHszX; Sat, 18 Apr 2020 07:53:21 -0400 (EDT)
+	with ESMTP id pzmefF6rQy+e; Sat, 18 Apr 2020 18:56:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E37A44B1F1;
-	Sat, 18 Apr 2020 07:53:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 178F44B160;
+	Sat, 18 Apr 2020 18:56:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E24634B250
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 22:49:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30D754B160
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Apr 2020 18:56:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1DPmEJ35pI+h for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Apr 2020 22:49:30 -0400 (EDT)
-Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C46CA4B228
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2020 22:49:29 -0400 (EDT)
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 97116A319AD7B1B2AC2E;
- Sat, 18 Apr 2020 10:49:25 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.234]) by
- DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0487.000;
- Sat, 18 Apr 2020 10:49:24 +0800
-From: "Zengtao (B)" <prime.zeng@hisilicon.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: RE: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Thread-Topic: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Thread-Index: AdYJhvrCKEKaxySRQua1lfr4U9NN2v//iESA//MqKcCAGX9aAP/4ImVggBBPsoCAAVt7AP/+wAyA
-Date: Sat, 18 Apr 2020 02:49:23 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
-References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
- <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
- <86r1wus7df.wl-maz@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
- <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
-In-Reply-To: <20200417160602.26706917@why>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
+ with ESMTP id FPCJieN3NBEh for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 18 Apr 2020 18:56:45 -0400 (EDT)
+Received: from mail-io1-f68.google.com (mail-io1-f68.google.com
+ [209.85.166.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 020644B130
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Apr 2020 18:56:44 -0400 (EDT)
+Received: by mail-io1-f68.google.com with SMTP id e127so6657719iof.6
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Apr 2020 15:56:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IvgW/0qH07zwxjdODqQ/wkgwGDwP10Y75Wq+uiCGqQc=;
+ b=Z4vkZdXUCzEflRxHo4/BoQHXMctRosO8uawz4V6ao+y5Gn/pY6vhTXVdiNpDa1FjsM
+ V/gC6oUtIMnqPY+UZQgXZQYM99SeqpSkdKNmKqfLod+6NRmJNr5B5Iu500T3KGJVgZ6k
+ 0HWcXwFmVIwDA26k8oqUR1wpIAQtWifWUtPoyILoHtVdzSatj3rJew5pWRkY+7bQ2HaA
+ zuRuhCepQFZmLR+vF9XWgqVcUG2+9ldBTy3sO0rHupb8lYgGjr58OBxH2Mb3L7Qcdft9
+ v2mST8ZQPPuWj+pQMNEL9+/YQdW4uKcd+Lf0/qcDXoy1GAXJZfesyzmLPBQi18VeSvjw
+ EcNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IvgW/0qH07zwxjdODqQ/wkgwGDwP10Y75Wq+uiCGqQc=;
+ b=heGsgVPw1keTAM6jk4qjkzyHBTZhLJwXAgJW9lo/jNIqbCSo50DkU7bv/DtR4dRvF4
+ ndCentv971jVr8pr5unLcNznYDJLZXen7tfuZcsAR0AJ82MU7qH7HKjjOtGdii3UTSk6
+ emjtp0kryohLWJMQt8OuR3YRfxZGKPeIvcJn0/IhhYKcH9onS6vynTH7x5bq30vQ14N0
+ iB8GBBm17gEfY1P6uhOte2HP+CT800FnMt0Ic8V8y3jUKOuMZvVrxtcAFQJQDB79Sz7e
+ XKX5N8No2kXW4FlbZLdse8BiGyxIXCQb8K4nMaysQtVGzUoEj2pV9qq15G/qZcOrTVnJ
+ 68YQ==
+X-Gm-Message-State: AGi0Publ8VUgjtEqIek6qUHpzWNfBTqs22Xo7d1cy8LQlFXJDmsaHrsd
+ 9ujmf9T/aApEFWV5bFnoI/HS0n9BLCPejA5cm3v7Zg==
+X-Google-Smtp-Source: APiQypIXmPHLcvbEMLaoylw67WcS+FV+BryMjmCs5C3z5k/15r+BfwsPOQMTmor8ATWksCqVvZ6vbDkZMefCgoGv4m4=
+X-Received: by 2002:a02:ccf4:: with SMTP id l20mr9766213jaq.28.1587250604367; 
+ Sat, 18 Apr 2020 15:56:44 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Sat, 18 Apr 2020 07:53:20 -0400
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Ganapatrao Kulkarni <gkulkarni@marvell.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "andre.przywara@arm.com" <andre.przywara@arm.com>,
- George Cherian <gcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Anil Kumar Reddy H <areddy3@marvell.com>,
- "Dave.Martin@arm.com" <Dave.Martin@arm.com>
+References: <20200323113227.3169-1-beata.michalska@linaro.org>
+ <20200323113227.3169-2-beata.michalska@linaro.org>
+ <CAFEAcA_uWS+cVRk=BKra8AhsD+B1syVzhXeCMttSKwQDdo=j3w@mail.gmail.com>
+ <20200417131032.lcyunbjwofsn2nzz@kamzik.brq.redhat.com>
+In-Reply-To: <20200417131032.lcyunbjwofsn2nzz@kamzik.brq.redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Sat, 18 Apr 2020 23:56:32 +0100
+Message-ID: <CADSWDzvz6RzhQnPL9k91SGAXP0iGfXVd+h3RML8yqXrcCQ1xsQ@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] target/arm: kvm: Handle DABT with no valid ISS
+To: Andrew Jones <drjones@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,85 +99,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
- -----Original Message-----
-> From: Marc Zyngier [mailto:maz@kernel.org]
-> Sent: Friday, April 17, 2020 11:06 PM
-> To: Zengtao (B)
-> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
-> andre.przywara@arm.com; christoffer.dall@arm.com;
-> james.morse@arm.com; jintack@cs.columbia.edu;
-> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
-> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
-> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
-> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
-> Virtualization support
-> 
-> On Thu, 16 Apr 2020 19:22:21 +0100
-> Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > Hi Zengtao,
-> >
-> > On 2020-04-16 02:38, Zengtao (B) wrote:
-> > > Hi Marc:
+On Fri, 17 Apr 2020 at 14:10, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Fri, Apr 17, 2020 at 11:39:25AM +0100, Peter Maydell wrote:
+> > On Mon, 23 Mar 2020 at 11:32, Beata Michalska
+> > <beata.michalska@linaro.org> wrote:
 > > >
-> > > Got it.
-> > > Really a bit patch set :)
-> >
-> > Well, yeah... ;-)
-> >
+> > > On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> > > exception with no valid ISS info to be decoded. The lack of decode info
+> > > makes it at least tricky to emulate those instruction which is one of the
+> > > (many) reasons why KVM will not even try to do so.
 > > >
-> > > BTW, I have done a basic kvm unit test
-> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
-> > > The psci test failed for some reason, I can't understand why, this
-> > > is only the test result.(find the patch by git bisect + kvm test)
+> > > Add support for handling those by requesting KVM to inject external
+> > > dabt into the quest.
+> > >
+> > > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> > > ---
+> > >  target/arm/cpu.h     |  2 ++
+> > >  target/arm/kvm.c     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  target/arm/kvm_arm.h | 11 +++++++++++
+> > >  3 files changed, 67 insertions(+)
+> > >
+> > > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > > index 4ffd991..4f834c1 100644
+> > > --- a/target/arm/cpu.h
+> > > +++ b/target/arm/cpu.h
+> > > @@ -560,6 +560,8 @@ typedef struct CPUARMState {
+> > >          uint64_t esr;
+> > >      } serror;
+> > >
+> > > +    uint8_t ext_dabt_pending; /* Request for injecting ext DABT */
 > >
-> > That it is that mechanical, we should be able to quickly nail that one.
+> > I was trying to work out whether we need to migrate this state,
+> > and I'm not sure. Andrew, do you know? I think this comes down
+> > to "at what points in QEMU's kvm run loop can migration kick in",
+> > and specifically if we get a KVM_EXIT_ARM_NISV do we definitely
+> > go round the loop and KVM_RUN again without ever checking
+> > to see if we should do a migration ?
 > >
-> > > My platform: Hisilicon D06 board.
-> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
-> > > Could you help to take a look?
-> >
-> > I'll have a look tomorrow. I'm in the middle of refactoring the series
-> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
-> > vs non-VHE issue.
-> 
-> So I've repeatedly tried with the current state of the NV patches[1],
-> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
-> (vim3l). PSCI is pretty happy, although I can only test with at most 8
-> vcpus (GICv2 gets in the way).
-> 
-> Can you please:
-> 
-> - post the detailed error by running the PSCI unit test on its own
-I tried to trace the error, and I found in kernel function kvm_mpidr_to_vcpu,
-casually, mpidr returns zero and we can't get the expected vcpu, and psci
- test failed due to this.
-And as I mentioned in my last before, the psci error is introduced by the
- patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
-Maybe you have to try tens of times to reproduce. :)
-Deep into the patch itself, I don't find any connection between the patch
-and the issue.
+>
+> I'd prefer a migration expert confirm this, so I've CC'ed David and Juan,
+> but afaict there's no way to break out of the KVM_RUN loop after a
+> successful (ret=0) call to kvm_arch_handle_exit() until after the next
+> KVM_RUN ioctl. This is because even if migration kicks the vcpus between
+> kvm_arch_handle_exit() and the next run, the signal won't do anything
+> other than prepare the vcpu for an immediate exit.
+>
+I am definitely not an expert on that one, but if I got things right,
+by the time the 'exit_request' gets verified , the external abort
+should already be set up , the pending status cleared (through
+KVM_SET_VCPU_EVENTS)
+and the reg content verified (kvm_arch_pre_run), as all of it is being
+ triggered
+prior to checking the exit request. So this should not need a
+dedicated migration state.
 
-> - test with the current state of the patches
-I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the 
-error still exist.
+I will hold on with sending the new version though to get the confirmation
+whether that is the case.
 
-Thanks.
-zengtao
+Thanks,
 
-> 
-
-
+BR
+Beata
+>
 > Thanks,
-> 
-> 	M.
-> 
-> [1]
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/l
-> og/?h=kvm-arm64/nv-5.7-rc1-WIP
-> --
-> Jazz is not dead. It just smells funny...
+> drew
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
