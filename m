@@ -2,72 +2,86 @@ Return-Path: <SRS0=QomF=6E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 540CBC3A5A0
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 09:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98495C54FD0
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 10:04:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 16EB52145D
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 09:54:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16EB52145D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTP id 1D7BF22240
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 10:04:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2Q0vwOA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D7BF22240
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B39D94B163;
-	Mon, 20 Apr 2020 05:54:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E704B119;
+	Mon, 20 Apr 2020 06:04:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nOtPI56nlYBZ; Mon, 20 Apr 2020 05:54:40 -0400 (EDT)
+	with ESMTP id cvcKN+mD659k; Mon, 20 Apr 2020 06:03:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29CD94B15F;
-	Mon, 20 Apr 2020 05:54:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B2D24B117;
+	Mon, 20 Apr 2020 06:03:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8374B148
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 03:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E33DC4B117
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:03:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1pHYyKyoaAwf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2020 03:18:07 -0400 (EDT)
-Received: from out30-57.freemail.mail.aliyun.com
- (out30-57.freemail.mail.aliyun.com [115.124.30.57])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D12DE4B0C5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 03:18:06 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R171e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04394;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=36; SR=0;
- TI=SMTPD_---0Tw1zGpr_1587367076; 
-Received: from 30.27.118.66(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0Tw1zGpr_1587367076) by smtp.aliyun-inc.com(127.0.0.1);
- Mon, 20 Apr 2020 15:17:58 +0800
-Subject: Re: [PATCH 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
-To: Christian Borntraeger <borntraeger@de.ibm.com>, pbonzini@redhat.com,
- tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
- benh@kernel.crashing.org, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
- sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com,
- jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, x86@kernel.org, hpa@zytor.com, maz@kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
-References: <20200419075106.16248-1-tianjia.zhang@linux.alibaba.com>
- <20200419075106.16248-2-tianjia.zhang@linux.alibaba.com>
- <7a783487-2f9b-08a6-0ff6-f57bb90495a1@de.ibm.com>
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <e182050c-c5eb-8c83-df6e-2b46c1f15ca3@linux.alibaba.com>
-Date: Mon, 20 Apr 2020 15:17:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ with ESMTP id RCLZ6zLT53DR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2020 06:03:55 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91E754B10E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:03:55 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 73D1F20857;
+ Mon, 20 Apr 2020 10:03:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587377034;
+ bh=T+IkyhCGWmGjFb1dkbRxqVNqlQocAwEx9c7HtptLrJQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=I2Q0vwOApagpSZa8aKZX6jIxWVVd//vWr1lsY6oqJu7WvRNttvnjyXCU52yI/HlO/
+ 3fJNsnCAPSdBsdFE5Am5IsFfQ5F+vfavyJ4H75E9RWVIEckbZu8RBshUvb4qqvpzs9
+ AMSEgFyr/xJ5+t6rM272GwgMznGGkHGkBmg16dLw=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jQTHM-004pNG-EA; Mon, 20 Apr 2020 11:03:52 +0100
+Date: Mon, 20 Apr 2020 11:03:50 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state
+ when userspace accesses pending bits
+Message-ID: <20200420110350.675a3393@why>
+In-Reply-To: <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
+References: <20200417083319.3066217-1-maz@kernel.org>
+ <20200417083319.3066217-5-maz@kernel.org>
+ <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com>
+ <20200417134140.0a901749@why>
+ <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <7a783487-2f9b-08a6-0ff6-f57bb90495a1@de.ibm.com>
-X-Mailman-Approved-At: Mon, 20 Apr 2020 05:54:38 -0400
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, yuzenghui@huawei.com,
+ eric.auger@redhat.com, Andre.Przywara@arm.com, julien@xen.org,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
+ Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -80,290 +94,171 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Fri, 17 Apr 2020 17:48:34 +0100
+James Morse <james.morse@arm.com> wrote:
 
+Hi James,
 
-On 2020/4/20 15:07, Christian Borntraeger wrote:
+> Hi Marc,
+> 
+> On 17/04/2020 13:41, Marc Zyngier wrote:
+> > On Fri, 17 Apr 2020 12:22:10 +0100 James Morse <james.morse@arm.com> wrote:  
+> >> On 17/04/2020 09:33, Marc Zyngier wrote:  
+> >>> There is no point in accessing the HW when writing to any of the
+> >>> ISPENDR/ICPENDR registers from userspace, as only the guest should
+> >>> be allowed to change the HW state.
+> >>>
+> >>> Introduce new userspace-specific accessors that deal solely with
+> >>> the virtual state. Note that the API differs from that of GICv3,
+> >>> where userspace exclusively uses ISPENDR to set the state. Too
+> >>> bad we can't reuse it.    
+> 
+> >>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> >>> index 6e30034d1464..f1927ae02d2e 100644
+> >>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> >>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> >>> @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,    
+> >>  
+> >>> +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
+> >>> +				gpa_t addr, unsigned int len,
+> >>> +				unsigned long val)
+> >>> +{
+> >>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> >>> +	int i;
+> >>> +	unsigned long flags;
+> >>> +
+> >>> +	for_each_set_bit(i, &val, len * 8) {
+> >>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);    
+> >>
+> >> vgic_mmio_write_spending() has:
+> >> |	/* GICD_ISPENDR0 SGI bits are WI *
+> >>
+> >> and bales out early. Is GIC_DIST_PENDING_SET the same register?
+> >> (If so, shouldn't that be true for PPI too?)  
+> > 
+> > Hmmm. It's a bit more complicated (surprisingly).
+> > 
+> > Yes, the SGI pending bits are WI from the guest perspective (as
+> > required by the spec).  
+> 
+> > But we still need to be able to restore them
+> > from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
+> > Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
+> > GICv2 (if you migrated with a pending SGI, you cannot restore it...).  
+> 
+> Fun! It looks like the ioctl() would succeed, but nothing happened. Once you restart the
+> guest one CPU may wait forever for the victim to respond.
+
+Yup. I can only see two reason for this not being reported: nobody
+tests live migration with GICv2 (most probable), or we're incredibly
+lucky by having never take a snapshot of a pending SGI. Either way,
+this needs fixing.
+
+> > Now, there is still a bug here, in the sense that we need to indicate
+> > which vcpu is the source of the SGI (this is a GICv2-special).
+> > Unfortunately, we don't have a way to communicate this architecturally.
+> > The only option we have is to make it up (as a self-SGI, for example).
+> > But this is pretty broken at the architectural level TBH.
+> > On the other hand, PPIs are just fine.  
+> 
+> Yup, wrong spec, I was looking at the same register in GICv3! It looks like the GICv3 text
+> is there because those registers live in the redistributor instead... duh!
 > 
 > 
-> On 19.04.20 09:51, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. Earlier than historical reasons, many kvm-related function
->> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
->> This patch does a unified cleanup of these remaining redundant parameters.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   arch/s390/kvm/kvm-s390.c | 127 +++++++++++++++++++++------------------
->>   1 file changed, 67 insertions(+), 60 deletions(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 443af3ead739..cf420d013ba3 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4173,24 +4173,25 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>   	return rc;
->>   }
->>   
->> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
->>   {
->> +	struct kvm_run *run = vcpu->run;
+> >>> @@ -390,6 +411,26 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,    
+> >>  
+> >>> +int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+> >>> +				gpa_t addr, unsigned int len,
+> >>> +				unsigned long val)
+> >>> +{
+> >>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> >>> +	int i;
+> >>> +	unsigned long flags;
+> >>> +
+> >>> +	for_each_set_bit(i, &val, len * 8) {
+> >>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);    
+> >>
+> >> Same dumb question about GICD_ICPENDR0!?  
+> > 
+> > Not dumb at all! Given that we previously allowed this to be accessed
+> > from userspace (well, before we broke it again), it should be able to
+> > clear *something*. If we adopt the self-SGI behaviour as above, we will
+> > get away with it.
+> > 
+> > Here's what I'm proposing to add to this patch, together with a
+> > Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
+> > 
+> > Nobody is using GICv2, obviously... :-/  
 > 
-> Please use kvm_run as variable name. This makes all of the changes below go away.
+> > diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> > index f1927ae02d2e..974cdcf2f232 100644
+> > --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> > +++ b/virt/kvm/arm/vgic/vgic-mmio.c  
 > 
-
-It's OK, I will fix it in v2 patch.
-
-Thanks,
-Tianjia
-
+> > @@ -334,6 +322,15 @@ int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
+> >  
+> >  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> >  		irq->pending_latch = true;
+> > +
+> > +		/*
+> > +		 * GICv2 SGIs are terribly broken. We can't restore
+> > +		 * the source of the interrupt, so just pick the vcpu
+> > +		 * itself as the source...  
 > 
->>   	struct runtime_instr_cb *riccb;
->>   	struct gs_cb *gscb;
->>   
->> -	riccb = (struct runtime_instr_cb *) &kvm_run->s.regs.riccb;
->> -	gscb = (struct gs_cb *) &kvm_run->s.regs.gscb;
->> -	vcpu->arch.sie_block->gpsw.mask = kvm_run->psw_mask;
->> -	vcpu->arch.sie_block->gpsw.addr = kvm_run->psw_addr;
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
->> -		vcpu->arch.sie_block->todpr = kvm_run->s.regs.todpr;
->> -		vcpu->arch.sie_block->pp = kvm_run->s.regs.pp;
->> -		vcpu->arch.sie_block->gbea = kvm_run->s.regs.gbea;
->> -	}
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PFAULT) {
->> -		vcpu->arch.pfault_token = kvm_run->s.regs.pft;
->> -		vcpu->arch.pfault_select = kvm_run->s.regs.pfs;
->> -		vcpu->arch.pfault_compare = kvm_run->s.regs.pfc;
->> +	riccb = (struct runtime_instr_cb *) &run->s.regs.riccb;
->> +	gscb = (struct gs_cb *) &run->s.regs.gscb;
->> +	vcpu->arch.sie_block->gpsw.mask = run->psw_mask;
->> +	vcpu->arch.sie_block->gpsw.addr = run->psw_addr;
->> +	if (run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
->> +		vcpu->arch.sie_block->todpr = run->s.regs.todpr;
->> +		vcpu->arch.sie_block->pp = run->s.regs.pp;
->> +		vcpu->arch.sie_block->gbea = run->s.regs.gbea;
->> +	}
->> +	if (run->kvm_dirty_regs & KVM_SYNC_PFAULT) {
->> +		vcpu->arch.pfault_token = run->s.regs.pft;
->> +		vcpu->arch.pfault_select = run->s.regs.pfs;
->> +		vcpu->arch.pfault_compare = run->s.regs.pfc;
->>   		if (vcpu->arch.pfault_token == KVM_S390_PFAULT_TOKEN_INVALID)
->>   			kvm_clear_async_pf_completion_queue(vcpu);
->>   	}
->> @@ -4198,7 +4199,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   	 * If userspace sets the riccb (e.g. after migration) to a valid state,
->>   	 * we should enable RI here instead of doing the lazy enablement.
->>   	 */
->> -	if ((kvm_run->kvm_dirty_regs & KVM_SYNC_RICCB) &&
->> +	if ((run->kvm_dirty_regs & KVM_SYNC_RICCB) &&
->>   	    test_kvm_facility(vcpu->kvm, 64) &&
->>   	    riccb->v &&
->>   	    !(vcpu->arch.sie_block->ecb3 & ECB3_RI)) {
->> @@ -4209,7 +4210,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   	 * If userspace sets the gscb (e.g. after migration) to non-zero,
->>   	 * we should enable GS here instead of doing the lazy enablement.
->>   	 */
->> -	if ((kvm_run->kvm_dirty_regs & KVM_SYNC_GSCB) &&
->> +	if ((run->kvm_dirty_regs & KVM_SYNC_GSCB) &&
->>   	    test_kvm_facility(vcpu->kvm, 133) &&
->>   	    gscb->gssm &&
->>   	    !vcpu->arch.gs_enabled) {
->> @@ -4218,10 +4219,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   		vcpu->arch.sie_block->ecd |= ECD_HOSTREGMGMT;
->>   		vcpu->arch.gs_enabled = 1;
->>   	}
->> -	if ((kvm_run->kvm_dirty_regs & KVM_SYNC_BPBC) &&
->> +	if ((run->kvm_dirty_regs & KVM_SYNC_BPBC) &&
->>   	    test_kvm_facility(vcpu->kvm, 82)) {
->>   		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
->> -		vcpu->arch.sie_block->fpf |= kvm_run->s.regs.bpbc ? FPF_BPBC : 0;
->> +		vcpu->arch.sie_block->fpf |= run->s.regs.bpbc ? FPF_BPBC : 0;
->>   	}
->>   	if (MACHINE_HAS_GS) {
->>   		preempt_disable();
->> @@ -4232,45 +4233,47 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   		}
->>   		if (vcpu->arch.gs_enabled) {
->>   			current->thread.gs_cb = (struct gs_cb *)
->> -						&vcpu->run->s.regs.gscb;
->> +						&run->s.regs.gscb;
->>   			restore_gs_cb(current->thread.gs_cb);
->>   		}
->>   		preempt_enable();
->>   	}
->> -	/* SIE will load etoken directly from SDNX and therefore kvm_run */
->> +	/* SIE will load etoken directly from SDNX and therefore run */
->>   }
->>   
->> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +static void sync_regs(struct kvm_vcpu *vcpu)
->>   {
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
->> -		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
->> -		memcpy(&vcpu->arch.sie_block->gcr, &kvm_run->s.regs.crs, 128);
->> +	struct kvm_run *run = vcpu->run;
->> +
->> +	if (run->kvm_dirty_regs & KVM_SYNC_PREFIX)
->> +		kvm_s390_set_prefix(vcpu, run->s.regs.prefix);
->> +	if (run->kvm_dirty_regs & KVM_SYNC_CRS) {
->> +		memcpy(&vcpu->arch.sie_block->gcr, &run->s.regs.crs, 128);
->>   		/* some control register changes require a tlb flush */
->>   		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->>   	}
->> -	if (kvm_run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
->> -		kvm_s390_set_cpu_timer(vcpu, kvm_run->s.regs.cputm);
->> -		vcpu->arch.sie_block->ckc = kvm_run->s.regs.ckc;
->> +	if (run->kvm_dirty_regs & KVM_SYNC_ARCH0) {
->> +		kvm_s390_set_cpu_timer(vcpu, run->s.regs.cputm);
->> +		vcpu->arch.sie_block->ckc = run->s.regs.ckc;
->>   	}
->>   	save_access_regs(vcpu->arch.host_acrs);
->> -	restore_access_regs(vcpu->run->s.regs.acrs);
->> +	restore_access_regs(run->s.regs.acrs);
->>   	/* save host (userspace) fprs/vrs */
->>   	save_fpu_regs();
->>   	vcpu->arch.host_fpregs.fpc = current->thread.fpu.fpc;
->>   	vcpu->arch.host_fpregs.regs = current->thread.fpu.regs;
->>   	if (MACHINE_HAS_VX)
->> -		current->thread.fpu.regs = vcpu->run->s.regs.vrs;
->> +		current->thread.fpu.regs = run->s.regs.vrs;
->>   	else
->> -		current->thread.fpu.regs = vcpu->run->s.regs.fprs;
->> -	current->thread.fpu.fpc = vcpu->run->s.regs.fpc;
->> +		current->thread.fpu.regs = run->s.regs.fprs;
->> +	current->thread.fpu.fpc = run->s.regs.fpc;
->>   	if (test_fp_ctl(current->thread.fpu.fpc))
->>   		/* User space provided an invalid FPC, let's clear it */
->>   		current->thread.fpu.fpc = 0;
->>   
->>   	/* Sync fmt2 only data */
->>   	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu))) {
->> -		sync_regs_fmt2(vcpu, kvm_run);
->> +		sync_regs_fmt2(vcpu);
->>   	} else {
->>   		/*
->>   		 * In several places we have to modify our internal view to
->> @@ -4282,19 +4285,21 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   		 * do only accept the condition code from userspace.
->>   		 */
->>   		vcpu->arch.sie_block->gpsw.mask &= ~PSW_MASK_CC;
->> -		vcpu->arch.sie_block->gpsw.mask |= kvm_run->psw_mask &
->> +		vcpu->arch.sie_block->gpsw.mask |= run->psw_mask &
->>   						   PSW_MASK_CC;
->>   	}
->>   
->> -	kvm_run->kvm_dirty_regs = 0;
->> +	run->kvm_dirty_regs = 0;
->>   }
->>   
->> -static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +static void store_regs_fmt2(struct kvm_vcpu *vcpu)
->>   {
->> -	kvm_run->s.regs.todpr = vcpu->arch.sie_block->todpr;
->> -	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
->> -	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
->> -	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
->> +	struct kvm_run *run = vcpu->run;
->> +
->> +	run->s.regs.todpr = vcpu->arch.sie_block->todpr;
->> +	run->s.regs.pp = vcpu->arch.sie_block->pp;
->> +	run->s.regs.gbea = vcpu->arch.sie_block->gbea;
->> +	run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
->>   	if (MACHINE_HAS_GS) {
->>   		__ctl_set_bit(2, 4);
->>   		if (vcpu->arch.gs_enabled)
->> @@ -4310,39 +4315,41 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>   	/* SIE will save etoken directly into SDNX and therefore kvm_run */
->>   }
->>   
->> -static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->> +static void store_regs(struct kvm_vcpu *vcpu)
->>   {
->> -	kvm_run->psw_mask = vcpu->arch.sie_block->gpsw.mask;
->> -	kvm_run->psw_addr = vcpu->arch.sie_block->gpsw.addr;
->> -	kvm_run->s.regs.prefix = kvm_s390_get_prefix(vcpu);
->> -	memcpy(&kvm_run->s.regs.crs, &vcpu->arch.sie_block->gcr, 128);
->> -	kvm_run->s.regs.cputm = kvm_s390_get_cpu_timer(vcpu);
->> -	kvm_run->s.regs.ckc = vcpu->arch.sie_block->ckc;
->> -	kvm_run->s.regs.pft = vcpu->arch.pfault_token;
->> -	kvm_run->s.regs.pfs = vcpu->arch.pfault_select;
->> -	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
->> -	save_access_regs(vcpu->run->s.regs.acrs);
->> +	struct kvm_run *run = vcpu->run;
->> +
->> +	run->psw_mask = vcpu->arch.sie_block->gpsw.mask;
->> +	run->psw_addr = vcpu->arch.sie_block->gpsw.addr;
->> +	run->s.regs.prefix = kvm_s390_get_prefix(vcpu);
->> +	memcpy(&run->s.regs.crs, &vcpu->arch.sie_block->gcr, 128);
->> +	run->s.regs.cputm = kvm_s390_get_cpu_timer(vcpu);
->> +	run->s.regs.ckc = vcpu->arch.sie_block->ckc;
->> +	run->s.regs.pft = vcpu->arch.pfault_token;
->> +	run->s.regs.pfs = vcpu->arch.pfault_select;
->> +	run->s.regs.pfc = vcpu->arch.pfault_compare;
->> +	save_access_regs(run->s.regs.acrs);
->>   	restore_access_regs(vcpu->arch.host_acrs);
->>   	/* Save guest register state */
->>   	save_fpu_regs();
->> -	vcpu->run->s.regs.fpc = current->thread.fpu.fpc;
->> +	run->s.regs.fpc = current->thread.fpu.fpc;
->>   	/* Restore will be done lazily at return */
->>   	current->thread.fpu.fpc = vcpu->arch.host_fpregs.fpc;
->>   	current->thread.fpu.regs = vcpu->arch.host_fpregs.regs;
->>   	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu)))
->> -		store_regs_fmt2(vcpu, kvm_run);
->> +		store_regs_fmt2(vcpu);
->>   }
->>   
->>   int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>   {
->> -	struct kvm_run *kvm_run = vcpu->run;
->> +	struct kvm_run *run = vcpu->run;
->>   	int rc;
->>   
->> -	if (kvm_run->immediate_exit)
->> +	if (run->immediate_exit)
->>   		return -EINTR;
->>   
->> -	if (kvm_run->kvm_valid_regs & ~KVM_SYNC_S390_VALID_FIELDS ||
->> -	    kvm_run->kvm_dirty_regs & ~KVM_SYNC_S390_VALID_FIELDS)
->> +	if (run->kvm_valid_regs & ~KVM_SYNC_S390_VALID_FIELDS ||
->> +	    run->kvm_dirty_regs & ~KVM_SYNC_S390_VALID_FIELDS)
->>   		return -EINVAL;
->>   
->>   	vcpu_load(vcpu);
->> @@ -4368,14 +4375,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>   		goto out;
->>   	}
->>   
->> -	sync_regs(vcpu, kvm_run);
->> +	sync_regs(vcpu);
->>   	enable_cpu_timer_accounting(vcpu);
->>   
->>   	might_fault();
->>   	rc = __vcpu_run(vcpu);
->>   
->>   	if (signal_pending(current) && !rc) {
->> -		kvm_run->exit_reason = KVM_EXIT_INTR;
->> +		run->exit_reason = KVM_EXIT_INTR;
->>   		rc = -EINTR;
->>   	}
->>   
->> @@ -4390,7 +4397,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>   	}
->>   
->>   	disable_cpu_timer_accounting(vcpu);
->> -	store_regs(vcpu, kvm_run);
->> +	store_regs(vcpu);
->>   
->>   	kvm_sigset_deactivate(vcpu);
->>   
->>
+> Makes sense, this way you can't have an SGI coming from an offline CPU!
+> 
+> 
+> > +		 */
+> > +		if (is_vgic_v2_sgi(vcpu, irq))
+> > +			irq->source |= BIT(vcpu->vcpu_id);
+> > +
+> >  		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+> >  
+> >  		vgic_put_irq(vcpu->kvm, irq);  
+> 
+> > @@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+> >  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> >  
+> >  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> > -		irq->pending_latch = false;
+> > +		/*
+> > +		 * More fun with GICv2 SGIs! If we're clearing one of them
+> > +		 * from userspace, which source vcpu to clear?  Let's pick
+> > +		 * the target vcpu itself (consistent whith the way we
+> > +		 * populate them on the ISPENDR side), and only clear the
+> > +		 * pending state if no sources are left (insert expletive
+> > +		 * here).  
+> 
+> But I'm not so sure about this. Doesn't this mean that user-space can't clear pending-SGI?
+> Only if its pending due to self-SGI. I'm not sure when user-space would want to do this,
+> so it may not matter.
+
+In general, userspace just sets the pending bit, and doesn't bother
+clearing anything (because by default, there is nothing to clear).
+
+> Using ffs() you could clear the lowest pending source, I assume if its pending, there is
+> likely only one source. If not, user-space can eventually clear pending SGI with at most
+> nr-vcpu calls ... and ffs() could double up as the missing expletive!
+
+;-)
+
+> (but if user-space never actually does this, then we should do the simplest thing)
+
+A third way would be to align on what GICv3 does, which is that ISPENDR
+is used for both setting and clearing in one go. Given that the current
+state it broken (and has been for some time now), I'm tempted to adopt
+the same behaviour...
+
+What do you think?
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
