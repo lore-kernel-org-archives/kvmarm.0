@@ -2,92 +2,59 @@ Return-Path: <SRS0=QomF=6E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 390B9C54FCB
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 14:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98246C3A5A0
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 16:10:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C201720722
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 14:03:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQ8HBwam"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C201720722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1A1C920775
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 16:10:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A1C920775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68E564B135;
-	Mon, 20 Apr 2020 10:03:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86A5A4B12A;
+	Mon, 20 Apr 2020 12:10:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oKE8LSnzNbhM; Mon, 20 Apr 2020 10:03:29 -0400 (EDT)
+	with ESMTP id GTYHN5OxgPMh; Mon, 20 Apr 2020 12:10:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A794B0F0;
-	Mon, 20 Apr 2020 10:03:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 444B64B119;
+	Mon, 20 Apr 2020 12:10:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C22104B0DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 10:03:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C56284B107
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 12:10:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dYM8aEEnDs37 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2020 10:03:22 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAB154B0D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 10:03:22 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 918E420722;
- Mon, 20 Apr 2020 14:03:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587391401;
- bh=GPT20fEi2/FOGz+OkWS9srVMj+Rsxisj5E5BJqEY3UU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=bQ8HBwamtxiv7Lhgcap7xcBV4Jlc9CX5VQNZlpTf0yVkbH9kEl5RE8gBvInvva93g
- L4UulNBvuMdIJR8930Fx1dR/9O25nYqJSi1DKOPDBZoVX9F47jjaSRSr2uWm8H/mMg
- Nsa/xcz6YHHICI8JzH58nRHy4kE+RfdMsNOcJ3ME=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jQX15-004ttw-TP; Mon, 20 Apr 2020 15:03:20 +0100
+ with ESMTP id H0dSGCQal8pb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2020 12:10:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8684B101
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 12:10:34 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61D1531B;
+ Mon, 20 Apr 2020 09:10:33 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6BFC3F73D;
+ Mon, 20 Apr 2020 09:10:32 -0700 (PDT)
+Subject: Re: [PATCH RFC] KVM: arm64: Sidestep stage2_unmap_vm() on vcpu reset
+ when S2FWB is supported
+To: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20200415072835.1164-1-yuzenghui@huawei.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <e99bc07d-0dd4-055c-808f-fd9cde88d2fc@arm.com>
+Date: Mon, 20 Apr 2020 17:10:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Date: Mon, 20 Apr 2020 15:03:19 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: "Zengtao (B)" <prime.zeng@hisilicon.com>
-Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
-References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
- <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
- <86r1wus7df.wl-maz@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
- <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
- <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
-Message-ID: <dd1283e9b31fd01ac5c9f434aa00d34e@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com,
- Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com,
- christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu,
- julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, Ganapatrao Kulkarni <gkulkarni@marvell.com>,
- kvm@vger.kernel.org, andre.przywara@arm.com,
- George Cherian <gcherian@marvell.com>, linux-arm-kernel@lists.infradead.org,
- Anil Kumar Reddy H <areddy3@marvell.com>, Dave.Martin@arm.com
+In-Reply-To: <20200415072835.1164-1-yuzenghui@huawei.com>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,92 +66,86 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-04-18 03:49, Zengtao (B) wrote:
-> -----Original Message-----
->> From: Marc Zyngier [mailto:maz@kernel.org]
->> Sent: Friday, April 17, 2020 11:06 PM
->> To: Zengtao (B)
->> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
->> andre.przywara@arm.com; christoffer.dall@arm.com;
->> james.morse@arm.com; jintack@cs.columbia.edu;
->> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
->> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
->> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
->> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
->> Virtualization support
->> 
->> On Thu, 16 Apr 2020 19:22:21 +0100
->> Marc Zyngier <maz@kernel.org> wrote:
->> 
->> > Hi Zengtao,
->> >
->> > On 2020-04-16 02:38, Zengtao (B) wrote:
->> > > Hi Marc:
->> > >
->> > > Got it.
->> > > Really a bit patch set :)
->> >
->> > Well, yeah... ;-)
->> >
->> > >
->> > > BTW, I have done a basic kvm unit test
->> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
->> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
->> > > The psci test failed for some reason, I can't understand why, this
->> > > is only the test result.(find the patch by git bisect + kvm test)
->> >
->> > That it is that mechanical, we should be able to quickly nail that one.
->> >
->> > > My platform: Hisilicon D06 board.
->> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
->> > > Could you help to take a look?
->> >
->> > I'll have a look tomorrow. I'm in the middle of refactoring the series
->> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
->> > vs non-VHE issue.
->> 
->> So I've repeatedly tried with the current state of the NV patches[1],
->> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
->> (vim3l). PSCI is pretty happy, although I can only test with at most 8
->> vcpus (GICv2 gets in the way).
->> 
->> Can you please:
->> 
->> - post the detailed error by running the PSCI unit test on its own
-> I tried to trace the error, and I found in kernel function 
-> kvm_mpidr_to_vcpu,
-> casually, mpidr returns zero and we can't get the expected vcpu, and 
-> psci
->  test failed due to this.
+Hi,
 
-Can you post the exact error message from the unit test?
+On 4/15/20 8:28 AM, Zenghui Yu wrote:
+> stage2_unmap_vm() was introduced to unmap user RAM region in the stage2
+> page table to make the caches coherent. E.g., a guest reboot with stage1
+> MMU disabled will access memory using non-cacheable attributes. If the
+> RAM and caches are not coherent at this stage, some evicted dirty cache
+> line may go and corrupt guest data in RAM.
+>
+> Since ARMv8.4, S2FWB feature is mandatory and KVM will take advantage
+> of it to configure the stage2 page table and the attributes of memory
+> access. So we ensure that guests always access memory using cacheable
+> attributes and thus, the caches always be coherent.
+>
+> So on CPUs that support S2FWB, we can safely reset the vcpu without a
+> heavy stage2 unmapping.
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>
+> If this is correct, there should be a great performance improvement on
+> a guest reboot (or reset) on systems support S2FWB. But I'm afraid that
+> I've missed some points here, so please comment!
+>
+> The commit 957db105c997 ("arm/arm64: KVM: Introduce stage2_unmap_vm")
+> was merged about six years ago and I failed to track its histroy and
+> intention. Instead of a whole stage2 unmapping, something like
+> stage2_flush_vm() looks enough to me. But again, I'm unsure...
+>
+> Thanks for having a look!
 
-> And as I mentioned in my last before, the psci error is introduced by 
-> the
->  patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
-> Maybe you have to try tens of times to reproduce. :)
-> Deep into the patch itself, I don't find any connection between the 
-> patch
-> and the issue.
+I had a chat with Christoffer about stage2_unmap_vm, and as I understood it, the
+purpose was to make sure that any changes made by userspace were seen by the guest
+while the MMU is off. When a stage 2 fault happens, we do clean+inval on the
+dcache, or inval on the icache if it was an exec fault. This means that whatever
+the host userspace writes while the guest is shut down and is still in the cache,
+the guest will be able to read/execute.
 
-Me neither, and I haven't managed to reproduce your issue.
+This can be relevant if the guest relocates the kernel and overwrites the original
+image location, and userspace copies the original kernel image back in before
+restarting the vm.
 
->> - test with the current state of the patches
-> I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the
-> error still exist.
+>
+>  virt/kvm/arm/arm.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 48d0ec44ad77..e6378162cdef 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -983,8 +983,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	/*
+>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>  	 * guest MMU is turned off and flush the caches as needed.
+> +	 *
+> +	 * S2FWB enforces all memory accesses to RAM being cacheable, we
+> +	 * ensure that the cache is always coherent.
+>  	 */
+> -	if (vcpu->arch.has_run_once)
+> +	if (vcpu->arch.has_run_once && !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
 
-How many vcpus do you create with this PSCI test?
+I think userspace does not invalidate the icache when loading a new kernel image,
+and if the guest patched instructions, they could potentially still be in the
+icache. Should the icache be invalidated if FWB is present?
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Alex
+>  		stage2_unmap_vm(vcpu->kvm);
+>  
+>  	vcpu_reset_hcr(vcpu);
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
