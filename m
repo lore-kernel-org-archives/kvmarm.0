@@ -2,92 +2,63 @@ Return-Path: <SRS0=QomF=6E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A38C3815B
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 433DAC3815B
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:46:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CEF2720857
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="kPj7agkm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF2720857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C677F21473
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:46:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C677F21473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FBF14B135;
-	Mon, 20 Apr 2020 09:37:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2824C4B12F;
+	Mon, 20 Apr 2020 09:46:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id as1U3A6imW4a; Mon, 20 Apr 2020 09:37:23 -0400 (EDT)
+	with ESMTP id YGzD58QPqCmL; Mon, 20 Apr 2020 09:46:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E06D74B12C;
-	Mon, 20 Apr 2020 09:37:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0199B4B131;
+	Mon, 20 Apr 2020 09:46:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBCA44B129
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:37:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E11024B12F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:46:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q4p4ztaoXeWE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2020 09:37:21 -0400 (EDT)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 637E64B0FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:37:21 -0400 (EDT)
-Received: by mail-wm1-f68.google.com with SMTP id r26so11452507wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:date:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=BLAHTYVLykyAFNf8wRqZjn2QntSGVk3ZjCApuPikmyY=;
- b=kPj7agkmsJbRTEhY9gZECvzMUnVjow/pHLabt5Rz4A4gvBD/3+WxgH4FaTYlNQwAiV
- APgeY+cHsV5Vss6ilHxA2xmU5WGBPAkYE409yFcJSegDhyi0rggFUlyCquJezz69HznN
- 2vcUmThUbTW6cdAen1D/LxK2hqVjHs/kQ06W/vbqgZXhIQ17MTR0wghyX9iZvoZs7tia
- YJfRA6+StGUxa/E81bZGo5ZwaOBeGVfyESQAv1XNGQnzo3jVsTaZJHbjVJ1vOdaiaX+1
- VuYqCKdST4I9OSW/tNaHhbV0JtNL8E57/CyWJYsUrQ9Ydr2VaZe6NTZEjHs6Wm1A9rne
- 3xOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=BLAHTYVLykyAFNf8wRqZjn2QntSGVk3ZjCApuPikmyY=;
- b=aqzDmFV4qc3VjdLC/xFXqOdAMVCYXq8jMfgcrF4FwjHtexlvv7hpdbKjcxfThvSrVS
- MK84D0NaZJ8wzF3kK/AIBGEn1ZouR0nsU/so0Lebzma4LwsDeTLNr3AZXZG8iKpS0B5u
- VCVCt+Cfk9hdHxWkvQM6KrSuPzeDFkHsmAMyIEbq0wb5LekNlA+m18HsOVyPgtECsQ+h
- Gqq1jVJHpGLq8WkftVzz7eafTj7XhBmwR6vGE+rGn5rD4ezVlMy5o8wbr/SAN/EaJazQ
- /dhisc8j/q+USyXqztY4zfIGuLAacpbFWxIjqk7oSlEKUn0K+Hr7fqNF9Hz8dHfRexhJ
- 3cUw==
-X-Gm-Message-State: AGi0Puah4gyC1f23hgiFUc1UxPf44dqWUVg29AP2eUc4A4+u3GyCDjq5
- ySvnDdDJJzdNfFo/Ky8UB4XgEQ==
-X-Google-Smtp-Source: APiQypLPIANe9CN7y6tqsUYix8muuLwwoeqZmtOfhmQp7V7bhrUxE1q24ur/wJFsDhFEJCYfp0TKtg==
-X-Received: by 2002:a1c:4ca:: with SMTP id 193mr17995360wme.18.1587389839900; 
- Mon, 20 Apr 2020 06:37:19 -0700 (PDT)
-Received: from dbrazdil-macbookpro.roam.corp.google.com
- ([2a01:4b00:8523:2d03:3d2b:8fad:27b3:46fc])
- by smtp.gmail.com with ESMTPSA id a67sm1475822wmc.30.2020.04.20.06.37.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 06:37:19 -0700 (PDT)
-From: David Brazdil <dbrazdil@google.com>
-X-Google-Original-From: David Brazdil
- <dbrazdil@dbrazdil-macbookpro.roam.corp.google.com>
-Date: Mon, 20 Apr 2020 14:37:18 +0100
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: Kill off CONFIG_KVM_ARM_HOST
-Message-ID: <20200420133718.wbpspunss6gawi5m@dbrazdil-macbookpro.roam.corp.google.com>
-References: <20200417140821.89974-1-tabba@google.com>
- <20200417140821.89974-2-tabba@google.com>
+ with ESMTP id LtgBYRzem+DV for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2020 09:46:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7854B12B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:46:17 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A5A2F1FB;
+ Mon, 20 Apr 2020 06:46:16 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFD8B3F68F;
+ Mon, 20 Apr 2020 06:46:13 -0700 (PDT)
+Subject: Re: [RFC PATCH] arm64: unify WORKAROUND_SPECULATIVE_AT_{NVHE,VHE}
+To: Will Deacon <will@kernel.org>, Andrew Scull <ascull@google.com>
+References: <20200327143941.195626-1-ascull@google.com>
+ <1705907b-234c-6f56-1360-f598c8047d1d@arm.com>
+ <20200403125726.GA33049@google.com> <20200417164103.GA12362@willie-the-truck>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <40f6b8bc-3ff4-2053-f8ae-e6b5fb811573@arm.com>
+Date: Mon, 20 Apr 2020 14:46:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200417140821.89974-2-tabba@google.com>
-Cc: catalin.marinas@arm.com, maz@kernel.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200417164103.GA12362@willie-the-truck>
+Content-Language: en-GB
+Cc: "qwandor@google.com" <qwandor@google.com>, Marc Zyngier <maz@kernel.org>,
+ "wedsonaf@google.com" <wedsonaf@google.com>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "kernel-team@android.com" <kernel-team@android.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,186 +70,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CONFIG_KVM_ARM_HOST has one more use in arch/arm64/kernel/cpu_errata.c.
+On 17/04/2020 17:41, Will Deacon wrote:
+> On Fri, Apr 03, 2020 at 01:57:26PM +0100, Andrew Scull wrote:
+>> On Fri, Mar 27, 2020 at 02:59:47PM +0000, Steven Price wrote:
+>>> I proposed something similar a while ago[1], but Marc was concerned about
+>>> the microarch detail[2] and hence I split the workaround into VHE/non-VHE.
+>>>
+>>> That said I'm not saying this is necessarily wrong, just that we'd need some
+>>> more information on whether the non-VHE workaround is suitable for the CPUs
+>>> we're currently forcing VHE on.
+>>
+>> We noticed that both the nVHE and VHE workarounds share the same
+>> assumption that the EPDx bits are not being cached in the TLB.
+>>
+>> `__tlb_switch_to_guest_vhe` and `__tlb_switch_to_guest_nvhe` are both
+>> setting EPDx as part of the workaround. However, neither handles the
+>> possibility of a speculative AT being able to make use of a cached EPD=0
+>> value in the TLB in order to allocate bad TLB entries.
+>>
+>> If this is correct, the microarch concern appears to have been solved
+>> already. Otherwise, or if we are unsure, we should go ahead and add the
+>> TLB flushes to keep this safe.
+> 
+> I think Andrew's right here. Can we go ahead with the original approach of
+> combining the workarounds, or is there something we've missed?
 
--David
+As far as I know it is safe to combine the workarounds: I did post my 
+own patch earlier. But I don't have the deep understanding of the 
+microarch - so I accepted Marc's concerns and dropped that, and was 
+simply linking up the discussions.
 
-On Fri, Apr 17, 2020 at 03:08:18PM +0100, Fuad Tabba wrote:
-> From: Will Deacon <will@kernel.org>
-> 
-> CONFIG_KVM_ARM_HOST is just a proxy for CONFIG_KVM, so remove it in favour
-> of the latter.
-> 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kernel/asm-offsets.c |  2 +-
->  arch/arm64/kernel/smp.c         |  2 +-
->  arch/arm64/kvm/Kconfig          |  6 ----
->  arch/arm64/kvm/Makefile         | 54 ++++++++++++++++-----------------
->  arch/arm64/kvm/hyp/Makefile     | 22 +++++++-------
->  5 files changed, 40 insertions(+), 46 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 9981a0a5a87f..a27e0cd731e9 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -96,7 +96,7 @@ int main(void)
->    DEFINE(CPU_BOOT_PTRAUTH_KEY,	offsetof(struct secondary_data, ptrauth_key));
->  #endif
->    BLANK();
-> -#ifdef CONFIG_KVM_ARM_HOST
-> +#ifdef CONFIG_KVM
->    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
->    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
->    DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
-> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-> index 061f60fe452f..0a3045d9f33f 100644
-> --- a/arch/arm64/kernel/smp.c
-> +++ b/arch/arm64/kernel/smp.c
-> @@ -430,7 +430,7 @@ static void __init hyp_mode_check(void)
->  			   "CPU: CPUs started in inconsistent modes");
->  	else
->  		pr_info("CPU: All CPU(s) started at EL1\n");
-> -	if (IS_ENABLED(CONFIG_KVM_ARM_HOST))
-> +	if (IS_ENABLED(CONFIG_KVM))
->  		kvm_compute_layout();
->  }
->  
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 449386d76441..ce724e526689 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -28,7 +28,6 @@ config KVM
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
->  	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
->  	select KVM_MMIO
-> -	select KVM_ARM_HOST
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->  	select SRCU
->  	select KVM_VFIO
-> @@ -50,11 +49,6 @@ config KVM
->  
->  	  If unsure, say N.
->  
-> -config KVM_ARM_HOST
-> -	bool
-> -	---help---
-> -	  Provides host support for ARM processors.
-> -
->  config KVM_ARM_PMU
->  	bool
->  	---help---
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 7a3768538343..a5334b91729a 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -7,33 +7,33 @@ ccflags-y += -I $(srctree)/$(src)
->  
->  KVM=../../../virt/kvm
->  
-> -obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += hyp/
-> +obj-$(CONFIG_KVM) += kvm.o
-> +obj-$(CONFIG_KVM) += hyp/
->  
-> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += arm.o mmu.o mmio.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += psci.o perf.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += hypercalls.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += pvtime.o
-> +kvm-$(CONFIG_KVM) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
-> +kvm-$(CONFIG_KVM) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
-> +kvm-$(CONFIG_KVM) += arm.o mmu.o mmio.o
-> +kvm-$(CONFIG_KVM) += psci.o perf.o
-> +kvm-$(CONFIG_KVM) += hypercalls.o
-> +kvm-$(CONFIG_KVM) += pvtime.o
->  
-> -kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o fpsimd.o pmu.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += aarch32.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += arch_timer.o
-> -kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
-> +kvm-$(CONFIG_KVM) += inject_fault.o regmap.o va_layout.o
-> +kvm-$(CONFIG_KVM) += hyp.o hyp-init.o handle_exit.o
-> +kvm-$(CONFIG_KVM) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
-> +kvm-$(CONFIG_KVM) += vgic-sys-reg-v3.o fpsimd.o pmu.o
-> +kvm-$(CONFIG_KVM) += aarch32.o
-> +kvm-$(CONFIG_KVM) += arch_timer.o
-> +kvm-$(CONFIG_KVM)  += pmu-emul.o
->  
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-init.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-irqfd.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v2.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v3.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v4.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v2.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v3.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-kvm-device.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-its.o
-> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-debug.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-init.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-irqfd.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-v2.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-v3.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-v4.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v2.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v3.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-kvm-device.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-its.o
-> +kvm-$(CONFIG_KVM) += vgic/vgic-debug.o
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index dc18274a6826..8229e47ba870 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -6,17 +6,17 @@
->  ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
->  		$(DISABLE_STACKLEAK_PLUGIN)
->  
-> -obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += aarch32.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
-> +obj-$(CONFIG_KVM) += vgic-v3-sr.o
-> +obj-$(CONFIG_KVM) += timer-sr.o
-> +obj-$(CONFIG_KVM) += aarch32.o
-> +obj-$(CONFIG_KVM) += vgic-v2-cpuif-proxy.o
-> +obj-$(CONFIG_KVM) += sysreg-sr.o
-> +obj-$(CONFIG_KVM) += debug-sr.o
-> +obj-$(CONFIG_KVM) += entry.o
-> +obj-$(CONFIG_KVM) += switch.o
-> +obj-$(CONFIG_KVM) += fpsimd.o
-> +obj-$(CONFIG_KVM) += tlb.o
-> +obj-$(CONFIG_KVM) += hyp-entry.o
->  
->  # KVM code is run at a different exception code with a different map, so
->  # compiler instrumentation that inserts callbacks or checks into the code may
-> -- 
-> 2.26.1.301.g55bc3eb7cb9-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+The assumption before was that booting a VHE capable system without VHE 
+wasn't useful, so there wasn't a pressing need to unify the workarounds. 
+And therefore the easiest option for me was to keep the workarounds 
+separate. Since there is apparently a desire to do such a thing then 
+unifying the workarounds seems reasonable.
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
