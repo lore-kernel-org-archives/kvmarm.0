@@ -2,75 +2,92 @@ Return-Path: <SRS0=QomF=6E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1B3C3815B
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 10:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A38C3815B
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 77863205C9
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 10:48:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77863205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTP id CEF2720857
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="kPj7agkm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF2720857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E075D4B142;
-	Mon, 20 Apr 2020 06:48:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FBF14B135;
+	Mon, 20 Apr 2020 09:37:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KSWW+JSzSfSP; Mon, 20 Apr 2020 06:48:17 -0400 (EDT)
+	with ESMTP id as1U3A6imW4a; Mon, 20 Apr 2020 09:37:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B579B4B0CC;
-	Mon, 20 Apr 2020 06:48:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E06D74B12C;
+	Mon, 20 Apr 2020 09:37:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68A774B130
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:42:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBCA44B129
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:37:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 53EI7B+BWsqr for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2020 06:42:24 -0400 (EDT)
-Received: from out30-132.freemail.mail.aliyun.com
- (out30-132.freemail.mail.aliyun.com [115.124.30.132])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAD254B120
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:42:23 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R161e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04428;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
- TI=SMTPD_---0Tw6Imgc_1587379335; 
-Received: from 30.27.118.66(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0Tw6Imgc_1587379335) by smtp.aliyun-inc.com(127.0.0.1);
- Mon, 20 Apr 2020 18:42:17 +0800
-Subject: Re: [PATCH 7/7] KVM: MIPS: clean up redundant kvm_run parameters in
- assembly
-To: maobibo <maobibo@loongson.cn>, pbonzini@redhat.com,
- tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
- benh@kernel.crashing.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
- david@redhat.com, cohuck@redhat.com, heiko.carstens@de.ibm.com,
- gor@linux.ibm.com, sean.j.christopherson@intel.com, vkuznets@redhat.com,
- wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
- hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
-References: <20200419075106.16248-1-tianjia.zhang@linux.alibaba.com>
- <20200419075106.16248-8-tianjia.zhang@linux.alibaba.com>
- <0b110e7f-9d08-496e-158e-8c3ff7307423@loongson.cn>
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <793b2b58-a199-c067-aec7-b07c444a6091@linux.alibaba.com>
-Date: Mon, 20 Apr 2020 18:42:15 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ with ESMTP id Q4p4ztaoXeWE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2020 09:37:21 -0400 (EDT)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 637E64B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:37:21 -0400 (EDT)
+Received: by mail-wm1-f68.google.com with SMTP id r26so11452507wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 06:37:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=from:date:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=BLAHTYVLykyAFNf8wRqZjn2QntSGVk3ZjCApuPikmyY=;
+ b=kPj7agkmsJbRTEhY9gZECvzMUnVjow/pHLabt5Rz4A4gvBD/3+WxgH4FaTYlNQwAiV
+ APgeY+cHsV5Vss6ilHxA2xmU5WGBPAkYE409yFcJSegDhyi0rggFUlyCquJezz69HznN
+ 2vcUmThUbTW6cdAen1D/LxK2hqVjHs/kQ06W/vbqgZXhIQ17MTR0wghyX9iZvoZs7tia
+ YJfRA6+StGUxa/E81bZGo5ZwaOBeGVfyESQAv1XNGQnzo3jVsTaZJHbjVJ1vOdaiaX+1
+ VuYqCKdST4I9OSW/tNaHhbV0JtNL8E57/CyWJYsUrQ9Ydr2VaZe6NTZEjHs6Wm1A9rne
+ 3xOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=BLAHTYVLykyAFNf8wRqZjn2QntSGVk3ZjCApuPikmyY=;
+ b=aqzDmFV4qc3VjdLC/xFXqOdAMVCYXq8jMfgcrF4FwjHtexlvv7hpdbKjcxfThvSrVS
+ MK84D0NaZJ8wzF3kK/AIBGEn1ZouR0nsU/so0Lebzma4LwsDeTLNr3AZXZG8iKpS0B5u
+ VCVCt+Cfk9hdHxWkvQM6KrSuPzeDFkHsmAMyIEbq0wb5LekNlA+m18HsOVyPgtECsQ+h
+ Gqq1jVJHpGLq8WkftVzz7eafTj7XhBmwR6vGE+rGn5rD4ezVlMy5o8wbr/SAN/EaJazQ
+ /dhisc8j/q+USyXqztY4zfIGuLAacpbFWxIjqk7oSlEKUn0K+Hr7fqNF9Hz8dHfRexhJ
+ 3cUw==
+X-Gm-Message-State: AGi0Puah4gyC1f23hgiFUc1UxPf44dqWUVg29AP2eUc4A4+u3GyCDjq5
+ ySvnDdDJJzdNfFo/Ky8UB4XgEQ==
+X-Google-Smtp-Source: APiQypLPIANe9CN7y6tqsUYix8muuLwwoeqZmtOfhmQp7V7bhrUxE1q24ur/wJFsDhFEJCYfp0TKtg==
+X-Received: by 2002:a1c:4ca:: with SMTP id 193mr17995360wme.18.1587389839900; 
+ Mon, 20 Apr 2020 06:37:19 -0700 (PDT)
+Received: from dbrazdil-macbookpro.roam.corp.google.com
+ ([2a01:4b00:8523:2d03:3d2b:8fad:27b3:46fc])
+ by smtp.gmail.com with ESMTPSA id a67sm1475822wmc.30.2020.04.20.06.37.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 06:37:19 -0700 (PDT)
+From: David Brazdil <dbrazdil@google.com>
+X-Google-Original-From: David Brazdil
+ <dbrazdil@dbrazdil-macbookpro.roam.corp.google.com>
+Date: Mon, 20 Apr 2020 14:37:18 +0100
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v3 1/4] KVM: arm64: Kill off CONFIG_KVM_ARM_HOST
+Message-ID: <20200420133718.wbpspunss6gawi5m@dbrazdil-macbookpro.roam.corp.google.com>
+References: <20200417140821.89974-1-tabba@google.com>
+ <20200417140821.89974-2-tabba@google.com>
 MIME-Version: 1.0
-In-Reply-To: <0b110e7f-9d08-496e-158e-8c3ff7307423@loongson.cn>
-X-Mailman-Approved-At: Mon, 20 Apr 2020 06:48:15 -0400
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200417140821.89974-2-tabba@google.com>
+Cc: catalin.marinas@arm.com, maz@kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,163 +99,186 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+CONFIG_KVM_ARM_HOST has one more use in arch/arm64/kernel/cpu_errata.c.
 
+-David
 
-On 2020/4/20 18:32, maobibo wrote:
+On Fri, Apr 17, 2020 at 03:08:18PM +0100, Fuad Tabba wrote:
+> From: Will Deacon <will@kernel.org>
 > 
+> CONFIG_KVM_ARM_HOST is just a proxy for CONFIG_KVM, so remove it in favour
+> of the latter.
 > 
-> On 04/19/2020 03:51 PM, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. Earlier than historical reasons, many kvm-related function
->> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
->> This patch does a unified cleanup of these remaining redundant parameters.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   arch/mips/include/asm/kvm_host.h |  4 ++--
->>   arch/mips/kvm/entry.c            | 15 +++++----------
->>   arch/mips/kvm/mips.c             |  3 ++-
->>   arch/mips/kvm/trap_emul.c        |  2 +-
->>   arch/mips/kvm/vz.c               |  2 +-
->>   5 files changed, 11 insertions(+), 15 deletions(-)
->>
->> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
->> index 971439297cea..db915c55166d 100644
->> --- a/arch/mips/include/asm/kvm_host.h
->> +++ b/arch/mips/include/asm/kvm_host.h
->> @@ -310,7 +310,7 @@ struct kvm_mmu_memory_cache {
->>   #define KVM_MIPS_GUEST_TLB_SIZE	64
->>   struct kvm_vcpu_arch {
->>   	void *guest_ebase;
->> -	int (*vcpu_run)(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +	int (*vcpu_run)(struct kvm_vcpu *vcpu);
->>   
->>   	/* Host registers preserved across guest mode execution */
->>   	unsigned long host_stack;
->> @@ -821,7 +821,7 @@ int kvm_mips_emulation_init(struct kvm_mips_callbacks **install_callbacks);
->>   /* Debug: dump vcpu state */
->>   int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
->>   
->> -extern int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +extern int kvm_mips_handle_exit(struct kvm_vcpu *vcpu);
->>   
->>   /* Building of entry/exception code */
->>   int kvm_mips_entry_setup(void);
->> diff --git a/arch/mips/kvm/entry.c b/arch/mips/kvm/entry.c
->> index 16e1c93b484f..e3f29af3b6cd 100644
->> --- a/arch/mips/kvm/entry.c
->> +++ b/arch/mips/kvm/entry.c
->> @@ -204,7 +204,7 @@ static inline void build_set_exc_base(u32 **p, unsigned int reg)
->>    * Assemble the start of the vcpu_run function to run a guest VCPU. The function
->>    * conforms to the following prototype:
->>    *
->> - * int vcpu_run(struct kvm_run *run, struct kvm_vcpu *vcpu);
->> + * int vcpu_run(struct kvm_vcpu *vcpu);
->>    *
->>    * The exit from the guest and return to the caller is handled by the code
->>    * generated by kvm_mips_build_ret_to_host().
->> @@ -217,8 +217,7 @@ void *kvm_mips_build_vcpu_run(void *addr)
->>   	unsigned int i;
->>   
->>   	/*
->> -	 * A0: run
->> -	 * A1: vcpu
->> +	 * A0: vcpu
->>   	 */
->>   
->>   	/* k0/k1 not being used in host kernel context */
->> @@ -237,10 +236,10 @@ void *kvm_mips_build_vcpu_run(void *addr)
->>   	kvm_mips_build_save_scratch(&p, V1, K1);
->>   
->>   	/* VCPU scratch register has pointer to vcpu */
->> -	UASM_i_MTC0(&p, A1, scratch_vcpu[0], scratch_vcpu[1]);
->> +	UASM_i_MTC0(&p, A0, scratch_vcpu[0], scratch_vcpu[1]);
->>   
->>   	/* Offset into vcpu->arch */
->> -	UASM_i_ADDIU(&p, K1, A1, offsetof(struct kvm_vcpu, arch));
->> +	UASM_i_ADDIU(&p, K1, A0, offsetof(struct kvm_vcpu, arch));
->>   
->>   	/*
->>   	 * Save the host stack to VCPU, used for exception processing
->> @@ -628,10 +627,7 @@ void *kvm_mips_build_exit(void *addr)
->>   	/* Now that context has been saved, we can use other registers */
->>   
->>   	/* Restore vcpu */
->> -	UASM_i_MFC0(&p, S1, scratch_vcpu[0], scratch_vcpu[1]);
->> -
->> -	/* Restore run (vcpu->run) */
->> -	UASM_i_LW(&p, S0, offsetof(struct kvm_vcpu, run), S1);
->> +	UASM_i_MFC0(&p, S0, scratch_vcpu[0], scratch_vcpu[1]);
->>   
->>   	/*
->>   	 * Save Host level EPC, BadVaddr and Cause to VCPU, useful to process
->> @@ -793,7 +789,6 @@ void *kvm_mips_build_exit(void *addr)
->>   	 * with this in the kernel
->>   	 */
->>   	uasm_i_move(&p, A0, S0);
->> -	uasm_i_move(&p, A1, S1);
->>   	UASM_i_LA(&p, T9, (unsigned long)kvm_mips_handle_exit);
->>   	uasm_i_jalr(&p, RA, T9);
->>   	 UASM_i_ADDIU(&p, SP, SP, -CALLFRAME_SIZ);
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kernel/asm-offsets.c |  2 +-
+>  arch/arm64/kernel/smp.c         |  2 +-
+>  arch/arm64/kvm/Kconfig          |  6 ----
+>  arch/arm64/kvm/Makefile         | 54 ++++++++++++++++-----------------
+>  arch/arm64/kvm/hyp/Makefile     | 22 +++++++-------
+>  5 files changed, 40 insertions(+), 46 deletions(-)
 > 
-> I suggest keeping asm code untouched, the change for c code is much easier to understand, however I do not see obvious advantage to remove one redundant function parameter :)
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 9981a0a5a87f..a27e0cd731e9 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -96,7 +96,7 @@ int main(void)
+>    DEFINE(CPU_BOOT_PTRAUTH_KEY,	offsetof(struct secondary_data, ptrauth_key));
+>  #endif
+>    BLANK();
+> -#ifdef CONFIG_KVM_ARM_HOST
+> +#ifdef CONFIG_KVM
+>    DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+>    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
+>    DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
+> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+> index 061f60fe452f..0a3045d9f33f 100644
+> --- a/arch/arm64/kernel/smp.c
+> +++ b/arch/arm64/kernel/smp.c
+> @@ -430,7 +430,7 @@ static void __init hyp_mode_check(void)
+>  			   "CPU: CPUs started in inconsistent modes");
+>  	else
+>  		pr_info("CPU: All CPU(s) started at EL1\n");
+> -	if (IS_ENABLED(CONFIG_KVM_ARM_HOST))
+> +	if (IS_ENABLED(CONFIG_KVM))
+>  		kvm_compute_layout();
+>  }
+>  
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 449386d76441..ce724e526689 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -28,7 +28,6 @@ config KVM
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>  	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+>  	select KVM_MMIO
+> -	select KVM_ARM_HOST
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select SRCU
+>  	select KVM_VFIO
+> @@ -50,11 +49,6 @@ config KVM
+>  
+>  	  If unsure, say N.
+>  
+> -config KVM_ARM_HOST
+> -	bool
+> -	---help---
+> -	  Provides host support for ARM processors.
+> -
+>  config KVM_ARM_PMU
+>  	bool
+>  	---help---
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 7a3768538343..a5334b91729a 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -7,33 +7,33 @@ ccflags-y += -I $(srctree)/$(src)
+>  
+>  KVM=../../../virt/kvm
+>  
+> -obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+> +obj-$(CONFIG_KVM) += kvm.o
+> +obj-$(CONFIG_KVM) += hyp/
+>  
+> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += arm.o mmu.o mmio.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += psci.o perf.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += hypercalls.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += pvtime.o
+> +kvm-$(CONFIG_KVM) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+> +kvm-$(CONFIG_KVM) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
+> +kvm-$(CONFIG_KVM) += arm.o mmu.o mmio.o
+> +kvm-$(CONFIG_KVM) += psci.o perf.o
+> +kvm-$(CONFIG_KVM) += hypercalls.o
+> +kvm-$(CONFIG_KVM) += pvtime.o
+>  
+> -kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o fpsimd.o pmu.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += aarch32.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += arch_timer.o
+> -kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
+> +kvm-$(CONFIG_KVM) += inject_fault.o regmap.o va_layout.o
+> +kvm-$(CONFIG_KVM) += hyp.o hyp-init.o handle_exit.o
+> +kvm-$(CONFIG_KVM) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+> +kvm-$(CONFIG_KVM) += vgic-sys-reg-v3.o fpsimd.o pmu.o
+> +kvm-$(CONFIG_KVM) += aarch32.o
+> +kvm-$(CONFIG_KVM) += arch_timer.o
+> +kvm-$(CONFIG_KVM)  += pmu-emul.o
+>  
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-init.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-irqfd.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v2.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v3.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v4.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v2.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v3.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-kvm-device.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-its.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-debug.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-init.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-irqfd.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-v2.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-v3.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-v4.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v2.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v3.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-kvm-device.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-its.o
+> +kvm-$(CONFIG_KVM) += vgic/vgic-debug.o
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index dc18274a6826..8229e47ba870 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -6,17 +6,17 @@
+>  ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+>  		$(DISABLE_STACKLEAK_PLUGIN)
+>  
+> -obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += aarch32.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+> -obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+> +obj-$(CONFIG_KVM) += vgic-v3-sr.o
+> +obj-$(CONFIG_KVM) += timer-sr.o
+> +obj-$(CONFIG_KVM) += aarch32.o
+> +obj-$(CONFIG_KVM) += vgic-v2-cpuif-proxy.o
+> +obj-$(CONFIG_KVM) += sysreg-sr.o
+> +obj-$(CONFIG_KVM) += debug-sr.o
+> +obj-$(CONFIG_KVM) += entry.o
+> +obj-$(CONFIG_KVM) += switch.o
+> +obj-$(CONFIG_KVM) += fpsimd.o
+> +obj-$(CONFIG_KVM) += tlb.o
+> +obj-$(CONFIG_KVM) += hyp-entry.o
+>  
+>  # KVM code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+> -- 
+> 2.26.1.301.g55bc3eb7cb9-goog
 > 
-> 
-> regards
-> bibo,mao
-> 
-
-This is acceptable, asm code is an independent patch, is to provide 
-convenience for this operation.
-
-> 
->> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
->> index 9710477a9827..32850470c037 100644
->> --- a/arch/mips/kvm/mips.c
->> +++ b/arch/mips/kvm/mips.c
->> @@ -1186,8 +1186,9 @@ static void kvm_mips_set_c0_status(void)
->>   /*
->>    * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
->>    */
->> -int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
->> +int kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
->>   {
->> +	struct kvm_run *run = vcpu->run;
->>   	u32 cause = vcpu->arch.host_cp0_cause;
->>   	u32 exccode = (cause >> CAUSEB_EXCCODE) & 0x1f;
->>   	u32 __user *opc = (u32 __user *) vcpu->arch.pc;
->> diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
->> index d822f3aee3dc..04c864cc356a 100644
->> --- a/arch/mips/kvm/trap_emul.c
->> +++ b/arch/mips/kvm/trap_emul.c
->> @@ -1238,7 +1238,7 @@ static int kvm_trap_emul_vcpu_run(struct kvm_vcpu *vcpu)
->>   	 */
->>   	kvm_mips_suspend_mm(cpu);
->>   
->> -	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
->> +	r = vcpu->arch.vcpu_run(vcpu);
->>   
->>   	/* We may have migrated while handling guest exits */
->>   	cpu = smp_processor_id();
->> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
->> index 94f1d23828e3..c5878fa0636d 100644
->> --- a/arch/mips/kvm/vz.c
->> +++ b/arch/mips/kvm/vz.c
->> @@ -3152,7 +3152,7 @@ static int kvm_vz_vcpu_run(struct kvm_vcpu *vcpu)
->>   	kvm_vz_vcpu_load_tlb(vcpu, cpu);
->>   	kvm_vz_vcpu_load_wired(vcpu);
->>   
->> -	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
->> +	r = vcpu->arch.vcpu_run(vcpu);
->>   
->>   	kvm_vz_vcpu_save_wired(vcpu);
->>   
->>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
