@@ -2,63 +2,92 @@ Return-Path: <SRS0=QomF=6E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 433DAC3815B
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390B9C54FCB
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 14:03:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C677F21473
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 13:46:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C677F21473
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C201720722
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Apr 2020 14:03:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQ8HBwam"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C201720722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2824C4B12F;
-	Mon, 20 Apr 2020 09:46:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68E564B135;
+	Mon, 20 Apr 2020 10:03:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YGzD58QPqCmL; Mon, 20 Apr 2020 09:46:20 -0400 (EDT)
+	with ESMTP id oKE8LSnzNbhM; Mon, 20 Apr 2020 10:03:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0199B4B131;
-	Mon, 20 Apr 2020 09:46:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A794B0F0;
+	Mon, 20 Apr 2020 10:03:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E11024B12F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:46:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C22104B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 10:03:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LtgBYRzem+DV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2020 09:46:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7854B12B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 09:46:17 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A5A2F1FB;
- Mon, 20 Apr 2020 06:46:16 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFD8B3F68F;
- Mon, 20 Apr 2020 06:46:13 -0700 (PDT)
-Subject: Re: [RFC PATCH] arm64: unify WORKAROUND_SPECULATIVE_AT_{NVHE,VHE}
-To: Will Deacon <will@kernel.org>, Andrew Scull <ascull@google.com>
-References: <20200327143941.195626-1-ascull@google.com>
- <1705907b-234c-6f56-1360-f598c8047d1d@arm.com>
- <20200403125726.GA33049@google.com> <20200417164103.GA12362@willie-the-truck>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <40f6b8bc-3ff4-2053-f8ae-e6b5fb811573@arm.com>
-Date: Mon, 20 Apr 2020 14:46:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ with ESMTP id dYM8aEEnDs37 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2020 10:03:22 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAB154B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2020 10:03:22 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 918E420722;
+ Mon, 20 Apr 2020 14:03:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587391401;
+ bh=GPT20fEi2/FOGz+OkWS9srVMj+Rsxisj5E5BJqEY3UU=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=bQ8HBwamtxiv7Lhgcap7xcBV4Jlc9CX5VQNZlpTf0yVkbH9kEl5RE8gBvInvva93g
+ L4UulNBvuMdIJR8930Fx1dR/9O25nYqJSi1DKOPDBZoVX9F47jjaSRSr2uWm8H/mMg
+ Nsa/xcz6YHHICI8JzH58nRHy4kE+RfdMsNOcJ3ME=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jQX15-004ttw-TP; Mon, 20 Apr 2020 15:03:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200417164103.GA12362@willie-the-truck>
-Content-Language: en-GB
-Cc: "qwandor@google.com" <qwandor@google.com>, Marc Zyngier <maz@kernel.org>,
- "wedsonaf@google.com" <wedsonaf@google.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kernel-team@android.com" <kernel-team@android.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Date: Mon, 20 Apr 2020 15:03:19 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: "Zengtao (B)" <prime.zeng@hisilicon.com>
+Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
+References: <MN2PR18MB26869A6CA4E67558324F655CC5C70@MN2PR18MB2686.namprd18.prod.outlook.com>
+ <06d08f904f003160a48eac3c5ab3c7ff@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED342E29B9@dggemm526-mbx.china.huawei.com>
+ <86r1wus7df.wl-maz@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED3A535FCF@DGGEMM506-MBX.china.huawei.com>
+ <3e84aaf8b757bc5a7685a291e54c232b@kernel.org> <20200417160602.26706917@why>
+ <678F3D1BB717D949B966B68EAEB446ED3A545C71@dggemm526-mbx.china.huawei.com>
+Message-ID: <dd1283e9b31fd01ac5c9f434aa00d34e@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: prime.zeng@hisilicon.com, gcherian@marvell.com,
+ Dave.Martin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com,
+ christoffer.dall@arm.com, james.morse@arm.com, jintack@cs.columbia.edu,
+ julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ suzuki.poulose@arm.com, areddy3@marvell.com, gkulkarni@marvell.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, Ganapatrao Kulkarni <gkulkarni@marvell.com>,
+ kvm@vger.kernel.org, andre.przywara@arm.com,
+ George Cherian <gcherian@marvell.com>, linux-arm-kernel@lists.infradead.org,
+ Anil Kumar Reddy H <areddy3@marvell.com>, Dave.Martin@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,43 +104,87 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/04/2020 17:41, Will Deacon wrote:
-> On Fri, Apr 03, 2020 at 01:57:26PM +0100, Andrew Scull wrote:
->> On Fri, Mar 27, 2020 at 02:59:47PM +0000, Steven Price wrote:
->>> I proposed something similar a while ago[1], but Marc was concerned about
->>> the microarch detail[2] and hence I split the workaround into VHE/non-VHE.
->>>
->>> That said I'm not saying this is necessarily wrong, just that we'd need some
->>> more information on whether the non-VHE workaround is suitable for the CPUs
->>> we're currently forcing VHE on.
->>
->> We noticed that both the nVHE and VHE workarounds share the same
->> assumption that the EPDx bits are not being cached in the TLB.
->>
->> `__tlb_switch_to_guest_vhe` and `__tlb_switch_to_guest_nvhe` are both
->> setting EPDx as part of the workaround. However, neither handles the
->> possibility of a speculative AT being able to make use of a cached EPD=0
->> value in the TLB in order to allocate bad TLB entries.
->>
->> If this is correct, the microarch concern appears to have been solved
->> already. Otherwise, or if we are unsure, we should go ahead and add the
->> TLB flushes to keep this safe.
-> 
-> I think Andrew's right here. Can we go ahead with the original approach of
-> combining the workarounds, or is there something we've missed?
+On 2020-04-18 03:49, Zengtao (B) wrote:
+> -----Original Message-----
+>> From: Marc Zyngier [mailto:maz@kernel.org]
+>> Sent: Friday, April 17, 2020 11:06 PM
+>> To: Zengtao (B)
+>> Cc: George Cherian; Dave.Martin@arm.com; alexandru.elisei@arm.com;
+>> andre.przywara@arm.com; christoffer.dall@arm.com;
+>> james.morse@arm.com; jintack@cs.columbia.edu;
+>> julien.thierry.kdev@gmail.com; kvm@vger.kernel.org;
+>> kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org;
+>> suzuki.poulose@arm.com; Anil Kumar Reddy H; Ganapatrao Kulkarni
+>> Subject: Re: [PATCH v2 00/94] KVM: arm64: ARMv8.3/8.4 Nested
+>> Virtualization support
+>> 
+>> On Thu, 16 Apr 2020 19:22:21 +0100
+>> Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> > Hi Zengtao,
+>> >
+>> > On 2020-04-16 02:38, Zengtao (B) wrote:
+>> > > Hi Marc:
+>> > >
+>> > > Got it.
+>> > > Really a bit patch set :)
+>> >
+>> > Well, yeah... ;-)
+>> >
+>> > >
+>> > > BTW, I have done a basic kvm unit test
+>> > > git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+>> > > And I find that after apply the patch KVM: arm64: VNCR-ize ELR_EL1,
+>> > > The psci test failed for some reason, I can't understand why, this
+>> > > is only the test result.(find the patch by git bisect + kvm test)
+>> >
+>> > That it is that mechanical, we should be able to quickly nail that one.
+>> >
+>> > > My platform: Hisilicon D06 board.
+>> > > Linux kernel: Linux 5.6-rc6 + nv patches(some rebases)
+>> > > Could you help to take a look?
+>> >
+>> > I'll have a look tomorrow. I'm in the middle of refactoring the series
+>> > for 5.7, and things have changed quite a bit. Hopefully this isn't a VHE
+>> > vs non-VHE issue.
+>> 
+>> So I've repeatedly tried with the current state of the NV patches[1],
+>> on both an ARMv8.0 system (Seattle) and an ARMv8.2 pile of putrid junk
+>> (vim3l). PSCI is pretty happy, although I can only test with at most 8
+>> vcpus (GICv2 gets in the way).
+>> 
+>> Can you please:
+>> 
+>> - post the detailed error by running the PSCI unit test on its own
+> I tried to trace the error, and I found in kernel function 
+> kvm_mpidr_to_vcpu,
+> casually, mpidr returns zero and we can't get the expected vcpu, and 
+> psci
+>  test failed due to this.
 
-As far as I know it is safe to combine the workarounds: I did post my 
-own patch earlier. But I don't have the deep understanding of the 
-microarch - so I accepted Marc's concerns and dropped that, and was 
-simply linking up the discussions.
+Can you post the exact error message from the unit test?
 
-The assumption before was that booting a VHE capable system without VHE 
-wasn't useful, so there wasn't a pressing need to unify the workarounds. 
-And therefore the easiest option for me was to keep the workarounds 
-separate. Since there is apparently a desire to do such a thing then 
-unifying the workarounds seems reasonable.
+> And as I mentioned in my last before, the psci error is introduced by 
+> the
+>  patch KVM: arm64: VNCR-ize ELR_EL1.(Only test result)
+> Maybe you have to try tens of times to reproduce. :)
+> Deep into the patch itself, I don't find any connection between the 
+> patch
+> and the issue.
 
-Steve
+Me neither, and I haven't managed to reproduce your issue.
+
+>> - test with the current state of the patches
+> I test with your nv-5.7-rc1-WIP branch and latest kvm_unit_test, the
+> error still exist.
+
+How many vcpus do you create with this PSCI test?
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
