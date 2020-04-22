@@ -2,80 +2,63 @@ Return-Path: <SRS0=wQQg=6G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12209C5518B
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 15:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60193C54FCB
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 15:56:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8D8AB20767
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 15:51:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMHmyc73"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8AB20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F100020767
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 15:56:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F100020767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 354624B107;
-	Wed, 22 Apr 2020 11:51:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA3A4B165;
+	Wed, 22 Apr 2020 11:56:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id abCAouISMW5X; Wed, 22 Apr 2020 11:50:59 -0400 (EDT)
+	with ESMTP id 6S1pJJNMHkIQ; Wed, 22 Apr 2020 11:56:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 413284B186;
-	Wed, 22 Apr 2020 11:50:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 062D24B171;
+	Wed, 22 Apr 2020 11:56:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F9A24B16D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 11:50:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C9F24B16D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 11:56:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ab9xr4Cp+RdO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 11:50:57 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2942C4B107
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 11:50:57 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EA32220767;
- Wed, 22 Apr 2020 15:50:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587570656;
- bh=16hEh7COz5X6gcSR+cor8Xs6XMhtSt7DiaO+McpA8Xw=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=rMHmyc73fzTojqpjdwKu0r3nS1CE3k+rX6IVaJiJbUiZ+TXDsCzHKILep59dff0sg
- SvWFQdEHeBMdmlppWgVvZ/GyPw4mATcgm+0+MxEBoaZB7sFTnyw+l4zidFrBws1vmV
- f5iORe/ZCTL9Kpe/+OHiTnCc1xLGdFlO9M+lTXiI=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jRHeI-005YGi-Am; Wed, 22 Apr 2020 16:50:54 +0100
+ with ESMTP id U1noiShU8N0Z for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 11:55:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0B014B165
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 11:55:58 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6998A30E;
+ Wed, 22 Apr 2020 08:55:58 -0700 (PDT)
+Received: from [192.168.0.14] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16D493F68F;
+ Wed, 22 Apr 2020 08:55:56 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm: vgic-v2: Only use the virtual state when
+ userspace accesses pending bits
+To: Marc Zyngier <maz@kernel.org>
+References: <20200417083319.3066217-1-maz@kernel.org>
+ <20200417083319.3066217-5-maz@kernel.org>
+ <4133d5f2-ed0e-9c4a-8a66-953fb6bf6e70@arm.com> <20200417134140.0a901749@why>
+ <7b001ee4-0a8e-d79c-1be4-563dab4ca452@arm.com> <20200420110350.675a3393@why>
+Message-ID: <5aa2acf8-e775-325c-0340-fa000a4e3513@arm.com>
+Date: Wed, 22 Apr 2020 16:55:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Date: Wed, 22 Apr 2020 16:50:54 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] arm64/kvm: Fix duplicate tracepoint definitions after KVM
- consolidation
-In-Reply-To: <20200422152249.GE676@willie-the-truck>
-References: <20200421091707.16743-1-will@kernel.org>
- <20200422152249.GE676@willie-the-truck>
-Message-ID: <f353b0115e16914b0f91d74246c277d1@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+In-Reply-To: <20200420110350.675a3393@why>
+Content-Language: en-GB
+Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
+ Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,44 +70,131 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-04-22 16:22, Will Deacon wrote:
-> On Tue, Apr 21, 2020 at 10:17:07AM +0100, Will Deacon wrote:
->> Both kvm/{arm,handle_exit}.c include trace.h and attempt to 
->> instantiate
->> the same tracepoints, resulting in failures at link-time:
->> 
->>   | aarch64-linux-gnu-ld: 
->> arch/arm64/kvm/handle_exit.o:(__tracepoints+0x30):
->>   |   multiple definition of `__tracepoint_kvm_wfx_arm64';
->>   |   arch/arm64/kvm/arm.o:(__tracepoints+0x510): first defined here
->>   | ...
->> 
->> Split trace.h into two files so that the tracepoints are only created
->> in the C files that use them.
->> 
->> Cc: Marc Zyngier <maz@kernel.org>
->> Signed-off-by: Will Deacon <will@kernel.org>
->> ---
->> 
->> Applies against kvm-arm64/welcome-home. Probably worth just folding in
->> to the only commit on that branch.
-> 
-> I also just noticed that you forgot to update MAINTAINERS after the 
-> move,
-> so you can fold in the diff below as well.
+Hi Marc,
 
-All applied, squashed and pushed out.
+On 20/04/2020 11:03, Marc Zyngier wrote:
+> On Fri, 17 Apr 2020 17:48:34 +0100
+> James Morse <james.morse@arm.com> wrote:
+>> On 17/04/2020 13:41, Marc Zyngier wrote:
+>>> On Fri, 17 Apr 2020 12:22:10 +0100 James Morse <james.morse@arm.com> wrote:  
+>>>> On 17/04/2020 09:33, Marc Zyngier wrote:  
+>>>>> There is no point in accessing the HW when writing to any of the
+>>>>> ISPENDR/ICPENDR registers from userspace, as only the guest should
+>>>>> be allowed to change the HW state.
+>>>>>
+>>>>> Introduce new userspace-specific accessors that deal solely with
+>>>>> the virtual state. Note that the API differs from that of GICv3,
+>>>>> where userspace exclusively uses ISPENDR to set the state. Too
+>>>>> bad we can't reuse it.    
+>>
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>>>>> index 6e30034d1464..f1927ae02d2e 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>>>>> @@ -321,6 +321,27 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,    
+>>>>  
+>>>>> +int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
+>>>>> +				gpa_t addr, unsigned int len,
+>>>>> +				unsigned long val)
+>>>>> +{
+>>>>> +	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+>>>>> +	int i;
+>>>>> +	unsigned long flags;
+>>>>> +
+>>>>> +	for_each_set_bit(i, &val, len * 8) {
+>>>>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);    
+>>>>
+>>>> vgic_mmio_write_spending() has:
+>>>> |	/* GICD_ISPENDR0 SGI bits are WI *
+>>>>
+>>>> and bales out early. Is GIC_DIST_PENDING_SET the same register?
+>>>> (If so, shouldn't that be true for PPI too?)  
+>>>
+>>> Hmmm. It's a bit more complicated (surprisingly).
+>>>
+>>> Yes, the SGI pending bits are WI from the guest perspective (as
+>>> required by the spec).  
+>>
+>>> But we still need to be able to restore them
+>>> from userspace, and I bet 82e40f558de56 ("KVM: arm/arm64: vgic-v2:
+>>> Handle SGI bits in GICD_I{S,C}PENDR0 as WI") has broken migration with
+>>> GICv2 (if you migrated with a pending SGI, you cannot restore it...).  
+>>
+>> Fun! It looks like the ioctl() would succeed, but nothing happened. Once you restart the
+>> guest one CPU may wait forever for the victim to respond.
+> 
+> Yup. I can only see two reason for this not being reported: nobody
+> tests live migration with GICv2 (most probable), or we're incredibly
+> lucky by having never take a snapshot of a pending SGI. Either way,
+> this needs fixing.
+> 
+>>> Now, there is still a bug here, in the sense that we need to indicate
+>>> which vcpu is the source of the SGI (this is a GICv2-special).
+>>> Unfortunately, we don't have a way to communicate this architecturally.
+>>> The only option we have is to make it up (as a self-SGI, for example).
+>>> But this is pretty broken at the architectural level TBH.
+>>> On the other hand, PPIs are just fine.  
+
+[...]
+
+>>> Not dumb at all! Given that we previously allowed this to be accessed
+>>> from userspace (well, before we broke it again), it should be able to
+>>> clear *something*. If we adopt the self-SGI behaviour as above, we will
+>>> get away with it.
+
+>>> @@ -423,7 +415,22 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+>>>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>  
+>>>  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>>> -		irq->pending_latch = false;
+>>> +		/*
+>>> +		 * More fun with GICv2 SGIs! If we're clearing one of them
+>>> +		 * from userspace, which source vcpu to clear?  Let's pick
+>>> +		 * the target vcpu itself (consistent whith the way we
+>>> +		 * populate them on the ISPENDR side), and only clear the
+>>> +		 * pending state if no sources are left (insert expletive
+>>> +		 * here).  
+>>
+>> But I'm not so sure about this. Doesn't this mean that user-space can't clear pending-SGI?
+>> Only if its pending due to self-SGI. I'm not sure when user-space would want to do this,
+>> so it may not matter.
+> 
+> In general, userspace just sets the pending bit, and doesn't bother
+> clearing anything (because by default, there is nothing to clear).
+
+>> (but if user-space never actually does this, then we should do the simplest thing)
+
+Adding printk() to this combined patch and using 'loadvm' on the qemu console, I see Qemu
+writing '0xffffffff' into cpending to clear all 16 SGIs. I guess it is 'resetting' the
+in-kernel state to replace it with the state read from disk.
+
+
+> A third way would be to align on what GICv3 does, which is that ISPENDR
+> is used for both setting and clearing in one go. Given that the current
+> state it broken (and has been for some time now), I'm tempted to adopt
+> the same behaviour...
+
+> What do you think?
+
+I think Qemu is expecting the bank of cpending writes to clear whatever the kernel has
+stored, so that it can replay the new state. Ignoring the cpending writes means the kernel
+keeps an interrupt pending if nothing else in that 64bit group was set. Its not what Qemu
+expects, it looks like we'd get away with it, but I don't think we should do it!
+
+I think we should let user-space write to those WI registers, and clearing the SGIs should
+clear all sources of SGI...
+
+(N.B. I hit the original issue by typing 'loadvm' in the wrong terminal)
+
 
 Thanks,
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+James
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
