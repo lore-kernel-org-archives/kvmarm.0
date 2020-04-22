@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA5BC55194
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECB2C5518B
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5B782082E
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBDE62076E
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcRj5m7L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B782082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="TA7uM5hO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDE62076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA2D4B10F;
-	Wed, 22 Apr 2020 12:19:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7D804B1A8;
+	Wed, 22 Apr 2020 12:19:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bszO7LgsV-Ba; Wed, 22 Apr 2020 12:19:30 -0400 (EDT)
+	with ESMTP id QnSsjEg0dz2u; Wed, 22 Apr 2020 12:19:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D04BB4B1C2;
-	Wed, 22 Apr 2020 12:19:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07EE54B19F;
+	Wed, 22 Apr 2020 12:19:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEBC74B125
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 12:19:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E42924B188
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 12:19:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1m0sDLGs29Lt for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id D+HtYcjKdcJv for <kvmarm@lists.cs.columbia.edu>;
  Wed, 22 Apr 2020 12:19:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05BBB4B1A8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 12:19:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 340F04B18E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 12:19:26 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 307F8214AF;
- Wed, 22 Apr 2020 16:19:24 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 64B7F21582;
+ Wed, 22 Apr 2020 16:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587572364;
- bh=BhZwMgT/N29ik0vHNd8c5Z9Kj3KV3g9ZDtZhDYw4fNw=;
+ s=default; t=1587572365;
+ bh=ak8isB0FGlseKt4JiC38muAkANaK86FQSKsLQTeIsUc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=CcRj5m7La1j/mE83eWz1l/u8S09S2mhxd7ArI57Q/SVzsvHomcz2UufrdAkjIDDkP
- nnKLdSRoVcxDbS0LGl0o8NFObe0zbkpDy6SlvgoU4A66FNa449LgU/Xbl9Fx5laaCh
- X/LnjEvbJXdcxDxwWrYg0CkeAZH+yLg0xKpdGFJk=
+ b=TA7uM5hOYoNIVk8PohFOkWL0eczaMaBSGL+pEZx6gzt639Ho/n7mB+5L8avj4yhm3
+ Uk0YbSza2Krf260n4qv6CdW3uyilwyB27Yj2hgFDsoCsATQlFdVveKnXrZBY4d7fhg
+ sx+TXCU2YPf5HE/6QcpiC3eWmXNBCU/h9KdxxiQQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jRI5q-005Ynp-H1; Wed, 22 Apr 2020 17:19:22 +0100
+ id 1jRI5r-005Ynp-QO; Wed, 22 Apr 2020 17:19:23 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 4/6] KVM: arm: vgic-v2: Only use the virtual state when
- userspace accesses pending bits
-Date: Wed, 22 Apr 2020 17:18:42 +0100
-Message-Id: <20200422161844.3848063-5-maz@kernel.org>
+Subject: [PATCH v3 6/6] KVM: arm64: vgic-its: Fix memory leak on the error
+ path of vgic_add_lpi()
+Date: Wed, 22 Apr 2020 17:18:44 +0100
+Message-Id: <20200422161844.3848063-7-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422161844.3848063-1-maz@kernel.org>
 References: <20200422161844.3848063-1-maz@kernel.org>
@@ -93,201 +93,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There is no point in accessing the HW when writing to any of the
-ISPENDR/ICPENDR registers from userspace, as only the guest should
-be allowed to change the HW state.
+From: Zenghui Yu <yuzenghui@huawei.com>
 
-Introduce new userspace-specific accessors that deal solely with
-the virtual state. Note that the API differs from that of GICv3,
-where userspace exclusively uses ISPENDR to set the state. Too
-bad we can't reuse it.
+If we're going to fail out the vgic_add_lpi(), let's make sure the
+allocated vgic_irq memory is also freed. Though it seems that both
+cases are unlikely to fail.
 
-Fixes: 82e40f558de56 ("KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI")
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200414030349.625-3-yuzenghui@huawei.com
 ---
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  6 ++-
- virt/kvm/arm/vgic/vgic-mmio.c    | 86 ++++++++++++++++++++++++--------
- virt/kvm/arm/vgic/vgic-mmio.h    |  8 +++
- 3 files changed, 76 insertions(+), 24 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index f51c6e939c761..a016f07adc281 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -417,10 +417,12 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		NULL, vgic_uaccess_write_cenable, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
--		vgic_mmio_read_pending, vgic_mmio_write_spending, NULL, NULL, 1,
-+		vgic_mmio_read_pending, vgic_mmio_write_spending,
-+		NULL, vgic_uaccess_write_spending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
--		vgic_mmio_read_pending, vgic_mmio_write_cpending, NULL, NULL, 1,
-+		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-+		NULL, vgic_uaccess_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 6e30034d14645..b2d73fc0d1ef4 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -261,17 +261,6 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	return value;
- }
- 
--/* Must be called with irq->irq_lock held */
--static void vgic_hw_irq_spending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				 bool is_uaccess)
--{
--	if (is_uaccess)
--		return;
--
--	irq->pending_latch = true;
--	vgic_irq_set_phys_active(irq, true);
--}
--
- static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
- 	return (vgic_irq_is_sgi(irq->intid) &&
-@@ -282,7 +271,6 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
--	bool is_uaccess = !kvm_get_running_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -312,22 +300,48 @@ void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			continue;
- 		}
- 
-+		irq->pending_latch = true;
- 		if (irq->hw)
--			vgic_hw_irq_spending(vcpu, irq, is_uaccess);
--		else
--			irq->pending_latch = true;
-+			vgic_irq_set_phys_active(irq, true);
-+
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
- }
- 
--/* Must be called with irq->irq_lock held */
--static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
--				 bool is_uaccess)
-+int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
- {
--	if (is_uaccess)
--		return;
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+	unsigned long flags;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
- 
-+		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		irq->pending_latch = true;
-+
-+		/*
-+		 * GICv2 SGIs are terribly broken. We can't restore
-+		 * the source of the interrupt, so just pick the vcpu
-+		 * itself as the source...
-+		 */
-+		if (is_vgic_v2_sgi(vcpu, irq))
-+			irq->source |= BIT(vcpu->vcpu_id);
-+
-+		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index d53d34a33e35d..c012a52b19f57 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -96,14 +96,21 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	 * We "cache" the configuration table entries in our struct vgic_irq's.
+ 	 * However we only have those structs for mapped IRQs, so we read in
+ 	 * the respective config data from memory here upon mapping the LPI.
++	 *
++	 * Should any of these fail, behave as if we couldn't create the LPI
++	 * by dropping the refcount and returning the error.
+ 	 */
+ 	ret = update_lpi_config(kvm, irq, NULL, false);
+-	if (ret)
++	if (ret) {
++		vgic_put_irq(kvm, irq);
+ 		return ERR_PTR(ret);
 +	}
-+
-+	return 0;
-+}
-+
-+/* Must be called with irq->irq_lock held */
-+static void vgic_hw_irq_cpending(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
-+{
- 	irq->pending_latch = false;
  
- 	/*
-@@ -350,7 +364,6 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val)
- {
--	bool is_uaccess = !kvm_get_running_vcpu();
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	int i;
- 	unsigned long flags;
-@@ -381,7 +394,7 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 		}
- 
- 		if (irq->hw)
--			vgic_hw_irq_cpending(vcpu, irq, is_uaccess);
-+			vgic_hw_irq_cpending(vcpu, irq);
- 		else
- 			irq->pending_latch = false;
- 
-@@ -390,6 +403,35 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 	}
- }
- 
-+int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val)
-+{
-+	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
-+	int i;
-+	unsigned long flags;
-+
-+	for_each_set_bit(i, &val, len * 8) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		/*
-+		 * More fun with GICv2 SGIs! If we're clearing one of them
-+		 * from userspace, which source vcpu to clear? Let's not
-+		 * even think of it, and blow the whole set.
-+		 */
-+		if (is_vgic_v2_sgi(vcpu, irq))
-+			irq->source = 0;
-+
-+		irq->pending_latch = false;
-+
-+		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+
-+		vgic_put_irq(vcpu->kvm, irq);
+ 	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
+-	if (ret)
++	if (ret) {
++		vgic_put_irq(kvm, irq);
+ 		return ERR_PTR(ret);
 +	}
-+
-+	return 0;
-+}
  
- /*
-  * If we are fiddling with an IRQ's active state, we have to make sure the IRQ
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 327d0a6938e4d..fefcca2b14dc7 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -157,6 +157,14 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
- 
-+int vgic_uaccess_write_spending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val);
-+
-+int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
-+				gpa_t addr, unsigned int len,
-+				unsigned long val);
-+
- unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
- 				    gpa_t addr, unsigned int len);
- 
+ 	return irq;
+ }
 -- 
 2.26.1
 
