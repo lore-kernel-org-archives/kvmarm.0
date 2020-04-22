@@ -2,61 +2,89 @@ Return-Path: <SRS0=wQQg=6G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0448AC55189
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC50C54FCB
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:46:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 86E192084D
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:35:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E192084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 819C620774
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:46:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KSOhQROh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819C620774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06DF24B149;
-	Wed, 22 Apr 2020 09:35:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C0164B124;
+	Wed, 22 Apr 2020 09:46:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XNdu1K3f5vxH; Wed, 22 Apr 2020 09:35:30 -0400 (EDT)
+	with ESMTP id 0+FFhpm0FmgD; Wed, 22 Apr 2020 09:46:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 929004B108;
-	Wed, 22 Apr 2020 09:35:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1383B4B136;
+	Wed, 22 Apr 2020 09:46:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 503864B0DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 09:35:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B8194B124
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 09:46:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aJ9+4uvjMLCP for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 09:35:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBB954B0BF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 09:35:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B39131B;
- Wed, 22 Apr 2020 06:35:27 -0700 (PDT)
-Received: from [10.37.12.172] (unknown [10.37.12.172])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 86A923F6CF;
- Wed, 22 Apr 2020 06:35:23 -0700 (PDT)
-Subject: Re: [PATCH 01/26] KVM: arm64: Check advertised Stage-2 page size
- capability
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-2-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <32cc9a60-1b47-f3f7-d18d-d39db397ea55@arm.com>
-Date: Wed, 22 Apr 2020 14:40:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ with ESMTP id Q7XSGYuUXQzS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 09:46:06 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BA114B091
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 09:46:06 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587563166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fbzJ2c3Jbmfs6TXG5rybp4esqbXtRerCZxsEpCUlwvY=;
+ b=KSOhQROhKcxBad/BPbNTfeMl8xRSlUic5xcNuc6F3Ok0MJHrsXqm6W18Mrtprqd7H3KwoP
+ 1jbQUeluMdwyIG+zRO9sk7vitQKV6H8AM3h/84PmxKe4ZxBI9V7f2e8ZLPksannDcUaeZo
+ tgp6yOjV7kDuCMX1WCETo6LmF7BatpI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-lh4Pzp_SOlKmSyI6QDWB7Q-1; Wed, 22 Apr 2020 09:46:04 -0400
+X-MC-Unique: lh4Pzp_SOlKmSyI6QDWB7Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D47C800FC7;
+ Wed, 22 Apr 2020 13:46:00 +0000 (UTC)
+Received: from gondolin (ovpn-112-195.ams2.redhat.com [10.36.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C266B5D706;
+ Wed, 22 Apr 2020 13:45:46 +0000 (UTC)
+Date: Wed, 22 Apr 2020 15:45:43 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
+Message-ID: <20200422154543.2efba3dd.cohuck@redhat.com>
+In-Reply-To: <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
+ <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200422120050.3693593-2-maz@kernel.org>
-Content-Language: en-US
-Cc: will@kernel.org, andre.przywara@arm.com, dave.martin@arm.com,
- gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
+ benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
+ linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ frankja@linux.ibm.com, maz@kernel.org, joro@8bytes.org, x86@kernel.org,
+ borntraeger@de.ibm.com, mingo@redhat.com, thuth@redhat.com, gor@linux.ibm.com,
+ kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de,
+ linux-arm-kernel@lists.infradead.org, jmattson@google.com,
+ tsbogend@alpha.franken.de, sean.j.christopherson@intel.com,
+ linux-kernel@vger.kernel.org, mpe@ellerman.id.au, pbonzini@redhat.com,
+ vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,170 +96,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Wed, 22 Apr 2020 20:58:04 +0800
+Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
 
-On 04/22/2020 01:00 PM, Marc Zyngier wrote:
-> With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
-> advertise the supported Stage-2 page sizes.
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. Earlier than historical reasons, many kvm-related function
+
+s/Earlier than/For/ ?
+
+> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+> This patch does a unified cleanup of these remaining redundant parameters.
 > 
-> Let's check this at boot time.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > ---
->   arch/arm64/include/asm/kvm_host.h |  2 +-
->   arch/arm64/include/asm/sysreg.h   |  3 +++
->   arch/arm64/kernel/cpufeature.c    |  8 +++++++
->   arch/arm64/kvm/reset.c            | 40 ++++++++++++++++++++++++++++---
->   virt/kvm/arm/arm.c                |  4 +---
->   5 files changed, 50 insertions(+), 7 deletions(-)
+>  arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
+>  1 file changed, 22 insertions(+), 15 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 32c8a675e5a4a..7dd8fefa6aecd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
->   void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
->   void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
->   
-> -void kvm_set_ipa_limit(void);
-> +int kvm_set_ipa_limit(void);
->   
->   #define __KVM_HAVE_ARCH_VM_ALLOC
->   struct kvm *kvm_arch_alloc_vm(void);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index ebc6224328318..5d10c9148e844 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -686,6 +686,9 @@
->   #define ID_AA64ZFR0_SVEVER_SVE2		0x1
->   
->   /* id_aa64mmfr0 */
-> +#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
-> +#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
-> +#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
->   #define ID_AA64MMFR0_TGRAN4_SHIFT	28
->   #define ID_AA64MMFR0_TGRAN64_SHIFT	24
->   #define ID_AA64MMFR0_TGRAN16_SHIFT	20
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9fac745aa7bb2..9892a845d06c9 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -208,6 +208,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
->   };
->   
->   static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
-> +	/*
-> +	 * Page size not being supported at Stage-2 are not fatal. You
-> +	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
-> +	 * your favourite nesting hypervisor.
-> +	 */
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e335a7e5ead7..d7bb2e7a07ff 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+>  	struct runtime_instr_cb *riccb;
+>  	struct gs_cb *gscb;
+>  
+> @@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  		}
+>  		if (vcpu->arch.gs_enabled) {
+>  			current->thread.gs_cb = (struct gs_cb *)
+> -						&vcpu->run->s.regs.gscb;
+> +						&kvm_run->s.regs.gscb;
 
-One minor issue with this is, if we get a system with cpus having values
-0 and 2 (both of which indicates the stage-2 support), we might reset
-the value to 1 for the feature indicating, we don't support and block
-KVM. But, we can blame the nesting hypervisor for not emulating this to
-(2). Do we need a comment to make this explicit here ?
+Not sure if these changes (vcpu->run-> => kvm_run->) are really worth
+it. (It seems they amount to at least as much as the changes advertised
+in the patch description.)
 
-Otherwise this looks fine to me
+Other opinions?
 
-Suzuki
-
-
-
->   	/*
->   	 * We already refuse to boot CPUs that don't support our configured
->   	 * page size, so we can only detect mismatches for a page size other
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 30b7ea680f66c..241db35a7ef4f 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -9,6 +9,7 @@
->    */
->   
->   #include <linux/errno.h>
-> +#include <linux/bitfield.h>
->   #include <linux/kernel.h>
->   #include <linux/kvm_host.h>
->   #include <linux/kvm.h>
-> @@ -340,11 +341,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->   	return ret;
->   }
->   
-> -void kvm_set_ipa_limit(void)
-> +int kvm_set_ipa_limit(void)
->   {
-> -	unsigned int ipa_max, pa_max, va_max, parange;
-> +	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
-> +	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
->   
-> -	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
-> +	/*
-> +	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
-> +	 * Stage-2. If not, things will stop very quickly.
-> +	 */
-> +	switch (PAGE_SIZE) {
-> +	default:
-> +	case SZ_4K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
-> +		break;
-> +	case SZ_16K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
-> +		break;
-> +	case SZ_64K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
-> +		break;
-> +	}
-> +
-> +	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
-> +	default:
-> +	case 1:
-> +		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
-> +		return -EINVAL;
-> +	case 0:
-> +		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
-> +		break;
-> +	case 2:
-> +		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
-> +		break;
-> +	}
-> +
-> +	parange = mmfr0 & 0x7;
->   	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
->   
->   	/* Clamp the IPA limit to the PA size supported by the kernel */
-> @@ -378,6 +410,8 @@ void kvm_set_ipa_limit(void)
->   	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
->   	kvm_ipa_limit = ipa_max;
->   	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
-> +
-> +	return 0;
->   }
->   
->   /*
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 48d0ec44ad77e..53b3ba9173ba7 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1387,9 +1387,7 @@ static inline void hyp_cpu_pm_exit(void)
->   
->   static int init_common_resources(void)
->   {
-> -	kvm_set_ipa_limit();
-> -
-> -	return 0;
-> +	return kvm_set_ipa_limit();
->   }
->   
->   static int init_subsystems(void)
-> 
+>  			restore_gs_cb(current->thread.gs_cb);
+>  		}
+>  		preempt_enable();
 
 _______________________________________________
 kvmarm mailing list
