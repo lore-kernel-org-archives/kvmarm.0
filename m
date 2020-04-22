@@ -4,67 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5C8C55189
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73579C5518C
 	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:21:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 94DB9221EB
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:21:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2835D2222E
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:21:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOwurP18"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DB9221EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="JqIPGeoX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2835D2222E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 968544B172;
-	Wed, 22 Apr 2020 08:21:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7A244B14A;
+	Wed, 22 Apr 2020 08:21:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZvwgVU9yc49Z; Wed, 22 Apr 2020 08:21:07 -0400 (EDT)
+	with ESMTP id 2R2d5WuZv85o; Wed, 22 Apr 2020 08:21:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A434B160;
-	Wed, 22 Apr 2020 08:21:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 718904B17F;
+	Wed, 22 Apr 2020 08:21:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D15394B0DE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:21:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F36394B12E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:21:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bsTWBcBryUS7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 08:21:04 -0400 (EDT)
+ with ESMTP id bkr5lqYfc1uB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 08:21:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEDAD4B0DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:21:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 957F74B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:21:06 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 914D620784;
- Wed, 22 Apr 2020 12:21:03 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C30642098B;
+ Wed, 22 Apr 2020 12:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587558063;
- bh=z3AT2reYnyV5hPONn1rqvr/DkOxt2Vj5nLApRzI/zKw=;
+ s=default; t=1587558065;
+ bh=NMLWRv9KCKp8Z61Wz4miIzCqXCelvOKl4u2IuIAKs1s=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=jOwurP18Q6bTTdXSzPIlMh1mfaQFKio2ClncMbc13h8MSZGWt1Wbvh7AzLpB2E72q
- HbU7Xc/U1vzJfzxWTlCUiGNTJrd+HDEGdg7k/kwsq5ZU99POi0rBSi00gU4RShJImc
- uU0eMPEQShMIjYCo+StNKoDhPZL+1MMV8p3rCdjk=
+ b=JqIPGeoX4cgEmGwCR1fTpVDYO1yjZw7/7nZbnP8Im/9CZeuK1KTsjfOd3akO2VcMK
+ nbXALIZkFVLcjCDziMnq5M+sS+ANOIo+la3v1hEZy39g5WCG0t8x8pAeZy+vzrH3Nn
+ yfojClYIukd0IF152eSECVpRuMp0YKGp9B1bLq2Y=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jRE46-005UI7-1A; Wed, 22 Apr 2020 13:01:18 +0100
+ id 1jRE3s-005UI7-3n; Wed, 22 Apr 2020 13:01:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 24/26] KVM: arm64: timers: Rename kvm_timer_sync_hwstate to
- kvm_timer_sync_user
-Date: Wed, 22 Apr 2020 13:00:48 +0100
-Message-Id: <20200422120050.3693593-25-maz@kernel.org>
+Subject: [PATCH 10/26] KVM: arm64: Refactor vcpu_{read,write}_sys_reg
+Date: Wed, 22 Apr 2020 13:00:34 +0100
+Message-Id: <20200422120050.3693593-11-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
 References: <20200422120050.3693593-1-maz@kernel.org>
@@ -99,65 +97,180 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_timer_sync_hwstate() has nothing to do with the timer HW state,
-but more to do with the state of a userspace interrupt controller.
-Change the suffix from _hwstate to_user, in keeping with the rest
-of the code.
+Extract the direct HW accessors for later reuse.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- include/kvm/arm_arch_timer.h | 2 +-
- virt/kvm/arm/arch_timer.c    | 2 +-
- virt/kvm/arm/arm.c           | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 135 ++++++++++++++++++++++----------------
+ 1 file changed, 78 insertions(+), 57 deletions(-)
 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index d120e6c323e7c..a821dd1df0cfa 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -71,7 +71,7 @@ int kvm_timer_hyp_init(bool);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
--void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
-+void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
- void kvm_timer_update_run(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 93bd59b46848e..1961de8828ee9 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -624,7 +624,7 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
- 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 51db934702b64..46f218982df8c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -64,11 +64,8 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+ 	return false;
  }
  
--void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
-+void kvm_timer_sync_user(struct kvm_vcpu *vcpu)
+-u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
++static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
  {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+-	if (!vcpu->arch.sysregs_loaded_on_cpu)
+-		goto immediate_read;
+-
+ 	/*
+ 	 * System registers listed in the switch are not saved on every
+ 	 * exit from the guest but are only saved on vcpu_put.
+@@ -79,40 +76,37 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 	 * thread when emulating cross-VCPU communication.
+ 	 */
+ 	switch (reg) {
+-	case CSSELR_EL1:	return read_sysreg_s(SYS_CSSELR_EL1);
+-	case SCTLR_EL1:		return read_sysreg_s(SYS_SCTLR_EL12);
+-	case ACTLR_EL1:		return read_sysreg_s(SYS_ACTLR_EL1);
+-	case CPACR_EL1:		return read_sysreg_s(SYS_CPACR_EL12);
+-	case TTBR0_EL1:		return read_sysreg_s(SYS_TTBR0_EL12);
+-	case TTBR1_EL1:		return read_sysreg_s(SYS_TTBR1_EL12);
+-	case TCR_EL1:		return read_sysreg_s(SYS_TCR_EL12);
+-	case ESR_EL1:		return read_sysreg_s(SYS_ESR_EL12);
+-	case AFSR0_EL1:		return read_sysreg_s(SYS_AFSR0_EL12);
+-	case AFSR1_EL1:		return read_sysreg_s(SYS_AFSR1_EL12);
+-	case FAR_EL1:		return read_sysreg_s(SYS_FAR_EL12);
+-	case MAIR_EL1:		return read_sysreg_s(SYS_MAIR_EL12);
+-	case VBAR_EL1:		return read_sysreg_s(SYS_VBAR_EL12);
+-	case CONTEXTIDR_EL1:	return read_sysreg_s(SYS_CONTEXTIDR_EL12);
+-	case TPIDR_EL0:		return read_sysreg_s(SYS_TPIDR_EL0);
+-	case TPIDRRO_EL0:	return read_sysreg_s(SYS_TPIDRRO_EL0);
+-	case TPIDR_EL1:		return read_sysreg_s(SYS_TPIDR_EL1);
+-	case AMAIR_EL1:		return read_sysreg_s(SYS_AMAIR_EL12);
+-	case CNTKCTL_EL1:	return read_sysreg_s(SYS_CNTKCTL_EL12);
+-	case PAR_EL1:		return read_sysreg_s(SYS_PAR_EL1);
+-	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
+-	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
+-	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
++	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
++	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
++	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
++	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
++	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
++	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
++	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
++	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
++	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
++	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
++	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
++	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
++	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
++	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
++	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
++	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
++	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
++	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
++	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
++	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
++	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
++	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
++	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
++	default:		return false;
+ 	}
  
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 03f01fcfa2bd5..a7ca341e7fd76 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -720,7 +720,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			kvm_pmu_sync_hwstate(vcpu);
- 			if (static_branch_unlikely(&userspace_irqchip_in_use))
--				kvm_timer_sync_hwstate(vcpu);
-+				kvm_timer_sync_user(vcpu);
- 			kvm_vgic_sync_hwstate(vcpu);
- 			local_irq_enable();
- 			preempt_enable();
-@@ -769,7 +769,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 * timer virtual interrupt state.
- 		 */
- 		if (static_branch_unlikely(&userspace_irqchip_in_use))
--			kvm_timer_sync_hwstate(vcpu);
-+			kvm_timer_sync_user(vcpu);
+-immediate_read:
+-	return __vcpu_sys_reg(vcpu, reg);
++	return true;
+ }
  
- 		kvm_arch_vcpu_ctxsync_fp(vcpu);
+-void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
++static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ {
+-	if (!vcpu->arch.sysregs_loaded_on_cpu)
+-		goto immediate_write;
+-
+ 	/*
+ 	 * System registers listed in the switch are not restored on every
+ 	 * entry to the guest but are only restored on vcpu_load.
+@@ -122,32 +116,59 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 	 * set once, before running the VCPU, and never changed later.
+ 	 */
+ 	switch (reg) {
+-	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	return;
+-	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	return;
+-	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	return;
+-	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	return;
+-	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	return;
+-	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	return;
+-	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	return;
+-	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	return;
+-	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	return;
+-	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	return;
+-	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	return;
+-	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	return;
+-	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	return;
+-	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12); return;
+-	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	return;
+-	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	return;
+-	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	return;
+-	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	return;
+-	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	return;
+-	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	return;
+-	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
+-	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
+-	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
++	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
++	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
++	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
++	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
++	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
++	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
++	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
++	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
++	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
++	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
++	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
++	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
++	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
++	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
++	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
++	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
++	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
++	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
++	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
++	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
++	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
++	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
++	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
++	default:		return false;
++	}
++
++	return true;
++}
++
++u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
++{
++	u64 val = 0x8badf00d8badf00d;
++
++	if (!vcpu->arch.sysregs_loaded_on_cpu) {
++		goto memory_read;
+ 	}
+ 
+-immediate_write:
++	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
++		return val;
++
++memory_read:
++	return __vcpu_sys_reg(vcpu, reg);
++}
++
++void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
++{
++	if (!vcpu->arch.sysregs_loaded_on_cpu)
++		goto memory_write;
++
++	if (__vcpu_write_sys_reg_to_cpu(val, reg))
++		return;
++
++memory_write:
+ 	 __vcpu_sys_reg(vcpu, reg) = val;
+ }
  
 -- 
 2.26.1
