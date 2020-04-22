@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CADC55189
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69292C55185
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:01:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8FEB020736
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FEB020736
+	by mail.kernel.org (Postfix) with ESMTP id 2951320706
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 13:01:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2951320706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E56224B092;
-	Wed, 22 Apr 2020 09:01:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C014B0FB;
+	Wed, 22 Apr 2020 09:01:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6Vg5OEEq2Uqn; Wed, 22 Apr 2020 09:01:31 -0400 (EDT)
+	with ESMTP id pXqBjEgYV-IO; Wed, 22 Apr 2020 09:01:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FC5A4B17A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC4E4B182;
 	Wed, 22 Apr 2020 09:01:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B324B07F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:58:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2244B07F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:58:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TcSna-XhqVPr for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 5x9qBBfJmnsY for <kvmarm@lists.cs.columbia.edu>;
  Wed, 22 Apr 2020 08:58:19 -0400 (EDT)
-Received: from out30-57.freemail.mail.aliyun.com
- (out30-57.freemail.mail.aliyun.com [115.124.30.57])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A94AE4B08D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:58:18 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R211e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01355;
+Received: from out4436.biz.mail.alibaba.com (out4436.biz.mail.alibaba.com
+ [47.88.44.36])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5126C4B12C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:58:19 -0400 (EDT)
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R181e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01422;
  MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
- TI=SMTPD_---0TwJzjgy_1587560292; 
+ TI=SMTPD_---0TwK9pmk_1587560293; 
 Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0TwJzjgy_1587560292) by smtp.aliyun-inc.com(127.0.0.1);
- Wed, 22 Apr 2020 20:58:12 +0800
+ fp:SMTPD_---0TwK9pmk_1587560293) by smtp.aliyun-inc.com(127.0.0.1);
+ Wed, 22 Apr 2020 20:58:14 +0800
 From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To: pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
  mpe@ellerman.id.au, benh@kernel.crashing.org, borntraeger@de.ibm.com,
@@ -55,9 +55,9 @@ To: pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
  hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
  julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
  christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
-Subject: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
-Date: Wed, 22 Apr 2020 20:58:04 +0800
-Message-Id: <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 3/7] KVM: PPC: Remove redundant kvm_run from vcpu_arch
+Date: Wed, 22 Apr 2020 20:58:06 +0800
+Message-Id: <20200422125810.34847-4-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
 References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
@@ -83,143 +83,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-structure. Earlier than historical reasons, many kvm-related function
-parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
-This patch does a unified cleanup of these remaining redundant parameters.
+The 'kvm_run' field already exists in the 'vcpu' structure, which
+is the same structure as the 'kvm_run' in the 'vcpu_arch' and
+should be deleted.
 
 Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
- 1 file changed, 22 insertions(+), 15 deletions(-)
+ arch/powerpc/include/asm/kvm_host.h | 1 -
+ arch/powerpc/kvm/book3s_hv.c        | 6 ++----
+ arch/powerpc/kvm/book3s_hv_nested.c | 3 +--
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e335a7e5ead7..d7bb2e7a07ff 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
- 	return rc;
- }
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 1dc63101ffe1..2745ff8faa01 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -795,7 +795,6 @@ struct kvm_vcpu_arch {
+ 	struct mmio_hpte_cache_entry *pgfault_cache;
  
--static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-+static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_run *kvm_run = vcpu->run;
- 	struct runtime_instr_cb *riccb;
- 	struct gs_cb *gscb;
+ 	struct task_struct *run_task;
+-	struct kvm_run *kvm_run;
  
-@@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 	spinlock_t vpa_update_lock;
+ 	struct kvmppc_vpa vpa;
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 93493f0cbfe8..413ea2dcb10c 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2934,7 +2934,7 @@ static void post_guest_process(struct kvmppc_vcore *vc, bool is_master)
+ 
+ 		ret = RESUME_GUEST;
+ 		if (vcpu->arch.trap)
+-			ret = kvmppc_handle_exit_hv(vcpu->arch.kvm_run, vcpu,
++			ret = kvmppc_handle_exit_hv(vcpu->run, vcpu,
+ 						    vcpu->arch.run_task);
+ 
+ 		vcpu->arch.ret = ret;
+@@ -3920,7 +3920,6 @@ static int kvmppc_run_vcpu(struct kvm_run *kvm_run, struct kvm_vcpu *vcpu)
+ 	spin_lock(&vc->lock);
+ 	vcpu->arch.ceded = 0;
+ 	vcpu->arch.run_task = current;
+-	vcpu->arch.kvm_run = kvm_run;
+ 	vcpu->arch.stolen_logged = vcore_stolen_time(vc, mftb());
+ 	vcpu->arch.state = KVMPPC_VCPU_RUNNABLE;
+ 	vcpu->arch.busy_preempt = TB_NIL;
+@@ -3973,7 +3972,7 @@ static int kvmppc_run_vcpu(struct kvm_run *kvm_run, struct kvm_vcpu *vcpu)
+ 			if (signal_pending(v->arch.run_task)) {
+ 				kvmppc_remove_runnable(vc, v);
+ 				v->stat.signal_exits++;
+-				v->arch.kvm_run->exit_reason = KVM_EXIT_INTR;
++				v->run->exit_reason = KVM_EXIT_INTR;
+ 				v->arch.ret = -EINTR;
+ 				wake_up(&v->arch.cpu_run);
+ 			}
+@@ -4049,7 +4048,6 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
+ 	vc = vcpu->arch.vcore;
+ 	vcpu->arch.ceded = 0;
+ 	vcpu->arch.run_task = current;
+-	vcpu->arch.kvm_run = kvm_run;
+ 	vcpu->arch.stolen_logged = vcore_stolen_time(vc, mftb());
+ 	vcpu->arch.state = KVMPPC_VCPU_RUNNABLE;
+ 	vcpu->arch.busy_preempt = TB_NIL;
+diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
+index dc97e5be76f6..5a3987f3ebf3 100644
+--- a/arch/powerpc/kvm/book3s_hv_nested.c
++++ b/arch/powerpc/kvm/book3s_hv_nested.c
+@@ -290,8 +290,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
+ 			r = RESUME_HOST;
+ 			break;
  		}
- 		if (vcpu->arch.gs_enabled) {
- 			current->thread.gs_cb = (struct gs_cb *)
--						&vcpu->run->s.regs.gscb;
-+						&kvm_run->s.regs.gscb;
- 			restore_gs_cb(current->thread.gs_cb);
- 		}
- 		preempt_enable();
-@@ -4243,8 +4244,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	/* SIE will load etoken directly from SDNX and therefore kvm_run */
- }
+-		r = kvmhv_run_single_vcpu(vcpu->arch.kvm_run, vcpu, hdec_exp,
+-					  lpcr);
++		r = kvmhv_run_single_vcpu(vcpu->run, vcpu, hdec_exp, lpcr);
+ 	} while (is_kvmppc_resume_guest(r));
  
--static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-+static void sync_regs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_run *kvm_run = vcpu->run;
-+
- 	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
- 		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
- 	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
-@@ -4257,23 +4260,23 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 		vcpu->arch.sie_block->ckc = kvm_run->s.regs.ckc;
- 	}
- 	save_access_regs(vcpu->arch.host_acrs);
--	restore_access_regs(vcpu->run->s.regs.acrs);
-+	restore_access_regs(kvm_run->s.regs.acrs);
- 	/* save host (userspace) fprs/vrs */
- 	save_fpu_regs();
- 	vcpu->arch.host_fpregs.fpc = current->thread.fpu.fpc;
- 	vcpu->arch.host_fpregs.regs = current->thread.fpu.regs;
- 	if (MACHINE_HAS_VX)
--		current->thread.fpu.regs = vcpu->run->s.regs.vrs;
-+		current->thread.fpu.regs = kvm_run->s.regs.vrs;
- 	else
--		current->thread.fpu.regs = vcpu->run->s.regs.fprs;
--	current->thread.fpu.fpc = vcpu->run->s.regs.fpc;
-+		current->thread.fpu.regs = kvm_run->s.regs.fprs;
-+	current->thread.fpu.fpc = kvm_run->s.regs.fpc;
- 	if (test_fp_ctl(current->thread.fpu.fpc))
- 		/* User space provided an invalid FPC, let's clear it */
- 		current->thread.fpu.fpc = 0;
- 
- 	/* Sync fmt2 only data */
- 	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu))) {
--		sync_regs_fmt2(vcpu, kvm_run);
-+		sync_regs_fmt2(vcpu);
- 	} else {
- 		/*
- 		 * In several places we have to modify our internal view to
-@@ -4292,8 +4295,10 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	kvm_run->kvm_dirty_regs = 0;
- }
- 
--static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-+static void store_regs_fmt2(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_run *kvm_run = vcpu->run;
-+
- 	kvm_run->s.regs.todpr = vcpu->arch.sie_block->todpr;
- 	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
- 	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
-@@ -4313,8 +4318,10 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	/* SIE will save etoken directly into SDNX and therefore kvm_run */
- }
- 
--static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
-+static void store_regs(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_run *kvm_run = vcpu->run;
-+
- 	kvm_run->psw_mask = vcpu->arch.sie_block->gpsw.mask;
- 	kvm_run->psw_addr = vcpu->arch.sie_block->gpsw.addr;
- 	kvm_run->s.regs.prefix = kvm_s390_get_prefix(vcpu);
-@@ -4324,16 +4331,16 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
- 	kvm_run->s.regs.pft = vcpu->arch.pfault_token;
- 	kvm_run->s.regs.pfs = vcpu->arch.pfault_select;
- 	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
--	save_access_regs(vcpu->run->s.regs.acrs);
-+	save_access_regs(kvm_run->s.regs.acrs);
- 	restore_access_regs(vcpu->arch.host_acrs);
- 	/* Save guest register state */
- 	save_fpu_regs();
--	vcpu->run->s.regs.fpc = current->thread.fpu.fpc;
-+	kvm_run->s.regs.fpc = current->thread.fpu.fpc;
- 	/* Restore will be done lazily at return */
- 	current->thread.fpu.fpc = vcpu->arch.host_fpregs.fpc;
- 	current->thread.fpu.regs = vcpu->arch.host_fpregs.regs;
- 	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu)))
--		store_regs_fmt2(vcpu, kvm_run);
-+		store_regs_fmt2(vcpu);
- }
- 
- int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-@@ -4371,7 +4378,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		goto out;
- 	}
- 
--	sync_regs(vcpu, kvm_run);
-+	sync_regs(vcpu);
- 	enable_cpu_timer_accounting(vcpu);
- 
- 	might_fault();
-@@ -4393,7 +4400,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	}
- 
- 	disable_cpu_timer_accounting(vcpu);
--	store_regs(vcpu, kvm_run);
-+	store_regs(vcpu);
- 
- 	kvm_sigset_deactivate(vcpu);
- 
+ 	/* save L2 state for return */
 -- 
 2.17.1
 
