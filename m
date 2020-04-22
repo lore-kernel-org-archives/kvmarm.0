@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851A7C55185
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EAFC5518F
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D16320787
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E96120CC7
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ph3+Cp7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D16320787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0/H836R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E96120CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC7424B18B;
-	Wed, 22 Apr 2020 08:01:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 289954B16B;
+	Wed, 22 Apr 2020 08:01:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 44I3b6MRhJ6V; Wed, 22 Apr 2020 08:01:05 -0400 (EDT)
+	with ESMTP id xx4+qrtrU122; Wed, 22 Apr 2020 08:01:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1CD84B13C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C84BF4B183;
 	Wed, 22 Apr 2020 08:01:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D078A4B179
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D694B183
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CsjfO6V-Xt0w for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 08:00:59 -0400 (EDT)
+ with ESMTP id S1RuyadsyWfR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 08:01:03 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D35154B163
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:00:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA81D4B15C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0E73C20787;
- Wed, 22 Apr 2020 12:00:58 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 22C4C20882;
+ Wed, 22 Apr 2020 12:01:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587556858;
- bh=u+4FuEwnjYI5qwvLEzafYDQhxRYZxiIACMXXRLk2yo0=;
+ s=default; t=1587556860;
+ bh=7lL63NAp1+UlaQgohryxo+6glhT1Vh0NfdPOJ8D2NEE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ph3+Cp7eKK/OBbQWaS3fM/ZpACcxWBP3I+eocFF4QKdUcdQFA+gvRQNRGEYPrjcU0
- 1svO0CKc5xofjOYIprYplANpLoacxy9MYFdbGuUEFyhvO7rn5u9PvTFHCUKIKYVNfe
- 1hfA2bSU8AeQkvF9UKgXnt0XynwCGsAXlpQnfF5I=
+ b=J0/H836R6Phc0WBlOKHCcSJ1rnpYhcjOzYbcJMRmOY6QFRLkBMYwdKbQU68ZDgXsq
+ lJwIpV5yh6+RcSC690OeRl3hLUnn6ycw/mFIZZxYGJnUurnCqOTw/WRWlqdHeDlqzx
+ IP4p4l0H8GY3R/QvIXHlEKc7mcQigdLfTCIxXA04=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jRE3k-005UI7-D9; Wed, 22 Apr 2020 13:00:56 +0100
+ id 1jRE3m-005UI7-H3; Wed, 22 Apr 2020 13:00:58 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 02/26] KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
-Date: Wed, 22 Apr 2020 13:00:26 +0100
-Message-Id: <20200422120050.3693593-3-maz@kernel.org>
+Subject: [PATCH 04/26] arm64: Detect the ARMv8.4 TTL feature
+Date: Wed, 22 Apr 2020 13:00:28 +0100
+Message-Id: <20200422120050.3693593-5-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
 References: <20200422120050.3693593-1-maz@kernel.org>
@@ -98,81 +98,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Having __load_guest_stage2 in kvm_hyp.h is quickly going to trigger
-a circular include problem. In order to avoid this, let's move
-it to kvm_mmu.h, where it will be a better fit anyway.
+In order to reduce the cost of TLB invalidation, the ARMv8.4 TTL
+feature allows TLBs to be issued with a level allowing for quicker
+invalidation.
 
-In the process, drop the __hyp_text annotation, which doesn't help
-as the function is marked as __always_inline.
+Let's detect the feature for now. Further patches will implement
+its actual usage.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 18 ------------------
- arch/arm64/include/asm/kvm_mmu.h | 17 +++++++++++++++++
- 2 files changed, 17 insertions(+), 18 deletions(-)
+ arch/arm64/include/asm/cpucaps.h |  3 ++-
+ arch/arm64/include/asm/sysreg.h  |  1 +
+ arch/arm64/kernel/cpufeature.c   | 11 +++++++++++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index fe57f60f06a89..dcb63bf941057 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -10,7 +10,6 @@
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
- #include <asm/alternative.h>
--#include <asm/kvm_mmu.h>
- #include <asm/sysreg.h>
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 8eb5a088ae658..cabb0c49a1d11 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -61,7 +61,8 @@
+ #define ARM64_HAS_AMU_EXTN			51
+ #define ARM64_HAS_ADDRESS_AUTH			52
+ #define ARM64_HAS_GENERIC_AUTH			53
++#define ARM64_HAS_ARMv8_4_TTL			54
  
- #define __hyp_text __section(.hyp.text) notrace
-@@ -88,22 +87,5 @@ void deactivate_traps_vhe_put(void);
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
+-#define ARM64_NCAPS				54
++#define ARM64_NCAPS				55
  
--/*
-- * Must be called from hyp code running at EL2 with an updated VTTBR
-- * and interrupts disabled.
-- */
--static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
--{
--	write_sysreg(kvm->arch.vtcr, vtcr_el2);
--	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
--
--	/*
--	 * ARM errata 1165522 and 1530923 require the actual execution of the
--	 * above before we can switch to the EL1/EL0 translation regime used by
--	 * the guest.
--	 */
--	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT_VHE));
--}
--
- #endif /* __ARM64_KVM_HYP_H__ */
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 5d10c9148e844..79cf186b7e471 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -726,6 +726,7 @@
  
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 30b0e8d6b8953..5ba1310639ec6 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -604,5 +604,22 @@ static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
- 	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
- }
+ /* id_aa64mmfr2 */
+ #define ID_AA64MMFR2_E0PD_SHIFT		60
++#define ID_AA64MMFR2_TTL_SHIFT		48
+ #define ID_AA64MMFR2_FWB_SHIFT		40
+ #define ID_AA64MMFR2_AT_SHIFT		32
+ #define ID_AA64MMFR2_LVA_SHIFT		16
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 9892a845d06c9..d8ab4f1e93bee 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -252,6 +252,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
  
-+/*
-+ * Must be called from hyp code running at EL2 with an updated VTTBR
-+ * and interrupts disabled.
-+ */
-+static __always_inline void __load_guest_stage2(struct kvm *kvm)
-+{
-+	write_sysreg(kvm->arch.vtcr, vtcr_el2);
-+	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
-+
-+	/*
-+	 * ARM erratum 1165522 requires the actual execution of the above
-+	 * before we can switch to the EL1/EL0 translation regime used by
-+	 * the guest.
-+	 */
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT_VHE));
-+}
-+
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr2[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_E0PD_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_TTL_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_FWB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_AT_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_LVA_SHIFT, 4, 0),
+@@ -1630,6 +1631,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.cpu_enable = cpu_has_fwb,
+ 	},
++	{
++		.desc = "ARMv8.4 Translation Table Level",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_ARMv8_4_TTL,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_TTL_SHIFT,
++		.min_field_value = 1,
++		.matches = has_cpuid_feature,
++	},
+ #ifdef CONFIG_ARM64_HW_AFDBM
+ 	{
+ 		/*
 -- 
 2.26.1
 
