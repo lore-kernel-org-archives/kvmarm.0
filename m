@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 629ADC55189
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 009BBC55185
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 188382084D
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD99820784
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMKFgOqk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188382084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbbaPbLe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD99820784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7ADE4B13B;
-	Wed, 22 Apr 2020 08:01:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67F8E4B18C;
+	Wed, 22 Apr 2020 08:01:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hwMJZhyGFyAM; Wed, 22 Apr 2020 08:01:10 -0400 (EDT)
+	with ESMTP id JxFk9K56UIb1; Wed, 22 Apr 2020 08:01:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 164404B179;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9C74B183;
 	Wed, 22 Apr 2020 08:01:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEAD54B179
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07A0D4B16A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ntePWcCW6jQP for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 08:01:03 -0400 (EDT)
+ with ESMTP id 0BxWhhiUmj9A for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 08:01:04 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7E754B170
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD6C44B0B7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:01:03 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0FCD920784;
- Wed, 22 Apr 2020 12:01:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 092E020780;
+ Wed, 22 Apr 2020 12:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587556861;
- bh=AQq7xJ8ZXi/72v13Wk8lju6LWb73SYKYdW77HCXIWmU=;
+ s=default; t=1587556863;
+ bh=eou4v9Zcof0qILQGFtY1FJb9P3iiyyGjomnnq+zt3+k=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=SMKFgOqk+7AULQcu5u3eefXN6EgwWt6Pkr+gKByGKM1cgz43z6o49iekRTrgPk56M
- 2PESre9yTOKLKaOGXUo2KNouZtsJQbMMNJQj/uguKi1oH4SvDDjjyOXufPAAH0JTMA
- 9LGW2qSkywB9fKbQQ1BUWyQ9l2kVo22KNRY2WMLo=
+ b=cbbaPbLeBqEbogpndqzVBwlhY5IuYH/bW63CoxvtkBS0hMmYnD7u+g7Tp2gB+d/Sv
+ 4LhikGWTDcR3TOg9hgtV0m11SRhWqp2NarddCye8FaJJYhlSXkJByjxTRBKHYeZxRJ
+ skOJyA/c7R0DSyVW0OU66QIo50FLLMh5jPZdoa2g=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jRE3n-005UI7-Cp; Wed, 22 Apr 2020 13:00:59 +0100
+ id 1jRE3p-005UI7-E9; Wed, 22 Apr 2020 13:01:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 05/26] arm64: Document SW reserved PTE/PMD bits in Stage-2
- descriptors
-Date: Wed, 22 Apr 2020 13:00:29 +0100
-Message-Id: <20200422120050.3693593-6-maz@kernel.org>
+Subject: [PATCH 07/26] KVM: arm64: Add a level hint to __kvm_tlb_flush_vmid_ipa
+Date: Wed, 22 Apr 2020 13:00:31 +0100
+Message-Id: <20200422120050.3693593-8-maz@kernel.org>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <20200422120050.3693593-1-maz@kernel.org>
 References: <20200422120050.3693593-1-maz@kernel.org>
@@ -98,30 +97,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Advertise bits [58:55] as reserved for SW in the S2 descriptors.
+Introduce a level hint to __kvm_tlb_flush_vmid_ipa. No functional
+change.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/include/asm/kvm_asm.h | 3 ++-
+ arch/arm64/kvm/hyp/tlb.c         | 5 +++--
+ virt/kvm/arm/mmu.c               | 2 +-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 6bf5e650da788..7eab0d23cdb52 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -177,10 +177,12 @@
- #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
- #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
- #define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
-+#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for SW */
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 5adf4e1a4c2c9..fad03b83f8e41 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -61,7 +61,8 @@ extern char __kvm_hyp_init_end[];
+ extern char __kvm_hyp_vector[];
  
- #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
- #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
- #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
-+#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for SW */
+ extern void __kvm_flush_vm_context(void);
+-extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa);
++extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
++				     int level);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
  
- #define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
- #define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index b795891b0d091..6db2f8ad383f0 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -132,7 +132,8 @@ static void __hyp_text __tlb_switch_to_host(struct kvm_s2_mmu *mmu,
+ 		__tlb_switch_to_host_nvhe(cxt);
+ }
+ 
+-void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
++void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
++					 phys_addr_t ipa, int level)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -148,7 +149,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa
+ 	 * whole of Stage-1. Weep...
+ 	 */
+ 	ipa >>= 12;
+-	__tlbi(ipas2e1is, ipa);
++	__tlbi_level(ipas2e1is, ipa, level);
+ 
+ 	/*
+ 	 * We have to ensure completion of the invalidation at Stage-2,
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 2f99749048285..611234e0aef12 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -60,7 +60,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ 
+ static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
+ {
+-	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa);
++	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, 0);
+ }
+ 
+ /*
 -- 
 2.26.1
 
