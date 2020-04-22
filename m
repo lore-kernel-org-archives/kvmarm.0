@@ -2,72 +2,83 @@ Return-Path: <SRS0=wQQg=6G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB3AFC55186
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 10:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A80FEC55185
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 353CE2071E
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 10:15:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353CE2071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=misterjones.org
+	by mail.kernel.org (Postfix) with ESMTP id 371BF2098B
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Apr 2020 12:01:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCoygnjp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371BF2098B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 905174B14D;
-	Wed, 22 Apr 2020 06:15:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B49D64B165;
+	Wed, 22 Apr 2020 08:01:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B3GaoklQ-uyi; Wed, 22 Apr 2020 06:15:08 -0400 (EDT)
+	with ESMTP id tAfvVqqLY2EH; Wed, 22 Apr 2020 08:01:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93ECC4B14F;
-	Wed, 22 Apr 2020 06:15:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 742F04B16B;
+	Wed, 22 Apr 2020 08:01:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5F694B124
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 06:15:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B0B24B15C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:00:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MksC-tBU0qDk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Apr 2020 06:15:06 -0400 (EDT)
+ with ESMTP id YE2Ki4Lw9FnT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 08:00:57 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78D254B0B7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 08:00:57 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52FC64B0BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 06:15:06 -0400 (EDT)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@misterjones.org>)
- id 1jRCOi-005RP3-VM; Wed, 22 Apr 2020 11:14:29 +0100
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 45B3D20780;
+ Wed, 22 Apr 2020 12:00:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587556856;
+ bh=cjNtiZiSfG8NCNGrLmoyucuhnBDcnLMQHlTpx9c+/rQ=;
+ h=From:To:Cc:Subject:Date:From;
+ b=NCoygnjpF76Otji5EmVvuJDE0QdIRz2Fim66ksOD9SzJprbT6vIp/3C0kUNbb2y0G
+ P9h/3TxTnhcDvtYzGc6pmq++7JXvFqDt+tJaQXnvjuTvkCcJQecQrAZYj8mqCiCZsx
+ laibgAPSq3EHmqsHQ6zH+wY4BjvSqpearnncm5PY=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jRE3i-005UI7-JR; Wed, 22 Apr 2020 13:00:54 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH 00/26] KVM: arm64: Preliminary NV patches
+Date: Wed, 22 Apr 2020 13:00:24 +0100
+Message-Id: <20200422120050.3693593-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-Date: Wed, 22 Apr 2020 11:14:28 +0100
-From: Marc Zyngier <maz@misterjones.org>
-To: Davidlohr Bueso <dave@stgolabs.net>
-Subject: Re: [PATCH 4/5] kvm: Replace vcpu->swait with rcuwait
-In-Reply-To: <20200422040739.18601-5-dave@stgolabs.net>
-References: <20200422040739.18601-1-dave@stgolabs.net>
- <20200422040739.18601-5-dave@stgolabs.net>
-Message-ID: <a6e848e46f3c865f6b9d2771c8aad37a@misterjones.org>
-X-Sender: maz@misterjones.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dave@stgolabs.net, tglx@linutronix.de, pbonzini@redhat.com,
- kvm@vger.kernel.org, dbueso@suse.de, peterz@infradead.org,
- torvalds@linux-foundation.org, bigeasy@linutronix.de,
- linux-kernel@vger.kernel.org, rostedt@goodmis.org, linux-mips@vger.kernel.org,
- paulus@ozlabs.org, joel@joelfernandes.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@misterjones.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
+ alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org,
- will@kernel.org, bigeasy@linutronix.de, linux-kernel@vger.kernel.org,
- rostedt@goodmis.org, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, joel@joelfernandes.org,
- pbonzini@redhat.com, tglx@linutronix.de, torvalds@linux-foundation.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Will Deacon <will@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
+ Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,49 +90,128 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-04-22 05:07, Davidlohr Bueso wrote:
-> The use of any sort of waitqueue (simple or regular) for
-> wait/waking vcpus has always been an overkill and semantically
-> wrong. Because this is per-vcpu (which is blocked) there is
-> only ever a single waiting vcpu, thus no need for any sort of
-> queue.
-> 
-> As such, make use of the rcuwait primitive, with the following
-> considerations:
-> 
->   - rcuwait already provides the proper barriers that serialize
->   concurrent waiter and waker.
-> 
->   - Task wakeup is done in rcu read critical region, with a
->   stable task pointer.
-> 
->   - Because there is no concurrency among waiters, we need
->   not worry about rcuwait_wait_event() calls corrupting
->   the wait->task. As a consequence, this saves the locking
->   done in swait when modifying the queue. This also applies
->   to per-vcore wait for powerpc kvm-hv.
-> 
-> The x86 tscdeadline_latency test mentioned in 8577370fb0cb
-> ("KVM: Use simple waitqueue for vcpu->wq") shows that, on avg,
-> latency is reduced by around 15-20% with this change.
-> 
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-mips@vger.kernel.org
-> Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+Hi all,
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+In order not to repeat the 90+ patch series that resulted in a
+deafening silence last time, I've extracted a smaller set of patches
+that form the required dependencies that allow the rest of the 65 NV
+patches to be added on top. Yes, it is that bad.
 
-Thanks,
+The one real feature here is support for the ARMv8.4-TTL extension at
+Stage-2 only. The reason to support it is that it helps the hypervisor
+a lot when it comes to finding out how much to invalidate. It is thus
+always "supported" with NV.
 
-         M.
+The rest doesn't contain any functionality change. Most of it reworks
+existing data structures and adds new accessors for the things that
+get moved around. The reason for this is that:
+
+- With NV, we end-up with multiple Stage-2 MMU contexts per VM instead
+  of a single one. This requires we divorce struct kvm from the S2 MMU
+  configuration. Of course, we stick with a single MMU context for now.
+
+- With ARMv8.4-NV, a number of system register accesses are turned
+  into memory accesses into the so-called VNCR page. It is thus
+  convenient to make this VNCR page part of the vcpu context and avoid
+  copying data back and forth. For this to work, we need to make sure
+  that all the VNCR-aware sysregs are moved into our per-vcpu sys_regs
+  array instead of leaving in other data structures (the timers, for
+  example). The VNCR page itself isn't introduced with these patches.
+
+- As some of these data structures change, we need a way to isolate
+  the userspace ABI from such change.
+
+- The exception generation code is also reworked to prepare the
+  addition of EL2 exceptions.
+
+There is also a number of cleanups that were in the full fat series
+that I decided to move early to get them out of the way.
+
+The whole this is a bit of a mix of vaguely unrelated "stuff", but it
+all comes together if you look at the final series[1]. This applies on
+top of v5.7-rc1.
+
+I haven't applied any of the Tested-by: tags, as the series keeps
+changing. Please keep testing though!
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-5.7-rc1-WIP
+
+Christoffer Dall (2):
+  KVM: arm64: Factor out stage 2 page table data from struct kvm
+  KVM: arm64: vgic-v3: Take cpu_if pointer directly instead of vcpu
+
+Marc Zyngier (24):
+  KVM: arm64: Check advertised Stage-2 page size capability
+  KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
+  arm64: Detect the ARMv8.4 TTL feature
+  arm64: Document SW reserved PTE/PMD bits in Stage-2 descriptors
+  arm64: Add level-hinted TLB invalidation helper
+  KVM: arm64: Add a level hint to __kvm_tlb_flush_vmid_ipa
+  KVM: arm64: Use TTL hint in when invalidating stage-2 translations
+  KVM: arm64: Refactor vcpu_{read,write}_sys_reg
+  KVM: arm64: Add missing reset handlers for PMU emulation
+  KVM: arm64: Move sysreg reset check to boot time
+  KVM: arm64: Introduce accessor for ctxt->sys_reg
+  KVM: arm64: hyp: Use ctxt_sys_reg/__vcpu_sys_reg instead of raw
+    sys_regs access
+  KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw sys_regs access
+  KVM: arm64: pauth: Use ctxt_sys_reg() instead of raw sys_regs access
+  KVM: arm64: debug: Use ctxt_sys_reg() instead of raw sys_regs access
+  KVM: arm64: Don't use empty structures as CPU reset state
+  KVM: arm64: Make struct kvm_regs userspace-only
+  KVM: arm64: Move ELR_EL1 to the system register array
+  KVM: arm64: Move SP_EL1 to the system register array
+  KVM: arm64: Disintegrate SPSR array
+  KVM: arm64: Move SPSR_EL1 to the system register array
+  KVM: arm64: timers: Rename kvm_timer_sync_hwstate to
+    kvm_timer_sync_user
+  KVM: arm64: timers: Move timer registers to the sys_regs file
+  KVM: arm64: Parametrize exception entry with a target EL
+
+ arch/arm64/include/asm/cpucaps.h        |   3 +-
+ arch/arm64/include/asm/kvm_asm.h        |   6 +-
+ arch/arm64/include/asm/kvm_emulate.h    |  37 +---
+ arch/arm64/include/asm/kvm_host.h       |  71 +++++--
+ arch/arm64/include/asm/kvm_hyp.h        |  30 +--
+ arch/arm64/include/asm/kvm_mmu.h        |  27 ++-
+ arch/arm64/include/asm/pgtable-hwdef.h  |   2 +
+ arch/arm64/include/asm/stage2_pgtable.h |   9 +
+ arch/arm64/include/asm/sysreg.h         |   4 +
+ arch/arm64/include/asm/tlbflush.h       |  30 +++
+ arch/arm64/kernel/asm-offsets.c         |   3 +-
+ arch/arm64/kernel/cpufeature.c          |  19 ++
+ arch/arm64/kvm/fpsimd.c                 |   6 +-
+ arch/arm64/kvm/guest.c                  |  79 ++++++-
+ arch/arm64/kvm/handle_exit.c            |  17 +-
+ arch/arm64/kvm/hyp/debug-sr.c           |  18 +-
+ arch/arm64/kvm/hyp/entry.S              |   3 +-
+ arch/arm64/kvm/hyp/switch.c             |  31 ++-
+ arch/arm64/kvm/hyp/sysreg-sr.c          | 160 +++++++-------
+ arch/arm64/kvm/hyp/tlb.c                |  51 +++--
+ arch/arm64/kvm/inject_fault.c           |  75 +++----
+ arch/arm64/kvm/regmap.c                 |  37 +++-
+ arch/arm64/kvm/reset.c                  |  60 ++++--
+ arch/arm64/kvm/sys_regs.c               | 215 ++++++++++---------
+ include/kvm/arm_arch_timer.h            |  13 +-
+ include/kvm/arm_vgic.h                  |   5 +-
+ virt/kvm/arm/arch_timer.c               | 157 +++++++++++---
+ virt/kvm/arm/arm.c                      |  40 ++--
+ virt/kvm/arm/hyp/vgic-v3-sr.c           |  33 +--
+ virt/kvm/arm/mmu.c                      | 267 +++++++++++++-----------
+ virt/kvm/arm/trace.h                    |   8 +-
+ virt/kvm/arm/vgic/vgic-v2.c             |  10 +-
+ virt/kvm/arm/vgic/vgic-v3.c             |  14 +-
+ virt/kvm/arm/vgic/vgic.c                |  25 ++-
+ 34 files changed, 942 insertions(+), 623 deletions(-)
+
 -- 
-Who you jivin' with that Cosmik Debris?
+2.26.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
