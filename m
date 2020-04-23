@@ -2,58 +2,76 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C51C54FCB
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 17:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300D2C54FD0
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 18:07:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB78520736
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 17:39:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB78520736
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A96F820736
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 18:07:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cu4I9nHQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96F820736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7616A4B0EC;
-	Thu, 23 Apr 2020 13:39:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 261024B09F;
+	Thu, 23 Apr 2020 14:07:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pgkJDnc64DoW; Thu, 23 Apr 2020 13:39:16 -0400 (EDT)
+	with ESMTP id UzE2W85cAksX; Thu, 23 Apr 2020 14:07:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C219E4B1B1;
-	Thu, 23 Apr 2020 13:39:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF84E4B1AE;
+	Thu, 23 Apr 2020 14:07:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21C534B187
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:39:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AA994B172
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:55:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZfGFrTQeStCB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 13:39:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14B7E4B19E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:39:11 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A386EC14;
- Thu, 23 Apr 2020 10:39:10 -0700 (PDT)
-Received: from localhost.localdomain (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FA713F68F;
- Thu, 23 Apr 2020 10:39:09 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: [PATCH kvmtool v4 5/5] cfi-flash: Add support for mapping flash into
- guest
-Date: Thu, 23 Apr 2020 18:38:44 +0100
-Message-Id: <20200423173844.24220-6-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
+ with ESMTP id rSZ0le+e3qIb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2020 13:55:34 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E72CE4B0BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:55:33 -0400 (EDT)
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com
+ [209.85.166.180])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id D71EC20784
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 17:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587664532;
+ bh=HzfdttVM9BgXQr/ijSQNIg+ZauLcJdE62a/irg9HQUA=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=cu4I9nHQfaAgy0rxfE2IlSOes6GxtHhb1TM6KzJAfSoXk3LQVsGKljDgd4Kf2e0Du
+ cgTDqQF09l20AZz5QEkMAXbyseU5q3jalMsiN/Hvx3mfkYLe/u9uBIWtbfuu8QqiYD
+ SEJ5CeenY+ILfm9KNSCcO8L/iPPsdWYEoz4fb+Bc=
+Received: by mail-il1-f180.google.com with SMTP id s10so6413662iln.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
+X-Gm-Message-State: AGi0Puaesbw+MKH/coHt/b2pt/UEhlXbcdyhkSPQgGW9t0IdRFVEV54Z
+ QOxvUzkri4BhGQN3Elph9kUNp96sMOP/ce4praI=
+X-Google-Smtp-Source: APiQypL/Z2RoaxQTfyMU8HG6ck8a1KcKtB0U7jGPtMPkv1hfvGb/DzU/DYKwhO+zoay4gzXDiXn1MefQvMTM2uI93Yw=
+X-Received: by 2002:a92:405:: with SMTP id 5mr4426510ile.279.1587664532201;
+ Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200423173844.24220-1-andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
- Raphael Gault <raphael.gault@arm.com>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 23 Apr 2020 19:55:21 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+To: Andre Przywara <andre.przywara@arm.com>
+X-Mailman-Approved-At: Thu, 23 Apr 2020 14:07:53 -0400
+Cc: kvm@vger.kernel.org, Raphael Gault <raphael.gault@arm.com>,
+ Sami Mujawar <sami.mujawar@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,119 +83,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At the moment we trap *every* access to the flash memory, even when we
-are in array read mode (which just directly copies from the storage
-array to the guest).
-To improve performance, allow cacheable mappings and to avoid fatal traps
-on unsupported instructions (on ARM), export a read-only memslot to the
-guest when the flash is in read-array mode. A guest does not need to
-trap on read accesses then.
-A write command (which always traps) will revoke this mapping if the
-read mode changes.
+On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> wrote:
+>
+> Hi,
+>
+> an update for the CFI flash emulation, addressing Alex' comments and
+> adding direct mapping support.
+> The actual code changes to the flash emulation are minimal, mostly this
+> is about renaming and cleanups.
+> This versions now adds some patches. 1/5 is a required fix, the last
+> three patches add mapping support as an extension. See below.
+>
+> In addition to a branch with this series[1], I also put a git branch with
+> all the changes compared to v3[2] as separate patches on the server, please
+> have a look if you want to verify against a previous review.
+>
+> ===============
+> The EDK II UEFI firmware implementation requires some storage for the EFI
+> variables, which is typically some flash storage.
+> Since this is already supported on the EDK II side, and looks like a
+> generic standard, this series adds a CFI flash emulation to kvmtool.
+>
+> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
+> registering MMIO devices, which is needed for this device.
+> Patches 3-5 add support for mapping the flash memory into guest, should
+> it be in read-array mode. For this to work, patch 3/5 is cherry-picked
+> from Alex' PCIe reassignable BAR series, to support removing a memslot
+> mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
+> adds or removes the mapping based on the current state.
+> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
+> merged either separately or the PCIe series is actually merged before
+> this one.
+>
+> This is one missing piece towards a working UEFI boot with kvmtool on
+> ARM guests, the other is to provide writable PCI BARs, which is WIP.
+> This series alone already enables UEFI boot, but only with virtio-mmio.
+>
 
-This reduces the number of read traps from more than 800,000 to a few
-hundreds when booting into the UEFI shell.
+Excellent! Thanks for taking the time to implement the r/o memslot for
+the flash, it really makes the UEFI firmware much more usable.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- hw/cfi_flash.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+I will test this as soon as I get a chance, probably tomorrow.
 
-diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
-index 3c76c04a..7faecdfb 100644
---- a/hw/cfi_flash.c
-+++ b/hw/cfi_flash.c
-@@ -8,6 +8,7 @@
- 
- #include "kvm/kvm.h"
- #include "kvm/kvm-arch.h"
-+#include "kvm/kvm-cpu.h"
- #include "kvm/devices.h"
- #include "kvm/fdt.h"
- #include "kvm/mutex.h"
-@@ -139,6 +140,7 @@ struct cfi_flash_device {
- 	enum cfi_flash_state	state;
- 	enum cfi_read_mode	read_mode;
- 	u8			sr;
-+	bool			is_mapped;
- };
- 
- static int nr_erase_blocks(struct cfi_flash_device *sfdev)
-@@ -437,6 +439,43 @@ static void cfi_flash_write(struct cfi_flash_device *sfdev, u16 command,
- 	}
- }
- 
-+/*
-+ * If we are in ARRAY_READ mode, we can map the flash array directly
-+ * into the guest, just as read-only. This greatly improves read
-+ * performance, and avoids problems with exits due to accesses from
-+ * load instructions without syndrome information (on ARM).
-+ * Also it could allow code to be executed XIP in there.
-+ */
-+static int map_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
-+{
-+	int ret;
-+
-+	ret = kvm__register_mem(kvm, sfdev->base_addr, sfdev->size,
-+				sfdev->flash_memory,
-+				KVM_MEM_TYPE_RAM | KVM_MEM_TYPE_READONLY);
-+	if (!ret)
-+		sfdev->is_mapped = true;
-+
-+	return ret;
-+}
-+
-+/*
-+ * Any write access changing the read mode would need to bring us back to
-+ * "trap everything", as the CFI query read need proper handholding.
-+ */
-+static int unmap_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
-+{
-+	int ret;
-+
-+	ret = kvm__destroy_mem(kvm, sfdev->base_addr, sfdev->size,
-+			       sfdev->flash_memory);
-+
-+	if (!ret)
-+		sfdev->is_mapped = false;
-+
-+	return ret;
-+}
-+
- static void cfi_flash_mmio(struct kvm_cpu *vcpu,
- 			   u64 addr, u8 *data, u32 len, u8 is_write,
- 			   void *context)
-@@ -467,6 +506,12 @@ static void cfi_flash_mmio(struct kvm_cpu *vcpu,
- 
- 	cfi_flash_write(sfdev, value & 0xffff, faddr, data, len);
- 
-+	/* Adjust our mapping status accordingly. */
-+	if (!sfdev->is_mapped && sfdev->read_mode == READ_ARRAY)
-+		map_flash_memory(vcpu->kvm, sfdev);
-+	else if (sfdev->is_mapped && sfdev->read_mode != READ_ARRAY)
-+		unmap_flash_memory(vcpu->kvm, sfdev);
-+
- 	mutex_unlock(&sfdev->mutex);
- }
- 
-@@ -543,6 +588,8 @@ static struct cfi_flash_device *create_flash_device_file(struct kvm *kvm,
- 	sfdev->read_mode = READ_ARRAY;
- 	sfdev->sr = CFI_STATUS_READY;
- 
-+	map_flash_memory(kvm, sfdev);
-+
- 	value = roundup(nr_erase_blocks(sfdev), BITS_PER_LONG) / 8;
- 	sfdev->lock_bm = malloc(value);
- 	memset(sfdev->lock_bm, 0, value);
--- 
-2.17.1
 
+>
+> [1] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v4
+> [2] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v3
+> git://linux-arm.org/kvmtool.git (branches cfi-flash/v3 and cfi-flash/v4)
+>
+> Changelog v3 .. v4:
+> - Rename file to cfi-flash.c (dash instead of underscore).
+> - Unify macro names for states, modes and commands.
+> - Enforce one or two chips only.
+> - Comment on pow2_size() function.
+> - Use more consistent identifier spellings.
+> - Assign symbols to status register values.
+> - Drop RCR register emulation.
+> - Use numerical offsets instead of names for query offsets to match spec.
+> - Cleanup error path and reword info message in create_flash_device_file().
+> - Add fix to allow non-virtio MMIO device emulations.
+> - Support tearing down and adding read-only memslots.
+> - Add read-only memslot mapping when in read mode.
+>
+> Changelog v2 .. v3:
+> - Breaking MMIO handling into three separate functions.
+> - Assing the flash base address in the memory map, but stay at 32 MB for now.
+>   The MMIO area has been moved up to 48 MB, to never overlap with the
+>   flash.
+> - Impose a limit of 16 MB for the flash size, mostly to fit into the
+>   (for now) fixed memory map.
+> - Trim flash size down to nearest power-of-2, to match hardware.
+> - Announce forced flash size trimming.
+> - Rework the CFI query table slightly, to add the addresses as array
+>   indicies.
+> - Fix error handling when creating the flash device.
+> - Fix pow2_size implementation for 0 and 1 as input values.
+> - Fix write buffer size handling.
+> - Improve some comments.
+>
+> Changelog v1 .. v2:
+> - Add locking for MMIO handling.
+> - Fold flash read into handler.
+> - Move pow2_size() into generic header.
+> - Spell out flash base address.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
