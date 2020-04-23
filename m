@@ -2,83 +2,58 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE10EC55191
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 15:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3559DC55191
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 17:39:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A76DE2075A
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 15:41:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4oJBwUW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76DE2075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F009620857
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 17:39:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F009620857
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61C5A4B1D8;
-	Thu, 23 Apr 2020 11:41:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9EED4B1AA;
+	Thu, 23 Apr 2020 13:39:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wj0gS5TFZ73O; Thu, 23 Apr 2020 11:41:05 -0400 (EDT)
+	with ESMTP id 2gCqNcyL1OV1; Thu, 23 Apr 2020 13:39:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C846A4B2A0;
-	Thu, 23 Apr 2020 11:40:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3704B19F;
+	Thu, 23 Apr 2020 13:39:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9253B4B1F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 11:40:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 818844B18C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:39:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GtXxGpcaHW9F for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 11:40:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F20A4B1F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 11:40:38 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A1CFD216FD;
- Thu, 23 Apr 2020 15:40:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587656437;
- bh=GNXG5kPdn9LeEq52oGgCF3JivlMErksaY8YYinNLtkU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=b4oJBwUWiUHbzkM5SMOQwsCpLLIqGCSFsVzTZOWsY5WKzxn1XCR52lrJ7EMKy4cml
- NHp+i73dqh2ltLXe1krJzju+7C5rzDLd+A9yZrITaBMvmckkZNwg2fbkufSpnXQ6zc
- A7cIafOk6eC91BNnlRQVb/XvQGg/mzLQRrlkPbCI=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jRdxr-005oPM-RY; Thu, 23 Apr 2020 16:40:36 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 8/8] KVM: arm64: vgic-its: Fix memory leak on the error path
- of vgic_add_lpi()
-Date: Thu, 23 Apr 2020 16:40:09 +0100
-Message-Id: <20200423154009.4113562-9-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200423154009.4113562-1-maz@kernel.org>
-References: <20200423154009.4113562-1-maz@kernel.org>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- andre.przywara@arm.com, christoffer.dall@arm.com, julien@xen.org,
- yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
- =?UTF-8?q?Andr=C3=A9=20Przywara?= <andre.przywara@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id AaBNyuEuDjLe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2020 13:39:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 543464B187
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:39:04 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7F89C14;
+ Thu, 23 Apr 2020 10:39:03 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A1FE3F68F;
+ Thu, 23 Apr 2020 10:39:02 -0700 (PDT)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: [PATCH kvmtool v4 1/5] virtio-mmio: Assign IRQ line directly before
+ registering device
+Date: Thu, 23 Apr 2020 18:38:40 +0100
+Message-Id: <20200423173844.24220-2-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ Raphael Gault <raphael.gault@arm.com>, Sami Mujawar <sami.mujawar@arm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,54 +65,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+At the moment the IRQ line for a virtio-mmio device is assigned in the
+generic device__register() routine in devices.c, by calling back into
+virtio-mmio.c. This does not only sound slightly convoluted, but also
+breaks when we try to register an MMIO device that is not a virtio-mmio
+device. In this case container_of will return a bogus pointer (as it
+assumes a struct virtio_mmio), and the IRQ allocation routine will
+corrupt some data in the device_header (for instance the first byte
+of the "data" pointer).
 
-If we're going to fail out the vgic_add_lpi(), let's make sure the
-allocated vgic_irq memory is also freed. Though it seems that both
-cases are unlikely to fail.
+Simply assign the IRQ directly in virtio_mmio_init(), before calling
+device__register(). This avoids the problem and looks actually much more
+straightforward.
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200414030349.625-3-yuzenghui@huawei.com
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ devices.c                 |  4 ----
+ include/kvm/virtio-mmio.h |  1 -
+ virtio/mmio.c             | 10 ++--------
+ 3 files changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index d53d34a33e35d..c012a52b19f57 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -96,14 +96,21 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	 * We "cache" the configuration table entries in our struct vgic_irq's.
- 	 * However we only have those structs for mapped IRQs, so we read in
- 	 * the respective config data from memory here upon mapping the LPI.
-+	 *
-+	 * Should any of these fail, behave as if we couldn't create the LPI
-+	 * by dropping the refcount and returning the error.
- 	 */
- 	ret = update_lpi_config(kvm, irq, NULL, false);
--	if (ret)
-+	if (ret) {
-+		vgic_put_irq(kvm, irq);
- 		return ERR_PTR(ret);
-+	}
+diff --git a/devices.c b/devices.c
+index a7c666a7..2c8b2665 100644
+--- a/devices.c
++++ b/devices.c
+@@ -1,7 +1,6 @@
+ #include "kvm/devices.h"
+ #include "kvm/kvm.h"
+ #include "kvm/pci.h"
+-#include "kvm/virtio-mmio.h"
  
- 	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
--	if (ret)
-+	if (ret) {
-+		vgic_put_irq(kvm, irq);
- 		return ERR_PTR(ret);
-+	}
- 
- 	return irq;
+ #include <linux/err.h>
+ #include <linux/rbtree.h>
+@@ -33,9 +32,6 @@ int device__register(struct device_header *dev)
+ 	case DEVICE_BUS_PCI:
+ 		pci__assign_irq(dev);
+ 		break;
+-	case DEVICE_BUS_MMIO:
+-		virtio_mmio_assign_irq(dev);
+-		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
+index 0528947a..6bc50bd1 100644
+--- a/include/kvm/virtio-mmio.h
++++ b/include/kvm/virtio-mmio.h
+@@ -57,5 +57,4 @@ int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		      int device_id, int subsys_id, int class);
+-void virtio_mmio_assign_irq(struct device_header *dev_hdr);
+ #endif
+diff --git a/virtio/mmio.c b/virtio/mmio.c
+index 5537c393..875a288c 100644
+--- a/virtio/mmio.c
++++ b/virtio/mmio.c
+@@ -280,14 +280,6 @@ static void generate_virtio_mmio_fdt_node(void *fdt,
  }
+ #endif
+ 
+-void virtio_mmio_assign_irq(struct device_header *dev_hdr)
+-{
+-	struct virtio_mmio *vmmio = container_of(dev_hdr,
+-						 struct virtio_mmio,
+-						 dev_hdr);
+-	vmmio->irq = irq__alloc_line();
+-}
+-
+ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		     int device_id, int subsys_id, int class)
+ {
+@@ -316,6 +308,8 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		.data		= generate_virtio_mmio_fdt_node,
+ 	};
+ 
++	vmmio->irq = irq__alloc_line();
++
+ 	r = device__register(&vmmio->dev_hdr);
+ 	if (r < 0) {
+ 		kvm__deregister_mmio(kvm, vmmio->addr);
 -- 
-2.26.2
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
