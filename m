@@ -2,79 +2,85 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4DDC55195
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54045C54FCB
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:03:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C6A5A2084D
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A5A2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTP id D5B9D2084D
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:03:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2GFQj9Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B9D2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 345384B173;
-	Thu, 23 Apr 2020 08:02:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 813C54B117;
+	Thu, 23 Apr 2020 08:03:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AHuJby1ht24J; Thu, 23 Apr 2020 08:02:35 -0400 (EDT)
+	with ESMTP id zbNF+oRGWzcE; Thu, 23 Apr 2020 08:03:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F25B4B19B;
-	Thu, 23 Apr 2020 08:02:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 187024B14A;
+	Thu, 23 Apr 2020 08:03:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 257BB4B0F5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 07:11:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1663B4B117
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 08:03:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qWb6A9OoLo+U for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 07:11:31 -0400 (EDT)
-Received: from out30-133.freemail.mail.aliyun.com
- (out30-133.freemail.mail.aliyun.com [115.124.30.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A2074B091
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 07:11:30 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R141e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04407;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=36; SR=0;
- TI=SMTPD_---0TwQiqf0_1587640283; 
-Received: from 30.27.118.66(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0TwQiqf0_1587640283) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 23 Apr 2020 19:11:25 +0800
-Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
- <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
- <20200422154543.2efba3dd.cohuck@redhat.com>
- <dc5e0fa3-558b-d606-bda9-ed281cf9e9ae@de.ibm.com>
- <20200422180403.03f60b0c.cohuck@redhat.com>
- <5e1e126d-f1b0-196c-594b-4289d0afb9a8@linux.alibaba.com>
- <20200423123901.72a4c6a4.cohuck@redhat.com>
- <71344f73-c34f-a373-49d1-5d839c6be5f6@linux.alibaba.com>
- <1d73b700-4a20-3d7a-66d1-29b5afa03f4d@de.ibm.com>
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <9a477117-7295-c4f4-097f-bfb146670435@linux.alibaba.com>
-Date: Thu, 23 Apr 2020 19:11:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ with ESMTP id SSmqiPtyqG3B for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2020 08:03:53 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C543A4B0D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 08:03:53 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AC4DD20781;
+ Thu, 23 Apr 2020 12:03:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587643432;
+ bh=Yr+fkNmvLrz5b3ICOiyLazRf0Fuq3pgrt9QoX+DdBF8=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=o2GFQj9Q0+NAc5cK9SBz15ZI+lsTPKH5RaaTlo00DKMSU8Mf+4wnWhR2yi4iVPD/1
+ ZQS4NSzX6D2YB0ikmmy0a6UnvVy7sIQTefufvOBJoNam99BbXXOxlo/GzNLoUyFvq1
+ hNrb76I8BBsWHkZwlOSY9gnD9yIhbx5ngTuFyBhg=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jRaa6-005lQU-TF; Thu, 23 Apr 2020 13:03:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <1d73b700-4a20-3d7a-66d1-29b5afa03f4d@de.ibm.com>
-X-Mailman-Approved-At: Thu, 23 Apr 2020 08:02:30 -0400
-Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
- benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
- linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- frankja@linux.ibm.com, maz@kernel.org, joro@8bytes.org, x86@kernel.org,
- mingo@redhat.com, thuth@redhat.com, gor@linux.ibm.com, kvm-ppc@vger.kernel.org,
- bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org,
- jmattson@google.com, tsbogend@alpha.franken.de,
- sean.j.christopherson@intel.com, linux-kernel@vger.kernel.org,
- mpe@ellerman.id.au, pbonzini@redhat.com, vkuznets@redhat.com,
- linuxppc-dev@lists.ozlabs.org
+Date: Thu, 23 Apr 2020 13:03:50 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v3 5/6] KVM: arm64: vgic-v3: Retire all pending LPIs on
+ vcpu destroy
+In-Reply-To: <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
+References: <20200422161844.3848063-1-maz@kernel.org>
+ <20200422161844.3848063-6-maz@kernel.org>
+ <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
+Message-ID: <c4b89164d79b733bcc38801c9483417d@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: james.morse@arm.com, yuzenghui@huawei.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, eric.auger@redhat.com, Andre.Przywara@arm.com,
+ julien@xen.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
+ Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,75 +92,151 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CgpPbiAyMDIwLzQvMjMgMTk6MDAsIENocmlzdGlhbiBCb3JudHJhZWdlciB3cm90ZToKPiAKPiAK
-PiBPbiAyMy4wNC4yMCAxMjo1OCwgVGlhbmppYSBaaGFuZyB3cm90ZToKPj4KPj4KPj4gT24gMjAy
-MC80LzIzIDE4OjM5LCBDb3JuZWxpYSBIdWNrIHdyb3RlOgo+Pj4gT24gVGh1LCAyMyBBcHIgMjAy
-MCAxMTowMTo0MyArMDgwMAo+Pj4gVGlhbmppYSBaaGFuZyA8dGlhbmppYS56aGFuZ0BsaW51eC5h
-bGliYWJhLmNvbT4gd3JvdGU6Cj4+Pgo+Pj4+IE9uIDIwMjAvNC8yMyAwOjA0LCBDb3JuZWxpYSBI
-dWNrIHdyb3RlOgo+Pj4+PiBPbiBXZWQsIDIyIEFwciAyMDIwIDE3OjU4OjA0ICswMjAwCj4+Pj4+
-IENocmlzdGlhbiBCb3JudHJhZWdlciA8Ym9ybnRyYWVnZXJAZGUuaWJtLmNvbT4gd3JvdGU6Cj4+
-Pj4+ICAgIAo+Pj4+Pj4gT24gMjIuMDQuMjAgMTU6NDUsIENvcm5lbGlhIEh1Y2sgd3JvdGU6Cj4+
-Pj4+Pj4gT24gV2VkLCAyMiBBcHIgMjAyMCAyMDo1ODowNCArMDgwMAo+Pj4+Pj4+IFRpYW5qaWEg
-WmhhbmcgPHRpYW5qaWEuemhhbmdAbGludXguYWxpYmFiYS5jb20+IHdyb3RlOgo+Pj4+Pj4+ICAg
-ICAgIAo+Pj4+Pj4+PiBJbiB0aGUgY3VycmVudCBrdm0gdmVyc2lvbiwgJ2t2bV9ydW4nIGhhcyBi
-ZWVuIGluY2x1ZGVkIGluIHRoZSAna3ZtX3ZjcHUnCj4+Pj4+Pj4+IHN0cnVjdHVyZS4gRWFybGll
-ciB0aGFuIGhpc3RvcmljYWwgcmVhc29ucywgbWFueSBrdm0tcmVsYXRlZCBmdW5jdGlvbgo+Pj4+
-Pj4+Cj4+Pj4+Pj4gcy9FYXJsaWVyIHRoYW4vRm9yLyA/Cj4+Pj4+Pj4gICAgICAgCj4+Pj4+Pj4+
-IHBhcmFtZXRlcnMgcmV0YWluIHRoZSAna3ZtX3J1bicgYW5kICdrdm1fdmNwdScgcGFyYW1ldGVy
-cyBhdCB0aGUgc2FtZSB0aW1lLgo+Pj4+Pj4+PiBUaGlzIHBhdGNoIGRvZXMgYSB1bmlmaWVkIGNs
-ZWFudXAgb2YgdGhlc2UgcmVtYWluaW5nIHJlZHVuZGFudCBwYXJhbWV0ZXJzLgo+Pj4+Pj4+Pgo+
-Pj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBUaWFuamlhIFpoYW5nIDx0aWFuamlhLnpoYW5nQGxpbnV4
-LmFsaWJhYmEuY29tPgo+Pj4+Pj4+PiAtLS0KPj4+Pj4+Pj4gIMKgwqAgYXJjaC9zMzkwL2t2bS9r
-dm0tczM5MC5jIHwgMzcgKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLQo+Pj4+
-Pj4+PiAgwqDCoCAxIGZpbGUgY2hhbmdlZCwgMjIgaW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25z
-KC0pCj4+Pj4+Pj4+Cj4+Pj4+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL3MzOTAva3ZtL2t2bS1zMzkw
-LmMgYi9hcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMKPj4+Pj4+Pj4gaW5kZXggZTMzNWE3ZTVlYWQ3
-Li5kN2JiMmU3YTA3ZmYgMTAwNjQ0Cj4+Pj4+Pj4+IC0tLSBhL2FyY2gvczM5MC9rdm0va3ZtLXMz
-OTAuYwo+Pj4+Pj4+PiArKysgYi9hcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMKPj4+Pj4+Pj4gQEAg
-LTQxNzYsOCArNDE3Niw5IEBAIHN0YXRpYyBpbnQgX192Y3B1X3J1bihzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpCj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqAgcmV0dXJuIHJjOwo+Pj4+Pj4+PiAgwqDCoCB9
-Cj4+Pj4+Pj4+ICDCoMKgIC1zdGF0aWMgdm9pZCBzeW5jX3JlZ3NfZm10MihzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICprdm1fcnVuKQo+Pj4+Pj4+PiArc3RhdGljIHZvaWQg
-c3luY19yZWdzX2ZtdDIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+Pj4+Pj4+PiAgwqDCoCB7Cj4+
-Pj4+Pj4+ICvCoMKgwqAgc3RydWN0IGt2bV9ydW4gKmt2bV9ydW4gPSB2Y3B1LT5ydW47Cj4+Pj4+
-Pj4+ICDCoMKgwqDCoMKgwqAgc3RydWN0IHJ1bnRpbWVfaW5zdHJfY2IgKnJpY2NiOwo+Pj4+Pj4+
-PiAgwqDCoMKgwqDCoMKgIHN0cnVjdCBnc19jYiAqZ3NjYjsKPj4+Pj4+Pj4gIMKgwqAgQEAgLTQy
-MzUsNyArNDIzNiw3IEBAIHN0YXRpYyB2b2lkIHN5bmNfcmVnc19mbXQyKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKmt2bV9ydW4pCj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCB9Cj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAodmNwdS0+YXJjaC5n
-c19lbmFibGVkKSB7Cj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGN1cnJl
-bnQtPnRocmVhZC5nc19jYiA9IChzdHJ1Y3QgZ3NfY2IgKikKPj4+Pj4+Pj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgJnZjcHUtPnJ1bi0+cy5yZWdzLmdz
-Y2I7Cj4+Pj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgICZrdm1fcnVuLT5zLnJlZ3MuZ3NjYjsKPj4+Pj4+Pgo+Pj4+Pj4+IE5vdCBzdXJlIGlmIHRo
-ZXNlIGNoYW5nZXMgKHZjcHUtPnJ1bi0+ID0+IGt2bV9ydW4tPikgYXJlIHJlYWxseSB3b3J0aAo+
-Pj4+Pj4+IGl0LiAoSXQgc2VlbXMgdGhleSBhbW91bnQgdG8gYXQgbGVhc3QgYXMgbXVjaCBhcyB0
-aGUgY2hhbmdlcyBhZHZlcnRpc2VkCj4+Pj4+Pj4gaW4gdGhlIHBhdGNoIGRlc2NyaXB0aW9uLikK
-Pj4+Pj4+Pgo+Pj4+Pj4+IE90aGVyIG9waW5pb25zPwo+Pj4+Pj4KPj4+Pj4+IEFncmVlZC4gSXQg
-ZmVlbHMga2luZCBvZiByYW5kb20uIE1heWJlIGp1c3QgZG8gdGhlIGZpcnN0IGxpbmUgKG1vdmUg
-a3ZtX3J1biBmcm9tIHRoZQo+Pj4+Pj4gZnVuY3Rpb24gcGFyYW1ldGVyIGxpc3QgaW50byB0aGUg
-dmFyaWFibGUgZGVjbGFyYXRpb24pPyBOb3Qgc3VyZSBpZiB0aGlzIGlzIGJldHRlci4KPj4+Pj4+
-ICAgIAo+Pj4+Pgo+Pj4+PiBUaGVyZSdzIG1vcmUgaW4gdGhpcyBwYXRjaCB0aGF0IEkgY3V0Li4u
-IGJ1dCBJIHRoaW5rIGp1c3QgbW92aW5nCj4+Pj4+IGt2bV9ydW4gZnJvbSB0aGUgcGFyYW1ldGVy
-IGxpc3Qgd291bGQgYmUgbXVjaCBsZXNzIGRpc3J1cHRpdmUuCj4+Pj4+ICAgICAKPj4+Pgo+Pj4+
-IEkgdGhpbmsgdGhlcmUgYXJlIHR3byBraW5kcyBvZiBjb2RlKGB2Y3B1LT5ydW4tPmAgYW5kIGBr
-dm1fcnVuLT5gKSwgYnV0Cj4+Pj4gdGhlcmUgd2lsbCBiZSBtb3JlIGRpc3J1cHRpdmUsIG5vdCBs
-ZXNzLgo+Pj4KPj4+IEkganVzdCBmYWlsIHRvIHNlZSB0aGUgYmVuZWZpdDsgc3VyZSwga3ZtX3J1
-bi0+IGlzIGNvbnZlbmllbnQsIGJ1dCB0aGUKPj4+IGN1cnJlbnQgY29kZSBpcyBqdXN0IGZpbmUs
-IGFuZCBhbnkgcmV3b3JrIHNob3VsZCBiZSBiYWxhbmNlZCBhZ2FpbnN0Cj4+PiB0aGUgY29zdCAo
-ZS5nLiBjbHV0dGVyaW5nIGdpdCBhbm5vdGF0ZSkuCj4+Pgo+Pgo+PiBjbHV0dGVyaW5nIGdpdCBh
-bm5vdGF0ZSA/IERvZXMgaXQgbWVhbiBGaXggeHh4eCAoImNvbW1lbnQiKS4gSXMgaXQgcG9zc2li
-bGUgdG8gc29sdmUgdGhpcyBwcm9ibGVtIGJ5IHNwbGl0dGluZyB0aGlzIHBhdGNoPwo+IAo+IE5v
-IGl0cyBhYm91dCBicmVha2luZyBnaXQgYmxhbWUgKGFuZCBidWdmaXggYmFja3BvcnRzKSBmb3Ig
-anVzdCBhIGNvc21ldGljIGltcHJvdmVtZW50Lgo+IEFuZCBJIGFncmVlIHdpdGggQ29ubnk6IHRo
-ZSBjb3N0IGlzIGhpZ2hlciB0aGFuIHRoZSBiZW5lZml0Lgo+IAoKSSB3aWxsIG1ha2UgYSBmaXgg
-aW4gdGhlIHYzIHZlcnNpb24uIEhlbHAgdG8gc2VlIGlmIHRoZXJlIGFyZSBwcm9ibGVtcyAKd2l0
-aCB0aGUgbmV4dCBmZXcgcGF0Y2hlcy4KClRoYW5rcywKVGlhbmppYQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi James,
+
+Thanks for the heads up.
+
+On 2020-04-23 12:35, James Morse wrote:
+> Hi Marc, Zenghui,
+> 
+> On 22/04/2020 17:18, Marc Zyngier wrote:
+>> From: Zenghui Yu <yuzenghui@huawei.com>
+>> 
+>> It's likely that the vcpu fails to handle all virtual interrupts if
+>> userspace decides to destroy it, leaving the pending ones stay in the
+>> ap_list. If the un-handled one is a LPI, its vgic_irq structure will
+>> be eventually leaked because of an extra refcount increment in
+>> vgic_queue_irq_unlock().
+> 
+>> diff --git a/virt/kvm/arm/vgic/vgic-init.c 
+>> b/virt/kvm/arm/vgic/vgic-init.c
+>> index a963b9d766b73..53ec9b9d9bc43 100644
+>> --- a/virt/kvm/arm/vgic/vgic-init.c
+>> +++ b/virt/kvm/arm/vgic/vgic-init.c
+>> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>> 
+>> +	/*
+>> +	 * Retire all pending LPIs on this vcpu anyway as we're
+>> +	 * going to destroy it.
+>> +	 */
+> 
+> Looking at the other caller, do we need something like:
+> |	if (vgic_cpu->lpis_enabled)
+> 
+> ?
+
+Huh... On its own, this call is absolutely harmless even if you
+don't have LPIs. But see below.
+
+> 
+>> +	vgic_flush_pending_lpis(vcpu);
+>> +
+> 
+> Otherwise, I get this on a gic-v2 machine!:
+> [ 1742.187139] BUG: KASAN: use-after-free in 
+> vgic_flush_pending_lpis+0x250/0x2c0
+> [ 1742.194302] Read of size 8 at addr ffff0008e1bf1f28 by task
+> qemu-system-aar/542
+> [ 1742.203140] CPU: 2 PID: 542 Comm: qemu-system-aar Not tainted
+> 5.7.0-rc2-00006-g4fb0f7bb0e27 #2
+> [ 1742.211780] Hardware name: ARM LTD ARM Juno Development
+> Platform/ARM Juno Development
+> Platform, BIOS EDK II Jul 30 2018
+> [ 1742.222596] Call trace:
+> [ 1742.225059]  dump_backtrace+0x0/0x328
+> [ 1742.228738]  show_stack+0x18/0x28
+> [ 1742.232071]  dump_stack+0x134/0x1b0
+> [ 1742.235578]  print_address_description.isra.0+0x6c/0x350
+> [ 1742.240910]  __kasan_report+0x10c/0x180
+> [ 1742.244763]  kasan_report+0x4c/0x68
+> [ 1742.248268]  __asan_report_load8_noabort+0x30/0x48
+> [ 1742.253081]  vgic_flush_pending_lpis+0x250/0x2c0
+> [ 1742.257718]  __kvm_vgic_destroy+0x1cc/0x478
+> [ 1742.261919]  kvm_vgic_destroy+0x30/0x48
+> [ 1742.265773]  kvm_arch_destroy_vm+0x20/0x128
+> [ 1742.269976]  kvm_put_kvm+0x3e0/0x8d0
+> [ 1742.273567]  kvm_vm_release+0x3c/0x60
+> [ 1742.277248]  __fput+0x218/0x630
+> [ 1742.280406]  ____fput+0x10/0x20
+> [ 1742.283565]  task_work_run+0xd8/0x1f0
+> [ 1742.287245]  do_exit+0x87c/0x2640
+> [ 1742.290575]  do_group_exit+0xd0/0x258
+> [ 1742.294254]  __arm64_sys_exit_group+0x3c/0x48
+> [ 1742.298631]  el0_svc_common.constprop.0+0x10c/0x348
+> [ 1742.303529]  do_el0_svc+0x48/0xd0
+> [ 1742.306861]  el0_sync_handler+0x11c/0x1b8
+> [ 1742.310888]  el0_sync+0x158/0x180
+> [ 1742.315716] The buggy address belongs to the page:
+> [ 1742.320529] page:fffffe002366fc40 refcount:0 mapcount:0
+> mapping:000000007e21d29f index:0x0
+> [ 1742.328821] flags: 0x2ffff00000000000()
+> [ 1742.332678] raw: 2ffff00000000000 0000000000000000 ffffffff23660401
+> 0000000000000000
+> [ 1742.340449] raw: 0000000000000000 0000000000000000 00000000ffffffff
+> 0000000000000000
+> [ 1742.348215] page dumped because: kasan: bad access detected
+> [ 1742.355304] Memory state around the buggy address:
+> [ 1742.360115]  ffff0008e1bf1e00: ff ff ff ff ff ff ff ff ff ff ff ff
+> ff ff ff ff
+> [ 1742.367360]  ffff0008e1bf1e80: ff ff ff ff ff ff ff ff ff ff ff ff
+> ff ff ff ff
+> [ 1742.374606] >ffff0008e1bf1f00: ff ff ff ff ff ff ff ff ff ff ff ff
+> ff ff ff ff
+> [ 1742.381851]                                   ^
+> [ 1742.386399]  ffff0008e1bf1f80: ff ff ff ff ff ff ff ff ff ff ff ff
+> ff ff ff ff
+> [ 1742.393645]  ffff0008e1bf2000: ff ff ff ff ff ff ff ff ff ff ff ff
+> ff ff ff ff
+> [ 1742.400889]
+> ==================================================================
+> [ 1742.408132] Disabling lock debugging due to kernel taint
+> 
+> 
+> With that:
+> Reviewed-by: James Morse <james.morse@arm.com>
+
+I think this is slightly more concerning. The issue is that we have
+started freeing parts of the interrupt state already (we free the
+SPIs early in kvm_vgic_dist_destroy()).
+
+If a SPI was pending or active at this stage (i.e. present in the
+ap_list), we are going to iterate over memory that has been freed
+already. This is bad, and this can happen on GICv3 as well.
+
+I think this should solve it, but I need to test it on a GICv2 system:
+
+diff --git a/virt/kvm/arm/vgic/vgic-init.c 
+b/virt/kvm/arm/vgic/vgic-init.c
+index 53ec9b9d9bc43..30dbec9fe0b4a 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -365,10 +365,10 @@ static void __kvm_vgic_destroy(struct kvm *kvm)
+
+  	vgic_debug_destroy(kvm);
+
+-	kvm_vgic_dist_destroy(kvm);
+-
+  	kvm_for_each_vcpu(i, vcpu, kvm)
+  		kvm_vgic_vcpu_destroy(vcpu);
++
++	kvm_vgic_dist_destroy(kvm);
+  }
+
+  void kvm_vgic_destroy(struct kvm *kvm)
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
