@@ -2,73 +2,102 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 300D2C54FD0
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 18:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B724C55186
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 21:32:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A96F820736
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 18:07:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cu4I9nHQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96F820736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id DFD862074F
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 21:32:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD862074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 261024B09F;
-	Thu, 23 Apr 2020 14:07:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563734B1D4;
+	Thu, 23 Apr 2020 17:32:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UzE2W85cAksX; Thu, 23 Apr 2020 14:07:55 -0400 (EDT)
+	with ESMTP id ozWaapGYLlPF; Thu, 23 Apr 2020 17:32:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF84E4B1AE;
-	Thu, 23 Apr 2020 14:07:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 128814B1C1;
+	Thu, 23 Apr 2020 17:32:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AA994B172
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:55:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 768A14B1B6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 17:32:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rSZ0le+e3qIb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 13:55:34 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E72CE4B0BD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 13:55:33 -0400 (EDT)
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com
- [209.85.166.180])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D71EC20784
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 17:55:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1587664532;
- bh=HzfdttVM9BgXQr/ijSQNIg+ZauLcJdE62a/irg9HQUA=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=cu4I9nHQfaAgy0rxfE2IlSOes6GxtHhb1TM6KzJAfSoXk3LQVsGKljDgd4Kf2e0Du
- cgTDqQF09l20AZz5QEkMAXbyseU5q3jalMsiN/Hvx3mfkYLe/u9uBIWtbfuu8QqiYD
- SEJ5CeenY+ILfm9KNSCcO8L/iPPsdWYEoz4fb+Bc=
-Received: by mail-il1-f180.google.com with SMTP id s10so6413662iln.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
-X-Gm-Message-State: AGi0Puaesbw+MKH/coHt/b2pt/UEhlXbcdyhkSPQgGW9t0IdRFVEV54Z
- QOxvUzkri4BhGQN3Elph9kUNp96sMOP/ce4praI=
-X-Google-Smtp-Source: APiQypL/Z2RoaxQTfyMU8HG6ck8a1KcKtB0U7jGPtMPkv1hfvGb/DzU/DYKwhO+zoay4gzXDiXn1MefQvMTM2uI93Yw=
-X-Received: by 2002:a92:405:: with SMTP id 5mr4426510ile.279.1587664532201;
- Thu, 23 Apr 2020 10:55:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200423173844.24220-1-andre.przywara@arm.com>
-In-Reply-To: <20200423173844.24220-1-andre.przywara@arm.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 23 Apr 2020 19:55:21 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
-Message-ID: <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+ with ESMTP id YNI5wNH9FA+F for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2020 17:32:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FC504B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 17:32:08 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EFED030E;
+ Thu, 23 Apr 2020 14:32:07 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D731A3F68F;
+ Thu, 23 Apr 2020 14:32:06 -0700 (PDT)
 Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
-To: Andre Przywara <andre.przywara@arm.com>
-X-Mailman-Approved-At: Thu, 23 Apr 2020 14:07:53 -0400
+To: Ard Biesheuvel <ardb@kernel.org>
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+ <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+ <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com>
+Date: Thu, 23 Apr 2020 22:31:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com>
+Content-Language: en-US
 Cc: kvm@vger.kernel.org, Raphael Gault <raphael.gault@arm.com>,
  Sami Mujawar <sami.mujawar@arm.com>, Will Deacon <will@kernel.org>,
  kvmarm <kvmarm@lists.cs.columbia.edu>
@@ -88,89 +117,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> wrote:
->
-> Hi,
->
-> an update for the CFI flash emulation, addressing Alex' comments and
-> adding direct mapping support.
-> The actual code changes to the flash emulation are minimal, mostly this
-> is about renaming and cleanups.
-> This versions now adds some patches. 1/5 is a required fix, the last
-> three patches add mapping support as an extension. See below.
->
-> In addition to a branch with this series[1], I also put a git branch with
-> all the changes compared to v3[2] as separate patches on the server, please
-> have a look if you want to verify against a previous review.
->
-> ===============
-> The EDK II UEFI firmware implementation requires some storage for the EFI
-> variables, which is typically some flash storage.
-> Since this is already supported on the EDK II side, and looks like a
-> generic standard, this series adds a CFI flash emulation to kvmtool.
->
-> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
-> registering MMIO devices, which is needed for this device.
-> Patches 3-5 add support for mapping the flash memory into guest, should
-> it be in read-array mode. For this to work, patch 3/5 is cherry-picked
-> from Alex' PCIe reassignable BAR series, to support removing a memslot
-> mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
-> adds or removes the mapping based on the current state.
-> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
-> merged either separately or the PCIe series is actually merged before
-> this one.
->
-> This is one missing piece towards a working UEFI boot with kvmtool on
-> ARM guests, the other is to provide writable PCI BARs, which is WIP.
-> This series alone already enables UEFI boot, but only with virtio-mmio.
->
+On 23/04/2020 21:43, Ard Biesheuvel wrote:
 
-Excellent! Thanks for taking the time to implement the r/o memslot for
-the flash, it really makes the UEFI firmware much more usable.
+Hi Ard,
 
-I will test this as soon as I get a chance, probably tomorrow.
+> On Thu, 23 Apr 2020 at 19:55, Ard Biesheuvel <ardb@kernel.org> wrote:
+>>
+>> On Thu, 23 Apr 2020 at 19:39, Andre Przywara <andre.przywara@arm.com> wrote:
+>>>
+>>> Hi,
+>>>
+>>> an update for the CFI flash emulation, addressing Alex' comments and
+>>> adding direct mapping support.
+>>> The actual code changes to the flash emulation are minimal, mostly this
+>>> is about renaming and cleanups.
+>>> This versions now adds some patches. 1/5 is a required fix, the last
+>>> three patches add mapping support as an extension. See below.
+>>>
+>>> In addition to a branch with this series[1], I also put a git branch with
+>>> all the changes compared to v3[2] as separate patches on the server, please
+>>> have a look if you want to verify against a previous review.
+>>>
+>>> ===============
+>>> The EDK II UEFI firmware implementation requires some storage for the EFI
+>>> variables, which is typically some flash storage.
+>>> Since this is already supported on the EDK II side, and looks like a
+>>> generic standard, this series adds a CFI flash emulation to kvmtool.
+>>>
+>>> Patch 2/5 is the actual emulation code, patch 1/5 is a bug-fix for
+>>> registering MMIO devices, which is needed for this device.
+>>> Patches 3-5 add support for mapping the flash memory into guest, should
+>>> it be in read-array mode. For this to work, patch 3/5 is cherry-picked
+>>> from Alex' PCIe reassignable BAR series, to support removing a memslot
+>>> mapping. Patch 4/5 adds support for read-only mappings, while patch 5/5
+>>> adds or removes the mapping based on the current state.
+>>> I am happy to squash 5/5 into 2/5, if we agree that patch 3/5 should be
+>>> merged either separately or the PCIe series is actually merged before
+>>> this one.
+>>>
+>>> This is one missing piece towards a working UEFI boot with kvmtool on
+>>> ARM guests, the other is to provide writable PCI BARs, which is WIP.
+>>> This series alone already enables UEFI boot, but only with virtio-mmio.
+>>>
+>>
+>> Excellent! Thanks for taking the time to implement the r/o memslot for
+>> the flash, it really makes the UEFI firmware much more usable.
+>>
+>> I will test this as soon as I get a chance, probably tomorrow.
+>>
+> 
+> I tested this on a SynQuacer box as a host, using EFI firmware [0]
+> built from patches provided by Sami.
+> 
+> I booted the Debian buster installer, completed the installation, and
+> could boot into the system. The only glitch was the fact that the
+> reboot didn't work, but I suppose we are not preserving the memory the
+> contains the firmware image, so there is nothing to reboot into.
 
+It's even worth, kvmtool does actually not support reset at all:
+https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/tree/kvm-cpu.c#n220
 
->
-> [1] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v4
-> [2] http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/cfi-flash/v3
-> git://linux-arm.org/kvmtool.git (branches cfi-flash/v3 and cfi-flash/v4)
->
-> Changelog v3 .. v4:
-> - Rename file to cfi-flash.c (dash instead of underscore).
-> - Unify macro names for states, modes and commands.
-> - Enforce one or two chips only.
-> - Comment on pow2_size() function.
-> - Use more consistent identifier spellings.
-> - Assign symbols to status register values.
-> - Drop RCR register emulation.
-> - Use numerical offsets instead of names for query offsets to match spec.
-> - Cleanup error path and reword info message in create_flash_device_file().
-> - Add fix to allow non-virtio MMIO device emulations.
-> - Support tearing down and adding read-only memslots.
-> - Add read-only memslot mapping when in read mode.
->
-> Changelog v2 .. v3:
-> - Breaking MMIO handling into three separate functions.
-> - Assing the flash base address in the memory map, but stay at 32 MB for now.
->   The MMIO area has been moved up to 48 MB, to never overlap with the
->   flash.
-> - Impose a limit of 16 MB for the flash size, mostly to fit into the
->   (for now) fixed memory map.
-> - Trim flash size down to nearest power-of-2, to match hardware.
-> - Announce forced flash size trimming.
-> - Rework the CFI query table slightly, to add the addresses as array
->   indicies.
-> - Fix error handling when creating the flash device.
-> - Fix pow2_size implementation for 0 and 1 as input values.
-> - Fix write buffer size handling.
-> - Improve some comments.
->
-> Changelog v1 .. v2:
-> - Add locking for MMIO handling.
-> - Fold flash read into handler.
-> - Move pow2_size() into generic header.
-> - Spell out flash base address.
+And yeah, the UEFI firmware is loaded at the beginning of RAM, so most
+of it is long gone by then.
+kvmtool could reload the image and reset the VCPUs, but every device
+emulation would need to be reset, for which there is no code yet.
+
+> But
+> just restarting kvmtool with the flash image containing the EFI
+> variables got me straight into GRUB and the installed OS.
+
+So, yeah, this is the way to do it ;-)
+
+> Tested-by: Ard Biesheuvel <ardb@kernel.org>
+
+Many thanks for that!
+
+> Thanks again for getting this sorted.
+
+It was actually easier than I thought (see the last patch).
+
+Just curious: the images Sami gave me this morning did not show any
+issues anymore (no no-syndrome fault, no alignment issues), even without
+the mapping [1]. And even though I saw the 800k read traps, I didn't
+notice any real performance difference (on a Juno). The PXE timeout was
+definitely much more noticeable.
+
+So did you see any performance impact with this series?
+
+> [0] https://people.linaro.org/~ard.biesheuvel/KVMTOOL_EFI.fd
+
+Ah, nice, will this stay there for a while? I can't provide binaries,
+but wanted others to be able to easily test this.
+
+Cheers,
+Andre.
+
+[1]
+http://www.linux-arm.org/git?p=kvmtool.git;a=commitdiff;h=2f2cf67f9514894d88e9ca799bb9dacd1f7557d4
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
