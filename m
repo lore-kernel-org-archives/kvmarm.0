@@ -2,64 +2,72 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D157C54FCB
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 11:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8C6C54FCB
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:02:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C03882084D
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 11:57:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03882084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id DC77020781
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 12:02:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC77020781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2930C4B170;
-	Thu, 23 Apr 2020 07:57:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57E9F4B14F;
+	Thu, 23 Apr 2020 08:02:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bsGVT2Dq6Kpu; Thu, 23 Apr 2020 07:57:32 -0400 (EDT)
+	with ESMTP id m0GPFWL88GB2; Thu, 23 Apr 2020 08:02:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E625F4B171;
-	Thu, 23 Apr 2020 07:57:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F0EB4B170;
+	Thu, 23 Apr 2020 08:02:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5F5A4B16D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 07:57:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D5CE4B15C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 22:54:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QO5UpecGqsYY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 07:57:29 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DB2F4B13B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 07:57:29 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 31843E061F836E6EF3C0;
- Thu, 23 Apr 2020 19:57:26 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 23 Apr 2020
- 19:57:17 +0800
-Subject: Re: [PATCH v3 5/6] KVM: arm64: vgic-v3: Retire all pending LPIs on
- vcpu destroy
-To: James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
-References: <20200422161844.3848063-1-maz@kernel.org>
- <20200422161844.3848063-6-maz@kernel.org>
- <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <f8c8b60d-f701-28c5-3102-e2ae8804e341@huawei.com>
-Date: Thu, 23 Apr 2020 19:57:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id enRwEfMFNAFx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Apr 2020 22:54:45 -0400 (EDT)
+Received: from out30-132.freemail.mail.aliyun.com
+ (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B5C24B14A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Apr 2020 22:54:44 -0400 (EDT)
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R111e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04427;
+ MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=36; SR=0;
+ TI=SMTPD_---0TwO5QT5_1587610476; 
+Received: from 30.27.118.66(mailfrom:tianjia.zhang@linux.alibaba.com
+ fp:SMTPD_---0TwO5QT5_1587610476) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 23 Apr 2020 10:54:37 +0800
+Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
+ <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+ <20200422154543.2efba3dd.cohuck@redhat.com>
+From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <e115bcf6-edf3-7465-f592-4e93e5ad984c@linux.alibaba.com>
+Date: Thu, 23 Apr 2020 10:54:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <2a0d1542-1964-c818-aae8-76f9227676b8@arm.com>
-Content-Language: en-US
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: Julien Grall <julien@xen.org>, kvm@vger.kernel.org,
- Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200422154543.2efba3dd.cohuck@redhat.com>
+X-Mailman-Approved-At: Thu, 23 Apr 2020 08:02:30 -0400
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
+ benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
+ linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ frankja@linux.ibm.com, maz@kernel.org, joro@8bytes.org, x86@kernel.org,
+ borntraeger@de.ibm.com, mingo@redhat.com, thuth@redhat.com, gor@linux.ibm.com,
+ kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de,
+ linux-arm-kernel@lists.infradead.org, jmattson@google.com,
+ tsbogend@alpha.franken.de, sean.j.christopherson@intel.com,
+ linux-kernel@vger.kernel.org, mpe@ellerman.id.au, pbonzini@redhat.com,
+ vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,113 +84,67 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi James,
 
-Thanks for having a look and testing it!
 
-On 2020/4/23 19:35, James Morse wrote:
-> Hi Marc, Zenghui,
+On 2020/4/22 21:45, Cornelia Huck wrote:
+> On Wed, 22 Apr 2020 20:58:04 +0800
+> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
 > 
-> On 22/04/2020 17:18, Marc Zyngier wrote:
->> From: Zenghui Yu <yuzenghui@huawei.com>
+>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+>> structure. Earlier than historical reasons, many kvm-related function
+> 
+> s/Earlier than/For/ ?
+> 
+
+Yes, it should be replaced like this.
+
+>> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+>> This patch does a unified cleanup of these remaining redundant parameters.
 >>
->> It's likely that the vcpu fails to handle all virtual interrupts if
->> userspace decides to destroy it, leaving the pending ones stay in the
->> ap_list. If the un-handled one is a LPI, its vgic_irq structure will
->> be eventually leaked because of an extra refcount increment in
->> vgic_queue_irq_unlock().
-> 
->> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
->> index a963b9d766b73..53ec9b9d9bc43 100644
->> --- a/virt/kvm/arm/vgic/vgic-init.c
->> +++ b/virt/kvm/arm/vgic/vgic-init.c
->> @@ -348,6 +348,12 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->>   {
->>   	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
+>>   1 file changed, 22 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index e335a7e5ead7..d7bb2e7a07ff 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>>   	return rc;
+>>   }
 >>   
->> +	/*
->> +	 * Retire all pending LPIs on this vcpu anyway as we're
->> +	 * going to destroy it.
->> +	 */
+>> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>>   {
+>> +	struct kvm_run *kvm_run = vcpu->run;
+>>   	struct runtime_instr_cb *riccb;
+>>   	struct gs_cb *gscb;
+>>   
+>> @@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>   		}
+>>   		if (vcpu->arch.gs_enabled) {
+>>   			current->thread.gs_cb = (struct gs_cb *)
+>> -						&vcpu->run->s.regs.gscb;
+>> +						&kvm_run->s.regs.gscb;
 > 
-> Looking at the other caller, do we need something like:
-> |	if (vgic_cpu->lpis_enabled)
+> Not sure if these changes (vcpu->run-> => kvm_run->) are really worth
+> it. (It seems they amount to at least as much as the changes advertised
+> in the patch description.)
 > 
-> ?
-
-If LPIs are disabled at redistributor level, yes there should be no
-pending LPIs in the ap_list. But I'm not sure how can the following
-use-after-free BUG be triggered.
-
+> Other opinions?
 > 
->> +	vgic_flush_pending_lpis(vcpu);
->> +
-> 
-> Otherwise, I get this on a gic-v2 machine!:
 
-I don't have a gic-v2 one and thus can't reproduce it :-(
+Why not replace `vcpu->run->` to `kvm_run->` ? If not, there will be 
+both styles of code, which is confusing. I will be confused and think 
+that this is something different.
 
-> [ 1742.187139] BUG: KASAN: use-after-free in vgic_flush_pending_lpis+0x250/0x2c0
-> [ 1742.194302] Read of size 8 at addr ffff0008e1bf1f28 by task qemu-system-aar/542
-> [ 1742.203140] CPU: 2 PID: 542 Comm: qemu-system-aar Not tainted
-> 5.7.0-rc2-00006-g4fb0f7bb0e27 #2
-> [ 1742.211780] Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development
-> Platform, BIOS EDK II Jul 30 2018
-> [ 1742.222596] Call trace:
-> [ 1742.225059]  dump_backtrace+0x0/0x328
-> [ 1742.228738]  show_stack+0x18/0x28
-> [ 1742.232071]  dump_stack+0x134/0x1b0
-> [ 1742.235578]  print_address_description.isra.0+0x6c/0x350
-> [ 1742.240910]  __kasan_report+0x10c/0x180
-> [ 1742.244763]  kasan_report+0x4c/0x68
-> [ 1742.248268]  __asan_report_load8_noabort+0x30/0x48
-> [ 1742.253081]  vgic_flush_pending_lpis+0x250/0x2c0
+Thanks,
+Tianjia
 
-Could you please show the result of
-
-./scripts/faddr2line vmlinux vgic_flush_pending_lpis+0x250/0x2c0
-
-on your setup?
-
-> [ 1742.257718]  __kvm_vgic_destroy+0x1cc/0x478
-> [ 1742.261919]  kvm_vgic_destroy+0x30/0x48
-> [ 1742.265773]  kvm_arch_destroy_vm+0x20/0x128
-> [ 1742.269976]  kvm_put_kvm+0x3e0/0x8d0
-> [ 1742.273567]  kvm_vm_release+0x3c/0x60
-> [ 1742.277248]  __fput+0x218/0x630
-> [ 1742.280406]  ____fput+0x10/0x20
-> [ 1742.283565]  task_work_run+0xd8/0x1f0
-> [ 1742.287245]  do_exit+0x87c/0x2640
-> [ 1742.290575]  do_group_exit+0xd0/0x258
-> [ 1742.294254]  __arm64_sys_exit_group+0x3c/0x48
-> [ 1742.298631]  el0_svc_common.constprop.0+0x10c/0x348
-> [ 1742.303529]  do_el0_svc+0x48/0xd0
-> [ 1742.306861]  el0_sync_handler+0x11c/0x1b8
-> [ 1742.310888]  el0_sync+0x158/0x180
-> [ 1742.315716] The buggy address belongs to the page:
-> [ 1742.320529] page:fffffe002366fc40 refcount:0 mapcount:0 mapping:000000007e21d29f index:0x0
-> [ 1742.328821] flags: 0x2ffff00000000000()
-> [ 1742.332678] raw: 2ffff00000000000 0000000000000000 ffffffff23660401 0000000000000000
-> [ 1742.340449] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-> [ 1742.348215] page dumped because: kasan: bad access detected
-> [ 1742.355304] Memory state around the buggy address:
-> [ 1742.360115]  ffff0008e1bf1e00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> [ 1742.367360]  ffff0008e1bf1e80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> [ 1742.374606] >ffff0008e1bf1f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> [ 1742.381851]                                   ^
-> [ 1742.386399]  ffff0008e1bf1f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> [ 1742.393645]  ffff0008e1bf2000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> [ 1742.400889] ==================================================================
-> [ 1742.408132] Disabling lock debugging due to kernel taint
-> 
-> 
-> With that:
-> Reviewed-by: James Morse <james.morse@arm.com>
-
-Thanks a lot!
-
-Zenghui
-
+>>   			restore_gs_cb(current->thread.gs_cb);
+>>   		}
+>>   		preempt_enable();
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
