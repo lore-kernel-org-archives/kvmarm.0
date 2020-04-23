@@ -2,107 +2,94 @@ Return-Path: <SRS0=c4fT=6H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C634C55186
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 09:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E56C2BA19
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 10:40:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 093A121569
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 09:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7B6020857
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Apr 2020 10:40:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvAnHRSD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093A121569
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NouqzbRN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B6020857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51E084B0BF;
-	Thu, 23 Apr 2020 05:26:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1D794B0F3;
+	Thu, 23 Apr 2020 06:40:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9w39cqoScQnj; Thu, 23 Apr 2020 05:26:12 -0400 (EDT)
+	with ESMTP id 4gOj7cp47V7H; Thu, 23 Apr 2020 06:40:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 632F44B107;
-	Thu, 23 Apr 2020 05:26:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0F594B0F5;
+	Thu, 23 Apr 2020 06:40:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55BF54B15B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 05:26:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 351B04B0F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 06:40:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ivpxRkShREKV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2020 05:26:10 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5625F4B107
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 05:26:10 -0400 (EDT)
+ with ESMTP id Gai8Ysv20CVM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2020 06:40:07 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BB54B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 06:40:07 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587633970;
+ s=mimecast20190719; t=1587638406;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MGgmr4DwO0KzfyPWlPuSjwCWCAlutT/YH5ClZ1SR4T4=;
- b=GvAnHRSD/ptgzPjwurhto7PzVLpikhHg54JNw5S2YZVnYLoE3Ig+moKxpCG3uWoVjTbWHW
- 1vSSnf9kawTIi4wigaUnBRdwmSO0jsjGzittZ8X58dY3Pohfy4TmOb9Bri30Zefq3A/70F
- LuMQvvHvsDCxeT5ATQ01FGJZn6hlA2U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-jR0vp98zMaac397TiSe39Q-1; Thu, 23 Apr 2020 05:26:07 -0400
-X-MC-Unique: jR0vp98zMaac397TiSe39Q-1
-Received: by mail-wm1-f70.google.com with SMTP id b203so2058714wmd.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2020 02:26:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MGgmr4DwO0KzfyPWlPuSjwCWCAlutT/YH5ClZ1SR4T4=;
- b=E+B2mT403gtTV5Ptk+trAfhhkEM4Qzay0F/lnZ/KMhd7Ndz1dfWKxNZ0u1Ujnl84BY
- ZE3IJHG5lUalCqwMu/vRxtb9z5AFci6KsgttlE1BHEaC497OaAWRwrhFFn9jwsV5B84r
- 1MuXRqPLtAQVJ94cK09EYF0i4ds/E7DSYkGN+9umt8dOS3hj99xuSSTFdmYEcASjdsMP
- ytf8mx3XXXjD4HoA3on9HTlxlTXoPyxtD1RsiIkVz7qNZ7BtQURO3so8pvplx0mwEDoE
- RaFKGo18l5MFj8LEzrleMWf7t0yPMEj9gU8sFQG8KFCpTcOBQlmR9iVU94lxc/I5J2YU
- hRGQ==
-X-Gm-Message-State: AGi0PuYJP0baCNAbQnA+5X1X0q0SkaPqWdyLVxE6AOF1TIpPP4TpsKeO
- O97AucbU5fHhjY0JOk0++0KhSisFi224gPMifD2eLFHIn+lwjp47260znonjThO4oj9kqOb87BI
- Vu+M8Z1D64OOV+Jiqd7koIh2g
-X-Received: by 2002:adf:ee91:: with SMTP id b17mr3881558wro.109.1587633966466; 
- Thu, 23 Apr 2020 02:26:06 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKViKVqjhZYWHhmD4gX+L181e384ppt9H3dp83Sm4GYTaac8jfbTOwhBotE8r0qEIg2tyXvIA==
-X-Received: by 2002:adf:ee91:: with SMTP id b17mr3881512wro.109.1587633966196; 
- Thu, 23 Apr 2020 02:26:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926?
- ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
- by smtp.gmail.com with ESMTPSA id z18sm2779590wrw.41.2020.04.23.02.26.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 02:26:05 -0700 (PDT)
-Subject: Re: [PATCH 4/5] kvm: Replace vcpu->swait with rcuwait
-To: Peter Zijlstra <peterz@infradead.org>
-References: <20200422040739.18601-1-dave@stgolabs.net>
- <20200422040739.18601-5-dave@stgolabs.net> <20200423094140.69909bbb@why>
- <f07f6f55-9339-04b0-3877-d3240abd6d9c@redhat.com>
- <20200423091911.GP20730@hirez.programming.kicks-ass.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a1e2aa6-64b2-f642-1e19-d3f5684d70b3@redhat.com>
-Date: Thu, 23 Apr 2020 11:26:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ bh=+r/PR2FbN4xLG8Nok2HJ4M/QJoOCF0Nk3Bss40sN0xs=;
+ b=NouqzbRNU0NtRrqjYHfw+/WBOocxOD7emRBy8+WtupinH1n2ksqncPmN2RWmtHCW4Slcwv
+ Pylx1nxegLSqTrgXAkRKaJIMrtukm1/EoGxYBzn2rkqS3nzCsGdhHCiJe5zZKEKwzrBqRb
+ KQdnNU45+wHkvERAscbdGcXDvxM+bq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-AkzxH94nMVKFKkFx37Ew_w-1; Thu, 23 Apr 2020 06:39:20 -0400
+X-MC-Unique: AkzxH94nMVKFKkFx37Ew_w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07DD5835B41;
+ Thu, 23 Apr 2020 10:39:17 +0000 (UTC)
+Received: from gondolin (ovpn-112-121.ams2.redhat.com [10.36.112.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11C6260608;
+ Thu, 23 Apr 2020 10:39:03 +0000 (UTC)
+Date: Thu, 23 Apr 2020 12:39:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
+Message-ID: <20200423123901.72a4c6a4.cohuck@redhat.com>
+In-Reply-To: <5e1e126d-f1b0-196c-594b-4289d0afb9a8@linux.alibaba.com>
+References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
+ <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
+ <20200422154543.2efba3dd.cohuck@redhat.com>
+ <dc5e0fa3-558b-d606-bda9-ed281cf9e9ae@de.ibm.com>
+ <20200422180403.03f60b0c.cohuck@redhat.com>
+ <5e1e126d-f1b0-196c-594b-4289d0afb9a8@linux.alibaba.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200423091911.GP20730@hirez.programming.kicks-ass.net>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: Davidlohr Bueso <dave@stgolabs.net>, kvm@vger.kernel.org,
- Davidlohr Bueso <dbueso@suse.de>, Marc Zyngier <maz@kernel.org>,
- bigeasy@linutronix.de, linux-kernel@vger.kernel.org, rostedt@goodmis.org,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- will@kernel.org, joel@joelfernandes.org, tglx@linutronix.de,
- torvalds@linux-foundation.org, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
+ benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
+ linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ frankja@linux.ibm.com, maz@kernel.org, joro@8bytes.org, x86@kernel.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, mingo@redhat.com,
+ thuth@redhat.com, gor@linux.ibm.com, kvm-ppc@vger.kernel.org, bp@alien8.de,
+ tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, jmattson@google.com,
+ tsbogend@alpha.franken.de, sean.j.christopherson@intel.com,
+ linux-kernel@vger.kernel.org, mpe@ellerman.id.au, pbonzini@redhat.com,
+ vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -119,25 +106,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 23/04/20 11:19, Peter Zijlstra wrote:
->>
->> 1) Davidlohr, please post only patches 1-3 to "equalize" the swait and
->> rcuwait APIs.
->>
->> 2) Peter, please prepare a topic branch for those, or provide Acked-by
-> I don't think I have anything that conflicts with this, so sure, take
-> the whole thing through KVM.
-> 
-> For 1-3 (and I'll send a small niggle for 3 right after this):
-> 
-> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+On Thu, 23 Apr 2020 11:01:43 +0800
+Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
 
-Great thanks.  I assume you have no issue with rcuwait_active either.
-
-Paolo
-
-> I'll keep 5 as it is unrelated.
+> On 2020/4/23 0:04, Cornelia Huck wrote:
+> > On Wed, 22 Apr 2020 17:58:04 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 22.04.20 15:45, Cornelia Huck wrote:  
+> >>> On Wed, 22 Apr 2020 20:58:04 +0800
+> >>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
+> >>>      
+> >>>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> >>>> structure. Earlier than historical reasons, many kvm-related function  
+> >>>
+> >>> s/Earlier than/For/ ?
+> >>>      
+> >>>> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+> >>>> This patch does a unified cleanup of these remaining redundant parameters.
+> >>>>
+> >>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> >>>> ---
+> >>>>   arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
+> >>>>   1 file changed, 22 insertions(+), 15 deletions(-)
+> >>>>
+> >>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> >>>> index e335a7e5ead7..d7bb2e7a07ff 100644
+> >>>> --- a/arch/s390/kvm/kvm-s390.c
+> >>>> +++ b/arch/s390/kvm/kvm-s390.c
+> >>>> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+> >>>>   	return rc;
+> >>>>   }
+> >>>>   
+> >>>> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> >>>> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+> >>>>   {
+> >>>> +	struct kvm_run *kvm_run = vcpu->run;
+> >>>>   	struct runtime_instr_cb *riccb;
+> >>>>   	struct gs_cb *gscb;
+> >>>>   
+> >>>> @@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> >>>>   		}
+> >>>>   		if (vcpu->arch.gs_enabled) {
+> >>>>   			current->thread.gs_cb = (struct gs_cb *)
+> >>>> -						&vcpu->run->s.regs.gscb;
+> >>>> +						&kvm_run->s.regs.gscb;  
+> >>>
+> >>> Not sure if these changes (vcpu->run-> => kvm_run->) are really worth
+> >>> it. (It seems they amount to at least as much as the changes advertised
+> >>> in the patch description.)
+> >>>
+> >>> Other opinions?  
+> >>
+> >> Agreed. It feels kind of random. Maybe just do the first line (move kvm_run from the
+> >> function parameter list into the variable declaration)? Not sure if this is better.
+> >>  
+> > 
+> > There's more in this patch that I cut... but I think just moving
+> > kvm_run from the parameter list would be much less disruptive.
+> >   
 > 
+> I think there are two kinds of code(`vcpu->run->` and `kvm_run->`), but 
+> there will be more disruptive, not less.
+
+I just fail to see the benefit; sure, kvm_run-> is convenient, but the
+current code is just fine, and any rework should be balanced against
+the cost (e.g. cluttering git annotate).
 
 _______________________________________________
 kvmarm mailing list
