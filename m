@@ -2,59 +2,81 @@ Return-Path: <SRS0=H2W4=6I=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE16C54FCB
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Apr 2020 13:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018D4C55191
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Apr 2020 13:40:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84D602084D
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Apr 2020 13:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84D602084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
+	by mail.kernel.org (Postfix) with ESMTP id AF13720767
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Apr 2020 13:40:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSuoz731"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF13720767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D02E4B250;
-	Fri, 24 Apr 2020 09:40:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 687284B24C;
+	Fri, 24 Apr 2020 09:40:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bAHqSWbcJ4TW; Fri, 24 Apr 2020 09:40:40 -0400 (EDT)
+	with ESMTP id nTbJmc2l-rkX; Fri, 24 Apr 2020 09:40:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 909E14B240;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C531E4B25B;
 	Fri, 24 Apr 2020 09:40:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9824B286
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 01:52:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8FAD4B25C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 08:25:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hUsumi1zEGK0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Apr 2020 01:52:33 -0400 (EDT)
-Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D34D84B281
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 01:52:32 -0400 (EDT)
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id E23BBAEB9;
- Fri, 24 Apr 2020 05:52:29 +0000 (UTC)
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: tglx@linutronix.de,
-	pbonzini@redhat.com
-Subject: [PATCH 5/5] kvm: Replace vcpu->swait with rcuwait
-Date: Thu, 23 Apr 2020 22:48:37 -0700
-Message-Id: <20200424054837.5138-6-dave@stgolabs.net>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200424054837.5138-1-dave@stgolabs.net>
-References: <20200424054837.5138-1-dave@stgolabs.net>
+ with ESMTP id coww-k0qAEOd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Apr 2020 08:25:27 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BC974B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 08:25:27 -0400 (EDT)
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com
+ [209.85.166.53])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 703C721473
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 12:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587731126;
+ bh=At8xmfKBJxQ9CafuQrxhSF7RQSm74iu7lK9/pffz/Kk=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=hSuoz731MrEwMi2PEd3c9/Zupwr84KMTfGVXuHRXhm9aYcqRY78XoDs+Mpcsx3yqj
+ FY7Q37+129/tYtL2RZlzP0k3Pks6aQ6AAO2WWK9PoTkIpeGmMvZcI65R2iR/2l0ieX
+ c0Bqu6hvqyghzrOyJIAUYtUacnE0LgptmtjJcXQg=
+Received: by mail-io1-f53.google.com with SMTP id f19so10131706iog.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2020 05:25:26 -0700 (PDT)
+X-Gm-Message-State: AGi0PuaM/upjxLC+YFJA1J3gUSVzZuIqJcgxgmEk2S5RC6+nsr8PYaEZ
+ ooMI+JE7wpVxPVajGBMuKKFai8r2wViAYzAiCKs=
+X-Google-Smtp-Source: APiQypJc/nkscRMyfcPd01oltQYjyEJquNAjGFcmgHSSoISonFfv+XMnS8tZSLIDvipgwz2NbSPAKVS/Gu9zhzUEeD4=
+X-Received: by 2002:a6b:ef03:: with SMTP id k3mr8349793ioh.203.1587731125790; 
+ Fri, 24 Apr 2020 05:25:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200423173844.24220-1-andre.przywara@arm.com>
+ <CAMj1kXGDjzLA3sZg33EK2RVrSmYGuCm4cZ0Y9X=ZLxN8R--7=g@mail.gmail.com>
+ <CAMj1kXEjckV3HzcX_XXTSn-tDDQ5H8=LgteDcP5USThn=OgTQg@mail.gmail.com>
+ <9e742184-86c1-a4be-c2cb-fe96979e0f1f@arm.com>
+ <CAMj1kXGMHfENDCkAyPCvS0avaYGOVbjDkPi964L3y0DVvz8m8A@mail.gmail.com>
+ <df9a0aeb-39ed-f9bc-c506-71d2f134bc62@arm.com>
+In-Reply-To: <df9a0aeb-39ed-f9bc-c506-71d2f134bc62@arm.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 24 Apr 2020 14:25:14 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEr0fVVG1xCxEJtcrrKe3_OYbOmAmbYy0TceSeX+3gfww@mail.gmail.com>
+Message-ID: <CAMj1kXEr0fVVG1xCxEJtcrrKe3_OYbOmAmbYy0TceSeX+3gfww@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v4 0/5] Add CFI flash emulation
+To: =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
 X-Mailman-Approved-At: Fri, 24 Apr 2020 09:40:38 -0400
-Cc: dave@stgolabs.net, kvm@vger.kernel.org, will@kernel.org,
- Davidlohr Bueso <dbueso@suse.de>, peterz@infradead.org, maz@kernel.org,
- bigeasy@linutronix.de, linux-kernel@vger.kernel.org, rostedt@goodmis.org,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- joel@joelfernandes.org, torvalds@linux-foundation.org,
- kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Raphael Gault <raphael.gault@arm.com>,
+ Sami Mujawar <sami.mujawar@arm.com>, Leif Lindholm <leif@nuviainc.com>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,380 +88,99 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The use of any sort of waitqueue (simple or regular) for
-wait/waking vcpus has always been an overkill and semantically
-wrong. Because this is per-vcpu (which is blocked) there is
-only ever a single waiting vcpu, thus no need for any sort of
-queue.
-
-As such, make use of the rcuwait primitive, with the following
-considerations:
-
-  - rcuwait already provides the proper barriers that serialize
-  concurrent waiter and waker.
-
-  - Task wakeup is done in rcu read critical region, with a
-  stable task pointer.
-
-  - Because there is no concurrency among waiters, we need
-  not worry about rcuwait_wait_event() calls corrupting
-  the wait->task. As a consequence, this saves the locking
-  done in swait when modifying the queue. This also applies
-  to per-vcore wait for powerpc kvm-hv.
-
-The x86 tscdeadline_latency test mentioned in 8577370fb0cb
-("KVM: Use simple waitqueue for vcpu->wq") shows that, on avg,
-latency is reduced by around 15-20% with this change.
-
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-mips@vger.kernel.org
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
----
- arch/mips/kvm/mips.c                  |  6 ++----
- arch/powerpc/include/asm/kvm_book3s.h |  2 +-
- arch/powerpc/include/asm/kvm_host.h   |  2 +-
- arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++--------------
- arch/powerpc/kvm/powerpc.c            |  2 +-
- arch/x86/kvm/lapic.c                  |  2 +-
- include/linux/kvm_host.h              | 10 +++++-----
- virt/kvm/arm/arch_timer.c             |  3 ++-
- virt/kvm/arm/arm.c                    |  9 +++++----
- virt/kvm/async_pf.c                   |  3 +--
- virt/kvm/kvm_main.c                   | 19 +++++++++----------
- 11 files changed, 36 insertions(+), 44 deletions(-)
-
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 8f05dd0a0f4e..fad6acce46e4 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -284,8 +284,7 @@ static enum hrtimer_restart kvm_mips_comparecount_wakeup(struct hrtimer *timer)
- 	kvm_mips_callbacks->queue_timer_int(vcpu);
- 
- 	vcpu->arch.wait = 0;
--	if (swq_has_sleeper(&vcpu->wq))
--		swake_up_one(&vcpu->wq);
-+	rcuwait_wake_up(&vcpu->wait);
- 
- 	return kvm_mips_count_timeout(vcpu);
- }
-@@ -511,8 +510,7 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 
- 	dvcpu->arch.wait = 0;
- 
--	if (swq_has_sleeper(&dvcpu->wq))
--		swake_up_one(&dvcpu->wq);
-+	rcuwait_wake_up(&dvcpu->wait);
- 
- 	return 0;
- }
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index 506e4df2d730..6e5d85ba588d 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -78,7 +78,7 @@ struct kvmppc_vcore {
- 	struct kvm_vcpu *runnable_threads[MAX_SMT_THREADS];
- 	struct list_head preempt_list;
- 	spinlock_t lock;
--	struct swait_queue_head wq;
-+	struct rcuwait wait;
- 	spinlock_t stoltb_lock;	/* protects stolen_tb and preempt_tb */
- 	u64 stolen_tb;
- 	u64 preempt_tb;
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 1dc63101ffe1..337047ba4a56 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -751,7 +751,7 @@ struct kvm_vcpu_arch {
- 	u8 irq_pending; /* Used by XIVE to signal pending guest irqs */
- 	u32 last_inst;
- 
--	struct swait_queue_head *wqp;
-+	struct rcuwait *waitp;
- 	struct kvmppc_vcore *vcore;
- 	int ret;
- 	int trap;
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 93493f0cbfe8..b8d42f523ca7 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -230,13 +230,11 @@ static bool kvmppc_ipi_thread(int cpu)
- static void kvmppc_fast_vcpu_kick_hv(struct kvm_vcpu *vcpu)
- {
- 	int cpu;
--	struct swait_queue_head *wqp;
-+	struct rcuwait *wait;
- 
--	wqp = kvm_arch_vcpu_wq(vcpu);
--	if (swq_has_sleeper(wqp)) {
--		swake_up_one(wqp);
-+	wait = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(wait))
- 		++vcpu->stat.halt_wakeup;
--	}
- 
- 	cpu = READ_ONCE(vcpu->arch.thread_cpu);
- 	if (cpu >= 0 && kvmppc_ipi_thread(cpu))
-@@ -2125,7 +2123,7 @@ static struct kvmppc_vcore *kvmppc_vcore_create(struct kvm *kvm, int id)
- 
- 	spin_lock_init(&vcore->lock);
- 	spin_lock_init(&vcore->stoltb_lock);
--	init_swait_queue_head(&vcore->wq);
-+	rcuwait_init(&vcore->wait);
- 	vcore->preempt_tb = TB_NIL;
- 	vcore->lpcr = kvm->arch.lpcr;
- 	vcore->first_vcpuid = id;
-@@ -3784,7 +3782,6 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	ktime_t cur, start_poll, start_wait;
- 	int do_sleep = 1;
- 	u64 block_ns;
--	DECLARE_SWAITQUEUE(wait);
- 
- 	/* Poll for pending exceptions and ceded state */
- 	cur = start_poll = ktime_get();
-@@ -3812,10 +3809,7 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 		}
- 	}
- 
--	prepare_to_swait_exclusive(&vc->wq, &wait, TASK_INTERRUPTIBLE);
--
- 	if (kvmppc_vcore_check_block(vc)) {
--		finish_swait(&vc->wq, &wait);
- 		do_sleep = 0;
- 		/* If we polled, count this as a successful poll */
- 		if (vc->halt_poll_ns)
-@@ -3828,8 +3822,8 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	vc->vcore_state = VCORE_SLEEPING;
- 	trace_kvmppc_vcore_blocked(vc, 0);
- 	spin_unlock(&vc->lock);
--	schedule();
--	finish_swait(&vc->wq, &wait);
-+	rcuwait_wait_event(&vc->wait,
-+			   kvmppc_vcore_check_block(vc), TASK_INTERRUPTIBLE);
- 	spin_lock(&vc->lock);
- 	vc->vcore_state = VCORE_INACTIVE;
- 	trace_kvmppc_vcore_blocked(vc, 1);
-@@ -3940,7 +3934,7 @@ static int kvmppc_run_vcpu(struct kvm_run *kvm_run, struct kvm_vcpu *vcpu)
- 			kvmppc_start_thread(vcpu, vc);
- 			trace_kvm_guest_enter(vcpu);
- 		} else if (vc->vcore_state == VCORE_SLEEPING) {
--			swake_up_one(&vc->wq);
-+		        rcuwait_wake_up(&vc->wait);
- 		}
- 
- 	}
-@@ -4279,7 +4273,7 @@ static int kvmppc_vcpu_run_hv(struct kvm_run *run, struct kvm_vcpu *vcpu)
- 	}
- 	user_vrsave = mfspr(SPRN_VRSAVE);
- 
--	vcpu->arch.wqp = &vcpu->arch.vcore->wq;
-+	vcpu->arch.waitp = &vcpu->arch.vcore->wait;
- 	vcpu->arch.pgdir = kvm->mm->pgd;
- 	vcpu->arch.state = KVMPPC_VCPU_BUSY_IN_HOST;
- 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index e15166b0a16d..4a074b587520 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -751,7 +751,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	if (err)
- 		goto out_vcpu_uninit;
- 
--	vcpu->arch.wqp = &vcpu->wq;
-+	vcpu->arch.waitp = &vcpu->wait;
- 	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
- 	return 0;
- 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 9af25c97612a..54345dc645ba 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1833,7 +1833,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
- 	/* If the preempt notifier has already run, it also called apic_timer_expired */
- 	if (!apic->lapic_timer.hv_timer_in_use)
- 		goto out;
--	WARN_ON(swait_active(&vcpu->wq));
-+	WARN_ON(rcuwait_active(&vcpu->wait));
- 	cancel_hv_timer(apic);
- 	apic_timer_expired(apic);
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6d58beb65454..fc34021546bd 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -23,7 +23,7 @@
- #include <linux/irqflags.h>
- #include <linux/context_tracking.h>
- #include <linux/irqbypass.h>
--#include <linux/swait.h>
-+#include <linux/rcuwait.h>
- #include <linux/refcount.h>
- #include <linux/nospec.h>
- #include <asm/signal.h>
-@@ -277,7 +277,7 @@ struct kvm_vcpu {
- 	struct mutex mutex;
- 	struct kvm_run *run;
- 
--	struct swait_queue_head wq;
-+	struct rcuwait wait;
- 	struct pid __rcu *pid;
- 	int sigset_active;
- 	sigset_t sigset;
-@@ -956,12 +956,12 @@ static inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
- }
- #endif
- 
--static inline struct swait_queue_head *kvm_arch_vcpu_wq(struct kvm_vcpu *vcpu)
-+static inline struct rcuwait *kvm_arch_vcpu_get_wait(struct kvm_vcpu *vcpu)
- {
- #ifdef __KVM_HAVE_ARCH_WQP
--	return vcpu->arch.wqp;
-+	return vcpu->arch.waitp;
- #else
--	return &vcpu->wq;
-+	return &vcpu->wait;
- #endif
- }
- 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 93bd59b46848..d5024416e722 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -571,6 +571,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
- 	struct timer_map map;
-+	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 
- 	if (unlikely(!timer->enabled))
- 		return;
-@@ -593,7 +594,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (map.emul_ptimer)
- 		soft_timer_cancel(&map.emul_ptimer->hrtimer);
- 
--	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
-+	if (rcuwait_active(wait))
- 		kvm_timer_blocking(vcpu);
- 
- 	/*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 48d0ec44ad77..479f36d02418 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -579,16 +579,17 @@ void kvm_arm_resume_guest(struct kvm *kvm)
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		vcpu->arch.pause = false;
--		swake_up_one(kvm_arch_vcpu_wq(vcpu));
-+		rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
- 	}
- }
- 
- static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
- {
--	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
-+	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
- 
--	swait_event_interruptible_exclusive(*wq, ((!vcpu->arch.power_off) &&
--				       (!vcpu->arch.pause)));
-+	rcuwait_wait_event(wait,
-+			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
-+			   TASK_INTERRUPTIBLE);
- 
- 	if (vcpu->arch.power_off || vcpu->arch.pause) {
- 		/* Awaken to handle a signal, request we sleep again later. */
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index 15e5b037f92d..10b533f641a6 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -80,8 +80,7 @@ static void async_pf_execute(struct work_struct *work)
- 
- 	trace_kvm_async_pf_completed(addr, cr2_or_gpa);
- 
--	if (swq_has_sleeper(&vcpu->wq))
--		swake_up_one(&vcpu->wq);
-+	rcuwait_wake_up(&vcpu->wait);
- 
- 	mmput(mm);
- 	kvm_put_kvm(vcpu->kvm);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 74bdb7bf3295..f027ae3598e8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -341,7 +341,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 	vcpu->kvm = kvm;
- 	vcpu->vcpu_id = id;
- 	vcpu->pid = NULL;
--	init_swait_queue_head(&vcpu->wq);
-+	rcuwait_init(&vcpu->wait);
- 	kvm_async_pf_vcpu_init(vcpu);
- 
- 	vcpu->pre_pcpu = -1;
-@@ -2671,7 +2671,6 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
- void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- {
- 	ktime_t start, cur;
--	DECLARE_SWAITQUEUE(wait);
- 	bool waited = false;
- 	u64 block_ns;
- 
-@@ -2697,8 +2696,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 		} while (single_task_running() && ktime_before(cur, stop));
- 	}
- 
-+	prepare_to_rcuwait(&vcpu->wait);
- 	for (;;) {
--		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
-+		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		if (kvm_vcpu_check_block(vcpu) < 0)
- 			break;
-@@ -2706,8 +2706,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 		waited = true;
- 		schedule();
- 	}
--
--	finish_swait(&vcpu->wq, &wait);
-+	finish_rcuwait(&vcpu->wait);
- 	cur = ktime_get();
- out:
- 	kvm_arch_vcpu_unblocking(vcpu);
-@@ -2738,11 +2737,10 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_block);
- 
- bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
- {
--	struct swait_queue_head *wqp;
-+	struct rcuwait *wait;
- 
--	wqp = kvm_arch_vcpu_wq(vcpu);
--	if (swq_has_sleeper(wqp)) {
--		swake_up_one(wqp);
-+	wait = kvm_arch_vcpu_get_wait(vcpu);
-+	if (rcuwait_wake_up(wait)) {
- 		WRITE_ONCE(vcpu->ready, true);
- 		++vcpu->stat.halt_wakeup;
- 		return true;
-@@ -2884,7 +2882,8 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 				continue;
- 			if (vcpu == me)
- 				continue;
--			if (swait_active(&vcpu->wq) && !vcpu_dy_runnable(vcpu))
-+			if (rcuwait_active(&vcpu->wait) &&
-+			    !vcpu_dy_runnable(vcpu))
- 				continue;
- 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
- 				!kvm_arch_vcpu_in_kernel(vcpu))
--- 
-2.16.4
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gRnJpLCAyNCBBcHIgMjAyMCBhdCAxNDowOCwgQW5kcsOpIFByenl3YXJhIDxhbmRyZS5wcnp5
+d2FyYUBhcm0uY29tPiB3cm90ZToKPgo+IE9uIDI0LzA0LzIwMjAgMDc6NDUsIEFyZCBCaWVzaGV1
+dmVsIHdyb3RlOgo+Cj4gSGksCj4KPiAoYWRkaW5nIExlaWYgZm9yIEVESy0yIGRpc2N1c3Npb24p
+Cj4KPiA+IE9uIFRodSwgMjMgQXByIDIwMjAgYXQgMjM6MzIsIEFuZHLDqSBQcnp5d2FyYSA8YW5k
+cmUucHJ6eXdhcmFAYXJtLmNvbT4gd3JvdGU6Cj4gPj4KPiA+PiBPbiAyMy8wNC8yMDIwIDIxOjQz
+LCBBcmQgQmllc2hldXZlbCB3cm90ZToKPgo+IFsgLi4uIGt2bXRvb2wgc2VyaWVzIHRvIGFkZCBD
+RkkgZmxhc2ggZW11bGF0aW9uIGFsbG93aW5nIEVESy0yIHRvIHN0b3JlCj4gdmFyaWFibGVzLiBT
+dGFydGluZyB3aXRoIHRoaXMgdmVyc2lvbiAodjQpIHRoZSBmbGFzaCBtZW1vcnkgcmVnaW9uIGlz
+Cj4gcHJlc2VudGVkIGFzIGEgcmVhZC1vbmx5IG1lbXNsb3QgdG8gS1ZNLCB0byBhbGxvdyBkaXJl
+Y3QgZ3Vlc3QgYWNjZXNzZXMKPiBhcyBvcHBvc2VkIHRvIHRyYXAtYW5kLWVtdWxhdGUgZXZlbiBy
+ZWFkIGFjY2Vzc2VzIHRvIHRoZSBhcnJheS5dCj4KPiA+Pgo+ID4+Cj4gPj4gSnVzdCBjdXJpb3Vz
+OiB0aGUgaW1hZ2VzIFNhbWkgZ2F2ZSBtZSB0aGlzIG1vcm5pbmcgZGlkIG5vdCBzaG93IGFueQo+
+ID4+IGlzc3VlcyBhbnltb3JlIChubyBuby1zeW5kcm9tZSBmYXVsdCwgbm8gYWxpZ25tZW50IGlz
+c3VlcyksIGV2ZW4gd2l0aG91dAo+ID4+IHRoZSBtYXBwaW5nIFsxXS4gQW5kIGV2ZW4gdGhvdWdo
+IEkgc2F3IHRoZSA4MDBrIHJlYWQgdHJhcHMsIEkgZGlkbid0Cj4gPj4gbm90aWNlIGFueSByZWFs
+IHBlcmZvcm1hbmNlIGRpZmZlcmVuY2UgKG9uIGEgSnVubykuIFRoZSBQWEUgdGltZW91dCB3YXMK
+PiA+PiBkZWZpbml0ZWx5IG11Y2ggbW9yZSBub3RpY2VhYmxlLgo+ID4+Cj4gPj4gU28gZGlkIHlv
+dSBzZWUgYW55IHBlcmZvcm1hbmNlIGltcGFjdCB3aXRoIHRoaXMgc2VyaWVzPwo+ID4+Cj4gPgo+
+ID4gWW91IG5vcm1hbGx5IGRvbid0IFBYRSBib290LiBUaGVyZSBpcyBhbiBpc3N1ZSB3aXRoIHRo
+ZSBpU0NTSSBkcml2ZXIKPiA+IGFzIHdlbGwsIHdoaWNoIGNhdXNlcyBhIGJvb3QgZGVsYXkgZm9y
+IHNvbWUgcmVhc29uLCBzbyBJIGRpc2FibGVkIHRoYXQKPiA+IGluIG15IGJ1aWxkLgo+ID4KPiA+
+IEkgZGVmaW5pdGVseSAqZmVlbHMqIGZhc3RlciA6LSkgQnV0IGluIGFueSBjYXNlLCBleHBvc2lu
+ZyB0aGUgYXJyYXkKPiA+IG1vZGUgYXMgYSByL28gbWVtc2xvdCBpcyBkZWZpbml0ZWx5IHRoZSBy
+aWdodCB3YXkgdG8gZGVhbCB3aXRoIHRoaXMuCj4gPiBFdmVuIGlmIFNhbWkgZGlkIGZpbmQgYSB3
+b3JrYXJvdW5kIHRoYXQgbWFza3MgdGhlIGVycm9yLCBpdCBpcyBubwo+ID4gZ3VhcmFudGVlIHRo
+YXQgYWxsIGFjY2Vzc2VzIGdvIHRocm91Z2ggdGhhdCBsaWJyYXJ5Lgo+Cj4gU28gSSB3YXMgd29u
+ZGVyaW5nIGFib3V0IHRoaXMsIG1heWJlIHlvdSBjYW4gY29uZmlybSBvciBkZWJ1bmsgdGhpczoK
+PiAtIEFueSBtZW1vcnkgZ2l2ZW4gdG8gdGhlIGNvbXBpbGVyICh0aHJvdWdoIGEgcG9pbnRlcikg
+aXMgYXNzdW1lZCB0byBiZQo+ICJub3JtYWwiIG1lbW9yeTogdGhlIGNvbXBpbGVyIGNhbiByZS1h
+cnJhbmdlIGFjY2Vzc2VzLCBzcGxpdCB0aGVtIHVwIG9yCj4gY29sbGF0ZSB0aGVtLiBBbHNvIHVu
+YWxpZ25lZCBhY2Nlc3NlcyBzaG91bGQgYmUgYWxsb3dlZCAtIGFsdGhvdWdoIEkKPiBndWVzcyBt
+b3N0IGNvbXBpbGVycyB3b3VsZCBhdm9pZCB0aGVtLgo+IC0gVGhpcyBub3JtYWxseSBmb3JiaWRz
+IHRvIGdpdmUgYSBwb2ludGVyIHRvIG1lbW9yeSBtYXBwZWQgYXMgImRldmljZQo+IG1lbW9yeSIg
+dG8gdGhlIGNvbXBpbGVyLCBzaW5jZSB0aGlzIHdvdWxkIHZpb2xhdGUgYWxsIG9mIHRoZSBhc3N1
+bXB0aW9ucwo+IGFib3ZlLgo+IC0gSWYgdGhlIGRldmljZSBtYXBwZWQgYXMgImRldmljZSBtZW1v
+cnkiIGlzIGFjdHVhbGx5IG1lbW9yeSAoU1JBTSwKPiBST00vZmxhc2gsIGZyYW1lYnVmZmVyKSwg
+dGhlbiBtb3N0IG9mIHRoZSBhc3N1bXB0aW9ucyBhcmUgbWV0LCBleGNlcHQKPiB0aGUgYWxpZ25t
+ZW50IHJlcXVpcmVtZW50LCB3aGljaCBpcyBib3VuZCB0byB0aGUgbWFwcGluZyB0eXBlLCBub3Qg
+dGhlCj4gYWN0dWFsIGRldmljZSAoQVJNdjggQVJNOiBVbmFsaWduZWQgYWNjZXNzZXMgdG8gZGV2
+aWNlIG1lbW9yeSBhbHdheXMKPiB0cmFwLCByZWdhcmRsZXNzIG9mIFNDVExSLkEpCj4gLSBUbyBh
+Y2NvbW1vZGF0ZSB0aGUgbGF0dGVyLCBHQ0Mga25vd3MgdGhlIG9wdGlvbiAtbWFsaWduLXN0cmlj
+dCwgdG8KPiBhdm9pZCB1bmFsaWduZWQgYWNjZXNzZXMuIFRGLUEgYW5kIFUtQm9vdCB1c2UgdGhp
+cyBvcHRpb24sIHRvIHJ1bgo+IHdpdGhvdXQgdGhlIE1NVSBlbmFibGVkLgo+Cj4gTm93IGlmIEVE
+Sy0yIGxldHMgdGhlIGNvbXBpbGVyIGRlYWwgd2l0aCB0aGUgZmxhc2ggbWVtb3J5IHJlZ2lvbgo+
+IGRpcmVjdGx5LCBJIHRoaW5rIHRoaXMgd291bGQgc3RpbGwgYmUgcHJvbmUgdG8gYWxpZ25tZW50
+IGZhdWx0cy4gSW4gZmFjdAo+IGFuIGVhcmxpZXIgYnVpbGQgSSBnb3QgZnJvbSBTYW1pIGZhdWx0
+ZWQgb24gZXhhY3RseSB0aGF0LCB3aGVuIEkgcmFuIGl0LAo+IGV2ZW4gd2l0aCB0aGUgci9vIG1l
+bXNsb3QgbWFwcGluZyBpbiBwbGFjZS4KPgo+IFNvIHNob3VsZCBFREstMiBhZGQgLW1hbGlnbi1z
+dHJpY3QgdG8gYmUgc2FmZT8KCkl0IGFscmVhZHkgdXNlcyB0aGlzIGluIHZhcmlvdXMgcGxhY2Vz
+IHdoZXJlIGl0IG1hdHRlcnMuCgo+ICAgICAgICAgb3IKPiBTaG91bGQgRURLLTIgYWRkIGFuIGFk
+ZGl0aW9uYWwgb3IgYWx0ZXJuYXRlIG1hcHBpbmcgdXNpbmcgYSBub24tZGV2aWNlCj4gbWVtb3J5
+IHR5cGUgKHdpdGggYWxsIHRoZSBtaXNtYXRjaGVkIGF0dHJpYnV0ZXMgY29uc2VxdWVuY2VzKT8K
+ClRoZSBtZW1vcnkgbWFwcGVkIE5PUiBmbGFzaCBpbiBVRUZJIGlzIHJlYWxseSBhIHNwZWNpYWwg
+Y2FzZSwgc2luY2Ugd2UKbmVlZCB0aGUgT1MgdG8gbWFwIGl0IGZvciB1cyBhdCBydW50aW1lLCBh
+bmQgd2UgY2Fubm90IHRlbGwgaXQgdG8Kc3dpdGNoIGJldHdlZW4gbm9ybWFsLU5DIGFuZCBkZXZp
+Y2UgYXR0cmlidXRlcyBkZXBlbmRpbmcgb24gd2hpY2ggbW9kZQp0aGUgZmlybXdhcmUgaXMgdXNp
+bmcgaXQgaW4uCgpOb3RlIHRoYXQgdGhpcyBpcyBub3QgYW55IGRpZmZlcmVudCBvbiBiYXJlIG1l
+dGFsLgoKPiAgICAgICAgIG9yCj4gU2hvdWxkIEVESy0yIG9ubHkgdG91Y2ggdGhlIGZsYXNoIHJl
+Z2lvbiB1c2luZyBNTUlPIGFjY2Vzc29ycywgYW5kCj4gZm9yYmlkIHRoZSBjb21waWxlciBkaXJl
+Y3QgYWNjZXNzIHRvIHRoYXQgcmVnaW9uPwo+CgpJdCBzaG91bGQgb25seSB0b3VjaCB0aG9zZSBy
+ZWdpb25zIHVzaW5nIGFic3RyYWN0aW9ucyBpdCBkZWZpbmVzCml0c2VsZiwgYW5kIHdoaWNoIGNh
+biBiZSBiYWNrZWQgaW4gZGlmZmVyZW50IHdheXMuIFRoaXMgaXMgYWxyZWFkeSB0aGUKY2FzZSBp
+biBFREsyOiBpdCBoYXMgaXRzIG93biBDb3B5TWVtLCBaZXJvTWVtLCBldGMgc3RyaW5nIGxpYnJh
+cnksIGFuZApiYW5zIHRoZSB1c2UgdGhlIHN0YW5kYXJkIEMgb25lcy4gT24gdG9wIG9mIHRoYXQs
+IGl0IGJhbnMgc3RydWN0CmFzc2lnbm1lbnQsIGluaXRpYWxpemVycyBmb3IgYXV0b21hdGljIHZh
+cmlhYmxlcyBhbmQgYXJlIHRoaW5ncyB0aGF0CnJlc3VsdCBpbiBzdWNoIGNhbGxzIHRvIGJlIGVt
+aXR0ZWQgaW1wbGljaXRseS4KClNvIGluIHByYWN0aWNlLCB0aGlzIGlzc3VlIGlzIHVuZGVyIGNv
+bnRyb2wsIHVubGVzcyB5b3UgdXNlIGEgdmVyc2lvbgpvZiB0aG9zZSBhYnN0cmFjdGlvbnMgdGhh
+dCB3aWxsaW5nbHkgdXNlcyB1bmFsaWduZWQgYWNjZXNzZXMgKHdlIGhhdmUKb3B0aW1pemVkIHZl
+cnNpb25zIGJhc2VkIG9uIHRoZSBjb3J0ZXgtc3RyaW5ncyBsaWJyYXJ5KS4gU28gbXkKc3VzcGlj
+aW9uIGlzIHRoYXQgdGhpcyBtYXkgaGF2ZSBjYXVzZWQgdGhlIGNyYXNoOiBvbiBiYXJlIG1ldGFs
+LCB3ZQpoYXZlIHRvIHN3aXRjaCB0byB0aGUgbm9uLW9wdGltaXplZCBzdHJpbmcgbGlicmFyeSBm
+b3IgdGhlIHZhcmlhYmxlCmRyaXZlciBmb3IgdGhpcyByZWFzb24uCgpUaGUgcmVhbCBzb2x1dGlv
+biBpcyB0byBmaXggRURLMiwgYW5kIG1ha2UgdGhlIHZhcmlhYmxlIHN0YWNrIHdvcmsKd2l0aCBO
+T1IgZmxhc2ggdGhhdCBpcyBub24tbWVtb3J5IG1hcHBlZC4gVGhpcyBpcyBzb21ldGhpbmcgdGhh
+dCBoYXMKY29tZSB1cCBiZWZvcmUsIGFuZCB0aGUgb3RoZXIgZGF5LCBTYW1pIGFuZCBJIHdlcmUg
+anVzdCBkaXNjdXNzaW5nCmxvZ2dpbmcgdGhpcyBhcyBhIHdpc2hsaXN0IGl0ZW0gZm9yIHRoZSBm
+aXJtd2FyZSB0ZWFtLgoKCj4gU28gZG9lcyBFREstMiBnZXQgYXdheSB3aXRoIHRoaXMgYmVjYXVz
+ZSB0aGUgY29tcGlsZXIgdHlwaWNhbGx5IGF2b2lkcwo+IHVuYWxpZ25lZCBhY2Nlc3Nlcz8KPgoK
+VGhlcmUgYXJlIGNlcnRhaW5seSBzb21lIHBsYWNlcyBpbiB0aGUgY3VycmVudCBjb2RlIGJhc2Ug
+d2hlcmUgaXQgaXMKdGhlIGNvbXBpbGVyIHRoYXQgaXMgZW1pdHRpbmcgcmVhZHMgZnJvbSB0aGUg
+Tk9SIGZsYXNoIHJlZ2lvbiwgYnV0CnRoZXJlIGFyZW4ndCB0aGF0IG1hbnkuIE1vdmluZyB0aGUg
+dmFyaWFibGUgZGF0YSBpdHNlbGYgaW4gYW5kIG91dAp3aWxsIHR5cGljYWxseSB1c2UgdGhlIGFi
+c3RyYWN0aW9ucywgc2luY2UgaXQgaXMgbW92aW5nIGFub255bW91cwpjaHVua3Mgb2YgZGF0YS4g
+SG93ZXZlciwgdGhlcmUgYXJlIHBsYWNlcyB3aGVyZSwgZS5nLiwgZmllbGRzIGluIHRoZQpGUyBt
+ZXRhZGF0YSBhcmUgYmVpbmcgcmVhZCBieSB0aGUgY29kZSwgYW5kIHRoZXJlIGl0IGp1c3QgY2Fz
+dHMgYW4KYWRkcmVzcyBwb2ludGluZyBpbnRvIHRoZSBOT1IgZmxhc2ggcmVnaW9uIHRvIHRoZSBh
+cHByb3ByaWF0ZSBzdHJ1Y3QKdHlwZSwgYW5kIGRlcmVmZXJlbmNlcyB0aGUgZmllbGRzLgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
+ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
+bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
