@@ -2,104 +2,76 @@ Return-Path: <SRS0=i7fx=6J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CC4C55186
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Apr 2020 09:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AFDC55186
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Apr 2020 09:43:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C421D2074F
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Apr 2020 09:26:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E420820714
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Apr 2020 09:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ii2Q4Zvb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C421D2074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pm7FFlsm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E420820714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A5344B293;
-	Sat, 25 Apr 2020 05:26:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B5034B248;
+	Sat, 25 Apr 2020 05:43:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Aqf6kp2WH-kq; Sat, 25 Apr 2020 05:26:33 -0400 (EDT)
+	with ESMTP id KJys6uc5PEhu; Sat, 25 Apr 2020 05:43:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 054CD4B28E;
-	Sat, 25 Apr 2020 05:26:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0BB4B2A0;
+	Sat, 25 Apr 2020 05:43:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63CB74B287
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Apr 2020 05:26:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C48D44B28E
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Apr 2020 05:43:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V2ObY+ujeBxO for <kvmarm@lists.cs.columbia.edu>;
- Sat, 25 Apr 2020 05:26:30 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78CEE4B282
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Apr 2020 05:26:30 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587806790;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EcIayTYvRSnN3LHp4TWg4vfwCvPsVctRGypt1w6ru+g=;
- b=Ii2Q4ZvbwG1jR2LsrUckfTBdsSRwq4nFcjVvPUSeO7eH1yyKPIo0Ta3AUhkYzdcHEwt1pV
- CcM6fs6cnQUd6mE2mkdYitM6L/PznjyulOIgP6r5R6Emdtn0GwRpINf57lxiKD7wjeOjb1
- 8UEwhBz4qu6fUrzDXnRA/UI+j+CnxlA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-_OfRuBl2Ok-rDCzARqYWeg-1; Sat, 25 Apr 2020 05:26:28 -0400
-X-MC-Unique: _OfRuBl2Ok-rDCzARqYWeg-1
-Received: by mail-wr1-f70.google.com with SMTP id a3so6450476wro.1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Apr 2020 02:26:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EcIayTYvRSnN3LHp4TWg4vfwCvPsVctRGypt1w6ru+g=;
- b=Ny/KEr7nnJHmjKy1mCr/ZpHlDBWeatQ+bJfWXtkTJEhhg7mf2PulHCj7KRH82xB7jI
- HLEltGRFCsFlPIgVr4cYV7EIdA+g2U5DUIDvYc6Y+JDXcTttgThEnV2TYTQKbVxPze8Q
- qFPMHcOn7qVL7M0zdM13V6PUfWIvXo/u2LcllLDiDpGyZUixdRyeQh6zHYcqXjWOuJ3X
- GvPfBhTOQBjaOMhgCVv1zWcSjFa/zSx8KegFX6sY4DkRPFJ3VXAzCSSzZwG+H6qVUfvJ
- kdcWysV4ueCqC+3JNL6ykl5qec7bCZLLIHM8Ij+T5mfa3Vp6M0+c0yIYzdMxvw7kClo2
- vh/Q==
-X-Gm-Message-State: AGi0PuZA8D2mNeki2d2sFBTZebE0Lf8d+kU03hLwuHqo6FMsOaBe4s8l
- 4vscR66lIhcZtk/SWlecwHuVfVlkWuwAb/n4YeRDgZBVc6zp7mpC86bGe59mvNwDwIKjtcWPJ+p
- hYQG9w58lTlBgP/KDJZBphY8b
-X-Received: by 2002:a5d:6148:: with SMTP id y8mr15777245wrt.236.1587806787068; 
- Sat, 25 Apr 2020 02:26:27 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJrEPwo8PqkSy+AwbDGziqW7HxlTyJldn8EHJDzRKu+Q7IPdJOabx47EoCj6fSXW6f/LRnEmQ==
-X-Received: by 2002:a5d:6148:: with SMTP id y8mr15777218wrt.236.1587806786753; 
- Sat, 25 Apr 2020 02:26:26 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id j13sm11628472wro.51.2020.04.25.02.26.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 25 Apr 2020 02:26:26 -0700 (PDT)
-Subject: Re: [PATCH v4 1/2] target/arm: kvm: Handle DABT with no valid ISS
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Andrew Jones <drjones@redhat.com>
-References: <20200323113227.3169-1-beata.michalska@linaro.org>
- <20200323113227.3169-2-beata.michalska@linaro.org>
- <CAFEAcA_uWS+cVRk=BKra8AhsD+B1syVzhXeCMttSKwQDdo=j3w@mail.gmail.com>
- <20200417131032.lcyunbjwofsn2nzz@kamzik.brq.redhat.com>
- <20200424121633.GF3106@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d6f4b17c-1202-3aef-320a-247dc0295277@redhat.com>
-Date: Sat, 25 Apr 2020 11:24:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ with ESMTP id RqW-oHP1iffD for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 25 Apr 2020 05:43:32 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AEDD4B248
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Apr 2020 05:43:32 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 39A5220704;
+ Sat, 25 Apr 2020 09:43:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1587807811;
+ bh=zvYrOISsqhXXkpkz+TnXeLEkWvfF6n0Y6JOs4aslC1Y=;
+ h=From:To:Cc:Subject:Date:From;
+ b=pm7FFlsmPkKp8TRBVHkn7sGO3WZwHKBkL8zyVIh59CSu7eHk0PQR6xoxnHgrJ9R3W
+ eBrixxYSdRgIQCGCUKDbX396hH8AFk7mfOL5+aXT8Uzid50aBKXjUcyyeIyLxPzcjk
+ yWzPZsttMPHCgUNPvCnNH8FICm+EU7luhE5eU8cY=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jSHLN-006HA5-DN; Sat, 25 Apr 2020 10:43:29 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Save/restore sp_el0 as part of __guest_enter
+Date: Sat, 25 Apr 2020 10:43:21 +0100
+Message-Id: <20200425094321.162752-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200424121633.GF3106@work-vm>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: quintela@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,51 +88,135 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 24/04/20 14:16, Dr. David Alan Gilbert wrote:
->>> I was trying to work out whether we need to migrate this state,
->>> and I'm not sure. Andrew, do you know? I think this comes down
->>> to "at what points in QEMU's kvm run loop can migration kick in",
->>> and specifically if we get a KVM_EXIT_ARM_NISV do we definitely
->>> go round the loop and KVM_RUN again without ever checking
->>> to see if we should do a migration ?
->>>
->> I'd prefer a migration expert confirm this, so I've CC'ed David and Juan,
->> but afaict there's no way to break out of the KVM_RUN loop after a
->> successful (ret=0) call to kvm_arch_handle_exit() until after the next
->> KVM_RUN ioctl. This is because even if migration kicks the vcpus between
->> kvm_arch_handle_exit() and the next run, the signal won't do anything
->> other than prepare the vcpu for an immediate exit.
+We currently save/restore sp_el0 in C code. This is a bit unsafe,
+as a lot of the C code expects 'current' to be accessible from
+there (and the opportunity to run kernel code in HYP is specially
+great with VHE).
 
-As far as QEMU is concerned, this should be enough for Beata's patch to
-be safe.  If the signal causes KVM to exit before KVM_EXIT_ARM_NISV,
-it's of course okay.  If you get a KVM_EXIT_ARM_NISV, however, KVM_RUN
-will exit with return code 0 and kvm_cpu_exec will:
+Instead, let's move the save/restore of sp_el0 to the assembly
+code (in __guest_enter), making sure that sp_el0 is correct
+very early on when we exit the guest, and is preserved as long
+as possible to its host value when we enter the guest.
 
-- set env->ext_dabt_pending
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/entry.S     | 23 +++++++++++++++++++++++
+ arch/arm64/kvm/hyp/sysreg-sr.c | 17 +++--------------
+ 2 files changed, 26 insertions(+), 14 deletions(-)
 
-- go round the loop again
-
-- notice cpu->exit_request and schedule an immediate exit
-
-- call kvm_arch_put_registers
-
-- call KVM_RUN again, which will exit with -EINTR
-
-- exit the loop and allow migration to proceed
-
-However, I'm not sure that it's a good idea to
-
-+        /* Clear instantly if the call was successful */
-+        env->ext_dabt_pending = 0;
-
-Rather, this should be done by the next kvm_arch_get_registers when it
-calls KVM_GET_VCPU_EVENTS.  It's also possible to add an assertion in
-kvm_get_vcpu_events that it you always get zero, to justify that the
-field is not migrated.
-
-Thanks,
-
-Paolo
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index d22d0534dd600..90186cf6473e0 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -18,6 +18,7 @@
+ 
+ #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+ #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
++#define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
+ 
+ 	.text
+ 	.pushsection	.hyp.text, "ax"
+@@ -47,6 +48,16 @@
+ 	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
+ .endm
+ 
++.macro save_sp_el0 ctxt, tmp
++	mrs	\tmp,	sp_el0
++	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
++.endm
++
++.macro restore_sp_el0 ctxt, tmp
++	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
++	msr	sp_el0, \tmp
++.endm
++
+ /*
+  * u64 __guest_enter(struct kvm_vcpu *vcpu,
+  *		     struct kvm_cpu_context *host_ctxt);
+@@ -60,6 +71,9 @@ SYM_FUNC_START(__guest_enter)
+ 	// Store the host regs
+ 	save_callee_saved_regs x1
+ 
++	// Save the host's sp_el0
++	save_sp_el0	x1, x2
++
+ 	// Now the host state is stored if we have a pending RAS SError it must
+ 	// affect the host. If any asynchronous exception is pending we defer
+ 	// the guest entry. The DSB isn't necessary before v8.2 as any SError
+@@ -83,6 +97,9 @@ alternative_else_nop_endif
+ 	// when this feature is enabled for kernel code.
+ 	ptrauth_switch_to_guest x29, x0, x1, x2
+ 
++	// Restore the guest's sp_el0
++	restore_sp_el0 x29, x0
++
+ 	// Restore guest regs x0-x17
+ 	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
+ 	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
+@@ -130,6 +147,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// Store the guest regs x18-x29, lr
+ 	save_callee_saved_regs x1
+ 
++	// Store the guest's sp_el0
++	save_sp_el0	x1, x2
++
+ 	get_host_ctxt	x2, x3
+ 
+ 	// Macro ptrauth_switch_to_guest format:
+@@ -139,6 +159,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// when this feature is enabled for kernel code.
+ 	ptrauth_switch_to_host x1, x2, x3, x4, x5
+ 
++	// Restore the hosts's sp_el0
++	restore_sp_el0 x2, x3
++
+ 	// Now restore the host regs
+ 	restore_callee_saved_regs x2
+ 
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 75b1925763f16..6d2df9fe0b5d2 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -15,8 +15,9 @@
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+- * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and pstate,
+- * which are handled as part of the el2 return state) on every switch.
++ * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
++ * pstate, which are handled as part of the el2 return state) on every
++ * switch (sp_el0 is being dealt with in the assembly code).
+  * tpidr_el0 and tpidrro_el0 only need to be switched when going
+  * to host userspace or a different VCPU.  EL1 registers only need to be
+  * switched when potentially going to run a different VCPU.  The latter two
+@@ -26,12 +27,6 @@
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+-
+-	/*
+-	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+-	 * therefore be saved/restored on every entry/exit to/from the guest.
+-	 */
+-	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+ }
+ 
+ static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+@@ -99,12 +94,6 @@ NOKPROBE_SYMBOL(sysreg_save_guest_state_vhe);
+ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+-
+-	/*
+-	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+-	 * therefore be saved/restored on every entry/exit to/from the guest.
+-	 */
+-	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+ }
+ 
+ static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+-- 
+2.26.2
 
 _______________________________________________
 kvmarm mailing list
