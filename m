@@ -2,78 +2,67 @@ Return-Path: <SRS0=evlJ=6L=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A2A0C54FD0
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 07:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E1DC54FD0
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A4DF32051A
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 07:28:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QM/66+JX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DF32051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 08AC4206A5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08AC4206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B88B4B12C;
-	Mon, 27 Apr 2020 03:28:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 755934B17B;
+	Mon, 27 Apr 2020 05:39:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GjWOoKdyJhYt; Mon, 27 Apr 2020 03:28:39 -0400 (EDT)
+	with ESMTP id iQcUam86HeXp; Mon, 27 Apr 2020 05:39:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 197404B11B;
-	Mon, 27 Apr 2020 03:28:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E9194B1A0;
+	Mon, 27 Apr 2020 05:39:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B5194B11D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 03:28:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AD1C4B164
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Apr 2020 08:39:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id puSOSsEJYOfS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Apr 2020 03:28:36 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 507334B11B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 03:28:36 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587972516;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=fhbDo34NJp8lf0z2mD+gxz78VWyhT6vzLSI7DIn5U0k=;
- b=QM/66+JXXbkP5SECyuyUPGIREMTF9itLCIoqLm/iEeYJugk3Nda9iocJdQR1eKaGNfBxts
- mhx0exD3qILJM4n8AaMvRatvnENmr53orpoK2EoJq95LLF3ui+FjDfmn5D5us2i9TLOqQq
- O/466iCtsy0a8eqQoq6En5rtKpl9VaE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-xE9ys-BJNemCctbaqWDaxQ-1; Mon, 27 Apr 2020 03:28:33 -0400
-X-MC-Unique: xE9ys-BJNemCctbaqWDaxQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73EC11895A28;
- Mon, 27 Apr 2020 07:28:31 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.184])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D76A95C1D4;
- Mon, 27 Apr 2020 07:28:28 +0000 (UTC)
-Date: Mon, 27 Apr 2020 09:28:25 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Save/restore sp_el0 as part of __guest_enter
-Message-ID: <20200427072825.ekcekll6f23bt2um@kamzik.brq.redhat.com>
-References: <20200425094321.162752-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200425094321.162752-1-maz@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id ZsDxUMNd-n88 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Apr 2020 08:39:12 -0400 (EDT)
+Received: from out30-132.freemail.mail.aliyun.com
+ (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AD7C4B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Apr 2020 08:39:12 -0400 (EDT)
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R211e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01355;
+ MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
+ TI=SMTPD_---0TwgoYV6_1587904745; 
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com
+ fp:SMTPD_---0TwgoYV6_1587904745) by smtp.aliyun-inc.com(127.0.0.1);
+ Sun, 26 Apr 2020 20:39:06 +0800
+From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To: pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+ mpe@ellerman.id.au, benh@kernel.crashing.org, borntraeger@de.ibm.com,
+ frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+ sean.j.christopherson@intel.com, vkuznets@redhat.com,
+ wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+ hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com
+Subject: [PATCH v3 0/7] clean up redundant 'kvm_run' parameters
+Date: Sun, 26 Apr 2020 20:38:58 +0800
+Message-Id: <20200426123905.8336-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
+X-Mailman-Approved-At: Mon, 27 Apr 2020 05:39:54 -0400
+Cc: linux-s390@vger.kernel.org, tianjia.zhang@linux.alibaba.com,
+ kvm@vger.kernel.org, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,30 +74,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Apr 25, 2020 at 10:43:21AM +0100, Marc Zyngier wrote:
-> We currently save/restore sp_el0 in C code. This is a bit unsafe,
-> as a lot of the C code expects 'current' to be accessible from
-> there (and the opportunity to run kernel code in HYP is specially
-> great with VHE).
-> 
-> Instead, let's move the save/restore of sp_el0 to the assembly
-> code (in __guest_enter), making sure that sp_el0 is correct
-> very early on when we exit the guest, and is preserved as long
-> as possible to its host value when we enter the guest.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/entry.S     | 23 +++++++++++++++++++++++
->  arch/arm64/kvm/hyp/sysreg-sr.c | 17 +++--------------
->  2 files changed, 26 insertions(+), 14 deletions(-)
->
+In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+structure. Earlier than historical reasons, many kvm-related function
+parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
+This patch does a unified cleanup of these remaining redundant parameters.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This series of patches has completely cleaned the architecture of
+arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+the large number of modified codes, a separate patch is made for each
+platform. On the ppc platform, there is also a redundant structure
+pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+separately.
+
+---
+v3 change:
+  Keep the existing `vcpu->run` in the function body unchanged.
+
+v2 change:
+  s390 retains the original variable name and minimizes modification.
+
+Tianjia Zhang (7):
+  KVM: s390: clean up redundant 'kvm_run' parameters
+  KVM: arm64: clean up redundant 'kvm_run' parameters
+  KVM: PPC: Remove redundant kvm_run from vcpu_arch
+  KVM: PPC: clean up redundant 'kvm_run' parameters
+  KVM: PPC: clean up redundant kvm_run parameters in assembly
+  KVM: MIPS: clean up redundant 'kvm_run' parameters
+  KVM: MIPS: clean up redundant kvm_run parameters in assembly
+
+ arch/arm64/include/asm/kvm_coproc.h      |  12 +--
+ arch/arm64/include/asm/kvm_host.h        |  11 +--
+ arch/arm64/include/asm/kvm_mmu.h         |   2 +-
+ arch/arm64/kvm/handle_exit.c             |  36 +++----
+ arch/arm64/kvm/sys_regs.c                |  13 ++-
+ arch/mips/include/asm/kvm_host.h         |  32 +------
+ arch/mips/kvm/emulate.c                  |  59 ++++--------
+ arch/mips/kvm/entry.c                    |  15 +--
+ arch/mips/kvm/mips.c                     |  14 +--
+ arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
+ arch/mips/kvm/vz.c                       |  26 ++----
+ arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
+ arch/powerpc/include/asm/kvm_host.h      |   1 -
+ arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
+ arch/powerpc/kvm/book3s.c                |   4 +-
+ arch/powerpc/kvm/book3s.h                |   2 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
+ arch/powerpc/kvm/book3s_emulate.c        |  10 +-
+ arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
+ arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
+ arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
+ arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
+ arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
+ arch/powerpc/kvm/booke.c                 |  39 ++++----
+ arch/powerpc/kvm/booke.h                 |   8 +-
+ arch/powerpc/kvm/booke_emulate.c         |   2 +-
+ arch/powerpc/kvm/booke_interrupts.S      |   9 +-
+ arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
+ arch/powerpc/kvm/e500_emulate.c          |  15 ++-
+ arch/powerpc/kvm/emulate.c               |  10 +-
+ arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
+ arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
+ arch/powerpc/kvm/trace_hv.h              |   6 +-
+ arch/s390/kvm/kvm-s390.c                 |  23 +++--
+ virt/kvm/arm/arm.c                       |   6 +-
+ virt/kvm/arm/mmio.c                      |  11 ++-
+ virt/kvm/arm/mmu.c                       |   5 +-
+ 38 files changed, 389 insertions(+), 467 deletions(-)
+
+-- 
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
