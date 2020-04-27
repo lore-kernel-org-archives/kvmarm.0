@@ -2,60 +2,83 @@ Return-Path: <SRS0=evlJ=6L=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F04C54FD0
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 15:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74038C54FCB
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 16:49:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D03B2064C
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 15:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D03B2064C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id F40312080C
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Apr 2020 16:49:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOIirCPK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F40312080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26714B0C8;
-	Mon, 27 Apr 2020 11:50:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 917C64B09E;
+	Mon, 27 Apr 2020 12:49:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WY17Ectx4iOw; Mon, 27 Apr 2020 11:50:15 -0400 (EDT)
+	with ESMTP id T3CLVO0iTH3l; Mon, 27 Apr 2020 12:49:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94F094B14E;
-	Mon, 27 Apr 2020 11:50:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84D904B117;
+	Mon, 27 Apr 2020 12:49:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E06E4B133
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 11:50:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CA3C4B114
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 12:49:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ALBEr1shMsFd for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Apr 2020 11:50:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 072184B0B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 11:50:13 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 927BC31B;
- Mon, 27 Apr 2020 08:50:12 -0700 (PDT)
-Received: from [10.37.12.144] (unknown [10.37.12.144])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5DB53F68F;
- Mon, 27 Apr 2020 08:50:08 -0700 (PDT)
-Subject: Re: [PATCH 04/26] arm64: Detect the ARMv8.4 TTL feature
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-5-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <d6032191-ba0e-82a4-4dde-11beef369a11@arm.com>
-Date: Mon, 27 Apr 2020 16:55:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ with ESMTP id hCPycC5XODC4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Apr 2020 12:49:52 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 346E54B09E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2020 12:49:52 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 07B742078E;
+ Mon, 27 Apr 2020 16:49:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1588006191;
+ bh=jQ0KWWZhLYMByhegFoIiVPOZdGk0Lzl4q7rMMcBmaew=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mOIirCPKrFvI4awGm7xtERC/1d+1IFdK9FBuJhvAwXVySQ6LtQOVV3941dL88nHln
+ oPon4b0PTqtO0zEbbez/LxcvR5zQJZEss/YQkxoUjDL4VVdWlJ5sHqC5/9CyDhSBvL
+ AY2QX+K9rJ4UMv2Vu2x1pstXgUgGx3aJduDVdEj8=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jT6x3-006mzt-Ds; Mon, 27 Apr 2020 17:49:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200422120050.3693593-5-maz@kernel.org>
-Content-Language: en-US
-Cc: will@kernel.org, andre.przywara@arm.com, dave.martin@arm.com,
- gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
+Date: Mon, 27 Apr 2020 17:49:49 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?Q?Andr=C3=A9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [PATCH][kvmtool] kvm: Request VM specific limits instead of
+ system-wide ones
+In-Reply-To: <c36c30b1-6017-9c75-e0e9-e643eb348641@arm.com>
+References: <20200427141738.285217-1-maz@kernel.org>
+ <c36c30b1-6017-9c75-e0e9-e643eb348641@arm.com>
+Message-ID: <3886cae6b5e7e1fc9ab821f1d734036f@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, will@kernel.org, ardb@kernel.org,
+ Alexandru.Elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,83 +90,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/22/2020 01:00 PM, Marc Zyngier wrote:
-> In order to reduce the cost of TLB invalidation, the ARMv8.4 TTL
-> feature allows TLBs to be issued with a level allowing for quicker
-> invalidation.
-> 
-> Let's detect the feature for now. Further patches will implement
-> its actual usage.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
-
-
->   arch/arm64/include/asm/cpucaps.h |  3 ++-
->   arch/arm64/include/asm/sysreg.h  |  1 +
->   arch/arm64/kernel/cpufeature.c   | 11 +++++++++++
->   3 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index 8eb5a088ae658..cabb0c49a1d11 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -61,7 +61,8 @@
->   #define ARM64_HAS_AMU_EXTN			51
->   #define ARM64_HAS_ADDRESS_AUTH			52
->   #define ARM64_HAS_GENERIC_AUTH			53
-> +#define ARM64_HAS_ARMv8_4_TTL			54
->   
-> -#define ARM64_NCAPS				54
-> +#define ARM64_NCAPS				55
->   
->   #endif /* __ASM_CPUCAPS_H */
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 5d10c9148e844..79cf186b7e471 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -726,6 +726,7 @@
->   
->   /* id_aa64mmfr2 */
->   #define ID_AA64MMFR2_E0PD_SHIFT		60
-> +#define ID_AA64MMFR2_TTL_SHIFT		48
->   #define ID_AA64MMFR2_FWB_SHIFT		40
->   #define ID_AA64MMFR2_AT_SHIFT		32
->   #define ID_AA64MMFR2_LVA_SHIFT		16
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9892a845d06c9..d8ab4f1e93bee 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -252,6 +252,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
->   
->   static const struct arm64_ftr_bits ftr_id_aa64mmfr2[] = {
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_E0PD_SHIFT, 4, 0),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_TTL_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_FWB_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_AT_SHIFT, 4, 0),
->   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_LVA_SHIFT, 4, 0),
-> @@ -1630,6 +1631,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		.matches = has_cpuid_feature,
->   		.cpu_enable = cpu_has_fwb,
->   	},
-> +	{
-> +		.desc = "ARMv8.4 Translation Table Level",
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.capability = ARM64_HAS_ARMv8_4_TTL,
-> +		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-> +		.sign = FTR_UNSIGNED,
-> +		.field_pos = ID_AA64MMFR2_TTL_SHIFT,
-> +		.min_field_value = 1,
-> +		.matches = has_cpuid_feature,
-> +	},
-
-Reviewed-by : Suzuki K Polose <suzuki.poulose@arm.com>
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0wNC0yNyAxNjozNywgQW5kcsOpIFByenl3YXJhIHdyb3RlOgo+IE9uIDI3LzA0LzIw
+MjAgMTU6MTcsIE1hcmMgWnluZ2llciB3cm90ZToKPiBIaSwKPiAKPj4gT24gYXJtNjQsIHRoZSBt
+YXhpbXVtIG51bWJlciBvZiB2Y3B1cyBpcyBjb25zdHJhaW5lZCBieSB0aGUgdHlwZQo+PiBvZiBp
+bnRlcnJ1cHQgY29udHJvbGxlciB0aGF0IGhhcyBiZWVuIHNlbGVjdGVkIChHSUN2MiBpbXBvc2Vz
+IGEKPj4gbGltaXQgb2YgOCB2Y3B1cywgd2hpbGUgR0lDdjMgY3VycmVudGx5IGhhcyBhIGxpbWl0
+IG9mIDUxMikuCj4+IAo+PiBJdCBpcyB0aHVzIGltcG9ydGFudCB0byByZXF1ZXN0IHRoaXMgbGlt
+aXQgb24gdGhlIFZNIGZpbGUgZGVzY3JpcHRvcgo+PiByYXRoZXIgdGhhbiBvbiB0aGUgb25lIHRo
+YXQgY29ycmVzcG9uZHMgdG8gL2Rldi9rdm0sIGFzIHRoZSBsYXR0ZXIKPj4gaXMgbGlrZWx5IHRv
+IHJldHVybiBzb21ldGhpbmcgdGhhdCBkb2Vzbid0IHRha2UgdGhlIGNvbnN0cmFpbnRzIGludG8K
+Pj4gYWNjb3VudC4KPiAKPiBUaGF0IHNvdW5kcyByZWFzb25hYmxlLCBidXQgSSBmYWlsIHRvIGZp
+bmQgYW55IGRpc3RpbmN0aW9uIGluIHRoZSAKPiBrZXJuZWwKPiBjb2RlLiBXZSBkb24ndCBtYWtl
+IGFueSBkaWZmZXJlbmNlIGJldHdlZW4gdGhlIFZNIG9yIHRoZSBzeXN0ZW0gRkQgaW4KPiB0aGUg
+aW9jdGwgaGFuZGxlciBmb3IgdGhvc2UgdHdvIGV4dGVuc2lvbnMuIEZvciBhcm02NCB3ZSBhbHdh
+eXMgcmV0dXJuCj4gbWF4LiA1MTIgKG1heCBWQ1BVcyBvbiBHSUN2MyksIGFuZCBudW1iZXIgb2Yg
+b25saW5lIGhvc3QgY29yZXMgZm9yIHRoZQo+IHJlY29tbWVuZGVkIHZhbHVlLiBGb3IgYXJtIHRo
+ZXJlIHdhcyBhIGRpc3RpbmN0aW9uIGJldHdlZW4gR0lDdjMgCj4gc3VwcG9ydAo+IGNvbXBpbGVk
+IGluIG9yIG5vdCwgYnV0IG90aGVyd2lzZSB0aGUgc2FtZSBjb25zdGFudCB2YWx1ZXMgcmV0dXJu
+ZWQuCj4gUXVpY2tseSB0ZXN0ZWQgb24gSnVubyBhbmQgTjFTRFAsIHRoZSBpb2N0bHMgcmV0dXJu
+IHRoZSBzYW1lIGV4cGVjdGVkCj4gdmFsdWVzLCByZWdhcmRsZXNzIG9mIHN5c19mZCB2cyB2bV9m
+ZC4KPiAKPiBTbyB3aGF0IGFtIEkgbWlzc2luZyBoZXJlPyBJcyB0aGlzIGZvciBzb21lIG9sZGVy
+IG9yIGV2ZW4gbmV3ZXIgCj4ga2VybmVscz8KCllvdSdyZSBtaXNzaW5nIHRoaXM6CgpodHRwczov
+L2xvcmUua2VybmVsLm9yZy9rdm0vMjAyMDA0MjcxNDE1MDcuMjg0OTg1LTEtbWF6QGtlcm5lbC5v
+cmcvCgp3aGljaCBhZGRzIHRoZSBtaXNzaW5nIGJpdHMgdG8gdGhlIGtlcm5lbC4KClRoYW5rcywK
+CiAgICAgICAgIE0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4u
+LgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0g
+bWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5j
+cy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
