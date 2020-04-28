@@ -2,63 +2,86 @@ Return-Path: <SRS0=hKGY=6M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B2AC83000
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 09:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA19C83000
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 13:09:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1205B206D9
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 09:08:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1205B206D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 44803206A1
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 13:09:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="PSLkuXkh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44803206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BCC34B238;
-	Tue, 28 Apr 2020 05:08:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF9AF4B286;
+	Tue, 28 Apr 2020 09:09:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@web.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Dh-TfWTpe07A; Tue, 28 Apr 2020 05:08:57 -0400 (EDT)
+	with ESMTP id UqeWAqmx7gy4; Tue, 28 Apr 2020 09:09:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F204B247;
-	Tue, 28 Apr 2020 05:08:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95C654B288;
+	Tue, 28 Apr 2020 09:09:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE5084B217
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 05:08:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A21F64B1F8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 08:39:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J0S8rg7xd0LU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2020 05:08:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A36C14B20E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 05:08:55 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A83B30E;
- Tue, 28 Apr 2020 02:08:55 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A8743F305;
- Tue, 28 Apr 2020 02:08:53 -0700 (PDT)
-Subject: Re: [PATCH][kvmtool] kvm: Request VM specific limits instead of
- system-wide ones
-To: Marc Zyngier <maz@kernel.org>
-References: <20200427141738.285217-1-maz@kernel.org>
- <d27e4a14-34b8-7f3d-1e58-ef2ae13e443b@arm.com>
- <7ac17890-72d1-1c81-e513-5d4f7841ca9d@arm.com> <20200427183331.48f411f5@why>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9305b65b-8431-e609-6756-07f1960ff95e@arm.com>
-Date: Tue, 28 Apr 2020 10:09:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ with ESMTP id BkzwDlVlTNli for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2020 08:39:02 -0400 (EDT)
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BB14B1F7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 08:39:02 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1588077540;
+ bh=uQwbH454f0gvDC4JIzZ39otWeu4LRi8sg9802Ksokko=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=PSLkuXkhm9wJOYvkT6fPW2rQ9GgYn7OSK4xhbnUiGy5ev/jPwDJVvtgUsXRbvz1ba
+ B9Vg/i41u24nbr+Vj56TR+Zq8S7M60z0mmQyxQXSOCjR9l9qfmjFnLPkCUb3OAuUST
+ URyyI/SkWx9lGhlAlDfzA9Pe/wuDtdFLCXzW8Tu8=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([94.134.180.8]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MRD0p-1jbyjk499z-00UWhH; Tue, 28
+ Apr 2020 14:39:00 +0200
+Date: Tue, 28 Apr 2020 14:38:50 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: kvmarm@lists.cs.columbia.edu
+Subject: Against removing aarch32 kvm host support
+Message-ID: <20200428143850.4c8cbd2a@luklap>
 MIME-Version: 1.0
-In-Reply-To: <20200427183331.48f411f5@why>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Andre Przywara <Andre.Przywara@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-Provags-ID: V03:K1:5o4ibYrEfygVMB7pNk1k2Y4+srFg4x1KzaRFPI7d7wLoZFcv4vH
+ Vsq+OvB/GYg1mAmK3bLY7rgy0eubW1zuLCFwfNVvZq5lNE3sFZFNxGCq9/oovSLH5FvLw4f
+ W0+QXQvz5F67Zk9vytmVAGSSc/15VB76Djn3esUhprtqBmn3jL5abGso4cSy6MwnZSHEDR8
+ 2AZ4MpMIkuAO7pylAB0ng==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+jfAGiK0wF0=:sl66xQYxXjYqZNbOtftMWF
+ LLuEF5v/C+v+Atvlp1i9q5y9nCQfzTOXCVsYQywev5yYt9HKoaWnHM7yleuLCL+FjRfcFicK/
+ MmT4d25I7bOsgcsScjRLSvlzmr5+m6I5AXw7Ztf4s0JuKkRrQT2xlgQp7I42X5kcoZEaqN3Kp
+ pDPljlxSoOc4n32Ul3WJ6M9t3YzwbGdlHxG6/7nhNexjx7hfg8syxXjbH0JPGR67znmchMa9X
+ NQFDJIwUYRpoWZFKz594UjmFIAtmBeqaOklnFGoKpqOnuZ/Ks0Y1oUUwNSMuez9NANeiZcQuq
+ oIgR5JtW/Hd4CoAg4WTPWfnmhuUE1cMhObuVQsSgUJDmCj++Gh+NGBAhtohUHTJvQ1th1PaCD
+ uqKLYrWx7WiM6H6At/WtitOrYE/KqKxP2UXOjRAw/bVUGc8b//OX9c0xS/0vmUN9zW4eKC3Pm
+ gV92s+nW1QJqddOJWHIk57CdGdnD68jxNRGQMj3WvpwrCkY12MJ9QK9yocvRMBY1lIq6j8dt+
+ V7OqRyctTDyuAsFjFelghXArRKNq4+Yj9lbzdznrYUr5EUpiADzVotr6N6Zu2/uY6qUuicvZ7
+ 3Q1ocdcA5D6uvLvxxjbrswnsm3WwZtX0gaol2bCFW8weqYFo2rhG+E4jVe5JS8UjQ27QCtzbk
+ ECF8nzeBnhTpPTKc3TMRomYWHRS+5vHQpUVPtj8Cm0xO9T2wx7VyLAVwgPQWLFRUN1KuESkns
+ qDkmYJblujiVwCLH8uIiPcbODbnMllaGqBZ3UdlLROYEkScnpBud43PonxYCd01cQN9AM2NXA
+ 6yDs3PWI6Gn1JQiTX8CMQrzEr8Z4ZzLmoyMLk8yh6+BZR3hN6MH5ExpXyPxuFStvgOJZd20wJ
+ DVDlxrQw8Gbqs+16FCiszyDVPcYoMPb66PgWteWcFdw7iWLvsZq245fl7VSuBzKq0p/vWvNNY
+ TJGhuXCilZ7VEmDv45RZPuPpD41kHErLrftMxoGB78Jj+cAVi/fxtVjz00oSsFABpWIqYcClu
+ L+Q8fEEG60LtRKQCBzqbi16ALTgwmTb4Lk2UuVw5dNQ33Aq/utBtDJNo3ktK3QJLmFF2N/lXh
+ PgDrt+vfeTXZAtRqPxuLuHoXpb69fLwYMXup9FAxJpO8ZgYuDe4dRWQTyXrMYVQ5HWkykZb7H
+ Wma5zkU/gy3vxLnE21L8cHlgdfepQ5XQno7uI4+cu9s6CUFB+wdVVUOOYHtW7O5BV3enOGYhY
+ oy1ue9mrZZDs2revY
+X-Mailman-Approved-At: Tue, 28 Apr 2020 09:09:50 -0400
+Cc: kvm@vger.kernel.org, kernel@pyra-handheld.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,82 +93,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============2003584969240408755=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+--===============2003584969240408755==
+Content-Type: multipart/signed; boundary="Sig_/MktA=Dv1EjHA4CX8vUSTchZ";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
 
-On 4/27/20 6:33 PM, Marc Zyngier wrote:
-> On Mon, 27 Apr 2020 16:00:58 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
->> Hi,
->>
->> On 4/27/20 3:44 PM, Alexandru Elisei wrote:
->>> Hi,
->>>
->>> On 4/27/20 3:17 PM, Marc Zyngier wrote:  
->>>> On arm64, the maximum number of vcpus is constrained by the type
->>>> of interrupt controller that has been selected (GICv2 imposes a
->>>> limit of 8 vcpus, while GICv3 currently has a limit of 512).
->>>>
->>>> It is thus important to request this limit on the VM file descriptor
->>>> rather than on the one that corresponds to /dev/kvm, as the latter
->>>> is likely to return something that doesn't take the constraints into
->>>> account.
->>>>
->>>> Reported-by: Ard Biesheuvel <ardb@kernel.org>
->>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>> ---
->>>>  kvm.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/kvm.c b/kvm.c
->>>> index e327541..3d5173d 100644
->>>> --- a/kvm.c
->>>> +++ b/kvm.c
->>>> @@ -406,7 +406,7 @@ int kvm__recommended_cpus(struct kvm *kvm)
->>>>  {
->>>>  	int ret;
->>>>  
->>>> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
->>>> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_NR_VCPUS);
->>>>  	if (ret <= 0)
->>>>  		/*
->>>>  		 * api.txt states that if KVM_CAP_NR_VCPUS does not exist,
->>>> @@ -421,7 +421,7 @@ int kvm__max_cpus(struct kvm *kvm)
->>>>  {
->>>>  	int ret;
->>>>  
->>>> -	ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
->>>> +	ret = ioctl(kvm->vm_fd, KVM_CHECK_EXTENSION, KVM_CAP_MAX_VCPUS);
->>>>  	if (ret <= 0)
->>>>  		ret = kvm__recommended_cpus(kvm);
->>>>    
->>> I've checked that gic__create comes before the call kvm__recommended_capus:
->>> gic__create is in core_init (called via kvm__init->kvm_arch_init), and
->>> kvm__recommended_cpus is in base_init (called via kvm__cpu_init ->
->>> kvm__{recommended,max}_cpus).
->>>
->>> The KVM api documentation states that KVM_CHECK_EXTENSION is available for the vm
->>> fd only if the system capability KVM_CAP_CHECK_EXTENSION_VM is present. kvmtool
->>> already has a function for checking extensions on the vm fd, it's called
->>> kvm__supports_vm_extension. Can we use that instead of doing the ioctl directly on
->>> the vm fd?  
->> Scratch that, kvm__supports_vm_extension returns a bool, not an int.
->> How about we write kvm__check_vm_extension that returns an int, and
->> kvm__supports_vm_extension calls it?
-> That, or we just change the return type for kvm__supports_vm_extension,
-> and hack the only places that uses it so far (the GIC code) to detect
-> the error.
+--Sig_/MktA=Dv1EjHA4CX8vUSTchZ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Yep, whatever you prefer.
+Hello Everyone,
+As a preorder of the Pyra handheld, (OMAP5 SoC with 2x cortex-a15 arm cores)
+I'm against removing KVM host support for aarch32. I'm probably going to use
+this device for more than 5 years and thus the latest lts-kernel is no opti=
+on
+for me.
 
-Thanks,
-Alex
+Regards,
+Lukas Straub
+
+--Sig_/MktA=Dv1EjHA4CX8vUSTchZ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6oI9oACgkQNasLKJxd
+slg/3Q/8CDCjeuUL6fjcGSdcXaIIgwytnr1e6qlfxXgFXw2wiLfZAmyo5zeXdmqq
+1TjIzMOdNowwMXTZVKBp5zGXvg5/VKcX/Sp2d/wk7QY8cxfeRwz9jwSywQ1D9aqa
+Ipiqcy/HPtzOlzgUrzoXROEFEn9q/7+//b2vNkHnOY+pNA+m4m+PzY3ndY6CcpBO
+rH/k0TdTP0jraDGhoh3qcL4+Zsrhfn0DRyH6W8gkF/aiW4FB96uMxyO0OZ+l/uK1
+lxzazng8J84wmx4gbnnG+TqUK6gI4S92I7vnjx6qA2h5cPI9JKRJhc0dTZNzKErZ
+XtznnB0eJM7BaMsMGritiichC/VXWzj4o95zlTieaymMMmjrK8BxqZ1vgU8NlT5O
+3AI5Z5h0VFre9LQioHmMaz4Ls+0UvEQQ4sfpW8W02cMh4Pg6m7qUVcyjy569zkbT
+44tWkAsbCF0LHba0pLDqvpJplRMxL+PBfQZ4JIyVWSDaLeVZxe4mv4JQXsP58UdJ
+p6c1o2TIjqrkWVloFCEa0G54ndZNPlWdKGxx+lhaLuOkdjSWL5AF37A1rSPE2bwS
+C7BESc5wZiizwE7bA+hHNjsatjDNVaoZr8SY1ejVoHLZLNr9ykOivEYbpJt2tONn
+RdZ3ZRNGRqn9h8oTBLU5rlmBUQWDhsiDjfVnpZXklQEBVpoTrAI=
+=B0xd
+-----END PGP SIGNATURE-----
+
+--Sig_/MktA=Dv1EjHA4CX8vUSTchZ--
+
+--===============2003584969240408755==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============2003584969240408755==--
