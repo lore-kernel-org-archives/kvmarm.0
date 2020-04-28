@@ -2,81 +2,55 @@ Return-Path: <SRS0=hKGY=6M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEC5C83001
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 16:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99255C83000
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 16:26:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 21EF82063A
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 16:13:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oh8fOJLN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21EF82063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 35AEE206D8
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Apr 2020 16:26:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35AEE206D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=atomide.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B33624B244;
-	Tue, 28 Apr 2020 12:13:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FB644B17B;
+	Tue, 28 Apr 2020 12:26:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Eo-S2o9flZ6X; Tue, 28 Apr 2020 12:13:57 -0400 (EDT)
+	with ESMTP id uELIhKgBtAax; Tue, 28 Apr 2020 12:26:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 816294B288;
-	Tue, 28 Apr 2020 12:13:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 938484B1E3;
+	Tue, 28 Apr 2020 12:26:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D399A4B259
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 12:13:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FDB04B1C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 12:26:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id McAx5h3sT7pC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2020 12:13:55 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD2124B244
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 12:13:55 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9B69F2063A;
- Tue, 28 Apr 2020 16:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588090434;
- bh=CHxPMdMtXgCxp7jYJRO9Lz56+pxSSBnx2dPI3JGn6mQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Oh8fOJLNiku2IDCPSQblj3TfEucyBMwB1dATPVIP2q2tPa5qN05yteDCnICfRyouX
- 2v4HOThXeH7+UiZKXvk6VczULmRhp6sCi10Hj4qzZ6Sb01KtQsiuCxj3y0UWStUq3o
- GsBjYh+b2Ke9RL1tp+ueRqKW9M5vrPxbfvBiEWdg=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jTSrp-007QVJ-2k; Tue, 28 Apr 2020 17:13:53 +0100
+ with ESMTP id 8HwKZUKvrZkW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2020 12:26:14 -0400 (EDT)
+Received: from muru.com (muru.com [72.249.23.125])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5142B4B17B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2020 12:26:14 -0400 (EDT)
+Received: from atomide.com (localhost [127.0.0.1])
+ by muru.com (Postfix) with ESMTPS id 8684180F3;
+ Tue, 28 Apr 2020 16:27:02 +0000 (UTC)
+Date: Tue, 28 Apr 2020 09:26:11 -0700
+From: Tony Lindgren <tony@atomide.com>
+To: Michael Mrozek <EvilDragon@openpandora.org>
+Subject: Re: Against removing aarch32 kvm host support
+Message-ID: <20200428162611.GW43721@atomide.com>
+References: <20200428143850.4c8cbd2a@luklap>
+ <916b6072a4a2688745a5e3f75c1c8c01@misterjones.org>
+ <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
 MIME-Version: 1.0
-Date: Tue, 28 Apr 2020 17:13:53 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: Fix spelling in code comments
-In-Reply-To: <20200428155847.GC12697@willie-the-truck>
-References: <20200401140310.29701-1-tabba@google.com>
- <20200428155847.GC12697@willie-the-truck>
-User-Agent: Roundcube Webmail/1.4.3
-Message-ID: <38234cbd287b9e7f4b87ec3d6fa9b0e5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, tabba@google.com, catalin.marinas@arm.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, trivial@kernel.org,
- jeffv@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: trivial@kernel.org, kvm@vger.kernel.org, jeffv@google.com,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <9c67a3722611d1ec9fe1e8a1fbe65956b32147c3.camel@openpandora.org>
+Cc: Marc Zyngier <maz@kernel.org>, Lukas Straub <lukasstraub2@web.de>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel@pyra-handheld.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,44 +62,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-04-28 16:58, Will Deacon wrote:
-> On Wed, Apr 01, 2020 at 03:03:10PM +0100, Fuad Tabba wrote:
->> Fix spelling and typos (e.g., repeated words) in comments.
->> 
->> Signed-off-by: Fuad Tabba <tabba@google.com>
->> ---
->>  arch/arm64/kvm/guest.c        | 4 ++--
->>  arch/arm64/kvm/reset.c        | 6 +++---
->>  arch/arm64/kvm/sys_regs.c     | 6 +++---
->>  virt/kvm/arm/arm.c            | 6 +++---
->>  virt/kvm/arm/hyp/vgic-v3-sr.c | 2 +-
->>  virt/kvm/arm/mmio.c           | 2 +-
->>  virt/kvm/arm/mmu.c            | 6 +++---
->>  virt/kvm/arm/psci.c           | 6 +++---
->>  virt/kvm/arm/vgic/vgic-v3.c   | 2 +-
->>  virt/kvm/coalesced_mmio.c     | 2 +-
->>  virt/kvm/eventfd.c            | 2 +-
->>  virt/kvm/kvm_main.c           | 2 +-
->>  12 files changed, 23 insertions(+), 23 deletions(-)
+* Michael Mrozek <EvilDragon@openpandora.org> [200428 14:27]:
+> Am Dienstag, den 28.04.2020, 14:30 +0100 schrieb Marc Zyngier:
+> I know we have to accept the decision, but so far, I've known Linux to support
+> as many older devices as possible as well - removing KVM Host 32bit support
+> would be a step back here.
 > 
-> FWIW, these *do* all look like valid typos to me, but I'll leave it at
-> Marc's discretion as to whether he wants to merge the series, since 
-> things
-> like this can confuse 'git blame' and get in the way of backports.
+> Is there a specific reason for that?
+> Is it too complex to maintain alongside the aarch64 KVM Host?
 
-I have provisionally queued this a couple of weeks ago, with a goal to
-apply it on top of the whole arm64 cleanup series.
+I don't know the details, but ideally things would be set up
+in a way where folks interested in patching 32-bit arm kvm support
+can do so without causing issues for 64-bit kvm development.
 
-Thanks,
+That being said, I don't know who might be interested in doing
+all the work for that. It's unrealistic to expect Marc to do this
+work if he's not using it.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Features that are used get more resources, and features that are
+less used end up just bitrotting into a broken state in about
+six weeks in the Linux kernel :)
+
+Regards,
+
+Tony
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
