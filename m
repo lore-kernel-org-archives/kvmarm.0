@@ -2,90 +2,84 @@ Return-Path: <SRS0=Ot4E=6O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9EAC8300B
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 09:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CB7C8300D
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 09:39:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DCCB22173E
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 09:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CF13214D8
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 09:39:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="sev0RdWr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCB22173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="nQOE4vPY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF13214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=canb.auug.org.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E934B39A;
-	Thu, 30 Apr 2020 05:27:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D05F74B555;
+	Thu, 30 Apr 2020 05:39:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@canb.auug.org.au
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ifx4d0+s+UVT; Thu, 30 Apr 2020 05:27:07 -0400 (EDT)
+	with ESMTP id h5-0L3IEc-iW; Thu, 30 Apr 2020 05:39:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BA324B38D;
-	Thu, 30 Apr 2020 05:27:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB7A94B52D;
+	Thu, 30 Apr 2020 05:39:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2612F4B38D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 05:27:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B64524B508
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 05:39:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZG+rZFH7vti4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Apr 2020 05:27:05 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E08744B24D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 05:27:04 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id d15so5999665wrx.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 02:27:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=USjIGVhWOh7s7FNpGRPObIs3K/tQd5FXhV8J+B/lAQk=;
- b=sev0RdWrDsI1k4SKZ2ClO+eqqDlLSi/X3Hq0Hwm6NuW4/E6/aLIqyMzcZvqhZR+J6c
- eUIxWtZR77N0Pv0Y4R55NsjIra2VIWrslAhrIuH8cj2aH2FILfWnwTBDEmoP6X8xpHGr
- +pMIL/nORGtb23Q7Gqw1TB/rFmceMz+uJjfFgyg1sCEq2z+mKuKq4qZ1Ag1RY1dNnLkW
- Iu9WJ/r57i1hI3vsLD5RojTkpnMVzKno357mok+W7VqLE1DFmANm0WRM7Vbj7N9jd3oV
- yid5orRXgtJKlQQXUA728cybZ6Yb6/ifuOSzoo44eK4HoAM1FYIWrV3cWUh97laqY/wV
- cD6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=USjIGVhWOh7s7FNpGRPObIs3K/tQd5FXhV8J+B/lAQk=;
- b=UAklo3AzR1GT34rS9bdqRQtjQhBLm6RnI1lTT1QtRfATbMRAlxThEEYjBfX/ObqieS
- zWBCYCsFtryrzhULGpDF3Km/lRVAhX2JAJiU8zaV790JVC/NuWlWGO1Ak/skpjzqoAjX
- gUkpBSeOq2IH+VN2UytO9JytAQPm65T1QKuxYeBPI3P6Gsyp59wnBlbLeXIjRmtI03y8
- G2b0QPspYlciDBTkJP8so8UVK+TIdIVIiJOLq0F/f9Bequ1Thqm+FlG0NPpb69dHjqkH
- B85+ZdQR9C5D5bXRDPCSBfn9V08oly16af5Ju4rC8aWyNRVfGZGGpTCNMtvpa4weWxqv
- ERVQ==
-X-Gm-Message-State: AGi0Pub1JHmbxyPbZqd3Fp1YP45YdlscYyDTEQPXGOzh3iqM42sYJXag
- y89vKyy4XlzWWQkuq+t0hW32Rw==
-X-Google-Smtp-Source: APiQypJ/7f3QnMFmCrai7poM2/q9I4XlvyLP2DcEusXJJVO9kgxdMGnvXsEUZaGfBg2W8rHlAmov6A==
-X-Received: by 2002:adf:cc8d:: with SMTP id p13mr3124810wrj.114.1588238823516; 
- Thu, 30 Apr 2020 02:27:03 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
- by smtp.gmail.com with ESMTPSA id q10sm3158515wrv.95.2020.04.30.02.27.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 02:27:02 -0700 (PDT)
-Date: Thu, 30 Apr 2020 10:26:58 +0100
-From: Andrew Scull <ascull@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2] arm64: Unify WORKAROUND_SPECULATIVE_AT_{NVHE,VHE}
-Message-ID: <20200430092658.GF15669@google.com>
-References: <20200422161346.67325-1-ascull@google.com>
- <20200429212120.GC8604@willie-the-truck>
- <5f391a75142a8ae2263e52d37d73526d@kernel.org>
+ with ESMTP id aXoXTdaHzaFx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Apr 2020 05:39:31 -0400 (EDT)
+Received: from ozlabs.org (ozlabs.org [203.11.71.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81F834B505
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 05:39:31 -0400 (EDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest
+ SHA256) (No client certificate requested)
+ by mail.ozlabs.org (Postfix) with ESMTPSA id 49CVhL1mfPz9sPF;
+ Thu, 30 Apr 2020 19:39:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+ s=201702; t=1588239567;
+ bh=+q3qK7ThA6S0SUMv93CvqoJgpSGdg5tNFF2TPvf35hI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=nQOE4vPYnSb9Gz4jmhcJfj+a1yh87FOuKiuzmd4oxYn5IhsI/Dnpwzmq52qQW0pQf
+ M0tApzyZI9uxTdAiPF4s0Nkcmvsx1nkje8SKC9VWyRlEJIRIX73CXIJEF4ai+ol2DI
+ zjGTMwOLdpx2CnZhmjov0yXsGp5XA5MkdfXI+vDu21NiH3qaAKsho+OsYLhyDQuPyb
+ oOyc6EHycC/flK5ft9w6rIq/dmjl65Ag+k1HTd5JfXzHzqtobx0BmmMKwqCk3977qq
+ 93M3QGH4Y94A9KzFtlczuY8Tg4jfonKEvSz3r0vaMgH4N7dojOCJC3EIRX7AZLVqeW
+ 5SR7cffZTwIrQ==
+Date: Thu, 30 Apr 2020 19:39:10 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] arm64: kvm: fix gcc-10 shift warning
+Message-ID: <20200430193910.294842c4@canb.auug.org.au>
+In-Reply-To: <20200430082927.GA18615@willie-the-truck>
+References: <20200429185657.4085975-1-arnd@arndb.de>
+ <20200430090251.715f6bf0@why>
+ <20200430082927.GA18615@willie-the-truck>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <5f391a75142a8ae2263e52d37d73526d@kernel.org>
-Cc: Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Rich Felker <dalias@libc.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paul Mackerras <paulus@samba.org>,
+ kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>,
+ Brian Cain <bcain@codeaurora.org>, Marc Zyngier <maz@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
+ Mike Rapoport <rppt@linux.ibm.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Fenghua Yu <fenghua.yu@intel.com>, Arnd Bergmann <arnd@arndb.de>,
+ Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+ Stafford Horne <shorne@gmail.com>, Guan Xuetao <gxt@pku.edu.cn>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@c-s.fr>, Tony Luck <tony.luck@intel.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,62 +91,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============5536399358252091315=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 30, 2020 at 10:16:03AM +0100, Marc Zyngier wrote:
-> On 2020-04-29 22:21, Will Deacon wrote:
-> > Hi Andrew,
-> > 
-> > On Wed, Apr 22, 2020 at 05:13:46PM +0100, Andrew Scull wrote:
-> > > Errata 1165522, 1319367 and 1530923 each allow TLB entries to be
-> > > allocated as a result of a speculative AT instruction. In order to
-> > > avoid mandating VHE on certain affected CPUs, apply the workaround to
-> > > both the nVHE and the VHE case for all affected CPUs.
-> > > 
-> > > Signed-off-by: Andrew Scull <ascull@google.com>
-> > > CC: Marc Zyngier <maz@kernel.org>
-> > > CC: James Morse <james.morse@arm.com>
-> > > CC: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > CC: Will Deacon <will@kernel.org>
-> > > CC: Steven Price <steven.price@arm.com>
-> > > ---
-> > > * From v1 <20200327143941.195626-1-ascull@google.com>:
-> > >   - Restored registers in VHE path
-> > 
-> > This largely looks good to me, but I don't understand these bits:
-> > 
-> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > index 8a1e81a400e0..651820f537fb 100644
-> > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > @@ -138,7 +138,7 @@ static void __hyp_text
-> > > __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> > > 
-> > >  	write_sysreg(val, cptr_el2);
-> > > 
-> > > -	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT_NVHE)) {
-> > > +	if (cpus_have_const_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> > 
-> > It seems like you consistently replace cpus_have_final_cap() with
-> > cpus_have_const_cap(), but I can't figure out why that's required.
-> 
-> Seems like a bad conflict resolution. We definitely want to keep the
-> final_cap checks for anything that will run at EL2, and probably
-> everywhere else (if capabilities are not final by the time we hit KVM,
-> we have bigger problems to solve).
-> 
-> Thanks,
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
+--===============5536399358252091315==
+Content-Type: multipart/signed; boundary="Sig_/xzv.XEbMG=15e_LStDYa1s9";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Indeed, those weren't the 5 characters my eye was interested in. Looks
-like we'll be having a v3..
+--Sig_/xzv.XEbMG=15e_LStDYa1s9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Will,
+
+On Thu, 30 Apr 2020 09:29:28 +0100 Will Deacon <will@kernel.org> wrote:
+>
+> On Thu, Apr 30, 2020 at 09:02:51AM +0100, Marc Zyngier wrote:
+> > On Wed, 29 Apr 2020 20:56:20 +0200
+> > Arnd Bergmann <arnd@arndb.de> wrote:
+> >  =20
+> > > Fixes: 22998131ab33 ("arm64: add support for folded p4d page tables")
+>=20
+> Happy to queue via arm64 for 5.8. Does that work for you, Arnd, or were y=
+ou
+> planning to get this in sooner than that?
+
+The commit that this fixes is in Andrew's patch series in linux-next,
+so it should just go in there.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/xzv.XEbMG=15e_LStDYa1s9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl6qnL4ACgkQAVBC80lX
+0GzToAf/bXREqbiltcjG5hxNdpU1I4moIKv6bFtCjrnCW5muA2pCR3xx5Twzm5UG
+Mw36RWbLqcQwOOcH9RtlCFe0zq1DEgPvShaF1lTh8n5dybdjKbCzSFsP6uoSZ/1i
+rcT/rZ1GC/9zCOvI8MUYb748fIMdC5zeZOGpTPzYL8HPV4+65nY3+OMT8+0IS2JS
+kJACY35PygG1QnWjF7JmwfBnAGe3M3jJ2OJe1IiF8lR6max8qziACp5cGHxAMq3B
+d+XyW62Jfft6iGyz4+RAslfELwJXtLqgnJPy3NoJDy3eSghTCCh43mjuRctsVctk
+7aYaVXRjxdDyfLBn013vvyPbIibusQ==
+=6Ce6
+-----END PGP SIGNATURE-----
+
+--Sig_/xzv.XEbMG=15e_LStDYa1s9--
+
+--===============5536399358252091315==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5536399358252091315==--
