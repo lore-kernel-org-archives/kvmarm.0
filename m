@@ -2,71 +2,82 @@ Return-Path: <SRS0=Ot4E=6O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA65C4724C
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 16:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951C5C47247
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 17:53:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 346502070B
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 16:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C814208D6
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 17:53:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ca/g0Woi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 346502070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnzHy6V0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C814208D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1C3F4B57E;
-	Thu, 30 Apr 2020 12:48:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F6A4B3D2;
+	Thu, 30 Apr 2020 13:53:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 20knwhegb71Z; Thu, 30 Apr 2020 12:48:04 -0400 (EDT)
+	with ESMTP id xUNE4x8Kk8x7; Thu, 30 Apr 2020 13:53:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B130E4B570;
-	Thu, 30 Apr 2020 12:48:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3862E4B3CE;
+	Thu, 30 Apr 2020 13:53:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A33A94B52E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 12:48:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4192D4B3B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 13:53:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p219IJ7yue2L for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Apr 2020 12:48:02 -0400 (EDT)
+ with ESMTP id lvzLiVRmxAUr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Apr 2020 13:53:50 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A34824B52C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 12:48:02 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DB7332070B;
- Thu, 30 Apr 2020 16:47:59 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 074344B3B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 13:53:50 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C9B7F20836;
+ Thu, 30 Apr 2020 17:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588265281;
- bh=axoYz9ubvidu6Q4qb8tE1iZySwHLJ5aESX8frhVyuiE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Ca/g0WoiwN4MNpRo23zI84MuVdc3f57axAaaKLI+X0I8yCH2/jidRQBKHbK8Kj0le
- p0ifJPTxniAeJNPxdDSQ3sL1FcGdRO8dvdmXF6bViBXQY+Fl9+SUzjn0eh/2hXocYc
- SNXgDN/8PRduyw3CCDEyv20e7Bjs+BAm0Et0exUw=
-Date: Thu, 30 Apr 2020 17:47:56 +0100
-From: Will Deacon <will@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH V2 00/16] arm64/cpufeature: Introduce ID_PFR2, ID_DFR1,
- ID_MMFR5 and other changes
-Message-ID: <20200430164756.GH25258@willie-the-truck>
-References: <1586857710-17154-1-git-send-email-anshuman.khandual@arm.com>
- <6749304e-8a4d-f4b9-eb40-91f0dd13166e@arm.com>
- <20200429212614.GD8604@willie-the-truck>
- <da15c0f0-f8ec-c2bc-bd5b-907a75119dc1@arm.com>
+ s=default; t=1588269228;
+ bh=4Xo8/1e7qaJmuQQltLTfB4vjVZPdGrjTFYT8oEPKWno=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=TnzHy6V0ZH7paWMDm5JrkAHnp/DaOr3pZvhvI0vYr1381WdBJTPVhmepyRnBUiLba
+ o8thxzN3rCxTBpDBvcLfBQetKd7K7qWM3ZeU1eXq82INA7n961BxRiD4T+u1HNYwcZ
+ dpNJGdEFn0SyLaoq3c7EWRsANA/N5cp3TcBUyYss=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jUDNb-0088YE-6h; Thu, 30 Apr 2020 18:53:47 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <da15c0f0-f8ec-c2bc-bd5b-907a75119dc1@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Thu, 30 Apr 2020 18:53:47 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH 00/15] Split off nVHE hyp code
+In-Reply-To: <20200430144831.59194-1-dbrazdil@google.com>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+User-Agent: Roundcube Webmail/1.4.3
+Message-ID: <73efca41e7b955db4963ff182624107d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,37 +89,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 30, 2020 at 08:29:44AM +0530, Anshuman Khandual wrote:
-> On 04/30/2020 02:56 AM, Will Deacon wrote:
-> > On Wed, Apr 29, 2020 at 03:07:15PM +0530, Anshuman Khandual wrote:
-> >> On 04/14/2020 03:18 PM, Anshuman Khandual wrote:
-> >>> Changes in V2:
-> >>>
-> >>> - Added Suggested-by tag from Mark Rutland for all changes he had proposed
-> >>> - Added comment for SpecSEI feature on why it is HIGHER_SAFE per Suzuki
-> >>> - Added a patch which makes ID_AA64DFR0_DOUBLELOCK a signed feature per Suzuki
-> >>> - Added ID_DFR1 and ID_MMFR5 system register definitions per Will
-> >>> - Added remaining features bits for relevant 64 bit system registers per Will
-> >>> - Changed commit message on [PATCH 5/7] regarding TraceFilt feature per Suzuki
-> >>> - Changed ID_PFR2.CSV3 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will
-> >>> - Changed ID_PFR0.CSV2 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will 
-> >>> - Changed some commit messages
-> >>
-> >> Just a gentle ping. I am wondering if you had a chance to glance
-> >> through this updated series.
-> > 
-> > Please can you resend based on for-next/cpufeature?
+Hi David,
+
+Thanks for posting this, looks quite interesting!
+
+On 2020-04-30 15:48, David Brazdil wrote:
+> Refactor files in arch/arm64/kvm/hyp to compile all code which runs in 
+> EL2
+> under nVHE into separate object files from the rest of KVM. This is 
+> done in
+> preparation for being able to unmap .hyp.text from EL1 but has other 
+> benefits,
+> notably:
+>  * safe use of KASAN/UBSAN/GCOV instrumentation on VHE code,
+>  * cleaner HVC API,
+>  * no need for __hyp_text annotations.
 > 
-> Sure, will do.
+> nVHE-specific code is moved to hyp/nvhe and compiled with custom build 
+> rules
+> similar to those used by EFI stub. Shared source files are compiled 
+> under both
+> VHE and nVHE build rules. Where a source file contained both VHE and 
+> nVHE code,
+> it is split into a shared header file and two C source files. This is 
+> done one
+> file per commit to make review easier.
 
-Thanks. I'll keep an eye out for them.
+Do you have any figure on how much bigger the final kernel becomes once 
+this
+is applied? I guess I can find out pretty easily, but this is the kind 
+of thing
+that would be useful to make part of your cover letter.
 
-Will
+I'll try to review this shortly.
+
+Thanks,
+
+         M.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
