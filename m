@@ -1,68 +1,60 @@
-Return-Path: <SRS0=Ot4E=6O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=60hl=6P=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A79C8C47258
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 20:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C51C4724C
+	for <kvmarm@archiver.kernel.org>; Fri,  1 May 2020 08:51:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 26CA5206D9
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Apr 2020 20:25:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAs32bsn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CA5206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7D0C92076D
+	for <kvmarm@archiver.kernel.org>; Fri,  1 May 2020 08:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0C92076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 842384B3D4;
-	Thu, 30 Apr 2020 16:25:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D48074B2B1;
+	Fri,  1 May 2020 04:51:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HzIus7r4hn4u; Thu, 30 Apr 2020 16:25:19 -0400 (EDT)
+	with ESMTP id 1a0rn6taJAma; Fri,  1 May 2020 04:51:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CC084B3D1;
-	Thu, 30 Apr 2020 16:25:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B43C34B578;
+	Fri,  1 May 2020 04:51:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D446C4B3BF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 16:25:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3684B542
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 May 2020 04:51:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UKJ3uT84HL4T for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Apr 2020 16:25:16 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C171D4B3BB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2020 16:25:16 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5E49C206D9;
- Thu, 30 Apr 2020 20:25:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588278315;
- bh=Xn+tE5OcczALCQrB4z/K3kU/5d8pPFbiEJOPvrC/zko=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hAs32bsnVoa0/Yh+2QzwVRaVvbOoSz+pD9f74BAjRo7XoC/GPkbSKxy40nxisbxZm
- drxJdbgiXWFKmyMcrs6WuRMP/xYh69fQZC3D2cZj3M3XsmEUx2uvT6IncAdmBux37J
- wXFtlbYTwpsrg0zuSvO477Jvl/vBC9vpZGKTfbss=
-Date: Thu, 30 Apr 2020 21:25:10 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v4 4/4] KVM: arm64: Clean up kvm makefiles
-Message-ID: <20200430202509.GA31455@willie-the-truck>
+ with ESMTP id voSxyS46-LWn for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 May 2020 04:51:22 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43AAF4B2B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 May 2020 04:51:22 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6BF41FB;
+ Fri,  1 May 2020 01:51:21 -0700 (PDT)
+Received: from [10.37.12.139] (unknown [10.37.12.139])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A3373F305;
+ Fri,  1 May 2020 01:51:19 -0700 (PDT)
+Subject: Re: [PATCH v4 2/4] KVM: arm64: Update help text
+To: tabba@google.com, maz@kernel.org, catalin.marinas@arm.com,
+ julien.thierry.kdev@gmail.com, kvmarm@lists.cs.columbia.edu
 References: <20200421131734.141766-1-tabba@google.com>
- <20200421131734.141766-5-tabba@google.com>
+ <20200421131734.141766-3-tabba@google.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <170ec871-be60-a150-5c3e-2dc9a3366f36@arm.com>
+Date: Fri, 1 May 2020 09:56:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200421131734.141766-5-tabba@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com
+In-Reply-To: <20200421131734.141766-3-tabba@google.com>
+Content-Language: en-US
+Cc: will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,26 +66,38 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Apr 21, 2020 at 02:17:34PM +0100, Fuad Tabba wrote:
-> Consolidate references to the CONFIG_KVM configuration item to encompass
-> entire folders rather than per line.
+On 04/21/2020 02:17 PM, Fuad Tabba wrote:
+> From: Will Deacon <will@kernel.org>
 > 
+> arm64 KVM supports 16k pages since 02e0b7600f83
+> ("arm64: kvm: Add support for 16K pages"), so update the Kconfig help
+> text accordingly.
+> 
+> Signed-off-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/Makefile     | 40 ++++++++++++-------------------------
->  arch/arm64/kvm/hyp/Makefile | 15 ++++----------
->  2 files changed, 17 insertions(+), 38 deletions(-)
+>   arch/arm64/kvm/Kconfig | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index ce724e526689..d2cf4f099454 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -44,8 +44,6 @@ config KVM
+>   	select TASK_DELAY_ACCT
+>   	---help---
+>   	  Support hosting virtualized guest machines.
+> -	  We don't support KVM with 16K page tables yet, due to the multiple
+> -	  levels of fake page tables.
+>   
+>   	  If unsure, say N.
 
-Seems like a sensible clean-up to me:
-
-Acked-by: Will Deacon <will@kernel.org>
-
-Will
+Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
