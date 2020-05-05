@@ -2,92 +2,90 @@ Return-Path: <SRS0=MGAT=6T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5AAC47247
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 18:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA922C47247
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 18:10:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E039320752
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 18:00:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F52B206FA
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 18:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rpE0djmo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E039320752
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHyv4DFd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F52B206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 774114B414;
-	Tue,  5 May 2020 14:00:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B41BB4B40D;
+	Tue,  5 May 2020 14:10:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mTBDi8w4WFPw; Tue,  5 May 2020 14:00:06 -0400 (EDT)
+	with ESMTP id wl8isb5PmZR2; Tue,  5 May 2020 14:10:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A4D34B3C9;
-	Tue,  5 May 2020 14:00:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 777EF4B409;
+	Tue,  5 May 2020 14:10:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 586D84B3D0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 14:00:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E94D4B402
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 14:10:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 20DkRSVz2dqi for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 May 2020 14:00:03 -0400 (EDT)
+ with ESMTP id Q3HA7rJ+amT3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 May 2020 14:10:55 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D584A4B3C9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 14:00:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36BCE4B3FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 14:10:55 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 948072075A;
- Tue,  5 May 2020 18:00:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 12B5E206B8;
+ Tue,  5 May 2020 18:10:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588701601;
- bh=yhuu/o3EzoH1HmkCKzTB+u/7msrEd4fTYFMNJZelWl4=;
+ s=default; t=1588702254;
+ bh=WdYkPZE/293zR7WzWCJ4+neg7BG9vBaeaHBO/vgMctM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=rpE0djmo3gOuHHXAwnJbfW+5wjchpdP9pNPQAcOSe31UDyhNdFk0BxmL11ktwyRyw
- VOj80xtEX0kCByhcLsDolv1tWCDDRazIm9XiMEjuMO4QR5Rt33Jfn4J8lkv7+q6w2I
- xTcaDYNIyYHmrfKINQonq2b8C6r2A3ki9iF5uOjM=
+ b=sHyv4DFdRAGLwvbTYAEY4V1bXwK+vPKh9sipsbL84Y4hMGam/3M8YtASvMiCl0AVl
+ wHZ1re5z2AUaFNJ/VaoF3BOBDMvuJLyL3rRhkPxzCyAlksTiTTL2q+VQgQsOiNKyy2
+ Dk/cTgxeuUDvN6C2yp568EEUlruh8txqehJem42Q=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=big-swifty.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jW1rL-009bAi-C8; Tue, 05 May 2020 19:00:00 +0100
-Date: Tue, 05 May 2020 18:59:56 +0100
-Message-ID: <86o8r2tg83.wl-maz@kernel.org>
+ id 1jW21s-009bV3-3P; Tue, 05 May 2020 19:10:52 +0100
+Date: Tue, 05 May 2020 19:10:50 +0100
+Message-ID: <86mu6mtfpx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: James Morse <james.morse@arm.com>
+To: Andrew Scull <ascull@google.com>
 Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
  struct kvm
-In-Reply-To: <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+In-Reply-To: <20200505172351.GD237572@google.com>
 References: <20200422120050.3693593-1-maz@kernel.org>
  <20200422120050.3693593-4-maz@kernel.org>
- <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+ <20200505152648.GA237572@google.com> <86pnbitka5.wl-maz@kernel.org>
+ <20200505172351.GD237572@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
- alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
+ andre.przywara@arm.com, Dave.Martin@arm.com, gcherian@marvell.com,
+ prime.zeng@hisilicon.com, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
- George Cherian <gcherian@marvell.com>,
+ kvmarm@lists.cs.columbia.edu, George Cherian <gcherian@marvell.com>,
  "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,240 +102,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi James,
-
-On Tue, 05 May 2020 17:03:15 +0100,
-James Morse <james.morse@arm.com> wrote:
+On Tue, 05 May 2020 18:23:51 +0100,
+Andrew Scull <ascull@google.com> wrote:
 > 
-> Hi Marc,
-> 
-> On 22/04/2020 13:00, Marc Zyngier wrote:
-> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > > > +	/* VTCR_EL2 value for this VM */
+> > > > +	u64    vtcr;
+> > > 
+> > > VTCR seems quite strongly tied to the MMU config. Is it not controlled
+> > > independently for the nested MMUs and so remains in this struct?
 > > 
-> > As we are about to reuse our stage 2 page table manipulation code for
-> > shadow stage 2 page tables in the context of nested virtualization, we
-> > are going to manage multiple stage 2 page tables for a single VM.
+> > This particular instance of VTCR_EL2 is the host's version. Which
+> > means it describes the virtual HW for the EL1 guest. It constraints,
+> > among other things, the number of IPA bits for the guest, for example,
+> > and is configured by the VMM.
 > > 
-> > This requires some pretty invasive changes to our data structures,
-> > which moves the vmid and pgd pointers into a separate structure and
-> > change pretty much all of our mmu code to operate on this structure
-> > instead.
+> > Once you start nesting, each vcpu has its own VTCR_EL2 which is still
+> > constrained by the main one (no nested guest can have a T0SZ bigger
+> > than the value imposed by userspace for this guest as a whole).
 > > 
-> > The new structure is called struct kvm_s2_mmu.
-> > 
-> > There is no intended functional change by this patch alone.
+> > Does it make sense?
 > 
-> It's not obvious to me that VTCR_EL2.T0SZ is a per-vm thing, today
-> the size of the IPA space comes from the VMM, its not a
-> hardware/compile-time property. Where does the vEL2's T0SZ go?
-> ... but using this for nested guests would 'only' cause a
-> translation fault, it would still need handling in the emulation
-> code. So making it per-vm should be simpler.
+> It does up to my ignorance of the spec in this regard.
+> 
+> Simliar to James's question, should `vtcr` live inside the mmu struct
+> with the top level `kvm::mmu` field containing the host's version and
+> the nested mmus containing the nested version of vtcr to be applied to
+> the vCPU? I didn't noticed there being a vtcr for the nested version in
+> the ~90-patch series so maybe that just isn't something that needs
+> thinking about?
 
-My reasoning is that this VTCR defines the virtual HW, and the guest's
-own VTCR_EL2 is just another guest system register. It is the role of
-the NV code to compose the two in a way that makes sense (delivering
-translation faults if the NV guest's S2 output range doesn't fit in
-the host's view of the VM IPA range).
+They serve two very different purposes. One defines the virtual HW,
+the other one is the view that a guest hypervisor gives to its own
+guests. The latter is also per-vcpu, and not per VM (yes, NV implies
+the "de-facto CnP", for those who remember an intense whiteboard
+session).  It thus lives in the system register file (being private to
+each vcpu). Another reason is that the HW can directly access the
+in-memory version of VTCR_EL2 when ARMv8.4-NV is present.
 
-> But accessing VTCR is why the stage2_dissolve_p?d() stuff still
-> needs the kvm pointer, hence the backreference... it might be neater
-> to push the vtcr properties into kvm_s2_mmu that way you could drop
-> the kvm backref, and only things that take vm-wide locks would need
-> the kvm pointer. But I don't think it matters.
-
-That's an interesting consideration. I'll have a look.
-
-> I think I get it. I can't see anything that should be the other
-> vm/vcpu pointer.
-> 
-> Reviewed-by: James Morse <james.morse@arm.com>
-
-Thanks!
-
-> Some boring fiddly stuff:
-> 
-> [...]
-> 
-> > @@ -125,24 +123,24 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
-> >  	}
-> >  }
-> >  
-> > -static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-> > +static void __hyp_text __tlb_switch_to_host(struct kvm_s2_mmu *mmu,
-> >  					    struct tlb_inv_context *cxt)
-> >  {
-> >  	if (has_vhe())
-> > -		__tlb_switch_to_host_vhe(kvm, cxt);
-> > +		__tlb_switch_to_host_vhe(cxt);
-> >  	else
-> > -		__tlb_switch_to_host_nvhe(kvm, cxt);
-> > +		__tlb_switch_to_host_nvhe(cxt);
-> >  }
-> 
-> What does __tlb_switch_to_host() need the kvm_s2_mmu for?
-
-Not much. Obviously mechanical conversion of kvm->kvm_s2_mmu, and not
-finishing the job. I'll fix that.
-
-> 
-> [...]
-> 
-> 
-> >  void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-> >  {
-> > -	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
-> > +	struct kvm_s2_mmu *mmu = kern_hyp_va(kern_hyp_va(vcpu)->arch.hw_mmu);
-> >  	struct tlb_inv_context cxt;
-> >
-> >  	/* Switch to requested VMID */
-> > -	__tlb_switch_to_guest(kvm, &cxt);
-> > +	__tlb_switch_to_guest(mmu, &cxt);
-> >
-> >  	__tlbi(vmalle1);
-> >  	dsb(nsh);
-> >  	isb();
-> >
-> > -	__tlb_switch_to_host(kvm, &cxt);
-> > +	__tlb_switch_to_host(mmu, &cxt);
-> >  }
-> 
-> Does this need the vcpu in the future?
-> Its the odd one out, the other tlb functions here take the s2_mmu, or nothing.
-> We only use the s2_mmu here.
-
-I think this was done as a way not impact the 32bit code (rest in
-peace). Definitely a candidate for immediate cleanup.
-
-> 
-> [...]
-> 
-> 
-> > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> > index e3b9ee268823b..2f99749048285 100644
-> > --- a/virt/kvm/arm/mmu.c
-> > +++ b/virt/kvm/arm/mmu.c
-> 
-> > @@ -96,31 +96,33 @@ static bool kvm_is_device_pfn(unsigned long pfn)
-> >   *
-> >   * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
-> >   */
-> > -static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
-> > +static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
-> 
-> The comment above this function still has '@kvm:	pointer to kvm structure.'
-> 
-> [...]
-> 
-> 
-> > @@ -331,8 +339,9 @@ static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
-> >   * destroying the VM), otherwise another faulting VCPU may come in and mess
-> >   * with things behind our backs.
-> >   */
-> > -static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
-> > +static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-> 
-> The comment above this function still has '@kvm:   The VM pointer'
-> 
-> [...]
-> 
-> > -static void stage2_flush_memslot(struct kvm *kvm,
-> > +static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
-> >  				 struct kvm_memory_slot *memslot)
-> >  {
-> 
-> Wouldn't something manipulating a memslot have to mess with a set of
-> kvm_s2_mmu once this is all assembled?  stage2_unmap_memslot() takes
-> struct kvm, it seems odd to pass one kvm_s2_mmu here.
-
-Indeed, that doesn't make sense. I guess this was done to match
-kvm_stage2_flush_range, which does need to take a kvm_s2_mmu (it is
-directly called from the nesting code).
-
-stage2_flush_memslot() only affects the "main" S2 PTs, so passing kvm
-here should be the right thing to do.
-
-> 
-> [...]
-> 
-> > @@ -886,21 +898,23 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
-> 
-> > -int kvm_alloc_stage2_pgd(struct kvm *kvm)
-> > +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
-> >  {
-> >  	phys_addr_t pgd_phys;
-> >  	pgd_t *pgd;
-> > +	int cpu;
-> >  
-> > -	if (kvm->arch.pgd != NULL) {
-> > +	if (mmu->pgd != NULL) {
-> >  		kvm_err("kvm_arch already initialized?\n");
-> 
-> Does this error message still make sense?
-
-Probably not anymore. I'll revisit that shortly.
-
-> 
-> 
-> >  		return -EINVAL;
-> >  	}
-> 
-> [...]
-> 
-> > @@ -1439,9 +1467,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
-> >   * @addr:	range start address
-> >   * @end:	range end address
-> >   */
-> > -static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
-> > +static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
-> >  			   phys_addr_t addr, phys_addr_t end)
-> 
-> The comment above this function still has 'kvm:		kvm instance for the VM'.
-> 
-> 
-> >  {
-> > +	struct kvm *kvm = mmu->kvm;
-> >  	pmd_t *pmd;
-> >  	phys_addr_t next;
-> >  
-> > @@ -1461,14 +1490,15 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
-> >  }
-> >  
-> >  /**
-> > - * stage2_wp_puds - write protect PGD range
-> > - * @pgd:	pointer to pgd entry
-> > - * @addr:	range start address
-> > - * @end:	range end address
-> > - */
-> > -static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
-> > +  * stage2_wp_puds - write protect PGD range
-> > +  * @pgd:	pointer to pgd entry
-> > +  * @addr:	range start address
-> > +  * @end:	range end address
-> > +  */
-> > +static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
-> >  			    phys_addr_t addr, phys_addr_t end)
-> 
-> Comment was missing @kvm, now its missing @mmu....
-> 
-> 
-> >  {
-> > +	struct kvm *kvm __maybe_unused = mmu->kvm;
-> >  	pud_t *pud;
-> >  	phys_addr_t next;
-> >  
-> 
-> > @@ -1492,12 +1522,13 @@ static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
-> >   * @addr:	Start address of range
-> >   * @end:	End address of range
-> >   */
-> > -static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
-> > +static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-> 
-> The comment above this function still ... you get the picture.
-
-Thanks a lot for the careful review. I'll respin this shortly, as this
-is one of the patch I'd like to get in early.
+Thanks,
 
 	M.
 
