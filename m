@@ -2,92 +2,81 @@ Return-Path: <SRS0=MGAT=6T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 358BBC47247
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0160C47257
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:45:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A5F3F2073B
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D8DC20746
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:45:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="D5EdbvAa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F3F2073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="p0GEzJWJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D8DC20746
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8CC4B36D;
-	Tue,  5 May 2020 11:26:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96DB74B276;
+	Tue,  5 May 2020 11:45:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ihNi6bK6+IGX; Tue,  5 May 2020 11:26:58 -0400 (EDT)
+	with ESMTP id 07KOaCZa2u8N; Tue,  5 May 2020 11:45:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CEB54B359;
-	Tue,  5 May 2020 11:26:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A26854B27F;
+	Tue,  5 May 2020 11:45:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9D94B359
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:26:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C62CC4B26D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:45:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ien43RZOv-mF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 May 2020 11:26:56 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3AA64B27D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:26:55 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id i10so3222826wrv.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2020 08:26:55 -0700 (PDT)
+ with ESMTP id JiieNTFyiUrj for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 May 2020 11:45:23 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 983D74B269
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:45:23 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id fe18so2601624qvb.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2020 08:45:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=zXzR1aUk2ZPbhK+lz+Dt3JwzZZ+Iz4WfBlkdVh6bKZ4=;
- b=D5EdbvAamPv1DrL3nw+DFrCk7yJ0oA0Pk0KLYgu30csT1pr6SXwD2SFPhq9b16Ree2
- ++nyPqcQTRhY6O4Ye2ZkZKT+PA8UYEWVNv+b5qGz096S1/6vAu7jppfCqUeBXoXr8RWO
- 7tT1K1i1KFaSNwEvHVV4zEVWWxTxTC6RU4M0UrpLdzS9mv1Ck3AD1JaFPaB6R96xWoUo
- 7vbzFotV8dB2owsQUB3g107Y3UnKh3b+dNwJi2k5zB7wZ4dZtkbsPmJXAjeEXX3qKG7C
- qMjHiL1zRDXFin/CH1nE4zNhx93UIfsgjKsB3VPBYiSt0+6KZCaoets0e7sCsJDWqVcP
- LYaQ==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=DRQlRlFg9/YXW1K7HeMg/XHQoMMIT+SlW9vP0SsWr7I=;
+ b=p0GEzJWJNTroc4p3pE+lx6A5ZC4ik9pzu3TrrG2axN0guVE9rRDYiXuNiSHBgx+7Sz
+ Pk0nfnorzFdsSK/o59EqF40RcooZhDwwcJTtBD1OkbMwrJLRgeyiFbd4U5MQqpzu7GRZ
+ SR7h5SgfDPKBpaRUlwj1teCv7AEsJDM65W0Bo0YN/8KkqAjtvWcV7dH8TcJMkPYekPde
+ fFIOAHdo28Rp/JZdc02YpWaCLyU0jCD21wIXe4bE17cU+bcIfYYycXpQ+vaULQSjMR3J
+ nCqFhuGTaE2OVOaK4YIaARP4LEHPiRywZp+wi4iG/s0usIie9WVzepwKfejIKkzU23FH
+ LEZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=zXzR1aUk2ZPbhK+lz+Dt3JwzZZ+Iz4WfBlkdVh6bKZ4=;
- b=JXCIvvoeZlhXDYahyk4RNr96Kl9eOwAyEiMW/nHY0CE31FOtAR8UTs8wTPMGuI0kQn
- 5WDUay6aldA+0LDdFlrUnVo580GIxYFxPRItdKvKf2JGCIZe4xrMRmAIn7x/91rPy/Jg
- JXF8AykZxGLSK2R9d7xfJVzUMPbAkJF5afi/2N/FYFgcfpCUNjcfZaNbqSoPD1WIpt9y
- zpu9fm6NPEJTktXWSLu4whYo1zkibF7yY8iGDL/H8J5GjJi4FdQyd9y3HkUB2LfO7qbG
- zzhhr6dJtpwMoJu4PKuUsL845Q98wvwDbVIgTHDjhjxqIyrruWh196uqrgtyeiNFJj6Z
- PEVg==
-X-Gm-Message-State: AGi0PuaY7lJPZgL5UWvJn1EioN/teHvRLg1piWEjCItHQJB+AdnXRb0+
- t3uMrf4Jh/g6br4NiiIFc+m8oQ==
-X-Google-Smtp-Source: APiQypI8heCYBzq/jyvWYkJRjjg6bf3eXOCslINaHp7aVsym9o41pg4+cPoZ+kh2dtXuR1lVzqzCkg==
-X-Received: by 2002:a5d:51c9:: with SMTP id n9mr4216171wrv.84.1588692414526;
- Tue, 05 May 2020 08:26:54 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
- by smtp.gmail.com with ESMTPSA id a13sm3733889wrv.67.2020.05.05.08.26.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 May 2020 08:26:53 -0700 (PDT)
-Date: Tue, 5 May 2020 16:26:48 +0100
-From: Andrew Scull <ascull@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data
- from struct kvm
-Message-ID: <20200505152648.GA237572@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-4-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200422120050.3693593-4-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=DRQlRlFg9/YXW1K7HeMg/XHQoMMIT+SlW9vP0SsWr7I=;
+ b=eqoYGtgtBedcTYzyrgSUBDcpO+DZhXx3bUmNBLq2igCsWLEXdczT0OGyr/AUCsJvcP
+ JL+ndN13Y1wAhzjAQInNcQ/+vGw+BOZ1UpLnjHI6cfJ9Je0axJbWxUprGhDGx+UOImsb
+ OvDgLZkUBUchGDJSsIJexz2ddQIcvytbN+q0DJaP2xvRvJ8xkh3lPL84zcrQwnS6r1fF
+ hm/80Vm+Lq/pVvP9daRZz2qI2i8jUJI4Hj3IVzZOzVlnNavy8DlP8Xv1OQdW6c1sCNRd
+ eQOXWshk2LoFzZtJdMdr49lnHwBiQiyvyTh7IFRwxtzBcVI3uWaSwLxTpAVFr/JYvCbc
+ Z5Ug==
+X-Gm-Message-State: AGi0PuZ5RbRxaXQAKnVHGInNIGkYYsl44oynvnpKUzeiAPsxu0lpU8bn
+ zuYzR6zClI66vZNFA3DTyQ0VKiF3Xw==
+X-Google-Smtp-Source: APiQypL4EOWRuSkSToyaq9+Ev409Duk0bBnAsjvTrr/siToyzx7DCiUtkOSyMV+OtYjEgaL+THo/tyMPXg==
+X-Received: by 2002:a05:6214:18c9:: with SMTP id
+ cy9mr3353718qvb.35.1588693522995; 
+ Tue, 05 May 2020 08:45:22 -0700 (PDT)
+Date: Tue,  5 May 2020 16:45:16 +0100
+Message-Id: <20200505154520.194120-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.2.526.g744177e7f7-goog
+Subject: [PATCH v5 0/4] KVM: arm64: Tidy up arch Kconfig and Makefiles
+From: Fuad Tabba <tabba@google.com>
+To: maz@kernel.org, catalin.marinas@arm.com, julien.thierry.kdev@gmail.com, 
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu
+Cc: will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,63 +93,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Having a go at reviewing. Might turn out to be more useful as a learning
-exercise for me rather than useful feedback but we've got to start
-somewhere..
+Hi,
 
-> -struct kvm_arch {
-> +struct kvm_s2_mmu {
->  	struct kvm_vmid vmid;
->  
-> -	/* stage2 entry level table */
-> -	pgd_t *pgd;
-> -	phys_addr_t pgd_phys;
-> -
-> -	/* VTCR_EL2 value for this VM */
-> -	u64    vtcr;
-> +	/*
-> +	 * stage2 entry level table
-> +	 *
-> +	 * Two kvm_s2_mmu structures in the same VM can point to the same pgd
-> +	 * here.  This happens when running a non-VHE guest hypervisor which
-> +	 * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
-> +	 * with vHCR_EL2.VM == 0.
-> +	 */
-> +	pgd_t		*pgd;
-> +	phys_addr_t	pgd_phys;
->  
->  	/* The last vcpu id that ran on each physical CPU */
->  	int __percpu *last_vcpu_ran;
->  
-> +	struct kvm *kvm;
-> +};
-> +
-> +struct kvm_arch {
-> +	struct kvm_s2_mmu mmu;
-> +
-> +	/* VTCR_EL2 value for this VM */
-> +	u64    vtcr;
+This small patch series tidies up the arm64 KVM build system by
+rejigging config options, removing some redundant help text, and
+consolidating some of the Makefile rules.
 
-VTCR seems quite strongly tied to the MMU config. Is it not controlled
-independently for the nested MMUs and so remains in this struct?
+The changes are cosmetic, but it seemed worthwhile to send this out
+for consideration.  This series is a refresh on top of 5.7-rc1.
+It depends on Marc's kvm-arm64/welcome-home branch [1] plus the
+fix from Will [2].
 
-> -static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
-> +static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
+Changes since V4 [3]:
+  * Restore the KVM_ARM_PMU conditional for pmu-emul.o
 
-How strictly is the long line style rule enforced? checkpatch has 16
-such warnings on this patch.
+Cheers,
+/fuad
 
-> -static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
-> +static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t *pudp)
->  {
-> +	struct kvm *kvm __maybe_unused = mmu->kvm;
-> +
->  	if (!stage2_pud_huge(kvm, *pudp))
->  		return;
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/welcome-home
 
-There're a couple places with `__maybe_unused` on variables that are
-then used soon after. Can they be dropped in these cases so as not to
-hide legitimate warning?
+[2]
+https://lists.cs.columbia.edu/pipermail/kvmarm/2020-April/040336.html
+
+[3]
+https://lists.cs.columbia.edu/pipermail/kvmarm/2020-April/040346.html
+
+
+Fuad Tabba (1):
+  KVM: arm64: Clean up kvm makefiles
+
+Will Deacon (3):
+  KVM: arm64: Kill off CONFIG_KVM_ARM_HOST
+  KVM: arm64: Update help text
+  KVM: arm64: Change CONFIG_KVM to a menuconfig entry
+
+ arch/arm64/kernel/asm-offsets.c |  2 +-
+ arch/arm64/kernel/cpu_errata.c  |  2 +-
+ arch/arm64/kernel/smp.c         |  2 +-
+ arch/arm64/kvm/Kconfig          | 22 ++++++++---------
+ arch/arm64/kvm/Makefile         | 42 ++++++++++++---------------------
+ arch/arm64/kvm/hyp/Makefile     | 15 ++++--------
+ 6 files changed, 32 insertions(+), 53 deletions(-)
+
+
+base-commit: 3dd059fcb44bae19f503377d14d7afff0a1ea229
+-- 
+2.26.2.526.g744177e7f7-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
