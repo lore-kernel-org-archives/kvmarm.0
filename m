@@ -2,93 +2,64 @@ Return-Path: <SRS0=MGAT=6T=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25BFC47254
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C32C47247
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 16:03:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E7D52073B
-	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 15:59:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="gkD+4b/H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7D52073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C5D54206A4
+	for <kvmarm@archiver.kernel.org>; Tue,  5 May 2020 16:03:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D54206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEF94B35F;
-	Tue,  5 May 2020 11:59:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F1C4B2DF;
+	Tue,  5 May 2020 12:03:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QonI-4zRLxKu; Tue,  5 May 2020 11:59:25 -0400 (EDT)
+	with ESMTP id XXMbOn8P6WOm; Tue,  5 May 2020 12:03:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 917974B2D9;
-	Tue,  5 May 2020 11:59:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C10CF4B2CC;
+	Tue,  5 May 2020 12:03:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D66974B2D9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:59:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAD84B27F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 12:03:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ekPvcDfZge1m for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 May 2020 11:59:22 -0400 (EDT)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8BB24B2B9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 11:59:22 -0400 (EDT)
-Received: by mail-wm1-f66.google.com with SMTP id u16so2916203wmc.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2020 08:59:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=PGN1A+sSuq/RZDk1hxq5pwV+/ZZ2rP8eCBzu/0i9JeE=;
- b=gkD+4b/HuVR1OV+wasxnOnWiiI7SPXpzXXV6NVB0/4aI4sxsX5dMVJHJSdOMD/GURm
- 0qolj7BO2CfRRwNI14+BawRnPnhQFbnlUcP94ozWZKQZ1j+V70vzlvFOzNOzEr69a50h
- DB8zN1wrTSCem8xjw10+5voFbemDDzJBFhfQvssigfGPmr4ohNpwDBYQIdOM2SwI6T8a
- HLnlfx9P89ZU7KsSlT4it26YLSo+cIqmksGluTOY68GBTbihTzxie6CFZNiG0k3v9aPx
- K/LPKXjBg/4qPR7FGBucSgPN1l94dxQnIeL+ZTHRdPPaYpokD3D/8eXp7f61AvRYXn11
- zXMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=PGN1A+sSuq/RZDk1hxq5pwV+/ZZ2rP8eCBzu/0i9JeE=;
- b=MsmsPTYAQQsukNFYIvbmv1llkVQfxU3MIUSgHFHuzx1+drnZOYu2VF2mvOJ9jYG4Kk
- d3FThsdxRA/LiByjoFJsSmzb09AhSc5bxp9auh2R0g6+LCoqGOoRGSSN6m7M1d1kd8aW
- Z3A++cORYxhJwypy1Vks49p4DG1WQlZ9HacPOz/QU8BwM2SEvqyJTVyOzPje0oPVLRS1
- srosOGy1YudC7e0JfGdm3I7++xjxF914U1EnNRBWnEiwiEKVF3gdLHfoxnnDUgFfoH/k
- I+nbzrzvb6rWSMnZJVpQ3TROszC9Wwtrlj49E9fBsMCT7kk6Fbj4WyK5izY3gINcRnwL
- K12g==
-X-Gm-Message-State: AGi0PubwehihAZWpTesMCHTzI+2/rOpkLogGKIuCNSLjSqdJvTG3SHGa
- VbuBkmKROkWGp5BCTCMUabr0qA==
-X-Google-Smtp-Source: APiQypIRbnHubEaPb4xAueBVmUC4wFvaCgRRjttD5slQL+gt6ng+H5WZMUHVwb5dq420a0m0Cc4QGw==
-X-Received: by 2002:a7b:c7d2:: with SMTP id z18mr4240013wmk.72.1588694361415; 
- Tue, 05 May 2020 08:59:21 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
- by smtp.gmail.com with ESMTPSA id a12sm841990wro.68.2020.05.05.08.59.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 May 2020 08:59:20 -0700 (PDT)
-Date: Tue, 5 May 2020 16:59:16 +0100
-From: Andrew Scull <ascull@google.com>
+ with ESMTP id Z+IGmvjA9SwL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 May 2020 12:03:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF85B4B263
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2020 12:03:25 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 720841FB;
+ Tue,  5 May 2020 09:03:25 -0700 (PDT)
+Received: from [192.168.0.14] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8076D3F71F;
+ Tue,  5 May 2020 09:03:23 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
+ struct kvm
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 05/26] arm64: Document SW reserved PTE/PMD bits in
- Stage-2 descriptors
-Message-ID: <20200505155916.GB237572@google.com>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-6-maz@kernel.org>
+ <20200422120050.3693593-4-maz@kernel.org>
+Message-ID: <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+Date: Tue, 5 May 2020 17:03:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200422120050.3693593-6-maz@kernel.org>
+In-Reply-To: <20200422120050.3693593-4-maz@kernel.org>
+Content-Language: en-GB
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, George Cherian <gcherian@marvell.com>,
+ kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
+ George Cherian <gcherian@marvell.com>,
  "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+ Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,43 +76,208 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 22, 2020 at 01:00:29PM +0100, Marc Zyngier wrote:
-> Advertise bits [58:55] as reserved for SW in the S2 descriptors.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index 6bf5e650da788..7eab0d23cdb52 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -177,10 +177,12 @@
->  #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
->  #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
->  #define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
-> +#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for SW */
->  
->  #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
->  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
->  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
-> +#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for SW */
->  
->  #define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
->  #define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
-> -- 
-> 2.26.1
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Hi Marc,
 
-This is consistent with "Attribute fields in stage 1 VMSAv8-64 Block and
-Page descriptors"
+On 22/04/2020 13:00, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> As we are about to reuse our stage 2 page table manipulation code for
+> shadow stage 2 page tables in the context of nested virtualization, we
+> are going to manage multiple stage 2 page tables for a single VM.
+> 
+> This requires some pretty invasive changes to our data structures,
+> which moves the vmid and pgd pointers into a separate structure and
+> change pretty much all of our mmu code to operate on this structure
+> instead.
+> 
+> The new structure is called struct kvm_s2_mmu.
+> 
+> There is no intended functional change by this patch alone.
 
-Reviewed-by: Andrew Scull <ascull@google.com>
+It's not obvious to me that VTCR_EL2.T0SZ is a per-vm thing, today the size of the IPA
+space comes from the VMM, its not a hardware/compile-time property. Where does the vEL2's
+T0SZ go? ... but using this for nested guests would 'only' cause a translation fault, it
+would still need handling in the emulation code. So making it per-vm should be simpler.
+
+But accessing VTCR is why the stage2_dissolve_p?d() stuff still needs the kvm pointer,
+hence the backreference... it might be neater to push the vtcr properties into kvm_s2_mmu
+that way you could drop the kvm backref, and only things that take vm-wide locks would
+need the kvm pointer. But I don't think it matters.
+
+
+I think I get it. I can't see anything that should be the other vm/vcpu pointer.
+
+Reviewed-by: James Morse <james.morse@arm.com>
+
+
+Some boring fiddly stuff:
+
+[...]
+
+> @@ -125,24 +123,24 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
+>  	}
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
+> +static void __hyp_text __tlb_switch_to_host(struct kvm_s2_mmu *mmu,
+>  					    struct tlb_inv_context *cxt)
+>  {
+>  	if (has_vhe())
+> -		__tlb_switch_to_host_vhe(kvm, cxt);
+> +		__tlb_switch_to_host_vhe(cxt);
+>  	else
+> -		__tlb_switch_to_host_nvhe(kvm, cxt);
+> +		__tlb_switch_to_host_nvhe(cxt);
+>  }
+
+What does __tlb_switch_to_host() need the kvm_s2_mmu for?
+
+[...]
+
+
+>  void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
+> +	struct kvm_s2_mmu *mmu = kern_hyp_va(kern_hyp_va(vcpu)->arch.hw_mmu);
+>  	struct tlb_inv_context cxt;
+>
+>  	/* Switch to requested VMID */
+> -	__tlb_switch_to_guest(kvm, &cxt);
+> +	__tlb_switch_to_guest(mmu, &cxt);
+>
+>  	__tlbi(vmalle1);
+>  	dsb(nsh);
+>  	isb();
+>
+> -	__tlb_switch_to_host(kvm, &cxt);
+> +	__tlb_switch_to_host(mmu, &cxt);
+>  }
+
+Does this need the vcpu in the future?
+Its the odd one out, the other tlb functions here take the s2_mmu, or nothing.
+We only use the s2_mmu here.
+
+[...]
+
+
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index e3b9ee268823b..2f99749048285 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+
+> @@ -96,31 +96,33 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+>   *
+>   * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
+>   */
+> -static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+> +static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
+
+The comment above this function still has '@kvm:	pointer to kvm structure.'
+
+[...]
+
+
+> @@ -331,8 +339,9 @@ static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
+>   * destroying the VM), otherwise another faulting VCPU may come in and mess
+>   * with things behind our backs.
+>   */
+> -static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+> +static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+
+The comment above this function still has '@kvm:   The VM pointer'
+
+[...]
+
+> -static void stage2_flush_memslot(struct kvm *kvm,
+> +static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
+>  				 struct kvm_memory_slot *memslot)
+>  {
+
+Wouldn't something manipulating a memslot have to mess with a set of kvm_s2_mmu once this
+is all assembled?
+stage2_unmap_memslot() takes struct kvm, it seems odd to pass one kvm_s2_mmu here.
+
+[...]
+
+> @@ -886,21 +898,23 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+
+> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>  {
+>  	phys_addr_t pgd_phys;
+>  	pgd_t *pgd;
+> +	int cpu;
+>  
+> -	if (kvm->arch.pgd != NULL) {
+> +	if (mmu->pgd != NULL) {
+>  		kvm_err("kvm_arch already initialized?\n");
+
+Does this error message still make sense?
+
+
+>  		return -EINVAL;
+>  	}
+
+[...]
+
+> @@ -1439,9 +1467,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
+>   * @addr:	range start address
+>   * @end:	range end address
+>   */
+> -static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+> +static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+>  			   phys_addr_t addr, phys_addr_t end)
+
+The comment above this function still has 'kvm:		kvm instance for the VM'.
+
+
+>  {
+> +	struct kvm *kvm = mmu->kvm;
+>  	pmd_t *pmd;
+>  	phys_addr_t next;
+>  
+> @@ -1461,14 +1490,15 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+>  }
+>  
+>  /**
+> - * stage2_wp_puds - write protect PGD range
+> - * @pgd:	pointer to pgd entry
+> - * @addr:	range start address
+> - * @end:	range end address
+> - */
+> -static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
+> +  * stage2_wp_puds - write protect PGD range
+> +  * @pgd:	pointer to pgd entry
+> +  * @addr:	range start address
+> +  * @end:	range end address
+> +  */
+> +static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+>  			    phys_addr_t addr, phys_addr_t end)
+
+Comment was missing @kvm, now its missing @mmu....
+
+
+>  {
+> +	struct kvm *kvm __maybe_unused = mmu->kvm;
+>  	pud_t *pud;
+>  	phys_addr_t next;
+>  
+
+> @@ -1492,12 +1522,13 @@ static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
+>   * @addr:	Start address of range
+>   * @end:	End address of range
+>   */
+> -static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+> +static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+
+The comment above this function still ... you get the picture.
+
+[...]
+
+
+Thanks,
+
+James
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
