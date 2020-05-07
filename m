@@ -2,67 +2,86 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6556DC38A2A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B2BC38A24
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:01:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D7E4F2073A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:55:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CB0F205C9
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:01:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gmbs48eM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E4F2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGDxg5yL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB0F205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E1174B34B;
-	Thu,  7 May 2020 09:55:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 973394B350;
+	Thu,  7 May 2020 10:01:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E8nn8iXoaIAz; Thu,  7 May 2020 09:55:56 -0400 (EDT)
+	with ESMTP id 5q4baD8kTZc5; Thu,  7 May 2020 10:01:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 535744B33D;
-	Thu,  7 May 2020 09:55:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35F3D4B340;
+	Thu,  7 May 2020 10:01:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A4ECF4B33D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:55:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 675CA4B322
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:01:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kfKftrxkamcg for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 09:55:53 -0400 (EDT)
+ with ESMTP id 6ps-DADviyjC for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 10:01:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B96344B333
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:55:53 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 77EBA2073A;
- Thu,  7 May 2020 13:55:51 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 521D44B318
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:01:11 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 281A1205C9;
+ Thu,  7 May 2020 14:01:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588859752;
- bh=ARBCvtUkWIJnZIUMuqoL/qArHyM8Q20nSwEF8CntUpc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Gmbs48eMUoU11HWR9JvfCWurSC63USRCarYWpDYoeXzl2onX/u/zFAZ5KQsnkn4xB
- YP+Z0YTMkL7Il3qFBehFaq6cfYAf4nwiPiz+IUwR8X7yFaQbM90geR0o5Psa+dWGyd
- sBuWFtDgDkLQirhNiX7JtqnVonYc23+hsiUk0aeY=
-Date: Thu, 7 May 2020 14:55:48 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v5 4/4] KVM: arm64: Clean up kvm makefiles
-Message-ID: <20200507135547.GB32706@willie-the-truck>
-References: <20200505154520.194120-1-tabba@google.com>
- <20200505154520.194120-5-tabba@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200505154520.194120-5-tabba@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com
+ s=default; t=1588860070;
+ bh=gzrqRuI9GcmfEYiEfi2XuT7v3FFwAUhADme/wD3GYVs=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=GGDxg5yLGkmFd6fo2A8wVmpg94TwvFupgACz42aOGVPq9c5cB5UC3/YeXx7jcsfhN
+ fZ5M4xTsrBTfyecJQ0jaB4uKnZfsI88E+TJQCHQdEp1QOxkyNw1vaiK4JLt797657u
+ mI+oyMtSbRMypSovQBoUuCeUlLgyNMl7YTZzhD2o=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jWh5I-00AHZ2-Eo; Thu, 07 May 2020 15:01:08 +0100
+Date: Thu, 07 May 2020 15:01:07 +0100
+Message-ID: <878si3j13w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH 01/15] arm64: kvm: Unify users of HVC instruction
+In-Reply-To: <20200430144831.59194-2-dbrazdil@google.com>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+ <20200430144831.59194-2-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,19 +98,216 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, May 05, 2020 at 04:45:20PM +0100, Fuad Tabba wrote:
-> Consolidate references to the CONFIG_KVM configuration item to encompass
-> entire folders rather than per line.
+On Thu, 30 Apr 2020 15:48:17 +0100,
+David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> From: Quentin Perret <qperret@google.com>
+> 
+> Currently, the arm64 KVM code provides __kvm_call_hyp assembly procedure which
+> does nothing but call the HVC instruction. This is used to call functions by
+> their pointer in EL2 under nVHE, and abused by __cpu_init_hyp_mode to pass
+> a data pointer. The hyp-stub code, on the other hand, has its own assembly
+> procedures for (re)setting hyp vectors.
+> 
+> In preparation for a clean-up of the KVM hypercall interface, unify all HVC
+> users behind __kvm_call_hyp and remove comments about expected meaning of
+> arguments.
+
+But the arguments still have a meaning, don't they? See below.
+
+> 
+> No functional changes intended.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/kvm/Makefile     | 38 +++++++++++++------------------------
->  arch/arm64/kvm/hyp/Makefile | 15 ++++-----------
->  2 files changed, 17 insertions(+), 36 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 12 ++++++-----
+>  arch/arm64/include/asm/virt.h     | 33 ++++++++++++++++++++++++++++--
+>  arch/arm64/kernel/hyp-stub.S      | 34 -------------------------------
+>  arch/arm64/kvm/hyp.S              | 13 +-----------
+>  4 files changed, 39 insertions(+), 53 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 32c8a675e5a4..e61143d6602d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -25,6 +25,7 @@
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/thread_info.h>
+> +#include <asm/virt.h>
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>  
+> @@ -446,7 +447,8 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+> -u64 __kvm_call_hyp(void *hypfn, ...);
+> +#define kvm_call_hyp_nvhe(hypfn, ...) \
+> +	__kvm_call_hyp((unsigned long)kvm_ksym_ref(hypfn), ##__VA_ARGS__)
+>  
+>  /*
+>   * The couple of isb() below are there to guarantee the same behaviour
+> @@ -459,7 +461,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			f(__VA_ARGS__);					\
+>  			isb();						\
+>  		} else {						\
+> -			__kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__); \
+> +			kvm_call_hyp_nvhe(f, ##__VA_ARGS__);		\
+>  		}							\
+>  	} while(0)
+>  
+> @@ -471,8 +473,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			ret = f(__VA_ARGS__);				\
+>  			isb();						\
+>  		} else {						\
+> -			ret = __kvm_call_hyp(kvm_ksym_ref(f),		\
+> -					     ##__VA_ARGS__);		\
+> +			ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
+>  		}							\
+>  									\
+>  		ret;							\
+> @@ -551,7 +552,8 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+>  	 * cpus_have_const_cap() wrapper.
+>  	 */
+>  	BUG_ON(!system_capabilities_finalized());
+> -	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2);
+> +	__kvm_call_hyp((unsigned long)pgd_ptr, hyp_stack_ptr, vector_ptr,
+> +		       tpidr_el2);
+>  
+>  	/*
+>  	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index 61fd26752adc..fdc11f819b06 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -62,8 +62,37 @@
+>   */
+>  extern u32 __boot_cpu_mode[2];
+>  
+> -void __hyp_set_vectors(phys_addr_t phys_vector_base);
+> -void __hyp_reset_vectors(void);
+> +/* Make HVC call into the hypervisor. */
+> +extern u64 __kvm_call_hyp(unsigned long arg, ...);
+> +
+> +/*
+> + * __hyp_set_vectors: Call this after boot to set the initial hypervisor
+> + * vectors as part of hypervisor installation.  On an SMP system, this should
+> + * be called on each CPU.
+> + *
+> + * @phys_vector_base must be the physical address of the new vector table, and
+> + * must be 2KB aligned.
+> + *
+> + * Before calling this, you must check that the stub hypervisor is installed
+> + * everywhere, by waiting for any secondary CPUs to be brought up and then
+> + * checking that is_hyp_mode_available() is true.
+> + *
+> + * If not, there is a pre-existing hypervisor, some CPUs failed to boot, or
+> + * something else went wrong... in such cases, trying to install a new
+> + * hypervisor is unlikely to work as desired.
+> + *
+> + * When you call into your shiny new hypervisor, sp_el2 will contain junk,
+> + * so you will need to set that to something sensible at the new hypervisor's
+> + * initialisation entry point.
+> + */
+> +static inline void __hyp_set_vectors(phys_addr_t phys_vector_base)
+> +{
+> +	__kvm_call_hyp(HVC_SET_VECTORS, phys_vector_base);
+> +}
+> +static inline void __hyp_reset_vectors(void)
+> +{
+> +	__kvm_call_hyp(HVC_RESET_VECTORS);
+> +}
+>  
+>  /* Reports the availability of HYP mode */
+>  static inline bool is_hyp_mode_available(void)
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index e473ead806ed..78d4ec5c4290 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -84,37 +84,3 @@ ENDPROC(\label)
+>  	invalid_vector	el1_irq_invalid
+>  	invalid_vector	el1_fiq_invalid
+>  	invalid_vector	el1_error_invalid
+> -
+> -/*
+> - * __hyp_set_vectors: Call this after boot to set the initial hypervisor
+> - * vectors as part of hypervisor installation.  On an SMP system, this should
+> - * be called on each CPU.
+> - *
+> - * x0 must be the physical address of the new vector table, and must be
+> - * 2KB aligned.
+> - *
+> - * Before calling this, you must check that the stub hypervisor is installed
+> - * everywhere, by waiting for any secondary CPUs to be brought up and then
+> - * checking that is_hyp_mode_available() is true.
+> - *
+> - * If not, there is a pre-existing hypervisor, some CPUs failed to boot, or
+> - * something else went wrong... in such cases, trying to install a new
+> - * hypervisor is unlikely to work as desired.
+> - *
+> - * When you call into your shiny new hypervisor, sp_el2 will contain junk,
+> - * so you will need to set that to something sensible at the new hypervisor's
+> - * initialisation entry point.
+> - */
+> -
+> -ENTRY(__hyp_set_vectors)
+> -	mov	x1, x0
+> -	mov	x0, #HVC_SET_VECTORS
+> -	hvc	#0
+> -	ret
+> -ENDPROC(__hyp_set_vectors)
+> -
+> -ENTRY(__hyp_reset_vectors)
+> -	mov	x0, #HVC_RESET_VECTORS
+> -	hvc	#0
+> -	ret
+> -ENDPROC(__hyp_reset_vectors)
+> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> index 3c79a1124af2..f6c9501ddfc9 100644
+> --- a/arch/arm64/kvm/hyp.S
+> +++ b/arch/arm64/kvm/hyp.S
+> @@ -11,22 +11,11 @@
+>  #include <asm/cpufeature.h>
+>  
+>  /*
+> - * u64 __kvm_call_hyp(void *hypfn, ...);
+> + * u64 __kvm_call_hyp(unsigned long arg, ...);
+>   *
+>   * This is not really a variadic function in the classic C-way and care must
+>   * be taken when calling this to ensure parameters are passed in registers
+>   * only, since the stack will change between the caller and the callee.
+> - *
+> - * Call the function with the first argument containing a pointer to the
+> - * function you wish to call in Hyp mode, and subsequent arguments will be
+> - * passed as x0, x1, and x2 (a maximum of 3 arguments in addition to the
+> - * function pointer can be passed).  The function being called must be mapped
+> - * in Hyp mode (see init_hyp_mode in arch/arm/kvm/arm.c).  Return values are
+> - * passed in x0.
+> - *
+> - * A function pointer with a value less than 0xfff has a special meaning,
+> - * and is used to implement hyp stubs in the same way as in
+> - * arch/arm64/kernel/hyp_stub.S.
 
-Acked-by: Will Deacon <will@kernel.org>
+I don't think any of this becomes obsolete with this patch (apart from
+the reference to 32bit), and only changes with patch #2. Or am I
+misunderstanding something?
 
-Will
+>   */
+>  SYM_FUNC_START(__kvm_call_hyp)
+>  	hvc	#0
+> -- 
+> 2.26.1
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
