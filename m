@@ -2,86 +2,71 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFF4C54E49
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C12C38A2A
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:12:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A9ED20870
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:10:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVRqGcta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A9ED20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 3168D20838
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:12:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3168D20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA2304B31A;
-	Thu,  7 May 2020 09:10:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A148E4B31D;
+	Thu,  7 May 2020 09:12:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lWG5fSkp33uK; Thu,  7 May 2020 09:10:44 -0400 (EDT)
+	with ESMTP id xzI1YIs6s3W3; Thu,  7 May 2020 09:12:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5493C4B2D2;
-	Thu,  7 May 2020 09:10:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B05C4B312;
+	Thu,  7 May 2020 09:12:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F39994B30E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:10:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3354B2CC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:04:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w8aR5YK5GVlZ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 09:10:41 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65F624B307
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:10:41 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4A16520735;
- Thu,  7 May 2020 13:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588857040;
- bh=ieqy+3LY8jE1+xFmcUK+l0Z6piJfFAFR7BpBJF3y+rM=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=NVRqGctajLq1T7nrzCEcqgRIwhpJvHQgGM205pfomc8MNeocCdmit1yibM9dVlPWP
- tGXPiRVWEnckU3WHmkZbRk6BfJ9qqol4jqoLUYjfzD8tB3uxBMDwyQuQnjw5pMphoG
- faii14U9EKzB78Ydmqv4HYY2m2lRthKbdOYRmOxs=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jWgIQ-00AGiC-Lz; Thu, 07 May 2020 14:10:38 +0100
-Date: Thu, 07 May 2020 14:10:30 +0100
-Message-ID: <87d07fj3g9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH 02/15] arm64: kvm: Formalize host-hyp hypcall ABI
-In-Reply-To: <20200430144831.59194-3-dbrazdil@google.com>
-References: <20200430144831.59194-1-dbrazdil@google.com>
- <20200430144831.59194-3-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id w-ye1x5lZIqy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 09:04:44 -0400 (EDT)
+Received: from out30-54.freemail.mail.aliyun.com
+ (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05D5F4B27D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:04:43 -0400 (EDT)
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R881e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07425;
+ MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
+ TI=SMTPD_---0TxqomBt_1588856677; 
+Received: from 30.27.116.247(mailfrom:tianjia.zhang@linux.alibaba.com
+ fp:SMTPD_---0TxqomBt_1588856677) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 07 May 2020 21:04:38 +0800
+Subject: Re: [PATCH v4 2/7] KVM: arm64: clean up redundant 'kvm_run' parameters
+To: Marc Zyngier <maz@kernel.org>
+References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+ <20200427043514.16144-3-tianjia.zhang@linux.alibaba.com>
+ <35eb095a344b4192b912385bc02c54e6@kernel.org>
+From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <f093f6cf-4892-7c8f-d3aa-e908d5740cba@linux.alibaba.com>
+Date: Thu, 7 May 2020 21:04:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <35eb095a344b4192b912385bc02c54e6@kernel.org>
+X-Mailman-Approved-At: Thu, 07 May 2020 09:12:15 -0400
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
+ benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
+ linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ frankja@linux.ibm.com, chenhuacai@gmail.com, mpe@ellerman.id.au,
+ joro@8bytes.org, x86@kernel.org, borntraeger@de.ibm.com, mingo@redhat.com,
+ thuth@redhat.com, gor@linux.ibm.com, kvm-ppc@vger.kernel.org, bp@alien8.de,
+ tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, jmattson@google.com,
+ tsbogend@alpha.franken.de, cohuck@redhat.com, sean.j.christopherson@intel.com,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
+ linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,311 +78,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi David, Quentin,
-
-On Thu, 30 Apr 2020 15:48:18 +0100,
-David Brazdil <dbrazdil@google.com> wrote:
-> 
-> From: Quentin Perret <qperret@google.com>
-> 
-> In preparation for removing the hyp code from the TCB, convert the current
-
-nit: Unless we have a different interpretation of the TCB acronym, I
-think you want to remove anything *but* the EL2 code from the TCB.
-
-> EL1 - EL2 KVM ABI to use hypercall numbers in lieu of direct function pointers.
-> While this in itself does not provide any isolation, it is a first step towards
-> having a properly defined EL2 ABI.
-> 
-> The implementation is based on a kvm_hcall_table which holds function pointers
-> to the hyp_text functions corresponding to each hypercall. This is highly
-> inspired from the arm64 sys_call_table, the main difference being the lack of
-> hcall wrappers at this stage.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h            | 20 ++++++-
->  arch/arm64/include/asm/kvm_host_hypercalls.h | 62 ++++++++++++++++++++
->  arch/arm64/kvm/hyp/Makefile                  |  2 +-
->  arch/arm64/kvm/hyp/host_hypercall.c          | 22 +++++++
->  arch/arm64/kvm/hyp/hyp-entry.S               | 36 +++++++++++-
->  5 files changed, 137 insertions(+), 5 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_host_hypercalls.h
->  create mode 100644 arch/arm64/kvm/hyp/host_hypercall.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e61143d6602d..5dec3b06f2b7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -24,6 +24,7 @@
->  #include <asm/fpsimd.h>
->  #include <asm/kvm.h>
->  #include <asm/kvm_asm.h>
-> +#include <asm/kvm_host_hypercalls.h>
->  #include <asm/thread_info.h>
->  #include <asm/virt.h>
->  
-> @@ -447,10 +448,25 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
->  
-> -#define kvm_call_hyp_nvhe(hypfn, ...) \
-> -	__kvm_call_hyp((unsigned long)kvm_ksym_ref(hypfn), ##__VA_ARGS__)
-> +/*
-> + * Call the hypervisor via HVC. The hcall parameter must be the name of
-> + * a hypercall as defined in <asm/kvm_host_hypercall.h>.
-> + *
-> + * Hypercalls take at most 6 parameters.
-> + */
-> +#define kvm_call_hyp_nvhe(hcall, ...) \
-> +	__kvm_call_hyp(KVM_HOST_HCALL_NR(hcall), ##__VA_ARGS__)
->  
->  /*
-> + * u64 kvm_call_hyp(hcall, ...);
-> + *
-> + * Call the hypervisor. The hcall parameter must be the name of a hypercall
-> + * defined in <asm/kvm_host_hypercall.h>. In the VHE case, this will be
-> + * translated into a direct function call.
-> + *
-> + * A hcall value of less than 0xfff has a special meaning and is used to
-> + * implement hyp stubs in the same way as in arch/arm64/kernel/hyp_stub.S.
-> + *
->   * The couple of isb() below are there to guarantee the same behaviour
->   * on VHE as on !VHE, where the eret to EL1 acts as a context
->   * synchronization event.
-> diff --git a/arch/arm64/include/asm/kvm_host_hypercalls.h b/arch/arm64/include/asm/kvm_host_hypercalls.h
-> new file mode 100644
-> index 000000000000..af8ad505d816
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_host_hypercalls.h
-> @@ -0,0 +1,62 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2020 Google, inc
-> + */
-> +
-> +#ifndef __KVM_HOST_HCALL
-> +#define __KVM_HOST_HCALL(x)
-> +#endif
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_enable_ssbs		0
-> +__KVM_HOST_HCALL(__kvm_enable_ssbs)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_get_mdcr_el2		1
-> +__KVM_HOST_HCALL(__kvm_get_mdcr_el2)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_timer_set_cntvoff	2
-> +__KVM_HOST_HCALL(__kvm_timer_set_cntvoff)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_local_vmid	3
-> +__KVM_HOST_HCALL(__kvm_tlb_flush_local_vmid)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_flush_vm_context	4
-> +__KVM_HOST_HCALL(__kvm_flush_vm_context)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_vcpu_run_nvhe		5
-> +__KVM_HOST_HCALL(__kvm_vcpu_run_nvhe)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_vmid		6
-> +__KVM_HOST_HCALL(__kvm_tlb_flush_vmid)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_vmid_ipa	7
-> +__KVM_HOST_HCALL(__kvm_tlb_flush_vmid_ipa)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_init_lrs		8
-> +__KVM_HOST_HCALL(__vgic_v3_init_lrs)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_get_ich_vtr_el2	9
-> +__KVM_HOST_HCALL(__vgic_v3_get_ich_vtr_el2)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_write_vmcr		10
-> +__KVM_HOST_HCALL(__vgic_v3_write_vmcr)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_restore_aprs	11
-> +__KVM_HOST_HCALL(__vgic_v3_restore_aprs)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_read_vmcr		12
-> +__KVM_HOST_HCALL(__vgic_v3_read_vmcr)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_save_aprs		13
-> +__KVM_HOST_HCALL(__vgic_v3_save_aprs)
-> +
-> +#define __KVM_HOST_HCALL_TABLE_IDX_SIZE				14
-
-This whole thing screams "enum" into my ears. Having to maintain these
-as #defines feels like a pain, specially if the numbers are never used
-in assembly code. (and for that, we have asm-offset.h).
-
-> +
-> +/* XXX - Arbitrary offset for KVM-related hypercalls */
-> +#define __KVM_HOST_HCALL_BASE_SHIFT 8
-> +#define __KVM_HOST_HCALL_BASE (1ULL << __KVM_HOST_HCALL_BASE_SHIFT)
-> +#define __KVM_HOST_HCALL_END (__KVM_HOST_HCALL_BASE + \
-> +			      __KVM_HOST_HCALL_TABLE_IDX_SIZE)
-
-I don't really get what is this offset for. It is too small to be used
-to skip the stub hypercalls (you'd need to start at 0x1000). Given
-that you store the whole thing in an array, you're wasting some
-memory. I'm sure you have a good story for it though! ;-)
-
-> +
-> +/* Hypercall number = kvm offset + table idx */
-> +#define KVM_HOST_HCALL_NR(name) (__KVM_HOST_HCALL_TABLE_IDX_##name + \
-> +				 __KVM_HOST_HCALL_BASE)
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 8c9880783839..29e2b2cd2fbc 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -9,7 +9,7 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
->  obj-$(CONFIG_KVM) += hyp.o
->  
->  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
-> -	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
-> +	 debug-sr.o entry.o switch.o fpsimd.o tlb.o host_hypercall.o hyp-entry.o
->  
->  # KVM code is run at a different exception code with a different map, so
->  # compiler instrumentation that inserts callbacks or checks into the code may
-> diff --git a/arch/arm64/kvm/hyp/host_hypercall.c b/arch/arm64/kvm/hyp/host_hypercall.c
-> new file mode 100644
-> index 000000000000..6b31310f36a8
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/host_hypercall.c
-> @@ -0,0 +1,22 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2020 Google, inc
-> + */
-> +
-> +#include <asm/kvm_hyp.h>
-> +
-> +typedef long (*kvm_hcall_fn_t)(void);
-> +
-> +static long __hyp_text kvm_hc_ni(void)
-> +{
-> +       return -ENOSYS;
-> +}
-> +
-> +#undef __KVM_HOST_HCALL
-> +#define __KVM_HOST_HCALL(name) \
-> +	[__KVM_HOST_HCALL_TABLE_IDX_##name] = (long (*)(void))name,
-> +
-> +const kvm_hcall_fn_t kvm_hcall_table[__KVM_HOST_HCALL_TABLE_IDX_SIZE] = {
-> +	[0 ... __KVM_HOST_HCALL_TABLE_IDX_SIZE-1] = kvm_hc_ni,
-> +#include <asm/kvm_host_hypercalls.h>
-> +};
-
-Cunning. At the same time, if you can do this once, you can do it
-twice, and generating the __KVM_HOST_HCALL_TABLE_IDX_* as an enum
-should be pretty easy, and could live in its own include file.
-
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index c2a13ab3c471..1a51a0958504 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -13,6 +13,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_host_hypercalls.h>
->  #include <asm/mmu.h>
->  
->  	.text
-> @@ -21,17 +22,26 @@
->  .macro do_el2_call
->  	/*
->  	 * Shuffle the parameters before calling the function
-> -	 * pointed to in x0. Assumes parameters in x[1,2,3].
-> +	 * pointed to in x0. Assumes parameters in x[1,2,3,4,5,6].
->  	 */
->  	str	lr, [sp, #-16]!
->  	mov	lr, x0
->  	mov	x0, x1
->  	mov	x1, x2
->  	mov	x2, x3
-> +	mov	x3, x4
-> +	mov	x4, x5
-> +	mov	x5, x6
-
-Has any function changed prototype as part of this patch that they'd
-require this change? It doesn't look like it. I guess this should be
-part of another patch.
-
->  	blr	lr
->  	ldr	lr, [sp], #16
->  .endm
->  
-> +/* kern_hyp_va(lm_alias(ksym)) */
-> +.macro ksym_hyp_va ksym, lm_offset
-> +	sub	\ksym, \ksym, \lm_offset
-> +	kern_hyp_va	\ksym
-> +.endm
-> +
->  el1_sync:				// Guest trapped into EL2
->  
->  	mrs	x0, esr_el2
-> @@ -66,10 +76,32 @@ el1_sync:				// Guest trapped into EL2
->  	br	x5
->  
->  1:
-> +	/* Check if the hcall number is valid */
-> +	cmp	x0, #__KVM_HOST_HCALL_BASE
-> +	b.lt	2f
-> +	cmp	x0, #__KVM_HOST_HCALL_END
-> +	b.lt	3f
-> +2:
-> +	mov	x0, -ENOSYS
-> +	eret
-> +
-> +3:
-> +	/* Compute lm_alias() offset in x9 */
-> +	ldr_l	x9, kimage_voffset
-> +	ldr_l	x10, physvirt_offset
-> +	add	x9, x9, x10
-> +
-> +	/* Find hcall function pointer in the table */
-> +	ldr	x10, =kvm_hcall_table
-> +	ksym_hyp_va	x10, x9
-
-Can't kvm_hcall_table be referenced with adr or adr_l? It'd certainly
-be nice to avoid the extra load for something that is essentially a
-build-time constant.
-
-Another thing that could be improved is to keep the lm_alias offset
-somewhere, saving one load per entry. Not a huge deal.
-
-> +	sub	x0, x0, #__KVM_HOST_HCALL_BASE
-> +	add	x0, x10, x0, lsl 3
-
-The usual convention for immediate is to prefix them with #.
-
-> +	ldr	x0, [x0]
-> +	ksym_hyp_va	x0, x9
-> +
->  	/*
->  	 * Perform the EL2 call
->  	 */
-> -	kern_hyp_va	x0
->  	do_el2_call
->  
->  	eret
-> -- 
-> 2.26.1
-> 
-> 
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+CgpPbiAyMDIwLzUvNSAxNjozOSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFRpYW5qaWEsCj4g
+Cj4gT24gMjAyMC0wNC0yNyAwNTozNSwgVGlhbmppYSBaaGFuZyB3cm90ZToKPj4gSW4gdGhlIGN1
+cnJlbnQga3ZtIHZlcnNpb24sICdrdm1fcnVuJyBoYXMgYmVlbiBpbmNsdWRlZCBpbiB0aGUgJ2t2
+bV92Y3B1Jwo+PiBzdHJ1Y3R1cmUuIEZvciBoaXN0b3JpY2FsIHJlYXNvbnMsIG1hbnkga3ZtLXJl
+bGF0ZWQgZnVuY3Rpb24gcGFyYW1ldGVycwo+PiByZXRhaW4gdGhlICdrdm1fcnVuJyBhbmQgJ2t2
+bV92Y3B1JyBwYXJhbWV0ZXJzIGF0IHRoZSBzYW1lIHRpbWUuIFRoaXMKPj4gcGF0Y2ggZG9lcyBh
+IHVuaWZpZWQgY2xlYW51cCBvZiB0aGVzZSByZW1haW5pbmcgcmVkdW5kYW50IHBhcmFtZXRlcnMu
+Cj4+Cj4+IFNpZ25lZC1vZmYtYnk6IFRpYW5qaWEgWmhhbmcgPHRpYW5qaWEuemhhbmdAbGludXgu
+YWxpYmFiYS5jb20+Cj4gCj4gT24gdGhlIGZhY2Ugb2YgaXQsIHRoaXMgbG9va3MgT0ssIGJ1dCBJ
+IGhhdmVuJ3QgdHJpZWQgdG8gcnVuIHRoZQo+IHJlc3VsdGluZyBrZXJuZWwuIEknbSBub3Qgb3Bw
+b3NlZCB0byB0YWtpbmcgdGhpcyBwYXRjaCAqaWYqIHRoZXJlCj4gaXMgYW4gYWdyZWVtZW50IGFj
+cm9zcyBhcmNoaXRlY3R1cmVzIHRvIHRha2UgdGhlIHNlcmllcyAoSSB2YWx1ZQo+IGNvbnNpc3Rl
+bmN5IG92ZXIgdGhlIGphbml0b3JpYWwgZXhlcmNpc2UpLgo+IAo+IEFub3RoZXIgdGhpbmcgaXMg
+dGhhdCB0aGlzIGlzIGdvaW5nIHRvIGNvbmZsaWN0IHdpdGggdGhlIHNldCBvZgo+IHBhdGNoZXMg
+dGhhdCBtb3ZlIHRoZSBLVk0vYXJtIGNvZGUgYmFjayB3aGVyZSBpdCBiZWxvbmdzIChhcmNoL2Fy
+bTY0L2t2bSksCj4gc28gSSdkIHByb2JhYmx5IGNoZXJyeS1waWNrIHRoYXQgb25lIGRpcmVjdGx5
+Lgo+IAo+IFRoYW5rcywKPiAKPiAgwqDCoMKgwqDCoMKgwqAgTS4KPiAKCkRvIEkgbmVlZCB0byBz
+dWJtaXQgdGhpcyBzZXQgb2YgcGF0Y2hlcyBzZXBhcmF0ZWx5IGZvciBlYWNoIAphcmNoaXRlY3R1
+cmU/IENvdWxkIGl0IGJlIG1lcmdlZCBhdCBvbmNlLCBpZiBuZWNlc3NhcnksIEkgd2lsbApyZXN1
+Ym1pdCBiYXNlZCBvbiB0aGUgbGF0ZXN0IG1haW5saW5lLgoKVGhhbmtzLApUaWFuamlhCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
