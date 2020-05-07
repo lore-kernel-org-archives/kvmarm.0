@@ -2,58 +2,86 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8C0C54E4A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 12:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFF4C54E49
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:10:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED63220663
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 12:36:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED63220663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 3A9ED20870
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:10:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVRqGcta"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A9ED20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6E914B24E;
-	Thu,  7 May 2020 08:36:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA2304B31A;
+	Thu,  7 May 2020 09:10:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5Jl2XSpQ-An5; Thu,  7 May 2020 08:36:39 -0400 (EDT)
+	with ESMTP id lWG5fSkp33uK; Thu,  7 May 2020 09:10:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 426564B2F0;
-	Thu,  7 May 2020 08:36:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5493C4B2D2;
+	Thu,  7 May 2020 09:10:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B3514B1FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 08:36:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F39994B30E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:10:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FECKP+9JWKmn for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 08:36:35 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93A914B1FC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 08:36:35 -0400 (EDT)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 98BE86ECF0636A7CEB95;
- Thu,  7 May 2020 20:36:31 +0800 (CST)
-Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 7 May 2020 20:36:24 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <kvmarm@lists.cs.columbia.edu>, <suzuki.poulose@arm.com>
-Subject: [PATCH resend 2/2] KVM: arm64: Unify handling THP backed host memory
-Date: Thu, 7 May 2020 20:35:46 +0800
-Message-ID: <20200507123546.1875-3-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
-In-Reply-To: <20200507123546.1875-1-yuzenghui@huawei.com>
-References: <20200507123546.1875-1-yuzenghui@huawei.com>
-MIME-Version: 1.0
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id w8aR5YK5GVlZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 09:10:41 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65F624B307
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:10:41 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4A16520735;
+ Thu,  7 May 2020 13:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1588857040;
+ bh=ieqy+3LY8jE1+xFmcUK+l0Z6piJfFAFR7BpBJF3y+rM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=NVRqGctajLq1T7nrzCEcqgRIwhpJvHQgGM205pfomc8MNeocCdmit1yibM9dVlPWP
+ tGXPiRVWEnckU3WHmkZbRk6BfJ9qqol4jqoLUYjfzD8tB3uxBMDwyQuQnjw5pMphoG
+ faii14U9EKzB78Ydmqv4HYY2m2lRthKbdOYRmOxs=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jWgIQ-00AGiC-Lz; Thu, 07 May 2020 14:10:38 +0100
+Date: Thu, 07 May 2020 14:10:30 +0100
+Message-ID: <87d07fj3g9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH 02/15] arm64: kvm: Formalize host-hyp hypcall ABI
+In-Reply-To: <20200430144831.59194-3-dbrazdil@google.com>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+ <20200430144831.59194-3-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,170 +98,305 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi David, Quentin,
 
-We support mapping host memory backed by PMD transparent hugepages
-at stage2 as huge pages. However the checks are now spread across
-two different places. Let us unify the handling of the THPs to
-keep the code cleaner (and future proof for PUD THP support).
-This patch moves transparent_hugepage_adjust() closer to the caller
-to avoid a forward declaration for fault_supports_stage2_huge_mappings().
+On Thu, 30 Apr 2020 15:48:18 +0100,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> From: Quentin Perret <qperret@google.com>
+> 
+> In preparation for removing the hyp code from the TCB, convert the current
 
-Also, since we already handle the case where the host VA and the guest
-PA may not be aligned, the explicit VM_BUG_ON() is not required.
+nit: Unless we have a different interpretation of the TCB acronym, I
+think you want to remove anything *but* the EL2 code from the TCB.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
- virt/kvm/arm/mmu.c | 115 +++++++++++++++++++++++----------------------
- 1 file changed, 60 insertions(+), 55 deletions(-)
+> EL1 - EL2 KVM ABI to use hypercall numbers in lieu of direct function pointers.
+> While this in itself does not provide any isolation, it is a first step towards
+> having a properly defined EL2 ABI.
+> 
+> The implementation is based on a kvm_hcall_table which holds function pointers
+> to the hyp_text functions corresponding to each hypercall. This is highly
+> inspired from the arm64 sys_call_table, the main difference being the lack of
+> hcall wrappers at this stage.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h            | 20 ++++++-
+>  arch/arm64/include/asm/kvm_host_hypercalls.h | 62 ++++++++++++++++++++
+>  arch/arm64/kvm/hyp/Makefile                  |  2 +-
+>  arch/arm64/kvm/hyp/host_hypercall.c          | 22 +++++++
+>  arch/arm64/kvm/hyp/hyp-entry.S               | 36 +++++++++++-
+>  5 files changed, 137 insertions(+), 5 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_host_hypercalls.h
+>  create mode 100644 arch/arm64/kvm/hyp/host_hypercall.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e61143d6602d..5dec3b06f2b7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -24,6 +24,7 @@
+>  #include <asm/fpsimd.h>
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+> +#include <asm/kvm_host_hypercalls.h>
+>  #include <asm/thread_info.h>
+>  #include <asm/virt.h>
+>  
+> @@ -447,10 +448,25 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+> -#define kvm_call_hyp_nvhe(hypfn, ...) \
+> -	__kvm_call_hyp((unsigned long)kvm_ksym_ref(hypfn), ##__VA_ARGS__)
+> +/*
+> + * Call the hypervisor via HVC. The hcall parameter must be the name of
+> + * a hypercall as defined in <asm/kvm_host_hypercall.h>.
+> + *
+> + * Hypercalls take at most 6 parameters.
+> + */
+> +#define kvm_call_hyp_nvhe(hcall, ...) \
+> +	__kvm_call_hyp(KVM_HOST_HCALL_NR(hcall), ##__VA_ARGS__)
+>  
+>  /*
+> + * u64 kvm_call_hyp(hcall, ...);
+> + *
+> + * Call the hypervisor. The hcall parameter must be the name of a hypercall
+> + * defined in <asm/kvm_host_hypercall.h>. In the VHE case, this will be
+> + * translated into a direct function call.
+> + *
+> + * A hcall value of less than 0xfff has a special meaning and is used to
+> + * implement hyp stubs in the same way as in arch/arm64/kernel/hyp_stub.S.
+> + *
+>   * The couple of isb() below are there to guarantee the same behaviour
+>   * on VHE as on !VHE, where the eret to EL1 acts as a context
+>   * synchronization event.
+> diff --git a/arch/arm64/include/asm/kvm_host_hypercalls.h b/arch/arm64/include/asm/kvm_host_hypercalls.h
+> new file mode 100644
+> index 000000000000..af8ad505d816
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_host_hypercalls.h
+> @@ -0,0 +1,62 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2020 Google, inc
+> + */
+> +
+> +#ifndef __KVM_HOST_HCALL
+> +#define __KVM_HOST_HCALL(x)
+> +#endif
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_enable_ssbs		0
+> +__KVM_HOST_HCALL(__kvm_enable_ssbs)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_get_mdcr_el2		1
+> +__KVM_HOST_HCALL(__kvm_get_mdcr_el2)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_timer_set_cntvoff	2
+> +__KVM_HOST_HCALL(__kvm_timer_set_cntvoff)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_local_vmid	3
+> +__KVM_HOST_HCALL(__kvm_tlb_flush_local_vmid)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_flush_vm_context	4
+> +__KVM_HOST_HCALL(__kvm_flush_vm_context)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_vcpu_run_nvhe		5
+> +__KVM_HOST_HCALL(__kvm_vcpu_run_nvhe)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_vmid		6
+> +__KVM_HOST_HCALL(__kvm_tlb_flush_vmid)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___kvm_tlb_flush_vmid_ipa	7
+> +__KVM_HOST_HCALL(__kvm_tlb_flush_vmid_ipa)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_init_lrs		8
+> +__KVM_HOST_HCALL(__vgic_v3_init_lrs)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_get_ich_vtr_el2	9
+> +__KVM_HOST_HCALL(__vgic_v3_get_ich_vtr_el2)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_write_vmcr		10
+> +__KVM_HOST_HCALL(__vgic_v3_write_vmcr)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_restore_aprs	11
+> +__KVM_HOST_HCALL(__vgic_v3_restore_aprs)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_read_vmcr		12
+> +__KVM_HOST_HCALL(__vgic_v3_read_vmcr)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_save_aprs		13
+> +__KVM_HOST_HCALL(__vgic_v3_save_aprs)
+> +
+> +#define __KVM_HOST_HCALL_TABLE_IDX_SIZE				14
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 557f36866d1c..93a770fd2b5e 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1372,47 +1372,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 	return ret;
- }
- 
--static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
--{
--	kvm_pfn_t pfn = *pfnp;
--	gfn_t gfn = *ipap >> PAGE_SHIFT;
--
--	if (kvm_is_transparent_hugepage(pfn)) {
--		unsigned long mask;
--		/*
--		 * The address we faulted on is backed by a transparent huge
--		 * page.  However, because we map the compound huge page and
--		 * not the individual tail page, we need to transfer the
--		 * refcount to the head page.  We have to be careful that the
--		 * THP doesn't start to split while we are adjusting the
--		 * refcounts.
--		 *
--		 * We are sure this doesn't happen, because mmu_notifier_retry
--		 * was successful and we are holding the mmu_lock, so if this
--		 * THP is trying to split, it will be blocked in the mmu
--		 * notifier before touching any of the pages, specifically
--		 * before being able to call __split_huge_page_refcount().
--		 *
--		 * We can therefore safely transfer the refcount from PG_tail
--		 * to PG_head and switch the pfn from a tail page to the head
--		 * page accordingly.
--		 */
--		mask = PTRS_PER_PMD - 1;
--		VM_BUG_ON((gfn & mask) != (pfn & mask));
--		if (pfn & mask) {
--			*ipap &= PMD_MASK;
--			kvm_release_pfn_clean(pfn);
--			pfn &= ~mask;
--			kvm_get_pfn(pfn);
--			*pfnp = pfn;
--		}
--
--		return true;
--	}
--
--	return false;
--}
--
- /**
-  * stage2_wp_ptes - write protect PMD range
-  * @pmd:	pointer to pmd entry
-@@ -1660,6 +1619,59 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
- }
- 
-+/*
-+ * Check if the given hva is backed by a transparent huge page (THP) and
-+ * whether it can be mapped using block mapping in stage2. If so, adjust
-+ * the stage2 PFN and IPA accordingly. Only PMD_SIZE THPs are currently
-+ * supported. This will need to be updated to support other THP sizes.
-+ *
-+ * Returns the size of the mapping.
-+ */
-+static unsigned long
-+transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
-+			    unsigned long hva, kvm_pfn_t *pfnp,
-+			    phys_addr_t *ipap)
-+{
-+	kvm_pfn_t pfn = *pfnp;
-+
-+	/*
-+	 * Make sure the adjustment is done only for THP pages. Also make
-+	 * sure that the HVA and IPA are sufficiently aligned and that the
-+	 * block map is contained within the memslot.
-+	 */
-+	if (kvm_is_transparent_hugepage(pfn) &&
-+	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-+		/*
-+		 * The address we faulted on is backed by a transparent huge
-+		 * page.  However, because we map the compound huge page and
-+		 * not the individual tail page, we need to transfer the
-+		 * refcount to the head page.  We have to be careful that the
-+		 * THP doesn't start to split while we are adjusting the
-+		 * refcounts.
-+		 *
-+		 * We are sure this doesn't happen, because mmu_notifier_retry
-+		 * was successful and we are holding the mmu_lock, so if this
-+		 * THP is trying to split, it will be blocked in the mmu
-+		 * notifier before touching any of the pages, specifically
-+		 * before being able to call __split_huge_page_refcount().
-+		 *
-+		 * We can therefore safely transfer the refcount from PG_tail
-+		 * to PG_head and switch the pfn from a tail page to the head
-+		 * page accordingly.
-+		 */
-+		*ipap &= PMD_MASK;
-+		kvm_release_pfn_clean(pfn);
-+		pfn &= ~(PTRS_PER_PMD - 1);
-+		kvm_get_pfn(pfn);
-+		*pfnp = pfn;
-+
-+		return PMD_SIZE;
-+	}
-+
-+	/* Use page mapping if we cannot use block mapping. */
-+	return PAGE_SIZE;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -1773,20 +1785,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
- 
--	if (vma_pagesize == PAGE_SIZE && !force_pte) {
--		/*
--		 * Only PMD_SIZE transparent hugepages(THP) are
--		 * currently supported. This code will need to be
--		 * updated to support other THP sizes.
--		 *
--		 * Make sure the host VA and the guest IPA are sufficiently
--		 * aligned and that the block is contained within the memslot.
--		 */
--		if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
--		    transparent_hugepage_adjust(&pfn, &fault_ipa))
--			vma_pagesize = PMD_SIZE;
--	}
--
-+	/*
-+	 * If we are not forced to use page mapping, check if we are
-+	 * backed by a THP and thus use block mapping if possible.
-+	 */
-+	if (vma_pagesize == PAGE_SIZE && !force_pte)
-+		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-+							   &pfn, &fault_ipa);
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
- 
+This whole thing screams "enum" into my ears. Having to maintain these
+as #defines feels like a pain, specially if the numbers are never used
+in assembly code. (and for that, we have asm-offset.h).
+
+> +
+> +/* XXX - Arbitrary offset for KVM-related hypercalls */
+> +#define __KVM_HOST_HCALL_BASE_SHIFT 8
+> +#define __KVM_HOST_HCALL_BASE (1ULL << __KVM_HOST_HCALL_BASE_SHIFT)
+> +#define __KVM_HOST_HCALL_END (__KVM_HOST_HCALL_BASE + \
+> +			      __KVM_HOST_HCALL_TABLE_IDX_SIZE)
+
+I don't really get what is this offset for. It is too small to be used
+to skip the stub hypercalls (you'd need to start at 0x1000). Given
+that you store the whole thing in an array, you're wasting some
+memory. I'm sure you have a good story for it though! ;-)
+
+> +
+> +/* Hypercall number = kvm offset + table idx */
+> +#define KVM_HOST_HCALL_NR(name) (__KVM_HOST_HCALL_TABLE_IDX_##name + \
+> +				 __KVM_HOST_HCALL_BASE)
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 8c9880783839..29e2b2cd2fbc 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -9,7 +9,7 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+>  obj-$(CONFIG_KVM) += hyp.o
+>  
+>  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
+> -	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
+> +	 debug-sr.o entry.o switch.o fpsimd.o tlb.o host_hypercall.o hyp-entry.o
+>  
+>  # KVM code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+> diff --git a/arch/arm64/kvm/hyp/host_hypercall.c b/arch/arm64/kvm/hyp/host_hypercall.c
+> new file mode 100644
+> index 000000000000..6b31310f36a8
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/host_hypercall.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2020 Google, inc
+> + */
+> +
+> +#include <asm/kvm_hyp.h>
+> +
+> +typedef long (*kvm_hcall_fn_t)(void);
+> +
+> +static long __hyp_text kvm_hc_ni(void)
+> +{
+> +       return -ENOSYS;
+> +}
+> +
+> +#undef __KVM_HOST_HCALL
+> +#define __KVM_HOST_HCALL(name) \
+> +	[__KVM_HOST_HCALL_TABLE_IDX_##name] = (long (*)(void))name,
+> +
+> +const kvm_hcall_fn_t kvm_hcall_table[__KVM_HOST_HCALL_TABLE_IDX_SIZE] = {
+> +	[0 ... __KVM_HOST_HCALL_TABLE_IDX_SIZE-1] = kvm_hc_ni,
+> +#include <asm/kvm_host_hypercalls.h>
+> +};
+
+Cunning. At the same time, if you can do this once, you can do it
+twice, and generating the __KVM_HOST_HCALL_TABLE_IDX_* as an enum
+should be pretty easy, and could live in its own include file.
+
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index c2a13ab3c471..1a51a0958504 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -13,6 +13,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_host_hypercalls.h>
+>  #include <asm/mmu.h>
+>  
+>  	.text
+> @@ -21,17 +22,26 @@
+>  .macro do_el2_call
+>  	/*
+>  	 * Shuffle the parameters before calling the function
+> -	 * pointed to in x0. Assumes parameters in x[1,2,3].
+> +	 * pointed to in x0. Assumes parameters in x[1,2,3,4,5,6].
+>  	 */
+>  	str	lr, [sp, #-16]!
+>  	mov	lr, x0
+>  	mov	x0, x1
+>  	mov	x1, x2
+>  	mov	x2, x3
+> +	mov	x3, x4
+> +	mov	x4, x5
+> +	mov	x5, x6
+
+Has any function changed prototype as part of this patch that they'd
+require this change? It doesn't look like it. I guess this should be
+part of another patch.
+
+>  	blr	lr
+>  	ldr	lr, [sp], #16
+>  .endm
+>  
+> +/* kern_hyp_va(lm_alias(ksym)) */
+> +.macro ksym_hyp_va ksym, lm_offset
+> +	sub	\ksym, \ksym, \lm_offset
+> +	kern_hyp_va	\ksym
+> +.endm
+> +
+>  el1_sync:				// Guest trapped into EL2
+>  
+>  	mrs	x0, esr_el2
+> @@ -66,10 +76,32 @@ el1_sync:				// Guest trapped into EL2
+>  	br	x5
+>  
+>  1:
+> +	/* Check if the hcall number is valid */
+> +	cmp	x0, #__KVM_HOST_HCALL_BASE
+> +	b.lt	2f
+> +	cmp	x0, #__KVM_HOST_HCALL_END
+> +	b.lt	3f
+> +2:
+> +	mov	x0, -ENOSYS
+> +	eret
+> +
+> +3:
+> +	/* Compute lm_alias() offset in x9 */
+> +	ldr_l	x9, kimage_voffset
+> +	ldr_l	x10, physvirt_offset
+> +	add	x9, x9, x10
+> +
+> +	/* Find hcall function pointer in the table */
+> +	ldr	x10, =kvm_hcall_table
+> +	ksym_hyp_va	x10, x9
+
+Can't kvm_hcall_table be referenced with adr or adr_l? It'd certainly
+be nice to avoid the extra load for something that is essentially a
+build-time constant.
+
+Another thing that could be improved is to keep the lm_alias offset
+somewhere, saving one load per entry. Not a huge deal.
+
+> +	sub	x0, x0, #__KVM_HOST_HCALL_BASE
+> +	add	x0, x10, x0, lsl 3
+
+The usual convention for immediate is to prefix them with #.
+
+> +	ldr	x0, [x0]
+> +	ksym_hyp_va	x0, x9
+> +
+>  	/*
+>  	 * Perform the EL2 call
+>  	 */
+> -	kern_hyp_va	x0
+>  	do_el2_call
+>  
+>  	eret
+> -- 
+> 2.26.1
+> 
+> 
+
+Thanks,
+
+	M.
+
 -- 
-2.19.1
-
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
