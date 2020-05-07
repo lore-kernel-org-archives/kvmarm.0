@@ -2,71 +2,86 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C12C38A2A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C41AC38A2A
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:22:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3168D20838
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:12:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3168D20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTP id 2A6DD20838
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 13:22:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mvxv/k6N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6DD20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A148E4B31D;
-	Thu,  7 May 2020 09:12:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7FCE4B332;
+	Thu,  7 May 2020 09:22:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xzI1YIs6s3W3; Thu,  7 May 2020 09:12:16 -0400 (EDT)
+	with ESMTP id dZzrvwyIxbOd; Thu,  7 May 2020 09:22:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B05C4B312;
-	Thu,  7 May 2020 09:12:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C93F14B327;
+	Thu,  7 May 2020 09:22:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3354B2CC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:04:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3D894B324
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:22:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w-ye1x5lZIqy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 09:04:44 -0400 (EDT)
-Received: from out30-54.freemail.mail.aliyun.com
- (out30-54.freemail.mail.aliyun.com [115.124.30.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05D5F4B27D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:04:43 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R881e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07425;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
- TI=SMTPD_---0TxqomBt_1588856677; 
-Received: from 30.27.116.247(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0TxqomBt_1588856677) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 07 May 2020 21:04:38 +0800
-Subject: Re: [PATCH v4 2/7] KVM: arm64: clean up redundant 'kvm_run' parameters
-To: Marc Zyngier <maz@kernel.org>
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <20200427043514.16144-3-tianjia.zhang@linux.alibaba.com>
- <35eb095a344b4192b912385bc02c54e6@kernel.org>
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <f093f6cf-4892-7c8f-d3aa-e908d5740cba@linux.alibaba.com>
-Date: Thu, 7 May 2020 21:04:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <35eb095a344b4192b912385bc02c54e6@kernel.org>
-X-Mailman-Approved-At: Thu, 07 May 2020 09:12:15 -0400
-Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
- benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
- linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- frankja@linux.ibm.com, chenhuacai@gmail.com, mpe@ellerman.id.au,
- joro@8bytes.org, x86@kernel.org, borntraeger@de.ibm.com, mingo@redhat.com,
- thuth@redhat.com, gor@linux.ibm.com, kvm-ppc@vger.kernel.org, bp@alien8.de,
- tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, jmattson@google.com,
- tsbogend@alpha.franken.de, cohuck@redhat.com, sean.j.christopherson@intel.com,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
- linuxppc-dev@lists.ozlabs.org
+ with ESMTP id g2N1VWYoAgI6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 09:22:37 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D07C04B323
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 09:22:37 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B8A5920838;
+ Thu,  7 May 2020 13:22:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1588857756;
+ bh=dU2Zo4Cy68Npnqp73m+WYREuX5FjtiM6YUcFyZ5Glks=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Mvxv/k6N6eZhza7DRddP/HQFLzYxG1sOPRTBagBbVSX+mWQuvMoyOdQz41Z3PkSNw
+ oY9IRopODgKsVRXGmEjvlVkYEpRPYzNoS/8IeFzGzM6Pg/zSJNlzRW/nwfHqf6AByO
+ 2H9Y99Vq60RECr/Ej/t+r3afxre/15Nkp/hfXcXo=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jWgTz-00AGtt-4Z; Thu, 07 May 2020 14:22:35 +0100
+Date: Thu, 07 May 2020 14:22:34 +0100
+Message-ID: <87blmzj2w5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH 03/15] arm64: kvm: Fix symbol dependency in
+ __hyp_call_panic_nvhe
+In-Reply-To: <20200430144831.59194-4-dbrazdil@google.com>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+ <20200430144831.59194-4-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,31 +93,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CgpPbiAyMDIwLzUvNSAxNjozOSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFRpYW5qaWEsCj4g
-Cj4gT24gMjAyMC0wNC0yNyAwNTozNSwgVGlhbmppYSBaaGFuZyB3cm90ZToKPj4gSW4gdGhlIGN1
-cnJlbnQga3ZtIHZlcnNpb24sICdrdm1fcnVuJyBoYXMgYmVlbiBpbmNsdWRlZCBpbiB0aGUgJ2t2
-bV92Y3B1Jwo+PiBzdHJ1Y3R1cmUuIEZvciBoaXN0b3JpY2FsIHJlYXNvbnMsIG1hbnkga3ZtLXJl
-bGF0ZWQgZnVuY3Rpb24gcGFyYW1ldGVycwo+PiByZXRhaW4gdGhlICdrdm1fcnVuJyBhbmQgJ2t2
-bV92Y3B1JyBwYXJhbWV0ZXJzIGF0IHRoZSBzYW1lIHRpbWUuIFRoaXMKPj4gcGF0Y2ggZG9lcyBh
-IHVuaWZpZWQgY2xlYW51cCBvZiB0aGVzZSByZW1haW5pbmcgcmVkdW5kYW50IHBhcmFtZXRlcnMu
-Cj4+Cj4+IFNpZ25lZC1vZmYtYnk6IFRpYW5qaWEgWmhhbmcgPHRpYW5qaWEuemhhbmdAbGludXgu
-YWxpYmFiYS5jb20+Cj4gCj4gT24gdGhlIGZhY2Ugb2YgaXQsIHRoaXMgbG9va3MgT0ssIGJ1dCBJ
-IGhhdmVuJ3QgdHJpZWQgdG8gcnVuIHRoZQo+IHJlc3VsdGluZyBrZXJuZWwuIEknbSBub3Qgb3Bw
-b3NlZCB0byB0YWtpbmcgdGhpcyBwYXRjaCAqaWYqIHRoZXJlCj4gaXMgYW4gYWdyZWVtZW50IGFj
-cm9zcyBhcmNoaXRlY3R1cmVzIHRvIHRha2UgdGhlIHNlcmllcyAoSSB2YWx1ZQo+IGNvbnNpc3Rl
-bmN5IG92ZXIgdGhlIGphbml0b3JpYWwgZXhlcmNpc2UpLgo+IAo+IEFub3RoZXIgdGhpbmcgaXMg
-dGhhdCB0aGlzIGlzIGdvaW5nIHRvIGNvbmZsaWN0IHdpdGggdGhlIHNldCBvZgo+IHBhdGNoZXMg
-dGhhdCBtb3ZlIHRoZSBLVk0vYXJtIGNvZGUgYmFjayB3aGVyZSBpdCBiZWxvbmdzIChhcmNoL2Fy
-bTY0L2t2bSksCj4gc28gSSdkIHByb2JhYmx5IGNoZXJyeS1waWNrIHRoYXQgb25lIGRpcmVjdGx5
-Lgo+IAo+IFRoYW5rcywKPiAKPiAgwqDCoMKgwqDCoMKgwqAgTS4KPiAKCkRvIEkgbmVlZCB0byBz
-dWJtaXQgdGhpcyBzZXQgb2YgcGF0Y2hlcyBzZXBhcmF0ZWx5IGZvciBlYWNoIAphcmNoaXRlY3R1
-cmU/IENvdWxkIGl0IGJlIG1lcmdlZCBhdCBvbmNlLCBpZiBuZWNlc3NhcnksIEkgd2lsbApyZXN1
-Ym1pdCBiYXNlZCBvbiB0aGUgbGF0ZXN0IG1haW5saW5lLgoKVGhhbmtzLApUaWFuamlhCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Thu, 30 Apr 2020 15:48:19 +0100,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> __hyp_call_panic_nvhe contains inline assembly which did not declare
+> its dependency on the __hyp_panic_string symbol.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/kvm/hyp/switch.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 8a1e81a400e0..7a7c08029d81 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -836,7 +836,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+>  	 * making sure it is a kernel address and not a PC-relative
+>  	 * reference.
+>  	 */
+> -	asm volatile("ldr %0, =__hyp_panic_string" : "=r" (str_va));
+> +	asm volatile("ldr %0, =%1" : "=r" (str_va) : "S" (__hyp_panic_string));
+>  
+>  	__hyp_do_panic(str_va,
+>  		       spsr, elr,
+> -- 
+> 2.26.1
+> 
+> 
+
+What breaks without this constraint? Is it a fix that should go in
+early? Otherwise looks good.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
