@@ -2,122 +2,64 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBDBCC38A2A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9189AC38A24
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:26:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 722CD2083B
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:13:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722CD2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0F9352083B
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:26:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F9352083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A66D64B382;
-	Thu,  7 May 2020 12:13:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 747BE4B3D1;
+	Thu,  7 May 2020 12:26:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pgJsW5qXn5JY; Thu,  7 May 2020 12:13:08 -0400 (EDT)
+	with ESMTP id Jfz8IiRWIWvG; Thu,  7 May 2020 12:26:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0B54B1E7;
-	Thu,  7 May 2020 12:13:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 566CF4B3CE;
+	Thu,  7 May 2020 12:26:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A623A4B1E3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:13:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBAA14B3CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:26:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CypLLnfTAbXF for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 12:13:06 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AB864B1C2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:13:06 -0400 (EDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 047G4OvV160549; Thu, 7 May 2020 12:12:41 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30vmp6jc3d-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 07 May 2020 12:12:41 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 047G5fk6165277;
- Thu, 7 May 2020 12:12:40 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30vmp6jc2g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 07 May 2020 12:12:40 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047G9kSs025490;
- Thu, 7 May 2020 16:12:38 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma04ams.nl.ibm.com with ESMTP id 30s0g5unrs-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 07 May 2020 16:12:37 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 047GCZYR1048834
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 7 May 2020 16:12:35 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BA52442041;
- Thu,  7 May 2020 16:12:35 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2DFA142047;
- Thu,  7 May 2020 16:12:21 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.148.201.211])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Thu,  7 May 2020 16:12:20 +0000 (GMT)
-Date: Thu, 7 May 2020 19:11:55 +0300
-From: Mike Rapoport <rppt@linux.ibm.com>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: Re: [PATCH v4 02/14] arm: add support for folded p4d page tables
-Message-ID: <20200507161155.GE683243@linux.ibm.com>
-References: <20200414153455.21744-1-rppt@kernel.org>
- <20200414153455.21744-3-rppt@kernel.org>
- <CGME20200507121658eucas1p240cf4a3e0fe5c22dda5ec4f72734149f@eucas1p2.samsung.com>
- <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
+ with ESMTP id SQDskhUngtlG for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 12:26:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 810544B323
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:26:10 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A4B21FB;
+ Thu,  7 May 2020 09:26:10 -0700 (PDT)
+Received: from [192.168.0.14] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0701C3F71F;
+ Thu,  7 May 2020 09:26:07 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 09/26] KVM: arm64: vgic-v3: Take cpu_if pointer directly
+ instead of vcpu
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-10-maz@kernel.org>
+Message-ID: <3174eaad-7d8d-0c52-d71c-afc6b991b636@arm.com>
+Date: Thu, 7 May 2020 17:26:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-07_10:2020-05-07,
- 2020-05-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 spamscore=0
- priorityscore=1501 suspectscore=1 malwarescore=0 impostorscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 adultscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005070125
-Cc: Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Fenghua Yu <fenghua.yu@intel.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mm@kvack.org,
- Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Jonas Bonn <jonas@southpole.se>, Brian Cain <bcain@codeaurora.org>,
- linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
+In-Reply-To: <20200422120050.3693593-10-maz@kernel.org>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Dave Martin <Dave.Martin@arm.com>, Will Deacon <will@kernel.org>,
+ George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
- uclinux-h8-devel@lists.sourceforge.jp, linux-arch@vger.kernel.org,
- Arnd Bergmann <arnd@arndb.de>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
- kvm-ppc@vger.kernel.org,
- Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
- openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
- Guan Xuetao <gxt@pku.edu.cn>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@c-s.fr>, Tony Luck <tony.luck@intel.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, nios2-dev@lists.rocketboards.org,
- Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
- Mike Rapoport <rppt@kernel.org>
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -129,107 +71,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi Marc, Christoffer,
 
-On Thu, May 07, 2020 at 02:16:56PM +0200, Marek Szyprowski wrote:
-> Hi
-> =
+On 22/04/2020 13:00, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> If we move the used_lrs field to the version-specific cpu interface
+> structure, the following functions only operate on the struct
+> vgic_v3_cpu_if and not the full vcpu:
+> 
+>   __vgic_v3_save_state
+>   __vgic_v3_restore_state
+>   __vgic_v3_activate_traps
+>   __vgic_v3_deactivate_traps
+>   __vgic_v3_save_aprs
+>   __vgic_v3_restore_aprs
+> 
+> This is going to be very useful for nested virt, 
 
-> On 14.04.2020 17:34, Mike Rapoport wrote:
-> > From: Mike Rapoport <rppt@linux.ibm.com>
-> >
-> > Implement primitives necessary for the 4th level folding, add walks of =
-p4d
-> > level where appropriate, and remove __ARCH_USE_5LEVEL_HACK.
-> >
-> > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-> =
-
-> Today I've noticed that kexec is broken on ARM 32bit. Bisecting between =
-
-> current linux-next and v5.7-rc1 pointed to this commit. I've tested this =
-
-> on Odroid XU4 and Raspberry Pi4 boards. Here is the relevant log:
-> =
-
-> # kexec --kexec-syscall -l zImage --append "$(cat /proc/cmdline)"
-> memory_range[0]:0x40000000..0xbe9fffff
-> memory_range[0]:0x40000000..0xbe9fffff
-> # kexec -e
-> kexec_core: Starting new kernel
-> 8<--- cut here ---
-> Unable to handle kernel paging request at virtual address c010f1f4
-> pgd =3D c6817793
-> [c010f1f4] *pgd=3D4000041e(bad)
-> Internal error: Oops: 80d [#1] PREEMPT ARM
-> Modules linked in:
-> CPU: 0 PID: 1329 Comm: kexec Tainted: G=A0=A0=A0=A0=A0=A0=A0 W =
-
-> 5.7.0-rc3-00127-g6cba81ed0f62 #611
-> Hardware name: Samsung Exynos (Flattened Device Tree)
-> PC is at machine_kexec+0x40/0xfc
-
-Any chance you have the debug info in this kernel?
-scripts/faddr2line would come handy here.
-
-> LR is at 0xffffffff
-> pc : [<c010f0b4>]=A0=A0=A0 lr : [<ffffffff>]=A0=A0=A0 psr: 60000013
-> sp : ebc13e60=A0 ip : 40008000=A0 fp : 00000001
-> r10: 00000058=A0 r9 : fee1dead=A0 r8 : 00000001
-> r7 : c121387c=A0 r6 : 6c224000=A0 r5 : ece40c00=A0 r4 : ec222000
-> r3 : c010f1f4=A0 r2 : c1100000=A0 r1 : c1100000=A0 r0 : 418d0000
-> Flags: nZCv=A0 IRQs on=A0 FIQs on=A0 Mode SVC_32=A0 ISA ARM=A0 Segment no=
-ne
-> Control: 10c5387d=A0 Table: 6bc14059=A0 DAC: 00000051
-> Process kexec (pid: 1329, stack limit =3D 0x366bb4dc)
-> Stack: (0xebc13e60 to 0xebc14000)
-> ...
-> [<c010f0b4>] (machine_kexec) from [<c01c0d84>] (kernel_kexec+0x74/0x7c)
-> [<c01c0d84>] (kernel_kexec) from [<c014b1bc>] (__do_sys_reboot+0x1f8/0x21=
-0)
-> [<c014b1bc>] (__do_sys_reboot) from [<c0100060>] (ret_fast_syscall+0x0/0x=
-28)
-> Exception stack(0xebc13fa8 to 0xebc13ff0)
-> ...
-> ---[ end trace 3e8d6c81723c778d ]---
-> 1329 Segmentation fault=A0=A0=A0=A0=A0 ./kexec -e
-> =
-
-> > ---
-> >   arch/arm/include/asm/pgtable.h     |  1 -
-> >   arch/arm/lib/uaccess_with_memcpy.c |  7 +++++-
-> >   arch/arm/mach-sa1100/assabet.c     |  2 +-
-> >   arch/arm/mm/dump.c                 | 29 +++++++++++++++++-----
-> >   arch/arm/mm/fault-armv.c           |  7 +++++-
-> >   arch/arm/mm/fault.c                | 22 ++++++++++------
-> >   arch/arm/mm/idmap.c                |  3 ++-
-> >   arch/arm/mm/init.c                 |  2 +-
-> >   arch/arm/mm/ioremap.c              | 12 ++++++---
-> >   arch/arm/mm/mm.h                   |  2 +-
-> >   arch/arm/mm/mmu.c                  | 35 +++++++++++++++++++++-----
-> >   arch/arm/mm/pgd.c                  | 40 ++++++++++++++++++++++++------
-> >   12 files changed, 125 insertions(+), 37 deletions(-)
-> >
-> > ...
-> =
-
-> Best regards
-> -- =
-
-> Marek Szyprowski, PhD
-> Samsung R&D Institute Poland
-> =
+... because you don't need to consider whether the vcpu is running in vEL2?
 
 
--- =
+> so move the used_lrs
+> field and change the prototypes and implementations of these functions to
+> take the cpu_if parameter directly.
 
-Sincerely yours,
-Mike.
+
+> No functional change.
+
+Looks like no change!
+
+Reviewed-by: James Morse <james.morse@arm.com>
+
+
+Thanks,
+
+James
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
