@@ -2,86 +2,93 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2DFC38A24
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6C3C38A2A
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:08:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0E57D2083B
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 008D12073A
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:08:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXs0fLbL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E57D2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="QLPKtMif"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 008D12073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85ABA4B209;
-	Thu,  7 May 2020 11:08:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96C174B29E;
+	Thu,  7 May 2020 11:08:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xgYfF9HSiyMA; Thu,  7 May 2020 11:08:03 -0400 (EDT)
+	with ESMTP id ZhqtONCnOhNL; Thu,  7 May 2020 11:08:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDD174B3D2;
-	Thu,  7 May 2020 11:08:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 365054B3D0;
+	Thu,  7 May 2020 11:08:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3351D4B209
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:08:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C491F4B2A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:08:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jG6n4C9t0X76 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 11:08:01 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D3764B13B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:08:01 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1E33420857;
- Thu,  7 May 2020 15:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588864080;
- bh=I6CP1bbqm86yiKkH4SCLmCHIahi+tjXLVQAe829l6ts=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=qXs0fLbLR4ftwE2PDlpaYuWKnAFnBUT/tGw7nW0oEbCBHnZ7Jye92XoXAuVqZ/k+i
- kr6s5pN6sUu149ODm7Ctg89mBkUuCKvi5CadYAo8+yHIqwUxRSgqqLWmSvAquvXh4H
- WPete+mOqVmAK8AV3VbBjIIdCiMJcyeiH4gtFot8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jWi7y-00AJYS-ET; Thu, 07 May 2020 16:07:58 +0100
-Date: Thu, 07 May 2020 16:07:54 +0100
-Message-ID: <87imh72379.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH 05/15] arm64: kvm: Build hyp-entry.S separately for
- VHE/nVHE
-In-Reply-To: <20200430144831.59194-6-dbrazdil@google.com>
-References: <20200430144831.59194-1-dbrazdil@google.com>
- <20200430144831.59194-6-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, catalin.marinas@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id 6X+StM91dAcv for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 11:08:51 -0400 (EDT)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D0CC4B29E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:08:51 -0400 (EDT)
+Received: by mail-wr1-f68.google.com with SMTP id y4so6802511wrm.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2020 08:08:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=TQa81UcYxl76b0HSzt9euhUmUepcpv3Z6r/LM6Ln5KE=;
+ b=QLPKtMifAlPpfvwJKFqGd26kBFWPILMeiCXFGFuEBE548R8w7lgb/0jsPh1bu3DHka
+ breNdX586T44AB8m87A/JFIhSjk18lq8Ve/dJA8HOPPUdvxMajShm3p9OrMioRH7BjNk
+ OtO/C7ZoIrq3QXqeHbPkDtJj/UCSnMPHzfmtbcFPKku/qJ3SLGEvDZfQNIGTDQOHihp2
+ RZUnfXmJAg5LekkpLJLHtjTC60tVDp/QS+HCO4fpBcJAltENqV7gK5zsOYx3ba2n1ytG
+ Gid9G0dnaQqFzt1Mv4dH7ozS4PPRWrE3NnI+YiPyf0hsTtLfCKlYI43SN/29CxJTkK6U
+ Irsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=TQa81UcYxl76b0HSzt9euhUmUepcpv3Z6r/LM6Ln5KE=;
+ b=dpesNTOJxfFx2cPvD2a5XXa2KN3aeoPAhIzaPNO1JnHlEgGh7ZhO3/a8/ju2bwEykU
+ TTDQqZT0NnRYJxFCblcyIG+HjpsUjBzU3RKmw6jbC0i0gyD8pC6gd3j5kOB61FxEcI71
+ jQFue0AmYspV1x3g7LRXW4B+ZmNHWK6ldhLocJlc0wB3xWYuxkawdOMOiKDmUnllw7SY
+ k+XvpPSD7OT3W91ZAfKr/bF8UAgq9U1cXIphnheNhnx3hgUJ25eW1Y19/Ucc6WP4zj9g
+ 9OIZCGfSQzoUIbtBJN5tCdJDTMli5aQJ4GZWv086HWX55sMWbLRUqYBRYnK2D71O0J5q
+ dbwA==
+X-Gm-Message-State: AGi0PuZzuNAI8O2bvxQM0x4faNl57neyE+HMkV/29ndTag7OTcIFe5RI
+ mNjwv4T7QwQeVQg6ueKauVprXFQfoW8=
+X-Google-Smtp-Source: APiQypIHxYj17NVfmcnSuGrpk40/cA1y0gsCzWWQg9AehmmC7nw/0HsXW/bsHDdO/dPr7ICzSJ0SUQ==
+X-Received: by 2002:a5d:5445:: with SMTP id w5mr15635148wrv.422.1588864130021; 
+ Thu, 07 May 2020 08:08:50 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+ by smtp.gmail.com with ESMTPSA id u2sm10491869wrd.40.2020.05.07.08.08.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 May 2020 08:08:49 -0700 (PDT)
+Date: Thu, 7 May 2020 16:08:43 +0100
+From: Andrew Scull <ascull@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 07/26] KVM: arm64: Add a level hint to
+ __kvm_tlb_flush_vmid_ipa
+Message-ID: <20200507150843.GG237572@google.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-8-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20200422120050.3693593-8-maz@kernel.org>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ kvmarm@lists.cs.columbia.edu, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,347 +105,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 30 Apr 2020 15:48:21 +0100,
-David Brazdil <dbrazdil@google.com> wrote:
-> 
-> This patch is part of a series which builds KVM's non-VHE hyp code separately
-> from VHE and the rest of the kernel.
+> -void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
+> +void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+> +					 phys_addr_t ipa, int level)
 
-This sentence should be part of your cover letter, and not in the 5th
-patch.
+The level feels like a good opportunity for an enum to add some
+documentation from the type.
 
-> 
-> hyp-entry.S contains implementation of KVM hyp vectors. This code is mostly
-> shared between VHE/nVHE, therefore compile it under both VHE and nVHE build
-> rules, with small differences hidden behind '#ifdef __HYPERVISOR__'. These are:
->   * only nVHE should handle host HVCs, VHE will now panic,
-
-That's not true. VHE does handle HVCs from the guest. If you make VHE
-panic on guest exit, I'll come after you! ;-)
-
->   * only nVHE needs kvm_hcall_table, so move host_hypcall.c to nvhe/,
->   * __smccc_workaround_1_smc is not needed by nVHE, only cpu_errata.c in
->     kernel proper.
-
-How comes? You certainly need to be able to use the generated code,
-don't you? Or do you actually mean that the assembly code doesn't need
-to live in the file that contains the vectors themselves (which I'd
-agree with)?
-
-> 
-> Adjust code which selects which KVM hyp vecs to install to choose the correct
-> VHE/nVHE symbol.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |  7 +++++
->  arch/arm64/include/asm/kvm_mmu.h              | 13 +++++----
->  arch/arm64/include/asm/mmu.h                  |  7 -----
->  arch/arm64/kernel/cpu_errata.c                |  2 +-
->  arch/arm64/kernel/image-vars.h                | 28 +++++++++++++++++++
->  arch/arm64/kvm/hyp/Makefile                   |  2 +-
->  arch/arm64/kvm/hyp/hyp-entry.S                | 27 ++++++++++++------
->  arch/arm64/kvm/hyp/nvhe/Makefile              |  2 +-
->  .../arm64/kvm/hyp/{ => nvhe}/host_hypercall.c |  0
->  arch/arm64/kvm/va_layout.c                    |  2 +-
->  10 files changed, 65 insertions(+), 25 deletions(-)
->  rename arch/arm64/kvm/hyp/{ => nvhe}/host_hypercall.c (100%)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 99ab204519ca..cdaf3df8085d 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -71,6 +71,13 @@ extern char __kvm_hyp_init[];
->  extern char __kvm_hyp_init_end[];
->  
->  extern char __kvm_hyp_vector[];
-> +extern char kvm_nvhe_sym(__kvm_hyp_vector)[];
-
-This is becoming pretty ugly. I'd rather we have a helper that emits
-the declaration for both symbols. Or something.
-
-> +
-> +#ifdef CONFIG_KVM_INDIRECT_VECTORS
-> +extern char __bp_harden_hyp_vecs[];
-> +extern char kvm_nvhe_sym(__bp_harden_hyp_vecs)[];
-> +extern atomic_t arm64_el2_vector_last_slot;
-> +#endif
->  
->  extern void __kvm_flush_vm_context(void);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 30b0e8d6b895..0a5fa033422c 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -468,7 +468,7 @@ static inline int kvm_write_guest_lock(struct kvm *kvm, gpa_t gpa,
->   * VHE, as we don't have hypervisor-specific mappings. If the system
->   * is VHE and yet selects this capability, it will be ignored.
->   */
-> -#include <asm/mmu.h>
-> +#include <asm/kvm_asm.h>
->  
->  extern void *__kvm_bp_vect_base;
->  extern int __kvm_harden_el2_vector_slot;
-> @@ -477,11 +477,11 @@ extern int __kvm_harden_el2_vector_slot;
->  static inline void *kvm_get_hyp_vector(void)
+>  static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
 >  {
->  	struct bp_hardening_data *data = arm64_get_bp_hardening_data();
-> -	void *vect = kern_hyp_va(kvm_ksym_ref(__kvm_hyp_vector));
-> +	void *vect = kern_hyp_va(kvm_hyp_ref(__kvm_hyp_vector));
+> -	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa);
+> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, 0);
 
-I find it pretty annoying (again) that I have to know where a symbol
-lives (kernel or nVHE-EL2) to know which kvm_*_ref() helper to use.
-Maybe there is no good solution to this, but still...
+With the constants from the next patch brought forward, the magic 0 can
+be given a name, although it's very temporary so..
 
->  	int slot = -1;
->  
->  	if (cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR) && data->fn) {
-> -		vect = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
-> +		vect = kern_hyp_va(kvm_hyp_ref(__bp_harden_hyp_vecs));
->  		slot = data->hyp_vectors_slot;
->  	}
->  
-> @@ -510,12 +510,13 @@ static inline int kvm_map_vectors(void)
->  	 *  HBP +  HEL2 -> use hardened vertors and use exec mapping
->  	 */
->  	if (cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR)) {
-> -		__kvm_bp_vect_base = kvm_ksym_ref(__bp_harden_hyp_vecs);
-> +		__kvm_bp_vect_base = kvm_hyp_ref(__bp_harden_hyp_vecs);
->  		__kvm_bp_vect_base = kern_hyp_va(__kvm_bp_vect_base);
->  	}
->  
->  	if (cpus_have_const_cap(ARM64_HARDEN_EL2_VECTORS)) {
-> -		phys_addr_t vect_pa = __pa_symbol(__bp_harden_hyp_vecs);
-> +		phys_addr_t vect_pa =
-> +			__pa_symbol(kvm_nvhe_sym(__bp_harden_hyp_vecs));
-
-Please keep the assignment on a single line (and screw checkpatch).
-
->  		unsigned long size = __BP_HARDEN_HYP_VECS_SZ;
->  
->  		/*
-> @@ -534,7 +535,7 @@ static inline int kvm_map_vectors(void)
->  #else
->  static inline void *kvm_get_hyp_vector(void)
->  {
-> -	return kern_hyp_va(kvm_ksym_ref(__kvm_hyp_vector));
-> +	return kern_hyp_va(kvm_hyp_ref(__kvm_hyp_vector));
->  }
->  
->  static inline int kvm_map_vectors(void)
-> diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-> index 68140fdd89d6..4d913f6dd366 100644
-> --- a/arch/arm64/include/asm/mmu.h
-> +++ b/arch/arm64/include/asm/mmu.h
-> @@ -42,13 +42,6 @@ struct bp_hardening_data {
->  	bp_hardening_cb_t	fn;
->  };
->  
-> -#if (defined(CONFIG_HARDEN_BRANCH_PREDICTOR) ||	\
-> -     defined(CONFIG_HARDEN_EL2_VECTORS))
-> -
-> -extern char __bp_harden_hyp_vecs[];
-> -extern atomic_t arm64_el2_vector_last_slot;
-> -#endif  /* CONFIG_HARDEN_BRANCH_PREDICTOR || CONFIG_HARDEN_EL2_VECTORS */
-> -
->  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
->  DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
->  
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index a102321fc8a2..b4b41552c6df 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -117,7 +117,7 @@ DEFINE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
->  static void __copy_hyp_vect_bpi(int slot, const char *hyp_vecs_start,
->  				const char *hyp_vecs_end)
->  {
-> -	void *dst = lm_alias(__bp_harden_hyp_vecs + slot * SZ_2K);
-> +	void *dst = lm_alias(kvm_hyp_sym(__bp_harden_hyp_vecs) + slot * SZ_2K);
->  	int i;
->  
->  	for (i = 0; i < SZ_2K; i += 0x80)
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 13850134fc28..59c53566eceb 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -61,6 +61,34 @@ __efistub__ctype		= _ctype;
->   * memory mappings.
->   */
->  
-> +__hyp_text___guest_exit = __guest_exit;
-> +__hyp_text___kvm_enable_ssbs = __kvm_enable_ssbs;
-> +__hyp_text___kvm_flush_vm_context = __kvm_flush_vm_context;
-> +__hyp_text___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
-> +__hyp_text___kvm_handle_stub_hvc = __kvm_handle_stub_hvc;
-> +__hyp_text___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
-> +__hyp_text___kvm_tlb_flush_local_vmid = __kvm_tlb_flush_local_vmid;
-> +__hyp_text___kvm_tlb_flush_vmid = __kvm_tlb_flush_vmid;
-> +__hyp_text___kvm_tlb_flush_vmid_ipa = __kvm_tlb_flush_vmid_ipa;
-> +__hyp_text___kvm_vcpu_run_nvhe = __kvm_vcpu_run_nvhe;
-> +__hyp_text___vgic_v3_get_ich_vtr_el2 = __vgic_v3_get_ich_vtr_el2;
-> +__hyp_text___vgic_v3_init_lrs = __vgic_v3_init_lrs;
-> +__hyp_text___vgic_v3_read_vmcr = __vgic_v3_read_vmcr;
-> +__hyp_text___vgic_v3_restore_aprs = __vgic_v3_restore_aprs;
-> +__hyp_text___vgic_v3_save_aprs = __vgic_v3_save_aprs;
-> +__hyp_text___vgic_v3_write_vmcr = __vgic_v3_write_vmcr;
-> +__hyp_text_abort_guest_exit_end = abort_guest_exit_end;
-> +__hyp_text_abort_guest_exit_start = abort_guest_exit_start;
-> +__hyp_text_arm64_enable_wa2_handling = arm64_enable_wa2_handling;
-> +__hyp_text_arm64_ssbd_callback_required = arm64_ssbd_callback_required;
-> +__hyp_text_hyp_panic = hyp_panic;
-> +__hyp_text_kimage_voffset = kimage_voffset;
-> +__hyp_text_kvm_host_data = kvm_host_data;
-> +__hyp_text_kvm_patch_vector_branch = kvm_patch_vector_branch;
-> +__hyp_text_kvm_update_va_mask = kvm_update_va_mask;
-> +__hyp_text_panic = panic;
-> +__hyp_text_physvirt_offset = physvirt_offset;
-> +
-
-Err... What on Earth is this? Why can't this be generated? one way or
-another? Safety is our goal ("But let's be realistic here" ;-), so
-having to manually maintain this symbol list is unlikely to work long
-term. And are all these symbols required at this stage in the series?
-
->  #endif /* CONFIG_KVM */
->  
->  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 79bf822a484b..a6883f4fed9e 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -9,7 +9,7 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
->  obj-$(CONFIG_KVM) += vhe.o nvhe/
->  
->  vhe-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
-> -	 debug-sr.o entry.o switch.o fpsimd.o tlb.o host_hypercall.o hyp-entry.o
-> +	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
->  
->  # KVM code is run at a different exception code with a different map, so
->  # compiler instrumentation that inserts callbacks or checks into the code may
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 1a51a0958504..5986e1d78d3f 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -36,12 +36,6 @@
->  	ldr	lr, [sp], #16
->  .endm
->  
-> -/* kern_hyp_va(lm_alias(ksym)) */
-> -.macro ksym_hyp_va ksym, lm_offset
-> -	sub	\ksym, \ksym, \lm_offset
-> -	kern_hyp_va	\ksym
-> -.endm
-> -
->  el1_sync:				// Guest trapped into EL2
->  
->  	mrs	x0, esr_el2
-> @@ -53,7 +47,15 @@ el1_sync:				// Guest trapped into EL2
->  	mrs	x1, vttbr_el2		// If vttbr is valid, the guest
->  	cbnz	x1, el1_hvc_guest	// called HVC
->  
-> -	/* Here, we're pretty sure the host called HVC. */
-> +#ifdef __HYPERVISOR__
-
-nit: We may need a better symbol than __HYPERVISOR__.
-__nVHE_HYPERVISOR__, maybe?
-
-> +
-> +/* kern_hyp_va(lm_alias(ksym)) */
-> +.macro ksym_hyp_va ksym, lm_offset
-> +	sub	\ksym, \ksym, \lm_offset
-> +	kern_hyp_va	\ksym
-> +.endm
-> +
-> +	/* nVHE: Here, we're pretty sure the host called HVC. */
->  	ldp	x0, x1, [sp], #16
->  
->  	/* Check for a stub HVC call */
-> @@ -107,6 +109,13 @@ el1_sync:				// Guest trapped into EL2
->  	eret
->  	sb
->  
-> +#else /* __HYPERVISOR__ */
-> +
-> +	/* VHE: Guest called HVC but vttbr is not valid. */
-> +	b	__hyp_panic
-
-The comment doesn't quite describe the reality of this case. If
-VTTBR_EL2 is zero, you cannot run the guest at all, let alone have it
-to execute a HVC. Where are its S2 PTs? And it cannot come from the
-host either, as a HVC would go via the local EL vector.
-
-I honestly don't see how you can realistically reach this code. But
-maybe the whole point is to have a "catch the unexpected" branch.
-
-> +
-> +#endif /* __HYPERVISOR__ */
-> +
->  el1_hvc_guest:
->  	/*
->  	 * Fastest possible path for ARM_SMCCC_ARCH_WORKAROUND_1.
-> @@ -354,6 +363,7 @@ SYM_CODE_END(__bp_harden_hyp_vecs)
->  
->  	.popsection
->  
-> +#ifndef __HYPERVISOR__
->  SYM_CODE_START(__smccc_workaround_1_smc)
->  	esb
->  	sub	sp, sp, #(8 * 4)
-> @@ -367,4 +377,5 @@ SYM_CODE_START(__smccc_workaround_1_smc)
->  1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
->  	.org 1b
->  SYM_CODE_END(__smccc_workaround_1_smc)
-> -#endif
-> +#endif /* __HYPERVISOR__ */
-
-Instead of wrapping this in yet another layer of ifdefs, how about
-moving it to a different object file altogether?
-
-> +#endif /* CONFIG_KVM_INDIRECT_VECTORS */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 873d3ab0fd68..fa20b2723652 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -7,7 +7,7 @@ asflags-y := -D__HYPERVISOR__
->  ccflags-y := -D__HYPERVISOR__ -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
->  	     $(DISABLE_STACKLEAK_PLUGIN)
->  
-> -obj-y :=
-> +obj-y := host_hypercall.o ../hyp-entry.o
-
-"The return of the vengeance of relative paths in KVM...". Oh well.
-
->  
->  obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
->  extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-> diff --git a/arch/arm64/kvm/hyp/host_hypercall.c b/arch/arm64/kvm/hyp/nvhe/host_hypercall.c
-> similarity index 100%
-> rename from arch/arm64/kvm/hyp/host_hypercall.c
-> rename to arch/arm64/kvm/hyp/nvhe/host_hypercall.c
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index a4f48c1ac28c..8d941d19085d 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -150,7 +150,7 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
->  	/*
->  	 * Compute HYP VA by using the same computation as kern_hyp_va()
->  	 */
-> -	addr = (uintptr_t)kvm_ksym_ref(__kvm_hyp_vector);
-> +	addr = (uintptr_t)kvm_hyp_ref(__kvm_hyp_vector);
->  	addr &= va_mask;
->  	addr |= tag_val << tag_lsb;
->  
-> -- 
-> 2.26.1
-> 
-> 
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Otherwise, looks good.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
