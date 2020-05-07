@@ -7,87 +7,83 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28242C47247
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD78C38A24
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:36:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A65A52083B
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7591208D6
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 14:36:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ZzB4d4PH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65A52083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="va8IcNz8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7591208D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 107F14B3A1;
-	Thu,  7 May 2020 10:36:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FAB54B375;
+	Thu,  7 May 2020 10:36:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fA5fYpbQxWnL; Thu,  7 May 2020 10:36:27 -0400 (EDT)
+	with ESMTP id 6XVJb9eUZYOv; Thu,  7 May 2020 10:36:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2744C4B325;
-	Thu,  7 May 2020 10:36:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C73B4B316;
+	Thu,  7 May 2020 10:36:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E209C4B316
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:36:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 376F34B316
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:36:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lUfIqinFntIi for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 10:36:20 -0400 (EDT)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE5E44B2C3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:36:20 -0400 (EDT)
-Received: by mail-wm1-f68.google.com with SMTP id y24so7112108wma.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2020 07:36:20 -0700 (PDT)
+ with ESMTP id 4ebmodWM+icm for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 10:36:39 -0400 (EDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DEE34B2C3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 10:36:39 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id x17so6682592wrt.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2020 07:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:date:to:cc:subject:message-id:references:mime-version
+ h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=97qbtlSksxUqP4IepQZvJvrELnOIuCcLtceZei2X0fU=;
- b=ZzB4d4PH21eRkcpcL8/dT+++RvB0ZZmSphkIMJLtD5oMY2Jnwy7S98JFpZfw1OYm52
- 3TWG2h2gorD9PKb0JKdyLP7kgH0CYBI6AQD+bD51IoyPOPJmai2OhLaOaM2Tn8KR/r+T
- 0HjMn9km6DG+HcLGaNGTTtsaAmKgEi66yeYEVYKrej1QmHPcsTZfgNVFFeqPB5IR4/oJ
- G297cddKz4Z7Lxx7yvZy8V268l+77Bsr7s7lMPa0lTjhhO62NCnger0sZ9xW99EGDqJN
- GyLqbTJdof20XyI1vBiW1i2flDKKGUJpK3R7pfKCu/PK8sMvX8aEdJ/CQGv2O2uojqIf
- fROw==
+ bh=2cUePzGWzDDGYMdSJecoGhzZI0bICDSzA7fgbQwoVdI=;
+ b=va8IcNz8I2zqjE9CHsCzAnM6YWsHCkT+6BNuJ8fRsAg/QlH3lUCW+YkNknR8VqSvOG
+ E/IC3lRkd0ZwHQalan9TG1D4/w2fUTyiZGxS/Q17YpXKcCbyWWsxSxx0xFlWxdzfx+ut
+ ysYussSGR3GqsKtZzvNvKz5uEtHfKa8FYgUcDiMWE1hpFlB7r3M6eaEtZRKXOjsn7QfN
+ oORfrpfCEN3NfkyQRARTPBZf4GQ7PEgSTsKIsFDcD3penmf6YN2IBJ8mFLFunzaBnjmu
+ tuILSOMKhNChWN19gJNhOvmcEv+JElMcVgODP4coW1YiN9SIPkaGu9JYdaOSup2+p4YN
+ 6M5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=97qbtlSksxUqP4IepQZvJvrELnOIuCcLtceZei2X0fU=;
- b=HZ6NlehrUlsPx6rB7gB3H9gmXkX33cHuSioetsfcPWngdpU7dNE9DdetQLdUXa9q5X
- R1ss/rSo8wAO/dswW/ra7/atOTdvCkiD9GdNsCevzcfw5Vl2wRtBkkgPtjnisbHItSBW
- kyS+6j+pNee8lzbMgBKlCChs3cdiESjLhu4c5sUR3hY5W8tUg8mgUtkQ3ATriD+nNLRr
- uDld7NWGTT6+mutN9iwD6aglJJgfyWYVXa6OiimYdTJ4ZqdPTOjG/q7n5OSkycaI1c6r
- Qm2Up/asU53iipGF0swk0AloXEPhSsxac/1WV+idJNl0B9FcdDJK0CFfr8n7oj756wih
- wuRQ==
-X-Gm-Message-State: AGi0PuZs/NqhCuE8nUHJfkH1fDzWf21dTUder8UYGWFBtoQiv6qP6P9T
- RNJzYxEGYDWNuWO/coZyrCQL0A==
-X-Google-Smtp-Source: APiQypKByb7yOAaqMEZY3XrineEZDS7bGjGUh3lbDYheXhS+bRdzViSRoAmOnUwDPOJrmi6GqqsTGw==
-X-Received: by 2002:a1c:7d4b:: with SMTP id y72mr10888700wmc.11.1588862179402; 
- Thu, 07 May 2020 07:36:19 -0700 (PDT)
-Received: from dbrazdil-macbookpro.roam.corp.google.com
- ([2a01:4b00:8523:2d03:1887:a290:f251:d169])
- by smtp.gmail.com with ESMTPSA id c190sm8793473wme.4.2020.05.07.07.36.18
+ bh=2cUePzGWzDDGYMdSJecoGhzZI0bICDSzA7fgbQwoVdI=;
+ b=ncLXSKRW8YxO6HP+fEmJ0sPIpRShY1MMV2KKVnJ0CMyj2lEM8mNiIVAygbob4KmEP+
+ EeofNHYbPyX//LVQ1POcy1+/gIKrkPTjNwQAz64Fs7fjO+ihDid3nHBGoya4tGS+gpBg
+ jKx2ajl8876rzbx2z87nkXVcr0nWFmAJq8kuQAte+UPUlWSKq3eRRTv/flkPZcOw35DN
+ 4TdJKDArstUnudFv48rUy7zSq4aOsfXidgD+OvfzUIf4joBj9wCpoY1jDI2IV4OVXUDZ
+ wYNu00ylNsirplvKlZ9wNfKrBfLD8IjZUkYXpQfBcsv+H0J6fZMJWvaXM7i//jUUDVVp
+ 0kQw==
+X-Gm-Message-State: AGi0PubOx/v/tg+YMoQ9VoOOfmp/S0nk19gboZCYMvDmzLEaRw5/dyrF
+ QkTRrPPkXa66fm8HZkUerHhWvQ==
+X-Google-Smtp-Source: APiQypIg/E6o9sgqmhLM4Cgv9qszquDB3MDl0xGyH0m0ulxsGd7+lcGC7cQvQySga4gTWRe+HpOBog==
+X-Received: by 2002:adf:f8c1:: with SMTP id f1mr15498170wrq.171.1588862197885; 
+ Thu, 07 May 2020 07:36:37 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:110:d6cc:2030:37c1:9964])
+ by smtp.gmail.com with ESMTPSA id h17sm8450409wmm.6.2020.05.07.07.36.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 May 2020 07:36:18 -0700 (PDT)
-From: David Brazdil <dbrazdil@google.com>
-X-Google-Original-From: David Brazdil
- <dbrazdil@dbrazdil-macbookpro.roam.corp.google.com>
-Date: Thu, 7 May 2020 15:36:17 +0100
+ Thu, 07 May 2020 07:36:37 -0700 (PDT)
+Date: Thu, 7 May 2020 15:36:33 +0100
+From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 03/15] arm64: kvm: Fix symbol dependency in
- __hyp_call_panic_nvhe
-Message-ID: <20200507143617.2j5x3mfxi3ber7ig@dbrazdil-macbookpro.roam.corp.google.com>
+Subject: Re: [PATCH 01/15] arm64: kvm: Unify users of HVC instruction
+Message-ID: <20200507143633.GA169263@google.com>
 References: <20200430144831.59194-1-dbrazdil@google.com>
- <20200430144831.59194-4-dbrazdil@google.com>
- <87blmzj2w5.wl-maz@kernel.org>
+ <20200430144831.59194-2-dbrazdil@google.com>
+ <878si3j13w.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87blmzj2w5.wl-maz@kernel.org>
+In-Reply-To: <878si3j13w.wl-maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
@@ -107,25 +103,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
+On Thursday 07 May 2020 at 15:01:07 (+0100), Marc Zyngier wrote:
+> >  /*
+> > - * u64 __kvm_call_hyp(void *hypfn, ...);
+> > + * u64 __kvm_call_hyp(unsigned long arg, ...);
+> >   *
+> >   * This is not really a variadic function in the classic C-way and care must
+> >   * be taken when calling this to ensure parameters are passed in registers
+> >   * only, since the stack will change between the caller and the callee.
+> > - *
+> > - * Call the function with the first argument containing a pointer to the
+> > - * function you wish to call in Hyp mode, and subsequent arguments will be
+> > - * passed as x0, x1, and x2 (a maximum of 3 arguments in addition to the
+> > - * function pointer can be passed).  The function being called must be mapped
+> > - * in Hyp mode (see init_hyp_mode in arch/arm/kvm/arm.c).  Return values are
+> > - * passed in x0.
+> > - *
+> > - * A function pointer with a value less than 0xfff has a special meaning,
+> > - * and is used to implement hyp stubs in the same way as in
+> > - * arch/arm64/kernel/hyp_stub.S.
 > 
-> What breaks without this constraint? Is it a fix that should go in
-> early? Otherwise looks good.
+> I don't think any of this becomes obsolete with this patch (apart from
+> the reference to 32bit), and only changes with patch #2. Or am I
+> misunderstanding something?
 
-This only becomes an issue when __hyp_call_panic_nvhe() and
-__hyp_call_panic_vhe() are moved to separate files, so I don't think it's
-necessary to go in early.
+Nope, I think you're right. To be fair, this patch has changed quite
+a bit since the first version (which did change that comment a little
+later IIRC), but David has done all the hard work on top so I'll let
+him answer that one.
 
-Currently the string variable (declared static) is seen by the C compiler as
-used by __hyp_call_panic_vhe(). But when split, the variable in the nVHE source
-file becomes unused, is dropped by the compiler and the inline assembly's
-reference is unresolved. We could then alias __hyp_text___hyp_panic_string back
-to the VHE copy, but this is the right way of addressing it.
+And David, feel free to take the authorship for this patch -- I barely
+recognize it (for the better), so it's more than fair if you get the
+credit :)
 
-Thanks for the review,
-David
-
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
