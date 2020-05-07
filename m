@@ -6,83 +6,80 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9784EC47247
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E2C38A24
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:16:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 48A3F2063A
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:13:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE5EE20857
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="yyZ6rd0N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48A3F2063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zudqrwOE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE5EE20857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E584B3DB;
-	Thu,  7 May 2020 11:13:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74A534B274;
+	Thu,  7 May 2020 11:16:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cJRxnedf7J60; Thu,  7 May 2020 11:13:35 -0400 (EDT)
+	with ESMTP id QrcnEqhpCE+w; Thu,  7 May 2020 11:15:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F12EA4B281;
-	Thu,  7 May 2020 11:13:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59C734B3C9;
+	Thu,  7 May 2020 11:15:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDEC84B281
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:13:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD13F4B35C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:15:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a-e5BKKtg3Qx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 11:13:31 -0400 (EDT)
+ with ESMTP id E8weyB68JlbY for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 11:15:58 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B98284B3D0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:13:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E810B4B274
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:15:57 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 95836208D6;
- Thu,  7 May 2020 15:13:30 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D392B207DD;
+ Thu,  7 May 2020 15:15:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588864410;
- bh=k29A0IdfLiHWDqKOzD4CblXmGpqrNA1u5nmT1s31i0o=;
+ s=default; t=1588864557;
+ bh=ux/WK4BgpiCCy4diPu3bKfY8AWDQXyNVDGkRY8G5x9M=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=yyZ6rd0NSWlhpoG9Q0esg6nHGFLl1NvhjNZwMMitnXQY0hBkjr5SL58/FXa5w+2S/
- aCztoEdN/hC5vzhkizpb/ZCOWhDH7YpgoI1B3dtt6Cpkd/aQoaKglYMjAYfeE2wwbk
- SnBEvBxqaKuIc3M+0ZF2Eb+5vROr7m2O8A8pccEQ=
+ b=zudqrwOEUY4DrnXjGQ98u/M9JwOEVc2mYKgd2qyD6usz0b0wVhGN/ItZFzVXLo0R7
+ bP62RQIzzwzc3uL2VJdZi2SHW+rxNi7LR0aaVg4gaXWAOjCUwANHAFCk9luv2am+7G
+ +BzQ4FAUUMp2mZIeSATcsMXvjbtawZA3Rrhf9u5k=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jWiDJ-00AJjI-1O; Thu, 07 May 2020 16:13:29 +0100
+ id 1jWiFf-00AJoN-6T; Thu, 07 May 2020 16:15:55 +0100
 MIME-Version: 1.0
-Date: Thu, 07 May 2020 16:13:28 +0100
+Date: Thu, 07 May 2020 16:15:55 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 07/26] KVM: arm64: Add a level hint to
- __kvm_tlb_flush_vmid_ipa
-In-Reply-To: <20200507150843.GG237572@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-8-maz@kernel.org>
- <20200507150843.GG237572@google.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH 05/15] arm64: kvm: Build hyp-entry.S separately for
+ VHE/nVHE
+In-Reply-To: <87imh72379.wl-maz@kernel.org>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+ <20200430144831.59194-6-dbrazdil@google.com> <87imh72379.wl-maz@kernel.org>
 User-Agent: Roundcube Webmail/1.4.3
-Message-ID: <6a347ce739ff46f03fc6c6c7bc5b0c4f@kernel.org>
+Message-ID: <df5bf1943851715130517c43fde8e5a9@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org,
- andre.przywara@arm.com, Dave.Martin@arm.com, gcherian@marvell.com,
- prime.zeng@hisilicon.com, catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org, james.morse@arm.com,
+ linux-arm-kernel@lists.infradead.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, julien.thierry.kdev@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,33 +96,24 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-07 16:08, Andrew Scull wrote:
->> -void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, 
->> phys_addr_t ipa)
->> +void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->> +					 phys_addr_t ipa, int level)
+On 2020-05-07 16:07, Marc Zyngier wrote:
+> On Thu, 30 Apr 2020 15:48:21 +0100,
+> David Brazdil <dbrazdil@google.com> wrote:
+
+[...]
+
+>> hyp-entry.S contains implementation of KVM hyp vectors. This code is 
+>> mostly
+>> shared between VHE/nVHE, therefore compile it under both VHE and nVHE 
+>> build
+>> rules, with small differences hidden behind '#ifdef __HYPERVISOR__'. 
+>> These are:
+>>   * only nVHE should handle host HVCs, VHE will now panic,
 > 
-> The level feels like a good opportunity for an enum to add some
-> documentation from the type.
+> That's not true. VHE does handle HVCs from the guest. If you make VHE
+> panic on guest exit, I'll come after you! ;-)
 
-Sure, why not. I'll give it a go.
-
-> 
->>  static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, 
->> phys_addr_t ipa)
->>  {
->> -	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa);
->> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, 0);
-> 
-> With the constants from the next patch brought forward, the magic 0 can
-> be given a name, although it's very temporary so..
-
-Yup. To the point where I've now squashed this patch and the following
-one together, and moved the constants to the previous patch.
-
-> Otherwise, looks good.
-
-Thanks,
+Duh, I can't read. "host HVCs". You can relax. ;-)
 
          M.
 -- 
