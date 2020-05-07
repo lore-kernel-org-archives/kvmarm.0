@@ -2,84 +2,122 @@ Return-Path: <SRS0=Tpw5=6V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E2C38A24
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBDBCC38A2A
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:13:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CE5EE20857
-	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 15:16:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zudqrwOE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE5EE20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 722CD2083B
+	for <kvmarm@archiver.kernel.org>; Thu,  7 May 2020 16:13:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722CD2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74A534B274;
-	Thu,  7 May 2020 11:16:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A66D64B382;
+	Thu,  7 May 2020 12:13:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QrcnEqhpCE+w; Thu,  7 May 2020 11:15:59 -0400 (EDT)
+	with ESMTP id pgJsW5qXn5JY; Thu,  7 May 2020 12:13:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59C734B3C9;
-	Thu,  7 May 2020 11:15:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0B54B1E7;
+	Thu,  7 May 2020 12:13:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD13F4B35C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:15:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A623A4B1E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:13:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E8weyB68JlbY for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 11:15:58 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E810B4B274
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 11:15:57 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D392B207DD;
- Thu,  7 May 2020 15:15:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1588864557;
- bh=ux/WK4BgpiCCy4diPu3bKfY8AWDQXyNVDGkRY8G5x9M=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=zudqrwOEUY4DrnXjGQ98u/M9JwOEVc2mYKgd2qyD6usz0b0wVhGN/ItZFzVXLo0R7
- bP62RQIzzwzc3uL2VJdZi2SHW+rxNi7LR0aaVg4gaXWAOjCUwANHAFCk9luv2am+7G
- +BzQ4FAUUMp2mZIeSATcsMXvjbtawZA3Rrhf9u5k=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jWiFf-00AJoN-6T; Thu, 07 May 2020 16:15:55 +0100
+ with ESMTP id CypLLnfTAbXF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 12:13:06 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
+ [148.163.158.5])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AB864B1C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 12:13:06 -0400 (EDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 047G4OvV160549; Thu, 7 May 2020 12:12:41 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vmp6jc3d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 12:12:41 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 047G5fk6165277;
+ Thu, 7 May 2020 12:12:40 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vmp6jc2g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 12:12:40 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047G9kSs025490;
+ Thu, 7 May 2020 16:12:38 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma04ams.nl.ibm.com with ESMTP id 30s0g5unrs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 16:12:37 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 047GCZYR1048834
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 7 May 2020 16:12:35 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BA52442041;
+ Thu,  7 May 2020 16:12:35 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2DFA142047;
+ Thu,  7 May 2020 16:12:21 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.148.201.211])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Thu,  7 May 2020 16:12:20 +0000 (GMT)
+Date: Thu, 7 May 2020 19:11:55 +0300
+From: Mike Rapoport <rppt@linux.ibm.com>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: [PATCH v4 02/14] arm: add support for folded p4d page tables
+Message-ID: <20200507161155.GE683243@linux.ibm.com>
+References: <20200414153455.21744-1-rppt@kernel.org>
+ <20200414153455.21744-3-rppt@kernel.org>
+ <CGME20200507121658eucas1p240cf4a3e0fe5c22dda5ec4f72734149f@eucas1p2.samsung.com>
+ <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
 MIME-Version: 1.0
-Date: Thu, 07 May 2020 16:15:55 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH 05/15] arm64: kvm: Build hyp-entry.S separately for
- VHE/nVHE
-In-Reply-To: <87imh72379.wl-maz@kernel.org>
-References: <20200430144831.59194-1-dbrazdil@google.com>
- <20200430144831.59194-6-dbrazdil@google.com> <87imh72379.wl-maz@kernel.org>
-User-Agent: Roundcube Webmail/1.4.3
-Message-ID: <df5bf1943851715130517c43fde8e5a9@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org, james.morse@arm.com,
- linux-arm-kernel@lists.infradead.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+Content-Disposition: inline
+In-Reply-To: <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-07_10:2020-05-07,
+ 2020-05-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ priorityscore=1501 suspectscore=1 malwarescore=0 impostorscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005070125
+Cc: Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mm@kvack.org,
+ Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Jonas Bonn <jonas@southpole.se>, Brian Cain <bcain@codeaurora.org>,
+ linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ uclinux-h8-devel@lists.sourceforge.jp, linux-arch@vger.kernel.org,
+ Arnd Bergmann <arnd@arndb.de>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+ kvm-ppc@vger.kernel.org,
+ Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+ openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
+ Guan Xuetao <gxt@pku.edu.cn>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@c-s.fr>, Tony Luck <tony.luck@intel.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, nios2-dev@lists.rocketboards.org,
+ Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
+ Mike Rapoport <rppt@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,33 +129,107 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-07 16:07, Marc Zyngier wrote:
-> On Thu, 30 Apr 2020 15:48:21 +0100,
-> David Brazdil <dbrazdil@google.com> wrote:
+Hi,
 
-[...]
+On Thu, May 07, 2020 at 02:16:56PM +0200, Marek Szyprowski wrote:
+> Hi
+> =
 
->> hyp-entry.S contains implementation of KVM hyp vectors. This code is 
->> mostly
->> shared between VHE/nVHE, therefore compile it under both VHE and nVHE 
->> build
->> rules, with small differences hidden behind '#ifdef __HYPERVISOR__'. 
->> These are:
->>   * only nVHE should handle host HVCs, VHE will now panic,
-> 
-> That's not true. VHE does handle HVCs from the guest. If you make VHE
-> panic on guest exit, I'll come after you! ;-)
+> On 14.04.2020 17:34, Mike Rapoport wrote:
+> > From: Mike Rapoport <rppt@linux.ibm.com>
+> >
+> > Implement primitives necessary for the 4th level folding, add walks of =
+p4d
+> > level where appropriate, and remove __ARCH_USE_5LEVEL_HACK.
+> >
+> > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> =
 
-Duh, I can't read. "host HVCs". You can relax. ;-)
+> Today I've noticed that kexec is broken on ARM 32bit. Bisecting between =
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> current linux-next and v5.7-rc1 pointed to this commit. I've tested this =
+
+> on Odroid XU4 and Raspberry Pi4 boards. Here is the relevant log:
+> =
+
+> # kexec --kexec-syscall -l zImage --append "$(cat /proc/cmdline)"
+> memory_range[0]:0x40000000..0xbe9fffff
+> memory_range[0]:0x40000000..0xbe9fffff
+> # kexec -e
+> kexec_core: Starting new kernel
+> 8<--- cut here ---
+> Unable to handle kernel paging request at virtual address c010f1f4
+> pgd =3D c6817793
+> [c010f1f4] *pgd=3D4000041e(bad)
+> Internal error: Oops: 80d [#1] PREEMPT ARM
+> Modules linked in:
+> CPU: 0 PID: 1329 Comm: kexec Tainted: G=A0=A0=A0=A0=A0=A0=A0 W =
+
+> 5.7.0-rc3-00127-g6cba81ed0f62 #611
+> Hardware name: Samsung Exynos (Flattened Device Tree)
+> PC is at machine_kexec+0x40/0xfc
+
+Any chance you have the debug info in this kernel?
+scripts/faddr2line would come handy here.
+
+> LR is at 0xffffffff
+> pc : [<c010f0b4>]=A0=A0=A0 lr : [<ffffffff>]=A0=A0=A0 psr: 60000013
+> sp : ebc13e60=A0 ip : 40008000=A0 fp : 00000001
+> r10: 00000058=A0 r9 : fee1dead=A0 r8 : 00000001
+> r7 : c121387c=A0 r6 : 6c224000=A0 r5 : ece40c00=A0 r4 : ec222000
+> r3 : c010f1f4=A0 r2 : c1100000=A0 r1 : c1100000=A0 r0 : 418d0000
+> Flags: nZCv=A0 IRQs on=A0 FIQs on=A0 Mode SVC_32=A0 ISA ARM=A0 Segment no=
+ne
+> Control: 10c5387d=A0 Table: 6bc14059=A0 DAC: 00000051
+> Process kexec (pid: 1329, stack limit =3D 0x366bb4dc)
+> Stack: (0xebc13e60 to 0xebc14000)
+> ...
+> [<c010f0b4>] (machine_kexec) from [<c01c0d84>] (kernel_kexec+0x74/0x7c)
+> [<c01c0d84>] (kernel_kexec) from [<c014b1bc>] (__do_sys_reboot+0x1f8/0x21=
+0)
+> [<c014b1bc>] (__do_sys_reboot) from [<c0100060>] (ret_fast_syscall+0x0/0x=
+28)
+> Exception stack(0xebc13fa8 to 0xebc13ff0)
+> ...
+> ---[ end trace 3e8d6c81723c778d ]---
+> 1329 Segmentation fault=A0=A0=A0=A0=A0 ./kexec -e
+> =
+
+> > ---
+> >   arch/arm/include/asm/pgtable.h     |  1 -
+> >   arch/arm/lib/uaccess_with_memcpy.c |  7 +++++-
+> >   arch/arm/mach-sa1100/assabet.c     |  2 +-
+> >   arch/arm/mm/dump.c                 | 29 +++++++++++++++++-----
+> >   arch/arm/mm/fault-armv.c           |  7 +++++-
+> >   arch/arm/mm/fault.c                | 22 ++++++++++------
+> >   arch/arm/mm/idmap.c                |  3 ++-
+> >   arch/arm/mm/init.c                 |  2 +-
+> >   arch/arm/mm/ioremap.c              | 12 ++++++---
+> >   arch/arm/mm/mm.h                   |  2 +-
+> >   arch/arm/mm/mmu.c                  | 35 +++++++++++++++++++++-----
+> >   arch/arm/mm/pgd.c                  | 40 ++++++++++++++++++++++++------
+> >   12 files changed, 125 insertions(+), 37 deletions(-)
+> >
+> > ...
+> =
+
+> Best regards
+> -- =
+
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+> =
+
+
+-- =
+
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
