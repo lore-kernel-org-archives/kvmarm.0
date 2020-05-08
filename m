@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E848C47254
-	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F13C47247
+	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED5A92145D
-	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B191E20725
+	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwhTE91f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED5A92145D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJVk0aHe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B191E20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5FDC4B1C6;
-	Fri,  8 May 2020 08:11:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2DF4B1C7;
+	Fri,  8 May 2020 08:11:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vb9UodpN65Av; Fri,  8 May 2020 08:11:15 -0400 (EDT)
+	with ESMTP id GmNlgIfjxxcc; Fri,  8 May 2020 08:11:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 492A34B1DF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75DBF4B186;
 	Fri,  8 May 2020 08:11:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D28F64B561
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC4D34B54E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7B6PBh67vtwT for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 23:31:09 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0518D4B54E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:09 -0400 (EDT)
+ with ESMTP id 5BbbmgVQJ1yS for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 23:31:22 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DC224B58C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:22 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588908668;
+ s=mimecast20190719; t=1588908682;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1JW2QmxfM3dQHTg5w77I8MJwpXYVVNY3VWW9mn8DP/4=;
- b=DwhTE91fYELDSapdPz24arhc3H6eBW8lfrlol0rxgK6dnVU3L0Dn/r2knnD8GQXrBo+Rg5
- dMIv9ku1pVGJXUfNK///0aLDL3UYlPWneE5ulsfItmdgwzUs4VJ1v5EHpJwFdQMKCIG30T
- DPJbFWk61zPHKxY5TTM9IJdJsVjGF/g=
+ bh=uBkKHh/qpLr11wIcCOtC7b6njssPEoWR96mn6evo82A=;
+ b=aJVk0aHehh7J2xkOlgCMOgsBZrFkzDpDQESJEyaFIseRxnvFcsGPGIgnrwJHRLN6JiDj5v
+ hQqBRd21qkkoaapSUtfRphLkVj935bXv4u2k4cjuiaJVrX23QqVy26UIcxw/Sq0rQ1Da1o
+ bme5hTFz/14eMbDU0Lyjlyv+jJmQIzQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-aep5ud-rOFuNyR3w7LzG_Q-1; Thu, 07 May 2020 23:31:04 -0400
-X-MC-Unique: aep5ud-rOFuNyR3w7LzG_Q-1
+ us-mta-17-94fY9OJHPvOK2ffbcd23pQ-1; Thu, 07 May 2020 23:31:17 -0400
+X-MC-Unique: 94fY9OJHPvOK2ffbcd23pQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CE11461;
- Fri,  8 May 2020 03:31:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED3F9107ACCA;
+ Fri,  8 May 2020 03:31:15 +0000 (UTC)
 Received: from localhost.localdomain.com (vpn2-54-199.bne.redhat.com
  [10.64.54.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9C6E799CF;
- Fri,  8 May 2020 03:30:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CCD952E045;
+ Fri,  8 May 2020 03:31:11 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH RFCv2 7/9] kvm/arm64: Support async page fault
-Date: Fri,  8 May 2020 13:29:17 +1000
-Message-Id: <20200508032919.52147-8-gshan@redhat.com>
+Subject: [PATCH RFCv2 9/9] arm64: Support async page fault
+Date: Fri,  8 May 2020 13:29:19 +1000
+Message-Id: <20200508032919.52147-10-gshan@redhat.com>
 In-Reply-To: <20200508032919.52147-1-gshan@redhat.com>
 References: <20200508032919.52147-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -93,725 +93,665 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There are two stages of fault pages and the stage one page fault is
-handled by guest itself. The guest is trapped to host when the page
-fault is caused by stage 2 page table, for example missing. The guest
-is suspended until the requested page is populated. To populate the
-requested page can be related to IO activities if the page was swapped
-out previously. In this case, the guest has to suspend for a few of
-milliseconds at least, regardless of the overall system load. There
-is no useful work done during the suspended period from guest's view.
+This supports asynchronous page fault for the guest. The design is
+similar to what x86 has: on receiving a PAGE_NOT_PRESENT signal from
+the host, the current task is either rescheduled or put into power
+saving mode. The task will be waken up when PAGE_READY signal is
+received. The PAGE_READY signal might be received in the context
+of the suspended process, to be waken up. That means the suspended
+process has to wake up itself, but it's not safe and prone to cause
+dead-lock on CPU runqueue lock. So the wakeup is delayed on returning
+from kernel space to user space or idle process is picked for running.
 
-This adds asychornous page fault to improve the situation. A signal
-(PAGE_NOT_PRESENT) is sent to guest if the requested page needs some time
-to be populated. Guest might reschedule to another running process if
-possible. Otherwise, the vCPU is put into power-saving mode, which is
-actually to cause vCPU reschedule from host's view. A followup signal
-(PAGE_READY) is sent to guest once the requested page is populated.
-The suspended task is waken up or scheduled when guest receives the
-signal. With this mechanism, the vCPU won't be stuck when the requested
-page is being populated by host.
+The signals are conveyed through the async page fault control block,
+which was passed to host on enabling the functionality. On each page
+fault, the control block is checked and switch to the async page fault
+handling flow if any signals exist.
 
-There are more details highlighted as below. Note the implementation is
-similar to what x86 has to some extent:
-
-   * A dedicated SMCCC ID is reserved to enable, disable or configure
-     the functionality. The only 64-bits parameter is conveyed by two
-     registers (w2/w1). Bits[63:56] is the bitmap used to specify the
-     operated functionality like enabling/disabling/configuration. The
-     bits[55:6] is the physical address of control block or external
-     data abort injection disallowed region. Bit[5:0] are used to pass
-     control flags.
-
-   * Signal (PAGE_NOT_PRESENT) is sent to guest if the requested page
-     isn't ready. In the mean while, a work is started to populate the
-     page asynchronously in background. The stage 2 page table entry is
-     updated accordingly and another signal (PAGE_READY) is fired after
-     the request page is populted. The signals is notified by injected
-     data abort fault.
-
-   * The signals are fired and consumed in sequential fashion. It means
-     no more signals will be fired if there is pending one, awaiting the
-     guest to consume. It's because the injected data abort faults have
-     to be done in sequential fashion.
+The feature is put into the CONFIG_KVM_GUEST umbrella, which is added
+by this patch. So we have inline functions implemented in kvm_para.h,
+like other architectures do, to check if async page fault (one of the
+KVM para-virtualized features) is available. Also, the kernel boot
+parameter "no-kvmapf" can be specified to disable the feature.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h      |  43 ++++
- arch/arm64/include/asm/kvm_para.h      |  27 ++
- arch/arm64/include/uapi/asm/Kbuild     |   2 -
- arch/arm64/include/uapi/asm/kvm_para.h |  22 ++
- arch/arm64/kvm/Kconfig                 |   1 +
- arch/arm64/kvm/Makefile                |   2 +
- include/linux/arm-smccc.h              |   6 +
- virt/kvm/arm/arm.c                     |  36 ++-
- virt/kvm/arm/async_pf.c                | 335 +++++++++++++++++++++++++
- virt/kvm/arm/hypercalls.c              |   8 +
- virt/kvm/arm/mmu.c                     |  29 ++-
- 11 files changed, 506 insertions(+), 5 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_para.h
- create mode 100644 arch/arm64/include/uapi/asm/kvm_para.h
- create mode 100644 virt/kvm/arm/async_pf.c
+ arch/arm64/Kconfig                 |  11 +
+ arch/arm64/include/asm/exception.h |   3 +
+ arch/arm64/include/asm/kvm_para.h  |  27 +-
+ arch/arm64/kernel/entry.S          |  33 +++
+ arch/arm64/kernel/process.c        |   4 +
+ arch/arm64/mm/fault.c              | 434 +++++++++++++++++++++++++++++
+ 6 files changed, 505 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f77c706777ec..a207728d6f3f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -250,6 +250,23 @@ struct vcpu_reset_state {
- 	bool		reset;
- };
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 40fb05d96c60..2d5e5ee62d6d 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1045,6 +1045,17 @@ config PARAVIRT
+ 	  under a hypervisor, potentially improving performance significantly
+ 	  over full virtualization.
  
-+#ifdef CONFIG_KVM_ASYNC_PF
++config KVM_GUEST
++	bool "KVM Guest Support"
++	depends on PARAVIRT
++	default y
++	help
++	  This option enables various optimizations for running under the KVM
++	  hypervisor. Overhead for the kernel when not running inside KVM should
++	  be minimal.
 +
-+/* Should be a power of two number */
-+#define ASYNC_PF_PER_VCPU	64
++	  In case of doubt, say Y
 +
-+/*
-+ * The association of gfn and token. The token will be sent to guest as
-+ * page fault address. Also, the guest could be in aarch32 mode. So its
-+ * length should be 32-bits.
-+ */
-+struct kvm_arch_async_pf {
-+	u32     token;
-+	gfn_t   gfn;
-+	u32	esr;
-+};
-+#endif /* CONFIG_KVM_ASYNC_PF */
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 	void *sve_state;
-@@ -351,6 +368,17 @@ struct kvm_vcpu_arch {
- 		u64 last_steal;
- 		gpa_t base;
- 	} steal;
-+
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	struct {
-+		struct gfn_to_hva_cache	cache;
-+		gfn_t			gfns[ASYNC_PF_PER_VCPU];
-+		u64			control_block;
-+		u16			id;
-+		bool			send_user_only;
-+		u64			no_fault_inst_range;
-+	} apf;
+ config PARAVIRT_TIME_ACCOUNTING
+ 	bool "Paravirtual steal time accounting"
+ 	select PARAVIRT
+diff --git a/arch/arm64/include/asm/exception.h b/arch/arm64/include/asm/exception.h
+index 7a6e81ca23a8..d878afa42746 100644
+--- a/arch/arm64/include/asm/exception.h
++++ b/arch/arm64/include/asm/exception.h
+@@ -46,4 +46,7 @@ void bad_el0_sync(struct pt_regs *regs, int reason, unsigned int esr);
+ void do_cp15instr(unsigned int esr, struct pt_regs *regs);
+ void do_el0_svc(struct pt_regs *regs);
+ void do_el0_svc_compat(struct pt_regs *regs);
++#ifdef CONFIG_KVM_GUEST
++void kvm_async_pf_delayed_wake(void);
 +#endif
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -604,6 +632,21 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- static inline void __cpu_init_stage2(void) {}
- 
-+#ifdef CONFIG_KVM_ASYNC_PF
-+bool kvm_async_pf_hash_find(struct kvm_vcpu *vcpu, gfn_t gfn);
-+bool kvm_arch_can_inject_async_page_not_present(struct kvm_vcpu *vcpu);
-+bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu);
-+int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, u32 esr,
-+			    gpa_t gpa, gfn_t gfn);
-+void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+				     struct kvm_async_pf *work);
-+void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
-+				     struct kvm_async_pf *work);
-+void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
-+			       struct kvm_async_pf *work);
-+long kvm_async_pf_hypercall(struct kvm_vcpu *vcpu);
-+#endif /* CONFIG_KVM_ASYNC_PF */
-+
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+ #endif	/* __ASM_EXCEPTION_H */
 diff --git a/arch/arm64/include/asm/kvm_para.h b/arch/arm64/include/asm/kvm_para.h
-new file mode 100644
-index 000000000000..0ea481dd1c7a
---- /dev/null
+index 0ea481dd1c7a..b2f8ef243df7 100644
+--- a/arch/arm64/include/asm/kvm_para.h
 +++ b/arch/arm64/include/asm/kvm_para.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_ARM_KVM_PARA_H
-+#define _ASM_ARM_KVM_PARA_H
+@@ -3,6 +3,20 @@
+ #define _ASM_ARM_KVM_PARA_H
+ 
+ #include <uapi/asm/kvm_para.h>
++#include <linux/of.h>
++#include <asm/hypervisor.h>
 +
-+#include <uapi/asm/kvm_para.h>
-+
-+static inline bool kvm_check_and_clear_guest_paused(void)
++#ifdef CONFIG_KVM_GUEST
++static inline int kvm_para_available(void)
 +{
-+	return false;
++	return 1;
 +}
-+
-+static inline unsigned int kvm_arch_para_features(void)
-+{
-+	return 0;
-+}
-+
-+static inline unsigned int kvm_arch_para_hints(void)
++#else
++static inline int kvm_para_available(void)
 +{
 +	return 0;
 +}
-+
-+static inline bool kvm_para_available(void)
-+{
-+	return false;
-+}
-+
-+#endif /* _ASM_ARM_KVM_PARA_H */
-diff --git a/arch/arm64/include/uapi/asm/Kbuild b/arch/arm64/include/uapi/asm/Kbuild
-index 602d137932dc..f66554cd5c45 100644
---- a/arch/arm64/include/uapi/asm/Kbuild
-+++ b/arch/arm64/include/uapi/asm/Kbuild
-@@ -1,3 +1 @@
- # SPDX-License-Identifier: GPL-2.0
--
--generic-y += kvm_para.h
-diff --git a/arch/arm64/include/uapi/asm/kvm_para.h b/arch/arm64/include/uapi/asm/kvm_para.h
-new file mode 100644
-index 000000000000..e0bd0e579b9a
---- /dev/null
-+++ b/arch/arm64/include/uapi/asm/kvm_para.h
-@@ -0,0 +1,22 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI_ASM_ARM_KVM_PARA_H
-+#define _UAPI_ASM_ARM_KVM_PARA_H
-+
-+#include <linux/types.h>
-+
-+#define KVM_FEATURE_ASYNC_PF	0
-+
-+/* Async PF */
-+#define KVM_ASYNC_PF_ENABLED		(1 << 0)
-+#define KVM_ASYNC_PF_SEND_ALWAYS	(1 << 1)
-+
-+#define KVM_PV_REASON_PAGE_NOT_PRESENT	1
-+#define KVM_PV_REASON_PAGE_READY	2
-+
-+struct kvm_vcpu_pv_apf_data {
-+	__u32	reason;
-+	__u8	pad[60];
-+	__u32	enabled;
-+};
-+
-+#endif /* _UAPI_ASM_ARM_KVM_PARA_H */
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 449386d76441..1053e16b1739 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -34,6 +34,7 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
-+	select KVM_ASYNC_PF
- 	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 5ffbdc39e780..3be24c1e401f 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -37,3 +37,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-debug.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
- kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
-+kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
-+kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/arm/async_pf.o
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index bdc0124a064a..22007dd3b9f0 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -94,6 +94,7 @@
++#endif /* CONFIG_KVM_GUEST */
  
- /* KVM "vendor specific" services */
- #define ARM_SMCCC_KVM_FUNC_FEATURES		0
-+#define ARM_SMCCC_KVM_FUNC_APF			1
- #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
- #define ARM_SMCCC_KVM_NUM_FUNCS			128
- 
-@@ -102,6 +103,11 @@
- 			   ARM_SMCCC_SMC_32,				\
- 			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
- 			   ARM_SMCCC_KVM_FUNC_FEATURES)
-+#define ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_APF)
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 2cbb57485760..3f62899cef13 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -222,6 +222,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	case KVM_CAP_ASYNC_PF:
-+		r = 1;
-+		break;
-+#endif
- 	default:
- 		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
-@@ -269,6 +274,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	/* Force users to call KVM_ARM_VCPU_INIT */
- 	vcpu->arch.target = -1;
- 	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	vcpu->arch.apf.control_block = 0UL;
-+	vcpu->arch.apf.no_fault_inst_range = 0x800;
-+#endif
- 
- 	/* Set up the timer */
- 	kvm_timer_vcpu_init(vcpu);
-@@ -426,8 +435,27 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ static inline bool kvm_check_and_clear_guest_paused(void)
  {
- 	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
--	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
--		&& !v->arch.power_off && !v->arch.pause);
+@@ -11,17 +25,16 @@ static inline bool kvm_check_and_clear_guest_paused(void)
+ 
+ static inline unsigned int kvm_arch_para_features(void)
+ {
+-	return 0;
++	unsigned int features = 0;
 +
-+	if ((irq_lines || kvm_vgic_vcpu_pending_irq(v)) &&
-+	    !v->arch.power_off && !v->arch.pause)
-+		return true;
++	if (kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_APF))
++		features |= (1 << KVM_FEATURE_ASYNC_PF);
 +
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	if (v->arch.apf.control_block & KVM_ASYNC_PF_ENABLED) {
-+		u32 val;
-+		int ret;
-+
-+		if (!list_empty_careful(&v->async_pf.done))
-+			return true;
-+
-+		ret = kvm_read_guest_cached(v->kvm, &v->arch.apf.cache,
-+					    &val, sizeof(val));
-+		if (ret || val)
-+			return true;
-+	}
-+#endif
-+
-+	return false;
++	return features;
  }
  
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
-@@ -683,6 +711,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		check_vcpu_requests(vcpu);
- 
-+#ifdef CONFIG_KVM_ASYNC_PF
-+		kvm_check_async_pf_completion(vcpu);
+ static inline unsigned int kvm_arch_para_hints(void)
+ {
+ 	return 0;
+ }
+-
+-static inline bool kvm_para_available(void)
+-{
+-	return false;
+-}
+-
+ #endif /* _ASM_ARM_KVM_PARA_H */
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index ddcde093c433..15efd57129ff 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -751,12 +751,45 @@ finish_ret_to_user:
+ 	enable_step_tsk x1, x2
+ #ifdef CONFIG_GCC_PLUGIN_STACKLEAK
+ 	bl	stackleak_erase
 +#endif
++#ifdef CONFIG_KVM_GUEST
++	bl	kvm_async_pf_delayed_wake
+ #endif
+ 	kernel_exit 0
+ ENDPROC(ret_to_user)
+ 
+ 	.popsection				// .entry.text
+ 
++#ifdef CONFIG_KVM_GUEST
++	.pushsection ".rodata", "a"
++SYM_DATA_START(__exception_handlers_offset)
++	.quad	0
++	.quad	0
++	.quad	0
++	.quad	0
++	.quad	el1_sync - vectors
++	.quad	el1_irq - vectors
++	.quad	0
++	.quad	el1_error - vectors
++	.quad	el0_sync - vectors
++	.quad	el0_irq - vectors
++	.quad	0
++	.quad	el0_error - vectors
++#ifdef CONFIG_COMPAT
++	.quad	el0_sync_compat - vectors
++	.quad	el0_irq_compat - vectors
++	.quad	0
++	.quad	el0_error_compat - vectors
++#else
++	.quad	0
++	.quad	0
++	.quad	0
++	.quad	0
++#endif
++SYM_DATA_END(__exception_handlers_offset)
++	.popsection				// .rodata
++#endif /* CONFIG_KVM_GUEST */
 +
- 		/*
- 		 * Preparing the interrupts to be injected also
- 		 * involves poking the GIC, which must be done in a
-diff --git a/virt/kvm/arm/async_pf.c b/virt/kvm/arm/async_pf.c
-new file mode 100644
-index 000000000000..5be49d684de3
---- /dev/null
-+++ b/virt/kvm/arm/async_pf.c
-@@ -0,0 +1,335 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Asynchronous Page Fault Support
-+ *
-+ * Copyright (C) 2020 Red Hat, Inc., Gavin Shan
-+ *
-+ * Based on arch/x86/kernel/kvm.c
-+ */
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+ /*
+  * Exception vectors trampoline.
+diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+index 56be4cbf771f..5e7ee553566d 100644
+--- a/arch/arm64/kernel/process.c
++++ b/arch/arm64/kernel/process.c
+@@ -53,6 +53,7 @@
+ #include <asm/processor.h>
+ #include <asm/pointer_auth.h>
+ #include <asm/stacktrace.h>
++#include <asm/exception.h>
+ 
+ #if defined(CONFIG_STACKPROTECTOR) && !defined(CONFIG_STACKPROTECTOR_PER_TASK)
+ #include <linux/stackprotector.h>
+@@ -70,6 +71,9 @@ void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
+ 
+ static void __cpu_do_idle(void)
+ {
++#ifdef CONFIG_KVM_GUEST
++	kvm_async_pf_delayed_wake();
++#endif
+ 	dsb(sy);
+ 	wfi();
+ }
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index c9cedc0432d2..cbf8b52135c9 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -19,10 +19,12 @@
+ #include <linux/page-flags.h>
+ #include <linux/sched/signal.h>
+ #include <linux/sched/debug.h>
++#include <linux/swait.h>
+ #include <linux/highmem.h>
+ #include <linux/perf_event.h>
+ #include <linux/preempt.h>
+ #include <linux/hugetlb.h>
++#include <linux/kvm_para.h>
+ 
+ #include <asm/acpi.h>
+ #include <asm/bug.h>
+@@ -48,8 +50,31 @@ struct fault_info {
+ 	const char *name;
+ };
+ 
++#ifdef CONFIG_KVM_GUEST
++struct kvm_task_sleep_node {
++	struct hlist_node	link;
++	struct swait_queue_head	wq;
++	u32			token;
++	struct task_struct	*task;
++	int			cpu;
++	bool			halted;
++	bool			delayed;
++};
 +
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_emulate.h>
-+#include <kvm/arm_hypercalls.h>
++struct kvm_task_sleep_head {
++	raw_spinlock_t		lock;
++	struct hlist_head	list;
++};
++#endif /* CONFIG_KVM_GUEST */
 +
-+static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
+ static const struct fault_info fault_info[];
+ static struct fault_info debug_fault_info[];
++#ifdef CONFIG_KVM_GUEST
++extern char __exception_handlers_offset[];
++static bool async_pf_available = true;
++static DEFINE_PER_CPU(struct kvm_vcpu_pv_apf_data, apf_data) __aligned(64);
++static DEFINE_PER_CPU(struct kvm_task_sleep_head, apf_head);
++#endif
+ 
+ static inline const struct fault_info *esr_to_fault_info(unsigned int esr)
+ {
+@@ -717,10 +742,281 @@ static const struct fault_info fault_info[] = {
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 63"			},
+ };
+ 
++#ifdef CONFIG_KVM_GUEST
++static inline unsigned int kvm_async_pf_read_enabled(void)
 +{
-+	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
++	return __this_cpu_read(apf_data.enabled);
 +}
 +
-+static inline u32 kvm_async_pf_hash_next(u32 key)
++static inline void kvm_async_pf_write_enabled(unsigned int val)
 +{
-+	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
++	__this_cpu_write(apf_data.enabled, val);
 +}
 +
-+static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
++static inline unsigned int kvm_async_pf_read_reason(void)
 +{
-+	int i;
-+
-+	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
-+		vcpu->arch.apf.gfns[i] = ~0;
++	return __this_cpu_read(apf_data.reason);
 +}
 +
-+/*
-+ * Add gfn to the hash table. It's ensured there is a free entry
-+ * when this function is called.
-+ */
-+static void kvm_async_pf_hash_add(struct kvm_vcpu *vcpu, gfn_t gfn)
++static inline void kvm_async_pf_write_reason(unsigned int val)
 +{
-+	u32 key = kvm_async_pf_hash_fn(gfn);
-+
-+	while (vcpu->arch.apf.gfns[key] != ~0)
-+		key = kvm_async_pf_hash_next(key);
-+
-+	vcpu->arch.apf.gfns[key] = gfn;
++	__this_cpu_write(apf_data.reason, val);
 +}
 +
-+static u32 kvm_async_pf_hash_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
++#define kvm_async_pf_lock(b, flags)					\
++	raw_spin_lock_irqsave(&(b)->lock, (flags))
++#define kvm_async_pf_trylock(b, flags)					\
++	raw_spin_trylock_irqsave(&(b)->lock, (flags))
++#define kvm_async_pf_unlock(b, flags)					\
++	raw_spin_unlock_irqrestore(&(b)->lock, (flags))
++#define kvm_async_pf_unlock_and_clear(b, flags)				\
++	do {								\
++		raw_spin_unlock_irqrestore(&(b)->lock, (flags));	\
++		kvm_async_pf_write_reason(0);				\
++	} while (0)
++
++static struct kvm_task_sleep_node *kvm_async_pf_find(
++		struct kvm_task_sleep_head *b, u32 token)
 +{
-+	u32 key = kvm_async_pf_hash_fn(gfn);
-+	int i;
++	struct kvm_task_sleep_node *n;
++	struct hlist_node *p;
 +
-+	for (i = 0; i < ASYNC_PF_PER_VCPU; i++) {
-+		if (vcpu->arch.apf.gfns[key] == gfn ||
-+		    vcpu->arch.apf.gfns[key] == ~0)
-+			break;
-+
-+		key = kvm_async_pf_hash_next(key);
++	hlist_for_each(p, &b->list) {
++		n = hlist_entry(p, typeof(*n), link);
++		if (n->token == token)
++			return n;
 +	}
 +
-+	return key;
++	return NULL;
 +}
 +
-+static void kvm_async_pf_hash_remove(struct kvm_vcpu *vcpu, gfn_t gfn)
++static void kvm_async_pf_wait(u32 token, int in_kernel)
 +{
-+	u32 i, j, k;
++	struct kvm_task_sleep_head *b = this_cpu_ptr(&apf_head);
++	struct kvm_task_sleep_node n, *e;
++	DECLARE_SWAITQUEUE(wait);
++	unsigned long flags;
 +
-+	i = j = kvm_async_pf_hash_slot(vcpu, gfn);
-+	while (true) {
-+		vcpu->arch.apf.gfns[i] = ~0;
++	kvm_async_pf_lock(b, flags);
++	e = kvm_async_pf_find(b, token);
++	if (e) {
++		/* dummy entry exist -> wake up was delivered ahead of PF */
++		hlist_del(&e->link);
++		kfree(e);
++		kvm_async_pf_unlock_and_clear(b, flags);
 +
-+		do {
-+			j = kvm_async_pf_hash_next(j);
-+			if (vcpu->arch.apf.gfns[j] == ~0)
-+				return;
-+
-+			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
-+			/*
-+			 * k lies cyclically in ]i,j]
-+			 * |    i.k.j |
-+			 * |....j i.k.| or  |.k..j i...|
-+			 */
-+		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
-+
-+		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
-+		i = j;
-+	}
-+}
-+
-+bool kvm_async_pf_hash_find(struct kvm_vcpu *vcpu, gfn_t gfn)
-+{
-+	u32 key = kvm_async_pf_hash_slot(vcpu, gfn);
-+
-+	return vcpu->arch.apf.gfns[key] == gfn;
-+}
-+
-+static inline int kvm_async_pf_read_cache(struct kvm_vcpu *vcpu, u32 *val)
-+{
-+	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.apf.cache,
-+				     val, sizeof(*val));
-+}
-+
-+static inline int kvm_async_pf_write_cache(struct kvm_vcpu *vcpu, u32 val)
-+{
-+	return kvm_write_guest_cached(vcpu->kvm, &vcpu->arch.apf.cache,
-+				      &val, sizeof(val));
-+}
-+
-+bool kvm_arch_can_inject_async_page_not_present(struct kvm_vcpu *vcpu)
-+{
-+	u64 vbar, pc;
-+	u32 val;
-+	int ret;
-+
-+	if (!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED))
-+		return false;
-+
-+	if (vcpu->arch.apf.send_user_only && vcpu_mode_priv(vcpu))
-+		return false;
-+
-+	/* Pending page fault, which ins't acknowledged by guest */
-+	ret = kvm_async_pf_read_cache(vcpu, &val);
-+	if (ret || val)
-+		return false;
-+
-+	/*
-+	 * Events can't be injected through data abort because it's
-+	 * going to clobber ELR_EL1, which might not consued (or saved)
-+	 * by guest yet.
-+	 */
-+	vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+	pc = *vcpu_pc(vcpu);
-+	if (pc >= vbar && pc < (vbar + vcpu->arch.apf.no_fault_inst_range))
-+		return false;
-+
-+	return true;
-+}
-+
-+/*
-+ * We need deliver the page present signal as quick as possible because
-+ * it's performance critical. So the signal is delivered no matter which
-+ * privilege level the guest has. It's possible the signal can't be handled
-+ * by the guest immediately. However, host doesn't contribute the delay
-+ * anyway.
-+ */
-+bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
-+{
-+	u64 vbar, pc;
-+	u32 val;
-+	int ret;
-+
-+	if (!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED))
-+		return true;
-+
-+	/* Pending page fault, which ins't acknowledged by guest */
-+	ret = kvm_async_pf_read_cache(vcpu, &val);
-+	if (ret || val)
-+		return false;
-+
-+	/*
-+	 * Events can't be injected through data abort because it's
-+	 * going to clobber ELR_EL1, which might not consued (or saved)
-+	 * by guest yet.
-+	 */
-+	vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+	pc = *vcpu_pc(vcpu);
-+	if (pc >= vbar && pc < (vbar + vcpu->arch.apf.no_fault_inst_range))
-+		return false;
-+
-+	return true;
-+}
-+
-+int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, u32 esr,
-+			    gpa_t gpa, gfn_t gfn)
-+{
-+	struct kvm_arch_async_pf arch;
-+	unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gfn);
-+
-+	arch.token = (vcpu->arch.apf.id++ << 16) | vcpu->vcpu_id;
-+	arch.gfn = gfn;
-+	arch.esr = esr;
-+
-+	return kvm_setup_async_pf(vcpu, gpa, hva, &arch);
-+}
-+
-+/*
-+ * It's garanteed that no pending asynchronous page fault when this is
-+ * called. It means all previous issued asynchronous page faults have
-+ * been acknoledged.
-+ */
-+void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+				     struct kvm_async_pf *work)
-+{
-+	int ret;
-+
-+	kvm_async_pf_hash_add(vcpu, work->arch.gfn);
-+	ret = kvm_async_pf_write_cache(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT);
-+	if (ret) {
-+		kvm_err("%s: Error %d writing cache\n", __func__, ret);
-+		kvm_async_pf_hash_remove(vcpu, work->arch.gfn);
 +		return;
 +	}
 +
-+	kvm_inject_dabt(vcpu, work->arch.token);
++	n.token = token;
++	n.task = current;
++	n.cpu = smp_processor_id();
++	n.halted = is_idle_task(current) ||
++		   (IS_ENABLED(CONFIG_PREEMPT_COUNT) ?
++		    preempt_count() > 1 || rcu_preempt_depth() : in_kernel);
++	n.delayed = false;
++	init_swait_queue_head(&n.wq);
++	hlist_add_head(&n.link, &b->list);
++	kvm_async_pf_unlock_and_clear(b, flags);
++
++	for (;;) {
++		if (!n.halted) {
++			prepare_to_swait_exclusive(&n.wq, &wait,
++						   TASK_UNINTERRUPTIBLE);
++		}
++
++		if (hlist_unhashed(&n.link))
++			break;
++
++		if (!n.halted) {
++			schedule();
++		} else {
++			dsb(sy);
++			wfi();
++		}
++	}
++
++	if (!n.halted)
++		finish_swait(&n.wq, &wait);
 +}
 +
 +/*
-+ * It's garanteed that no pending asynchronous page fault when this is
-+ * called. It means all previous issued asynchronous page faults have
-+ * been acknoledged.
++ * There are two cases the suspended processed can't be waken up
++ * immediately: The waker is exactly the suspended process, or
++ * the current CPU runqueue has been locked. Otherwise, we might
++ * run into dead-lock.
 + */
-+void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
-+				 struct kvm_async_pf *work)
++static inline void kvm_async_pf_wake_one(struct kvm_task_sleep_node *n)
 +{
-+	int ret;
++	if (n->task == current ||
++	    cpu_rq_is_locked(smp_processor_id())) {
++		n->delayed = true;
++		return;
++	}
 +
-+	/* Broadcast wakeup */
-+	if (work->wakeup_all)
-+		work->arch.token = ~0;
++	hlist_del_init(&n->link);
++	if (n->halted)
++		smp_send_reschedule(n->cpu);
 +	else
-+		kvm_async_pf_hash_remove(vcpu, work->arch.gfn);
-+
-+	ret = kvm_async_pf_write_cache(vcpu, KVM_PV_REASON_PAGE_READY);
-+	if (ret) {
-+		kvm_err("%s: Error %d writing cache\n", __func__, ret);
-+		return;
-+	}
-+
-+	kvm_inject_dabt(vcpu, work->arch.token);
++		swake_up_one(&n->wq);
 +}
 +
-+void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
-+			       struct kvm_async_pf *work)
++void kvm_async_pf_delayed_wake(void)
 +{
-+	struct kvm_memory_slot *memslot;
-+	unsigned int esr = work->arch.esr;
-+	phys_addr_t gpa = work->cr2_or_gpa;
-+	gfn_t gfn = gpa >> PAGE_SHIFT;
-+	unsigned long hva;
-+	bool write_fault, writable;
-+	int idx;
++	struct kvm_task_sleep_head *b;
++	struct kvm_task_sleep_node *n;
++	struct hlist_node *p, *next;
++	unsigned int reason;
++	unsigned long flags;
 +
-+	/*
-+	 * We shouldn't issue prefault for special work to wake up
-+	 * all pending tasks because the associated token (address)
-+	 * is invalid.
-+	 */
-+	if (work->wakeup_all)
++	if (!kvm_async_pf_read_enabled())
 +		return;
 +
 +	/*
-+	 * The gpa was validated before the work is started. However, the
-+	 * memory slots might be changed since then. So we need to redo the
-+	 * validatation here.
++	 * We're running in the edging context, we need to complete
++	 * the work as quick as possible. So we have a preliminary
++	 * check without holding the lock.
 +	 */
-+	idx = srcu_read_lock(&vcpu->kvm->srcu);
++	b = this_cpu_ptr(&apf_head);
++	if (hlist_empty(&b->list))
++		return;
 +
-+	write_fault = kvm_is_write_fault(esr);
-+	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-+	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-+	if (kvm_is_error_hva(hva) || (write_fault && !writable))
-+		goto out;
-+
-+	kvm_handle_user_mem_abort(vcpu, esr, memslot, gpa, hva, true);
-+
-+out:
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+}
-+
-+static long kvm_async_pf_update_enable_reg(struct kvm_vcpu *vcpu, u64 data)
-+{
-+	bool enabled, enable;
-+	gpa_t gpa = (data & ~0x3F);
-+	int ret;
-+
-+	enabled = !!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED);
-+	enable = !!(data & KVM_ASYNC_PF_ENABLED);
-+	if (enable == enabled) {
-+		kvm_debug("%s: Async PF has been %s (0x%llx -> 0x%llx)\n",
-+			  __func__, enabled ? "enabled" : "disabled",
-+			  vcpu->arch.apf.control_block, data);
-+		return SMCCC_RET_NOT_REQUIRED;
++	/*
++	 * Set the async page fault reason to something to avoid
++	 * receiving the signals, which might cause lock contention
++	 * and possibly dead-lock. As we're in guest context, it's
++	 * safe to set the reason here.
++	 *
++	 * There might be pending signals. For that case, we needn't
++	 * do anything. Otherwise, the pending signal will be lost.
++	 */
++	reason = kvm_async_pf_read_reason();
++	if (!reason) {
++		kvm_async_pf_write_reason(KVM_PV_REASON_PAGE_NOT_PRESENT +
++					  KVM_PV_REASON_PAGE_READY);
 +	}
 +
-+	if (enable) {
-+		ret = kvm_gfn_to_hva_cache_init(
-+			vcpu->kvm, &vcpu->arch.apf.cache,
-+			gpa + offsetof(struct kvm_vcpu_pv_apf_data, reason),
-+			sizeof(u32));
-+		if (ret) {
-+			kvm_err("%s: Error %d initializing cache on 0x%llx\n",
-+				__func__, ret, data);
-+			return SMCCC_RET_NOT_SUPPORTED;
++	if (!kvm_async_pf_trylock(b, flags))
++		goto done;
++
++	hlist_for_each_safe(p, next, &b->list) {
++		n = hlist_entry(p, typeof(*n), link);
++		if (n->cpu != smp_processor_id())
++			continue;
++		if (!n->delayed)
++			continue;
++
++		kvm_async_pf_wake_one(n);
++	}
++
++	kvm_async_pf_unlock(b, flags);
++
++done:
++	if (!reason)
++		kvm_async_pf_write_reason(0);
++}
++NOKPROBE_SYMBOL(kvm_async_pf_delayed_wake);
++
++static void kvm_async_pf_wake_all(void)
++{
++	struct kvm_task_sleep_head *b;
++	struct kvm_task_sleep_node *n;
++	struct hlist_node *p, *next;
++	unsigned long flags;
++
++	b = this_cpu_ptr(&apf_head);
++	kvm_async_pf_lock(b, flags);
++
++	hlist_for_each_safe(p, next, &b->list) {
++		n = hlist_entry(p, typeof(*n), link);
++		kvm_async_pf_wake_one(n);
++	}
++
++	kvm_async_pf_unlock(b, flags);
++
++	kvm_async_pf_write_reason(0);
++}
++
++static void kvm_async_pf_wake(u32 token)
++{
++	struct kvm_task_sleep_head *b = this_cpu_ptr(&apf_head);
++	struct kvm_task_sleep_node *n;
++	unsigned long flags;
++
++	if (token == ~0) {
++		kvm_async_pf_wake_all();
++		return;
++	}
++
++again:
++	kvm_async_pf_lock(b, flags);
++
++	n = kvm_async_pf_find(b, token);
++	if (!n) {
++		/*
++		 * Async PF was not yet handled. Add dummy entry
++		 * for the token. Busy wait until other CPU handles
++		 * the async PF on allocation failure.
++		 */
++		n = kzalloc(sizeof(*n), GFP_ATOMIC);
++		if (!n) {
++			kvm_async_pf_unlock(b, flags);
++			cpu_relax();
++			goto again;
 +		}
-+
-+		kvm_async_pf_hash_reset(vcpu);
-+		vcpu->arch.apf.send_user_only =
-+			!(data & KVM_ASYNC_PF_SEND_ALWAYS);
-+		kvm_async_pf_wakeup_all(vcpu);
-+		vcpu->arch.apf.control_block = data;
++		n->token = token;
++		n->task = current;
++		n->cpu = smp_processor_id();
++		n->halted = false;
++		n->delayed = false;
++		init_swait_queue_head(&n->wq);
++		hlist_add_head(&n->link, &b->list);
 +	} else {
-+		kvm_clear_async_pf_completion_queue(vcpu);
-+		vcpu->arch.apf.control_block = data;
++		kvm_async_pf_wake_one(n);
 +	}
 +
-+	return SMCCC_RET_SUCCESS;
++	kvm_async_pf_unlock_and_clear(b, flags);
 +}
 +
-+long kvm_async_pf_hypercall(struct kvm_vcpu *vcpu)
++static bool do_async_pf(unsigned long addr, unsigned int esr,
++		       struct pt_regs *regs)
 +{
-+	u64 data, func, val, range;
-+	long ret = SMCCC_RET_SUCCESS;
++	u32 reason;
 +
-+	data = (smccc_get_arg2(vcpu) << 32) | smccc_get_arg1(vcpu);
-+	func = data & (0xfful << 56);
-+	val = data & ~(0xfful << 56);
-+	switch (func) {
-+	case BIT(63):
-+		ret = kvm_async_pf_update_enable_reg(vcpu, val);
++	if (!kvm_async_pf_read_enabled())
++		return false;
++
++	reason = kvm_async_pf_read_reason();
++	if (!reason)
++		return false;
++
++	switch (reason) {
++	case KVM_PV_REASON_PAGE_NOT_PRESENT:
++		kvm_async_pf_wait((u32)addr, !user_mode(regs));
 +		break;
-+	case BIT(62):
-+		if (vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED) {
-+			ret = SMCCC_RET_NOT_SUPPORTED;
-+			break;
-+		}
-+
-+		range = vcpu->arch.apf.no_fault_inst_range;
-+		vcpu->arch.apf.no_fault_inst_range = max(range, val);
++	case KVM_PV_REASON_PAGE_READY:
++		kvm_async_pf_wake((u32)addr);
 +		break;
 +	default:
-+		kvm_err("%s: Unrecognized function 0x%llx\n", __func__, func);
-+		ret = SMCCC_RET_NOT_SUPPORTED;
++		if (reason) {
++			pr_warn("%s: Illegal reason %d\n", __func__, reason);
++			kvm_async_pf_write_reason(0);
++		}
 +	}
 +
-+	return ret;
++	return true;
 +}
-diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-index db6dce3d0e23..a7e0fe17e2f1 100644
---- a/virt/kvm/arm/hypercalls.c
-+++ b/virt/kvm/arm/hypercalls.c
-@@ -70,7 +70,15 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
- 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-+#ifdef CONFIG_KVM_ASYNC_PF
-+		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_APF);
++#endif /* CONFIG_KVM_GUEST */
++
+ void do_mem_abort(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+ {
+ 	const struct fault_info *inf = esr_to_fault_info(esr);
+ 
++#ifdef CONFIG_KVM_GUEST
++	if (do_async_pf(addr, esr, regs))
++		return;
 +#endif
- 		break;
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	case ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID:
-+		val[0] = kvm_async_pf_hypercall(vcpu);
-+		break;
-+#endif
- 	default:
- 		return kvm_psci_call(vcpu);
- 	}
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 95aaabb2b1fc..a303815845a2 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1656,6 +1656,30 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
++
+ 	if (!inf->fn(addr, esr, regs))
+ 		return;
+ 
+@@ -878,3 +1174,141 @@ void do_debug_exception(unsigned long addr_if_watchpoint, unsigned int esr,
+ 	debug_exception_exit(regs);
  }
- 
-+static bool try_async_pf(struct kvm_vcpu *vcpu, u32 esr, gpa_t gpa,
-+			 gfn_t gfn, kvm_pfn_t *pfn, bool write,
-+			 bool *writable, bool prefault)
+ NOKPROBE_SYMBOL(do_debug_exception);
++
++#ifdef CONFIG_KVM_GUEST
++static int __init kvm_async_pf_available(char *arg)
 +{
-+	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+#ifdef CONFIG_KVM_ASYNC_PF
-+	bool async = false;
++	async_pf_available = false;
++	return 0;
++}
++early_param("no-kvmapf", kvm_async_pf_available);
 +
-+	/* Bail if *pfn has correct page */
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
-+	if (!async)
-+		return false;
++static void kvm_async_pf_enable(bool enable)
++{
++	struct arm_smccc_res res;
++	unsigned long *offsets = (unsigned long *)__exception_handlers_offset;
++	u32 enabled = kvm_async_pf_read_enabled();
++	u64 val;
++	int i;
 +
-+	if (!prefault && kvm_arch_can_inject_async_page_not_present(vcpu)) {
-+		if (kvm_async_pf_hash_find(vcpu, gfn) ||
-+		    kvm_arch_setup_async_pf(vcpu, esr, gpa, gfn))
-+			return true;
++	if (enable == enabled)
++		return;
++
++	if (enable) {
++		/*
++		 * Asychonous page faults will be prohibited when CPU runs
++		 * instructions between the vector base and the maximal
++		 * offset, plus 4096. The 4096 is the assumped maximal
++		 * length for individual handler. The hardware registers
++		 * should be saved to stack at the beginning of the handlers,
++		 * so 4096 shuld be safe enough.
++		 */
++		val = 0;
++		for (i = 0; i < 16; i++) {
++			if (offsets[i] > val)
++				val = offsets[i];
++		}
++
++		val += 4096;
++		val |= BIT(62);
++
++		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID,
++				     (u32)val, (u32)(val >> 32), &res);
++		if (res.a0 != SMCCC_RET_SUCCESS) {
++			pr_warn("Async PF configuration error %ld on CPU %d\n",
++				res.a0, smp_processor_id());
++			return;
++		}
++
++		/* FIXME: Enable KVM_ASYNC_PF_SEND_ALWAYS */
++		val = BIT(63);
++		val |= virt_to_phys(this_cpu_ptr(&apf_data));
++		val |= KVM_ASYNC_PF_ENABLED;
++
++		kvm_async_pf_write_enabled(1);
++		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID,
++				     (u32)val, (u32)(val >> 32), &res);
++		if (res.a0 != SMCCC_RET_SUCCESS) {
++			pr_warn("Async PF enable error %ld on CPU %d\n",
++				res.a0, smp_processor_id());
++			kvm_async_pf_write_enabled(0);
++			return;
++		}
++	} else {
++		val = BIT(63);
++		arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID,
++				     (u32)val, (u32)(val >> 32), &res);
++		if (res.a0 != SMCCC_RET_SUCCESS) {
++			pr_warn("Async PF disable error %ld on CPU %d\n",
++				res.a0, smp_processor_id());
++			return;
++		}
++
++		kvm_async_pf_write_enabled(0);
 +	}
-+#endif
 +
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
-+	return false;
++	pr_info("Async PF %s on CPU %d\n",
++		enable ? "enabled" : "disabled", smp_processor_id());
 +}
 +
- int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
- 			      struct kvm_memory_slot *memslot,
- 			      phys_addr_t fault_ipa, unsigned long hva,
-@@ -1737,7 +1761,10 @@ int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
- 	 */
- 	smp_rmb();
- 
--	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-+	if (try_async_pf(vcpu, esr, fault_ipa, gfn, &pfn,
-+			 write_fault, &writable, prefault))
-+		return 1;
++static void kvm_async_pf_cpu_reboot(void *unused)
++{
++	kvm_async_pf_enable(false);
++}
 +
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
++static int kvm_async_pf_cpu_reboot_notify(struct notifier_block *nb,
++					  unsigned long code, void *unused)
++{
++	if (code == SYS_RESTART)
++		on_each_cpu(kvm_async_pf_cpu_reboot, NULL, 1);
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block kvm_async_pf_cpu_reboot_nb = {
++	.notifier_call = kvm_async_pf_cpu_reboot_notify,
++};
++
++static int kvm_async_pf_cpu_online(unsigned int cpu)
++{
++	struct kvm_task_sleep_head *b;
++
++	b = this_cpu_ptr(&apf_head);
++	raw_spin_lock_init(&b->lock);
++	kvm_async_pf_enable(true);
++	return 0;
++}
++
++static int kvm_async_pf_cpu_offline(unsigned int cpu)
++{
++	kvm_async_pf_enable(false);
++	return 0;
++}
++
++static int __init kvm_async_pf_cpu_init(void)
++{
++	struct kvm_task_sleep_head *b;
++	int ret;
++
++	if (!kvm_para_has_feature(KVM_FEATURE_ASYNC_PF) ||
++	    !async_pf_available)
++		return -EPERM;
++
++	register_reboot_notifier(&kvm_async_pf_cpu_reboot_nb);
++	ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
++			"arm/kvm:online", kvm_async_pf_cpu_online,
++			kvm_async_pf_cpu_offline);
++	if (ret < 0) {
++		pr_warn("%s: Error %d to install cpu hotplug callbacks\n",
++			__func__, ret);
++		return ret;
++	}
++
++	b = this_cpu_ptr(&apf_head);
++	raw_spin_lock_init(&b->lock);
++	kvm_async_pf_enable(true);
++
++	return 0;
++}
++early_initcall(kvm_async_pf_cpu_init);
++#endif /* CONFIG_KVM_GUEST */
 -- 
 2.23.0
 
