@@ -4,73 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B11C47257
-	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20805C47247
+	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2BD4320725
-	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE7A920725
+	for <kvmarm@archiver.kernel.org>; Fri,  8 May 2020 12:11:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="coTi/0Sv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD4320725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BC5rWRRz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE7A920725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D93F94B1B4;
-	Fri,  8 May 2020 08:11:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 873274B1C3;
+	Fri,  8 May 2020 08:11:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8tByEVR9ly4D; Fri,  8 May 2020 08:11:14 -0400 (EDT)
+	with ESMTP id 71LZ7cxFrY14; Fri,  8 May 2020 08:11:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 310D74B1D8;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6165C4B1E1;
 	Fri,  8 May 2020 08:11:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 302EC4B583
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A11834B561
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sAY4Z6m+RaXd for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2020 23:31:04 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43E964B582
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:04 -0400 (EDT)
+ with ESMTP id 7Wa5IZ1QdRkL for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2020 23:31:16 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBBA24B54E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2020 23:31:16 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588908664;
+ s=mimecast20190719; t=1588908676;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uOxS8qUh1P601xhSbaR+Vu3Pd0b4Lw9cqUexthKtkJg=;
- b=coTi/0SvN7TAEt20wSqlJfovMtO1mS1g5PlDNpG6LXVEhpWKMm7P2iPcYarw6AzGi/1e29
- n1CMvIf80290aqK1vTT7ohloJENzorR4UOLYHOAZdxV5mioBTjRQleDRuorqpwrcPqCbEI
- UD1MP0KBeVOlZBYy3F82B/Mi1cTHY8g=
+ bh=E8MHh9dyvpe8bslvZNsUP5j2B3v4NSqfl6A+NT0wxD4=;
+ b=BC5rWRRzCn4QvHcORTqm3ZaoPOdFeOEoTjuK0yb618C1oQ8s7F4f9gGCDADJWYXCRVRWLO
+ PxFYUpnnlGQaFv0+aVL7tUVZ0aynzoJCW7fC7DhBcev+tYLA039RRvvZPijSG5CzBZq3vA
+ alHrkvq1na6SQXYERuOyPu44DQgEHrA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-U2Rao8xiNb2Hn3U1HK1l_A-1; Thu, 07 May 2020 23:30:59 -0400
-X-MC-Unique: U2Rao8xiNb2Hn3U1HK1l_A-1
+ us-mta-259-kwm_sW8LPE6l4dM0Y68Z0w-1; Thu, 07 May 2020 23:31:13 -0400
+X-MC-Unique: kwm_sW8LPE6l4dM0Y68Z0w-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38B041895A29;
- Fri,  8 May 2020 03:30:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6762D107ACCA;
+ Fri,  8 May 2020 03:31:11 +0000 (UTC)
 Received: from localhost.localdomain.com (vpn2-54-199.bne.redhat.com
  [10.64.54.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8109699CF;
- Fri,  8 May 2020 03:30:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 783242E052;
+ Fri,  8 May 2020 03:31:03 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH RFCv2 6/9] kvm/arm64: Export kvm_handle_user_mem_abort() with
- prefault mode
-Date: Fri,  8 May 2020 13:29:16 +1000
-Message-Id: <20200508032919.52147-7-gshan@redhat.com>
+Subject: [PATCH RFCv2 8/9] kernel/sched: Add cpu_rq_is_locked()
+Date: Fri,  8 May 2020 13:29:18 +1000
+Message-Id: <20200508032919.52147-9-gshan@redhat.com>
 In-Reply-To: <20200508032919.52147-1-gshan@redhat.com>
 References: <20200508032919.52147-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -94,77 +93,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This renames user_mem_abort() to kvm_handle_user_mem_abort(), and
-then export it. The function will be used in asynchronous page fault
-to populate a page table entry once the corresponding page is populated
-from the backup device (e.g. swap partition):
-
-   * Parameter @fault_status is replace by @esr.
-   * The parameters are reorder based on their importance.
-
-This shouldn't cause any functional changes.
+This adds API cpu_rq_is_locked() to check if the CPU's runqueue has been
+locked or not. It's used in the subsequent patch to determine the task
+wakeup should be executed immediately or delayed.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  4 ++++
- virt/kvm/arm/mmu.c                | 14 ++++++++------
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ include/linux/sched.h | 1 +
+ kernel/sched/core.c   | 8 ++++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 32c8a675e5a4..f77c706777ec 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -437,6 +437,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 4418f5cb8324..e68882443da7 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1691,6 +1691,7 @@ extern struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *n
+  */
+ extern struct task_struct *find_get_task_by_vpid(pid_t nr);
  
- #define KVM_ARCH_WANT_MMU_NOTIFIER
-+int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
-+			      struct kvm_memory_slot *memslot,
-+			      phys_addr_t fault_ipa, unsigned long hva,
-+			      bool prefault);
- int kvm_unmap_hva_range(struct kvm *kvm,
- 			unsigned long start, unsigned long end);
- int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e462e0368fd9..95aaabb2b1fc 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1656,12 +1656,12 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
- }
++extern bool cpu_rq_is_locked(int cpu);
+ extern int wake_up_state(struct task_struct *tsk, unsigned int state);
+ extern int wake_up_process(struct task_struct *tsk);
+ extern void wake_up_new_task(struct task_struct *tsk);
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 9a2fbf98fd6f..30f4a8845495 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -73,6 +73,14 @@ __read_mostly int scheduler_running;
+  */
+ int sysctl_sched_rt_runtime = 950000;
  
--static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
--			  struct kvm_memory_slot *memslot, unsigned long hva,
--			  unsigned long fault_status)
-+int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
-+			      struct kvm_memory_slot *memslot,
-+			      phys_addr_t fault_ipa, unsigned long hva,
-+			      bool prefault)
- {
--	int ret;
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	unsigned int fault_status = kvm_vcpu_trap_get_fault_type(esr);
- 	bool write_fault, writable, force_pte = false;
- 	bool exec_fault, needs_exec;
- 	unsigned long mmu_seq;
-@@ -1674,6 +1674,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	pgprot_t mem_type = PAGE_S2;
- 	bool logging_active = memslot_is_logging(memslot);
- 	unsigned long vma_pagesize, flags = 0;
-+	int ret;
- 
- 	write_fault = kvm_is_write_fault(esr);
- 	exec_fault = kvm_vcpu_trap_is_iabt(esr);
-@@ -1995,7 +1996,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		goto out_unlock;
- 	}
- 
--	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
-+	ret = kvm_handle_user_mem_abort(vcpu, esr, memslot,
-+					fault_ipa, hva, false);
- 	if (ret == 0)
- 		ret = 1;
- out:
++bool cpu_rq_is_locked(int cpu)
++{
++	struct rq *rq = cpu_rq(cpu);
++
++	return raw_spin_is_locked(&rq->lock) ? true :  false;
++}
++EXPORT_SYMBOL_GPL(cpu_rq_is_locked);
++
+ /*
+  * __task_rq_lock - lock the rq @p resides on.
+  */
 -- 
 2.23.0
 
