@@ -1,86 +1,87 @@
-Return-Path: <SRS0=/OlI=6X=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=+3AG=6Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BEEC28CBC
-	for <kvmarm@archiver.kernel.org>; Sat,  9 May 2020 10:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA30C54E49
+	for <kvmarm@archiver.kernel.org>; Sun, 10 May 2020 10:17:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0079C21775
-	for <kvmarm@archiver.kernel.org>; Sat,  9 May 2020 10:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A454206A3
+	for <kvmarm@archiver.kernel.org>; Sun, 10 May 2020 10:17:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2SKLstv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0079C21775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCq/ffd0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A454206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CB914B3CD;
-	Sat,  9 May 2020 06:59:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 233304B2CA;
+	Sun, 10 May 2020 06:17:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D9a6eOQds-em; Sat,  9 May 2020 06:59:20 -0400 (EDT)
+	with ESMTP id jJd9JFHHdDqA; Sun, 10 May 2020 06:17:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 105534B3CB;
-	Sat,  9 May 2020 06:59:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1D604B2D8;
+	Sun, 10 May 2020 06:17:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C04184B3A5
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 May 2020 06:59:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 701DC4B2CA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 May 2020 06:17:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tngX8Zi2gU+a for <kvmarm@lists.cs.columbia.edu>;
- Sat,  9 May 2020 06:59:16 -0400 (EDT)
+ with ESMTP id KrOZJxTqr1y3 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 10 May 2020 06:17:02 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A56674B38A
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 May 2020 06:59:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 488844B2C9
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 May 2020 06:17:02 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4E90621775;
- Sat,  9 May 2020 10:59:15 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1DEB8206A3;
+ Sun, 10 May 2020 10:17:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589021955;
- bh=2seki1yMcX+JSM6LXSPPyxLywnbmcos26i1LfBlyMKw=;
+ s=default; t=1589105821;
+ bh=+0kDXWCp+FqkNWlLvZ+TWB7dPSP/xtLz8CjN8Au1pfY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=S2SKLstvTxZuONsyfQmzS5L/tHWpDjLq7uApbj6sPNFMk0F/4SY4aCSfdVUrw+gAY
- BWa5w/DwWSXyGhaqZZWyZJ1nt5sjty//GwOQTrXAID3L8tCUzAmwnivbhHOEI+UQJ0
- Y3ShsO8eu0HbaynvF060UD179ZUlKpDeSsJ+Qfjo=
+ b=SCq/ffd0ndynT5J+/zSojwIXSnyvVOS5dyJf7h09dTyq1QpTCh1IlWOSMK7ZB9CGA
+ T7V0luZDjAb7hyGAp4OehAahjoR6e5a9lVercD0SZuQK8TWjodALDgPRombn1SJcL0
+ MIabkHSZA8F1SerF0Mb9pV99Ragti8oDB1tsI+gg=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jXNCL-00AqsR-Dl; Sat, 09 May 2020 11:59:13 +0100
-Date: Sat, 09 May 2020 11:59:07 +0100
-Message-ID: <875zd51iis.wl-maz@kernel.org>
+ id 1jXj11-00B1Pu-20; Sun, 10 May 2020 11:16:59 +0100
+Date: Sun, 10 May 2020 11:16:54 +0100
+Message-ID: <871rns14dl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH V2] arm64/cpufeature: Validate hypervisor capabilities
- during CPU hotplug
-In-Reply-To: <1588906358-7845-1-git-send-email-anshuman.khandual@arm.com>
-References: <1588906358-7845-1-git-send-email-anshuman.khandual@arm.com>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 02/15] arm64: kvm: Formalize host-hyp hypcall ABI
+In-Reply-To: <20200507133320.GA16899@google.com>
+References: <20200430144831.59194-1-dbrazdil@google.com>
+ <20200430144831.59194-3-dbrazdil@google.com>
+ <87d07fj3g9.wl-maz@kernel.org> <20200507133320.GA16899@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com,
- linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org,
- mark.rutland@arm.com, james.morse@arm.com, suzuki.poulose@arm.com,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: qperret@google.com, dbrazdil@google.com,
+ catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,207 +98,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 08 May 2020 03:52:38 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+Hi Quentin,
+
+On Thu, 07 May 2020 14:33:20 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> This validates hypervisor capabilities like VMID width, IPA range for any
-> hot plug CPU against system finalized values. While here, it factors out
-> get_vmid_bits() for general use and also defines ID_AA64MMFR0_PARANGE_MASK.
-
-Maybe add a quick word on the fact that we use KVM's view of the IPA
-space to allow a CPU to come up.
-
->
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: linux-kernel@vger.kernel.org
+> Hey Marc,
 > 
-> Suggested-by: Suzuki Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V2:
+> On Thursday 07 May 2020 at 14:10:30 (+0100), Marc Zyngier wrote:
+> > Hi David, Quentin,
+
+[...]
+
+> > > +#define __KVM_HOST_HCALL_TABLE_IDX___vgic_v3_save_aprs		13
+> > > +__KVM_HOST_HCALL(__vgic_v3_save_aprs)
+> > > +
+> > > +#define __KVM_HOST_HCALL_TABLE_IDX_SIZE				14
+> > 
+> > This whole thing screams "enum" into my ears. Having to maintain these
+> > as #defines feels like a pain, specially if the numbers are never used
+> > in assembly code. (and for that, we have asm-offset.h).
 > 
-> - Added is_hyp_mode_available() check per Marc
-> - Moved verify_kvm_capabilities() into cpufeature.c per Marc
-> - Added helper get_kvm_ipa_limit() to fetch kvm_ipa_limit per Marc
-> - Renamed kvm as hyp including the commit message per Marc
+> This is essentially inspired from the various 'unistd.h' files we have
+> in the kernel, e.g. include/uapi/asm-generic/unistd.h, which have
+> exactly this type of construct. So, this was really just for consistency,
+> but no strong opinion from me.
+
+I think part of the of the reason for not using an enum in the syscall
+code is that part of is is (was?) used from assembly code. In our
+case, I'm pretty sure we won't go back to handling calls from asm any
+time soon, so a generated enum (and associated function pointer array)
+would be better.
+
 > 
-> Changes in V1: (https://patchwork.kernel.org/patch/11532565/)
+> > 
+> > > +
+> > > +/* XXX - Arbitrary offset for KVM-related hypercalls */
+> > > +#define __KVM_HOST_HCALL_BASE_SHIFT 8
+> > > +#define __KVM_HOST_HCALL_BASE (1ULL << __KVM_HOST_HCALL_BASE_SHIFT)
+> > > +#define __KVM_HOST_HCALL_END (__KVM_HOST_HCALL_BASE + \
+> > > +			      __KVM_HOST_HCALL_TABLE_IDX_SIZE)
+> > 
+> > I don't really get what is this offset for. It is too small to be used
+> > to skip the stub hypercalls (you'd need to start at 0x1000).
 > 
->  arch/arm64/include/asm/cpufeature.h | 20 +++++++++++++++++
->  arch/arm64/include/asm/kvm_mmu.h    |  2 +-
->  arch/arm64/include/asm/sysreg.h     |  1 +
->  arch/arm64/kernel/cpufeature.c      | 33 +++++++++++++++++++++++++++++
->  arch/arm64/kvm/reset.c              | 11 ++++++++--
->  5 files changed, 64 insertions(+), 3 deletions(-)
+> Oh, OK. I assumed anything above HVC_STUB_HCALL_NR would be fine. But
+> yes, this offset is really arbitrary, so if 0x1000 is better then that
+> totally works. For my education, where is that 0x1000 coming from ?
+
+We assumed that we wouldn't get a function pointer in the first 4kB,
+and documented as such in hyp.S. I would say that either we keep the
+current convention of leaving the first 4k function codes for the
+hyp-stubs, or we drop any sort of gap.
+
+Another thing to consider is that there is at least *one* external
+hypervisor (Jailhouse) that uses the stubs, so I'd like to make sure
+we don't break that (even if we made no promise whatsoever in that
+respect).
+
 > 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index afe08251ff95..fbbb4d2216f0 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -745,6 +745,26 @@ static inline bool cpu_has_hw_af(void)
->  extern bool cpu_has_amu_feat(int cpu);
->  #endif
->  
-> +static inline unsigned int get_vmid_bits(u64 mmfr1)
-> +{
-> +	int vmid_bits;
-> +
-> +	vmid_bits = cpuid_feature_extract_unsigned_field(mmfr1,
-> +						ID_AA64MMFR1_VMIDBITS_SHIFT);
-> +	if (vmid_bits == ID_AA64MMFR1_VMIDBITS_16)
-> +		return 16;
-> +
-> +	/*
-> +	 * Return the default here even if any reserved
-> +	 * value is fetched from the system register.
-> +	 */
-> +	return 8;
-> +}
-> +
-> +#ifdef CONFIG_KVM_ARM_HOST
-
-nit: useless #ifdefery.
-
-> +u32 get_kvm_ipa_limit(void);
-> +#endif
-> +
->  #endif /* __ASSEMBLY__ */
->  
->  #endif
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 30b0e8d6b895..a7137e144b97 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -416,7 +416,7 @@ static inline unsigned int kvm_get_vmid_bits(void)
->  {
->  	int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
->  
-> -	return (cpuid_feature_extract_unsigned_field(reg, ID_AA64MMFR1_VMIDBITS_SHIFT) == 2) ? 16 : 8;
-> +	return get_vmid_bits(reg);
->  }
->  
->  /*
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index c4ac0ac25a00..3510a4668970 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -705,6 +705,7 @@
->  #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
->  #define ID_AA64MMFR0_PARANGE_48		0x5
->  #define ID_AA64MMFR0_PARANGE_52		0x6
-> +#define ID_AA64MMFR0_PARANGE_MASK	0x7
-
-I realise this is already like this in the current code, but using 7
-as a mask value for the feature feels wrong. If we ever get a value
-with bit 3 of the capability being set, we will confuse it with some
-other configuration.
-
-We should be more careful and pass the full value of the feature to
-id_aa64mmfr0_parange_to_phys_shift(), which already does the right
-thing.
-
->  
->  #ifdef CONFIG_ARM64_PA_BITS_52
->  #define ID_AA64MMFR0_PARANGE_MAX	ID_AA64MMFR0_PARANGE_52
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9fac745aa7bb..7e5ff452574c 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2181,6 +2181,36 @@ static void verify_sve_features(void)
->  	/* Add checks on other ZCR bits here if necessary */
->  }
->  
-> +#ifdef CONFIG_KVM_ARM_HOST
-> +void verify_hyp_capabilities(void)
-> +{
-> +	u64 safe_mmfr1, mmfr0, mmfr1;
-> +	int parange, ipa_max;
-> +	unsigned int safe_vmid_bits, vmid_bits;
-> +
-> +	safe_mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +	mmfr0 = read_cpuid(ID_AA64MMFR0_EL1);
-> +	mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
-> +
-> +	/* Verify VMID bits */
-> +	safe_vmid_bits = get_vmid_bits(safe_mmfr1);
-> +	vmid_bits = get_vmid_bits(mmfr1);
-> +	if (vmid_bits < safe_vmid_bits) {
-> +		pr_crit("CPU%d: VMID width mismatch\n", smp_processor_id());
-> +		cpu_die_early();
-> +	}
-> +
-> +	/* Verify IPA range */
-> +	parange = mmfr0 & ID_AA64MMFR0_PARANGE_MASK;
-> +	ipa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
-> +	if (ipa_max < get_kvm_ipa_limit()) {
-> +		pr_crit("CPU%d: IPA range mismatch\n", smp_processor_id());
-> +		cpu_die_early();
-> +	}
-> +}
-> +#else	/* !CONFIG_KVM_ARM_HOST */
-> +static inline void verify_hyp_capabilities(void) { }
-> +#endif	/* CONFIG_KVM_ARM_HOST */
->  
->  /*
->   * Run through the enabled system capabilities and enable() it on this CPU.
-> @@ -2206,6 +2236,9 @@ static void verify_local_cpu_capabilities(void)
->  
->  	if (system_supports_sve())
->  		verify_sve_features();
-> +
-> +	if (is_hyp_mode_available())
-> +		verify_hyp_capabilities();
->  }
->  
->  void check_local_cpu_capabilities(void)
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 30b7ea680f66..1131b112dda2 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -340,11 +340,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> +u32 get_kvm_ipa_limit(void)
-> +{
-> +	return kvm_ipa_limit;
-> +}
-> +
->  void kvm_set_ipa_limit(void)
->  {
->  	unsigned int ipa_max, pa_max, va_max, parange;
->  
-> -	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
-> +	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) &
-> +						ID_AA64MMFR0_PARANGE_MASK;
->  	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
->  
->  	/* Clamp the IPA limit to the PA size supported by the kernel */
-> @@ -406,7 +412,8 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
->  		phys_shift = KVM_PHYS_SHIFT;
->  	}
->  
-> -	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
-> +	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) &
-> +						ID_AA64MMFR0_PARANGE_MASK;
->  	if (parange > ID_AA64MMFR0_PARANGE_MAX)
->  		parange = ID_AA64MMFR0_PARANGE_MAX;
->  	vtcr |= parange << VTCR_EL2_PS_SHIFT;
-> -- 
-> 2.20.1
+> > Given
+> > that you store the whole thing in an array, you're wasting some
+> > memory. I'm sure you have a good story for it though! ;-)
 > 
+> Note that the array's length is __KVM_HOST_HCALL_TABLE_IDX_SIZE, which
+> doesn't include the offset, so we shouldn't be wasting memory here.
+
+Ah, you're right. I got confused between _SIZE and _END.
+
 > 
+> > > +
+> > > +/* Hypercall number = kvm offset + table idx */
+> > > +#define KVM_HOST_HCALL_NR(name) (__KVM_HOST_HCALL_TABLE_IDX_##name + \
+> > > +				 __KVM_HOST_HCALL_BASE)
+> > > diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> > > index 8c9880783839..29e2b2cd2fbc 100644
+> > > --- a/arch/arm64/kvm/hyp/Makefile
+> > > +++ b/arch/arm64/kvm/hyp/Makefile
+> > > @@ -9,7 +9,7 @@ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+> > >  obj-$(CONFIG_KVM) += hyp.o
+> > >  
+> > >  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
+> > > -	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
+> > > +	 debug-sr.o entry.o switch.o fpsimd.o tlb.o host_hypercall.o hyp-entry.o
+> > >  
+> > >  # KVM code is run at a different exception code with a different map, so
+> > >  # compiler instrumentation that inserts callbacks or checks into the code may
+> > > diff --git a/arch/arm64/kvm/hyp/host_hypercall.c b/arch/arm64/kvm/hyp/host_hypercall.c
+> > > new file mode 100644
+> > > index 000000000000..6b31310f36a8
+> > > --- /dev/null
+> > > +++ b/arch/arm64/kvm/hyp/host_hypercall.c
+> > > @@ -0,0 +1,22 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright (C) 2020 Google, inc
+> > > + */
+> > > +
+> > > +#include <asm/kvm_hyp.h>
+> > > +
+> > > +typedef long (*kvm_hcall_fn_t)(void);
+> > > +
+> > > +static long __hyp_text kvm_hc_ni(void)
+> > > +{
+> > > +       return -ENOSYS;
+> > > +}
+> > > +
+> > > +#undef __KVM_HOST_HCALL
+> > > +#define __KVM_HOST_HCALL(name) \
+> > > +	[__KVM_HOST_HCALL_TABLE_IDX_##name] = (long (*)(void))name,
+> > > +
+> > > +const kvm_hcall_fn_t kvm_hcall_table[__KVM_HOST_HCALL_TABLE_IDX_SIZE] = {
+> > > +	[0 ... __KVM_HOST_HCALL_TABLE_IDX_SIZE-1] = kvm_hc_ni,
+> > > +#include <asm/kvm_host_hypercalls.h>
+> > > +};
+> > 
+> > Cunning. At the same time, if you can do this once, you can do it
+> > twice, and generating the __KVM_HOST_HCALL_TABLE_IDX_* as an enum
+> > should be pretty easy, and could live in its own include file.
+> 
+> Right, and that again is inspired from the arm64 syscall table (see
+> arch/arm64/kernel/sys.c). So the first intention was to keep things
+> consistent. But again, no strong opinion :)
 
-With the couple of nits above addressed:
+So let's try to build it with an enum instead, and see if it works. If
+it doesn't, at least we will know why.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+[...]
+
+> > > +	/* Find hcall function pointer in the table */
+> > > +	ldr	x10, =kvm_hcall_table
+> > > +	ksym_hyp_va	x10, x9
+> > 
+> > Can't kvm_hcall_table be referenced with adr or adr_l? It'd certainly
+> > be nice to avoid the extra load for something that is essentially a
+> > build-time constant.
+> 
+> In fact David already has a nice patch that transforms the whole thing
+> in a jump table, which is much nicer. I'll let him share the details
+> :)
+
+Ah! Looking forward to reviewing it then!
+
+Thanks,
 
 	M.
 
