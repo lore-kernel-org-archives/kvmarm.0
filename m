@@ -2,69 +2,119 @@ Return-Path: <SRS0=e6Jp=6Z=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6F7C54E4B
-	for <kvmarm@archiver.kernel.org>; Mon, 11 May 2020 10:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6C6C47255
+	for <kvmarm@archiver.kernel.org>; Mon, 11 May 2020 14:16:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3FC5E2080C
-	for <kvmarm@archiver.kernel.org>; Mon, 11 May 2020 10:29:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0vuf+Zo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FC5E2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 63360206B7
+	for <kvmarm@archiver.kernel.org>; Mon, 11 May 2020 14:16:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63360206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC5154B101;
-	Mon, 11 May 2020 06:29:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A291D4B0E0;
+	Mon, 11 May 2020 10:16:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hHU7o0XILUQi; Mon, 11 May 2020 06:29:29 -0400 (EDT)
+	with ESMTP id Tk231+VE-rOD; Mon, 11 May 2020 10:16:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D15BA4B0E5;
-	Mon, 11 May 2020 06:29:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91AE84B0D5;
+	Mon, 11 May 2020 10:16:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EB364B0E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 May 2020 06:29:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B25B24B0D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 May 2020 10:15:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o4VRs7kCgSS2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 May 2020 06:29:27 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 772504B0DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 May 2020 06:29:27 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E97C02080C;
- Mon, 11 May 2020 10:29:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589192966;
- bh=/HtkDEUSJNCGLykcJeF51FbbiEEPPZDAt/jaVHdhRWc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=J0vuf+ZotQeRxth/qHzk0monizmO/oZrY0XlTEMp3GOvKC2C9ZGzbBQsmEje6tfhV
- drhODojTl9CKLTGN3jGxEvkg0amm8cChelSejV1audJqLmta+BCdVclouAv4z/FqLZ
- 5UsKODnRShHCuOk9nIvWvHXpIdZ2tVePfXGqPstU=
-Date: Mon, 11 May 2020 11:29:21 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 06/15] arm64: kvm: Move __smccc_workaround_1_smc to .rodata
-Message-ID: <20200511102921.GA18310@willie-the-truck>
-References: <20200430144831.59194-1-dbrazdil@google.com>
- <20200430144831.59194-7-dbrazdil@google.com>
- <20200511110459.1fcf4db7@why>
+ with ESMTP id KdQ1wkOPc7zH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 May 2020 10:15:53 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
+ [148.163.156.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E7A34AEE2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 May 2020 10:15:53 -0400 (EDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04BDXD0a161500; Mon, 11 May 2020 10:15:47 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30wrvrxy12-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 11 May 2020 10:15:47 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04BEB2Gc003182;
+ Mon, 11 May 2020 14:15:44 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03ams.nl.ibm.com with ESMTP id 30wm55mhcy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 11 May 2020 14:15:44 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04BEFg6J62193780
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 11 May 2020 14:15:42 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E49024204B;
+ Mon, 11 May 2020 14:15:41 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C160C42045;
+ Mon, 11 May 2020 14:15:38 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.148.203.187])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Mon, 11 May 2020 14:15:38 +0000 (GMT)
+Date: Mon, 11 May 2020 17:15:36 +0300
+From: Mike Rapoport <rppt@linux.ibm.com>
+To: Marek Szyprowski <m.szyprowski@samsung.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v4 02/14] arm: add support for folded p4d page tables
+Message-ID: <20200511141536.GB983798@linux.ibm.com>
+References: <20200414153455.21744-1-rppt@kernel.org>
+ <20200414153455.21744-3-rppt@kernel.org>
+ <CGME20200507121658eucas1p240cf4a3e0fe5c22dda5ec4f72734149f@eucas1p2.samsung.com>
+ <39ba8a04-d6b5-649d-c289-0c8b27cb66c5@samsung.com>
+ <20200507161155.GE683243@linux.ibm.com>
+ <98229ab1-fbf8-0a89-c5d6-270c828799e7@samsung.com>
+ <20200508174232.GA759899@linux.ibm.com>
+ <665dade8-727a-3318-6779-3998080da18f@samsung.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200511110459.1fcf4db7@why>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <665dade8-727a-3318-6779-3998080da18f@samsung.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-11_05:2020-05-11,
+ 2020-05-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 priorityscore=1501 phishscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1015 impostorscore=0 suspectscore=1 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005110112
+Cc: Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-mm@kvack.org,
+ Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Jonas Bonn <jonas@southpole.se>, Brian Cain <bcain@codeaurora.org>,
+ linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Ley Foon Tan <ley.foon.tan@intel.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ uclinux-h8-devel@lists.sourceforge.jp, linux-arch@vger.kernel.org,
+ Arnd Bergmann <arnd@arndb.de>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+ kvm-ppc@vger.kernel.org,
+ Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+ openrisc@lists.librecores.org, Stafford Horne <shorne@gmail.com>,
+ Guan Xuetao <gxt@pku.edu.cn>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@c-s.fr>, Tony Luck <tony.luck@intel.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, nios2-dev@lists.rocketboards.org,
+ linuxppc-dev@lists.ozlabs.org, Mike Rapoport <rppt@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,41 +131,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 11, 2020 at 11:04:59AM +0100, Marc Zyngier wrote:
-> On Thu, 30 Apr 2020 15:48:22 +0100
-> David Brazdil <dbrazdil@google.com> wrote:
-> 
-> > This snippet of assembly is used by cpu_errata.c to overwrite parts of KVM hyp
-> > vector. It is never directly executed, so move it from .text to .rodata.
-> > 
-> > Signed-off-by: David Brazdil <dbrazdil@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/hyp-entry.S | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> > index 5986e1d78d3f..7e5f386c5c2d 100644
-> > --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> > +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> > @@ -364,6 +364,11 @@ SYM_CODE_END(__bp_harden_hyp_vecs)
-> >  	.popsection
-> >  
-> >  #ifndef __HYPERVISOR__
-> > +	/*
-> > +	 * This is not executed directly and is instead copied into the vectors
-> > +	 * by install_bp_hardening_cb().
-> > +	 */
-> > +	.pushsection	.rodata
-> >  SYM_CODE_START(__smccc_workaround_1_smc)
-> 
-> I wonder whether we should keep the SYM_CODE_START() annotation or not.
-> It feels weird to say "code" in a rodata section, and the alignment
-> doesn't matter as we copy it in place, as you noticed.
+Hi Marek,
 
-The BTI patches hook these, but I don't see that being relevant for a
-vector entry as PSTATE.BTYPE is zapped to 0.
+On Mon, May 11, 2020 at 08:36:41AM +0200, Marek Szyprowski wrote:
+> Hi Mike,
+> 
+> On 08.05.2020 19:42, Mike Rapoport wrote:
+> > On Fri, May 08, 2020 at 08:53:27AM +0200, Marek Szyprowski wrote:
+> >> On 07.05.2020 18:11, Mike Rapoport wrote:
+> >>> On Thu, May 07, 2020 at 02:16:56PM +0200, Marek Szyprowski wrote:
+> >>>> On 14.04.2020 17:34, Mike Rapoport wrote:
+> >>>>> From: Mike Rapoport <rppt@linux.ibm.com>
+> >>>>>
+> >>>>> Implement primitives necessary for the 4th level folding, add walks of p4d
+> >>>>> level where appropriate, and remove __ARCH_USE_5LEVEL_HACK.
+> >>>>>
+> >>>>> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> > Can you please try the patch below:
+> >
+> > diff --git a/arch/arm/mm/init.c b/arch/arm/mm/init.c
+> > index 963b5284d284..f86b3d17928e 100644
+> > --- a/arch/arm/mm/init.c
+> > +++ b/arch/arm/mm/init.c
+> > @@ -571,7 +571,7 @@ static inline void section_update(unsigned long addr, pmdval_t mask,
+> >   {
+> >   	pmd_t *pmd;
+> >   
+> > -	pmd = pmd_off_k(addr);
+> > +	pmd = pmd_offset(pud_offset(p4d_offset(pgd_offset(mm, addr), addr), addr), addr);
+> >   
+> >   #ifdef CONFIG_ARM_LPAE
+> >   	pmd[0] = __pmd((pmd_val(pmd[0]) & mask) | prot);
+> This fixes kexec issue! Thanks!
+> 
+> 
+> Feel free to add:
+> 
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Fixes: 218f1c390557 ("arm: add support for folded p4d page tables")
+> Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
 
-Will
+Thanks for testing!
+
+The patch is still in mmotm tree, so I don't think "Fixes" apply.
+
+Andrew, would you like me to send the fix as a formal patch or will pick
+it up as a fixup?
+
+> Best regards
+> -- 
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+> 
+
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
