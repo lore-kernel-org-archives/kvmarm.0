@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76566C433E5
-	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 10:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D909C433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 10:59:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 20D9220709
-	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 10:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 390AB20709
+	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 10:59:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="NlJH/3MR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D9220709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="epUHLrxn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 390AB20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C48714B4FF;
-	Fri, 15 May 2020 06:59:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC604B4DF;
+	Fri, 15 May 2020 06:59:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 78wt3YJafvkG; Fri, 15 May 2020 06:59:38 -0400 (EDT)
+	with ESMTP id ok36eVz0Kbrr; Fri, 15 May 2020 06:59:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAEC64B4F8;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2E474B505;
 	Fri, 15 May 2020 06:59:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13FD24B4D7
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 156914B4E5
  for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 06:59:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kn7J0dOQQ96l for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id l14N0t8xLNaJ for <kvmarm@lists.cs.columbia.edu>;
  Fri, 15 May 2020 06:59:24 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCA9D4B4CF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 06:59:14 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id l11so3077863wru.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 03:59:14 -0700 (PDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D47F4B4FF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 06:59:11 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id l11so3077689wru.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 03:59:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qUYKxeqFmugL2ekLV39MyViS4NNaUTmppS2gbMRIELI=;
- b=NlJH/3MRJY49M/3njTipBUXnGPJGLor527gHDg7Ccbfp6Fy+WbyyqOQux9LQtXFqP6
- +oSKoPOyU8TkDXeD4ohbnat4X3fD0ifjlwT/6b7bMW4Z7dwlwet6iUbspgUkU5VP8uu2
- c+yGDkq/0oAX6eNc4t/tj0WGGKVHcYZc5/Fk/Dp+2w4TwIGz0hpXuE+zo3jr0qax3Jo6
- BQWs4nyy81XP6sDDH7Of0C+ZjxK4D1s5M2fVlcRgwle4R6ERlMq1VzSWUK6yCsXYVI4f
- EaffBugUsGqlLdrNSED7kS8Sblh2cnzWxmpvDpQGgqYe3P+4fote97V9Y2vYkCEO07it
- /AFQ==
+ bh=BE9nyaoIVsy0Uu4Bb4/XGauSOljVERYPioc3Z6j5llE=;
+ b=epUHLrxnN08kuUW6lif5uKugTZk0Ai/VIfR4EIYIQfNJJN0K9msHRKQ5i60Zenqicr
+ xqvAr4WMl3pGig+CWO/4afBDyGepV/MGYpXKmvVJNgdCFhqfse3d5oT+J5mlRf+kJCJU
+ p2PM4DVDBaLNqC4mxZj9Y9gK5ykdV+ABfXYC1QkdGJF4oco8afENi2mSJ8dVZMfW+Ol1
+ VYZQLbSoBQXKYw+ki8ENVNTdphn30KsIwFA9bzoEYwvE6jUstNNykLIedsL4UfeCCvDn
+ rhra3aSnv852lvTVZd6cxokJNXLSnfDdTxF+aKBsMoX89UtaSXHn6/aZ7R2aJUeDqSML
+ 7c8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qUYKxeqFmugL2ekLV39MyViS4NNaUTmppS2gbMRIELI=;
- b=BIZQoxJ4VyGjaQ7P0Stg+24Q+IM70bsRei0G+cbqma80bi3oQ+ih6SxbsWnwrogHq7
- sdbp0+sG9Osfv65v5CduLTm2xcGOVDgdlG18IYtF1ix6qVDCY2h4t7elZkVZjz4KJr03
- d7cYltRso/y60dD/eKnOO5qXBE8hTeWAdP9Sj87nIgKmE6Y19CcKUvafNbzJATX2l3kX
- RE4SKDYXHDWSMTpjoeoimcuQVGBtfvscsgBLWB6Iz2UsjkKwzaibeoXbI0dnVCmCXyxX
- zVnFc18L2VnJ2T4h6SgbYCWtfyix5ZDGyjM23KpUBq901ViwZN0sjDeOxxdHEqDUSx/h
- utqQ==
-X-Gm-Message-State: AOAM532MCY4MumTG00R8wgzBVI83lRTl+BLxD316j0gXxiwSN0GY1oKD
- Rq31nUW+U6xlpszLhuaIAQxHaA==
-X-Google-Smtp-Source: ABdhPJz8L+oLnstInjy+qRVkjsl3lHqBMGwOF6aiH2Z0N+sa1ULlAqHKHHZdf97y1h4INqINWTTXqA==
-X-Received: by 2002:a5d:5686:: with SMTP id f6mr3723358wrv.168.1589540353667; 
- Fri, 15 May 2020 03:59:13 -0700 (PDT)
+ bh=BE9nyaoIVsy0Uu4Bb4/XGauSOljVERYPioc3Z6j5llE=;
+ b=hVWdBERO+c9EqzWGKD/bjh60gmNwElQec3chxAjk5t46QAel4TVoVMJMoZxDZrC9hN
+ YFEscfuxA49QIANr3rVVjom9OykgExRJHbIW6hzOyqXuRiJqN2Gk6NiJu3gGvlDVx95z
+ IGTJwb4PlIOcDf+Ja8MB7te751FChRx0yg8CMg15Z2+gsSXWZZBfBMDSozV0F6ghmKDg
+ Gb2SM8wXNGaq1Zmy66bVRw72wkp7wxmMQ2qmuHPgh9Wrekvw4Y/6HBS3P+5T4Ra3mw9H
+ +QDTOixx/xQKSgaVEEEOHEm5lGwjdbzN6P6Swo3ZhZ6xAHLz++cwl1eXgVoapjmJveQJ
+ a8nA==
+X-Gm-Message-State: AOAM531j7cHcnwEUMZ/Pf1NP4Jy/lVzk6i7Cls0ut1DspbdCzoBiZrgx
+ 1QNUT8Pf+v7jrLfsrZgSDbWFHA==
+X-Google-Smtp-Source: ABdhPJyunXb0BnPE3U8JLRPzsnbIpHBh+Pal1ueJlmJdY5FA0sOnlFUxb+pZcb1Day+tyy4FjstVPg==
+X-Received: by 2002:adf:f9c1:: with SMTP id w1mr3873290wrr.342.1589540349741; 
+ Fri, 15 May 2020 03:59:09 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:d11b:f847:8002:7411])
- by smtp.gmail.com with ESMTPSA id r2sm3034272wrg.84.2020.05.15.03.59.12
+ by smtp.gmail.com with ESMTPSA id t71sm3101615wmt.31.2020.05.15.03.59.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 15 May 2020 03:59:12 -0700 (PDT)
+ Fri, 15 May 2020 03:59:09 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
  James Morse <james.morse@arm.com>,
  Julien Thierry <julien.thierry.kdev@gmail.com>,
  Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v2 10/14] arm64: kvm: Split hyp/timer-sr.c to VHE/nVHE
-Date: Fri, 15 May 2020 11:58:37 +0100
-Message-Id: <20200515105841.73532-11-dbrazdil@google.com>
+Subject: [PATCH v2 08/14] arm64: kvm: Split hyp/debug-sr.c to VHE/nVHE
+Date: Fri, 15 May 2020 11:58:35 +0100
+Message-Id: <20200515105841.73532-9-dbrazdil@google.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200515105841.73532-1-dbrazdil@google.com>
 References: <20200515105841.73532-1-dbrazdil@google.com>
@@ -107,164 +107,551 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 This patch is part of a series which builds KVM's non-VHE hyp code separately
 from VHE and the rest of the kernel.
 
-timer-sr.c contains a HVC handler for setting CNTVOFF_EL2 and two helper
-functions for controlling access to physical counter. The former is shared
-between VHE/nVHE and is kept in timer-sr.c but compiled under both configs.
-The latter are nVHE-specific and are moved to nvhe/timer-sr.c.
+debug-sr.c contains KVM's code for context-switching debug registers, with some
+parts shared between VHE/nVHE. These common routines are moved to debug-sr.h,
+VHE-specific code is left in debug-sr.c and nVHE-specific code is moved to
+nvhe/debug-sr.c.
+
+Functions are slightly refactored to move code hidden behind `has_vhe()` checks
+to the corresponding .c files.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h   |  2 ++
- arch/arm64/kernel/image-vars.h     |  3 ---
- arch/arm64/kvm/hyp/nvhe/Makefile   |  3 ++-
- arch/arm64/kvm/hyp/nvhe/timer-sr.c | 43 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/timer-sr.c      | 36 -------------------------
- 5 files changed, 47 insertions(+), 40 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/timer-sr.c
+ arch/arm64/kernel/image-vars.h     |   3 -
+ arch/arm64/kvm/hyp/debug-sr.c      | 214 +----------------------------
+ arch/arm64/kvm/hyp/debug-sr.h      | 172 +++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c |  77 +++++++++++
+ 5 files changed, 256 insertions(+), 212 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/debug-sr.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/debug-sr.c
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 2084fd3186a7..f9fa7fd7a0f3 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -64,8 +64,10 @@ void __vgic_v3_save_aprs(struct kvm_vcpu *vcpu);
- void __vgic_v3_restore_aprs(struct kvm_vcpu *vcpu);
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
-+#ifdef __KVM_NVHE_HYPERVISOR__
- void __timer_enable_traps(struct kvm_vcpu *vcpu);
- void __timer_disable_traps(struct kvm_vcpu *vcpu);
-+#endif
- 
- #ifdef __KVM_NVHE_HYPERVISOR__
- void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt);
 diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index bf9053d65ad7..c16cf4e2cd8b 100644
+index f8d94190af80..5de3a5998bcd 100644
 --- a/arch/arm64/kernel/image-vars.h
 +++ b/arch/arm64/kernel/image-vars.h
-@@ -67,9 +67,6 @@ __kvm_nvhe___guest_enter = __guest_enter;
+@@ -61,15 +61,12 @@ __efistub__ctype		= _ctype;
+  * memory mappings.
+  */
+ 
+-__kvm_nvhe___debug_switch_to_guest = __debug_switch_to_guest;
+-__kvm_nvhe___debug_switch_to_host = __debug_switch_to_host;
+ __kvm_nvhe___fpsimd_restore_state = __fpsimd_restore_state;
+ __kvm_nvhe___fpsimd_save_state = __fpsimd_save_state;
+ __kvm_nvhe___guest_enter = __guest_enter;
  __kvm_nvhe___guest_exit = __guest_exit;
  __kvm_nvhe___icache_flags = __icache_flags;
+ __kvm_nvhe___kvm_enable_ssbs = __kvm_enable_ssbs;
+-__kvm_nvhe___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
  __kvm_nvhe___kvm_handle_stub_hvc = __kvm_handle_stub_hvc;
--__kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
--__kvm_nvhe___timer_disable_traps = __timer_disable_traps;
--__kvm_nvhe___timer_enable_traps = __timer_enable_traps;
- __kvm_nvhe___vgic_v2_perform_cpuif_access = __vgic_v2_perform_cpuif_access;
- __kvm_nvhe___vgic_v3_activate_traps = __vgic_v3_activate_traps;
- __kvm_nvhe___vgic_v3_deactivate_traps = __vgic_v3_deactivate_traps;
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 8157f6fa4c99..a67958f29fd7 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -7,7 +7,8 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
- 	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
- 
--obj-y := sysreg-sr.o debug-sr.o switch.o tlb.o ../hyp-entry.o
-+obj-y := ../timer-sr.o timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o \
-+	 ../hyp-entry.o
- 
- obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
- extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-new file mode 100644
-index 000000000000..f0e694743883
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2012-2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ */
-+
-+#include <clocksource/arm_arch_timer.h>
-+#include <linux/compiler.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_hyp.h>
-+
-+/*
-+ * Should only be called on non-VHE systems.
-+ * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-+ */
-+void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	/* Allow physical timer/counter access for the host */
-+	val = read_sysreg(cnthctl_el2);
-+	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+	write_sysreg(val, cnthctl_el2);
-+}
-+
-+/*
-+ * Should only be called on non-VHE systems.
-+ * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-+ */
-+void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	/*
-+	 * Disallow physical timer access for the guest
-+	 * Physical counter access is allowed
-+	 */
-+	val = read_sysreg(cnthctl_el2);
-+	val &= ~CNTHCTL_EL1PCEN;
-+	val |= CNTHCTL_EL1PCTEN;
-+	write_sysreg(val, cnthctl_el2);
-+}
-diff --git a/arch/arm64/kvm/hyp/timer-sr.c b/arch/arm64/kvm/hyp/timer-sr.c
-index ff76e6845fe4..46e303281a2c 100644
---- a/arch/arm64/kvm/hyp/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/timer-sr.c
-@@ -4,10 +4,6 @@
+ __kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
+ __kvm_nvhe___sysreg32_restore_state = __sysreg32_restore_state;
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 0fc9872a1467..39e0b9bcc8b7 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -4,221 +4,19 @@
   * Author: Marc Zyngier <marc.zyngier@arm.com>
   */
  
--#include <clocksource/arm_arch_timer.h>
 -#include <linux/compiler.h>
 -#include <linux/kvm_host.h>
--
- #include <asm/kvm_hyp.h>
++#include "debug-sr.h"
  
- void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
-@@ -15,35 +11,3 @@ void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
- 	u64 cntvoff = (u64)cntvoff_high << 32 | cntvoff_low;
- 	write_sysreg(cntvoff, cntvoff_el2);
- }
+-#include <asm/debug-monitors.h>
+-#include <asm/kvm_asm.h>
+-#include <asm/kvm_hyp.h>
+-#include <asm/kvm_mmu.h>
 -
--/*
-- * Should only be called on non-VHE systems.
-- * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-- */
--void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
+-#define read_debug(r,n)		read_sysreg(r##n##_el1)
+-#define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
+-
+-#define save_debug(ptr,reg,nr)						\
+-	switch (nr) {							\
+-	case 15:	ptr[15] = read_debug(reg, 15);			\
+-			/* Fall through */				\
+-	case 14:	ptr[14] = read_debug(reg, 14);			\
+-			/* Fall through */				\
+-	case 13:	ptr[13] = read_debug(reg, 13);			\
+-			/* Fall through */				\
+-	case 12:	ptr[12] = read_debug(reg, 12);			\
+-			/* Fall through */				\
+-	case 11:	ptr[11] = read_debug(reg, 11);			\
+-			/* Fall through */				\
+-	case 10:	ptr[10] = read_debug(reg, 10);			\
+-			/* Fall through */				\
+-	case 9:		ptr[9] = read_debug(reg, 9);			\
+-			/* Fall through */				\
+-	case 8:		ptr[8] = read_debug(reg, 8);			\
+-			/* Fall through */				\
+-	case 7:		ptr[7] = read_debug(reg, 7);			\
+-			/* Fall through */				\
+-	case 6:		ptr[6] = read_debug(reg, 6);			\
+-			/* Fall through */				\
+-	case 5:		ptr[5] = read_debug(reg, 5);			\
+-			/* Fall through */				\
+-	case 4:		ptr[4] = read_debug(reg, 4);			\
+-			/* Fall through */				\
+-	case 3:		ptr[3] = read_debug(reg, 3);			\
+-			/* Fall through */				\
+-	case 2:		ptr[2] = read_debug(reg, 2);			\
+-			/* Fall through */				\
+-	case 1:		ptr[1] = read_debug(reg, 1);			\
+-			/* Fall through */				\
+-	default:	ptr[0] = read_debug(reg, 0);			\
+-	}
+-
+-#define restore_debug(ptr,reg,nr)					\
+-	switch (nr) {							\
+-	case 15:	write_debug(ptr[15], reg, 15);			\
+-			/* Fall through */				\
+-	case 14:	write_debug(ptr[14], reg, 14);			\
+-			/* Fall through */				\
+-	case 13:	write_debug(ptr[13], reg, 13);			\
+-			/* Fall through */				\
+-	case 12:	write_debug(ptr[12], reg, 12);			\
+-			/* Fall through */				\
+-	case 11:	write_debug(ptr[11], reg, 11);			\
+-			/* Fall through */				\
+-	case 10:	write_debug(ptr[10], reg, 10);			\
+-			/* Fall through */				\
+-	case 9:		write_debug(ptr[9], reg, 9);			\
+-			/* Fall through */				\
+-	case 8:		write_debug(ptr[8], reg, 8);			\
+-			/* Fall through */				\
+-	case 7:		write_debug(ptr[7], reg, 7);			\
+-			/* Fall through */				\
+-	case 6:		write_debug(ptr[6], reg, 6);			\
+-			/* Fall through */				\
+-	case 5:		write_debug(ptr[5], reg, 5);			\
+-			/* Fall through */				\
+-	case 4:		write_debug(ptr[4], reg, 4);			\
+-			/* Fall through */				\
+-	case 3:		write_debug(ptr[3], reg, 3);			\
+-			/* Fall through */				\
+-	case 2:		write_debug(ptr[2], reg, 2);			\
+-			/* Fall through */				\
+-	case 1:		write_debug(ptr[1], reg, 1);			\
+-			/* Fall through */				\
+-	default:	write_debug(ptr[0], reg, 0);			\
+-	}
+-
+-static void __hyp_text __debug_save_spe_nvhe(u64 *pmscr_el1)
 -{
--	u64 val;
+-	u64 reg;
 -
--	/* Allow physical timer/counter access for the host */
--	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
--	write_sysreg(val, cnthctl_el2);
+-	/* Clear pmscr in case of early return */
+-	*pmscr_el1 = 0;
+-
+-	/* SPE present on this CPU? */
+-	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+-						  ID_AA64DFR0_PMSVER_SHIFT))
+-		return;
+-
+-	/* Yes; is it owned by EL3? */
+-	reg = read_sysreg_s(SYS_PMBIDR_EL1);
+-	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
+-		return;
+-
+-	/* No; is the host actually using the thing? */
+-	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+-	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
+-		return;
+-
+-	/* Yes; save the control register and disable data generation */
+-	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
+-	write_sysreg_s(0, SYS_PMSCR_EL1);
+-	isb();
+-
+-	/* Now drain all buffered data to memory */
+-	psb_csync();
+-	dsb(nsh);
 -}
 -
--/*
-- * Should only be called on non-VHE systems.
-- * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-- */
--void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
+-static void __hyp_text __debug_restore_spe_nvhe(u64 pmscr_el1)
 -{
--	u64 val;
+-	if (!pmscr_el1)
+-		return;
+-
+-	/* The host page table is installed, but not yet synchronised */
+-	isb();
+-
+-	/* Re-enable data generation */
+-	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
+-}
+-
+-static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+-					  struct kvm_guest_debug_arch *dbg,
+-					  struct kvm_cpu_context *ctxt)
+-{
+-	u64 aa64dfr0;
+-	int brps, wrps;
+-
+-	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+-	brps = (aa64dfr0 >> 12) & 0xf;
+-	wrps = (aa64dfr0 >> 20) & 0xf;
+-
+-	save_debug(dbg->dbg_bcr, dbgbcr, brps);
+-	save_debug(dbg->dbg_bvr, dbgbvr, brps);
+-	save_debug(dbg->dbg_wcr, dbgwcr, wrps);
+-	save_debug(dbg->dbg_wvr, dbgwvr, wrps);
+-
+-	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
+-}
+-
+-static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+-					     struct kvm_guest_debug_arch *dbg,
+-					     struct kvm_cpu_context *ctxt)
+-{
+-	u64 aa64dfr0;
+-	int brps, wrps;
+-
+-	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+-
+-	brps = (aa64dfr0 >> 12) & 0xf;
+-	wrps = (aa64dfr0 >> 20) & 0xf;
+-
+-	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
+-	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
+-	restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
+-	restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
+-
+-	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
+-}
+-
+-void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
++void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt;
+-	struct kvm_cpu_context *guest_ctxt;
+-	struct kvm_guest_debug_arch *host_dbg;
+-	struct kvm_guest_debug_arch *guest_dbg;
 -
 -	/*
--	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
+-	 * Non-VHE: Disable and flush SPE data generation
+-	 * VHE: The vcpu can run, but it can't hide.
 -	 */
--	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
--	write_sysreg(val, cnthctl_el2);
--}
+-	if (!has_vhe())
+-		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
+-
+-	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+-		return;
+-
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+-	guest_ctxt = &vcpu->arch.ctxt;
+-	host_dbg = &vcpu->arch.host_debug_state.regs;
+-	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+-
+-	__debug_save_state(vcpu, host_dbg, host_ctxt);
+-	__debug_restore_state(vcpu, guest_dbg, guest_ctxt);
++	__debug_switch_to_guest_common(vcpu);
+ }
+ 
+-void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
++void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt;
+-	struct kvm_cpu_context *guest_ctxt;
+-	struct kvm_guest_debug_arch *host_dbg;
+-	struct kvm_guest_debug_arch *guest_dbg;
+-
+-	if (!has_vhe())
+-		__debug_restore_spe_nvhe(vcpu->arch.host_debug_state.pmscr_el1);
+-
+-	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+-		return;
+-
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+-	guest_ctxt = &vcpu->arch.ctxt;
+-	host_dbg = &vcpu->arch.host_debug_state.regs;
+-	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+-
+-	__debug_save_state(vcpu, guest_dbg, guest_ctxt);
+-	__debug_restore_state(vcpu, host_dbg, host_ctxt);
+-
+-	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
++	__debug_switch_to_host_common(vcpu);
+ }
+ 
+-u32 __hyp_text __kvm_get_mdcr_el2(void)
++u32 __kvm_get_mdcr_el2(void)
+ {
+ 	return read_sysreg(mdcr_el2);
+ }
+diff --git a/arch/arm64/kvm/hyp/debug-sr.h b/arch/arm64/kvm/hyp/debug-sr.h
+new file mode 100644
+index 000000000000..6a94553493a1
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/debug-sr.h
+@@ -0,0 +1,172 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2015 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ */
++
++#ifndef __ARM64_KVM_HYP_DEBUG_SR_H__
++#define __ARM64_KVM_HYP_DEBUG_SR_H__
++
++#include <linux/compiler.h>
++#include <linux/kvm_host.h>
++
++#include <asm/debug-monitors.h>
++#include <asm/kvm_asm.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++
++#define read_debug(r,n)		read_sysreg(r##n##_el1)
++#define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
++
++#define save_debug(ptr,reg,nr)						\
++	switch (nr) {							\
++	case 15:	ptr[15] = read_debug(reg, 15);			\
++			/* Fall through */				\
++	case 14:	ptr[14] = read_debug(reg, 14);			\
++			/* Fall through */				\
++	case 13:	ptr[13] = read_debug(reg, 13);			\
++			/* Fall through */				\
++	case 12:	ptr[12] = read_debug(reg, 12);			\
++			/* Fall through */				\
++	case 11:	ptr[11] = read_debug(reg, 11);			\
++			/* Fall through */				\
++	case 10:	ptr[10] = read_debug(reg, 10);			\
++			/* Fall through */				\
++	case 9:		ptr[9] = read_debug(reg, 9);			\
++			/* Fall through */				\
++	case 8:		ptr[8] = read_debug(reg, 8);			\
++			/* Fall through */				\
++	case 7:		ptr[7] = read_debug(reg, 7);			\
++			/* Fall through */				\
++	case 6:		ptr[6] = read_debug(reg, 6);			\
++			/* Fall through */				\
++	case 5:		ptr[5] = read_debug(reg, 5);			\
++			/* Fall through */				\
++	case 4:		ptr[4] = read_debug(reg, 4);			\
++			/* Fall through */				\
++	case 3:		ptr[3] = read_debug(reg, 3);			\
++			/* Fall through */				\
++	case 2:		ptr[2] = read_debug(reg, 2);			\
++			/* Fall through */				\
++	case 1:		ptr[1] = read_debug(reg, 1);			\
++			/* Fall through */				\
++	default:	ptr[0] = read_debug(reg, 0);			\
++	}
++
++#define restore_debug(ptr,reg,nr)					\
++	switch (nr) {							\
++	case 15:	write_debug(ptr[15], reg, 15);			\
++			/* Fall through */				\
++	case 14:	write_debug(ptr[14], reg, 14);			\
++			/* Fall through */				\
++	case 13:	write_debug(ptr[13], reg, 13);			\
++			/* Fall through */				\
++	case 12:	write_debug(ptr[12], reg, 12);			\
++			/* Fall through */				\
++	case 11:	write_debug(ptr[11], reg, 11);			\
++			/* Fall through */				\
++	case 10:	write_debug(ptr[10], reg, 10);			\
++			/* Fall through */				\
++	case 9:		write_debug(ptr[9], reg, 9);			\
++			/* Fall through */				\
++	case 8:		write_debug(ptr[8], reg, 8);			\
++			/* Fall through */				\
++	case 7:		write_debug(ptr[7], reg, 7);			\
++			/* Fall through */				\
++	case 6:		write_debug(ptr[6], reg, 6);			\
++			/* Fall through */				\
++	case 5:		write_debug(ptr[5], reg, 5);			\
++			/* Fall through */				\
++	case 4:		write_debug(ptr[4], reg, 4);			\
++			/* Fall through */				\
++	case 3:		write_debug(ptr[3], reg, 3);			\
++			/* Fall through */				\
++	case 2:		write_debug(ptr[2], reg, 2);			\
++			/* Fall through */				\
++	case 1:		write_debug(ptr[1], reg, 1);			\
++			/* Fall through */				\
++	default:	write_debug(ptr[0], reg, 0);			\
++	}
++
++static inline void __hyp_text
++__debug_save_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
++		   struct kvm_cpu_context *ctxt)
++{
++	u64 aa64dfr0;
++	int brps, wrps;
++
++	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
++	brps = (aa64dfr0 >> 12) & 0xf;
++	wrps = (aa64dfr0 >> 20) & 0xf;
++
++	save_debug(dbg->dbg_bcr, dbgbcr, brps);
++	save_debug(dbg->dbg_bvr, dbgbvr, brps);
++	save_debug(dbg->dbg_wcr, dbgwcr, wrps);
++	save_debug(dbg->dbg_wvr, dbgwvr, wrps);
++
++	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
++}
++
++static inline void __hyp_text
++__debug_restore_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
++		      struct kvm_cpu_context *ctxt)
++{
++	u64 aa64dfr0;
++	int brps, wrps;
++
++	aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
++
++	brps = (aa64dfr0 >> 12) & 0xf;
++	wrps = (aa64dfr0 >> 20) & 0xf;
++
++	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
++	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
++	restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
++	restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
++
++	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
++}
++
++static inline void __hyp_text
++__debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	struct kvm_guest_debug_arch *host_dbg;
++	struct kvm_guest_debug_arch *guest_dbg;
++
++	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
++		return;
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	guest_ctxt = &vcpu->arch.ctxt;
++	host_dbg = &vcpu->arch.host_debug_state.regs;
++	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
++
++	__debug_save_state(vcpu, host_dbg, host_ctxt);
++	__debug_restore_state(vcpu, guest_dbg, guest_ctxt);
++}
++
++static inline void __hyp_text
++__debug_switch_to_host_common(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	struct kvm_guest_debug_arch *host_dbg;
++	struct kvm_guest_debug_arch *guest_dbg;
++
++	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
++		return;
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	guest_ctxt = &vcpu->arch.ctxt;
++	host_dbg = &vcpu->arch.host_debug_state.regs;
++	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
++
++	__debug_save_state(vcpu, guest_dbg, guest_ctxt);
++	__debug_restore_state(vcpu, host_dbg, host_ctxt);
++
++	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
++}
++
++#endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index bbfd9d27d742..33a80da34154 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
+ 	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
+ 
+-obj-y := switch.o tlb.o ../hyp-entry.o
++obj-y := debug-sr.o switch.o tlb.o ../hyp-entry.o
+ 
+ obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+ extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+new file mode 100644
+index 000000000000..b3752cfdcf3d
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2015 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ */
++
++#include <linux/compiler.h>
++#include <linux/kvm_host.h>
++
++#include <asm/debug-monitors.h>
++#include <asm/kvm_asm.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++
++#include "../debug-sr.h"
++
++static void __hyp_text __debug_save_spe(u64 *pmscr_el1)
++{
++	u64 reg;
++
++	/* Clear pmscr in case of early return */
++	*pmscr_el1 = 0;
++
++	/* SPE present on this CPU? */
++	if (!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
++						  ID_AA64DFR0_PMSVER_SHIFT))
++		return;
++
++	/* Yes; is it owned by EL3? */
++	reg = read_sysreg_s(SYS_PMBIDR_EL1);
++	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT))
++		return;
++
++	/* No; is the host actually using the thing? */
++	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
++	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
++		return;
++
++	/* Yes; save the control register and disable data generation */
++	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
++	write_sysreg_s(0, SYS_PMSCR_EL1);
++	isb();
++
++	/* Now drain all buffered data to memory */
++	psb_csync();
++	dsb(nsh);
++}
++
++static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
++{
++	if (!pmscr_el1)
++		return;
++
++	/* The host page table is installed, but not yet synchronised */
++	isb();
++
++	/* Re-enable data generation */
++	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
++}
++
++void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
++{
++	/* Disable and flush SPE data generation */
++	__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
++	__debug_switch_to_guest_common(vcpu);
++}
++
++void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
++{
++	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
++	__debug_switch_to_host_common(vcpu);
++}
++
++u32 __hyp_text __kvm_get_mdcr_el2(void)
++{
++	return read_sysreg(mdcr_el2);
++}
 -- 
 2.26.2
 
