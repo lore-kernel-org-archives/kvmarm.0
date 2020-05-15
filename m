@@ -1,56 +1,59 @@
-Return-Path: <SRS0=MYlw=64=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=nzcv=65=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E5FC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 14 May 2020 16:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0461C433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 04:20:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2DD3720675
-	for <kvmarm@archiver.kernel.org>; Thu, 14 May 2020 16:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD3720675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 5684020671
+	for <kvmarm@archiver.kernel.org>; Fri, 15 May 2020 04:20:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5684020671
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CCE14B34F;
-	Thu, 14 May 2020 12:14:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACFEE4B453;
+	Fri, 15 May 2020 00:20:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aQeN1btUAuM1; Thu, 14 May 2020 12:14:34 -0400 (EDT)
+	with ESMTP id SzWGiBk-ZxRF; Fri, 15 May 2020 00:20:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9129B4B360;
-	Thu, 14 May 2020 12:14:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C0A4B457;
+	Fri, 15 May 2020 00:20:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A13174B34F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2020 12:14:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF9D4B457
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 00:20:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gii6ripORc6r for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 May 2020 12:14:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE3604B34E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2020 12:14:31 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53BA61FB;
- Thu, 14 May 2020 09:14:31 -0700 (PDT)
-Received: from gaia (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44C223F7BB;
- Thu, 14 May 2020 09:14:30 -0700 (PDT)
-Date: Thu, 14 May 2020 17:14:28 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: zhukeqian <zhukeqian1@huawei.com>
+ with ESMTP id tgCn4UsUcdlV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2020 00:20:23 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F29AD4B453
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2020 00:20:22 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id CED2B789477CF5FD1381;
+ Fri, 15 May 2020 12:20:18 +0800 (CST)
+Received: from [10.173.221.230] (10.173.221.230) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 15 May 2020 12:20:12 +0800
 Subject: Re: [Question] Hardware management of stage2 page dirty state
-Message-ID: <20200514161427.GD1907@gaia>
+To: Catalin Marinas <catalin.marinas@arm.com>
 References: <0767678d-d580-eb02-c2f0-423b16526736@huawei.com>
+ <20200514161427.GD1907@gaia>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <dce26d58-7b6b-5eaf-8f7d-41361cb5cc9c@huawei.com>
+Date: Fri, 15 May 2020 12:20:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <0767678d-d580-eb02-c2f0-423b16526736@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200514161427.GD1907@gaia>
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
 Cc: Marc Zyngier <maz@kernel.org>, "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -69,64 +72,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Keqian,
+Hi Catalin,
 
-On Thu, May 14, 2020 at 05:16:52PM +0800, zhukeqian wrote:
-> I have some questions after deep reading your patch
-> https://patchwork.kernel.org/patch/8824261/ which enables hardware updates
-> of the Access Flag for Stage 2 page tables.
+On 2020/5/15 0:14, Catalin Marinas wrote:
+> Hi Keqian,
 > 
-> I notice that at the bottom of commit message, you said the following words:
-> "After some digging through the KVM code, I concluded that hardware DBM
-> (dirty bit management) support is not feasible for Stage 2. A potential
-> user would be dirty logging but this requires a different bitmap exposed
-> to Qemu and, to avoid races, the stage 2 mappings need to be mapped
-> read-only on clean, writable on fault. This assumption simplifies the
-> hardware Stage 2 AF support."
+> On Thu, May 14, 2020 at 05:16:52PM +0800, zhukeqian wrote:
+>> I have some questions after deep reading your patch
+>> https://patchwork.kernel.org/patch/8824261/ which enables hardware updates
+>> of the Access Flag for Stage 2 page tables.
+>>
+>> I notice that at the bottom of commit message, you said the following words:
+>> "After some digging through the KVM code, I concluded that hardware DBM
+>> (dirty bit management) support is not feasible for Stage 2. A potential
+>> user would be dirty logging but this requires a different bitmap exposed
+>> to Qemu and, to avoid races, the stage 2 mappings need to be mapped
+>> read-only on clean, writable on fault. This assumption simplifies the
+>> hardware Stage 2 AF support."
+>>
+>> I have three questions here.
+>>
+>> 1. I do not understand the reason well about "not feasible". Does the main reason
+>>    for this is the "races" you referred?
 > 
-> I have three questions here.
+> IIRC, dirty logging works by having a bitmap populated by the host
+> kernel when the guest writes a page. Such write triggers a stage 2 fault
+> and the kernel populates the bitmap. With S2 DBM, you wouldn't get a
+> fault when the guest writes the page, so the host kernel would have to
+> periodically check which S2 entries became writable to update the qemu
+> bitmap.
+Sure, the performance problem introduced by traversing page table entries is
+a defect of DBM mechanism.
+
 > 
-> 1. I do not understand the reason well about "not feasible". Does the main reason
->    for this is the "races" you referred?
+> I think the race I had in mind was that the bitmap still reports the
+> page as clean while the guest already updated it.
+> 
+> Looking at this again, it may not matter much as qemu can copy those
+> pages again when migrating and before control is handed over to the new
+> host.
+Yes, race is not a problem. Qemu will not miss dirty pages when control is
+handed over to the new Qemu.
 
-IIRC, dirty logging works by having a bitmap populated by the host
-kernel when the guest writes a page. Such write triggers a stage 2 fault
-and the kernel populates the bitmap. With S2 DBM, you wouldn't get a
-fault when the guest writes the page, so the host kernel would have to
-periodically check which S2 entries became writable to update the qemu
-bitmap.
+> 
+>> 2. What does the "races" refer to? Do you mean the races between [hardware S2 DBM]
+>>    and [dirty information collection that executed by KVM]?
+> 
+> Yes.
+> 
+>>    During VM live migration, Qemu will send dirty page iteratively and finally stop
+>>    VM when dirty pages is not too much. We may miss dirty pages during each iteration
+>>    before VM stop, but there are no races after VM stop, so we won't miss dirty pages
+>>    finally. It seems that "races" is not a convinced reason for "not feasible".
+> 
+> You are probably right. But you'd have to change the dirty tracking from
+> a fault mechanism to a polling one checking the S2 page tables
+> periodically. Or, can you check then only once after VM stop?
 
-I think the race I had in mind was that the bitmap still reports the
-page as clean while the guest already updated it.
+Our purpose is to remove performance side effect on guest caused by fault mechanism, so we want to
+use DBM from begin to end.
 
-Looking at this again, it may not matter much as qemu can copy those
-pages again when migrating and before control is handed over to the new
-host.
+For now, the only problem of DBM that we can figure out is the page table traversing performance.
+We have done some demo tests on this and situation is not that bad. Besides, we have come up with
+some optimizations which can ease this situation effectively.
 
-> 2. What does the "races" refer to? Do you mean the races between [hardware S2 DBM]
->    and [dirty information collection that executed by KVM]?
+I plan to send out all test data and PATCH RFC to community next week. It should work functional
+correctly but without any optimizations. After that I will add all optimizations based on PATCH
+RFC and send PATCH v1.
 
-Yes.
+> 
+>> 3. You said that disable hardware S2 DBM support can simplify the hardware S2 AF support.
+>>    Could you please explain the reason in detail?
+> 
+> I probably meant that it simplifies the patch rather than something
+> specific to the AF support. If you add DBM, you'd need to make sure that
+> making a pte read-only doesn't lose the dirty information (see
+> ptep_set_wrprotect(), not sure whether KVM uses the same macro).
+> 
+OK, I will notice this problem, thanks!
 
->    During VM live migration, Qemu will send dirty page iteratively and finally stop
->    VM when dirty pages is not too much. We may miss dirty pages during each iteration
->    before VM stop, but there are no races after VM stop, so we won't miss dirty pages
->    finally. It seems that "races" is not a convinced reason for "not feasible".
-
-You are probably right. But you'd have to change the dirty tracking from
-a fault mechanism to a polling one checking the S2 page tables
-periodically. Or, can you check then only once after VM stop?
-
-> 3. You said that disable hardware S2 DBM support can simplify the hardware S2 AF support.
->    Could you please explain the reason in detail?
-
-I probably meant that it simplifies the patch rather than something
-specific to the AF support. If you add DBM, you'd need to make sure that
-making a pte read-only doesn't lose the dirty information (see
-ptep_set_wrprotect(), not sure whether KVM uses the same macro).
-
--- 
-Catalin
+Thanks,
+Keqian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
