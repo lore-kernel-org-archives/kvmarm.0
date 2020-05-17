@@ -2,52 +2,55 @@ Return-Path: <SRS0=26+9=67=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6781C433DF
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 187DDC433E0
+	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 56A60207F5
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A60207F5
+	by mail.kernel.org (Postfix) with ESMTP id CE08120801
+	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE08120801
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8824C4B0FB;
-	Sun, 17 May 2020 06:11:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 873054B100;
+	Sun, 17 May 2020 06:11:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HpoDj7thhGqe; Sun, 17 May 2020 06:11:26 -0400 (EDT)
+	with ESMTP id 0zWbI1QRWm5X; Sun, 17 May 2020 06:11:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7695B4B0F5;
-	Sun, 17 May 2020 06:11:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9399C4B0FA;
+	Sun, 17 May 2020 06:11:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB2F4B0E1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FE894B0E2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0sftpuiGQ4tm for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 May 2020 06:11:22 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E5384B0DA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:22 -0400 (EDT)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id EDB92EA9E14D29C6CA83;
- Sun, 17 May 2020 18:11:18 +0800 (CST)
+ with ESMTP id 1NyYyYqaNc6E for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 May 2020 06:11:26 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30EBA4B0DA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:26 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 0DC9D623E945004D26DF;
+ Sun, 17 May 2020 18:11:24 +0800 (CST)
 Received: from DESKTOP-FPN2511.china.huawei.com (10.173.222.58) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 17 May 2020 18:11:12 +0800
+ 14.3.487.0; Sun, 17 May 2020 18:11:16 +0800
 From: Jingyi Wang <wangjingyi11@huawei.com>
 To: <drjones@redhat.com>, <kvm@vger.kernel.org>,
  <kvmarm@lists.cs.columbia.edu>, <wangjingyi11@huawei.com>
-Subject: [kvm-unit-tests PATCH 0/6] arm64: add IPI/LPI/vtimer latency
-Date: Sun, 17 May 2020 18:08:54 +0800
-Message-ID: <20200517100900.30792-1-wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH 4/6] arm64: its: Handle its command queue
+ wrapping
+Date: Sun, 17 May 2020 18:08:58 +0800
+Message-ID: <20200517100900.30792-5-wangjingyi11@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
+In-Reply-To: <20200517100900.30792-1-wangjingyi11@huawei.com>
+References: <20200517100900.30792-1-wangjingyi11@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.173.222.58]
 X-CFilter-Loop: Reflected
@@ -68,26 +71,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With the development of arm gic architecture, we think it will be useful
-to add some performance test in kut to measure the cost of interrupts.
-In this series, we add GICv4.1 support for ipi latency test and
-implement LPI/vtimer latency test.
+Because micro-bench may send a large number of ITS commands, we
+should handle ITS command queue wrapping as kernel instead of just
+failing the test.
 
-Jingyi Wang (6):
-  arm64: microbench: get correct ipi recieved num
-  arm64: microbench: Use the funcions for ipi test as the general
-    functions for gic(ipi/lpi/timer) test.
-  arm64: microbench: gic: Add gicv4.1 support for ipi latency test.
-  arm64: its: Handle its command queue wrapping
-  arm64: microbench: its: Add LPI latency test.
-  arm64: microbench: Add vtimer latency test
+Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+---
+ lib/arm64/gic-v3-its-cmd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- arm/micro-bench.c          | 215 +++++++++++++++++++++++++++++++------
- lib/arm/asm/gic-v3.h       |   5 +
- lib/arm/asm/gic.h          |   1 +
- lib/arm64/gic-v3-its-cmd.c |   3 +-
- 4 files changed, 192 insertions(+), 32 deletions(-)
-
+diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
+index 2c208d1..34574f7 100644
+--- a/lib/arm64/gic-v3-its-cmd.c
++++ b/lib/arm64/gic-v3-its-cmd.c
+@@ -164,8 +164,9 @@ static struct its_cmd_block *its_allocate_entry(void)
+ {
+ 	struct its_cmd_block *cmd;
+ 
+-	assert((u64)its_data.cmd_write < (u64)its_data.cmd_base + SZ_64K);
+ 	cmd = its_data.cmd_write++;
++	if ((u64)its_data.cmd_write  == (u64)its_data.cmd_base + SZ_64K)
++		its_data.cmd_write = its_data.cmd_base;
+ 	return cmd;
+ }
+ 
 -- 
 2.19.1
 
