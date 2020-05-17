@@ -2,77 +2,56 @@ Return-Path: <SRS0=26+9=67=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96699C433E0
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 09:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6781C433DF
+	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 17B72206D5
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 09:24:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="RAU97g05"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B72206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 56A60207F5
+	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A60207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB1404B0E6;
-	Sun, 17 May 2020 05:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8824C4B0FB;
+	Sun, 17 May 2020 06:11:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MxgT3ZUxWNPD; Sun, 17 May 2020 05:24:18 -0400 (EDT)
+	with ESMTP id HpoDj7thhGqe; Sun, 17 May 2020 06:11:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6499F4B0EA;
-	Sun, 17 May 2020 05:24:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7695B4B0F5;
+	Sun, 17 May 2020 06:11:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5584B0D3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 05:24:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB2F4B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S7biYBSEYnq2 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 May 2020 05:24:13 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC6C74B0C2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 05:24:13 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 841CC206D5;
- Sun, 17 May 2020 09:24:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589707452;
- bh=HrqBD8ywpNuI1L4Z2TzDt7T36IeiriWa+zcJeJTpAjU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=RAU97g052QzaYdHC61/tZZXlJL0DoRKdsSu7QxHSAOBO1GMlCm6Z/s8DNNCr9md4p
- Kb/922k1NCiLBHmgx5B5j0PRfStuoBnDsRHtrJqXpAPSdmCc2Kg7JfDzn4wmXTZpoe
- M4ToQ6SQYW8GiXyGte4yJLJXnSIN2XU55soExoho=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jaFWk-00CyXM-M0; Sun, 17 May 2020 10:24:10 +0100
+ with ESMTP id 0sftpuiGQ4tm for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 May 2020 06:11:22 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E5384B0DA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:22 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id EDB92EA9E14D29C6CA83;
+ Sun, 17 May 2020 18:11:18 +0800 (CST)
+Received: from DESKTOP-FPN2511.china.huawei.com (10.173.222.58) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Sun, 17 May 2020 18:11:12 +0800
+From: Jingyi Wang <wangjingyi11@huawei.com>
+To: <drjones@redhat.com>, <kvm@vger.kernel.org>,
+ <kvmarm@lists.cs.columbia.edu>, <wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH 0/6] arm64: add IPI/LPI/vtimer latency
+Date: Sun, 17 May 2020 18:08:54 +0800
+Message-ID: <20200517100900.30792-1-wangjingyi11@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-Date: Sun, 17 May 2020 10:24:10 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Roja Eswaran <reswara1@binghamton.edu>
-Subject: Re: Performance of VM is better than Host
-In-Reply-To: <CAGTfD8aY-oJ2J8+EYziHt1Ugy84kK8CU_mwfc0QYkVCMjnjgtw@mail.gmail.com>
-References: <CAGTfD8aY-oJ2J8+EYziHt1Ugy84kK8CU_mwfc0QYkVCMjnjgtw@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <044c89beae309b69a991ba9ea76521ea@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reswara1@binghamton.edu, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.173.222.58]
+X-CFilter-Loop: Reflected
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,46 +63,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[please do not post HTML messages, and stick to plain text]
+With the development of arm gic architecture, we think it will be useful
+to add some performance test in kut to measure the cost of interrupts.
+In this series, we add GICv4.1 support for ipi latency test and
+implement LPI/vtimer latency test.
 
-On 2020-05-17 03:29, Roja Eswaran wrote:
-> Hello,
-> 
-> I virtualized Raspi-4 and ran _sysbench  - Memory_ on bare metal and
-> the VM.
-> The performance of VM is better than Host (Increase by 11%)
-> -> Both host and VM has the same OS
-> -> No Background Processes are running when sysbench is executed
-> -> Turned off Transparent huge pages in VM before booting
-> Yet getting the same performance difference.
-> Please let me know, What I am missing here
+Jingyi Wang (6):
+  arm64: microbench: get correct ipi recieved num
+  arm64: microbench: Use the funcions for ipi test as the general
+    functions for gic(ipi/lpi/timer) test.
+  arm64: microbench: gic: Add gicv4.1 support for ipi latency test.
+  arm64: its: Handle its command queue wrapping
+  arm64: microbench: its: Add LPI latency test.
+  arm64: microbench: Add vtimer latency test
 
-With this level of information, I can't tell you anything. Funnily 
-enough
-  you're not mentioning:
+ arm/micro-bench.c          | 215 +++++++++++++++++++++++++++++++------
+ lib/arm/asm/gic-v3.h       |   5 +
+ lib/arm/asm/gic.h          |   1 +
+ lib/arm64/gic-v3-its-cmd.c |   3 +-
+ 4 files changed, 192 insertions(+), 32 deletions(-)
 
-- what you are running (exact version and parameters of your benchmark)
-- what you are running it on (host configuration, parameters of the VM
-   itself and its vmm, as "virualized Raspi-4" doesn't mean much to me)
-- which kernel versions
-- how you are measuring this discrepancy
-- the variability of the measurement
-
-Things you could look at: using perf capture the various counters and
-work out by yourself where the difference lies, look at the impact
-of power management on the host, the impact of other kernel threads
-running, the number of interrupts...
-
-HTH,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+2.19.1
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
