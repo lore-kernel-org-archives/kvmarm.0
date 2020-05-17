@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E7BC433E4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F5D6C433DF
 	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D8CB4207FB
+	by mail.kernel.org (Postfix) with ESMTP id CD620206D5
 	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CB4207FB
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD620206D5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 929BB4B0F5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A1184B0FD;
 	Sun, 17 May 2020 06:11:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ruT14AY0EW1H; Sun, 17 May 2020 06:11:30 -0400 (EDT)
+	with ESMTP id JCFD9H-qSVlN; Sun, 17 May 2020 06:11:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5CD44B114;
-	Sun, 17 May 2020 06:11:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7C24B0FC;
+	Sun, 17 May 2020 06:11:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 880F94B0F5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4013F4B0FE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mjgysBxjZqJs for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 May 2020 06:11:27 -0400 (EDT)
+ with ESMTP id x5XBn3q4k+P2 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 May 2020 06:11:26 -0400 (EDT)
 Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75C594B0FA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 331884B0E3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:26 -0400 (EDT)
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 085EB41220321354A7B0;
+ by Forcepoint Email with ESMTP id 1D3621D6387FA7EA67E2;
  Sun, 17 May 2020 18:11:24 +0800 (CST)
 Received: from DESKTOP-FPN2511.china.huawei.com (10.173.222.58) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 17 May 2020 18:11:14 +0800
+ 14.3.487.0; Sun, 17 May 2020 18:11:16 +0800
 From: Jingyi Wang <wangjingyi11@huawei.com>
 To: <drjones@redhat.com>, <kvm@vger.kernel.org>,
  <kvmarm@lists.cs.columbia.edu>, <wangjingyi11@huawei.com>
-Subject: [kvm-unit-tests PATCH 2/6] arm64: microbench: Use the funcions for
- ipi test as the general functions for gic(ipi/lpi/timer) test.
-Date: Sun, 17 May 2020 18:08:56 +0800
-Message-ID: <20200517100900.30792-3-wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH 5/6] arm64: microbench: its: Add LPI latency
+ test.
+Date: Sun, 17 May 2020 18:08:59 +0800
+Message-ID: <20200517100900.30792-6-wangjingyi11@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200517100900.30792-1-wangjingyi11@huawei.com>
 References: <20200517100900.30792-1-wangjingyi11@huawei.com>
@@ -71,106 +71,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The following patches will use that.
+Triggers LPIs through the INT command and test the latency.
+Mostly inherited form commit 0ef02cd6cbaa(arm/arm64: ITS: INT
+functional tests).
 
 Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
 ---
- arm/micro-bench.c | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
+ arm/micro-bench.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
 diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index ca022d9..fc4d356 100644
+index 0c7869b..91af1f7 100644
 --- a/arm/micro-bench.c
 +++ b/arm/micro-bench.c
-@@ -25,24 +25,24 @@
+@@ -20,6 +20,7 @@
+  */
+ #include <libcflat.h>
+ #include <asm/gic.h>
++#include <asm/gic-v3-its.h>
  
- static u32 cntfrq;
+ #define NTIMES (1U << 16)
  
--static volatile bool ipi_ready, ipi_received;
-+static volatile bool irq_ready, irq_received;
- static void *vgic_dist_base;
- static void (*write_eoir)(u32 irqstat);
- 
--static void ipi_irq_handler(struct pt_regs *regs)
-+static void gic_irq_handler(struct pt_regs *regs)
- {
--	ipi_ready = false;
--	ipi_received = true;
-+	irq_ready = false;
-+	irq_received = true;
- 	gic_write_eoir(gic_read_iar());
--	ipi_ready = true;
-+	irq_ready = true;
+@@ -152,6 +153,48 @@ static void ipi_exec(void)
+ 	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
  }
  
--static void ipi_secondary_entry(void *data)
-+static void gic_secondary_entry(void *data)
- {
--	install_irq_handler(EL1H_IRQ, ipi_irq_handler);
-+	install_irq_handler(EL1H_IRQ, gic_irq_handler);
- 	gic_enable_defaults();
- 	local_irq_enable();
--	ipi_ready = true;
-+	irq_ready = true;
- 	while (true)
- 		cpu_relax();
- }
-@@ -72,9 +72,9 @@ static bool test_init(void)
- 		break;
- 	}
- 
--	ipi_ready = false;
-+	irq_ready = false;
- 	gic_enable_defaults();
--	on_cpu_async(1, ipi_secondary_entry, NULL);
-+	on_cpu_async(1, gic_secondary_entry, NULL);
- 
- 	cntfrq = get_cntfrq();
- 	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
-@@ -82,13 +82,18 @@ static bool test_init(void)
- 	return true;
- }
- 
--static void ipi_prep(void)
-+static void gic_prep_common(void)
- {
- 	unsigned tries = 1 << 28;
- 
--	while (!ipi_ready && tries--)
-+	while (!irq_ready && tries--)
- 		cpu_relax();
--	assert(ipi_ready);
-+	assert(irq_ready);
++static bool lpi_prep(void)
++{
++	struct its_collection *col1;
++	struct its_device *dev2;
++
++	if (!gicv3_its_base())
++		return false;
++
++	its_enable_defaults();
++	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
++	col1 = its_create_collection(1 /* col id */, 1 /* target PE */);
++	gicv3_lpi_set_config(8199, LPI_PROP_DEFAULT);
++
++	its_send_mapd_nv(dev2, true);
++	its_send_mapc_nv(col1, true);
++	its_send_invall_nv(col1);
++	its_send_mapti_nv(dev2, 8199 /* lpi id */, 20 /* event id */, col1);
++
++	gic_prep_common();
++	return true;
 +}
 +
-+static void ipi_prep(void)
++static void lpi_exec(void)
 +{
-+	gic_prep_common();
- }
- 
- static void ipi_exec(void)
-@@ -96,17 +101,17 @@ static void ipi_exec(void)
- 	unsigned tries = 1 << 28;
- 	static int received = 0;
- 
--	ipi_received = false;
++	struct its_device *dev2;
++	unsigned tries = 1 << 28;
++	static int received = 0;
++
 +	irq_received = false;
- 
- 	gic_ipi_send_single(1, 1);
- 
--	while (!ipi_received && tries--)
++
++	dev2 = its_get_device(2);
++	its_send_int_nv(dev2, 20);
++
 +	while (!irq_received && tries--)
- 		cpu_relax();
- 
--	if (ipi_recieved)
++		cpu_relax();
++
 +	if (irq_received)
- 		++received;
- 
--	assert_msg(ipi_received, "failed to receive IPI in time, but received %d successfully\n", received);
-+	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
- }
- 
++		++received;
++
++	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
++}
++
  static void hvc_exec(void)
+ {
+ 	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+@@ -197,6 +240,7 @@ static struct exit_test tests[] = {
+ 	{"eoi",			NULL,		eoi_exec,		true},
+ 	{"ipi",			ipi_prep,	ipi_exec,		true},
+ 	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
++	{"lpi",			lpi_prep,	lpi_exec,		true},
+ };
+ 
+ struct ns_time {
 -- 
 2.19.1
 
