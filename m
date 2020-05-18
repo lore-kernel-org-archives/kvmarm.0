@@ -2,92 +2,90 @@ Return-Path: <SRS0=o21O=7A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39012C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 12:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DE5C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 15:29:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B5DF320643
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 12:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A10220758
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 15:29:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fb8jC7BE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5DF320643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="RWSt17Q/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A10220758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 070CD4B12C;
-	Mon, 18 May 2020 08:28:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C6DD4B14A;
+	Mon, 18 May 2020 11:29:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V8Z7xVSkya1N; Mon, 18 May 2020 08:28:22 -0400 (EDT)
+	with ESMTP id ClNugG9RS5KS; Mon, 18 May 2020 11:29:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E08B14B103;
-	Mon, 18 May 2020 08:28:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A2A4B14B;
+	Mon, 18 May 2020 11:29:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6114B0BB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 08:12:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB074B148
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 11:28:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n4ySXdRfcZrd for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 May 2020 08:12:16 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DEE54B0B3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 08:12:16 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589803935;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6/EWbjFmwbmvg4uq23X0Lczc3hPOEd517yRWe/yPnXY=;
- b=fb8jC7BEgi3vH7lNzEYY6p4nttT0HIPHJiq1fhfJ6BrqN9UUbSVIUcB1uA6aXHTaUh0N9M
- A3V+LG60f43UTpWhC0uuhsmlCuBob0xPUqAqeGxCrUK31pF/lGkYt9LqLbfexKDzuAeFqy
- IqPe3UEVGssdjBQ+WnjPNau7d7D5ttk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-JFMSKqioPeSueabZHReEjA-1; Mon, 18 May 2020 08:12:14 -0400
-X-MC-Unique: JFMSKqioPeSueabZHReEjA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68107BFC0;
- Mon, 18 May 2020 12:12:11 +0000 (UTC)
-Received: from starship (unknown [10.35.206.255])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0E5A6100239B;
- Mon, 18 May 2020 12:12:05 +0000 (UTC)
-Message-ID: <2b5bbfd9b6e4a82262de75be8a1c93a02be127b3.camel@redhat.com>
-Subject: Re: [PATCH 0/2] Expose KVM API to Linux Kernel
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Anastassios Nanos
- <ananos@nubificus.co.uk>, Marc Zyngier <maz@kernel.org>
-Date: Mon, 18 May 2020 15:12:04 +0300
-In-Reply-To: <f077234c-ea74-faaf-422a-fd5d2c1c6923@redhat.com>
-References: <cover.1589784221.git.ananos@nubificus.co.uk>
- <c1124c27293769f8e4836fb8fdbd5adf@kernel.org>
- <CALRTab90UyMq2hMxCdCmC3GwPWFn2tK_uKMYQP2YBRcHwzkEUQ@mail.gmail.com>
- <760e0927-d3a7-a8c6-b769-55f43a65e095@redhat.com>
- <680e86ca19dd9270b95917da1d65e4b4d2bb18a9.camel@redhat.com>
- <f077234c-ea74-faaf-422a-fd5d2c1c6923@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+ with ESMTP id ZTSS+0Dz62r6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 May 2020 11:28:58 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A13E4B0E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 11:28:58 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id m185so6076889wme.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 08:28:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=4WixP9zOQESaEUk+grq6tjXSo20K+tLvJTvsRgnudUk=;
+ b=RWSt17Q/P+CTGFhSHnF5vSVIgqEukfT/ue7prWyK3v1ihEQJc74VjQg5Bf31WcJ8k4
+ jouQvwUwfngsU4A8QwLSizOwMcPiatSqqmPp2eqpf6+ZgdMWG/CwdnXnaFSH95kncofW
+ /3vslGy5j3My4P0CocjIZaqunf0B3RGMsfOFHTDhT1yA7eMR65w13RBfRRWu9A2RRq3w
+ PhKzgdxDPMxyMmYxNMqqiqB7BAkv8RHT8Cfw12/pH5LYoKTZyT5pss5xdr7wLA3w5YHj
+ TGlG5y2rQLbmZQRREQPmyNEeDBoqsCtgSPI8DYfBiw0OQQSr8AvpQOsVY9LVCxvlB54i
+ kMVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=4WixP9zOQESaEUk+grq6tjXSo20K+tLvJTvsRgnudUk=;
+ b=eNJZADSPwf26zAMFqnloZI5fZsthd3yCbZl0K5GRBnadtj5/GEBMm9krGzbnk9WqJV
+ rsgHkGXlvze9pRuy3+LX29bj1FIFQz1kBpfoLMJZ3EH3j7hZrYo20No7jXwTFXVVbXTl
+ aHhks+lKpnj/tfvYYoN7T/GXmF0v4QnNEnEIkSjwkwsn4+M4PqeKDe4HvbblJYPBWNN/
+ k/ycHGi60Lc+vOmrJ4IQRVbSD015H3EuJHedHKxLY7KVzuMCfeoRdMze5oBvWDNAQOBZ
+ tM2xyL+sYFf4uW492Pc16DVtJQHiovDD2M1enAxMeiw6R7I7P7sWrrmbSqTaJfp37rED
+ SP0w==
+X-Gm-Message-State: AOAM531zSPg5FxmiWkYO6Yd5umluphnNtKDyIV1a1TlyCiy8uKbC33Gs
+ SSQQK/wThqJYyb7maZrmIzm8MA==
+X-Google-Smtp-Source: ABdhPJxNgUPicwALsWOh/eNYOxbadohP9rcnrjnk2Eie3S7vO1kCgSNAmXH0HQ9ZKDHh7XTExrpDBg==
+X-Received: by 2002:a05:600c:1006:: with SMTP id
+ c6mr20951848wmc.133.1589815736776; 
+ Mon, 18 May 2020 08:28:56 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+ by smtp.gmail.com with ESMTPSA id r2sm17269506wrg.84.2020.05.18.08.28.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 May 2020 08:28:55 -0700 (PDT)
+Date: Mon, 18 May 2020 16:28:51 +0100
+From: Andrew Scull <ascull@google.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 07/14] arm64: kvm: Split hyp/switch.c to VHE/nVHE
+Message-ID: <20200518152851.GA147668@google.com>
+References: <20200515105841.73532-1-dbrazdil@google.com>
+ <20200515105841.73532-8-dbrazdil@google.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mailman-Approved-At: Mon, 18 May 2020 08:28:22 -0400
-Cc: Thomas Gleixner <tglx@linutronix.de>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Borislav Petkov <bp@alien8.de>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <20200515105841.73532-8-dbrazdil@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,61 +102,18 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 2020-05-18 at 13:51 +0200, Paolo Bonzini wrote:
-> On 18/05/20 13:34, Maxim Levitsky wrote:
-> > > In high-performance configurations, most of the time virtio devices are
-> > > processed in another thread that polls on the virtio rings.  In this
-> > > setup, the rings are configured to not cause a vmexit at all; this has
-> > > much smaller latency than even a lightweight (kernel-only) vmexit,
-> > > basically corresponding to writing an L1 cache line back to L2.
-> > 
-> > This can be used to run kernel drivers inside a very thin VM IMHO to break up the stigma,
-> > that kernel driver is always a bad thing to and should be by all means replaced by a userspace driver,
-> > something I see a lot lately, and what was the ground for rejection of my nvme-mdev proposal.
-> 
-> It's a tought design decision between speeding up a kernel driver with
-> something like eBPF or wanting to move everything to userspace.
-> 
-> Networking has moved more towards the first because there are many more
-> opportunities for NIC-based acceleration, while storage has moved
-> towards the latter with things such as io_uring.  That said, I don't see
-> why in-kernel NVMeoF drivers would be acceptable for anything but Fibre
-> Channel (and that's only because FC HBAs try hard to hide most of the
-> SAN layers).
-> 
-> Paolo
-> 
+On Fri, May 15, 2020 at 11:58:34AM +0100, David Brazdil wrote:
+> +__kvm_nvhe_sve_load_state = sve_load_state;
+> +__kvm_nvhe_sve_save_state = sve_save_state;
 
-Note that these days storage is as fast or even faster that many types of networking,
-and that there also are opportunities for acceleration (like p2p pci dma) that also are more
-natural to do in the kernel.
+Building without CONFIG_ARM64_VHE leads to a linker error due to the SVE
+functions being referenced in this list. This is caused by
+CONFIG_ARM64_VHE disabling CONFIG_ARM64_SVE and, in turn, preventing the
+generation of those symbols. There aren't any references from code, just
+this file.
 
-io-uring is actually not about moving everything to userspace IMHO, but rather the opposite,
-it allows the userspace to access the kernel block subsystem in very efficent way which
-is the right thing to do.
-
-Sadly it doesn't help much with fast NVME virtualization because the bottleneck moves
-to the communication with the guest.
-
-I guess this is getting offtopic, so I won't continue this discussion here,
-I just wanted to voice my opinion on this manner.
-
-Another thing that comes to my mind (not that it has to be done in the kernel),
-is that AMD's AVIC allows peer to peer interrupts between guests, and that
-can in theory allow to run a 'driver' in a special guest and let it communicate
-with a normal guest using interrupts bi-directionally which can finally solve the
-need to waste a core in a busy wait loop.
-
-The only catch is that the 'special guest' has to run 100% of the time,
-thus it can't still share a core with other kernel/usespace tasks, but at least it can be in sleeping
-state most of the time, and it can itsel run various tasks that serve various needs.
-
-In other words, I don't have any objection to allowing part of the host kernel to run in VMX/SVM
-guest mode. This can be a very intersting thing.
-
-Best regards,
-	Maxim Levitsky
-
+It can be resolved by having the SVE symbol aliases depend on
+CONFIG_ARM64_SVE.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
