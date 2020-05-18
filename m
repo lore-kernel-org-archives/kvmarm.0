@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2377C433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C79C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:38:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 643A1207F5
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:38:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643A1207F5
+	by mail.kernel.org (Postfix) with ESMTP id A8DC5207F5
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:38:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DC5207F5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nubificus.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F5894B193;
-	Mon, 18 May 2020 03:38:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D794B191;
+	Mon, 18 May 2020 03:38:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eIdzDF7xZMG9; Mon, 18 May 2020 03:37:58 -0400 (EDT)
+	with ESMTP id iFIjLByYJAjw; Mon, 18 May 2020 03:37:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFE4C4B1A2;
-	Mon, 18 May 2020 03:37:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13F094B1A5;
+	Mon, 18 May 2020 03:37:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 441784B183
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:01:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C8564B183
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:01:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s6HNN0oSLPP1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 May 2020 03:01:10 -0400 (EDT)
+ with ESMTP id E-mTTFzaThWl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 May 2020 03:01:19 -0400 (EDT)
 Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
  [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6ECBE4B156
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:01:10 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id h17so10387524wrc.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 00:01:10 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F5414B156
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:01:19 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id e1so10422138wrt.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 00:01:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
  bh=3ktmgsg3xha6B5GpCBnFJna4pj320XLto2kPDS1ikDE=;
- b=umIxgTcAxmKj4uwbOuZUb0Ypw0zFdhFB8aAlOXSrSRhB4G6OcDTC2aph51/zzj3iHZ
- FoCe5lpVJ1wj0YgelzSiurTRA2RY4wgWW5Y5R9yJYcwHKj8wCJvD9ZX2Kc5cSdE+w8zB
- yFhZO71YFCNmxh5hSD28aSgaAc9iDSc9oouHeI/JmbQC/OtIakyxVyHHnBZjyEPak7oC
- O90CqXyzRLbG/yTmHdEhifvwpFckAp5HsTGz7e6wVitVgFAXG9v2mozRpjw1ANkQsbnR
- nK4U9VtjVL/98X7t4hBzjZbojONerWRZfniSLRYRd86zepzaUvzleE4IYxTdlQsNYihT
- uvGQ==
-X-Gm-Message-State: AOAM5321aOBmsvZGE4DGuz0/PzaH7y7EjqiSaJvEKFM4QiZ8LcE+J+iR
- dXfTzZN6i7+d9f9Ax2og0S8=
-X-Google-Smtp-Source: ABdhPJwBZQmTLzFsw3b2/RzAQB0Mx8mNx5PVWc79zHrUBFr79ME2FpxDJKCgCbecZP7DaH6ZCTJwig==
-X-Received: by 2002:a5d:5751:: with SMTP id q17mr18353783wrw.106.1589785269150; 
- Mon, 18 May 2020 00:01:09 -0700 (PDT)
-Received: from bf.nubificus.co.uk ([2a02:587:b919:800:aaa1:59ff:fe09:f176])
- by smtp.gmail.com with ESMTPSA id 77sm15918421wrc.6.2020.05.18.00.01.08
+ b=f2ONGS95lE3Sf6kkVCG4QWiKMzKxT9XAGNeM1DslCkMHWJib7f5jVEBvnMjM9oiKaV
+ i/CZNoaB+SOsUhyfnxqdFdOLfWvDG7bXIvcfOBmXX6JHr/0aKaO4epJNFpTdf5voZgDX
+ GBbsii4uoW3fzifj1ZPc4CZumBH5qOt1+3HI+bwkJqNnQUkaSDNhneudDqKQWkCfjfPp
+ lboppihMJk0uuxWXnTYgOSIn5F3Va7UiRGcYaryaaV+aCL2rGrBYcfqJ5r8lOQwXguNY
+ vxXu6i8BuD93zs358DVaq+lDV0Ic0den95+vu21xlQZd7wCFlIryPHLNzpPMXz4C2wlt
+ lGuA==
+X-Gm-Message-State: AOAM531EsvSSA0tQyf+Ud+BJX9FWgQk6cVJ0DAze+DyHXTR6EUe14JRq
+ 68aL6S1ZYQSWzH8A98sfZg0=
+X-Google-Smtp-Source: ABdhPJwjitBMt/RtFK5bbJ0SJay9mnUhBiGUedQcpLLKkVeArY5rKrG5bMbr6faIiUqJ4rhi7P6ZHg==
+X-Received: by 2002:adf:94c2:: with SMTP id 60mr17945880wrr.366.1589785278216; 
+ Mon, 18 May 2020 00:01:18 -0700 (PDT)
+Received: from bf.nubificus.co.uk (athedsl-213442.home.otenet.gr.
+ [85.74.153.96])
+ by smtp.gmail.com with ESMTPSA id i6sm17118950wmb.41.2020.05.18.00.01.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 00:01:08 -0700 (PDT)
-Date: Mon, 18 May 2020 10:01:07 +0300
+ Mon, 18 May 2020 00:01:17 -0700 (PDT)
+Date: Mon, 18 May 2020 09:59:06 +0300
 From: Anastassios Nanos <ananos@nubificus.co.uk>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
@@ -94,6 +95,7 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
+Message-ID: <20200518065906.NW1MDwF6yKgPBq1T9lOBL_wAaazObk4ZqErNv1C-fOo@z>
 
 To run KVMM guests, we need to extend the KVM memory subsystem
 to support kernel-allocated memory. To do this, we allow "vmalloced"
