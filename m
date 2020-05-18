@@ -1,60 +1,80 @@
-Return-Path: <SRS0=26+9=67=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=o21O=7A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2776EC433E4
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88856C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:05:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DEA43206D5
-	for <kvmarm@archiver.kernel.org>; Sun, 17 May 2020 10:11:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEA43206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 0A95B2067D
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:05:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItHYSfi9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A95B2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97ED64B0FE;
-	Sun, 17 May 2020 06:11:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A11B4B187;
+	Mon, 18 May 2020 03:05:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pcdNdz2aX4vY; Sun, 17 May 2020 06:11:33 -0400 (EDT)
+	with ESMTP id UMdOjzNt0Im3; Mon, 18 May 2020 03:05:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32FEF4B118;
-	Sun, 17 May 2020 06:11:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEAD74B18A;
+	Mon, 18 May 2020 03:05:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC7D4B118
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 053984B187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:05:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tA034VE-BDke for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 May 2020 06:11:31 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51A394B0DD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 06:11:29 -0400 (EDT)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 17CFCE35482A0151C02B;
- Sun, 17 May 2020 18:11:24 +0800 (CST)
-Received: from DESKTOP-FPN2511.china.huawei.com (10.173.222.58) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 17 May 2020 18:11:15 +0800
-From: Jingyi Wang <wangjingyi11@huawei.com>
-To: <drjones@redhat.com>, <kvm@vger.kernel.org>,
- <kvmarm@lists.cs.columbia.edu>, <wangjingyi11@huawei.com>
-Subject: [kvm-unit-tests PATCH 3/6] arm64: microbench: gic: Add gicv4.1
- support for ipi latency test.
-Date: Sun, 17 May 2020 18:08:57 +0800
-Message-ID: <20200517100900.30792-4-wangjingyi11@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20200517100900.30792-1-wangjingyi11@huawei.com>
+ with ESMTP id OUST7tK-FV9S for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 May 2020 03:05:19 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 012284B174
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:05:18 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589785518;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=iKLG9bJEeG3dZC3d50wQc+GIQ3Y71rrHtOQFzlpx34Y=;
+ b=ItHYSfi95knVpJ0eBByJfD8Os2NHXAtSv2l42yPIFklFoXgxcvV9yAqUM1LI5Hubo9Pl86
+ aNQgIZUSrmOqAfR5Y+9mXeLIlERkCtOvwX0GDLDj6HtBU/nfgOQGnMp6A69+ptHpHfM1+Y
+ pzNt6Ut6qorxOuYLVlFVtM3N/VHIwlA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-dhIDb_CZOpOzENvFsNIUbQ-1; Mon, 18 May 2020 03:05:16 -0400
+X-MC-Unique: dhIDb_CZOpOzENvFsNIUbQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D6D118FE861;
+ Mon, 18 May 2020 07:05:15 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C35966062;
+ Mon, 18 May 2020 07:05:10 +0000 (UTC)
+Date: Mon, 18 May 2020 09:05:07 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Jingyi Wang <wangjingyi11@huawei.com>
+Subject: Re: [kvm-unit-tests PATCH 6/6] arm64: microbench: Add vtimer latency
+ test
+Message-ID: <20200518070507.pvs4iol34wc2zjkz@kamzik.brq.redhat.com>
 References: <20200517100900.30792-1-wangjingyi11@huawei.com>
+ <20200517100900.30792-7-wangjingyi11@huawei.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.173.222.58]
-X-CFilter-Loop: Reflected
-Cc: maz@kernel.org
+Content-Disposition: inline
+In-Reply-To: <20200517100900.30792-7-wangjingyi11@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,160 +91,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If gicv4.1(sgi hardware injection) supported, we test ipi injection
-via hw/sw way separately.
+On Sun, May 17, 2020 at 06:09:00PM +0800, Jingyi Wang wrote:
+> Triggers PPIs by setting up a 10msec timer and test the latency.
+> For this test can be time consuming, we add time limit for loop_test
+> to make sure each test should be done in a certain time(5 sec here).
 
-Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
----
- arm/micro-bench.c    | 53 +++++++++++++++++++++++++++++++++++++++-----
- lib/arm/asm/gic-v3.h |  5 +++++
- lib/arm/asm/gic.h    |  1 +
- 3 files changed, 54 insertions(+), 5 deletions(-)
+Having a time limit for the micro-bench tests might be a good idea, as
+the overall unit test timeout configured by unittests.cfg can't measure
+each individual micro-bench test separately, but it seems what we're
+really doing here is saying that we can't do 65536 10ms long vtimer-ppi
+tests, so let's do 500 instead -- however by using time to dictate the
+count.
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index fc4d356..0c7869b 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -28,6 +28,7 @@ static u32 cntfrq;
- static volatile bool irq_ready, irq_received;
- static void *vgic_dist_base;
- static void (*write_eoir)(u32 irqstat);
-+static bool ipi_hw;
- 
- static void gic_irq_handler(struct pt_regs *regs)
- {
-@@ -91,9 +92,42 @@ static void gic_prep_common(void)
- 	assert(irq_ready);
- }
- 
--static void ipi_prep(void)
-+static bool ipi_prep(void)
- {
-+	u32 val;
-+
-+	val = readl(vgic_dist_base + GICD_CTLR);
-+	if (readl(vgic_dist_base + GICD_TYPER2) & GICD_TYPER2_nASSGIcap) {
-+		val &= ~GICD_CTLR_ENABLE_G1A;
-+		val &= ~GICD_CTLR_nASSGIreq;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		val |= GICD_CTLR_ENABLE_G1A;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+	}
-+
-+	ipi_hw = false;
- 	gic_prep_common();
-+	return true;
-+}
-+
-+static bool ipi_hw_prep(void)
-+{
-+	u32 val;
-+
-+	val = readl(vgic_dist_base + GICD_CTLR);
-+	if (readl(vgic_dist_base + GICD_TYPER2) & GICD_TYPER2_nASSGIcap) {
-+		val &= ~GICD_CTLR_ENABLE_G1A;
-+		val |= GICD_CTLR_nASSGIreq;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		val |= GICD_CTLR_ENABLE_G1A;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+	} else {
-+		return false;
-+	}
-+
-+	ipi_hw = true;
-+	gic_prep_common();
-+	return true;
- }
- 
- static void ipi_exec(void)
-@@ -103,7 +137,11 @@ static void ipi_exec(void)
- 
- 	irq_received = false;
- 
--	gic_ipi_send_single(1, 1);
-+	if (ipi_hw) {
-+		writel(1 << 1, gicv3_sgi_base_percpu(1) + GICR_ISPENDR0);
-+	} else {
-+		gic_ipi_send_single(1, 1);
-+	}
- 
- 	while (!irq_received && tries--)
- 		cpu_relax();
-@@ -147,7 +185,7 @@ static void eoi_exec(void)
- 
- struct exit_test {
- 	const char *name;
--	void (*prep)(void);
-+	bool (*prep)(void);
- 	void (*exec)(void);
- 	bool run;
- };
-@@ -158,6 +196,7 @@ static struct exit_test tests[] = {
- 	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
- 	{"eoi",			NULL,		eoi_exec,		true},
- 	{"ipi",			ipi_prep,	ipi_exec,		true},
-+	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
- };
- 
- struct ns_time {
-@@ -181,9 +220,13 @@ static void loop_test(struct exit_test *test)
- 	uint64_t start, end, total_ticks, ntimes = NTIMES;
- 	struct ns_time total_ns, avg_ns;
- 
--	if (test->prep)
--		test->prep();
-+	if (test->prep) {
-+		if(!test->prep()) {
- 
-+			printf("%s test skipped\n", test->name);
-+			return;
-+		}
-+	}
- 	isb();
- 	start = read_sysreg(cntpct_el0);
- 	while (ntimes--)
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index cb72922..cbf51ba 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -20,10 +20,13 @@
-  */
- #define GICD_CTLR			0x0000
- #define GICD_CTLR_RWP			(1U << 31)
-+#define GICD_CTLR_nASSGIreq		(1U << 8)
- #define GICD_CTLR_ARE_NS		(1U << 4)
- #define GICD_CTLR_ENABLE_G1A		(1U << 1)
- #define GICD_CTLR_ENABLE_G1		(1U << 0)
- 
-+#define GICD_TYPER2_nASSGIcap		(1U << 8)
-+
- /* Re-Distributor registers, offsets from RD_base */
- #define GICR_TYPER			0x0008
- 
-@@ -87,6 +90,8 @@ extern struct gicv3_data gicv3_data;
- #define gicv3_redist_base()		(gicv3_data.redist_base[smp_processor_id()])
- #define gicv3_sgi_base()		(gicv3_data.redist_base[smp_processor_id()] + SZ_64K)
- 
-+#define gicv3_sgi_base_percpu(cpu)	(gicv3_data.redist_base[cpu] + SZ_64K)
-+
- extern int gicv3_init(void);
- extern void gicv3_enable_defaults(void);
- extern u32 gicv3_read_iar(void);
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 38e79b2..1898400 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -13,6 +13,7 @@
- #define GICD_CTLR			0x0000
- #define GICD_TYPER			0x0004
- #define GICD_IIDR			0x0008
-+#define GICD_TYPER2			0x000C
- #define GICD_IGROUPR			0x0080
- #define GICD_ISENABLER			0x0100
- #define GICD_ICENABLER			0x0180
--- 
-2.19.1
+I think I'd rather see NTIMES be changed to a micro-bench test parameter
+that defaults to 65536, but for the vtimer-ppi test it can be set to
+something much smaller.
 
+Also, please create a separate patch for the loop_test()/ntimes changes.
+If you'd still like to do a per micro-bench test timeout as well, then
+please create a separate patch for that too.
+
+Thanks,
+drew
+
+> 
+> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+> ---
+>  arm/micro-bench.c | 81 ++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 70 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 91af1f7..dbe8e54 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -23,6 +23,11 @@
+>  #include <asm/gic-v3-its.h>
+>  
+>  #define NTIMES (1U << 16)
+> +#define MAX_NS (5 * 1000 * 1000 * 1000UL)
+> +
+> +#define IRQ_VTIMER		27
+> +#define ARCH_TIMER_CTL_ENABLE	(1 << 0)
+> +#define ARCH_TIMER_CTL_IMASK	(1 << 1)
+>  
+>  static u32 cntfrq;
+>  
+> @@ -33,9 +38,16 @@ static bool ipi_hw;
+>  
+>  static void gic_irq_handler(struct pt_regs *regs)
+>  {
+> +	u32 irqstat = gic_read_iar();
+>  	irq_ready = false;
+>  	irq_received = true;
+> -	gic_write_eoir(gic_read_iar());
+> +	gic_write_eoir(irqstat);
+> +
+> +	if (irqstat == IRQ_VTIMER) {
+> +		write_sysreg((ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE),
+> +				cntv_ctl_el0);
+> +		isb();
+> +	}
+>  	irq_ready = true;
+>  }
+>  
+> @@ -195,6 +207,47 @@ static void lpi_exec(void)
+>  	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
+>  }
+>  
+> +static bool timer_prep(void)
+> +{
+> +	static void *gic_isenabler;
+> +
+> +	gic_enable_defaults();
+> +	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+> +	local_irq_enable();
+> +
+> +	gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
+> +	writel(1 << IRQ_VTIMER, gic_isenabler);
+> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+> +	isb();
+> +
+> +	gic_prep_common();
+> +	return true;
+> +}
+> +
+> +static void timer_exec(void)
+> +{
+> +	u64 before_timer;
+> +	u64 timer_10ms;
+> +	unsigned tries = 1 << 28;
+> +	static int received = 0;
+> +
+> +	irq_received = false;
+> +
+> +	before_timer = read_sysreg(cntvct_el0);
+> +	timer_10ms = cntfrq / 100;
+> +	write_sysreg(before_timer + timer_10ms, cntv_cval_el0);
+> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+> +	isb();
+> +
+> +	while (!irq_received && tries--)
+> +		cpu_relax();
+> +
+> +	if (irq_received)
+> +		++received;
+> +
+> +	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
+> +}
+> +
+>  static void hvc_exec(void)
+>  {
+>  	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+> @@ -241,6 +294,7 @@ static struct exit_test tests[] = {
+>  	{"ipi",			ipi_prep,	ipi_exec,		true},
+>  	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
+>  	{"lpi",			lpi_prep,	lpi_exec,		true},
+> +	{"timer_10ms",		timer_prep,	timer_exec,		true},
+>  };
+>  
+>  struct ns_time {
+> @@ -261,27 +315,32 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
+>  
+>  static void loop_test(struct exit_test *test)
+>  {
+> -	uint64_t start, end, total_ticks, ntimes = NTIMES;
+> +	uint64_t start, end, total_ticks, ntimes = 0;
+>  	struct ns_time total_ns, avg_ns;
+>  
+> +	total_ticks = 0;
+>  	if (test->prep) {
+>  		if(!test->prep()) {
+> -
+>  			printf("%s test skipped\n", test->name);
+>  			return;
+>  		}
+>  	}
+> -	isb();
+> -	start = read_sysreg(cntpct_el0);
+> -	while (ntimes--)
+> +
+> +	while (ntimes < NTIMES && total_ns.ns < MAX_NS) {
+> +		isb();
+> +		start = read_sysreg(cntpct_el0);
+>  		test->exec();
+> -	isb();
+> -	end = read_sysreg(cntpct_el0);
+> +		isb();
+> +		end = read_sysreg(cntpct_el0);
+> +
+> +		ntimes++;
+> +		total_ticks += (end - start);
+> +		ticks_to_ns_time(total_ticks, &total_ns);
+> +	}
+>  
+> -	total_ticks = end - start;
+>  	ticks_to_ns_time(total_ticks, &total_ns);
+> -	avg_ns.ns = total_ns.ns / NTIMES;
+> -	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
+> +	avg_ns.ns = total_ns.ns / ntimes;
+> +	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
+>  
+>  	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
+>  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+> -- 
+> 2.19.1
+> 
+> 
 
 _______________________________________________
 kvmarm mailing list
