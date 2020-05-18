@@ -2,79 +2,80 @@ Return-Path: <SRS0=o21O=7A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88856C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD373C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:37:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A95B2067D
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:05:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItHYSfi9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A95B2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 480DB20715
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 07:37:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 480DB20715
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nubificus.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A11B4B187;
-	Mon, 18 May 2020 03:05:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A33414B181;
+	Mon, 18 May 2020 03:37:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UMdOjzNt0Im3; Mon, 18 May 2020 03:05:20 -0400 (EDT)
+	with ESMTP id mJH2SHlVyjOW; Mon, 18 May 2020 03:37:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEAD74B18A;
-	Mon, 18 May 2020 03:05:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADAF14B191;
+	Mon, 18 May 2020 03:37:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 053984B187
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:05:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 904774B183
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 02:58:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OUST7tK-FV9S for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 May 2020 03:05:19 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 012284B174
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 03:05:18 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589785518;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iKLG9bJEeG3dZC3d50wQc+GIQ3Y71rrHtOQFzlpx34Y=;
- b=ItHYSfi95knVpJ0eBByJfD8Os2NHXAtSv2l42yPIFklFoXgxcvV9yAqUM1LI5Hubo9Pl86
- aNQgIZUSrmOqAfR5Y+9mXeLIlERkCtOvwX0GDLDj6HtBU/nfgOQGnMp6A69+ptHpHfM1+Y
- pzNt6Ut6qorxOuYLVlFVtM3N/VHIwlA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-dhIDb_CZOpOzENvFsNIUbQ-1; Mon, 18 May 2020 03:05:16 -0400
-X-MC-Unique: dhIDb_CZOpOzENvFsNIUbQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D6D118FE861;
- Mon, 18 May 2020 07:05:15 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.150])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C35966062;
- Mon, 18 May 2020 07:05:10 +0000 (UTC)
-Date: Mon, 18 May 2020 09:05:07 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Jingyi Wang <wangjingyi11@huawei.com>
-Subject: Re: [kvm-unit-tests PATCH 6/6] arm64: microbench: Add vtimer latency
- test
-Message-ID: <20200518070507.pvs4iol34wc2zjkz@kamzik.brq.redhat.com>
-References: <20200517100900.30792-1-wangjingyi11@huawei.com>
- <20200517100900.30792-7-wangjingyi11@huawei.com>
+ with ESMTP id tHGr2sjuFZaK for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 May 2020 02:58:10 -0400 (EDT)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 506DF4B156
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 02:58:10 -0400 (EDT)
+Received: by mail-wr1-f68.google.com with SMTP id l17so10419756wrr.4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 May 2020 23:58:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:user-agent;
+ bh=+D77RfiJOu4D1YxT/E/Zl3KQA8PQ7qtZd5MuZFWy0Z8=;
+ b=eR4/+U5XtYG0hRezX4wYjPewOM321zfsJP/YDx3YJdkJeqznYc2uMMYUY/bxCJEvDJ
+ /hUPOakwMEwnFVOQOipN87p7XraNSHS7+UgL3ucm2S+P45X1WUYNOH+BYZAPHPaH0Gq0
+ 76Y1JtRlMvXJDfWEIgh6EViXsA1yanlhYpEyyhk4F34wkC9Cl+k+sAWHRYxDAAWKoMiX
+ wrE1S3ALUwusGczX0LTbC3t0SmffpcYQMQ03QstesZXDQgL5PHYB79/cPSYacAZHtvv9
+ 8Ktnhee7cCcOgv1Xs37TfwwVPNDGYcxw1qcZOkJIbtuFpIAkL3QtJZjSyfrSNQ2JLDnB
+ JZ/g==
+X-Gm-Message-State: AOAM5313zgy5V4mR2c/4uq3Cf8TOalGMLIyGXFg0ykLuh0AqA/AeAdvn
+ tCrU6cgAn0PCLBLxB61ZHeE=
+X-Google-Smtp-Source: ABdhPJyxw+2tvhwUPs5V0h23SzHGXLChNa2LJLySoY5UzfK9tiPx/GZscXXrz3LabEGdcG6dz3I77A==
+X-Received: by 2002:adf:f981:: with SMTP id f1mr17802097wrr.244.1589785089337; 
+ Sun, 17 May 2020 23:58:09 -0700 (PDT)
+Received: from bf.nubificus.co.uk ([2a02:587:b919:800:aaa1:59ff:fe09:f176])
+ by smtp.gmail.com with ESMTPSA id x184sm15563684wmg.38.2020.05.17.23.58.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 17 May 2020 23:58:08 -0700 (PDT)
+Date: Mon, 18 May 2020 09:58:05 +0300
+From: Anastassios Nanos <ananos@nubificus.co.uk>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] Expose KVM API to Linux Kernel
+Message-ID: <cover.1589784221.git.ananos@nubificus.co.uk>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200517100900.30792-7-wangjingyi11@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Mailman-Approved-At: Mon, 18 May 2020 03:37:55 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Ingo Molnar <mingo@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Will Deacon <will@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,172 +92,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, May 17, 2020 at 06:09:00PM +0800, Jingyi Wang wrote:
-> Triggers PPIs by setting up a 10msec timer and test the latency.
-> For this test can be time consuming, we add time limit for loop_test
-> to make sure each test should be done in a certain time(5 sec here).
+To spawn KVM-enabled Virtual Machines on Linux systems, one has to use
+QEMU, or some other kind of VM monitor in user-space to host the vCPU
+threads, I/O threads and various other book-keeping/management mechanisms.
+This is perfectly fine for a large number of reasons and use cases: for
+instance, running generic VMs, running general purpose Operating systems
+that need some kind of emulation for legacy boot/hardware etc.
 
-Having a time limit for the micro-bench tests might be a good idea, as
-the overall unit test timeout configured by unittests.cfg can't measure
-each individual micro-bench test separately, but it seems what we're
-really doing here is saying that we can't do 65536 10ms long vtimer-ppi
-tests, so let's do 500 instead -- however by using time to dictate the
-count.
+What if we wanted to execute a small piece of code as a guest instance,
+without the involvement of user-space? The KVM functions are already doing
+what they should: VM and vCPU setup is already part of the kernel, the only
+missing piece is memory handling.
 
-I think I'd rather see NTIMES be changed to a micro-bench test parameter
-that defaults to 65536, but for the vtimer-ppi test it can be set to
-something much smaller.
+With these series, (a) we expose to the Linux Kernel the bare minimum KVM
+API functions in order to spawn a guest instance without the intervention
+of user-space; and (b) we tweak the memory handling code of KVM-related
+functions to account for another kind of guest, spawned in kernel-space.
 
-Also, please create a separate patch for the loop_test()/ntimes changes.
-If you'd still like to do a per micro-bench test timeout as well, then
-please create a separate patch for that too.
+PATCH #1 exposes the needed stub functions, whereas PATCH #2 introduces the
+changes in the KVM memory handling code for x86_64 and aarch64.
 
-Thanks,
-drew
+An example of use is provided based on kvmtest.c
+[https://lwn.net/Articles/658512/] at
+https://github.com/cloudkernels/kvmmtest
 
-> 
-> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
-> ---
->  arm/micro-bench.c | 81 ++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 70 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> index 91af1f7..dbe8e54 100644
-> --- a/arm/micro-bench.c
-> +++ b/arm/micro-bench.c
-> @@ -23,6 +23,11 @@
->  #include <asm/gic-v3-its.h>
->  
->  #define NTIMES (1U << 16)
-> +#define MAX_NS (5 * 1000 * 1000 * 1000UL)
-> +
-> +#define IRQ_VTIMER		27
-> +#define ARCH_TIMER_CTL_ENABLE	(1 << 0)
-> +#define ARCH_TIMER_CTL_IMASK	(1 << 1)
->  
->  static u32 cntfrq;
->  
-> @@ -33,9 +38,16 @@ static bool ipi_hw;
->  
->  static void gic_irq_handler(struct pt_regs *regs)
->  {
-> +	u32 irqstat = gic_read_iar();
->  	irq_ready = false;
->  	irq_received = true;
-> -	gic_write_eoir(gic_read_iar());
-> +	gic_write_eoir(irqstat);
-> +
-> +	if (irqstat == IRQ_VTIMER) {
-> +		write_sysreg((ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE),
-> +				cntv_ctl_el0);
-> +		isb();
-> +	}
->  	irq_ready = true;
->  }
->  
-> @@ -195,6 +207,47 @@ static void lpi_exec(void)
->  	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
->  }
->  
-> +static bool timer_prep(void)
-> +{
-> +	static void *gic_isenabler;
-> +
-> +	gic_enable_defaults();
-> +	install_irq_handler(EL1H_IRQ, gic_irq_handler);
-> +	local_irq_enable();
-> +
-> +	gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-> +	writel(1 << IRQ_VTIMER, gic_isenabler);
-> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
-> +	isb();
-> +
-> +	gic_prep_common();
-> +	return true;
-> +}
-> +
-> +static void timer_exec(void)
-> +{
-> +	u64 before_timer;
-> +	u64 timer_10ms;
-> +	unsigned tries = 1 << 28;
-> +	static int received = 0;
-> +
-> +	irq_received = false;
-> +
-> +	before_timer = read_sysreg(cntvct_el0);
-> +	timer_10ms = cntfrq / 100;
-> +	write_sysreg(before_timer + timer_10ms, cntv_cval_el0);
-> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
-> +	isb();
-> +
-> +	while (!irq_received && tries--)
-> +		cpu_relax();
-> +
-> +	if (irq_received)
-> +		++received;
-> +
-> +	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
-> +}
-> +
->  static void hvc_exec(void)
->  {
->  	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> @@ -241,6 +294,7 @@ static struct exit_test tests[] = {
->  	{"ipi",			ipi_prep,	ipi_exec,		true},
->  	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
->  	{"lpi",			lpi_prep,	lpi_exec,		true},
-> +	{"timer_10ms",		timer_prep,	timer_exec,		true},
->  };
->  
->  struct ns_time {
-> @@ -261,27 +315,32 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
->  
->  static void loop_test(struct exit_test *test)
->  {
-> -	uint64_t start, end, total_ticks, ntimes = NTIMES;
-> +	uint64_t start, end, total_ticks, ntimes = 0;
->  	struct ns_time total_ns, avg_ns;
->  
-> +	total_ticks = 0;
->  	if (test->prep) {
->  		if(!test->prep()) {
-> -
->  			printf("%s test skipped\n", test->name);
->  			return;
->  		}
->  	}
-> -	isb();
-> -	start = read_sysreg(cntpct_el0);
-> -	while (ntimes--)
-> +
-> +	while (ntimes < NTIMES && total_ns.ns < MAX_NS) {
-> +		isb();
-> +		start = read_sysreg(cntpct_el0);
->  		test->exec();
-> -	isb();
-> -	end = read_sysreg(cntpct_el0);
-> +		isb();
-> +		end = read_sysreg(cntpct_el0);
-> +
-> +		ntimes++;
-> +		total_ticks += (end - start);
-> +		ticks_to_ns_time(total_ticks, &total_ns);
-> +	}
->  
-> -	total_ticks = end - start;
->  	ticks_to_ns_time(total_ticks, &total_ns);
-> -	avg_ns.ns = total_ns.ns / NTIMES;
-> -	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
-> +	avg_ns.ns = total_ns.ns / ntimes;
-> +	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
->  
->  	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
->  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
-> -- 
-> 2.19.1
-> 
-> 
+Anastassios Nanos (2):
+  KVMM: export needed symbols
+  KVMM: Memory and interface related changes
+
+ arch/arm64/include/asm/kvm_host.h   |   6 ++
+ arch/arm64/kvm/fpsimd.c             |   8 +-
+ arch/arm64/kvm/guest.c              |  48 +++++++++++
+ arch/x86/include/asm/fpu/internal.h |  10 ++-
+ arch/x86/kvm/cpuid.c                |  25 ++++++
+ arch/x86/kvm/emulate.c              |   3 +-
+ arch/x86/kvm/vmx/vmx.c              |   3 +-
+ arch/x86/kvm/x86.c                  |  38 ++++++++-
+ include/linux/kvm_host.h            |  36 +++++++++
+ virt/kvm/arm/arm.c                  |  18 +++++
+ virt/kvm/arm/mmu.c                  |  34 +++++---
+ virt/kvm/async_pf.c                 |   4 +-
+ virt/kvm/coalesced_mmio.c           |   6 ++
+ virt/kvm/kvm_main.c                 | 120 ++++++++++++++++++++++------
+ 14 files changed, 316 insertions(+), 43 deletions(-)
+
+-- 
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
