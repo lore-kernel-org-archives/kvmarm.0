@@ -2,105 +2,107 @@ Return-Path: <SRS0=o21O=7A=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D73A2C433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 10:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00513C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 11:18:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8F21D207F5
-	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 10:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D7A8207F5
+	for <kvmarm@archiver.kernel.org>; Mon, 18 May 2020 11:18:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vq33VVii"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F21D207F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1FOTvg2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7A8207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9744B1B0;
-	Mon, 18 May 2020 06:43:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0C7D4B14D;
+	Mon, 18 May 2020 07:18:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yoHCBsytljHB; Mon, 18 May 2020 06:43:06 -0400 (EDT)
+	with ESMTP id eDOx8lXTHJCx; Mon, 18 May 2020 07:18:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD89D4B19D;
-	Mon, 18 May 2020 06:43:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2024B18A;
+	Mon, 18 May 2020 07:18:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2288D4B184
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 05:19:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3754B185
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 07:18:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q0ZMzgTav+lS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 May 2020 05:18:59 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35D484B17D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 05:18:59 -0400 (EDT)
+ with ESMTP id X9iQMSwtc9Bv for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 May 2020 07:18:28 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AF924B149
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 07:18:28 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589793539;
+ s=mimecast20190719; t=1589800708;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wUvuFHtpRP2kms7NhYOoam9/bRncTEMEMk1lIVn22aw=;
- b=Vq33VVii1K/miBGCsqvx9ahU2CHfM24JmQIMcnBAtbe1CgIKRThZkimjM4uD04XWbKNokE
- pJEPaQ5gAugdbFGWumebcSEeaiEOvU3Y7bZoTVSCpyx9II2vt9v0It1FpseQ4UpLziTlby
- clwfmYnoBKNcxei7IOmocX2vB5s4FkU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-P8oJKAlTOBOfmZqe2XRZ5g-1; Mon, 18 May 2020 05:18:57 -0400
-X-MC-Unique: P8oJKAlTOBOfmZqe2XRZ5g-1
-Received: by mail-wm1-f69.google.com with SMTP id f9so2006903wml.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 02:18:56 -0700 (PDT)
+ bh=dxiBECMHFAplzz2KB29O/LRSLdFzNsUzEToTKNWFHYs=;
+ b=h1FOTvg2S+c1egPCZdGtvP6YOqoW1ZtlQq5YEJWsXWvupreE90whGjCNev/jstjCmCpOUt
+ HqCmzEAJwneC4UNRwYwf7zypDxCVjJ2fYHziVNxiBFAtpiY2va4xjvsByJua6FJScGfeR+
+ ZI2PeBPSnCYE2TJLItwWskkwnt0jAnM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-4-xdB0oPOGGfYa8iWEqCjQ-1; Mon, 18 May 2020 07:18:26 -0400
+X-MC-Unique: 4-xdB0oPOGGfYa8iWEqCjQ-1
+Received: by mail-wm1-f70.google.com with SMTP id v23so2959644wmj.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 May 2020 04:18:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=wUvuFHtpRP2kms7NhYOoam9/bRncTEMEMk1lIVn22aw=;
- b=fgL3K/DZHtXWcMmNZ59xeLaClum9r6XoZCOsQGkqc5i67Wrd/L+PDy7vZBjDQugBBw
- 18wueWTeC+0XWppbJ/h8fhNG/kBEWTh1odOdBkOgLTuJxS5qpwDmFqFVmQqjS7mMFnV7
- 0jgDotoBVSyHQlduyMDQqmCqdYN7/wGNtB4J7ThpHK9bI15WilTF3Mar529WbtJxMZbn
- pcDfD6I6v8FdL16CzAT3Ap97JOF+q7/FYDELa/Gb9gwTOxbtyEmQZVktAnTHN4A5XRj0
- +W10Uvkw0S5iXacDnZrB6NQxhDEZPg4UCiZTgyenX8dJxbQQbD8aC3rxeKEtFdQjkNF1
- rKdQ==
-X-Gm-Message-State: AOAM533t63PXbpg5Qb7oHL8sz7WqKeNGc2W8nHmGqso4q5Wydui8CBFZ
- OEoP3t6Fc1hz5b0P4JshK130ibeeI0TyNHnIo7kUtylhkDj1j9EdoaNXzrH6te2J4LRYtsjsG5h
- Qx5wsqFVMD+5GGRP0gnK6al/g
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr19179738wme.154.1589793535932; 
- Mon, 18 May 2020 02:18:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwi7pOADLN/te5X0J+pmMiiuSIEST5v0Ejiqlgn996sQFmMXUsyHPVUkRkXSpo0mOyUHs5dug==
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr19179715wme.154.1589793535716; 
- Mon, 18 May 2020 02:18:55 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id z11sm15011531wrr.32.2020.05.18.02.18.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 May 2020 02:18:55 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Anastassios Nanos <ananos@nubificus.co.uk>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dxiBECMHFAplzz2KB29O/LRSLdFzNsUzEToTKNWFHYs=;
+ b=Za5DzbH38vpWHxFbYQbU+2nFYIr/QAw99Ckw6oV6t3HWt3ZqZP7Urbt/H6UANUhG86
+ IXw+qxoMJNzJmv6y7FgqAk3ubPtn5u4F2Kw9kwZk9JmjJloHhB4WoSJnw5ToOi4/YS+W
+ Iofv74+x4DfnXNHI4Reh7Ig5apY4GYbc62IV97Xl8YW4tZbHFVI0WSCbANP89uMVkD6X
+ UpnBP8hhvI9crOQ6HjnybeXHlFb/K1LBfbOQVshPI2616KBXZBa4TTt4s9BOlEGpzYxZ
+ fZ0HWSxZ1usjqKVtgxF/pVVHB2Ctv6jmKnCIVCi1wgIEsMEeX0vSQVhln7Ry/qfxQW4f
+ BblQ==
+X-Gm-Message-State: AOAM531mFw1CBNjiayGqOH/lsvaSN8b0O6HANkZW+elGrkLUsuRMLp1G
+ tIx09JneC1A477SHuKOt4nf4XAHqkc2E7NFN7vokYfSo+aScL8Qk4qFnqi0tPGpToW0p7+jaiig
+ rdyYaB3AGppHQW6cugMgQFfUG
+X-Received: by 2002:adf:f786:: with SMTP id q6mr19058398wrp.120.1589800705062; 
+ Mon, 18 May 2020 04:18:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwNLwMrbe3B5c0qaCQ/YjHTYYnwcj/Jnv2tH5S7lfJMD5adLyh8g16sr+0JKvnyuDSUcvQdGA==
+X-Received: by 2002:adf:f786:: with SMTP id q6mr19058368wrp.120.1589800704864; 
+ Mon, 18 May 2020 04:18:24 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.90.67])
+ by smtp.gmail.com with ESMTPSA id r2sm16417514wrg.84.2020.05.18.04.18.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 May 2020 04:18:24 -0700 (PDT)
 Subject: Re: [PATCH 0/2] Expose KVM API to Linux Kernel
-In-Reply-To: <CALRTab-mEYtRG4zQbSGoAri+jg8xNL-imODv=MWE330Hkt_t+Q@mail.gmail.com>
+To: Anastassios Nanos <ananos@nubificus.co.uk>, Marc Zyngier <maz@kernel.org>
 References: <cover.1589784221.git.ananos@nubificus.co.uk>
- <87y2ppy6q0.fsf@nanos.tec.linutronix.de>
- <CALRTab-mEYtRG4zQbSGoAri+jg8xNL-imODv=MWE330Hkt_t+Q@mail.gmail.com>
-Date: Mon, 18 May 2020 11:18:53 +0200
-Message-ID: <87o8qlvbwi.fsf@vitty.brq.redhat.com>
+ <c1124c27293769f8e4836fb8fdbd5adf@kernel.org>
+ <CALRTab90UyMq2hMxCdCmC3GwPWFn2tK_uKMYQP2YBRcHwzkEUQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <760e0927-d3a7-a8c6-b769-55f43a65e095@redhat.com>
+Date: Mon, 18 May 2020 13:18:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <CALRTab90UyMq2hMxCdCmC3GwPWFn2tK_uKMYQP2YBRcHwzkEUQ@mail.gmail.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-X-Mailman-Approved-At: Mon, 18 May 2020 06:43:03 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+Cc: Thomas Gleixner <tglx@linutronix.de>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org, linux-kernel@vger.kernel.org,
  Sean Christopherson <sean.j.christopherson@intel.com>,
- Ingo Molnar <mingo@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+ Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Borislav Petkov <bp@alien8.de>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -117,39 +119,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Anastassios Nanos <ananos@nubificus.co.uk> writes:
+On 18/05/20 10:45, Anastassios Nanos wrote:
+> Being in the kernel saves us from doing unneccessary mode switches.
+> Of course there are optimizations for handling I/O on QEMU/KVM VMs
+> (virtio/vhost), but essentially what happens is removing mode-switches (and
+> exits) for I/O operations -- is there a good reason not to address that
+> directly? a guest running in the kernel exits because of an I/O request,
+> which gets processed and forwarded directly to the relevant subsystem *in*
+> the kernel (net/block etc.).
 
-> Moreover, it doesn't involve *any* mode switch at all while printing
-> out the result of the  addition of these two registers -- which I
-> guess for a simple use-case like this it isn't much.
-> But if we were to scale this to a large number of exits (and their
-> respective handling in user-space) that would incur significant
-> overhead.
+In high-performance configurations, most of the time virtio devices are
+processed in another thread that polls on the virtio rings.  In this
+setup, the rings are configured to not cause a vmexit at all; this has
+much smaller latency than even a lightweight (kernel-only) vmexit,
+basically corresponding to writing an L1 cache line back to L2.
 
-Eliminating frequent exits to userspace when the guest is already
-running is absolutely fine but eliminating userspace completely, even
-for creation of the guest, is something dubious. To create a simple
-guest you need just a dozen of IOCTLs, you'll have to find a really,
-really good showcase when it makes a difference. 
-
-E.g. I can imagine the following use-case: you need to create a lot of
-guests with the same (or almost the same) memory contents and allocating
-and populating this memory in userspace takes time. But even in this
-use-case, why do you need to terminate your userspace? Or would it be
-possible to create guests from a shared memory? (we may not have
-copy-on-write capabilities in KVM currently but this doesn't mean they
-can't be added).
-
-Alternatively, you may want to mangle vmexit handling somehow and
-exiting to userspace seems slow. Fine, let's add eBPF attach points to
-KVM and an API to attach eBPF code there.
-
-I'm, however, just guessing. I understand you may not want to reveal
-your original idea for some reason but without us understanding what's
-really needed I don't see how the change can be reviewed.
-
--- 
-Vitaly
+Paolo
 
 _______________________________________________
 kvmarm mailing list
