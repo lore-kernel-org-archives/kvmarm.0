@@ -2,80 +2,59 @@ Return-Path: <SRS0=JN4F=7B=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB7CC433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 19 May 2020 10:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27436C433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 May 2020 10:41:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4C1E020674
-	for <kvmarm@archiver.kernel.org>; Tue, 19 May 2020 10:40:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="asPR0hzt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C1E020674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C1B0A207D3
+	for <kvmarm@archiver.kernel.org>; Tue, 19 May 2020 10:41:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B0A207D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C43A34B138;
-	Tue, 19 May 2020 06:40:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A8E54B163;
+	Tue, 19 May 2020 06:41:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fdUIufyJJaNV; Tue, 19 May 2020 06:40:47 -0400 (EDT)
+	with ESMTP id 9cd1Y16j9VNL; Tue, 19 May 2020 06:41:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE1C64B16D;
-	Tue, 19 May 2020 06:40:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F60B4B16D;
+	Tue, 19 May 2020 06:41:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6FD4B138
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 May 2020 06:40:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D48264B138
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 May 2020 06:41:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XoYiaR4xBul6 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 May 2020 06:40:44 -0400 (EDT)
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
- [209.85.160.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 138454B132
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 May 2020 06:40:44 -0400 (EDT)
-Received: by mail-qt1-f202.google.com with SMTP id c20so16206493qtw.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 May 2020 03:40:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=IukSylGaIR5gaKlG+xDtFZim9P8RAJ6FK69GQOC9RaQ=;
- b=asPR0hztoEoHaGzaHjCw+fe/33Ee3krH9GlxwXyBDh0CDhZMRpxqzBAnJbcf+KzLeh
- Fo5lbRQeY/B3I5ZrEUwMabjb57cFzpJLgNBc9yIg9AVKn0ZUWHVK160PEi0+Cc/OcVUq
- FYo8qUioio8CZBQ+gqvJysQd7yRxigcg/xxbT14BEgYwhLfwnUucnI+2MlpHM28N0Tlx
- RG5hiz9Q4cyP2B+AUkf4qvAMGzckvYD4324/TtIMSVufpq/jrZA4bb7Sef+76z4BxFlD
- 9jH1taeLDZOaS7yea9neMUKfZ3DDYSj1by9Aw5TrlQaFtnNyPKAdCuK9rU1RWhBvdUte
- txVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=IukSylGaIR5gaKlG+xDtFZim9P8RAJ6FK69GQOC9RaQ=;
- b=HBJGxHCemM2e3pZRTv/Vlq8s7tF5DwPOHhYGFgn7vjRCt+4dObLpWhJQpRiPtNPYqg
- YukTWtS9WfyZTom2ZhD1QqiEH54mJcUK+teWTCubrFfxKMLvOEjnjUTmitQfw1wz8Lvq
- aaxWbBAcxhhUTVrXL+WbsJFsckiKXqgSU1fEwLCm+zr9NbkimcK7S3F3okcitd85xqbq
- Hi3TRkz3vsTWDHd9KHy2jbodtl8Qzr/RcNRu+GXzGGDBykLhhtXkNmMf9o7odSDbxx1B
- cBaFkDoGpYga9Vdq5hOsriQVlU/gKWGBcNtdNtUDKnDHi/DKjQwILzrK3BZ5ECJGLpYS
- NAxg==
-X-Gm-Message-State: AOAM530TX6F9qK2275Q4SoS36JSSAy3SDu0CgABMIZbAaEmHPEBiR8dG
- NiFj0kOusbXqms/M4+GNnCb7VeMsdPYXnFlcMxHcgWnVjvQVc8Et2LqRq/v6DjMD4JemvJuy9LN
- uFHu55cDsqO+1NVGcJJzjoQY/1f+LE6jnA6Qc740lBOP/pY3nKGtN39h6zgd8B5nYrdFwqA==
-X-Google-Smtp-Source: ABdhPJzRMWotQQ2GSoODUI15KJr07PIzObzEaNnJPdBcJPC1OCuYK6tQUji4oYmJXVF5R0/R/ze8J9pEbgY=
-X-Received: by 2002:a25:77d8:: with SMTP id s207mr2934092ybc.8.1589884843420; 
- Tue, 19 May 2020 03:40:43 -0700 (PDT)
-Date: Tue, 19 May 2020 11:40:36 +0100
-Message-Id: <20200519104036.259917-1-ascull@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.26.2.761.g0e0b3e54be-goog
-Subject: [PATCH] arm64: kvm: Remove obsolete kvm_virt_to_phys abstraction
-From: Andrew Scull <ascull@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <maz@kernel.org>
+ with ESMTP id 3g3JV6znpOpZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 May 2020 06:41:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0581F4B132
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 May 2020 06:41:50 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 650AC101E;
+ Tue, 19 May 2020 03:41:49 -0700 (PDT)
+Received: from [10.37.8.206] (unknown [10.37.8.206])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 555D23F305;
+ Tue, 19 May 2020 03:41:47 -0700 (PDT)
+Subject: Re: [PATCH V4 05/17] arm64/cpufeature: Introduce ID_DFR1 CPU register
+To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org
+References: <1589881254-10082-1-git-send-email-anshuman.khandual@arm.com>
+ <1589881254-10082-6-git-send-email-anshuman.khandual@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <9d609264-83e4-230e-8d37-46f040b79666@arm.com>
+Date: Tue, 19 May 2020 11:46:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
+MIME-Version: 1.0
+In-Reply-To: <1589881254-10082-6-git-send-email-anshuman.khandual@arm.com>
+Content-Language: en-US
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, maz@kernel.org,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,59 +66,71 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This abstraction was introduced to hide the difference between arm and
-arm64 but, with the former no longer supported, this abstraction can be
-removed and the canonical kernel API used directly instead.
+On 05/19/2020 10:40 AM, Anshuman Khandual wrote:
+> This adds basic building blocks required for ID_DFR1 CPU register which
+> provides top level information about the debug system in AArch32 state.
+> This is added per ARM DDI 0487F.a specification.
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> 
+> Suggested-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 
-Signed-off-by: Andrew Scull <ascull@google.com>
-CC: Marc Zyngier <maz@kernel.org>
-CC: James Morse <james.morse@arm.com>
-CC: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/include/asm/kvm_mmu.h | 2 --
- virt/kvm/arm/mmu.c               | 6 +++---
- 2 files changed, 3 insertions(+), 5 deletions(-)
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 600ce237c487..faf644a66e89 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -457,6 +457,11 @@ static const struct arm64_ftr_bits ftr_id_dfr0[] = {
+>   	ARM64_FTR_END,
+>   };
+>   
+> +static const struct arm64_ftr_bits ftr_id_dfr1[] = {
+> +	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_DFR1_MTPMU_SHIFT, 4, 0),
+> +	ARM64_FTR_END,
+> +};
+> +
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 30b0e8d6b895..e275a85117e8 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -363,8 +363,6 @@ static inline void __kvm_flush_dcache_pud(pud_t pud)
- 	}
- }
- 
--#define kvm_virt_to_phys(x)		__pa_symbol(x)
--
- void kvm_set_way_flush(struct kvm_vcpu *vcpu);
- void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
- 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e3b9ee268823..2aa853e3c789 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -2185,11 +2185,11 @@ int kvm_mmu_init(void)
- {
- 	int err;
- 
--	hyp_idmap_start = kvm_virt_to_phys(__hyp_idmap_text_start);
-+	hyp_idmap_start = __pa_symbol(__hyp_idmap_text_start);
- 	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
--	hyp_idmap_end = kvm_virt_to_phys(__hyp_idmap_text_end);
-+	hyp_idmap_end = __pa_symbol(__hyp_idmap_text_end);
- 	hyp_idmap_end = ALIGN(hyp_idmap_end, PAGE_SIZE);
--	hyp_idmap_vector = kvm_virt_to_phys(__kvm_hyp_init);
-+	hyp_idmap_vector = __pa_symbol(__kvm_hyp_init);
- 
- 	/*
- 	 * We rely on the linker script to ensure at build time that the HYP
--- 
-2.26.2.761.g0e0b3e54be-goog
+> diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+> index cb79b083f97f..50a281703d9d 100644
+> --- a/arch/arm64/kernel/cpuinfo.c
+> +++ b/arch/arm64/kernel/cpuinfo.c
+> @@ -362,6 +362,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+>   	/* Update the 32bit ID registers only if AArch32 is implemented */
+>   	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
+>   		info->reg_id_dfr0 = read_cpuid(ID_DFR0_EL1);
+> +		info->reg_id_dfr1 = read_cpuid(ID_DFR1_EL1);
+>   		info->reg_id_isar0 = read_cpuid(ID_ISAR0_EL1);
+>   		info->reg_id_isar1 = read_cpuid(ID_ISAR1_EL1);
+>   		info->reg_id_isar2 = read_cpuid(ID_ISAR2_EL1);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b784b156edb3..0723cfbff7e9 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1457,7 +1457,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>   	ID_SANITISED(MVFR2_EL1),
+>   	ID_UNALLOCATED(3,3),
+>   	ID_SANITISED(ID_PFR2_EL1),
+> -	ID_UNALLOCATED(3,5),
+> +	ID_HIDDEN(ID_DFR1_EL1),
 
+It might be a good idea to mention why this is HIDDEN in the description.
+
+With that :
+
+Reviewed-by : Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
