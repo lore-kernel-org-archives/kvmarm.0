@@ -2,83 +2,58 @@ Return-Path: <SRS0=EL0d=7E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BAAC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 05:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DAF2C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 08:37:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CC6A22073B
-	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 05:34:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPPRdln3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6A22073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 94BFA20823
+	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 08:37:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94BFA20823
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2648B4B0A0;
-	Fri, 22 May 2020 01:34:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2D7F4B3BE;
+	Fri, 22 May 2020 04:37:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oXzmsMucqs8x; Fri, 22 May 2020 01:34:41 -0400 (EDT)
+	with ESMTP id GEk3USBEYKdA; Fri, 22 May 2020 04:37:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 129F64B302;
-	Fri, 22 May 2020 01:34:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8999B4B3B6;
+	Fri, 22 May 2020 04:37:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC334B185
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 01:34:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6AEE4B39E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 04:37:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v5oHjPfB5tfC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 May 2020 01:34:38 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5BB44B0A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 01:34:38 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590125678;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dnQ0nMFf0h8WwglXkeiu5R/EKl0trwSByG4G+2rCYaE=;
- b=dPPRdln3FqEm+T6OxykFW8fr83H33F2+oeLfK782L+4mwKWnszXKx22d8jood+Ylml+56X
- 5cF+gnpydMOs3DRMwW5kUk3lN/GTm1Rm/gWcDp+mM4ekCX8VCzl+QJNqg9F26w4hhUHmHB
- W4SOwL5xJT2GzxAwgEUWGqzZT31jCGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-V2GasK5KMByUJGyOtwaR9g-1; Fri, 22 May 2020 01:34:36 -0400
-X-MC-Unique: V2GasK5KMByUJGyOtwaR9g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06A131005510;
- Fri, 22 May 2020 05:34:35 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 58C605D9CD;
- Fri, 22 May 2020 05:34:27 +0000 (UTC)
-Date: Fri, 22 May 2020 07:34:23 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Jingyi Wang <wangjingyi11@huawei.com>
-Subject: Re: [kvm-unit-tests PATCH 1/6] arm64: microbench: get correct ipi
- recieved num
-Message-ID: <20200522053423.cus3pnhmp4p4t3ck@kamzik.brq.redhat.com>
-References: <20200517100900.30792-1-wangjingyi11@huawei.com>
- <20200517100900.30792-2-wangjingyi11@huawei.com>
- <8e011659-4e4d-7312-4466-5ed3ea54cc9b@huawei.com>
- <8b9d51f2-3906-9e0a-38ae-564424c38ff5@huawei.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <8b9d51f2-3906-9e0a-38ae-564424c38ff5@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 1DCHEfWQ7+uq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 May 2020 04:37:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 311FF4B356
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 04:37:40 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DFB455D;
+ Fri, 22 May 2020 01:37:39 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
+ [10.169.40.35])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B55613F52E;
+ Fri, 22 May 2020 01:37:32 -0700 (PDT)
+From: Jianyong Wu <jianyong.wu@arm.com>
+To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
+ maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com
+Subject: [RFC PATCH v12 0/11] Enable ptp_kvm for arm64
+Date: Fri, 22 May 2020 16:37:13 +0800
+Message-Id: <20200522083724.38182-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: justin.he@arm.com, Wei.Chen@arm.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nd@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,73 +65,179 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, May 22, 2020 at 10:32:25AM +0800, Jingyi Wang wrote:
-> =
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-> On 5/21/2020 10:00 PM, Zenghui Yu wrote:
-> > On 2020/5/17 18:08, Jingyi Wang wrote:
-> > > If ipi_exec() fails because of timeout, we shouldn't increase
-> > > the number of ipi received.
-> > > =
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
-> > > Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
-> > > ---
-> > > =A0 arm/micro-bench.c | 4 +++-
-> > > =A0 1 file changed, 3 insertions(+), 1 deletion(-)
-> > > =
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp works.
 
-> > > diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> > > index 4612f41..ca022d9 100644
-> > > --- a/arm/micro-bench.c
-> > > +++ b/arm/micro-bench.c
-> > > @@ -103,7 +103,9 @@ static void ipi_exec(void)
-> > > =A0=A0=A0=A0=A0 while (!ipi_received && tries--)
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0 cpu_relax();
-> > > -=A0=A0=A0 ++received;
-> > > +=A0=A0=A0 if (ipi_recieved)
-> > =
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |        host              |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          | 
+|       |   V      (get host walltime/counter cycle)                   |
+|  kvm ptp API (hypercall)- -|- - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |              
+|----------------------------|              |--------------------------|
 
-> > I think you may want *ipi_received* ;-) Otherwise it can not even
-> > compile!
-> > =
+1. time sync service in guest userspace call ptp device using ioctl.
+2. guest kernel ptp_kvm API get this request then invoke hypercall to request
+host walltime/counter cycle to host kernel.
+3. ptp_kvm host hypercall service response to the request and send back data
+4. ptp copy the data to userspace.
+This ptp_kvm implemetation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
 
-> > > +=A0=A0=A0=A0=A0=A0=A0 ++received;
-> > > +
-> > > =A0=A0=A0=A0=A0 assert_msg(ipi_received, "failed to receive IPI in ti=
-me, but
-> > > received %d successfully\n", received);
-> > > =A0 }
-> > =
+change log:
+from v11 to v12:
+        (1) rebase code on 5.7_rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
 
-> > With this fixed, this looks good to me,
-> > =
+from v10 to v11:
+        (1) rebase code on 5.7_rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
 
-> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> > =
+from v11 to v10:
+        (1) change code base to v5.5.
+	(2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
 
-> > =
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
 
-> > Thanks.
-> > =
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
 
-> > .
-> This variable name is modified in the next patch, so I ignored that
-> mistake, thanks.
->
+from v6 to v7:
+        (1) include the omitted clocksource_id.h in last version.
+        (2) reorder the header file in patch.
+        (3) refine some words in commit message to make it more impersonal.
 
-kvm-unit-tests build and run fast enough that you can do something like
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
 
-  git rebase -i -x 'make clean && make && arm/run arm/micro-bench'
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
 
-to test your series before posting.
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
 
-Thanks,
-drew
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+Jianyong Wu (8):
+  psci: export psci conduit get helper.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  psci: Add hypercall service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm/arm64
+  ptp: extend input argument for getcrosstimestamp API
+  arm64: add mechanism to let user choose which counter to return
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+ drivers/clocksource/arm_arch_timer.c        | 33 ++++++++
+ drivers/firmware/psci/psci.c                |  1 +
+ drivers/net/ethernet/intel/e1000e/ptp.c     |  3 +-
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_chardev.c                   |  8 +-
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 ++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 85 ++++++--------------
+ drivers/ptp/ptp_kvm_x86.c                   | 89 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 21 +++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_clock_kernel.h            |  3 +-
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ include/uapi/linux/ptp_clock.h              |  4 +-
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/arm/arm.c                          |  1 +
+ virt/kvm/arm/hypercalls.c                   | 44 +++++++++-
+ 21 files changed, 322 insertions(+), 72 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
+-- 
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
