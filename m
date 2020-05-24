@@ -1,89 +1,97 @@
-Return-Path: <SRS0=EL0d=7E=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6EXF=7G=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06E8C433E1
-	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 17:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0429C433E1
+	for <kvmarm@archiver.kernel.org>; Sun, 24 May 2020 01:42:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 557B820738
-	for <kvmarm@archiver.kernel.org>; Fri, 22 May 2020 17:15:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B7D220825
+	for <kvmarm@archiver.kernel.org>; Sun, 24 May 2020 01:42:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r/uep0uu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 557B820738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtZPJ7jM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7D220825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A166A4B26D;
-	Fri, 22 May 2020 13:15:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 711094B21A;
+	Sat, 23 May 2020 21:42:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SLOOE+FbfZhr; Fri, 22 May 2020 13:15:08 -0400 (EDT)
+	with ESMTP id dvF8RIaL6ROp; Sat, 23 May 2020 21:42:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90BB04B254;
-	Fri, 22 May 2020 13:15:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 781384B1EB;
+	Sat, 23 May 2020 21:42:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E5F94B236
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 13:15:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E0B4B1EB
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 May 2020 21:42:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ScOVxQUrKJoo for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 May 2020 13:15:06 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63AD34B230
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 13:15:06 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id e1so10870944wrt.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2020 10:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ with ESMTP id HL8pefVQzwpl for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 May 2020 21:42:26 -0400 (EDT)
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com
+ [209.85.215.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DE694B1DD
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 May 2020 21:42:26 -0400 (EDT)
+Received: by mail-pg1-f193.google.com with SMTP id j21so6875447pgb.7
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 May 2020 18:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=09cuiPopIOJ5aAQOSJRwjVEJJoZ5ZgmUzhsRLgEZpY0=;
- b=r/uep0uuJQLYx20aHcrEbEpO3MMibL4LPe/jFDu4IN2wSG9yqX5PXP245RsG//+TO/
- Cocvp89LCLIPNNYlc6OykX8uBrz6LwI+ReTQvzxRSOMOey16m0EEisxn2tx5VunYYTPP
- 1jbBQZtV83OTjzCQnsh+N53ProKGcWMS8TGEyyuf7fSKcAfptwIo5LRCJv+avtpmP8L4
- hw0ACBaOW0MFC/hnBrM5W8WeEfd600mle588Ys+xGLVDUUVJWDPhAxhlT3jyUMO8ckJo
- 0HWO5mb4UdgvRrUcQTNZ8YcozyhK/90aBnlFS7/6rR61MKaYkOxfcqk8kWjHK77a+8sz
- MR9g==
+ :content-disposition:in-reply-to:user-agent;
+ bh=WOxnSmEbJ8sld8voIH7dFeotuFTK+vKmyxU3MIIUb6w=;
+ b=GtZPJ7jMgTd975u9HvJI8Vb4cQ0PF/kILo5F96YhAHphc7CWosNo5glezVlXxhXmfe
+ 2gU8cK7Y8pxzBSBxL2vGV0mECSCAAp8pkJw0+o85UREcMBs5pU34VmV2PquiuIlMBZVS
+ I6mX64GzgFs+eJMW1wOvV1EV776L2G42DYYbsYCNlRri+pFm1GFU598QW95NFZbyWUIv
+ mkxS+NW/iDwbC1BzK0EnISSbg2E5G/UhDnndhRbKFe1rh3EbsWJYpuQ85dqvt96abTs7
+ h0rIdsreV3awAzUw83FAk+0u4QFJaMqks/RfYUAH6W3qqEF3vq6g7HD6yqmDacd3ngUG
+ boqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=09cuiPopIOJ5aAQOSJRwjVEJJoZ5ZgmUzhsRLgEZpY0=;
- b=h3zxR4ASXCZtMhsoBvpMmlLPj+aiYIFA3PjquDlvBgl0qo05u/zcWJQBmGr32dzm6s
- IVC6wo8y4w0x48ljHZqDUsO2JBzEclrfdug0kjcQMWByhfV89Cx5MA+kDZajxB1OTlfW
- X0Vae7vqeLiHLO3achhNew8VFI8VnNVz8myL0fdsPwtPsDkAtB8pMKQ2Z7SCCbZeJeJ3
- TXymud+dMN+HHI2t2QyNq7u/GwM4NNoH5/jV4OwpIYeoOtOt1hRvf1EO1L3KuclZ+txv
- CNx8Rji+DMfYGPrTpGMGK3zz28iw+k5e1sAp3BrOI5ViCh4Rp6JHo7g/ovNkC7M+U5B+
- MgOg==
-X-Gm-Message-State: AOAM532gM2FpgWCdCqW3NeFYxRYbUOrJstrGF71YVF3upKe/PIaMsJvn
- R2moabfW5LuyuIusx9xc4N65fA==
-X-Google-Smtp-Source: ABdhPJyxZ7kAMuA18QTw/krT1LaT+RyS8m/xIWMdni16UN7OYLdnQFqzGTPLW06K+87Eh9MIsX4pmw==
-X-Received: by 2002:a5d:49c5:: with SMTP id t5mr4331584wrs.18.1590167705375;
- Fri, 22 May 2020 10:15:05 -0700 (PDT)
-Received: from myrica ([2001:171b:226e:c200:c43b:ef78:d083:b355])
- by smtp.gmail.com with ESMTPSA id h74sm10394613wrh.76.2020.05.22.10.15.02
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=WOxnSmEbJ8sld8voIH7dFeotuFTK+vKmyxU3MIIUb6w=;
+ b=i5rmqscn70ih3pf8nwO9UexYYe1eqEe0eeY4pMUFSh7wcE/Bm//nqAlpRJEDuy2k3B
+ xDF8TRo74OxjCmEhNNRv/qrTiJHGWPGEeTSkUET9pp5QPFb+hQIa1fNWdLU8w1EiOpOz
+ w7Xdy02/kq+cDyQ1+lSFM85f7gUj1PSnvUkgTh0qqWZ/LKz3OMBiZRNODA6qgbqB6N8M
+ BrTDh5RwVN1Mfj8nzNgf/6NJX8g1ryx+wtihS+HdIIfsTNMmWp905/RIk4qUrY8fPqgQ
+ JG6wlP3zgvRGIu9RohJkapZUYyN6sDGNfB9AIJI8c/eJd/5x6SGUl/ef/mQXiQSV3rrI
+ paLQ==
+X-Gm-Message-State: AOAM5327Cz2Ju7dPzOXUy8TNS0ae/gVJje0Ws8d2nreEtF+a+aT1mXXO
+ agRomX1b7Ei1JNEn1sRETYA=
+X-Google-Smtp-Source: ABdhPJz/r2ARO1+zFfzMU6tmLJif4eacW94VQyHfz5ZBMq8FJBOIwE90YKcA4DCDXFxeOk1t1yVKbQ==
+X-Received: by 2002:a62:c5c2:: with SMTP id j185mr3837671pfg.74.1590284544972; 
+ Sat, 23 May 2020 18:42:24 -0700 (PDT)
+Received: from localhost (c-73-241-114-122.hsd1.ca.comcast.net.
+ [73.241.114.122])
+ by smtp.gmail.com with ESMTPSA id y18sm9957798pfr.100.2020.05.23.18.42.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 May 2020 10:15:04 -0700 (PDT)
-Date: Fri, 22 May 2020 19:14:52 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Subject: Re: [RFC] Use SMMU HTTU for DMA dirty page tracking
-Message-ID: <20200522171452.GC3453945@myrica>
-References: <b926ec0b-fe87-0792-c41d-acad56c656a4@huawei.com>
+ Sat, 23 May 2020 18:42:24 -0700 (PDT)
+Date: Sat, 23 May 2020 18:42:20 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [RFC PATCH v12 09/11] ptp: extend input argument for
+ getcrosstimestamp API
+Message-ID: <20200524014220.GA335@localhost>
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-10-jianyong.wu@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <b926ec0b-fe87-0792-c41d-acad56c656a4@huawei.com>
-Cc: maz@kernel.org, iommu@lists.linux-foundation.org, wangzhou1@hisilicon.com,
- prime.zeng@hisilicon.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200522083724.38182-10-jianyong.wu@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: maz@kernel.org, justin.he@arm.com, Wei.Chen@arm.com, kvm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
+ yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,58 +108,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Fri, May 22, 2020 at 04:37:22PM +0800, Jianyong Wu wrote:
+> sometimes we may need tell getcrosstimestamp call back how to perform
+> itself. Extending input arguments for getcrosstimestamp API to offer more
+> exquisite control for the operation.
 
-On Tue, May 19, 2020 at 05:42:55PM +0800, Xiang Zheng wrote:
-> Hi all,
-> 
-> Is there any plan for enabling SMMU HTTU?
+This text does not offer any justification for the change in API.
+ 
+> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+> index c602670bbffb..ba765647e54b 100644
+> --- a/include/linux/ptp_clock_kernel.h
+> +++ b/include/linux/ptp_clock_kernel.h
+> @@ -133,7 +133,8 @@ struct ptp_clock_info {
+>  	int (*gettimex64)(struct ptp_clock_info *ptp, struct timespec64 *ts,
+>  			  struct ptp_system_timestamp *sts);
+>  	int (*getcrosststamp)(struct ptp_clock_info *ptp,
+> -			      struct system_device_crosststamp *cts);
+> +			      struct system_device_crosststamp *cts,
+> +			      long *flag);
 
-Not outside of SVA, as far as I know.
-
-> I have seen the patch locates in the SVA series patch, which adds
-> support for HTTU:
->     https://www.spinics.net/lists/arm-kernel/msg798694.html
-> 
-> HTTU reduces the number of access faults on SMMU fault queue
-> (permission faults also benifit from it).
-> 
-> Besides reducing the faults, HTTU also helps to track dirty pages for
-> device DMA. Is it feasible to utilize HTTU to get dirty pages on device
-> DMA during VFIO live migration?
-
-As you know there is a VFIO interface for this under discussion:
-https://lore.kernel.org/kvm/1589781397-28368-1-git-send-email-kwankhede@nvidia.com/
-It doesn't implement an internal API to communicate with the IOMMU driver
-about dirty pages.
-
-> If SMMU can track dirty pages, devices are not required to implement
-> additional dirty pages tracking to support VFIO live migration.
-
-It seems feasible, though tracking it in the device might be more
-efficient. I might have misunderstood but I think for live migration of
-the Intel NIC they trap guest accesses to the device and introspect its
-state to figure out which pages it is accessing.
-
-With HTTU I suppose (without much knowledge about live migration) that
-you'd need several new interfaces to the IOMMU drivers:
-
-* A way for VFIO to query HTTU support in the SMMU. There are some
-  discussions about communicating more IOMMU capabilities through VFIO but
-  no implementation yet. When HTTU isn't supported the DIRTY_PAGES bitmap
-  would report all pages as they do now.
-
-* VFIO_IOMMU_DIRTY_PAGES_FLAG_START/STOP would clear the dirty bit
-  for all VFIO mappings (which is going to take some time). There is a
-  walker in io-pgtable for iova_to_phys() which could be extended. I
-  suppose it's also possible to atomically switch the HA and HD bits in
-  context descriptors.
-
-* VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP would query the dirty bit for all
-  VFIO mappings.
+Well, you ignored the kernel doc completely.  But in any case, I must
+NAK this completely opaque and mysterious change.  You want to add a
+random pointer to some flag?  I don't think so.
 
 Thanks,
-Jean
+Richard
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
