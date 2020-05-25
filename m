@@ -2,63 +2,62 @@ Return-Path: <SRS0=u+QM=7H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8D9C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 02:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A506C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 04:50:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA7012075F
-	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 02:12:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED59A207DA
+	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 04:50:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="d3PWjUhX";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="d3PWjUhX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA7012075F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="Xu2fyOrW";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="Xu2fyOrW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED59A207DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7E44B1BA;
-	Sun, 24 May 2020 22:12:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5011A4B193;
+	Mon, 25 May 2020 00:50:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+	(fail, body has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id C1AxAgOwxc5I; Sun, 24 May 2020 22:12:04 -0400 (EDT)
+	with ESMTP id 2LktogHsBDHl; Mon, 25 May 2020 00:50:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C566D4B186;
-	Sun, 24 May 2020 22:12:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF9C4B16F;
+	Mon, 25 May 2020 00:50:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5288F4B17C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2020 22:12:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C0FE4B161
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 00:50:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nCC5ffRjI8t8 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 24 May 2020 22:12:01 -0400 (EDT)
-Received: from EUR02-VE1-obe.outbound.protection.outlook.com
- (mail-eopbgr20063.outbound.protection.outlook.com [40.107.2.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 492E84B15F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2020 22:12:01 -0400 (EDT)
+ with ESMTP id IF-+KxP2Nbb1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 May 2020 00:50:42 -0400 (EDT)
+Received: from EUR03-DB5-obe.outbound.protection.outlook.com
+ (mail-eopbgr40080.outbound.protection.outlook.com [40.107.4.80])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 837084B160
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 00:50:42 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+1YoSmT7WS0Ndsv47A1pmnmGimdg5mugN7lyM40VV+o=;
- b=d3PWjUhXz3bc3ZzZVFEiOzFRMs9RKXlp5peJLeShtjTONojKwhnb50/inwPM7x0bbk9R5407UglasyxaVxp6eNbGBUx9QrI1rv1SdELvYVNIg/gWtoiLLIRGhm9OxiwTLTu72FUVkHnkNJP1rI42aJLqo6gfGvuVqfyXjhG/RkI=
-Received: from AM3PR07CA0112.eurprd07.prod.outlook.com (2603:10a6:207:7::22)
- by DB6PR0801MB1767.eurprd08.prod.outlook.com (2603:10a6:4:2e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Mon, 25 May
- 2020 02:11:58 +0000
-Received: from AM5EUR03FT056.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:207:7:cafe::4d) by AM3PR07CA0112.outlook.office365.com
- (2603:10a6:207:7::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.7 via Frontend
- Transport; Mon, 25 May 2020 02:11:58 +0000
+ bh=yBe6a9FB0XVi+xwEwBkCm8WfTrjMg5lxhRAHJUOmWa0=;
+ b=Xu2fyOrWA9wlnrMnbWYHDEWSz/1G8DDC4wSR361vo3lKsztL/RfWTHPE4iMCVUXtU3j2jcFsH/XC47jE/YqKIcWGTz8Bm7O+RZvWKR35SYNwOBsv3d4cNo/+uia2r5Ba9B2+GRSQAeGbMbrHi04ja9xNrhBLwfDrpyFwEkRhOUM=
+Received: from AM6PR04CA0040.eurprd04.prod.outlook.com (2603:10a6:20b:f0::17)
+ by DB6PR0802MB2533.eurprd08.prod.outlook.com (2603:10a6:4:a0::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Mon, 25 May
+ 2020 04:50:39 +0000
+Received: from VE1EUR03FT024.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:f0:cafe::58) by AM6PR04CA0040.outlook.office365.com
+ (2603:10a6:20b:f0::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend
+ Transport; Mon, 25 May 2020 04:50:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; lists.cs.columbia.edu; dkim=pass (signature was
  verified) header.d=armh.onmicrosoft.com;lists.cs.columbia.edu;
@@ -67,117 +66,122 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  63.35.35.123 as permitted sender) receiver=protection.outlook.com;
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM5EUR03FT056.mail.protection.outlook.com (10.152.17.224) with
+ VE1EUR03FT024.mail.protection.outlook.com (10.152.18.87) with
  Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 02:11:57 +0000
-Received: ("Tessian outbound facc38080784:v57");
- Mon, 25 May 2020 02:11:57 +0000
+ 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 04:50:38 +0000
+Received: ("Tessian outbound b157666c5529:v57");
+ Mon, 25 May 2020 04:50:38 +0000
 X-CR-MTA-TID: 64aa7808
-Received: from 10dd158996a5.3
+Received: from 642c2e7ce00e.2
  by 64aa7808-outbound-1.mta.getcheckrecipient.com id
- BA220C70-94CC-4857-A31B-FE3EE6AC0425.1; 
- Mon, 25 May 2020 02:11:52 +0000
-Received: from EUR03-VE1-obe.outbound.protection.outlook.com
- by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 10dd158996a5.3
+ 6791C755-D578-4386-9B2F-955DAA4E244B.1; 
+ Mon, 25 May 2020 04:50:33 +0000
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 642c2e7ce00e.2
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
- Mon, 25 May 2020 02:11:52 +0000
+ Mon, 25 May 2020 04:50:33 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PXpgNEsa0tqK5CdY/Jj79NnH0p1GPPgthSzW4ec34A7Il9y5phzbd4iEU7QnFgFEC/z/PwcBAKsQdiLBAZzDp+xvC0N+Y6kXFc5jl/rHCfvyh4PTe70NtqITD/UhiK3xvcDSS38lwutWVvTcriVnjy6d8ytfVk48x4BVW8Tp03IC+fCOTjimkAW9hSfMgIPkCACTsOz45khJU4EpZ1Hn+BE0iQ6XZWdFbSL/h8fPd/AxwfhnrUowz5G9f3oxL1YKD8YXkFBn2iyPav5lZEeeQGfVEN51ebBmqRVYEbu+42B25VfpLXYRtsd/qSv1x0owuUVxd3ijEkQyMTsIYU3yMw==
+ b=Mi7DZ4JAO2BhNtyXjFiUf14NAHhfsK1uyCOvVTJaU4BA4lNERytXJYaZkH4R/Mq6utjQGOp1TjZqqX+jF00r1NjXVOOrrKtIBsB3saMnQVNylCO4rVLv50Jq5yO5BeJj13vbI0Nrjl/fUdxa6kIRCTV3tyuitDluVr/NH2Z6Ktn3yKeuyJGZ8gTnMNoyNYnBl8rMJBk97R4koO+s5N5F+Yy1zoVUj5pWDRXTxUYFqHnWjN4sEyM5JXWkGGzgDz+q9cn5pEL/cLh17tEHhAY/JKvagge2mpt0JA2YpryGaQzZFl5ipsMw3bHGBlW12LOIWZ9oiuWq3TSIEps2PkGSoQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+1YoSmT7WS0Ndsv47A1pmnmGimdg5mugN7lyM40VV+o=;
- b=lwqQMXb5zUI7SrXCDgLWBhZ7Cr9uA1rd86sZaORa1t42VWp5TTyfWuxO4jhqvSKC/AN/TFs0olN5GOgwz5DW5NLFtzmjp361RaJ/CcL0ypDC6fHJwH2Gg/MnXBwE5NUnWAM3pGQ0lvm9js/4p6+SDHC3ePRM7h4Rdb4V/rilaFAZVYUTAgd6lLm9Kay4DJcdpODk6f/zAv+IsvELsGlFmi+p+PinGTbPcKMJtFkOkGnsoTDa1AE0WFzAW+PfNJv9HnmApN7dX0Diq+LgojCCpVI+YgRIF83ziG2FG3Rp8AFu5l/mLTuAyUoDhu7BE563GzF4UNdaloG1R/mEKsaIsA==
+ bh=yBe6a9FB0XVi+xwEwBkCm8WfTrjMg5lxhRAHJUOmWa0=;
+ b=jsJJvYuKhB1gm8Hz3BXkw1rGJf6TOysiQXfB80sXjk32VVr3uJb+jaUCw3WDcVSMa/FFz4May+2NeIjnK34mWRrt4RSGdG+0dozPDwLAoeTrEL8iLtZzl9n09Xfo7vn0zD3bzytoINidkzrm75+8tc26jn0vwNmfGS9UTmeufMUD+wFC5bEyyG6cmCQC+rXRjfmGHrCx/8BeIzr/vSI159Kut1LgRDodb3c+hACEbKstdDVSLE+7xFZCSlom4kpce6jpEXwCuw7EOzZe5sgu+3VcOfRXQCtav7muLmIyjKFgZNvrbjq8KC9bjWC7lLMmlDR6UF30s7lQ7Y2AE0FRUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+1YoSmT7WS0Ndsv47A1pmnmGimdg5mugN7lyM40VV+o=;
- b=d3PWjUhXz3bc3ZzZVFEiOzFRMs9RKXlp5peJLeShtjTONojKwhnb50/inwPM7x0bbk9R5407UglasyxaVxp6eNbGBUx9QrI1rv1SdELvYVNIg/gWtoiLLIRGhm9OxiwTLTu72FUVkHnkNJP1rI42aJLqo6gfGvuVqfyXjhG/RkI=
+ bh=yBe6a9FB0XVi+xwEwBkCm8WfTrjMg5lxhRAHJUOmWa0=;
+ b=Xu2fyOrWA9wlnrMnbWYHDEWSz/1G8DDC4wSR361vo3lKsztL/RfWTHPE4iMCVUXtU3j2jcFsH/XC47jE/YqKIcWGTz8Bm7O+RZvWKR35SYNwOBsv3d4cNo/+uia2r5Ba9B2+GRSQAeGbMbrHi04ja9xNrhBLwfDrpyFwEkRhOUM=
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
- by HE1PR0802MB2443.eurprd08.prod.outlook.com (2603:10a6:3:d7::8) with
+ by HE1PR0802MB2556.eurprd08.prod.outlook.com (2603:10a6:3:e1::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Mon, 25 May
- 2020 02:11:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Mon, 25 May
+ 2020 04:50:29 +0000
 Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::b1eb:9515:4851:8be]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
  ([fe80::b1eb:9515:4851:8be%6]) with mapi id 15.20.3021.029; Mon, 25 May 2020
- 02:11:48 +0000
+ 04:50:29 +0000
 From: Jianyong Wu <Jianyong.Wu@arm.com>
-To: Steven Price <Steven.Price@arm.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
- "john.stultz@linaro.org" <john.stultz@linaro.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
- "maz@kernel.org" <maz@kernel.org>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, Mark Rutland <Mark.Rutland@arm.com>,
- "will@kernel.org" <will@kernel.org>, Suzuki Poulose <Suzuki.Poulose@arm.com>
-Subject: RE: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
-Thread-Topic: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
-Thread-Index: AQHWMBRiyrp0i3ftg0yKp1NgeF42Dqi0J4kAgAPjibA=
-Date: Mon, 25 May 2020 02:11:48 +0000
-Message-ID: <HE1PR0802MB2555A66F063927D5B855E1C6F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+To: Richard Cochran <richardcochran@gmail.com>, "maz@kernel.org"
+ <maz@kernel.org>
+Subject: RE: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
+ which counter to return
+Thread-Topic: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
+ which counter to return
+Thread-Index: AQHWMBRtHtaBVLC+ukSXkuIjkrpVgai2gQEAgAGkltA=
+Date: Mon, 25 May 2020 04:50:28 +0000
+Message-ID: <HE1PR0802MB25552E7C792D3BB9CBE2D2C7F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
 References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-8-jianyong.wu@arm.com>
- <87fce07b-d0f5-47b0-05ce-dd664ce53eec@arm.com>
-In-Reply-To: <87fce07b-d0f5-47b0-05ce-dd664ce53eec@arm.com>
+ <20200522083724.38182-11-jianyong.wu@arm.com>
+ <20200524021106.GC335@localhost>
+In-Reply-To: <20200524021106.GC335@localhost>
 Accept-Language: en-US
 Content-Language: en-US
+X-Mentions: maz@kernel.org
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ts-tracking-id: ce3b9103-893c-4ae7-915c-be7da61ac5e9.1
+x-ts-tracking-id: 2acbd9d0-45d3-4119-b71f-c53f85f849e9.1
 x-checkrecipientchecked: true
-Authentication-Results-Original: arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
+Authentication-Results-Original: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=arm.com;
 x-originating-ip: [203.126.0.111]
 x-ms-publictraffictype: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 91174930-7fa9-4481-ed8b-08d800510084
-x-ms-traffictypediagnostic: HE1PR0802MB2443:|DB6PR0801MB1767:
+X-MS-Office365-Filtering-Correlation-Id: 653dc40e-64d9-42de-e2d7-08d800672bcf
+x-ms-traffictypediagnostic: HE1PR0802MB2556:|DB6PR0802MB2533:
 x-ms-exchange-transport-forked: True
-X-Microsoft-Antispam-PRVS: <DB6PR0801MB1767BC461DF5793F8C291956F4B30@DB6PR0801MB1767.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DB6PR0802MB2533762DFDC9156612DD13CAF4B30@DB6PR0802MB2533.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
 nodisclaimer: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;OLM:10000;
+x-ms-oob-tlc-oobclassifiers: OLM:8882;OLM:8882;
 x-forefront-prvs: 0414DF926F
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: +zaMIu5jRJzSeLCnoFbFR4aEOOMCpbAq7AeEn93OldWUps4bmEUhCf7Glyoas4WSzKEEY/ea1NITrSsL9DevrhSurumEs50mNwbpBQ1jGtIcb5fAs79s8ZvmRZKV5HDmvBb50CWWjsDveymhiU2cYQwjtfLYOPpB22ohMhsAE7VQByMKWt+Q6xq9UFDdygj1zMQIMr7CUW8gww32NyHHhTiFmL3B1KWe+38RE7x+07NBjOlAIU1IKi8Hd7Mtq67iZrc5ddkjUl1pbwwN5mt7uxL/0lOpPMv9c0v6N5Z1a0+kJirUjMdSsv4JGzymWTgVz2lMKpTA0fjrDkEKOI5SmEQBGNwa50CpHajVrwubMszCGXx+qHpnC0bVDs1N3ST6
+X-Microsoft-Antispam-Message-Info-Original: WRTlXvpllqTfyKztAXZhhmURtG6366EhN81xl7VMyZpjqTG+4cQKKZ9j35FbWhoDAIvsnCQ22mKn5XQipk/IYGzpEVX+mcu9zceQWG6blGFPbS/FkfRq+3z9bBtyI5X431xjteCMS85vX0b35OiTh5TtIkFm0M03kHgtkFmjI/g6OIUl9SpgNR9kpuLkKbrdc9NRRDfiVcDdg49B5KiKZyqhHY/kDvneYWT7Xp1eol/LUTudMt8vEEAGLfotVLmC7eza1IOpPsTYieOEjrUqskHoquV6mroDV4fqCoszkyWtm99/GakxT+zCPV/vYtW2klOoM9ZrCdu8tOpI+ae22pZkhfFNBA8DAecrATQd/k6FQ1FHp1WAfHrP7Ssv8dKm
 X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
  SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:HE1PR0802MB2555.eurprd08.prod.outlook.com;
  PTR:; CAT:NONE; SFTY:;
- SFS:(4636009)(39850400004)(366004)(396003)(136003)(346002)(376002)(66556008)(55016002)(64756008)(8676002)(6636002)(66476007)(66946007)(186003)(86362001)(52536014)(33656002)(66446008)(2906002)(110136005)(5660300002)(54906003)(4326008)(7416002)(6506007)(71200400001)(53546011)(26005)(8936002)(316002)(9686003)(478600001)(76116006)(7696005)(921003);
+ SFS:(4636009)(136003)(39850400004)(366004)(376002)(396003)(346002)(5660300002)(7416002)(7696005)(55016002)(66946007)(316002)(76116006)(54906003)(66556008)(66446008)(66476007)(64756008)(110136005)(9686003)(478600001)(8676002)(86362001)(52536014)(26005)(186003)(33656002)(53546011)(71200400001)(6506007)(4326008)(2906002)(8936002)(76704002);
  DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: 5VmSj1yL4DaQ0nweIlNUKH1FJGnygou4FaNtmYzoqvxyK05oAtIOaIYvJQ9u4HjPfc0VPs5J72DSN4t3QaLyr9vZTlbm/xqytpdJb0Lu+Qs8k3HxpkFM1u+o9G/07WYtxW2D+pNQSRYuaoB+gKpgMErE2xwdpnaYF8zd2IXbVIvxDSTPex8NkjrZ+SdquLuvLhKStz3WVKs5kfAf3uGZHExJk7wd6Lp8dYsjRo96CueGfP+J6X0J11frglLK4oaXUJakyrntyPwdKkrgaX33LY772nBKxct3IzbqIwigVh1JCViJXgEuy9CHbb5o35jJk/MFJxm8/7+EKk570bJMWB5q141Vd+TsIAEYOPTqZBfwYYCS4VwWvTf++cep1v73gASSFdiss7cliCBVYnMYJKO9ZosxcG8kFMP33tCtKBlrSIMISdideI6v+U0vNj2G7Djw8N7ZoACsR7scXPRpVRhT6VOrejwiKIRfBZiIbjY=
+x-ms-exchange-antispam-messagedata: bDvCD3/Wy5dBCtBkmIQPqXeGvdBa6c+Nf+cxIFiQJtgfF9AxkmYYbiPyuX3JX713rpqNzkE/H+/cS3mrYtRnh+GNJXAi3b3mgylygW+/2JvLX7f+YbS+NaEMu2F78/7OL6D5vn2kcMgwb21KGhfDlef8vFtw8iWYu/gKW4i7+V1xjNSBuZ89kRAJ7r9xhRZ9g1qT08joRBTkej+Xf5eHMz/ggKHlLsTSuE3f4w3hlXLDOI+z/oe65W0hFuNs87HbtDjtPSCISyKvwseWcCPcevv8QSQWH39Dl66wkVbinPkrcl/ZjnVucib1/3ayfpb/QsorFO5hSxkNNva3tALCpGGd7V3EMdRreDnf0gqVVbJsFXDu+P3W6+VWUCntr59rh6LwpKQbmYuJzNbjZ4GoOIClt2ycmXqBEV/Z5a8r1OCGnQaXetAhAKnnYZUE8Z2zXaW+RJDJNs+kg6ZY6t3sEG4sBOXz2guNDlHp3XqyH4E=
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2443
-Original-Authentication-Results: arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2556
+Original-Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=arm.com;
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT056.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT024.eop-EUR03.prod.protection.outlook.com
 X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
  IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
  PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE; SFTY:;
- SFS:(4636009)(136003)(376002)(346002)(39850400004)(396003)(46966005)(53546011)(6506007)(8936002)(26005)(36906005)(5660300002)(2906002)(110136005)(356005)(4326008)(54906003)(316002)(82310400002)(81166007)(7696005)(478600001)(336012)(9686003)(6636002)(70586007)(70206006)(8676002)(55016002)(82740400003)(186003)(52536014)(86362001)(47076004)(33656002)(921003);
+ SFS:(4636009)(39850400004)(136003)(376002)(396003)(346002)(46966005)(5660300002)(82740400003)(7696005)(55016002)(81166007)(316002)(110136005)(356005)(478600001)(9686003)(70586007)(36906005)(86362001)(8676002)(47076004)(70206006)(54906003)(82310400002)(52536014)(26005)(186003)(336012)(33656002)(53546011)(6506007)(4326008)(2906002)(8936002)(76704002);
  DIR:OUT; SFP:1101; 
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 81e19192-6ecb-446b-64e0-08d80050fb18
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 23135167-5e5c-4cb9-06e1-08d800672609
 X-Forefront-PRVS: 0414DF926F
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6PkK5K9YOTem0JAq8D+BKMTG+Y5T4ZbwUmnmBuafI1sHW2FVwlmS9wq2JEsOYPEGhT/tfam+4NiNxMU21Wwkz4TshYWyxFEUTKsKIjdf8wWVI5xxVUOtHbApKkxqjOQMG40i7YEPkIA31B1eGIFJq7OM1l+VS02noeB3nrNxxzRJoAdCtm4C5mX9Nvtp5MPgupDBwk9aTAAamFwaQ/IUD/37RAJ4l5jEKh/Y9LKJDPXJHO4+FPCPxjWB+zqPNfWZQ/Gu2rtnBGAC5L5qmCWuhtU+1clwD5qEIlJMUkDBJlbsWalvHDllJ0q1goCt4nQtBTsM04Ly9ZLvFz+PmWcbz/t0iTb6wGS1KAPWiInGznN9dKHY1may8qkLUxvrzl8LuZOCXIN/FoPFZfh8n5sAttpClX1CY7fp7ZJ3nZuGmrI=
+X-Microsoft-Antispam-Message-Info: AuLcKbbHCSjuVRW/dlKz1lLD8qlnQYDCvHBABF2J4+WHQldGXg///MQUXClLb/VmjOusfUiPWV9KiRhm6KzbvbD+qFmWO6mDKOiMtrmt6FzJ6H2tN7a4XzITRfDnAKTpSOiy8oBzsgqZ7B8xz3suiv8xiEyk25JKGpxN34kj/EbNPymzASOWeuZkhfKfh2dKVvMS2/YSrJyCyejRCJ5GrtVpTFtZzArnJFC79Hy4z+TnJrzAxOca+xt4QxVRaui8lBTtN3wqng897+nLqkFkFNXSSSHnCLsaBoAQI9iwOu3q3I4nYzxwelnqtGZ4hXM/YJB9y1t3StRANZWCDS1pZ/ZUlu+SkfuIRVugGTeL9Ik8gCQuj6Km6AfPw3/a0EbNMzwnk5oXuRysfJKQtGmxL3AHzSRqi7a+C7qq4aBtKcY=
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 02:11:57.3108 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91174930-7fa9-4481-ed8b-08d800510084
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 04:50:38.8431 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 653dc40e-64d9-42de-e2d7-08d800672bcf
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
  Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0801MB1767
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0802MB2533
 Cc: Justin He <Justin.He@arm.com>, Wei Chen <Wei.Chen@arm.com>,
  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, nd <nd@arm.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ Steven Price <Steven.Price@arm.com>,
+ "john.stultz@linaro.org" <john.stultz@linaro.org>,
+ "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, nd <nd@arm.com>,
+ "will@kernel.org" <will@kernel.org>,
  "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
  "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -196,212 +200,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Steven,
+Hi Richard,
 
 > -----Original Message-----
-> From: Steven Price <steven.price@arm.com>
-> Sent: Friday, May 22, 2020 10:18 PM
-> To: Jianyong Wu <Jianyong.Wu@arm.com>; netdev@vger.kernel.org;
-> yangbo.lu@nxp.com; john.stultz@linaro.org; tglx@linutronix.de;
-> pbonzini@redhat.com; sean.j.christopherson@intel.com; maz@kernel.org;
-> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
-> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>
-> Cc: linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
-> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
-> <Steve.Capper@arm.com>; Kaly Xin <Kaly.Xin@arm.com>; Justin He
-> <Justin.He@arm.com>; Wei Chen <Wei.Chen@arm.com>; nd <nd@arm.com>
-> Subject: Re: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
+> From: Richard Cochran <richardcochran@gmail.com>
+> Sent: Sunday, May 24, 2020 10:11 AM
+> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> maz@kernel.org; Mark Rutland <Mark.Rutland@arm.com>; will@kernel.org;
+> Suzuki Poulose <Suzuki.Poulose@arm.com>; Steven Price
+> <Steven.Price@arm.com>; linux-kernel@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; Kaly Xin
+> <Kaly.Xin@arm.com>; Justin He <Justin.He@arm.com>; Wei Chen
+> <Wei.Chen@arm.com>; nd <nd@arm.com>
+> Subject: Re: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
+> which counter to return
 > 
-> On 22/05/2020 09:37, Jianyong Wu wrote:
-> > ptp_kvm modules will get this service through smccc call.
-> > The service offers real time and counter cycle of host for guest.
-> > Also let caller determine which cycle of virtual counter or physical
-> > counter to return.
-> >
-> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> > ---
-> >   include/linux/arm-smccc.h | 14 ++++++++++++
-> >   virt/kvm/Kconfig          |  4 ++++
-> >   virt/kvm/arm/hypercalls.c | 47
-> +++++++++++++++++++++++++++++++++++++++
-> >   3 files changed, 65 insertions(+)
-> >
-> > diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> > index bdc0124a064a..badadc390809 100644
-> > --- a/include/linux/arm-smccc.h
-> > +++ b/include/linux/arm-smccc.h
-> > @@ -94,6 +94,8 @@
-> >
-> >   /* KVM "vendor specific" services */
-> >   #define ARM_SMCCC_KVM_FUNC_FEATURES		0
-> > +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
-> > +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY		2
-> >   #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-> >   #define ARM_SMCCC_KVM_NUM_FUNCS			128
-> >
-> > @@ -103,6 +105,18 @@
-> >   			   ARM_SMCCC_OWNER_VENDOR_HYP,
-> 		\
-> >   			   ARM_SMCCC_KVM_FUNC_FEATURES)
-> >
-> > +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
-> 		\
-> > +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
-> 		\
-> > +			   ARM_SMCCC_SMC_32,
-> 	\
-> > +			   ARM_SMCCC_OWNER_VENDOR_HYP,
-> 		\
-> > +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
-> > +
-> > +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID
-> 		\
-> > +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
-> 		\
-> > +			   ARM_SMCCC_SMC_32,
-> 	\
-> > +			   ARM_SMCCC_OWNER_VENDOR_HYP,
-> 		\
-> > +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY)
-> > +
-> >   #ifndef __ASSEMBLY__
-> >
-> >   #include <linux/linkage.h>
-> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig index
-> > aad9284c043a..bf820811e815 100644
-> > --- a/virt/kvm/Kconfig
-> > +++ b/virt/kvm/Kconfig
-> > @@ -60,3 +60,7 @@ config HAVE_KVM_VCPU_RUN_PID_CHANGE
-> >
-> >   config HAVE_KVM_NO_POLL
-> >          bool
-> > +
-> > +config ARM64_KVM_PTP_HOST
-> > +       def_bool y
-> > +       depends on ARM64 && KVM
-> > diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> > index db6dce3d0e23..c964122f8dae 100644
-> > --- a/virt/kvm/arm/hypercalls.c
-> > +++ b/virt/kvm/arm/hypercalls.c
-> > @@ -3,6 +3,7 @@
-> >
-> >   #include <linux/arm-smccc.h>
-> >   #include <linux/kvm_host.h>
-> > +#include <linux/clocksource_ids.h>
-> >
-> >   #include <asm/kvm_emulate.h>
-> >
-> > @@ -11,6 +12,10 @@
-> >
-> >   int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >   {
-> > +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> > +	struct system_time_snapshot systime_snapshot;
-> > +	u64 cycles;
-> > +#endif
-> >   	u32 func_id = smccc_get_function(vcpu);
-> >   	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
-> >   	u32 feature;
-> > @@ -70,7 +75,49 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >   		break;
-> >   	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> >   		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-> > +
-> > +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP); #endif
-> >   		break;
-> > +
-> > +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> > +	/*
-> > +	 * This serves virtual kvm_ptp.
-> > +	 * Four values will be passed back.
-> > +	 * reg0 stores high 32-bit host ktime;
-> > +	 * reg1 stores low 32-bit host ktime;
-> > +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
-> > +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
-> > +	 */
-> > +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> > +		/*
-> > +		 * system time and counter value must captured in the same
-> > +		 * time to keep consistency and precision.
-> > +		 */
-> > +		ktime_get_snapshot(&systime_snapshot);
-> > +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
-> > +			break;
-> > +		val[0] = upper_32_bits(systime_snapshot.real);
-> > +		val[1] = lower_32_bits(systime_snapshot.real);
-> > +		/*
-> > +		 * which of virtual counter or physical counter being
-> > +		 * asked for is decided by the first argument.
-> > +		 */
-> > +		feature = smccc_get_arg1(vcpu);
-> > +		switch (feature) {
-> > +		case ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID:
-> > +			cycles = systime_snapshot.cycles;
-> > +			break;
-> > +		default:
+> On Fri, May 22, 2020 at 04:37:23PM +0800, Jianyong Wu wrote:
+> > In general, vm inside will use virtual counter compered with host use
+> > phyical counter. But in some special scenarios, like nested
+> > virtualization, phyical counter maybe used by vm. A interface added in
+> > ptp_kvm driver to offer a mechanism to let user choose which counter
+> > should be return from host.
 > 
-> There's something a bit odd here.
+> Sounds like you have two time sources, one for normal guest, and one for
+> nested.  Why not simply offer the correct one to user space automatically?  If
+> that cannot be done, then just offer two PHC devices with descriptive names.
 > 
-> ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID and
-> ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID look like they should
-> be names of separate (top-level) functions, but actually the _PHY_ one is a
-> parameter for the first. If the intention is to have a parameter then it would
-> be better to pick a better name for the _PHY_ define and not define it using
-> ARM_SMCCC_CALL_VAL.
-> 
-Yeah, _PHY_ is not the same meaning with _PTP_FUNC_ID,  so I think it should be a different name.
-What about ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_COUNTER?
 
-> Second the use of "default:" means that there's no possibility to later extend
-> this interface for more clocks if needed in the future.
-> 
-I think we can add more clocks by adding more cases, this "default" means we can use no first arg to determine the default clock.
+It's a good idea, but in most case physical counter will not be used, so it's  better not keep 2 ptp devices all the time.
+How about adding an extra argument in struct ptp_clock_info to serve as a flag, then we can control this flag using IOCTL to determine the counter type.
+In this way, no extra arguments needed in .getcrosststamp. But we also need specific code in ptp_ioctl to implement it like in this patch.
 
-> Alternatively you could indeed implement as two top-level functions and
-> change this to a...
+The second way, maybe we can use the flag as a module parameter, this is easier to implement.
+  @maz@kernel.org WDYT?
+ 
+> > diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+> > index fef72f29f3c8..8b0a7b328bcd 100644
+> > --- a/drivers/ptp/ptp_chardev.c
+> > +++ b/drivers/ptp/ptp_chardev.c
+> > @@ -123,6 +123,9 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int
+> cmd, unsigned long arg)
+> >  	struct timespec64 ts;
+> >  	int enable, err = 0;
+> >
+> > +#ifdef CONFIG_ARM64
+> > +	static long flag;
 > 
-> 	switch (func_id)
+> static?  This is not going to fly.
+
+Need remove here.
+
 > 
-> ... along with multiple case labels as the functions would obviously be mostly
-> the same.
+> > +		 * In most cases, we just need virtual counter from host and
+> > +		 * there is limited scenario using this to get physical counter
+> > +		 * in guest.
+> > +		 * Be careful to use this as there is no way to set it back
+> > +		 * unless you reinstall the module.
 > 
-> Also a minor style issue - you might want to consider splitting this into it's
-> own function.
+> How on earth is the user supposed to know this?
 > 
-I think "switch (feature)" maybe better as this _PHY_ is not like a function id. Just like:
-"
-case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-                feature = smccc_get_arg1(vcpu);
-                switch (feature) {
-                case ARM_SMCCC_ARCH_WORKAROUND_1:
-...
-"
-> Finally I do think it would be useful to add some documentation of the new
-> SMC calls. It would be easier to review the interface based on that
-> documentation rather than trying to reverse-engineer the interface from the
-> code.
-> 
-Yeah, more doc needed here.
+Yeah, It's odd , should be removed.
+
+> From your description, this "flag" really should be a module parameter.
+Maybe use flag as a module parameter is a better way.
 
 Thanks
 Jianyong 
-
-> Steve
 > 
-> > +			cycles = systime_snapshot.cycles -
-> > +				 vcpu_vtimer(vcpu)->cntvoff;
-> > +		}
-> > +		val[2] = upper_32_bits(cycles);
-> > +		val[3] = lower_32_bits(cycles);
-> > +		break;
-> > +#endif
-> > +
-> >   	default:
-> >   		return kvm_psci_call(vcpu);
-> >   	}
-> >
-
+> Thanks,
+> Richard
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
