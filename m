@@ -2,93 +2,61 @@ Return-Path: <SRS0=u+QM=7H=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA5DC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 09:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B159DC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 11:25:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CDF3F20823
-	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 09:17:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXnRIYph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF3F20823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 4258020787
+	for <kvmarm@archiver.kernel.org>; Mon, 25 May 2020 11:25:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4258020787
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66B8B4B17B;
-	Mon, 25 May 2020 05:17:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A15BB4B1D8;
+	Mon, 25 May 2020 07:25:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kGfX0jJ2eC0n; Mon, 25 May 2020 05:17:24 -0400 (EDT)
+	with ESMTP id q4MGKmtwFz7x; Mon, 25 May 2020 07:25:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5391A4B181;
-	Mon, 25 May 2020 05:17:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7336E4B1C3;
+	Mon, 25 May 2020 07:25:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E97F4B17F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 05:17:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 080374B1C1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 07:25:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A1lqCUwClqlb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 May 2020 05:17:22 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DACF4B0DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 05:17:22 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 01ED020787;
- Mon, 25 May 2020 09:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590398241;
- bh=dvoIblhrB6r6q1w4YgHnKBzB3u8MDjy2EHOsa4SWZok=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tXnRIYphXASv22/CWUBMA4CPRNsDbUMhgCnKjxTTC6dq9DDNazs1+GztuGsokQpEJ
- 72QM5aF0JoA15SMnoO0AX6SPOL6GCj0SXNeERYxlYPaPRT7hQ4f+IaxJUF+lIYihOX
- pyq7Ce4X2AFg/w1e44/Sm5YB7VXDDhAc7W7i/lfo=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jd9EU-00F730-Ux; Mon, 25 May 2020 10:17:19 +0100
+ with ESMTP id 7PeZP5nwPAkl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 May 2020 07:25:08 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 502414B1BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2020 07:25:08 -0400 (EDT)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 5A106A0EB3F34B6CB6FB;
+ Mon, 25 May 2020 19:25:04 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 25 May 2020 19:24:54 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+Subject: [RFC PATCH 0/7] kvm: arm64: Support stage2 hardware DBM
+Date: Mon, 25 May 2020 19:23:59 +0800
+Message-ID: <20200525112406.28224-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Date: Mon, 25 May 2020 10:17:18 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>, Jianyong Wu
- <jianyong.wu@arm.com>
-Subject: Re: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
- which counter to return
-In-Reply-To: <20200524021106.GC335@localhost>
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-11-jianyong.wu@arm.com>
- <20200524021106.GC335@localhost>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <306951e4945b9e486dc98818ba24466d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: richardcochran@gmail.com, jianyong.wu@arm.com,
- netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
- Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
- steven.price@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
- Wei.Chen@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: justin.he@arm.com, Wei.Chen@arm.com, kvm@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
- yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Alexios Zavras <alexios.zavras@intel.com>, Mark Brown <broonie@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Thomas
+ Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,67 +68,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-24 03:11, Richard Cochran wrote:
-> On Fri, May 22, 2020 at 04:37:23PM +0800, Jianyong Wu wrote:
->> In general, vm inside will use virtual counter compered with host use
->> phyical counter. But in some special scenarios, like nested
->> virtualization, phyical counter maybe used by vm. A interface added in
->> ptp_kvm driver to offer a mechanism to let user choose which counter
->> should be return from host.
-> 
-> Sounds like you have two time sources, one for normal guest, and one
-> for nested.  Why not simply offer the correct one to user space
-> automatically?  If that cannot be done, then just offer two PHC
-> devices with descriptive names.
+This patch series add support for stage2 hardware DBM, and it is only
+used for dirty log for now.
 
-There is no such thing as a distinction between nested or non-nested.
-Both counters are available to the guest at all times, and said guest
-can choose whichever it wants to use. So the hypervisor (KVM) has to
-support both counters as a reference.
+It works well under some migration test cases, including VM with 4K
+pages or 2M THP. I checked the SHA256 hash digest of all memory and
+they keep same for source VM and destination VM, which means no dirty
+pages is missed under hardware DBM.
 
-For a Linux guest, we always know which reference we're using (the
-virtual counter). So it is pointless to expose the choice to userspace
-at all.
+However, there are some known issues not solved.
 
-> 
->> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
->> index fef72f29f3c8..8b0a7b328bcd 100644
->> --- a/drivers/ptp/ptp_chardev.c
->> +++ b/drivers/ptp/ptp_chardev.c
->> @@ -123,6 +123,9 @@ long ptp_ioctl(struct posix_clock *pc, unsigned 
->> int cmd, unsigned long arg)
->>  	struct timespec64 ts;
->>  	int enable, err = 0;
->> 
->> +#ifdef CONFIG_ARM64
->> +	static long flag;
-> 
-> static?  This is not going to fly.
-> 
->> +		 * In most cases, we just need virtual counter from host and
->> +		 * there is limited scenario using this to get physical counter
->> +		 * in guest.
->> +		 * Be careful to use this as there is no way to set it back
->> +		 * unless you reinstall the module.
-> 
-> How on earth is the user supposed to know this?
-> 
-> From your description, this "flag" really should be a module
-> parameter.
+1. Some mechanisms that rely on "write permission fault" become invalid,
+   such as kvm_set_pfn_dirty and "mmap page sharing".
 
-Not even that. If anything, the driver can obtain full knowledge of 
-which
-counter is in use without any help. And the hard truth is that it is
-*always* the virtual counter as far as Linux is concerned.
+   kvm_set_pfn_dirty is called in user_mem_abort when guest issues write
+   fault. This guarantees physical page will not be dropped directly when
+   host kernel recycle memory. After using hardware dirty management, we
+   have no chance to call kvm_set_pfn_dirty.
 
-         M.
+   For "mmap page sharing" mechanism, host kernel will allocate a new
+   physical page when guest writes a page that is shared with other page
+   table entries. After using hardware dirty management, we have no chance
+   to do this too.
+
+   I need to do some survey on how stage1 hardware DBM solve these problems.
+   It helps if anyone can figure it out.
+
+2. Page Table Modification Races: Though I have found and solved some data
+   races when kernel changes page table entries, I still doubt that there
+   are data races I am not aware of. It's great if anyone can figure them out.
+
+3. Performance: Under Kunpeng 920 platform, for every 64GB memory, KVM
+   consumes about 40ms to traverse all PTEs to collect dirty log. It will
+   cause unbearable downtime for migration if memory size is too big. I will
+   try to solve this problem in Patch v1.
+
+Keqian Zhu (7):
+  KVM: arm64: Add some basic functions for hw DBM
+  KVM: arm64: Set DBM bit of PTEs if hw DBM enabled
+  KVM: arm64: Traverse page table entries when sync dirty log
+  KVM: arm64: Steply write protect page table by mask bit
+  kvm: arm64: Modify stage2 young mechanism to support hw DBM
+  kvm: arm64: Save stage2 PTE dirty info if it is coverred
+  KVM: arm64: Enable stage2 hardware DBM
+
+ arch/arm64/include/asm/kvm_host.h     |   1 +
+ arch/arm64/include/asm/kvm_mmu.h      |  44 +++++-
+ arch/arm64/include/asm/pgtable-prot.h |   1 +
+ arch/arm64/include/asm/sysreg.h       |   2 +
+ arch/arm64/kvm/reset.c                |   9 +-
+ virt/kvm/arm/arm.c                    |   6 +-
+ virt/kvm/arm/mmu.c                    | 202 ++++++++++++++++++++++++--
+ 7 files changed, 246 insertions(+), 19 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.19.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
