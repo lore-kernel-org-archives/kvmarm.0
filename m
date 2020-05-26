@@ -6,70 +6,59 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1813C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 11:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B17C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 11:49:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2E31220899
-	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 11:02:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E31220899
+	by mail.kernel.org (Postfix) with ESMTP id 5DDA920663
+	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 11:49:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DDA920663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 987464B2B5;
-	Tue, 26 May 2020 07:02:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 921BF4B0CB;
+	Tue, 26 May 2020 07:49:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MbPzrS3OUl0V; Tue, 26 May 2020 07:02:09 -0400 (EDT)
+	with ESMTP id iqybPhUJAqwS; Tue, 26 May 2020 07:49:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 359734B27E;
-	Tue, 26 May 2020 07:02:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51C764B284;
+	Tue, 26 May 2020 07:49:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F1814B278
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 07:02:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E736E4B0F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 07:49:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LdmOO1WHSN11 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 May 2020 07:02:06 -0400 (EDT)
+ with ESMTP id iArvlbMMz9QC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 May 2020 07:49:32 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 422B14B255
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 07:02:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A830F4B0CB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 07:49:32 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C65A931B;
- Tue, 26 May 2020 04:02:05 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18D213F6C4;
- Tue, 26 May 2020 04:02:02 -0700 (PDT)
-Subject: Re: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
-To: Jianyong Wu <Jianyong.Wu@arm.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
- "john.stultz@linaro.org" <john.stultz@linaro.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- Mark Rutland <Mark.Rutland@arm.com>, "will@kernel.org" <will@kernel.org>,
- Suzuki Poulose <Suzuki.Poulose@arm.com>
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-8-jianyong.wu@arm.com>
- <87fce07b-d0f5-47b0-05ce-dd664ce53eec@arm.com>
- <HE1PR0802MB2555A66F063927D5B855E1C6F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <d7ec2534-95e4-ae79-fc53-4d48a4ea628c@arm.com>
-Date: Tue, 26 May 2020 12:02:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 16B8630E;
+ Tue, 26 May 2020 04:49:32 -0700 (PDT)
+Received: from gaia (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B510E3F6C4;
+ Tue, 26 May 2020 04:49:29 -0700 (PDT)
+Date: Tue, 26 May 2020 12:49:27 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [RFC PATCH 2/7] KVM: arm64: Set DBM bit of PTEs if hw DBM enabled
+Message-ID: <20200526114926.GD17051@gaia>
+References: <20200525112406.28224-1-zhukeqian1@huawei.com>
+ <20200525112406.28224-3-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <HE1PR0802MB2555A66F063927D5B855E1C6F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-Content-Language: en-GB
-Cc: Justin He <Justin.He@arm.com>, Wei Chen <Wei.Chen@arm.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, nd <nd@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20200525112406.28224-3-zhukeqian1@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Peng Liang <liangpeng10@huawei.com>, Alexios Zavras <alexios.zavras@intel.com>,
+ Mark Brown <broonie@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,152 +70,84 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 25/05/2020 03:11, Jianyong Wu wrote:
-> Hi Steven,
+On Mon, May 25, 2020 at 07:24:01PM +0800, Keqian Zhu wrote:
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index 1305e28225fc..f9910ba2afd8 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -79,6 +79,7 @@ extern bool arm64_use_ng_mappings;
+>  	})
+>  
+>  #define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
+> +#define PAGE_S2_DBM		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN | PTE_DBM)
 
-Hi Jianyong,
+You don't need a new page permission (see below).
 
-[...]>>> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
->>> index db6dce3d0e23..c964122f8dae 100644
->>> --- a/virt/kvm/arm/hypercalls.c
->>> +++ b/virt/kvm/arm/hypercalls.c
->>> @@ -3,6 +3,7 @@
->>>
->>>    #include <linux/arm-smccc.h>
->>>    #include <linux/kvm_host.h>
->>> +#include <linux/clocksource_ids.h>
->>>
->>>    #include <asm/kvm_emulate.h>
->>>
->>> @@ -11,6 +12,10 @@
->>>
->>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>>    {
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +	struct system_time_snapshot systime_snapshot;
->>> +	u64 cycles;
->>> +#endif
->>>    	u32 func_id = smccc_get_function(vcpu);
->>>    	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
->>>    	u32 feature;
->>> @@ -70,7 +75,49 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>>    		break;
->>>    	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->>>    		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
->>> +
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP); #endif
->>>    		break;
->>> +
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +	/*
->>> +	 * This serves virtual kvm_ptp.
->>> +	 * Four values will be passed back.
->>> +	 * reg0 stores high 32-bit host ktime;
->>> +	 * reg1 stores low 32-bit host ktime;
->>> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
->>> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
->>> +	 */
->>> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
->>> +		/*
->>> +		 * system time and counter value must captured in the same
->>> +		 * time to keep consistency and precision.
->>> +		 */
->>> +		ktime_get_snapshot(&systime_snapshot);
->>> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
->>> +			break;
->>> +		val[0] = upper_32_bits(systime_snapshot.real);
->>> +		val[1] = lower_32_bits(systime_snapshot.real);
->>> +		/*
->>> +		 * which of virtual counter or physical counter being
->>> +		 * asked for is decided by the first argument.
->>> +		 */
->>> +		feature = smccc_get_arg1(vcpu);
->>> +		switch (feature) {
->>> +		case ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID:
->>> +			cycles = systime_snapshot.cycles;
->>> +			break;
->>> +		default:
->>
->> There's something a bit odd here.
->>
->> ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID and
->> ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID look like they should
->> be names of separate (top-level) functions, but actually the _PHY_ one is a
->> parameter for the first. If the intention is to have a parameter then it would
->> be better to pick a better name for the _PHY_ define and not define it using
->> ARM_SMCCC_CALL_VAL.
->>
-> Yeah, _PHY_ is not the same meaning with _PTP_FUNC_ID,  so I think it should be a different name.
-> What about ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_COUNTER?
+>  #define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+>  
+>  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index e3b9ee268823..dc97988eb2e0 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1426,6 +1426,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
+>  	pte = pte_offset_kernel(pmd, addr);
+>  	do {
+>  		if (!pte_none(*pte)) {
+> +#ifdef CONFIG_ARM64_HW_AFDBM
+> +			if (kvm_hw_dbm_enabled() && !kvm_s2pte_dbm(pte))
+> +				kvm_set_s2pte_dbm(pte);
+> +#endif
+>  			if (!kvm_s2pte_readonly(pte))
+>  				kvm_set_s2pte_readonly(pte);
+>  		}
 
-Personally I'd go with something much shorter, e.g. ARM_PTP_PHY_COUNTER. 
-This is just an argument to an SMCCC call so there's no need for most of 
-the prefix, indeed if (for whatever reason) there was a non-SMCCC 
-mechanism added to do the same thing it would be reasonable to reuse the 
-same values.
+Setting the DBM bit is equivalent to marking the page writable. The
+actual writable pte bit (S2AP[1] or HAP[2] as we call them in Linux for
+legacy reasons) tells you whether the page has been dirtied but it is
+still writable if you set DBM. Doing this in stage2_wp_ptes()
+practically means that you no longer have read-only pages at S2. There
+are several good reasons why you don't want to break this. For example,
+the S2 pte may already be read-only for other reasons (CoW).
 
->> Second the use of "default:" means that there's no possibility to later extend
->> this interface for more clocks if needed in the future.
->>
-> I think we can add more clocks by adding more cases, this "default" means we can use no first arg to determine the default clock.
+I think you should only set the DBM bit if the pte was previously
+writable. In addition, any permission change to the S2 pte must take
+into account the DBM bit and clear it while transferring the dirty
+status to the underlying page. I'm not deeply familiar with all these
+callbacks into KVM but two such paths are kvm_unmap_hva_range() and the
+kvm_mmu_notifier_change_pte().
 
-The problem with the 'default' is it means it's not possible to probe 
-whether the kernel supports any more clocks. If we used a different 
-value (that the kernel doesn't support) then we end up in the default 
-case and have no idea whether the clock value is the one we requested or 
-not.
 
-It's generally better when defining an ABI to explicitly return an error 
-for unknown parameters, that way a future user of the ABI can discover 
-whether the call did what was expected or not.
+> @@ -1827,7 +1831,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+>  	} else {
+> -		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
+> +		pte_t new_pte;
+> +
+> +#ifdef CONFIG_ARM64_HW_AFDBM
+> +		if (kvm_hw_dbm_enabled() &&
+> +		    pgprot_val(mem_type) == pgprot_val(PAGE_S2)) {
+> +			mem_type = PAGE_S2_DBM;
+> +		}
+> +#endif
+> +		new_pte = kvm_pfn_pte(pfn, mem_type);
+>  
+>  		if (writable) {
+>  			new_pte = kvm_s2pte_mkwrite(new_pte);
 
->> Alternatively you could indeed implement as two top-level functions and
->> change this to a...
->>
->> 	switch (func_id)
->>
->> ... along with multiple case labels as the functions would obviously be mostly
->> the same.
->>
->> Also a minor style issue - you might want to consider splitting this into it's
->> own function.
->>
-> I think "switch (feature)" maybe better as this _PHY_ is not like a function id. Just like:
-> "
-> case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
->                  feature = smccc_get_arg1(vcpu);
->                  switch (feature) {
->                  case ARM_SMCCC_ARCH_WORKAROUND_1:
-> ...
-> "
+That's wrong here. Basically for any fault you get, you just turn the S2
+page writable. The point of DBM is that you don't get write faults at
+all if you have a writable page. So, as I said above, only set the DBM
+bit if you stored a writable S2 pte (kvm_s2pte_mkwrite()).
 
-I'm happy either way - it's purely that the definition/naming of 
-ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID made it look like that was the 
-intention. My preference would be to stick with the 'feature' approach 
-as above because there's no need to "use up" the top-level SMCCC calls 
-(but equally there's a large space so we'd have to work very hard to run 
-out... ;) )
-
->> Finally I do think it would be useful to add some documentation of the new
->> SMC calls. It would be easier to review the interface based on that
->> documentation rather than trying to reverse-engineer the interface from the
->> code.
->>
-> Yeah, more doc needed here.
-
-Thanks, I think it's a good idea to get the ABI nailed down before 
-worrying too much about the code, and it's easier to discuss based on 
-documentation rather than code.
-
-Thanks,
-
-Steve
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
