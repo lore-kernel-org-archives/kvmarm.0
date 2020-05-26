@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAA6C433DF
-	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 16:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D390C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 16:29:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 654D920776
-	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 16:29:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654D920776
+	by mail.kernel.org (Postfix) with ESMTP id C23F420787
+	for <kvmarm@archiver.kernel.org>; Tue, 26 May 2020 16:29:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C23F420787
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ECB14B173;
-	Tue, 26 May 2020 12:29:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4244B17B;
+	Tue, 26 May 2020 12:29:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kbO6RKvc229Y; Tue, 26 May 2020 12:29:47 -0400 (EDT)
+	with ESMTP id w3oTiihbqY10; Tue, 26 May 2020 12:29:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5E44B15C;
-	Tue, 26 May 2020 12:29:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC144B164;
+	Tue, 26 May 2020 12:29:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18CFB4B15C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 12:29:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9A44B164
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 12:29:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NvG0Uy5XOjnL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 May 2020 12:29:45 -0400 (EDT)
+ with ESMTP id N0NwehLIa92g for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 May 2020 12:29:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 168B74B0F4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 12:29:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B46914B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2020 12:29:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C352B30E;
- Tue, 26 May 2020 09:29:44 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 639A330E;
+ Tue, 26 May 2020 09:29:54 -0700 (PDT)
 Received: from [192.168.0.14] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C53183F52E;
- Tue, 26 May 2020 09:29:42 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 676543F52E;
+ Tue, 26 May 2020 09:29:52 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 19/26] KVM: arm64: Make struct kvm_regs userspace-only
+Subject: Re: [PATCH 20/26] KVM: arm64: Move ELR_EL1 to the system register
+ array
 To: Marc Zyngier <maz@kernel.org>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-20-maz@kernel.org>
-Message-ID: <0a38305f-77f8-11b0-cb74-2bec07ce0a0a@arm.com>
-Date: Tue, 26 May 2020 17:29:41 +0100
+ <20200422120050.3693593-21-maz@kernel.org>
+Message-ID: <b6a08ca6-1682-4fa6-e8f4-bb4adba5d19a@arm.com>
+Date: Tue, 26 May 2020 17:29:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200422120050.3693593-20-maz@kernel.org>
+In-Reply-To: <20200422120050.3693593-21-maz@kernel.org>
 Content-Language: en-GB
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
@@ -78,43 +79,49 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 22/04/2020 13:00, Marc Zyngier wrote:
-> struct kvm_regs is used by userspace to indicate which register gets
-> accessed by the {GET,SET}_ONE_REG API. But as we're about to refactor
-> the layout of the in-kernel register structures, we need the kernel to
-> move away from it.
-> 
-> Let's make kvm_regs userspace only, and let the kernel map it to its own
-> internal representation.
+> As ELR-EL1 is a VNCR-capable register with ARMv8.4-NV, let's move it to
+> the sys_regs array and repaint the accessors. While we're at it, let's
+> kill the now useless accessors used only on the fault injection path.
 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 23ebe51410f06..9fec9231b63e2 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -102,6 +102,55 @@ static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
->  	return size;
->  }
->  
-> +static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	u64 off = core_reg_offset_from_id(reg->id);
-> +
-> +	switch (off) {
-
-> +	default:
-> +		return NULL;
-
-Doesn't this switch statement catch an out of range offset, and a misaligned offset?
-
-... We still test for those explicitly in the caller. Better safe than implicit?
-
-
-> +	}
-> +}
-
-With the reset thing reported by Zenghui and Zengtao on the previous patch fixed:
 Reviewed-by: James Morse <james.morse@arm.com>
 
-(otherwise struct kvm_regs isn't userspace-only!)
+
+A curiosity:
+
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 95977b80265ce..46949fce3e813 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -184,6 +184,8 @@ enum vcpu_sysreg {
+
+Comment above the enum has some claims about the order, but its already out of order with
+__vcpu_read_sys_reg_from_cpu()... (PAR_EL1 being the culprit)
+
+(I think it only matters for searching by encoding, which is checked at boot.)
+
+
+>  	APGAKEYLO_EL1,
+>  	APGAKEYHI_EL1,
+>  
+> +	ELR_EL1,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5bda4af36a0e7..7c2fffb20c217 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -95,6 +95,7 @@ static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+>  	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
+>  	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
+>  	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
+> +	case ELR_EL1:		*val = read_sysreg_s(SYS_ELR_EL12);	break;
+>  	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
+>  	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
+>  	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
+
 
 
 Thanks,
