@@ -2,91 +2,78 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90374C433E1
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 07:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACACC433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 07:18:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 48C94208FE
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 07:18:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ie/iCg9D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C94208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 3D6BF20C09
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 07:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D6BF20C09
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CD84B1E0;
-	Wed, 27 May 2020 03:18:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D1A4B210;
+	Wed, 27 May 2020 03:18:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rzB24Bd-SEYn; Wed, 27 May 2020 03:18:45 -0400 (EDT)
+	with ESMTP id DrGbKVUs+dic; Wed, 27 May 2020 03:18:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E34404B217;
-	Wed, 27 May 2020 03:18:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3288E4B222;
+	Wed, 27 May 2020 03:18:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFBA94B1B8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 00:05:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 186544B1B9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 02:46:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xs0PoRKLNGU2 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 00:05:36 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A96814B1A7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 00:05:36 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1590552336;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rOuCEnm3TVaSlYzsTP5MIGvsB+lWS7vx560wtzCUUqs=;
- b=Ie/iCg9DWXpzF+HfKlwUklu3KsxKD61mUZcttSH42YLTVjPQ0n8FGMFxsKkYnOet8E90iS
- olfwoVJYKYs0Q1NGKTA4jkr0GbHZdPCYCIjQHeT9fMwFnIvgWOxnRwSXxIU47WFpyfCLWQ
- Qyzdjl4uLtSWeSMF5ybG2wlrLOu2lOE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-db1QmEjhMgWp86OUtxX6Iw-1; Wed, 27 May 2020 00:05:31 -0400
-X-MC-Unique: db1QmEjhMgWp86OUtxX6Iw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 723578018A2;
- Wed, 27 May 2020 04:05:29 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-130.bne.redhat.com
- [10.64.54.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E994F96FAB;
- Wed, 27 May 2020 04:05:21 +0000 (UTC)
-Subject: Re: [PATCH RFCv2 7/9] kvm/arm64: Support async page fault
-To: Mark Rutland <mark.rutland@arm.com>
-References: <20200508032919.52147-1-gshan@redhat.com>
- <20200508032919.52147-8-gshan@redhat.com>
- <20200526123424.GF1363@C02TD0UTHF1T.local>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <e1230110-b51f-b8b8-60d9-372660c5c387@redhat.com>
-Date: Wed, 27 May 2020 14:05:19 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id JVmkkmb1Kwa3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 02:46:34 -0400 (EDT)
+Received: from huawei.com (szxga08-in.huawei.com [45.249.212.255])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 686AD4B137
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 02:46:34 -0400 (EDT)
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 35613D2FADC08F94C152;
+ Wed, 27 May 2020 14:46:32 +0800 (CST)
+Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Wed, 27 May 2020 14:46:31 +0800
+Received: from DGGEMM506-MBX.china.huawei.com ([169.254.3.4]) by
+ dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0487.000;
+ Wed, 27 May 2020 14:46:25 +0800
+From: "Zengtao (B)" <prime.zeng@hisilicon.com>
+To: "zhengxiang (A)" <zhengxiang9@huawei.com>, Jean-Philippe Brucker
+ <jean-philippe@linaro.org>
+Subject: RE: [RFC] Use SMMU HTTU for DMA dirty page tracking
+Thread-Topic: [RFC] Use SMMU HTTU for DMA dirty page tracking
+Thread-Index: AQHWLcHpdMO0bbYbEkW2sovVw/ZxjKiz12IAgARX1wCAA1ZFUA==
+Date: Wed, 27 May 2020 06:46:24 +0000
+Message-ID: <678F3D1BB717D949B966B68EAEB446ED4146A6E4@DGGEMM506-MBX.china.huawei.com>
+References: <b926ec0b-fe87-0792-c41d-acad56c656a4@huawei.com>
+ <20200522171452.GC3453945@myrica>
+ <e68c1158-8573-a477-42ce-48cee510c3ce@huawei.com>
+In-Reply-To: <e68c1158-8573-a477-42ce-48cee510c3ce@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.74.221.187]
 MIME-Version: 1.0
-In-Reply-To: <20200526123424.GF1363@C02TD0UTHF1T.local>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-CFilter-Loop: Reflected
 X-Mailman-Approved-At: Wed, 27 May 2020 03:18:39 -0400
-Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, shan.gavin@gmail.com,
- maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ "Wangzhou \(B\)" <wangzhou1@hisilicon.com>, Will Deacon <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -95,941 +82,113 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Mark,
+> -----Original Message-----
+> From: zhengxiang (A)
+> Sent: Monday, May 25, 2020 7:34 PM
+> To: Jean-Philippe Brucker
+> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> Will Deacon; Wanghaibin (D); Zengtao (B); maz@kernel.org; James Morse;
+> julien.thierry.kdev@gmail.com; Suzuki K Poulose; Wangzhou (B);
+> iommu@lists.linux-foundation.org; Kirti Wankhede; Yan Zhao;
+> alex.williamson@redhat.com
+> Subject: Re: [RFC] Use SMMU HTTU for DMA dirty page tracking
+> 
+> [+cc Kirti, Yan, Alex]
+> 
+> On 2020/5/23 1:14, Jean-Philippe Brucker wrote:
+> > Hi,
+> >
+> > On Tue, May 19, 2020 at 05:42:55PM +0800, Xiang Zheng wrote:
+> >> Hi all,
+> >>
+> >> Is there any plan for enabling SMMU HTTU?
+> >
+> > Not outside of SVA, as far as I know.
+> >
+> 
+> >> I have seen the patch locates in the SVA series patch, which adds
+> >> support for HTTU:
+> >>     https://www.spinics.net/lists/arm-kernel/msg798694.html
+> >>
+> >> HTTU reduces the number of access faults on SMMU fault queue
+> >> (permission faults also benifit from it).
+> >>
+> >> Besides reducing the faults, HTTU also helps to track dirty pages for
+> >> device DMA. Is it feasible to utilize HTTU to get dirty pages on device
+> >> DMA during VFIO live migration?
+> >
+> > As you know there is a VFIO interface for this under discussion:
+> >
+> https://lore.kernel.org/kvm/1589781397-28368-1-git-send-email-kwankhe
+> de@nvidia.com/
+> > It doesn't implement an internal API to communicate with the IOMMU
+> driver
+> > about dirty pages.
+> 
+> >
+> >> If SMMU can track dirty pages, devices are not required to implement
+> >> additional dirty pages tracking to support VFIO live migration.
+> >
+> > It seems feasible, though tracking it in the device might be more
+> > efficient. I might have misunderstood but I think for live migration of
+> > the Intel NIC they trap guest accesses to the device and introspect its
+> > state to figure out which pages it is accessing.
+> >
+> > With HTTU I suppose (without much knowledge about live migration)
+> that
+> > you'd need several new interfaces to the IOMMU drivers:
+> >
+> > * A way for VFIO to query HTTU support in the SMMU. There are some
+> >   discussions about communicating more IOMMU capabilities through
+> VFIO but
+> >   no implementation yet. When HTTU isn't supported the DIRTY_PAGES
+> bitmap
+> >   would report all pages as they do now.
+> >
+> > * VFIO_IOMMU_DIRTY_PAGES_FLAG_START/STOP would clear the dirty
+> bit
+> >   for all VFIO mappings (which is going to take some time). There is a
+> >   walker in io-pgtable for iova_to_phys() which could be extended. I
+> >   suppose it's also possible to atomically switch the HA and HD bits in
+> >   context descriptors.
+> 
+> Maybe we need not switch HA and HD bits, just turn on them all the time?
 
-On 5/26/20 10:34 PM, Mark Rutland wrote:
-> On Fri, May 08, 2020 at 01:29:17PM +1000, Gavin Shan wrote:
->> There are two stages of fault pages and the stage one page fault is
->> handled by guest itself. The guest is trapped to host when the page
->> fault is caused by stage 2 page table, for example missing. The guest
->> is suspended until the requested page is populated. To populate the
->> requested page can be related to IO activities if the page was swapped
->> out previously. In this case, the guest has to suspend for a few of
->> milliseconds at least, regardless of the overall system load. There
->> is no useful work done during the suspended period from guest's view.
-> 
-> This is a bit difficult to read. How about:
-> 
-> | When a vCPU triggers a Stage-2 fault (e.g. when accessing a page that
-> | is not mapped at Stage-2), the vCPU is suspended until the host has
-> | handled the fault. It can take the host milliseconds or longer to
-> | handle the fault as this may require IO, and when the system load is
-> | low neither the host nor guest perform useful work during such
-> | periods.
-> 
+I think we need START/STOP, start is called when migration is started and STOP
+called when migration finished.
 
-Yes, It's much better.
+I think you mean that during the migration(between START and STOP), HA and HD
+functionality is always turned on.
 
->>
->> This adds asychornous page fault to improve the situation. A signal
 > 
-> Nit: typo for `asynchronous` here, and there are a few other typos in
-> the patch itself. It would be nice if you could run a spellcheck over
-> that.
-> 
+> >
+> > * VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP would query the
+> dirty bit for all
+> >   VFIO mappings.
+> >
+We need a clear during the query which mean we have to reset the dirty status 
+after a query.
 
-Sure.
+> 
+> I think we need to consider the case of IOMMU dirty pages logging. We
+> want
+> to test Kirti's VFIO migration patches combined with SMMU HTTU, any
+> suggestions?
 
->> (PAGE_NOT_PRESENT) is sent to guest if the requested page needs some time
->> to be populated. Guest might reschedule to another running process if
->> possible. Otherwise, the vCPU is put into power-saving mode, which is
->> actually to cause vCPU reschedule from host's view. A followup signal
->> (PAGE_READY) is sent to guest once the requested page is populated.
->> The suspended task is waken up or scheduled when guest receives the
->> signal. With this mechanism, the vCPU won't be stuck when the requested
->> page is being populated by host.
-> 
-> It would probably be best to say 'notification' rather than 'signal'
-> here, and say 'the guest is notified', etc. As above, it seems that this
-> is per-vCPU, so it's probably better to say 'vCPU' rather than guest, to
-> make it clear which context this applies to.
-> 
+@kirti @yan @alex
+As we know, you have worked on this feature for a long time, and it seems that
+ everything is going very well now, thanks very much for your VFIO migration 
+framework, it really helps a lot, and we want to start with SMMU HTTU enabled
+ based on your jobs, it's kind of hardware dirty page tracking, and expected to bring us
+ better performance, any suggestions? 
 
-Ok.
-
->>
->> There are more details highlighted as below. Note the implementation is
->> similar to what x86 has to some extent:
->>
->>     * A dedicated SMCCC ID is reserved to enable, disable or configure
->>       the functionality. The only 64-bits parameter is conveyed by two
->>       registers (w2/w1). Bits[63:56] is the bitmap used to specify the
->>       operated functionality like enabling/disabling/configuration. The
->>       bits[55:6] is the physical address of control block or external
->>       data abort injection disallowed region. Bit[5:0] are used to pass
->>       control flags.
->>
->>     * Signal (PAGE_NOT_PRESENT) is sent to guest if the requested page
->>       isn't ready. In the mean while, a work is started to populate the
->>       page asynchronously in background. The stage 2 page table entry is
->>       updated accordingly and another signal (PAGE_READY) is fired after
->>       the request page is populted. The signals is notified by injected
->>       data abort fault.
->>
->>     * The signals are fired and consumed in sequential fashion. It means
->>       no more signals will be fired if there is pending one, awaiting the
->>       guest to consume. It's because the injected data abort faults have
->>       to be done in sequential fashion.
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h      |  43 ++++
->>   arch/arm64/include/asm/kvm_para.h      |  27 ++
->>   arch/arm64/include/uapi/asm/Kbuild     |   2 -
->>   arch/arm64/include/uapi/asm/kvm_para.h |  22 ++
->>   arch/arm64/kvm/Kconfig                 |   1 +
->>   arch/arm64/kvm/Makefile                |   2 +
->>   include/linux/arm-smccc.h              |   6 +
->>   virt/kvm/arm/arm.c                     |  36 ++-
->>   virt/kvm/arm/async_pf.c                | 335 +++++++++++++++++++++++++
->>   virt/kvm/arm/hypercalls.c              |   8 +
->>   virt/kvm/arm/mmu.c                     |  29 ++-
->>   11 files changed, 506 insertions(+), 5 deletions(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_para.h
->>   create mode 100644 arch/arm64/include/uapi/asm/kvm_para.h
->>   create mode 100644 virt/kvm/arm/async_pf.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index f77c706777ec..a207728d6f3f 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -250,6 +250,23 @@ struct vcpu_reset_state {
->>   	bool		reset;
->>   };
->>   
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +
->> +/* Should be a power of two number */
->> +#define ASYNC_PF_PER_VCPU	64
-> 
-> What exactly is this number?
-> 
-
-It's maximal number of async page faults pending on the specific vCPU.
-
->> +
->> +/*
->> + * The association of gfn and token. The token will be sent to guest as
->> + * page fault address. Also, the guest could be in aarch32 mode. So its
->> + * length should be 32-bits.
->> + */
-> 
-> The length of what should be 32-bit? The token?
-> 
-> The guest sees the token as the fault address? How exactly is that
-> exposed to the guest, is that via a synthetic S1 fault?
-> 
-
-Yes, the token is 32-bits in length and it's exposed to guest via fault
-address. I'll improve the comments in next revision.
-
->> +struct kvm_arch_async_pf {
->> +	u32     token;
->> +	gfn_t   gfn;
->> +	u32	esr;
->> +};
->> +#endif /* CONFIG_KVM_ASYNC_PF */
->> +
->>   struct kvm_vcpu_arch {
->>   	struct kvm_cpu_context ctxt;
->>   	void *sve_state;
->> @@ -351,6 +368,17 @@ struct kvm_vcpu_arch {
->>   		u64 last_steal;
->>   		gpa_t base;
->>   	} steal;
->> +
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	struct {
->> +		struct gfn_to_hva_cache	cache;
->> +		gfn_t			gfns[ASYNC_PF_PER_VCPU];
->> +		u64			control_block;
->> +		u16			id;
->> +		bool			send_user_only;
->> +		u64			no_fault_inst_range;
-> 
-> What are all of these fields? This implies functionality not covered
-> in the commit message, and it's not at all clear what these are.
-> 
-> For example, what exactly is `no_fault_inst_range`? If it's a range,
-> surely that needs a start/end or base/size pair rather than a single
-> value?
-> 
-
-Ok. I will add more words about how the data struct is designed and
-how it's used etc in next revision.
-
->> +	} apf;
->> +#endif
->>   };
->>   
->>   /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->> @@ -604,6 +632,21 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->>   
->>   static inline void __cpu_init_stage2(void) {}
->>   
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +bool kvm_async_pf_hash_find(struct kvm_vcpu *vcpu, gfn_t gfn);
->> +bool kvm_arch_can_inject_async_page_not_present(struct kvm_vcpu *vcpu);
->> +bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu);
->> +int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, u32 esr,
->> +			    gpa_t gpa, gfn_t gfn);
->> +void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
->> +				     struct kvm_async_pf *work);
->> +void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->> +				     struct kvm_async_pf *work);
->> +void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
->> +			       struct kvm_async_pf *work);
->> +long kvm_async_pf_hypercall(struct kvm_vcpu *vcpu);
->> +#endif /* CONFIG_KVM_ASYNC_PF */
->> +
->>   /* Guest/host FPSIMD coordination helpers */
->>   int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->>   void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/include/asm/kvm_para.h b/arch/arm64/include/asm/kvm_para.h
->> new file mode 100644
->> index 000000000000..0ea481dd1c7a
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/kvm_para.h
->> @@ -0,0 +1,27 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef _ASM_ARM_KVM_PARA_H
->> +#define _ASM_ARM_KVM_PARA_H
->> +
->> +#include <uapi/asm/kvm_para.h>
->> +
->> +static inline bool kvm_check_and_clear_guest_paused(void)
->> +{
->> +	return false;
->> +}
->> +
->> +static inline unsigned int kvm_arch_para_features(void)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline unsigned int kvm_arch_para_hints(void)
->> +{
->> +	return 0;
->> +}
->> +
->> +static inline bool kvm_para_available(void)
->> +{
->> +	return false;
->> +}
->> +
->> +#endif /* _ASM_ARM_KVM_PARA_H */
->> diff --git a/arch/arm64/include/uapi/asm/Kbuild b/arch/arm64/include/uapi/asm/Kbuild
->> index 602d137932dc..f66554cd5c45 100644
->> --- a/arch/arm64/include/uapi/asm/Kbuild
->> +++ b/arch/arm64/include/uapi/asm/Kbuild
->> @@ -1,3 +1 @@
->>   # SPDX-License-Identifier: GPL-2.0
->> -
->> -generic-y += kvm_para.h
->> diff --git a/arch/arm64/include/uapi/asm/kvm_para.h b/arch/arm64/include/uapi/asm/kvm_para.h
->> new file mode 100644
->> index 000000000000..e0bd0e579b9a
->> --- /dev/null
->> +++ b/arch/arm64/include/uapi/asm/kvm_para.h
->> @@ -0,0 +1,22 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +#ifndef _UAPI_ASM_ARM_KVM_PARA_H
->> +#define _UAPI_ASM_ARM_KVM_PARA_H
->> +
->> +#include <linux/types.h>
->> +
->> +#define KVM_FEATURE_ASYNC_PF	0
->> +
->> +/* Async PF */
->> +#define KVM_ASYNC_PF_ENABLED		(1 << 0)
->> +#define KVM_ASYNC_PF_SEND_ALWAYS	(1 << 1)
->> +
->> +#define KVM_PV_REASON_PAGE_NOT_PRESENT	1
->> +#define KVM_PV_REASON_PAGE_READY	2
->> +
->> +struct kvm_vcpu_pv_apf_data {
->> +	__u32	reason;
->> +	__u8	pad[60];
->> +	__u32	enabled;
->> +};
-> 
-> What's all the padding for?
-> 
-
-The padding is ensure the @reason and @enabled in different cache
-line. @reason is shared by host/guest, while @enabled is almostly
-owned by guest.
-
->> +
->> +#endif /* _UAPI_ASM_ARM_KVM_PARA_H */
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index 449386d76441..1053e16b1739 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -34,6 +34,7 @@ config KVM
->>   	select KVM_VFIO
->>   	select HAVE_KVM_EVENTFD
->>   	select HAVE_KVM_IRQFD
->> +	select KVM_ASYNC_PF
->>   	select KVM_ARM_PMU if HW_PERF_EVENTS
->>   	select HAVE_KVM_MSI
->>   	select HAVE_KVM_IRQCHIP
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 5ffbdc39e780..3be24c1e401f 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -37,3 +37,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-debug.o
->>   kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
->>   kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->>   kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
->> +kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
->> +kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/arm/async_pf.o
->> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
->> index bdc0124a064a..22007dd3b9f0 100644
->> --- a/include/linux/arm-smccc.h
->> +++ b/include/linux/arm-smccc.h
->> @@ -94,6 +94,7 @@
->>   
->>   /* KVM "vendor specific" services */
->>   #define ARM_SMCCC_KVM_FUNC_FEATURES		0
->> +#define ARM_SMCCC_KVM_FUNC_APF			1
->>   #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
->>   #define ARM_SMCCC_KVM_NUM_FUNCS			128
->>   
->> @@ -102,6 +103,11 @@
->>   			   ARM_SMCCC_SMC_32,				\
->>   			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
->>   			   ARM_SMCCC_KVM_FUNC_FEATURES)
->> +#define ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID				\
->> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
->> +			   ARM_SMCCC_SMC_32,				\
->> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
->> +			   ARM_SMCCC_KVM_FUNC_APF)
->>   
->>   #ifndef __ASSEMBLY__
->>   
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 2cbb57485760..3f62899cef13 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -222,6 +222,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   		 */
->>   		r = 1;
->>   		break;
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	case KVM_CAP_ASYNC_PF:
->> +		r = 1;
->> +		break;
->> +#endif
->>   	default:
->>   		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
->>   		break;
->> @@ -269,6 +274,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>   	/* Force users to call KVM_ARM_VCPU_INIT */
->>   	vcpu->arch.target = -1;
->>   	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	vcpu->arch.apf.control_block = 0UL;
->> +	vcpu->arch.apf.no_fault_inst_range = 0x800;
-> 
-> Where has this magic number come from?
-> 
-
-It's the total length (size) of exception vectors. When the vCPU's
-PC in the range, the DABT can't be injected.
-
->> +#endif
->>   
->>   	/* Set up the timer */
->>   	kvm_timer_vcpu_init(vcpu);
->> @@ -426,8 +435,27 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->>   int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
->>   {
->>   	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
->> -	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
->> -		&& !v->arch.power_off && !v->arch.pause);
->> +
->> +	if ((irq_lines || kvm_vgic_vcpu_pending_irq(v)) &&
->> +	    !v->arch.power_off && !v->arch.pause)
->> +		return true;
->> +
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	if (v->arch.apf.control_block & KVM_ASYNC_PF_ENABLED) {
->> +		u32 val;
->> +		int ret;
->> +
->> +		if (!list_empty_careful(&v->async_pf.done))
->> +			return true;
->> +
->> +		ret = kvm_read_guest_cached(v->kvm, &v->arch.apf.cache,
->> +					    &val, sizeof(val));
->> +		if (ret || val)
->> +			return true;
->> +	}
->> +#endif
->> +
->> +	return false;
->>   }
->>   
->>   bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
->> @@ -683,6 +711,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>   
->>   		check_vcpu_requests(vcpu);
->>   
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +		kvm_check_async_pf_completion(vcpu);
->> +#endif
-> 
-> Rather than adding ifdeffery like this, please add an empty stub for
-> when CONFIG_KVM_ASYNC_PF isn't selected, so that this can be used
-> unconditionally.
-> 
-
-Ok.
-
->> +
->>   		/*
->>   		 * Preparing the interrupts to be injected also
->>   		 * involves poking the GIC, which must be done in a
->> diff --git a/virt/kvm/arm/async_pf.c b/virt/kvm/arm/async_pf.c
->> new file mode 100644
->> index 000000000000..5be49d684de3
->> --- /dev/null
->> +++ b/virt/kvm/arm/async_pf.c
->> @@ -0,0 +1,335 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Asynchronous Page Fault Support
->> + *
->> + * Copyright (C) 2020 Red Hat, Inc., Gavin Shan
->> + *
->> + * Based on arch/x86/kernel/kvm.c
->> + */
->> +
->> +#include <linux/arm-smccc.h>
->> +#include <linux/kvm_host.h>
->> +#include <asm/kvm_emulate.h>
->> +#include <kvm/arm_hypercalls.h>
->> +
->> +static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
->> +{
->> +	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
->> +}
->> +
->> +static inline u32 kvm_async_pf_hash_next(u32 key)
->> +{
->> +	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
->> +}
->> +
->> +static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
->> +		vcpu->arch.apf.gfns[i] = ~0;
->> +}
->> +
->> +/*
->> + * Add gfn to the hash table. It's ensured there is a free entry
->> + * when this function is called.
->> + */
->> +static void kvm_async_pf_hash_add(struct kvm_vcpu *vcpu, gfn_t gfn)
->> +{
->> +	u32 key = kvm_async_pf_hash_fn(gfn);
->> +
->> +	while (vcpu->arch.apf.gfns[key] != ~0)
->> +		key = kvm_async_pf_hash_next(key);
->> +
->> +	vcpu->arch.apf.gfns[key] = gfn;
->> +}
->> +
->> +static u32 kvm_async_pf_hash_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
->> +{
->> +	u32 key = kvm_async_pf_hash_fn(gfn);
->> +	int i;
->> +
->> +	for (i = 0; i < ASYNC_PF_PER_VCPU; i++) {
->> +		if (vcpu->arch.apf.gfns[key] == gfn ||
->> +		    vcpu->arch.apf.gfns[key] == ~0)
->> +			break;
->> +
->> +		key = kvm_async_pf_hash_next(key);
->> +	}
->> +
->> +	return key;
->> +}
->> +
->> +static void kvm_async_pf_hash_remove(struct kvm_vcpu *vcpu, gfn_t gfn)
->> +{
->> +	u32 i, j, k;
->> +
->> +	i = j = kvm_async_pf_hash_slot(vcpu, gfn);
->> +	while (true) {
->> +		vcpu->arch.apf.gfns[i] = ~0;
->> +
->> +		do {
->> +			j = kvm_async_pf_hash_next(j);
->> +			if (vcpu->arch.apf.gfns[j] == ~0)
->> +				return;
->> +
->> +			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
->> +			/*
->> +			 * k lies cyclically in ]i,j]
->> +			 * |    i.k.j |
->> +			 * |....j i.k.| or  |.k..j i...|
->> +			 */
->> +		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
->> +
->> +		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
->> +		i = j;
->> +	}
->> +}
-> 
-> This looks like a copy-paste of code under arch/x86.
-> 
-> This looks like something that should be factored into common code
-> rather than duplicated. Do we not have an existing common hash table
-> implementation that we can use rather than building one specific to KVM
-> async page faults?
-> 
-
-Yeah, It's copied from arch/x86. I will explore the possiblity to
-make the code is sharable among multiple architectures.
-
->> +
->> +bool kvm_async_pf_hash_find(struct kvm_vcpu *vcpu, gfn_t gfn)
->> +{
->> +	u32 key = kvm_async_pf_hash_slot(vcpu, gfn);
->> +
->> +	return vcpu->arch.apf.gfns[key] == gfn;
->> +}
->> +
->> +static inline int kvm_async_pf_read_cache(struct kvm_vcpu *vcpu, u32 *val)
->> +{
->> +	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.apf.cache,
->> +				     val, sizeof(*val));
->> +}
->> +
->> +static inline int kvm_async_pf_write_cache(struct kvm_vcpu *vcpu, u32 val)
->> +{
->> +	return kvm_write_guest_cached(vcpu->kvm, &vcpu->arch.apf.cache,
->> +				      &val, sizeof(val));
->> +}
->> +
->> +bool kvm_arch_can_inject_async_page_not_present(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 vbar, pc;
->> +	u32 val;
->> +	int ret;
->> +
->> +	if (!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED))
->> +		return false;
->> +
->> +	if (vcpu->arch.apf.send_user_only && vcpu_mode_priv(vcpu))
->> +		return false;
->> +
->> +	/* Pending page fault, which ins't acknowledged by guest */
->> +	ret = kvm_async_pf_read_cache(vcpu, &val);
->> +	if (ret || val)
->> +		return false;
->> +
->> +	/*
->> +	 * Events can't be injected through data abort because it's
->> +	 * going to clobber ELR_EL1, which might not consued (or saved)
->> +	 * by guest yet.
->> +	 */
->> +	vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
->> +	pc = *vcpu_pc(vcpu);
->> +	if (pc >= vbar && pc < (vbar + vcpu->arch.apf.no_fault_inst_range))
->> +		return false;
-> 
-> Ah, so that's when this `no_fault_inst_range` is for.
-> 
-> As-is this is not sufficient, and we'll need t be extremely careful
-> here.
-> 
-> The vectors themselves typically only have a small amount of stub code,
-> and the bulk of the non-reentrant exception entry work happens
-> elsewhere, in a mixture of assembly and C code that isn't even virtually
-> contiguous with either the vectors or itself.
-> 
-> It's possible in theory that code in modules (or perhaps in eBPF JIT'd
-> code) that isn't safe to take a fault from, so even having a contiguous
-> range controlled by the kernel isn't ideal.
-> 
-> How does this work on x86?
-> 
-
-Yeah, here we just provide a mechanism to forbid injecting data abort. The
-range is fed by guest through HVC call. So I think it's guest related issue.
-You had more comments about this in PATCH[9]. I will explain a bit more there.
-
-x86 basically relies on EFLAGS[IF] flag. The async page fault can be injected
-if it's on. Otherwise, it's forbidden. It's workable because exception is
-special interrupt to x86 if I'm correct.
-
-            return (vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
-                   !(vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) &
-                         (GUEST_INTR_STATE_STI | GUEST_INTR_STATE_MOV_SS));
-
-
->> +
->> +	return true;
->> +}
->> +
->> +/*
->> + * We need deliver the page present signal as quick as possible because
->> + * it's performance critical. So the signal is delivered no matter which
->> + * privilege level the guest has. It's possible the signal can't be handled
->> + * by the guest immediately. However, host doesn't contribute the delay
->> + * anyway.
->> + */
->> +bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 vbar, pc;
->> +	u32 val;
->> +	int ret;
->> +
->> +	if (!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED))
->> +		return true;
->> +
->> +	/* Pending page fault, which ins't acknowledged by guest */
->> +	ret = kvm_async_pf_read_cache(vcpu, &val);
->> +	if (ret || val)
->> +		return false;
->> +
->> +	/*
->> +	 * Events can't be injected through data abort because it's
->> +	 * going to clobber ELR_EL1, which might not consued (or saved)
->> +	 * by guest yet.
->> +	 */
->> +	vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
->> +	pc = *vcpu_pc(vcpu);
->> +	if (pc >= vbar && pc < (vbar + vcpu->arch.apf.no_fault_inst_range))
->> +		return false;
->> +
->> +	return true;
->> +}
-> 
-> Much of this is identical to the not_present case, so the same comments
-> apply. The common bits should probably be factored out into a helper.
-> 
-
-Yep, I will take look to introduce a helper function if needed.
-
->> +
->> +int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, u32 esr,
->> +			    gpa_t gpa, gfn_t gfn)
->> +{
->> +	struct kvm_arch_async_pf arch;
->> +	unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gfn);
->> +
->> +	arch.token = (vcpu->arch.apf.id++ << 16) | vcpu->vcpu_id;
->> +	arch.gfn = gfn;
->> +	arch.esr = esr;
->> +
->> +	return kvm_setup_async_pf(vcpu, gpa, hva, &arch);
->> +}
->> +
->> +/*
->> + * It's garanteed that no pending asynchronous page fault when this is
->> + * called. It means all previous issued asynchronous page faults have
->> + * been acknoledged.
->> + */
->> +void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
->> +				     struct kvm_async_pf *work)
->> +{
->> +	int ret;
->> +
->> +	kvm_async_pf_hash_add(vcpu, work->arch.gfn);
->> +	ret = kvm_async_pf_write_cache(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT);
->> +	if (ret) {
->> +		kvm_err("%s: Error %d writing cache\n", __func__, ret);
->> +		kvm_async_pf_hash_remove(vcpu, work->arch.gfn);
->> +		return;
->> +	}
->> +
->> +	kvm_inject_dabt(vcpu, work->arch.token);
->> +}
->> +
->> +/*
->> + * It's garanteed that no pending asynchronous page fault when this is
->> + * called. It means all previous issued asynchronous page faults have
->> + * been acknoledged.
->> + */
->> +void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->> +				 struct kvm_async_pf *work)
->> +{
->> +	int ret;
->> +
->> +	/* Broadcast wakeup */
->> +	if (work->wakeup_all)
->> +		work->arch.token = ~0;
->> +	else
->> +		kvm_async_pf_hash_remove(vcpu, work->arch.gfn);
->> +
->> +	ret = kvm_async_pf_write_cache(vcpu, KVM_PV_REASON_PAGE_READY);
->> +	if (ret) {
->> +		kvm_err("%s: Error %d writing cache\n", __func__, ret);
->> +		return;
->> +	}
->> +
->> +	kvm_inject_dabt(vcpu, work->arch.token);
-> 
-> So the guest sees a fake S1 abort with a fake address?
-> 
-> How is the guest expected to distinguish this from a real S1 fault?
-> 
-
-KVM_PV_REASON_PAGE_READY is stored in the per-vCPU status block, which
-is represented by the following data struct. When the @reason is zero,
-it's normal fault. Otherwise, it's a async page fault. So we shouldn't
-have async page fault and normal one cross over.
-
-    struct kvm_vcpu_pv_apf_data {
-         __u32   reason;
-         __u8    pad[60];
-         __u32   enabled;
-    };
-
->> +}
->> +
->> +void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
->> +			       struct kvm_async_pf *work)
->> +{
->> +	struct kvm_memory_slot *memslot;
->> +	unsigned int esr = work->arch.esr;
->> +	phys_addr_t gpa = work->cr2_or_gpa;
->> +	gfn_t gfn = gpa >> PAGE_SHIFT;
-> 
-> Perhaps:
-> 
-> 	gfn_t gfn = gpa_to_gfn(gpa);
-> 
-
-Sure.
-
->> +	unsigned long hva;
->> +	bool write_fault, writable;
->> +	int idx;
->> +
->> +	/*
->> +	 * We shouldn't issue prefault for special work to wake up
->> +	 * all pending tasks because the associated token (address)
->> +	 * is invalid.
->> +	 */
-> 
-> I'm not sure what this comment is trying to say.
-> 
-
-There are two types of workers. One of them is to wakeup all sleepers
-in guest, preparing to shutdown the machine. For this type of wakeup,
-the token (faulting address) is set to ~0, which is invalid. So there
-isn't a prefault issued for this particular wakeup. I'll improve the
-comments in next reivion :)
-
->> +	if (work->wakeup_all)
->> +		return;
->> +
->> +	/*
->> +	 * The gpa was validated before the work is started. However, the
->> +	 * memory slots might be changed since then. So we need to redo the
->> +	 * validatation here.
->> +	 */
->> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
->> +
->> +	write_fault = kvm_is_write_fault(esr);
->> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
->> +	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
->> +	if (kvm_is_error_hva(hva) || (write_fault && !writable))
->> +		goto out;
->> +
->> +	kvm_handle_user_mem_abort(vcpu, esr, memslot, gpa, hva, true);
->> +
->> +out:
->> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->> +}
->> +
->> +static long kvm_async_pf_update_enable_reg(struct kvm_vcpu *vcpu, u64 data)
->> +{
->> +	bool enabled, enable;
->> +	gpa_t gpa = (data & ~0x3F);
-> 
-> What exactly is going on here? Why are the low 7 bits of data not valid?
-> 
-> This will also truncate the value to 32 bits; did you mean to do that?
-> 
-
-Yes, because the control block (@data) is 64-bytes aligned.
-
->> +	int ret;
->> +
->> +	enabled = !!(vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED);
->> +	enable = !!(data & KVM_ASYNC_PF_ENABLED);
->> +	if (enable == enabled) {
->> +		kvm_debug("%s: Async PF has been %s (0x%llx -> 0x%llx)\n",
->> +			  __func__, enabled ? "enabled" : "disabled",
->> +			  vcpu->arch.apf.control_block, data);
->> +		return SMCCC_RET_NOT_REQUIRED;
->> +	}
->> +
->> +	if (enable) {
->> +		ret = kvm_gfn_to_hva_cache_init(
->> +			vcpu->kvm, &vcpu->arch.apf.cache,
->> +			gpa + offsetof(struct kvm_vcpu_pv_apf_data, reason),
->> +			sizeof(u32));
->> +		if (ret) {
->> +			kvm_err("%s: Error %d initializing cache on 0x%llx\n",
->> +				__func__, ret, data);
->> +			return SMCCC_RET_NOT_SUPPORTED;
->> +		}
->> +
->> +		kvm_async_pf_hash_reset(vcpu);
->> +		vcpu->arch.apf.send_user_only =
->> +			!(data & KVM_ASYNC_PF_SEND_ALWAYS);
->> +		kvm_async_pf_wakeup_all(vcpu);
->> +		vcpu->arch.apf.control_block = data;
->> +	} else {
->> +		kvm_clear_async_pf_completion_queue(vcpu);
->> +		vcpu->arch.apf.control_block = data;
->> +	}
->> +
->> +	return SMCCC_RET_SUCCESS;
->> +}
->> +
->> +long kvm_async_pf_hypercall(struct kvm_vcpu *vcpu)
->> +{
->> +	u64 data, func, val, range;
->> +	long ret = SMCCC_RET_SUCCESS;
->> +
->> +	data = (smccc_get_arg2(vcpu) << 32) | smccc_get_arg1(vcpu);
-> 
-> What prevents the high bits being set in arg1?
-> 
-
-The function shuld work for both 32-bit and 64-bit guest.
-
->> +	func = data & (0xfful << 56);
->> +	val = data & ~(0xfful << 56);
->> +	switch (func) {
->> +	case BIT(63):
->> +		ret = kvm_async_pf_update_enable_reg(vcpu, val);
-> 
-> Please give BIT(63) a mnemonic.
-> 
->> +		break;
->> +	case BIT(62):
-> 
-> Likewise.
-> 
-
-Yes.
-
->> +		if (vcpu->arch.apf.control_block & KVM_ASYNC_PF_ENABLED) {
->> +			ret = SMCCC_RET_NOT_SUPPORTED;
->> +			break;
->> +		}
->> +
->> +		range = vcpu->arch.apf.no_fault_inst_range;
->> +		vcpu->arch.apf.no_fault_inst_range = max(range, val);
-> 
-> Huh? How is the `no_fault_inst_range` set by he guest?
-> 
-
-I'll explain to you when replying your comments on PATCH[9] :)
-
-> Thanks,
-> Mark.
-> 
-
-Thanks,
-Gavin
-
->> +		break;
->> +	default:
->> +		kvm_err("%s: Unrecognized function 0x%llx\n", __func__, func);
->> +		ret = SMCCC_RET_NOT_SUPPORTED;
->> +	}
->> +
->> +	return ret;
->> +}
->> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
->> index db6dce3d0e23..a7e0fe17e2f1 100644
->> --- a/virt/kvm/arm/hypercalls.c
->> +++ b/virt/kvm/arm/hypercalls.c
->> @@ -70,7 +70,15 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>   		break;
->>   	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->>   		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_APF);
->> +#endif
->>   		break;
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	case ARM_SMCCC_VENDOR_HYP_KVM_APF_FUNC_ID:
->> +		val[0] = kvm_async_pf_hypercall(vcpu);
->> +		break;
->> +#endif
->>   	default:
->>   		return kvm_psci_call(vcpu);
->>   	}
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 95aaabb2b1fc..a303815845a2 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1656,6 +1656,30 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->>   	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
->>   }
->>   
->> +static bool try_async_pf(struct kvm_vcpu *vcpu, u32 esr, gpa_t gpa,
->> +			 gfn_t gfn, kvm_pfn_t *pfn, bool write,
->> +			 bool *writable, bool prefault)
->> +{
->> +	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->> +#ifdef CONFIG_KVM_ASYNC_PF
->> +	bool async = false;
->> +
->> +	/* Bail if *pfn has correct page */
->> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
->> +	if (!async)
->> +		return false;
->> +
->> +	if (!prefault && kvm_arch_can_inject_async_page_not_present(vcpu)) {
->> +		if (kvm_async_pf_hash_find(vcpu, gfn) ||
->> +		    kvm_arch_setup_async_pf(vcpu, esr, gpa, gfn))
->> +			return true;
->> +	}
->> +#endif
->> +
->> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
->> +	return false;
->> +}
->> +
->>   int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
->>   			      struct kvm_memory_slot *memslot,
->>   			      phys_addr_t fault_ipa, unsigned long hva,
->> @@ -1737,7 +1761,10 @@ int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu, unsigned int esr,
->>   	 */
->>   	smp_rmb();
->>   
->> -	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
->> +	if (try_async_pf(vcpu, esr, fault_ipa, gfn, &pfn,
->> +			 write_fault, &writable, prefault))
->> +		return 1;
->> +
->>   	if (pfn == KVM_PFN_ERR_HWPOISON) {
->>   		kvm_send_hwpoison_signal(hva, vma_shift);
->>   		return 0;
->> -- 
->> 2.23.0
->>
-> 
-
+Thank you.
+Zengtao 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
