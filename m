@@ -2,63 +2,103 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B2FC433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 14:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA88C433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 16:10:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D8E5720899
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 14:41:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8E5720899
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 353F420873
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 16:10:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQs+PA1s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353F420873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F4E4B16F;
-	Wed, 27 May 2020 10:41:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 926B94B214;
+	Wed, 27 May 2020 12:10:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eg8akO9PZGte; Wed, 27 May 2020 10:41:47 -0400 (EDT)
+	with ESMTP id 4k0TPnxJHM4q; Wed, 27 May 2020 12:10:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E14404B1BB;
-	Wed, 27 May 2020 10:41:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AF834B237;
+	Wed, 27 May 2020 12:10:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F33894B16F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 10:41:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D2B74B238
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 12:10:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DSrPfMFH39J9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 10:41:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 927434B141
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 10:41:44 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC2EC30E;
- Wed, 27 May 2020 07:41:43 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.7.129])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70C2D3F6C4;
- Wed, 27 May 2020 07:41:40 -0700 (PDT)
-Date: Wed, 27 May 2020 15:41:33 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
- target EL
-Message-ID: <20200527144133.GA59947@C02TD0UTHF1T.local>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-27-maz@kernel.org>
- <20200519104457.GA19548@C02TD0UTHF1T.local>
- <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
+ with ESMTP id 9oaxBlT8-zjF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 12:10:41 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39DFE4B164
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 12:10:41 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1590595841;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gpS5WDJIgyjBNnbz57joD1fkY56BnMjV/cB+edX+sFA=;
+ b=eQs+PA1sqjIJqZrzF7zY/oP0eQTeCVfvHSdKoK3R+2x6cWZ5h2ln/xw4mfT+3HIfTHbG55
+ cBibQpxczWkQN4QjWBWx9roUCc1L5Ur7tWYoo0YkfVl5PHqUbBNTS2ilNyXSSb/lHNOtYf
+ 03I4mCKwss19oj1Ix5Jz3OBlabqTYE0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-KdrABXfINHu0MDsXeEi7yg-1; Wed, 27 May 2020 12:10:39 -0400
+X-MC-Unique: KdrABXfINHu0MDsXeEi7yg-1
+Received: by mail-wm1-f72.google.com with SMTP id o8so1048610wmd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 09:10:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gpS5WDJIgyjBNnbz57joD1fkY56BnMjV/cB+edX+sFA=;
+ b=pD7GDDUV/AK+Np9L3diaLa/rV/moVx7WjTgKmHr912btDEpotDaFP/2gxu/7urDSCE
+ 2m43sADxlH+6L+s60JIJXBs8ztTOHhWmbYT1GcRye+1EraoifPKEiqAwqN8qqyYW+Tk3
+ nFSmljghKhDsSfttIDHbdENQ4hbgYLQMptBfYpn4Oj9swykSPhEFUCJsqaC8OjR2E7xT
+ sp0zE/628K6hTg/oVIP4OBlkWRO+/5fU4c6VBPvzuF80SqKeUigTwgyI3NeUl9yrWaRq
+ GCM0EXH0xgku9fd04dmBam7AXjr2lUn2Q5yTjul8yCqIly/2S2c7IqgtRuhzvO5tAzab
+ DmbQ==
+X-Gm-Message-State: AOAM533lhW5oJC+hGQGVrGo5RmCLQ8W13HW6+drP2euUAEkgIUeCmu0x
+ 6cqsYLphSRBH1/G+NVy52u2Y0Xddh5UiV6L4mv9bRb6T12T2+P+xZIiWMkekYGDje8l6rt+HvZd
+ e2pyb0//wlRpCWd9627g4VQWS
+X-Received: by 2002:a7b:cf06:: with SMTP id l6mr4939098wmg.63.1590595838151;
+ Wed, 27 May 2020 09:10:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwwv2WOvp+dGE5Bd+63NHTAUmNpXjYKI6PXzKuriRFk4SIKF8scu4bdTkpQ8+eWY4jLf6e98w==
+X-Received: by 2002:a7b:cf06:: with SMTP id l6mr4939064wmg.63.1590595837858;
+ Wed, 27 May 2020 09:10:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8?
+ ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
+ by smtp.gmail.com with ESMTPSA id a10sm3149808wmf.46.2020.05.27.09.10.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 27 May 2020 09:10:37 -0700 (PDT)
+Subject: Re: [PATCH RFCv2 0/9] kvm/arm64: Support Async Page Fault
+To: Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>
+References: <20200508032919.52147-1-gshan@redhat.com>
+ <20200526130927.GH1363@C02TD0UTHF1T.local>
+ <987785b2-2533-c3d8-8f6a-4193aa82d502@redhat.com>
+ <ae0f32fa338969d25dc3da56292e35ed@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eb2a2291-85b0-a39a-96d1-58e4652771ba@redhat.com>
+Date: Wed, 27 May 2020 18:10:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
- George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+In-Reply-To: <ae0f32fa338969d25dc3da56292e35ed@kernel.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, shan.gavin@gmail.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -76,101 +116,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, May 27, 2020 at 10:34:09AM +0100, Marc Zyngier wrote:
-> HI Mark,
+On 27/05/20 09:48, Marc Zyngier wrote:
 > 
-> On 2020-05-19 11:44, Mark Rutland wrote:
-> > On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
-> > > -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
-> > > +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long
-> > > target_mode,
-> > > +			    enum exception_type type)
-> > 
-> > Since this is all for an AArch64 target, could we keep `64` in the name,
-> > e.g enter_exception64? That'd mirror the callers below.
-> > 
-> > >  {
-> > > -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> > > -	unsigned long old, new;
-> > > +	unsigned long sctlr, vbar, old, new, mode;
-> > > +	u64 exc_offset;
-> > > +
-> > > +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> > > +
-> > > +	if      (mode == target_mode)
-> > > +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-> > > +	else if ((mode | 1) == target_mode)
-> > > +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-> > 
-> > It would be nice if we could add a mnemonic for the `1` here, e.g.
-> > PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
-> 
-> I've addressed both comments as follows:
-> 
-> diff --git a/arch/arm64/include/asm/ptrace.h
-> b/arch/arm64/include/asm/ptrace.h
-> index bf57308fcd63..953b6a1ce549 100644
-> --- a/arch/arm64/include/asm/ptrace.h
-> +++ b/arch/arm64/include/asm/ptrace.h
-> @@ -35,6 +35,7 @@
->  #define GIC_PRIO_PSR_I_SET		(1 << 4)
-> 
->  /* Additional SPSR bits not exposed in the UABI */
-> +#define PSR_MODE_THREAD_BIT	(1 << 0)
->  #define PSR_IL_BIT		(1 << 20)
-> 
->  /* AArch32-specific ptrace requests */
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index 3dbcbc839b9c..ebfdfc27b2bd 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -43,8 +43,8 @@ enum exception_type {
->   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout,
-> from
->   * MSB to LSB.
->   */
-> -static void enter_exception(struct kvm_vcpu *vcpu, unsigned long
-> target_mode,
-> -			    enum exception_type type)
-> +static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long
-> target_mode,
-> +			      enum exception_type type)
->  {
->  	unsigned long sctlr, vbar, old, new, mode;
->  	u64 exc_offset;
-> @@ -53,7 +53,7 @@ static void enter_exception(struct kvm_vcpu *vcpu,
-> unsigned long target_mode,
-> 
->  	if      (mode == target_mode)
->  		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-> -	else if ((mode | 1) == target_mode)
-> +	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
->  		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
->  	else if (!(mode & PSR_MODE32_BIT))
->  		exc_offset = LOWER_EL_AArch64_VECTOR;
-> @@ -126,7 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool
-> is_iabt, unsigned long addr
->  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
->  	u32 esr = 0;
-> 
-> -	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-> +	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-> 
->  	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
-> 
-> @@ -156,7 +156,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->  {
->  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-> 
-> -	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-> +	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-> 
->  	/*
->  	 * Build an unknown exception, depending on the instruction
+> My own question is whether this even makes any sense 10 years later.
+> The HW has massively changed, and this adds a whole lot of complexity
+> to both the hypervisor and the guest.
 
-Thanks; that all looks good to me, and my R-b stands!
+It still makes sense, but indeed it's for different reasons.  One
+example is host page cache sharing, where (parts of) the host page cache
+are visible to the guest.  In this context, async page faults are used
+for any kind of host page faults, not just paging out memory due to
+overcommit.
 
-Mark.
+But I agree that it is very very important to design the exception model
+first, as we're witnessing in x86 land the problems with a poor design.
+ Nothing major, but just pain all around.
+
+Paolo
+
+> It also plays very ugly games
+> with the exception model, which doesn't give me the warm fuzzy feeling
+> that it's going to be great.
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
