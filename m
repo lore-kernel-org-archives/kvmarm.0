@@ -2,91 +2,62 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D0EC433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6D1C433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:42:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CA9D20723
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:41:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="nmjnrOt6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA9D20723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id A420820723
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:42:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A420820723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 407674B1A1;
-	Wed, 27 May 2020 04:41:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 382204B211;
+	Wed, 27 May 2020 04:42:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OJ37GNJoZl61; Wed, 27 May 2020 04:41:31 -0400 (EDT)
+	with ESMTP id lHOglz26wKVz; Wed, 27 May 2020 04:42:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE0424B1BB;
-	Wed, 27 May 2020 04:41:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 330014B1BB;
+	Wed, 27 May 2020 04:42:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09EDE4B17B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:41:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 741114B199
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:42:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gtKbkAXRQA+m for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 04:41:30 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9CEA4B172
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:41:29 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BF36120723;
- Wed, 27 May 2020 08:41:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590568888;
- bh=E378D1wkdmQfMiop/fBX66cdxZ0b9zhjf0U/fYZnvBk=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=nmjnrOt6WgNE82CBCmt4ZJ8pDHHi6T+/y6D/ivIGYua+SXBSlKOrfbiEBriENHmGv
- xWvu55Jfjl8GQN0O46HWurgC/PJfj3r1bBcFfphCXq2Z8Y+FzkWo58iaQdFLBFaQbu
- aEHmcEhuDX/LU957RhGmlO3saI7YCobglXKif+mM=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jdrct-00Fe3b-6m; Wed, 27 May 2020 09:41:27 +0100
+ with ESMTP id EemuAlSztFSD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 04:42:25 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8B1A4B172
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:42:24 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id BB54F1344ACB74EED863;
+ Wed, 27 May 2020 16:42:21 +0800 (CST)
+Received: from [10.173.222.27] (10.173.222.27) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 27 May 2020 16:42:14 +0800
+Subject: Re: [PATCH] KVM: arm64: Allow in-atomic injection of SPIs
+To: Marc Zyngier <maz@kernel.org>
+References: <20200526161136.451312-1-maz@kernel.org>
+ <47d6d521-f05e-86fe-4a94-ce21754100ae@huawei.com>
+ <1d3658f4b92a690ba05367f2a22a7331@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <628e9f4b-0587-bde6-05f3-6877e37bd659@huawei.com>
+Date: Wed, 27 May 2020 16:42:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Date: Wed, 27 May 2020 09:41:27 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
- struct kvm
-In-Reply-To: <6518439c-65b7-1e87-a21d-a053d75c0514@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-4-maz@kernel.org>
- <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
- <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
- <6518439c-65b7-1e87-a21d-a053d75c0514@arm.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <ea603b3a7a51a597263e7c8152f4c795@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- Dave.Martin@arm.com, jintack@cs.columbia.edu, gcherian@marvell.com,
- prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com,
- mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1d3658f4b92a690ba05367f2a22a7331@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,101 +69,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 2020-05-12 17:53, Alexandru Elisei wrote:
-> Hi,
-> 
-> On 5/12/20 12:17 PM, James Morse wrote:
->> Hi Alex, Marc,
->> 
->> (just on this last_vcpu_ran thing...)
->> 
->> On 11/05/2020 17:38, Alexandru Elisei wrote:
->>> On 4/22/20 1:00 PM, Marc Zyngier wrote:
->>>> From: Christoffer Dall <christoffer.dall@arm.com>
->>>> 
->>>> As we are about to reuse our stage 2 page table manipulation code 
->>>> for
->>>> shadow stage 2 page tables in the context of nested virtualization, 
->>>> we
->>>> are going to manage multiple stage 2 page tables for a single VM.
->>>> 
->>>> This requires some pretty invasive changes to our data structures,
->>>> which moves the vmid and pgd pointers into a separate structure and
->>>> change pretty much all of our mmu code to operate on this structure
->>>> instead.
->>>> 
->>>> The new structure is called struct kvm_s2_mmu.
->>>> 
->>>> There is no intended functional change by this patch alone.
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h 
->>>> b/arch/arm64/include/asm/kvm_host.h
->>>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -63,19 +63,32 @@ struct kvm_vmid {
->>>>  	u32    vmid;
->>>>  };
->>>> 
->>>> -struct kvm_arch {
->>>> +struct kvm_s2_mmu {
->>>>  	struct kvm_vmid vmid;
->>>> 
->>>> -	/* stage2 entry level table */
->>>> -	pgd_t *pgd;
->>>> -	phys_addr_t pgd_phys;
->>>> -
->>>> -	/* VTCR_EL2 value for this VM */
->>>> -	u64    vtcr;
->>>> +	/*
->>>> +	 * stage2 entry level table
->>>> +	 *
->>>> +	 * Two kvm_s2_mmu structures in the same VM can point to the same 
->>>> pgd
->>>> +	 * here.  This happens when running a non-VHE guest hypervisor 
->>>> which
->>>> +	 * uses the canonical stage 2 page table for both vEL2 and for 
->>>> vEL1/0
->>>> +	 * with vHCR_EL2.VM == 0.
->>> It makes more sense to me to say that a non-VHE guest hypervisor will 
->>> use the
->>> canonical stage *1* page table when running at EL2
->> Can KVM say anything about stage1? Its totally under the the guests 
->> control even at vEL2...
-> 
-> It just occurred to me that "canonical stage 2 page table" refers to 
-> the L0
-> hypervisor stage 2, not to the L1 hypervisor stage 2. If you don't mind 
-> my
-> suggestion, perhaps the comment can be slightly improved to avoid any 
-> confusion?
-> Maybe something along the lines of "[..] This happens when running a
-> non-VHE guest
-> hypervisor, in which case we use the canonical stage 2 page table for 
-> both vEL2
-> and for vEL1/0 with vHCR_EL2.VM == 0".
-
-If the confusion stems from the lack of guest stage-2, how about:
-
-"This happens when running a guest using a translation regime that isn't
-  affected by its own stage-2 translation, such as a non-VHE hypervisor
-  running at vEL2, or for vEL1/EL0 with vHCR_EL2.VM == 0. In that case,
-  we use the canonical stage-2 page tables."
-
-instead? Does this lift the ambiguity?
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvNS8yNyAxNTo1NSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFpl
+bmdodWksCj4gCj4gT24gMjAyMC0wNS0yNyAwODo0MSwgWmVuZ2h1aSBZdSB3cm90ZToKPj4gT24g
+MjAyMC81LzI3IDA6MTEsIE1hcmMgWnluZ2llciB3cm90ZToKPj4+IE9uIGEgc3lzdGVtIHRoYXQg
+dXNlcyBTUElzIHRvIGltcGxlbWVudCBNU0lzIChhcyBpdCB3b3VsZCBiZQo+Pj4gdGhlIGNhc2Ug
+b24gYSBHSUN2MiBzeXN0ZW0gZXhwb3NpbmcgYSBHSUN2Mm0gdG8gaXRzIGd1ZXN0cyksCj4+PiB3
+ZSBkZW55IHRoZSBwb3NzaWJpbGl0eSBvZiBpbmplY3RpbmcgU1BJcyBvbiB0aGUgaW4tYXRvbWlj
+Cj4+PiBmYXN0LXBhdGguCj4+Pgo+Pj4gVGhpcyByZXN1bHRzIGluIGEgdmVyeSBsYXJnZSBhbW91
+bnQgb2YgY29udGV4dC1zd2l0Y2hlcwo+Pj4gKHJvdWdobHkgZXF1aXZhbGVudCB0byB0d2ljZSB0
+aGUgaW50ZXJydXB0IHJhdGUpIG9uIHRoZSBob3N0LAo+Pj4gYW5kIHN1Ym9wdGltYWwgcGVyZm9y
+bWFuY2UgZm9yIHRoZSBndWVzdCAoYXMgbWVhc3VyZWQgd2l0aAo+Pj4gYSB0ZXN0IHdvcmtsb2Fk
+IGludm9sdmluZyBhIHZpcnRpbyBpbnRlcmZhY2UgYmFja2VkIGJ5IHZob3N0LW5ldCkuCj4+PiBH
+aXZlbiB0aGF0IEdJQ3YyIHN5c3RlbXMgYXJlIHVzdWFsbHkgb24gdGhlIGxvdy1lbmQgb2YgdGhl
+IHNwZWN0cnVtCj4+PiBwZXJmb3JtYW5jZSB3aXNlLCB0aGV5IGNvdWxkIGRvIHdpdGhvdXQgdGhl
+IGFnZ3JhdmF0aW9uLgo+Pj4KPj4+IFdlIHNvbHZlZCB0aGlzIGZvciBHSUN2MytJVFMgYnkgaGF2
+aW5nIGEgdHJhbnNsYXRpb24gY2FjaGUuIEJ1dAo+Pj4gU1BJcyBkbyBub3QgbmVlZCBhbnkgZXh0
+cmEgaW5mcmFzdHJ1Y3R1cmUsIGFuZCBjYW4gYmUgaW1tZWRpYXRlbHkKPj4+IGluamVjdGVkIGlu
+IHRoZSB2aXJ0dWFsIGRpc3RyaWJ1dG9yIGFzIHRoZSBsb2NraW5nIGlzIGFscmVhZHkKPj4+IGhl
+YXZ5IGVub3VnaCB0aGF0IHdlIGRvbid0IG5lZWQgdG8gd29ycnkgYWJvdXQgYW55dGhpbmcuCj4+
+Pgo+Pj4gVGhpcyBoYWx2ZXMgdGhlIG51bWJlciBvZiBjb250ZXh0IHN3aXRjaGVzIGZvciB0aGUg
+c2FtZSB3b3JrbG9hZC4KPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBr
+ZXJuZWwub3JnPgo+Pj4gLS0tCj4+PiDCoCBhcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtaXJxZmQu
+YyB8IDIwICsrKysrKysrKysrKysrKystLS0tCj4+PiDCoCBhcmNoL2FybTY0L2t2bS92Z2ljL3Zn
+aWMtaXRzLmPCoMKgIHzCoCAzICstLQo+Pj4gwqAgMiBmaWxlcyBjaGFuZ2VkLCAxNyBpbnNlcnRp
+b25zKCspLCA2IGRlbGV0aW9ucygtKQo+Pj4KPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2
+bS92Z2ljL3ZnaWMtaXJxZmQuYyAKPj4+IGIvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLWlycWZk
+LmMKPj4+IGluZGV4IGQ4Y2RmZWE1Y2M5Ni4uMTFhOWY4MTExNWFiIDEwMDY0NAo+Pj4gLS0tIGEv
+YXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLWlycWZkLmMKPj4+ICsrKyBiL2FyY2gvYXJtNjQva3Zt
+L3ZnaWMvdmdpYy1pcnFmZC5jCj4+PiBAQCAtMTA3LDE1ICsxMDcsMjcgQEAgaW50IGt2bV9hcmNo
+X3NldF9pcnFfaW5hdG9taWMoc3RydWN0IAo+Pj4ga3ZtX2tlcm5lbF9pcnFfcm91dGluZ19lbnRy
+eSAqZSwKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBr
+dm0gKmt2bSwgaW50IGlycV9zb3VyY2VfaWQsIGludCBsZXZlbCwKPj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb2wgbGluZV9zdGF0dXMpCj4+Cj4+IC4uLiBhbmQg
+eW91IG1heSBhbHNvIG5lZWQgdG8gdXBkYXRlIHRoZSBjb21tZW50IG9uIHRvcCBvZiBpdCB0bwo+
+PiByZWZsZWN0IHRoaXMgY2hhbmdlLgo+Pgo+PiAvKioKPj4gwqAqIGt2bV9hcmNoX3NldF9pcnFf
+aW5hdG9taWM6IGZhc3QtcGF0aCBmb3IgaXJxZmQgaW5qZWN0aW9uCj4+IMKgKgo+PiDCoCogQ3Vy
+cmVudGx5IG9ubHkgZGlyZWN0IE1TSSBpbmplY3Rpb24gaXMgc3VwcG9ydGVkLgo+PiDCoCovCj4g
+Cj4gQXMgZmFyIGFzIEkgY2FuIHRlbGwsIGl0IGlzIHN0aWxsIHZhbGlkIChhdCBsZWFzdCBmcm9t
+IHRoZSBndWVzdCdzCj4gcGVyc3BlY3RpdmUpLiBZb3UgY291bGQgaW4gcHJhY3RpY2UgdXNlIHRo
+YXQgdG8gZGVhbCB3aXRoIGxldmVsCj4gaW50ZXJydXB0cywgYnV0IHdlIG9ubHkgaW5qZWN0IHRo
+ZSByaXNpbmcgZWRnZSBvbiB0aGlzIHBhdGgsIG5ldmVyCj4gdGhlIGZhbGxpbmcgZWRnZS4gU28g
+ZWZmZWN0aXZlbHksIHRoaXMgaXMgbGltaXRlZCB0byBlZGdlIGludGVycnVwdHMsCj4gd2hpY2gg
+aXMgbW9zdGx5IE1TSXMuCgpPb3BzLi4uIEkgaGFkIHdyb25nbHkgbWl4ZWQgTVNJIHdpdGggdGhl
+IGFyY2hpdGVjdHVyZS1kZWZpbmVkIExQSSwgYW5kCndhcyB0aGluayB0aGF0IHdlIHNob3VsZCBh
+ZGQgc29tZXRoaW5nIGxpa2UgImRpcmVjdCBTUEkgaW5qZWN0aW9uIGlzCmFsc28gc3VwcG9ydGVk
+IG5vdyIuIFNvcnJ5LgoKPiAKPiBVbmxlc3MgeW91IGFyZSB0aGlua2luZyBvZiBzb21ldGhpbmcg
+ZWxzZSB3aGljaCBJIHdvdWxkIGhhdmUgbWlzc2VkPwoKTm8sIHBsZWFzZSBpZ25vcmUgdGhlIG5v
+aXN5LgoKClRoYW5rcywKWmVuZ2h1aQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
