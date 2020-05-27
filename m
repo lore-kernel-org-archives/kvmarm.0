@@ -2,89 +2,97 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE56BC433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB28DC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:14:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 586012078B
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 08:59:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3672084C
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tvrGcnXk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586012078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cMob0knk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3672084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E72AC4B1C3;
-	Wed, 27 May 2020 04:59:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD08F4B207;
+	Wed, 27 May 2020 05:14:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JWcM-2yrE6r4; Wed, 27 May 2020 04:59:52 -0400 (EDT)
+	with ESMTP id FdaqgHZrUOQf; Wed, 27 May 2020 05:14:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9CA24B1FF;
-	Wed, 27 May 2020 04:59:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CCE24B1FC;
+	Wed, 27 May 2020 05:14:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E612C4B1E8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:59:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F56B4B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:14:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qd2Vjn+9QI-z for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 04:59:50 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B50FD4B1C3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 04:59:50 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9A4A920723;
- Wed, 27 May 2020 08:59:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590569989;
- bh=rPHAc5eimetXVqweeSipTURrEuy4V6ve5PkutgmKEtA=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tvrGcnXkSNJG9A+/gWnqyD9xa0wya4IQJK0PY/BHByHP6dRgqxXsEdBNg2uTPoBQo
- JY/4zMhBU/iygu/eMKo4uXCxEP6Az72mtKngAC968FsAm2meKbE6qBtYtiFyZ/DzLK
- 5mqMTqrzs/Knxjpm6gR83sMhQZAcAg/K8J2q4/No=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jdrue-00FeLV-31; Wed, 27 May 2020 09:59:48 +0100
+ with ESMTP id Tl8tTLT2ber5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 05:14:40 -0400 (EDT)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AD3F4B1E8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:14:40 -0400 (EDT)
+Received: by mail-wm1-f68.google.com with SMTP id u188so2302824wmu.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 02:14:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ERVcxFTM0vT/1MH9e0iwQ2bGR9XL129932mJIGULC34=;
+ b=cMob0knkFSJDBlUwLV6UPNqIun4MapJpUgHYb9tboeOz36yVvhh9l2hDsgB54ivPJO
+ yiCC30cVW3EKTZ3OO3AfHqU8x+VtFkIIr0R9fGSd418KPIu5PXD3MofWwt9Cn2ZLKNWJ
+ WbqhPncsVCI9jaz/XYl8TQfUkBhZcJJIY+1dRZnbr6+8xGUCHKX6T3hTbccnFO0xr8m3
+ 3EGoD8UDVloV9br85tJzoOvF0n7pBVf6BYmpEDvTfr4K+VpGOi5q5unNylupXEFoRhUj
+ VLg7JlpiPYNFEZAuzR0Ht67wXC9aZNcjXjxPiAMlvjYvrPxmhzj07ZCy89z8WzMRBcry
+ p1wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ERVcxFTM0vT/1MH9e0iwQ2bGR9XL129932mJIGULC34=;
+ b=KKD7ZrG54jxz7K+vDdlqYi8jBqd1nF5V2M3k158MOIDCWMVn0CYq/bEIgckxozqVSO
+ awOPmnO+eCCLlXAmZwHMu81QKPUUT5+a2iRmqgfOwWosifsENRVRhokJbGn/2O5T68ws
+ HsHjASnKtVcbIDgUTuPtj9Z1uMyER8cE0rdBuuGVT7qKMTTN0IYD6H9UZG0kYhbq0P9I
+ 7uzN370hIGnv8Xe0Qyc+zNtzVgpe9CbUdtWsTcJNuVqMUuFKSEXJVmWZJ0XPpiww9boH
+ O6YRwxQf2TGhnJtPPgdGEeREH/d0iHC9nCfIZECbFDEIppRa0waLWjxFNIbMgubp1NAb
+ zbAA==
+X-Gm-Message-State: AOAM530gcV9dXzQXQ+IstjBasfwSiPJHqK6dKLDEVfOlOXIcmjt9fVva
+ Y9ysGdTUI6BB+Z5wxKkHWdvO5A==
+X-Google-Smtp-Source: ABdhPJwwb+zSrIRkBY0A0SsuRcJOHMxMcWGLJGJHnizfqmIO4FBg2RexGKWtdOVRtUHcowLTG/s5zA==
+X-Received: by 2002:a7b:c5d7:: with SMTP id n23mr3582615wmk.185.1590570879183; 
+ Wed, 27 May 2020 02:14:39 -0700 (PDT)
+Received: from myrica ([2001:171b:226e:c200:c43b:ef78:d083:b355])
+ by smtp.gmail.com with ESMTPSA id r5sm2369132wrq.0.2020.05.27.02.14.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 May 2020 02:14:38 -0700 (PDT)
+Date: Wed, 27 May 2020 11:14:28 +0200
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RFC] Use SMMU HTTU for DMA dirty page tracking
+Message-ID: <20200527091428.GB265288@myrica>
+References: <b926ec0b-fe87-0792-c41d-acad56c656a4@huawei.com>
+ <20200522171452.GC3453945@myrica>
+ <e68c1158-8573-a477-42ce-48cee510c3ce@huawei.com>
+ <MWHPR11MB16454475DA1FF417CEF5A32B8CB10@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <897a84ac-0a71-ace7-e05b-3cc9f0b05c28@huawei.com>
+ <MWHPR11MB1645AA007D24F2D005794E5C8CB10@MWHPR11MB1645.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Date: Wed, 27 May 2020 09:59:48 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 08/26] KVM: arm64: Use TTL hint in when invalidating
- stage-2 translations
-In-Reply-To: <20200513090648.GA193035@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-9-maz@kernel.org>
- <20200507151321.GH237572@google.com>
- <63e16fdd-fe1b-07d3-23b7-cd99170fdd59@arm.com>
- <20200513090648.GA193035@google.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <7a2a533088ecc77f2c5a473e2c1c3004@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ascull@google.com, james.morse@arm.com, kvm@vger.kernel.org,
- andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, gcherian@marvell.com,
- prime.zeng@hisilicon.com, catalin.marinas@arm.com, will@kernel.org,
- Dave.Martin@arm.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB1645AA007D24F2D005794E5C8CB10@MWHPR11MB1645.namprd11.prod.outlook.com>
+Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "prime.zeng@hisilicon.com" <prime.zeng@hisilicon.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,80 +104,107 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-13 10:06, Andrew Scull wrote:
-> On Tue, May 12, 2020 at 01:04:31PM +0100, James Morse wrote:
->> Hi Andrew,
->> 
->> On 07/05/2020 16:13, Andrew Scull wrote:
->> >> @@ -176,7 +177,7 @@ static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr
->> >>  	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
->> >>  	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
->> >>  	stage2_pud_clear(kvm, pud);
->> >> -	kvm_tlb_flush_vmid_ipa(mmu, addr);
->> >> +	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
->> >>  	stage2_pmd_free(kvm, pmd_table);
->> >>  	put_page(virt_to_page(pud));
->> >>  }
->> >> @@ -186,7 +187,7 @@ static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr
->> >>  	pte_t *pte_table = pte_offset_kernel(pmd, 0);
->> >>  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
->> >>  	pmd_clear(pmd);
->> >> -	kvm_tlb_flush_vmid_ipa(mmu, addr);
->> >> +	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
->> >>  	free_page((unsigned long)pte_table);
->> >>  	put_page(virt_to_page(pmd));
->> >>  }
->> >
->> > Going by the names, is it possible to give a better level hint for these
->> > cases?
->> 
->> There is no leaf entry being invalidated here. After clearing the 
->> range, we found we'd
->> emptied (and invalidated) a whole page of mappings:
->> |	if (stage2_pmd_table_empty(kvm, start_pmd))
->> |		clear_stage2_pud_entry(mmu, pud, start_addr);
->> 
->> Now we want to remove the link to the empty page so we can free it. We 
->> are changing the
->> structure of the tables, not what gets mapped.
->> 
->> I think this is why we need the un-hinted behaviour, to invalidate 
->> "any level of the
->> translation table walk required to translate the specified IPA". 
->> Otherwise the hardware
->> can look for a leaf at the indicated level, find none, and do nothing.
->> 
->> 
->> This is sufficiently horrible, its possible I've got it completely 
->> wrong! (does it make
->> sense?)
+On Wed, May 27, 2020 at 08:40:47AM +0000, Tian, Kevin wrote:
+> > From: Xiang Zheng <zhengxiang9@huawei.com>
+> > Sent: Wednesday, May 27, 2020 2:45 PM
+> > 
+> > 
+> > On 2020/5/27 11:27, Tian, Kevin wrote:
+> > >> From: Xiang Zheng
+> > >> Sent: Monday, May 25, 2020 7:34 PM
+> > >>
+> > >> [+cc Kirti, Yan, Alex]
+> > >>
+> > >> On 2020/5/23 1:14, Jean-Philippe Brucker wrote:
+> > >>> Hi,
+> > >>>
+> > >>> On Tue, May 19, 2020 at 05:42:55PM +0800, Xiang Zheng wrote:
+> > >>>> Hi all,
+> > >>>>
+> > >>>> Is there any plan for enabling SMMU HTTU?
+> > >>>
+> > >>> Not outside of SVA, as far as I know.
+> > >>>
+> > >>
+> > >>>> I have seen the patch locates in the SVA series patch, which adds
+> > >>>> support for HTTU:
+> > >>>>     https://www.spinics.net/lists/arm-kernel/msg798694.html
+> > >>>>
+> > >>>> HTTU reduces the number of access faults on SMMU fault queue
+> > >>>> (permission faults also benifit from it).
+> > >>>>
+> > >>>> Besides reducing the faults, HTTU also helps to track dirty pages for
+> > >>>> device DMA. Is it feasible to utilize HTTU to get dirty pages on device
+> > >>>> DMA during VFIO live migration?
+> > >>>
+> > >>> As you know there is a VFIO interface for this under discussion:
+> > >>> https://lore.kernel.org/kvm/1589781397-28368-1-git-send-email-
+> > >> kwankhede@nvidia.com/
+> > >>> It doesn't implement an internal API to communicate with the IOMMU
+> > >> driver
+> > >>> about dirty pages.
+> > >
+> > > We plan to add such API later, e.g. to utilize A/D bit in VT-d 2nd-level
+> > > page tables (Rev 3.0).
+> > >
+> > 
+> > Thank you, Kevin.
+> > 
+> > When will you send this series patches? Maybe(Hope) we can also support
+> > hardware-based dirty pages tracking via common APIs based on your
+> > patches. :)
 > 
-> Ok. `addr` is an IPA, that IPA is now omitted from the map so doesn't
-> appear in any entry of the table, least of all a leaf entry. That makes
-> sense.
+> Yan is working with Kirti on basic live migration support now. After that
+> part is done, we will start working on A/D bit support. Yes, common APIs
+> are definitely the goal here.
 > 
-> Is there a convention to distinguish IPA and PA similar to the
-> distinction for VA or does kvmarm just use phys_addr_t all round?
-> 
-> It seems like the TTL patches are failry self contained if it would be
-> easier to serparate them out from these larger series?
+> > 
+> > >>
+> > >>>
+> > >>>> If SMMU can track dirty pages, devices are not required to implement
+> > >>>> additional dirty pages tracking to support VFIO live migration.
+> > >>>
+> > >>> It seems feasible, though tracking it in the device might be more
+> > >>> efficient. I might have misunderstood but I think for live migration of
+> > >>> the Intel NIC they trap guest accesses to the device and introspect its
+> > >>> state to figure out which pages it is accessing.
+> > >
+> > > Does HTTU implement A/D-like mechanism in SMMU page tables, or just
+> > > report dirty pages in a log buffer? Either way tracking dirty pages in IOMMU
+> > > side is generic thus doesn't require device-specific tweak like in Intel NIC.
+> > >
+> > 
+> > Currently HTTU just implement A/D-like mechanism in SMMU page tables.
+> > We certainly
+> > expect SMMU can also implement PML-like feature so that we can avoid
+> > walking the
+> > whole page table to get the dirty pages.
 
-They are. This whole series is a mix of unrelated patches anyway.
-Their only goal is to make my life a bit easier in the distant
-future.
+There is no reporting of dirty pages in log buffer. It might be possible
+to do software logging based on PRI or Stall, but that requires special
+support in the endpoint as well as the SMMU.
 
-I'll repost that anyway, as I have made some cosmetic changes.
+> Is there a link to HTTU introduction?
+
+I don't know any gentle introduction, but there are sections D5.4.11
+"Hardware management of the Access flag and dirty state" in the ARM
+Architecture Reference Manual (DDI0487E), and section 3.13 "Translation
+table entries and Access/Dirty flags" in the SMMU specification
+(IHI0070C). HTTU stands for "Hardware Translation Table Update".
+
+In short, when HTTU is enabled, the SMMU translation performs an atomic
+read-modify-write on the leaf translation table descriptor, setting some
+bits depending on the type of memory access. This can be enabled
+independently on both stage-1 and stage-2 tables (equivalent to your 1st
+and 2nd page tables levels, I think).
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
