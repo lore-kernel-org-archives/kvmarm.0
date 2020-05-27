@@ -2,65 +2,90 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BFFC433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D39C433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:34:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D549020890
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:29:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D549020890
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id B110C208B8
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:34:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAWjg7T6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B110C208B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574E74B17B;
-	Wed, 27 May 2020 05:29:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 444674B130;
+	Wed, 27 May 2020 05:34:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f81946F6FuUa; Wed, 27 May 2020 05:29:05 -0400 (EDT)
+	with ESMTP id KyzUXTvIrIDz; Wed, 27 May 2020 05:34:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42C754B10A;
-	Wed, 27 May 2020 05:29:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 121D74B140;
+	Wed, 27 May 2020 05:34:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B70CE4B0F2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:29:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0619E4B130
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:34:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iur+VtIIUKJz for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 05:29:01 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68C334B0FC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:29:01 -0400 (EDT)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 0B8E0E4858C83D8465D0;
- Wed, 27 May 2020 17:28:58 +0800 (CST)
-Received: from [10.173.221.230] (10.173.221.230) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 27 May 2020 17:28:51 +0800
-Subject: Re: [RFC PATCH 2/7] KVM: arm64: Set DBM bit of PTEs if hw DBM enabled
-To: Catalin Marinas <catalin.marinas@arm.com>
-References: <20200525112406.28224-1-zhukeqian1@huawei.com>
- <20200525112406.28224-3-zhukeqian1@huawei.com> <20200526114926.GD17051@gaia>
-From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <01147c57-b45e-0a40-da9a-4a0e56aac78d@huawei.com>
-Date: Wed, 27 May 2020 17:28:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id zi28cjKDKMcr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 05:34:12 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A32F94B096
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:34:12 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 752EB20890;
+ Wed, 27 May 2020 09:34:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1590572051;
+ bh=7Pi5My5nrzsGsUPwd6yUzD0/bg9Bh6OPCq4593K9TBk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=WAWjg7T60B2Gikan7es25KIN24d3UnYrPrk01hgFvSxnLQllWeL9RXVuAttD1WpsS
+ wQzw505kXGws+pWoXbpVW81ZKXZyfVbiakstUmqJzW3cBEs+GK3YgU9Q3ehbGfvlOM
+ 3/fhysIll/R99br1U1BtzIKHaqrGiG4ZQlPQ09jA=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jdsRt-00Fejs-NL; Wed, 27 May 2020 10:34:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200526114926.GD17051@gaia>
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
-Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org, Sean
- Christopherson <sean.j.christopherson@intel.com>,
- Peng Liang <liangpeng10@huawei.com>, Alexios Zavras <alexios.zavras@intel.com>,
- Mark Brown <broonie@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Wed, 27 May 2020 10:34:09 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
+ target EL
+In-Reply-To: <20200519104457.GA19548@C02TD0UTHF1T.local>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-27-maz@kernel.org>
+ <20200519104457.GA19548@C02TD0UTHF1T.local>
+User-Agent: Roundcube Webmail/1.4.4
+Message-ID: <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
+ alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
+ will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
+ George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,93 +97,177 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Catalin,
+HI Mark,
 
-On 2020/5/26 19:49, Catalin Marinas wrote:
-> On Mon, May 25, 2020 at 07:24:01PM +0800, Keqian Zhu wrote:
->> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
->> index 1305e28225fc..f9910ba2afd8 100644
->> --- a/arch/arm64/include/asm/pgtable-prot.h
->> +++ b/arch/arm64/include/asm/pgtable-prot.h
->> @@ -79,6 +79,7 @@ extern bool arm64_use_ng_mappings;
->>  	})
->>  
->>  #define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
->> +#define PAGE_S2_DBM		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN | PTE_DBM)
+On 2020-05-19 11:44, Mark Rutland wrote:
+> On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
+>> We currently assume that an exception is delivered to EL1, always.
+>> Once we emulate EL2, this no longer will be the case. To prepare
+>> for this, add a target_mode parameter.
+>> 
+>> While we're at it, merge the computing of the target PC and PSTATE in
+>> a single function that updates both PC and CPSR after saving their
+>> previous values in the corresponding ELR/SPSR. This ensures that they
+>> are updated in the correct order (a pretty common source of bugs...).
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/inject_fault.c | 75 
+>> ++++++++++++++++++-----------------
+>>  1 file changed, 38 insertions(+), 37 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/inject_fault.c 
+>> b/arch/arm64/kvm/inject_fault.c
+>> index d3ebf8bca4b89..3dbcbc839b9c3 100644
+>> --- a/arch/arm64/kvm/inject_fault.c
+>> +++ b/arch/arm64/kvm/inject_fault.c
+>> @@ -26,28 +26,12 @@ enum exception_type {
+>>  	except_type_serror	= 0x180,
+>>  };
+>> 
+>> -static u64 get_except_vector(struct kvm_vcpu *vcpu, enum 
+>> exception_type type)
+>> -{
+>> -	u64 exc_offset;
+>> -
+>> -	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+>> -	case PSR_MODE_EL1t:
+>> -		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+>> -		break;
+>> -	case PSR_MODE_EL1h:
+>> -		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+>> -		break;
+>> -	case PSR_MODE_EL0t:
+>> -		exc_offset = LOWER_EL_AArch64_VECTOR;
+>> -		break;
+>> -	default:
+>> -		exc_offset = LOWER_EL_AArch32_VECTOR;
+>> -	}
+>> -
+>> -	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
+>> -}
+>> -
+>>  /*
+>> + * This performs the exception entry at a given EL (@target_mode), 
+>> stashing PC
+>> + * and PSTATE into ELR and SPSR respectively, and compute the new 
+>> PC/PSTATE.
+>> + * The EL passed to this function *must* be a non-secure, privileged 
+>> mode with
+>> + * bit 0 being set (PSTATE.SP == 1).
+>> + *
+>>   * When an exception is taken, most PSTATE fields are left unchanged 
+>> in the
+>>   * handler. However, some are explicitly overridden (e.g. M[4:0]). 
+>> Luckily all
+>>   * of the inherited bits have the same position in the 
+>> AArch64/AArch32 SPSR_ELx
+>> @@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu 
+>> *vcpu, enum exception_type type)
+>>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
+>> layout, from
+>>   * MSB to LSB.
+>>   */
+>> -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
+>> +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
+>> target_mode,
+>> +			    enum exception_type type)
 > 
-> You don't need a new page permission (see below).
+> Since this is all for an AArch64 target, could we keep `64` in the 
+> name,
+> e.g enter_exception64? That'd mirror the callers below.
 > 
->>  #define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
->>  
->>  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index e3b9ee268823..dc97988eb2e0 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1426,6 +1426,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
->>  	pte = pte_offset_kernel(pmd, addr);
->>  	do {
->>  		if (!pte_none(*pte)) {
->> +#ifdef CONFIG_ARM64_HW_AFDBM
->> +			if (kvm_hw_dbm_enabled() && !kvm_s2pte_dbm(pte))
->> +				kvm_set_s2pte_dbm(pte);
->> +#endif
->>  			if (!kvm_s2pte_readonly(pte))
->>  				kvm_set_s2pte_readonly(pte);
->>  		}
-> 
-> Setting the DBM bit is equivalent to marking the page writable. The
-> actual writable pte bit (S2AP[1] or HAP[2] as we call them in Linux for
-> legacy reasons) tells you whether the page has been dirtied but it is
-> still writable if you set DBM. Doing this in stage2_wp_ptes()
-> practically means that you no longer have read-only pages at S2. There
-> are several good reasons why you don't want to break this. For example,
-> the S2 pte may already be read-only for other reasons (CoW).
-> 
-Thanks, your comments help to solve the first problem in cover letter.
-
-> I think you should only set the DBM bit if the pte was previously
-> writable. In addition, any permission change to the S2 pte must take
-> into account the DBM bit and clear it while transferring the dirty
-> status to the underlying page. I'm not deeply familiar with all these
-> callbacks into KVM but two such paths are kvm_unmap_hva_range() and the
-> kvm_mmu_notifier_change_pte().
-Yes, I agree.
-> 
-> 
->> @@ -1827,7 +1831,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>  
->>  		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
->>  	} else {
->> -		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
->> +		pte_t new_pte;
+>>  {
+>> -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+>> -	unsigned long old, new;
+>> +	unsigned long sctlr, vbar, old, new, mode;
+>> +	u64 exc_offset;
 >> +
->> +#ifdef CONFIG_ARM64_HW_AFDBM
->> +		if (kvm_hw_dbm_enabled() &&
->> +		    pgprot_val(mem_type) == pgprot_val(PAGE_S2)) {
->> +			mem_type = PAGE_S2_DBM;
->> +		}
->> +#endif
->> +		new_pte = kvm_pfn_pte(pfn, mem_type);
->>  
->>  		if (writable) {
->>  			new_pte = kvm_s2pte_mkwrite(new_pte);
+>> +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+>> +
+>> +	if      (mode == target_mode)
+>> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+>> +	else if ((mode | 1) == target_mode)
+>> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
 > 
-> That's wrong here. Basically for any fault you get, you just turn the S2
-> page writable. The point of DBM is that you don't get write faults at
-> all if you have a writable page. So, as I said above, only set the DBM
-> bit if you stored a writable S2 pte (kvm_s2pte_mkwrite()).
-Yeah, you are right. I will correct it in Patch v1.
-> 
+> It would be nice if we could add a mnemonic for the `1` here, e.g.
+> PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
+
+I've addressed both comments as follows:
+
+diff --git a/arch/arm64/include/asm/ptrace.h 
+b/arch/arm64/include/asm/ptrace.h
+index bf57308fcd63..953b6a1ce549 100644
+--- a/arch/arm64/include/asm/ptrace.h
++++ b/arch/arm64/include/asm/ptrace.h
+@@ -35,6 +35,7 @@
+  #define GIC_PRIO_PSR_I_SET		(1 << 4)
+
+  /* Additional SPSR bits not exposed in the UABI */
++#define PSR_MODE_THREAD_BIT	(1 << 0)
+  #define PSR_IL_BIT		(1 << 20)
+
+  /* AArch32-specific ptrace requests */
+diff --git a/arch/arm64/kvm/inject_fault.c 
+b/arch/arm64/kvm/inject_fault.c
+index 3dbcbc839b9c..ebfdfc27b2bd 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -43,8 +43,8 @@ enum exception_type {
+   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
+layout, from
+   * MSB to LSB.
+   */
+-static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
+target_mode,
+-			    enum exception_type type)
++static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long 
+target_mode,
++			      enum exception_type type)
+  {
+  	unsigned long sctlr, vbar, old, new, mode;
+  	u64 exc_offset;
+@@ -53,7 +53,7 @@ static void enter_exception(struct kvm_vcpu *vcpu, 
+unsigned long target_mode,
+
+  	if      (mode == target_mode)
+  		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+-	else if ((mode | 1) == target_mode)
++	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
+  		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+  	else if (!(mode & PSR_MODE32_BIT))
+  		exc_offset = LOWER_EL_AArch64_VECTOR;
+@@ -126,7 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool 
+is_iabt, unsigned long addr
+  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+  	u32 esr = 0;
+
+-	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
++	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+
+  	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
+
+@@ -156,7 +156,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+  {
+  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+
+-	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
++	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+
+  	/*
+  	 * Build an unknown exception, depending on the instruction
+
 
 Thanks,
-Keqian
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
