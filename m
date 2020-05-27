@@ -2,72 +2,72 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8683DC433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E28C433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:23:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09D9120B80
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43031207CB
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdxZIF05"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09D9120B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="H+Dno3Nf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43031207CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC724B112;
-	Wed, 27 May 2020 06:04:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5FD34B214;
+	Wed, 27 May 2020 06:23:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bgm+WKx8LeEa; Wed, 27 May 2020 06:04:14 -0400 (EDT)
+	with ESMTP id EWeX5aSits+r; Wed, 27 May 2020 06:23:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7556E4B119;
-	Wed, 27 May 2020 06:04:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AF854B203;
+	Wed, 27 May 2020 06:23:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEFEC4B1B5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:04:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B614B1C3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:23:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sUz9URotTncg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 06:04:11 -0400 (EDT)
+ with ESMTP id HJq5kTawQzHe for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 06:23:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C9834B112
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:04:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A9DD4B18E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:23:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6EBCA2084C;
- Wed, 27 May 2020 10:04:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C1D99207CB;
+ Wed, 27 May 2020 10:22:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590573850;
- bh=zSIdbYQzBzwhjrQI1hWwupDBNv6wpaxUIuCkjXojSUs=;
+ s=default; t=1590574978;
+ bh=A4o6AQ11xM15anYtwypBhO8P5vfetakTLxp99W90wuY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=mdxZIF05SH6elzOSo9ZapHNOQTVJUmqp6M8R2ruYxkwZfsnML55SowgexSg4vGSjR
- 9BrMXLjFGrYP0ZeSZ8q1G2q8UjOZL+OwezjpS3XZ4MXV1NuaCWhNoG73aOTLSrtsLc
- wS9UJZ2vgVazwPa9OxZQ4zUZbrOv7fmLZg4hCw9E=
+ b=H+Dno3NfR/xe7QlwfmZtVqOewiqZuMfqzkYeg2HKsHD5yaLjIA0pGWcPaFAbK0GCu
+ 9ixtmldbrA9onTT7Xr+rexmfko5Ubp5dYvU8QreAd+rguINSFD7MnOg4bTKXOhvEAX
+ AkhphrVvfFfS5dbJsmyB1Z+eedNXsX37mvNbz64A=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jdsuu-00Ff8O-Pj; Wed, 27 May 2020 11:04:08 +0100
+ id 1jdtD7-00FfKg-6n; Wed, 27 May 2020 11:22:57 +0100
 MIME-Version: 1.0
-Date: Wed, 27 May 2020 11:04:08 +0100
+Date: Wed, 27 May 2020 11:22:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 10/26] KVM: arm64: Refactor vcpu_{read,write}_sys_reg
-In-Reply-To: <09da829c-1640-40fe-313f-df021759fb34@arm.com>
+Subject: Re: [PATCH 19/26] KVM: arm64: Make struct kvm_regs userspace-only
+In-Reply-To: <0a38305f-77f8-11b0-cb74-2bec07ce0a0a@arm.com>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-11-maz@kernel.org>
- <09da829c-1640-40fe-313f-df021759fb34@arm.com>
+ <20200422120050.3693593-20-maz@kernel.org>
+ <0a38305f-77f8-11b0-cb74-2bec07ce0a0a@arm.com>
 User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <1612302e289ba15fb0ffbfba5ea18e3b@kernel.org>
+Message-ID: <8f1665abb0bd6f018cb8af53ec203b76@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
@@ -101,78 +101,63 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-26 17:28, James Morse wrote:
+On 2020-05-26 17:29, James Morse wrote:
 > Hi Marc,
 > 
 > On 22/04/2020 13:00, Marc Zyngier wrote:
->> Extract the direct HW accessors for later reuse.
-> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 51db934702b64..46f218982df8c 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
-> 
->> +u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->> +{
->> +	u64 val = 0x8badf00d8badf00d;
->> +
->> +	if (!vcpu->arch.sysregs_loaded_on_cpu) {
->> +		goto memory_read;
->>  	}
+>> struct kvm_regs is used by userspace to indicate which register gets
+>> accessed by the {GET,SET}_ONE_REG API. But as we're about to refactor
+>> the layout of the in-kernel register structures, we need the kernel to
+>> move away from it.
 >> 
->> -immediate_write:
->> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
->> +		return val;
+>> Let's make kvm_regs userspace only, and let the kernel map it to its 
+>> own
+>> internal representation.
+> 
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 23ebe51410f06..9fec9231b63e2 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -102,6 +102,55 @@ static int core_reg_size_from_offset(const struct 
+>> kvm_vcpu *vcpu, u64 off)
+>>  	return size;
+>>  }
+>> 
+>> +static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct 
+>> kvm_one_reg *reg)
+>> +{
+>> +	u64 off = core_reg_offset_from_id(reg->id);
 >> +
->> +memory_read:
->> +	return __vcpu_sys_reg(vcpu, reg);
+>> +	switch (off) {
+> 
+>> +	default:
+>> +		return NULL;
+> 
+> Doesn't this switch statement catch an out of range offset, and a
+> misaligned offset?
+> 
+> ... We still test for those explicitly in the caller. Better safe than 
+> implicit?
+
+Indeed, this is not supposed to happen at all. Maybe I should just fold
+validate_core_offset offset there, and make this NULL value the error
+case.
+
+> 
+>> +	}
 >> +}
 > 
-> 
-> The goto here is a bit odd, is it just an artefact of how we got here?
-
-That's because a lot of this changes when NV gets added to the mix,
-see [1].
-
-> Is this easier on the eye?:
-> | u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
-> | {
-> |	u64 val = 0x8badf00d8badf00d;
-> |
-> |	if (vcpu->arch.sysregs_loaded_on_cpu &&
-> |	    __vcpu_read_sys_reg_from_cpu(reg, &val))
-> |		return val;
-> |
-> | 	return __vcpu_sys_reg(vcpu, reg);
-> | }
-
-Definitely. I don't mind reworking the NV branch so that the label
-gets introduced there.
-
->> +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->> +{
->> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
->> +		goto memory_write;
->> +
->> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
->> +		return;
->> +
->> +memory_write:
->>  	 __vcpu_sys_reg(vcpu, reg) = val;
->>  }
-> 
-> Again I think its clearer without the goto....
-> 
-> 
-> Regardless:
+> With the reset thing reported by Zenghui and Zengtao on the previous
+> patch fixed:
 > Reviewed-by: James Morse <james.morse@arm.com>
+> 
+> (otherwise struct kvm_regs isn't userspace-only!)
+
+Indeed!
 
 Thanks,
 
          M.
-
-[1] 
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-5.7-rc1-WIP&id=11f3217d39a602cbfac7d08064c8b31afb57348e
 -- 
 Jazz is not dead. It just smells funny...
 _______________________________________________
