@@ -2,80 +2,79 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D39C433E1
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8683DC433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:04:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B110C208B8
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 09:34:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09D9120B80
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:04:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAWjg7T6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B110C208B8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdxZIF05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09D9120B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 444674B130;
-	Wed, 27 May 2020 05:34:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC724B112;
+	Wed, 27 May 2020 06:04:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KyzUXTvIrIDz; Wed, 27 May 2020 05:34:15 -0400 (EDT)
+	with ESMTP id Bgm+WKx8LeEa; Wed, 27 May 2020 06:04:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 121D74B140;
-	Wed, 27 May 2020 05:34:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7556E4B119;
+	Wed, 27 May 2020 06:04:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0619E4B130
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:34:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEFEC4B1B5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:04:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zi28cjKDKMcr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 05:34:12 -0400 (EDT)
+ with ESMTP id sUz9URotTncg for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 06:04:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A32F94B096
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 05:34:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C9834B112
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:04:11 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 752EB20890;
- Wed, 27 May 2020 09:34:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6EBCA2084C;
+ Wed, 27 May 2020 10:04:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590572051;
- bh=7Pi5My5nrzsGsUPwd6yUzD0/bg9Bh6OPCq4593K9TBk=;
+ s=default; t=1590573850;
+ bh=zSIdbYQzBzwhjrQI1hWwupDBNv6wpaxUIuCkjXojSUs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=WAWjg7T60B2Gikan7es25KIN24d3UnYrPrk01hgFvSxnLQllWeL9RXVuAttD1WpsS
- wQzw505kXGws+pWoXbpVW81ZKXZyfVbiakstUmqJzW3cBEs+GK3YgU9Q3ehbGfvlOM
- 3/fhysIll/R99br1U1BtzIKHaqrGiG4ZQlPQ09jA=
+ b=mdxZIF05SH6elzOSo9ZapHNOQTVJUmqp6M8R2ruYxkwZfsnML55SowgexSg4vGSjR
+ 9BrMXLjFGrYP0ZeSZ8q1G2q8UjOZL+OwezjpS3XZ4MXV1NuaCWhNoG73aOTLSrtsLc
+ wS9UJZ2vgVazwPa9OxZQ4zUZbrOv7fmLZg4hCw9E=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jdsRt-00Fejs-NL; Wed, 27 May 2020 10:34:09 +0100
+ id 1jdsuu-00Ff8O-Pj; Wed, 27 May 2020 11:04:08 +0100
 MIME-Version: 1.0
-Date: Wed, 27 May 2020 10:34:09 +0100
+Date: Wed, 27 May 2020 11:04:08 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
- target EL
-In-Reply-To: <20200519104457.GA19548@C02TD0UTHF1T.local>
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 10/26] KVM: arm64: Refactor vcpu_{read,write}_sys_reg
+In-Reply-To: <09da829c-1640-40fe-313f-df021759fb34@arm.com>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-27-maz@kernel.org>
- <20200519104457.GA19548@C02TD0UTHF1T.local>
+ <20200422120050.3693593-11-maz@kernel.org>
+ <09da829c-1640-40fe-313f-df021759fb34@arm.com>
 User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
+Message-ID: <1612302e289ba15fb0ffbfba5ea18e3b@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
  christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
  alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
- will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
  julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
@@ -102,170 +101,78 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HI Mark,
-
-On 2020-05-19 11:44, Mark Rutland wrote:
-> On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
->> We currently assume that an exception is delivered to EL1, always.
->> Once we emulate EL2, this no longer will be the case. To prepare
->> for this, add a target_mode parameter.
->> 
->> While we're at it, merge the computing of the target PC and PSTATE in
->> a single function that updates both PC and CPSR after saving their
->> previous values in the corresponding ELR/SPSR. This ensures that they
->> are updated in the correct order (a pretty common source of bugs...).
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/inject_fault.c | 75 
->> ++++++++++++++++++-----------------
->>  1 file changed, 38 insertions(+), 37 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/inject_fault.c 
->> b/arch/arm64/kvm/inject_fault.c
->> index d3ebf8bca4b89..3dbcbc839b9c3 100644
->> --- a/arch/arm64/kvm/inject_fault.c
->> +++ b/arch/arm64/kvm/inject_fault.c
->> @@ -26,28 +26,12 @@ enum exception_type {
->>  	except_type_serror	= 0x180,
->>  };
->> 
->> -static u64 get_except_vector(struct kvm_vcpu *vcpu, enum 
->> exception_type type)
->> -{
->> -	u64 exc_offset;
->> -
->> -	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
->> -	case PSR_MODE_EL1t:
->> -		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
->> -		break;
->> -	case PSR_MODE_EL1h:
->> -		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
->> -		break;
->> -	case PSR_MODE_EL0t:
->> -		exc_offset = LOWER_EL_AArch64_VECTOR;
->> -		break;
->> -	default:
->> -		exc_offset = LOWER_EL_AArch32_VECTOR;
->> -	}
->> -
->> -	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
->> -}
->> -
->>  /*
->> + * This performs the exception entry at a given EL (@target_mode), 
->> stashing PC
->> + * and PSTATE into ELR and SPSR respectively, and compute the new 
->> PC/PSTATE.
->> + * The EL passed to this function *must* be a non-secure, privileged 
->> mode with
->> + * bit 0 being set (PSTATE.SP == 1).
->> + *
->>   * When an exception is taken, most PSTATE fields are left unchanged 
->> in the
->>   * handler. However, some are explicitly overridden (e.g. M[4:0]). 
->> Luckily all
->>   * of the inherited bits have the same position in the 
->> AArch64/AArch32 SPSR_ELx
->> @@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu 
->> *vcpu, enum exception_type type)
->>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
->> layout, from
->>   * MSB to LSB.
->>   */
->> -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
->> +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
->> target_mode,
->> +			    enum exception_type type)
+On 2020-05-26 17:28, James Morse wrote:
+> Hi Marc,
 > 
-> Since this is all for an AArch64 target, could we keep `64` in the 
-> name,
-> e.g enter_exception64? That'd mirror the callers below.
+> On 22/04/2020 13:00, Marc Zyngier wrote:
+>> Extract the direct HW accessors for later reuse.
 > 
->>  {
->> -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->> -	unsigned long old, new;
->> +	unsigned long sctlr, vbar, old, new, mode;
->> +	u64 exc_offset;
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 51db934702b64..46f218982df8c 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+> 
+>> +u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>> +{
+>> +	u64 val = 0x8badf00d8badf00d;
 >> +
->> +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+>> +	if (!vcpu->arch.sysregs_loaded_on_cpu) {
+>> +		goto memory_read;
+>>  	}
+>> 
+>> -immediate_write:
+>> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+>> +		return val;
 >> +
->> +	if      (mode == target_mode)
->> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
->> +	else if ((mode | 1) == target_mode)
->> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+>> +memory_read:
+>> +	return __vcpu_sys_reg(vcpu, reg);
+>> +}
 > 
-> It would be nice if we could add a mnemonic for the `1` here, e.g.
-> PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
+> 
+> The goto here is a bit odd, is it just an artefact of how we got here?
 
-I've addressed both comments as follows:
+That's because a lot of this changes when NV gets added to the mix,
+see [1].
 
-diff --git a/arch/arm64/include/asm/ptrace.h 
-b/arch/arm64/include/asm/ptrace.h
-index bf57308fcd63..953b6a1ce549 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -35,6 +35,7 @@
-  #define GIC_PRIO_PSR_I_SET		(1 << 4)
+> Is this easier on the eye?:
+> | u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> | {
+> |	u64 val = 0x8badf00d8badf00d;
+> |
+> |	if (vcpu->arch.sysregs_loaded_on_cpu &&
+> |	    __vcpu_read_sys_reg_from_cpu(reg, &val))
+> |		return val;
+> |
+> | 	return __vcpu_sys_reg(vcpu, reg);
+> | }
 
-  /* Additional SPSR bits not exposed in the UABI */
-+#define PSR_MODE_THREAD_BIT	(1 << 0)
-  #define PSR_IL_BIT		(1 << 20)
+Definitely. I don't mind reworking the NV branch so that the label
+gets introduced there.
 
-  /* AArch32-specific ptrace requests */
-diff --git a/arch/arm64/kvm/inject_fault.c 
-b/arch/arm64/kvm/inject_fault.c
-index 3dbcbc839b9c..ebfdfc27b2bd 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -43,8 +43,8 @@ enum exception_type {
-   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
-layout, from
-   * MSB to LSB.
-   */
--static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
-target_mode,
--			    enum exception_type type)
-+static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long 
-target_mode,
-+			      enum exception_type type)
-  {
-  	unsigned long sctlr, vbar, old, new, mode;
-  	u64 exc_offset;
-@@ -53,7 +53,7 @@ static void enter_exception(struct kvm_vcpu *vcpu, 
-unsigned long target_mode,
-
-  	if      (mode == target_mode)
-  		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
--	else if ((mode | 1) == target_mode)
-+	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
-  		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-  	else if (!(mode & PSR_MODE32_BIT))
-  		exc_offset = LOWER_EL_AArch64_VECTOR;
-@@ -126,7 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool 
-is_iabt, unsigned long addr
-  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
-  	u32 esr = 0;
-
--	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-
-  	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
-
-@@ -156,7 +156,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
-  {
-  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-
--	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-
-  	/*
-  	 * Build an unknown exception, depending on the instruction
-
+>> +void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>> +{
+>> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>> +		goto memory_write;
+>> +
+>> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
+>> +		return;
+>> +
+>> +memory_write:
+>>  	 __vcpu_sys_reg(vcpu, reg) = val;
+>>  }
+> 
+> Again I think its clearer without the goto....
+> 
+> 
+> Regardless:
+> Reviewed-by: James Morse <james.morse@arm.com>
 
 Thanks,
 
          M.
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-5.7-rc1-WIP&id=11f3217d39a602cbfac7d08064c8b31afb57348e
 -- 
 Jazz is not dead. It just smells funny...
 _______________________________________________
