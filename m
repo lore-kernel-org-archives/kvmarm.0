@@ -2,84 +2,58 @@ Return-Path: <SRS0=MITk=7J=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 600ECC433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B2FC433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 14:41:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDD0B2073B
-	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 10:36:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOGli9qm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDD0B2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D8E5720899
+	for <kvmarm@archiver.kernel.org>; Wed, 27 May 2020 14:41:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8E5720899
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C91F4B1BE;
-	Wed, 27 May 2020 06:36:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F4E4B16F;
+	Wed, 27 May 2020 10:41:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tRtXgNG07opM; Wed, 27 May 2020 06:36:44 -0400 (EDT)
+	with ESMTP id eg8akO9PZGte; Wed, 27 May 2020 10:41:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 443344B12E;
-	Wed, 27 May 2020 06:36:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E14404B1BB;
+	Wed, 27 May 2020 10:41:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEAAA4B12E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:36:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F33894B16F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 10:41:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uggRJYbIpUOu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2020 06:36:42 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3E494B0DB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 06:36:41 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id ADBF02073B;
- Wed, 27 May 2020 10:36:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590575800;
- bh=7S8+Z2WBgc1CxZauci2e0vIy7gbHb1PyiVeg2bPwpiA=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=FOGli9qmkqQ4Ze0mRKWYbl6IppezOt2yoZUoMr7iHcex1obc03QQ3Py46tdbH8e1W
- u7VuSQozk3bsiTyFdUIrNif5FMiHWV1omCJC97VbGRNSgbz+tL6s99Quqb6Phn4K6r
- JljcMRM9wLQqsUP4A5SEMYqpI6ckO2wJduE72oKk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jdtQN-00FfU0-2j; Wed, 27 May 2020 11:36:39 +0100
-MIME-Version: 1.0
-Date: Wed, 27 May 2020 11:36:39 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 20/26] KVM: arm64: Move ELR_EL1 to the system register
- array
-In-Reply-To: <b6a08ca6-1682-4fa6-e8f4-bb4adba5d19a@arm.com>
+ with ESMTP id DSrPfMFH39J9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2020 10:41:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 927434B141
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2020 10:41:44 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC2EC30E;
+ Wed, 27 May 2020 07:41:43 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.7.129])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70C2D3F6C4;
+ Wed, 27 May 2020 07:41:40 -0700 (PDT)
+Date: Wed, 27 May 2020 15:41:33 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
+ target EL
+Message-ID: <20200527144133.GA59947@C02TD0UTHF1T.local>
 References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-21-maz@kernel.org>
- <b6a08ca6-1682-4fa6-e8f4-bb4adba5d19a@arm.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <d7cb5dc4656cab36db79b0eaf3737221@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
- alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <20200422120050.3693593-27-maz@kernel.org>
+ <20200519104457.GA19548@C02TD0UTHF1T.local>
+ <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
  George Cherian <gcherian@marvell.com>,
@@ -97,51 +71,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-05-26 17:29, James Morse wrote:
-> Hi Marc,
+On Wed, May 27, 2020 at 10:34:09AM +0100, Marc Zyngier wrote:
+> HI Mark,
 > 
-> On 22/04/2020 13:00, Marc Zyngier wrote:
->> As ELR-EL1 is a VNCR-capable register with ARMv8.4-NV, let's move it 
->> to
->> the sys_regs array and repaint the accessors. While we're at it, let's
->> kill the now useless accessors used only on the fault injection path.
+> On 2020-05-19 11:44, Mark Rutland wrote:
+> > On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
+> > > -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
+> > > +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long
+> > > target_mode,
+> > > +			    enum exception_type type)
+> > 
+> > Since this is all for an AArch64 target, could we keep `64` in the name,
+> > e.g enter_exception64? That'd mirror the callers below.
+> > 
+> > >  {
+> > > -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > > -	unsigned long old, new;
+> > > +	unsigned long sctlr, vbar, old, new, mode;
+> > > +	u64 exc_offset;
+> > > +
+> > > +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > > +
+> > > +	if      (mode == target_mode)
+> > > +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> > > +	else if ((mode | 1) == target_mode)
+> > > +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> > 
+> > It would be nice if we could add a mnemonic for the `1` here, e.g.
+> > PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
 > 
-> Reviewed-by: James Morse <james.morse@arm.com>
+> I've addressed both comments as follows:
 > 
+> diff --git a/arch/arm64/include/asm/ptrace.h
+> b/arch/arm64/include/asm/ptrace.h
+> index bf57308fcd63..953b6a1ce549 100644
+> --- a/arch/arm64/include/asm/ptrace.h
+> +++ b/arch/arm64/include/asm/ptrace.h
+> @@ -35,6 +35,7 @@
+>  #define GIC_PRIO_PSR_I_SET		(1 << 4)
 > 
-> A curiosity:
+>  /* Additional SPSR bits not exposed in the UABI */
+> +#define PSR_MODE_THREAD_BIT	(1 << 0)
+>  #define PSR_IL_BIT		(1 << 20)
 > 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index 95977b80265ce..46949fce3e813 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -184,6 +184,8 @@ enum vcpu_sysreg {
+>  /* AArch32-specific ptrace requests */
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index 3dbcbc839b9c..ebfdfc27b2bd 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -43,8 +43,8 @@ enum exception_type {
+>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout,
+> from
+>   * MSB to LSB.
+>   */
+> -static void enter_exception(struct kvm_vcpu *vcpu, unsigned long
+> target_mode,
+> -			    enum exception_type type)
+> +static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long
+> target_mode,
+> +			      enum exception_type type)
+>  {
+>  	unsigned long sctlr, vbar, old, new, mode;
+>  	u64 exc_offset;
+> @@ -53,7 +53,7 @@ static void enter_exception(struct kvm_vcpu *vcpu,
+> unsigned long target_mode,
 > 
-> Comment above the enum has some claims about the order, but its
-> already out of order with
-> __vcpu_read_sys_reg_from_cpu()... (PAR_EL1 being the culprit)
+>  	if      (mode == target_mode)
+>  		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> -	else if ((mode | 1) == target_mode)
+> +	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
+>  		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+>  	else if (!(mode & PSR_MODE32_BIT))
+>  		exc_offset = LOWER_EL_AArch64_VECTOR;
+> @@ -126,7 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool
+> is_iabt, unsigned long addr
+>  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+>  	u32 esr = 0;
+> 
+> -	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
+> +	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+> 
+>  	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
+> 
+> @@ -156,7 +156,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> 
+> -	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
+> +	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+> 
+>  	/*
+>  	 * Build an unknown exception, depending on the instruction
 
-This comment dates back from the original assembly implementation,
-where I was paranoid about accessing the sys_regs array in strict
-order to maximize the chances of the prefetcher doing the right thing.
+Thanks; that all looks good to me, and my R-b stands!
 
-As always with premature optimization, it was worthless, and moving
-things to C forced us to do things differently anyway (not to mention
-VHE...).
-
-I'll delete the comment in a separate patch.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
