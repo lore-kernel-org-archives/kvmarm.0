@@ -2,80 +2,67 @@ Return-Path: <SRS0=/xnR=7K=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFC3C433E1
-	for <kvmarm@archiver.kernel.org>; Thu, 28 May 2020 13:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463D4C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 May 2020 16:36:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B07462089D
-	for <kvmarm@archiver.kernel.org>; Thu, 28 May 2020 13:13:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2OHw/FQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07462089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C5AA3207F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 May 2020 16:36:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5AA3207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43F8E4B250;
-	Thu, 28 May 2020 09:13:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4628F4B1DC;
+	Thu, 28 May 2020 12:36:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mhd-HoWFF5le; Thu, 28 May 2020 09:13:17 -0400 (EDT)
+	with ESMTP id eSu5Iw0nRHL8; Thu, 28 May 2020 12:36:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F08234B235;
-	Thu, 28 May 2020 09:13:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 351F34B1D2;
+	Thu, 28 May 2020 12:36:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D28364B232
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2020 09:13:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6766E4B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2020 12:36:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oUw4j3nILwwO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 May 2020 09:13:15 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 859CE4B143
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2020 09:13:15 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6774320814;
- Thu, 28 May 2020 13:13:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590671594;
- bh=88nAhcUdAjqSE5P8DmE4VKnsji8sqj9MbWPaJTGERCA=;
- h=From:To:Cc:Subject:Date:From;
- b=l2OHw/FQ9kerohAio4wp12902DOjbqbrMavpBZZOXeJk1Cey1Q+bKIje+2nVhDNvK
- WfulkPDPNpuEBUQA1KNabTOrlpcNAzHEz2FN7ZbdBGQ0pVUsJC0wZymO6GhkrEKsyG
- oK+/W9yovwCO4nBdu8ztZkfiyXkr+lh3SMcuJ0iM=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jeILQ-00Fzjb-KP; Thu, 28 May 2020 14:13:12 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: Check advertised Stage-2 page size capability
-Date: Thu, 28 May 2020 14:12:58 +0100
-Message-Id: <20200528131259.860459-1-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
+ with ESMTP id i8QbABi36eMI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 May 2020 12:36:13 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 555F04B1D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2020 12:36:13 -0400 (EDT)
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11]
+ helo=nanos.tec.linutronix.de)
+ by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+ (Exim 4.80) (envelope-from <tglx@linutronix.de>)
+ id 1jeLVl-0004mm-VY; Thu, 28 May 2020 18:36:06 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+ id 3A4C7100D01; Thu, 28 May 2020 18:36:05 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, pbonzini@redhat.com,
+ sean.j.christopherson@intel.com, maz@kernel.org, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ steven.price@arm.com
+Subject: Re: [RFC PATCH v12 05/11] time: Add mechanism to recognize
+ clocksource in time_get_snapshot
+In-Reply-To: <20200522083724.38182-6-jianyong.wu@arm.com>
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-6-jianyong.wu@arm.com>
+Date: Thu, 28 May 2020 18:36:05 +0200
+Message-ID: <87tv00nhje.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: will@kernel.org, catalin.marinas@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required, ALL_TRUSTED=-1,
+ SHORTCIRCUIT=-0.0001
+Cc: justin.he@arm.com, Wei.Chen@arm.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nd@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,164 +79,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
-advertise the supported Stage-2 page sizes.
+Jianyong Wu <jianyong.wu@arm.com> writes:
+> From: Thomas Gleixner <tglx@linutronix.de>
+> diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
+> index 7cb09c4cf21c..a8f65b3e4ec8 100644
+> --- a/kernel/time/clocksource.c
+> +++ b/kernel/time/clocksource.c
+> @@ -928,6 +928,9 @@ int __clocksource_register_scale(struct clocksource *cs, u32 scale, u32 freq)
+>  
+>  	clocksource_arch_init(cs);
+>  
+> +if (WARN_ON_ONCE((unsigned int)cs->id >= CSID_MAX))
+> +		cs->id = CSID_GENERIC;
+> +
 
-Let's check this at boot time.
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
-Hi Will,
-
-Can you please take this patch via the arm64 tree, and apply it
-to the for-next/cpufeature branch?
-
-Thanks,
-
-        M.
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/include/asm/sysreg.h   |  3 +++
- arch/arm64/kernel/cpufeature.c    | 18 +++++++++++++++
- arch/arm64/kvm/reset.c            | 37 +++++++++++++++++++++++++++++--
- virt/kvm/arm/arm.c                |  4 +---
- 5 files changed, 58 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 32c8a675e5a4..7dd8fefa6aec 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
- 
--void kvm_set_ipa_limit(void);
-+int kvm_set_ipa_limit(void);
- 
- #define __KVM_HAVE_ARCH_VM_ALLOC
- struct kvm *kvm_arch_alloc_vm(void);
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index fa9d02ca4b25..efe368ee4996 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -703,6 +703,9 @@
- #define ID_AA64ZFR0_SVEVER_SVE2		0x1
- 
- /* id_aa64mmfr0 */
-+#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
-+#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
-+#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
- #define ID_AA64MMFR0_TGRAN4_SHIFT	28
- #define ID_AA64MMFR0_TGRAN64_SHIFT	24
- #define ID_AA64MMFR0_TGRAN16_SHIFT	20
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 7437b8c19528..b3202a99e559 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -267,6 +267,24 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
-+	/*
-+	 * Page size not being supported at Stage-2 is not fatal. You
-+	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
-+	 * your favourite nesting hypervisor.
-+	 *
-+	 * There is a small corner case where the hypervisor explicitly
-+	 * advertises a given granule size at Stage-2 (value 2) on some
-+	 * vCPUs, and uses the fallback to Stage-1 (value 0) for other
-+	 * vCPUs. Although this is not forbidden by the architecture, it
-+	 * indicates that the hypervisor is being silly (or buggy).
-+	 *
-+	 * We make no effort to cope with this and pretend that if these
-+	 * fields are inconsistent across vCPUs, then it isn't worth
-+	 * trying to bring KVM up.
-+	 */
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
- 	/*
- 	 * We already refuse to boot CPUs that don't support our configured
- 	 * page size, so we can only detect mismatches for a page size other
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index d8800ef4f42d..70cd7bcca433 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -337,14 +337,45 @@ u32 get_kvm_ipa_limit(void)
- 	return kvm_ipa_limit;
- }
- 
--void kvm_set_ipa_limit(void)
-+int kvm_set_ipa_limit(void)
- {
--	unsigned int ipa_max, pa_max, va_max, parange;
-+	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
- 	u64 mmfr0;
- 
- 	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
- 	parange = cpuid_feature_extract_unsigned_field(mmfr0,
- 				ID_AA64MMFR0_PARANGE_SHIFT);
-+
-+	/*
-+	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
-+	 * Stage-2. If not, things will stop very quickly.
-+	 */
-+	switch (PAGE_SIZE) {
-+	default:
-+	case SZ_4K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
-+		break;
-+	case SZ_16K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
-+		break;
-+	case SZ_64K:
-+		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
-+		break;
-+	}
-+
-+	switch (cpuid_feature_extract_unsigned_field(mmfr0, tgran_2)) {
-+	default:
-+	case 1:
-+		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
-+		return -EINVAL;
-+	case 0:
-+		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
-+		break;
-+	case 2:
-+		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
-+		break;
-+	}
-+
- 	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
- 
- 	/* Clamp the IPA limit to the PA size supported by the kernel */
-@@ -378,6 +409,8 @@ void kvm_set_ipa_limit(void)
- 	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
- 	kvm_ipa_limit = ipa_max;
- 	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
-+
-+	return 0;
- }
- 
- /*
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 48d0ec44ad77..53b3ba9173ba 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1387,9 +1387,7 @@ static inline void hyp_cpu_pm_exit(void)
- 
- static int init_common_resources(void)
- {
--	kvm_set_ipa_limit();
--
--	return 0;
-+	return kvm_set_ipa_limit();
- }
- 
- static int init_subsystems(void)
--- 
-2.26.2
+This is white space damaged and certainly not from me.
 
 _______________________________________________
 kvmarm mailing list
