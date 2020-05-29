@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3AAC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3FAEC433E0
 	for <kvmarm@archiver.kernel.org>; Fri, 29 May 2020 16:03:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E7F25207F9
-	for <kvmarm@archiver.kernel.org>; Fri, 29 May 2020 16:03:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D789207BC
+	for <kvmarm@archiver.kernel.org>; Fri, 29 May 2020 16:03:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qiGX/GIO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7F25207F9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zAVOOYYA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D789207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0F2B4B1CF;
-	Fri, 29 May 2020 12:03:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 271294B282;
+	Fri, 29 May 2020 12:03:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LtQXC+JD7Vxw; Fri, 29 May 2020 12:03:49 -0400 (EDT)
+	with ESMTP id vOphK8e10i-w; Fri, 29 May 2020 12:03:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFE7F4B2BB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B89044B2AE;
 	Fri, 29 May 2020 12:03:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 343A14B280
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A4EF4B21E
  for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2020 12:03:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L51kmL4nG-Qz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2020 12:03:45 -0400 (EDT)
+ with ESMTP id o8z+77IRsQ26 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 May 2020 12:03:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 035D34B273
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2020 12:03:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C1574B2B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2020 12:03:47 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 34F4720814;
- Fri, 29 May 2020 16:03:44 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 29F6A20C09;
+ Fri, 29 May 2020 16:03:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590768224;
- bh=JoaO0OUIgw9ZfmDzivNnlpOdxdHTUTFlsCCG5N/VBLw=;
+ s=default; t=1590768226;
+ bh=rWnup0IH1825PzySVnOY4g/uJduuMESktYe3lmuCQC4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qiGX/GIOiodWTgqx3R/Z7+o7+0ieJYg8oB8nd6J3jmWLyOFZCsZ98lKE0UjwVIAVq
- exx/aV5hNOGEPPV+WAH39bXHPCjc6P4RrkR6JihntCFCgTZZItiVwPvpTfSOHIM/Em
- sZGxDMZTwNi7IERB0QC9uVoPCqy6IFXeT8g9AXy8=
+ b=zAVOOYYA8KUlpCoNWPrM1sWObbObksqJv1j1FQx+7DZRXy8cnZlW4tqTIkCcuBnPh
+ lZ+3s64dAAPSfinsLhFXS30++QmQQw+aYgwf/QJIGwTRXUtDx6/TIuGZYFfdzSh5TX
+ SMVbuiTz1J6w4DQLoeLJ82oh+EarRkaHbOmMijkc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jehSO-00GJKc-Lg; Fri, 29 May 2020 17:02:04 +0100
+ id 1jehSN-00GJKc-Or; Fri, 29 May 2020 17:02:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 23/24] KVM: arm64: Parametrize exception entry with a target EL
-Date: Fri, 29 May 2020 17:01:20 +0100
-Message-Id: <20200529160121.899083-24-maz@kernel.org>
+Subject: [PATCH 22/24] KVM: arm64: Don't use empty structures as CPU reset
+ state
+Date: Fri, 29 May 2020 17:01:19 +0100
+Message-Id: <20200529160121.899083-23-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529160121.899083-1-maz@kernel.org>
 References: <20200529160121.899083-1-maz@kernel.org>
@@ -97,153 +97,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We currently assume that an exception is delivered to EL1, always.
-Once we emulate EL2, this no longer will be the case. To prepare
-for this, add a target_mode parameter.
+Keeping empty structure as the vcpu state initializer is slightly
+wasteful: we only want to set pstate, and zero everything else.
+Just do that.
 
-While we're at it, merge the computing of the target PC and PSTATE in
-a single function that updates both PC and CPSR after saving their
-previous values in the corresponding ELR/SPSR. This ensures that they
-are updated in the correct order (a pretty common source of bugs...).
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/ptrace.h |  1 +
- arch/arm64/kvm/inject_fault.c   | 75 +++++++++++++++++----------------
- 2 files changed, 39 insertions(+), 37 deletions(-)
+ arch/arm64/kvm/reset.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
-index bf57308fcd63..953b6a1ce549 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -35,6 +35,7 @@
- #define GIC_PRIO_PSR_I_SET		(1 << 4)
- 
- /* Additional SPSR bits not exposed in the UABI */
-+#define PSR_MODE_THREAD_BIT	(1 << 0)
- #define PSR_IL_BIT		(1 << 20)
- 
- /* AArch32-specific ptrace requests */
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 6aafc2825c1c..e21fdd93027a 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -26,28 +26,12 @@ enum exception_type {
- 	except_type_serror	= 0x180,
- };
- 
--static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
--{
--	u64 exc_offset;
--
--	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
--	case PSR_MODE_EL1t:
--		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
--		break;
--	case PSR_MODE_EL1h:
--		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
--		break;
--	case PSR_MODE_EL0t:
--		exc_offset = LOWER_EL_AArch64_VECTOR;
--		break;
--	default:
--		exc_offset = LOWER_EL_AArch32_VECTOR;
--	}
--
--	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
--}
--
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 658f3a79617b..865c8aa670bc 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -36,15 +36,11 @@ static u32 kvm_ipa_limit;
  /*
-+ * This performs the exception entry at a given EL (@target_mode), stashing PC
-+ * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-+ * The EL passed to this function *must* be a non-secure, privileged mode with
-+ * bit 0 being set (PSTATE.SP == 1).
-+ *
-  * When an exception is taken, most PSTATE fields are left unchanged in the
-  * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
-  * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-@@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
-  * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
-  * MSB to LSB.
+  * ARMv8 Reset Values
   */
--static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
-+static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
-+			      enum exception_type type)
+-static const struct kvm_regs default_regs_reset = {
+-	.regs.pstate = (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT |
+-			PSR_F_BIT | PSR_D_BIT),
+-};
++#define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
++				 PSR_F_BIT | PSR_D_BIT)
+ 
+-static const struct kvm_regs default_regs_reset32 = {
+-	.regs.pstate = (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT |
+-			PSR_AA32_I_BIT | PSR_AA32_F_BIT),
+-};
++#define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
++				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+ 
+ static bool cpu_has_32bit_el1(void)
  {
--	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
--	unsigned long old, new;
-+	unsigned long sctlr, vbar, old, new, mode;
-+	u64 exc_offset;
-+
-+	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	if      (mode == target_mode)
-+		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-+	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
-+		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-+	else if (!(mode & PSR_MODE32_BIT))
-+		exc_offset = LOWER_EL_AArch64_VECTOR;
-+	else
-+		exc_offset = LOWER_EL_AArch32_VECTOR;
-+
-+	switch (target_mode) {
-+	case PSR_MODE_EL1h:
-+		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+		vcpu_write_elr_el1(vcpu, *vcpu_pc(vcpu));
-+		break;
-+	default:
-+		/* Don't do that */
-+		BUG();
-+	}
-+
-+	*vcpu_pc(vcpu) = vbar + exc_offset + type;
- 
- 	old = *vcpu_cpsr(vcpu);
- 	new = 0;
-@@ -105,9 +114,10 @@ static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
- 	new |= PSR_I_BIT;
- 	new |= PSR_F_BIT;
- 
--	new |= PSR_MODE_EL1h;
-+	new |= target_mode;
- 
--	return new;
-+	*vcpu_cpsr(vcpu) = new;
-+	vcpu_write_spsr(vcpu, old);
- }
- 
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
-@@ -116,11 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
- 	u32 esr = 0;
- 
--	vcpu_write_elr_el1(vcpu, *vcpu_pc(vcpu));
--	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
--
--	*vcpu_cpsr(vcpu) = get_except64_pstate(vcpu);
--	vcpu_write_spsr(vcpu, cpsr);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
- 
- 	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
- 
-@@ -148,14 +154,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 
- static void inject_undef64(struct kvm_vcpu *vcpu)
+@@ -257,9 +253,9 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+  */
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
  {
--	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+-	const struct kvm_regs *cpu_reset;
+ 	int ret = -EINVAL;
+ 	bool loaded;
++	u32 pstate;
  
--	vcpu_write_elr_el1(vcpu, *vcpu_pc(vcpu));
--	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
--
--	*vcpu_cpsr(vcpu) = get_except64_pstate(vcpu);
--	vcpu_write_spsr(vcpu, cpsr);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+ 	/* Reset PMU outside of the non-preemptible section */
+ 	kvm_pmu_vcpu_reset(vcpu);
+@@ -290,16 +286,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+ 			if (!cpu_has_32bit_el1())
+ 				goto out;
+-			cpu_reset = &default_regs_reset32;
++			pstate = VCPU_RESET_PSTATE_SVC;
+ 		} else {
+-			cpu_reset = &default_regs_reset;
++			pstate = VCPU_RESET_PSTATE_EL1;
+ 		}
  
- 	/*
- 	 * Build an unknown exception, depending on the instruction
+ 		break;
+ 	}
+ 
+ 	/* Reset core registers */
+-	memcpy(vcpu_gp_regs(vcpu), cpu_reset, sizeof(*cpu_reset));
++	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
++	vcpu_gp_regs(vcpu)->regs.pstate = pstate;
+ 
+ 	/* Reset system registers */
+ 	kvm_reset_sys_regs(vcpu);
 -- 
 2.26.2
 
