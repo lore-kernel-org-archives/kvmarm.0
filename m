@@ -1,87 +1,61 @@
-Return-Path: <SRS0=vHWX=7L=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=AbtX=7M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D601C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 29 May 2020 16:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB85C433DF
+	for <kvmarm@archiver.kernel.org>; Sat, 30 May 2020 10:45:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ECCCD207BC
-	for <kvmarm@archiver.kernel.org>; Fri, 29 May 2020 16:04:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NApHd2XI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECCCD207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 848AF20842
+	for <kvmarm@archiver.kernel.org>; Sat, 30 May 2020 10:45:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 848AF20842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A712F4B2AB;
-	Fri, 29 May 2020 12:04:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C55E94B22E;
+	Sat, 30 May 2020 06:45:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cfInXf2yZG+F; Fri, 29 May 2020 12:04:13 -0400 (EDT)
+	with ESMTP id xXNVqD4yFycR; Sat, 30 May 2020 06:45:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A564B28B;
-	Fri, 29 May 2020 12:04:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E5BB4B2AF;
+	Sat, 30 May 2020 06:45:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0DB24B0D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2020 12:04:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 678D74B2AD
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2020 06:45:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Usnac-pyZitE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2020 12:04:10 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B4344B29D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2020 12:04:09 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9E933207BC;
- Fri, 29 May 2020 16:04:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590768248;
- bh=9yqTa5LpsDYSLQJHPcL8M1lq28IIleOmSLUASgoqcAI=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NApHd2XIa3F6tKzwVofEEEZMTW7hh6FA33rvqkQ7U+GcMi1d/qgBKMXQliiJTtYsl
- 9h68Kc2wlC3BW6Qr6mc4kiYm6D8YPDiMDxOwzXvqpF2xLSPc2TRPmSGFTnaM4Hfe/8
- MoMLMCRTeaZ/pDmTZmTnkFq4wyLM/guOtw8aRKAU=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jehSC-00GJKc-Tk; Fri, 29 May 2020 17:01:53 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 13/24] KVM: arm64: Support enabling dirty log gradually in
- small chunks
-Date: Fri, 29 May 2020 17:01:10 +0100
-Message-Id: <20200529160121.899083-14-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200529160121.899083-1-maz@kernel.org>
-References: <20200529160121.899083-1-maz@kernel.org>
+ with ESMTP id LBfQ26kRnUCQ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 30 May 2020 06:45:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5A4C4B2AC
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2020 06:45:38 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 665131042;
+ Sat, 30 May 2020 03:45:38 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC74B3F6C4;
+ Sat, 30 May 2020 03:45:37 -0700 (PDT)
+Subject: Re: [PATCH RFC] KVM: arm64: Sidestep stage2_unmap_vm() on vcpu reset
+ when S2FWB is supported
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20200415072835.1164-1-yuzenghui@huawei.com>
+ <e99bc07d-0dd4-055c-808f-fd9cde88d2fc@arm.com>
+Message-ID: <a1a1961a-2eae-b26c-e607-ab5c0c929f37@arm.com>
+Date: Sat, 30 May 2020 11:46:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- ascull@google.com, ardb@kernel.org, christoffer.dall@arm.com,
- dbrazdil@google.com, tabba@google.com, james.morse@arm.com, giangyi@amazon.com,
- zhukeqian1@huawei.com, mark.rutland@arm.com, suzuki.poulose@arm.com,
- will@kernel.org, yuzenghui@huawei.com, julien.thierry.kdev@gmail.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Jiang Yi <giangyi@amazon.com>,
- Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <e99bc07d-0dd4-055c-808f-fd9cde88d2fc@arm.com>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,92 +72,101 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Keqian Zhu <zhukeqian1@huawei.com>
+Hi,
 
-There is already support of enabling dirty log gradually in small chunks
-for x86 in commit 3c9bd4006bfc ("KVM: x86: enable dirty log gradually in
-small chunks"). This adds support for arm64.
+On 4/20/20 5:10 PM, Alexandru Elisei wrote:
+> Hi,
+>
+> On 4/15/20 8:28 AM, Zenghui Yu wrote:
+>> stage2_unmap_vm() was introduced to unmap user RAM region in the stage2
+>> page table to make the caches coherent. E.g., a guest reboot with stage1
+>> MMU disabled will access memory using non-cacheable attributes. If the
+>> RAM and caches are not coherent at this stage, some evicted dirty cache
+>> line may go and corrupt guest data in RAM.
+>>
+>> Since ARMv8.4, S2FWB feature is mandatory and KVM will take advantage
+>> of it to configure the stage2 page table and the attributes of memory
+>> access. So we ensure that guests always access memory using cacheable
+>> attributes and thus, the caches always be coherent.
+>>
+>> So on CPUs that support S2FWB, we can safely reset the vcpu without a
+>> heavy stage2 unmapping.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>> ---
+>>
+>> If this is correct, there should be a great performance improvement on
+>> a guest reboot (or reset) on systems support S2FWB. But I'm afraid that
+>> I've missed some points here, so please comment!
+>>
+>> The commit 957db105c997 ("arm/arm64: KVM: Introduce stage2_unmap_vm")
+>> was merged about six years ago and I failed to track its histroy and
+>> intention. Instead of a whole stage2 unmapping, something like
+>> stage2_flush_vm() looks enough to me. But again, I'm unsure...
+>>
+>> Thanks for having a look!
+> I had a chat with Christoffer about stage2_unmap_vm, and as I understood it, the
+> purpose was to make sure that any changes made by userspace were seen by the guest
+> while the MMU is off. When a stage 2 fault happens, we do clean+inval on the
+> dcache, or inval on the icache if it was an exec fault. This means that whatever
+> the host userspace writes while the guest is shut down and is still in the cache,
+> the guest will be able to read/execute.
+>
+> This can be relevant if the guest relocates the kernel and overwrites the original
+> image location, and userspace copies the original kernel image back in before
+> restarting the vm.
+>
+>>  virt/kvm/arm/arm.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 48d0ec44ad77..e6378162cdef 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -983,8 +983,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>>  	/*
+>>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>>  	 * guest MMU is turned off and flush the caches as needed.
+>> +	 *
+>> +	 * S2FWB enforces all memory accesses to RAM being cacheable, we
+>> +	 * ensure that the cache is always coherent.
+>>  	 */
+>> -	if (vcpu->arch.has_run_once)
+>> +	if (vcpu->arch.has_run_once && !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> I think userspace does not invalidate the icache when loading a new kernel image,
+> and if the guest patched instructions, they could potentially still be in the
+> icache. Should the icache be invalidated if FWB is present?
 
-x86 still writes protect all huge pages when DIRTY_LOG_INITIALLY_ALL_SET
-is enabled. However, for arm64, both huge pages and normal pages can be
-write protected gradually by userspace.
+I noticed that this was included in the current pull request and I remembered that
+I wasn't sure about this part. Did some more digging and it turns out that FWB
+implies no cache maintenance needed for *data to instruction* coherence. From ARM
+DDI 0487F.b, page D5-2635:
 
-Under the Huawei Kunpeng 920 2.6GHz platform, I did some tests on 128G
-Linux VMs with different page size. The memory pressure is 127G in each
-case. The time taken of memory_global_dirty_log_start in QEMU is listed
-below:
+"When ARMv8.4-S2FWB is implemented, the architecture requires that
+CLIDR_EL1.{LOUU, LOIUS} are zero so that no levels of data cache need to be
+cleaned in order to manage coherency with instruction fetches".
 
-Page Size      Before    After Optimization
-  4K            650ms         1.8ms
-  2M             4ms          1.8ms
-  1G             2ms          1.8ms
+However, there's no mention that I found for instruction to data coherence,
+meaning that the icache would still need to be invalidated on each vcpu in order
+to prevent fetching of patched instructions from the icache. Am I missing something?
 
-Besides the time reduction, the biggest improvement is that we will minimize
-the performance side effect (because of dissolving huge pages and marking
-memslots dirty) on guest after enabling dirty log.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200413122023.52583-1-zhukeqian1@huawei.com
----
- Documentation/virt/kvm/api.rst    |  2 +-
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/mmu.c              | 12 ++++++++++--
- 3 files changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index efbbe570aa9b..0017f63fa44f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5777,7 +5777,7 @@ will be initialized to 1 when created.  This also improves performance because
- dirty logging can be enabled gradually in small chunks on the first call
- to KVM_CLEAR_DIRTY_LOG.  KVM_DIRTY_LOG_INITIALLY_SET depends on
- KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (it is also only available on
--x86 for now).
-+x86 and arm64 for now).
- 
- KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
- KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 32c8a675e5a4..a723f84fab83 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -46,6 +46,9 @@
- #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
- #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- 
-+#define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-+				     KVM_DIRTY_LOG_INITIALLY_SET)
-+
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
- extern unsigned int kvm_sve_max_vl;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 66eb8e3f6e8c..ddf85bf21897 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2277,8 +2277,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
--	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
--		kvm_mmu_wp_memory_region(kvm, mem->slot);
-+	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+		/*
-+		 * If we're with initial-all-set, we don't need to write
-+		 * protect any pages because they're all reported as dirty.
-+		 * Huge pages and normal pages will be write protect gradually.
-+		 */
-+		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-+			kvm_mmu_wp_memory_region(kvm, mem->slot);
-+		}
-+	}
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
--- 
-2.26.2
-
+Thanks,
+Alex
+>
+> Thanks,
+> Alex
+>>  		stage2_unmap_vm(vcpu->kvm);
+>>  
+>>  	vcpu_reset_hcr(vcpu);
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
