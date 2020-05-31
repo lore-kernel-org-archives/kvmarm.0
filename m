@@ -1,82 +1,61 @@
-Return-Path: <SRS0=AbtX=7M=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6eMA=7N=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6D0C433DF
-	for <kvmarm@archiver.kernel.org>; Sat, 30 May 2020 16:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC975C433DF
+	for <kvmarm@archiver.kernel.org>; Sun, 31 May 2020 09:11:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 95C022081A
-	for <kvmarm@archiver.kernel.org>; Sat, 30 May 2020 16:31:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3jV1cd/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C022081A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 4F0262073B
+	for <kvmarm@archiver.kernel.org>; Sun, 31 May 2020 09:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0262073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A8424B31A;
-	Sat, 30 May 2020 12:31:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC534B2A7;
+	Sun, 31 May 2020 05:11:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I01XQuQX07kd; Sat, 30 May 2020 12:31:40 -0400 (EDT)
+	with ESMTP id 7XQmlRGB2WZL; Sun, 31 May 2020 05:11:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2D4D4B371;
-	Sat, 30 May 2020 12:31:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 467E34B27D;
+	Sun, 31 May 2020 05:11:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58A724B370
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2020 12:31:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 295964B277
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2020 05:11:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lIdiIPTGjjsT for <kvmarm@lists.cs.columbia.edu>;
- Sat, 30 May 2020 12:31:39 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 232504B31C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2020 12:31:39 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C55DD207F9;
- Sat, 30 May 2020 16:31:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1590856297;
- bh=JfAXX86jsFaQs68I//x89vYrH6wJwLVZOjVj42YlNnQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=H3jV1cd/WX6RtRn97g2b7AdNitzkpiJv2wMpkibU2NjBic0MddIGijSa/TM2c8hCl
- sAzSe/r3kR1TfdQ7O9hH9p0NEBirfE9ej7aRtsqQ+ZQgjW8VEIwB56uY2jdp9qPtLv
- Yx012vWn1cr+EWTen+4jLGJfToIf5L0mQIXYz7Hc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jf4OW-00GYve-3E; Sat, 30 May 2020 17:31:36 +0100
-MIME-Version: 1.0
-Date: Sat, 30 May 2020 17:31:36 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id DTI62Xcv4Qt2 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 31 May 2020 05:11:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B3B4B276
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2020 05:11:30 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18F591045;
+ Sun, 31 May 2020 02:11:30 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58C973F52E;
+ Sun, 31 May 2020 02:11:29 -0700 (PDT)
 Subject: Re: [PATCH RFC] KVM: arm64: Sidestep stage2_unmap_vm() on vcpu reset
  when S2FWB is supported
-In-Reply-To: <a1a1961a-2eae-b26c-e607-ab5c0c929f37@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20200415072835.1164-1-yuzenghui@huawei.com>
  <e99bc07d-0dd4-055c-808f-fd9cde88d2fc@arm.com>
  <a1a1961a-2eae-b26c-e607-ab5c0c929f37@arm.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <13db879dff56d091f98f7c5416ab1535@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <13db879dff56d091f98f7c5416ab1535@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ff9e2eb5-cbc4-b831-bc59-d194c966d04e@arm.com>
+Date: Sun, 31 May 2020 10:12:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+MIME-Version: 1.0
+In-Reply-To: <13db879dff56d091f98f7c5416ab1535@kernel.org>
+Content-Language: en-US
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -90,130 +69,90 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 2020-05-30 11:46, Alexandru Elisei wrote:
-> Hi,
-
-[...]
-
->>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>> index 48d0ec44ad77..e6378162cdef 100644
->>> --- a/virt/kvm/arm/arm.c
->>> +++ b/virt/kvm/arm/arm.c
->>> @@ -983,8 +983,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct 
->>> kvm_vcpu *vcpu,
->>>  	/*
->>>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
->>>  	 * guest MMU is turned off and flush the caches as needed.
->>> +	 *
->>> +	 * S2FWB enforces all memory accesses to RAM being cacheable, we
->>> +	 * ensure that the cache is always coherent.
->>>  	 */
->>> -	if (vcpu->arch.has_run_once)
->>> +	if (vcpu->arch.has_run_once && 
->>> !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
->> I think userspace does not invalidate the icache when loading a new 
->> kernel image,
->> and if the guest patched instructions, they could potentially still be 
->> in the
->> icache. Should the icache be invalidated if FWB is present?
-> 
-> I noticed that this was included in the current pull request and I
-> remembered that
-> I wasn't sure about this part. Did some more digging and it turns out 
-> that FWB
-> implies no cache maintenance needed for *data to instruction*
-> coherence. From ARM
-> DDI 0487F.b, page D5-2635:
-> 
-> "When ARMv8.4-S2FWB is implemented, the architecture requires that
-> CLIDR_EL1.{LOUU, LOIUS} are zero so that no levels of data cache need 
-> to be
-> cleaned in order to manage coherency with instruction fetches".
-> 
-> However, there's no mention that I found for instruction to data 
-> coherence,
-> meaning that the icache would still need to be invalidated on each vcpu 
-> in order
-> to prevent fetching of patched instructions from the icache. Am I
-> missing something?
-
-I think you are right, and this definitely matches the way we deal with
-the icache on the fault path. For some bizarre reason, I always assume
-that FWB implies DIC, which isn't true at all.
-
-I'm planning to address it as follows. Please let me know what you 
-think.
-
-Thanks,
-
-         M.
-
- From f7860d1d284f41afea176cc17e5c9d895ae665e9 Mon Sep 17 00:00:00 2001
- From: Marc Zyngier <maz@kernel.org>
-Date: Sat, 30 May 2020 17:22:19 +0100
-Subject: [PATCH] KVM: arm64: Flush the instruction cache if not 
-unmapping the
-  VM on reboot
-
-On a system with FWB, we don't need to unmap Stage-2 on reboot,
-as even if userspace takes this opportunity to repaint the whole
-of memory, FWB ensures that the data side stays consistent even
-if the guest uses non-cacheable mappings.
-
-However, the I-side is not necessarily coherent with the D-side
-if CTR_EL0.DIC is 0. In this case, invalidate the i-cache to
-preserve coherency.
-
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Fixes: 892713e97ca1 ("KVM: arm64: Sidestep stage2_unmap_vm() on vcpu 
-reset when S2FWB is supported")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
-  arch/arm64/kvm/arm.c | 14 ++++++++++----
-  1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b0b569f2cdd0..d6988401c22a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -989,11 +989,17 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct 
-kvm_vcpu *vcpu,
-  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
-  	 * guest MMU is turned off and flush the caches as needed.
-  	 *
--	 * S2FWB enforces all memory accesses to RAM being cacheable, we
--	 * ensure that the cache is always coherent.
-+	 * S2FWB enforces all memory accesses to RAM being cacheable,
-+	 * ensuring that the data side is always coherent. We still
-+	 * need to invalidate the I-cache though, as FWB does *not*
-+	 * imply CTR_EL0.DIC.
-  	 */
--	if (vcpu->arch.has_run_once && 
-!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
--		stage2_unmap_vm(vcpu->kvm);
-+	if (vcpu->arch.has_run_once) {
-+		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+			stage2_unmap_vm(vcpu->kvm);
-+		else
-+			__flush_icache_all();
-+	}
-
-  	vcpu_reset_hcr(vcpu);
-
--- 
-2.26.2
-
-
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDUvMzAvMjAgNTozMSBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFs
+ZXgsCj4KPiBPbiAyMDIwLTA1LTMwIDExOjQ2LCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+PiBI
+aSwKPgo+IFsuLi5dCj4KPj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL2FybS5jIGIvdmly
+dC9rdm0vYXJtL2FybS5jCj4+Pj4gaW5kZXggNDhkMGVjNDRhZDc3Li5lNjM3ODE2MmNkZWYgMTAw
+NjQ0Cj4+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL2FybS5jCj4+Pj4gKysrIGIvdmlydC9rdm0vYXJt
+L2FybS5jCj4+Pj4gQEAgLTk4Myw4ICs5ODMsMTEgQEAgc3RhdGljIGludCBrdm1fYXJjaF92Y3B1
+X2lvY3RsX3ZjcHVfaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUKPj4+PiAqdmNwdSwKPj4+PiDCoMKgwqDC
+oCAvKgo+Pj4+IMKgwqDCoMKgwqAgKiBFbnN1cmUgYSByZWJvb3RlZCBWTSB3aWxsIGZhdWx0IGlu
+IFJBTSBwYWdlcyBhbmQgZGV0ZWN0IGlmIHRoZQo+Pj4+IMKgwqDCoMKgwqAgKiBndWVzdCBNTVUg
+aXMgdHVybmVkIG9mZiBhbmQgZmx1c2ggdGhlIGNhY2hlcyBhcyBuZWVkZWQuCj4+Pj4gK8KgwqDC
+oMKgICoKPj4+PiArwqDCoMKgwqAgKiBTMkZXQiBlbmZvcmNlcyBhbGwgbWVtb3J5IGFjY2Vzc2Vz
+IHRvIFJBTSBiZWluZyBjYWNoZWFibGUsIHdlCj4+Pj4gK8KgwqDCoMKgICogZW5zdXJlIHRoYXQg
+dGhlIGNhY2hlIGlzIGFsd2F5cyBjb2hlcmVudC4KPj4+PiDCoMKgwqDCoMKgICovCj4+Pj4gLcKg
+wqDCoCBpZiAodmNwdS0+YXJjaC5oYXNfcnVuX29uY2UpCj4+Pj4gK8KgwqDCoCBpZiAodmNwdS0+
+YXJjaC5oYXNfcnVuX29uY2UgJiYgIWNwdXNfaGF2ZV9jb25zdF9jYXAoQVJNNjRfSEFTX1NUQUdF
+Ml9GV0IpKQo+Pj4gSSB0aGluayB1c2Vyc3BhY2UgZG9lcyBub3QgaW52YWxpZGF0ZSB0aGUgaWNh
+Y2hlIHdoZW4gbG9hZGluZyBhIG5ldyBrZXJuZWwgaW1hZ2UsCj4+PiBhbmQgaWYgdGhlIGd1ZXN0
+IHBhdGNoZWQgaW5zdHJ1Y3Rpb25zLCB0aGV5IGNvdWxkIHBvdGVudGlhbGx5IHN0aWxsIGJlIGlu
+IHRoZQo+Pj4gaWNhY2hlLiBTaG91bGQgdGhlIGljYWNoZSBiZSBpbnZhbGlkYXRlZCBpZiBGV0Ig
+aXMgcHJlc2VudD8KPj4KPj4gSSBub3RpY2VkIHRoYXQgdGhpcyB3YXMgaW5jbHVkZWQgaW4gdGhl
+IGN1cnJlbnQgcHVsbCByZXF1ZXN0IGFuZCBJCj4+IHJlbWVtYmVyZWQgdGhhdAo+PiBJIHdhc24n
+dCBzdXJlIGFib3V0IHRoaXMgcGFydC4gRGlkIHNvbWUgbW9yZSBkaWdnaW5nIGFuZCBpdCB0dXJu
+cyBvdXQgdGhhdCBGV0IKPj4gaW1wbGllcyBubyBjYWNoZSBtYWludGVuYW5jZSBuZWVkZWQgZm9y
+ICpkYXRhIHRvIGluc3RydWN0aW9uKgo+PiBjb2hlcmVuY2UuIEZyb20gQVJNCj4+IERESSAwNDg3
+Ri5iLCBwYWdlIEQ1LTI2MzU6Cj4+Cj4+ICJXaGVuIEFSTXY4LjQtUzJGV0IgaXMgaW1wbGVtZW50
+ZWQsIHRoZSBhcmNoaXRlY3R1cmUgcmVxdWlyZXMgdGhhdAo+PiBDTElEUl9FTDEue0xPVVUsIExP
+SVVTfSBhcmUgemVybyBzbyB0aGF0IG5vIGxldmVscyBvZiBkYXRhIGNhY2hlIG5lZWQgdG8gYmUK
+Pj4gY2xlYW5lZCBpbiBvcmRlciB0byBtYW5hZ2UgY29oZXJlbmN5IHdpdGggaW5zdHJ1Y3Rpb24g
+ZmV0Y2hlcyIuCj4+Cj4+IEhvd2V2ZXIsIHRoZXJlJ3Mgbm8gbWVudGlvbiB0aGF0IEkgZm91bmQg
+Zm9yIGluc3RydWN0aW9uIHRvIGRhdGEgY29oZXJlbmNlLAo+PiBtZWFuaW5nIHRoYXQgdGhlIGlj
+YWNoZSB3b3VsZCBzdGlsbCBuZWVkIHRvIGJlIGludmFsaWRhdGVkIG9uIGVhY2ggdmNwdSBpbiBv
+cmRlcgo+PiB0byBwcmV2ZW50IGZldGNoaW5nIG9mIHBhdGNoZWQgaW5zdHJ1Y3Rpb25zIGZyb20g
+dGhlIGljYWNoZS4gQW0gSQo+PiBtaXNzaW5nIHNvbWV0aGluZz8KPgo+IEkgdGhpbmsgeW91IGFy
+ZSByaWdodCwgYW5kIHRoaXMgZGVmaW5pdGVseSBtYXRjaGVzIHRoZSB3YXkgd2UgZGVhbCB3aXRo
+Cj4gdGhlIGljYWNoZSBvbiB0aGUgZmF1bHQgcGF0aC4gRm9yIHNvbWUgYml6YXJyZSByZWFzb24s
+IEkgYWx3YXlzIGFzc3VtZQo+IHRoYXQgRldCIGltcGxpZXMgRElDLCB3aGljaCBpc24ndCB0cnVl
+IGF0IGFsbC4KPgo+IEknbSBwbGFubmluZyB0byBhZGRyZXNzIGl0IGFzIGZvbGxvd3MuIFBsZWFz
+ZSBsZXQgbWUga25vdyB3aGF0IHlvdSB0aGluay4KPgo+IFRoYW5rcywKPgo+IMKgwqDCoMKgwqDC
+oMKgIE0uCj4KPiBGcm9tIGY3ODYwZDFkMjg0ZjQxYWZlYTE3NmNjMTdlNWM5ZDg5NWFlNjY1ZTkg
+TW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCj4gRnJvbTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVs
+Lm9yZz4KPiBEYXRlOiBTYXQsIDMwIE1heSAyMDIwIDE3OjIyOjE5ICswMTAwCj4gU3ViamVjdDog
+W1BBVENIXSBLVk06IGFybTY0OiBGbHVzaCB0aGUgaW5zdHJ1Y3Rpb24gY2FjaGUgaWYgbm90IHVu
+bWFwcGluZyB0aGUKPiDCoFZNIG9uIHJlYm9vdAo+Cj4gT24gYSBzeXN0ZW0gd2l0aCBGV0IsIHdl
+IGRvbid0IG5lZWQgdG8gdW5tYXAgU3RhZ2UtMiBvbiByZWJvb3QsCj4gYXMgZXZlbiBpZiB1c2Vy
+c3BhY2UgdGFrZXMgdGhpcyBvcHBvcnR1bml0eSB0byByZXBhaW50IHRoZSB3aG9sZQo+IG9mIG1l
+bW9yeSwgRldCIGVuc3VyZXMgdGhhdCB0aGUgZGF0YSBzaWRlIHN0YXlzIGNvbnNpc3RlbnQgZXZl
+bgo+IGlmIHRoZSBndWVzdCB1c2VzIG5vbi1jYWNoZWFibGUgbWFwcGluZ3MuCj4KPiBIb3dldmVy
+LCB0aGUgSS1zaWRlIGlzIG5vdCBuZWNlc3NhcmlseSBjb2hlcmVudCB3aXRoIHRoZSBELXNpZGUK
+PiBpZiBDVFJfRUwwLkRJQyBpcyAwLiBJbiB0aGlzIGNhc2UsIGludmFsaWRhdGUgdGhlIGktY2Fj
+aGUgdG8KPiBwcmVzZXJ2ZSBjb2hlcmVuY3kuCj4KPiBSZXBvcnRlZC1ieTogQWxleGFuZHJ1IEVs
+aXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+IEZpeGVzOiA4OTI3MTNlOTdjYTEgKCJL
+Vk06IGFybTY0OiBTaWRlc3RlcCBzdGFnZTJfdW5tYXBfdm0oKSBvbiB2Y3B1IHJlc2V0IHdoZW4K
+PiBTMkZXQiBpcyBzdXBwb3J0ZWQiKQo+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWF6
+QGtlcm5lbC5vcmc+Cj4gLS0tCj4gwqBhcmNoL2FybTY0L2t2bS9hcm0uYyB8IDE0ICsrKysrKysr
+KystLS0tCj4gwqAxIGZpbGUgY2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMo
+LSkKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9hcm0uYyBiL2FyY2gvYXJtNjQva3Zt
+L2FybS5jCj4gaW5kZXggYjBiNTY5ZjJjZGQwLi5kNjk4ODQwMWMyMmEgMTAwNjQ0Cj4gLS0tIGEv
+YXJjaC9hcm02NC9rdm0vYXJtLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9hcm0uYwo+IEBAIC05
+ODksMTEgKzk4OSwxNyBAQCBzdGF0aWMgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxfdmNwdV9pbml0
+KHN0cnVjdCBrdm1fdmNwdQo+ICp2Y3B1LAo+IMKgwqDCoMKgwqAgKiBFbnN1cmUgYSByZWJvb3Rl
+ZCBWTSB3aWxsIGZhdWx0IGluIFJBTSBwYWdlcyBhbmQgZGV0ZWN0IGlmIHRoZQo+IMKgwqDCoMKg
+wqAgKiBndWVzdCBNTVUgaXMgdHVybmVkIG9mZiBhbmQgZmx1c2ggdGhlIGNhY2hlcyBhcyBuZWVk
+ZWQuCj4gwqDCoMKgwqDCoCAqCj4gLcKgwqDCoMKgICogUzJGV0IgZW5mb3JjZXMgYWxsIG1lbW9y
+eSBhY2Nlc3NlcyB0byBSQU0gYmVpbmcgY2FjaGVhYmxlLCB3ZQo+IC3CoMKgwqDCoCAqIGVuc3Vy
+ZSB0aGF0IHRoZSBjYWNoZSBpcyBhbHdheXMgY29oZXJlbnQuCj4gK8KgwqDCoMKgICogUzJGV0Ig
+ZW5mb3JjZXMgYWxsIG1lbW9yeSBhY2Nlc3NlcyB0byBSQU0gYmVpbmcgY2FjaGVhYmxlLAo+ICvC
+oMKgwqDCoCAqIGVuc3VyaW5nIHRoYXQgdGhlIGRhdGEgc2lkZSBpcyBhbHdheXMgY29oZXJlbnQu
+IFdlIHN0aWxsCj4gK8KgwqDCoMKgICogbmVlZCB0byBpbnZhbGlkYXRlIHRoZSBJLWNhY2hlIHRo
+b3VnaCwgYXMgRldCIGRvZXMgKm5vdCoKPiArwqDCoMKgwqAgKiBpbXBseSBDVFJfRUwwLkRJQy4K
+PiDCoMKgwqDCoMKgICovCj4gLcKgwqDCoCBpZiAodmNwdS0+YXJjaC5oYXNfcnVuX29uY2UgJiYg
+IWNwdXNfaGF2ZV9jb25zdF9jYXAoQVJNNjRfSEFTX1NUQUdFMl9GV0IpKQo+IC3CoMKgwqDCoMKg
+wqDCoCBzdGFnZTJfdW5tYXBfdm0odmNwdS0+a3ZtKTsKPiArwqDCoMKgIGlmICh2Y3B1LT5hcmNo
+Lmhhc19ydW5fb25jZSkgewo+ICvCoMKgwqDCoMKgwqDCoCBpZiAoIWNwdXNfaGF2ZV9maW5hbF9j
+YXAoQVJNNjRfSEFTX1NUQUdFMl9GV0IpKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0YWdl
+Ml91bm1hcF92bSh2Y3B1LT5rdm0pOwo+ICvCoMKgwqDCoMKgwqDCoCBlbHNlCj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgX19mbHVzaF9pY2FjaGVfYWxsKCk7Cj4gK8KgwqDCoCB9Cj4KPiDCoMKg
+wqDCoCB2Y3B1X3Jlc2V0X2hjcih2Y3B1KTsKPgo+Ckxvb2tzIGdvb2QsIF9fZmx1c2hfaWNhY2hl
+X2FsbCBjaGVja3MgQ1RSX0VMMC5ESUMgYmVmb3JlIGRvaW5nIGljYWNoZSBtYWludGVuYW5jZToK
+ClJldmlld2VkLWJ5OiBBbGV4YW5kcnUgRWxpc2VpIDxhbGV4YW5kcnUuZWxpc2VpQGFybS5jb20+
+CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0g
+bWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5j
+cy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
