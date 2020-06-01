@@ -2,63 +2,102 @@ Return-Path: <SRS0=WTva=7O=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FD7C433DF
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Jun 2020 06:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F73C433DF
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jun 2020 08:27:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1AE11207BC
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Jun 2020 06:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE11207BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 134412063A
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jun 2020 08:27:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlziDNVM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134412063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C2994B242;
-	Mon,  1 Jun 2020 02:26:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 472634B22E;
+	Mon,  1 Jun 2020 04:27:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Gx5wxXpVexAb; Mon,  1 Jun 2020 02:26:28 -0400 (EDT)
+	with ESMTP id Gc3VAAJp1Rm9; Mon,  1 Jun 2020 04:27:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61C1C4B244;
-	Mon,  1 Jun 2020 02:26:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 524C94B241;
+	Mon,  1 Jun 2020 04:27:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96B084B242
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jun 2020 02:26:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AB244B241
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jun 2020 04:27:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6zsC6ECSNk+l for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Jun 2020 02:26:26 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D8F64B1E5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jun 2020 02:26:26 -0400 (EDT)
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 8D7BD5F8F2CAC077568D;
- Mon,  1 Jun 2020 14:26:22 +0800 (CST)
-Received: from [10.173.221.230] (10.173.221.230) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 1 Jun 2020 14:26:15 +0800
-Subject: Re: [PATCH RFC] KVM: arm64: Sidestep stage2_unmap_vm() on vcpu reset
- when S2FWB is supported
-To: Marc Zyngier <maz@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>
-References: <20200415072835.1164-1-yuzenghui@huawei.com>
- <e99bc07d-0dd4-055c-808f-fd9cde88d2fc@arm.com>
- <a1a1961a-2eae-b26c-e607-ab5c0c929f37@arm.com>
- <13db879dff56d091f98f7c5416ab1535@kernel.org>
-From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <d72e4299-e9f7-064c-98c7-621721e5671c@huawei.com>
-Date: Mon, 1 Jun 2020 14:26:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id ha5vdlELWo+i for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Jun 2020 04:27:09 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C59F54B22E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jun 2020 04:27:09 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591000029;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E4lu/dxD8ezXYOJnBc6Dn7bo6tW00B3HpYIm/3Tes6k=;
+ b=SlziDNVMDqWrW6gfiyWjJEeTOFcfLyuuVLBfQEkoV3dRQqKHp9dKLI8TvDz1jSeOw6OOBH
+ T0CuyuZ+YLOnYuBKMYv77EPSMMmUTI4lKeXNq0NEUkNLrI5YoWr/fCjBadNVg75xJCGWk3
+ yc/n2rOgSsGQtZMZklzcDZ+DKSV+3LQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-evcK2P6hOwKXk24spAXl6A-1; Mon, 01 Jun 2020 04:27:05 -0400
+X-MC-Unique: evcK2P6hOwKXk24spAXl6A-1
+Received: by mail-wm1-f72.google.com with SMTP id 11so2671535wmj.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Jun 2020 01:27:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=E4lu/dxD8ezXYOJnBc6Dn7bo6tW00B3HpYIm/3Tes6k=;
+ b=qdPLNmpwVMmqc9BhdPgbsFmBGtydao78g33W5vspvG9W64LDn/Br5rkSLCUGJ5Fxri
+ j4fzt/F9q2As+/jH/uPJ96xZtrYewVH4Li1wgXQt9NDJyGsktd4IZFgD8ZUGOWqNk4VW
+ Uvgqs1ogCnlnNOGKFxe3rdS5ja2q2/VY0yomHHniIUTV2tUYooXx1YzUQsttVlMhhjT0
+ KAF9Iq1Iopu6bA1T3NcFMbbPO1C/R/WXFO5ZAkvHUxh0OlKfBL0dbdijAyY+vbP6wgSC
+ xaC1ACbHr3J2PM7X7Qk5GWTdz0QbQ+CHO4AL1mYuePfzkGHtzXI08e5mEVLGvL4nYqgs
+ wqpA==
+X-Gm-Message-State: AOAM530Bq0EdZnaIedlwVSUjj09me2jYbh4gybImaRxbmdza754Gg0kd
+ 6RdHUGHiE2SPLd30M9FaVRAvwc4SMGOoKdq6BIbEGE/XforpOVlaZ68pgaBnxTNtfFZqRJYB23d
+ 9Jc/OecW5vlPITyX30YC1bK1N
+X-Received: by 2002:a5d:4bcb:: with SMTP id l11mr22357432wrt.363.1591000024517; 
+ Mon, 01 Jun 2020 01:27:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx32HOgFCCtByd40naAgUYbnAHE2Ln8h8s37CuU7DmFEmUw7hzr40v2F7kG19gUrQdUe0+aLQ==
+X-Received: by 2002:a5d:4bcb:: with SMTP id l11mr22357394wrt.363.1591000024205; 
+ Mon, 01 Jun 2020 01:27:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e044:3d2:1991:920c?
+ ([2001:b07:6468:f312:e044:3d2:1991:920c])
+ by smtp.gmail.com with ESMTPSA id h137sm11582353wme.0.2020.06.01.01.27.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 01 Jun 2020 01:27:03 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 updates for Linux 5.8
+To: Marc Zyngier <maz@kernel.org>
+References: <20200529160121.899083-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <32adb91d-c80c-743e-fe8f-57aee08140c4@redhat.com>
+Date: Mon, 1 Jun 2020 10:27:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <13db879dff56d091f98f7c5416ab1535@kernel.org>
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+In-Reply-To: <20200529160121.899083-1-maz@kernel.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Jiang Yi <giangyi@amazon.com>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,112 +114,13 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On 29/05/20 18:00, Marc Zyngier wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.8
 
-On 2020/5/31 0:31, Marc Zyngier wrote:
-> Hi Alex,
-> 
-> On 2020-05-30 11:46, Alexandru Elisei wrote:
->> Hi,
-> 
-> [...]
-> 
->>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>>> index 48d0ec44ad77..e6378162cdef 100644
->>>> --- a/virt/kvm/arm/arm.c
->>>> +++ b/virt/kvm/arm/arm.c
->>>> @@ -983,8 +983,11 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->>>>      /*
->>>>       * Ensure a rebooted VM will fault in RAM pages and detect if the
->>>>       * guest MMU is turned off and flush the caches as needed.
->>>> +     *
->>>> +     * S2FWB enforces all memory accesses to RAM being cacheable, we
->>>> +     * ensure that the cache is always coherent.
->>>>       */
->>>> -    if (vcpu->arch.has_run_once)
->>>> +    if (vcpu->arch.has_run_once && !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
->>> I think userspace does not invalidate the icache when loading a new kernel image,
->>> and if the guest patched instructions, they could potentially still be in the
->>> icache. Should the icache be invalidated if FWB is present?
->>
->> I noticed that this was included in the current pull request and I
->> remembered that
->> I wasn't sure about this part. Did some more digging and it turns out that FWB
->> implies no cache maintenance needed for *data to instruction*
->> coherence. From ARM
->> DDI 0487F.b, page D5-2635:
->>
->> "When ARMv8.4-S2FWB is implemented, the architecture requires that
->> CLIDR_EL1.{LOUU, LOIUS} are zero so that no levels of data cache need to be
->> cleaned in order to manage coherency with instruction fetches".
->>
->> However, there's no mention that I found for instruction to data coherence,
->> meaning that the icache would still need to be invalidated on each vcpu in order
->> to prevent fetching of patched instructions from the icache. Am I
->> missing something?
-> 
-> I think you are right, and this definitely matches the way we deal with
-> the icache on the fault path. For some bizarre reason, I always assume
-> that FWB implies DIC, which isn't true at all.
-> 
-> I'm planning to address it as follows. Please let me know what you think.
-> 
-> Thanks,
-> 
->         M.
-> 
-> From f7860d1d284f41afea176cc17e5c9d895ae665e9 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Sat, 30 May 2020 17:22:19 +0100
-> Subject: [PATCH] KVM: arm64: Flush the instruction cache if not unmapping the
->  VM on reboot
-> 
-> On a system with FWB, we don't need to unmap Stage-2 on reboot,
-> as even if userspace takes this opportunity to repaint the whole
-> of memory, FWB ensures that the data side stays consistent even
-> if the guest uses non-cacheable mappings.
-> 
-> However, the I-side is not necessarily coherent with the D-side
-> if CTR_EL0.DIC is 0. In this case, invalidate the i-cache to
-> preserve coherency.
-> 
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Fixes: 892713e97ca1 ("KVM: arm64: Sidestep stage2_unmap_vm() on vcpu reset when S2FWB is supported")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/arm.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index b0b569f2cdd0..d6988401c22a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -989,11 +989,17 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->       * Ensure a rebooted VM will fault in RAM pages and detect if the
->       * guest MMU is turned off and flush the caches as needed.
->       *
-> -     * S2FWB enforces all memory accesses to RAM being cacheable, we
-> -     * ensure that the cache is always coherent.
-> +     * S2FWB enforces all memory accesses to RAM being cacheable,
-> +     * ensuring that the data side is always coherent. We still
-> +     * need to invalidate the I-cache though, as FWB does *not*
-> +     * imply CTR_EL0.DIC.
->       */
-> -    if (vcpu->arch.has_run_once && !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> -        stage2_unmap_vm(vcpu->kvm);
-> +    if (vcpu->arch.has_run_once) {
-> +        if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-> +            stage2_unmap_vm(vcpu->kvm);
-> +        else
-> +            __flush_icache_all();
-After I looking into this function, I think it's OK here. Please ignore
-my question :-).
-> +    }
-> 
->      vcpu_reset_hcr(vcpu);
-> 
-Thanks,
-Keqian
+Pulled, thanks (to kvm/queue only for now).
+
+Paolo
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
