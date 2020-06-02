@@ -1,97 +1,83 @@
 Return-Path: <SRS0=kHGs=7P=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,TVD_SPACE_RATIO,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8927AC433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Jun 2020 05:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D182C433DF
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Jun 2020 07:53:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0AB02206C3
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Jun 2020 05:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E1BF206A2
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Jun 2020 07:53:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y63W1x+j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB02206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TEMvocqB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1BF206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC554B1A3;
-	Tue,  2 Jun 2020 01:44:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 535A44B1E2;
+	Tue,  2 Jun 2020 03:53:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, body has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iA2bwYwaZJDT; Tue,  2 Jun 2020 01:44:56 -0400 (EDT)
+	with ESMTP id x++JMcODHIKL; Tue,  2 Jun 2020 03:53:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33ADD4B0F2;
-	Tue,  2 Jun 2020 01:44:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9CF4B1A5;
+	Tue,  2 Jun 2020 03:53:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D87504B09E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2020 01:44:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 636B84B18D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2020 02:19:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lZRCyTuYTUDk for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Jun 2020 01:44:53 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9E804B11E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2020 01:44:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591076693;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bCo6Hs1XvKVZ/we8zlozkhnglL2Do2YvAix/0i2LEXM=;
- b=Y63W1x+jPASWT5dLtyK5KW30WZOC1GJJa8JS06G1AQ8rd9SaB6n6Ba29gFHIC68LRk5XXy
- g2SJa4uKMislkCTuJGk9/GPoDTGc2xWNnWDPHhOddVLsi2p0XOogH+l+TXpAYJ5HKB7NQX
- 3+qoljhYnpwtl7RXlXHVtH/zL1vE5d0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-1OLmskEZNhOBtfnAOikoPA-1; Tue, 02 Jun 2020 01:44:49 -0400
-X-MC-Unique: 1OLmskEZNhOBtfnAOikoPA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40DBC835B40;
- Tue,  2 Jun 2020 05:44:48 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-70.bne.redhat.com [10.64.54.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D7375D9C9;
- Tue,  2 Jun 2020 05:44:45 +0000 (UTC)
-Subject: Re: [PATCH RFCv2 9/9] arm64: Support async page fault
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
-References: <20200508032919.52147-1-gshan@redhat.com>
- <20200508032919.52147-10-gshan@redhat.com>
- <81adf013-3de7-23e6-7648-8aec821b033c@redhat.com>
- <a6addc25-29af-3690-8392-efa5e8381e98@redhat.com>
- <8ab64c6a-582b-691d-79ab-21cdc0455cd3@redhat.com>
- <6a4a82a4-af01-98c2-c854-9199f55f7bd3@redhat.com>
- <6965aaf641a23fab64fbe2ceeb790272@kernel.org>
- <d0bfb944-b50a-608a-7dcc-5a409cdc4524@redhat.com>
- <4337cca152df47c93d96e092189a0e36@kernel.org>
- <5c72c597-732e-7dbf-d056-665674ec1792@redhat.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <fca52ea1-294a-6011-45f1-d0df30069800@redhat.com>
-Date: Tue, 2 Jun 2020 15:44:42 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id GLR2JIkZ0z96 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Jun 2020 02:19:01 -0400 (EDT)
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com
+ [209.85.160.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3416D4B08C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2020 02:19:01 -0400 (EDT)
+Received: by mail-qt1-f174.google.com with SMTP id y1so9769967qtv.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Jun 2020 23:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=dBhWGBisxfa1raeM1guw9xlVWqydEL4cHPADAnOG63g=;
+ b=TEMvocqBPGJ7LiT71ol0I4XMs7Daenb/RW4KmBHUUQtNGqgi+80C3TRmMVadBPHXXd
+ BiwzqPMO5rGGVMZ2hA8/wzKT9tvqFrRIf1XLHamL9KqemkBoM0U2CVaOwIVij0/xBmTa
+ HyNue8Res1oD2VwgkbO0m1ZqClJhxxZS9LlLH5Pq/5ojKA42dG7/WjHiOgqyeZd3WC7d
+ Qd7tvLktDfxEmE1A/JJ2fGRK1tV2GtApRPIPU6a/wiITcd9mz1GwPZgVOM7KENh/Lp/x
+ MR9lxe3Luzk6lCNIjHswnLyCGMzTn3u9ao8wjzjXfCwfRy3FJfTV/sIt8TdE2J+mqvos
+ Qeuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=dBhWGBisxfa1raeM1guw9xlVWqydEL4cHPADAnOG63g=;
+ b=IrG4+R+PiCfvQu2Cm2wA62F5d/NNAHUT23EmuQMtDv6rN0k9tq4/tToak2cgGGYQwT
+ mO1jckKuG4PRpRlVEvn4byizyzGW2EQ7fBrlUUKWgfAPHXiovrskaeiLS8DihgHlKTUS
+ UhGe39cbFCwIOvYeT1nMscebweAYooUkG9BI4g42jQ1BQffVUQVF//Rm0XfcULb/JVqL
+ zRCIzmzCRFTenUOng04T/484dMOzzqPakZEXqbF8XO9bQUGHKsJyWs58V2idgFGKJ5ut
+ gzjgKvGyvvtqt8ejwYufxu/4wOVdJkdK9LGfjlf82a9pxBYGGrcrHGSwk1O2PvhAirp1
+ +qZg==
+X-Gm-Message-State: AOAM533b0tNTe18TM7HRFWhTDHkmtNagI2SAYEFUGHJrXXslbXILmyUS
+ buGKuCrttiBuJvyjZbmKYr/UIRH/pFB/oxMUKhzi5jPG
+X-Google-Smtp-Source: ABdhPJzcYVQUaBvCJrlqFWyeKN1Y1cF/ZFaUQ6YKLNNFZiuKkZf5QqhDbRIfmD0kFk3eH2WGZshIb/hTXr/ZZCT7i5s=
+X-Received: by 2002:ac8:551a:: with SMTP id j26mr26222387qtq.237.1591078740504; 
+ Mon, 01 Jun 2020 23:19:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5c72c597-732e-7dbf-d056-665674ec1792@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, shan.gavin@gmail.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+From: =?UTF-8?B?w5HDtMOYYg==?= <domlolpls8@gmail.com>
+Date: Tue, 2 Jun 2020 14:18:49 +0800
+Message-ID: <CAKUrxgmRVOVc6rzc6fxq8Efh_ixfnD_CETSd=Ayycu4Tii_XjQ@mail.gmail.com>
+Subject: test
+To: kvmarm@lists.cs.columbia.edu
+X-Mailman-Approved-At: Tue, 02 Jun 2020 03:53:06 -0400
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -100,55 +86,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: multipart/mixed; boundary="===============4182435370478338085=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc, Paolo,
+--===============4182435370478338085==
+Content-Type: multipart/alternative; boundary="00000000000023350805a713e329"
 
-On 6/1/20 7:21 PM, Paolo Bonzini wrote:
-> On 31/05/20 14:44, Marc Zyngier wrote:
->>>
->>> Is there an ARM-approved way to reuse the S2 fault syndromes to detect
->>> async page faults?
->>
->> It would mean being able to set an ESR_EL2 register value into ESR_EL1,
->> and there is nothing in the architecture that would allow that,
-> 
-> I understand that this is not what you want to do and I'm not proposing
-> it, but I want to understand this better: _in practice_ do CPUs check
-> closely what is written in ESR_EL1?
-> 
-> In any case, the only way to implement this, it seems to me, would be a
-> completely paravirtualized exception vector that doesn't use ESR at all.
-> 
-> On the other hand, for the page ready (interrupt) side assigning a PPI
-> seems complicated but doable.
-> 
+--00000000000023350805a713e329
+Content-Type: text/plain; charset="UTF-8"
 
-Marc suggested to use SDEI in another reply. I think it might be the
-appropriate way to deliver page-not-present. To some extent, it could
-be regarded as exception, which doesn't use ESR at all. It matches with
-what Paolo is thinking of: paravirtualized exception vector that doesn't
-use ESR at all. However, it seems it's not supported in kvm-arm yet. So
-I assume it needs to be developed from scratch. Marc, could you please
-help to confirm? Thanks in advance.
+test
 
-I agree with Paolo PPI (interrupt) might be the best way to deliver
-page-ready currently. I don't think SDEI is suitable because there
-are no big difference between SDEI and currently used DABT injection
-to some extent. With SDEI, We will have the issues we are facing.
-For example, some critical code section isn't safe to receive SDEI
-if I'm correct.
+--00000000000023350805a713e329
+Content-Type: text/html; charset="UTF-8"
 
+<div dir="ltr">test</div>
 
-Thanks,
-Gavin
+--00000000000023350805a713e329--
 
-[...]
+--===============4182435370478338085==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============4182435370478338085==--
