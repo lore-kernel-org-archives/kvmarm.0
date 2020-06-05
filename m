@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A60C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EE1C433E3
 	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EB5D2206FA
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5D2206FA
+	by mail.kernel.org (Postfix) with ESMTP id 70B89206FA
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B89206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A44DD4B213;
-	Fri,  5 Jun 2020 17:39:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 289FB4B1D2;
+	Fri,  5 Jun 2020 17:39:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aZBtLcE9flGd; Fri,  5 Jun 2020 17:39:29 -0400 (EDT)
+	with ESMTP id eeN5Bm4VXgJQ; Fri,  5 Jun 2020 17:39:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD5E4B1E2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B764B1E3;
 	Fri,  5 Jun 2020 17:39:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A34DB4B1DC
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47E9A4B1D2
  for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jun 2020 17:39:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DlXYiOEbKmCW for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id lqqo94OJ3XJC for <kvmarm@lists.cs.columbia.edu>;
  Fri,  5 Jun 2020 17:39:19 -0400 (EDT)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 343984B1E6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jun 2020 17:39:15 -0400 (EDT)
-IronPort-SDR: G9oDv4Z/T7Ei+B9c+tCKklKD+NzStqKvaNFM4OY4RegXrD5V3Pfpmqx4ZyWlZwkuT89ADli2UU
- 2BF0azTMeYIg==
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA51E4B1DC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jun 2020 17:39:14 -0400 (EDT)
+IronPort-SDR: qsd3jgNPS+7oXxPsLbDOxnY93Cmc/hmR1qTwi93DhOtmtUpcdAhcNzdfqe5y0MDxu7EDlou3F2
+ vrKdhM7kaDQw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  05 Jun 2020 14:39:08 -0700
-IronPort-SDR: I7BwiRnb6qWgFO7BpcC5Xe5lAqmxnRsI1qmZGEZxMZw6goAYfu74oYxKINf/llsyqxunF210uj
- a9IwlvttJxJQ==
+IronPort-SDR: Idi1IVMcTFydss692Nr+fYxQ9yvfSMWB6bKmY+OfZPOI8dSsDUPllwe6ya97uamInOkH2WtnY5
+ pNdFXOfp+O3g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; d="scan'208";a="287860895"
+X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; d="scan'208";a="287860883"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
  by orsmga002.jf.intel.com with ESMTP; 05 Jun 2020 14:39:08 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 10/21] KVM: x86/mmu: Make __GFP_ZERO a property of the memory
- cache
-Date: Fri,  5 Jun 2020 14:38:42 -0700
-Message-Id: <20200605213853.14959-11-sean.j.christopherson@intel.com>
+Subject: [PATCH 06/21] KVM: x86/mmu: Move fast_page_fault() call above
+ mmu_topup_memory_caches()
+Date: Fri,  5 Jun 2020 14:38:38 -0700
+Message-Id: <20200605213853.14959-7-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
@@ -86,60 +86,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a gfp_zero flag to 'struct kvm_mmu_memory_cache' and use it to
-control __GFP_ZERO instead of hardcoding a call to kmem_cache_zalloc().
-A future patch needs such a flag for the __get_free_page() path, as
-gfn arrays do not need/want the allocator to zero the memory.  Convert
-the kmem_cache paths to __GFP_ZERO now so as to avoid a weird and
-inconsistent API in the future.
-
-No functional change intended.
+Avoid refilling the memory caches and potentially slow reclaim/swap when
+handling a fast page fault, which does not need to allocate any new
+objects.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu/mmu.c          | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e7a427547557..fb99e6776e27 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
-  */
- struct kvm_mmu_memory_cache {
- 	int nobjs;
-+	gfp_t gfp_zero;
- 	struct kmem_cache *kmem_cache;
- 	void *objects[KVM_NR_MEM_OBJS];
- };
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d245acece3cd..6b0ec9060786 100644
+index 5e773564ab20..4b4c3234d623 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1063,8 +1063,10 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
- static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
- 					       gfp_t gfp_flags)
- {
-+	gfp_flags |= mc->gfp_zero;
-+
- 	if (mc->kmem_cache)
--		return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
-+		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
- 	else
- 		return (void *)__get_free_page(gfp_flags);
- }
-@@ -5680,7 +5682,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	int ret;
+@@ -4095,6 +4095,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
+ 		return RET_PF_EMULATE;
  
- 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
-+	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
++	if (fast_page_fault(vcpu, gpa, error_code))
++		return RET_PF_RETRY;
 +
- 	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-+	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+ 	r = mmu_topup_memory_caches(vcpu);
+ 	if (r)
+ 		return r;
+@@ -4102,9 +4105,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 	if (lpage_disallowed)
+ 		max_level = PG_LEVEL_4K;
  
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+-	if (fast_page_fault(vcpu, gpa, error_code))
+-		return RET_PF_RETRY;
+-
+ 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+ 	smp_rmb();
+ 
 -- 
 2.26.0
 
