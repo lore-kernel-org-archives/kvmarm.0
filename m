@@ -4,59 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A11A0C433E4
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33A7C433E2
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 62780206DC
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62780206DC
+	by mail.kernel.org (Postfix) with ESMTP id B306C206DC
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Jun 2020 21:39:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B306C206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BAAE4B1DC;
-	Fri,  5 Jun 2020 17:39:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C74A4B1FA;
+	Fri,  5 Jun 2020 17:39:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LQ4Y81D3JhFS; Fri,  5 Jun 2020 17:39:32 -0400 (EDT)
+	with ESMTP id BQ26BQGKsjHP; Fri,  5 Jun 2020 17:39:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 121644B1D9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A2C64B249;
 	Fri,  5 Jun 2020 17:39:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62FFB4B07F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB2B34B226
  for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jun 2020 17:39:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qXQBXv783dv7 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Jun 2020 17:39:20 -0400 (EDT)
+ with ESMTP id stz1zgI-mfKK for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Jun 2020 17:39:19 -0400 (EDT)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 743924B1F3
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 217794B1E5
  for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Jun 2020 17:39:15 -0400 (EDT)
-IronPort-SDR: ul9IPChLIr8+BkGvVepQQd+0eg6KYKsasGj4XeL0DPwxeyzpFzwooErgpsDnIxb8xxOuoRUQ1X
- g5eSh+cD7fvg==
+IronPort-SDR: BMBvHhEKeTd01W1S5QDKjk9BvEn091G4L4WFfPRJfT/KlNPatZmvIyFiBuARta0quxIRHerFqR
+ yKncnJJ2X7jA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  05 Jun 2020 14:39:08 -0700
-IronPort-SDR: j7Wc2uJYO1nS60vi1HPczs7gXFA7HoPA+i9Y3yXEGgSIHvuwj1L1as4jdw7VkhXY0JW6DL68E1
- GDo+WnXbv7cw==
+IronPort-SDR: K5xNZ3oXYp+oVBI7V1zZKjiJSJR0lMy065Lb/QLuNuIN9eZhnavo+VVKzrYDCA/IblpQWSVCl4
+ 30GwmqIJk2qg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; d="scan'208";a="287860901"
+X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; d="scan'208";a="287860889"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
  by orsmga002.jf.intel.com with ESMTP; 05 Jun 2020 14:39:08 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 12/21] KVM: x86/mmu: Skip filling the gfn cache for guaranteed
- direct MMU topups
-Date: Fri,  5 Jun 2020 14:38:44 -0700
-Message-Id: <20200605213853.14959-13-sean.j.christopherson@intel.com>
+Subject: [PATCH 08/21] KVM: x86/mmu: Clean up the gorilla math in
+ mmu_topup_memory_caches()
+Date: Fri,  5 Jun 2020 14:38:40 -0700
+Message-Id: <20200605213853.14959-9-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
@@ -87,94 +86,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Don't bother filling the gfn array cache when the caller is a fully
-direct MMU, i.e. won't need a gfn array for shadow pages.
+Clean up the minimums in mmu_topup_memory_caches() to document the
+driving mechanisms behind the minimums.  Now that encountering an empty
+cache is unlikely to trigger BUG_ON(), it is less dangerous to be more
+precise when defining the minimums.
+
+For rmaps, the logic is 1 parent PTE per level, plus a single rmap, and
+prefetched rmaps.  The extra objects in the current '8 + PREFETCH'
+minimum came about due to an abundance of paranoia in commit
+c41ef344de212 ("KVM: MMU: increase per-vcpu rmap cache alloc size"),
+i.e. it could have increased the minimum to 2 rmaps.  Furthermore, the
+unexpected extra rmap case was killed off entirely by commits
+f759e2b4c728c ("KVM: MMU: avoid pte_list_desc running out in
+kvm_mmu_pte_write") and f5a1e9f89504f ("KVM: MMU: remove call to
+kvm_mmu_pte_write from walk_addr").
+
+For the so called page cache, replace '8' with 2*PT64_ROOT_MAX_LEVEL.
+The 2x multiplier is needed because the cache is used for both shadow
+pages and gfn arrays for indirect MMUs.
+
+And finally, for page headers, replace '4' with PT64_ROOT_MAX_LEVEL.
+
+Note, KVM now supports 5-level paging, i.e. the old minimums that used a
+baseline derived from 4-level paging were technically wrong.  But, KVM
+always allocates roots in a separate flow, e.g. it's impossible in the
+current implementation to actually need 5 new shadow pages in a single
+flow.  Use PT64_ROOT_MAX_LEVEL unmodified instead of subtracting 1, as
+the direct usage is likely more intuitive to uninformed readers, and the
+inflated minimum is unlikely to affect functionality in practice.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 18 ++++++++++--------
- arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a8f8eebf67df..8d66cf558f1b 100644
+index 4b4c3234d623..451e0365e5dd 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1101,7 +1101,7 @@ static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
- 	}
- }
- 
--static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
-+static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+@@ -1103,14 +1103,17 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
  {
  	int r;
  
-@@ -1114,10 +1114,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
- 				   PT64_ROOT_MAX_LEVEL);
++	/* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+ 	r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+-				   8 + PTE_PREFETCH_NUM);
++				   1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
  	if (r)
  		return r;
--	r = mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
--				   PT64_ROOT_MAX_LEVEL);
--	if (r)
--		return r;
-+	if (maybe_indirect) {
-+		r = mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-+					   PT64_ROOT_MAX_LEVEL);
-+		if (r)
-+			return r;
-+	}
- 	return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
- 				      PT64_ROOT_MAX_LEVEL);
+-	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache, 8);
++	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
++				   2 * PT64_ROOT_MAX_LEVEL);
+ 	if (r)
+ 		return r;
+-	return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
++	return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
++				      PT64_ROOT_MAX_LEVEL);
  }
-@@ -4107,7 +4109,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	if (fast_page_fault(vcpu, gpa, error_code))
- 		return RET_PF_RETRY;
  
--	r = mmu_topup_memory_caches(vcpu);
-+	r = mmu_topup_memory_caches(vcpu, false);
- 	if (r)
- 		return r;
- 
-@@ -5147,7 +5149,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- {
- 	int r;
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->direct_map);
- 	if (r)
- 		goto out;
- 	r = mmu_alloc_roots(vcpu);
-@@ -5341,7 +5343,7 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	 * or not since pte prefetch is skiped if it does not have
- 	 * enough objects in the cache.
- 	 */
--	mmu_topup_memory_caches(vcpu);
-+	mmu_topup_memory_caches(vcpu, true);
- 
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 3de32122f601..ac39710d0594 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -818,7 +818,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 		return RET_PF_EMULATE;
- 	}
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = mmu_topup_memory_caches(vcpu, true);
- 	if (r)
- 		return r;
- 
-@@ -905,7 +905,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- 	 * No need to check return value here, rmap_can_add() can
- 	 * help us to skip pte prefetch later.
- 	 */
--	mmu_topup_memory_caches(vcpu);
-+	mmu_topup_memory_caches(vcpu, true);
- 
- 	if (!VALID_PAGE(root_hpa)) {
- 		WARN_ON(1);
+ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
 -- 
 2.26.0
 
