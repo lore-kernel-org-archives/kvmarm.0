@@ -2,82 +2,90 @@ Return-Path: <SRS0=JvcX=7V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B717FC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 16:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40595C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 17:09:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4051E2053B
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 16:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7BCC2076A
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 17:09:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NpaVW4l4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4051E2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="p1wdQUod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7BCC2076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A33B04B187;
-	Mon,  8 Jun 2020 12:58:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 411B64B150;
+	Mon,  8 Jun 2020 13:09:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MYGxSRlak1Rj; Mon,  8 Jun 2020 12:58:36 -0400 (EDT)
+	with ESMTP id y8nQNPuttTV8; Mon,  8 Jun 2020 13:09:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EFCE4B0F6;
-	Mon,  8 Jun 2020 12:58:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4347E4B13B;
+	Mon,  8 Jun 2020 13:09:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 212BE4B0F6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 12:58:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DBF24B0F9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 13:09:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aBdwlEhKEFkc for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jun 2020 12:58:34 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11D294B08F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 12:58:34 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1591635513;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DjeaWq24L9IqEh+sMIQV7yL5aFDflGPNZnawA6peKro=;
- b=NpaVW4l4JQaN+1NBu+d/IrxE8uwFblFIMJZln7wZ2IYodZRyO/1UECAnfr5oTeofiC8XZQ
- KpkXw8eot2AeRsZItGCJDH9AfPZ94WXQkUqWTcQn+3tKFhtClZSybkGRQVfI797QVVmt10
- IlzKtQVgQlbYG3QvN1hYGN3jXeHQQTc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-kkFr2eOeNk2Vl7IHHGtkgg-1; Mon, 08 Jun 2020 12:58:10 -0400
-X-MC-Unique: kkFr2eOeNk2Vl7IHHGtkgg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73EAFA0C09;
- Mon,  8 Jun 2020 16:58:08 +0000 (UTC)
-Received: from [10.36.112.85] (ovpn-112-85.ams2.redhat.com [10.36.112.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7115679598;
- Mon,  8 Jun 2020 16:58:06 +0000 (UTC)
-Subject: Re: [PATCH] KVM: arm64: Allow in-atomic injection of SPIs
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200526161136.451312-1-maz@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0a3875f0-9918-51f3-08eb-29a72eeb1306@redhat.com>
-Date: Mon, 8 Jun 2020 18:58:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id gcJpJt19lG8O for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jun 2020 13:09:27 -0400 (EDT)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12BF34B0D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 13:09:27 -0400 (EDT)
+Received: by mail-wm1-f65.google.com with SMTP id q25so296481wmj.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Jun 2020 10:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=O5kyIIzxsOCQ0wtFJtMJAdBIg3y6KuYFhCf9iMzgFJQ=;
+ b=p1wdQUodkbKA53RU829/S14bgNwXUZk4oaZTZITlLvC1R/7pCLt8Qec1xAGFhamIuc
+ 6GF1n0XpMYAVGZKMywm22h1ALDMPKC6G/E5cO+DrxJ5qCSzcWyrUHMqFumgbHdUB4PKI
+ NXGPYjtcPBb58hKLeEFKZhEW3c+c7gfIsbHDkzXKT86fv2c6LRGCjIStT6NFcC/RFCUV
+ Cd6FPlkFGwdFBPcY9Gu+WoR99u+T8tOtU2rKJ8OttEpNZZcKTZiS/TQdIyt7UoWh0mnL
+ jSWwEg9ye92wgPswhOn2ZJsE21UwfoMC1vNYT56fDTeseRBdlyb87eNnOHq3gueSJbtm
+ +Z4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=O5kyIIzxsOCQ0wtFJtMJAdBIg3y6KuYFhCf9iMzgFJQ=;
+ b=ay7gEE/nB3nnnntT5tAm06dDXoDsqMvlP7RPSaSjBdRTMt7l2v2Bb2QzaB921WgnMf
+ dgpWpBww69lxSo3L4jeVDUk4pt56827O0G9v8IR6OGb63aJTMclPg8uCujMJU49l1Skq
+ e83PufEfGVu/qeDjHA2xkoVPAnw7l+VcsPgN097PYVpq1J6mpGMZXXB/h0cUKcNIikGx
+ dKxKF3oszjxrC9J+b2xyvSEwu4FvqSmgxOkkf/S0ftCvCwrV1fvaE6bKVJD1p3M3zDpL
+ /Oj75cYlZ+8XVjM5Jh7MgAq5msOVhRO2tgk4oUZwOxT/DpzIsie9iUl5cdorj1wG5bIV
+ Jjpw==
+X-Gm-Message-State: AOAM533shXuEu/kXb5wo1aIFYsQuivlLorWDhoT+faURdbI/vN0813Zm
+ YNqAvhP/5R54WeRDIfP8fKtVOQ==
+X-Google-Smtp-Source: ABdhPJxZEDJueTXgTcDW9U9iUaISMszgUVW6R1TTHIBvERHVRmV8seKAaqqSKuvHuMRooFnwn0NlQQ==
+X-Received: by 2002:a7b:cc08:: with SMTP id f8mr350455wmh.106.1591636165854;
+ Mon, 08 Jun 2020 10:09:25 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+ by smtp.gmail.com with ESMTPSA id z8sm357180wru.33.2020.06.08.10.09.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 08 Jun 2020 10:09:25 -0700 (PDT)
+Date: Mon, 8 Jun 2020 18:09:20 +0100
+From: Andrew Scull <ascull@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2] KVM: arm64: Remove host_cpu_context member from vcpu
+ structure
+Message-ID: <20200608170920.GC96714@google.com>
+References: <20200608085657.1405730-1-maz@kernel.org>
+ <20200608145145.GA96714@google.com>
+ <1a00887a4af019fa83380b68afd43a29@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200526161136.451312-1-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kernel-team@android.com
+Content-Disposition: inline
+In-Reply-To: <1a00887a4af019fa83380b68afd43a29@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,98 +102,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Mon, Jun 08, 2020 at 04:42:42PM +0100, Marc Zyngier wrote:
+> Hi Andrew,
+> 
+> On 2020-06-08 15:51, Andrew Scull wrote:
+> > On Mon, Jun 08, 2020 at 09:56:57AM +0100, Marc Zyngier wrote:
+> > > For very long, we have kept this pointer back to the per-cpu
+> > > host state, despite having working per-cpu accessors at EL2
+> > > for some time now.
+> > > 
+> > > Recent investigations have shown that this pointer is easy
+> > > to abuse in preemptible context, which is a sure sign that
+> > > it would better be gone. Not to mention that a per-cpu
+> > > pointer is faster to access at all times.
+> > 
+> > Helps to make the references to `kvm_host_data` clearer with there now
+> > being just one way to get to it and shows that it is scoped to the
+> > current CPU. A good change IMO!
+> 
+> Thanks! Can I take this as a Reviewed-by or Acked-by tag? Just let me know.
 
-On 5/26/20 6:11 PM, Marc Zyngier wrote:
-> On a system that uses SPIs to implement MSIs (as it would be
-> the case on a GICv2 system exposing a GICv2m to its guests),
-> we deny the possibility of injecting SPIs on the in-atomic
-> fast-path.
-> 
-> This results in a very large amount of context-switches
-> (roughly equivalent to twice the interrupt rate) on the host,
-> and suboptimal performance for the guest (as measured with
-> a test workload involving a virtio interface backed by vhost-net).
-> Given that GICv2 systems are usually on the low-end of the spectrum
-> performance wise, they could do without the aggravation.
-> 
-> We solved this for GICv3+ITS by having a translation cache. But
-> SPIs do not need any extra infrastructure, and can be immediately
-> injected in the virtual distributor as the locking is already
-> heavy enough that we don't need to worry about anything.
-> 
-> This halves the number of context switches for the same workload.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-irqfd.c | 20 ++++++++++++++++----
->  arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
->  2 files changed, 17 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-> index d8cdfea5cc96..11a9f81115ab 100644
-> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-There is still a comment above saying
- * Currently only direct MSI injection is supported.
-> @@ -107,15 +107,27 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
->  			      struct kvm *kvm, int irq_source_id, int level,
->  			      bool line_status)
->  {
-> -	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
-> +	if (!level)
-> +		return -EWOULDBLOCK;
-> +
-> +	switch (e->type) {
-> +	case KVM_IRQ_ROUTING_MSI: {
->  		struct kvm_msi msi;
->  
-> +		if (!vgic_has_its(kvm))
-> +			return -EINVAL;
-Shouldn't we return -EWOULDBLOCK by default?
-QEMU does not use that path with GICv2m but in kvm_set_routing_entry() I
-don't see any check related to the ITS.
-> +
->  		kvm_populate_msi(e, &msi);
-> -		if (!vgic_its_inject_cached_translation(kvm, &msi))
-> -			return 0;
-> +		return vgic_its_inject_cached_translation(kvm, &msi);
+Build and booted your kvm-arm64/ptrauth-fixes branch contianing this
+patch with VHE and nVHE on qemu. Booted a VM within each with kvmtool.
 
->  	}
->  
-> -	return -EWOULDBLOCK;
-> +	case KVM_IRQ_ROUTING_IRQCHIP:
-> +		/* Injecting SPIs is always possible in atomic context */
-> +		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
-what about the 	mutex_lock(&kvm->lock) called from within
-vgic_irqfd_set_irq/kvm_vgic_inject_irq/vgic_lazy_init
-> +
-> +	default:
-> +		return -EWOULDBLOCK;
-> +	}
->  }
->  
->  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index c012a52b19f5..40cbaca81333 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -757,9 +757,8 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
->  
->  	db = (u64)msi->address_hi << 32 | msi->address_lo;
->  	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
-> -
->  	if (!irq)
-> -		return -1;
-> +		return -EWOULDBLOCK;
->  
->  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
->  	irq->pending_latch = true;
-> 
-Thanks
-
-Eric
-
+Reviewed-by: Andrew Scull <ascull@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
