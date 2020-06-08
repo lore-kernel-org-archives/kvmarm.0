@@ -2,88 +2,77 @@ Return-Path: <SRS0=JvcX=7V=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A40C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 15:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F48C433DF
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 15:28:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 01584206C3
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 15:00:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66045206D5
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jun 2020 15:28:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="H4q0p6de"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01584206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="diyDYWHv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66045206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 774E14B1BD;
-	Mon,  8 Jun 2020 11:00:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A1ED4B1CA;
+	Mon,  8 Jun 2020 11:28:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uulj-bMDh25c; Mon,  8 Jun 2020 11:00:57 -0400 (EDT)
+	with ESMTP id EZOdsMQ7+RNn; Mon,  8 Jun 2020 11:28:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AFF44B1C1;
-	Mon,  8 Jun 2020 11:00:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B865C4B1AF;
+	Mon,  8 Jun 2020 11:28:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB534B1C1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 11:00:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA1974B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 11:28:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MuxgALlN9RQC for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jun 2020 11:00:41 -0400 (EDT)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BD3E4B1BC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 11:00:41 -0400 (EDT)
-Received: by mail-wm1-f66.google.com with SMTP id q25so16868674wmj.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Jun 2020 08:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=hjZu9HUiJ4ghbYbVLHHdJJBsYU84vEwMo6AWGQbzbMg=;
- b=H4q0p6dexKRAu9bVDnRSuBCRoRqXk6tNmInurnFg/yZIgEWNJZaxUzJp9X/7yxQx+E
- Kq2z1a4o455v0Lxpi92VdXUmx0hyUT0ay2fwkkHVS1FvMcpSIx7mbZvGiPS7WuQUjzAw
- +cq2dDek+N/qnt2G0nz9jyyORRXYAg2c+A2CWUB9l9QseFwiLsjbg2wasklnP4DkeOMi
- VOrKoLsghKd23Fp3h4gjM7oPG8kR6M86DVX4S1hH0lU785YYfm1JWSQXLe+LiIiogHW4
- nvA3eES0u3Nvu4q1p8fvq7vAiy3KGMlaVeuQ9lD+gmWKWTx46tvQi7eMxrKOD7Hmz7oz
- wKFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=hjZu9HUiJ4ghbYbVLHHdJJBsYU84vEwMo6AWGQbzbMg=;
- b=uV97xgJkji4nmixjh1j8jolV3Uac/SoKKQEWuB+H7ryDP3FYfanYSRTkU9gZi4Qcpi
- +/6xek7f6KCRMl1T9d5dFMTwGlIX+l0LaPviMCToyMkJ/Qn4PxGm1/OtRjPry9JyoYGX
- Haj/f99CBXM8zojN/mOAfhBJ9T4lT9t5p6OG260LN/3f+GGnnuVQ/jh15Jp0SkjQuJFG
- ravkXzdviMVgn5dP95BdyYtqL5aH+vw0aMOg3qu3+IZIXDfY/JIpnLXxRWMauWzU1AWE
- s9afs9J26f/A+j2S1UALvvXoliZiO41RkQfPcdSiP4syC8f8x1Hi1h4JykCwr6omdWTC
- 9B8A==
-X-Gm-Message-State: AOAM533ETcsEQkWJksTt+eLWU/hYeWBzPhX9s6igB+h7wuIHLqG1sxyx
- 1nlWjxsJAc1Pq8sJy0RTh76X2A==
-X-Google-Smtp-Source: ABdhPJwc83jEVUrsYqdet2/G/6Soma/d1TvTQMjyae5cRkkAfGcbkJMyoOVSLQRjigs4Bo6/5LNImQ==
-X-Received: by 2002:a1c:29c4:: with SMTP id p187mr16901343wmp.73.1591628440198; 
- Mon, 08 Jun 2020 08:00:40 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
- by smtp.gmail.com with ESMTPSA id n1sm10397wrp.10.2020.06.08.08.00.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 08 Jun 2020 08:00:39 -0700 (PDT)
-Date: Mon, 8 Jun 2020 16:00:35 +0100
-From: Andrew Scull <ascull@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Stop sparse from moaning at __hyp_this_cpu_ptr
-Message-ID: <20200608150035.GB96714@google.com>
-References: <20200608085731.1405854-1-maz@kernel.org>
+ with ESMTP id MW0zwZikQ5XA for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jun 2020 11:28:10 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C0B94B1AA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2020 11:28:10 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 725ED206D5;
+ Mon,  8 Jun 2020 15:28:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1591630089;
+ bh=dLu0XJ1TYdNhKvkSJPwUcvKrUNbDTGDeAe/7UCVVlKI=;
+ h=From:To:Cc:Subject:Date:From;
+ b=diyDYWHvk1c6D/XEQnkWOhPkj9WV6PEnRf7nqyH2tLdplBuPmBzqAGzN5Hr1PwZUX
+ VshTX5+WGk9edlFny5qPInE6jeZZGdz9Y4b3P0GBekUOTNaucnpWbHU9tkGW66HtqG
+ ndOkCsfflQl0uIQTgdtZLYneR1jxE0nSyr+pelR0=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jiJh1-0019tL-Ue; Mon, 08 Jun 2020 16:28:08 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org
+Subject: [kvmtool][PATCH v2] arm64: Obtain text offset from kernel image
+Date: Mon,  8 Jun 2020 16:28:01 +0100
+Message-Id: <20200608152801.1415902-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200608085731.1405854-1-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, will@kernel.org,
+ julien.thierry.kdev@gmail.com, alexandru.elisei@arm.com, ardb@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,49 +89,207 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 08, 2020 at 09:57:31AM +0100, Marc Zyngier wrote:
-> Sparse complains that __hyp_this_cpu_ptr() returns something
-> that is flagged noderef and not in the correct address space
-> (both being the result of the __percpu annotation).
-> 
-> Pretend that __hyp_this_cpu_ptr() knows what it is doing by
-> forcefully casting the pointer with __kernel __force.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 0c9b5fc4ba0a..82691406d493 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -81,12 +81,17 @@ extern u32 __kvm_get_mdcr_el2(void);
->  
->  extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
->  
-> -/* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
-> +/*
-> + * Home-grown __this_cpu_{ptr,read} variants that always work at HYP,
-> + * provided that sym is really a *symbol* and not a pointer obtained from
+Recent changes made to Linux 5.8 have outlined that kvmtool
+hardcodes the text offset instead of reading it from the arm64
+image itself.
 
-Look at `this_cpu_ptr` one thing that stood out was `__verify_pcpu_ptr`
-that is documented to be suitable for used in custom per CPU macros. I
-didn't get how it worked (a type check?) but maybe it would work here
-to validate the argment was indeed a per CPU symbol?
+To address this, import the image header structure into kvmtool
+and do the right thing. 32bit guests are still loaded to their
+usual locations.
 
-> + * a data structure. As for SHIFT_PERCPU_PTR(), the creative casting keeps
-> + * sparse quiet.
-> + */
->  #define __hyp_this_cpu_ptr(sym)						\
->  	({								\
->  		void *__ptr = hyp_symbol_addr(sym);			\
->  		__ptr += read_sysreg(tpidr_el2);			\
-> -		(typeof(&sym))__ptr;					\
-> +		(typeof(sym) __kernel __force *)__ptr;			\
->  	 })
->  
->  #define __hyp_this_cpu_read(sym)					\
+While we're at it, check the image magic and default to the text
+offset to be 0x80000 when image_size is 0, as described in the
+kernel's booting.rst document.
+
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Reported-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+
+Notes:
+    v2: Check magic, assume offset to be 0x8000 if image_size is 0.
+
+ Makefile                           |  1 +
+ arm/aarch32/include/kvm/kvm-arch.h |  2 +-
+ arm/aarch64/include/asm/image.h    | 59 ++++++++++++++++++++++++++++++
+ arm/aarch64/include/kvm/kvm-arch.h |  5 +--
+ arm/aarch64/kvm.c                  | 43 ++++++++++++++++++++++
+ arm/kvm.c                          |  2 +-
+ 6 files changed, 107 insertions(+), 5 deletions(-)
+ create mode 100644 arm/aarch64/include/asm/image.h
+ create mode 100644 arm/aarch64/kvm.c
+
+diff --git a/Makefile b/Makefile
+index d27ff38..35bb118 100644
+--- a/Makefile
++++ b/Makefile
+@@ -179,6 +179,7 @@ ifeq ($(ARCH), arm64)
+ 	OBJS		+= $(OBJS_ARM_COMMON)
+ 	OBJS		+= arm/aarch64/arm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm-cpu.o
++	OBJS		+= arm/aarch64/kvm.o
+ 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+ 	ARCH_INCLUDE	+= -Iarm/aarch64/include
+ 
+diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+index cd31e72..a772bb1 100644
+--- a/arm/aarch32/include/kvm/kvm-arch.h
++++ b/arm/aarch32/include/kvm/kvm-arch.h
+@@ -1,7 +1,7 @@
+ #ifndef KVM__KVM_ARCH_H
+ #define KVM__KVM_ARCH_H
+ 
+-#define ARM_KERN_OFFSET(...)	0x8000
++#define kvm__arch_get_kern_offset(...)	0x8000
+ 
+ #define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+ 
+diff --git a/arm/aarch64/include/asm/image.h b/arm/aarch64/include/asm/image.h
+new file mode 100644
+index 0000000..c2b1321
+--- /dev/null
++++ b/arm/aarch64/include/asm/image.h
+@@ -0,0 +1,59 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef __ASM_IMAGE_H
++#define __ASM_IMAGE_H
++
++#define ARM64_IMAGE_MAGIC	"ARM\x64"
++
++#define ARM64_IMAGE_FLAG_BE_SHIFT		0
++#define ARM64_IMAGE_FLAG_PAGE_SIZE_SHIFT	(ARM64_IMAGE_FLAG_BE_SHIFT + 1)
++#define ARM64_IMAGE_FLAG_PHYS_BASE_SHIFT \
++					(ARM64_IMAGE_FLAG_PAGE_SIZE_SHIFT + 2)
++#define ARM64_IMAGE_FLAG_BE_MASK		0x1
++#define ARM64_IMAGE_FLAG_PAGE_SIZE_MASK		0x3
++#define ARM64_IMAGE_FLAG_PHYS_BASE_MASK		0x1
++
++#define ARM64_IMAGE_FLAG_LE			0
++#define ARM64_IMAGE_FLAG_BE			1
++#define ARM64_IMAGE_FLAG_PAGE_SIZE_4K		1
++#define ARM64_IMAGE_FLAG_PAGE_SIZE_16K		2
++#define ARM64_IMAGE_FLAG_PAGE_SIZE_64K		3
++#define ARM64_IMAGE_FLAG_PHYS_BASE		1
++
++#ifndef __ASSEMBLY__
++
++#define arm64_image_flag_field(flags, field) \
++				(((flags) >> field##_SHIFT) & field##_MASK)
++
++/*
++ * struct arm64_image_header - arm64 kernel image header
++ * See Documentation/arm64/booting.rst for details
++ *
++ * @code0:		Executable code, or
++ *   @mz_header		  alternatively used for part of MZ header
++ * @code1:		Executable code
++ * @text_offset:	Image load offset
++ * @image_size:		Effective Image size
++ * @flags:		kernel flags
++ * @reserved:		reserved
++ * @magic:		Magic number
++ * @reserved5:		reserved, or
++ *   @pe_header:	  alternatively used for PE COFF offset
++ */
++
++struct arm64_image_header {
++	__le32 code0;
++	__le32 code1;
++	__le64 text_offset;
++	__le64 image_size;
++	__le64 flags;
++	__le64 res2;
++	__le64 res3;
++	__le64 res4;
++	__le32 magic;
++	__le32 res5;
++};
++
++#endif /* __ASSEMBLY__ */
++
++#endif /* __ASM_IMAGE_H */
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 9de623a..55ef8ed 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -1,9 +1,8 @@
+ #ifndef KVM__KVM_ARCH_H
+ #define KVM__KVM_ARCH_H
+ 
+-#define ARM_KERN_OFFSET(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+-				0x8000				:	\
+-				0x80000)
++struct kvm;
++unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+ 
+ #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+ 				ARM_LOMAP_MAX_MEMORY		:	\
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+new file mode 100644
+index 0000000..a46d438
+--- /dev/null
++++ b/arm/aarch64/kvm.c
+@@ -0,0 +1,43 @@
++#include "kvm/kvm.h"
++
++#include <asm/image.h>
++
++#include <linux/byteorder.h>
++
++/*
++ * Return the TEXT_OFFSET value that the guest kernel expects. Note
++ * that pre-3.17 kernels expose this value using the native endianness
++ * instead of Little-Endian. BE kernels of this vintage may fail to
++ * boot. See Documentation/arm64/booting.rst in your local kernel tree.
++ */
++unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
++{
++	struct arm64_image_header header;
++	off_t cur_offset;
++	ssize_t size;
++
++	/* the 32bit kernel offset is a well known value */
++	if (kvm->cfg.arch.aarch32_guest)
++		return 0x8000;
++
++	cur_offset = lseek(fd, 0, SEEK_CUR);
++	if (cur_offset == (off_t)-1 ||
++	    lseek(fd, 0, SEEK_SET) == (off_t)-1)
++		die("Failed to seek in image file");
++
++	size = xread(fd, &header, sizeof(header));
++	if (size < 0 || (size_t)size < sizeof(header))
++		die("Failed to read kernel image header");
++
++	lseek(fd, cur_offset, SEEK_SET);
++
++	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic)))
++		pr_warning("Kernel image magic not matching");
++
++	if (le64_to_cpu(header.image_size))
++		return le64_to_cpu(header.text_offset);
++
++	pr_warning("Image size is 0, assuming TEXT_OFFSET to be 0x80000");
++	return 0x80000;
++}
++
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 1f85fc6..5aea18f 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -103,7 +103,7 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 	 */
+ 	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
+ 
+-	pos = kvm->ram_start + ARM_KERN_OFFSET(kvm);
++	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, fd_kernel);
+ 	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
+ 	file_size = read_file(fd_kernel, pos, limit - pos);
+ 	if (file_size < 0) {
+-- 
+2.26.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
