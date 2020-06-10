@@ -5,78 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 413D8C433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 07:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C619BC433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 07:22:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EE11F20812
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 07:22:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78F622075F
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 07:22:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="QyyXrmeK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE11F20812
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="UevvpOts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F622075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A768F4B219;
-	Thu, 11 Jun 2020 03:22:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3138D4B1C9;
+	Thu, 11 Jun 2020 03:22:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rtSojG1VEH5E; Thu, 11 Jun 2020 03:22:37 -0400 (EDT)
+	with ESMTP id 2oQS8GK0hjY2; Thu, 11 Jun 2020 03:22:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20D64B1EE;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7CEA4B1F2;
 	Thu, 11 Jun 2020 03:22:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E1904B1D7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 18:20:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 917094B1D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 18:34:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1ndA5UA3xMLO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jun 2020 18:20:34 -0400 (EDT)
-Received: from mail-vs1-f68.google.com (mail-vs1-f68.google.com
- [209.85.217.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97A944B1D1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 18:20:34 -0400 (EDT)
-Received: by mail-vs1-f68.google.com with SMTP id y123so2266801vsb.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 15:20:34 -0700 (PDT)
+ with ESMTP id UVyLiru9fusI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Jun 2020 18:34:39 -0400 (EDT)
+Received: from mail-vs1-f66.google.com (mail-vs1-f66.google.com
+ [209.85.217.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 974634B15B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 18:34:39 -0400 (EDT)
+Received: by mail-vs1-f66.google.com with SMTP id y123so2284931vsb.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2020 15:34:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gbYrwjkRNzZs52wtNe5b9ymrBledc5fgJdW/7CYMczg=;
- b=QyyXrmeKJSKKc54VOXRhBA48lstvw0q3ctLwmRUmYvuniF6MaKqprw76G6WKeXgKXB
- r/jbdUg8yJ7iw34oE1OWz0dWyMIlim7iHYcQtD67/ivBRy+I7B838Bxvx4JWOVUAxYN3
- POzPLtPUSvRylefwwyiJnNCwZ28r+eFHCfQTlfjzukPMl52cDhRE0H8vA3A5R5qZ//vK
- hyVJruxV9jjEt3XKZbDLdCyH9tLqObhgWfqQJpRCLqqkFBHz8EB0eQ7avKhqHHK0zYzj
- RESHvTrXTKtZufFfvsuK5nk/vVANKcnKj1isrCHWI7ENKEYpAZgFY60ZfqvyNfgEDVAL
- 29Zw==
+ :cc; bh=C9LYQ8aclMkdwfJP4cdhxWD4N8cMJMuN6znPHlB3Rsc=;
+ b=UevvpOtsXUfdMcqvIgRfPVVQSDyZs6oXq/Xnj/8uJDFNeQBZ7vzloiU32xzvK6mFCu
+ cGGLwNrdnw/Q0on5lLXJlkuu8D4VI6gjZehfPhGO6t/torNaJ6NxHMQ2JuDgO8FwHc4P
+ o8FP7KzD9QWU8u7G49I5aLDbEK8X8zhTnPGPK+25pdCKJLn9W7w1iBlkb84D2LADSGpc
+ tCqhhzfq26VpCG0se8b1WZwp4CCFSusJSn+larn2+KMSi4aCsCQRQ/S3A4qsfTfUDCpT
+ JYfiX91/2CIDQozv8ZBX3SClrislUPBF+zqSWJE7quvH7sEsU2MJoNuxaq5T13FcVb0X
+ ExAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=gbYrwjkRNzZs52wtNe5b9ymrBledc5fgJdW/7CYMczg=;
- b=BdOptmnqr5rHZtnPRzTckao9nHco55SwTe9tVNb3HiEBRrS9hRPqpaT/lptT+FwUi3
- gX8MRkAX3conJsFE6ZKqk85KVEehuf2tMS6Au2cYiZdiYVNFChpxP9hyvt/sCDf75YyV
- 0urDWLhljAVJr4LvWfDNLU2VwbjjykU6vekjkH6CgZxR+gwGGCkXlwRghu1uIaBNrfvR
- C/6rSp66OmQ3Zv/ZuZxBzIquYtutu/lrfKTITYf8CvCcnJKp5HkTEy2n+TJvP10mTn27
- vg93b5UupWX/1cUR7gJdWxMDc858WQR805UuFIdKAJ9qZ3e6qrDcJR0/pmo1/GSzKDP2
- WC1Q==
-X-Gm-Message-State: AOAM530mYPBdwZKVY1KDzk0AJRhFKioP8/eR57mRF2jP0PbZTNazOXUk
- kewKPlyG3DP9WTMxeMpw7p/Rw4UFFScupN9ug9kMaA==
-X-Google-Smtp-Source: ABdhPJzOjvq/kbEr1iPy17gDm6Y5SxC/Oi9n4y5NbS27Re14ZbRVe9raYSH+GiU0z+vIPd8N4LFp9am07TBNHW7Kx80=
-X-Received: by 2002:a67:d287:: with SMTP id z7mr4666597vsi.2.1591827633895;
- Wed, 10 Jun 2020 15:20:33 -0700 (PDT)
+ bh=C9LYQ8aclMkdwfJP4cdhxWD4N8cMJMuN6znPHlB3Rsc=;
+ b=tHYY7BDB39AeICuE7LzpN5/wc3eya4ju5G3JBzM6mAylyvCzDARCuOEPxc8WsMlWCb
+ I8jn37Yp0WaeCyK52rh2r2zI64Y7s46N6zrA6DY/VEnw40rV/zyilGyEAWm9CKkNlwvx
+ rCHODvzv14GS8lNddPQ6JFO+Lz5yRINOBjYxX6CgXrfKxopok1qw4V74QoAGPqvCDGcM
+ Tb6evBheSBIeGEkQ0qEuPl+kezo51eZdRZrN1XUYd8Y+VQ6KHC09urNo56L0Dcn+iq+N
+ L1ksr1Lf3PP7OlkPGH6foMgNA8IK1V32Nlm8Sx6uTILYPBP8MHnN0pUaR8da4khlvN/u
+ iR0A==
+X-Gm-Message-State: AOAM533YEKh/V1wZ9PfdEcF7MPV1oUCo6Xz9uOdU+wuaNT67PYkDXQod
+ ZURWgz8s/75Bp29SVgWo5rREdcpt1CS0I29zBgj2QQ==
+X-Google-Smtp-Source: ABdhPJzdt1t5lYhNZNFDbxTCIee/fOpBW2dvkZTK5r9pH/LqHC+MVWmHSuu/UxjSaFUQydIW/izqWRJz+CsXZPttueA=
+X-Received: by 2002:a67:79ce:: with SMTP id u197mr4725019vsc.17.1591828478904; 
+ Wed, 10 Jun 2020 15:34:38 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
- <20200605213853.14959-9-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-9-sean.j.christopherson@intel.com>
+ <20200605213853.14959-8-sean.j.christopherson@intel.com>
+In-Reply-To: <20200605213853.14959-8-sean.j.christopherson@intel.com>
 From: Ben Gardon <bgardon@google.com>
-Date: Wed, 10 Jun 2020 15:20:19 -0700
-Message-ID: <CANgfPd-19pam9sujfsk1pdrp8YhVft1+JAmSS=xgUULqXRyUDg@mail.gmail.com>
-Subject: Re: [PATCH 08/21] KVM: x86/mmu: Clean up the gorilla math in
- mmu_topup_memory_caches()
+Date: Wed, 10 Jun 2020 15:34:28 -0700
+Message-ID: <CANgfPd9UH01vO1SYJ3vrKq4H_DXcJ3OL_VaeY2TV8_ZH9cR1GQ@mail.gmail.com>
+Subject: Re: [PATCH 07/21] KVM: x86/mmu: Topup memory caches after walking
+ GVA->GPA
 To: Sean Christopherson <sean.j.christopherson@intel.com>
 X-Mailman-Approved-At: Thu, 11 Jun 2020 03:22:32 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
@@ -109,66 +109,48 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Clean up the minimums in mmu_topup_memory_caches() to document the
-> driving mechanisms behind the minimums.  Now that encountering an empty
-> cache is unlikely to trigger BUG_ON(), it is less dangerous to be more
-> precise when defining the minimums.
+> Topup memory caches after walking the GVA->GPA translation during a
+> shadow page fault, there is no need to ensure the caches are full when
+> walking the GVA.  As of commit f5a1e9f89504f ("KVM: MMU: remove call
+> to kvm_mmu_pte_write from walk_addr"), the FNAME(walk_addr) flow no
+> longer add rmaps via kvm_mmu_pte_write().
 >
-> For rmaps, the logic is 1 parent PTE per level, plus a single rmap, and
-> prefetched rmaps.  The extra objects in the current '8 + PREFETCH'
-> minimum came about due to an abundance of paranoia in commit
-> c41ef344de212 ("KVM: MMU: increase per-vcpu rmap cache alloc size"),
-> i.e. it could have increased the minimum to 2 rmaps.  Furthermore, the
-> unexpected extra rmap case was killed off entirely by commits
-> f759e2b4c728c ("KVM: MMU: avoid pte_list_desc running out in
-> kvm_mmu_pte_write") and f5a1e9f89504f ("KVM: MMU: remove call to
-> kvm_mmu_pte_write from walk_addr").
->
-> For the so called page cache, replace '8' with 2*PT64_ROOT_MAX_LEVEL.
-> The 2x multiplier is needed because the cache is used for both shadow
-> pages and gfn arrays for indirect MMUs.
->
-> And finally, for page headers, replace '4' with PT64_ROOT_MAX_LEVEL.
->
-> Note, KVM now supports 5-level paging, i.e. the old minimums that used a
-> baseline derived from 4-level paging were technically wrong.  But, KVM
-> always allocates roots in a separate flow, e.g. it's impossible in the
-> current implementation to actually need 5 new shadow pages in a single
-> flow.  Use PT64_ROOT_MAX_LEVEL unmodified instead of subtracting 1, as
-> the direct usage is likely more intuitive to uninformed readers, and the
-> inflated minimum is unlikely to affect functionality in practice.
+> This avoids allocating memory in the case that the GVA is unmapped in
+> the guest, and also provides a paper trail of why/when the memory caches
+> need to be filled.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  arch/x86/kvm/mmu/paging_tmpl.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4b4c3234d623..451e0365e5dd 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1103,14 +1103,17 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->  {
->         int r;
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 38c576495048..3de32122f601 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -791,10 +791,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
 >
-> +       /* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
->         r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
-> -                                  8 + PTE_PREFETCH_NUM);
-> +                                  1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->         if (r)
->                 return r;
-> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache, 8);
-> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> +                                  2 * PT64_ROOT_MAX_LEVEL);
->         if (r)
->                 return r;
-> -       return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
-> +       return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-> +                                     PT64_ROOT_MAX_LEVEL);
->  }
+>         pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
 >
->  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> -       r = mmu_topup_memory_caches(vcpu);
+> -       if (r)
+> -               return r;
+> -
+>         /*
+>          * If PFEC.RSVD is set, this is a shadow page fault.
+>          * The bit needs to be cleared before walking guest page tables.
+> @@ -822,6 +818,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>                 return RET_PF_EMULATE;
+>         }
+>
+> +       r = mmu_topup_memory_caches(vcpu);
+> +       if (r)
+> +               return r;
+> +
+>         vcpu->arch.write_fault_to_shadow_pgtable = false;
+>
+>         is_self_change_mapping = FNAME(is_self_change_mapping)(vcpu,
 > --
 > 2.26.0
 >
