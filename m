@@ -4,66 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A297C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51697C433E3
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C75022078D
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AA352078D
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6y3dHfH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C75022078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="a1zZQHVr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA352078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8277C4B1F7;
-	Thu, 11 Jun 2020 05:10:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91994B1AC;
+	Thu, 11 Jun 2020 05:10:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2NujZL03YAnb; Thu, 11 Jun 2020 05:10:22 -0400 (EDT)
+	with ESMTP id VuR-tOQ7EJBw; Thu, 11 Jun 2020 05:10:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92EC24B1F2;
-	Thu, 11 Jun 2020 05:10:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACEAB4B1F4;
+	Thu, 11 Jun 2020 05:10:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A52734B1AC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF224B1AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z+p17z68sxlb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jun 2020 05:10:17 -0400 (EDT)
+ with ESMTP id S2Rmwf1cGJSU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2020 05:10:19 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBD194B197
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F7E04B1CF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1798A207C3;
- Thu, 11 Jun 2020 09:10:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 71C6A20760;
+ Thu, 11 Jun 2020 09:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1591866614;
- bh=msEjGp4qDF0WnQuD0W2AqRNSO4fEbHNst04epMYw4SU=;
+ s=default; t=1591866615;
+ bh=BFQrAygsJJlyDXb9tarWGIvLR0il/9XG69TZzgeENZo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=r6y3dHfHlFSyqXl+fUZa1w7c5vU1P3oQnxhvkIPj+d/U/Gm5KEC7XkCbUswSTmlRc
- t/JX4ypc4EMazkDP/GeWami4757LK6A5h9QpUxxaDVT8mS0xSol4aKI4x32zHIm+Op
- pxZ3EMxpI+yF0EwBl7plsevHcqFCxwOj8PSSZ1TU=
+ b=a1zZQHVrQwvkcKbbssi51DW+oi9sylfDOwdptICLjTP5YJpQkAX9DH7lNERX43QXA
+ u+3ZFySYQGea0+VS+LclrsMR7QOpdLpjFkPqULIx1vSR3JiIf1E7NI20MYwodHSBnk
+ NP1syYwNx9OYgenfgTVf1LSN1+hVBVni/hHRgPH0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jjJDw-0022ZT-KQ; Thu, 11 Jun 2020 10:10:12 +0100
+ id 1jjJDx-0022ZT-G5; Thu, 11 Jun 2020 10:10:14 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 08/11] KVM: arm64: Remove host_cpu_context member from vcpu
- structure
-Date: Thu, 11 Jun 2020 10:09:53 +0100
-Message-Id: <20200611090956.1537104-9-maz@kernel.org>
+Subject: [PATCH 09/11] KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
+Date: Thu, 11 Jun 2020 10:09:54 +0100
+Message-Id: <20200611090956.1537104-10-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
 References: <20200611090956.1537104-1-maz@kernel.org>
@@ -72,11 +70,12 @@ X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
  ascull@google.com, james.morse@arm.com, mark.rutland@arm.com,
  julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,190 +93,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For very long, we have kept this pointer back to the per-cpu
-host state, despite having working per-cpu accessors at EL2
-for some time now.
+AArch32 CP1x registers are overlayed on their AArch64 counterparts
+in the vcpu struct. This leads to an interesting problem as they
+are stored in their CPU-local format, and thus a CP1x register
+doesn't "hit" the lower 32bit portion of the AArch64 register on
+a BE host.
 
-Recent investigations have shown that this pointer is easy
-to abuse in preemptible context, which is a sure sign that
-it would better be gone. Not to mention that a per-cpu
-pointer is faster to access at all times.
+To workaround this unfortunate situation, introduce a bias trick
+in the vcpu_cp1x() accessors which picks the correct half of the
+64bit register.
 
-Reported-by: Andrew Scull <ascull@google.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com
-Reviewed-by: Andrew Scull <ascull@google.com>
+Cc: stable@vger.kernel.org
+Reported-by: James Morse <james.morse@arm.com>
+Tested-by: James Morse <james.morse@arm.com>
+Acked-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 ---
- arch/arm64/kvm/arm.c              | 3 ---
- arch/arm64/kvm/hyp/debug-sr.c     | 4 ++--
- arch/arm64/kvm/hyp/switch.c       | 6 +++---
- arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++--
- arch/arm64/kvm/pmu.c              | 8 ++------
- 6 files changed, 11 insertions(+), 19 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 59029e90b557..ada1faa92211 100644
+index 59029e90b557..521eaedfdcc3 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -284,9 +284,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
- 
--	/* Pointer to host CPU context */
--	struct kvm_cpu_context *host_cpu_context;
--
- 	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14b747266607..6ddaa23ef346 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -340,10 +340,8 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	int *last_ran;
--	kvm_host_data_t *cpu_data;
- 
- 	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
--	cpu_data = this_cpu_ptr(&kvm_host_data);
- 
- 	/*
- 	 * We might get preempted before the vCPU actually runs, but
-@@ -355,7 +353,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	}
- 
- 	vcpu->cpu = cpu;
--	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
- 
- 	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 0fc9872a1467..e95af204fec7 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -185,7 +185,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-@@ -207,7 +207,7 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d60c2ef0fe8c..1853c1788e0c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -532,7 +532,7 @@ static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	    !esr_is_ptrauth_trap(kvm_vcpu_get_hsr(vcpu)))
- 		return false;
- 
--	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__ptrauth_save_key(ctxt->sys_regs, APIA);
- 	__ptrauth_save_key(ctxt->sys_regs, APIB);
- 	__ptrauth_save_key(ctxt->sys_regs, APDA);
-@@ -703,7 +703,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-@@ -808,7 +808,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 
- 	vcpu = kern_hyp_va(vcpu);
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 6d2df9fe0b5d..143d7b7358f2 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -265,12 +265,13 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+@@ -404,8 +404,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+  * CP14 and CP15 live in the same array, as they are backed by the
+  * same system registers.
   */
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
+-#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+-#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
++#define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
++
++#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
++#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
  
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
- 
- 	/*
-@@ -301,12 +302,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
- 
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put();
- 
- 	__sysreg_save_el1_state(guest_ctxt);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index e71d00bb5271..b5ae3a5d509e 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -163,15 +163,13 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
-@@ -184,15 +182,13 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
 -- 
 2.26.2
 
