@@ -2,83 +2,77 @@ Return-Path: <SRS0=vcVD=7Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 885EAC433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52B3C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:44:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4050720760
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:33:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEmNmzYz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4050720760
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 47DC920792
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:44:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DC920792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE98E4B1A5;
-	Thu, 11 Jun 2020 05:33:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A459C4B1A1;
+	Thu, 11 Jun 2020 11:44:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JbVFBp3m9UvY; Thu, 11 Jun 2020 05:33:26 -0400 (EDT)
+	with ESMTP id 37n1XeVdCNlg; Thu, 11 Jun 2020 11:44:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5EA34B1B6;
-	Thu, 11 Jun 2020 05:33:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4504B17D;
+	Thu, 11 Jun 2020 11:44:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3149F4B164
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:33:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6885B4B160
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:44:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PM-eaPRSsbXq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jun 2020 05:33:24 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EE9C4B168
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:33:24 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 397D020760;
- Thu, 11 Jun 2020 09:33:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1591868003;
- bh=YpTPkF+pnFoMogA4X2GFObKXLTgxGc72fp25PaLmSWs=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NEmNmzYzkA3y84M3ZhGDWpR28WRid82ZRnELneRdXX6lslEhH/jLhEcfpklnNwbXm
- Jf3k8/KVtLZPQjtEvZSGncXQBrxjjVwCk1rOd4fHkwLKP0b3E8wilQB/XIck1bbMGK
- rW0+mquEnEKuI+67r29r1PQRODQcdio00lvkcKkI=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jjJDy-0022ZT-PS; Thu, 11 Jun 2020 10:10:14 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 10/11] KVM: arm64: Synchronize sysreg state on injecting an
- AArch32 exception
-Date: Thu, 11 Jun 2020 10:09:55 +0100
-Message-Id: <20200611090956.1537104-11-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
-References: <20200611090956.1537104-1-maz@kernel.org>
+ with ESMTP id vMocXEqnbMk2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2020 11:44:01 -0400 (EDT)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC0D34B132
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:44:00 -0400 (EDT)
+IronPort-SDR: iD9L8IlYgAhph0j/xuAhBc4PKj0He6A5U1vEAeW+jJABontf648ZH8uCPlZNcTSKyp6Ubc0ezA
+ sWEh95ZJeI4w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 Jun 2020 08:43:59 -0700
+IronPort-SDR: +Ydw/4Fg05XSUVeVdaVnYwXl169Eie8ePVgfFpQAiQZ2NUmXKZaRvV2IeZsKgMR2pcPAaKpDpn
+ +n8lSwG3SLOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="419144435"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
+ ([10.54.74.152])
+ by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 08:43:59 -0700
+Date: Thu, 11 Jun 2020 08:43:59 -0700
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 17/21] KVM: arm64: Use common code's approach for
+ __GFP_ZERO with memory caches
+Message-ID: <20200611154359.GF29918@linux.intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+ <20200605213853.14959-18-sean.j.christopherson@intel.com>
+ <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- ascull@google.com, james.morse@arm.com, mark.rutland@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, Ben Gardon <bgardon@google.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
+ Janosch Frank <frankja@linux.ibm.com>, Joerg Roedel <joro@8bytes.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Junaid Shahid <junaids@google.com>, kvm-ppc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Cornelia Huck <cohuck@redhat.com>, Peter Shier <pshier@google.com>,
+ linux-mips@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,92 +89,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On a VHE system, the EL1 state is left in the CPU most of the time,
-and only syncronized back to memory when vcpu_put() is called (most
-of the time on preemption).
+On Thu, Jun 11, 2020 at 08:59:05AM +0100, Marc Zyngier wrote:
+> >diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >index 9398b66f8a87..688213ef34f0 100644
+> >--- a/arch/arm64/kvm/mmu.c
+> >+++ b/arch/arm64/kvm/mmu.c
+> >@@ -131,7 +131,8 @@ static int mmu_topup_memory_cache(struct
+> >kvm_mmu_memory_cache *cache, int min)
+> > 	if (cache->nobjs >= min)
+> > 		return 0;
+> > 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> >-		page = (void *)__get_free_page(GFP_PGTABLE_USER);
+> >+		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT |
+> 
+> This is definitely a change in the way we account for guest
+> page tables allocation, although I find it bizarre that not
+> all architectures account for it the same way.
 
-Which means that when injecting an exception, we'd better have a way
-to either:
-(1) write directly to the EL1 sysregs
-(2) synchronize the state back to memory, and do the changes there
+It's not intended to be a functional change, i.e. the allocations should
+still be accounted:
 
-For an AArch64, we already do (1), so we are safe. Unfortunately,
-doing the same thing for AArch32 would be pretty invasive. Instead,
-we can easily implement (2) by calling the put/load architectural
-backends, and keep preemption disabled. We can then reload the
-state back into EL1.
+  #define GFP_PGTABLE_USER  (GFP_PGTABLE_KERNEL | __GFP_ACCOUNT)
+  |
+  -> #define GFP_PGTABLE_KERNEL        (GFP_KERNEL | __GFP_ZERO)
 
-Cc: stable@vger.kernel.org
-Reported-by: James Morse <james.morse@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/aarch32.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
 
-diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
-index 0a356aa91aa1..40a62a99fbf8 100644
---- a/arch/arm64/kvm/aarch32.c
-+++ b/arch/arm64/kvm/aarch32.c
-@@ -33,6 +33,26 @@ static const u8 return_offsets[8][2] = {
- 	[7] = { 4, 4 },		/* FIQ, unused */
- };
- 
-+static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
-+{
-+	preempt_disable();
-+	if (vcpu->arch.sysregs_loaded_on_cpu) {
-+		kvm_arch_vcpu_put(vcpu);
-+		return true;
-+	}
-+
-+	preempt_enable();
-+	return false;
-+}
-+
-+static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
-+{
-+	if (loaded) {
-+		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+		preempt_enable();
-+	}
-+}
-+
- /*
-  * When an exception is taken, most CPSR fields are left unchanged in the
-  * handler. However, some are explicitly overridden (e.g. M[4:0]).
-@@ -155,7 +175,10 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 
- void kvm_inject_undef32(struct kvm_vcpu *vcpu)
- {
-+	bool loaded = pre_fault_synchronize(vcpu);
-+
- 	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
-+	post_fault_synchronize(vcpu, loaded);
- }
- 
- /*
-@@ -168,6 +191,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	u32 vect_offset;
- 	u32 *far, *fsr;
- 	bool is_lpae;
-+	bool loaded;
-+
-+	loaded = pre_fault_synchronize(vcpu);
- 
- 	if (is_pabt) {
- 		vect_offset = 12;
-@@ -191,6 +217,8 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
- 		*fsr = DFSR_FSC_EXTABT_nLPAE;
- 	}
-+
-+	post_fault_synchronize(vcpu, loaded);
- }
- 
- void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
--- 
-2.26.2
+versus 
 
+  #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
+
+    with __GFP_ZERO explicitly OR'd in
+
+  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
+
+I can put the above in the changelog, unless of course it's wrong and I've
+missed something.
+
+> It seems logical to me that nested page tables would be accounted
+> against userspace, but I'm willing to be educated on the matter.
+> 
+> Another possibility is that depending on the context, some allocations
+> should be accounted on either the kernel or userspace (NV on arm64
+> could definitely do something like that). If that was the case,
+> maybe moving most of the GFP_* flags into the per-cache flags,
+> and have the renaming that Ben suggested earlier.
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
