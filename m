@@ -2,65 +2,65 @@ Return-Path: <SRS0=vcVD=7Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C52B3C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C839FC433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:46:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47DC920792
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:44:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DC920792
+	by mail.kernel.org (Postfix) with ESMTP id 589C9206C3
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 15:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 589C9206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A459C4B1A1;
-	Thu, 11 Jun 2020 11:44:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D73A54B192;
+	Thu, 11 Jun 2020 11:46:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 37n1XeVdCNlg; Thu, 11 Jun 2020 11:44:03 -0400 (EDT)
+	with ESMTP id A01vnnxOx6Pm; Thu, 11 Jun 2020 11:46:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4504B17D;
-	Thu, 11 Jun 2020 11:44:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2D1B4B198;
+	Thu, 11 Jun 2020 11:46:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6885B4B160
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:44:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 024084B192
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:46:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vMocXEqnbMk2 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jun 2020 11:44:01 -0400 (EDT)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC0D34B132
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:44:00 -0400 (EDT)
-IronPort-SDR: iD9L8IlYgAhph0j/xuAhBc4PKj0He6A5U1vEAeW+jJABontf648ZH8uCPlZNcTSKyp6Ubc0ezA
- sWEh95ZJeI4w==
+ with ESMTP id JdhxYHNt0MfF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2020 11:46:17 -0400 (EDT)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFE894B17F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:46:16 -0400 (EDT)
+IronPort-SDR: jZSN9fbOd/1CSNvOkmEhMsJOhhJnYFEaxu97pE0bzwP8iKx0Lchfwqig0rFI22kd+T5RFKwIr0
+ eTZXJ499Qifw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 Jun 2020 08:43:59 -0700
-IronPort-SDR: +Ydw/4Fg05XSUVeVdaVnYwXl169Eie8ePVgfFpQAiQZ2NUmXKZaRvV2IeZsKgMR2pcPAaKpDpn
- +n8lSwG3SLOg==
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 Jun 2020 08:46:16 -0700
+IronPort-SDR: 3iKlFSNmGLJIQjG6i4tV9DKlsjIjo/kGZ/UFziPeMJdfG9W3E92AKxhhodHCTS+EuQk+hqoqc0
+ jidNOjbX/9Jw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="419144435"
+X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="419145052"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
  ([10.54.74.152])
- by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 08:43:59 -0700
-Date: Thu, 11 Jun 2020 08:43:59 -0700
+ by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 08:46:15 -0700
+Date: Thu, 11 Jun 2020 08:46:15 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 17/21] KVM: arm64: Use common code's approach for
- __GFP_ZERO with memory caches
-Message-ID: <20200611154359.GF29918@linux.intel.com>
+Subject: Re: [PATCH 18/21] KVM: arm64: Use common KVM implementation of MMU
+ memory caches
+Message-ID: <20200611154615.GG29918@linux.intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
- <20200605213853.14959-18-sean.j.christopherson@intel.com>
- <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
+ <20200605213853.14959-19-sean.j.christopherson@intel.com>
+ <3555daf3b38c890e1e74f05d6f49f9be@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
+In-Reply-To: <3555daf3b38c890e1e74f05d6f49f9be@kernel.org>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -89,57 +89,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 11, 2020 at 08:59:05AM +0100, Marc Zyngier wrote:
-> >diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> >index 9398b66f8a87..688213ef34f0 100644
-> >--- a/arch/arm64/kvm/mmu.c
-> >+++ b/arch/arm64/kvm/mmu.c
-> >@@ -131,7 +131,8 @@ static int mmu_topup_memory_cache(struct
-> >kvm_mmu_memory_cache *cache, int min)
-> > 	if (cache->nobjs >= min)
-> > 		return 0;
-> > 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
-> >-		page = (void *)__get_free_page(GFP_PGTABLE_USER);
-> >+		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT |
+On Thu, Jun 11, 2020 at 09:01:44AM +0100, Marc Zyngier wrote:
+> On 2020-06-05 22:38, Sean Christopherson wrote:
+
+...
+
+> >@@ -1024,7 +993,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm,
+> >struct kvm_mmu_memory_cache *cache
+> > 	if (stage2_pgd_none(kvm, *pgd)) {
+> > 		if (!cache)
+> > 			return NULL;
+> >-		pud = mmu_memory_cache_alloc(cache);
+> >+		pud = kvm_mmu_memory_cache_alloc(cache);
+> > 		stage2_pgd_populate(kvm, pgd, pud);
+> > 		get_page(virt_to_page(pgd));
+> > 	}
 > 
-> This is definitely a change in the way we account for guest
-> page tables allocation, although I find it bizarre that not
-> all architectures account for it the same way.
+> Quick note: this patch (as it is) breaks on arm64 due to Mike Rapoport's
+> P4D rework. I've fixed it locally in order to test the series.
 
-It's not intended to be a functional change, i.e. the allocations should
-still be accounted:
-
-  #define GFP_PGTABLE_USER  (GFP_PGTABLE_KERNEL | __GFP_ACCOUNT)
-  |
-  -> #define GFP_PGTABLE_KERNEL        (GFP_KERNEL | __GFP_ZERO)
-
-  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
-
-versus 
-
-  #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
-
-    with __GFP_ZERO explicitly OR'd in
-
-  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
-
-I can put the above in the changelog, unless of course it's wrong and I've
-missed something.
-
-> It seems logical to me that nested page tables would be accounted
-> against userspace, but I'm willing to be educated on the matter.
-> 
-> Another possibility is that depending on the context, some allocations
-> should be accounted on either the kernel or userspace (NV on arm64
-> could definitely do something like that). If that was the case,
-> maybe moving most of the GFP_* flags into the per-cache flags,
-> and have the renaming that Ben suggested earlier.
-> 
-> Thanks,
-> 
->         M.
-> -- 
-> Jazz is not dead. It just smells funny...
+Good to know, I'll wait to send v2 until that gets pulled into Paolo's tree.
+Thanks for the heads up, and especially for testing!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
