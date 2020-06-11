@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3798C433E3
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A297C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7DB2620835
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C75022078D
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 09:10:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="LU44dOUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DB2620835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6y3dHfH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C75022078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 37EAF4B1AC;
-	Thu, 11 Jun 2020 05:10:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8277C4B1F7;
+	Thu, 11 Jun 2020 05:10:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wad+LQip+V4K; Thu, 11 Jun 2020 05:10:19 -0400 (EDT)
+	with ESMTP id 2NujZL03YAnb; Thu, 11 Jun 2020 05:10:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5692A4B1B0;
-	Thu, 11 Jun 2020 05:10:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92EC24B1F2;
+	Thu, 11 Jun 2020 05:10:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 528614B1B6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A52734B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9uHQGkiFByDW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jun 2020 05:10:14 -0400 (EDT)
+ with ESMTP id Z+p17z68sxlb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2020 05:10:17 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CF504B193
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBD194B197
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 05:10:14 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7FFCA2081A;
- Thu, 11 Jun 2020 09:10:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1798A207C3;
+ Thu, 11 Jun 2020 09:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1591866612;
- bh=LrJuTKlNXi8lbOBqQ8upVYMPjpFyfQxm7kVAOe0pMNs=;
+ s=default; t=1591866614;
+ bh=msEjGp4qDF0WnQuD0W2AqRNSO4fEbHNst04epMYw4SU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=LU44dOUBpNSyC4AZLqOvj2F9VUCTk9c/AVJ+4U0Vdc/jiuZ8AbDNH/3nFw802zXlu
- sSV7AghypL/NlksCggkJG3gSH4jr+d2EDUqLr6d4voN3iMbzuGAu29GO/Mt7khPKy1
- 6NJVm4yuuiCIIFcoKp+2+SPukhayFfitsUqr8T6s=
+ b=r6y3dHfHlFSyqXl+fUZa1w7c5vU1P3oQnxhvkIPj+d/U/Gm5KEC7XkCbUswSTmlRc
+ t/JX4ypc4EMazkDP/GeWami4757LK6A5h9QpUxxaDVT8mS0xSol4aKI4x32zHIm+Op
+ pxZ3EMxpI+yF0EwBl7plsevHcqFCxwOj8PSSZ1TU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jjJDv-0022ZT-0C; Thu, 11 Jun 2020 10:10:11 +0100
+ id 1jjJDw-0022ZT-KQ; Thu, 11 Jun 2020 10:10:12 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 06/11] KVM: arm64: Handle PtrAuth traps early
-Date: Thu, 11 Jun 2020 10:09:51 +0100
-Message-Id: <20200611090956.1537104-7-maz@kernel.org>
+Subject: [PATCH 08/11] KVM: arm64: Remove host_cpu_context member from vcpu
+ structure
+Date: Thu, 11 Jun 2020 10:09:53 +0100
+Message-Id: <20200611090956.1537104-9-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
 References: <20200611090956.1537104-1-maz@kernel.org>
@@ -93,209 +94,189 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The current way we deal with PtrAuth is a bit heavy handed:
+For very long, we have kept this pointer back to the per-cpu
+host state, despite having working per-cpu accessors at EL2
+for some time now.
 
-- We forcefully save the host's keys on each vcpu_load()
-- Handling the PtrAuth trap forces us to go all the way back
-  to the exit handling code to just set the HCR bits
+Recent investigations have shown that this pointer is easy
+to abuse in preemptible context, which is a sure sign that
+it would better be gone. Not to mention that a per-cpu
+pointer is faster to access at all times.
 
-Overall, this is pretty cumbersome. A better approach would be
-to handle it the same way we deal with the FPSIMD registers:
-
-- On vcpu_load() disable PtrAuth for the guest
-- On first use, save the host's keys, enable PtrAuth in the
-  guest
-
-Crucially, this can happen as a fixup, which is done very early
-on exit. We can then reenter the guest immediately without
-leaving the hypervisor role.
-
-Another thing is that it simplify the rest of the host handling:
-exiting all the way to the host means that the only possible
-outcome for this trap is to inject an UNDEF.
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+Reported-by: Andrew Scull <ascull@google.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com
+Reviewed-by: Andrew Scull <ascull@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c         | 17 +---------
- arch/arm64/kvm/handle_exit.c | 17 ++--------
- arch/arm64/kvm/hyp/switch.c  | 61 ++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c    | 13 +++-----
- 4 files changed, 70 insertions(+), 38 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 3 ---
+ arch/arm64/kvm/arm.c              | 3 ---
+ arch/arm64/kvm/hyp/debug-sr.c     | 4 ++--
+ arch/arm64/kvm/hyp/switch.c       | 6 +++---
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++--
+ arch/arm64/kvm/pmu.c              | 8 ++------
+ 6 files changed, 11 insertions(+), 19 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 59029e90b557..ada1faa92211 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -284,9 +284,6 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch vcpu_debug_state;
+ 	struct kvm_guest_debug_arch external_debug_state;
+ 
+-	/* Pointer to host CPU context */
+-	struct kvm_cpu_context *host_cpu_context;
+-
+ 	struct thread_info *host_thread_info;	/* hyp VA */
+ 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+ 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 152049c5055d..14b747266607 100644
+index 14b747266607..6ddaa23ef346 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -337,12 +337,6 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- 	preempt_enable();
- }
- 
--#define __ptrauth_save_key(regs, key)						\
--({										\
--	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
--	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
--})
--
+@@ -340,10 +340,8 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
  {
  	int *last_ran;
-@@ -376,17 +370,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	else
- 		vcpu_set_wfx_traps(vcpu);
+-	kvm_host_data_t *cpu_data;
  
--	if (vcpu_has_ptrauth(vcpu)) {
--		struct kvm_cpu_context *ctxt = vcpu->arch.host_cpu_context;
--
--		__ptrauth_save_key(ctxt->sys_regs, APIA);
--		__ptrauth_save_key(ctxt->sys_regs, APIB);
--		__ptrauth_save_key(ctxt->sys_regs, APDA);
--		__ptrauth_save_key(ctxt->sys_regs, APDB);
--		__ptrauth_save_key(ctxt->sys_regs, APGA);
--
-+	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
--	}
- }
+ 	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
+-	cpu_data = this_cpu_ptr(&kvm_host_data);
  
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 065251efa2e6..5a02d4c90559 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -162,25 +162,14 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 1;
- }
+ 	/*
+ 	 * We might get preempted before the vCPU actually runs, but
+@@ -355,7 +353,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	}
  
--/*
-- * Handle the guest trying to use a ptrauth instruction, or trying to access a
-- * ptrauth register.
-- */
--void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
--{
--	if (vcpu_has_ptrauth(vcpu))
--		vcpu_ptrauth_enable(vcpu);
--	else
--		kvm_inject_undefined(vcpu);
--}
--
- /*
-  * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
-- * a NOP).
-+ * a NOP). If we get here, it is that we didn't fixup ptrauth on exit, and all
-+ * that we can do is give the guest an UNDEF.
-  */
- static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	kvm_arm_vcpu_ptrauth_trap(vcpu);
-+	kvm_inject_undefined(vcpu);
- 	return 1;
- }
+ 	vcpu->cpu = cpu;
+-	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
  
+ 	kvm_vgic_load(vcpu);
+ 	kvm_timer_vcpu_load(vcpu);
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 0fc9872a1467..e95af204fec7 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -185,7 +185,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+ 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+ 		return;
+ 
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 	host_dbg = &vcpu->arch.host_debug_state.regs;
+ 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+@@ -207,7 +207,7 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
+ 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+ 		return;
+ 
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 	host_dbg = &vcpu->arch.host_debug_state.regs;
+ 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index c07a45643cd4..d60c2ef0fe8c 100644
+index d60c2ef0fe8c..1853c1788e0c 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -490,6 +490,64 @@ static bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 	return true;
- }
+@@ -532,7 +532,7 @@ static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	    !esr_is_ptrauth_trap(kvm_vcpu_get_hsr(vcpu)))
+ 		return false;
  
-+static bool __hyp_text esr_is_ptrauth_trap(u32 esr)
-+{
-+	u32 ec = ESR_ELx_EC(esr);
-+
-+	if (ec == ESR_ELx_EC_PAC)
-+		return true;
-+
-+	if (ec != ESR_ELx_EC_SYS64)
-+		return false;
-+
-+	switch (esr_sys64_to_sysreg(esr)) {
-+	case SYS_APIAKEYLO_EL1:
-+	case SYS_APIAKEYHI_EL1:
-+	case SYS_APIBKEYLO_EL1:
-+	case SYS_APIBKEYHI_EL1:
-+	case SYS_APDAKEYLO_EL1:
-+	case SYS_APDAKEYHI_EL1:
-+	case SYS_APDBKEYLO_EL1:
-+	case SYS_APDBKEYHI_EL1:
-+	case SYS_APGAKEYLO_EL1:
-+	case SYS_APGAKEYHI_EL1:
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+#define __ptrauth_save_key(regs, key)						\
-+({										\
-+	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
-+	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
-+})
-+
-+static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpu_context *ctxt;
-+	u64 val;
-+
-+	if (!vcpu_has_ptrauth(vcpu) ||
-+	    !esr_is_ptrauth_trap(kvm_vcpu_get_hsr(vcpu)))
-+		return false;
-+
-+	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	__ptrauth_save_key(ctxt->sys_regs, APIA);
-+	__ptrauth_save_key(ctxt->sys_regs, APIB);
-+	__ptrauth_save_key(ctxt->sys_regs, APDA);
-+	__ptrauth_save_key(ctxt->sys_regs, APDB);
-+	__ptrauth_save_key(ctxt->sys_regs, APGA);
-+
-+	vcpu_ptrauth_enable(vcpu);
-+
-+	val = read_sysreg(hcr_el2);
-+	val |= (HCR_API | HCR_APK);
-+	write_sysreg(val, hcr_el2);
-+
-+	return true;
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -524,6 +582,9 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	if (__hyp_handle_fpsimd(vcpu))
- 		return true;
+-	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	__ptrauth_save_key(ctxt->sys_regs, APIA);
+ 	__ptrauth_save_key(ctxt->sys_regs, APIB);
+ 	__ptrauth_save_key(ctxt->sys_regs, APDA);
+@@ -703,7 +703,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
  
-+	if (__hyp_handle_ptrauth(vcpu))
-+		return true;
-+
- 	if (!__populate_fault_info(vcpu))
- 		return true;
+-	host_ctxt = vcpu->arch.host_cpu_context;
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
  
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ad1d57501d6d..564995084cf8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1034,16 +1034,13 @@ static bool trap_ptrauth(struct kvm_vcpu *vcpu,
- 			 struct sys_reg_params *p,
- 			 const struct sys_reg_desc *rd)
+@@ -808,7 +808,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu = kern_hyp_va(vcpu);
+ 
+-	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 6d2df9fe0b5d..143d7b7358f2 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -265,12 +265,13 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+  */
+ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
  {
--	kvm_arm_vcpu_ptrauth_trap(vcpu);
--
+-	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
++	struct kvm_cpu_context *host_ctxt;
+ 
+ 	if (!has_vhe())
+ 		return;
+ 
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	__sysreg_save_user_state(host_ctxt);
+ 
  	/*
--	 * Return false for both cases as we never skip the trapped
--	 * instruction:
--	 *
--	 * - Either we re-execute the same key register access instruction
--	 *   after enabling ptrauth.
--	 * - Or an UNDEF is injected as ptrauth is not supported/enabled.
-+	 * If we land here, that is because we didn't fixup the access on exit
-+	 * by allowing the PtrAuth sysregs. The only way this happens is when
-+	 * the guest does not have PtrAuth support enabled.
- 	 */
-+	kvm_inject_undefined(vcpu);
-+
- 	return false;
- }
+@@ -301,12 +302,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+  */
+ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
++	struct kvm_cpu_context *host_ctxt;
+ 
+ 	if (!has_vhe())
+ 		return;
+ 
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+ 	deactivate_traps_vhe_put();
+ 
+ 	__sysreg_save_el1_state(guest_ctxt);
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index e71d00bb5271..b5ae3a5d509e 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -163,15 +163,13 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
+  */
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_host_data *host;
+ 	u32 events_guest, events_host;
+ 
+ 	if (!has_vhe())
+ 		return;
+ 
+-	host_ctxt = vcpu->arch.host_cpu_context;
+-	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
++	host = this_cpu_ptr(&kvm_host_data);
+ 	events_guest = host->pmu_events.events_guest;
+ 	events_host = host->pmu_events.events_host;
+ 
+@@ -184,15 +182,13 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+  */
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_host_data *host;
+ 	u32 events_guest, events_host;
+ 
+ 	if (!has_vhe())
+ 		return;
+ 
+-	host_ctxt = vcpu->arch.host_cpu_context;
+-	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
++	host = this_cpu_ptr(&kvm_host_data);
+ 	events_guest = host->pmu_events.events_guest;
+ 	events_host = host->pmu_events.events_host;
  
 -- 
 2.26.2
