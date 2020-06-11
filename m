@@ -2,78 +2,100 @@ Return-Path: <SRS0=vcVD=7Y=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5642C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 16:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67054C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 18:05:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 680A2206A4
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 16:00:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 680A2206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id CC80620836
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jun 2020 18:05:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ghOooeTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC80620836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E43DB4B1B4;
-	Thu, 11 Jun 2020 12:00:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF0924B132;
+	Thu, 11 Jun 2020 14:05:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8NUmPImhFWeT; Thu, 11 Jun 2020 12:00:00 -0400 (EDT)
+	with ESMTP id tbzcRGyxdXvN; Thu, 11 Jun 2020 14:05:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE814B190;
-	Thu, 11 Jun 2020 12:00:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A5CD4B145;
+	Thu, 11 Jun 2020 14:05:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CBDE4B18C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:59:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1307A4B132
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 14:05:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HvQLfbThyohr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jun 2020 11:59:57 -0400 (EDT)
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 887024B125
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:59:57 -0400 (EDT)
-IronPort-SDR: JWWQIMJk7UGBhOBuHttRBav4XZXZKzrey5oyq836NrIyr6Na13wjMAbXF6V1ZAjIx0U4uY+rXq
- TBNAoK28LD1Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 Jun 2020 08:59:55 -0700
-IronPort-SDR: vlQ6xqosUXqm2IK2atrupqAhPka9ERniiyAolofQ9QLnlgU84Ttdpz9HijVivDLr/IVeArXiV+
- xSQxjn+bUQsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; d="scan'208";a="306964950"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.152])
- by orsmga008.jf.intel.com with ESMTP; 11 Jun 2020 08:59:54 -0700
-Date: Thu, 11 Jun 2020 08:59:54 -0700
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 16/21] KVM: arm64: Drop @max param from
- mmu_topup_memory_cache()
-Message-ID: <20200611155954.GH29918@linux.intel.com>
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
- <20200605213853.14959-17-sean.j.christopherson@intel.com>
- <CANgfPd-x=Af6Wdn9Wz=9r5CiHDCbxEgQhS2swALUMQd00oQ3jg@mail.gmail.com>
+ with ESMTP id N5s6DAxTRn38 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2020 14:05:02 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C54944B130
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 14:05:02 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1591898702;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7cOqWTuYUa9FE9GP6fpBOyXkY5kMzNQixiqzTqJRGBI=;
+ b=ghOooeTcLtaSo9x+LHcqZrfBO+oTZAOVdqfZ4EhJn3KkZZAbiTbPpHpKUhgfhNLIYoNzIr
+ ifX9EuS+IfHO4YGYrTMOpGNXbNuKcAw6hJA6RgfcqmTgaXZT0NczFmxDYN8/9aSc50yqGF
+ sTFLvLFgmTtLgs4lJtphzuIJo/E6jS4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-UxWq_IpkN-u-aOr0XOMjfA-1; Thu, 11 Jun 2020 14:04:56 -0400
+X-MC-Unique: UxWq_IpkN-u-aOr0XOMjfA-1
+Received: by mail-wm1-f72.google.com with SMTP id l2so1308782wmi.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2020 11:04:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7cOqWTuYUa9FE9GP6fpBOyXkY5kMzNQixiqzTqJRGBI=;
+ b=MFMwMbayX0OZ4HnVR3bcB8/WRg1ZskbOxenKtV2zLMOBVUB5BJZwu9VDJFavAls8/v
+ yk01O8UOqsp3+eiPDAmEOqbtr9u36GDqnu7F9RcAh2Jl7c8gkyulIftuUJHbcIXH33/B
+ wRtP7rSYBXC2N/6Jr5XkqnIy5nWwbqaQi3SUxHru+ZR03+Htx/afUVaTGxh+HowdrkG1
+ SS2T9CDsDSBHNzqLtm3MZ7ZPvjpJOcbCBvM2b5fCcABzwpqVRkP/HCfBCOxNXPAR9XQk
+ LTcDxmHbpnYfMBXUv4pRXPWCcjvAWKqIaw/yd7GkrIL4UFn3WLRoKlvFD2B+s0lxr2y6
+ Kd3g==
+X-Gm-Message-State: AOAM533u/eIEueArFDuHexgIs2iesrJtGyB0P/ETnm/x3cbMQFFOaibX
+ tu2gVWBvAyyRr0vfoaxTzZP62OjU9RoxNFJ0dX2Wn32CYYAmidRvR+vz7TkZppRqh7HSkJLMUvr
+ 1dnqa7KwPaCoDoBR4VWdHT7MS
+X-Received: by 2002:a1c:ed0e:: with SMTP id l14mr9180034wmh.8.1591898695049;
+ Thu, 11 Jun 2020 11:04:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzR4smWGm/DBrvqHqnYi+0pYh8w7qlAz7vSbFH29HX9jSbIpMW1S4TmGZ3yFk17wCx3012mHw==
+X-Received: by 2002:a1c:ed0e:: with SMTP id l14mr9180010wmh.8.1591898694794;
+ Thu, 11 Jun 2020 11:04:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d?
+ ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
+ by smtp.gmail.com with ESMTPSA id v7sm6110537wro.76.2020.06.11.11.04.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 11 Jun 2020 11:04:54 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.8, take #1
+To: Marc Zyngier <maz@kernel.org>
+References: <20200611090956.1537104-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <be82c5cb-be6d-74f7-9b77-dbd1648a8933@redhat.com>
+Date: Thu, 11 Jun 2020 20:04:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CANgfPd-x=Af6Wdn9Wz=9r5CiHDCbxEgQhS2swALUMQd00oQ3jg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Junaid Shahid <junaids@google.com>, kvm-ppc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Cornelia Huck <cohuck@redhat.com>, Peter Shier <pshier@google.com>,
- linux-mips@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Peter Feiner <pfeiner@google.com>
+In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,78 +112,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jun 10, 2020 at 03:00:47PM -0700, Ben Gardon wrote:
-> On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > Replace the @max param in mmu_topup_memory_cache() and instead use
-> > ARRAY_SIZE() to terminate the loop to fill the cache.  This removes a
-> > BUG_ON() and sets the stage for moving arm64 to the common memory cache
-> > implementation.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 12 ++++--------
-> >  1 file changed, 4 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index a1f6bc70c4e4..9398b66f8a87 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -124,15 +124,13 @@ static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
-> >         put_page(virt_to_page(pudp));
-> >  }
-> >
-> > -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
-> > -                                 int min, int max)
-> > +static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
-> >  {
-> >         void *page;
-> >
-> > -       BUG_ON(max > KVM_NR_MEM_OBJS);
-> KVM_NR_MEM_OBJS should be undefined as of patch 14 in this series. I'd
-> recommend changing this to use the new constant you defined in that
-> patch.
+On 11/06/20 11:09, Marc Zyngier wrote:
+> Hi Paolo,
+> 
+> Here's a bunch of fixes that cropped up during the merge window,
+> mostly falling into two categories: 32bit system register accesses,
+> and 64bit pointer authentication handling.
+> 
+> Please pull,
+> 
+> 	M.
+> 
+> The following changes since commit 8f7f4fe756bd5cfef73cf8234445081385bdbf7d:
+> 
+>   KVM: arm64: Drop obsolete comment about sys_reg ordering (2020-05-28 13:16:57 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-1
+> 
+> for you to fetch changes up to 15c99816ed9396c548eed2e84f30c14caccad1f4:
+> 
+>   Merge branch 'kvm-arm64/ptrauth-fixes' into kvmarm-master/next (2020-06-10 19:10:40 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for Linux 5.8, take #1
+> 
+> * 32bit VM fixes:
+>   - Fix embarassing mapping issue between AArch32 CSSELR and AArch64
+>     ACTLR
+>   - Add ACTLR2 support for AArch32
+>   - Get rid of the useless ACTLR_EL1 save/restore
+>   - Fix CP14/15 accesses for AArch32 guests on BE hosts
+>   - Ensure that we don't loose any state when injecting a 32bit
+>     exception when running on a VHE host
+> 
+> * 64bit VM fixes:
+>   - Fix PtrAuth host saving happening in preemptible contexts
+>   - Optimize PtrAuth lazy enable
+>   - Drop vcpu to cpu context pointer
+>   - Fix sparse warnings for HYP per-CPU accesses
+> 
+> ----------------------------------------------------------------
+> James Morse (3):
+>       KVM: arm64: Stop writing aarch32's CSSELR into ACTLR
+>       KVM: arm64: Add emulation for 32bit guests accessing ACTLR2
+>       KVM: arm64: Stop save/restoring ACTLR_EL1
+> 
+> Marc Zyngier (9):
+>       KVM: arm64: Flush the instruction cache if not unmapping the VM on reboot
+>       KVM: arm64: Save the host's PtrAuth keys in non-preemptible context
+>       KVM: arm64: Handle PtrAuth traps early
+>       KVM: arm64: Stop sparse from moaning at __hyp_this_cpu_ptr
+>       KVM: arm64: Remove host_cpu_context member from vcpu structure
+>       KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
+>       KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
+>       KVM: arm64: Move hyp_symbol_addr() to kvm_asm.h
+>       Merge branch 'kvm-arm64/ptrauth-fixes' into kvmarm-master/next
+> 
+>  arch/arm64/include/asm/kvm_asm.h     | 33 ++++++++++++++++--
+>  arch/arm64/include/asm/kvm_emulate.h |  6 ----
+>  arch/arm64/include/asm/kvm_host.h    |  9 +++--
+>  arch/arm64/include/asm/kvm_mmu.h     | 20 -----------
+>  arch/arm64/kvm/aarch32.c             | 28 ++++++++++++++++
+>  arch/arm64/kvm/arm.c                 | 20 ++++++-----
+>  arch/arm64/kvm/handle_exit.c         | 32 ++----------------
+>  arch/arm64/kvm/hyp/debug-sr.c        |  4 +--
+>  arch/arm64/kvm/hyp/switch.c          | 65 ++++++++++++++++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/sysreg-sr.c       |  8 ++---
+>  arch/arm64/kvm/pmu.c                 |  8 ++---
+>  arch/arm64/kvm/sys_regs.c            | 25 +++++++-------
+>  arch/arm64/kvm/sys_regs_generic_v8.c | 10 ++++++
+>  13 files changed, 171 insertions(+), 97 deletions(-)
+> 
 
-My intent was to leave KVM_NR_MEM_OBJS defined by arm64 and MIPS until they
-move to the common implementation, e.g. this should be defined in
-arch/arm64/include/asm/kvm_host.h until patch 18.  I'll get cross-compiling
-setup so I can properly test bisection before sending v2.
+Pulled, thanks.
 
-> >         if (cache->nobjs >= min)
-> >                 return 0;
-> > -       while (cache->nobjs < max) {
-> > +       while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
-> >                 page = (void *)__get_free_page(GFP_PGTABLE_USER);
-> >                 if (!page)
-> >                         return -ENOMEM;
-> > @@ -1356,8 +1354,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >                         pte = kvm_s2pte_mkwrite(pte);
-> >
-> >                 ret = mmu_topup_memory_cache(&cache,
-> > -                                            kvm_mmu_cache_min_pages(kvm),
-> > -                                            KVM_NR_MEM_OBJS);
-> See above, KVM_NR_MEM_OBJS is undefined as of patch 14.
-> > +                                            kvm_mmu_cache_min_pages(kvm));
-> >                 if (ret)
-> >                         goto out;
-> >                 spin_lock(&kvm->mmu_lock);
-> > @@ -1737,8 +1734,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         up_read(&current->mm->mmap_sem);
-> >
-> >         /* We need minimum second+third level pages */
-> > -       ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm),
-> > -                                    KVM_NR_MEM_OBJS);
-> See above, KVM_NR_MEM_OBJS is undefined as of patch 14.
-> > +       ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm));
-> >         if (ret)
-> >                 return ret;
-> >
-> > --
-> > 2.26.0
-> >
+Paolo
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
