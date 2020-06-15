@@ -2,81 +2,55 @@ Return-Path: <SRS0=/TDH=74=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B418AC433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 422B6C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 12:59:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4C97A2068E
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIlbWLp6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C97A2068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C28F82076A
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 12:59:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28F82076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD444B0C9;
-	Mon, 15 Jun 2020 06:55:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1982D4B09B;
+	Mon, 15 Jun 2020 08:59:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id le7tusN5Jyee; Mon, 15 Jun 2020 06:55:58 -0400 (EDT)
+	with ESMTP id eyiExMBx8KrD; Mon, 15 Jun 2020 08:59:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC1254B0BB;
-	Mon, 15 Jun 2020 06:55:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EC164B09F;
+	Mon, 15 Jun 2020 08:59:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB40F4B09A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:55:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE9674B09B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 08:59:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F-ti8gQRLal0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 06:55:56 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FFDF4A522
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:55:56 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 759C82068E;
- Mon, 15 Jun 2020 10:55:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592218555;
- bh=QaBa2U9Geoqv5p35xEZGCPFzj0swu4OiDh55cMIarDQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=uIlbWLp6f1Vl5kwtuO2o8tEhAOPhh8OwsbhlCIUjVE5onhQxrcOt2paYytzhQFZ+S
- ELIHnWlyL61RYWU/C3dTm+2G2hErdEZSbK5DW3FL9qg5z91Ymd4N6jhMqSAN1YD6Je
- HKrDTYLd1K0oZDSgUbNGNojGjlv4ZletzawM1YYY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jkmmP-0034WH-Vp; Mon, 15 Jun 2020 11:55:54 +0100
-MIME-Version: 1.0
-Date: Mon, 15 Jun 2020 11:55:53 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 1/4] KVM: arm64: Enable Pointer Authentication at EL2 if
- available
-In-Reply-To: <20200615100318.GA773@C02TD0UTHF1T.local>
+ with ESMTP id 72BOXXL8CFNy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 08:59:24 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71D074A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 08:59:24 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E334431B;
+ Mon, 15 Jun 2020 05:59:23 -0700 (PDT)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2461D3F6CF;
+ Mon, 15 Jun 2020 05:59:23 -0700 (PDT)
+Date: Mon, 15 Jun 2020 13:59:21 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/4] KVM/arm64: Enable PtrAuth on non-VHE KVM
+Message-ID: <20200615125920.GJ25945@arm.com>
 References: <20200615081954.6233-1-maz@kernel.org>
- <20200615081954.6233-2-maz@kernel.org>
- <20200615100318.GA773@C02TD0UTHF1T.local>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <c1ab609a8888d1c67b1946ebbf934dac@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20200615081954.6233-1-maz@kernel.org>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Cc: kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -90,84 +64,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-06-15 11:03, Mark Rutland wrote:
-> On Mon, Jun 15, 2020 at 09:19:51AM +0100, Marc Zyngier wrote:
->> While initializing EL2, switch Pointer Authentication if detected
->> from EL1. We use the EL1-provided keys though.
-> 
-> Perhaps "enable address authentication", to avoid confusion with
-> context-switch, and since generic authentication cannot be disabled
-> locally at EL2.
+On Mon, Jun 15, 2020 at 09:19:50AM +0100, Marc Zyngier wrote:
+> Not having PtrAuth on non-VHE KVM (for whatever reason VHE is not
+> enabled on a v8.3 system) has always looked like an oddity. This
+> trivial series remedies it, and allows a non-VHE KVM to offer PtrAuth
+> to its guests.
 
-Ah, fair enough.
+How likely do you think it is that people will use such a configuration?
 
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/hyp-init.S | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->> 
->> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
->> index 6e6ed5581eed..81732177507d 100644
->> --- a/arch/arm64/kvm/hyp-init.S
->> +++ b/arch/arm64/kvm/hyp-init.S
->> @@ -104,6 +104,17 @@ alternative_else_nop_endif
->>  	 */
->>  	mov_q	x4, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
->>  CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
->> +alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
->> +	b	1f
->> +alternative_else_nop_endif
->> +alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
->> +	b	2f
->> +alternative_else_nop_endif
-> 
-> I see this is the same pattern we use in the kvm context switch, but I
-> think we can use the ARM64_HAS_ADDRESS_AUTH cap instead (likewise in 
-> the
-> existing code).
-> 
-> AFAICT that won't permit mismatch given both 
-> ARM64_HAS_ADDRESS_AUTH_ARCH
-> and ARM64_HAS_ADDRESS_AUTH_IMP_DEF are dealt with as
-> ARM64_CPUCAP_BOOT_CPU_FEATURE.
+The only reason I can see for people to build a kernel with CONFIG_VHE=n
+is as a workaround for broken hardware, or because the kernel is too old
+to support VHE (in which case it doesn't understand ptrauth either, so
+it is irrelevant whether ptrauth depends on VHE).
 
-That'd be a nice cleanup, as the two back to back alternatives are a bit 
-hard to read.
+I wonder whether it's therefore better to "encourage" people to turn
+VHE on by making subsequent features depend on it where appropriate.
+We do want multiplatform kernels to be configured with CONFIG_VHE=y for
+example.
 
-> 
->> +1:
->> +	orr	x4, x4, #(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB)
->> +	orr	x4, x4, #SCTLR_ELx_ENDA
->> +	orr	x4, x4, #SCTLR_ELx_ENDB
-> 
-> Assuming we have a spare register, it would be nice if we could follow 
-> the same
-> pattern as in proc.S, where we do:
-> 
-> | ldr     x2, =SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
-> |              SCTLR_ELx_ENDA | SCTLR_ELx_ENDB
-> | orr     x0, x0, x2
-> 
-> ... though we could/should use mov_q rather than a load literal, here 
-> and in
-> proc.S.
 
-Looks like this code isn't in -rc1 anymore, replaced with a mov_q in 
-__ptrauth_keys_init_cpu.
+I ask this, because SVE suffers the same "oddity".  If SVE can be
+enabled for non-VHE kernels straightforwardly then there's no reason not
+to do so, but I worried in the past that this would duplicate complex
+code that would never be tested or used.
 
-I'll switch to that in v2.
+If supporting ptrauth with !VHE is as simple as this series suggests,
+then it's low-risk.  Perhaps SVE isn't much worse.  I was chasing nasty
+bugs around at the time the SVE KVM support was originally written, and
+didn't want to add more unknowns into the mix...
 
-Thanks,
+(Note, this is not an offer from me to do the SVE work!)
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+[...]
+
+Cheers
+---Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
