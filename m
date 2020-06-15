@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2156C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B418AC433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 86C4120679
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C97A2068E
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 10:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1RtG08G/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C4120679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIlbWLp6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C97A2068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24F294B0B6;
-	Mon, 15 Jun 2020 06:45:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD444B0C9;
+	Mon, 15 Jun 2020 06:55:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TK7L3-f8R4tb; Mon, 15 Jun 2020 06:45:14 -0400 (EDT)
+	with ESMTP id le7tusN5Jyee; Mon, 15 Jun 2020 06:55:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 711BA4A4FC;
-	Mon, 15 Jun 2020 06:45:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC1254B0BB;
+	Mon, 15 Jun 2020 06:55:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CD524A4FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:45:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB40F4B09A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:55:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YCL8Rca3UV0X for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 06:45:11 -0400 (EDT)
+ with ESMTP id F-ti8gQRLal0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 06:55:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68F404A49C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:45:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FFDF4A522
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 06:55:56 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 440DE20679;
- Mon, 15 Jun 2020 10:45:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 759C82068E;
+ Mon, 15 Jun 2020 10:55:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592217910;
- bh=NQzIZ8HPcQkoHR2c+q1ZkigBSIf8XsDf44QYuMwZ1eI=;
+ s=default; t=1592218555;
+ bh=QaBa2U9Geoqv5p35xEZGCPFzj0swu4OiDh55cMIarDQ=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=1RtG08G/L03qKYK1oCOce5i21jHfrQ3NbZC8zOJcMgDMZ0czTmcyDD4bt7pC2BB3o
- qecG3/VcX504T1V2WOzpEUg5g2RXJmqv2ter5zGq7x6z+iBfsdH0JfYpj/dt2FmqRm
- v2hCvpW4bzXkjj+JNt21eLWPEaZqZnHxFtfGSm14=
+ b=uIlbWLp6f1Vl5kwtuO2o8tEhAOPhh8OwsbhlCIUjVE5onhQxrcOt2paYytzhQFZ+S
+ ELIHnWlyL61RYWU/C3dTm+2G2hErdEZSbK5DW3FL9qg5z91Ymd4N6jhMqSAN1YD6Je
+ HKrDTYLd1K0oZDSgUbNGNojGjlv4ZletzawM1YYY=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jkmc0-0034QJ-RE; Mon, 15 Jun 2020 11:45:08 +0100
+ id 1jkmmP-0034WH-Vp; Mon, 15 Jun 2020 11:55:54 +0100
 MIME-Version: 1.0
-Date: Mon, 15 Jun 2020 11:45:08 +0100
+Date: Mon, 15 Jun 2020 11:55:53 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
+To: Mark Rutland <mark.rutland@arm.com>
 Subject: Re: [PATCH 1/4] KVM: arm64: Enable Pointer Authentication at EL2 if
  available
-In-Reply-To: <20200615084857.GD177680@google.com>
+In-Reply-To: <20200615100318.GA773@C02TD0UTHF1T.local>
 References: <20200615081954.6233-1-maz@kernel.org>
- <20200615081954.6233-2-maz@kernel.org> <20200615084857.GD177680@google.com>
+ <20200615081954.6233-2-maz@kernel.org>
+ <20200615100318.GA773@C02TD0UTHF1T.local>
 User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <8683c038040236e1fefed067649c31d9@kernel.org>
+Message-ID: <c1ab609a8888d1c67b1946ebbf934dac@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ascull@google.com, kvm@vger.kernel.org,
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
  kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,18 +95,17 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On 2020-06-15 09:48, Andrew Scull wrote:
+On 2020-06-15 11:03, Mark Rutland wrote:
 > On Mon, Jun 15, 2020 at 09:19:51AM +0100, Marc Zyngier wrote:
 >> While initializing EL2, switch Pointer Authentication if detected
-> 
->                                 ^ nit: on?
-
-Yes.
-
-> 
 >> from EL1. We use the EL1-provided keys though.
+> 
+> Perhaps "enable address authentication", to avoid confusion with
+> context-switch, and since generic authentication cannot be disabled
+> locally at EL2.
+
+Ah, fair enough.
+
 >> 
 >> Signed-off-by: Marc Zyngier <maz@kernel.org>
 >> ---
@@ -127,20 +126,42 @@ Yes.
 >> +alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
 >> +	b	2f
 >> +alternative_else_nop_endif
+> 
+> I see this is the same pattern we use in the kvm context switch, but I
+> think we can use the ARM64_HAS_ADDRESS_AUTH cap instead (likewise in 
+> the
+> existing code).
+> 
+> AFAICT that won't permit mismatch given both 
+> ARM64_HAS_ADDRESS_AUTH_ARCH
+> and ARM64_HAS_ADDRESS_AUTH_IMP_DEF are dealt with as
+> ARM64_CPUCAP_BOOT_CPU_FEATURE.
+
+That'd be a nice cleanup, as the two back to back alternatives are a bit 
+hard to read.
+
+> 
 >> +1:
 >> +	orr	x4, x4, #(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB)
 >> +	orr	x4, x4, #SCTLR_ELx_ENDA
 >> +	orr	x4, x4, #SCTLR_ELx_ENDB
 > 
-> mm/proc.S builds the mask with ldr and ors it in one go, would be nice
-> to use the same pattern.
+> Assuming we have a spare register, it would be nice if we could follow 
+> the same
+> pattern as in proc.S, where we do:
+> 
+> | ldr     x2, =SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
+> |              SCTLR_ELx_ENDA | SCTLR_ELx_ENDB
+> | orr     x0, x0, x2
+> 
+> ... though we could/should use mov_q rather than a load literal, here 
+> and in
+> proc.S.
 
-Do you actually mean kernel/head.S, or even __ptrauth_keys_init_cpu in 
-asm/asm_pointer_auth.h?
+Looks like this code isn't in -rc1 anymore, replaced with a mov_q in 
+__ptrauth_keys_init_cpu.
 
-If so, I agree that it'd be good to make it look similar by using the 
-mov_q macro, at the expense of a spare register (which we definitely can 
-afford here).
+I'll switch to that in v2.
 
 Thanks,
 
