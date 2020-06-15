@@ -2,55 +2,79 @@ Return-Path: <SRS0=/TDH=74=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 422B6C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 12:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E2DC433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 13:22:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C28F82076A
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 12:59:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28F82076A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 949652076A
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 13:22:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuiJ8IZe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 949652076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1982D4B09B;
-	Mon, 15 Jun 2020 08:59:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E68F4B0CE;
+	Mon, 15 Jun 2020 09:22:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eyiExMBx8KrD; Mon, 15 Jun 2020 08:59:26 -0400 (EDT)
+	with ESMTP id AIPcFh2EaxzH; Mon, 15 Jun 2020 09:22:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EC164B09F;
-	Mon, 15 Jun 2020 08:59:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29AAD4B0C5;
+	Mon, 15 Jun 2020 09:22:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE9674B09B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 08:59:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A76434B0C3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:22:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 72BOXXL8CFNy for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 08:59:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71D074A4E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 08:59:24 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E334431B;
- Mon, 15 Jun 2020 05:59:23 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2461D3F6CF;
- Mon, 15 Jun 2020 05:59:23 -0700 (PDT)
-Date: Mon, 15 Jun 2020 13:59:21 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 0/4] KVM/arm64: Enable PtrAuth on non-VHE KVM
-Message-ID: <20200615125920.GJ25945@arm.com>
-References: <20200615081954.6233-1-maz@kernel.org>
+ with ESMTP id kckq9hJDmWMm for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 09:22:23 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D92B4B08E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:22:23 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 52D24207DA;
+ Mon, 15 Jun 2020 13:22:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1592227342;
+ bh=uy4ahmE9ucum8lJbLe9wqzS3k/FOFR4SdCtLdG3Gq0I=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=CuiJ8IZe30mcAP9RdYGckkauU+SBTZGV7fC5FPDiJq+tGsEDbRMQL7rvSkd5ArOww
+ pPN+rmqegIMnx9RrOmwVAGu1H1PSl6bEY6Bj27lqFHlcZA0IWmy9tmDUik6+EGl1lp
+ 0SnhAKmINch4ZJTNpeFW3P/3R7GaCD6LN1FU1xP4=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jkp47-0036qq-TS; Mon, 15 Jun 2020 14:22:20 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200615081954.6233-1-maz@kernel.org>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Date: Mon, 15 Jun 2020 14:22:19 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH 0/4] KVM/arm64: Enable PtrAuth on non-VHE KVM
+In-Reply-To: <20200615125920.GJ25945@arm.com>
+References: <20200615081954.6233-1-maz@kernel.org>
+ <20200615125920.GJ25945@arm.com>
+User-Agent: Roundcube Webmail/1.4.4
+Message-ID: <dd0e5196a4e7baf4d0f8fba2b00e9ef5@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: Dave.Martin@arm.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -64,46 +88,75 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 15, 2020 at 09:19:50AM +0100, Marc Zyngier wrote:
-> Not having PtrAuth on non-VHE KVM (for whatever reason VHE is not
-> enabled on a v8.3 system) has always looked like an oddity. This
-> trivial series remedies it, and allows a non-VHE KVM to offer PtrAuth
-> to its guests.
+Hi Dave,
 
-How likely do you think it is that people will use such a configuration?
+On 2020-06-15 13:59, Dave Martin wrote:
+> On Mon, Jun 15, 2020 at 09:19:50AM +0100, Marc Zyngier wrote:
+>> Not having PtrAuth on non-VHE KVM (for whatever reason VHE is not
+>> enabled on a v8.3 system) has always looked like an oddity. This
+>> trivial series remedies it, and allows a non-VHE KVM to offer PtrAuth
+>> to its guests.
+> 
+> How likely do you think it is that people will use such a 
+> configuration?
 
-The only reason I can see for people to build a kernel with CONFIG_VHE=n
-is as a workaround for broken hardware, or because the kernel is too old
-to support VHE (in which case it doesn't understand ptrauth either, so
-it is irrelevant whether ptrauth depends on VHE).
+Depending on the use case, very. See below.
 
-I wonder whether it's therefore better to "encourage" people to turn
-VHE on by making subsequent features depend on it where appropriate.
-We do want multiplatform kernels to be configured with CONFIG_VHE=y for
-example.
+> The only reason I can see for people to build a kernel with 
+> CONFIG_VHE=n
+> is as a workaround for broken hardware, or because the kernel is too 
+> old
+> to support VHE (in which case it doesn't understand ptrauth either, so
+> it is irrelevant whether ptrauth depends on VHE).
 
+Part of the work happening around running protected VMs (which cannot
+be tampered with from EL1/0 host) makes it mandatory to disable VHE,
+so that we can wrap the host EL1 in its own Stage-2 page tables.
+We (the Android kernel team) are actively working on enabling this
+feature.
 
-I ask this, because SVE suffers the same "oddity".  If SVE can be
-enabled for non-VHE kernels straightforwardly then there's no reason not
-to do so, but I worried in the past that this would duplicate complex
-code that would never be tested or used.
+> I wonder whether it's therefore better to "encourage" people to turn
+> VHE on by making subsequent features depend on it where appropriate.
+> We do want multiplatform kernels to be configured with CONFIG_VHE=y for
+> example.
 
-If supporting ptrauth with !VHE is as simple as this series suggests,
-then it's low-risk.  Perhaps SVE isn't much worse.  I was chasing nasty
-bugs around at the time the SVE KVM support was originally written, and
-didn't want to add more unknowns into the mix...
+I'm all for having VHE on for platforms that support it. Which is why
+CONFIG_VHE=y is present in defconfig. However, we cannot offer the same
+level of guarantee as we can hopefully achieve with non-VHE (we can
+drop mappings from Stage-1, but can't protect VMs from an evil or
+compromised host). This is a very different use case from the usual
+"reduced hypervisor overhead" that we want in the general case.
 
-(Note, this is not an offer from me to do the SVE work!)
+> I ask this, because SVE suffers the same "oddity".  If SVE can be
+> enabled for non-VHE kernels straightforwardly then there's no reason 
+> not
+> to do so, but I worried in the past that this would duplicate complex
+> code that would never be tested or used.
 
-[...]
+It is a concern. I guess that if we manage to get some traction on
+Android, then the feature will get some testing! And yes, SVE is
+next on my list.
 
-Cheers
----Dave
+> If supporting ptrauth with !VHE is as simple as this series suggests,
+> then it's low-risk.  Perhaps SVE isn't much worse.  I was chasing nasty
+> bugs around at the time the SVE KVM support was originally written, and
+> didn't want to add more unknowns into the mix...
+
+I think having started with a slightly smaller problem space was the
+right thing to do at the time. We are now reasonably confident that
+KVM and SVE are working correctly together, and we can now try to enable
+it on !VHE.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
