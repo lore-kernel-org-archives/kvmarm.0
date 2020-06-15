@@ -2,82 +2,78 @@ Return-Path: <SRS0=/TDH=74=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EBFC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 15:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88380C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 20:39:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B903206DB
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 15:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DFBF207D3
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 20:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kS/4p+1X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B903206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbeSjzVU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFBF207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D65BC4B0C3;
-	Mon, 15 Jun 2020 11:53:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A1D64ACC9;
+	Mon, 15 Jun 2020 16:39:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AySnhMP3FgOZ; Mon, 15 Jun 2020 11:53:50 -0400 (EDT)
+	with ESMTP id eNjU2vVh-K6S; Mon, 15 Jun 2020 16:39:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBAC04B0C7;
-	Mon, 15 Jun 2020 11:53:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7371D4B09B;
+	Mon, 15 Jun 2020 16:39:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFDE14B097
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 11:53:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D39E24B09B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 16:39:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7JIhp4f8i-hh for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 11:53:48 -0400 (EDT)
-Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com
- [209.85.167.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2C2F4B080
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 11:53:48 -0400 (EDT)
-Received: by mail-oi1-f193.google.com with SMTP id d67so16291925oig.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 08:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LpWoqLfnguV0GF6n4sJERMG+0Xr1p7BH5DoEXiKawJQ=;
- b=kS/4p+1Xf00zo77o/0QZGXVkaM0e5CHgM4kDNE4lKpSLqYOokRmTrzAoFWyb3xC//y
- Exru4PSTsuX/ZYcu7Q0PY8ysi9YBtcwVMRBzdyQOWq68ug4oaahur3YQR113utD8jZPK
- 2TTu5eaAKWuvdCDsq+OgzLxIsKhaPG164KAhWlh4SVeITCLTEZYfqP2V8hN2OFSNw2N2
- c7HxmRj/eHBDhIYFfchWh3i2Pv5Yppb1jdB+itvo1QFWHpx3X+AXTosEa7HkSMkUlZ4a
- XS/cSTyJo5rhwzo+mXVpdZt+7hWA2VMzpDTD4jpGKaUOLoO2jhdCpbFkGY6T7GXexoYg
- KFrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LpWoqLfnguV0GF6n4sJERMG+0Xr1p7BH5DoEXiKawJQ=;
- b=ipjbCjeUIiQzN/NDXRl/Oma0bIqNd8AJYII9EVfzyaGIETVZrhKmBnFRgweuNuzXK/
- xgaUI/vrXyXClsxpetYRvTj4k92j1G9gXQmA/Hwh3OZm1JuyDD9R8BqUK1mYfYO1akr5
- 5fAHt+9yp3Y1OZ9T0b1TDPeFUFuwgeSP+S3xiqVZuLYRHCHbiIWa4hKFqjEw+tw8txhS
- B05vYwNZJDm0+K6cNPBKpfaHdCSVdhpRhQSHQh2CaArr54eKdoYwKo9poetpwNHTq0Mm
- N9NlrlweXbc85BbGBzhOPQGNeGn4aVsSNfshrLpLYBHdVd4Dx30jk01ZtDfyVKGDieRm
- CoPg==
-X-Gm-Message-State: AOAM531UQ1yCLfk5yKRbuMQ4T868gLWeZm1ZVRaiDWTjO9+OZujY5WUd
- +f9VVoBR9o48SJwLObWXdvEC2rW9mfCmAh5gNsq4hQ==
-X-Google-Smtp-Source: ABdhPJz/dLhMgzEaqMzMzutuHgM69KbjBV3f6an0jDjlyC17KvCwJ9Sf9rYrzBWzeHjfuWLlQGI/SX4Y2TQeU9jBzd0=
-X-Received: by 2002:aca:568c:: with SMTP id k134mr4196oib.48.1592236428190;
- Mon, 15 Jun 2020 08:53:48 -0700 (PDT)
+ with ESMTP id J9PQtHJ-dCn5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 16:39:05 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC9404ACC9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 16:39:05 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8D9142078E;
+ Mon, 15 Jun 2020 20:39:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1592253544;
+ bh=G3kx7gmxUbYjMZujOdTgVsLt+bvnDQ4dZNfve9RFnlk=;
+ h=From:To:Cc:Subject:Date:From;
+ b=hbeSjzVU1xGOS4JUuRdRRivUGCZtnAK3/1Mi7AdM0dFxbIlDquwWgRGgJk9elc6RK
+ ZAvejcacP6lB+rH/i8FHrct33CahwXAecKzBCB4b7SMS1FBFMmN+vfuOpJK5Dyp8qE
+ 2SGqkn4qmSXBvT1oNMcHN2XapvUrv3nj+nEk6TD4=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jkvsl-003EcH-0j; Mon, 15 Jun 2020 21:39:03 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2] KVM: arm64: Allow in-atomic injection of SPIs
+Date: Mon, 15 Jun 2020 21:38:44 +0100
+Message-Id: <20200615203844.14793-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20200529112757.32235-1-beata.michalska@linaro.org>
-In-Reply-To: <20200529112757.32235-1-beata.michalska@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 15 Jun 2020 16:53:37 +0100
-Message-ID: <CAFEAcA_d=F6k3RcihV2x-HiOR-Qq+kWOcwh1FL9AUcG_2SqEVA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] target/arm: kvm: Support for KVM DABT with no
- valid ISS
-To: Beata Michalska <beata.michalska@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, yuzenghui@huawei.com, eric.auger@redhat.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,33 +90,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 29 May 2020 at 12:28, Beata Michalska
-<beata.michalska@linaro.org> wrote:
->
-> Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
-> exception with no valid ISS info to be decoded. The lack of decode info
-> makes it at least tricky to emulate the instruction which is one of the
-> (many) reasons why KVM will not even try to do so.
->
-> So far, if a guest made an attempt to access memory outside the memory slot,
-> KVM reported vague ENOSYS. As a result QEMU exited with no useful information
-> being provided or even a clue on what has just happened.
->
-> ARM KVM introduced support for notifying of an attempt to execute
-> an instruction that resulted in dabt with no valid ISS decoding info.
-> This still leaves QEMU to handle the case, but at least now it gives more
-> control and a start point for more meaningful handling of such cases.
->
-> This patchset relies on KVM to insert the external data abort into the guest.
->
->
-> Thanks for all the input on the previous version!
+On a system that uses SPIs to implement MSIs (as it would be
+the case on a GICv2 system exposing a GICv2m to its guests),
+we deny the possibility of injecting SPIs on the in-atomic
+fast-path.
 
+This results in a very large amount of context-switches
+(roughly equivalent to twice the interrupt rate) on the host,
+and suboptimal performance for the guest (as measured with
+a test workload involving a virtio interface backed by vhost-net).
+Given that GICv2 systems are usually on the low-end of the spectrum
+performance wise, they could do without the aggravation.
 
+We solved this for GICv3+ITS by having a translation cache. But
+SPIs do not need any extra infrastructure, and can be immediately
+injected in the virtual distributor as the locking is already
+heavy enough that we don't need to worry about anything.
 
-Applied to target-arm.next, thanks.
+This halves the number of context switches for the same workload.
 
--- PMM
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+* From v1:
+  - Drop confusing comment (Zenghui, Eric)
+  - Now consistently return -EWOULDBLOCK when unable to inject (Eric)
+  - Don't inject if the vgic isn't initialized yet (Eric)
+
+ arch/arm64/kvm/vgic/vgic-irqfd.c | 24 +++++++++++++++++++-----
+ arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
+index d8cdfea5cc96..79f8899b234c 100644
+--- a/arch/arm64/kvm/vgic/vgic-irqfd.c
++++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
+@@ -100,19 +100,33 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 
+ /**
+  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+- *
+- * Currently only direct MSI injection is supported.
+  */
+ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+ 			      struct kvm *kvm, int irq_source_id, int level,
+ 			      bool line_status)
+ {
+-	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
++	if (!level)
++		return -EWOULDBLOCK;
++
++	switch (e->type) {
++	case KVM_IRQ_ROUTING_MSI: {
+ 		struct kvm_msi msi;
+ 
++		if (!vgic_has_its(kvm))
++			break;
++
+ 		kvm_populate_msi(e, &msi);
+-		if (!vgic_its_inject_cached_translation(kvm, &msi))
+-			return 0;
++		return vgic_its_inject_cached_translation(kvm, &msi);
++	}
++
++	case KVM_IRQ_ROUTING_IRQCHIP:
++		/*
++		 * Injecting SPIs is always possible in atomic context
++		 * as long as the damn vgic is initialized.
++		 */
++		if (unlikely(!vgic_initialized(kvm)))
++			break;
++		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
+ 	}
+ 
+ 	return -EWOULDBLOCK;
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index c012a52b19f5..40cbaca81333 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -757,9 +757,8 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ 
+ 	db = (u64)msi->address_hi << 32 | msi->address_lo;
+ 	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+-
+ 	if (!irq)
+-		return -1;
++		return -EWOULDBLOCK;
+ 
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->pending_latch = true;
+-- 
+2.26.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
