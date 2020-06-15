@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA44C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0368C433DF
 	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 13:27:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B952D207DA
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 13:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A6F12076A
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 13:27:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMFBX/0K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B952D207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0vchwLq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A6F12076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7337A4B0F6;
-	Mon, 15 Jun 2020 09:27:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 537C14B0C8;
+	Mon, 15 Jun 2020 09:27:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D3iSmjFEfYj2; Mon, 15 Jun 2020 09:27:51 -0400 (EDT)
+	with ESMTP id VoOblU-p5FJc; Mon, 15 Jun 2020 09:27:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD14A4B0E1;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58024B0DE;
 	Mon, 15 Jun 2020 09:27:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E724B0CC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:27:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6944B0C7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:27:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0UjNJudnYHIZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 09:27:43 -0400 (EDT)
+ with ESMTP id E-1r41JkUeVa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 09:27:44 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 399964B0D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:27:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1ABFD4B0C9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 09:27:44 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6D37D207F5;
- Mon, 15 Jun 2020 13:27:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 22E50207DD;
+ Mon, 15 Jun 2020 13:27:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592227661;
- bh=qpol7kGtST0YAPLGqd3jECw4gFPmJdW+Tta3CGon6qA=;
+ s=default; t=1592227663;
+ bh=MpIKTtpi05PcleHDZqdb9FJ28HJeWwWnIEX0mHlP3aM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=fMFBX/0KlNCZzV/xZwmUIZ6eiOrqOxZpb+DTU7g6xQp8sFfg94OAfKnqNVvfc6nMr
- 32I5cIrAuYZl09nsO5rivXop0FsA8RoYbAFaGJsaguAcqcXFUSaGkXYfBpy/KfM0fs
- gLo9g3MIAItUuKn7xAS2ZgjYOLhEY/8w5NqGE4Ic=
+ b=J0vchwLq1Cu76vWT1MUJzxu77QhTC/RScKq0tTVg3eIc4Pbf/Z91Nxrpo/icgjlrn
+ 3cnPKiayKglqeFh5ODBrfHFGAYm/M7PTTb+/p6f3RTY+JjlY1IrB79wrEyagitynRd
+ +aj6+ocMekG+xH+qUZ3fR78EjQxoNtw+KDRT5qYU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jkp9H-0036w9-VZ; Mon, 15 Jun 2020 14:27:40 +0100
+ id 1jkp9J-0036w9-KM; Mon, 15 Jun 2020 14:27:41 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 05/17] KVM: arm64: Use TTL hint in when invalidating
- stage-2 translations
-Date: Mon, 15 Jun 2020 14:27:07 +0100
-Message-Id: <20200615132719.1932408-6-maz@kernel.org>
+Subject: [PATCH v2 07/17] KVM: arm64: hyp: Use ctxt_sys_reg/__vcpu_sys_reg
+ instead of raw sys_regs access
+Date: Mon, 15 Jun 2020 14:27:09 +0100
+Message-Id: <20200615132719.1932408-8-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200615132719.1932408-1-maz@kernel.org>
 References: <20200615132719.1932408-1-maz@kernel.org>
@@ -100,180 +100,312 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since we often have a precise idea of the level we're dealing with
-when invalidating TLBs, we can provide it to as a hint to our
-invalidation helper.
+Switch the hypervisor code to using ctxt_sys_reg/__vcpu_sys_reg instead
+of raw sys_regs accesses. No intended functionnal change.
 
-Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h |  3 ++-
- arch/arm64/kvm/hyp/tlb.c         |  5 +++--
- arch/arm64/kvm/mmu.c             | 29 +++++++++++++++--------------
- 3 files changed, 20 insertions(+), 17 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |   2 +-
+ arch/arm64/kvm/hyp/debug-sr.c     |   4 +-
+ arch/arm64/kvm/hyp/switch.c       |  11 ++-
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 110 +++++++++++++++---------------
+ 4 files changed, 62 insertions(+), 65 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 417b9a47e4a7..557be6db3cc2 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -61,7 +61,8 @@ extern char __kvm_hyp_init_end[];
- extern char __kvm_hyp_vector[];
- 
- extern void __kvm_flush_vm_context(void);
--extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa);
-+extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
-+				     int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu);
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 993c74cc054c..29e69b073748 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -130,7 +130,8 @@ static void __hyp_text __tlb_switch_to_host(struct tlb_inv_context *cxt)
- 		__tlb_switch_to_host_nvhe(cxt);
- }
- 
--void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-+void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa, int level)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 5314399944e7..e519a1b51904 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -550,7 +550,7 @@ DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
+ static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
  {
- 	struct tlb_inv_context cxt;
- 
-@@ -146,7 +147,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa
- 	 * whole of Stage-1. Weep...
- 	 */
- 	ipa >>= 12;
--	__tlbi(ipas2e1is, ipa);
-+	__tlbi_level(ipas2e1is, ipa, level);
- 
- 	/*
- 	 * We have to ensure completion of the invalidation at Stage-2,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4a4437be4bc5..97a24cd51db8 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -58,9 +58,10 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
- 	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+ 	/* The host's MPIDR is immutable, so let's set it up at boot time */
+-	cpu_ctxt->sys_regs[MPIDR_EL1] = read_cpuid_mpidr();
++	ctxt_sys_reg(cpu_ctxt, MPIDR_EL1) = read_cpuid_mpidr();
  }
  
--static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-+static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
-+				   int level)
- {
--	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa);
-+	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, level);
+ static inline bool kvm_arch_requires_vhe(void)
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index e95af204fec7..2a6bfa2d3a94 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -145,7 +145,7 @@ static void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+ 	save_debug(dbg->dbg_wcr, dbgwcr, wrps);
+ 	save_debug(dbg->dbg_wvr, dbgwvr, wrps);
+ 
+-	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
++	ctxt_sys_reg(ctxt, MDCCINT_EL1) = read_sysreg(mdccint_el1);
  }
  
- /*
-@@ -102,7 +103,7 @@ static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t
+ static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+@@ -165,7 +165,7 @@ static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+ 	restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
+ 	restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
+ 
+-	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
++	write_sysreg(ctxt_sys_reg(ctxt, MDCCINT_EL1), mdccint_el1);
+ }
+ 
+ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 8e9094458ec2..0eef15bf64d5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -48,7 +48,7 @@ static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ 	if (!vcpu_el1_is_32bit(vcpu))
  		return;
  
- 	pmd_clear(pmd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 	put_page(virt_to_page(pmd));
+-	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
++	__vcpu_sys_reg(vcpu, FPEXC32_EL2) = read_sysreg(fpexc32_el2);
  }
  
-@@ -122,7 +123,7 @@ static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t
- 		return;
- 
- 	stage2_pud_clear(kvm, pudp);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
- 	put_page(virt_to_page(pudp));
- }
- 
-@@ -163,7 +164,7 @@ static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr
- 	struct kvm *kvm = mmu->kvm;
- 	p4d_t *p4d_table __maybe_unused = stage2_p4d_offset(kvm, pgd, 0UL);
- 	stage2_pgd_clear(kvm, pgd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	stage2_p4d_free(kvm, p4d_table);
- 	put_page(virt_to_page(pgd));
- }
-@@ -173,7 +174,7 @@ static void clear_stage2_p4d_entry(struct kvm_s2_mmu *mmu, p4d_t *p4d, phys_addr
- 	struct kvm *kvm = mmu->kvm;
- 	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, p4d, 0);
- 	stage2_p4d_clear(kvm, p4d);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	stage2_pud_free(kvm, pud_table);
- 	put_page(virt_to_page(p4d));
- }
-@@ -185,7 +186,7 @@ static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr
- 
- 	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
- 	stage2_pud_clear(kvm, pud);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	stage2_pmd_free(kvm, pmd_table);
- 	put_page(virt_to_page(pud));
- }
-@@ -195,7 +196,7 @@ static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr
- 	pte_t *pte_table = pte_offset_kernel(pmd, 0);
- 	VM_BUG_ON(pmd_thp_or_huge(*pmd));
- 	pmd_clear(pmd);
--	kvm_tlb_flush_vmid_ipa(mmu, addr);
-+	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
- 	free_page((unsigned long)pte_table);
- 	put_page(virt_to_page(pmd));
- }
-@@ -273,7 +274,7 @@ static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
- 			pte_t old_pte = *pte;
- 
- 			kvm_set_pte(pte, __pte(0));
--			kvm_tlb_flush_vmid_ipa(mmu, addr);
-+			kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
- 
- 			/* No need to invalidate the cache for device mappings */
- 			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
-@@ -302,7 +303,7 @@ static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
- 				pmd_t old_pmd = *pmd;
- 
- 				pmd_clear(pmd);
--				kvm_tlb_flush_vmid_ipa(mmu, addr);
-+				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 
- 				kvm_flush_dcache_pmd(old_pmd);
- 
-@@ -332,7 +333,7 @@ static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, p4d_t *p4d,
- 				pud_t old_pud = *pud;
- 
- 				stage2_pud_clear(kvm, pud);
--				kvm_tlb_flush_vmid_ipa(mmu, addr);
-+				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
- 				kvm_flush_dcache_pud(old_pud);
- 				put_page(virt_to_page(pud));
- 			} else {
-@@ -1260,7 +1261,7 @@ static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
+ static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+@@ -147,9 +147,9 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ 		 * configured and enabled. We can now restore the guest's S1
+ 		 * configuration: SCTLR, and only then TCR.
  		 */
- 		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
- 		pmd_clear(pmd);
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
- 	} else {
- 		get_page(virt_to_page(pmd));
+-		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+ 		isb();
+-		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
  	}
-@@ -1302,7 +1303,7 @@ static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
+ }
  
- 		WARN_ON_ONCE(kvm_pud_pfn(old_pud) != kvm_pud_pfn(*new_pudp));
- 		stage2_pud_clear(kvm, pudp);
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+@@ -420,15 +420,14 @@ static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ 		sve_load_state(vcpu_sve_pffr(vcpu),
+ 			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
+ 			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+-		write_sysreg_s(vcpu->arch.ctxt.sys_regs[ZCR_EL1], SYS_ZCR_EL12);
++		write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL12);
  	} else {
- 		get_page(virt_to_page(pudp));
+ 		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
  	}
-@@ -1451,7 +1452,7 @@ static int stage2_set_pte(struct kvm_s2_mmu *mmu,
- 			return 0;
  
- 		kvm_set_pte(pte, __pte(0));
--		kvm_tlb_flush_vmid_ipa(mmu, addr);
-+		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
- 	} else {
- 		get_page(virt_to_page(pte));
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+-		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
+-			     fpexc32_el2);
++		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
+ 
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
+ 
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index cc7e957f5b2c..50f496d2ca40 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -26,34 +26,34 @@
+ 
+ static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
++	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
+ }
+ 
+ static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+-	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
++	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
++	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+ }
+ 
+ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+-	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(SYS_SCTLR);
+-	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(SYS_CPACR);
+-	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(SYS_TTBR0);
+-	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(SYS_TTBR1);
+-	ctxt->sys_regs[TCR_EL1]		= read_sysreg_el1(SYS_TCR);
+-	ctxt->sys_regs[ESR_EL1]		= read_sysreg_el1(SYS_ESR);
+-	ctxt->sys_regs[AFSR0_EL1]	= read_sysreg_el1(SYS_AFSR0);
+-	ctxt->sys_regs[AFSR1_EL1]	= read_sysreg_el1(SYS_AFSR1);
+-	ctxt->sys_regs[FAR_EL1]		= read_sysreg_el1(SYS_FAR);
+-	ctxt->sys_regs[MAIR_EL1]	= read_sysreg_el1(SYS_MAIR);
+-	ctxt->sys_regs[VBAR_EL1]	= read_sysreg_el1(SYS_VBAR);
+-	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg_el1(SYS_CONTEXTIDR);
+-	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg_el1(SYS_AMAIR);
+-	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg_el1(SYS_CNTKCTL);
+-	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+-	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
++	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
++	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
++	ctxt_sys_reg(ctxt, CPACR_EL1)	= read_sysreg_el1(SYS_CPACR);
++	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
++	ctxt_sys_reg(ctxt, TTBR1_EL1)	= read_sysreg_el1(SYS_TTBR1);
++	ctxt_sys_reg(ctxt, TCR_EL1)	= read_sysreg_el1(SYS_TCR);
++	ctxt_sys_reg(ctxt, ESR_EL1)	= read_sysreg_el1(SYS_ESR);
++	ctxt_sys_reg(ctxt, AFSR0_EL1)	= read_sysreg_el1(SYS_AFSR0);
++	ctxt_sys_reg(ctxt, AFSR1_EL1)	= read_sysreg_el1(SYS_AFSR1);
++	ctxt_sys_reg(ctxt, FAR_EL1)	= read_sysreg_el1(SYS_FAR);
++	ctxt_sys_reg(ctxt, MAIR_EL1)	= read_sysreg_el1(SYS_MAIR);
++	ctxt_sys_reg(ctxt, VBAR_EL1)	= read_sysreg_el1(SYS_VBAR);
++	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
++	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
++	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
++	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
++	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+ 
+ 	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+ 	ctxt->gp_regs.elr_el1		= read_sysreg_el1(SYS_ELR);
+@@ -66,7 +66,7 @@ static void __hyp_text __sysreg_save_el2_return_state(struct kvm_cpu_context *ct
+ 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(SYS_SPSR);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+-		ctxt->sys_regs[DISR_EL1] = read_sysreg_s(SYS_VDISR_EL2);
++		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
+ }
+ 
+ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+@@ -92,50 +92,50 @@ NOKPROBE_SYMBOL(sysreg_save_guest_state_vhe);
+ 
+ static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+ {
+-	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
++	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
+ }
+ 
+ static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+ {
+-	write_sysreg(ctxt->sys_regs[TPIDR_EL0],		tpidr_el0);
+-	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0],	tpidrro_el0);
++	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
++	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
+ }
+ 
+ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ {
+-	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+-	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
++	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
++	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
+ 
+ 	if (has_vhe() ||
+ 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+-		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+ 	} else	if (!ctxt->__hyp_running_vcpu) {
+ 		/*
+ 		 * Must only be done for guest registers, hence the context
+ 		 * test. We're coming from the host, so SCTLR.M is already
+ 		 * set. Pairs with __activate_traps_nvhe().
+ 		 */
+-		write_sysreg_el1((ctxt->sys_regs[TCR_EL1] |
++		write_sysreg_el1((ctxt_sys_reg(ctxt, TCR_EL1) |
+ 				  TCR_EPD1_MASK | TCR_EPD0_MASK),
+ 				 SYS_TCR);
+ 		isb();
  	}
+ 
+-	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	SYS_CPACR);
+-	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	SYS_TTBR0);
+-	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	SYS_TTBR1);
+-	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	SYS_ESR);
+-	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	SYS_AFSR0);
+-	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	SYS_AFSR1);
+-	write_sysreg_el1(ctxt->sys_regs[FAR_EL1],	SYS_FAR);
+-	write_sysreg_el1(ctxt->sys_regs[MAIR_EL1],	SYS_MAIR);
+-	write_sysreg_el1(ctxt->sys_regs[VBAR_EL1],	SYS_VBAR);
+-	write_sysreg_el1(ctxt->sys_regs[CONTEXTIDR_EL1],SYS_CONTEXTIDR);
+-	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL1],	SYS_AMAIR);
+-	write_sysreg_el1(ctxt->sys_regs[CNTKCTL_EL1],	SYS_CNTKCTL);
+-	write_sysreg(ctxt->sys_regs[PAR_EL1],		par_el1);
+-	write_sysreg(ctxt->sys_regs[TPIDR_EL1],		tpidr_el1);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, CPACR_EL1),	SYS_CPACR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL1),	SYS_TTBR0);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL1),	SYS_TTBR1);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL1),	SYS_ESR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL1),	SYS_AFSR0);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL1),	SYS_AFSR1);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, FAR_EL1),	SYS_FAR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, MAIR_EL1),	SYS_MAIR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, VBAR_EL1),	SYS_VBAR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL1), SYS_CONTEXTIDR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL1),	SYS_AMAIR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
++	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
++	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
+ 
+ 	if (!has_vhe() &&
+ 	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
+@@ -150,9 +150,9 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 		 * deconfigured and disabled. We can now restore the host's
+ 		 * S1 configuration: SCTLR, and only then TCR.
+ 		 */
+-		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+ 		isb();
+-		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
++		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+ 	}
+ 
+ 	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
+@@ -184,7 +184,7 @@ __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el2(pstate,			SYS_SPSR);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+-		write_sysreg_s(ctxt->sys_regs[DISR_EL1], SYS_VDISR_EL2);
++		write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_VDISR_EL2);
+ }
+ 
+ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+@@ -210,46 +210,44 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+ 
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *spsr, *sysreg;
++	u64 *spsr;
+ 
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+ 	spsr = vcpu->arch.ctxt.gp_regs.spsr;
+-	sysreg = vcpu->arch.ctxt.sys_regs;
+ 
+ 	spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
+ 	spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
+ 	spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
+ 	spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
+ 
+-	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+-	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
++	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
++	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+-		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
++		__vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
+ }
+ 
+ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ {
+-	u64 *spsr, *sysreg;
++	u64 *spsr;
+ 
+ 	if (!vcpu_el1_is_32bit(vcpu))
+ 		return;
+ 
+ 	spsr = vcpu->arch.ctxt.gp_regs.spsr;
+-	sysreg = vcpu->arch.ctxt.sys_regs;
+ 
+ 	write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
+ 	write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
+ 	write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
+ 	write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
+ 
+-	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
+-	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
++	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
++	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+-		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
++		write_sysreg(__vcpu_sys_reg(vcpu, DBGVCR32_EL2), dbgvcr32_el2);
+ }
+ 
+ /**
 -- 
 2.27.0
 
