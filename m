@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4BBC433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 08:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37ABEC433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 08:58:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 20F402067B
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 08:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABEEB2065F
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jun 2020 08:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="IdUUOc4Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20F402067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="HbVh+hzk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABEEB2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87EEF4B0E3;
-	Mon, 15 Jun 2020 04:49:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A82B4B0F5;
+	Mon, 15 Jun 2020 04:58:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wf+Aw4EfJSJx; Mon, 15 Jun 2020 04:49:06 -0400 (EDT)
+	with ESMTP id weMFlIahdATu; Mon, 15 Jun 2020 04:58:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E9844B0D9;
-	Mon, 15 Jun 2020 04:49:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D48FF4B0F1;
+	Mon, 15 Jun 2020 04:58:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB66B4B0D9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 04:49:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AAB194B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 04:58:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z1s9icchIuZ5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jun 2020 04:49:03 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4BDB4B093
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 04:49:03 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id r7so16212400wro.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 01:49:03 -0700 (PDT)
+ with ESMTP id JkKL-NzT8VzH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jun 2020 04:58:13 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED2144B0EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 04:58:12 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id u26so13599345wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jun 2020 01:58:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=xnddRkOdnpKmvgw1VTZ4tNEZP6mx+SwnzvEeJGa4n2I=;
- b=IdUUOc4QN2EUtr5PjBCK2Zqf0CL6mqEqyLIucODDtyyBluNXy7IPgKlGEsAn4RWzGs
- nW+xad357QPkJ4LjoK5MQHOBV/MxHoOxh4h+EMlehW3h749KHSVV+PHzbCMuh8DGiokx
- E5Sli76y1wzpiiggmJR1PCDk6ELgjg7ThLmIVxvuUDK+ZU76cOKgH/gJfp5F96Z/yLEd
- gKBPXOCkEIRjruMkus8iaygwDb7aOzrKjxqOZIIg+zYdgi/F90nRXjaaD2JBvYExE15i
- QLnl0/KSxESnJO5XZelyiSuMnO4PAbEWms4jfB7clTSzFR8IwXtO699TeR/xrKsD1TGv
- W+ig==
+ bh=5ShxQ/p8QgWJk316YAyJ/2tQifOc4oxip3xhjWlqJEQ=;
+ b=HbVh+hzk5EMCxM8HGK4hG1KrtSz8Nm/Y6fwcA3KHzRcyUFMqNhJy20y/BVVd2vSQvW
+ AErfOfpMe734o02wktzcMFgR2BX2dgnZYwJBZBldKTZIq5SUyVfg6nNP/80txEzIAfmr
+ +gb9uCi7jZtYrv0+/5lGpjxNz/DoagX/I2qFwY72TakjZb6Sh35Zd0czsvw7EDfJ5z3k
+ EN/5hItz0s1wsQl+L0hGFE+IoKsaUbQoG012t9KJh2NbSfJwm8+qau8Y2Q6Scr/2YEur
+ DwiK8g9gUopMHDDNckOxXOcZH1JVHtGStDfFIanwt5BVtw+qlwkJWamTCGWX3ZrDsgTi
+ aTmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=xnddRkOdnpKmvgw1VTZ4tNEZP6mx+SwnzvEeJGa4n2I=;
- b=m6ZawOqUw0KuTeaaBP3nQk8N4KivxvkkxFpCjFNpyLE6PjWRE7zPla6c4p7QguXAj/
- sfyYjzX+lLDUX75KFV1aTkF8Xnamv3k/+Aj7HJ24JSsmW0rnhdXOclpsQcWUAmMCh8oq
- KCQ4SCzkdT/S7g7ehGaV7DUaIyHKOCzq8d3F96I7F/y8QNYEe4i3DIFJ00ezdL96m9xn
- uiVaN1rfeAxCyp4Hla4wKUtD7Y/8NesNecCYnWf+YliT3fxsr/yHjtICv4VvwnipJQYS
- lCL7nObtvlqcNkXYiF+O78/70QbCPMn/+YcmzKLXWtqY94WFUAVCfEUcyGDT/5TkJ7gb
- dBlQ==
-X-Gm-Message-State: AOAM533ZxzJUA451RZ/+CMWYcvkiFH429UjEAVtdLC51/gsCaVU5yDR3
- ebT2mnubx7nKkEucJ3Tvssc7yA==
-X-Google-Smtp-Source: ABdhPJy6wOoCwROS2ko/uRFMhnKwrDbOnQ2R/qDxpfmtGlLbagTzm9WybMrfNKEgpZoPG5/t5RdqWQ==
-X-Received: by 2002:adf:f847:: with SMTP id d7mr26976924wrq.261.1592210942617; 
- Mon, 15 Jun 2020 01:49:02 -0700 (PDT)
+ bh=5ShxQ/p8QgWJk316YAyJ/2tQifOc4oxip3xhjWlqJEQ=;
+ b=fKg8u5RkWaZE4//GE7WMo9bHPp/1Qr8KLv4ZDsa9wCGv+X32e9WWISek8pG89JbotT
+ NFE3emhTh0sKWMsawcf5ki2jowMpyFU4BajHjRW6TezfeThCmi1zWlsHb9PySSTUHp4w
+ CamtkG9mpMUADAt0NbmlaZ7z587/KlCaIqhlxWC+MZVL50V5NJxEv4F4YNI1BcVKEPys
+ REzsLdLu58g9bFEPU2FAf2g/uNkE8wHDBkMSMT48rwbjwvblWU+hZo0XnPmu7rv0d6KC
+ ZoaMl46rbD5YJ/QAGxjg7j42uXjUEJ/jhTNm9LVgirRhRkNDKATwDLpnvPH4sHYHFFJT
+ REOw==
+X-Gm-Message-State: AOAM532os8PV40F7AXPpirRhmaDtWSB3AuyVM9BI/Q4ouwZk/4eBYldl
+ Q78uYekpor/zhJlc5zymBJpF5w==
+X-Google-Smtp-Source: ABdhPJwLOxCm//URtwLoljmFofuNMfLd0PKuFSaN0kqqtlnaKFsHDaMnEqPiaGR8skUD0V+QZBoTjA==
+X-Received: by 2002:a1c:7d4c:: with SMTP id y73mr11858831wmc.188.1592211491868; 
+ Mon, 15 Jun 2020 01:58:11 -0700 (PDT)
 Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
- by smtp.gmail.com with ESMTPSA id c5sm10250109wmb.24.2020.06.15.01.49.01
+ by smtp.gmail.com with ESMTPSA id y80sm21776273wmc.34.2020.06.15.01.58.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 15 Jun 2020 01:49:02 -0700 (PDT)
-Date: Mon, 15 Jun 2020 09:48:57 +0100
+ Mon, 15 Jun 2020 01:58:11 -0700 (PDT)
+Date: Mon, 15 Jun 2020 09:58:06 +0100
 From: Andrew Scull <ascull@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/4] KVM: arm64: Enable Pointer Authentication at EL2 if
- available
-Message-ID: <20200615084857.GD177680@google.com>
+Subject: Re: [PATCH 2/4] KVM: arm64: Allow ARM64_PTR_AUTH when ARM64_VHE=n
+Message-ID: <20200615085806.GE177680@google.com>
 References: <20200615081954.6233-1-maz@kernel.org>
- <20200615081954.6233-2-maz@kernel.org>
+ <20200615081954.6233-3-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200615081954.6233-2-maz@kernel.org>
+In-Reply-To: <20200615081954.6233-3-maz@kernel.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -102,43 +101,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 15, 2020 at 09:19:51AM +0100, Marc Zyngier wrote:
-> While initializing EL2, switch Pointer Authentication if detected
-
-                                ^ nit: on?
-
-> from EL1. We use the EL1-provided keys though.
+On Mon, Jun 15, 2020 at 09:19:52AM +0100, Marc Zyngier wrote:
+> We currently prevent PtrAuth from even being built if KVM is selected,
+> but VHE isn't. It is a bit of a pointless restriction, since we also
+> check this at run time (rejecting the enabling of PtrAuth for the
+> vcpu if we're not running with VHE).
+> 
+> Just drop this apparently useless restriction.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/hyp-init.S | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  arch/arm64/Kconfig | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-> index 6e6ed5581eed..81732177507d 100644
-> --- a/arch/arm64/kvm/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp-init.S
-> @@ -104,6 +104,17 @@ alternative_else_nop_endif
->  	 */
->  	mov_q	x4, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
->  CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
-> +alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
-> +	b	1f
-> +alternative_else_nop_endif
-> +alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
-> +	b	2f
-> +alternative_else_nop_endif
-> +1:
-> +	orr	x4, x4, #(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB)
-> +	orr	x4, x4, #SCTLR_ELx_ENDA
-> +	orr	x4, x4, #SCTLR_ELx_ENDB
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 31380da53689..d719ea9c596d 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1516,7 +1516,6 @@ menu "ARMv8.3 architectural features"
+>  config ARM64_PTR_AUTH
+>  	bool "Enable support for pointer authentication"
+>  	default y
+> -	depends on !KVM || ARM64_VHE
+>  	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
+>  	# GCC 9.1 and later inserts a .note.gnu.property section note for PAC
+>  	# which is only understood by binutils starting with version 2.33.1.
+> @@ -1543,8 +1542,7 @@ config ARM64_PTR_AUTH
+>  
+>  	  The feature is detected at runtime. If the feature is not present in
+>  	  hardware it will not be advertised to userspace/KVM guest nor will it
+> -	  be enabled. However, KVM guest also require VHE mode and hence
+> -	  CONFIG_ARM64_VHE=y option to use this feature.
+> +	  be enabled.
+>  
+>  	  If the feature is present on the boot CPU but not on a late CPU, then
+>  	  the late CPU will be parked. Also, if the boot CPU does not have
 
-mm/proc.S builds the mask with ldr and ors it in one go, would be nice
-to use the same pattern.
-
-> +2:
->  	msr	sctlr_el2, x4
->  	isb
+...and we just got the patch to let EL2 use the ptrauth instructions for
+the save restore in hyp/entry.S!
 
 Acked-by: Andrew Scull <ascull@google.com>
 _______________________________________________
