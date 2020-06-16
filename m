@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D04AC433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77DFAC433E1
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2F3DC2074D
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F3DC2074D
+	by mail.kernel.org (Postfix) with ESMTP id 390622074D
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 390622074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB5574B0FD;
-	Tue, 16 Jun 2020 05:36:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E546D4B0F1;
+	Tue, 16 Jun 2020 05:36:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AqWF5qPtxsy3; Tue, 16 Jun 2020 05:36:29 -0400 (EDT)
+	with ESMTP id SvyvYQaCA4LC; Tue, 16 Jun 2020 05:36:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B2AF4B11B;
-	Tue, 16 Jun 2020 05:36:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 957C64B147;
+	Tue, 16 Jun 2020 05:36:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A4D4B112
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19C7C4B128
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vovl4hJ8m4UC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jun 2020 05:36:23 -0400 (EDT)
+ with ESMTP id mbBiL0lKh3tI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jun 2020 05:36:24 -0400 (EDT)
 Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3B904B103
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDB4C4B10D
  for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:20 -0400 (EDT)
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id CB61C6A3FCE268A0B19E;
+ by Forcepoint Email with ESMTP id D41EBD40471D8FD3AFBD;
  Tue, 16 Jun 2020 17:36:18 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 16 Jun 2020 17:36:11 +0800
+ 14.3.487.0; Tue, 16 Jun 2020 17:36:12 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-Subject: [PATCH 09/12] KVM: arm64: Steply write protect page table by mask bit
-Date: Tue, 16 Jun 2020 17:35:50 +0800
-Message-ID: <20200616093553.27512-10-zhukeqian1@huawei.com>
+Subject: [PATCH 10/12] KVM: arm64: Save stage2 PTE dirty status if it is
+ coverred
+Date: Tue, 16 Jun 2020 17:35:51 +0800
+Message-ID: <20200616093553.27512-11-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20200616093553.27512-1-zhukeqian1@huawei.com>
 References: <20200616093553.27512-1-zhukeqian1@huawei.com>
@@ -75,45 +76,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-During dirty log clear, page table entries are write protected
-according to a mask. In the past we write protect all entries
-corresponding to the mask from ffs to fls. Though there may be
-zero bits between this range, we are holding the kvm mmu lock
-so we won't write protect entries that we don't want to.
+There are two types of operations will change PTE and may cover
+dirty status set by hardware.
 
-We are about to add support for hardware management of dirty state
-to arm64, holding kvm mmu lock will be not enough. We should write
-protect entries steply by mask bit.
+1. Stage2 PTE unmapping: Page table merging (revert of huge page
+table dissolving), kvm_unmap_hva_range() and so on.
+
+2. Stage2 PTE changing: including user_mem_abort(), kvm_mmu_notifier
+_change_pte() and so on.
+
+All operations above will invoke kvm_set_pte() finally. We should
+save the dirty status into memslot bitmap.
+
+Question: Should we acquire kvm_slots_lock when invoke mark_page_dirty?
+It seems that user_mem_abort does not acquire this lock when invoke it.
 
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- arch/arm64/kvm/mmu.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 3aa0303d83f0..898e272a2c07 100644
+index 898e272a2c07..a230fbcf3889 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1710,10 +1710,16 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 		gfn_t gfn_offset, unsigned long mask)
+@@ -294,15 +294,23 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
  {
- 	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
--	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
--	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-+	phys_addr_t start, end;
-+	u32 i;
+ 	phys_addr_t start_addr = addr;
+ 	pte_t *pte, *start_pte;
++	bool dirty_coverred;
++	int idx;
  
--	stage2_wp_range(kvm, start, end);
-+	for (i = __ffs(mask); i <= __fls(mask); i++) {
-+		if (test_bit_le(i, &mask)) {
-+			start = (base_gfn + i) << PAGE_SHIFT;
-+			end = (base_gfn + i + 1) << PAGE_SHIFT;
-+			stage2_wp_range(kvm, start, end);
+ 	start_pte = pte = pte_offset_kernel(pmd, addr);
+ 	do {
+ 		if (!pte_none(*pte)) {
+ 			pte_t old_pte = *pte;
+ 
+-			kvm_set_pte(pte, __pte(0));
++			dirty_coverred = kvm_set_pte(pte, __pte(0));
+ 			kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 
++			if (dirty_coverred) {
++				idx = srcu_read_lock(&kvm->srcu);
++				mark_page_dirty(kvm, addr >> PAGE_SHIFT);
++				srcu_read_unlock(&kvm->srcu, idx);
++			}
++
+ 			/* No need to invalidate the cache for device mappings */
+ 			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
+ 				kvm_flush_dcache_pte(old_pte);
+@@ -1388,6 +1396,8 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 	pte_t *pte, old_pte;
+ 	bool iomap = flags & KVM_S2PTE_FLAG_IS_IOMAP;
+ 	bool logging_active = flags & KVM_S2_FLAG_LOGGING_ACTIVE;
++	bool dirty_coverred;
++	int idx;
+ 
+ 	VM_BUG_ON(logging_active && !cache);
+ 
+@@ -1453,8 +1463,14 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 		if (pte_val(old_pte) == pte_val(*new_pte))
+ 			return 0;
+ 
+-		kvm_set_pte(pte, __pte(0));
++		dirty_coverred = kvm_set_pte(pte, __pte(0));
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
++
++		if (dirty_coverred) {
++			idx = srcu_read_lock(&kvm->srcu);
++			mark_page_dirty(kvm, addr >> PAGE_SHIFT);
++			srcu_read_unlock(&kvm->srcu, idx);
 +		}
-+	}
- }
- 
- /*
+ 	} else {
+ 		get_page(virt_to_page(pte));
+ 	}
 -- 
 2.19.1
 
