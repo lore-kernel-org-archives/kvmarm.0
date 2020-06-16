@@ -2,52 +2,55 @@ Return-Path: <SRS0=MRip=75=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3292C433E1
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE27C433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A60222078E
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60222078E
+	by mail.kernel.org (Postfix) with ESMTP id B0C16207DD
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jun 2020 09:36:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C16207DD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DD964B126;
-	Tue, 16 Jun 2020 05:36:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 690154B0F6;
+	Tue, 16 Jun 2020 05:36:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fxaBA2sG4n56; Tue, 16 Jun 2020 05:36:23 -0400 (EDT)
+	with ESMTP id B64mRVHlY0GZ; Tue, 16 Jun 2020 05:36:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14F714B116;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA2E4B11B;
 	Tue, 16 Jun 2020 05:36:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3B304B0E6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D55D24B0DD
  for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IJ8qg+HzLKy5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jun 2020 05:36:18 -0400 (EDT)
+ with ESMTP id shWXlQNf5hHW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jun 2020 05:36:17 -0400 (EDT)
 Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1791B4A49C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8C5F4B0DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2020 05:36:16 -0400 (EDT)
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 968F783B892EBF894D59;
+ by Forcepoint Email with ESMTP id B8F055F8BBC2B2F531C4;
  Tue, 16 Jun 2020 17:36:13 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 16 Jun 2020 17:36:03 +0800
+ 14.3.487.0; Tue, 16 Jun 2020 17:36:05 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-Subject: [PATCH 00/12] KVM: arm64: Support stage2 hardware DBM
-Date: Tue, 16 Jun 2020 17:35:41 +0800
-Message-ID: <20200616093553.27512-1-zhukeqian1@huawei.com>
+Subject: [PATCH 02/12] KVM: arm64: Modify stage2 young mechanism to support hw
+ DBM
+Date: Tue, 16 Jun 2020 17:35:43 +0800
+Message-ID: <20200616093553.27512-3-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20200616093553.27512-1-zhukeqian1@huawei.com>
+References: <20200616093553.27512-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.173.221.230]
 X-CFilter-Loop: Reflected
@@ -73,80 +76,124 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch series add support for stage2 hardware DBM, and it is only
-used for dirty log for now.
+Marking PTs young (set AF bit) should be atomic to avoid cover
+dirty status set by hardware.
 
-It works well under some migration test cases, including VM with 4K
-pages or 2M THP. I checked the SHA256 hash digest of all memory and
-they keep same for source VM and destination VM, which means no dirty
-pages is missed under hardware DBM.
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ arch/arm64/include/asm/kvm_mmu.h | 32 ++++++++++++++++++++++----------
+ arch/arm64/kvm/mmu.c             | 15 ++++++++-------
+ 2 files changed, 30 insertions(+), 17 deletions(-)
 
-Some key points:
-
-1. Only support hardware updates of dirty status for PTEs. PMDs and PUDs
-   are not involved for now.
-
-2. About *performance*: In RFC patch, I have mentioned that for every 64GB
-   memory, KVM consumes about 40ms to scan all PTEs to collect dirty log.
-   
-   Initially, I plan to solve this problem using parallel CPUs. However
-   I faced two problems.
-
-   The first is bottleneck of memory bandwith. Single thread will occupy
-   bandwidth about 500GB/s, we can support about 4 parallel threads at
-   most, so the ideal speedup ratio is low.
-
-   The second is huge impact on other CPUs. To scan PTs quickly, I use
-   smp_call_function_many, which is based on IPI, to dispatch workload
-   on other CPUs. Though it can complete work in time, the interrupt is
-   disabled during scaning PTs, which has huge impact on other CPUs.
-
-   Now, I make hardware dirty log can be dynamic enabled and disabled.
-   Userspace can enable it before VM migration and disable it when
-   remaining dirty pages is little. Thus VM downtime is not affected. 
-
-
-3. About correctness: Only add DBM bit when PTE is already writable, so
-   we still have readonly PTE and some mechanisms which rely on readonly
-   PTs are not broken.
-
-4. About PTs modification races: There are two kinds of PTs modification.
-   
-   The first is adding or clearing specific bit, such as AF or RW. All
-   these operations have been converted to be atomic, avoid covering
-   dirty status set by hardware.
-   
-   The second is replacement, such as PTEs unmapping or changement. All
-   these operations will invoke kvm_set_pte finally. kvm_set_pte have
-   been converted to be atomic and we save the dirty status to underlying
-   bitmap if dirty status is coverred.
-
-
-Keqian Zhu (12):
-  KVM: arm64: Add some basic functions to support hw DBM
-  KVM: arm64: Modify stage2 young mechanism to support hw DBM
-  KVM: arm64: Report hardware dirty status of stage2 PTE if coverred
-  KVM: arm64: Support clear DBM bit for PTEs
-  KVM: arm64: Add KVM_CAP_ARM_HW_DIRTY_LOG capability
-  KVM: arm64: Set DBM bit of PTEs during write protecting
-  KVM: arm64: Scan PTEs to sync dirty log
-  KVM: Omit dirty log sync in log clear if initially all set
-  KVM: arm64: Steply write protect page table by mask bit
-  KVM: arm64: Save stage2 PTE dirty status if it is coverred
-  KVM: arm64: Support disable hw dirty log after enable
-  KVM: arm64: Enable stage2 hardware DBM
-
- arch/arm64/include/asm/kvm_host.h |  11 +
- arch/arm64/include/asm/kvm_mmu.h  |  56 +++-
- arch/arm64/include/asm/sysreg.h   |   2 +
- arch/arm64/kvm/arm.c              |  22 +-
- arch/arm64/kvm/mmu.c              | 411 ++++++++++++++++++++++++++++--
- arch/arm64/kvm/reset.c            |  14 +-
- include/uapi/linux/kvm.h          |   1 +
- tools/include/uapi/linux/kvm.h    |   1 +
- virt/kvm/kvm_main.c               |   7 +-
- 9 files changed, 499 insertions(+), 26 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e0ee6e23d626..51af71505fbc 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -215,6 +215,18 @@ static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+ 	} while (pteval != old_pteval);
+ }
+ 
++static inline void kvm_set_s2pte_young(pte_t *ptep)
++{
++	pteval_t old_pteval, pteval;
++
++	pteval = READ_ONCE(pte_val(*ptep));
++	do {
++		old_pteval = pteval;
++		pteval |= PTE_AF;
++		pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, pteval);
++	} while (pteval != old_pteval);
++}
++
+ static inline bool kvm_s2pte_readonly(pte_t *ptep)
+ {
+ 	return (READ_ONCE(pte_val(*ptep)) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+@@ -230,6 +242,11 @@ static inline void kvm_set_s2pmd_readonly(pmd_t *pmdp)
+ 	kvm_set_s2pte_readonly((pte_t *)pmdp);
+ }
+ 
++static inline void kvm_set_s2pmd_young(pmd_t *pmdp)
++{
++	kvm_set_s2pte_young((pte_t *)pmdp);
++}
++
+ static inline bool kvm_s2pmd_readonly(pmd_t *pmdp)
+ {
+ 	return kvm_s2pte_readonly((pte_t *)pmdp);
+@@ -245,6 +262,11 @@ static inline void kvm_set_s2pud_readonly(pud_t *pudp)
+ 	kvm_set_s2pte_readonly((pte_t *)pudp);
+ }
+ 
++static inline void kvm_set_s2pud_young(pud_t *pudp)
++{
++	kvm_set_s2pte_young((pte_t *)pudp);
++}
++
+ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+ {
+ 	return kvm_s2pte_readonly((pte_t *)pudp);
+@@ -255,16 +277,6 @@ static inline bool kvm_s2pud_exec(pud_t *pudp)
+ 	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
+ }
+ 
+-static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+-{
+-	return pud_mkyoung(pud);
+-}
+-
+-static inline bool kvm_s2pud_young(pud_t pud)
+-{
+-	return pud_young(pud);
+-}
+-
+ #ifdef CONFIG_ARM64_HW_AFDBM
+ static inline bool kvm_hw_dbm_enabled(void)
+ {
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8c0035cab6b6..5ad87bce23c0 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2008,8 +2008,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+  * Resolve the access fault by making the page young again.
+  * Note that because the faulting entry is guaranteed not to be
+  * cached in the TLB, we don't need to invalidate anything.
+- * Only the HW Access Flag updates are supported for Stage 2 (no DBM),
+- * so there is no need for atomic (pte|pmd)_mkyoung operations.
++ *
++ * Note: Both DBM and HW AF updates are supported for Stage2, so
++ * young operations should be atomic.
+  */
+ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ {
+@@ -2027,15 +2028,15 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		goto out;
+ 
+ 	if (pud) {		/* HugeTLB */
+-		*pud = kvm_s2pud_mkyoung(*pud);
++		kvm_set_s2pud_young(pud);
+ 		pfn = kvm_pud_pfn(*pud);
+ 		pfn_valid = true;
+ 	} else	if (pmd) {	/* THP, HugeTLB */
+-		*pmd = pmd_mkyoung(*pmd);
++		kvm_set_s2pmd_young(pmd);
+ 		pfn = pmd_pfn(*pmd);
+ 		pfn_valid = true;
+-	} else {
+-		*pte = pte_mkyoung(*pte);	/* Just a page... */
++	} else {		/* Just a page... */
++		kvm_set_s2pte_young(pte);
+ 		pfn = pte_pfn(*pte);
+ 		pfn_valid = true;
+ 	}
+@@ -2280,7 +2281,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
+ 		return 0;
+ 
+ 	if (pud)
+-		return kvm_s2pud_young(*pud);
++		return pud_young(*pud);
+ 	else if (pmd)
+ 		return pmd_young(*pmd);
+ 	else
 -- 
 2.19.1
 
