@@ -2,58 +2,56 @@ Return-Path: <SRS0=IB6K=76=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D2BC433E1
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 11:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CA6C433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:39:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E422821548
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 11:38:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E422821548
+	by mail.kernel.org (Postfix) with ESMTP id 4AB1421532
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:39:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AB1421532
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CB8E4B196;
-	Wed, 17 Jun 2020 07:38:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 899894B201;
+	Wed, 17 Jun 2020 08:39:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id i5n9uHi31yCd; Wed, 17 Jun 2020 07:38:35 -0400 (EDT)
+	with ESMTP id WNWUce-7smF9; Wed, 17 Jun 2020 08:39:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 141564B220;
-	Wed, 17 Jun 2020 07:38:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8954B226;
+	Wed, 17 Jun 2020 08:39:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5B34B21E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 07:38:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CBAA4B1F8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:39:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RNdFfjHJAaZN for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jun 2020 07:38:32 -0400 (EDT)
+ with ESMTP id W1U4d1BL+HDv for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jun 2020 08:39:21 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4434B21C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 07:38:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4585F4B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:39:21 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8816F1045;
- Wed, 17 Jun 2020 04:38:32 -0700 (PDT)
-Received: from monolith.arm.com (unknown [10.37.8.7])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14DF43F71F;
- Wed, 17 Jun 2020 04:38:29 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 5/7] arm64: kvm: pmu: Make overflow handler NMI safe
-Date: Wed, 17 Jun 2020 12:38:49 +0100
-Message-Id: <20200617113851.607706-6-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200617113851.607706-1-alexandru.elisei@arm.com>
-References: <20200617113851.607706-1-alexandru.elisei@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA0781045;
+ Wed, 17 Jun 2020 05:39:20 -0700 (PDT)
+Received: from e112269-lin.arm.com (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 078483F71F;
+ Wed, 17 Jun 2020 05:39:18 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+Subject: [RFC PATCH 0/2] MTE support for KVM guest
+Date: Wed, 17 Jun 2020 13:38:42 +0100
+Message-Id: <20200617123844.29960-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, maz@kernel.org,
- Will Deacon <will.deacon@arm.com>, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org,
+ Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,91 +68,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Julien Thierry <julien.thierry@arm.com>
+These patches add support to KVM to enable MTE within a guest. It is
+based on Catalin's v4 MTE user space series[1].
 
-kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
-NMI context, defer waking the vcpu to an irq_work queue.
+[1] http://lkml.kernel.org/r/20200515171612.1020-1-catalin.marinas%40arm.com
 
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/pmu-emul.c | 25 ++++++++++++++++++++++++-
- include/kvm/arm_pmu.h     |  1 +
- 2 files changed, 25 insertions(+), 1 deletion(-)
+Posting as an RFC as I'd like feedback on the approach taken. First a
+little background on how MTE fits within the architecture:
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index f0d0312c0a55..30268397ed06 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -433,6 +433,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_pmu_update_state(vcpu);
- }
- 
-+/**
-+ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
-+ * to the event.
-+ * This is why we need a callback to do it once outside of the NMI context.
-+ */
-+static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_pmu *pmu;
-+
-+	pmu = container_of(work, struct kvm_pmu, overflow_work);
-+	vcpu = kvm_pmc_to_vcpu(&pmu->pmc[0]);
-+
-+	kvm_vcpu_kick(vcpu);
-+}
-+
- /**
-  * When the perf event overflows, set the overflow status and inform the vcpu.
-  */
-@@ -465,7 +481,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
- 
- 	if (kvm_pmu_overflow_status(vcpu)) {
- 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
--		kvm_vcpu_kick(vcpu);
-+
-+		if (!in_nmi())
-+			kvm_vcpu_kick(vcpu);
-+		else
-+			irq_work_queue(&vcpu->arch.pmu.overflow_work);
- 	}
- 
- 	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
-@@ -764,6 +784,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
-+	init_irq_work(&vcpu->arch.pmu.overflow_work,
-+		      kvm_pmu_perf_overflow_notify_vcpu);
-+
- 	vcpu->arch.pmu.created = true;
- 	return 0;
- }
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 6db030439e29..dbf4f08d42e5 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -27,6 +27,7 @@ struct kvm_pmu {
- 	bool ready;
- 	bool created;
- 	bool irq_level;
-+	struct irq_work overflow_work;
- };
- 
- #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+The stage 2 page tables have limited scope for controlling the
+availability of MTE. If a page is mapped as Normal and cached in stage 2
+then it's the stage 1 tables that get to choose whether the memory is
+tagged or not. So the only way of forbidding tags on a page from the
+hypervisor is to change the cacheability (or make it device memory)
+which would cause other problems.  Note this restriction fits the
+intention that a system should have all (general purpose) memory
+supporting tags if it support MTE, so it's not too surprising.
+
+However, the upshot of this is that to enable MTE within a guest all
+pages of memory mapped into the guest as normal cached pages in stage 2
+*must* support MTE (i.e. we must ensure the tags are appropriately
+sanitised and save/restore the tags during swap etc).
+
+My current approach is that KVM transparently upgrades any pages
+provided by the VMM to be tag-enabled when they are faulted in (i.e.
+sets the PG_mte_tagged flag on the page) which has the benefit of
+requiring fewer changes in the VMM. However, save/restore of the VM
+state still requires the VMM to have a PROT_MTE enabled mapping so that
+it can access the tag values. A VMM which 'forgets' to enable PROT_MTE
+would lose the tag values when saving/restoring (tags are RAZ/WI when
+PROT_MTE isn't set).
+
+An alternative approach would be to enforce the VMM provides PROT_MTE
+memory in the first place. This seems appealing to prevent the above
+potentially unexpected gotchas with save/restore, however this would
+also extend to memory that you might not expect to have PROT_MTE (e.g. a
+shared frame buffer for an emulated graphics card). 
+
+Comments on the approach (or ideas for alternative approaches) are very
+welcome.
+
+Steven Price (2):
+  arm64: kvm: Save/restore MTE registers
+  arm64: kvm: Introduce MTE VCPU feature
+
+ arch/arm64/include/asm/kvm_emulate.h |  3 +++
+ arch/arm64/include/asm/kvm_host.h    |  9 ++++++++-
+ arch/arm64/include/uapi/asm/kvm.h    |  1 +
+ arch/arm64/kvm/hyp/sysreg-sr.c       | 12 ++++++++++++
+ arch/arm64/kvm/reset.c               |  8 ++++++++
+ arch/arm64/kvm/sys_regs.c            |  8 ++++++++
+ virt/kvm/arm/mmu.c                   | 11 +++++++++++
+ 7 files changed, 51 insertions(+), 1 deletion(-)
+
 -- 
-2.27.0
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
