@@ -6,52 +6,54 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F37A7C433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 10:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D2BC433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 11:38:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7F741208B3
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 10:55:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F741208B3
+	by mail.kernel.org (Postfix) with ESMTP id E422821548
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 11:38:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E422821548
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1A44B182;
-	Wed, 17 Jun 2020 06:55:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CB8E4B196;
+	Wed, 17 Jun 2020 07:38:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CBHLbI4wBlo0; Wed, 17 Jun 2020 06:55:10 -0400 (EDT)
+	with ESMTP id i5n9uHi31yCd; Wed, 17 Jun 2020 07:38:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF6394B1A9;
-	Wed, 17 Jun 2020 06:55:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 141564B220;
+	Wed, 17 Jun 2020 07:38:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B6184B183
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 06:55:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5B34B21E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 07:38:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p8fuSKeGjXDM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jun 2020 06:55:08 -0400 (EDT)
+ with ESMTP id RNdFfjHJAaZN for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jun 2020 07:38:32 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0AE24B182
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 06:55:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4434B21C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 07:38:32 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86BF3C0A;
- Wed, 17 Jun 2020 03:55:08 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 384F03F71F;
- Wed, 17 Jun 2020 03:55:06 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v2] KVM: arm64: kvm_reset_vcpu() return code incorrect with SVE
-Date: Wed, 17 Jun 2020 11:54:56 +0100
-Message-Id: <20200617105456.28245-1-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8816F1045;
+ Wed, 17 Jun 2020 04:38:32 -0700 (PDT)
+Received: from monolith.arm.com (unknown [10.37.8.7])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14DF43F71F;
+ Wed, 17 Jun 2020 04:38:29 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 5/7] arm64: kvm: pmu: Make overflow handler NMI safe
+Date: Wed, 17 Jun 2020 12:38:49 +0100
+Message-Id: <20200617113851.607706-6-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200617113851.607706-1-alexandru.elisei@arm.com>
+References: <20200617113851.607706-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Cc: linux-kernel@vger.kernel.org, Dave Martin <Dave.Martin@arm.com>,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, maz@kernel.org,
+ Will Deacon <will.deacon@arm.com>, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,72 +70,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If SVE is enabled then 'ret' can be assigned the return value of
-kvm_vcpu_enable_sve() which may be 0 causing future "goto out" sites to
-erroneously return 0 on failure rather than -EINVAL as expected.
+From: Julien Thierry <julien.thierry@arm.com>
 
-Remove the initialisation of 'ret' and make setting the return value
-explicit to avoid this situation in the future.
+kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
+NMI context, defer waking the vcpu to an irq_work queue.
 
-Fixes: 9a3cdf26e336 ("KVM: arm64/sve: Allow userspace to enable SVE for vcpus")
-Reported-by: James Morse <james.morse@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
-Changes since v1:
- * Fix embarrassing accidental inversion of the if() test
+ arch/arm64/kvm/pmu-emul.c | 25 ++++++++++++++++++++++++-
+ include/kvm/arm_pmu.h     |  1 +
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-The problematic chunk isn't visible in the diff, so reproduced here:
-
-	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
-		if (test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
-			ret = kvm_vcpu_enable_sve(vcpu);
-			if (ret)
-				goto out;
-		}
-	} else {
-		kvm_vcpu_reset_sve(vcpu);
-	}
-
- arch/arm64/kvm/reset.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index d3b209023727..6ed36be51b4b 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -245,7 +245,7 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index f0d0312c0a55..30268397ed06 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -433,6 +433,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_update_state(vcpu);
+ }
+ 
++/**
++ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
++ * to the event.
++ * This is why we need a callback to do it once outside of the NMI context.
++ */
++static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_pmu *pmu;
++
++	pmu = container_of(work, struct kvm_pmu, overflow_work);
++	vcpu = kvm_pmc_to_vcpu(&pmu->pmc[0]);
++
++	kvm_vcpu_kick(vcpu);
++}
++
+ /**
+  * When the perf event overflows, set the overflow status and inform the vcpu.
   */
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
--	int ret = -EINVAL;
-+	int ret;
- 	bool loaded;
- 	u32 pstate;
+@@ -465,7 +481,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
  
-@@ -269,15 +269,19 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- 	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
- 	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features)) {
--		if (kvm_vcpu_enable_ptrauth(vcpu))
-+		if (kvm_vcpu_enable_ptrauth(vcpu)) {
-+			ret = -EINVAL;
- 			goto out;
-+		}
+ 	if (kvm_pmu_overflow_status(vcpu)) {
+ 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+-		kvm_vcpu_kick(vcpu);
++
++		if (!in_nmi())
++			kvm_vcpu_kick(vcpu);
++		else
++			irq_work_queue(&vcpu->arch.pmu.overflow_work);
  	}
  
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
--			if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
-+			if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1)) {
-+				ret = -EINVAL;
- 				goto out;
-+			}
- 			pstate = VCPU_RESET_PSTATE_SVC;
- 		} else {
- 			pstate = VCPU_RESET_PSTATE_EL1;
+ 	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+@@ -764,6 +784,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
+ 
++	init_irq_work(&vcpu->arch.pmu.overflow_work,
++		      kvm_pmu_perf_overflow_notify_vcpu);
++
+ 	vcpu->arch.pmu.created = true;
+ 	return 0;
+ }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 6db030439e29..dbf4f08d42e5 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -27,6 +27,7 @@ struct kvm_pmu {
+ 	bool ready;
+ 	bool created;
+ 	bool irq_level;
++	struct irq_work overflow_work;
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
 -- 
-2.20.1
+2.27.0
 
 _______________________________________________
 kvmarm mailing list
