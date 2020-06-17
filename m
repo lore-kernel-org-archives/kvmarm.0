@@ -2,58 +2,87 @@ Return-Path: <SRS0=IB6K=76=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6466C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6021C433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:40:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A651520CC7
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:39:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A651520CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9F14220CC7
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jun 2020 12:40:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hu9QCZJq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F14220CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60A114B25F;
-	Wed, 17 Jun 2020 08:39:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 438134B242;
+	Wed, 17 Jun 2020 08:40:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xO7PFwnYNwYS; Wed, 17 Jun 2020 08:39:27 -0400 (EDT)
+	with ESMTP id O1Y9E1T22wWC; Wed, 17 Jun 2020 08:40:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3B144B256;
-	Wed, 17 Jun 2020 08:39:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B5E94B1F5;
+	Wed, 17 Jun 2020 08:40:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 603C34B1F5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:39:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E2EF4B242
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:40:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GsBkoL1bsH+N for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jun 2020 08:39:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 28FD14B257
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:39:25 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D033512FC;
- Wed, 17 Jun 2020 05:39:24 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 100DB3F71F;
- Wed, 17 Jun 2020 05:39:22 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [RFC PATCH 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Wed, 17 Jun 2020 13:38:44 +0100
-Message-Id: <20200617123844.29960-3-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200617123844.29960-1-steven.price@arm.com>
-References: <20200617123844.29960-1-steven.price@arm.com>
+ with ESMTP id WSlITA0en3fa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jun 2020 08:40:21 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A0D54B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2020 08:40:21 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 54F7A20707;
+ Wed, 17 Jun 2020 12:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1592397620;
+ bh=ndOCPkh38nFJDiO+ELM8yvZLDJ1sr9wPZIH3weuN5TY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=hu9QCZJqAYpSvNtguuyYyagGeoTD4NslGLHEgWKfdLyg5aR+KpwghRONcr+GS4f5/
+ 97k7DaHIPshcOsqUU66DVp79knSFpk1HaMO6vFIWbGUxKmGVYzdP32YiEUiQLPQhKi
+ 647WVia1Oys+A1j7U02z6ADL0Iq1kidJxa5uF7os=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jlXMY-003mcB-Rj; Wed, 17 Jun 2020 13:40:19 +0100
+Date: Wed, 17 Jun 2020 13:40:17 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+Message-ID: <20200617134017.11e8cd15@why>
+In-Reply-To: <20200615132719.1932408-2-maz@kernel.org>
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
+ will@kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com,
+ gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,118 +99,206 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
-on a VCPU. When enabled on any VCPU in the virtual machine this causes
-all pages that are faulted into the VM to have the PG_mte_tagged flag
-set (and the tag storage cleared if this is the first use).
+On Mon, 15 Jun 2020 14:27:03 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  2 +-
- arch/arm64/include/uapi/asm/kvm.h    |  1 +
- arch/arm64/kvm/reset.c               |  8 ++++++++
- arch/arm64/kvm/sys_regs.c            |  3 ++-
- virt/kvm/arm/mmu.c                   | 11 +++++++++++
- 6 files changed, 26 insertions(+), 2 deletions(-)
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> As we are about to reuse our stage 2 page table manipulation code for
+> shadow stage 2 page tables in the context of nested virtualization, we
+> are going to manage multiple stage 2 page tables for a single VM.
+> 
+> This requires some pretty invasive changes to our data structures,
+> which moves the vmid and pgd pointers into a separate structure and
+> change pretty much all of our mmu code to operate on this structure
+> instead.
+> 
+> The new structure is called struct kvm_s2_mmu.
+> 
+> There is no intended functional change by this patch alone.
+> 
+> Reviewed-by: James Morse <james.morse@arm.com>
+> [Designed data structure layout in collaboration]
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Co-developed-by: Marc Zyngier <maz@kernel.org>
+> [maz: Moved the last_vcpu_ran down to the S2 MMU structure as well]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h  |   7 +-
+>  arch/arm64/include/asm/kvm_host.h |  32 +++-
+>  arch/arm64/include/asm/kvm_mmu.h  |  16 +-
+>  arch/arm64/kvm/arm.c              |  36 ++--
+>  arch/arm64/kvm/hyp/switch.c       |   8 +-
+>  arch/arm64/kvm/hyp/tlb.c          |  52 +++---
+>  arch/arm64/kvm/mmu.c              | 278 +++++++++++++++++-------------
+>  7 files changed, 233 insertions(+), 196 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index a30b4eec7cb4..b118f466a40b 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
+[...]
+
+> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+> index d063a576d511..993c74cc054c 100644
+> --- a/arch/arm64/kvm/hyp/tlb.c
+> +++ b/arch/arm64/kvm/hyp/tlb.c
+> @@ -16,7 +16,7 @@ struct tlb_inv_context {
+>  	u64		sctlr;
+>  };
+>  
+> -static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+> +static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm_s2_mmu *mmu,
+>  						 struct tlb_inv_context *cxt)
+>  {
+>  	u64 val;
+> @@ -53,14 +53,14 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+>  	 * place before clearing TGE. __load_guest_stage2() already
+>  	 * has an ISB in order to deal with this.
+>  	 */
+> -	__load_guest_stage2(kvm);
+> +	__load_guest_stage2(mmu);
+>  	val = read_sysreg(hcr_el2);
+>  	val &= ~HCR_TGE;
+>  	write_sysreg(val, hcr_el2);
+>  	isb();
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+> +static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm_s2_mmu *mmu,
+>  						  struct tlb_inv_context *cxt)
+>  {
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> @@ -79,22 +79,19 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+>  		isb();
+>  	}
+>  
+> -	/* __load_guest_stage2() includes an ISB for the workaround. */
+> -	__load_guest_stage2(kvm);
+> -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+> +	__load_guest_stage2(mmu);
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
+> +static void __hyp_text __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+>  					     struct tlb_inv_context *cxt)
+>  {
+>  	if (has_vhe())
+> -		__tlb_switch_to_guest_vhe(kvm, cxt);
+> +		__tlb_switch_to_guest_vhe(mmu, cxt);
+>  	else
+> -		__tlb_switch_to_guest_nvhe(kvm, cxt);
+> +		__tlb_switch_to_guest_nvhe(mmu, cxt);
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
+> -						struct tlb_inv_context *cxt)
+> +static void __hyp_text __tlb_switch_to_host_vhe(struct tlb_inv_context *cxt)
+>  {
+>  	/*
+>  	 * We're done with the TLB operation, let's restore the host's
+> @@ -113,8 +110,7 @@ static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
+>  	local_irq_restore(cxt->flags);
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
+> -						 struct tlb_inv_context *cxt)
+> +static void __hyp_text __tlb_switch_to_host_nvhe(struct tlb_inv_context *cxt)
+>  {
+>  	write_sysreg(0, vttbr_el2);
+>  
+> @@ -126,24 +122,23 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
+>  	}
+>  }
+>  
+> -static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
+> -					    struct tlb_inv_context *cxt)
+> +static void __hyp_text __tlb_switch_to_host(struct tlb_inv_context *cxt)
+>  {
+>  	if (has_vhe())
+> -		__tlb_switch_to_host_vhe(kvm, cxt);
+> +		__tlb_switch_to_host_vhe(cxt);
+>  	else
+> -		__tlb_switch_to_host_nvhe(kvm, cxt);
+> +		__tlb_switch_to_host_nvhe(cxt);
+>  }
+>  
+> -void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+> +void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
+>  {
+>  	struct tlb_inv_context cxt;
+>  
+>  	dsb(ishst);
+>  
+>  	/* Switch to requested VMID */
+> -	kvm = kern_hyp_va(kvm);
+> -	__tlb_switch_to_guest(kvm, &cxt);
+> +	mmu = kern_hyp_va(mmu);
+> +	__tlb_switch_to_guest(mmu, &cxt);
+>  
+>  	/*
+>  	 * We could do so much better if we had the VA as well.
+> @@ -186,39 +181,38 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+>  	if (!has_vhe() && icache_is_vpipt())
+>  		__flush_icache_all();
+>  
+> -	__tlb_switch_to_host(kvm, &cxt);
+> +	__tlb_switch_to_host(&cxt);
+>  }
+>  
+> -void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
+> +void __hyp_text __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+>  {
+>  	struct tlb_inv_context cxt;
+>  
+>  	dsb(ishst);
+>  
+>  	/* Switch to requested VMID */
+> -	kvm = kern_hyp_va(kvm);
+> -	__tlb_switch_to_guest(kvm, &cxt);
+> +	mmu = kern_hyp_va(mmu);
+> +	__tlb_switch_to_guest(mmu, &cxt);
+>  
+>  	__tlbi(vmalls12e1is);
+>  	dsb(ish);
+>  	isb();
+>  
+> -	__tlb_switch_to_host(kvm, &cxt);
+> +	__tlb_switch_to_host(&cxt);
+>  }
+>  
+> -void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+> +void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+>  {
+> -	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
+>  	struct tlb_inv_context cxt;
+>  
+>  	/* Switch to requested VMID */
+> -	__tlb_switch_to_guest(kvm, &cxt);
+> +	__tlb_switch_to_guest(mmu, &cxt);
+
+The astute reviewer will have noticed that this sequence is unlikely
+to work on non-VHE systems, as what we get here is a kernel address.
+
+I fixed it with the following patch:
+
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 993c74cc054c..e41217946289 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -206,6 +206,7 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct
+kvm_s2_mmu *mmu) struct tlb_inv_context cxt;
  
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1f10e9dee2e0..3461639bb08a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -37,7 +37,7 @@
+ 	/* Switch to requested VMID */
++	mmu = kern_hyp_va(mmu);
+ 	__tlb_switch_to_guest(mmu, &cxt);
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 8
- 
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ba85bb23f060..2677e1ab8c16 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index ab76728e2742..f87a434c0849 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -287,6 +287,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
-+		if (!system_supports_mte()) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		vcpu->kvm->arch.vcpu_has_mte = true;
-+	}
-+
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3ae008a9b0bd..a6a9552d1233 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1096,7 +1096,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
- 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e3b9ee268823..040a7fffaa93 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1783,6 +1783,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			vma_pagesize = PMD_SIZE;
- 	}
- 
-+	if (system_supports_mte() && kvm->arch.vcpu_has_mte) {
-+		/*
-+		 * VM will be able to see the page's tags, so we must ensure
-+		 * they have been initialised.
-+		 */
-+		struct page *page = pfn_to_page(pfn);
-+
-+		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+			mte_clear_page_tags(page_address(page), page_size(page));
-+	}
-+
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
- 
+ 	__tlbi(vmalle1);
+
+and tested that things work as expected on such a system. I'll push out
+an updated branch shortly.
+
+Thanks,
+
+	M.
 -- 
-2.20.1
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
