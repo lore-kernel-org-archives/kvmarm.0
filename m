@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66018C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 943CFC433E1
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:51:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E20232080D
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:34:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 161E120C09
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:51:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HvgtGquI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20232080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zvLKsyDE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161E120C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657654B126;
-	Thu, 18 Jun 2020 12:34:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF314B14B;
+	Thu, 18 Jun 2020 12:51:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HNNu+2eyrGOs; Thu, 18 Jun 2020 12:34:45 -0400 (EDT)
+	with ESMTP id auHovMOW+6he; Thu, 18 Jun 2020 12:51:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A23824B128;
-	Thu, 18 Jun 2020 12:34:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E52F4B13B;
+	Thu, 18 Jun 2020 12:51:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D7EE4B101
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:34:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2B8F4B13B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:51:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vd594scBTrZY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jun 2020 12:34:43 -0400 (EDT)
+ with ESMTP id McqlFiUXOS3a for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jun 2020 12:51:30 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 261B74B0EF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:34:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 602B14B0BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:51:30 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F3A5F2080D;
- Thu, 18 Jun 2020 16:34:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4A93B208C3;
+ Thu, 18 Jun 2020 16:51:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592498082;
- bh=eVyEMYcH3w0tu/t9tmx43Zd823558bcJbUdQrBCBp4c=;
+ s=default; t=1592499089;
+ bh=SERZFPf5xFpc7b0CjgIUjRDwN9gWuC34jVkU4t7/p6s=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=HvgtGquIIepvj2gQkKFmCpbCeAgAeeIo7rCFhFWj26c+6IajL8BvAWaMt/UCkLjBj
- Vtdzg6b/vnsNPFtyukEyPsuxiiDQ5nOPcGjyj1C4NTiv/RWhz9FGbzBk2HXK3F60XQ
- aftQCISswXvKXTI+OuS8zmbSzVxSrPM211c2bCl0=
+ b=zvLKsyDEUD0u82aAkmzKgbY1y56tjUifELojFJl8kDu0NYBeqK2NSJrkGK6p7MAgS
+ hFwOyQdLopNEXPXeFdIVm3o41ssrKFmCBxT+cmNUDDCdylwfx2+AHosuVakg97Lmvb
+ lFFsfVWJ+UHaWbIBu5BbgnMfIV+4pTMQcMfUeggo=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jlxUu-004EIo-A4; Thu, 18 Jun 2020 17:34:40 +0100
+ id 1jlxl9-004EW2-P8; Thu, 18 Jun 2020 17:51:27 +0100
 MIME-Version: 1.0
-Date: Thu, 18 Jun 2020 17:34:40 +0100
+Date: Thu, 18 Jun 2020 17:51:27 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v3 03/15] arm64: kvm: Add build rules for separate nVHE
- object files
-In-Reply-To: <20200618122537.9625-4-dbrazdil@google.com>
+Subject: Re: [PATCH v3 04/15] arm64: kvm: Handle calls to prefixed hyp
+ functions
+In-Reply-To: <20200618122537.9625-5-dbrazdil@google.com>
 References: <20200618122537.9625-1-dbrazdil@google.com>
- <20200618122537.9625-4-dbrazdil@google.com>
+ <20200618122537.9625-5-dbrazdil@google.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <09976ea31931481f4e00d627dc5e06fe@kernel.org>
+Message-ID: <a31b7ee9ad1edaa38aa122ac90cc605c@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
  catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- android-kvm@google.com, kernel-team@android.com
+ android-kvm@google.com, kernel-team@android.com, ascull@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -101,153 +101,182 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi David,
 
 On 2020-06-18 13:25, David Brazdil wrote:
-> Add new folder arch/arm64/kvm/hyp/nvhe and a Makefile for building code 
-> that
-> runs in EL2 under nVHE KVM.
+> From: Andrew Scull <ascull@google.com>
 > 
-> Compile each source file into a `.hyp.tmp.o` object first, then prefix 
-> all
-> its symbols with "__kvm_nvhe_" using `objcopy` and produce a `.hyp.o`.
-> Suffixes were chosen so that it would be possible for VHE and nVHE to 
-> share
-> some source files, but compiled with different CFLAGS. nVHE build rules 
-> add
-> -D__KVM_NVHE_HYPERVISOR__.
+> This patch is part of a series which builds KVM's non-VHE hyp code 
+> separately
+> from VHE and the rest of the kernel.
 > 
-> The nVHE ELF symbol prefix is added to kallsyms.c as ignored. EL2-only 
-> symbols
-> will never appear in EL1 stack traces.
+> Once hyp functions are moved to a hyp object, they will have prefixed 
+> symbols.
+> This change declares and gets the address of the prefixed version for 
+> calls to
+> the hyp functions.
 > 
+> To aid migration, the hyp functions that have not yet moved have their 
+> prefixed
+> versions aliased to their non-prefixed version. This begins with all 
+> the hyp
+> functions being listed and will reduce to none of them once the 
+> migration is
+> complete.
+> 
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> 
+> Extracted kvm_call_hyp nVHE branches into own helper macros.
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
+
+nit: if you want to add this kind of comment, try to write it between
+square brackets, without blank lines in between:
+
+Signed-off-by: Andrew Scull <ascull@google.com>
+[David: Extracted kvm_call_hyp nVHE branches into own helper macros.]
+Signed-off-by: David Brazdil <dbrazdil@google.com>
+
 > ---
->  arch/arm64/kernel/image-vars.h   | 12 +++++++++++
->  arch/arm64/kvm/hyp/Makefile      |  2 +-
->  arch/arm64/kvm/hyp/nvhe/Makefile | 35 ++++++++++++++++++++++++++++++++
->  scripts/kallsyms.c               |  1 +
->  4 files changed, 49 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
+>  arch/arm64/include/asm/kvm_asm.h  | 19 +++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h | 19 ++++++++++++++++---
+>  arch/arm64/kernel/image-vars.h    | 15 +++++++++++++++
+>  3 files changed, 50 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/image-vars.h 
-> b/arch/arm64/kernel/image-vars.h
-> index be0a63ffed23..f32b406e90c0 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -51,4 +51,16 @@ __efistub__ctype		= _ctype;
+> diff --git a/arch/arm64/include/asm/kvm_asm.h 
+> b/arch/arm64/include/asm/kvm_asm.h
+> index 352aaebf4198..6a682d66a640 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -42,6 +42,24 @@
 > 
->  #endif
+>  #include <linux/mm.h>
 > 
-> +#ifdef CONFIG_KVM
+> +/*
+> + * Translate name of a symbol defined in nVHE hyp to the name seen
+> + * by kernel proper. All nVHE symbols are prefixed by the build system
+> + * to avoid clashes with the VHE variants.
+> + */
+> +#define kvm_nvhe_sym(sym)	__kvm_nvhe_##sym
+> +
+> +#define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> +#define DECLARE_KVM_NVHE_SYM(sym)	extern char kvm_nvhe_sym(sym)[]
 > +
 > +/*
-> + * KVM nVHE code has its own symbol namespace prefixed by __kvm_nvhe_, 
-> to
-> + * isolate it from the kernel proper. The following symbols are 
-> legally
-> + * accessed by it, therefore provide aliases to make them linkable.
-> + * Do not include symbols which may not be safely accessed under 
-> hypervisor
-> + * memory mappings.
+> + * Define a pair of symbols sharing the same name but one defined in
+> + * VHE and the other in nVHE hyp implementations.
 > + */
+> +#define DECLARE_KVM_HYP_SYM(sym)		\
+> +	DECLARE_KVM_VHE_SYM(sym);		\
+> +	DECLARE_KVM_NVHE_SYM(sym)
 > +
-> +#endif /* CONFIG_KVM */
+>  /* Translate a kernel address of @sym into its equivalent linear 
+> mapping */
+>  #define kvm_ksym_ref(sym)						\
+>  	({								\
+> @@ -50,6 +68,7 @@
+>  			val = lm_alias(&sym);				\
+>  		val;							\
+>  	 })
+> +#define kvm_ksym_ref_nvhe(sym)	kvm_ksym_ref(kvm_nvhe_sym(sym))
+> 
+>  struct kvm;
+>  struct kvm_vcpu;
+> diff --git a/arch/arm64/include/asm/kvm_host.h
+> b/arch/arm64/include/asm/kvm_host.h
+> index c3e6fcc664b1..e782f98243d3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -448,6 +448,20 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+> 
+>  u64 __kvm_call_hyp(void *hypfn, ...);
+> 
+> +#define kvm_call_hyp_nvhe(f, ...)					\
+> +	do {								\
+> +		DECLARE_KVM_NVHE_SYM(f);				\
+
+I wanted to move this out to __kvm_call_hyp, but the nVHE ssbs code
+got in the way... Oh well.
+
+> +		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
+> +	} while(0)
 > +
+> +#define kvm_call_hyp_nvhe_ret(f, ...)					\
+> +	({								\
+> +		DECLARE_KVM_NVHE_SYM(f);				\
+> +		typeof(f(__VA_ARGS__)) ret;				\
+> +		ret = __kvm_call_hyp(kvm_ksym_ref_nvhe(f),		\
+> +				     ##__VA_ARGS__);			\
+
+You don't need to redefine ret here. actually, you can just evaluate
+the expression and let C do its magic:
+
+diff --git a/arch/arm64/include/asm/kvm_host.h 
+b/arch/arm64/include/asm/kvm_host.h
+index e782f98243d3..49d1a5cd8f8f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -457,9 +457,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+  #define kvm_call_hyp_nvhe_ret(f, ...)					\
+  	({								\
+  		DECLARE_KVM_NVHE_SYM(f);				\
+-		typeof(f(__VA_ARGS__)) ret;				\
+-		ret = __kvm_call_hyp(kvm_ksym_ref_nvhe(f),		\
+-				     ##__VA_ARGS__);			\
++		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
+  	})
+
+  /*
+
+> +	})
+> +
+>  /*
+>   * The couple of isb() below are there to guarantee the same behaviour
+>   * on VHE as on !VHE, where the eret to EL1 acts as a context
+> @@ -459,7 +473,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			f(__VA_ARGS__);					\
+>  			isb();						\
+>  		} else {						\
+> -			__kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__); \
+> +			kvm_call_hyp_nvhe(f, ##__VA_ARGS__);		\
+>  		}							\
+>  	} while(0)
+> 
+> @@ -471,8 +485,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			ret = f(__VA_ARGS__);				\
+>  			isb();						\
+>  		} else {						\
+> -			ret = __kvm_call_hyp(kvm_ksym_ref(f),		\
+> -					     ##__VA_ARGS__);		\
+> +			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
+>  		}							\
+>  									\
+>  		ret;							\
+> diff --git a/arch/arm64/kernel/image-vars.h 
+> b/arch/arm64/kernel/image-vars.h
+> index f32b406e90c0..89affa38b143 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -61,6 +61,21 @@ __efistub__ctype		= _ctype;
+>   * memory mappings.
+>   */
+> 
+> +__kvm_nvhe___kvm_enable_ssbs = __kvm_enable_ssbs;
+> +__kvm_nvhe___kvm_flush_vm_context = __kvm_flush_vm_context;
+> +__kvm_nvhe___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
+> +__kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
+> +__kvm_nvhe___kvm_tlb_flush_local_vmid = __kvm_tlb_flush_local_vmid;
+> +__kvm_nvhe___kvm_tlb_flush_vmid = __kvm_tlb_flush_vmid;
+> +__kvm_nvhe___kvm_tlb_flush_vmid_ipa = __kvm_tlb_flush_vmid_ipa;
+> +__kvm_nvhe___kvm_vcpu_run_nvhe = __kvm_vcpu_run_nvhe;
+> +__kvm_nvhe___vgic_v3_get_ich_vtr_el2 = __vgic_v3_get_ich_vtr_el2;
+> +__kvm_nvhe___vgic_v3_init_lrs = __vgic_v3_init_lrs;
+> +__kvm_nvhe___vgic_v3_read_vmcr = __vgic_v3_read_vmcr;
+> +__kvm_nvhe___vgic_v3_restore_aprs = __vgic_v3_restore_aprs;
+> +__kvm_nvhe___vgic_v3_save_aprs = __vgic_v3_save_aprs;
+> +__kvm_nvhe___vgic_v3_write_vmcr = __vgic_v3_write_vmcr;
+> +
+>  #endif /* CONFIG_KVM */
+> 
 >  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 5d8357ddc234..5f4f217532e0 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -6,7 +6,7 @@
->  ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
->  		$(DISABLE_STACKLEAK_PLUGIN)
-> 
-> -obj-$(CONFIG_KVM) += hyp.o
-> +obj-$(CONFIG_KVM) += hyp.o nvhe/
->  obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
-> 
->  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o 
-> sysreg-sr.o \
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile 
-> b/arch/arm64/kvm/hyp/nvhe/Makefile
-> new file mode 100644
-> index 000000000000..7d64235dba62
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -0,0 +1,35 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
-> +#
-> +
-> +asflags-y := -D__KVM_NVHE_HYPERVISOR__
-> +ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
-> +	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
-> +
-> +obj-y :=
-> +
-> +obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
-> +extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-> +
-> +$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
-> +	$(call if_changed_rule,cc_o_c)
-> +$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
-> +	$(call if_changed_rule,as_o_S)
-> +$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
-> +	$(call if_changed,hypcopy)
-> +
-> +quiet_cmd_hypcopy = HYPCOPY $@
-> +      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
-> +
-> +# KVM nVHE code is run at a different exception code with a different 
-> map, so
-> +# compiler instrumentation that inserts callbacks or checks into the 
-> code may
-> +# cause crashes. Just disable it.
-> +GCOV_PROFILE	:= n
-> +KASAN_SANITIZE	:= n
-> +UBSAN_SANITIZE	:= n
-> +KCOV_INSTRUMENT	:= n
-> +
-> +# Skip objtool checking for this directory because nVHE code is 
-> compiled with
-> +# non-standard build rules.
-> +OBJECT_FILES_NON_STANDARD := y
-> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 6dc3078649fa..0096cd965332 100644
-> --- a/scripts/kallsyms.c
-> +++ b/scripts/kallsyms.c
-> @@ -109,6 +109,7 @@ static bool is_ignored_symbol(const char *name, 
-> char type)
->  		".LASANPC",		/* s390 kasan local symbols */
->  		"__crc_",		/* modversions */
->  		"__efistub_",		/* arm64 EFI stub namespace */
-> +		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
->  		NULL
->  	};
 
-I guess that one of the first use of this __KVM_NVHE_HYPERVISOR__
-flag could be the has_vhe() predicate: if you're running the nVHE
-code, you are *guaranteed* not to use VHE at all.
-
-Something like:
-
-diff --git a/arch/arm64/include/asm/virt.h 
-b/arch/arm64/include/asm/virt.h
-index 5051b388c654..b2cb8fce43dd 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -85,10 +85,8 @@ static inline bool is_kernel_in_hyp_mode(void)
-
-  static __always_inline bool has_vhe(void)
-  {
--	if (cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN))
--		return true;
--
--	return false;
-+	return (__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-+		cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN));
-  }
-
-  #endif /* __ASSEMBLY__ */
+Otherwise looks good.
 
 Thanks,
 
