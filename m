@@ -2,94 +2,86 @@ Return-Path: <SRS0=nOLV=77=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 224DAC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47D0C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 13:57:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AC4AD2075E
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B86C2082F
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 13:57:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Kg/p7x59"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4AD2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvEtPq7y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B86C2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4978C4B090;
-	Thu, 18 Jun 2020 08:26:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A81284B18E;
+	Thu, 18 Jun 2020 09:57:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 13T97Bt4KqeM; Thu, 18 Jun 2020 08:26:28 -0400 (EDT)
+	with ESMTP id KKX8c2J+f60w; Thu, 18 Jun 2020 09:57:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E904F4B17C;
-	Thu, 18 Jun 2020 08:26:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82AB14B197;
+	Thu, 18 Jun 2020 09:57:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B15DC4B189
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:26:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B9C4B18E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 09:57:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nWBqfsLx6EyI for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jun 2020 08:26:23 -0400 (EDT)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76B984B0D2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:26:15 -0400 (EDT)
-Received: by mail-wm1-f66.google.com with SMTP id d128so5448820wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 05:26:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=TsZ+e0RMnftOu12/wJbsm288Ncd0dKF67O/gO3c9yCM=;
- b=Kg/p7x59v+1KN99KxMUWXsQ2OVhrIVeSRS/bGqD7qRvpafGi0QuHmJv/QQbDa2ySqA
- XSTuozWZ3Dmjlv+n1X+lAy3jc2znUMjbQZDNiEhJI4CdrE8nWDLCNhc/Iz/Kelm6u6D7
- wLy2Ark8ts6DQJq0/Z3QCGOBcvdwIB+tE3eADZJ0xOFTEgAX2iRs/mUzG4CChOFGuqcM
- XJ5Kw46yEQGisKbLVoElhonvb3MvYQP9C8lQM+cqvk2Qrsj90a0vY4g3TaXXo14Fh9VI
- l99bGgCXy4iovuwYwZJ0jHnEx0D6V/AuONGjuMFlKgqqW75kPxp0EzPgSi1Sox0L8h6W
- I62g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=TsZ+e0RMnftOu12/wJbsm288Ncd0dKF67O/gO3c9yCM=;
- b=HXFc6VxTgWnDtxuROjt/T2BLs7vKwPaNrff154hPabM39RhObhtMoqrx+LuKgYNzHG
- yPMgIXQVNa3kDkruj8tj/fG+tTUN/5GVvm+Xba/rqgkfzA2/YKbF/Yl/sfCRFSV3loA4
- RYk3jr2cZdXN1dnXimUG5YlE4Sh17D5AYhU9/8J6a0vx2ZwwsGvHc1tPsC87z+dIXXPc
- l3Iub1QUfZbTO2D5idRgz37qSmQCk9N7xWZcTSIsUL0naNYmEcCUxkX0ZgLVqcRsgQId
- xUd7SIghOnU4CYdvpXafCOJ4h+0w5HNeO4U7kAO9NMTE9QIFZQq8aW2mt2hvfPgOkiS0
- mUBg==
-X-Gm-Message-State: AOAM53095m1KsIKJXdY8qLUK4abszt5b2JlsRUGJvOF1H4c3qiKI+rES
- yuG9HwW3vZKijSNMrTvChdAeuQ==
-X-Google-Smtp-Source: ABdhPJxf5vbjbHo4teCdr0gr0rh3Xfm1KG3qmvdfSIQIsEDJx6DQTMkAeyiuUiEPoAHedx5HLojXow==
-X-Received: by 2002:a7b:c8d6:: with SMTP id f22mr3670879wml.108.1592483173640; 
- Thu, 18 Jun 2020 05:26:13 -0700 (PDT)
-Received: from localhost ([2a01:4b00:8523:2d03:c1af:c724:158a:e200])
- by smtp.gmail.com with ESMTPSA id e10sm3334372wrn.11.2020.06.18.05.26.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 18 Jun 2020 05:26:12 -0700 (PDT)
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 14/15] arm64: kvm: Remove __hyp_text macro,
- use build rules instead
-Date: Thu, 18 Jun 2020 13:25:36 +0100
-Message-Id: <20200618122537.9625-15-dbrazdil@google.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200618122537.9625-1-dbrazdil@google.com>
-References: <20200618122537.9625-1-dbrazdil@google.com>
+ with ESMTP id HIXwaiBjYAhq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jun 2020 09:57:49 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E39214B147
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 09:57:48 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C69B12082F;
+ Thu, 18 Jun 2020 13:57:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1592488667;
+ bh=LnYEKbo5XLm8oVGmH1Jg4y8ZvUiouHun1liXREq5bac=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=BvEtPq7yWq1HoWLreLAPoRHu9zg2dv4gVjA+/sWolyzzhzCuYfusljrsDt7PCh1Rl
+ 8VzOVSWJVHPKOQf8ENECav3J03US/j4/DonegZKfy7eWRDwY3D9dWQ05qwLpA4LpOi
+ HaPbrU2sScJRWJ14HAyMty8l/Dv/fn0Im1rhu9eQ=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jlv34-004BYE-2D; Thu, 18 Jun 2020 14:57:46 +0100
 MIME-Version: 1.0
-Cc: android-kvm@google.com, linux-kernel@vger.kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Date: Thu, 18 Jun 2020 14:57:45 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v3 02/15] arm64: kvm: Move __smccc_workaround_1_smc to
+ .rodata
+In-Reply-To: <20200618122537.9625-3-dbrazdil@google.com>
+References: <20200618122537.9625-1-dbrazdil@google.com>
+ <20200618122537.9625-3-dbrazdil@google.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <02322fdac903aa1786c334d0ddd7f38a@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
+ catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ android-kvm@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,1303 +93,121 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With nVHE code now fully separated from the rest of the kernel, the effects of
-the __hyp_text macro (which had to be applied on all nVHE code) can be
-achieved with build rules instead. The macro used to:
-  (a) move code to .hyp.text ELF section, now done by renaming .text using
-      `objcopy`, and
-  (b) `notrace` and `__noscs` would negate effects of CC_FLAGS_FTRACE and
-      CC_FLAGS_SCS, respectivelly, now those flags are  erased from
-      KBUILD_CFLAGS (same way as in EFI stub).
+Hi David,
 
-Note that by removing __hyp_text from code shared with VHE, all VHE code is now
-compiled into .text and without `notrace` and `__noscs`.
+On 2020-06-18 13:25, David Brazdil wrote:
+> This snippet of assembly is used by cpu_errata.c to overwrite parts of 
+> KVM hyp
+> vector. Move it to its own source file and change its ELF section to 
+> .rodata.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/kvm/hyp/Makefile    |  1 +
+>  arch/arm64/kvm/hyp/hyp-entry.S | 16 ----------------
+>  arch/arm64/kvm/hyp/smccc_wa.S  | 30 ++++++++++++++++++++++++++++++
+>  3 files changed, 31 insertions(+), 16 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/smccc_wa.S
+> 
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 8c9880783839..5d8357ddc234 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -7,6 +7,7 @@ ccflags-y += -fno-stack-protector 
+> -DDISABLE_BRANCH_PROFILING \
+>  		$(DISABLE_STACKLEAK_PLUGIN)
+> 
+>  obj-$(CONFIG_KVM) += hyp.o
+> +obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
+> 
+>  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o 
+> sysreg-sr.o \
+>  	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S 
+> b/arch/arm64/kvm/hyp/hyp-entry.S
+> index 9c5cfb04170e..d362fad97cc8 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -318,20 +318,4 @@ SYM_CODE_START(__bp_harden_hyp_vecs)
+>  1:	.org __bp_harden_hyp_vecs + __BP_HARDEN_HYP_VECS_SZ
+>  	.org 1b
+>  SYM_CODE_END(__bp_harden_hyp_vecs)
+> -
+> -	.popsection
 
-Use of '.pushsection .hyp.text' removed from assembly files as this is now also
-covered by the build rules.
+I'd be tempted to leave the .popsection in place, if only for symmetry  
+with the initial .pushsection.
 
-For MAINTAINERS: if needed to re-run, uses of macro were removed with the
-following command. Formatting was fixed up manually.
+> -
+> -SYM_CODE_START(__smccc_workaround_1_smc)
+> -	esb
+> -	sub	sp, sp, #(8 * 4)
+> -	stp	x2, x3, [sp, #(8 * 0)]
+> -	stp	x0, x1, [sp, #(8 * 2)]
+> -	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_1
+> -	smc	#0
+> -	ldp	x2, x3, [sp, #(8 * 0)]
+> -	ldp	x0, x1, [sp, #(8 * 2)]
+> -	add	sp, sp, #(8 * 4)
+> -1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
+> -	.org 1b
+> -SYM_CODE_END(__smccc_workaround_1_smc)
+>  #endif
+> diff --git a/arch/arm64/kvm/hyp/smccc_wa.S 
+> b/arch/arm64/kvm/hyp/smccc_wa.S
+> new file mode 100644
+> index 000000000000..aa25b5428e77
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/smccc_wa.S
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2015-2018 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> + */
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +	/*
+> +	 * This is not executed directly and is instead copied into the 
+> vectors
+> +	 * by install_bp_hardening_cb().
+> +	 */
+> +	.data
+> +	.pushsection	.rodata
+> +	.global		__smccc_workaround_1_smc
+> +__smccc_workaround_1_smc:
 
-  find arch/arm64/kvm/hyp -type f -name '*.c' -o -name '*.h' \
-       -exec sed -i 's/ __hyp_text//g' {} +
+You probably want to replace this with SYM_DATA_START (and SYM_DATA_END 
+at the end).
 
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/include/asm/kvm_emulate.h     |   2 +-
- arch/arm64/include/asm/kvm_hyp.h         |   2 -
- arch/arm64/kvm/hyp/aarch32.c             |   6 +-
- arch/arm64/kvm/hyp/debug-sr.h            |  18 ++--
- arch/arm64/kvm/hyp/entry.S               |   1 -
- arch/arm64/kvm/hyp/fpsimd.S              |   1 -
- arch/arm64/kvm/hyp/hyp-entry.S           |   1 -
- arch/arm64/kvm/hyp/nvhe/Makefile         |   8 +-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c       |  10 +-
- arch/arm64/kvm/hyp/nvhe/switch.c         |  18 ++--
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c      |  10 +-
- arch/arm64/kvm/hyp/nvhe/timer-sr.c       |   4 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c            |  14 ++-
- arch/arm64/kvm/hyp/switch.h              |  39 ++++---
- arch/arm64/kvm/hyp/sysreg-sr.h           |  27 ++---
- arch/arm64/kvm/hyp/timer-sr.c            |   2 +-
- arch/arm64/kvm/hyp/tlb.c                 |   6 +-
- arch/arm64/kvm/hyp/tlb.h                 |  15 ++-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   4 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c          | 130 ++++++++++-------------
- 20 files changed, 143 insertions(+), 175 deletions(-)
+> +	esb
+> +	sub	sp, sp, #(8 * 4)
+> +	stp	x2, x3, [sp, #(8 * 0)]
+> +	stp	x0, x1, [sp, #(8 * 2)]
+> +	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_1
+> +	smc	#0
+> +	ldp	x2, x3, [sp, #(8 * 0)]
+> +	ldp	x0, x1, [sp, #(8 * 2)]
+> +	add	sp, sp, #(8 * 4)
+> +1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
+> +	.org 1b
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 4d0f8ea600ba..269a76cd51ff 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -516,7 +516,7 @@ static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_i
-  * Skip an instruction which has been emulated at hyp while most guest sysregs
-  * are live.
-  */
--static __always_inline void __hyp_text __kvm_skip_instr(struct kvm_vcpu *vcpu)
-+static __always_inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(SYS_SPSR);
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 8a1510f521fe..fc4900a6bfe4 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -12,8 +12,6 @@
- #include <asm/alternative.h>
- #include <asm/sysreg.h>
- 
--#define __hyp_text __section(.hyp.text) notrace __noscs
--
- #define read_sysreg_elx(r,nvh,vh)					\
- 	({								\
- 		u64 reg;						\
-diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
-index 25c0e47d57cb..f9ff67dfbf0b 100644
---- a/arch/arm64/kvm/hyp/aarch32.c
-+++ b/arch/arm64/kvm/hyp/aarch32.c
-@@ -44,7 +44,7 @@ static const unsigned short cc_map[16] = {
- /*
-  * Check if a trapped instruction should have been executed or not.
-  */
--bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
-+bool kvm_condition_valid32(const struct kvm_vcpu *vcpu)
- {
- 	unsigned long cpsr;
- 	u32 cpsr_cond;
-@@ -93,7 +93,7 @@ bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
-  *
-  * IT[7:0] -> CPSR[26:25],CPSR[15:10]
-  */
--static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-+static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
- {
- 	unsigned long itbits, cond;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
-@@ -123,7 +123,7 @@ static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-  * kvm_skip_instr - skip a trapped instruction and proceed to the next
-  * @vcpu: The vcpu pointer
-  */
--void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
-+void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
- {
- 	u32 pc = *vcpu_pc(vcpu);
- 	bool is_thumb;
-diff --git a/arch/arm64/kvm/hyp/debug-sr.h b/arch/arm64/kvm/hyp/debug-sr.h
-index 62b5deeb301d..24e8acf9ec10 100644
---- a/arch/arm64/kvm/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/debug-sr.h
-@@ -88,9 +88,9 @@
- 	default:	write_debug(ptr[0], reg, 0);			\
- 	}
- 
--static inline void __hyp_text
--__debug_save_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
--		   struct kvm_cpu_context *ctxt)
-+static inline void __debug_save_state(struct kvm_vcpu *vcpu,
-+				      struct kvm_guest_debug_arch *dbg,
-+				      struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
- 	int brps, wrps;
-@@ -107,9 +107,9 @@ __debug_save_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
- 	ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
- }
- 
--static inline void __hyp_text
--__debug_restore_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
--		      struct kvm_cpu_context *ctxt)
-+static inline void __debug_restore_state(struct kvm_vcpu *vcpu,
-+					 struct kvm_guest_debug_arch *dbg,
-+					 struct kvm_cpu_context *ctxt)
- {
- 	u64 aa64dfr0;
- 	int brps, wrps;
-@@ -127,8 +127,7 @@ __debug_restore_state(struct kvm_vcpu *vcpu, struct kvm_guest_debug_arch *dbg,
- 	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
- }
- 
--static inline void __hyp_text
--__debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
-+static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -147,8 +146,7 @@ __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
- 	__debug_restore_state(vcpu, guest_dbg, guest_ctxt);
- }
- 
--static inline void __hyp_text
--__debug_switch_to_host_common(struct kvm_vcpu *vcpu)
-+static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 90186cf6473e..dfb4e6d359ab 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -21,7 +21,6 @@
- #define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
- 
- 	.text
--	.pushsection	.hyp.text, "ax"
- 
- /*
-  * We treat x18 as callee-saved as the host may use it as a platform
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-index 5b8ff517ff10..01f114aa47b0 100644
---- a/arch/arm64/kvm/hyp/fpsimd.S
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -9,7 +9,6 @@
- #include <asm/fpsimdmacros.h>
- 
- 	.text
--	.pushsection	.hyp.text, "ax"
- 
- SYM_FUNC_START(__fpsimd_save_state)
- 	fpsimd_save	x0, 1
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 8316ee67d6a0..689fccbc9de7 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -16,7 +16,6 @@
- #include <asm/mmu.h>
- 
- 	.text
--	.pushsection	.hyp.text, "ax"
- 
- .macro do_el2_call
- 	/*
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index d51ae163430d..5bc92674dab5 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -22,7 +22,13 @@ $(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
- 	$(call if_changed,hypcopy)
- 
- quiet_cmd_hypcopy = HYPCOPY $@
--      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
-+      cmd_hypcopy = $(OBJCOPY)	--prefix-symbols=__kvm_nvhe_		\
-+				--rename-section=.text=.hyp.text	\
-+				$< $@
-+
-+# Remove ftrace and Shadow Call Stack CFLAGS.
-+# This is equivalent to the 'notrace' and '__noscs' annotations.
-+KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
- 
- # KVM nVHE code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index b3752cfdcf3d..bb5c529da394 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -14,7 +14,7 @@
- 
- #include "../debug-sr.h"
- 
--static void __hyp_text __debug_save_spe(u64 *pmscr_el1)
-+static void __debug_save_spe(u64 *pmscr_el1)
- {
- 	u64 reg;
- 
-@@ -46,7 +46,7 @@ static void __hyp_text __debug_save_spe(u64 *pmscr_el1)
- 	dsb(nsh);
- }
- 
--static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
-+static void __debug_restore_spe(u64 pmscr_el1)
- {
- 	if (!pmscr_el1)
- 		return;
-@@ -58,20 +58,20 @@ static void __hyp_text __debug_restore_spe(u64 pmscr_el1)
- 	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
- }
- 
--void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-+void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
- 	__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
- 	__debug_switch_to_guest_common(vcpu);
- }
- 
--void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
-+void __debug_switch_to_host(struct kvm_vcpu *vcpu)
- {
- 	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
- 	__debug_switch_to_host_common(vcpu);
- }
- 
--u32 __hyp_text __kvm_get_mdcr_el2(void)
-+u32 __kvm_get_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 8f004d7da177..9fcf902c556c 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -26,7 +26,7 @@
- 
- #include "../switch.h"
- 
--static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-+static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-@@ -57,7 +57,7 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+static void __deactivate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 mdcr_el2;
- 
-@@ -92,13 +92,13 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
- 
--static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-+static void __deactivate_vm(struct kvm_vcpu *vcpu)
- {
- 	write_sysreg(0, vttbr_el2);
- }
- 
- /* Save VGICv3 state on non-VHE systems */
--static void __hyp_text __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
-+static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
- {
- 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
- 		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
-@@ -107,7 +107,7 @@ static void __hyp_text __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
- }
- 
- /* Restore VGICv3 state on non_VEH systems */
--static void __hyp_text __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
-+static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
- {
- 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
- 		__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
-@@ -118,7 +118,7 @@ static void __hyp_text __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
- /**
-  * Disable host events, enable guest events
-  */
--static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+static bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
- {
- 	struct kvm_host_data *host;
- 	struct kvm_pmu_events *pmu;
-@@ -138,7 +138,7 @@ static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
- /**
-  * Disable guest events, enable host events
-  */
--static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
- {
- 	struct kvm_host_data *host;
- 	struct kvm_pmu_events *pmu;
-@@ -154,7 +154,7 @@ static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
- }
- 
- /* Switch to the guest for legacy non-VHE systems */
--int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-+int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -241,7 +241,7 @@ int __hyp_text __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	return exit_code;
- }
- 
--void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
-+void __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
- {
- 	u64 spsr = read_sysreg_el2(SYS_SPSR);
- 	u64 elr = read_sysreg_el2(SYS_ELR);
-diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-index 55ab924d841a..b1da891bf307 100644
---- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-@@ -18,7 +18,7 @@
-  * Non-VHE: Both host and guest must save everything.
-  */
- 
--void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
-+void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_save_el1_state(ctxt);
- 	__sysreg_save_common_state(ctxt);
-@@ -26,7 +26,7 @@ void __hyp_text __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_save_el2_return_state(ctxt);
- }
- 
--void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
-+void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_el1_state(ctxt);
- 	__sysreg_restore_common_state(ctxt);
-@@ -34,17 +34,17 @@ void __hyp_text __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- 	__sysreg_restore_el2_return_state(ctxt);
- }
- 
--void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
-+void __sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
- 	___sysreg32_save_state(vcpu);
- }
- 
--void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-+void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- {
- 	___sysreg32_restore_state(vcpu);
- }
- 
--void __hyp_text __kvm_enable_ssbs(void)
-+void __kvm_enable_ssbs(void)
- {
- 	u64 tmp;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index f0e694743883..8b80a4c4c4c6 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -14,7 +14,7 @@
-  * Should only be called on non-VHE systems.
-  * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-  */
--void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
-+void __timer_disable_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-@@ -28,7 +28,7 @@ void __hyp_text __timer_disable_traps(struct kvm_vcpu *vcpu)
-  * Should only be called on non-VHE systems.
-  * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-  */
--void __hyp_text __timer_enable_traps(struct kvm_vcpu *vcpu)
-+void __timer_enable_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 111c4b0a23d3..329c23e52ff7 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -12,8 +12,7 @@
- 
- #include "../tlb.h"
- 
--static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
--					     struct tlb_inv_context *cxt)
-+static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt)
- {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		u64 val;
-@@ -36,8 +35,7 @@ static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
- 	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
- }
- 
--static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
--					    struct tlb_inv_context *cxt)
-+static void __tlb_switch_to_host(struct kvm *kvm, struct tlb_inv_context *cxt)
- {
- 	write_sysreg(0, vttbr_el2);
- 
-@@ -49,22 +47,22 @@ static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
- 	}
- }
- 
--void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	__tlb_flush_vmid_ipa(kvm, ipa);
- }
- 
--void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
-+void __kvm_tlb_flush_vmid(struct kvm *kvm)
- {
- 	__tlb_flush_vmid(kvm);
- }
- 
--void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-+void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- {
- 	__tlb_flush_local_vmid(vcpu);
- }
- 
--void __hyp_text __kvm_flush_vm_context(void)
-+void __kvm_flush_vm_context(void)
- {
- 	__tlb_flush_vm_context();
- }
-diff --git a/arch/arm64/kvm/hyp/switch.h b/arch/arm64/kvm/hyp/switch.h
-index 5b71d52c41f4..ddea73e97bb5 100644
---- a/arch/arm64/kvm/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/switch.h
-@@ -30,7 +30,7 @@
- extern const char __hyp_panic_string[];
- 
- /* Check whether the FP regs were dirtied while in the host-side run loop: */
--static inline bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
-+static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * When the system doesn't support FP/SIMD, we cannot rely on
-@@ -48,7 +48,7 @@ static inline bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
- }
- 
- /* Save the 32-bit only FPSIMD system register state */
--static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
-+static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- {
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
-@@ -56,7 +56,7 @@ static inline void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- 	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
- }
- 
--static inline void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
-+static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * We are about to set CPTR_EL2.TFP to trap all floating point
-@@ -73,7 +73,7 @@ static inline void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static inline void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
-+static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- {
- 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
-@@ -89,13 +89,13 @@ static inline void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- }
- 
--static inline void __hyp_text __deactivate_traps_common(void)
-+static inline void __deactivate_traps_common(void)
- {
- 	write_sysreg(0, hstr_el2);
- 	write_sysreg(0, pmuserenr_el0);
- }
- 
--static inline void __hyp_text ___activate_traps(struct kvm_vcpu *vcpu)
-+static inline void ___activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 hcr = vcpu->arch.hcr_el2;
- 
-@@ -108,7 +108,7 @@ static inline void __hyp_text ___activate_traps(struct kvm_vcpu *vcpu)
- 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
- }
- 
--static inline void __hyp_text ___deactivate_traps(struct kvm_vcpu *vcpu)
-+static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * If we pended a virtual abort, preserve it until it gets
-@@ -122,12 +122,12 @@ static inline void __hyp_text ___deactivate_traps(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static inline void __hyp_text __activate_vm(struct kvm *kvm)
-+static inline void __activate_vm(struct kvm *kvm)
- {
- 	__load_guest_stage2(kvm);
- }
- 
--static inline bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
-+static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
- {
- 	u64 par, tmp;
- 
-@@ -156,7 +156,7 @@ static inline bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
- }
- 
--static inline bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
-+static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
- {
- 	u8 ec;
- 	u64 esr;
-@@ -196,7 +196,7 @@ static inline bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
- }
- 
- /* Check for an FPSIMD/SVE trap and handle as appropriate */
--static inline bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
-+static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- {
- 	bool vhe, sve_guest, sve_host;
- 	u8 hsr_ec;
-@@ -278,7 +278,7 @@ static inline bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static inline bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
-+static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
- {
- 	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_hsr(vcpu));
- 	int rt = kvm_vcpu_sys_get_rt(vcpu);
-@@ -333,7 +333,7 @@ static inline bool __hyp_text handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static inline bool __hyp_text esr_is_ptrauth_trap(u32 esr)
-+static inline bool esr_is_ptrauth_trap(u32 esr)
- {
- 	u32 ec = ESR_ELx_EC(esr);
- 
-@@ -366,7 +366,7 @@ static inline bool __hyp_text esr_is_ptrauth_trap(u32 esr)
- 	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
- })
- 
--static inline bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-+static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *ctxt;
- 	u64 val;
-@@ -396,8 +396,7 @@ static inline bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-  * the guest, false when we should restore the host state and return to the
-  * main run loop.
-  */
--static inline bool __hyp_text
--fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
-+static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
- 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
-@@ -469,7 +468,7 @@ fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return false;
- }
- 
--static inline bool __hyp_text __needs_ssbd_off(struct kvm_vcpu *vcpu)
-+static inline bool __needs_ssbd_off(struct kvm_vcpu *vcpu)
- {
- 	if (!cpus_have_final_cap(ARM64_SSBD))
- 		return false;
-@@ -477,8 +476,7 @@ static inline bool __hyp_text __needs_ssbd_off(struct kvm_vcpu *vcpu)
- 	return !(vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG);
- }
- 
--static inline void __hyp_text
--__set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
-+static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_ARM64_SSBD
- 	/*
-@@ -491,8 +489,7 @@ __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
- #endif
- }
- 
--static inline void __hyp_text
--__set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
-+static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_ARM64_SSBD
- 	/*
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/sysreg-sr.h
-index 7bc102c60294..a42edd07403c 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.h
-@@ -15,21 +15,18 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- 
--static inline void __hyp_text
--__sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
- }
- 
--static inline void __hyp_text
--__sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
- 	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
- }
- 
--static inline void __hyp_text
--__sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
- 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(SYS_SCTLR);
-@@ -54,8 +51,7 @@ __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(SYS_SPSR);
- }
- 
--static inline void __hyp_text
--__sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt->gp_regs.regs.pc		= read_sysreg_el2(SYS_ELR);
- 	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(SYS_SPSR);
-@@ -64,21 +60,18 @@ __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- 		ctxt->sys_regs[DISR_EL1] = read_sysreg_s(SYS_VDISR_EL2);
- }
- 
--static inline void __hyp_text
--__sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
- }
- 
--static inline void __hyp_text
--__sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt->sys_regs[TPIDR_EL0],		tpidr_el0);
- 	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0],	tpidrro_el0);
- }
- 
--static inline void __hyp_text
--__sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
- 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
-@@ -137,7 +130,7 @@ __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],SYS_SPSR);
- }
- 
--static inline void __hyp_text
-+static inline void
- __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
- {
- 	u64 pstate = ctxt->gp_regs.regs.pstate;
-@@ -164,7 +157,7 @@ __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_s(ctxt->sys_regs[DISR_EL1], SYS_VDISR_EL2);
- }
- 
--static inline void __hyp_text ___sysreg32_save_state(struct kvm_vcpu *vcpu)
-+static inline void ___sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
- 	u64 *spsr, *sysreg;
- 
-@@ -186,7 +179,7 @@ static inline void __hyp_text ___sysreg32_save_state(struct kvm_vcpu *vcpu)
- 		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
- }
- 
--static inline void __hyp_text ___sysreg32_restore_state(struct kvm_vcpu *vcpu)
-+static inline void ___sysreg32_restore_state(struct kvm_vcpu *vcpu)
- {
- 	u64 *spsr, *sysreg;
- 
-diff --git a/arch/arm64/kvm/hyp/timer-sr.c b/arch/arm64/kvm/hyp/timer-sr.c
-index 6c620d807857..4cda674a8be6 100644
---- a/arch/arm64/kvm/hyp/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/timer-sr.c
-@@ -6,7 +6,7 @@
- 
- #include <asm/kvm_hyp.h>
- 
--void __hyp_text __kvm_timer_set_cntvoff(u64 cntvoff)
-+void __kvm_timer_set_cntvoff(u64 cntvoff)
- {
- 	write_sysreg(cntvoff, cntvoff_el2);
- }
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 4e190f8c7e9c..ebf07bb718ad 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -12,8 +12,7 @@
- 
- #include "tlb.h"
- 
--static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
--					     struct tlb_inv_context *cxt)
-+static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt)
- {
- 	u64 val;
- 
-@@ -56,8 +55,7 @@ static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
- 	isb();
- }
- 
--static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
--					    struct tlb_inv_context *cxt)
-+static void __tlb_switch_to_host(struct kvm *kvm, struct tlb_inv_context *cxt)
- {
- 	/*
- 	 * We're done with the TLB operation, let's restore the host's
-diff --git a/arch/arm64/kvm/hyp/tlb.h b/arch/arm64/kvm/hyp/tlb.h
-index 841ef400c8ec..25dba94d3f51 100644
---- a/arch/arm64/kvm/hyp/tlb.h
-+++ b/arch/arm64/kvm/hyp/tlb.h
-@@ -19,13 +19,10 @@ struct tlb_inv_context {
- 	u64		sctlr;
- };
- 
--static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
--					     struct tlb_inv_context *cxt);
--static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
--					    struct tlb_inv_context *cxt);
-+static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt);
-+static void __tlb_switch_to_host(struct kvm *kvm, struct tlb_inv_context *cxt);
- 
--static inline void __hyp_text
--__tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+static inline void __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	struct tlb_inv_context cxt;
- 
-@@ -79,7 +76,7 @@ __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	__tlb_switch_to_host(kvm, &cxt);
- }
- 
--static inline void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
-+static inline void __tlb_flush_vmid(struct kvm *kvm)
- {
- 	struct tlb_inv_context cxt;
- 
-@@ -96,7 +93,7 @@ static inline void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	__tlb_switch_to_host(kvm, &cxt);
- }
- 
--static inline void __hyp_text __tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-+static inline void __tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
- 	struct tlb_inv_context cxt;
-@@ -111,7 +108,7 @@ static inline void __hyp_text __tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- 	__tlb_switch_to_host(kvm, &cxt);
- }
- 
--static inline void __hyp_text __tlb_flush_vm_context(void)
-+static inline void __tlb_flush_vm_context(void)
- {
- 	dsb(ishst);
- 	__tlbi(alle1is);
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 4f3a087e36d5..bd1bab551d48 100644
---- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -13,7 +13,7 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- 
--static bool __hyp_text __is_be(struct kvm_vcpu *vcpu)
-+static bool __is_be(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_mode_is_32bit(vcpu))
- 		return !!(read_sysreg_el2(SYS_SPSR) & PSR_AA32_E_BIT);
-@@ -32,7 +32,7 @@ static bool __hyp_text __is_be(struct kvm_vcpu *vcpu)
-  *  0: Not a GICV access
-  * -1: Illegal GICV access successfully performed
-  */
--int __hyp_text __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
-+int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 10ed539835c1..d31eb6266f2e 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -16,7 +16,7 @@
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
- #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
- 
--static u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
-+static u64 __gic_v3_get_lr(unsigned int lr)
- {
- 	switch (lr & 0xf) {
- 	case 0:
-@@ -56,7 +56,7 @@ static u64 __hyp_text __gic_v3_get_lr(unsigned int lr)
- 	unreachable();
- }
- 
--static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
-+static void __gic_v3_set_lr(u64 val, int lr)
- {
- 	switch (lr & 0xf) {
- 	case 0:
-@@ -110,7 +110,7 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
- 	}
- }
- 
--static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
-+static void __vgic_v3_write_ap0rn(u32 val, int n)
- {
- 	switch (n) {
- 	case 0:
-@@ -128,7 +128,7 @@ static void __hyp_text __vgic_v3_write_ap0rn(u32 val, int n)
- 	}
- }
- 
--static void __hyp_text __vgic_v3_write_ap1rn(u32 val, int n)
-+static void __vgic_v3_write_ap1rn(u32 val, int n)
- {
- 	switch (n) {
- 	case 0:
-@@ -146,7 +146,7 @@ static void __hyp_text __vgic_v3_write_ap1rn(u32 val, int n)
- 	}
- }
- 
--static u32 __hyp_text __vgic_v3_read_ap0rn(int n)
-+static u32 __vgic_v3_read_ap0rn(int n)
- {
- 	u32 val;
- 
-@@ -170,7 +170,7 @@ static u32 __hyp_text __vgic_v3_read_ap0rn(int n)
- 	return val;
- }
- 
--static u32 __hyp_text __vgic_v3_read_ap1rn(int n)
-+static u32 __vgic_v3_read_ap1rn(int n)
- {
- 	u32 val;
- 
-@@ -194,7 +194,7 @@ static u32 __hyp_text __vgic_v3_read_ap1rn(int n)
- 	return val;
- }
- 
--void __hyp_text __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 used_lrs = cpu_if->used_lrs;
- 
-@@ -229,7 +229,7 @@ void __hyp_text __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
- 	}
- }
- 
--void __hyp_text __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 used_lrs = cpu_if->used_lrs;
- 	int i;
-@@ -255,7 +255,7 @@ void __hyp_text __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
- 	}
- }
- 
--void __hyp_text __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
- {
- 	/*
- 	 * VFIQEn is RES1 if ICC_SRE_EL1.SRE is 1. This causes a
-@@ -302,7 +302,7 @@ void __hyp_text __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
- 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
- }
- 
--void __hyp_text __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 
-@@ -328,7 +328,7 @@ void __hyp_text __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
- 		write_gicreg(0, ICH_HCR_EL2);
- }
- 
--void __hyp_text __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 	u32 nr_pre_bits;
-@@ -361,7 +361,7 @@ void __hyp_text __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if)
- 	}
- }
- 
--void __hyp_text __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
-+void __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
- {
- 	u64 val;
- 	u32 nr_pre_bits;
-@@ -394,7 +394,7 @@ void __hyp_text __vgic_v3_restore_aprs(struct vgic_v3_cpu_if *cpu_if)
- 	}
- }
- 
--void __hyp_text __vgic_v3_init_lrs(void)
-+void __vgic_v3_init_lrs(void)
- {
- 	int max_lr_idx = vtr_to_max_lr_idx(read_gicreg(ICH_VTR_EL2));
- 	int i;
-@@ -403,28 +403,28 @@ void __hyp_text __vgic_v3_init_lrs(void)
- 		__gic_v3_set_lr(0, i);
- }
- 
--u64 __hyp_text __vgic_v3_get_ich_vtr_el2(void)
-+u64 __vgic_v3_get_ich_vtr_el2(void)
- {
- 	return read_gicreg(ICH_VTR_EL2);
- }
- 
--u64 __hyp_text __vgic_v3_read_vmcr(void)
-+u64 __vgic_v3_read_vmcr(void)
- {
- 	return read_gicreg(ICH_VMCR_EL2);
- }
- 
--void __hyp_text __vgic_v3_write_vmcr(u32 vmcr)
-+void __vgic_v3_write_vmcr(u32 vmcr)
- {
- 	write_gicreg(vmcr, ICH_VMCR_EL2);
- }
- 
--static int __hyp_text __vgic_v3_bpr_min(void)
-+static int __vgic_v3_bpr_min(void)
- {
- 	/* See Pseudocode for VPriorityGroup */
- 	return 8 - vtr_to_nr_pre_bits(read_gicreg(ICH_VTR_EL2));
- }
- 
--static int __hyp_text __vgic_v3_get_group(struct kvm_vcpu *vcpu)
-+static int __vgic_v3_get_group(struct kvm_vcpu *vcpu)
- {
- 	u32 esr = kvm_vcpu_get_hsr(vcpu);
- 	u8 crm = (esr & ESR_ELx_SYS64_ISS_CRM_MASK) >> ESR_ELx_SYS64_ISS_CRM_SHIFT;
-@@ -434,9 +434,8 @@ static int __hyp_text __vgic_v3_get_group(struct kvm_vcpu *vcpu)
- 
- #define GICv3_IDLE_PRIORITY	0xff
- 
--static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
--						    u32 vmcr,
--						    u64 *lr_val)
-+static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
-+					 u64 *lr_val)
- {
- 	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
- 	u8 priority = GICv3_IDLE_PRIORITY;
-@@ -474,8 +473,8 @@ static int __hyp_text __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu,
- 	return lr;
- }
- 
--static int __hyp_text __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu,
--					       int intid, u64 *lr_val)
-+static int __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu, int intid,
-+				    u64 *lr_val)
- {
- 	unsigned int used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
- 	int i;
-@@ -494,7 +493,7 @@ static int __hyp_text __vgic_v3_find_active_lr(struct kvm_vcpu *vcpu,
- 	return -1;
- }
- 
--static int __hyp_text __vgic_v3_get_highest_active_priority(void)
-+static int __vgic_v3_get_highest_active_priority(void)
- {
- 	u8 nr_apr_regs = vtr_to_nr_apr_regs(read_gicreg(ICH_VTR_EL2));
- 	u32 hap = 0;
-@@ -526,12 +525,12 @@ static int __hyp_text __vgic_v3_get_highest_active_priority(void)
- 	return GICv3_IDLE_PRIORITY;
- }
- 
--static unsigned int __hyp_text __vgic_v3_get_bpr0(u32 vmcr)
-+static unsigned int __vgic_v3_get_bpr0(u32 vmcr)
- {
- 	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
- }
- 
--static unsigned int __hyp_text __vgic_v3_get_bpr1(u32 vmcr)
-+static unsigned int __vgic_v3_get_bpr1(u32 vmcr)
- {
- 	unsigned int bpr;
- 
-@@ -550,7 +549,7 @@ static unsigned int __hyp_text __vgic_v3_get_bpr1(u32 vmcr)
-  * Convert a priority to a preemption level, taking the relevant BPR
-  * into account by zeroing the sub-priority bits.
-  */
--static u8 __hyp_text __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
-+static u8 __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
- {
- 	unsigned int bpr;
- 
-@@ -568,7 +567,7 @@ static u8 __hyp_text __vgic_v3_pri_to_pre(u8 pri, u32 vmcr, int grp)
-  * matter what the guest does with its BPR, we can always set/get the
-  * same value of a priority.
-  */
--static void __hyp_text __vgic_v3_set_active_priority(u8 pri, u32 vmcr, int grp)
-+static void __vgic_v3_set_active_priority(u8 pri, u32 vmcr, int grp)
- {
- 	u8 pre, ap;
- 	u32 val;
-@@ -587,7 +586,7 @@ static void __hyp_text __vgic_v3_set_active_priority(u8 pri, u32 vmcr, int grp)
- 	}
- }
- 
--static int __hyp_text __vgic_v3_clear_highest_active_priority(void)
-+static int __vgic_v3_clear_highest_active_priority(void)
- {
- 	u8 nr_apr_regs = vtr_to_nr_apr_regs(read_gicreg(ICH_VTR_EL2));
- 	u32 hap = 0;
-@@ -625,7 +624,7 @@ static int __hyp_text __vgic_v3_clear_highest_active_priority(void)
- 	return GICv3_IDLE_PRIORITY;
- }
- 
--static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 lr_val;
- 	u8 lr_prio, pmr;
-@@ -661,7 +660,7 @@ static void __hyp_text __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int r
- 	vcpu_set_reg(vcpu, rt, ICC_IAR1_EL1_SPURIOUS);
- }
- 
--static void __hyp_text __vgic_v3_clear_active_lr(int lr, u64 lr_val)
-+static void __vgic_v3_clear_active_lr(int lr, u64 lr_val)
- {
- 	lr_val &= ~ICH_LR_ACTIVE_BIT;
- 	if (lr_val & ICH_LR_HW) {
-@@ -674,7 +673,7 @@ static void __hyp_text __vgic_v3_clear_active_lr(int lr, u64 lr_val)
- 	__gic_v3_set_lr(lr_val, lr);
- }
- 
--static void __hyp_text __vgic_v3_bump_eoicount(void)
-+static void __vgic_v3_bump_eoicount(void)
- {
- 	u32 hcr;
- 
-@@ -683,8 +682,7 @@ static void __hyp_text __vgic_v3_bump_eoicount(void)
- 	write_gicreg(hcr, ICH_HCR_EL2);
- }
- 
--static void __hyp_text __vgic_v3_write_dir(struct kvm_vcpu *vcpu,
--					   u32 vmcr, int rt)
-+static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 vid = vcpu_get_reg(vcpu, rt);
- 	u64 lr_val;
-@@ -707,7 +705,7 @@ static void __hyp_text __vgic_v3_write_dir(struct kvm_vcpu *vcpu,
- 	__vgic_v3_clear_active_lr(lr, lr_val);
- }
- 
--static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 vid = vcpu_get_reg(vcpu, rt);
- 	u64 lr_val;
-@@ -744,17 +742,17 @@ static void __hyp_text __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int
- 	__vgic_v3_clear_active_lr(lr, lr_val);
- }
- 
--static void __hyp_text __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
- }
- 
--static void __hyp_text __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
- }
- 
--static void __hyp_text __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 val = vcpu_get_reg(vcpu, rt);
- 
-@@ -766,7 +764,7 @@ static void __hyp_text __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr,
- 	__vgic_v3_write_vmcr(vmcr);
- }
- 
--static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 val = vcpu_get_reg(vcpu, rt);
- 
-@@ -778,17 +776,17 @@ static void __hyp_text __vgic_v3_write_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr,
- 	__vgic_v3_write_vmcr(vmcr);
- }
- 
--static void __hyp_text __vgic_v3_read_bpr0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_read_bpr0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vcpu_set_reg(vcpu, rt, __vgic_v3_get_bpr0(vmcr));
- }
- 
--static void __hyp_text __vgic_v3_read_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_read_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vcpu_set_reg(vcpu, rt, __vgic_v3_get_bpr1(vmcr));
- }
- 
--static void __hyp_text __vgic_v3_write_bpr0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_write_bpr0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 val = vcpu_get_reg(vcpu, rt);
- 	u8 bpr_min = __vgic_v3_bpr_min() - 1;
-@@ -805,7 +803,7 @@ static void __hyp_text __vgic_v3_write_bpr0(struct kvm_vcpu *vcpu, u32 vmcr, int
- 	__vgic_v3_write_vmcr(vmcr);
- }
- 
--static void __hyp_text __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
-+static void __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 val = vcpu_get_reg(vcpu, rt);
- 	u8 bpr_min = __vgic_v3_bpr_min();
-@@ -825,7 +823,7 @@ static void __hyp_text __vgic_v3_write_bpr1(struct kvm_vcpu *vcpu, u32 vmcr, int
- 	__vgic_v3_write_vmcr(vmcr);
- }
- 
--static void __hyp_text __vgic_v3_read_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
-+static void __vgic_v3_read_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
- {
- 	u32 val;
- 
-@@ -837,7 +835,7 @@ static void __hyp_text __vgic_v3_read_apxrn(struct kvm_vcpu *vcpu, int rt, int n
- 	vcpu_set_reg(vcpu, rt, val);
- }
- 
--static void __hyp_text __vgic_v3_write_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
-+static void __vgic_v3_write_apxrn(struct kvm_vcpu *vcpu, int rt, int n)
- {
- 	u32 val = vcpu_get_reg(vcpu, rt);
- 
-@@ -847,56 +845,49 @@ static void __hyp_text __vgic_v3_write_apxrn(struct kvm_vcpu *vcpu, int rt, int
- 		__vgic_v3_write_ap1rn(val, n);
- }
- 
--static void __hyp_text __vgic_v3_read_apxr0(struct kvm_vcpu *vcpu,
-+static void __vgic_v3_read_apxr0(struct kvm_vcpu *vcpu,
- 					    u32 vmcr, int rt)
- {
- 	__vgic_v3_read_apxrn(vcpu, rt, 0);
- }
- 
--static void __hyp_text __vgic_v3_read_apxr1(struct kvm_vcpu *vcpu,
-+static void __vgic_v3_read_apxr1(struct kvm_vcpu *vcpu,
- 					    u32 vmcr, int rt)
- {
- 	__vgic_v3_read_apxrn(vcpu, rt, 1);
- }
- 
--static void __hyp_text __vgic_v3_read_apxr2(struct kvm_vcpu *vcpu,
--					    u32 vmcr, int rt)
-+static void __vgic_v3_read_apxr2(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_read_apxrn(vcpu, rt, 2);
- }
- 
--static void __hyp_text __vgic_v3_read_apxr3(struct kvm_vcpu *vcpu,
--					    u32 vmcr, int rt)
-+static void __vgic_v3_read_apxr3(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_read_apxrn(vcpu, rt, 3);
- }
- 
--static void __hyp_text __vgic_v3_write_apxr0(struct kvm_vcpu *vcpu,
--					     u32 vmcr, int rt)
-+static void __vgic_v3_write_apxr0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_write_apxrn(vcpu, rt, 0);
- }
- 
--static void __hyp_text __vgic_v3_write_apxr1(struct kvm_vcpu *vcpu,
--					     u32 vmcr, int rt)
-+static void __vgic_v3_write_apxr1(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_write_apxrn(vcpu, rt, 1);
- }
- 
--static void __hyp_text __vgic_v3_write_apxr2(struct kvm_vcpu *vcpu,
--					     u32 vmcr, int rt)
-+static void __vgic_v3_write_apxr2(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_write_apxrn(vcpu, rt, 2);
- }
- 
--static void __hyp_text __vgic_v3_write_apxr3(struct kvm_vcpu *vcpu,
--					     u32 vmcr, int rt)
-+static void __vgic_v3_write_apxr3(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	__vgic_v3_write_apxrn(vcpu, rt, 3);
- }
- 
--static void __hyp_text __vgic_v3_read_hppir(struct kvm_vcpu *vcpu,
--					    u32 vmcr, int rt)
-+static void __vgic_v3_read_hppir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u64 lr_val;
- 	int lr, lr_grp, grp;
-@@ -915,16 +906,14 @@ static void __hyp_text __vgic_v3_read_hppir(struct kvm_vcpu *vcpu,
- 	vcpu_set_reg(vcpu, rt, lr_val & ICH_LR_VIRTUAL_ID_MASK);
- }
- 
--static void __hyp_text __vgic_v3_read_pmr(struct kvm_vcpu *vcpu,
--					  u32 vmcr, int rt)
-+static void __vgic_v3_read_pmr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	vmcr &= ICH_VMCR_PMR_MASK;
- 	vmcr >>= ICH_VMCR_PMR_SHIFT;
- 	vcpu_set_reg(vcpu, rt, vmcr);
- }
- 
--static void __hyp_text __vgic_v3_write_pmr(struct kvm_vcpu *vcpu,
--					   u32 vmcr, int rt)
-+static void __vgic_v3_write_pmr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 val = vcpu_get_reg(vcpu, rt);
- 
-@@ -936,15 +925,13 @@ static void __hyp_text __vgic_v3_write_pmr(struct kvm_vcpu *vcpu,
- 	write_gicreg(vmcr, ICH_VMCR_EL2);
- }
- 
--static void __hyp_text __vgic_v3_read_rpr(struct kvm_vcpu *vcpu,
--					  u32 vmcr, int rt)
-+static void __vgic_v3_read_rpr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 val = __vgic_v3_get_highest_active_priority();
- 	vcpu_set_reg(vcpu, rt, val);
- }
- 
--static void __hyp_text __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu,
--					   u32 vmcr, int rt)
-+static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 vtr, val;
- 
-@@ -965,8 +952,7 @@ static void __hyp_text __vgic_v3_read_ctlr(struct kvm_vcpu *vcpu,
- 	vcpu_set_reg(vcpu, rt, val);
- }
- 
--static void __hyp_text __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu,
--					    u32 vmcr, int rt)
-+static void __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- {
- 	u32 val = vcpu_get_reg(vcpu, rt);
- 
-@@ -983,7 +969,7 @@ static void __hyp_text __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu,
- 	write_gicreg(vmcr, ICH_VMCR_EL2);
- }
- 
--int __hyp_text __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
-+int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	int rt;
- 	u32 esr;
+Otherwise, looks good.
+
+Thanks,
+
+         M.
 -- 
-2.27.0
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
