@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B616C433E1
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDD8C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3479B20885
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F1C82085B
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 12:26:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="R5wOZrow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3479B20885
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="j6rqhLs+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F1C82085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB57E4B16A;
-	Thu, 18 Jun 2020 08:26:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 150154B172;
+	Thu, 18 Jun 2020 08:26:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tYSxTtJ0m1eF; Thu, 18 Jun 2020 08:26:00 -0400 (EDT)
+	with ESMTP id ueqt0dKMY8Uk; Thu, 18 Jun 2020 08:26:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4B74B1A7;
-	Thu, 18 Jun 2020 08:26:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98C0F4B18E;
+	Thu, 18 Jun 2020 08:26:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5734B4B175
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:25:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9A244B172
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:26:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oRe3LuT9FE88 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jun 2020 08:25:58 -0400 (EDT)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7C284B15D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:25:56 -0400 (EDT)
-Received: by mail-wm1-f67.google.com with SMTP id f185so5451031wmf.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 05:25:56 -0700 (PDT)
+ with ESMTP id HtSCAlLQvJCA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jun 2020 08:26:01 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 629AB4B190
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 08:26:00 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id b82so5008190wmb.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 05:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=D60Z34SZFzunDrVnRRvupIcqGYHycsZaSexa8Z/NEcc=;
- b=R5wOZrowNvymOhII5Vo3wuKlNlmIIa7ZuV7agZTTgZFUH3aAoFADrBAriFs36Lux4i
- u0oPXIAbolsLV5fsikLjn1CtZzdJFyM63oIkCXmc+Wcdowa1DxkLq5384FP92ewvLiYd
- cM6TPbBZx2bDn+wrPbd0wlqEJ3h73VM/Lc+WXvNTURLaJ/VNY+XvDWAdVLmGHRfY7q84
- RtvzKZUpk4XQOMw9IRyDxmly045+stSxNhnjPFGC9awWJp2xAiWx+E79XB0vLsXaydg4
- WM+2CBz7tNeqcvb3ML1e25FabZNYr0irIsvvtnyDR4YyZF6begqoWk07LoEGxWViiHEQ
- nNIA==
+ bh=SyJVc4e+GoUAEUncaRu7Abitq8XUwuB4SemkCGVL7hU=;
+ b=j6rqhLs+9os6IUKzcc97SvmbzHvnm7iqekCNBV594Zz30SPAzzCrDgd66fUViZUI2O
+ K8z74PXDmGJBAuIgnxkGg4mCcAmULENp3iY4u++w/w6LgKk9ZACdhRBzvItmpMrPQKF+
+ R+/nF1ktCKfoT7htrA46PeHuWXPobMcsq7yu1TnjnM8f2rI+Qasb3LcxvkSwHbwQTsn3
+ gKyDSsnPYr2uut1d01KbynGrj2nuWCBCFM/pK3RcJZxQv16IA4IQoySJVSG9PXxkksHe
+ QbccuKwjmDkQcSY+6ZwqLpcDDD5yAsnzn6vXNg1M0Ch0YZ/IcuFacuxZ02lQ4Sw+QAwR
+ 4gSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=D60Z34SZFzunDrVnRRvupIcqGYHycsZaSexa8Z/NEcc=;
- b=bNfByXLM5Psgq+Pf0CsUYHApkrzxOicp1I0pDT6DCDCbXknBub/HLNeMgkBbrRYhsf
- b6AZCSpwevwAOPXyapneY/JWV9QJStjVxbN9KKKJG0pDhx7BXXs4G1TQ3vyaCrXGigzc
- aWdVPlFHo6/BUky8tzi5CSYjsXFSacYBeDJeFuG23UOy7A8DSg4pBZkt2n+ohu93cg5f
- UA/fhe0norfrsgXgo94g0R/inSULB7LNyEfdtmFGyTEC0ClQBT5I2FPuFfw5nANAhfMZ
- ZHD8XAtNB9z+CpJ8xssrS13eNafMi5866Yq8IZevfHM5CK9EHxEQ6DNt9/rbeGE38ptU
- sShQ==
-X-Gm-Message-State: AOAM533yApsoeHLJjlVKtgm6zcYqwTG5Rl5+mhOgiTNrlf989Fno+9zx
- dvc4G4RuN0r6R727mWAjDcHUgA==
-X-Google-Smtp-Source: ABdhPJyqgv2iExydIc+UmgLZxFWWeg4P2dcwrwIeBrX8vM7l/xXUXy2CvIqw9oAusrkmQ0YvNplT6w==
-X-Received: by 2002:a1c:3881:: with SMTP id f123mr3770820wma.178.1592483155742; 
- Thu, 18 Jun 2020 05:25:55 -0700 (PDT)
+ bh=SyJVc4e+GoUAEUncaRu7Abitq8XUwuB4SemkCGVL7hU=;
+ b=mU2ez6tPmLDfsPBsV/hmVJR5hU2VZyg//9dClryUBdbS5v4kobmHeEFN35wHGM5CRV
+ nqQ2MZYj4HLUHc5OVdtPsEI6J/9+6EGqQh5zm38SgopRNtqxO0jJPN8FTCbMHVp35DqT
+ UJrqwCRAQleTF+0ew23W2grUvmf4Z5ZxuJWOiCaUMivrTyMnxbvE4Nrd30iqXyPvTz6P
+ Ft7bJOnZ/ZIrvpBK5PgCHaxxrZUUzCNM/RPkH3lR13dMfM6jsXGd6DC16Ehkbe0+xUMx
+ s4LyBlQyy9DpvRnh/Pbu5fWTw5rSc0loJ75kNWgHeU0c8pB5qFLC82q1K1tjD6YM0oSK
+ XIyg==
+X-Gm-Message-State: AOAM531je5C9MsCI8PTVAkUT7U6cgEUzNc/VAZceaTgkhvPQbBbFBeaM
+ 303fq2cLf98Q0txM4F11Px8Ccw==
+X-Google-Smtp-Source: ABdhPJxpr4HRSO92YDjrRYPnbc5L3TTKiVCvuPbkGpjbaCdfcJuGc2VlZl8Wnwp1JTVFdgXjnGyXRQ==
+X-Received: by 2002:a1c:1fc2:: with SMTP id f185mr3791350wmf.4.1592483159389; 
+ Thu, 18 Jun 2020 05:25:59 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:c1af:c724:158a:e200])
- by smtp.gmail.com with ESMTPSA id c206sm3629346wmf.36.2020.06.18.05.25.54
+ by smtp.gmail.com with ESMTPSA id q13sm3400341wrn.84.2020.06.18.05.25.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 18 Jun 2020 05:25:55 -0700 (PDT)
+ Thu, 18 Jun 2020 05:25:58 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>,
  James Morse <james.morse@arm.com>,
  Julien Thierry <julien.thierry.kdev@gmail.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 04/15] arm64: kvm: Handle calls to prefixed hyp functions
-Date: Thu, 18 Jun 2020 13:25:26 +0100
-Message-Id: <20200618122537.9625-5-dbrazdil@google.com>
+Subject: [PATCH v3 06/15] arm64: kvm: Move hyp-init.S to nVHE
+Date: Thu, 18 Jun 2020 13:25:28 +0100
+Message-Id: <20200618122537.9625-7-dbrazdil@google.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200618122537.9625-1-dbrazdil@google.com>
 References: <20200618122537.9625-1-dbrazdil@google.com>
@@ -107,135 +107,107 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Andrew Scull <ascull@google.com>
 
-This patch is part of a series which builds KVM's non-VHE hyp code separately
-from VHE and the rest of the kernel.
+This patch is part of a series which builds KVM's non-VHE hyp code
+separately from VHE and the rest of the kernel.
 
-Once hyp functions are moved to a hyp object, they will have prefixed symbols.
-This change declares and gets the address of the prefixed version for calls to
-the hyp functions.
+hyp-init.S contains the identity mapped initialisation code for the
+non-VHE code that runs at EL2. It is only used for non-VHE.
 
-To aid migration, the hyp functions that have not yet moved have their prefixed
-versions aliased to their non-prefixed version. This begins with all the hyp
-functions being listed and will reduce to none of them once the migration is
-complete.
+Adjust code that calls into this to use the prefixed symbol name.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
-
-Extracted kvm_call_hyp nVHE branches into own helper macros.
-Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h  | 19 +++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h | 19 ++++++++++++++++---
- arch/arm64/kernel/image-vars.h    | 15 +++++++++++++++
- 3 files changed, 50 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h         | 4 +---
+ arch/arm64/kernel/image-vars.h           | 3 ++-
+ arch/arm64/kvm/Makefile                  | 2 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile         | 2 +-
+ arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S | 0
+ arch/arm64/kvm/mmu.c                     | 2 +-
+ 6 files changed, 6 insertions(+), 7 deletions(-)
+ rename arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S (100%)
 
 diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 352aaebf4198..6a682d66a640 100644
+index 2baa69324cc9..bab14b64c4fc 100644
 --- a/arch/arm64/include/asm/kvm_asm.h
 +++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -42,6 +42,24 @@
- 
- #include <linux/mm.h>
- 
-+/*
-+ * Translate name of a symbol defined in nVHE hyp to the name seen
-+ * by kernel proper. All nVHE symbols are prefixed by the build system
-+ * to avoid clashes with the VHE variants.
-+ */
-+#define kvm_nvhe_sym(sym)	__kvm_nvhe_##sym
-+
-+#define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-+#define DECLARE_KVM_NVHE_SYM(sym)	extern char kvm_nvhe_sym(sym)[]
-+
-+/*
-+ * Define a pair of symbols sharing the same name but one defined in
-+ * VHE and the other in nVHE hyp implementations.
-+ */
-+#define DECLARE_KVM_HYP_SYM(sym)		\
-+	DECLARE_KVM_VHE_SYM(sym);		\
-+	DECLARE_KVM_NVHE_SYM(sym)
-+
- /* Translate a kernel address of @sym into its equivalent linear mapping */
- #define kvm_ksym_ref(sym)						\
- 	({								\
-@@ -50,6 +68,7 @@
- 			val = lm_alias(&sym);				\
- 		val;							\
- 	 })
-+#define kvm_ksym_ref_nvhe(sym)	kvm_ksym_ref(kvm_nvhe_sym(sym))
- 
+@@ -73,9 +73,7 @@
  struct kvm;
  struct kvm_vcpu;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c3e6fcc664b1..e782f98243d3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -448,6 +448,20 @@ void kvm_arm_resume_guest(struct kvm *kvm);
  
- u64 __kvm_call_hyp(void *hypfn, ...);
+-extern char __kvm_hyp_init[];
+-extern char __kvm_hyp_init_end[];
+-
++DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
+ DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
  
-+#define kvm_call_hyp_nvhe(f, ...)					\
-+	do {								\
-+		DECLARE_KVM_NVHE_SYM(f);				\
-+		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
-+	} while(0)
-+
-+#define kvm_call_hyp_nvhe_ret(f, ...)					\
-+	({								\
-+		DECLARE_KVM_NVHE_SYM(f);				\
-+		typeof(f(__VA_ARGS__)) ret;				\
-+		ret = __kvm_call_hyp(kvm_ksym_ref_nvhe(f),		\
-+				     ##__VA_ARGS__);			\
-+	})
-+
- /*
-  * The couple of isb() below are there to guarantee the same behaviour
-  * on VHE as on !VHE, where the eret to EL1 acts as a context
-@@ -459,7 +473,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
- 			f(__VA_ARGS__);					\
- 			isb();						\
- 		} else {						\
--			__kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__); \
-+			kvm_call_hyp_nvhe(f, ##__VA_ARGS__);		\
- 		}							\
- 	} while(0)
- 
-@@ -471,8 +485,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
- 			ret = f(__VA_ARGS__);				\
- 			isb();						\
- 		} else {						\
--			ret = __kvm_call_hyp(kvm_ksym_ref(f),		\
--					     ##__VA_ARGS__);		\
-+			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
- 		}							\
- 									\
- 		ret;							\
+ #ifdef CONFIG_KVM_INDIRECT_VECTORS
 diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index f32b406e90c0..89affa38b143 100644
+index dc7ee85531f5..4dc969ccda9e 100644
 --- a/arch/arm64/kernel/image-vars.h
 +++ b/arch/arm64/kernel/image-vars.h
-@@ -61,6 +61,21 @@ __efistub__ctype		= _ctype;
-  * memory mappings.
+@@ -62,10 +62,10 @@ __efistub__ctype		= _ctype;
   */
  
-+__kvm_nvhe___kvm_enable_ssbs = __kvm_enable_ssbs;
-+__kvm_nvhe___kvm_flush_vm_context = __kvm_flush_vm_context;
-+__kvm_nvhe___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
-+__kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
-+__kvm_nvhe___kvm_tlb_flush_local_vmid = __kvm_tlb_flush_local_vmid;
-+__kvm_nvhe___kvm_tlb_flush_vmid = __kvm_tlb_flush_vmid;
-+__kvm_nvhe___kvm_tlb_flush_vmid_ipa = __kvm_tlb_flush_vmid_ipa;
-+__kvm_nvhe___kvm_vcpu_run_nvhe = __kvm_vcpu_run_nvhe;
-+__kvm_nvhe___vgic_v3_get_ich_vtr_el2 = __vgic_v3_get_ich_vtr_el2;
-+__kvm_nvhe___vgic_v3_init_lrs = __vgic_v3_init_lrs;
-+__kvm_nvhe___vgic_v3_read_vmcr = __vgic_v3_read_vmcr;
-+__kvm_nvhe___vgic_v3_restore_aprs = __vgic_v3_restore_aprs;
-+__kvm_nvhe___vgic_v3_save_aprs = __vgic_v3_save_aprs;
-+__kvm_nvhe___vgic_v3_write_vmcr = __vgic_v3_write_vmcr;
-+
- #endif /* CONFIG_KVM */
+ __kvm_nvhe___guest_exit = __guest_exit;
++__kvm_nvhe___hyp_stub_vectors = __hyp_stub_vectors;
+ __kvm_nvhe___kvm_enable_ssbs = __kvm_enable_ssbs;
+ __kvm_nvhe___kvm_flush_vm_context = __kvm_flush_vm_context;
+ __kvm_nvhe___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
+-__kvm_nvhe___kvm_handle_stub_hvc = __kvm_handle_stub_hvc;
+ __kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
+ __kvm_nvhe___kvm_tlb_flush_local_vmid = __kvm_tlb_flush_local_vmid;
+ __kvm_nvhe___kvm_tlb_flush_vmid = __kvm_tlb_flush_vmid;
+@@ -82,6 +82,7 @@ __kvm_nvhe_abort_guest_exit_start = abort_guest_exit_start;
+ __kvm_nvhe_arm64_enable_wa2_handling = arm64_enable_wa2_handling;
+ __kvm_nvhe_arm64_ssbd_callback_required = arm64_ssbd_callback_required;
+ __kvm_nvhe_hyp_panic = hyp_panic;
++__kvm_nvhe_idmap_t0sz = idmap_t0sz;
+ __kvm_nvhe_kimage_voffset = kimage_voffset;
+ __kvm_nvhe_kvm_host_data = kvm_host_data;
+ __kvm_nvhe_kvm_patch_vector_branch = kvm_patch_vector_branch;
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 8d3d9513cbfe..152d8845a1a2 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
+ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 $(KVM)/vfio.o $(KVM)/irqchip.o \
+ 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+-	 inject_fault.o regmap.o va_layout.o hyp.o hyp-init.o handle_exit.o \
++	 inject_fault.o regmap.o va_layout.o hyp.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+ 	 aarch32.o arch_timer.o \
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index c68801e24950..fef6f1881765 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
+ 	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
  
- #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+-obj-y := ../hyp-entry.o
++obj-y := hyp-init.o ../hyp-entry.o
+ 
+ obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+ extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+similarity index 100%
+rename from arch/arm64/kvm/hyp-init.S
+rename to arch/arm64/kvm/hyp/nvhe/hyp-init.S
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8c0035cab6b6..592afe5e7003 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2346,7 +2346,7 @@ int kvm_mmu_init(void)
+ 	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
+ 	hyp_idmap_end = __pa_symbol(__hyp_idmap_text_end);
+ 	hyp_idmap_end = ALIGN(hyp_idmap_end, PAGE_SIZE);
+-	hyp_idmap_vector = __pa_symbol(__kvm_hyp_init);
++	hyp_idmap_vector = __pa_symbol(kvm_nvhe_sym(__kvm_hyp_init));
+ 
+ 	/*
+ 	 * We rely on the linker script to ensure at build time that the HYP
 -- 
 2.27.0
 
