@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B47D0C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 13:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66018C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:34:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3B86C2082F
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 13:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E20232080D
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jun 2020 16:34:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvEtPq7y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B86C2082F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HvgtGquI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E20232080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A81284B18E;
-	Thu, 18 Jun 2020 09:57:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657654B126;
+	Thu, 18 Jun 2020 12:34:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KKX8c2J+f60w; Thu, 18 Jun 2020 09:57:53 -0400 (EDT)
+	with ESMTP id HNNu+2eyrGOs; Thu, 18 Jun 2020 12:34:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82AB14B197;
-	Thu, 18 Jun 2020 09:57:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A23824B128;
+	Thu, 18 Jun 2020 12:34:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B9C4B18E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 09:57:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D7EE4B101
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:34:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HIXwaiBjYAhq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jun 2020 09:57:49 -0400 (EDT)
+ with ESMTP id vd594scBTrZY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jun 2020 12:34:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E39214B147
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 09:57:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 261B74B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2020 12:34:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C69B12082F;
- Thu, 18 Jun 2020 13:57:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id F3A5F2080D;
+ Thu, 18 Jun 2020 16:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592488667;
- bh=LnYEKbo5XLm8oVGmH1Jg4y8ZvUiouHun1liXREq5bac=;
+ s=default; t=1592498082;
+ bh=eVyEMYcH3w0tu/t9tmx43Zd823558bcJbUdQrBCBp4c=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=BvEtPq7yWq1HoWLreLAPoRHu9zg2dv4gVjA+/sWolyzzhzCuYfusljrsDt7PCh1Rl
- 8VzOVSWJVHPKOQf8ENECav3J03US/j4/DonegZKfy7eWRDwY3D9dWQ05qwLpA4LpOi
- HaPbrU2sScJRWJ14HAyMty8l/Dv/fn0Im1rhu9eQ=
+ b=HvgtGquIIepvj2gQkKFmCpbCeAgAeeIo7rCFhFWj26c+6IajL8BvAWaMt/UCkLjBj
+ Vtdzg6b/vnsNPFtyukEyPsuxiiDQ5nOPcGjyj1C4NTiv/RWhz9FGbzBk2HXK3F60XQ
+ aftQCISswXvKXTI+OuS8zmbSzVxSrPM211c2bCl0=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jlv34-004BYE-2D; Thu, 18 Jun 2020 14:57:46 +0100
+ id 1jlxUu-004EIo-A4; Thu, 18 Jun 2020 17:34:40 +0100
 MIME-Version: 1.0
-Date: Thu, 18 Jun 2020 14:57:45 +0100
+Date: Thu, 18 Jun 2020 17:34:40 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v3 02/15] arm64: kvm: Move __smccc_workaround_1_smc to
- .rodata
-In-Reply-To: <20200618122537.9625-3-dbrazdil@google.com>
+Subject: Re: [PATCH v3 03/15] arm64: kvm: Add build rules for separate nVHE
+ object files
+In-Reply-To: <20200618122537.9625-4-dbrazdil@google.com>
 References: <20200618122537.9625-1-dbrazdil@google.com>
- <20200618122537.9625-3-dbrazdil@google.com>
+ <20200618122537.9625-4-dbrazdil@google.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <02322fdac903aa1786c334d0ddd7f38a@kernel.org>
+Message-ID: <09976ea31931481f4e00d627dc5e06fe@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
@@ -101,107 +101,153 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi David,
 
 On 2020-06-18 13:25, David Brazdil wrote:
-> This snippet of assembly is used by cpu_errata.c to overwrite parts of 
-> KVM hyp
-> vector. Move it to its own source file and change its ELF section to 
-> .rodata.
+> Add new folder arch/arm64/kvm/hyp/nvhe and a Makefile for building code 
+> that
+> runs in EL2 under nVHE KVM.
+> 
+> Compile each source file into a `.hyp.tmp.o` object first, then prefix 
+> all
+> its symbols with "__kvm_nvhe_" using `objcopy` and produce a `.hyp.o`.
+> Suffixes were chosen so that it would be possible for VHE and nVHE to 
+> share
+> some source files, but compiled with different CFLAGS. nVHE build rules 
+> add
+> -D__KVM_NVHE_HYPERVISOR__.
+> 
+> The nVHE ELF symbol prefix is added to kallsyms.c as ignored. EL2-only 
+> symbols
+> will never appear in EL1 stack traces.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/kvm/hyp/Makefile    |  1 +
->  arch/arm64/kvm/hyp/hyp-entry.S | 16 ----------------
->  arch/arm64/kvm/hyp/smccc_wa.S  | 30 ++++++++++++++++++++++++++++++
->  3 files changed, 31 insertions(+), 16 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/smccc_wa.S
+>  arch/arm64/kernel/image-vars.h   | 12 +++++++++++
+>  arch/arm64/kvm/hyp/Makefile      |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/Makefile | 35 ++++++++++++++++++++++++++++++++
+>  scripts/kallsyms.c               |  1 +
+>  4 files changed, 49 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
 > 
+> diff --git a/arch/arm64/kernel/image-vars.h 
+> b/arch/arm64/kernel/image-vars.h
+> index be0a63ffed23..f32b406e90c0 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -51,4 +51,16 @@ __efistub__ctype		= _ctype;
+> 
+>  #endif
+> 
+> +#ifdef CONFIG_KVM
+> +
+> +/*
+> + * KVM nVHE code has its own symbol namespace prefixed by __kvm_nvhe_, 
+> to
+> + * isolate it from the kernel proper. The following symbols are 
+> legally
+> + * accessed by it, therefore provide aliases to make them linkable.
+> + * Do not include symbols which may not be safely accessed under 
+> hypervisor
+> + * memory mappings.
+> + */
+> +
+> +#endif /* CONFIG_KVM */
+> +
+>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
 > diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 8c9880783839..5d8357ddc234 100644
+> index 5d8357ddc234..5f4f217532e0 100644
 > --- a/arch/arm64/kvm/hyp/Makefile
 > +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -7,6 +7,7 @@ ccflags-y += -fno-stack-protector 
-> -DDISABLE_BRANCH_PROFILING \
+> @@ -6,7 +6,7 @@
+>  ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
 >  		$(DISABLE_STACKLEAK_PLUGIN)
 > 
->  obj-$(CONFIG_KVM) += hyp.o
-> +obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
+> -obj-$(CONFIG_KVM) += hyp.o
+> +obj-$(CONFIG_KVM) += hyp.o nvhe/
+>  obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
 > 
 >  hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o 
 > sysreg-sr.o \
->  	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S 
-> b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 9c5cfb04170e..d362fad97cc8 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -318,20 +318,4 @@ SYM_CODE_START(__bp_harden_hyp_vecs)
->  1:	.org __bp_harden_hyp_vecs + __BP_HARDEN_HYP_VECS_SZ
->  	.org 1b
->  SYM_CODE_END(__bp_harden_hyp_vecs)
-> -
-> -	.popsection
-
-I'd be tempted to leave the .popsection in place, if only for symmetry  
-with the initial .pushsection.
-
-> -
-> -SYM_CODE_START(__smccc_workaround_1_smc)
-> -	esb
-> -	sub	sp, sp, #(8 * 4)
-> -	stp	x2, x3, [sp, #(8 * 0)]
-> -	stp	x0, x1, [sp, #(8 * 2)]
-> -	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_1
-> -	smc	#0
-> -	ldp	x2, x3, [sp, #(8 * 0)]
-> -	ldp	x0, x1, [sp, #(8 * 2)]
-> -	add	sp, sp, #(8 * 4)
-> -1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
-> -	.org 1b
-> -SYM_CODE_END(__smccc_workaround_1_smc)
->  #endif
-> diff --git a/arch/arm64/kvm/hyp/smccc_wa.S 
-> b/arch/arm64/kvm/hyp/smccc_wa.S
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile 
+> b/arch/arm64/kvm/hyp/nvhe/Makefile
 > new file mode 100644
-> index 000000000000..aa25b5428e77
+> index 000000000000..7d64235dba62
 > --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/smccc_wa.S
-> @@ -0,0 +1,30 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2015-2018 - ARM Ltd
-> + * Author: Marc Zyngier <marc.zyngier@arm.com>
-> + */
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -0,0 +1,35 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Makefile for Kernel-based Virtual Machine module, HYP/nVHE part
+> +#
 > +
-> +#include <linux/arm-smccc.h>
+> +asflags-y := -D__KVM_NVHE_HYPERVISOR__
+> +ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
+> +	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
 > +
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_mmu.h>
+> +obj-y :=
 > +
-> +	/*
-> +	 * This is not executed directly and is instead copied into the 
-> vectors
-> +	 * by install_bp_hardening_cb().
-> +	 */
-> +	.data
-> +	.pushsection	.rodata
-> +	.global		__smccc_workaround_1_smc
-> +__smccc_workaround_1_smc:
+> +obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+> +extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
+> +
+> +$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
+> +	$(call if_changed_rule,cc_o_c)
+> +$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
+> +	$(call if_changed_rule,as_o_S)
+> +$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
+> +	$(call if_changed,hypcopy)
+> +
+> +quiet_cmd_hypcopy = HYPCOPY $@
+> +      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+> +
+> +# KVM nVHE code is run at a different exception code with a different 
+> map, so
+> +# compiler instrumentation that inserts callbacks or checks into the 
+> code may
+> +# cause crashes. Just disable it.
+> +GCOV_PROFILE	:= n
+> +KASAN_SANITIZE	:= n
+> +UBSAN_SANITIZE	:= n
+> +KCOV_INSTRUMENT	:= n
+> +
+> +# Skip objtool checking for this directory because nVHE code is 
+> compiled with
+> +# non-standard build rules.
+> +OBJECT_FILES_NON_STANDARD := y
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index 6dc3078649fa..0096cd965332 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -109,6 +109,7 @@ static bool is_ignored_symbol(const char *name, 
+> char type)
+>  		".LASANPC",		/* s390 kasan local symbols */
+>  		"__crc_",		/* modversions */
+>  		"__efistub_",		/* arm64 EFI stub namespace */
+> +		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
+>  		NULL
+>  	};
 
-You probably want to replace this with SYM_DATA_START (and SYM_DATA_END 
-at the end).
+I guess that one of the first use of this __KVM_NVHE_HYPERVISOR__
+flag could be the has_vhe() predicate: if you're running the nVHE
+code, you are *guaranteed* not to use VHE at all.
 
-> +	esb
-> +	sub	sp, sp, #(8 * 4)
-> +	stp	x2, x3, [sp, #(8 * 0)]
-> +	stp	x0, x1, [sp, #(8 * 2)]
-> +	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_1
-> +	smc	#0
-> +	ldp	x2, x3, [sp, #(8 * 0)]
-> +	ldp	x0, x1, [sp, #(8 * 2)]
-> +	add	sp, sp, #(8 * 4)
-> +1:	.org __smccc_workaround_1_smc + __SMCCC_WORKAROUND_1_SMC_SZ
-> +	.org 1b
+Something like:
 
-Otherwise, looks good.
+diff --git a/arch/arm64/include/asm/virt.h 
+b/arch/arm64/include/asm/virt.h
+index 5051b388c654..b2cb8fce43dd 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -85,10 +85,8 @@ static inline bool is_kernel_in_hyp_mode(void)
+
+  static __always_inline bool has_vhe(void)
+  {
+-	if (cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN))
+-		return true;
+-
+-	return false;
++	return (__is_defined(__KVM_NVHE_HYPERVISOR__) &&
++		cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN));
+  }
+
+  #endif /* __ASSEMBLY__ */
 
 Thanks,
 
