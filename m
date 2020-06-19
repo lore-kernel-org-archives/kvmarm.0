@@ -2,75 +2,75 @@ Return-Path: <SRS0=kKHV=AA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F34EC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 13:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26505C433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 18:46:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C08AF207FC
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 13:57:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0030208D5
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 18:46:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JyJL+hT/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08AF207FC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5NcMrwI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0030208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0C1B4B1AD;
-	Fri, 19 Jun 2020 09:57:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E874B183;
+	Fri, 19 Jun 2020 14:46:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tEPV4U+XV2kf; Fri, 19 Jun 2020 09:57:39 -0400 (EDT)
+	with ESMTP id l3oaB96sU-6E; Fri, 19 Jun 2020 14:46:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4AEB4B0DD;
-	Fri, 19 Jun 2020 09:57:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6A114B17C;
+	Fri, 19 Jun 2020 14:46:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4134B0D8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 09:57:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7671C4B15B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 14:46:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id igJKM9ZHf9eE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Jun 2020 09:57:33 -0400 (EDT)
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A9DA4B199
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 09:57:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
- :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=LAV5/s/2D5B3lhz5CBbE1JjwfKpleg8M/EZQLJv3gY0=; b=JyJL+hT/3UDxfhF0s3aTnfKjXz
- 4WDgwcRLMVoKg+qSDE9yLxzSco+H+pQ5Wb81Ou3fMfUQ/D/PUj99vJvG8DVfHMK7Xit5EUflkCXHg
- NVjSoMF1iXJkFyunmO4bT0bhYKqy8plu+KhCaWDYL5rTcS+0HqBZ2l2cO31jrjswYnTHix3XxuIdh
- CLa7YNXieoKzxyNI69zTga5BeVIp2nuN6JUkyNZVDF48paS3Z97GcqjEXS4SbkETaMrcC7oCiPtz7
- ebga12ePId6FrnHzkZ06/ly0HjW7/bElp6nlinv8nqqvH/e7fLXCA9LkJfD50awg4CtQOX9My32fH
- tAIxb96w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red
- Hat Linux)) id 1jmHW8-0000yl-Di; Fri, 19 Jun 2020 13:57:16 +0000
-Date: Fri, 19 Jun 2020 06:57:16 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jianyong Wu <jianyong.wu@arm.com>
-Subject: Re: [PATCH v13 3/9] smccc: Export smccc conduit get helper.
-Message-ID: <20200619135716.GA14308@infradead.org>
-References: <20200619130120.40556-1-jianyong.wu@arm.com>
- <20200619130120.40556-4-jianyong.wu@arm.com>
+ with ESMTP id T6-iVf6aN74H for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Jun 2020 14:46:39 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D5D64B09D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 14:46:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592592399;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=m0FpzCva/zyn/UMs7J4w8ZtycrPgdRAxriFzKZK3P20=;
+ b=Y5NcMrwIcXvJ5HnOLdmS0Hy4Mj/ss/lUL6fB8w8UCYi65XGoOV7zq0yFYITsVOOjShAJMl
+ wGeexueb3X2ieHx74sxa7yDpBKS8jv4eYfENCc3ci16b+SWD1guA3UJRvpJDaZC6OGz+kv
+ UWNBRIj4bSuzo/LQ+UzBQAAcx1L9OVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-3iUouf49P-q72fQsgHn2hg-1; Fri, 19 Jun 2020 14:46:33 -0400
+X-MC-Unique: 3iUouf49P-q72fQsgHn2hg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87D3BEC1A0;
+ Fri, 19 Jun 2020 18:46:32 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C160F60BF4;
+ Fri, 19 Jun 2020 18:46:30 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/4] arm64/x86: KVM: Introduce KVM_CAP_STEAL_TIME
+Date: Fri, 19 Jun 2020 20:46:25 +0200
+Message-Id: <20200619184629.58653-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200619130120.40556-4-jianyong.wu@arm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by
- bombadil.infradead.org. See http://www.infradead.org/rpr.html
-Cc: maz@kernel.org, justin.he@arm.com, kvm@vger.kernel.org, Wei.Chen@arm.com,
- netdev@vger.kernel.org, richardcochran@gmail.com, linux-kernel@vger.kernel.org,
- sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
- yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: pbonzini@redhat.com, steven.price@arm.com, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,27 +87,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 19, 2020 at 09:01:14PM +0800, Jianyong Wu wrote:
-> Export arm_smccc_1_1_get_conduit then modules can use smccc helper which
-> adopts it.
-> 
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  drivers/firmware/smccc/smccc.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
-> index 4e80921ee212..b855fe7b5c90 100644
-> --- a/drivers/firmware/smccc/smccc.c
-> +++ b/drivers/firmware/smccc/smccc.c
-> @@ -24,6 +24,7 @@ enum arm_smccc_conduit arm_smccc_1_1_get_conduit(void)
->  
->  	return smccc_conduit;
->  }
-> +EXPORT_SYMBOL(arm_smccc_1_1_get_conduit);
+This series introduces a KVM CAP for steal time to arm64 and x86.
+For arm64 the cap resolves a couple issues described in the second
+patch's commit message. The cap isn't necessary for x86, but is
+added for consistency.
 
-EXPORT_SYMBOL_GPL, please.
+Thanks,
+drew
+
+Andrew Jones (4):
+  KVM: Documentation minor fixups
+  arm64/x86: KVM: Introduce steal time cap
+  tools headers kvm: Sync linux/kvm.h with the kernel sources
+  KVM: selftests: Use KVM_CAP_STEAL_TIME
+
+ Documentation/virt/kvm/api.rst           | 20 ++++++++++++++++----
+ arch/arm64/kvm/arm.c                     |  3 +++
+ arch/x86/kvm/x86.c                       |  3 +++
+ include/uapi/linux/kvm.h                 |  1 +
+ tools/include/uapi/linux/kvm.h           | 15 +++++++++++++++
+ tools/testing/selftests/kvm/steal_time.c |  8 ++++++++
+ 6 files changed, 46 insertions(+), 4 deletions(-)
+
+-- 
+2.25.4
 
 _______________________________________________
 kvmarm mailing list
