@@ -2,85 +2,58 @@ Return-Path: <SRS0=kKHV=AA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD64C433DF
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 08:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C04C433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 09:30:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BBC2F21548
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 08:28:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHuVuKdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBC2F21548
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 774FE2073E
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Jun 2020 09:30:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 774FE2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 498374B0D8;
-	Fri, 19 Jun 2020 04:28:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B524F4B18A;
+	Fri, 19 Jun 2020 05:30:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PH6SlVBDGQEH; Fri, 19 Jun 2020 04:28:29 -0400 (EDT)
+	with ESMTP id 7OhazT7g55nc; Fri, 19 Jun 2020 05:30:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 960094B182;
-	Fri, 19 Jun 2020 04:28:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D2C64B126;
+	Fri, 19 Jun 2020 05:30:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3D94B182
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 04:28:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3771A4B126
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 05:30:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xQOvfiMKUthF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Jun 2020 04:28:25 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A1334B0D8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 04:28:25 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A5F0B20885;
- Fri, 19 Jun 2020 08:28:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592555303;
- bh=S79gsW+74BIDc7GKPImFAz0hb5fGrtyPpGZfOrQbLK0=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=hHuVuKdfeVR6d0OmT1exnTrTvuB5j83aEEsfAc9qbNZm8HYDOHs1ny2bjTG21OTF7
- drbBan2JItMO8YU5EeJPxk4YR2YTNmVq8DNTvkC7QRhW/fKBfbxx4M6psKy9hmJiFJ
- mUv5cz1KDp5JRgYGUB58R2eOHG5kGM5v9tPX/Mo4=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jmCNq-004Or3-83; Fri, 19 Jun 2020 09:28:22 +0100
-MIME-Version: 1.0
-Date: Fri, 19 Jun 2020 09:28:22 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v3 07/15] arm64: kvm: Split hyp/tlb.c to VHE/nVHE
-In-Reply-To: <20200618122537.9625-8-dbrazdil@google.com>
-References: <20200618122537.9625-1-dbrazdil@google.com>
- <20200618122537.9625-8-dbrazdil@google.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <63418803e5801279f012ce8c6fc824c6@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
- catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- android-kvm@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id Ns61qI7v73jt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Jun 2020 05:30:49 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DFC94B10F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2020 05:30:49 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5DD12B;
+ Fri, 19 Jun 2020 02:30:48 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com
+ [10.169.40.35])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 883613F71F;
+ Fri, 19 Jun 2020 02:30:42 -0700 (PDT)
+From: Jianyong Wu <jianyong.wu@arm.com>
+To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
+ maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com
+Subject: [RFC PATCH v13 0/9] Enable ptp_kvm for arm64
+Date: Fri, 19 Jun 2020 17:30:24 +0800
+Message-Id: <20200619093033.58344-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: justin.he@arm.com, Wei.Chen@arm.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nd@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,438 +65,184 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-06-18 13:25, David Brazdil wrote:
-> This patch is part of a series which builds KVM's non-VHE hyp code 
-> separately
-> from VHE and the rest of the kernel.
-> 
-> tlb.c contains code for flushing the TLB, with parts shared between 
-> VHE/nVHE.
-> These common routines are moved into a header file tlb.h, VHE-specific 
-> code
-> remains in tlb.c and nVHE-specific code is moved to nvhe/tlb.c.
-> 
-> The header file expects its users to implement two helper functions 
-> declared
-> at the top of the file.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kernel/image-vars.h   |   8 +-
->  arch/arm64/kvm/hyp/nvhe/Makefile |   2 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c    |  70 +++++++++++++
->  arch/arm64/kvm/hyp/tlb.c         | 171 +++----------------------------
->  arch/arm64/kvm/hyp/tlb.h         | 134 ++++++++++++++++++++++++
->  5 files changed, 222 insertions(+), 163 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/tlb.c
->  create mode 100644 arch/arm64/kvm/hyp/tlb.h
-> 
-> diff --git a/arch/arm64/kernel/image-vars.h 
-> b/arch/arm64/kernel/image-vars.h
-> index 4dc969ccda9e..e8a8aa6bc7bd 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -63,13 +63,10 @@ __efistub__ctype		= _ctype;
-> 
->  __kvm_nvhe___guest_exit = __guest_exit;
->  __kvm_nvhe___hyp_stub_vectors = __hyp_stub_vectors;
-> +__kvm_nvhe___icache_flags = __icache_flags;
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-This is new, and definitely deserves a comment, together with much of 
-the other kernel symbols you added. You probably want to keep these 
-symbols separate from the KVM-specific symbols for ease of maintenance.
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
->  __kvm_nvhe___kvm_enable_ssbs = __kvm_enable_ssbs;
-> -__kvm_nvhe___kvm_flush_vm_context = __kvm_flush_vm_context;
->  __kvm_nvhe___kvm_get_mdcr_el2 = __kvm_get_mdcr_el2;
->  __kvm_nvhe___kvm_timer_set_cntvoff = __kvm_timer_set_cntvoff;
-> -__kvm_nvhe___kvm_tlb_flush_local_vmid = __kvm_tlb_flush_local_vmid;
-> -__kvm_nvhe___kvm_tlb_flush_vmid = __kvm_tlb_flush_vmid;
-> -__kvm_nvhe___kvm_tlb_flush_vmid_ipa = __kvm_tlb_flush_vmid_ipa;
->  __kvm_nvhe___kvm_vcpu_run_nvhe = __kvm_vcpu_run_nvhe;
->  __kvm_nvhe___vgic_v3_get_ich_vtr_el2 = __vgic_v3_get_ich_vtr_el2;
->  __kvm_nvhe___vgic_v3_init_lrs = __vgic_v3_init_lrs;
-> @@ -79,8 +76,11 @@ __kvm_nvhe___vgic_v3_save_aprs = 
-> __vgic_v3_save_aprs;
->  __kvm_nvhe___vgic_v3_write_vmcr = __vgic_v3_write_vmcr;
->  __kvm_nvhe_abort_guest_exit_end = abort_guest_exit_end;
->  __kvm_nvhe_abort_guest_exit_start = abort_guest_exit_start;
-> +__kvm_nvhe_arm64_const_caps_ready = arm64_const_caps_ready;
->  __kvm_nvhe_arm64_enable_wa2_handling = arm64_enable_wa2_handling;
->  __kvm_nvhe_arm64_ssbd_callback_required = 
-> arm64_ssbd_callback_required;
-> +__kvm_nvhe_cpu_hwcap_keys = cpu_hwcap_keys;
-> +__kvm_nvhe_cpu_hwcaps = cpu_hwcaps;
->  __kvm_nvhe_hyp_panic = hyp_panic;
->  __kvm_nvhe_idmap_t0sz = idmap_t0sz;
->  __kvm_nvhe_kimage_voffset = kimage_voffset;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile 
-> b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index fef6f1881765..3bfc51de1679 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -fno-stack-protector \
->  	     -DDISABLE_BRANCH_PROFILING $(DISABLE_STACKLEAK_PLUGIN)
-> 
-> -obj-y := hyp-init.o ../hyp-entry.o
-> +obj-y := tlb.o hyp-init.o ../hyp-entry.o
-> 
->  obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
->  extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c 
-> b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> new file mode 100644
-> index 000000000000..111c4b0a23d3
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -0,0 +1,70 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2015 - ARM Ltd
-> + * Author: Marc Zyngier <marc.zyngier@arm.com>
-> + */
-> +
-> +#include <linux/irqflags.h>
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp clock works.
 
-Unnecessary non !VHE.
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |          host            |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          |
+|       |   V      (get host walltime/counter cycle)                   |
+|      ptp_kvm -> hypercall - - - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |
+|----------------------------|              |--------------------------|
 
-> +
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +#include <asm/tlbflush.h>
+1. time sync service in guest userspace call ptp device through /dev/ptp%d.
+2. ptp_kvm module in guest recive this request then invoke hypercall to
+route into host kernel to request host walltime/counter cycle.
+3. ptp_kvm hypercall service in host response to the request and send data
+back.
+4. ptp (not ptp_kvm) in guest copy the data to userspace.
 
-At least tlbflush.h should directly be dragged by tlb.h, since that's 
-where the actual TLB ops are done.
+This ptp_kvm implementation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
 
-> +
-> +#include "../tlb.h"
-> +
-> +static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
-> +					     struct tlb_inv_context *cxt)
-> +{
-> +	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> +		u64 val;
-> +
-> +		/*
-> +		 * For CPUs that are affected by ARM 1319367, we need to
-> +		 * avoid a host Stage-1 walk while we have the guest's
-> +		 * VMID set in the VTTBR in order to invalidate TLBs.
-> +		 * We're guaranteed that the S1 MMU is enabled, so we can
-> +		 * simply set the EPD bits to avoid any further TLB fill.
-> +		 */
-> +		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
-> +		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
-> +		write_sysreg_el1(val, SYS_TCR);
-> +		isb();
-> +	}
-> +
-> +	/* __load_guest_stage2() includes an ISB for the workaround. */
-> +	__load_guest_stage2(kvm);
-> +	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
-> +}
-> +
-> +static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-> +					    struct tlb_inv_context *cxt)
-> +{
-> +	write_sysreg(0, vttbr_el2);
-> +
-> +	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> +		/* Ensure write of the host VMID */
-> +		isb();
-> +		/* Restore the host's TCR_EL1 */
-> +		write_sysreg_el1(cxt->tcr, SYS_TCR);
-> +	}
-> +}
-> +
-> +void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t 
-> ipa)
-> +{
-> +	__tlb_flush_vmid_ipa(kvm, ipa);
-> +}
-> +
-> +void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
-> +{
-> +	__tlb_flush_vmid(kvm);
-> +}
-> +
-> +void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-> +{
-> +	__tlb_flush_local_vmid(vcpu);
-> +}
-> +
-> +void __hyp_text __kvm_flush_vm_context(void)
-> +{
-> +	__tlb_flush_vm_context();
-> +}
+change log:
+from v12 to v13:
+        (1) rebase code on 5.8-rc1.
+        (2) this patch set base on 2 patches of 1/8 and 2/8 from Will Decon.
+        (3) remove the change to ptp device code of extend getcrosststamp.
+        (4) remove the mechanism of letting user choose the counter type in
+ptp_kvm for arm64.
+        (5) add virtual counter option in ptp_kvm service to let user choose
+the specific counter explicitly.
 
-Overall, I find the result hard to reason about. Too many things happen 
-in the .h file, and reading the .c file feels puzzling (no apparent 
-users of the two static functions, for example).
+from v11 to v12:
+        (1) rebase code on 5.7-rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
 
-The VHE/nVHE files only differ by the the __tlb_switch_to_*() helpers 
-(and the __hyp_text annotation that ends up going away). Why can't this 
-be structured in a more conventionnal way, where the TLB code stays in a 
-C file, and per-mode .h files providing the two helpers? It would 
-certainly look much more readable.
+from v10 to v11:
+        (1) rebase code on 5.7-rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
 
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index d063a576d511..4e190f8c7e9c 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -10,14 +10,10 @@
->  #include <asm/kvm_mmu.h>
->  #include <asm/tlbflush.h>
-> 
-> -struct tlb_inv_context {
-> -	unsigned long	flags;
-> -	u64		tcr;
-> -	u64		sctlr;
-> -};
-> +#include "tlb.h"
-> 
-> -static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
-> -						 struct tlb_inv_context *cxt)
-> +static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
-> +					     struct tlb_inv_context *cxt)
->  {
->  	u64 val;
-> 
-> @@ -60,41 +56,8 @@ static void __hyp_text
-> __tlb_switch_to_guest_vhe(struct kvm *kvm,
->  	isb();
->  }
-> 
-> -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
-> -						  struct tlb_inv_context *cxt)
-> -{
-> -	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> -		u64 val;
-> -
-> -		/*
-> -		 * For CPUs that are affected by ARM 1319367, we need to
-> -		 * avoid a host Stage-1 walk while we have the guest's
-> -		 * VMID set in the VTTBR in order to invalidate TLBs.
-> -		 * We're guaranteed that the S1 MMU is enabled, so we can
-> -		 * simply set the EPD bits to avoid any further TLB fill.
-> -		 */
-> -		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
-> -		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
-> -		write_sysreg_el1(val, SYS_TCR);
-> -		isb();
-> -	}
-> -
-> -	/* __load_guest_stage2() includes an ISB for the workaround. */
-> -	__load_guest_stage2(kvm);
-> -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
-> -}
-> -
-> -static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
-> -					     struct tlb_inv_context *cxt)
-> -{
-> -	if (has_vhe())
-> -		__tlb_switch_to_guest_vhe(kvm, cxt);
-> -	else
-> -		__tlb_switch_to_guest_nvhe(kvm, cxt);
-> -}
-> -
-> -static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
-> -						struct tlb_inv_context *cxt)
-> +static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-> +					    struct tlb_inv_context *cxt)
->  {
->  	/*
->  	 * We're done with the TLB operation, let's restore the host's
-> @@ -113,130 +76,22 @@ static void __hyp_text
-> __tlb_switch_to_host_vhe(struct kvm *kvm,
->  	local_irq_restore(cxt->flags);
->  }
-> 
-> -static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
-> -						 struct tlb_inv_context *cxt)
-> -{
-> -	write_sysreg(0, vttbr_el2);
-> -
-> -	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> -		/* Ensure write of the host VMID */
-> -		isb();
-> -		/* Restore the host's TCR_EL1 */
-> -		write_sysreg_el1(cxt->tcr, SYS_TCR);
-> -	}
-> -}
-> -
-> -static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-> -					    struct tlb_inv_context *cxt)
-> -{
-> -	if (has_vhe())
-> -		__tlb_switch_to_host_vhe(kvm, cxt);
-> -	else
-> -		__tlb_switch_to_host_nvhe(kvm, cxt);
-> -}
-> -
-> -void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t 
-> ipa)
-> +void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
->  {
-> -	struct tlb_inv_context cxt;
-> -
-> -	dsb(ishst);
-> -
-> -	/* Switch to requested VMID */
-> -	kvm = kern_hyp_va(kvm);
-> -	__tlb_switch_to_guest(kvm, &cxt);
-> -
-> -	/*
-> -	 * We could do so much better if we had the VA as well.
-> -	 * Instead, we invalidate Stage-2 for this IPA, and the
-> -	 * whole of Stage-1. Weep...
-> -	 */
-> -	ipa >>= 12;
-> -	__tlbi(ipas2e1is, ipa);
-> -
-> -	/*
-> -	 * We have to ensure completion of the invalidation at Stage-2,
-> -	 * since a table walk on another CPU could refill a TLB with a
-> -	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-> -	 * the Stage-1 invalidation happened first.
-> -	 */
-> -	dsb(ish);
-> -	__tlbi(vmalle1is);
-> -	dsb(ish);
-> -	isb();
-> -
-> -	/*
-> -	 * If the host is running at EL1 and we have a VPIPT I-cache,
-> -	 * then we must perform I-cache maintenance at EL2 in order for
-> -	 * it to have an effect on the guest. Since the guest cannot hit
-> -	 * I-cache lines allocated with a different VMID, we don't need
-> -	 * to worry about junk out of guest reset (we nuke the I-cache on
-> -	 * VMID rollover), but we do need to be careful when remapping
-> -	 * executable pages for the same guest. This can happen when KSM
-> -	 * takes a CoW fault on an executable page, copies the page into
-> -	 * a page that was previously mapped in the guest and then needs
-> -	 * to invalidate the guest view of the I-cache for that page
-> -	 * from EL1. To solve this, we invalidate the entire I-cache when
-> -	 * unmapping a page from a guest if we have a VPIPT I-cache but
-> -	 * the host is running at EL1. As above, we could do better if
-> -	 * we had the VA.
-> -	 *
-> -	 * The moral of this story is: if you have a VPIPT I-cache, then
-> -	 * you should be running with VHE enabled.
-> -	 */
-> -	if (!has_vhe() && icache_is_vpipt())
-> -		__flush_icache_all();
-> -
-> -	__tlb_switch_to_host(kvm, &cxt);
-> +	__tlb_flush_vmid_ipa(kvm, ipa);
->  }
-> 
-> -void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
-> +void __kvm_tlb_flush_vmid(struct kvm *kvm)
->  {
-> -	struct tlb_inv_context cxt;
-> -
-> -	dsb(ishst);
-> -
-> -	/* Switch to requested VMID */
-> -	kvm = kern_hyp_va(kvm);
-> -	__tlb_switch_to_guest(kvm, &cxt);
-> -
-> -	__tlbi(vmalls12e1is);
-> -	dsb(ish);
-> -	isb();
-> -
-> -	__tlb_switch_to_host(kvm, &cxt);
-> +	__tlb_flush_vmid(kvm);
->  }
-> 
-> -void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-> +void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
-> -	struct tlb_inv_context cxt;
-> -
-> -	/* Switch to requested VMID */
-> -	__tlb_switch_to_guest(kvm, &cxt);
-> -
-> -	__tlbi(vmalle1);
-> -	dsb(nsh);
-> -	isb();
-> -
-> -	__tlb_switch_to_host(kvm, &cxt);
-> +	__tlb_flush_local_vmid(vcpu);
->  }
-> 
-> -void __hyp_text __kvm_flush_vm_context(void)
-> +void __kvm_flush_vm_context(void)
->  {
-> -	dsb(ishst);
-> -	__tlbi(alle1is);
-> -
-> -	/*
-> -	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-> -	 * is necessary across a VMID rollover.
-> -	 *
-> -	 * VPIPT caches constrain lookup and maintenance to the active VMID,
-> -	 * so we need to invalidate lines with a stale VMID to avoid an ABA
-> -	 * race after multiple rollovers.
-> -	 *
-> -	 */
-> -	if (icache_is_vpipt())
-> -		asm volatile("ic ialluis");
-> -
-> -	dsb(ish);
-> +	__tlb_flush_vm_context();
->  }
-> diff --git a/arch/arm64/kvm/hyp/tlb.h b/arch/arm64/kvm/hyp/tlb.h
-> new file mode 100644
-> index 000000000000..841ef400c8ec
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/tlb.h
-> @@ -0,0 +1,134 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2015 - ARM Ltd
-> + * Author: Marc Zyngier <marc.zyngier@arm.com>
-> + */
-> +
-> +#ifndef __ARM64_KVM_HYP_TLB_H__
-> +#define __ARM64_KVM_HYP_TLB_H__
-> +
-> +#include <linux/irqflags.h>
-> +
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +#include <asm/tlbflush.h>
-> +
-> +struct tlb_inv_context {
-> +	unsigned long	flags;
-> +	u64		tcr;
-> +	u64		sctlr;
-> +};
-> +
-> +static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
-> +					     struct tlb_inv_context *cxt);
-> +static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-> +					    struct tlb_inv_context *cxt);
-> +
-> +static inline void __hyp_text
-> +__tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+from v9 to v10:
+        (1) change code base to v5.5.
+        (2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
 
-For things that you move around, please do not reformat the code, This 
-will lead to unnecessary conflicts. And long lines are just fine (screw 
-checkpatch!).
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
 
-Thanks,
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
 
-         M.
+from v6 to v7:
+        (1) include the omitted clocksource_id.h in last version.
+        (2) reorder the header file in patch.
+        (3) refine some words in commit message to make it more impersonal.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+Jianyong Wu (7):
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+  smccc: export smccc conduit get helper.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  arm64/kvm: Add hypercall service for kvm ptp.
+  ptp: arm64: Enable ptp_kvm for arm64
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (1):
+  arm64: Probe for the presence of KVM hypervisor services during boot
+
+ arch/arm64/include/asm/hypervisor.h         | 11 +++
+ arch/arm64/kernel/setup.c                   | 36 +++++++++
+ arch/arm64/kvm/arm.c                        |  4 +
+ arch/arm64/kvm/hypercalls.c                 | 79 +++++++++++++++---
+ drivers/clocksource/arm_arch_timer.c        | 26 ++++++
+ drivers/firmware/smccc/smccc.c              |  1 +
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 ++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 80 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 89 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 56 +++++++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/Kconfig                            |  4 +
+ 20 files changed, 413 insertions(+), 75 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
 -- 
-Jazz is not dead. It just smells funny...
+2.17.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
