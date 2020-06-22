@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13924C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40550C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:34:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C5D4420708
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:33:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D4420708
+	by mail.kernel.org (Postfix) with ESMTP id ECEE720708
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEE720708
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E8F34B0EC;
-	Mon, 22 Jun 2020 07:33:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5A634B092;
+	Mon, 22 Jun 2020 07:34:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZYlkKto7H96j; Mon, 22 Jun 2020 07:33:58 -0400 (EDT)
+	with ESMTP id aT-hsXxSpdIj; Mon, 22 Jun 2020 07:34:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1030F4B0DB;
-	Mon, 22 Jun 2020 07:33:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 476974B0DD;
+	Mon, 22 Jun 2020 07:34:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91EF84B0D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77FAB4B0D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:34:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iVXyDawpd0BA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 07:33:55 -0400 (EDT)
+ with ESMTP id SVfqcvd263t8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 07:34:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33E8C4B0F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 631584B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:34:00 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E38951FB;
- Mon, 22 Jun 2020 04:33:54 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EE6311B3;
+ Mon, 22 Jun 2020 04:34:00 -0700 (PDT)
 Received: from merodach.members.linode.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20E583F71E;
- Mon, 22 Jun 2020 04:33:54 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E4213F71E;
+ Mon, 22 Jun 2020 04:33:59 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 4/5] KVM: arm64: Remove target_table from exit handlers
-Date: Mon, 22 Jun 2020 11:33:16 +0000
-Message-Id: <20200622113317.20477-5-james.morse@arm.com>
+Subject: [PATCH 5/5] KVM: arm64: Remove the target table
+Date: Mon, 22 Jun 2020 11:33:17 +0000
+Message-Id: <20200622113317.20477-6-james.morse@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200622113317.20477-1-james.morse@arm.com>
 References: <20200622113317.20477-1-james.morse@arm.com>
@@ -69,198 +69,204 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Whenever KVM searches for a register (e.g. due to a guest exit), it
-works with two tables, as the target table overrides the sys_regs array.
-
-Now that everything is in the sys_regs array, and the target table is
-empty, stop doing that.
-
-Remove the second table and its size from all the functions that take
-it.
+Finally, remove the target table. Merge the code that checks the
+tables into kvm_reset_sys_regs() as there is now only one table.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 87 +++++++--------------------------------
- 1 file changed, 16 insertions(+), 71 deletions(-)
+ arch/arm64/include/asm/kvm_coproc.h  |  7 ----
+ arch/arm64/kvm/Makefile              |  2 +-
+ arch/arm64/kvm/sys_regs.c            | 57 ++++++----------------------
+ arch/arm64/kvm/sys_regs.h            |  2 -
+ arch/arm64/kvm/sys_regs_generic_v8.c | 55 ---------------------------
+ 5 files changed, 12 insertions(+), 111 deletions(-)
+ delete mode 100644 arch/arm64/kvm/sys_regs_generic_v8.c
 
+diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
+index 4bf0d6d05e0f..147f3a77e6a5 100644
+--- a/arch/arm64/include/asm/kvm_coproc.h
++++ b/arch/arm64/include/asm/kvm_coproc.h
+@@ -19,13 +19,6 @@ struct kvm_sys_reg_table {
+ 	size_t num;
+ };
+ 
+-struct kvm_sys_reg_target_table {
+-	struct kvm_sys_reg_table table64;
+-	struct kvm_sys_reg_table table32;
+-};
+-
+-void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table);
+-
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 8d3d9513cbfe..48cda50aa225 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -14,7 +14,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 $(KVM)/vfio.o $(KVM)/irqchip.o \
+ 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+ 	 inject_fault.o regmap.o va_layout.o hyp.o hyp-init.o handle_exit.o \
+-	 guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o \
++	 guest.o debug.o reset.o sys_regs.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+ 	 aarch32.o arch_timer.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f8407cfa9032..14333005b476 100644
+index 14333005b476..41a4d3d2a312 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2269,9 +2269,7 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
-  */
- static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *global,
--			    size_t nr_global,
--			    const struct sys_reg_desc *target_specific,
--			    size_t nr_specific)
-+			    size_t nr_global)
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
-@@ -2298,14 +2296,11 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 	}
+@@ -2137,28 +2137,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+ 	return 0;
+ }
  
- 	/*
--	 * Try to emulate the coprocessor access using the target
--	 * specific table first, and using the global table afterwards.
--	 * If either of the tables contains a handler, handle the
-+	 * If the table contains a handler, handle the
- 	 * potential register operation in the case of a read and return
- 	 * with success.
- 	 */
--	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
--	    !emulate_cp(vcpu, &params, global, nr_global)) {
-+	if (!emulate_cp(vcpu, &params, global, nr_global)) {
- 		/* Split up the value between registers for the read side */
- 		if (!params.is_write) {
- 			vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
-@@ -2326,9 +2321,7 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
-  */
- static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *global,
--			    size_t nr_global,
--			    const struct sys_reg_desc *target_specific,
--			    size_t nr_specific)
-+			    size_t nr_global)
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
-@@ -2344,8 +2337,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- 	params.Op1 = (hsr >> 14) & 0x7;
- 	params.Op2 = (hsr >> 17) & 0x7;
- 
--	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
--	    !emulate_cp(vcpu, &params, global, nr_global)) {
-+	if (!emulate_cp(vcpu, &params, global, nr_global)) {
- 		if (!params.is_write)
- 			vcpu_set_reg(vcpu, Rt, params.regval);
- 		return 1;
-@@ -2357,38 +2349,22 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- 
- int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	const struct sys_reg_desc *target_specific;
--	size_t num;
+-void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table)
+-{
+-	BUG_ON(check_sysreg_table(table->table64.table, table->table64.num, false));
+-	BUG_ON(check_sysreg_table(table->table32.table, table->table32.num, true));
+-}
 -
--	target_specific = get_target_table(vcpu->arch.target, false, &num);
--	return kvm_handle_cp_64(vcpu,
--				cp15_64_regs, ARRAY_SIZE(cp15_64_regs),
--				target_specific, num);
-+	return kvm_handle_cp_64(vcpu, cp15_64_regs, ARRAY_SIZE(cp15_64_regs));
- }
- 
- int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	const struct sys_reg_desc *target_specific;
--	size_t num;
+-/* Get specific register table for this target. */
+-static const struct sys_reg_desc *get_target_table(unsigned target,
+-						   bool mode_is_64,
+-						   size_t *num)
+-{
+-	struct kvm_sys_reg_target_table *table = &genericv8_target_table;
 -
--	target_specific = get_target_table(vcpu->arch.target, false, &num);
--	return kvm_handle_cp_32(vcpu,
--				cp15_regs, ARRAY_SIZE(cp15_regs),
--				target_specific, num);
-+	return kvm_handle_cp_32(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
+-	if (mode_is_64) {
+-		*num = table->table64.num;
+-		return table->table64.table;
+-	} else {
+-		*num = table->table32.num;
+-		return table->table32.table;
+-	}
+-}
+-
+ static int match_sys_reg(const void *key, const void *elt)
+ {
+ 	const unsigned long pval = (unsigned long)key;
+@@ -2393,14 +2371,20 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ 	return 1;
  }
  
- int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+-				const struct sys_reg_desc *table, size_t num)
++/**
++ * kvm_reset_sys_regs - sets system registers to reset value
++ * @vcpu: The VCPU pointer
++ *
++ * This function finds the right table above and sets the registers on the
++ * virtual CPU struct to their architecturally defined reset values.
++ */
++void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
  {
--	return kvm_handle_cp_64(vcpu,
--				cp14_64_regs, ARRAY_SIZE(cp14_64_regs),
--				NULL, 0);
-+	return kvm_handle_cp_64(vcpu, cp14_64_regs, ARRAY_SIZE(cp14_64_regs));
+ 	unsigned long i;
+ 
+-	for (i = 0; i < num; i++)
+-		if (table[i].reset)
+-			table[i].reset(vcpu, &table[i]);
++	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++)
++		if (sys_reg_descs[i].reset)
++			sys_reg_descs[i].reset(vcpu, &sys_reg_descs[i]);
  }
  
- int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	return kvm_handle_cp_32(vcpu,
--				cp14_regs, ARRAY_SIZE(cp14_regs),
--				NULL, 0);
-+	return kvm_handle_cp_32(vcpu, cp14_regs, ARRAY_SIZE(cp14_regs));
+ /**
+@@ -2869,22 +2853,3 @@ void kvm_sys_reg_table_init(void)
+ 	/* Clear all higher bits. */
+ 	cache_levels &= (1 << (i*3))-1;
  }
- 
- static bool is_imp_def_sys_reg(struct sys_reg_params *params)
-@@ -2400,15 +2376,9 @@ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
- static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *params)
- {
+-
+-/**
+- * kvm_reset_sys_regs - sets system registers to reset value
+- * @vcpu: The VCPU pointer
+- *
+- * This function finds the right table above and sets the registers on the
+- * virtual CPU struct to their architecturally defined reset values.
+- */
+-void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+-{
 -	size_t num;
--	const struct sys_reg_desc *table, *r;
+-	const struct sys_reg_desc *table;
+-
+-	/* Generic chip reset first (so target could override). */
+-	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
 -
 -	table = get_target_table(vcpu->arch.target, true, &num);
-+	const struct sys_reg_desc *r;
+-	reset_sys_reg_descs(vcpu, table, num);
+-}
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 933609e883bf..5a6fc30f5989 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -165,6 +165,4 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
+ 	Op2(sys_reg_Op2(reg))
  
--	/* Search target-specific then generic table. */
--	r = find_reg(params, table, num);
--	if (!r)
--		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
- 	if (likely(r)) {
- 		perform_access(vcpu, params, r);
-@@ -2512,8 +2482,7 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
- static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 						    u64 id)
- {
--	size_t num;
--	const struct sys_reg_desc *table, *r;
-+	const struct sys_reg_desc *r;
- 	struct sys_reg_params params;
- 
- 	/* We only do sys_reg for now. */
-@@ -2523,10 +2492,7 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 	if (!index_to_params(id, &params))
- 		return NULL;
- 
--	table = get_target_table(vcpu->arch.target, true, &num);
--	r = find_reg(&params, table, num);
--	if (!r)
--		r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
- 	/* Not saved in the sys_reg array and not otherwise accessible? */
- 	if (r && !(r->reg || r->get_user))
-@@ -2826,38 +2792,17 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- /* Assumed ordered tables, see kvm_sys_reg_table_init. */
- static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- {
--	const struct sys_reg_desc *i1, *i2, *end1, *end2;
-+	const struct sys_reg_desc *i2, *end2;
- 	unsigned int total = 0;
--	size_t num;
- 	int err;
- 
--	/* We check for duplicates here, to allow arch-specific overrides. */
--	i1 = get_target_table(vcpu->arch.target, true, &num);
--	end1 = i1 + num;
- 	i2 = sys_reg_descs;
- 	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
- 
--	if (i1 == end1)
--		i1 = NULL;
+-extern struct kvm_sys_reg_target_table genericv8_target_table;
 -
--	BUG_ON(i2 == end2);
+ #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+deleted file mode 100644
+index a7e21e61beea..000000000000
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ /dev/null
+@@ -1,55 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Copyright (C) 2012,2013 - ARM Ltd
+- * Author: Marc Zyngier <marc.zyngier@arm.com>
+- *
+- * Based on arch/arm/kvm/coproc_a15.c:
+- * Copyright (C) 2012 - Virtual Open Systems and Columbia University
+- * Authors: Rusty Russell <rusty@rustcorp.au>
+- *          Christoffer Dall <c.dall@virtualopensystems.com>
+- */
+-#include <linux/kvm_host.h>
+-#include <asm/cputype.h>
+-#include <asm/kvm_arm.h>
+-#include <asm/kvm_asm.h>
+-#include <asm/kvm_emulate.h>
+-#include <asm/kvm_coproc.h>
+-#include <asm/sysreg.h>
+-#include <linux/init.h>
 -
--	/* Walk carefully, as both tables may refer to the same register. */
--	while (i1 || i2) {
--		int cmp = cmp_sys_reg(i1, i2);
--		/* target-specific overrides generic entry. */
--		if (cmp <= 0)
--			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
--		else
--			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
+-#include "sys_regs.h"
 -
-+	while (i2 != end2) {
-+		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
- 		if (err)
- 			return err;
+-/*
+- * Implementation specific sys-reg registers.
+- * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+- */
+-static const struct sys_reg_desc genericv8_sys_regs[] = {
+-};
 -
--		if (cmp <= 0 && ++i1 == end1)
--			i1 = NULL;
--		if (cmp >= 0 && ++i2 == end2)
--			i2 = NULL;
- 	}
- 	return total;
- }
+-static const struct sys_reg_desc genericv8_cp15_regs[] = {
+-};
+-
+-struct kvm_sys_reg_target_table genericv8_target_table = {
+-	.table64 = {
+-		.table = genericv8_sys_regs,
+-		.num = ARRAY_SIZE(genericv8_sys_regs),
+-	},
+-	.table32 = {
+-		.table = genericv8_cp15_regs,
+-		.num = ARRAY_SIZE(genericv8_cp15_regs),
+-	},
+-};
+-
+-static int __init sys_reg_genericv8_init(void)
+-{
+-	unsigned int i;
+-
+-	for (i = 1; i < ARRAY_SIZE(genericv8_sys_regs); i++)
+-		BUG_ON(cmp_sys_reg(&genericv8_sys_regs[i-1],
+-			       &genericv8_sys_regs[i]) >= 0);
+-
+-	kvm_check_target_sys_reg_table(&genericv8_target_table);
+-
+-	return 0;
+-}
+-late_initcall(sys_reg_genericv8_init);
 -- 
 2.20.1
 
