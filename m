@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD124C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AC8C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C40A207BC
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C40A207BC
+	by mail.kernel.org (Postfix) with ESMTP id 73C8120776
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C8120776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 254D14B0B3;
-	Mon, 22 Jun 2020 16:09:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E6554B0E7;
+	Mon, 22 Jun 2020 16:09:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TSgqZ5vMpbXl; Mon, 22 Jun 2020 16:09:17 -0400 (EDT)
+	with ESMTP id Px-ApBgIbY-4; Mon, 22 Jun 2020 16:09:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9108F4B107;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA9D94B100;
 	Mon, 22 Jun 2020 16:09:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 89CBC4B0EA
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 946314B0DC
  for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZqrZYSdYPvxA for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id aE9pwgizMHUm for <kvmarm@lists.cs.columbia.edu>;
  Mon, 22 Jun 2020 16:09:13 -0400 (EDT)
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14C8D4B0E2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:11 -0400 (EDT)
-IronPort-SDR: 43M/3nlYr4VEY5LcE0j3uFzpoWhIVwUQ9CUnv7hL5Nww+dG9au17msKZgOzKIadnzkd3eR+x75
- LavExOB4R4Dw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="142921270"
-X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="142921270"
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE6384B0AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:12 -0400 (EDT)
+IronPort-SDR: Ftb5HAi4n/Y1qqV2mEzcF6aXePHHnTVCQ7TOHl0Ctn0b/MbKcY2f8L0753fyrgONLeh+S+cgma
+ vyp/TQrTfmMw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="142921284"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="142921284"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jun 2020 13:09:10 -0700
-IronPort-SDR: yGlHMVpx7tPbvz8MilBzAcb+zV5/r1q/UDwdXJHLNr+wYdW5D6lwBhGmwvh3BbwcOP7TP9cHQR
- F9Wk/ytWU0Yw==
+ 22 Jun 2020 13:09:12 -0700
+IronPort-SDR: k20phxHuVKzfP3a/Z2J/Y7rkPb1pVSfMh/pE6MIfuHHvB9z/OqUaCQ130N8EIEPF10anjFD0AQ
+ Puo75HPQG3MQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="318877061"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="318877073"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
- by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2020 13:09:10 -0700
+ by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2020 13:09:11 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 05/21] KVM: x86/mmu: Try to avoid crashing KVM if a MMU
- memory cache is empty
-Date: Mon, 22 Jun 2020 13:08:06 -0700
-Message-Id: <20200622200822.4426-6-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 07/21] KVM: x86/mmu: Topup memory caches after walking
+ GVA->GPA
+Date: Mon, 22 Jun 2020 13:08:08 -0700
+Message-Id: <20200622200822.4426-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200622200822.4426-1-sean.j.christopherson@intel.com>
 References: <20200622200822.4426-1-sean.j.christopherson@intel.com>
@@ -87,64 +87,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Attempt to allocate a new object instead of crashing KVM (and likely the
-kernel) if a memory cache is unexpectedly empty.  Use GFP_ATOMIC for the
-allocation as the caches are used while holding mmu_lock.  The immediate
-BUG_ON() makes the code unnecessarily explosive and led to confusing
-minimums being used in the past, e.g. allocating 4 objects where 1 would
-suffice.
+Topup memory caches after walking the GVA->GPA translation during a
+shadow page fault, there is no need to ensure the caches are full when
+walking the GVA.  As of commit f5a1e9f89504f ("KVM: MMU: remove call
+to kvm_mmu_pte_write from walk_addr"), the FNAME(walk_addr) flow no
+longer add rmaps via kvm_mmu_pte_write().
 
+This avoids allocating memory in the case that the GVA is unmapped in
+the guest, and also provides a paper trail of why/when the memory caches
+need to be filled.
+
+Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ba70de24a5b0..5e773564ab20 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1060,6 +1060,15 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
- 	local_irq_enable();
- }
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 38c576495048..3de32122f601 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -791,10 +791,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
  
-+static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-+					       gfp_t gfp_flags)
-+{
-+	if (mc->kmem_cache)
-+		return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
-+	else
-+		return (void *)__get_free_page(gfp_flags);
-+}
+ 	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
+ 
+-	r = mmu_topup_memory_caches(vcpu);
+-	if (r)
+-		return r;
+-
+ 	/*
+ 	 * If PFEC.RSVD is set, this is a shadow page fault.
+ 	 * The bit needs to be cleared before walking guest page tables.
+@@ -822,6 +818,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+ 		return RET_PF_EMULATE;
+ 	}
+ 
++	r = mmu_topup_memory_caches(vcpu);
++	if (r)
++		return r;
 +
- static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
- {
- 	void *obj;
-@@ -1067,10 +1076,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
- 	if (mc->nobjs >= min)
- 		return 0;
- 	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
--		if (mc->kmem_cache)
--			obj = kmem_cache_zalloc(mc->kmem_cache, GFP_KERNEL_ACCOUNT);
--		else
--			obj = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
- 		if (!obj)
- 			return mc->nobjs >= min ? 0 : -ENOMEM;
- 		mc->objects[mc->nobjs++] = obj;
-@@ -1118,8 +1124,11 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
- {
- 	void *p;
+ 	vcpu->arch.write_fault_to_shadow_pgtable = false;
  
--	BUG_ON(!mc->nobjs);
--	p = mc->objects[--mc->nobjs];
-+	if (WARN_ON(!mc->nobjs))
-+		p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
-+	else
-+		p = mc->objects[--mc->nobjs];
-+	BUG_ON(!p);
- 	return p;
- }
- 
+ 	is_self_change_mapping = FNAME(is_self_change_mapping)(vcpu,
 -- 
 2.26.0
 
