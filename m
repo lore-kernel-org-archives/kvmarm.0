@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BACDC433E3
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3B4C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C817207F5
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C817207F5
+	by mail.kernel.org (Postfix) with ESMTP id 56C6620776
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 20:09:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56C6620776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C27CA4B0F1;
-	Mon, 22 Jun 2020 16:09:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10DA74B100;
+	Mon, 22 Jun 2020 16:09:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fkucad9rvl6M; Mon, 22 Jun 2020 16:09:20 -0400 (EDT)
+	with ESMTP id dFA0rwsgbJ4x; Mon, 22 Jun 2020 16:09:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E471C4B0FE;
-	Mon, 22 Jun 2020 16:09:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13F7D4B130;
+	Mon, 22 Jun 2020 16:09:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB3EA4B0B3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C9F4B0E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nqxWg-6WPJY1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 16:09:16 -0400 (EDT)
+ with ESMTP id X07w4R5Z1vh4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 16:09:17 -0400 (EDT)
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 916654B105
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:14 -0400 (EDT)
-IronPort-SDR: Fuf9+EPATEddQYqb6nlK6Zgdx9aQyht6k9cyUmM/OKrjAlAPCChy4+lh/+MKWBGYdK9AVTWD78
- Ul/2ulloJo3w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="142921296"
-X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="142921296"
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7777C4B0E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 16:09:15 -0400 (EDT)
+IronPort-SDR: /QMRauC+zavJBQ5QsOn4EnEszc2idUsnl6f+FAcnyV1zSw4LXL+6yIxnNVX2Z7830Q/WHJTQvH
+ 7cYvBdLyrJBg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="142921303"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="142921303"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jun 2020 13:09:14 -0700
-IronPort-SDR: ak1QnlFNmlOJvtP/hUTECRnOQeqVRiIZK96vwGh7pONYJj8Q1FtHto5qAAvNTpvRAMC6k+Twhw
- /ek8UxKqM3Rw==
+ 22 Jun 2020 13:09:15 -0700
+IronPort-SDR: vvjMTgT/HWbfbDPNYCUNUwqR/sOMZI0Acedm/ruzLO2XwwFozzOsBgL2vOcvBy03IM9qCdERdz
+ R38TlMUMMkhQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="318877082"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; d="scan'208";a="318877086"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
- by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2020 13:09:13 -0700
+ by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2020 13:09:14 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 09/21] KVM: x86/mmu: Separate the memory caches for shadow
- pages and gfn arrays
-Date: Mon, 22 Jun 2020 13:08:10 -0700
-Message-Id: <20200622200822.4426-10-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 10/21] KVM: x86/mmu: Make __GFP_ZERO a property of the
+ memory cache
+Date: Mon, 22 Jun 2020 13:08:11 -0700
+Message-Id: <20200622200822.4426-11-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200622200822.4426-1-sean.j.christopherson@intel.com>
 References: <20200622200822.4426-1-sean.j.christopherson@intel.com>
@@ -87,74 +87,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use separate caches for allocating shadow pages versus gfn arrays.  This
-sets the stage for specifying __GFP_ZERO when allocating shadow pages
-without incurring extra cost for gfn arrays.
+Add a gfp_zero flag to 'struct kvm_mmu_memory_cache' and use it to
+control __GFP_ZERO instead of hardcoding a call to kmem_cache_zalloc().
+A future patch needs such a flag for the __get_free_page() path, as
+gfn arrays do not need/want the allocator to zero the memory.  Convert
+the kmem_cache paths to __GFP_ZERO now so as to avoid a weird and
+inconsistent API in the future.
 
 No functional change intended.
 
 Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/mmu/mmu.c          | 15 ++++++++++-----
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/mmu/mmu.c          | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7b6ac8fad9c2..376e1653ac41 100644
+index 376e1653ac41..67b84aa2984e 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -636,7 +636,8 @@ struct kvm_vcpu_arch {
- 	struct kvm_mmu *walk_mmu;
- 
- 	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-+	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
- 	struct kvm_mmu_memory_cache mmu_page_header_cache;
- 
- 	/*
+@@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
+  */
+ struct kvm_mmu_memory_cache {
+ 	int nobjs;
++	gfp_t gfp_zero;
+ 	struct kmem_cache *kmem_cache;
+ 	void *objects[KVM_NR_MEM_OBJS];
+ };
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 451e0365e5dd..d245acece3cd 100644
+index d245acece3cd..6b0ec9060786 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1108,8 +1108,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
- 				   1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
- 	if (r)
- 		return r;
--	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
--				   2 * PT64_ROOT_MAX_LEVEL);
-+	r = mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-+				   PT64_ROOT_MAX_LEVEL);
-+	if (r)
-+		return r;
-+	r = mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-+				   PT64_ROOT_MAX_LEVEL);
- 	if (r)
- 		return r;
- 	return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-@@ -1119,7 +1123,8 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
- static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+@@ -1063,8 +1063,10 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 					       gfp_t gfp_flags)
  {
- 	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
--	mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-+	mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
- 	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
++	gfp_flags |= mc->gfp_zero;
++
+ 	if (mc->kmem_cache)
+-		return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
++		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+ 	else
+ 		return (void *)__get_free_page(gfp_flags);
  }
+@@ -5680,7 +5682,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	int ret;
  
-@@ -2096,9 +2101,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
- 	struct kvm_mmu_page *sp;
+ 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
++	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
++
+ 	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
++	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
  
- 	sp = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
--	sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-+	sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
- 	if (!direct)
--		sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-+		sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
- 
- 	/*
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
 -- 
 2.26.0
 
