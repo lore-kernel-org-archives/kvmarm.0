@@ -2,60 +2,82 @@ Return-Path: <SRS0=1gKC=AD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86910C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 10:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7366C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 10:31:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2C3CB20706
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 10:31:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C3CB20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 5CCA620706
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 10:31:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSe+Czhn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CCA620706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7204B07F;
-	Mon, 22 Jun 2020 06:31:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05BF34B0DB;
+	Mon, 22 Jun 2020 06:31:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tujCfjugyq6d; Mon, 22 Jun 2020 06:31:41 -0400 (EDT)
+	with ESMTP id QJaCcUfym0iy; Mon, 22 Jun 2020 06:31:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F5374B098;
-	Mon, 22 Jun 2020 06:31:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A50004B0A3;
+	Mon, 22 Jun 2020 06:31:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 624714B0A3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 06:31:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC68A4B07F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 06:31:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KqQesyX3-1qk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 06:31:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B65C4B08E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 06:31:38 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95BC61FB;
- Mon, 22 Jun 2020 03:31:38 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.15.132])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C1963F71E;
- Mon, 22 Jun 2020 03:31:36 -0700 (PDT)
-Date: Mon, 22 Jun 2020 11:31:33 +0100
-From: Mark Rutland <mark.rutland@arm.com>
+ with ESMTP id eD2boIo1Agoz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 06:31:54 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77D774B0D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 06:31:54 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1592821914;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zstoew6+y+ErDDpNlJitNVBDWEMg32PIYZVfYRB6WUo=;
+ b=TSe+CzhnKU48Oow/37X64QBvmHfG9alkzQnFwS6TRMyg+86Qz0p6llei7MxU5R52H74c/q
+ KbkzixuEa9e8vqNqmK3lk7hMMGa7MDAPxKcT3LR1AlLUJWjQT54FCCiEZi/dYRGgw8P/dd
+ edt89N2PmJ3ja7jgHNLP5Q8rwu1fa6w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-ArnuUmN3M1uOaHHBKtftMQ-1; Mon, 22 Jun 2020 06:31:52 -0400
+X-MC-Unique: ArnuUmN3M1uOaHHBKtftMQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 416451B18BC3;
+ Mon, 22 Jun 2020 10:31:51 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9112F60C05;
+ Mon, 22 Jun 2020 10:31:49 +0000 (UTC)
+Date: Mon, 22 Jun 2020 12:31:46 +0200
+From: Andrew Jones <drjones@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Simplify PtrAuth alternative patching
-Message-ID: <20200622103133.GD88608@C02TD0UTHF1T.local>
-References: <20200622080643.171651-1-maz@kernel.org>
- <20200622080643.171651-6-maz@kernel.org>
- <20200622091508.GB88608@C02TD0UTHF1T.local>
- <422da5e4a8cfb9f9d7870d0a50985e55@kernel.org>
+Subject: Re: [PATCH 2/4] arm64/x86: KVM: Introduce steal time cap
+Message-ID: <20200622103146.fwtr7z3l3mnq4foh@kamzik.brq.redhat.com>
+References: <20200619184629.58653-1-drjones@redhat.com>
+ <20200619184629.58653-3-drjones@redhat.com>
+ <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
+ <20200622084110.uosiqx3oy22lremu@kamzik.brq.redhat.com>
+ <5a52210e5f123d52459f15c594e77bad@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <422da5e4a8cfb9f9d7870d0a50985e55@kernel.org>
-Cc: kvm@vger.kernel.org, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <5a52210e5f123d52459f15c594e77bad@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ steven.price@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,54 +94,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 22, 2020 at 11:25:41AM +0100, Marc Zyngier wrote:
-> On 2020-06-22 10:15, Mark Rutland wrote:
-> > On Mon, Jun 22, 2020 at 09:06:43AM +0100, Marc Zyngier wrote:
-> I have folded in the following patch:
+On Mon, Jun 22, 2020 at 10:51:47AM +0100, Marc Zyngier wrote:
+> On 2020-06-22 09:41, Andrew Jones wrote:
+> > On Mon, Jun 22, 2020 at 09:20:02AM +0100, Marc Zyngier wrote:
+> > > Hi Andrew,
+> > > 
+> > > On 2020-06-19 19:46, Andrew Jones wrote:
+> > > > arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
+> > > > support for steal time. However this is unnecessary and complicates
+> > > > userspace (userspace may prefer delaying vcpu creation until after
+> > > > feature probing). Since probing steal time only requires a KVM fd,
+> > > > we introduce a cap that can be checked.
+> > > 
+> > > So this is purely an API convenience, right? You want a way to
+> > > identify the presence of steal time accounting without having to
+> > > create a vcpu? It would have been nice to have this requirement
+> > > before we merged this code :-(.
+> > 
+> > Yes. I wish I had considered it more closely when I was reviewing the
+> > patches. And, I believe we have yet another user interface issue that
+> > I'm looking at now. Without the VCPU feature bit I'm not sure how easy
+> > it will be for a migration to fail when attempting to migrate from a
+> > host
+> > with steal-time enabled to one that does not support steal-time. So it's
+> > starting to look like steal-time should have followed the pmu pattern
+> > completely, not just the vcpu device ioctl part.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_ptrauth.h
-> b/arch/arm64/include/asm/kvm_ptrauth.h
-> index 7a72508a841b..0ddf98c3ba9f 100644
-> --- a/arch/arm64/include/asm/kvm_ptrauth.h
-> +++ b/arch/arm64/include/asm/kvm_ptrauth.h
-> @@ -68,29 +68,29 @@
->   */
->  .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
->  alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> -	b	1000f
-> +	b	.L__skip_switch\@
->  alternative_else_nop_endif
->  	mrs	\reg1, hcr_el2
->  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
-> -	cbz	\reg1, 1000f
-> +	cbz	\reg1, .L__skip_switch\@
->  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
->  	ptrauth_restore_state	\reg1, \reg2, \reg3
-> -1000:
-> +.L__skip_switch\@:
->  .endm
+> Should we consider disabling steal time altogether until this is worked out?
+
+I think we can leave it alone and just try to resolve it before merging
+QEMU patches (which I'm working on now). It doesn't look like kvmtool or
+rust-vmm (the only other two KVM userspaces I'm paying some attention to)
+do anything with steal-time yet, so they won't notice. And, I'm not sure
+disabling steal-time for any other userspaces is better than just trying
+to keep them working the best we can while improving the uapi.
+
 > 
->  .macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
->  alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> -	b	2000f
-> +	b	.L__skip_switch\@
->  alternative_else_nop_endif
->  	mrs	\reg1, hcr_el2
->  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
-> -	cbz	\reg1, 2000f
-> +	cbz	\reg1, .L__skip_switch\@
->  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
->  	ptrauth_save_state	\reg1, \reg2, \reg3
->  	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
->  	ptrauth_restore_state	\reg1, \reg2, \reg3
->  	isb
-> -2000:
-> +.L__skip_switch\@:
->  .endm
+> > > 
+> > > > Additionally, when probing
+> > > > steal time we should check delayacct_on, because even though
+> > > > CONFIG_KVM selects TASK_DELAY_ACCT, it's possible for the host
+> > > > kernel to have delay accounting disabled with the 'nodelayacct'
+> > > > command line option. x86 already determines support for steal time
+> > > > by checking delayacct_on and can already probe steal time support
+> > > > with a kvm fd (KVM_GET_SUPPORTED_CPUID), but we add the cap there
+> > > > too for consistency.
+> > > >
+> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > > ---
+> > > >  Documentation/virt/kvm/api.rst | 11 +++++++++++
+> > > >  arch/arm64/kvm/arm.c           |  3 +++
+> > > >  arch/x86/kvm/x86.c             |  3 +++
+> > > >  include/uapi/linux/kvm.h       |  1 +
+> > > >  4 files changed, 18 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/virt/kvm/api.rst
+> > > > b/Documentation/virt/kvm/api.rst
+> > > > index 9a12ea498dbb..05b1fdb88383 100644
+> > > > --- a/Documentation/virt/kvm/api.rst
+> > > > +++ b/Documentation/virt/kvm/api.rst
+> > > > @@ -6151,3 +6151,14 @@ KVM can therefore start protected VMs.
+> > > >  This capability governs the KVM_S390_PV_COMMAND ioctl and the
+> > > >  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+> > > >  guests when the state change is invalid.
+> > > > +
+> > > > +8.24 KVM_CAP_STEAL_TIME
+> > > > +-----------------------
+> > > > +
+> > > > +:Architectures: arm64, x86
+> > > > +
+> > > > +This capability indicates that KVM supports steal time accounting.
+> > > > +When steal time accounting is supported it may be enabled with
+> > > > +architecture-specific interfaces.  For x86 see
+> > > > +Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".  For arm64 see
+> > > > +Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL"
+> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > index 90cb90561446..f6dca6d09952 100644
+> > > > --- a/arch/arm64/kvm/arm.c
+> > > > +++ b/arch/arm64/kvm/arm.c
+> > > > @@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+> > > > long ext)
+> > > >  		 */
+> > > >  		r = 1;
+> > > >  		break;
+> > > > +	case KVM_CAP_STEAL_TIME:
+> > > > +		r = sched_info_on();
+> > > > +		break;
+> > > >  	default:
+> > > >  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
+> > > >  		break;
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > index 00c88c2f34e4..ced6335e403e 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -3533,6 +3533,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
+> > > > *kvm, long ext)
+> > > >  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+> > > >  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
+> > > >  		break;
+> > > > +	case KVM_CAP_STEAL_TIME:
+> > > > +		r = sched_info_on();
+> > > > +		break;
+> > > >  	default:
+> > > >  		break;
+> > > >  	}
+> > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > > index 4fdf30316582..121fb29ac004 100644
+> > > > --- a/include/uapi/linux/kvm.h
+> > > > +++ b/include/uapi/linux/kvm.h
+> > > > @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+> > > >  #define KVM_CAP_PPC_SECURE_GUEST 181
+> > > >  #define KVM_CAP_HALT_POLL 182
+> > > >  #define KVM_CAP_ASYNC_PF_INT 183
+> > > > +#define KVM_CAP_STEAL_TIME 184
+> > > >
+> > > >  #ifdef KVM_CAP_IRQ_ROUTING
+> > > 
+> > > Shouldn't you also add the same check of sched_info_on() to
+> > > the various pvtime attribute handling functions? It feels odd
+> > > that the capability can say "no", and yet we'd accept userspace
+> > > messing with the steal time parameters...
+> > 
+> > I considered that, but the 'has attr' interface is really only asking
+> > if the interface exists, not if it should be used. I'm not sure what
+> > we should do about it other than document that the cap needs to say
+> > it's usable, rather than just the attr presence. But, since we've had
+> > the attr merged quite a while without the cap, then maybe we can't
+> > rely on a doc change alone?
+> 
+> Accepting the pvtime attributes (setting up the per-vcpu area) has two
+> effects: we promise both the guest and userspace that we will provide
+> the guest with steal time. By not checking sched_info_on(), we lie to
+> both, with potential consequences. It really feels like a bug.
 
-Looks good to me; thanks!
+Yes, I agree now. Again, following the pmu pattern looks best here. The
+pmu will report that it doesn't have the attr support when its underlying
+kernel support (perf counters) doesn't exist. That's a direct analogy with
+steal-time relying on sched_info_on().
 
-Mark.
+I'll work up another version of this series doing that, but before posting
+I'll look at the migration issue a bit more and likely post something for
+that as well.
+
+Thanks,
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
