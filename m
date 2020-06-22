@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902D8C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B58C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:33:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 42FA720732
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:33:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FA720732
+	by mail.kernel.org (Postfix) with ESMTP id 3791F2070E
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 11:33:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3791F2070E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E43804B0D8;
-	Mon, 22 Jun 2020 07:33:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E42EF4B0EE;
+	Mon, 22 Jun 2020 07:33:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F3IOO-RhSy7C; Mon, 22 Jun 2020 07:33:48 -0400 (EDT)
+	with ESMTP id IWJEbr9hPb8j; Mon, 22 Jun 2020 07:33:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A00D14B0D9;
-	Mon, 22 Jun 2020 07:33:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C29114B0EC;
+	Mon, 22 Jun 2020 07:33:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC264B0D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E73674B087
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZJaE4J+GgYYv for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 07:33:46 -0400 (EDT)
+ with ESMTP id NZaXBu5ZxTYT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 07:33:49 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C194B087
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B968A4B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 07:33:48 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 571A9C0A;
- Mon, 22 Jun 2020 04:33:46 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A93E1FB;
+ Mon, 22 Jun 2020 04:33:48 -0700 (PDT)
 Received: from merodach.members.linode.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8826F3F71E;
- Mon, 22 Jun 2020 04:33:45 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BD053F71E;
+ Mon, 22 Jun 2020 04:33:47 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 1/5] KVM: arm64: Drop the target_table[] indirection
-Date: Mon, 22 Jun 2020 11:33:13 +0000
-Message-Id: <20200622113317.20477-2-james.morse@arm.com>
+Subject: [PATCH 2/5] KVM: arm64: Tolerate an empty target_table list
+Date: Mon, 22 Jun 2020 11:33:14 +0000
+Message-Id: <20200622113317.20477-3-james.morse@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200622113317.20477-1-james.morse@arm.com>
 References: <20200622113317.20477-1-james.morse@arm.com>
@@ -69,132 +69,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM for 32bit arm had a get/set target mechanism to allow for
-micro-architecture differences that are visible in system registers
-to be described.
+Before emptying the target_table lists, and then removing their
+infrastructure, add some tolerance to an empty list.
 
-KVM's user-space can query the supported targets for a CPU, and
-create vCPUs for that target. The target can override the handling
-of system registers to provide different reset or RES0 behaviour.
-On 32bit arm this was used to provide different ACTLR reset values
-for A7 and A15.
-
-On 64bit arm, the first few CPUs out of the gate used this mechanism,
-before it was deemed redundant in commit bca556ac468a ("arm64/kvm:
-Add generic v8 KVM target"). All future CPUs use the
-KVM_ARM_TARGET_GENERIC_V8 target.
-
-The 64bit target_table[] stuff exists to preserve the ABI to
-user-space. As all targets registers genericv8_target_table, there
-is no reason to look the target up.
-
-Until we can merge genericv8_target_table with the main sys_regs
-array, kvm_register_target_sys_reg_table() becomes
-kvm_check_target_sys_reg_table(), which uses BUG_ON() in keeping
-with the other callers in this file.
+Instead of bugging-out on an empty list, pretend we already
+reached the end in the two-list-walk.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
- arch/arm64/include/asm/kvm_coproc.h  |  3 +--
- arch/arm64/kvm/sys_regs.c            | 16 ++++------------
- arch/arm64/kvm/sys_regs.h            |  2 ++
- arch/arm64/kvm/sys_regs_generic_v8.c | 15 ++-------------
- 4 files changed, 9 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-index 0185ee8b8b5e..4bf0d6d05e0f 100644
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ b/arch/arm64/include/asm/kvm_coproc.h
-@@ -24,8 +24,7 @@ struct kvm_sys_reg_target_table {
- 	struct kvm_sys_reg_table table32;
- };
- 
--void kvm_register_target_sys_reg_table(unsigned int target,
--				       struct kvm_sys_reg_target_table *table);
-+void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table);
- 
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index baf5ce9225ce..6333a7cd92d3 100644
+index 6333a7cd92d3..fb448bfc83ec 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2109,17 +2109,10 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
- 	return 0;
- }
+@@ -2809,7 +2809,10 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ 	i2 = sys_reg_descs;
+ 	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
  
--/* Target specific emulation tables */
--static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
--
--void kvm_register_target_sys_reg_table(unsigned int target,
--				       struct kvm_sys_reg_target_table *table)
-+void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table)
- {
--	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
--	    check_sysreg_table(table->table32.table, table->table32.num, true))
--		return;
--
--	target_tables[target] = table;
-+	BUG_ON(check_sysreg_table(table->table64.table, table->table64.num, false));
-+	BUG_ON(check_sysreg_table(table->table32.table, table->table32.num, true));
- }
- 
- /* Get specific register table for this target. */
-@@ -2127,9 +2120,8 @@ static const struct sys_reg_desc *get_target_table(unsigned target,
- 						   bool mode_is_64,
- 						   size_t *num)
- {
--	struct kvm_sys_reg_target_table *table;
-+	struct kvm_sys_reg_target_table *table = &genericv8_target_table;
- 
--	table = target_tables[target];
- 	if (mode_is_64) {
- 		*num = table->table64.num;
- 		return table->table64.table;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 5a6fc30f5989..933609e883bf 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -165,4 +165,6 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
- 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
- 	Op2(sys_reg_Op2(reg))
- 
-+extern struct kvm_sys_reg_target_table genericv8_target_table;
+-	BUG_ON(i1 == end1 || i2 == end2);
++	if (i1 == end1)
++		i1 = NULL;
 +
- #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index aa9d356451eb..a82cc2ccfd44 100644
---- a/arch/arm64/kvm/sys_regs_generic_v8.c
-+++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -59,7 +59,7 @@ static const struct sys_reg_desc genericv8_cp15_regs[] = {
- 	  access_actlr },
- };
++	BUG_ON(i2 == end2);
  
--static struct kvm_sys_reg_target_table genericv8_target_table = {
-+struct kvm_sys_reg_target_table genericv8_target_table = {
- 	.table64 = {
- 		.table = genericv8_sys_regs,
- 		.num = ARRAY_SIZE(genericv8_sys_regs),
-@@ -78,18 +78,7 @@ static int __init sys_reg_genericv8_init(void)
- 		BUG_ON(cmp_sys_reg(&genericv8_sys_regs[i-1],
- 			       &genericv8_sys_regs[i]) >= 0);
- 
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_AEM_V8,
--					  &genericv8_target_table);
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_FOUNDATION_V8,
--					  &genericv8_target_table);
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A53,
--					  &genericv8_target_table);
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A57,
--					  &genericv8_target_table);
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
--					  &genericv8_target_table);
--	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_GENERIC_V8,
--					  &genericv8_target_table);
-+	kvm_check_target_sys_reg_table(&genericv8_target_table);
- 
- 	return 0;
- }
+ 	/* Walk carefully, as both tables may refer to the same register. */
+ 	while (i1 || i2) {
 -- 
 2.20.1
 
