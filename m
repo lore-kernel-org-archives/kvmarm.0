@@ -2,58 +2,74 @@ Return-Path: <SRS0=1gKC=AD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A7EC433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 09:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 476B1C433E2
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A2C9020656
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 09:15:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2C9020656
+	by mail.kernel.org (Postfix) with ESMTP id CFAD8206D4
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 09:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFAD8206D4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFDC94B0D7;
-	Mon, 22 Jun 2020 05:15:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 438824B0D6;
+	Mon, 22 Jun 2020 05:51:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q7U+adFkjMPd; Mon, 22 Jun 2020 05:15:16 -0400 (EDT)
+	with ESMTP id C1pW34NgGhZw; Mon, 22 Jun 2020 05:51:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD154B0CA;
-	Mon, 22 Jun 2020 05:15:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B00014B0B5;
+	Mon, 22 Jun 2020 05:51:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 975A54B0C9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 05:15:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A9524B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 05:51:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 89CB5mmUF1Nb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 05:15:14 -0400 (EDT)
+ with ESMTP id jCpBNhs2Rfx2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 05:51:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 346E04B0C8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 05:15:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C754B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 05:51:28 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A5D51FB;
- Mon, 22 Jun 2020 02:15:13 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.15.132])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C7A63F6CF;
- Mon, 22 Jun 2020 02:15:11 -0700 (PDT)
-Date: Mon, 22 Jun 2020 10:15:08 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Simplify PtrAuth alternative patching
-Message-ID: <20200622091508.GB88608@C02TD0UTHF1T.local>
-References: <20200622080643.171651-1-maz@kernel.org>
- <20200622080643.171651-6-maz@kernel.org>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80FF41FB;
+ Mon, 22 Jun 2020 02:51:28 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C7EE93F71E;
+ Mon, 22 Jun 2020 02:51:25 -0700 (PDT)
+Subject: Re: [RFC PATCH v13 7/9] arm64/kvm: Add hypercall service for kvm ptp.
+To: Jianyong Wu <Jianyong.Wu@arm.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+ "john.stultz@linaro.org" <john.stultz@linaro.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ Mark Rutland <Mark.Rutland@arm.com>, "will@kernel.org" <will@kernel.org>,
+ Suzuki Poulose <Suzuki.Poulose@arm.com>
+References: <20200619093033.58344-1-jianyong.wu@arm.com>
+ <20200619093033.58344-8-jianyong.wu@arm.com>
+ <c56a5b56-8bcb-915c-ae7e-5de92161538c@arm.com>
+ <HE1PR0802MB25558F9A526C327134C7A7EEF4970@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <f331dc59-5642-33b0-9a37-553b7f536afe@arm.com>
+Date: Mon, 22 Jun 2020 10:51:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200622080643.171651-6-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <HE1PR0802MB25558F9A526C327134C7A7EEF4970@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+Content-Language: en-GB
+Cc: Justin He <Justin.He@arm.com>, Wei Chen <Wei.Chen@arm.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, nd <nd@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,71 +81,227 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCBKdW4gMjIsIDIwMjAgYXQgMDk6MDY6NDNBTSArMDEwMCwgTWFyYyBaeW5naWVyIHdy
-b3RlOgo+IFdlIGN1cnJlbnRseSBkZWNpZGUgdG8gZXhlY3V0ZSB0aGUgUHRyQXV0aCBzYXZlL3Jl
-c3RvcmUgY29kZSBiYXNlZAo+IG9uIGEgc2V0IG9mIGJyYW5jaGVzIHRoYXQgZXZhbHVhdGUgYXMg
-KEFSTTY0X0hBU19BRERSRVNTX0FVVEhfQVJDSCB8fAo+IEFSTTY0X0hBU19BRERSRVNTX0FVVEhf
-SU1QX0RFRikuIFRoaXMgY2FuIGJlIGVhc2lseSByZXBsYWNlZCBieQo+IGEgbXVjaCBzaW1wbGVy
-IHRlc3QgYXMgdGhlIEFSTTY0X0hBU19BRERSRVNTX0FVVEggY2FwYWJpbGl0eSBpcwo+IGV4YWN0
-bHkgdGhpcyBleHByZXNzaW9uLgo+IAo+IFN1Z2dlc3RlZC1ieTogTWFyayBSdXRsYW5kIDxtYXJr
-LnJ1dGxhbmRAYXJtLmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJu
-ZWwub3JnPgoKTG9va3MgZ29vZCB0byBtZS4gT25lIG1pbm9yIHN1Z2dlc3Rpb24gYmVsb3csIGJ1
-dCBlaXRoZXIgd2F5OgoKQWNrZWQtYnk6IE1hcmsgUnV0bGFuZCA8bWFyay5ydXRsYW5kQGFybS5j
-b20+Cgo+IC0tLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9wdHJhdXRoLmggfCAyNiAr
-KysrKysrKystLS0tLS0tLS0tLS0tLS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25z
-KCspLCAxNyBkZWxldGlvbnMoLSkKPiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9rdm1fcHRyYXV0aC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fcHRyYXV0aC5o
-Cj4gaW5kZXggZjE4MzAxNzNmYTllLi43YTcyNTA4YTg0MWIgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1fcHRyYXV0aC5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9rdm1fcHRyYXV0aC5oCj4gQEAgLTYxLDQ0ICs2MSwzNiBAQAo+ICAKPiAgLyoKPiAgICog
-Qm90aCBwdHJhdXRoX3N3aXRjaF90b19ndWVzdCBhbmQgcHRyYXV0aF9zd2l0Y2hfdG9faG9zdCBt
-YWNyb3Mgd2lsbAo+IC0gKiBjaGVjayBmb3IgdGhlIHByZXNlbmNlIG9mIG9uZSBvZiB0aGUgY3B1
-ZmVhdHVyZSBmbGFnCj4gLSAqIEFSTTY0X0hBU19BRERSRVNTX0FVVEhfQVJDSCBvciBBUk02NF9I
-QVNfQUREUkVTU19BVVRIX0lNUF9ERUYgYW5kCj4gKyAqIGNoZWNrIGZvciB0aGUgcHJlc2VuY2Ug
-QVJNNjRfSEFTX0FERFJFU1NfQVVUSCwgd2hpY2ggaXMgZGVmaW5lZCBhcwo+ICsgKiAoQVJNNjRf
-SEFTX0FERFJFU1NfQVVUSF9BUkNIIHx8IEFSTTY0X0hBU19BRERSRVNTX0FVVEhfSU1QX0RFRikg
-YW5kCj4gICAqIHRoZW4gcHJvY2VlZCBhaGVhZCB3aXRoIHRoZSBzYXZlL3Jlc3RvcmUgb2YgUG9p
-bnRlciBBdXRoZW50aWNhdGlvbgo+IC0gKiBrZXkgcmVnaXN0ZXJzLgo+ICsgKiBrZXkgcmVnaXN0
-ZXJzIGlmIGVuYWJsZWQgZm9yIHRoZSBndWVzdC4KPiAgICovCj4gIC5tYWNybyBwdHJhdXRoX3N3
-aXRjaF90b19ndWVzdCBnX2N0eHQsIHJlZzEsIHJlZzIsIHJlZzMKPiAtYWx0ZXJuYXRpdmVfaWYg
-QVJNNjRfSEFTX0FERFJFU1NfQVVUSF9BUkNICj4gK2FsdGVybmF0aXZlX2lmX25vdCBBUk02NF9I
-QVNfQUREUkVTU19BVVRICj4gIAliCTEwMDBmCj4gIGFsdGVybmF0aXZlX2Vsc2Vfbm9wX2VuZGlm
-Cj4gLWFsdGVybmF0aXZlX2lmX25vdCBBUk02NF9IQVNfQUREUkVTU19BVVRIX0lNUF9ERUYKPiAt
-CWIJMTAwMWYKPiAtYWx0ZXJuYXRpdmVfZWxzZV9ub3BfZW5kaWYKPiAtMTAwMDoKPiAgCW1ycwlc
-cmVnMSwgaGNyX2VsMgo+ICAJYW5kCVxyZWcxLCBccmVnMSwgIyhIQ1JfQVBJIHwgSENSX0FQSykK
-PiAtCWNieglccmVnMSwgMTAwMWYKPiArCWNieglccmVnMSwgMTAwMGYKPiAgCWFkZAlccmVnMSwg
-XGdfY3R4dCwgI0NQVV9BUElBS0VZTE9fRUwxCj4gIAlwdHJhdXRoX3Jlc3RvcmVfc3RhdGUJXHJl
-ZzEsIFxyZWcyLCBccmVnMwo+IC0xMDAxOgo+ICsxMDAwOgo+ICAuZW5kbQoKU2luY2UgdGhlc2Ug
-YXJlIGluIG1hY3Jvcywgd2UgY291bGQgdXNlIFxAIHRvIGdlbmVyYXRlIGEgbWFjcm8tc3BlY2lm
-aWMKbGF2ZWwgcmF0aGVyIHRoYW4gYSBtYWdpYyBudW1iZXIsIHdoaWNoIHdvdWxkIGJlIGxlc3Mg
-bGlrZWx5IHRvIGNvbmZsaWN0CndpdGggdGhlIHN1cnJvdW5kaW5nIGVudmlyb25tZW50IGFuZCB3
-b3VsZCBiZSBtb3JlIGRlc2NyaXB0aXZlLiBXZSBkbwp0aGF0IGluIGEgZmV3IHBsYWNlcyBhbHJl
-YWR5LCBhbmQgaGVyZSBpdCBjb3VsZCBsb29rIHNvbWV0aGluZyBsaWtlOgoKfCBhbHRlcm5hdGl2
-ZV9pZl9ub3QgQVJNNjRfSEFTX0FERFJFU1NfQVVUSAp8IAliCS5MX19za2lwX3BhdXRoX3N3aXRj
-aFxACnwgYWx0ZXJuYXRpdmVfZWxzZV9ub3BfZW5kaWYKfCAJCnwgCS4uLgp8IAp8IC5MX19za2lw
-X3BhdXRoX3N3aXRjaFxAOgoKUGVyIHRoZSBnYXMgZG9jdW1lbnRhdGlvbgoKfCBcQAp8CnwgICAg
-YXMgbWFpbnRhaW5zIGEgY291bnRlciBvZiBob3cgbWFueSBtYWNyb3MgaXQgaGFzIGV4ZWN1dGVk
-IGluIHRoaXMKfCAgICBwc2V1ZG8tdmFyaWFibGU7IHlvdSBjYW4gY29weSB0aGF0IG51bWJlciB0
-byB5b3VyIG91dHB1dCB3aXRoIOKAmFxA4oCZLAp8ICAgIGJ1dCBvbmx5IHdpdGhpbiBhIG1hY3Jv
-IGRlZmluaXRpb24uCgpObyB3b3JyaWVzIGlmIHlvdSBkb24ndCB3YW50IHRvIGNoYW5nZSB0aGF0
-IG5vdzsgdGhlIEFja2VkLWJ5IHN0YW5kcwplaXRoZXIgd2F5LgoKTWFyay4KCj4gIAo+ICAubWFj
-cm8gcHRyYXV0aF9zd2l0Y2hfdG9faG9zdCBnX2N0eHQsIGhfY3R4dCwgcmVnMSwgcmVnMiwgcmVn
-Mwo+IC1hbHRlcm5hdGl2ZV9pZiBBUk02NF9IQVNfQUREUkVTU19BVVRIX0FSQ0gKPiArYWx0ZXJu
-YXRpdmVfaWZfbm90IEFSTTY0X0hBU19BRERSRVNTX0FVVEgKPiAgCWIJMjAwMGYKPiAgYWx0ZXJu
-YXRpdmVfZWxzZV9ub3BfZW5kaWYKPiAtYWx0ZXJuYXRpdmVfaWZfbm90IEFSTTY0X0hBU19BRERS
-RVNTX0FVVEhfSU1QX0RFRgo+IC0JYgkyMDAxZgo+IC1hbHRlcm5hdGl2ZV9lbHNlX25vcF9lbmRp
-Zgo+IC0yMDAwOgo+ICAJbXJzCVxyZWcxLCBoY3JfZWwyCj4gIAlhbmQJXHJlZzEsIFxyZWcxLCAj
-KEhDUl9BUEkgfCBIQ1JfQVBLKQo+IC0JY2J6CVxyZWcxLCAyMDAxZgo+ICsJY2J6CVxyZWcxLCAy
-MDAwZgo+ICAJYWRkCVxyZWcxLCBcZ19jdHh0LCAjQ1BVX0FQSUFLRVlMT19FTDEKPiAgCXB0cmF1
-dGhfc2F2ZV9zdGF0ZQlccmVnMSwgXHJlZzIsIFxyZWczCj4gIAlhZGQJXHJlZzEsIFxoX2N0eHQs
-ICNDUFVfQVBJQUtFWUxPX0VMMQo+ICAJcHRyYXV0aF9yZXN0b3JlX3N0YXRlCVxyZWcxLCBccmVn
-MiwgXHJlZzMKPiAgCWlzYgo+IC0yMDAxOgo+ICsyMDAwOgo+ICAuZW5kbQo+ICAKPiAgI2Vsc2Ug
-LyogIUNPTkZJR19BUk02NF9QVFJfQVVUSCAqLwo+IC0tIAo+IDIuMjcuMAo+IApfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0
-Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5l
-ZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 22/06/2020 03:25, Jianyong Wu wrote:
+> Hi Steven,
+
+Hi Jianyong
+
+[...]
+>>> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+>>> index db6dce3d0e23..366b0646c360 100644
+>>> --- a/arch/arm64/kvm/hypercalls.c
+>>> +++ b/arch/arm64/kvm/hypercalls.c
+>>> @@ -3,6 +3,7 @@
+>>>
+>>>    #include <linux/arm-smccc.h>
+>>>    #include <linux/kvm_host.h>
+>>> +#include <linux/clocksource_ids.h>
+>>>
+>>>    #include <asm/kvm_emulate.h>
+>>>
+>>> @@ -11,6 +12,10 @@
+>>>
+>>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>    {
+>>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+>>> +	struct system_time_snapshot systime_snapshot;
+>>> +	u64 cycles = 0;
+>>> +#endif
+>>>    	u32 func_id = smccc_get_function(vcpu);
+>>>    	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
+>>>    	u32 feature;
+>>> @@ -70,7 +75,52 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>    		break;
+>>>    	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>>>    		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+>>> +
+>>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+>>> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP); #endif
+>>> +		break;
+>>> +
+>>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+>>> +	/*
+>>> +	 * This serves virtual kvm_ptp.
+>>> +	 * Four values will be passed back.
+>>> +	 * reg0 stores high 32-bit host ktime;
+>>> +	 * reg1 stores low 32-bit host ktime;
+>>> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
+>>> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+>>> +	 */
+>>> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+>>> +		/*
+>>> +		 * system time and counter value must captured in the same
+>>> +		 * time to keep consistency and precision.
+>>> +		 */
+>>> +		ktime_get_snapshot(&systime_snapshot);
+>>> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
+>>> +			break;
+>>> +		val[0] = upper_32_bits(systime_snapshot.real);
+>>> +		val[1] = lower_32_bits(systime_snapshot.real);
+>>> +		/*
+>>> +		 * which of virtual counter or physical counter being
+>>> +		 * asked for is decided by the first argument of smccc
+>>> +		 * call. If no first argument or invalid argument, zero
+>>> +		 * counter value will return;
+>>> +		 */
+>>
+>> It's not actually possible to have "no first argument" - there's no argument
+>> count, so whatever is in the register during the call with be passed. I'd also
+>> caution that "first argument" is ambigious: r0 could be the 'first' but is also the
+>> function number, here you mean r1.
+>>
+> Sorry,  I really make mistake here, I really mean no r1 value.
+
+My point is that it's not possible to have "no r1 value" - r1 always has 
+a value. So you can have an "invalid argument" (r1 has a value which 
+isn't valid), but it's not possible to have "no first argument". It 
+would only be possible to have no argument if the interface told us how 
+many arguments were valid, but SMCCC doesn't do that.
+
+>> There's also a subtle cast to 32 bits here (feature is u32), which might be
+>> worth a comment before someone 'optimises' by removing the 'feature'
+>> variable.
+>>
+> Yeah, it's better to add a note, but I think it's better add it at the first time calling smccc_get_arg1.
+> WDYT?
+
+I'm a bit confused about where exactly you were suggesting. The 
+assignment (and implicit cast) are just below, so this comment block 
+seemed a sensible place to add the note. But I don't really mind exactly 
+where you put it (as long as it's close), it's just a subtle detail that 
+might get lost if there isn't a comment.
+
+>> Finally I'm not sure if zero counter value is best - would it not be possible for
+>> this to be a valid counter value?
+> 
+> We have two different ways to call this service in ptp_kvm guest, one needs counter cycle,  the other
+> not. So I think it's vain to return a valid counter cycle back if the ptp_kvm does not needs it.
+
+Sorry, I didn't write that very clearly. What I meant is that returning 
+'0' in the case of an invalid argument might be difficult to recognise. 
+'0' may be a valid reading of a counter (e.g. reading the counter just 
+after the VM has been created if the counter increments very slowly). So 
+it may be worth using a different value when an invalid argument has 
+been specified. E.g. an "all ones" (-1) value may be more recognisable.
+
+In practice most counters increment fast enough that this may not 
+actually be an issue, but this sort of thing is a pain to fix if it 
+becomes a problem in the future.
+
+>>
+>>> +		feature = smccc_get_arg1(vcpu);
+>>> +		switch (feature) {
+>>> +		case ARM_PTP_VIRT_COUNTER:
+>>> +			cycles = systime_snapshot.cycles -
+>>> +			vcpu_vtimer(vcpu)->cntvoff;
+>>
+>> Please indent the continuation line so that it's obvious.
+> Ok,
+> 
+>>
+>>> +			break;
+>>> +		case ARM_PTP_PHY_COUNTER:
+>>> +			cycles = systime_snapshot.cycles;
+>>> +			break;
+>>> +		}
+>>> +		val[2] = upper_32_bits(cycles);
+>>> +		val[3] = lower_32_bits(cycles);
+>>>    		break;
+>>> +#endif
+>>> +
+>>>    	default:
+>>>    		return kvm_psci_call(vcpu);
+>>>    	}
+>>> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+>>> index 86ff30131e7b..e593ec515f82 100644
+>>> --- a/include/linux/arm-smccc.h
+>>> +++ b/include/linux/arm-smccc.h
+>>> @@ -98,6 +98,9 @@
+>>>
+>>>    /* KVM "vendor specific" services */
+>>>    #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+>>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+>>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY		2
+>>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_VIRT		3
+>>>    #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>>>    #define ARM_SMCCC_KVM_NUM_FUNCS			128
+>>>
+>>> @@ -107,6 +110,33 @@
+>>>    			   ARM_SMCCC_OWNER_VENDOR_HYP,
+>> 		\
+>>>    			   ARM_SMCCC_KVM_FUNC_FEATURES)
+>>>
+>>> +/*
+>>> + * kvm_ptp is a feature used for time sync between vm and host.
+>>> + * kvm_ptp module in guest kernel will get service from host using
+>>> + * this hypercall ID.
+>>> + */
+>>> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
+>> 		\
+>>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
+>> 		\
+>>> +			   ARM_SMCCC_SMC_32,
+>> 	\
+>>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
+>> 		\
+>>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
+>>> +
+>>> +/*
+>>> + * kvm_ptp may get counter cycle from host and should ask for which
+>>> +of
+>>> + * physical counter or virtual counter by using ARM_PTP_PHY_COUNTER
+>>> +and
+>>> + * ARM_PTP_VIRT_COUNTER explicitly.
+>>> + */
+>>> +#define ARM_PTP_PHY_COUNTER
+>> 	\
+>>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
+>> 		\
+>>> +			   ARM_SMCCC_SMC_32,
+>> 	\
+>>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
+>> 		\
+>>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY)
+>>> +
+>>> +#define ARM_PTP_VIRT_COUNTER
+>> 	\
+>>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
+>> 		\
+>>> +			   ARM_SMCCC_SMC_32,
+>> 	\
+>>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
+>> 		\
+>>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_VIRT)
+>>
+>> These two are not SMCCC calls themselves (just parameters to an SMCCC),
+>> so they really shouldn't be defined using ARM_SMCCC_CALL_VAL (it's just
+>> confusing and unnecessary). Can we not just pick small integers (e.g. 0 and 1)
+>> for these?
+>>
+> Yeah, I think so, it's better to define these parameters ID as single number and not related to
+> SMCCC. What about keep these 2 macros and define it directly as a number in include/linux/arm-smccc.h.
+
+Yes that sounds good.
+
+>> We also need some documentation of these SMCCC calls somewhere which
+>> would make this sort of review easier. For instance for paravirtualised stolen
+>> time there is Documentation/virt/kvm/arm/pvtime.rst (which also links to
+>> the published document from Arm).
+>>
+> Good point, a documentation is needed to explain these new SMCCC funcs.
+> Do you think we should do that in this patch serial? Does it beyond the scope of this patch set?
+
+Adding it in this patch series seems like the right place to me.
+
+Thanks,
+
+Steve
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
