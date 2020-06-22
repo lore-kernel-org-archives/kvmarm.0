@@ -2,80 +2,59 @@ Return-Path: <SRS0=1gKC=AD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A7CC433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 08:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0D4C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 08:35:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3201720739
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 08:20:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="nVSSN+CL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3201720739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 669BC206C3
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Jun 2020 08:35:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669BC206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE82C4B0B1;
-	Mon, 22 Jun 2020 04:20:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEDB44B0B7;
+	Mon, 22 Jun 2020 04:35:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YM59fyWdxlM8; Mon, 22 Jun 2020 04:20:07 -0400 (EDT)
+	with ESMTP id gUoLgKQGP-9O; Mon, 22 Jun 2020 04:35:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A21934B0AD;
-	Mon, 22 Jun 2020 04:20:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC55F4B0B4;
+	Mon, 22 Jun 2020 04:35:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35DDD4A524
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 04:20:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56DD54B080
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 04:35:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0SBIVkzWBybo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2020 04:20:05 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CD3D4A551
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 04:20:05 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EE6642068F;
- Mon, 22 Jun 2020 08:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1592814004;
- bh=URQIH36IqjHAteI3tRS6PZtAXue0JD4PEjTxbOmb5qU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=nVSSN+CLiSvIKWPd24EkPUl3Ob6KStXkYRXCEsoQTo7aDMPoi97U3ShMjICfKR2Mi
- nqHP5H1VUop/5gogJDDkvCp/rfx19fXuG9ZOfzfyZByX0CzSN2snWTDbG8U61kHs/9
- sEWHcdYP05wIeiSEtSDHAVDxhljSINmM3buGhIk0=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jnHgQ-005FZq-HE; Mon, 22 Jun 2020 09:20:02 +0100
-MIME-Version: 1.0
-Date: Mon, 22 Jun 2020 09:20:02 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <drjones@redhat.com>
+ with ESMTP id Tt+9U-mh8UbT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2020 04:35:13 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 877F54A551
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2020 04:35:13 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E5851FB;
+ Mon, 22 Jun 2020 01:35:13 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55C233F6CF;
+ Mon, 22 Jun 2020 01:35:12 -0700 (PDT)
 Subject: Re: [PATCH 2/4] arm64/x86: KVM: Introduce steal time cap
-In-Reply-To: <20200619184629.58653-3-drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>
 References: <20200619184629.58653-1-drjones@redhat.com>
  <20200619184629.58653-3-drjones@redhat.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, steven.price@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- steven.price@arm.com
+ <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <b11baec8-10f2-f389-ab8d-16224e9525a4@arm.com>
+Date: Mon, 22 Jun 2020 09:35:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
+Content-Language: en-GB
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,115 +66,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On 2020-06-19 19:46, Andrew Jones wrote:
-> arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
-> support for steal time. However this is unnecessary and complicates
-> userspace (userspace may prefer delaying vcpu creation until after
-> feature probing). Since probing steal time only requires a KVM fd,
-> we introduce a cap that can be checked.
-
-So this is purely an API convenience, right? You want a way to
-identify the presence of steal time accounting without having to
-create a vcpu? It would have been nice to have this requirement
-before we merged this code :-(.
-
-> Additionally, when probing
-> steal time we should check delayacct_on, because even though
-> CONFIG_KVM selects TASK_DELAY_ACCT, it's possible for the host
-> kernel to have delay accounting disabled with the 'nodelayacct'
-> command line option. x86 already determines support for steal time
-> by checking delayacct_on and can already probe steal time support
-> with a kvm fd (KVM_GET_SUPPORTED_CPUID), but we add the cap there
-> too for consistency.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst | 11 +++++++++++
->  arch/arm64/kvm/arm.c           |  3 +++
->  arch/x86/kvm/x86.c             |  3 +++
->  include/uapi/linux/kvm.h       |  1 +
->  4 files changed, 18 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst 
-> b/Documentation/virt/kvm/api.rst
-> index 9a12ea498dbb..05b1fdb88383 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6151,3 +6151,14 @@ KVM can therefore start protected VMs.
->  This capability governs the KVM_S390_PV_COMMAND ioctl and the
->  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
->  guests when the state change is invalid.
-> +
-> +8.24 KVM_CAP_STEAL_TIME
-> +-----------------------
-> +
-> +:Architectures: arm64, x86
-> +
-> +This capability indicates that KVM supports steal time accounting.
-> +When steal time accounting is supported it may be enabled with
-> +architecture-specific interfaces.  For x86 see
-> +Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".  For arm64 see
-> +Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL"
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 90cb90561446..f6dca6d09952 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
-> long ext)
->  		 */
->  		r = 1;
->  		break;
-> +	case KVM_CAP_STEAL_TIME:
-> +		r = sched_info_on();
-> +		break;
->  	default:
->  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
->  		break;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 00c88c2f34e4..ced6335e403e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3533,6 +3533,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
-> *kvm, long ext)
->  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
->  		break;
-> +	case KVM_CAP_STEAL_TIME:
-> +		r = sched_info_on();
-> +		break;
->  	default:
->  		break;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4fdf30316582..121fb29ac004 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SECURE_GUEST 181
->  #define KVM_CAP_HALT_POLL 182
->  #define KVM_CAP_ASYNC_PF_INT 183
-> +#define KVM_CAP_STEAL_TIME 184
-> 
->  #ifdef KVM_CAP_IRQ_ROUTING
-
-Shouldn't you also add the same check of sched_info_on() to
-the various pvtime attribute handling functions? It feels odd
-that the capability can say "no", and yet we'd accept userspace
-messing with the steal time parameters...
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjIvMDYvMjAyMCAwOToyMCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFuZHJldywKPiAK
+PiBPbiAyMDIwLTA2LTE5IDE5OjQ2LCBBbmRyZXcgSm9uZXMgd3JvdGU6ClsuLi5dCj4+IGRpZmYg
+LS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3Zt
+LmgKPj4gaW5kZXggNGZkZjMwMzE2NTgyLi4xMjFmYjI5YWMwMDQgMTAwNjQ0Cj4+IC0tLSBhL2lu
+Y2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+PiArKysgYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgK
+Pj4gQEAgLTEwMzEsNiArMTAzMSw3IEBAIHN0cnVjdCBrdm1fcHBjX3Jlc2l6ZV9ocHQgewo+PiDC
+oCNkZWZpbmUgS1ZNX0NBUF9QUENfU0VDVVJFX0dVRVNUIDE4MQo+PiDCoCNkZWZpbmUgS1ZNX0NB
+UF9IQUxUX1BPTEwgMTgyCj4+IMKgI2RlZmluZSBLVk1fQ0FQX0FTWU5DX1BGX0lOVCAxODMKPj4g
+KyNkZWZpbmUgS1ZNX0NBUF9TVEVBTF9USU1FIDE4NAo+Pgo+PiDCoCNpZmRlZiBLVk1fQ0FQX0lS
+UV9ST1VUSU5HCj4gCj4gU2hvdWxkbid0IHlvdSBhbHNvIGFkZCB0aGUgc2FtZSBjaGVjayBvZiBz
+Y2hlZF9pbmZvX29uKCkgdG8KPiB0aGUgdmFyaW91cyBwdnRpbWUgYXR0cmlidXRlIGhhbmRsaW5n
+IGZ1bmN0aW9ucz8gSXQgZmVlbHMgb2RkCj4gdGhhdCB0aGUgY2FwYWJpbGl0eSBjYW4gc2F5ICJu
+byIsIGFuZCB5ZXQgd2UnZCBhY2NlcHQgdXNlcnNwYWNlCj4gbWVzc2luZyB3aXRoIHRoZSBzdGVh
+bCB0aW1lIHBhcmFtZXRlcnMuLi4KCk15IHRob3VnaHQgd2FzIHRoYXQgdG8gc29tZSBleHRlbnQg
+dGhlIHR3byBhcmUgc2VwYXJhdGUuIApLVk1fQ0FQX1NURUFMX1RJTUUgaXMgIndlIGhhdmUgc3Rv
+bGVuIHRpbWUgX0FORF8gaXQgcmV0dXJucyBtZWFuaW5nZnVsIApudW1iZXJzIiwgS1ZNX0hBU19E
+RVZJQ0VfQVRUUihLVk1fQVJNX1ZDUFVfUFZUSU1FX0lQQSkgaXMgCih1bmZvcnR1bmF0ZWx5KSAi
+d2UgaGF2ZSB0aGUgc3RvbGVuIGludGVyZmFjZSwgYnV0IGl0IG1pZ2h0IG5vdCBzaG93IGhvdyAK
+bXVjaCB0aW1lIGlzIHN0b2xlbiIuIFJlc3RvcmluZyBhIFZNIG9uIGEgaG9zdCB3aXRoIFZDUFVf
+UFZUSU1FX0lQQSBidXQgCndpdGhvdXQgS1ZNX0NBUF9TVEVBTF9USU1FIGlzIHBvc3NpYmxlIGp1
+c3Qgd29uJ3QgcHJvdmlkZSBhbnkgc3RvbGVuIAp0aW1lIGRhdGEgKHRoZSBTTUMgY2FsbHMgd2ls
+bCBzdGlsbCB3b3JrIGFuZCB0aGUgZGF0YSBmb3JtYXQgaXMgdmFsaWQpLgoKT2J2aW91c2x5IHdp
+dGggaGluZHNpZ2h0IEkgd291bGQgaGF2ZSBkb25lIHRoaXMgZGlmZmVyZW50bHkuLi4KClN0ZXZl
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
