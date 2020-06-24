@@ -2,66 +2,75 @@ Return-Path: <SRS0=cLfN=AF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59606C433E1
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Jun 2020 11:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2235DC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Jun 2020 12:58:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E32E520CC7
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Jun 2020 11:52:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32E520CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9C6372076E
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Jun 2020 12:58:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7LBBWk0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6372076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA344B1E9;
-	Wed, 24 Jun 2020 07:52:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3608E4B20A;
+	Wed, 24 Jun 2020 08:58:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sytnZUEIJjOP; Wed, 24 Jun 2020 07:52:08 -0400 (EDT)
+	with ESMTP id Hkh2pbDQZzF8; Wed, 24 Jun 2020 08:58:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 163824B1F0;
-	Wed, 24 Jun 2020 07:52:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0297A4B244;
+	Wed, 24 Jun 2020 08:58:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF384B1D5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2020 07:52:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2BB64B20A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2020 08:58:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h9TxK7OtR4SZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jun 2020 07:52:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36BBF4B1D1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2020 07:52:05 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D881E1F1;
- Wed, 24 Jun 2020 04:52:04 -0700 (PDT)
-Received: from gaia (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FA4E3F6CF;
- Wed, 24 Jun 2020 04:52:03 -0700 (PDT)
-Date: Wed, 24 Jun 2020 12:52:01 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [RFC PATCH 0/2] MTE support for KVM guest
-Message-ID: <20200624115200.GA31575@gaia>
-References: <20200617123844.29960-1-steven.price@arm.com>
- <CAFEAcA8Myn_QEjfk4Ka604PDAUAWXs6dLUY5bEQ98C__oMsmhA@mail.gmail.com>
- <20200624093846.GA11863@gaia> <20200624103412.GD25945@arm.com>
- <faa68f22-4d8e-0290-b52a-63ae7425b988@arm.com>
- <20200624110904.GB11863@gaia>
- <904edac0-3de7-35a6-a9bc-b983ccd3490c@arm.com>
+ with ESMTP id dZftt-d-Nog1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Jun 2020 08:58:52 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C11F44B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2020 08:58:52 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AC7F920706;
+ Wed, 24 Jun 2020 12:58:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593003531;
+ bh=wc5mxzVtIYH7yXtP0I4Y5L+JdMP9jb1MqWLgvygyC2Q=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=g7LBBWk0hcjd9EWZt5yCOj+T1kx3Nm+H/7l/getRmdhgGbnYXcCS7OByq70ddLFLp
+ c26IiFZtjdu0zSZHl/BF7aEBhL5FZ21TcitI3oJgebolD4iDQdMXOL2H/63jOWFhbl
+ 1LguVB1N74FOG5WCRfQjYaROpMCGXIAihnhNJpsM=
+Date: Wed, 24 Jun 2020 13:58:46 +0100
+From: Will Deacon <will@kernel.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH stable 4.9] arm64: entry: Place an SB sequence following
+ an ERET instruction
+Message-ID: <20200624125846.GD6270@willie-the-truck>
+References: <20200612044219.31606-1-f.fainelli@gmail.com>
+ <2bcebe48-1218-403a-798c-da30d678fdd6@gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <904edac0-3de7-35a6-a9bc-b983ccd3490c@arm.com>
+In-Reply-To: <2bcebe48-1218-403a-798c-da30d678fdd6@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Dave P Martin <Dave.Martin@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: "open list:KERNEL VIRTUAL MACHINE \(KVM\)" <kvm@vger.kernel.org>,
+ Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>,
+ stable@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,79 +87,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jun 24, 2020 at 12:18:46PM +0100, Steven Price wrote:
-> On 24/06/2020 12:09, Catalin Marinas wrote:
-> > On Wed, Jun 24, 2020 at 12:03:35PM +0100, Steven Price wrote:
-> > > On 24/06/2020 11:34, Dave Martin wrote:
-> > > > On Wed, Jun 24, 2020 at 10:38:48AM +0100, Catalin Marinas wrote:
-> > > > > On Tue, Jun 23, 2020 at 07:05:07PM +0100, Peter Maydell wrote:
-> > > > > > On Wed, 17 Jun 2020 at 13:39, Steven Price <steven.price@arm.com> wrote:
-> > > > > > > These patches add support to KVM to enable MTE within a guest. It is
-> > > > > > > based on Catalin's v4 MTE user space series[1].
-> > > > > > > 
-> > > > > > > [1] http://lkml.kernel.org/r/20200515171612.1020-1-catalin.marinas%40arm.com
-> > > > > > > 
-> > > > > > > Posting as an RFC as I'd like feedback on the approach taken.
-> > > > > > 
-> > > > > > What's your plan for handling tags across VM migration?
-> > > > > > Will the kernel expose the tag ram to userspace so we
-> > > > > > can copy it from the source machine to the destination
-> > > > > > at the same time as we copy the actual ram contents ?
-> > > > > 
-> > > > > Qemu can map the guest memory with PROT_MTE and access the tags directly
-> > > > > with LDG/STG instructions. Steven was actually asking in the cover
-> > > > > letter whether we should require that the VMM maps the guest memory with
-> > > > > PROT_MTE as a guarantee that it can access the guest tags.
-> > > > > 
-> > > > > There is no architecturally visible tag ram (tag storage), that's a
-> > > > > microarchitecture detail.
-> > > > 
-> > > > If userspace maps the guest memory with PROT_MTE for dump purposes,
-> > > > isn't it going to get tag check faults when accessing the memory
-> > > > (i.e., when dumping the regular memory content, not the tags
-> > > > specifically).
-> > > > 
-> > > > Does it need to map two aliases, one with PROT_MTE and one without,
-> > > > and is that architecturally valid?
-> > > 
-> > > Userspace would either need to have two mappings (I don't believe there are
-> > > any architectural issues with that - but this could be awkward to arrange in
-> > > some situations) or be careful to avoid faults. Basically your choices with
-> > > one mapping are:
-> > > 
-> > >   1. Disable tag checking (using prctl) when touching the memory. This works
-> > > but means you lose tag checking for the VMM's own accesses during this code
-> > > sequence.
-> > > 
-> > >   2. Read the tag values and ensure you use the correct tag. This suffers
-> > > from race conditions if the VM is still running.
-> > > 
-> > >   3. Use one of the exceptions in the architecture that generates a Tag
-> > > Unchecked access. Sadly the only remotely useful thing I can see in the v8
-> > > ARM is "A base register plus immediate offset addressing form, with the SP
-> > > as the base register." - but making sure SP is in range of where you want to
-> > > access would be a pain.
+On Tue, Jun 23, 2020 at 11:46:37AM -0700, Florian Fainelli wrote:
+> On 6/11/20 9:42 PM, Florian Fainelli wrote:
+> > From: Will Deacon <will.deacon@arm.com>
 > > 
-> > Or:
+> > commit 679db70801da9fda91d26caf13bf5b5ccc74e8e8 upstream
 > > 
-> > 4. Set PSTATE.TCO when accessing tagged memory in an unsafe way.
+> > Some CPUs can speculate past an ERET instruction and potentially perform
+> > speculative accesses to memory before processing the exception return.
+> > Since the register state is often controlled by a lower privilege level
+> > at the point of an ERET, this could potentially be used as part of a
+> > side-channel attack.
+> > 
+> > This patch emits an SB sequence after each ERET so that speculation is
+> > held up on exception return.
+> > 
+> > Signed-off-by: Will Deacon <will.deacon@arm.com>
+> > [florian: Adjust hyp-entry.S to account for the label]
+> > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> > ---
+> > Will,
+> > 
+> > Can you confirm that for 4.9 these are the only places that require
+> > patching? Thank you!
 > 
-> Ah yes, similar to (1) but much lower overhead ;) That's probably the best
-> option - it can be hidden in a memcpy_ignoring_tags() function. However it
-> still means that the VMM can't directly touch the guest's memory which might
-> cause issues for the VMM.
+> Hi Will, Catalin,
+> 
+> Does this look good to you for a 4.9 backport? I would like to see this
+> included at some point since this pertains to CVE-2020-13844.
 
-You are right, I don't think it's safe for the VMM to access the guest
-memory via a PROT_MTE mapping. If the guest is using memory tagging for
-for a buffer and then it is passed to qemu for virtio, the tag
-information may have been lost already (does qemu only get the IPA in
-this case?)
+I think you're missing one of the ERET instructions in hyp/entry.S
 
-So we may end up with two mappings after all, one for the normal
-execution and a new on if migration is needed.
-
--- 
-Catalin
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
