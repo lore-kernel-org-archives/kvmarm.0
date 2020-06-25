@@ -2,95 +2,66 @@ Return-Path: <SRS0=2KC8=AG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B5FC433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 11:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580A9C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 12:19:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E967A207BB
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 11:54:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="MhOzW3yI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E967A207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D644D206C3
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 12:19:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D644D206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A7A4B4C9;
-	Thu, 25 Jun 2020 07:54:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C9434B4E0;
+	Thu, 25 Jun 2020 08:19:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8t3kTt4REE7D; Thu, 25 Jun 2020 07:54:00 -0400 (EDT)
+	with ESMTP id JFjD8S6-7ufj; Thu, 25 Jun 2020 08:19:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 561F64B4CA;
-	Thu, 25 Jun 2020 07:54:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 116F44B4D3;
+	Thu, 25 Jun 2020 08:19:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 326D44B4C7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 07:53:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15F204B4D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 08:19:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EFDI-F77aOnA for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jun 2020 07:53:58 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 001674B4A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 07:53:57 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id s10so5503811wrw.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 04:53:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=CW6BYTLV8RVUMjaLp+LWWUGTwyDc3MgC2HjUHbF/G2s=;
- b=MhOzW3yI+siMjHTtYaiCz2XLI6/mry8izaTQaA34GiRDbsBr88f4b3j8djs9+W84H4
- F+tDSo9EVncOoAMEqTx3X5wJsmZn3M3Phy8Ait0ENNBBAuKcEFkQkOgU4YaEj/fMgFkN
- 4qGDx8jnpdvv4MTKVr6SE2n7URh3I3WOvT8qwnrx26Z/a5zvG5xtwrGZRoj73cNfJnLC
- nYLmhjOcqQBfKnKjbGTp7DPyAIOn8vR019zIH0M4SzNBjAc4PS/zfjgw6TZ8z6PU0qxV
- RdkFK9ebW2V1iQfgLGgGt0MmWs1sUY+I1jWGbdLNOAYbZ3AJCooZimhraUf0vFkOVwsS
- UJMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=CW6BYTLV8RVUMjaLp+LWWUGTwyDc3MgC2HjUHbF/G2s=;
- b=HAJkZgcLN1BX/dT5bj9F6pkkx3anpjbqfHnC+wcvlSUq8p/yXYgFwEVCBd37/53h7R
- mX607SNqOR2/K+uTJ6znReuPemIvzFq0wMgYNXngd1GGiZ42XXCnmbo1gJKE5lIwyJN4
- OF7NS7u4HQIDfw0au5FMXipdguGt3LrIIM5nU8roiqeueBJk8+c9v1pqyrxSjmm3NJuJ
- HdnWa9s4HIX3lULv5+PF2zphS31tnfXF46qLoICQN0W+ie69fsXz1U0bkIolyJey7+DJ
- hmCp36HfSWLuYFbKjx8it/xrmn4eGM2Cl32dztY+AgsR1kWZ9VwQriYDu+Rfz9befkcX
- VuyA==
-X-Gm-Message-State: AOAM532Ic4gwlTIl85Lvp3xsmYDq4vPm2K3pkBMxG9oapIbvhRbABpZd
- znEYf7xsYzUqJMWT7q7sl6Xv/g==
-X-Google-Smtp-Source: ABdhPJy559uKp/8Pf7fBmRXt3yEfg0Q4Vzy6+P4IVjpOo/VV24C39KBymKP81gddL3dRbcznwrSMKA==
-X-Received: by 2002:adf:e749:: with SMTP id c9mr39236061wrn.25.1593086036592; 
- Thu, 25 Jun 2020 04:53:56 -0700 (PDT)
-Received: from google.com ([2a01:4b00:8523:2d03:c126:6748:7a9d:2d])
- by smtp.gmail.com with ESMTPSA id h203sm12165406wme.37.2020.06.25.04.53.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 25 Jun 2020 04:53:55 -0700 (PDT)
-Date: Thu, 25 Jun 2020 12:53:55 +0100
-From: David Brazdil <dbrazdil@google.com>
+ with ESMTP id 9aiA+gjbqKGN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jun 2020 08:19:18 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A866D4B4D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 08:19:18 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A0751FB;
+ Thu, 25 Jun 2020 05:19:18 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 073353F73C;
+ Thu, 25 Jun 2020 05:19:15 -0700 (PDT)
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 05/15] arm64: kvm: Build hyp-entry.S separately for
- VHE/nVHE
-Message-ID: <20200625115355.iqt3np4m6gjmpbap@google.com>
-References: <20200618122537.9625-1-dbrazdil@google.com>
- <20200618122537.9625-6-dbrazdil@google.com>
- <5029f8fb4a7816e11de7469c09347c79@kernel.org>
- <20200622102041.myve2otyoj5q7j5s@google.com>
- <491f3c8877897a4ac69d69fb7354c1cb@kernel.org>
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
+Date: Thu, 25 Jun 2020 13:19:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <491f3c8877897a4ac69d69fb7354c1cb@kernel.org>
-Cc: kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <9c0044564885d3356f76b55f35426987@kernel.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,82 +73,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Marc,
-
-> I'd be happy with the (maybe temporary) magic approach. It helps reasoning
-> about things, and makes the transition smoother. Yes, bugs could crop up
-> there, but given the static nature of obtaining a symbol's address, I'm
-> fairly confident we'll get it right. The same cannot be said about pointers
-> though.
-
-Ok, so this is what it would look like:
-
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 6a682d66a640..0d1b3b1946f0 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -59,13 +59,14 @@
- #define DECLARE_KVM_HYP_SYM(sym)               \
-        DECLARE_KVM_VHE_SYM(sym);               \
-        DECLARE_KVM_NVHE_SYM(sym)
-+#define CHOOSE_HYP_SYM(sym) (has_vhe() ? sym : kvm_nvhe_sym(sym))
-
- /* Translate a kernel address of @sym into its equivalent linear mapping */
--#define kvm_ksym_ref(sym)                                              \
-+#define kvm_ksym_ref(ptr)                                              \
-        ({                                                              \
--               void *val = &sym;                                       \
-+               void *val = (ptr);                                      \
-                if (!is_kernel_in_hyp_mode())                           \
--                       val = lm_alias(&sym);                           \
-+                       val = lm_alias((ptr));                          \
-                val;                                                    \
-         })
- #define kvm_ksym_ref_nvhe(sym) kvm_ksym_ref(kvm_nvhe_sym(sym))
-@@ -76,7 +77,14 @@ struct kvm_vcpu;
- extern char __kvm_hyp_init[];
- extern char __kvm_hyp_init_end[];
-
--extern char __kvm_hyp_vector[];
-+DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
-+#define __kvm_hyp_vector CHOOSE_HYP_SYM(__kvm_hyp_vector)
-+
-+#ifdef CONFIG_KVM_INDIRECT_VECTORS
-+DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
-+#define __bp_harden_hyp_vecs CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
-+extern atomic_t arm64_el2_vector_last_slot;
-+#endif
-
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
-
-Everything compiles and boots. Only existing code I had to change was:
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 90cb90561446..34b551385153 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1285,7 +1285,7 @@ static void cpu_init_hyp_mode(void)
-         * so that we can use adr_l to access per-cpu variables in EL2.
-         */
-        tpidr_el2 = ((unsigned long)this_cpu_ptr(&kvm_host_data) -
--                    (unsigned long)kvm_ksym_ref(kvm_host_data));
-+                    (unsigned long)kvm_ksym_ref(&kvm_host_data));
-
-        pgd_ptr = kvm_mmu_get_httbr();
-        hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
-
-WDYT?
-
-Thanks,
--David
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDYvMTYvMjAgNToxOCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFs
+ZXhhbmRydSwKPiBbLi5dCj4+PiBbLi5dCj4+Pgo+Pj4gwqAvKioKPj4+IC0gKiBrdm1fYWxsb2Nf
+c3RhZ2UyX3BnZCAtIGFsbG9jYXRlIGxldmVsLTEgdGFibGUgZm9yIHN0YWdlLTIgdHJhbnNsYXRp
+b24uCj4+PiAtICogQGt2bTrCoMKgwqAgVGhlIEtWTSBzdHJ1Y3QgcG9pbnRlciBmb3IgdGhlIFZN
+Lgo+Pj4gKyAqIGt2bV9pbml0X3N0YWdlMl9tbXUgLSBJbml0aWFsaXNlIGEgUzIgTU1VIHN0cnVj
+cnVyZQo+Pj4gKyAqIEBrdm06wqDCoMKgIFRoZSBwb2ludGVyIHRvIHRoZSBLVk0gc3RydWN0dXJl
+Cj4+PiArICogQG1tdTrCoMKgwqAgVGhlIHBvaW50ZXIgdG8gdGhlIHMyIE1NVSBzdHJ1Y3R1cmUK
+Pj4+IMKgICoKPj4+IMKgICogQWxsb2NhdGVzIG9ubHkgdGhlIHN0YWdlLTIgSFcgUEdEIGxldmVs
+IHRhYmxlKHMpIG9mIHNpemUgZGVmaW5lZCBieQo+Pj4gLSAqIHN0YWdlMl9wZ2Rfc2l6ZShrdm0p
+Lgo+Pj4gKyAqIHN0YWdlMl9wZ2Rfc2l6ZShtbXUtPmt2bSkuCj4+PiDCoCAqCj4+PiDCoCAqIE5v
+dGUgd2UgZG9uJ3QgbmVlZCBsb2NraW5nIGhlcmUgYXMgdGhpcyBpcyBvbmx5IGNhbGxlZCB3aGVu
+IHRoZSBWTSBpcwo+Pj4gwqAgKiBjcmVhdGVkLCB3aGljaCBjYW4gb25seSBiZSBkb25lIG9uY2Uu
+Cj4+PiDCoCAqLwo+Pj4gLWludCBrdm1fYWxsb2Nfc3RhZ2UyX3BnZChzdHJ1Y3Qga3ZtICprdm0p
+Cj4+PiAraW50IGt2bV9pbml0X3N0YWdlMl9tbXUoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3Zt
+X3MyX21tdSAqbW11KQo+Pj4gwqB7Cj4+PiDCoMKgwqDCoCBwaHlzX2FkZHJfdCBwZ2RfcGh5czsK
+Pj4+IMKgwqDCoMKgIHBnZF90ICpwZ2Q7Cj4+PiArwqDCoMKgIGludCBjcHU7Cj4+Pgo+Pj4gLcKg
+wqDCoCBpZiAoa3ZtLT5hcmNoLnBnZCAhPSBOVUxMKSB7Cj4+PiArwqDCoMKgIGlmIChtbXUtPnBn
+ZCAhPSBOVUxMKSB7Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIGt2bV9lcnIoImt2bV9hcmNoIGFscmVh
+ZHkgaW5pdGlhbGl6ZWQ/XG4iKTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU5WQUw7
+Cj4+PiDCoMKgwqDCoCB9Cj4+PiBAQCAtMTAyNCw4ICsxMDQwLDIwIEBAIGludCBrdm1fYWxsb2Nf
+c3RhZ2UyX3BnZChzdHJ1Y3Qga3ZtICprdm0pCj4+PiDCoMKgwqDCoCBpZiAoV0FSTl9PTihwZ2Rf
+cGh5cyAmIH5rdm1fdnR0YnJfYmFkZHJfbWFzayhrdm0pKSkKPj4+IMKgwqDCoMKgwqDCoMKgwqAg
+cmV0dXJuIC1FSU5WQUw7Cj4+Cj4+IFdlIGRvbid0IGZyZWUgdGhlIHBnZCBpZiB3ZSBnZXQgdGhl
+IGVycm9yIGFib3ZlLCBidXQgd2UgZG8gZnJlZSBpdCBiZWxvdywgaWYKPj4gYWxsb2NhdGluZyBs
+YXN0X3ZjcHVfcmFuIGZhaWxzLiBTaG91bGRuJ3Qgd2UgZnJlZSBpdCBpbiBib3RoIGNhc2VzPwo+
+Cj4gV29ydGggaW52ZXN0aWdhdGluZy4gVGhpcyBjb2RlIGdldHMgbWFqb3JseSByZXZhbXBlZCBp
+biB0aGUgTlYgc2VyaWVzLCBzbyBpdCBpcwo+IGxpa2VseSB0aGF0IEkgbWlzc2VkIHNvbWV0aGlu
+ZyBpbiB0aGUgbWlkZGxlLgoKWW91IGRpZG4ndCBtaXNzIGFueXRoaW5nLCBJIGNoZWNrZWQgYW5k
+IGl0J3MgdGhlIHNhbWUgaW4gdGhlIHVwc3RyZWFtIHZlcnNpb24gb2YgS1ZNLgoKa3ZtX2FyY2hf
+aW5pdF92bSgpIHJldHVybnMgd2l0aCBhbiBlcnJvciBpZiB0aGlzIGZ1bmN0aW9ucyBmYWlscywg
+c28gaXQncyB1cCB0bwp0aGUgZnVuY3Rpb24gdG8gZG8gdGhlIGNsZWFuIHVwLiBrdm1fYWxsb2Nf
+cGFnZXNfZXhhY3QoKSByZXR1cm5zIE5VTEwgb24gZXJyb3IsIHNvCmF0IHRoaXMgcG9pbnQgd2Ug
+aGF2ZSBhIHZhbGlkIGFsbG9jYXRpb24gb2YgcGh5c2ljYWwgY29udGlndW91cyBwYWdlcy4gRmFp
+bGluZyB0bwpjcmVhdGUgYSBWTSBpcyBub3QgYSBmYXRhbCBlcnJvciBmb3IgdGhlIHN5c3RlbSwg
+c28gSSdtIHRoaW5raW5nIHRoYXQgbWF5YmUgd2UKc2hvdWxkIGZyZWUgdGhvc2UgcGFnZXMgZm9y
+IHRoZSByZXN0IG9mIHRoZSBzeXN0ZW0gdG8gdXNlLiBIb3dldmVyLCB0aGlzIGlzIGEKbWlub3Ig
+aXNzdWUsIGFuZCB0aGUgcGF0Y2ggaXNuJ3Qgc3VwcG9zZWQgdG8gbWFrZSBhbnkgZnVuY3Rpb25h
+bCBjaGFuZ2VzLCBzbyBpdApjYW4gYmUgcHJvYmFibHkgYmUgbGVmdCBmb3IgYW5vdGhlciBwYXRj
+aCBhbmQgbm90IGFkZCBtb3JlIHRvIGFuIGFscmVhZHkgYmlnIHNlcmllcy4KClRoYW5rcywKQWxl
+eApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0g
+bWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5j
+cy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
