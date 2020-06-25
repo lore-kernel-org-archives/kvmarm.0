@@ -2,91 +2,81 @@ Return-Path: <SRS0=2KC8=AG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6DEC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 18:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28092C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 22:04:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 61F2020781
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 18:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95E2420672
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 22:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="HpNWW9Mw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F2020781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jfo/beSc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E2420672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E16CA4B10C;
-	Thu, 25 Jun 2020 14:26:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8AA94B1B4;
+	Thu, 25 Jun 2020 18:04:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IxBO2xpd5W8S; Thu, 25 Jun 2020 14:26:33 -0400 (EDT)
+	with ESMTP id 6sYD-+BnXQi4; Thu, 25 Jun 2020 18:04:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAFAC4B0FF;
-	Thu, 25 Jun 2020 14:26:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF7A54B1A2;
+	Thu, 25 Jun 2020 18:04:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B31F64A551
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 14:26:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCA8C4B1A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 18:04:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 23kPeIOotxB5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jun 2020 14:26:31 -0400 (EDT)
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com
- [209.85.216.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BAA74A4E1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 14:26:31 -0400 (EDT)
-Received: by mail-pj1-f65.google.com with SMTP id h22so3664751pjf.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 11:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ETOuWEoyx3l3QXnbkpa1FViwhlbDdj5RYMJCyJ/ebAM=;
- b=HpNWW9MwE6vq1Anc++U5txnTPeoSIrQ5ogp/CEHf3tIl/tnClkkszSCuLVxsOR4GPr
- qcQFsZrY1WgOj2xyyC4B017aZ0SuioqBQfuR9KnIkgAV64f3VaENBCHAG8DhybTBfLWK
- nEFxBn9j+386lOrjYHH726Abn7OdM3h2OFxvJqy5JV3xyI9J3wmHkmuLKsxidkQM0CMc
- EPug7d2CnudNRbjNrBVRx4MWrw8Oq4VXLovuCt05RFqTRT8U6a+Cl07V05KuUk8znw0t
- kgonB3v/6h4/vMMeve6EqnJsVah4jQabfhkmvBLZi0X9dlQkDwQnDrKzuz714RG2j/Hc
- aRHA==
+ with ESMTP id FKhXPclukjli for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jun 2020 18:04:12 -0400 (EDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6E1D4B141
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 18:04:12 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id b6so7431197wrs.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 15:04:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=dhNRoBg5bwpJi8jqJOz5Pclx/wgnmMVQ4FYzgXqH1GI=;
+ b=Jfo/beScBb8NqlCqTrzCtVVwcAgNebsFj272lm3s4ysDEL1egJNxtbzpSuyzodo8av
+ ZlVnNZ/ASn2AYqRFq/5BEpyxX8WA1gsrFosUzgi2axcQGNKdMCuMDJxYvUXqhvbpXfNm
+ keRJJo6cuI8bRnSAvWCtSOr9Vu7ZgQ+RCvQazVW/b6klF+hns/aN5oT18ZbkyQFNsH6K
+ 6AJp8W0UltKwzahDTzRZv64AMRumcopvNT46k7MkY+HQ7YK/oDy4cJj8slraNlNN8uyJ
+ TdJebyu/t3Vvhw00vwvrD2Ud09pUnX1maE3Hp265bvPppOSgSNW3R5Ij+wRwE5njy+w3
+ uO/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ETOuWEoyx3l3QXnbkpa1FViwhlbDdj5RYMJCyJ/ebAM=;
- b=jfFyo5zeHmeG6Lxu10bFIZu+7du1CAk/7hxhszjL82uY6umFE4ikPT1CU8k+HdL83R
- R/UC+ePeEA8cIYt6IPbF3hUlt2NfIF1gzVB3WL+vM6qViHGfLi+Layly6d1xJsll2HEM
- K2Oth5NsbyIr0QYstdgr9wyvAtcKEP2aQjTX3xrSbfPyJsPjFutDx1a/O0nFG55nvlKQ
- gI0MknTQ3dDsdRDW5k7/eYoMIJBgoCxQlL9+EpKxiDJCAoXPEJiTu+mCPRIlepY8IQV0
- dWpfJRtF3xlgbbwM4aEsYoS0FJQVgku7eKzP3pYmLtETW8y8wW+1H83zxRbyZU1nQeuO
- kfHg==
-X-Gm-Message-State: AOAM533mr5NHDh7BdGwoypWWbnfIZmdSYuc3xp+SG831cZaVVSzfs5/j
- fISbEX2ADZJyZqVougubcPqaC0I1Eu2X3ZgPsab6Vw==
-X-Google-Smtp-Source: ABdhPJx842ihVSXEC+dRBn4T1wBfiF1wZmkEpTThe17QN8NnIH9b7pknjYgr+o16BK9UFkYWqyd4uw/Uf/cSkjGAC0Q=
-X-Received: by 2002:a17:902:b698:: with SMTP id
- c24mr33333972pls.223.1593109590004; 
- Thu, 25 Jun 2020 11:26:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200618122537.9625-9-dbrazdil@google.com>
- <202006251244.YDWclRrq%lkp@intel.com>
- <d807e83db1f1052378b6998f683e4617@kernel.org>
- <20200625083441.GB7584@willie-the-truck>
-In-Reply-To: <20200625083441.GB7584@willie-the-truck>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Thu, 25 Jun 2020 11:26:18 -0700
-Message-ID: <CAKwvOd=TswBPY7J-VH6hm80O0eq6GPA_7YUsuddwq3RHaDMQfA@mail.gmail.com>
-Subject: Re: [PATCH v3 08/15] arm64: kvm: Split hyp/switch.c to VHE/nVHE
-To: Will Deacon <will@kernel.org>
-Cc: kbuild-all@lists.01.org, kernel test robot <lkp@intel.com>,
- android-kvm@google.com, Marc Zyngier <maz@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- clang-built-linux <clang-built-linux@googlegroups.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Philip Li <philip.li@intel.com>,
- kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=dhNRoBg5bwpJi8jqJOz5Pclx/wgnmMVQ4FYzgXqH1GI=;
+ b=WFJzfXAbtp69JLFIMjgPh+8LmgOSOUdpDkQeR/gjaUY4qD3JTbSMwN6qzPPwyFcsrI
+ RemnAKTJznknJYTZXfJnUBV+kqle/jLAnpM2SXK560uhE4r5B/AM0LAMDl6F/yT41gr3
+ LvNSjOM3y6NbZ0pT4Gyla20gM09v36BCPdl2caeoCrYfhsnJCFnfEHRVDYflLHiMhaZv
+ TqVbwotEjiaddDug79gNDwPm4CUs6NRjFKJrpszr2uGzWMMqMqlDdCxXneHNv8shxriP
+ MOjdwEtecI5zqorbUVRDccp2+L0hAGTNKE7YbpnAVWIRONkCawVhM1+KMr/ZFGSfWFJt
+ ulOw==
+X-Gm-Message-State: AOAM530Ii9Dpsb04+lgn2ab8aH3ro6TWJ4A5FERaYg8Di7I14BHAzUv2
+ ctDPp99MPOsk8hhPl7EbB++uTA==
+X-Google-Smtp-Source: ABdhPJwN9ZxjCAPTWtPaqGgrXRGKRNkBtDO5dO+NJw8LppNkrhsPp7c9+atcKtMRzy6oKj2upYJDZw==
+X-Received: by 2002:a5d:4a01:: with SMTP id m1mr348715wrq.250.1593122651573;
+ Thu, 25 Jun 2020 15:04:11 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-139-146-71.range86-139.btcentralplus.com. [86.139.146.71])
+ by smtp.gmail.com with ESMTPSA id l190sm13939277wml.12.2020.06.25.15.04.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 25 Jun 2020 15:04:11 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Thu, 25 Jun 2020 23:03:34 +0100
+Message-Id: <20200625220336.10186-1-beata.michalska@linaro.org>
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,74 +88,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 25, 2020 at 1:34 AM Will Deacon <will@kernel.org> wrote:
->
-> On Thu, Jun 25, 2020 at 09:16:03AM +0100, Marc Zyngier wrote:
-> > On 2020-06-25 06:03, kernel test robot wrote:
-> > > Hi David,
-> > >
-> > > Thank you for the patch! Perhaps something to improve:
-> > >
-> > > [auto build test WARNING on linus/master]
-> > > [also build test WARNING on v5.8-rc2 next-20200624]
-> > > [cannot apply to kvmarm/next arm64/for-next/core arm-perf/for-next/perf]
-> > > [If your patch is applied to the wrong git tree, kindly drop us a note.
-> > > And when submitting patch, we suggest to use  as documented in
-> > > https://git-scm.com/docs/git-format-patch]
-> > >
-> > > url:
-> > > https://github.com/0day-ci/linux/commits/David-Brazdil/Split-off-nVHE-hyp-code/20200618-203230
-> > > base:
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> > > 1b5044021070efa3259f3e9548dc35d1eb6aa844
-> > > config: arm64-randconfig-r021-20200624 (attached as .config)
-> > > compiler: clang version 11.0.0 (https://github.com/llvm/llvm-project
-> > > 8911a35180c6777188fefe0954a2451a2b91deaf)
-> > > reproduce (this is a W=1 build):
-> > >         wget
-> > > https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross
-> > > -O ~/bin/make.cross
-> > >         chmod +x ~/bin/make.cross
-> > >         # install arm64 cross compiling tool for clang build
-> > >         # apt-get install binutils-aarch64-linux-gnu
-> > >         # save the attached .config to linux build tree
-> > >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross
-> > > ARCH=arm64
-> > >
-> > > If you fix the issue, kindly add following tag as appropriate
-> > > Reported-by: kernel test robot <lkp@intel.com>
-> > >
-> > > All warnings (new ones prefixed by >>):
-> > >
-> > > > > arch/arm64/kvm/hyp/nvhe/switch.c:244:28: warning: no previous
-> > > > > prototype for function 'hyp_panic' [-Wmissing-prototypes]
-> > >    void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context
-> > > *host_ctxt)
-> >
-> > I really wish we could turn these warnings off. They don't add much.
-> > Or is there an annotation we could stick on the function (something
-> > like __called_from_asm_please_leave_me_alone springs to mind...)?
->
-> Agreed, I've caught myself skim-reading the kbuild robot reports now
-> because they're often just noise, and then having to force myself to look at
-> them properly when I remember. Even just something in the subject to
-> say "the only problems are W=1 warnings" would help. Is that possible?
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-When the W=1 reports started showing up, it took me a while to figure
-out these warnings were only enabled at W=1.  I asked Philip to help
-denote these in the reports, and Philip was kind enough to add a note
-in the report about W=1.  I agree that the note could still be more
-prominent.  Another part of me wants to move -Wmissing-prototypes to
-W=2, but that's just biding time until 0day starts reporting on those.
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
+
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
+
+This patchset relies on KVM to insert the external data abort into the guest.
+
+
+----------------------
+v6:
+ - replacing calling kvm_put_vcpu_events with an actual ioctl call
+ - making the handler function static
+
+v5:
+ - Drop syncing vcpu regs in favour of calling kvm_put_vcpu_events directly
+ - Fix decoding DFSC for LPAE case
+ - Add/clarify comments
+ - Switch to reporting error case failure when enabling the cap
+
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
+
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
+
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
+
+
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle misconfigured dabt injection
+
+ target/arm/cpu.h     |  2 ++
+ target/arm/kvm.c     | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/kvm32.c   | 34 ++++++++++++++++++++
+ target/arm/kvm64.c   | 49 +++++++++++++++++++++++++++++
+ target/arm/kvm_arm.h | 10 ++++++
+ 5 files changed, 181 insertions(+), 1 deletion(-)
 
 -- 
-Thanks,
-~Nick Desaulniers
+2.7.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
