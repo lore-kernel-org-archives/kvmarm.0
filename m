@@ -2,63 +2,95 @@ Return-Path: <SRS0=2KC8=AG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2042FC433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 16:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80734C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 17:13:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A447720857
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 16:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A447720857
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id F334920706
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jun 2020 17:13:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQSZ2Bq3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F334920706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 109CD4B130;
-	Thu, 25 Jun 2020 12:24:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48C0B4A95C;
+	Thu, 25 Jun 2020 13:13:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rv7e4E7S0EZ9; Thu, 25 Jun 2020 12:24:07 -0400 (EDT)
+	with ESMTP id wOHFmTlMKfgR; Thu, 25 Jun 2020 13:13:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A43374B111;
-	Thu, 25 Jun 2020 12:24:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E38F4B08B;
+	Thu, 25 Jun 2020 13:13:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 421DB4B0AC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 12:24:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBBC64B0C3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 12:37:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MiVepvisrulW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jun 2020 12:24:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D714AC80
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 12:24:05 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 248191FB;
- Thu, 25 Jun 2020 09:24:05 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E75FA3F6CF;
- Thu, 25 Jun 2020 09:24:02 -0700 (PDT)
-Subject: Re: [PATCH v2 04/17] arm64: Add level-hinted TLB invalidation helper
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-5-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <89d18c52-f3ee-8286-9353-1cd28226984a@arm.com>
-Date: Thu, 25 Jun 2020 17:24:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ with ESMTP id sdx4pZfvvOcT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jun 2020 12:37:38 -0400 (EDT)
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF4A94B09C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 12:37:38 -0400 (EDT)
+Received: by mail-ej1-f68.google.com with SMTP id w16so6596333ejj.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2020 09:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=VwAmIR6VLB+YcfnphtZyHLrRryQdawnk8xblq99lNpw=;
+ b=gQSZ2Bq3lC6LnQf8Wk4oi/jk/M+PtWAEGUIJCVTZFd0D2FgW/K9QRB/MBUeqIapMP2
+ /sptmreyARmDtm0x+VJyFlWrnJYPyMZ+ttEIz90lDqC5HgCFT7Sa9J3PkEw6zc2vC6E9
+ LZMTXIezWvX1sXa4VXd8MP2OhCyn8sVufJvL5pg0Gib0H4HumVaCUqZfoHQcodemyQNQ
+ FiZLQPHjwFUJN9aXTdGSO4hsSNX5D1r6fI6himeDy/+J6yaGZvSH11f6o4IEAsmu2xj4
+ /W6b1OyjVmrA4rD/MjrQk5RJWIBms9dkbPYUyyQcZZEtNkcrBTBFDMNX2nYasOUGJwtU
+ zacg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=VwAmIR6VLB+YcfnphtZyHLrRryQdawnk8xblq99lNpw=;
+ b=JvGW1oLXpBDWzYRJbB7Eghp9ICLt06/ISJsXADtIhHY4FIOQb5X6eJGlPQc7ZuZTm4
+ 91z00nmblD2nGbqz+nLxQ5g3P2o9W0UWeHU1OnGx9sRgNA95aJ3Jhlzhhv0y0tRdJFrh
+ KSFoNxcjI8wCwYJs8QoUVXJ4w9XFe24oBMaSWUKPKMp0DNtrzF2XUOT3T4UCurnUFL4H
+ s7TjCgQ8BGGyIwsBkU7Hdy+6E4nYmi/O7Q98PmvaC1ZuWwBKdSIqFmLAIE9KWUPZBLIA
+ CrpP7MOB3179fReCy8Y7SNd1UpD2o99JrdCbMEJ1Q/qte7+TVzNrQ5TDrC9z0H40N89M
+ gGiA==
+X-Gm-Message-State: AOAM531ZY70OBo9YeQutwrDNTGOWVmwUTtT51G9pjOcyyyHzUVFwAfGh
+ Yuf/BtRycwp2XrhGH59Kkes=
+X-Google-Smtp-Source: ABdhPJxvrRXlwZ2mp6kReJp3W3P2fYlzehlk3EWz7EpOv4/Pv2iiKdP8/uQ7IcJvK12FBnscwEgQwQ==
+X-Received: by 2002:a17:906:fcc1:: with SMTP id
+ qx1mr12562143ejb.379.1593103057718; 
+ Thu, 25 Jun 2020 09:37:37 -0700 (PDT)
+Received: from ltop.local ([2a02:a03f:b7f9:7600:7032:f41f:3b67:e84b])
+ by smtp.gmail.com with ESMTPSA id u60sm11052049edc.59.2020.06.25.09.37.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 25 Jun 2020 09:37:36 -0700 (PDT)
+Date: Thu, 25 Jun 2020 18:37:35 +0200
+From: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 08/15] arm64: kvm: Split hyp/switch.c to VHE/nVHE
+Message-ID: <20200625163735.yneq6lzpmfst2pak@ltop.local>
+References: <20200618122537.9625-9-dbrazdil@google.com>
+ <202006251244.YDWclRrq%lkp@intel.com>
+ <d807e83db1f1052378b6998f683e4617@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200615132719.1932408-5-maz@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <d807e83db1f1052378b6998f683e4617@kernel.org>
+X-Mailman-Approved-At: Thu, 25 Jun 2020 13:13:30 -0400
+Cc: kbuild-all@lists.01.org, kernel test robot <lkp@intel.com>,
+ android-kvm@google.com, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,112 +107,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Thu, Jun 25, 2020 at 09:16:03AM +0100, Marc Zyngier wrote:
+> 
+> I really wish we could turn these warnings off. They don't add much.
+> Or is there an annotation we could stick on the function (something
+> like __called_from_asm_please_leave_me_alone springs to mind...)?
 
-On 6/15/20 2:27 PM, Marc Zyngier wrote:
-> Add a level-hinted TLB invalidation helper that only gets used if
-> ARMv8.4-TTL gets detected.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/stage2_pgtable.h |  9 +++++
->  arch/arm64/include/asm/tlbflush.h       | 45 +++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> index b767904f28b1..996bf98f0cab 100644
-> --- a/arch/arm64/include/asm/stage2_pgtable.h
-> +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> @@ -256,4 +256,13 @@ stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
->  	return (boundary - 1 < end - 1) ? boundary : end;
->  }
->  
-> +/*
-> + * Level values for the ARMv8.4-TTL extension, mapping PUD/PMD/PTE and
-> + * the architectural page-table level.
-> + */
-> +#define S2_NO_LEVEL_HINT	0
-> +#define S2_PUD_LEVEL		1
-> +#define S2_PMD_LEVEL		2
-> +#define S2_PTE_LEVEL		3
-> +
->  #endif	/* __ARM64_S2_PGTABLE_H_ */
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> index bc3949064725..e05c31fd0bbc 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-> @@ -10,6 +10,7 @@
->  
->  #ifndef __ASSEMBLY__
->  
-> +#include <linux/bitfield.h>
->  #include <linux/mm_types.h>
->  #include <linux/sched.h>
->  #include <asm/cputype.h>
-> @@ -59,6 +60,50 @@
->  		__ta;						\
->  	})
->  
-> +/*
-> + * Level-based TLBI operations.
-> + *
-> + * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
-> + * the level at which the invalidation must take place. If the level is
-> + * wrong, no invalidation may take place. In the case where the level
-> + * cannot be easily determined, a 0 value for the level parameter will
-> + * perform a non-hinted invalidation.
-> + *
-> + * For Stage-2 invalidation, use the level values provided to that effect
-> + * in asm/stage2_pgtable.h.
-> + */
-> +#define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
-> +#define TLBI_TTL_PS_4K		1
-> +#define TLBI_TTL_PS_16K		2
-> +#define TLBI_TTL_PS_64K		3
+There is: '__visible'.
 
-The Arm ARM likes to call those translation granules, so maybe we can use TG
-instead of PS to be aligned with the field names in TCR/VTCR? Just a suggestion in
-case you think it works better than PS, otherwise feel free to ignore it.
-
-> +
-> +#define __tlbi_level(op, addr, level)					\
-> +	do {								\
-> +		u64 arg = addr;						\
-> +									\
-> +		if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&	\
-> +		    level) {						\
-> +			u64 ttl = level & 3;				\
-> +									\
-> +			switch (PAGE_SIZE) {				\
-> +			case SZ_4K:					\
-> +				ttl |= TLBI_TTL_PS_4K << 2;		\
-> +				break;					\
-> +			case SZ_16K:					\
-> +				ttl |= TLBI_TTL_PS_16K << 2;		\
-> +				break;					\
-> +			case SZ_64K:					\
-> +				ttl |= TLBI_TTL_PS_64K << 2;		\
-> +				break;					\
-> +			}						\
-> +									\
-> +			arg &= ~TLBI_TTL_MASK;				\
-> +			arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);		\
-> +		}							\
-> +									\
-> +		__tlbi(op, arg);					\
-> +	} while(0)
-> +
->  /*
->   *	TLB Invalidation
->   *	================
-
-I like the fact that defines are now used. I checked against Arm ARM, pages
-D5-2673 and D5-2674, and the granule size and the table level fields match, so:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
+-- Luc
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
