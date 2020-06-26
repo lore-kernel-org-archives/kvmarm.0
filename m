@@ -2,83 +2,62 @@ Return-Path: <SRS0=8LgP=AH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14323C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 09:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C718C433E1
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 09:41:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BB1B20675
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 09:12:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9/wlt0r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB1B20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 1E46D21532
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 09:41:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E46D21532
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B30484B15D;
-	Fri, 26 Jun 2020 05:12:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD234B18C;
+	Fri, 26 Jun 2020 05:41:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vht7yQ7KeY5w; Fri, 26 Jun 2020 05:12:49 -0400 (EDT)
+	with ESMTP id voo3xLa2pW3G; Fri, 26 Jun 2020 05:41:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B22A4B151;
-	Fri, 26 Jun 2020 05:12:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9956E4B166;
+	Fri, 26 Jun 2020 05:41:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77A5D4B13E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 05:12:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 537914B147
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 05:41:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G2xWJOipFim6 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2020 05:12:46 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C3AD4B0E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 05:12:46 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593162765;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7GW55amjyBmxVBVEYFyP6NXXU1860Jsa3d+2sKVvSRw=;
- b=e9/wlt0rctKoad7jp9ZXRZUp/1K7+n4FmCJDUREOg/xoudv3agDsHShxRj6n/KpsRWTeHG
- j4bhd27swZjXBSeIY4fkn+jrxs8L4avn3G0vlS8+NC2kyhTDcqAs/p9gNC6tepquFhX4qI
- 3py76bRmux4q4pTqKtIYc1/a2XomTOY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-ZjoLR9f9N8OKR8w5bhGJRg-1; Fri, 26 Jun 2020 05:12:44 -0400
-X-MC-Unique: ZjoLR9f9N8OKR8w5bhGJRg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B27A818585A4;
- Fri, 26 Jun 2020 09:12:42 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0D0510246E1;
- Fri, 26 Jun 2020 09:12:40 +0000 (UTC)
-Date: Fri, 26 Jun 2020 11:12:38 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v6 2/2] target/arm: kvm: Handle misconfigured dabt
- injection
-Message-ID: <20200626091238.xvpi5qtqummcl7qt@kamzik.brq.redhat.com>
-References: <20200625220336.10186-1-beata.michalska@linaro.org>
- <20200625220336.10186-3-beata.michalska@linaro.org>
+ with ESMTP id WpYo4JsGW-v6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jun 2020 05:41:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A9DC4A551
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 05:41:00 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 004CB1FB;
+ Fri, 26 Jun 2020 02:41:00 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49D623F71E;
+ Fri, 26 Jun 2020 02:40:58 -0700 (PDT)
+Subject: Re: [PATCH 2/2] irqchip/gic-v3: Support pseudo-NMIs when SCR_EL3.FIQ
+ == 0
+To: kernel test robot <lkp@intel.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20200625150026.867727-3-alexandru.elisei@arm.com>
+ <202006260902.snscFOg0%lkp@intel.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <31059bad-54e1-58a7-6531-14e473950bc9@arm.com>
+Date: Fri, 26 Jun 2020 10:41:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200625220336.10186-3-beata.michalska@linaro.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <202006260902.snscFOg0%lkp@intel.com>
+Content-Language: en-US
+Cc: kbuild-all@lists.01.org, jason@lakedaemon.net, maz@kernel.org,
+ clang-built-linux@googlegroups.com, catalin.marinas@arm.com,
+ tglx@linutronix.de, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,233 +74,276 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 25, 2020 at 11:03:36PM +0100, Beata Michalska wrote:
-> Injecting external data abort through KVM might trigger
-> an issue on kernels that do not get updated to include the KVM fix.
-> For those and aarch32 guests, the injected abort gets misconfigured
-> to be an implementation defined exception. This leads to the guest
-> repeatedly re-running the faulting instruction.
-> 
-> Add support for handling that case.
-> 
-> [
->   Fixed-by: 018f22f95e8a
-> 	('KVM: arm: Fix DFSR setting for non-LPAE aarch32 guests')
->   Fixed-by: 21aecdbd7f3a
-> 	('KVM: arm: Make inject_abt32() inject an external abort instead')
-> ]
-> 
-> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> ---
->  target/arm/cpu.h     |  2 ++
->  target/arm/kvm.c     | 30 +++++++++++++++++++++++++++++-
->  target/arm/kvm32.c   | 34 ++++++++++++++++++++++++++++++++++
->  target/arm/kvm64.c   | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/kvm_arm.h | 10 ++++++++++
->  5 files changed, 124 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 677584e..ed0ff09 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -570,6 +570,8 @@ typedef struct CPUARMState {
->          uint64_t esr;
->      } serror;
->  
-> +    uint8_t ext_dabt_raised; /* Tracking/verifying injection of ext DABT */
-> +
->      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
->      uint32_t irq_line_state;
->  
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 265c4b8..85a09ea 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -749,6 +749,29 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
->  
->  void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
->  {
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    if (unlikely(env->ext_dabt_raised)) {
-> +        /*
-> +         * Verifying that the ext DABT has been properly injected,
-> +         * otherwise risking indefinitely re-running the faulting instruction
-> +         * Covering a very narrow case for kernels 5.5..5.5.4
-> +         * when injected abort was misconfigured to be
-> +         * an IMPLEMENTATION DEFINED exception (for 32-bit EL1)
-> +         */
-> +        if (!arm_feature(env, ARM_FEATURE_AARCH64) &&
-> +            unlikely(!kvm_arm_verify_ext_dabt_pending(cs))) {
-> +
-> +            error_report("Data abort exception with no valid ISS generated by "
-> +                   "guest memory access. KVM unable to emulate faulting "
-> +                   "instruction. Failed to inject an external data abort "
-> +                   "into the guest.");
-> +            abort();
-> +       }
-> +       /* Clear the status */
-> +       env->ext_dabt_raised = 0;
-> +    }
->  }
->  
->  MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-> @@ -833,6 +856,8 @@ void kvm_arm_vm_state_change(void *opaque, int running, RunState state)
->  static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
->                               uint64_t fault_ipa)
->  {
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
->      /*
->       * Request KVM to inject the external data abort into the guest
->       */
-> @@ -852,7 +877,10 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
->           */
->          events.exception.ext_dabt_pending = 1;
->  
-> -        return kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-> +        if (!kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events)) {
-> +            env->ext_dabt_raised = 1;
-> +            return 0;
-> +        }
->      } else {
->          error_report("Data abort exception triggered by guest memory access "
->                       "at physical address: 0x"  TARGET_FMT_lx,
-> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-> index 7b3a19e..0af46b4 100644
-> --- a/target/arm/kvm32.c
-> +++ b/target/arm/kvm32.c
-> @@ -559,3 +559,37 @@ void kvm_arm_pmu_init(CPUState *cs)
->  {
->      qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
->  }
-> +
-> +#define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
-> +#define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
-> +/*
-> + *DFSR:
-> + *      TTBCR.EAE == 0
-> + *          FS[4]   - DFSR[10]
-> + *          FS[3:0] - DFSR[3:0]
-> + *      TTBCR.EAE == 1
-> + *          FS, bits [5:0]
-> + */
-> +#define DFSR_FSC(lpae, v) \
-> +    ((lpae) ? ((v) & 0x3F) : (((v) >> 6) | ((v) & 0x1F)))
-> +
-> +#define DFSC_EXTABT(lpae) ((lpae) ? 0x10 : 0x08)
-> +
-> +bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-> +{
-> +    uint32_t dfsr_val;
-> +
-> +    if (!kvm_get_one_reg(cs, ARM_REG_DFSR, &dfsr_val)) {
-> +        ARMCPU *cpu = ARM_CPU(cs);
-> +        CPUARMState *env = &cpu->env;
-> +        uint32_t ttbcr;
-> +        int lpae = 0;
-> +
-> +        if (!kvm_get_one_reg(cs, ARM_REG_TTBCR, &ttbcr)) {
-> +            lpae = arm_feature(env, ARM_FEATURE_LPAE) && (ttbcr & TTBCR_EAE);
-> +        }
-> +        /* The verification is based on FS filed of the DFSR reg only*/
-> +        return (DFSR_FSC(lpae, dfsr_val) == DFSC_EXTABT(lpae));
-> +    }
-> +    return false;
-> +}
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index f09ed9f..88cf10c 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -1497,3 +1497,52 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
->  
->      return false;
->  }
-> +
-> +#define ARM64_REG_ESR_EL1 ARM64_SYS_REG(3, 0, 5, 2, 0)
-> +#define ARM64_REG_TCR_EL1 ARM64_SYS_REG(3, 0, 2, 0, 2)
-> +
-> +/*
-> + * ESR_EL1
-> + * ISS encoding
-> + * AARCH64: DFSC,   bits [5:0]
-> + * AARCH32:
-> + *      TTBCR.EAE == 0
-> + *          FS[4]   - DFSR[10]
-> + *          FS[3:0] - DFSR[3:0]
-> + *      TTBCR.EAE == 1
-> + *          FS, bits [5:0]
-> + */
-> +#define ESR_DFSC(aarch64, lpae, v)        \
-> +    ((aarch64 || (lpae)) ? ((v) & 0x3F)   \
-> +               : (((v) >> 6) | ((v) & 0x1F)))
-> +
-> +#define ESR_DFSC_EXTABT(aarch64, lpae) \
-> +    ((aarch64) ? 0x10 : (lpae) ? 0x10 : 0x8)
-> +
-> +bool kvm_arm_verify_ext_dabt_pending(CPUState *cs)
-> +{
-> +    uint64_t dfsr_val;
-> +
-> +    if (!kvm_get_one_reg(cs, ARM64_REG_ESR_EL1, &dfsr_val)) {
-> +        ARMCPU *cpu = ARM_CPU(cs);
-> +        CPUARMState *env = &cpu->env;
-> +        int aarch64_mode = arm_feature(env, ARM_FEATURE_AARCH64);
-> +        int lpae = 0;
-> +
-> +        if (!aarch64_mode) {
-> +            uint64_t ttbcr;
-> +
-> +            if (!kvm_get_one_reg(cs, ARM64_REG_TCR_EL1, &ttbcr)) {
-> +                lpae = arm_feature(env, ARM_FEATURE_LPAE)
-> +                        && (ttbcr & TTBCR_EAE);
-> +            }
-> +        }
-> +        /*
-> +         * The verification here is based on the DFSC bits
-> +         * of the ESR_EL1 reg only
-> +         */
-> +         return (ESR_DFSC(aarch64_mode, lpae, dfsr_val) ==
-> +                ESR_DFSC_EXTABT(aarch64_mode, lpae));
-> +    }
-> +    return false;
-> +}
-> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index 48bf5e1..471ddd1 100644
-> --- a/target/arm/kvm_arm.h
-> +++ b/target/arm/kvm_arm.h
-> @@ -453,6 +453,16 @@ struct kvm_guest_debug_arch;
->  void kvm_arm_copy_hw_debug_data(struct kvm_guest_debug_arch *ptr);
->  
->  /**
-> + * kvm_arm_verify_ext_dabt_pending:
-> + * @cs: CPUState
-> + *
-> + * Verify the fault status code wrt the Ext DABT injection
-> + *
-> + * Returns: true if the fault status code is as expected, false otherwise
-> + */
-> +bool kvm_arm_verify_ext_dabt_pending(CPUState *cs);
-> +
-> +/**
->   * its_class_name:
->   *
->   * Return the ITS class name to use depending on whether KVM acceleration
-> -- 
-> 2.7.4
-> 
+Hi,
+
+On 6/26/20 2:51 AM, kernel test robot wrote:
+> Hi Alexandru,
 >
+> Thank you for the patch! Perhaps something to improve:
+>
+> [auto build test WARNING on arm64/for-next/core]
+> [also build test WARNING on tip/irq/core v5.8-rc2 next-20200625]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use  as documented in
+> https://git-scm.com/docs/git-format-patch]
+>
+> url:    https://github.com/0day-ci/linux/commits/Alexandru-Elisei/irqchip-gic-v3-Support-pseudo-NMIs-when-SCR_EL3-FIQ-0/20200625-230144
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+> config: arm64-randconfig-r025-20200624 (attached as .config)
+> compiler: clang version 11.0.0 (https://github.com/llvm/llvm-project 8911a35180c6777188fefe0954a2451a2b91deaf)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # install arm64 cross compiling tool for clang build
+>         # apt-get install binutils-aarch64-linux-gnu
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=arm64 
 
-I didn't try to review kvm_arm_verify_ext_dabt_pending() to be sure it's
-doing what it says it's doing, but the approach to the code looks good to
-me, so
+My mistake, I'll start compiling the kernel with clang too.
 
-Acked-by: Andrew Jones <drjones@redhat.com>
+The register width for ICC_PMR_EL1 in the kernel is rather inconsistent: in
+arch_gicv3.h, the accessors use 32 bits for the PMR value which gets casted to 64
+bit by the {read,write}_sysreg_s macros anyway, in struct pt_regs the register is
+64-bit, in __cpu_do_idle_irqprio it's declared as an unsigned long,
+arch_local_irqs_{disable,enable} declares it as u32 and casts it to an unsigned
+long when used by the inline assembly, the gicv3 irqchip driver uses it as a 32
+bit variable.
+
+I think the confusion stems from the fact that originally it was a 32 bit
+register, but was changed to 64 bits in Arm IHI 0069E (January 2019).
+
+I could cast it to an unsigned long in the inline assembly, but IMO that looks a
+bit awkward. Before sending the patches I was considering changing it everywhere
+to 64 bits, but Mark Rutland had a different idea. Mark, would you mind explaining
+why keeping it 32 bit wide makes more sense?
 
 Thanks,
-drew
-
+Alex
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All warnings (new ones prefixed by >>):
+>
+>    In file included from arch/arm64/kernel/asm-offsets.c:10:
+>    In file included from include/linux/arm_sdei.h:8:
+>    In file included from include/acpi/ghes.h:5:
+>    In file included from include/acpi/apei.h:9:
+>    In file included from include/linux/acpi.h:13:
+>    In file included from include/linux/irqdomain.h:35:
+>    In file included from include/linux/of.h:17:
+>    In file included from include/linux/kobject.h:20:
+>    In file included from include/linux/sysfs.h:16:
+>    In file included from include/linux/kernfs.h:13:
+>    In file included from include/linux/idr.h:15:
+>    In file included from include/linux/radix-tree.h:15:
+>    In file included from include/linux/rcupdate.h:26:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    2 warnings generated.
+> --
+>    In file included from drivers/power/supply/ltc2941-battery-gauge.c:12:
+>    In file included from include/linux/module.h:13:
+>    In file included from include/linux/stat.h:6:
+>    In file included from arch/arm64/include/asm/stat.h:12:
+>    In file included from include/linux/time.h:6:
+>    In file included from include/linux/seqlock.h:36:
+>    In file included from include/linux/spinlock.h:54:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    drivers/power/supply/ltc2941-battery-gauge.c:476:13: warning: cast to smaller integer type 'enum ltc294x_id' from 'const void *' [-Wvoid-pointer-to-enum-cast]
+>            info->id = (enum ltc294x_id)of_device_get_match_data(&client->dev);
+>                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    3 warnings generated.
+> --
+>    In file included from drivers/power/supply/goldfish_battery.c:11:
+>    In file included from include/linux/module.h:13:
+>    In file included from include/linux/stat.h:6:
+>    In file included from arch/arm64/include/asm/stat.h:12:
+>    In file included from include/linux/time.h:6:
+>    In file included from include/linux/seqlock.h:36:
+>    In file included from include/linux/spinlock.h:54:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    drivers/power/supply/goldfish_battery.c:269:36: warning: unused variable 'goldfish_battery_acpi_match' [-Wunused-const-variable]
+>    static const struct acpi_device_id goldfish_battery_acpi_match[] = {
+>                                       ^
+>    3 warnings generated.
+> --
+>    In file included from drivers/power/supply/bq25890_charger.c:8:
+>    In file included from include/linux/module.h:13:
+>    In file included from include/linux/stat.h:6:
+>    In file included from arch/arm64/include/asm/stat.h:12:
+>    In file included from include/linux/time.h:6:
+>    In file included from include/linux/seqlock.h:36:
+>    In file included from include/linux/spinlock.h:54:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    drivers/power/supply/bq25890_charger.c:1060:36: warning: unused variable 'bq25890_acpi_match' [-Wunused-const-variable]
+>    static const struct acpi_device_id bq25890_acpi_match[] = {
+>                                       ^
+>    3 warnings generated.
+> --
+>    In file included from drivers/power/reset/vexpress-poweroff.c:8:
+>    In file included from include/linux/notifier.h:15:
+>    In file included from include/linux/rwsem.h:16:
+>    In file included from include/linux/spinlock.h:54:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    drivers/power/reset/vexpress-poweroff.c:124:10: warning: cast to smaller integer type 'enum vexpress_reset_func' from 'const void *' [-Wvoid-pointer-to-enum-cast]
+>            switch ((enum vexpress_reset_func)match->data) {
+>                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    3 warnings generated.
+> --
+>    In file included from arch/arm64/kernel/asm-offsets.c:10:
+>    In file included from include/linux/arm_sdei.h:8:
+>    In file included from include/acpi/ghes.h:5:
+>    In file included from include/acpi/apei.h:9:
+>    In file included from include/linux/acpi.h:13:
+>    In file included from include/linux/irqdomain.h:35:
+>    In file included from include/linux/of.h:17:
+>    In file included from include/linux/kobject.h:20:
+>    In file included from include/linux/sysfs.h:16:
+>    In file included from include/linux/kernfs.h:13:
+>    In file included from include/linux/idr.h:15:
+>    In file included from include/linux/radix-tree.h:15:
+>    In file included from include/linux/rcupdate.h:26:
+>    In file included from include/linux/irqflags.h:16:
+>>> arch/arm64/include/asm/irqflags.h:45:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqon)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:42:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    arch/arm64/include/asm/irqflags.h:67:10: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+>                    : "r" (pmr_irqoff)
+>                           ^
+>    arch/arm64/include/asm/irqflags.h:64:29: note: use constraint modifier "w"
+>                    __msr_s(SYS_ICC_PMR_EL1, "%0"),
+>                                              ^
+>    2 warnings generated.
+>    arch/arm64/kernel/vdso/vgettimeofday.c:9:5: warning: no previous prototype for function '__kernel_clock_gettime' [-Wmissing-prototypes]
+>    int __kernel_clock_gettime(clockid_t clock,
+>        ^
+>    arch/arm64/kernel/vdso/vgettimeofday.c:9:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+>    int __kernel_clock_gettime(clockid_t clock,
+>    ^
+>    static 
+>    arch/arm64/kernel/vdso/vgettimeofday.c:15:5: warning: no previous prototype for function '__kernel_gettimeofday' [-Wmissing-prototypes]
+>    int __kernel_gettimeofday(struct __kernel_old_timeval *tv,
+>        ^
+>    arch/arm64/kernel/vdso/vgettimeofday.c:15:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+>    int __kernel_gettimeofday(struct __kernel_old_timeval *tv,
+>    ^
+>    static 
+>    arch/arm64/kernel/vdso/vgettimeofday.c:21:5: warning: no previous prototype for function '__kernel_clock_getres' [-Wmissing-prototypes]
+>    int __kernel_clock_getres(clockid_t clock_id,
+>        ^
+>    arch/arm64/kernel/vdso/vgettimeofday.c:21:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+>    int __kernel_clock_getres(clockid_t clock_id,
+>    ^
+>    static 
+>    3 warnings generated.
+>
+> vim +45 arch/arm64/include/asm/irqflags.h
+>
+>     12	
+>     13	/*
+>     14	 * Aarch64 has flags for masking: Debug, Asynchronous (serror), Interrupts and
+>     15	 * FIQ exceptions, in the 'daif' register. We mask and unmask them in 'dai'
+>     16	 * order:
+>     17	 * Masking debug exceptions causes all other exceptions to be masked too/
+>     18	 * Masking SError masks irq, but not debug exceptions. Masking irqs has no
+>     19	 * side effects for other flags. Keeping to this order makes it easier for
+>     20	 * entry.S to know which exceptions should be unmasked.
+>     21	 *
+>     22	 * FIQ is never expected, but we mask it when we disable debug exceptions, and
+>     23	 * unmask it at all other times.
+>     24	 */
+>     25	
+>     26	/*
+>     27	 * CPU interrupt mask handling.
+>     28	 */
+>     29	static inline void arch_local_irq_enable(void)
+>     30	{
+>     31		u32 pmr_irqon = GIC_PRIO_IRQON;
+>     32	
+>     33		if (system_has_prio_mask_debugging()) {
+>     34			u32 pmr = read_sysreg_s(SYS_ICC_PMR_EL1);
+>     35			u32 pmr_irqoff = gic_prio_irqoff();
+>     36	
+>     37			WARN_ON_ONCE(pmr != pmr_irqon && pmr != pmr_irqoff);
+>     38		}
+>     39	
+>     40		asm volatile(ALTERNATIVE(
+>     41			"msr	daifclr, #2		// arch_local_irq_enable",
+>     42			__msr_s(SYS_ICC_PMR_EL1, "%0"),
+>     43			ARM64_HAS_IRQ_PRIO_MASKING)
+>     44			:
+>   > 45			: "r" (pmr_irqon)
+>     46			: "memory");
+>     47	
+>     48		pmr_sync();
+>     49	}
+>     50	
+>
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
