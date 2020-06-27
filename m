@@ -1,65 +1,82 @@
-Return-Path: <SRS0=8LgP=AH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=z6yB=AI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A00C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 17:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86912C433DF
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Jun 2020 15:26:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E877B2065F
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jun 2020 17:24:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E877B2065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 01E1C2184D
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Jun 2020 15:26:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kNVe3GuF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01E1C2184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 428C14B125;
-	Fri, 26 Jun 2020 13:24:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4007D4B394;
+	Sat, 27 Jun 2020 11:26:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0oNp2XtlwDO2; Fri, 26 Jun 2020 13:24:42 -0400 (EDT)
+	with ESMTP id ODd1CHqVZuak; Sat, 27 Jun 2020 11:26:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F247A4B126;
-	Fri, 26 Jun 2020 13:24:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 271064B38A;
+	Sat, 27 Jun 2020 11:26:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85A974B122
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 13:24:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC7B4B382
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Jun 2020 11:26:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HWpA7sMO6JsQ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2020 13:24:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 286134B103
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2020 13:24:39 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93FDB1FB;
- Fri, 26 Jun 2020 10:24:38 -0700 (PDT)
-Received: from [192.168.0.14] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F35653F71E;
- Fri, 26 Jun 2020 10:24:36 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/2] MTE support for KVM guest
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>
-References: <20200617123844.29960-1-steven.price@arm.com>
- <20200623174807.GD5180@gaia> <e04696b6-63de-1e25-f6f3-1da63f791754@arm.com>
- <20200624142131.GA27945@gaia> <66ed0732-17ee-8f5a-44af-31ab768d845f@arm.com>
- <20200624161954.GC27945@gaia>
-From: James Morse <james.morse@arm.com>
-Message-ID: <bac439b7-c560-7597-8937-4a5bb66aeca4@arm.com>
-Date: Fri, 26 Jun 2020 18:24:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200624161954.GC27945@gaia>
-Content-Language: en-GB
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id 1emJORxzIP5D for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 27 Jun 2020 11:26:19 -0400 (EDT)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E9454B378
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Jun 2020 11:26:19 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id f7so9274924wrw.1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Jun 2020 08:26:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=/m5mkGKgtE7TjZA080Li1qh2nYl8NNeDGiBLeOpwFJo=;
+ b=kNVe3GuFiUeXwCsfG2Eq5K2BglY0ES0Gr/INHyYw6t8an42v+tbRggl/WTBc64RC/n
+ 6T0lJSR+QuMzKrhlQW8v4GQ8c6u9qRipzWcgcDUvxp6/jBwZ0b8WGkUYkj5jlcWv0yz/
+ 8apa/3iII9C6wrB6j/YNT7tewL7OUH3jUdxfOVZczIXyhRHyy6wLGdd6oLi23esux+jm
+ VY0hRKOlYHB0lx/I5tWX9uzxDjpMYFGZjS7/sD3itt80DgFyLryPy5OmHHHqMB2zAATv
+ s2SytPEIHifhLCnVIFKc7yJaPAfXrAuR6QlWQzwN26C7q8bZhzlfgEt2ayhejF8GMhC0
+ AO/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=/m5mkGKgtE7TjZA080Li1qh2nYl8NNeDGiBLeOpwFJo=;
+ b=Upm7GpMLXxpelCbF6Tu77a8+BLa6xwBd+3dSCyaT4k1XW+bJ/0tXmHuBGx6WkJZYhp
+ afEhuddPHYFwJjnpKO8D+DYVnmbXfUTR3auEAV+kLw5UHbJGzi3Ch0j9cJk8gl+kcHWp
+ PZSG+1awatTIpJur5dnaljN6gulQ2ZKkPD4J+lveo83xEuxyI6M2fdjJNPURMlo/Wo4b
+ lXz7/rLLNdBiMr3rHE8lwBwb6g9jjHB0awFVuJI0oiE7iJ7GlWOYmbfjGuF9Ciu55sG6
+ zNjreh/Nwn/REaGFn5yqpFNbgU5s27b9CynVjz0m53qJHQuZCP7v/kv0Cvs+NrtFuY1W
+ zpNQ==
+X-Gm-Message-State: AOAM5321pxWAcUgs452ZSYY1Ot0uIZI07vq2tW4GWGU2XErwOtOWEGvq
+ dGFPIEvKw4G1oTAeIDOOGOwC+g==
+X-Google-Smtp-Source: ABdhPJytZwJgPWrPXLFY8FUO8YhnxyDvbSYj2WOOTlZDTwlkA22oezC1GI4qqG3pYYNTR2laWiDCDg==
+X-Received: by 2002:a5d:43d2:: with SMTP id v18mr8780574wrr.196.1593271577800; 
+ Sat, 27 Jun 2020 08:26:17 -0700 (PDT)
+Received: from moi-limbo-9350.home (host-92-18-20-3.as13285.net. [92.18.20.3])
+ by smtp.gmail.com with ESMTPSA id
+ c6sm20965438wma.15.2020.06.27.08.26.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 27 Jun 2020 08:26:17 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Sat, 27 Jun 2020 16:25:54 +0100
+Message-Id: <20200627152556.7391-1-beata.michalska@linaro.org>
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,103 +88,81 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi guys,
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-On 24/06/2020 17:24, Catalin Marinas wrote:
-> On Wed, Jun 24, 2020 at 03:59:35PM +0100, Steven Price wrote:
->> On 24/06/2020 15:21, Catalin Marinas wrote:
->>> On Wed, Jun 24, 2020 at 12:16:28PM +0100, Steven Price wrote:
->>>> On 23/06/2020 18:48, Catalin Marinas wrote:
->>>>> This causes potential issues since we can't guarantee that all the
->>>>> Cacheable memory slots allocated by the VMM support MTE. If they do not,
->>>>> the arch behaviour is "unpredictable". We also can't trust the guest to
->>>>> not enable MTE on such Cacheable mappings.
->>>>
->>>> Architecturally it seems dodgy to export any address that isn't "normal
->>>> memory" (i.e. with tag storage) to the guest as Normal Cacheable. Although
->>>> I'm a bit worried this might cause a regression in some existing case.
->>>
->>> What I had in mind is some persistent memory that may be given to the
->>> guest for direct access. This is allowed to be cacheable (write-back)
->>> but may not have tag storage.
->>
->> At the moment we don't have a good idea what would happen if/when the guest
->> (or host) attempts to use that memory as tagged. If we have a relatively
->> safe hardware behaviour (e.g. the tags are silently dropped/read-as-zero)
->> then that's not a big issue. But if the accesses cause some form of abort
->> then we need to understand how that would be handled.
-> 
-> The architecture is not prescriptive here, the behaviour is
-> "unpredictable". It could mean tags read-as-zero/write-ignored or an
-> SError.
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-This surely is the same as treating a VFIO device as memory and performing some
-unsupported operation on it.
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
 
-I thought the DT 'which memory ranges' description for MTE was removed. Wouldn't the rules
-for a guest be the same? If you enable MTE, everything described as memory must support
-MTE. Something like persistent memory then can't be described as memory, ... we have the
-same problem on the host.
+This patchset relies on KVM to insert the external data abort into the guest.
 
 
->>>>> 1. As in your current patches, assume any Cacheable at Stage 2 can have
->>>>>      MTE enabled at Stage 1. In addition, we need to check whether the
->>>>>      physical memory supports MTE and it could be something simple like
->>>>>      pfn_valid(). Is there a way to reject a memory slot passed by the
->>>>>      VMM?
->>>>
->>>> Yes pfn_valid() should have been in there. At the moment pfn_to_page() is
->>>> called without any checks.
->>>>
->>>> The problem with attempting to reject a memory slot is that the memory
->>>> backing that slot can change. So checking at the time the slot is created
->>>> isn't enough (although it might be a useful error checking feature).
->>>
->>> But isn't the slot changed as a result of another VMM call? So we could
->>> always have such check in place.
->>
->> Once you have created a memslot the guest's view of memory follows the user
->> space's address space. This is the KVM_CAP_SYNC_MMU capability. So there's
->> nothing stopping a VMM adding a memslot backed with perfectly reasonable
->> memory then mmap()ing over the top of it some memory which isn't MTE
->> compatible. KVM gets told the memory is being removed (via mmu notifiers)
->> but I think it waits for the next fault before (re)creating the stage 2
->> entries.
+----------------------
+v7:
+ - Rephrasing the comment regarding abort injection and vcpu synchronization
+ - switching to struct initialization instead of memset
 
-(indeed, stage2 is pretty lazy)
+v6:
+ - replacing calling kvm_put_vcpu_events with an actual ioctl call
+ - making the handler function static
 
+v5:
+ - Drop syncing vcpu regs in favour of calling kvm_put_vcpu_events directly
+ - Fix decoding DFSC for LPAE case
+ - Add/clarify comments
+ - Switch to reporting error case failure when enabling the cap
 
-> OK, so that's where we could kill the guest if the VMM doesn't play
-> nicely. It means that we need the check when setting up the stage 2
-> entry. I guess it's fine if we only have the check at that point and
-> ignore it on KVM_SET_USER_MEMORY_REGION. It would be nice if we returned
-> on error on slot setup but
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
 
-> we may not know (yet) whether the VMM intends to enable MTE for the guest.
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
 
-We don't. Memory slots take the VM-fd, whereas the easy-to-add feature bits are per-vcpu.
-Packing features into the 'type' that create-vm takes is a problem once we run out,
-although the existing user is the IPA space size, and MTE is a property of the memory system.
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
 
 
-The meaning of the flag is then "I described this as memory, only let the guest access
-memory through this range that is MTE capable". What do we do when that is violated? Tell
-the VMM is the nicest, but its not something we ever expect to happen. I guess an abort is
-what real hardware would do, (if firmware magically turned off MTE while it was in use).
 
-This would need to be kvm's inject_abt64(), as otherwise the vcpu may take the stage2
-fault again, forever. For kvm_set_spte_hva() we can't inject an abort (which vcpu?), so
-not mapping the page and waiting for the guest to access it is the only option...
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle misconfigured dabt injection
 
+ target/arm/cpu.h     |  2 ++
+ target/arm/kvm.c     | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ target/arm/kvm32.c   | 34 +++++++++++++++++++++
+ target/arm/kvm64.c   | 49 ++++++++++++++++++++++++++++++
+ target/arm/kvm_arm.h | 10 ++++++
+ 5 files changed, 180 insertions(+), 1 deletion(-)
 
-Thanks,
+-- 
+2.7.4
 
-James
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
