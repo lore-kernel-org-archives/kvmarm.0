@@ -2,66 +2,72 @@ Return-Path: <SRS0=R6td=AK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7257DC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 17:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE77C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 21:33:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D26AD255A1
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 17:00:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26AD255A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=misterjones.org
+	by mail.kernel.org (Postfix) with ESMTP id 98EC2206A1
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 21:33:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EC2206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 252524B31E;
-	Mon, 29 Jun 2020 13:00:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 195AC4B4AE;
+	Mon, 29 Jun 2020 17:33:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id u+52UDRChnmI; Mon, 29 Jun 2020 13:00:30 -0400 (EDT)
+	with ESMTP id dTB-4NroSBDj; Mon, 29 Jun 2020 17:33:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21C4D4B323;
-	Mon, 29 Jun 2020 13:00:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E1E4B4C4;
+	Mon, 29 Jun 2020 17:33:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0703D4B30B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 13:00:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BAD44B4AE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 17:33:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yzLrHdqdiKfQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2020 13:00:27 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A12894B2F7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 13:00:27 -0400 (EDT)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@misterjones.org>)
- id 1jpx8n-007NSg-On; Mon, 29 Jun 2020 18:00:21 +0100
+ with ESMTP id ah367tXYbfcn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2020 17:33:24 -0400 (EDT)
+Received: from mail-io1-f66.google.com (mail-io1-f66.google.com
+ [209.85.166.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 807304B4AA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 17:33:24 -0400 (EDT)
+Received: by mail-io1-f66.google.com with SMTP id o5so18746026iow.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 14:33:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8xBC3nAXSULrgwmXIdCxH6li3ZbD31n6G3URGbOpyNA=;
+ b=M6ePIJkCBkrdZQxFNpXZhmj8Sbk/MzcgGxFCv2Mwh6NZVYR7xWEfywmXmO7EVGPitk
+ N/kSEhHj0wqw1SVuGBtMRhkE3gJhCWK1ugmBi5l306mI3hKK+uPASJktx8XtLtpPQPu/
+ YGt26akydwvrFjHB7Gd320kyqTZvYbGpKuCvCirWO+3kxPliSze/L/+GzsgRSgQkXtkJ
+ UqkStoo1QnJw1e9zCjlQkbFv1HupcDZZTiFDXwbYfBrkI59hp8rjiDGX7wb5TrSzPUW2
+ /pMyY6C9uvXLpsGLxYbtGrEsmz9V8TQMT4PNRZFQdHzKtl94CKHV9SzqvqBUPfKmdhVr
+ 2Dfw==
+X-Gm-Message-State: AOAM530XZ60NV1TDoZ2P75Bgnx2rpfkms7Usvc3Mer1hSJNW2jESPYBC
+ jRWrnLBqxQtHfmhh0tASTA==
+X-Google-Smtp-Source: ABdhPJyRkeJXwP2MospQQRfjdnhjvpSzuN8Aoy0eBf+6/pRwbQBFhYLb+ECvPhuSZso0lVUIME7BcA==
+X-Received: by 2002:a02:a19c:: with SMTP id n28mr19800365jah.13.1593466404002; 
+ Mon, 29 Jun 2020 14:33:24 -0700 (PDT)
+Received: from xps15.herring.priv ([64.188.179.255])
+ by smtp.googlemail.com with ESMTPSA id v13sm496155iox.12.2020.06.29.14.33.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 14:33:23 -0700 (PDT)
+From: Rob Herring <robh@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH 1/2] arm64: Add part number for Arm Cortex-A77
+Date: Mon, 29 Jun 2020 15:33:20 -0600
+Message-Id: <20200629213321.2953022-1-robh@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Date: Mon, 29 Jun 2020 18:00:21 +0100
-From: Marc Zyngier <maz@misterjones.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 1/2] kvm/arm64: Rename HSR to ESR
-In-Reply-To: <20200629103208.GA59769@C02TD0UTHF1T.local>
-References: <20200629091841.88198-1-gshan@redhat.com>
- <20200629091841.88198-2-gshan@redhat.com>
- <20200629103208.GA59769@C02TD0UTHF1T.local>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <9080c56e3f54d7661a57c5e2a771363f@misterjones.org>
-X-Sender: maz@misterjones.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, gshan@redhat.com,
- catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@misterjones.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
- kvmarm@lists.cs.columbia.edu, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,79 +79,43 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-06-29 11:32, Mark Rutland wrote:
-> On Mon, Jun 29, 2020 at 07:18:40PM +1000, Gavin Shan wrote:
->> kvm/arm32 isn't supported since commit 541ad0150ca4 ("arm: Remove
->> 32bit KVM host support"). So HSR isn't meaningful since then. This
->> renames HSR to ESR accordingly. This shouldn't cause any functional
->> changes:
->> 
->>    * Rename kvm_vcpu_get_hsr() to kvm_vcpu_get_esr() to make the
->>      function names self-explanatory.
->>    * Rename variables from @hsr to @esr to make them self-explanatory.
->> 
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> 
-> At a high-level, I agree that we should move to the `esr` naming to
-> match the architecture and minimize surprise. However, I think there 
-> are
-> some ABI changes here, which *are* funcitonal changes, and those need 
-> to
-> be avoided.
-> 
-> [...]
-> 
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h 
->> b/arch/arm64/include/uapi/asm/kvm.h
->> index ba85bb23f060..d54345573a88 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -140,7 +140,7 @@ struct kvm_guest_debug_arch {
->>  };
->> 
->>  struct kvm_debug_exit_arch {
->> -	__u32 hsr;
->> +	__u32 esr;
->>  	__u64 far;	/* used for watchpoints */
->>  };
-> 
-> This is userspace ABI, and changing this *will* break userspace. This
-> *is* a functional change.
-> 
-> NAK to this specifically. At best these should be a comment here that
-> this is naming is legacym but must stay for ABI reasons.
-> 
-> [...]
-> 
->> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
->> index 4c71270cc097..ee4f691b16ff 100644
->> --- a/arch/arm64/kvm/trace_arm.h
->> +++ b/arch/arm64/kvm/trace_arm.h
->> @@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
->>  		__entry->vcpu_pc		= vcpu_pc;
->>  	),
->> 
->> -	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
->> +	TP_printk("%s: ESR_EC: 0x%04x (%s), PC: 0x%08lx",
->>  		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
->>  		  __entry->esr_ec,
->>  		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
-> 
-> Likewise, isn't all the tracepoint format stuff ABI? I'm not 
-> comfortable
-> that we can change this.
+Add the MIDR part number info for the Arm Cortex-A77.
 
-Tracepoints are ABI, and they cannot change. As it is, this patch
-isn't acceptable (the worse offender being the uapi change though).
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ arch/arm64/include/asm/cputype.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-         M.
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index a87a93f67671..7a2d3c336579 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -71,6 +71,7 @@
+ #define ARM_CPU_PART_CORTEX_A55		0xD05
+ #define ARM_CPU_PART_CORTEX_A76		0xD0B
+ #define ARM_CPU_PART_NEOVERSE_N1	0xD0C
++#define ARM_CPU_PART_CORTEX_A77		0xD0D
+ 
+ #define APM_CPU_PART_POTENZA		0x000
+ 
+@@ -104,6 +105,7 @@
+ #define MIDR_CORTEX_A55 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A55)
+ #define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
+ #define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
++#define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
+ #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+ #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
+ #define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
 -- 
-Who you jivin' with that Cosmik Debris?
+2.25.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
