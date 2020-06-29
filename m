@@ -2,58 +2,81 @@ Return-Path: <SRS0=R6td=AK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7666FC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F689C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 02721239EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:05:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02721239EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E4A6923B84
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:41:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ANL3jf3F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A6923B84
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77EDE4B3C6;
-	Mon, 29 Jun 2020 07:05:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 340074B3EE;
+	Mon, 29 Jun 2020 07:41:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k52kl96fQiGl; Mon, 29 Jun 2020 07:05:20 -0400 (EDT)
+	with ESMTP id Zy8zc25TwNjY; Mon, 29 Jun 2020 07:41:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDB74B3E9;
-	Mon, 29 Jun 2020 07:05:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5CF4B3B7;
+	Mon, 29 Jun 2020 07:41:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 555A34B35B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:05:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84DA84B37D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:41:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nUpKmUV-FRzG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2020 07:05:18 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BAC24B332
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:05:18 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D37F313D5;
- Mon, 29 Jun 2020 04:05:17 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.20.135])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E5C03F73C;
- Mon, 29 Jun 2020 04:05:16 -0700 (PDT)
-Date: Mon, 29 Jun 2020 12:05:13 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] kvm/arm64: Rename HSR to ESR
-Message-ID: <20200629110513.GC59769@C02TD0UTHF1T.local>
-References: <20200629091841.88198-1-gshan@redhat.com>
- <20200629091841.88198-2-gshan@redhat.com>
- <20200629103208.GA59769@C02TD0UTHF1T.local>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200629103208.GA59769@C02TD0UTHF1T.local>
-Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id c9w75K89yG6Q for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2020 07:41:36 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CB774B353
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:41:36 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id g75so15040126wme.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 04:41:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=35DefQSlDniBHNXxGwbXkQ0Ae4JMwjKJXltjc+2+jKU=;
+ b=ANL3jf3FrDnXSbO2YeLHJZqIVP3nvNscZiBMvK44bM34qCdmdgqN9aXHBuTxP+w70R
+ QxBA9m0WF89OWH1z4IKMuy71WEeld9p5RrFN1iYdphUb8K4o5o4522H5O4OdJLw36qls
+ dhK2wP/oNJ5a9QoQSwnO6xwdVYkixZ8kzZ8Ny0jP0GlyRP8AlSpAelbtzDllt+JVDaIy
+ 9MgmfMWTBBnOGOrLnCkdpiw0yKbHmugY0rr5yUWXJPlY/LP5W97BdQQtSgGJYVo4yTU/
+ QFuUTPOtGj/g0O6azPN4XgZniOAnWQy4MK8pPsdy/cBjuaUaEr35l6I7ZN1viYa41pEP
+ yUSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=35DefQSlDniBHNXxGwbXkQ0Ae4JMwjKJXltjc+2+jKU=;
+ b=kbVyUwDxrJpodcBUKASnjuVcpejBvIu1+sSBHGuus5uGTWGEE+ria7HFNpeUGY7Ahq
+ dEdUKpoaSUV0RPcWKE7R1QHOuKaKrr7P2p+x8KKTHRNYDk+Fa+tiWTMcwl/+SwvNQts9
+ SP9eCsXjKEklRQIvsmiJ5FqlcJOwrLX+COl5ahJkbvx74ww+Ci0K6frMnlYWZiUYot59
+ z2LBzF/fluadFVhGzyxRv08ONeX77eRcOHIOsdV3ozKC5RrL51FXp5dTKq92FYMB3JAu
+ Zdog8wq3i0n2FajC21PjgDRvGOZqtaaTDePWvbbDxJxPA9YvdZwymfKFACMIe1O7ziCo
+ bElA==
+X-Gm-Message-State: AOAM533tuQkKeiMnsEO/466sqaCxC6PSaHlSl1lL01wMzC1+xlacsouy
+ 0U2x2j0JPNM64KzdQtymAUZcaA==
+X-Google-Smtp-Source: ABdhPJzgbhIHLvVDXWe6nPPX7AW/KZaX4bGuf4K4De/t2NvM97EDWgEUhFql9EFUqniMaZvjOpeVug==
+X-Received: by 2002:a7b:c250:: with SMTP id b16mr9154890wmj.30.1593430895545; 
+ Mon, 29 Jun 2020 04:41:35 -0700 (PDT)
+Received: from moi-limbo-9350.home
+ (host86-139-146-71.range86-139.btcentralplus.com. [86.139.146.71])
+ by smtp.gmail.com with ESMTPSA id c2sm49486357wrv.47.2020.06.29.04.41.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 29 Jun 2020 04:41:35 -0700 (PDT)
+From: Beata Michalska <beata.michalska@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 0/2] target/arm: kvm: Support for KVM DABT with no valid ISS
+Date: Mon, 29 Jun 2020 12:41:08 +0100
+Message-Id: <20200629114110.30723-1-beata.michalska@linaro.org>
+Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,56 +88,86 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 29, 2020 at 11:32:08AM +0100, Mark Rutland wrote:
-> On Mon, Jun 29, 2020 at 07:18:40PM +1000, Gavin Shan wrote:
-> > kvm/arm32 isn't supported since commit 541ad0150ca4 ("arm: Remove
-> > 32bit KVM host support"). So HSR isn't meaningful since then. This
-> > renames HSR to ESR accordingly. This shouldn't cause any functional
-> > changes:
-> > 
-> >    * Rename kvm_vcpu_get_hsr() to kvm_vcpu_get_esr() to make the
-> >      function names self-explanatory.
-> >    * Rename variables from @hsr to @esr to make them self-explanatory.
-> > 
-> > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> 
-> At a high-level, I agree that we should move to the `esr` naming to
-> match the architecture and minimize surprise. However, I think there are
-> some ABI changes here, which *are* funcitonal changes, and those need to
-> be avoided.
-> 
-> [...]
-> 
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index ba85bb23f060..d54345573a88 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -140,7 +140,7 @@ struct kvm_guest_debug_arch {
-> >  };
-> >  
-> >  struct kvm_debug_exit_arch {
-> > -	__u32 hsr;
-> > +	__u32 esr;
-> >  	__u64 far;	/* used for watchpoints */
-> >  };
-> 
-> This is userspace ABI, and changing this *will* break userspace. This
-> *is* a functional change.
+Some of the ARMv7 & ARMv8 load/store instructions might trigger a data abort
+exception with no valid ISS info to be decoded. The lack of decode info
+makes it at least tricky to emulate the instruction which is one of the
+(many) reasons why KVM will not even try to do so.
 
-To be slightly clearer: while the structure isn't changed, any userspace
-software consuming this header will fail to build after this change,
-beacause there will no longer be a field called `hsr`.
+So far, if a guest made an attempt to access memory outside the memory slot,
+KVM reported vague ENOSYS. As a result QEMU exited with no useful information
+being provided or even a clue on what has just happened.
 
-Existing binaries will almost certianly not care, but regardless this is
-a regression (when building userspce) that I don't think we can permit.
+ARM KVM introduced support for notifying of an attempt to execute
+an instruction that resulted in dabt with no valid ISS decoding info.
+This still leaves QEMU to handle the case, but at least now it gives more
+control and a start point for more meaningful handling of such cases.
 
-Thanks,
-Mark.
+This patchset relies on KVM to insert the external data abort into the guest.
+
+
+----------------------
+v9:
+ - formatting fixes
+
+v8:
+ - moving the comment re support for VCPU events - missed in previous patchset
+
+v7:
+ - Rephrasing the comment regarding abort injection and vcpu synchronization
+ - switching to struct initialization instead of memset
+
+v6:
+ - replacing calling kvm_put_vcpu_events with an actual ioctl call
+ - making the handler function static
+
+v5:
+ - Drop syncing vcpu regs in favour of calling kvm_put_vcpu_events directly
+ - Fix decoding DFSC for LPAE case
+ - Add/clarify comments
+ - Switch to reporting error case failure when enabling the cap
+
+v4:
+ - Removing one of the patches as it is being picked-up separately
+     target/arm: kvm: Inject events at the last stage of sync
+ - Moving handling KVM issue to a separate patch
+ - Minor changes wrt the review comments
+
+v3:
+ - Fix setting KVM cap per vm not per vcpu
+ - Simplifying the handler to bare minimum with no default logging to address
+   the potential risk of overflooding the host (adding support for rate
+   limiting the logs turned out to be bit too invasive to justify the little
+   add-on value from logs in this particular case)
+ - Adding handling KVM bug (for small range of affected kernels):
+   little bit of trade-off between what's reasonable and what's effective:
+   aborting qemu when running on buggy host kernel
+
+v2:
+- Improving/re-phrasing messaging
+- Dropping messing around with forced sync (@see [PATCH v2 1/2])
+  and PC alignment
+
+
+Beata Michalska (2):
+  target/arm: kvm: Handle DABT with no valid ISS
+  target/arm: kvm: Handle misconfigured dabt injection
+
+ target/arm/cpu.h     |  2 ++
+ target/arm/kvm.c     | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c   | 34 ++++++++++++++++++++++
+ target/arm/kvm64.c   | 49 ++++++++++++++++++++++++++++++++
+ target/arm/kvm_arm.h | 10 +++++++
+ 5 files changed, 175 insertions(+)
+
+-- 
+2.7.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
