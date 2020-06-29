@@ -2,83 +2,81 @@ Return-Path: <SRS0=R6td=AK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CB6C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD61DC433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 16:25:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4B05F23CD5
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 11:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5874E25598
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 16:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tei1JmJF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B05F23CD5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppSlbCZD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5874E25598
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B41B14B3B8;
-	Mon, 29 Jun 2020 07:55:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C996F4B439;
+	Mon, 29 Jun 2020 12:25:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yeaxE6o3-Bla; Mon, 29 Jun 2020 07:55:09 -0400 (EDT)
+	with ESMTP id qPyMIjRvghNT; Mon, 29 Jun 2020 12:25:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2364B3C4;
-	Mon, 29 Jun 2020 07:55:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C653E4B448;
+	Mon, 29 Jun 2020 12:25:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D0E4B3B5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:55:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A79B04B443
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 12:25:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G0l7RNnykSmz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2020 07:55:07 -0400 (EDT)
-Received: from mail-io1-f68.google.com (mail-io1-f68.google.com
- [209.85.166.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B5C54B332
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 07:55:07 -0400 (EDT)
-Received: by mail-io1-f68.google.com with SMTP id y2so16834352ioy.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 04:55:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fEJFWBnpsD1Fzxq+UGFqbCNX3W+nZoqUk4DjhMHNxrc=;
- b=Tei1JmJFXM/uRL0vORJ6QdAtj+XiwqDwDInAPjjzy7erYQ2SGnDGFUqn8USuLbD/9R
- 7EBZpHhfgdWUVBAR9BUeL7X+iRwSUbefOJRulJ3qKPH5DMqLCuJQjJ0ebLuvK0BDzvIC
- l6nKSIfU+smq3AMIOrjooYCcUCqhhZZbWS8CHQm0gpGp8SxNDSJcCDud1EVYjy772IC8
- PQ1D7fxPecfDC8J7XR8iS/sXTtqly3B9Aj+cGiQyyhtJfZ/1ZVgveKK5YdACUeuZz9Ps
- OFavMcU1tdlU17aJKgLQ28fYiM6N2TFL+4ZYQ8kl137rrszFZ4xTDiBisLVD+Pybhmlt
- fLeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=fEJFWBnpsD1Fzxq+UGFqbCNX3W+nZoqUk4DjhMHNxrc=;
- b=pCEWvhchP/u4SGGjj2bgrUyVnhtPTXKMk5VWbvLJFb+UL8ez54rN4KzAZbGEJGSgYM
- 01wwwgNbZPUNk4LsAkTohz31FnXXHLPYfXWFiAwbCIdo2HCX0cgZ4XVpxwBEAuMxI1qI
- ryb+jj5MOllb5JKVbgkazKd1e5lu/TFPNOpg/T5hbx6TyOvfBZWsM8CXBdOyO4cVxPk4
- dH9cl78Rk1AiJZ7Px51lIhREGymNj9WmcgI7muE6FM1LAvn+k9HRTHCA/mpoIFf1zNW6
- q3eiyFlA5D48x/oB4XwqC9tHEr8XghRRGU9MnGUqSLq5e208xO9B5VKMOSSodY5si5Eh
- jNCA==
-X-Gm-Message-State: AOAM533eWatHeCvxMn8KRV5PFtIeLrdkMhKBO6an+Rr4afCa2kPvUOJL
- sqrQ727FWDnQjMKEgqDzRTw8I7SowI8foGp2kJcPmA==
-X-Google-Smtp-Source: ABdhPJxFiRnOqZiR0JV6/Tck6vbv5sducHrJs2fK7Ug0C0z5E5z3rdeB5b5cpHQ1cqIsbnujm4ZIsDmbLRgcUGhgm9s=
-X-Received: by 2002:a5d:849a:: with SMTP id t26mr16661198iom.22.1593431706751; 
- Mon, 29 Jun 2020 04:55:06 -0700 (PDT)
+ with ESMTP id SXrSMI4LbIK1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2020 12:25:34 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABDB24B3E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 12:25:34 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 763CF25590;
+ Mon, 29 Jun 2020 16:25:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593447933;
+ bh=b7AT4TcF5146z4sJCRxR4jK16TDrwXxT+lOJTb6Ufpk=;
+ h=From:To:Cc:Subject:Date:From;
+ b=ppSlbCZD1v6btFHB3RK6H6kCie2cN7nclYGsybfoN/y6I9KItoVALr2CbZyQWsGII
+ b2XcIwRt89lPrekX19kMY43+jEVICQV2z3kBm29DtIPUXuaw2GbDfm/dJ5tM7kDTQQ
+ Q54rERPkFEYFqwuJiy+PdwgWDfTjqfZ84zlgNgI0=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jpwb5-007M5T-RJ; Mon, 29 Jun 2020 17:25:31 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.8, take #2
+Date: Mon, 29 Jun 2020 17:25:15 +0100
+Message-Id: <20200629162519.825200-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20200628150459.18566-1-beata.michalska@linaro.org>
- <20200628150459.18566-2-beata.michalska@linaro.org>
- <20200629081510.ochvmmmikhe62bsm@kamzik.brq.redhat.com>
-In-Reply-To: <20200629081510.ochvmmmikhe62bsm@kamzik.brq.redhat.com>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Mon, 29 Jun 2020 12:54:55 +0100
-Message-ID: <CADSWDzvdX6iDgd8YuZ3aGnz6qDzjzs7=a7A0MB2k4KAcRG6s9Q@mail.gmail.com>
-Subject: Re: [PATCH v8 1/2] target/arm: kvm: Handle DABT with no valid ISS
-To: Andrew Jones <drjones@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ drjones@redhat.com, james.morse@arm.com, steven.price@arm.com,
+ yuzenghui@huawei.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,137 +93,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 29 Jun 2020 at 09:15, Andrew Jones <drjones@redhat.com> wrote:
->
-> On Sun, Jun 28, 2020 at 04:04:58PM +0100, Beata Michalska wrote:
-> > On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
-> > exception with no valid ISS info to be decoded. The lack of decode info
-> > makes it at least tricky to emulate those instruction which is one of the
-> > (many) reasons why KVM will not even try to do so.
-> >
-> > Add support for handling those by requesting KVM to inject external
-> > dabt into the quest.
-> >
-> > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> > ---
-> >  target/arm/kvm.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 56 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> > index eef3bbd..2dd8a9a 100644
-> > --- a/target/arm/kvm.c
-> > +++ b/target/arm/kvm.c
-> > @@ -39,6 +39,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-> >
-> >  static bool cap_has_mp_state;
-> >  static bool cap_has_inject_serror_esr;
-> > +static bool cap_has_inject_ext_dabt;
-> >
-> >  static ARMHostCPUFeatures arm_host_cpu_features;
-> >
-> > @@ -245,6 +246,16 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-> >          ret = -EINVAL;
-> >      }
-> >
-> > +    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER)) {
-> > +        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
-> > +            error_report("Failed to enable KVM_CAP_ARM_NISV_TO_USER cap");
-> > +        } else {
-> > +            /* Set status for supporting the external dabt injection */
-> > +            cap_has_inject_ext_dabt = kvm_check_extension(s,
-> > +                                    KVM_CAP_ARM_INJECT_EXT_DABT);
-> > +        }
-> > +    }
-> > +
-> >      return ret;
-> >  }
-> >
-> > @@ -810,6 +821,45 @@ void kvm_arm_vm_state_change(void *opaque, int running, RunState state)
-> >      }
-> >  }
-> >
-> > +/**
-> > + * kvm_arm_handle_dabt_nisv:
-> > + * @cs: CPUState
-> > + * @esr_iss: ISS encoding (limited) for the exception from Data Abort
-> > + *           ISV bit set to '0b0' -> no valid instruction syndrome
-> > + * @fault_ipa: faulting address for the synchronous data abort
-> > + *
-> > + * Returns: 0 if the exception has been handled, < 0 otherwise
-> > + */
-> > +static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-> > +                             uint64_t fault_ipa)
->
-> The indent of 'uint64_t fault_ipa' is off. Should be under CPUState.
->
-> > +{
-> > +    /*
-> > +     * Request KVM to inject the external data abort into the guest
-> > +     */
-> > +    if (cap_has_inject_ext_dabt) {
-> > +        struct kvm_vcpu_events events = { };
-> > +        /*
-> > +         * The external data abort event will be handled immediately by KVM
-> > +         * using the address fault that triggered the exit on given VCPU.
-> > +         * Requesting injection of the external data abort does not rely
-> > +         * on any other VCPU state. Therefore, in this particular case, the VCPU
-> > +         * synchronization can be exceptionally skipped.
-> > +         */
-> > +        events.exception.ext_dabt_pending = 1;
-> > +        /*
-> > +         * KVM_CAP_ARM_INJECT_EXT_DABT implies KVM_CAP_VCPU_EVENTS
-> > +         */
->
-> Single line comments may be done with /* ... */
->
-> > +        return kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
-> > +
->
-> Extra blank line here.
->
-> > +    } else {
-> > +        error_report("Data abort exception triggered by guest memory access "
-> > +                     "at physical address: 0x"  TARGET_FMT_lx,
-> > +                     (target_ulong)fault_ipa);
-> > +        error_printf("KVM unable to emulate faulting instruction.\n");
-> > +    }
-> > +    return -1;
-> > +}
-> > +
-> >  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-> >  {
-> >      int ret = 0;
-> > @@ -820,7 +870,12 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-> >              ret = EXCP_DEBUG;
-> >          } /* otherwise return to guest */
-> >          break;
-> > -    default:
-> > +    case KVM_EXIT_ARM_NISV:
-> > +        /* External DABT with no valid iss to decode */
-> > +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
-> > +                                       run->arm_nisv.fault_ipa);
-> > +        break;
-> > +     default:
->
-> An extra space got added in front of 'default:'
->
-> >          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-> >                        __func__, run->exit_reason);
-> >          break;
-> > --
-> > 2.7.4
-> >
-> >
->
-> Besides the format changes
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
->
-Done.
-Thanks a lot for the reviews!
+Hi Paolo,
 
-BR
-Beata
+Here's another pull request for a handful of KVM/arm64 fixes. Nothing
+absolutely critical (see the tag for the gory details), but I'd rather
+get these merged as soon as possible.
+
+Please pull,
+
+	M.
+
+The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+
+  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvmarm-fixes-5.8-2
+
+for you to fetch changes up to a3f574cd65487cd993f79ab235d70229d9302c1e:
+
+  KVM: arm64: vgic-v4: Plug race between non-residency and v4.1 doorbell (2020-06-23 11:24:39 +0100)
+
+----------------------------------------------------------------
+KVM/arm fixes for 5.8, take #2
+
+- Make sure a vcpu becoming non-resident doesn't race against the doorbell delivery
+- Only advertise pvtime if accounting is enabled
+- Return the correct error code if reset fails with SVE
+- Make sure that pseudo-NMI functions are annotated as __always_inline
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Annotate hyp NMI-related functions as __always_inline
+
+Andrew Jones (1):
+      KVM: arm64: pvtime: Ensure task delay accounting is enabled
+
+Marc Zyngier (1):
+      KVM: arm64: vgic-v4: Plug race between non-residency and v4.1 doorbell
+
+Steven Price (1):
+      KVM: arm64: Fix kvm_reset_vcpu() return code being incorrect with SVE
+
+ arch/arm64/include/asm/arch_gicv3.h |  2 +-
+ arch/arm64/include/asm/cpufeature.h |  2 +-
+ arch/arm64/kvm/pvtime.c             | 15 ++++++++++++---
+ arch/arm64/kvm/reset.c              | 10 +++++++---
+ arch/arm64/kvm/vgic/vgic-v4.c       |  8 ++++++++
+ drivers/irqchip/irq-gic-v3-its.c    |  8 ++++++++
+ 6 files changed, 37 insertions(+), 8 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
