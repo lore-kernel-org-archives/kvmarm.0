@@ -1,4 +1,4 @@
-Return-Path: <SRS0=R6td=AK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=T474=AL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,82 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E177C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 23:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC87C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Jun 2020 00:16:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E5C5020776
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Jun 2020 23:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C31BE20780
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Jun 2020 00:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PH2UAbck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5C5020776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uhlyhabl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C31BE20780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 503014B556;
-	Mon, 29 Jun 2020 19:15:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 270514B570;
+	Mon, 29 Jun 2020 20:16:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zy+u+pk2aj6F; Mon, 29 Jun 2020 19:15:00 -0400 (EDT)
+	with ESMTP id P3Bn5ywZmp+U; Mon, 29 Jun 2020 20:16:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41ADF4B55B;
-	Mon, 29 Jun 2020 19:15:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C00234B574;
+	Mon, 29 Jun 2020 20:16:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6F84B555
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 19:14:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EFAC4B570
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 20:16:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xce57fS7uSoA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2020 19:14:58 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 564474B4FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 19:14:58 -0400 (EDT)
+ with ESMTP id hI5Mrc-S55dZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2020 20:16:19 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F11C94B55D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2020 20:16:18 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593472498;
+ s=mimecast20190719; t=1593476177;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QuobGItmN+qgme7a3Zr/02Vhk75SasKIUkFfoJJyzUk=;
- b=PH2UAbckWU6SkLV6GraE+UtT2HnZp0uPWNehNlrVdnrSyvfkhycZdfaEa8KYcpB1Dnjp6U
- kAjCUmRVXVrKv1z5S5WmRNdve9HB+flP0IdbKkL0JYJOc7dioy4nEXYzViLvm0//JAg3iq
- 5ShlNlRNceF65sT82FGVpxyZAvtLwhc=
+ bh=5VINUc1zw/rPkFcqE51OgyFJrBsajiVB+eNeeFTjokc=;
+ b=Uhlyhabl3q9EdTfgLBwhHW7cbQUArzeZCKLvf9e9rvt3+m3ZBVQHHx0Vhwbw4JfProBh6k
+ xamjaumQCrMCUYx8ugFwzopGTk56fhJFTHpvZ/c8LzR8b58SfnwYCN4NWiAqRHGSs9pEiw
+ Fl6w52fsB2fo/fhuqvxDBwpUu3l7dmY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-ix1sGDXINdq-LwvrlCZljg-1; Mon, 29 Jun 2020 19:14:51 -0400
-X-MC-Unique: ix1sGDXINdq-LwvrlCZljg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-237-J7YhkiBzPN2ee3iK7tVybQ-1; Mon, 29 Jun 2020 20:16:14 -0400
+X-MC-Unique: J7YhkiBzPN2ee3iK7tVybQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E45451005512;
- Mon, 29 Jun 2020 23:14:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 712A2805EEE;
+ Tue, 30 Jun 2020 00:16:12 +0000 (UTC)
 Received: from localhost.localdomain (vpn2-54-102.bne.redhat.com
  [10.64.54.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E57B2857F;
- Mon, 29 Jun 2020 23:14:47 +0000 (UTC)
-Subject: Re: [PATCH 1/2] kvm/arm64: Rename HSR to ESR
-To: Marc Zyngier <maz@misterjones.org>, Mark Rutland <mark.rutland@arm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DAE010013C1;
+ Tue, 30 Jun 2020 00:16:10 +0000 (UTC)
+Subject: Re: [PATCH 2/2] kvm/arm64: Detach ESR operator from vCPU struct
+To: Mark Rutland <mark.rutland@arm.com>
 References: <20200629091841.88198-1-gshan@redhat.com>
- <20200629091841.88198-2-gshan@redhat.com>
- <20200629103208.GA59769@C02TD0UTHF1T.local>
- <9080c56e3f54d7661a57c5e2a771363f@misterjones.org>
+ <20200629091841.88198-3-gshan@redhat.com>
+ <20200629110016.GB59769@C02TD0UTHF1T.local>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <1cc51ce6-0e94-03e5-85e1-66d074bb50f4@redhat.com>
-Date: Tue, 30 Jun 2020 09:14:44 +1000
+Message-ID: <1947c322-4fd0-5161-eab8-3504235408c1@redhat.com>
+Date: Tue, 30 Jun 2020 10:16:07 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <9080c56e3f54d7661a57c5e2a771363f@misterjones.org>
+In-Reply-To: <20200629110016.GB59769@C02TD0UTHF1T.local>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -99,57 +95,201 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gNi8zMC8yMCAzOjAwIEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAyMC0wNi0yOSAx
-MTozMiwgTWFyayBSdXRsYW5kIHdyb3RlOgo+PiBPbiBNb24sIEp1biAyOSwgMjAyMCBhdCAwNzox
-ODo0MFBNICsxMDAwLCBHYXZpbiBTaGFuIHdyb3RlOgo+Pj4ga3ZtL2FybTMyIGlzbid0IHN1cHBv
-cnRlZCBzaW5jZSBjb21taXQgNTQxYWQwMTUwY2E0ICgiYXJtOiBSZW1vdmUKPj4+IDMyYml0IEtW
-TSBob3N0IHN1cHBvcnQiKS4gU28gSFNSIGlzbid0IG1lYW5pbmdmdWwgc2luY2UgdGhlbi4gVGhp
-cwo+Pj4gcmVuYW1lcyBIU1IgdG8gRVNSIGFjY29yZGluZ2x5LiBUaGlzIHNob3VsZG4ndCBjYXVz
-ZSBhbnkgZnVuY3Rpb25hbAo+Pj4gY2hhbmdlczoKPj4+Cj4+PiDCoMKgICogUmVuYW1lIGt2bV92
-Y3B1X2dldF9oc3IoKSB0byBrdm1fdmNwdV9nZXRfZXNyKCkgdG8gbWFrZSB0aGUKPj4+IMKgwqDC
-oMKgIGZ1bmN0aW9uIG5hbWVzIHNlbGYtZXhwbGFuYXRvcnkuCj4+PiDCoMKgICogUmVuYW1lIHZh
-cmlhYmxlcyBmcm9tIEBoc3IgdG8gQGVzciB0byBtYWtlIHRoZW0gc2VsZi1leHBsYW5hdG9yeS4K
-Pj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBHYXZpbiBTaGFuIDxnc2hhbkByZWRoYXQuY29tPgo+Pgo+
-PiBBdCBhIGhpZ2gtbGV2ZWwsIEkgYWdyZWUgdGhhdCB3ZSBzaG91bGQgbW92ZSB0byB0aGUgYGVz
-cmAgbmFtaW5nIHRvCj4+IG1hdGNoIHRoZSBhcmNoaXRlY3R1cmUgYW5kIG1pbmltaXplIHN1cnBy
-aXNlLiBIb3dldmVyLCBJIHRoaW5rIHRoZXJlIGFyZQo+PiBzb21lIEFCSSBjaGFuZ2VzIGhlcmUs
-IHdoaWNoICphcmUqIGZ1bmNpdG9uYWwgY2hhbmdlcywgYW5kIHRob3NlIG5lZWQgdG8KPj4gYmUg
-YXZvaWRlZC4KPj4KPj4gWy4uLl0KPj4KPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1
-ZGUvdWFwaS9hc20va3ZtLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKPj4+
-IGluZGV4IGJhODViYjIzZjA2MC4uZDU0MzQ1NTczYTg4IDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9h
-cm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUv
-dWFwaS9hc20va3ZtLmgKPj4+IEBAIC0xNDAsNyArMTQwLDcgQEAgc3RydWN0IGt2bV9ndWVzdF9k
-ZWJ1Z19hcmNoIHsKPj4+IMKgfTsKPj4+Cj4+PiDCoHN0cnVjdCBrdm1fZGVidWdfZXhpdF9hcmNo
-IHsKPj4+IC3CoMKgwqAgX191MzIgaHNyOwo+Pj4gK8KgwqDCoCBfX3UzMiBlc3I7Cj4+PiDCoMKg
-wqDCoCBfX3U2NCBmYXI7wqDCoMKgIC8qIHVzZWQgZm9yIHdhdGNocG9pbnRzICovCj4+PiDCoH07
-Cj4+Cj4+IFRoaXMgaXMgdXNlcnNwYWNlIEFCSSwgYW5kIGNoYW5naW5nIHRoaXMgKndpbGwqIGJy
-ZWFrIHVzZXJzcGFjZS4gVGhpcwo+PiAqaXMqIGEgZnVuY3Rpb25hbCBjaGFuZ2UuCj4+Cj4+IE5B
-SyB0byB0aGlzIHNwZWNpZmljYWxseS4gQXQgYmVzdCB0aGVzZSBzaG91bGQgYmUgYSBjb21tZW50
-IGhlcmUgdGhhdAo+PiB0aGlzIGlzIG5hbWluZyBpcyBsZWdhY3ltIGJ1dCBtdXN0IHN0YXkgZm9y
-IEFCSSByZWFzb25zLgo+Pgo+PiBbLi4uXQo+Pgo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-a3ZtL3RyYWNlX2FybS5oIGIvYXJjaC9hcm02NC9rdm0vdHJhY2VfYXJtLmgKPj4+IGluZGV4IDRj
-NzEyNzBjYzA5Ny4uZWU0ZjY5MWIxNmZmIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0v
-dHJhY2VfYXJtLmgKPj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3RyYWNlX2FybS5oCj4+PiBAQCAt
-NDIsNyArNDIsNyBAQCBUUkFDRV9FVkVOVChrdm1fZXhpdCwKPj4+IMKgwqDCoMKgwqDCoMKgwqAg
-X19lbnRyeS0+dmNwdV9wY8KgwqDCoMKgwqDCoMKgID0gdmNwdV9wYzsKPj4+IMKgwqDCoMKgICks
-Cj4+Pgo+Pj4gLcKgwqDCoCBUUF9wcmludGsoIiVzOiBIU1JfRUM6IDB4JTA0eCAoJXMpLCBQQzog
-MHglMDhseCIsCj4+PiArwqDCoMKgIFRQX3ByaW50aygiJXM6IEVTUl9FQzogMHglMDR4ICglcyks
-IFBDOiAweCUwOGx4IiwKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIF9fcHJpbnRfc3ltYm9saWMo
-X19lbnRyeS0+cmV0LCBrdm1fYXJtX2V4Y2VwdGlvbl90eXBlKSwKPj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIF9fZW50cnktPmVzcl9lYywKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIF9fcHJpbnRf
-c3ltYm9saWMoX19lbnRyeS0+ZXNyX2VjLCBrdm1fYXJtX2V4Y2VwdGlvbl9jbGFzcyksCj4+Cj4+
-IExpa2V3aXNlLCBpc24ndCBhbGwgdGhlIHRyYWNlcG9pbnQgZm9ybWF0IHN0dWZmIEFCST8gSSdt
-IG5vdCBjb21mb3J0YWJsZQo+PiB0aGF0IHdlIGNhbiBjaGFuZ2UgdGhpcy4KPiAKPiBUcmFjZXBv
-aW50cyBhcmUgQUJJLCBhbmQgdGhleSBjYW5ub3QgY2hhbmdlLiBBcyBpdCBpcywgdGhpcyBwYXRj
-aAo+IGlzbid0IGFjY2VwdGFibGUgKHRoZSB3b3JzZSBvZmZlbmRlciBiZWluZyB0aGUgdWFwaSBj
-aGFuZ2UgdGhvdWdoKS4KPiAKClllcywgSSB3YXMgcmVsdWN0YW50IHRvIG1ha2UgdGhlIGNoYW5n
-ZXMgcmVnYXJkaW5nIHRoZSB1YXBpL3RyYWNlcG9pbnQsCndoaWNoIGlzIHBhcnQgb2YgdGhlIEFC
-SS4gSSB3aWxsIGRyb3AgdGhlIGNoYW5nZXMgaW4gdjIuCgpUaGFua3MsCkdhdmluCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
-aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
-YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Mark,
+
+On 6/29/20 9:00 PM, Mark Rutland wrote:
+> On Mon, Jun 29, 2020 at 07:18:41PM +1000, Gavin Shan wrote:
+>> There are a set of inline functions defined in kvm_emulate.h. Those
+>> functions reads ESR from vCPU fault information struct and then operate
+>> on it. So it's tied with vCPU fault information and vCPU struct. It
+>> limits their usage scope.
+>>
+>> This detaches these functions from the vCPU struct by introducing an
+>> other set of inline functions in esr.h to manupulate the specified
+>> ESR value. With it, the inline functions defined in kvm_emulate.h
+>> can call these inline functions (in esr.h) instead. This shouldn't
+>> cause any functional changes.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> 
+> TBH, I'm not sure that this patch makes much sense on its own.
+> 
+> We already use vcpu_get_esr(), which is the bit that'd have to change if
+> we didn't pass the vcpu around, and the new helpers are just consuming
+> the value in a sifferent way rather than a necessarily simpler way.
+> 
+> Further comments on that front below.
+> 
+>> ---
+>>   arch/arm64/include/asm/esr.h         | 32 +++++++++++++++++++++
+>>   arch/arm64/include/asm/kvm_emulate.h | 43 ++++++++++++----------------
+>>   2 files changed, 51 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index 035003acfa87..950204c5fbe1 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -326,6 +326,38 @@ static inline bool esr_is_data_abort(u32 esr)
+>>   	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
+>>   }
+>>   
+>> +#define ESR_DECLARE_CHECK_FUNC(name, field)	\
+>> +static inline bool esr_is_##name(u32 esr)	\
+>> +{						\
+>> +	return !!(esr & (field));		\
+>> +}
+>> +#define ESR_DECLARE_GET_FUNC(name, mask, shift)	\
+>> +static inline u32 esr_get_##name(u32 esr)	\
+>> +{						\
+>> +	return ((esr & (mask)) >> (shift));	\
+>> +}
+>> +
+>> +ESR_DECLARE_CHECK_FUNC(il_32bit,   ESR_ELx_IL);
+>> +ESR_DECLARE_CHECK_FUNC(condition,  ESR_ELx_CV);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_valid, ESR_ELx_ISV);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_sse,   ESR_ELx_SSE);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_sf,    ESR_ELx_SF);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_s1ptw, ESR_ELx_S1PTW);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_write, ESR_ELx_WNR);
+>> +ESR_DECLARE_CHECK_FUNC(dabt_cm,    ESR_ELx_CM);
+>> +
+>> +ESR_DECLARE_GET_FUNC(class,        ESR_ELx_EC_MASK,      ESR_ELx_EC_SHIFT);
+>> +ESR_DECLARE_GET_FUNC(fault,        ESR_ELx_FSC,          0);
+>> +ESR_DECLARE_GET_FUNC(fault_type,   ESR_ELx_FSC_TYPE,     0);
+>> +ESR_DECLARE_GET_FUNC(condition,    ESR_ELx_COND_MASK,    ESR_ELx_COND_SHIFT);
+>> +ESR_DECLARE_GET_FUNC(hvc_imm,      ESR_ELx_xVC_IMM_MASK, 0);
+>> +ESR_DECLARE_GET_FUNC(dabt_iss_nisv_sanitized,
+>> +		     (ESR_ELx_CM | ESR_ELx_WNR | ESR_ELx_FSC), 0);
+>> +ESR_DECLARE_GET_FUNC(dabt_rd,      ESR_ELx_SRT_MASK,     ESR_ELx_SRT_SHIFT);
+>> +ESR_DECLARE_GET_FUNC(dabt_as,      ESR_ELx_SAS,          ESR_ELx_SAS_SHIFT);
+>> +ESR_DECLARE_GET_FUNC(sys_rt,       ESR_ELx_SYS64_ISS_RT_MASK,
+>> +				   ESR_ELx_SYS64_ISS_RT_SHIFT);
+> 
+> I'm really not keen on this, as I think it's abstracting the problem at
+> the wrong level, hiding information and making things harder to reason
+> about rather than abstracting that.
+> 
+> I strongly suspect the right thing to do is use FIELD_GET() in-place in
+> the functions below, e.g.
+> 
+>     !!FIELD_GET(esr, ESR_ELx_IL);
+> 
+> ... rather than:
+> 
+>     esr_get_il_32bit(esr);
+> 
+> ... as that avoids the wrapper entirely, minimizing indirection and
+> making the codebase simpler to navigate.
+> 
+> For the cases where we *really* want a helper, i'd rather write those
+> out explicitly, e.g.
+> 
+
+It will be no difference except to use FIELD_GET() to make the code
+more explicit. Maybe I didn't fully understand your comments here.
+Please let me know if something like below is what you expect?
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index c9ba0df47f7d..e8294edcd8f4 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -343,7 +343,7 @@ static __always_inline unsigned int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *
+  /* This one is not specific to Data Abort */
+  static __always_inline bool kvm_vcpu_trap_il_is32bit(const struct kvm_vcpu *vcpu)
+  {
+-       return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_IL);
++       return !!FIELD_GET(kvm_vcpu_get_esr(vcpu), ESR_ELx_IL);
+  }
+
+If my understanding is correct, I think we needn't change the code
+and this patch can be dropped.
+
+> #define esr_get_hvc_imm(esr)	FIELD_GET(esr, ESR_ELx_xVC_IMM_MASK)
+> 
+> ... but I'm not sure if we really need those given these are mostly used
+> *once* below.
+> 
+
+We don't need these for now, but will be needed when the next revision
+of async page fault is posted. Lets ignore this requirement for now
+because I can revisit it when the async page fault patchset is posted.
+That time, we can have accessors defined in esr.h and helpers in
+kvm_emulate.h use those accessors. It's similar to what you're suggesting.
+
+#define esr_get_hvc_imm(esr)	FIELD_GET(esr, ESR_ELx_xVC_IMM_MASK)
+
+static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+{
+	return esr_get_hvc_imm(kvm_vcpu_get_esr(vcpu));
+}
+
+
+By the way, it's long way to reach that point because I'm still in the
+middle of working on virtualizing SDEI currently.
+
+>> +
+>>   const char *esr_get_class_string(u32 esr);
+>>   #endif /* __ASSEMBLY */
+>>   
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index c9ba0df47f7d..9337d90c517f 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -266,12 +266,8 @@ static __always_inline u32 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+>>   
+>>   static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+>>   {
+>> -	u32 esr = kvm_vcpu_get_esr(vcpu);
+>> -
+>> -	if (esr & ESR_ELx_CV)
+>> -		return (esr & ESR_ELx_COND_MASK) >> ESR_ELx_COND_SHIFT;
+>> -
+>> -	return -1;
+>> +	return esr_is_condition(kvm_vcpu_get_esr(vcpu)) ?
+>> +	       esr_get_condition(kvm_vcpu_get_esr(vcpu)) : -1;
+>>   }
+> 
+> Do we really need to change the structure of this code? I thought this
+> was purely about decooupling helpers from the vcpu struct. This could
+> have stayed as:
+> 
+> static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+> {
+> 	u32 esr = kvm_vcpu_get_esr(vcpu);
+> 
+> 	if (esr_is_condition(esr))
+> 		return esr_get_condition(esr);
+> 	
+> 	return -1;
+> }
+> 
+> ... or:
+> 
+> static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+> {
+> 	u32 esr = kvm_vcpu_get_esr(vcpu);
+> 
+> 	if (FEILD_GET(esr, ESR_ELx_CV))
+> 		return FIELD_GET(esr, ESR_ELx_COND_MASK);
+> 	
+> 	return -1;
+> }
+> 
+
+It's not needed to change the structure of the code, but it does
+reduce the lines of codes. It's kind of my personal taste :)
+
+[...]
+
+Thanks,
+Gavin
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
