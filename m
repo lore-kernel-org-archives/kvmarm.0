@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FC7C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 03:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2D5C433E1
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 03:02:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E649E20884
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 03:02:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E649E20884
+	by mail.kernel.org (Postfix) with ESMTP id 3CC5220884
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 03:02:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC5220884
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EC8D4B5A3;
-	Wed,  1 Jul 2020 23:02:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBEED4B575;
+	Wed,  1 Jul 2020 23:02:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QlqNlFdDua9A; Wed,  1 Jul 2020 23:02:38 -0400 (EDT)
+	with ESMTP id OiNoE-yWD2n4; Wed,  1 Jul 2020 23:02:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB4104B575;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E76A74B58E;
 	Wed,  1 Jul 2020 23:02:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38A674B572
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59D064B568
  for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2020 23:02:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jyOZ9Z7S60Mm for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id TqwrsXBe-k5R for <kvmarm@lists.cs.columbia.edu>;
  Wed,  1 Jul 2020 23:02:35 -0400 (EDT)
 Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC7D74B569
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2020 23:02:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 489714B56B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2020 23:02:35 -0400 (EDT)
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 6708DC55B26981E027C7;
+ by Forcepoint Email with ESMTP id 5D59980D0011CC29CE6B;
  Thu,  2 Jul 2020 11:02:30 +0800 (CST)
 Received: from DESKTOP-FPN2511.china.huawei.com (10.174.187.42) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 11:02:23 +0800
+ 14.3.487.0; Thu, 2 Jul 2020 11:02:22 +0800
 From: Jingyi Wang <wangjingyi11@huawei.com>
 To: <drjones@redhat.com>, <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [kvm-unit-tests PATCH v2 6/8] arm64: microbench: Allow each test to
- specify its running times
-Date: Thu, 2 Jul 2020 11:01:30 +0800
-Message-ID: <20200702030132.20252-7-wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH v2 4/8] arm64: its: Handle its command queue
+ wrapping
+Date: Thu, 2 Jul 2020 11:01:28 +0800
+Message-ID: <20200702030132.20252-5-wangjingyi11@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200702030132.20252-1-wangjingyi11@huawei.com>
 References: <20200702030132.20252-1-wangjingyi11@huawei.com>
@@ -71,75 +71,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For some test in micro-bench can be time consuming, we add a
-micro-bench test parameter to allow each individual test to specify
-its running times.
+Because micro-bench may send a large number of ITS commands, we
+should handle ITS command queue wrapping as kernel instead of just
+failing the test.
 
 Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
 ---
- arm/micro-bench.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+ lib/arm64/gic-v3-its-cmd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index aeb60a7..506d2f9 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -223,17 +223,18 @@ struct exit_test {
- 	const char *name;
- 	bool (*prep)(void);
- 	void (*exec)(void);
-+	u32 times;
- 	bool run;
- };
- 
- static struct exit_test tests[] = {
--	{"hvc",			NULL,		hvc_exec,		true},
--	{"mmio_read_user",	NULL,		mmio_read_user_exec,	true},
--	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
--	{"eoi",			NULL,		eoi_exec,		true},
--	{"ipi",			ipi_prep,	ipi_exec,		true},
--	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
--	{"lpi",			lpi_prep,	lpi_exec,		true},
-+	{"hvc",			NULL,		hvc_exec,		NTIMES,		true},
-+	{"mmio_read_user",	NULL,		mmio_read_user_exec,	NTIMES,		true},
-+	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	NTIMES,		true},
-+	{"eoi",			NULL,		eoi_exec,		NTIMES,		true},
-+	{"ipi",			ipi_prep,	ipi_exec,		NTIMES,		true},
-+	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NTIMES,		true},
-+	{"lpi",			lpi_prep,	lpi_exec,		NTIMES,		true},
- };
- 
- struct ns_time {
-@@ -254,7 +255,7 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
- 
- static void loop_test(struct exit_test *test)
+diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
+index 2c208d1..34574f7 100644
+--- a/lib/arm64/gic-v3-its-cmd.c
++++ b/lib/arm64/gic-v3-its-cmd.c
+@@ -164,8 +164,9 @@ static struct its_cmd_block *its_allocate_entry(void)
  {
--	uint64_t start, end, total_ticks, ntimes = NTIMES;
-+	uint64_t start, end, total_ticks, ntimes = 0;
- 	struct ns_time total_ns, avg_ns;
+ 	struct its_cmd_block *cmd;
  
- 	if (test->prep) {
-@@ -265,15 +266,17 @@ static void loop_test(struct exit_test *test)
- 	}
- 	isb();
- 	start = read_sysreg(cntpct_el0);
--	while (ntimes--)
-+	while (ntimes < test->times) {
- 		test->exec();
-+		ntimes++;
-+	}
- 	isb();
- 	end = read_sysreg(cntpct_el0);
+-	assert((u64)its_data.cmd_write < (u64)its_data.cmd_base + SZ_64K);
+ 	cmd = its_data.cmd_write++;
++	if ((u64)its_data.cmd_write  == (u64)its_data.cmd_base + SZ_64K)
++		its_data.cmd_write = its_data.cmd_base;
+ 	return cmd;
+ }
  
- 	total_ticks = end - start;
- 	ticks_to_ns_time(total_ticks, &total_ns);
--	avg_ns.ns = total_ns.ns / NTIMES;
--	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
-+	avg_ns.ns = total_ns.ns / ntimes;
-+	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
- 
- 	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
- 		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
 -- 
 2.19.1
 
