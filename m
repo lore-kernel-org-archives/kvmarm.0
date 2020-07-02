@@ -2,74 +2,63 @@ Return-Path: <SRS0=CSPl=AN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C154DC433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23D1C433E0
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:21:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4D79120720
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:13:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ek+X8PUt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D79120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 3D0A820720
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D0A820720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9E474B5A5;
-	Thu,  2 Jul 2020 04:13:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB4D64B5C6;
+	Thu,  2 Jul 2020 04:21:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tqfbZbDs+76x; Thu,  2 Jul 2020 04:13:56 -0400 (EDT)
+	with ESMTP id 7HjsSc2ikpg5; Thu,  2 Jul 2020 04:21:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CA264B599;
-	Thu,  2 Jul 2020 04:13:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 755944B5AA;
+	Thu,  2 Jul 2020 04:21:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE29F4B574
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:13:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F574B5AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:21:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OxRGkAuqitCX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 04:13:53 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF2B14B572
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:13:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593677633;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=gbJA/RmWRo4DsQRLNHyZabYf9h247N0ChofgtBrHV28=;
- b=Ek+X8PUtQ2igaZZ+xbOUV37+DPcVD1VTE4jPW61b3c3fHMmLym28bLeDEaLnEPBGQ8dRfB
- xnV3VdSSQwNq4zhXbfQmCLA/x05bo/A9OKL9qmy/YWYXqABWVwzcUmivY6sDPAn/DLW36U
- D869Sjl3E2UoQNZXbCcBTJxDoqRQEU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-3c3HQYISMbCahuG9rQWcKw-1; Thu, 02 Jul 2020 04:13:48 -0400
-X-MC-Unique: 3c3HQYISMbCahuG9rQWcKw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EF1F185B3B3;
- Thu,  2 Jul 2020 08:12:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 004EB610F2;
- Thu,  2 Jul 2020 08:12:20 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvm-unit-tests] arm/arm64: timer: Extract irqs at setup time
-Date: Thu,  2 Jul 2020 10:12:19 +0200
-Message-Id: <20200702081219.27176-1-drjones@redhat.com>
+ with ESMTP id RhqfRK5Uhr-W for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 04:21:46 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21DC94B5A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:21:46 -0400 (EDT)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D805C79AD0AFC2793C26;
+ Thu,  2 Jul 2020 16:21:42 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.42) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Jul 2020
+ 16:21:32 +0800
+Subject: Re: [kvm-unit-tests PATCH v2 2/8] arm64: microbench: Use the funcions
+ for ipi test as the general functions for gic(ipi/lpi/timer) test
+To: Andrew Jones <drjones@redhat.com>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-3-wangjingyi11@huawei.com>
+ <20200702052554.2be22pr3wa2nximf@kamzik.brq.redhat.com>
+From: Jingyi Wang <wangjingyi11@huawei.com>
+Message-ID: <cb92098b-5b0a-bc11-0a6a-2d4b34442b89@huawei.com>
+Date: Thu, 2 Jul 2020 16:21:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Cc: maz@kernel.org
+In-Reply-To: <20200702052554.2be22pr3wa2nximf@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.42]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,202 +70,151 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The timer can be useful for other tests besides the timer test.
-Extract the DT parsing of the irqs out of the timer test into
-setup and provide them along with some defines in a new timer.h
-file.
+Hi Drew,
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/timer.c           | 26 ++++----------------------
- lib/arm/asm/timer.h   | 31 +++++++++++++++++++++++++++++++
- lib/arm/setup.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/timer.h |  1 +
- 4 files changed, 78 insertions(+), 22 deletions(-)
- create mode 100644 lib/arm/asm/timer.h
- create mode 100644 lib/arm64/asm/timer.h
+On 7/2/2020 1:25 PM, Andrew Jones wrote:
+> 
+> Hi Jingyi,
+> 
+> This patch has quite a long summary. How about instead of
+> 
+>   arm64: microbench: Use the funcions for ipi test as the general functions for gic(ipi/lpi/timer) test
+> 
+> we use
+> 
+>   arm64: microbench: Generalize ipi test names
+> 
+> and then in the commit message, instead of
+> 
+>   The following patches will use that.
+> 
+> we use
+> 
+>   Later patches will use these functions for gic(ipi/lpi/timer) tests.
+> 
+> Thanks,
+> drew
+> 
 
-diff --git a/arm/timer.c b/arm/timer.c
-index 44621b4f2967..09e3f8f6bd7d 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -8,15 +8,12 @@
- #include <libcflat.h>
- #include <devicetree.h>
- #include <errata.h>
-+#include <asm/timer.h>
- #include <asm/delay.h>
- #include <asm/processor.h>
- #include <asm/gic.h>
- #include <asm/io.h>
- 
--#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
--#define ARCH_TIMER_CTL_IMASK   (1 << 1)
--#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
--
- static void *gic_isenabler;
- static void *gic_icenabler;
- 
-@@ -108,7 +105,6 @@ static void write_ptimer_ctl(u64 val)
- 
- struct timer_info {
- 	u32 irq;
--	u32 irq_flags;
- 	volatile bool irq_received;
- 	u64 (*read_counter)(void);
- 	u64 (*read_cval)(void);
-@@ -304,23 +300,9 @@ static void test_ptimer(void)
- 
- static void test_init(void)
- {
--	const struct fdt_property *prop;
--	const void *fdt = dt_fdt();
--	int node, len;
--	u32 *data;
--
--	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
--	assert(node >= 0);
--	prop = fdt_get_property(fdt, node, "interrupts", &len);
--	assert(prop && len == (4 * 3 * sizeof(u32)));
--
--	data = (u32 *)prop->data;
--	assert(fdt32_to_cpu(data[3]) == 1);
--	ptimer_info.irq = fdt32_to_cpu(data[4]);
--	ptimer_info.irq_flags = fdt32_to_cpu(data[5]);
--	assert(fdt32_to_cpu(data[6]) == 1);
--	vtimer_info.irq = fdt32_to_cpu(data[7]);
--	vtimer_info.irq_flags = fdt32_to_cpu(data[8]);
-+	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
-+	ptimer_info.irq = TIMER_PTIMER_IRQ;
-+	vtimer_info.irq = TIMER_VTIMER_IRQ;
- 
- 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
- 	ptimer_info.read_ctl();
-diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
-new file mode 100644
-index 000000000000..f75cc67f3ac4
---- /dev/null
-+++ b/lib/arm/asm/timer.h
-@@ -0,0 +1,31 @@
-+/*
-+ * Copyright (C) 2020, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_TIMER_H_
-+#define _ASMARM_TIMER_H_
-+
-+#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
-+#define ARCH_TIMER_CTL_IMASK   (1 << 1)
-+#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
-+
-+#ifndef __ASSEMBLY__
-+
-+struct timer_state {
-+	struct {
-+		u32 irq;
-+		u32 irq_flags;
-+	} ptimer;
-+	struct {
-+		u32 irq;
-+		u32 irq_flags;
-+	} vtimer;
-+};
-+extern struct timer_state __timer_state;
-+
-+#define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
-+#define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_TIMER_H_ */
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 418b4e58a5f8..78562e47c01c 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -22,6 +22,7 @@
- #include <asm/page.h>
- #include <asm/processor.h>
- #include <asm/smp.h>
-+#include <asm/timer.h>
- 
- #include "io.h"
- 
-@@ -29,6 +30,8 @@
- 
- extern unsigned long stacktop;
- 
-+struct timer_state __timer_state;
-+
- char *initrd;
- u32 initrd_size;
- 
-@@ -156,6 +159,43 @@ static void mem_init(phys_addr_t freemem_start)
- 	page_alloc_ops_enable();
- }
- 
-+static void timer_save_state(void)
-+{
-+	const struct fdt_property *prop;
-+	const void *fdt = dt_fdt();
-+	int node, len;
-+	u32 *data;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
-+	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
-+
-+	if (node == -FDT_ERR_NOTFOUND) {
-+		__timer_state.ptimer.irq = -1;
-+		__timer_state.vtimer.irq = -1;
-+		return;
-+	}
-+
-+	/*
-+	 * From Linux devicetree timer binding documentation
-+	 *
-+	 * interrupts <type irq flags>:
-+	 *	secure timer irq
-+	 *	non-secure timer irq		(ptimer)
-+	 *	virtual timer irq		(vtimer)
-+	 *	hypervisor timer irq
-+	 */
-+	prop = fdt_get_property(fdt, node, "interrupts", &len);
-+	assert(prop && len == (4 * 3 * sizeof(u32)));
-+
-+	data = (u32 *)prop->data;
-+	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */);
-+	__timer_state.ptimer.irq = fdt32_to_cpu(data[4]);
-+	__timer_state.ptimer.irq_flags = fdt32_to_cpu(data[5]);
-+	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */);
-+	__timer_state.vtimer.irq = fdt32_to_cpu(data[7]);
-+	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
-+}
-+
- void setup(const void *fdt)
- {
- 	void *freemem = &stacktop;
-@@ -211,6 +251,8 @@ void setup(const void *fdt)
- 	io_init();
- 
- 	/* finish setup */
-+	timer_save_state();
-+
- 	ret = dt_get_bootargs(&bootargs);
- 	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
- 	setup_args_progname(bootargs);
-diff --git a/lib/arm64/asm/timer.h b/lib/arm64/asm/timer.h
-new file mode 100644
-index 000000000000..c0f5f88287de
---- /dev/null
-+++ b/lib/arm64/asm/timer.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/timer.h"
--- 
-2.25.4
+This looks more concise, thanks for reviewing
+
+Thanks,
+Jingyi
+
+> On Thu, Jul 02, 2020 at 11:01:26AM +0800, Jingyi Wang wrote:
+>> The following patches will use that.
+>>
+>> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+>> ---
+>>   arm/micro-bench.c | 39 ++++++++++++++++++++++-----------------
+>>   1 file changed, 22 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+>> index 794dfac..fc4d356 100644
+>> --- a/arm/micro-bench.c
+>> +++ b/arm/micro-bench.c
+>> @@ -25,24 +25,24 @@
+>>   
+>>   static u32 cntfrq;
+>>   
+>> -static volatile bool ipi_ready, ipi_received;
+>> +static volatile bool irq_ready, irq_received;
+>>   static void *vgic_dist_base;
+>>   static void (*write_eoir)(u32 irqstat);
+>>   
+>> -static void ipi_irq_handler(struct pt_regs *regs)
+>> +static void gic_irq_handler(struct pt_regs *regs)
+>>   {
+>> -	ipi_ready = false;
+>> -	ipi_received = true;
+>> +	irq_ready = false;
+>> +	irq_received = true;
+>>   	gic_write_eoir(gic_read_iar());
+>> -	ipi_ready = true;
+>> +	irq_ready = true;
+>>   }
+>>   
+>> -static void ipi_secondary_entry(void *data)
+>> +static void gic_secondary_entry(void *data)
+>>   {
+>> -	install_irq_handler(EL1H_IRQ, ipi_irq_handler);
+>> +	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+>>   	gic_enable_defaults();
+>>   	local_irq_enable();
+>> -	ipi_ready = true;
+>> +	irq_ready = true;
+>>   	while (true)
+>>   		cpu_relax();
+>>   }
+>> @@ -72,9 +72,9 @@ static bool test_init(void)
+>>   		break;
+>>   	}
+>>   
+>> -	ipi_ready = false;
+>> +	irq_ready = false;
+>>   	gic_enable_defaults();
+>> -	on_cpu_async(1, ipi_secondary_entry, NULL);
+>> +	on_cpu_async(1, gic_secondary_entry, NULL);
+>>   
+>>   	cntfrq = get_cntfrq();
+>>   	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
+>> @@ -82,13 +82,18 @@ static bool test_init(void)
+>>   	return true;
+>>   }
+>>   
+>> -static void ipi_prep(void)
+>> +static void gic_prep_common(void)
+>>   {
+>>   	unsigned tries = 1 << 28;
+>>   
+>> -	while (!ipi_ready && tries--)
+>> +	while (!irq_ready && tries--)
+>>   		cpu_relax();
+>> -	assert(ipi_ready);
+>> +	assert(irq_ready);
+>> +}
+>> +
+>> +static void ipi_prep(void)
+>> +{
+>> +	gic_prep_common();
+>>   }
+>>   
+>>   static void ipi_exec(void)
+>> @@ -96,17 +101,17 @@ static void ipi_exec(void)
+>>   	unsigned tries = 1 << 28;
+>>   	static int received = 0;
+>>   
+>> -	ipi_received = false;
+>> +	irq_received = false;
+>>   
+>>   	gic_ipi_send_single(1, 1);
+>>   
+>> -	while (!ipi_received && tries--)
+>> +	while (!irq_received && tries--)
+>>   		cpu_relax();
+>>   
+>> -	if (ipi_received)
+>> +	if (irq_received)
+>>   		++received;
+>>   
+>> -	assert_msg(ipi_received, "failed to receive IPI in time, but received %d successfully\n", received);
+>> +	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
+>>   }
+>>   
+>>   static void hvc_exec(void)
+>> -- 
+>> 2.19.1
+>>
+>>
+> 
+> 
+> .
+> 
 
 _______________________________________________
 kvmarm mailing list
