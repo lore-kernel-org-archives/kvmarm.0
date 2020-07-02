@@ -2,62 +2,79 @@ Return-Path: <SRS0=CSPl=AN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB416C433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B347C433DF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 14:05:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 79F7F20772
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:57:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79F7F20772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id F3FFC20899
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 14:05:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+aiKaeu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FFC20899
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32ABB4B45E;
-	Thu,  2 Jul 2020 09:57:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC654B5FE;
+	Thu,  2 Jul 2020 10:05:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8-RQ9EPMknAK; Thu,  2 Jul 2020 09:57:17 -0400 (EDT)
+	with ESMTP id 3rBAFqXAndP9; Thu,  2 Jul 2020 10:04:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 129884B608;
-	Thu,  2 Jul 2020 09:57:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 434C74B5D7;
+	Thu,  2 Jul 2020 10:04:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB4274B47D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:57:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F12EA4B5D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 10:04:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CuMtuOGeJ7Vo for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 09:57:12 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 881B64B589
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:57:11 -0400 (EDT)
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 913E96BE24CEBCEA50BE;
- Thu,  2 Jul 2020 21:56:10 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.22) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 21:56:00 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-Subject: [PATCH v2 0/8] KVM: arm64: Support HW dirty log based on DBM
-Date: Thu, 2 Jul 2020 21:55:48 +0800
-Message-ID: <20200702135556.36896-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+ with ESMTP id 0Hu0m-wh6xPz for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 10:04:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C89234B4D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 10:04:56 -0400 (EDT)
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
+ [209.85.167.176])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B454120CC7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 14:04:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593698695;
+ bh=kA50VBMMrGdrE3xQ5v88BLtSVM3GvpTTysDMHRSjmko=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=a+aiKaeuTklSMSmtg/vA3HtvjPu26UYvgY252wgBZA006pvwDB0gJQEuZgJODWpQp
+ CMU5OPvfV3mXBDU9Bjh0vZByGx5Ek+eqAAMwOK4AOrnuIGOGeU+zCpHNxZu45uExM2
+ 4rmZjTQZWgSvjaIjKF00J96/8oBwBoQDFf+9L/x0=
+Received: by mail-oi1-f176.google.com with SMTP id t4so5930551oij.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jul 2020 07:04:55 -0700 (PDT)
+X-Gm-Message-State: AOAM531FiVd3wZEVAWhWqzg3ay9dbbFLrZELjqkSQMDuxqdXQ4XdBxQy
+ 227UwMR++zNtFtB9nYQU/EUkYmTBvtPOag2P1A==
+X-Google-Smtp-Source: ABdhPJzrROq+VU/GH93IJWKW6WzvKUKB+YcooXfMjvvTdLnExXgvVy4cZjq/+hv19pvd+ndH7K9GFY4fG46Ww9CIFFc=
+X-Received: by 2002:aca:30d2:: with SMTP id w201mr3133804oiw.147.1593698695101; 
+ Thu, 02 Jul 2020 07:04:55 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
+References: <20200701215308.3715856-1-robh@kernel.org>
+ <20200701215308.3715856-2-robh@kernel.org>
+ <20200702114527.GB16499@willie-the-truck>
+In-Reply-To: <20200702114527.GB16499@willie-the-truck>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 2 Jul 2020 08:04:43 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLnZHXjnYf3s6FJnVKf4kN1fhRgJov=Sb3H6J=Yro+cQg@mail.gmail.com>
+Message-ID: <CAL_JsqLnZHXjnYf3s6FJnVKf4kN1fhRgJov=Sb3H6J=Yro+cQg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Print warning when cpu erratum can
+ cause guests to deadlock
+To: Will Deacon <will@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Steven Price <steven.price@arm.com>, liangpeng10@huawei.com,
- Alexios Zavras <alexios.zavras@intel.com>, Mark Brown <broonie@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>
+ "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,87 +91,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch series add support for dirty log based on HW DBM.
+On Thu, Jul 2, 2020 at 5:45 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Wed, Jul 01, 2020 at 03:53:06PM -0600, Rob Herring wrote:
+> > If guests don't have certain CPU erratum work-arounds implemented, then
+> > there is a possibility a guest can deadlock the system. IOW, only trusted
+> > guests should be used on systems with the erratum.
+> >
+> > This is the case for Cortex-A57 erratum 832075.
+> >
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: James Morse <james.morse@arm.com>
+> > Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Cc: kvmarm@lists.cs.columbia.edu
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arm.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 90cb90561446..e2f50fa4d825 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1653,6 +1653,10 @@ int kvm_arch_init(void *opaque)
+> >               return -ENODEV;
+> >       }
+> >
+> > +     if (cpus_have_const_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE))
+> > +             kvm_info("Guests without required CPU erratum work-arounds can deadlock system!\n" \
+>
+> work-arounds => workarounds
+>
+> (mainly for consistency, I have no clue if this is a real word or not!).
+>
+> I'd also probably do erratum => errata given that you're about to add a
+> second one.
 
-It works well under some migration test cases, including VM with 4K
-pages or 2M THP. I checked the SHA256 hash digest of all memory and
-they keep same for source VM and destination VM, which means no dirty
-pages is missed under hardware DBM.
+Humm, the plural is on workarounds. If I use a more standard singular
+vs. plural form like "CPU feature workarounds" vs "CPU features
+workarounds", the former seems more correct to me. (working around
+features may be a bit nonsensical, but big.LITTLE ;) )
 
-Some key points:
-
-1. Only support hardware updates of dirty status for PTEs. PMDs and PUDs
-   are not involved for now.
-
-2. About *performance*: In RFC patch, I have mentioned that for every 64GB
-   memory, KVM consumes about 40ms to scan all PTEs to collect dirty log.
-   This patch solves this problem through two ways: HW/SW dynamic switch
-   and Multi-core offload.
-
-   HW/SW dynamic switch: Give userspace right to enable/disable hw dirty
-   log. This adds a new KVM cap named KVM_CAP_ARM_HW_DIRTY_LOG. We can
-   achieve this by change the kvm->arch.vtcr value and kick vCPUs out to
-   reload this value to VCTR_EL2. Then userspace can enable hw dirty log
-   at the begining and disable it when dirty pages is little and about to
-   stop VM, so VM downtime is not affected.
-
-   Multi-core offload: Offload the PT scanning workload to multi-core can
-   greatly reduce scanning time. To promise we can complete in time, I use
-   smp_call_fuction to realize this policy, which utilize IPI to dispatch
-   workload to other CPUs. Under 128U Kunpeng 920 platform, it just takes
-   about 5ms to scan PTs of 256 RAM (use mempress and almost all PTs have
-   been established). And We dispatch workload iterately (every CPU just
-   scan PTs of 512M RAM for each iteration), so it won't affect physical
-   CPUs seriously.
-
-3. About correctness: Only add DBM bit when PTE is already writable, so
-   we still have readonly PTE and some mechanisms which rely on readonly
-   PTs are not broken.
-
-4. About PTs modification races: There are two kinds of PTs modification.
-   
-   The first is adding or clearing specific bit, such as AF or RW. All
-   these operations have been converted to be atomic, avoid covering
-   dirty status set by hardware.
-   
-   The second is replacement, such as PTEs unmapping or changement. All
-   these operations will invoke kvm_set_pte finally. kvm_set_pte have
-   been converted to be atomic and we save the dirty status to underlying
-   bitmap if dirty status is coverred.
-
-Change log:
-
-v2:
- - Address Steven's comments.
- - Add support of parallel dirty log sync.
- - Simplify and merge patches of v1.
-
-v1:
- - Address Catalin's comments.
-
-Keqian Zhu (8):
-  KVM: arm64: Set DBM bit for writable PTEs
-  KVM: arm64: Scan PTEs to sync dirty log
-  KVM: arm64: Modify stage2 young mechanism to support hw DBM
-  KVM: arm64: Save stage2 PTE dirty status if it is covered
-  KVM: arm64: Steply write protect page table by mask bit
-  KVM: arm64: Add KVM_CAP_ARM_HW_DIRTY_LOG capability
-  KVM: arm64: Sync dirty log parallel
-  KVM: Omit dirty log sync in log clear if initially all set
-
- arch/arm64/include/asm/kvm_host.h |   5 +
- arch/arm64/include/asm/kvm_mmu.h  |  43 ++++-
- arch/arm64/kvm/arm.c              |  45 ++++-
- arch/arm64/kvm/mmu.c              | 307 ++++++++++++++++++++++++++++--
- arch/arm64/kvm/reset.c            |   5 +
- include/uapi/linux/kvm.h          |   1 +
- tools/include/uapi/linux/kvm.h    |   1 +
- virt/kvm/kvm_main.c               |   3 +-
- 8 files changed, 389 insertions(+), 21 deletions(-)
-
--- 
-2.19.1
-
+Rob
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
