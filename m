@@ -2,82 +2,84 @@ Return-Path: <SRS0=CSPl=AN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A10C433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0744EC433DF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:13:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 924A020899
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95E82208B8
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3Ep6pAG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924A020899
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OTwyfk0e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E82208B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3629F4B601;
-	Thu,  2 Jul 2020 09:09:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D0A84B5CC;
+	Thu,  2 Jul 2020 09:13:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aTiSS4ylKo78; Thu,  2 Jul 2020 09:09:00 -0400 (EDT)
+	with ESMTP id 2v+MmPj-jRxU; Thu,  2 Jul 2020 09:13:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 293864B602;
-	Thu,  2 Jul 2020 09:09:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A514B602;
+	Thu,  2 Jul 2020 09:13:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F19D34B5FF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:08:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7548C4B5F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:13:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gIKYto2PHlM9 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 09:08:57 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79D4E4B5FD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:08:57 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 9xC2qEHXCkaO for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 09:13:26 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 985DE4B5CC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:13:26 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1593695606;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hDq3YFC4R5tSKIwncV0+1iQLp6whE45MANKxnMI+EnE=;
+ b=OTwyfk0eHvO+ax9j/NbX7kDw81t1nR7ggsWQL1B36FS1V+qMl509F4zVZNMeqG6VM6bvhY
+ BK1VwmA/taEqld+7FlCD7EAK1aaAjEtjWXv6/jXsf2Dy5lH3gBGfH81O3uq2tgxGiJNTcU
+ s9MS9ch/Wb2D9YmcuOvcO3AkaFNpZZI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-xoRsjDBrN_mVNVg8YAEV2w-1; Thu, 02 Jul 2020 09:13:24 -0400
+X-MC-Unique: xoRsjDBrN_mVNVg8YAEV2w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5B401207CD;
- Thu,  2 Jul 2020 13:08:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593695336;
- bh=wzZQY7bA/hVY2XqRItqhXuqM8/KSi7U3zQpAD19GvME=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=U3Ep6pAGs+trXcdrVcDE0GJ6S1lm4ZKfCN6X7qA4jo3nic152rvF0aTn+WVCkmxtt
- ZvBQzUOH12AYzzqdeCFM+n8rHqQSbVuedg3p3hSaywJkUqPJh1uWP+W5tcFQyQaBNN
- 6OxpNl+6i1tx7Y6XcDU01woX+eb4Tzlu0odJDujI=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jqyxS-008PNJ-Sj; Thu, 02 Jul 2020 14:08:55 +0100
-MIME-Version: 1.0
-Date: Thu, 02 Jul 2020 14:08:54 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/8] arm64: microbench: gic: Add gicv4.1
- support for ipi latency test.
-In-Reply-To: <087ef371-5e7b-e0b2-900f-67b2eacb4e0f@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DDFE1054F8F;
+ Thu,  2 Jul 2020 13:13:23 +0000 (UTC)
+Received: from [10.36.112.70] (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55EB560CD1;
+ Thu,  2 Jul 2020 13:13:21 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/8] arm64: microbench: its: Add LPI
+ latency test
+To: Jingyi Wang <wangjingyi11@huawei.com>, drjones@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-4-wangjingyi11@huawei.com>
- <087ef371-5e7b-e0b2-900f-67b2eacb4e0f@redhat.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <05a3da5fa35568606e55eb6428ce91d8@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, wangjingyi11@huawei.com,
- drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+ <20200702030132.20252-6-wangjingyi11@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2e682906-8b0b-9f5c-31af-8067139c680d@redhat.com>
+Date: Thu, 2 Jul 2020 15:13:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200702030132.20252-6-wangjingyi11@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,61 +91,101 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 2020-07-02 13:57, Auger Eric wrote:
-> Hi Jingyi,
+Hi Jingyi,
+On 7/2/20 5:01 AM, Jingyi Wang wrote:
+> Triggers LPIs through the INT command and test the latency.
+> Mostly inherited form commit 0ef02cd6cbaa(arm/arm64: ITS: INT
+> functional tests).
 > 
-> On 7/2/20 5:01 AM, Jingyi Wang wrote:
->> If gicv4.1(sgi hardware injection) supported, we test ipi injection
->> via hw/sw way separately.
->> 
->> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
->> ---
->>  arm/micro-bench.c    | 45 
->> +++++++++++++++++++++++++++++++++++++++-----
->>  lib/arm/asm/gic-v3.h |  3 +++
->>  lib/arm/asm/gic.h    |  1 +
->>  3 files changed, 44 insertions(+), 5 deletions(-)
->> 
->> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
->> index fc4d356..80d8db3 100644
->> --- a/arm/micro-bench.c
->> +++ b/arm/micro-bench.c
->> @@ -91,9 +91,40 @@ static void gic_prep_common(void)
->>  	assert(irq_ready);
->>  }
->> 
->> -static void ipi_prep(void)
->> +static bool ipi_prep(void)
-> Any reason why the bool returned value is preferred over the standard 
-> int?
->>  {
->> +	u32 val;
->> +
->> +	val = readl(vgic_dist_base + GICD_CTLR);
->> +	if (readl(vgic_dist_base + GICD_TYPER2) & GICD_TYPER2_nASSGIcap) {
->> +		val &= ~GICD_CTLR_ENABLE_G1A;
->> +		val &= ~GICD_CTLR_nASSGIreq;
->> +		writel(val, vgic_dist_base + GICD_CTLR);
->> +		val |= GICD_CTLR_ENABLE_G1A;
->> +		writel(val, vgic_dist_base + GICD_CTLR);
-> Why do we need this G1A dance?
+> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+> ---
+>  arm/micro-bench.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+> 
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 80d8db3..aeb60a7 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -20,6 +20,7 @@
+>   */
+>  #include <libcflat.h>
+>  #include <asm/gic.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  #define NTIMES (1U << 16)
+>  
+> @@ -145,6 +146,48 @@ static void ipi_exec(void)
+>  	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
+>  }
+>  
+> +static bool lpi_prep(void)
+> +{
+> +	struct its_collection *col1;
+> +	struct its_device *dev2;
+> +
+> +	if (!gicv3_its_base())
+> +		return false;
+> +
+> +	its_enable_defaults();
+> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	col1 = its_create_collection(1 /* col id */, 1 /* target PE */);
+> +	gicv3_lpi_set_config(8199, LPI_PROP_DEFAULT);
+> +
+> +	its_send_mapd_nv(dev2, true);
+> +	its_send_mapc_nv(col1, true);
+> +	its_send_invall_nv(col1);
+> +	its_send_mapti_nv(dev2, 8199 /* lpi id */, 20 /* event id */, col1);
+> +
+> +	gic_prep_common();
+> +	return true;
+> +}
+> +
+> +static void lpi_exec(void)
+> +{
+> +	struct its_device *dev2;
+> +	unsigned tries = 1 << 28;
+> +	static int received = 0;
+> +
+> +	irq_received = false;
+> +
+> +	dev2 = its_get_device(2);
+> +	its_send_int_nv(dev2, 20);
+> +
+> +	while (!irq_received && tries--)
+> +		cpu_relax();
+> +
+> +	if (irq_received)
+> +		++received;
+> +
+> +	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
+> +}
+> +
+>  static void hvc_exec(void)
+>  {
+>  	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+> @@ -190,6 +233,7 @@ static struct exit_test tests[] = {
+>  	{"eoi",			NULL,		eoi_exec,		true},
+>  	{"ipi",			ipi_prep,	ipi_exec,		true},
+>  	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
+> +	{"lpi",			lpi_prep,	lpi_exec,		true},
+>  };
+>  
+>  struct ns_time {
+> 
+Looks good to me (w/wo the lpi_prep returned value change)
 
-Because it isn't legal to change the SGI behaviour when groups are 
-enabled.
-Yes, it is described in this bit of documentation nobody has access to.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-And this code needs to track RWP on disabling Group-1.
+Thanks
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Eric
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
