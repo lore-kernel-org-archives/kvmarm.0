@@ -2,73 +2,60 @@ Return-Path: <SRS0=CSPl=AN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4054C433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 15:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3C6C433E0
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 15:32:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 557E420737
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 15:01:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+W7cyXF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 557E420737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1FDE5208B8
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 15:32:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FDE5208B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E30274B180;
-	Thu,  2 Jul 2020 11:01:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 918AD4B193;
+	Thu,  2 Jul 2020 11:32:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VV0Vchgh40ws; Thu,  2 Jul 2020 11:01:17 -0400 (EDT)
+	with ESMTP id jcdnA-lKVFHo; Thu,  2 Jul 2020 11:32:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0E84B18C;
-	Thu,  2 Jul 2020 11:01:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C6BA4B18B;
+	Thu,  2 Jul 2020 11:32:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F106F4B187
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 11:01:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 602F74B18B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 11:32:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LzFg8AdFM-1M for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 11:01:15 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDAF64B180
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 11:01:15 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7E30020737;
- Thu,  2 Jul 2020 15:01:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593702074;
- bh=4sv2dQgqyYig8KEiDtrD0QJQ9XAoBFK3b1nNESU1sM0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=p+W7cyXFKklL/6ArCuykXMxQi1DuEPPLfOMpcIeboZNg2xmBF5dm58hF6OqF/xPBG
- 6Qy11miRMTKiagJtodgRrO9qtEiwdMyCaFJ2ONl3EJKQMwiDcGFIphC/SUKoF2JjpC
- 4U6HJAcaHA3EzMifo8seMhLWdbOLPYcdwfuZ1GmA=
-Date: Thu, 2 Jul 2020 16:01:10 +0100
-From: Will Deacon <will@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v2 3/3] arm64: Add workaround for Arm Cortex-A77 erratum
- 1508412
-Message-ID: <20200702150109.GC16999@willie-the-truck>
-References: <20200701215308.3715856-1-robh@kernel.org>
- <20200701215308.3715856-4-robh@kernel.org>
- <20200702114218.GA16499@willie-the-truck>
- <CAL_JsqJRMvmx3pOgoQ0eiaTCcDCC1fbxJDv81uAXrUWpAaF2Tg@mail.gmail.com>
+ with ESMTP id bNJ5f6dWR4Rm for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 11:32:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35DAF4B160
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 11:32:26 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B950E31B;
+ Thu,  2 Jul 2020 08:32:25 -0700 (PDT)
+Received: from [10.37.12.95] (unknown [10.37.12.95])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 686573F68F;
+ Thu,  2 Jul 2020 08:32:24 -0700 (PDT)
+Subject: Re: [PATCH] kvmtool: arm64: Report missing support for 32bit guests
+To: maz@misterjones.org
+References: <20200701142002.51654-1-suzuki.poulose@arm.com>
+ <1aa7885c0d1554c8797e65b13bd05e82@misterjones.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <0657181e-dff8-5bcc-add6-1b41df2993af@arm.com>
+Date: Thu, 2 Jul 2020 16:37:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqJRMvmx3pOgoQ0eiaTCcDCC1fbxJDv81uAXrUWpAaF2Tg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1aa7885c0d1554c8797e65b13bd05e82@misterjones.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, andre.przywara@arm.com, sami.mujawar@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,51 +67,47 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 02, 2020 at 08:56:05AM -0600, Rob Herring wrote:
-> On Thu, Jul 2, 2020 at 5:42 AM Will Deacon <will@kernel.org> wrote:
-> >
-> > On Wed, Jul 01, 2020 at 03:53:08PM -0600, Rob Herring wrote:
-> > > On Cortex-A77 r0p0 and r1p0, a sequence of a non-cacheable or device load
-> > > and a store exclusive or PAR_EL1 read can cause a deadlock.
-> > >
-> > > The workaround requires a DMB SY before and after a PAR_EL1 register read
-> > > and the disabling of KVM. KVM must be disabled to prevent the problematic
-> > > sequence in guests' EL1. This workaround also depends on a firmware
-> > > counterpart to enable the h/w to insert DMB SY after load and store
-> > > exclusive instructions. See the errata document SDEN-1152370 v10 [1] for
-> > > more information.
-> >
-> > This ^^ is out of date not that we're not disabling KVM.
-> 
-> Indeed, I fixed the kconfig text, but missed this.
-> 
-> > > All the other PAR_EL1 reads besides the one in
-> > > is_spurious_el1_translation_fault() are in KVM code, so the work-around is
-> > > not needed for them.
-> >
-> > And I think this now needs some extra work.
-> 
-> Ugg, that was too easy...
-> 
-> The KVM code in __translate_far_to_hpfar() has:
-> 
-> read PAR
-> read PAR
-> write PAR
-> 
-> I'm wondering if we need 2 dmbs or 4 here. I'm checking on that.
-
-Also worth checking what happens if the PAR access is executed
-speculatively, as in that case we probably can't guarantee that the DMB
-instructions are executed at all...
-
-Will
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYwoKT24gMDcvMDEvMjAyMCAwNDo0MiBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9u
+IDIwMjAtMDctMDEgMTU6MjAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+IFdoZW4gdGhlIGhv
+c3QgZG9lc24ndCBzdXBwb3J0IDMyYml0IGd1ZXN0cywgdGhlIGt2bXRvb2wgZmFpbHMKPj4gd2l0
+aG91dCBhIHByb3BlciBtZXNzYWdlIG9uIHdoYXQgaXMgd3JvbmcuIGkuZSwKPj4KPj4gwqAkIGxr
+dm0gcnVuIC1jIDEgSW1hZ2UgLS1hYXJjaDMyCj4+IMKgICMgbGt2bSBydW4gLWsgSW1hZ2UgLW0g
+MjU2IC1jIDEgLS1uYW1lIGd1ZXN0LTEwNTYxOAo+PiDCoCBGYXRhbDogVW5hYmxlIHRvIGluaXRp
+YWxpc2UgdmNwdQo+Pgo+PiBHaXZlbiB0aGF0IHRoZXJlIGlzIG5vIG90aGVyIGVhc3kgd2F5IHRv
+IGNoZWNrIGlmIHRoZSBob3N0IHN1cHBvcnRzIDMyYml0Cj4+IGd1ZXN0cywgaXQgaXMgYWx3YXlz
+IGdvb2QgdG8gcmVwb3J0IHRoaXMgYnkgY2hlY2tpbmcgdGhlIGNhcGFiaWxpdHksIAo+PiByYXRo
+ZXIKPj4gdGhhbiBsZWF2aW5nIHRoZSB1c2VycyB0byBodW50IHRoaXMgZG93biBieSBsb29raW5n
+IGF0IHRoZSBjb2RlIQo+Pgo+PiBBZnRlciB0aGlzIHBhdGNoOgo+Pgo+PiDCoCQgbGt2bSBydW4g
+LWMgMSBJbWFnZSAtLWFhcmNoMzIKPj4gwqAgIyBsa3ZtIHJ1biAtayBJbWFnZSAtbSAyNTYgLWMg
+MSAtLW5hbWUgZ3Vlc3QtMTA1Njk1Cj4+IMKgIEZhdGFsOiAzMmJpdCBndWVzdHMgYXJlIG5vdCBz
+dXBwb3J0ZWQKPiAKPiBGYW5jeSEKPiAKPj4KPj4gQ2M6IFdpbGwgRGVhY29uIDx3aWxsQGtlcm5l
+bC5vcmc+Cj4+IFJlcG9ydGVkLWJ5OiBTYW1pIE11amF3YXIgPHNhbWkubXVqYXdhckBhcm0uY29t
+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0u
+Y29tPgo+PiAtLS0KPj4gwqBhcm0va3ZtLWNwdS5jIHwgNCArKysrCj4+IMKgMSBmaWxlIGNoYW5n
+ZWQsIDQgaW5zZXJ0aW9ucygrKQo+Pgo+PiBkaWZmIC0tZ2l0IGEvYXJtL2t2bS1jcHUuYyBiL2Fy
+bS9rdm0tY3B1LmMKPj4gaW5kZXggNTU0NDE0Zi4uMmFjZWNhZSAxMDA2NDQKPj4gLS0tIGEvYXJt
+L2t2bS1jcHUuYwo+PiArKysgYi9hcm0va3ZtLWNwdS5jCj4+IEBAIC00Niw2ICs0NiwxMCBAQCBz
+dHJ1Y3Qga3ZtX2NwdSAqa3ZtX2NwdV9fYXJjaF9pbml0KHN0cnVjdCBrdm0gKmt2bSwKPj4gdW5z
+aWduZWQgbG9uZyBjcHVfaWQpCj4+IMKgwqDCoMKgwqDCoMKgwqAgLmZlYXR1cmVzID0gQVJNX1ZD
+UFVfRkVBVFVSRV9GTEFHUyhrdm0sIGNwdV9pZCkKPj4gwqDCoMKgwqAgfTsKPj4KPj4gK8KgwqDC
+oCBpZiAoa3ZtLT5jZmcuYXJjaC5hYXJjaDMyX2d1ZXN0ICYmCj4+ICvCoMKgwqDCoMKgwqDCoCAh
+a3ZtX19zdXBwb3J0c19leHRlbnNpb24oa3ZtLCBLVk1fQ0FQX0FSTV9FTDFfMzJCSVQpKQo+IAo+
+IENhbiB5b3UgcGxlYXNlIGNoZWNrIHRoYXQgdGhpcyBzdGlsbCBjb21waWxlcyBmb3IgMzJiaXQg
+aG9zdD8KClllcywgaXQgZG9lcy4gSSBoYXZlIGJ1aWx0IHRoaXMgb24gYW4gYXJtMzIgcm9vdGZz
+IHdpdGggbWFrZSBBUkNIPWFybS4KVGhlIGt2bS0+Y2ZnLmFyY2ggaXMgY29tbW9uIGFjcm9zcyBh
+cm0vYXJtNjQgYW5kIGlzIGRlZmluZWQgaGVyZSA6Cgphcm0vaW5jbHVkZS9hcm0tY29tbW9uL2t2
+bS1jb25maWctYXJjaC5oCgpBbmQgdGhlIGFhcmNoMzIgY29tbWFuZCBsaW5lIG9wdGlvbiBpcyBv
+bmx5IGF2YWlsYWJsZSBvbiBhYXJjaDY0IGhvc3QuClNvIHRoaXMgaXMgc2FmZSBvbiBhbiBhcm0z
+MiBob3N0LgoKPiAKPj4gK8KgwqDCoMKgwqDCoMKgIGRpZSgiMzJiaXQgZ3Vlc3RzIGFyZSBub3Qg
+c3VwcG9ydGVkXG4iKTsKPj4gKwo+PiDCoMKgwqDCoCB2Y3B1ID0gY2FsbG9jKDEsIHNpemVvZihz
+dHJ1Y3Qga3ZtX2NwdSkpOwo+PiDCoMKgwqDCoCBpZiAoIXZjcHUpCj4+IMKgwqDCoMKgwqDCoMKg
+wqAgcmV0dXJuIE5VTEw7Cj4gCj4gV2l0aCB0aGUgYWJvdmUgZGV0YWlsIGNoZWNrZWQsCj4gCj4g
+QWNrZWQtYnk6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+CgpUaGFua3MKU3V6dWtpCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
+aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
+bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
