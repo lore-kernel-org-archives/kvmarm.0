@@ -4,57 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E0ACC433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C35EEC433DF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CF7D20884
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:46:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF7D20884
+	by mail.kernel.org (Postfix) with ESMTP id 819C820884
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819C820884
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D594B5C7;
-	Thu,  2 Jul 2020 04:46:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16D8D4B5D1;
+	Thu,  2 Jul 2020 04:47:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kQCZSQtHsfij; Thu,  2 Jul 2020 04:46:42 -0400 (EDT)
+	with ESMTP id i4uQwounQcbw; Thu,  2 Jul 2020 04:47:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA9F14B5AA;
-	Thu,  2 Jul 2020 04:46:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0987C4B5C6;
+	Thu,  2 Jul 2020 04:47:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA794B5B1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:46:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 977BD4B5C7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:47:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LKVcWa7dqAWt for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 04:46:39 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B19F4B5A2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:46:39 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id CB791E8580BA167F2405;
- Thu,  2 Jul 2020 16:46:35 +0800 (CST)
-Received: from [127.0.0.1] (10.174.187.42) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Jul 2020
- 16:46:26 +0800
-Subject: Re: [kvm-unit-tests PATCH v2 6/8] arm64: microbench: Allow each test
- to specify its running times
+ with ESMTP id D4sGKvSoTiD6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 04:47:17 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C4DA4B5BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:47:17 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 4D8B7D733B65A62050CE;
+ Thu,  2 Jul 2020 16:47:15 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.42) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Jul 2020
+ 16:47:09 +0800
+Subject: Re: [kvm-unit-tests PATCH v2 7/8] arm64: microbench: Add time limit
+ for each individual test
 To: Andrew Jones <drjones@redhat.com>
 References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-7-wangjingyi11@huawei.com>
- <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
+ <20200702030132.20252-8-wangjingyi11@huawei.com>
+ <20200702054857.qcmaaproewgzzljf@kamzik.brq.redhat.com>
 From: Jingyi Wang <wangjingyi11@huawei.com>
-Message-ID: <c30baed6-2ff3-7d9d-64e1-0ff2bdf2697b@huawei.com>
-Date: Thu, 2 Jul 2020 16:46:25 +0800
+Message-ID: <88f2e5a2-def5-81f1-eb3c-b6a12b9ea64d@huawei.com>
+Date: Thu, 2 Jul 2020 16:47:08 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
+In-Reply-To: <20200702054857.qcmaaproewgzzljf@kamzik.brq.redhat.com>
 Content-Language: en-US
 X-Originating-IP: [10.174.187.42]
 X-CFilter-Loop: Reflected
@@ -77,92 +76,75 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
 
-On 7/2/2020 1:29 PM, Andrew Jones wrote:
-> On Thu, Jul 02, 2020 at 11:01:30AM +0800, Jingyi Wang wrote:
->> For some test in micro-bench can be time consuming, we add a
->> micro-bench test parameter to allow each individual test to specify
->> its running times.
+On 7/2/2020 1:48 PM, Andrew Jones wrote:
+> On Thu, Jul 02, 2020 at 11:01:31AM +0800, Jingyi Wang wrote:
+>> Besides using separate running times parameter, we add time limit
+>> for loop_test to make sure each test should be done in a certain
+>> time(5 sec here).
 >>
 >> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
 >> ---
->>   arm/micro-bench.c | 25 ++++++++++++++-----------
->>   1 file changed, 14 insertions(+), 11 deletions(-)
+>>   arm/micro-bench.c | 17 +++++++++++------
+>>   1 file changed, 11 insertions(+), 6 deletions(-)
 >>
 >> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
->> index aeb60a7..506d2f9 100644
+>> index 506d2f9..4c962b7 100644
 >> --- a/arm/micro-bench.c
 >> +++ b/arm/micro-bench.c
->> @@ -223,17 +223,18 @@ struct exit_test {
->>   	const char *name;
->>   	bool (*prep)(void);
->>   	void (*exec)(void);
->> +	u32 times;
->>   	bool run;
->>   };
+>> @@ -23,6 +23,7 @@
+>>   #include <asm/gic-v3-its.h>
 >>   
->>   static struct exit_test tests[] = {
->> -	{"hvc",			NULL,		hvc_exec,		true},
->> -	{"mmio_read_user",	NULL,		mmio_read_user_exec,	true},
->> -	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
->> -	{"eoi",			NULL,		eoi_exec,		true},
->> -	{"ipi",			ipi_prep,	ipi_exec,		true},
->> -	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
->> -	{"lpi",			lpi_prep,	lpi_exec,		true},
->> +	{"hvc",			NULL,		hvc_exec,		NTIMES,		true},
->> +	{"mmio_read_user",	NULL,		mmio_read_user_exec,	NTIMES,		true},
->> +	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	NTIMES,		true},
->> +	{"eoi",			NULL,		eoi_exec,		NTIMES,		true},
->> +	{"ipi",			ipi_prep,	ipi_exec,		NTIMES,		true},
->> +	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NTIMES,		true},
->> +	{"lpi",			lpi_prep,	lpi_exec,		NTIMES,		true},
+>>   #define NTIMES (1U << 16)
+>> +#define MAX_NS (5 * 1000 * 1000 * 1000UL)
 > 
-> Now that we no longer use 'NTIMES' in functions we don't really need the
-> define at all. We can just put 65536 directly into the table here for
-> each test that needs 65536 times.
-> 
-> Thanks,
-> drew
+> How about naming this something like "NS_5_SECONDS"?
 > 
 
 Done, thanks for reviewing.
 
->>   };
 >>   
->>   struct ns_time {
->> @@ -254,7 +255,7 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
+>>   static u32 cntfrq;
 >>   
->>   static void loop_test(struct exit_test *test)
->>   {
->> -	uint64_t start, end, total_ticks, ntimes = NTIMES;
->> +	uint64_t start, end, total_ticks, ntimes = 0;
+>> @@ -258,22 +259,26 @@ static void loop_test(struct exit_test *test)
+>>   	uint64_t start, end, total_ticks, ntimes = 0;
 >>   	struct ns_time total_ns, avg_ns;
 >>   
+>> +	total_ticks = 0;
 >>   	if (test->prep) {
->> @@ -265,15 +266,17 @@ static void loop_test(struct exit_test *test)
+>>   		if(!test->prep()) {
+>>   			printf("%s test skipped\n", test->name);
+>>   			return;
+>>   		}
 >>   	}
->>   	isb();
->>   	start = read_sysreg(cntpct_el0);
->> -	while (ntimes--)
->> +	while (ntimes < test->times) {
+>> -	isb();
+>> -	start = read_sysreg(cntpct_el0);
+>> -	while (ntimes < test->times) {
+>> +
+>> +	while (ntimes < test->times && total_ns.ns < MAX_NS) {
+>> +		isb();
+>> +		start = read_sysreg(cntpct_el0);
 >>   		test->exec();
->> +		ntimes++;
->> +	}
->>   	isb();
->>   	end = read_sysreg(cntpct_el0);
+>> +		isb();
+>> +		end = read_sysreg(cntpct_el0);
+>> +
+>>   		ntimes++;
+>> +		total_ticks += (end - start);
+>> +		ticks_to_ns_time(total_ticks, &total_ns);
+>>   	}
+>> -	isb();
+>> -	end = read_sysreg(cntpct_el0);
 >>   
->>   	total_ticks = end - start;
+>> -	total_ticks = end - start;
 >>   	ticks_to_ns_time(total_ticks, &total_ns);
->> -	avg_ns.ns = total_ns.ns / NTIMES;
->> -	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
->> +	avg_ns.ns = total_ns.ns / ntimes;
->> +	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
->>   
->>   	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
->>   		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+>>   	avg_ns.ns = total_ns.ns / ntimes;
+>>   	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
 >> -- 
 >> 2.19.1
 >>
 >>
+> 
+> Thanks,
+> drew
 > 
 > 
 > .
