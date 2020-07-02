@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0744EC433DF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B32C8C433DF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:18:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 95E82208B8
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52A972088E
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 13:18:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OTwyfk0e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E82208B8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jG26Z2at"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A972088E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D0A84B5CC;
-	Thu,  2 Jul 2020 09:13:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE24C4B5CC;
+	Thu,  2 Jul 2020 09:18:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2v+MmPj-jRxU; Thu,  2 Jul 2020 09:13:28 -0400 (EDT)
+	with ESMTP id itmoxqPh8bwg; Thu,  2 Jul 2020 09:17:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A514B602;
-	Thu,  2 Jul 2020 09:13:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01FA4B602;
+	Thu,  2 Jul 2020 09:17:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7548C4B5F2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:13:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8DF4B5CC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:17:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9xC2qEHXCkaO for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 09:13:26 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
- [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 985DE4B5CC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:13:26 -0400 (EDT)
+ with ESMTP id deUYKqkBqNcx for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 09:17:57 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A074B476
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 09:17:57 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1593695606;
+ s=mimecast20190719; t=1593695877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hDq3YFC4R5tSKIwncV0+1iQLp6whE45MANKxnMI+EnE=;
- b=OTwyfk0eHvO+ax9j/NbX7kDw81t1nR7ggsWQL1B36FS1V+qMl509F4zVZNMeqG6VM6bvhY
- BK1VwmA/taEqld+7FlCD7EAK1aaAjEtjWXv6/jXsf2Dy5lH3gBGfH81O3uq2tgxGiJNTcU
- s9MS9ch/Wb2D9YmcuOvcO3AkaFNpZZI=
+ bh=iPqmxCco2qOcPw6NCGzpbeppRDF5Nngtn4bMyEz2Q8g=;
+ b=jG26Z2atWAtPxgu3qY2P4esKNtto0zU0Jv/qAUd8DAnSCatE8ZfwZQHpCLCMVhWa24sY0W
+ w9i5tKX8Ufrnv3j8qhZoE5m68NQARe8B9SHaJgDI7iuIbjTDWqGyRitUIwMNeXAoL/AbM8
+ rAJCUMhsN2lDoQ2UpAvxQaiU/21IM1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-xoRsjDBrN_mVNVg8YAEV2w-1; Thu, 02 Jul 2020 09:13:24 -0400
-X-MC-Unique: xoRsjDBrN_mVNVg8YAEV2w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-231-RM255m1bMSK_e0Skae9WbA-1; Thu, 02 Jul 2020 09:17:55 -0400
+X-MC-Unique: RM255m1bMSK_e0Skae9WbA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DDFE1054F8F;
- Thu,  2 Jul 2020 13:13:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAE9819253C2;
+ Thu,  2 Jul 2020 13:17:53 +0000 (UTC)
 Received: from [10.36.112.70] (ovpn-112-70.ams2.redhat.com [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 55EB560CD1;
- Thu,  2 Jul 2020 13:13:21 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 5/8] arm64: microbench: its: Add LPI
- latency test
-To: Jingyi Wang <wangjingyi11@huawei.com>, drjones@redhat.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DCCD5DD61;
+ Thu,  2 Jul 2020 13:17:52 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 6/8] arm64: microbench: Allow each test
+ to specify its running times
+To: Andrew Jones <drjones@redhat.com>, Jingyi Wang <wangjingyi11@huawei.com>
 References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-6-wangjingyi11@huawei.com>
+ <20200702030132.20252-7-wangjingyi11@huawei.com>
+ <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2e682906-8b0b-9f5c-31af-8067139c680d@redhat.com>
-Date: Thu, 2 Jul 2020 15:13:19 +0200
+Message-ID: <0ac90a80-2180-ee07-b614-dc2466b711a5@redhat.com>
+Date: Thu, 2 Jul 2020 15:17:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200702030132.20252-6-wangjingyi11@huawei.com>
+In-Reply-To: <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Cc: maz@kernel.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,94 +96,93 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Jingyi,
-On 7/2/20 5:01 AM, Jingyi Wang wrote:
-> Triggers LPIs through the INT command and test the latency.
-> Mostly inherited form commit 0ef02cd6cbaa(arm/arm64: ITS: INT
-> functional tests).
-> 
-> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
-> ---
->  arm/micro-bench.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
-> 
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> index 80d8db3..aeb60a7 100644
-> --- a/arm/micro-bench.c
-> +++ b/arm/micro-bench.c
-> @@ -20,6 +20,7 @@
->   */
->  #include <libcflat.h>
->  #include <asm/gic.h>
-> +#include <asm/gic-v3-its.h>
->  
->  #define NTIMES (1U << 16)
->  
-> @@ -145,6 +146,48 @@ static void ipi_exec(void)
->  	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
->  }
->  
-> +static bool lpi_prep(void)
-> +{
-> +	struct its_collection *col1;
-> +	struct its_device *dev2;
-> +
-> +	if (!gicv3_its_base())
-> +		return false;
-> +
-> +	its_enable_defaults();
-> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	col1 = its_create_collection(1 /* col id */, 1 /* target PE */);
-> +	gicv3_lpi_set_config(8199, LPI_PROP_DEFAULT);
-> +
-> +	its_send_mapd_nv(dev2, true);
-> +	its_send_mapc_nv(col1, true);
-> +	its_send_invall_nv(col1);
-> +	its_send_mapti_nv(dev2, 8199 /* lpi id */, 20 /* event id */, col1);
-> +
-> +	gic_prep_common();
-> +	return true;
-> +}
-> +
-> +static void lpi_exec(void)
-> +{
-> +	struct its_device *dev2;
-> +	unsigned tries = 1 << 28;
-> +	static int received = 0;
-> +
-> +	irq_received = false;
-> +
-> +	dev2 = its_get_device(2);
-> +	its_send_int_nv(dev2, 20);
-> +
-> +	while (!irq_received && tries--)
-> +		cpu_relax();
-> +
-> +	if (irq_received)
-> +		++received;
-> +
-> +	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
-> +}
-> +
->  static void hvc_exec(void)
->  {
->  	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> @@ -190,6 +233,7 @@ static struct exit_test tests[] = {
->  	{"eoi",			NULL,		eoi_exec,		true},
->  	{"ipi",			ipi_prep,	ipi_exec,		true},
->  	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
-> +	{"lpi",			lpi_prep,	lpi_exec,		true},
->  };
->  
->  struct ns_time {
-> 
-Looks good to me (w/wo the lpi_prep returned value change)
 
+On 7/2/20 7:29 AM, Andrew Jones wrote:
+> On Thu, Jul 02, 2020 at 11:01:30AM +0800, Jingyi Wang wrote:
+>> For some test in micro-bench can be time consuming, we add a
+>> micro-bench test parameter to allow each individual test to specify
+>> its running times.
+>>
+>> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
-
 Eric
-
+>> ---
+>>  arm/micro-bench.c | 25 ++++++++++++++-----------
+>>  1 file changed, 14 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+>> index aeb60a7..506d2f9 100644
+>> --- a/arm/micro-bench.c
+>> +++ b/arm/micro-bench.c
+>> @@ -223,17 +223,18 @@ struct exit_test {
+>>  	const char *name;
+>>  	bool (*prep)(void);
+>>  	void (*exec)(void);
+>> +	u32 times;
+>>  	bool run;
+>>  };
+>>  
+>>  static struct exit_test tests[] = {
+>> -	{"hvc",			NULL,		hvc_exec,		true},
+>> -	{"mmio_read_user",	NULL,		mmio_read_user_exec,	true},
+>> -	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
+>> -	{"eoi",			NULL,		eoi_exec,		true},
+>> -	{"ipi",			ipi_prep,	ipi_exec,		true},
+>> -	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
+>> -	{"lpi",			lpi_prep,	lpi_exec,		true},
+>> +	{"hvc",			NULL,		hvc_exec,		NTIMES,		true},
+>> +	{"mmio_read_user",	NULL,		mmio_read_user_exec,	NTIMES,		true},
+>> +	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	NTIMES,		true},
+>> +	{"eoi",			NULL,		eoi_exec,		NTIMES,		true},
+>> +	{"ipi",			ipi_prep,	ipi_exec,		NTIMES,		true},
+>> +	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NTIMES,		true},
+>> +	{"lpi",			lpi_prep,	lpi_exec,		NTIMES,		true},
+> 
+> Now that we no longer use 'NTIMES' in functions we don't really need the
+> define at all. We can just put 65536 directly into the table here for
+> each test that needs 65536 times.
+> 
+> Thanks,
+> drew
+> 
+>>  };
+>>  
+>>  struct ns_time {
+>> @@ -254,7 +255,7 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
+>>  
+>>  static void loop_test(struct exit_test *test)
+>>  {
+>> -	uint64_t start, end, total_ticks, ntimes = NTIMES;
+>> +	uint64_t start, end, total_ticks, ntimes = 0;
+>>  	struct ns_time total_ns, avg_ns;
+>>  
+>>  	if (test->prep) {
+>> @@ -265,15 +266,17 @@ static void loop_test(struct exit_test *test)
+>>  	}
+>>  	isb();
+>>  	start = read_sysreg(cntpct_el0);
+>> -	while (ntimes--)
+>> +	while (ntimes < test->times) {
+>>  		test->exec();
+>> +		ntimes++;
+>> +	}
+>>  	isb();
+>>  	end = read_sysreg(cntpct_el0);
+>>  
+>>  	total_ticks = end - start;
+>>  	ticks_to_ns_time(total_ticks, &total_ns);
+>> -	avg_ns.ns = total_ns.ns / NTIMES;
+>> -	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
+>> +	avg_ns.ns = total_ns.ns / ntimes;
+>> +	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
+>>  
+>>  	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
+>>  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+>> -- 
+>> 2.19.1
+>>
+>>
 
 _______________________________________________
 kvmarm mailing list
