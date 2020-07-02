@@ -2,63 +2,80 @@ Return-Path: <SRS0=CSPl=AN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B23D1C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8277AC433E2
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:23:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D0A820720
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:21:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D0A820720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 11DAA20720
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jul 2020 08:23:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uk4KAbid"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11DAA20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB4D64B5C6;
-	Thu,  2 Jul 2020 04:21:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A87744B5A7;
+	Thu,  2 Jul 2020 04:23:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7HjsSc2ikpg5; Thu,  2 Jul 2020 04:21:49 -0400 (EDT)
+	with ESMTP id 2ps70QXg7h8c; Thu,  2 Jul 2020 04:22:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 755944B5AA;
-	Thu,  2 Jul 2020 04:21:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0D64B5AC;
+	Thu,  2 Jul 2020 04:22:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F574B5AA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:21:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D43BA4B5AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:22:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RhqfRK5Uhr-W for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 04:21:46 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21DC94B5A2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:21:46 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id D805C79AD0AFC2793C26;
- Thu,  2 Jul 2020 16:21:42 +0800 (CST)
-Received: from [127.0.0.1] (10.174.187.42) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Jul 2020
- 16:21:32 +0800
-Subject: Re: [kvm-unit-tests PATCH v2 2/8] arm64: microbench: Use the funcions
- for ipi test as the general functions for gic(ipi/lpi/timer) test
-To: Andrew Jones <drjones@redhat.com>
-References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-3-wangjingyi11@huawei.com>
- <20200702052554.2be22pr3wa2nximf@kamzik.brq.redhat.com>
-From: Jingyi Wang <wangjingyi11@huawei.com>
-Message-ID: <cb92098b-5b0a-bc11-0a6a-2d4b34442b89@huawei.com>
-Date: Thu, 2 Jul 2020 16:21:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ with ESMTP id jd0Xvr5LO0PN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2020 04:22:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAF694B5AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 04:22:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9E9C320874;
+ Thu,  2 Jul 2020 08:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593678175;
+ bh=pbs0tL/KRHo9Or+8WKf0S/Y8rnUfyyi5aMuo4ndjDb0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Uk4KAbidTKiBkRHckpKADLipXJTOreeNHvPrKb0/67ZecOH6IgOJjzNDBtWfmaXOG
+ KBUxXgWmt2fdxdnW+sjvGjf3tbkPUnCPmPBVE2tPjGoOcPG+gnL67tX8o8kLujvEde
+ oi5fWrU2KfcDFL147o//XX8GD29gNVVwbL56CLYY=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jquUg-008JXG-8g; Thu, 02 Jul 2020 09:22:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200702052554.2be22pr3wa2nximf@kamzik.brq.redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.42]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+Date: Thu, 02 Jul 2020 09:22:54 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Jingyi Wang <wangjingyi11@huawei.com>
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] arm64: microbench: gic: Add gicv4.1
+ support for ipi latency test.
+In-Reply-To: <20200702030132.20252-4-wangjingyi11@huawei.com>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-4-wangjingyi11@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <fe9699e3ee2131fe800911aea1425af4@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com, drjones@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,147 +92,19 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+On 2020-07-02 04:01, Jingyi Wang wrote:
+> If gicv4.1(sgi hardware injection) supported, we test ipi injection
+> via hw/sw way separately.
 
-On 7/2/2020 1:25 PM, Andrew Jones wrote:
-> 
-> Hi Jingyi,
-> 
-> This patch has quite a long summary. How about instead of
-> 
->   arm64: microbench: Use the funcions for ipi test as the general functions for gic(ipi/lpi/timer) test
-> 
-> we use
-> 
->   arm64: microbench: Generalize ipi test names
-> 
-> and then in the commit message, instead of
-> 
->   The following patches will use that.
-> 
-> we use
-> 
->   Later patches will use these functions for gic(ipi/lpi/timer) tests.
-> 
-> Thanks,
-> drew
-> 
-
-This looks more concise, thanks for reviewing
+nit: active-less SGIs are not strictly a feature of GICv4.1 (you could
+imagine a GIC emulation offering the same thing). Furthermore, GICv4.1
+isn't as such visible to the guest itself (it only sees a GICv3).
 
 Thanks,
-Jingyi
 
-> On Thu, Jul 02, 2020 at 11:01:26AM +0800, Jingyi Wang wrote:
->> The following patches will use that.
->>
->> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
->> ---
->>   arm/micro-bench.c | 39 ++++++++++++++++++++++-----------------
->>   1 file changed, 22 insertions(+), 17 deletions(-)
->>
->> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
->> index 794dfac..fc4d356 100644
->> --- a/arm/micro-bench.c
->> +++ b/arm/micro-bench.c
->> @@ -25,24 +25,24 @@
->>   
->>   static u32 cntfrq;
->>   
->> -static volatile bool ipi_ready, ipi_received;
->> +static volatile bool irq_ready, irq_received;
->>   static void *vgic_dist_base;
->>   static void (*write_eoir)(u32 irqstat);
->>   
->> -static void ipi_irq_handler(struct pt_regs *regs)
->> +static void gic_irq_handler(struct pt_regs *regs)
->>   {
->> -	ipi_ready = false;
->> -	ipi_received = true;
->> +	irq_ready = false;
->> +	irq_received = true;
->>   	gic_write_eoir(gic_read_iar());
->> -	ipi_ready = true;
->> +	irq_ready = true;
->>   }
->>   
->> -static void ipi_secondary_entry(void *data)
->> +static void gic_secondary_entry(void *data)
->>   {
->> -	install_irq_handler(EL1H_IRQ, ipi_irq_handler);
->> +	install_irq_handler(EL1H_IRQ, gic_irq_handler);
->>   	gic_enable_defaults();
->>   	local_irq_enable();
->> -	ipi_ready = true;
->> +	irq_ready = true;
->>   	while (true)
->>   		cpu_relax();
->>   }
->> @@ -72,9 +72,9 @@ static bool test_init(void)
->>   		break;
->>   	}
->>   
->> -	ipi_ready = false;
->> +	irq_ready = false;
->>   	gic_enable_defaults();
->> -	on_cpu_async(1, ipi_secondary_entry, NULL);
->> +	on_cpu_async(1, gic_secondary_entry, NULL);
->>   
->>   	cntfrq = get_cntfrq();
->>   	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
->> @@ -82,13 +82,18 @@ static bool test_init(void)
->>   	return true;
->>   }
->>   
->> -static void ipi_prep(void)
->> +static void gic_prep_common(void)
->>   {
->>   	unsigned tries = 1 << 28;
->>   
->> -	while (!ipi_ready && tries--)
->> +	while (!irq_ready && tries--)
->>   		cpu_relax();
->> -	assert(ipi_ready);
->> +	assert(irq_ready);
->> +}
->> +
->> +static void ipi_prep(void)
->> +{
->> +	gic_prep_common();
->>   }
->>   
->>   static void ipi_exec(void)
->> @@ -96,17 +101,17 @@ static void ipi_exec(void)
->>   	unsigned tries = 1 << 28;
->>   	static int received = 0;
->>   
->> -	ipi_received = false;
->> +	irq_received = false;
->>   
->>   	gic_ipi_send_single(1, 1);
->>   
->> -	while (!ipi_received && tries--)
->> +	while (!irq_received && tries--)
->>   		cpu_relax();
->>   
->> -	if (ipi_received)
->> +	if (irq_received)
->>   		++received;
->>   
->> -	assert_msg(ipi_received, "failed to receive IPI in time, but received %d successfully\n", received);
->> +	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
->>   }
->>   
->>   static void hvc_exec(void)
->> -- 
->> 2.19.1
->>
->>
-> 
-> 
-> .
-> 
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
