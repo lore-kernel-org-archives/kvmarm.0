@@ -2,60 +2,69 @@ Return-Path: <SRS0=Ct8k=AO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAC0C433E0
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 11:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C82C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 12:08:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84A5C206B6
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 11:54:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A5C206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9F3C52088E
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 12:07:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWokXalU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F3C52088E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E81474B125;
-	Fri,  3 Jul 2020 07:54:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 484F54B185;
+	Fri,  3 Jul 2020 08:07:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G9SVXew0ugAh; Fri,  3 Jul 2020 07:54:43 -0400 (EDT)
+	with ESMTP id PRGbh0fpUlxT; Fri,  3 Jul 2020 08:07:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D5FB4B0C7;
-	Fri,  3 Jul 2020 07:54:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38EDE4B165;
+	Fri,  3 Jul 2020 08:07:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F6274B0BE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 07:54:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C916D4B163
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 08:07:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U-VGSz2KjYRA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2020 07:54:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0D3E4B153
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 07:54:40 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DEDB2F;
- Fri,  3 Jul 2020 04:54:40 -0700 (PDT)
-Received: from [10.163.85.168] (unknown [10.163.85.168])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 64ED53F68F;
- Fri,  3 Jul 2020 04:54:37 -0700 (PDT)
-Subject: Re: [PATCH V5 0/4] arm64/cpufeature: Introduce ID_PFR2, ID_DFR1,
- ID_MMFR5 and other changes
-To: Catalin Marinas <catalin.marinas@arm.com>
-References: <1590548619-3441-1-git-send-email-anshuman.khandual@arm.com>
- <20200702173403.GI22241@gaia>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <5a66d9a0-7ada-d0b0-f768-9901494175e4@arm.com>
-Date: Fri, 3 Jul 2020 17:24:21 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ with ESMTP id LyjSOY-H2O+X for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jul 2020 08:07:55 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7027B4B161
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 08:07:55 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 99EB2207D4;
+ Fri,  3 Jul 2020 12:07:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1593778074;
+ bh=nUh9op6CAi0IxgUhuOMPaGPv8W0mnewfQsFgLajKM8Q=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=ZWokXalUsEEfKxEaYWHe/VpbopWzUYcyJ4zepSldCNmsSsiiH8ltKSHNVgRIWa0uY
+ C2nz+c2xriblDEx6x+1Ufpv95aHv5UqXZmkXBi/xabSVE02/ZVo+WViIgK8tSQCQip
+ 1ifUGemUJwM7wQgRe0A0U6TojMLaLbJ01JloK4Rk=
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] kvmtool: arm64: Report missing support for 32bit guests
+Date: Fri,  3 Jul 2020 13:07:48 +0100
+Message-Id: <159377741751.260263.15198073437610178444.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200701142002.51654-1-suzuki.poulose@arm.com>
+References: <20200701142002.51654-1-suzuki.poulose@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200702173403.GI22241@gaia>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: Will Deacon <will@kernel.org>, catalin.marinas@arm.com,
+ andre.przywara@arm.com, Sami Mujawar <sami.mujawar@arm.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -73,34 +82,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 07/02/2020 11:04 PM, Catalin Marinas wrote:
-> On Wed, May 27, 2020 at 08:33:35AM +0530, Anshuman Khandual wrote:
->> These are remaining patches from V4 series which had some pending reviews
->> from Suzuki (https://patchwork.kernel.org/cover/11557333/). Also dropped
->> [PATCH 15/17] as that will need some more investigation and rework.
->>
->> This series applies on arm64/for-next/cpufeature.
->>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Mark Rutland <mark.rutland@arm.com> 
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
+On Wed, 1 Jul 2020 15:20:02 +0100, Suzuki K Poulose wrote:
+> When the host doesn't support 32bit guests, the kvmtool fails
+> without a proper message on what is wrong. i.e,
 > 
-> Thanks Suzuki for review.
+>  $ lkvm run -c 1 Image --aarch32
+>   # lkvm run -k Image -m 256 -c 1 --name guest-105618
+>   Fatal: Unable to initialise vcpu
 > 
-> Anshuman, could you please rebase this series on top of 5.8-rc3? It no
-> longer applies cleanly.
+> [...]
 
-Already posted here.
+Applied to kvmtool (master), thanks!
 
-https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=312281
+[1/1] kvmtool: arm64: Report missing support for 32bit guests
+      https://git.kernel.org/will/kvmtool/c/351d931f496a
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
