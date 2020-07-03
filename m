@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C3DC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FFBC433E4
 	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 02:36:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9121D208FE
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 02:36:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9121D208FE
+	by mail.kernel.org (Postfix) with ESMTP id 672B1208FE
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 02:36:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 672B1208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8E184B2A2;
-	Thu,  2 Jul 2020 22:36:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ECD44B26C;
+	Thu,  2 Jul 2020 22:36:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qvsowrnjs-Yc; Thu,  2 Jul 2020 22:36:09 -0400 (EDT)
+	with ESMTP id uboZSWHzy5gh; Thu,  2 Jul 2020 22:36:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D9A4B284;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EECE04B28C;
 	Thu,  2 Jul 2020 22:36:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7E34B260
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FCE64B268
  for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 22:36:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JFUttiKzeZRZ for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id fXgHVuHX0BKY for <kvmarm@lists.cs.columbia.edu>;
  Thu,  2 Jul 2020 22:36:07 -0400 (EDT)
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C83744B1FF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 22:36:06 -0400 (EDT)
-IronPort-SDR: DwbC9P1/wAD+IDLZE5z76vfabPZJWwSlLanhgb09H7EZhyWHAnUHQo5uaPtLdKtnHivrcMgFuM
- UYl8e31/Al3g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="231938475"
-X-IronPort-AV: E=Sophos;i="5.75,306,1589266800"; d="scan'208";a="231938475"
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 293164B219
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 22:36:07 -0400 (EDT)
+IronPort-SDR: 3Z3o3pu9YnH3pjCyhasRBNDQa91wKWHtmS5dhfpEzCg3wSicGkTwTI52FJTtgLT/P/BHH6COA7
+ B+GVksv03WTg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="231938480"
+X-IronPort-AV: E=Sophos;i="5.75,306,1589266800"; d="scan'208";a="231938480"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  02 Jul 2020 19:36:05 -0700
-IronPort-SDR: Tf2UVjZ6SYjYNjI28qCvFsw5DIp+J6Bn7pYy33T3q37kSEk3EvDJqiJpYD3iFpyJbSP45UgECj
- mwXx+VAt2qiw==
+IronPort-SDR: lq5xZUJFLbh93fPrxLG2HJCQFj4oIO5T+45h0TGZZxmJ+ksUWk2qwMwBdEwk9ZCIUVHF7gL3lU
+ 8NZduWuw+fAw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,306,1589266800"; d="scan'208";a="278295718"
+X-IronPort-AV: E=Sophos;i="5.75,306,1589266800"; d="scan'208";a="278295725"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
  by orsmga003.jf.intel.com with ESMTP; 02 Jul 2020 19:36:04 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 To: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v3 01/21] KVM: x86/mmu: Track the associated kmem_cache in the
- MMU caches
-Date: Thu,  2 Jul 2020 19:35:25 -0700
-Message-Id: <20200703023545.8771-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 03/21] KVM: x86/mmu: Use consistent "mc" name for
+ kvm_mmu_memory_cache locals
+Date: Thu,  2 Jul 2020 19:35:27 -0700
+Message-Id: <20200703023545.8771-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200703023545.8771-1-sean.j.christopherson@intel.com>
 References: <20200703023545.8771-1-sean.j.christopherson@intel.com>
@@ -87,107 +87,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Track the kmem_cache used for non-page KVM MMU memory caches instead of
-passing in the associated kmem_cache when filling the cache.  This will
-allow consolidating code and other cleanups.
+Use "mc" for local variables to shorten line lengths and provide
+consistent names, which will be especially helpful when some of the
+helpers are moved to common KVM code in future patches.
 
 No functional change intended.
 
 Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/mmu/mmu.c          | 24 +++++++++++-------------
- 2 files changed, 12 insertions(+), 13 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f852ee350beb..71bc32e00d7e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
-  */
- struct kvm_mmu_memory_cache {
- 	int nobjs;
-+	struct kmem_cache *kmem_cache;
- 	void *objects[KVM_NR_MEM_OBJS];
- };
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3dd0af7e7515..2c62cc1d0353 100644
+index d6612af6c056..b6df4525e86c 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1060,15 +1060,14 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+@@ -1060,27 +1060,27 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
  	local_irq_enable();
  }
  
--static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
--				  struct kmem_cache *base_cache, int min)
-+static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
+-static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
++static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
  {
  	void *obj;
  
- 	if (cache->nobjs >= min)
+-	if (cache->nobjs >= min)
++	if (mc->nobjs >= min)
  		return 0;
- 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
--		obj = kmem_cache_zalloc(base_cache, GFP_KERNEL_ACCOUNT);
-+		obj = kmem_cache_zalloc(cache->kmem_cache, GFP_KERNEL_ACCOUNT);
+-	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+-		if (cache->kmem_cache)
+-			obj = kmem_cache_zalloc(cache->kmem_cache, GFP_KERNEL_ACCOUNT);
++	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
++		if (mc->kmem_cache)
++			obj = kmem_cache_zalloc(mc->kmem_cache, GFP_KERNEL_ACCOUNT);
+ 		else
+ 			obj = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
  		if (!obj)
- 			return cache->nobjs >= min ? 0 : -ENOMEM;
- 		cache->objects[cache->nobjs++] = obj;
-@@ -1081,11 +1080,10 @@ static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
- 	return cache->nobjs;
+-			return cache->nobjs >= min ? 0 : -ENOMEM;
+-		cache->objects[cache->nobjs++] = obj;
++			return mc->nobjs >= min ? 0 : -ENOMEM;
++		mc->objects[mc->nobjs++] = obj;
+ 	}
+ 	return 0;
  }
  
--static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
--				  struct kmem_cache *cache)
-+static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+-static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
++static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *mc)
  {
- 	while (mc->nobjs)
--		kmem_cache_free(cache, mc->objects[--mc->nobjs]);
-+		kmem_cache_free(mc->kmem_cache, mc->objects[--mc->nobjs]);
+-	return cache->nobjs;
++	return mc->nobjs;
  }
  
- static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
-@@ -1115,25 +1113,22 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
- 	int r;
+ static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+@@ -1395,10 +1395,10 @@ static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
  
- 	r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
--				   pte_list_desc_cache, 8 + PTE_PREFETCH_NUM);
-+				   8 + PTE_PREFETCH_NUM);
- 	if (r)
- 		goto out;
- 	r = mmu_topup_memory_cache_page(&vcpu->arch.mmu_page_cache, 8);
- 	if (r)
- 		goto out;
--	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
--				   mmu_page_header_cache, 4);
-+	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
- out:
- 	return r;
- }
- 
- static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+ static bool rmap_can_add(struct kvm_vcpu *vcpu)
  {
--	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
--				pte_list_desc_cache);
-+	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
- 	mmu_free_memory_cache_page(&vcpu->arch.mmu_page_cache);
--	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache,
--				mmu_page_header_cache);
-+	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+-	struct kvm_mmu_memory_cache *cache;
++	struct kvm_mmu_memory_cache *mc;
+ 
+-	cache = &vcpu->arch.mmu_pte_list_desc_cache;
+-	return mmu_memory_cache_free_objects(cache);
++	mc = &vcpu->arch.mmu_pte_list_desc_cache;
++	return mmu_memory_cache_free_objects(mc);
  }
  
- static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
-@@ -5679,6 +5674,9 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	uint i;
- 	int ret;
- 
-+	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
-+	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-+
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
- 
+ static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
 -- 
 2.26.0
 
