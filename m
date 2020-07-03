@@ -2,56 +2,64 @@ Return-Path: <SRS0=Ct8k=AO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC55C433DF
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 03:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1FDC433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 07:41:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 96A1120A8B
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 03:52:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A1120A8B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B3B92206B6
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jul 2020 07:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B92206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D825C4B251;
-	Thu,  2 Jul 2020 23:52:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E2204B286;
+	Fri,  3 Jul 2020 03:41:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mZYoHjFPLzyc; Thu,  2 Jul 2020 23:52:13 -0400 (EDT)
+	with ESMTP id nzDlaAAVBZBS; Fri,  3 Jul 2020 03:41:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9BA24B24C;
-	Thu,  2 Jul 2020 23:52:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C67334B28B;
+	Fri,  3 Jul 2020 03:41:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2237A4B24C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 23:52:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98F984B292
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 03:41:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7mQrWFQ1RHlI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2020 23:52:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3110B4B246
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2020 23:52:09 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91CF431B;
- Thu,  2 Jul 2020 20:52:08 -0700 (PDT)
-Received: from p8cg001049571a15.arm.com (unknown [10.163.85.168])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3C6E13F71E;
- Thu,  2 Jul 2020 20:52:04 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH V5 (RESEND) 0/4] arm64/cpufeature: Introduce ID_PFR2, ID_DFR1,
- ID_MMFR5 and other changes
-Date: Fri,  3 Jul 2020 09:21:33 +0530
-Message-Id: <1593748297-1965-1-git-send-email-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.7.4
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id wDR6sCDhlZQm for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jul 2020 03:41:50 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F423D4B28B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2020 03:41:49 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 832375305EE57D5560E9;
+ Fri,  3 Jul 2020 15:41:44 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.42) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 3 Jul 2020
+ 15:41:37 +0800
+Subject: Re: [kvm-unit-tests PATCH v2 8/8] arm64: microbench: Add vtimer
+ latency test
+To: Auger Eric <eric.auger@redhat.com>, <drjones@redhat.com>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-9-wangjingyi11@huawei.com>
+ <88eacd00-1951-f6de-aa7c-bda48ece4fde@redhat.com>
+From: Jingyi Wang <wangjingyi11@huawei.com>
+Message-ID: <5a43242d-2c0b-d8d1-b12d-7436e7d03e52@huawei.com>
+Date: Fri, 3 Jul 2020 15:41:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <88eacd00-1951-f6de-aa7c-bda48ece4fde@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.42]
+X-CFilter-Loop: Reflected
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,77 +71,140 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These are remaining patches from V4 series which had some pending reviews
-from Suzuki (https://patchwork.kernel.org/cover/11557333/). Also dropped
-[PATCH 15/17] as that will need some more investigation and rework.
+Hi Eric, Drew,
 
-This series applies on 5.8-rc3.
+On 7/2/2020 9:36 PM, Auger Eric wrote:
+> Hi Jingyi,
+> 
+> On 7/2/20 5:01 AM, Jingyi Wang wrote:
+>> Trigger PPIs by setting up a 10msec timer and test the latency.
+> 
+> so for each iteration the accumulated valued is 10 ms + latency, right?
+> and what is printed at the end does include the accumulated periods.
+> Wouldn't it make sense to have a test->post() that substract this value.
+> You would need to store the actual number of iterations.
+> 
+> Thanks
+> 
+> Eric
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com> 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
+That's right, the result indicates 10ms + latency, which is a 10msec
+timer actually costs. I think using the difference instead of the total
+time cost can be a little confusing here. Maybe we can use test->post()
+to get the latency and print an extra result in logs? Do you have any
+opinions on that?
 
-Changes in V5: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=293885)
+Thanks,
+Jingyi
 
-- Dropped TGRAN features along with it's macros from ID_AA64MMFR0 per Suzuki
-- Replaced with FTR_HIGHER_SAFE for SpecSEI feature in ID_AA64MMFR1 per Suzuki
-- Dropped patch "arm64/cpufeature: Add remaining feature bits in ID_AA64DFR0 register"
-
-Changes in V4: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=290085)
-
-- Updated ftr_id_dfr0[] with a documentation for now missing [31:28] Tracfilt per Will
-- Fixed erroneous bit width value from 28 to 4 for double lock feature per Will
-- Replaced ID_SANITIZED() with ID_HIDDEN() for SYS_ID_DFR1_EL1 per Suzuki
-- Fixed positions for register definitions as per new name based grouping per Will
-- Replaced FTR_VISIBLE with FTR_HIDDEN for TLB feature in ID_AA64ISAR0 per Suzuki
-- Replaced FTR_VISIBLE with FTR_HIDDEN for MPAM and SEL2 in ID_AA64PFR0 per Suzuki
-- Replaced FTR_VISIBLE with FTR_HIDDEN for MPAMFRAC and RASFRAC in ID_AA64PFR1 per Suzuki
-- Dropped both MTE and BT features from ftr_id_aa64pfr1[] to be added later per Suzuki
-- Added ID_MMFR4_EL1 into the cpuinfo_arm64 context per Will
-
-Changes in V3: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=281211)
-
-- Rebased on git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git (for-next/cpufeature)
-
-Changes in V2: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=270605)
-
-- Added Suggested-by tag from Mark Rutland for all changes he had proposed
-- Added comment for SpecSEI feature on why it is HIGHER_SAFE per Suzuki
-- Added a patch which makes ID_AA64DFR0_DOUBLELOCK a signed feature per Suzuki
-- Added ID_DFR1 and ID_MMFR5 system register definitions per Will
-- Added remaining features bits for relevant 64 bit system registers per Will
-- Changed commit message on [PATCH 5/7] regarding TraceFilt feature per Suzuki
-- Changed ID_PFR2.CSV3 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will
-- Changed ID_PFR0.CSV2 (FTR_STRICT -> FTR_NONSTRICT) as 64 bit registers per Will 
-- Changed some commit messages
-
-Changes in V1: (https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=234093)
-
-
-Anshuman Khandual (4):
-  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR0 register
-  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR1 register
-  arm64/cpufeature: Add remaining feature bits in ID_AA64MMFR2 register
-  arm64/cpufeature: Replace all open bits shift encodings with macros
-
- arch/arm64/include/asm/sysreg.h | 42 +++++++++++++++++++++
- arch/arm64/kernel/cpufeature.c  | 67 ++++++++++++++++++++-------------
- 2 files changed, 83 insertions(+), 26 deletions(-)
-
--- 
-2.20.1
+>>
+>> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+>> ---
+>>   arm/micro-bench.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 55 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+>> index 4c962b7..6822084 100644
+>> --- a/arm/micro-bench.c
+>> +++ b/arm/micro-bench.c
+>> @@ -23,8 +23,13 @@
+>>   #include <asm/gic-v3-its.h>
+>>   
+>>   #define NTIMES (1U << 16)
+>> +#define NTIMES_MINOR (1U << 8)
+>>   #define MAX_NS (5 * 1000 * 1000 * 1000UL)
+>>   
+>> +#define IRQ_VTIMER		27
+>> +#define ARCH_TIMER_CTL_ENABLE	(1 << 0)
+>> +#define ARCH_TIMER_CTL_IMASK	(1 << 1)
+>> +
+>>   static u32 cntfrq;
+>>   
+>>   static volatile bool irq_ready, irq_received;
+>> @@ -33,9 +38,16 @@ static void (*write_eoir)(u32 irqstat);
+>>   
+>>   static void gic_irq_handler(struct pt_regs *regs)
+>>   {
+>> +	u32 irqstat = gic_read_iar();
+>>   	irq_ready = false;
+>>   	irq_received = true;
+>> -	gic_write_eoir(gic_read_iar());
+>> +	gic_write_eoir(irqstat);
+>> +
+>> +	if (irqstat == IRQ_VTIMER) {
+>> +		write_sysreg((ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE),
+>> +			     cntv_ctl_el0);
+>> +		isb();
+>> +	}
+>>   	irq_ready = true;
+>>   }
+>>   
+>> @@ -189,6 +201,47 @@ static void lpi_exec(void)
+>>   	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
+>>   }
+>>   
+>> +static bool timer_prep(void)
+>> +{
+>> +	static void *gic_isenabler;
+>> +
+>> +	gic_enable_defaults();
+>> +	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+>> +	local_irq_enable();
+>> +
+>> +	gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
+>> +	writel(1 << 27, gic_isenabler);
+>> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+>> +	isb();
+>> +
+>> +	gic_prep_common();
+>> +	return true;
+>> +}
+>> +
+>> +static void timer_exec(void)
+>> +{
+>> +	u64 before_timer;
+>> +	u64 timer_10ms;
+>> +	unsigned tries = 1 << 28;
+>> +	static int received = 0;
+>> +
+>> +	irq_received = false;
+>> +
+>> +	before_timer = read_sysreg(cntvct_el0);
+>> +	timer_10ms = cntfrq / 100;
+>> +	write_sysreg(before_timer + timer_10ms, cntv_cval_el0);
+>> +	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
+>> +	isb();
+>> +
+>> +	while (!irq_received && tries--)
+>> +		cpu_relax();
+>> +
+>> +	if (irq_received)
+>> +		++received;
+>> +
+>> +	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
+>> +}
+>> +
+>>   static void hvc_exec(void)
+>>   {
+>>   	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
+>> @@ -236,6 +289,7 @@ static struct exit_test tests[] = {
+>>   	{"ipi",			ipi_prep,	ipi_exec,		NTIMES,		true},
+>>   	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NTIMES,		true},
+>>   	{"lpi",			lpi_prep,	lpi_exec,		NTIMES,		true},
+>> +	{"timer_10ms",		timer_prep,	timer_exec,		NTIMES_MINOR,	true},
+>>   };
+>>   
+>>   struct ns_time {
+>>
+> 
+> 
+> .
+> 
 
 _______________________________________________
 kvmarm mailing list
