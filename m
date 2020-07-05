@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CC3C433E0
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 12:00:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6518C433DF
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 13:45:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BA75120708
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 12:00:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EB0320723
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 13:45:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUDLk+Ti"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA75120708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlMbk8BF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB0320723
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5344B3D9;
-	Sun,  5 Jul 2020 08:00:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A99214B343;
+	Sun,  5 Jul 2020 09:45:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v8lW6SXICnsi; Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
+	with ESMTP id Es4pIWffqMTr; Sun,  5 Jul 2020 09:45:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6FA34B3BF;
-	Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67B044B2D4;
+	Sun,  5 Jul 2020 09:45:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD764B3BE
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC2D4B2A0
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 09:45:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GRytAVNa7E8V for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 Jul 2020 08:00:14 -0400 (EDT)
+ with ESMTP id XxxoFiPKDAAZ for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2020 09:45:28 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D11B14B3AE
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 08:00:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1B7C4B24E
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 09:45:28 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B4C4720708;
- Sun,  5 Jul 2020 12:00:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9BDC820723;
+ Sun,  5 Jul 2020 13:45:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593950412;
- bh=Hrki0NWbQnR7mFDJ86LIf/24cbRDX0SnjCAQfKCMf88=;
+ s=default; t=1593956727;
+ bh=GRrK3a5skX+hTzje/hiXpCqKg6Ht2lZO8SAGK4bDpLE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=qUDLk+TioO8qTy6bLwzuhK91dy/Jhc9T383RiyVLYx5MZpH3sY8Kdq2JlP1BAQf1B
- NDMyjsOkTIdBD38VpLqV/rjb17LE0W8VQWGhV43kMpjRLO0O0GFEe/FLnpS3zO7duQ
- G30D2gqEmI+J8C3FkfYibJHLOvfWTzYozou6/G50=
+ b=tlMbk8BFB3Cf38eIKF6bcjDadn6ROhQxNApdZu6PHfr/OKUANDk5dhaQJMwUGPCOU
+ 2nmsiAFVPw/9Dq6aWsKsdxcxqev0E3HtvoPNRNvUa1US7uoNmFVgSMHHH1xUQtCHA9
+ aRNUg3dLB2Rzb4ZegnmWnLHShJz7crOdlq0/fg7c=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1js3Jb-009AjB-3s; Sun, 05 Jul 2020 13:00:11 +0100
-Date: Sun, 05 Jul 2020 13:00:10 +0100
-Message-ID: <87r1tqdved.wl-maz@kernel.org>
+ id 1js4xS-009BZX-4Z; Sun, 05 Jul 2020 14:45:26 +0100
+Date: Sun, 05 Jul 2020 14:45:25 +0100
+Message-ID: <87pn9adqiy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
 Subject: Re: [PATCH v4 08/15] arm64: kvm: Duplicate hyp/tlb.c for VHE/nVHE
@@ -117,49 +117,28 @@ David Brazdil <dbrazdil@google.com> wrote:
 >  6 files changed, 178 insertions(+), 98 deletions(-)
 >  rename arch/arm64/kvm/hyp/{ => nvhe}/tlb.c (62%)
 >  create mode 100644 arch/arm64/kvm/hyp/vhe/tlb.c
+> 
 
 [...]
 
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> similarity index 62%
-> rename from arch/arm64/kvm/hyp/tlb.c
-> rename to arch/arm64/kvm/hyp/nvhe/tlb.c
-> index d063a576d511..9513ad41db9a 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -4,8 +4,6 @@
->   * Author: Marc Zyngier <marc.zyngier@arm.com>
->   */
->  
-> -#include <linux/irqflags.h>
-> -
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/tlbflush.h>
-> @@ -16,52 +14,8 @@ struct tlb_inv_context {
->  	u64		sctlr;
->  };
+> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+> new file mode 100644
+> index 000000000000..35e8e112ba28
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
 
-nit: You seem to have overlooked that some of the tlb_inv_context
-fields are now unused. I plan to squash the following patch in:
+[...]
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 6fe190bb930a..d4475f8340c4 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -9,9 +9,7 @@
- #include <asm/tlbflush.h>
- 
- struct tlb_inv_context {
--	unsigned long	flags;
- 	u64		tcr;
--	u64		sctlr;
- };
- 
- static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt)
+> +void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+> +{
+> +	struct tlb_inv_context cxt;
+> +
+> +	dsb(ishst);
+> +
+> +	/* Switch to requested VMID */
+> +	kvm = kern_hyp_va(kvm);
 
-
-Otherwise, this looks good to me.
+nit: this is now superfluous. I'll drop it locally.
 
 Thanks,
 
