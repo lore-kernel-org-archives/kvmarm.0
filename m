@@ -2,87 +2,78 @@ Return-Path: <SRS0=ILOk=AQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6518C433DF
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 13:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473E6C433E0
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 17:17:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1EB0320723
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 13:45:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE2C8206B7
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 17:17:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlMbk8BF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB0320723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="U10GYN+T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE2C8206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A99214B343;
-	Sun,  5 Jul 2020 09:45:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D8054B0B5;
+	Sun,  5 Jul 2020 13:17:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Es4pIWffqMTr; Sun,  5 Jul 2020 09:45:30 -0400 (EDT)
+	with ESMTP id ROcuy-q+cBcy; Sun,  5 Jul 2020 13:17:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67B044B2D4;
-	Sun,  5 Jul 2020 09:45:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A3C24B080;
+	Sun,  5 Jul 2020 13:17:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC2D4B2A0
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 09:45:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9C984B080
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 13:17:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XxxoFiPKDAAZ for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 Jul 2020 09:45:28 -0400 (EDT)
+ with ESMTP id 5IVZb6ifkZkf for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2020 13:17:24 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1B7C4B24E
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 09:45:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B79DF4B07F
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 13:17:24 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9BDC820723;
- Sun,  5 Jul 2020 13:45:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 657DD206B7;
+ Sun,  5 Jul 2020 17:17:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593956727;
- bh=GRrK3a5skX+hTzje/hiXpCqKg6Ht2lZO8SAGK4bDpLE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tlMbk8BFB3Cf38eIKF6bcjDadn6ROhQxNApdZu6PHfr/OKUANDk5dhaQJMwUGPCOU
- 2nmsiAFVPw/9Dq6aWsKsdxcxqev0E3HtvoPNRNvUa1US7uoNmFVgSMHHH1xUQtCHA9
- aRNUg3dLB2Rzb4ZegnmWnLHShJz7crOdlq0/fg7c=
+ s=default; t=1593969443;
+ bh=d7CxIFbR9PjqU7uaul6PCzWr3qAvUzYOsNUr357wPcQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=U10GYN+TmXHfYJYIE6oBt7yYpNwspWBfmS37Yn7zhTg85DEOgadbIdBgWDyaQFfNp
+ 8Y6bHeOkQi4oYvreyN/qOPELIZIc79SPUbbOOLfNvnT7HlbX32RARgjavILURnb2pI
+ brG1jsUjGj8ZgjOL8AdvXC4pO+BP96yS+OskK9Xw=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
+ helo=wait-a-minute.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1js4xS-009BZX-4Z; Sun, 05 Jul 2020 14:45:26 +0100
-Date: Sun, 05 Jul 2020 14:45:25 +0100
-Message-ID: <87pn9adqiy.wl-maz@kernel.org>
+ id 1js8GX-009DEB-LA; Sun, 05 Jul 2020 18:17:21 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v4 08/15] arm64: kvm: Duplicate hyp/tlb.c for VHE/nVHE
-In-Reply-To: <20200625131420.71444-9-dbrazdil@google.com>
-References: <20200625131420.71444-1-dbrazdil@google.com>
- <20200625131420.71444-9-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: Andrew Scull <ascull@google.com>,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH] arm64: kvm: Remove kern_hyp_va from get_vcpu_ptr
+Date: Sun,  5 Jul 2020 18:17:07 +0100
+Message-Id: <159396935735.249189.17492989703239636430.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200618093616.164413-1-ascull@google.com>
+References: <20200618093616.164413-1-ascull@google.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
- catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- android-kvm@google.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,53 +90,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 25 Jun 2020 14:14:13 +0100,
-David Brazdil <dbrazdil@google.com> wrote:
+On Thu, 18 Jun 2020 10:36:16 +0100, Andrew Scull wrote:
+> get_vcpu_ptr is an assembly accessor for the percpu value
+> kvm_host_data->host_ctxt.__hyp_running_vcpu. kern_hyp_va only applies to
+> nVHE however __hyp_running_vcpu is always assigned a pointer that has
+> already had kern_hyp_va applied in __kvm_vcpu_run_nvhe.
 > 
-> tlb.c contains code for flushing the TLB, with code shared between VHE/nVHE.
-> Because common code is small, duplicate tlb.c and specialize each copy for
-> VHE/nVHE.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kernel/image-vars.h      |  14 +--
->  arch/arm64/kvm/hyp/Makefile         |   2 +-
->  arch/arm64/kvm/hyp/nvhe/Makefile    |   2 +-
->  arch/arm64/kvm/hyp/{ => nvhe}/tlb.c |  94 +---------------
->  arch/arm64/kvm/hyp/vhe/Makefile     |   2 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c        | 162 ++++++++++++++++++++++++++++
->  6 files changed, 178 insertions(+), 98 deletions(-)
->  rename arch/arm64/kvm/hyp/{ => nvhe}/tlb.c (62%)
->  create mode 100644 arch/arm64/kvm/hyp/vhe/tlb.c
-> 
+> kern_hyp_va is currently idempotent as it just masks and inserts the
+> tag, but this could change in future and the second application is
+> unnecessary.
 
-[...]
+Applied, thanks!
 
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> new file mode 100644
-> index 000000000000..35e8e112ba28
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+[1/1] arm64: kvm: Remove kern_hyp_va from get_vcpu_ptr
+      commit: 2da3ffa6e840b9f8fc65a71326c43b716992861d
 
-[...]
-
-> +void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	kvm = kern_hyp_va(kvm);
-
-nit: this is now superfluous. I'll drop it locally.
-
-Thanks,
-
-	M.
-
+Best regards,
 -- 
 Without deviation from the norm, progress is not possible.
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
