@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CC4C433DF
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 11:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CC3C433E0
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 12:00:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4D72C20723
-	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 11:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA75120708
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 12:00:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdVX8Vk4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D72C20723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUDLk+Ti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA75120708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D58714B3EE;
-	Sun,  5 Jul 2020 07:42:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5344B3D9;
+	Sun,  5 Jul 2020 08:00:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M5GG36QzIrLA; Sun,  5 Jul 2020 07:42:27 -0400 (EDT)
+	with ESMTP id v8lW6SXICnsi; Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E594B35E;
-	Sun,  5 Jul 2020 07:42:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6FA34B3BF;
+	Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC784B2FA
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 07:42:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD764B3BE
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 08:00:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MRc2R2MY+-8z for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 Jul 2020 07:42:25 -0400 (EDT)
+ with ESMTP id GRytAVNa7E8V for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2020 08:00:14 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A912A4B25F
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 07:42:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D11B14B3AE
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 08:00:13 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7129620723;
- Sun,  5 Jul 2020 11:42:24 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B4C4720708;
+ Sun,  5 Jul 2020 12:00:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593949344;
- bh=osIqCvX4+ivPwL8+fsRDv25DW8yCHi04b5BbNz7bvVs=;
+ s=default; t=1593950412;
+ bh=Hrki0NWbQnR7mFDJ86LIf/24cbRDX0SnjCAQfKCMf88=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=AdVX8Vk4fwtJeKRNNP90+6latAq3QxT9WX0vb3GSjvvZDc4Urv7LtGq/qOiFPp39P
- vLren38X0sXAUl+eRRAW9wRRhXcTRlgnA/MhgcEnzZF3cPtlgr3ic8FGYjWQ8VBvOP
- cPoWpDdI9pNk2veOezHToQ4JGjaZmvzCvx5jzKek=
+ b=qUDLk+TioO8qTy6bLwzuhK91dy/Jhc9T383RiyVLYx5MZpH3sY8Kdq2JlP1BAQf1B
+ NDMyjsOkTIdBD38VpLqV/rjb17LE0W8VQWGhV43kMpjRLO0O0GFEe/FLnpS3zO7duQ
+ G30D2gqEmI+J8C3FkfYibJHLOvfWTzYozou6/G50=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1js32M-009AZX-VF; Sun, 05 Jul 2020 12:42:23 +0100
-Date: Sun, 05 Jul 2020 12:42:16 +0100
-Message-ID: <87sge6dw87.wl-maz@kernel.org>
+ id 1js3Jb-009AjB-3s; Sun, 05 Jul 2020 13:00:11 +0100
+Date: Sun, 05 Jul 2020 13:00:10 +0100
+Message-ID: <87r1tqdved.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v4 07/15] arm64: kvm: Move hyp-init.S to nVHE
-In-Reply-To: <20200625131420.71444-8-dbrazdil@google.com>
+Subject: Re: [PATCH v4 08/15] arm64: kvm: Duplicate hyp/tlb.c for VHE/nVHE
+In-Reply-To: <20200625131420.71444-9-dbrazdil@google.com>
 References: <20200625131420.71444-1-dbrazdil@google.com>
- <20200625131420.71444-8-dbrazdil@google.com>
+ <20200625131420.71444-9-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,7 +75,7 @@ X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
  catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- android-kvm@google.com, kernel-team@android.com, ascull@google.com
+ android-kvm@google.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -99,121 +99,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi David,
-
-On Thu, 25 Jun 2020 14:14:12 +0100,
+On Thu, 25 Jun 2020 14:14:13 +0100,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> From: Andrew Scull <ascull@google.com>
+> tlb.c contains code for flushing the TLB, with code shared between VHE/nVHE.
+> Because common code is small, duplicate tlb.c and specialize each copy for
+> VHE/nVHE.
 > 
-> hyp-init.S contains the identity mapped initialisation code for the
-> non-VHE code that runs at EL2. It is only used for non-VHE.
-> 
-> Adjust code that calls into this to use the prefixed symbol name.
-> 
-> Signed-off-by: Andrew Scull <ascull@google.com>
-> 
-> [David: pass idmap_t0sz as an argument]
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/kernel/image-vars.h      |  14 +--
+>  arch/arm64/kvm/hyp/Makefile         |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/Makefile    |   2 +-
+>  arch/arm64/kvm/hyp/{ => nvhe}/tlb.c |  94 +---------------
+>  arch/arm64/kvm/hyp/vhe/Makefile     |   2 +-
+>  arch/arm64/kvm/hyp/vhe/tlb.c        | 162 ++++++++++++++++++++++++++++
+>  6 files changed, 178 insertions(+), 98 deletions(-)
+>  rename arch/arm64/kvm/hyp/{ => nvhe}/tlb.c (62%)
+>  create mode 100644 arch/arm64/kvm/hyp/vhe/tlb.c
 
-It is unclear to me why moving the way idmap_t0sz is passed is
-required at this stage. I understand that you want to minimise the
-amount of shared data between EL1 and EL2, but it hardly seems
-relevant here.
+[...]
 
-Or is it, as I expect, to avoid yet another symbol renaming issue?
-If so, it would be preferable to have the symbol alias, keep the setup
-hypercall as is, and have a later, separate patch that deals with the
-the idmap. And I am pretty sure that, as we move to a more autonomous
-EL2, we won't have to deal with it at all and we'll simply delete this
-code.
+> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> similarity index 62%
+> rename from arch/arm64/kvm/hyp/tlb.c
+> rename to arch/arm64/kvm/hyp/nvhe/tlb.c
+> index d063a576d511..9513ad41db9a 100644
+> --- a/arch/arm64/kvm/hyp/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -4,8 +4,6 @@
+>   * Author: Marc Zyngier <marc.zyngier@arm.com>
+>   */
+>  
+> -#include <linux/irqflags.h>
+> -
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/tlbflush.h>
+> @@ -16,52 +14,8 @@ struct tlb_inv_context {
+>  	u64		sctlr;
+>  };
 
-I'm planning to squash the following diff into this patch, effectively
-reverting the idmap_t0sz related changes. Let me know if you're OK
-with it.
+nit: You seem to have overlooked that some of the tlb_inv_context
+fields are now unused. I plan to squash the following patch in:
 
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 8ba32bff7bb2..9e897c500237 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -83,6 +83,9 @@ KVM_NVHE_ALIAS(panic);
- /* Vectors installed by hyp-init on reset HVC. */
- KVM_NVHE_ALIAS(__hyp_stub_vectors);
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index 6fe190bb930a..d4475f8340c4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -9,9 +9,7 @@
+ #include <asm/tlbflush.h>
  
-+/* IDMAP TCR_EL1.T0SZ as computed by the EL1 init code */
-+KVM_NVHE_ALIAS(idmap_t0sz);
-+
- /* Kernel symbol used by icache_is_vpipt(). */
- KVM_NVHE_ALIAS(__icache_flags);
+ struct tlb_inv_context {
+-	unsigned long	flags;
+ 	u64		tcr;
+-	u64		sctlr;
+ };
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8ca2c111cec2..0bf2cf5614c6 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1296,7 +1296,7 @@ static void cpu_init_hyp_mode(void)
- 	 * cpus_have_const_cap() wrapper.
- 	 */
- 	BUG_ON(!system_capabilities_finalized());
--	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2, idmap_t0sz);
-+	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2);
- 
- 	/*
- 	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 7bb75acbede0..6e6ed5581eed 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -47,24 +47,23 @@ __invalid:
- 	 * x1: HYP stack
- 	 * x2: HYP vectors
- 	 * x3: per-CPU offset
--	 * x4: idmap_t0sz
- 	 */
- __do_hyp_init:
- 	/* Check for a stub HVC call */
- 	cmp	x0, #HVC_STUB_HCALL_NR
- 	b.lo	__kvm_handle_stub_hvc
- 
--	phys_to_ttbr x5, x0
-+	phys_to_ttbr x4, x0
- alternative_if ARM64_HAS_CNP
--	orr	x5, x5, #TTBR_CNP_BIT
-+	orr	x4, x4, #TTBR_CNP_BIT
- alternative_else_nop_endif
--	msr	ttbr0_el2, x5
-+	msr	ttbr0_el2, x4
- 
--	mrs	x5, tcr_el1
--	mov_q	x6, TCR_EL2_MASK
--	and	x5, x5, x6
--	mov	x6, #TCR_EL2_RES1
--	orr	x5, x5, x6
-+	mrs	x4, tcr_el1
-+	mov_q	x5, TCR_EL2_MASK
-+	and	x4, x4, x5
-+	mov	x5, #TCR_EL2_RES1
-+	orr	x4, x4, x5
- 
- 	/*
- 	 * The ID map may be configured to use an extended virtual address
-@@ -80,14 +79,15 @@ alternative_else_nop_endif
- 	 *
- 	 * So use the same T0SZ value we use for the ID map.
- 	 */
--	bfi	x5, x4, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
-+	ldr_l	x5, idmap_t0sz
-+	bfi	x4, x5, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
- 
- 	/*
- 	 * Set the PS bits in TCR_EL2.
- 	 */
--	tcr_compute_pa_size x5, #TCR_EL2_PS_SHIFT, x4, x6
-+	tcr_compute_pa_size x4, #TCR_EL2_PS_SHIFT, x5, x6
- 
--	msr	tcr_el2, x5
-+	msr	tcr_el2, x4
- 
- 	mrs	x4, mair_el1
- 	msr	mair_el2, x4
+ static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt)
+
+
+Otherwise, this looks good to me.
 
 Thanks,
 
