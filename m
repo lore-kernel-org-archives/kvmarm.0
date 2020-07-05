@@ -1,79 +1,88 @@
-Return-Path: <SRS0=s82F=AP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ILOk=AQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E8EC433E0
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Jul 2020 13:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CC4C433DF
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 11:42:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7ACB20826
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Jul 2020 13:37:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D72C20723
+	for <kvmarm@archiver.kernel.org>; Sun,  5 Jul 2020 11:42:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="yreCcty7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7ACB20826
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdVX8Vk4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D72C20723
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22DEF4B2AF;
-	Sat,  4 Jul 2020 09:37:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D58714B3EE;
+	Sun,  5 Jul 2020 07:42:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fAvelv1X4p9P; Sat,  4 Jul 2020 09:37:56 -0400 (EDT)
+	with ESMTP id M5GG36QzIrLA; Sun,  5 Jul 2020 07:42:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D6094B2A5;
-	Sat,  4 Jul 2020 09:37:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E594B35E;
+	Sun,  5 Jul 2020 07:42:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39CEE4B2A5
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jul 2020 09:37:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC784B2FA
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 07:42:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hqs70ykK+x-s for <kvmarm@lists.cs.columbia.edu>;
- Sat,  4 Jul 2020 09:37:53 -0400 (EDT)
+ with ESMTP id MRc2R2MY+-8z for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2020 07:42:25 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F32724B29B
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jul 2020 09:37:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A912A4B25F
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2020 07:42:25 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9539020826;
- Sat,  4 Jul 2020 13:37:51 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7129620723;
+ Sun,  5 Jul 2020 11:42:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1593869871;
- bh=pNwXVAMDXVJlIpm6TO8om9y6iGboItUmVHhsv43zIi0=;
- h=From:To:Cc:Subject:Date:From;
- b=yreCcty7LGBA5T6a7Ze4NTB5GSHk/LphvReviko9cP/XfSOd/Saz9yjRkY+UPH1aR
- YsAFhRdDj9CFlAxzgqh66MrC0LaQP1cfB3kNXPwiKZEBKf6NJ2KyTGhON09NOt69MR
- pc5uSp4PjmGKq/uH6V5nFurdtpwYNvXTKfFSwW38=
+ s=default; t=1593949344;
+ bh=osIqCvX4+ivPwL8+fsRDv25DW8yCHi04b5BbNz7bvVs=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=AdVX8Vk4fwtJeKRNNP90+6latAq3QxT9WX0vb3GSjvvZDc4Urv7LtGq/qOiFPp39P
+ vLren38X0sXAUl+eRRAW9wRRhXcTRlgnA/MhgcEnzZF3cPtlgr3ic8FGYjWQ8VBvOP
+ cPoWpDdI9pNk2veOezHToQ4JGjaZmvzCvx5jzKek=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.lan) by disco-boy.misterjones.org with esmtpsa
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jriMX-008xsK-Tf; Sat, 04 Jul 2020 14:37:50 +0100
+ id 1js32M-009AZX-VF; Sun, 05 Jul 2020 12:42:23 +0100
+Date: Sun, 05 Jul 2020 12:42:16 +0100
+Message-ID: <87sge6dw87.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: PMU: Fix per-CPU access in preemptible context
-Date: Sat,  4 Jul 2020 14:37:41 +0100
-Message-Id: <20200704133741.148094-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v4 07/15] arm64: kvm: Move hyp-init.S to nVHE
+In-Reply-To: <20200625131420.71444-8-dbrazdil@google.com>
+References: <20200625131420.71444-1-dbrazdil@google.com>
+ <20200625131420.71444-8-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, ascull@google.com, mark.rutland@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- kernel-team@android.com, amurray@thegoodpenguin.co.uk
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, will@kernel.org,
+ catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ android-kvm@google.com, kernel-team@android.com, ascull@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, amurray@thegoodpenguin.co.uk
+Cc: kernel-team@android.com, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,74 +99,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Commit 07da1ffaa137 ("KVM: arm64: Remove host_cpu_context
-member from vcpu structure") has, by removing the host CPU
-context pointer, exposed that kvm_vcpu_pmu_restore_guest
-is called in preemptible contexts:
+Hi David,
 
-[  266.932442] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/779
-[  266.939721] caller is debug_smp_processor_id+0x20/0x30
-[  266.944157] CPU: 2 PID: 779 Comm: qemu-system-aar Tainted: G            E     5.8.0-rc3-00015-g8d4aa58b2fe3 #1374
-[  266.954268] Hardware name: amlogic w400/w400, BIOS 2020.04 05/22/2020
-[  266.960640] Call trace:
-[  266.963064]  dump_backtrace+0x0/0x1e0
-[  266.966679]  show_stack+0x20/0x30
-[  266.969959]  dump_stack+0xe4/0x154
-[  266.973338]  check_preemption_disabled+0xf8/0x108
-[  266.977978]  debug_smp_processor_id+0x20/0x30
-[  266.982307]  kvm_vcpu_pmu_restore_guest+0x2c/0x68
-[  266.986949]  access_pmcr+0xf8/0x128
-[  266.990399]  perform_access+0x8c/0x250
-[  266.994108]  kvm_handle_sys_reg+0x10c/0x2f8
-[  266.998247]  handle_exit+0x78/0x200
-[  267.001697]  kvm_arch_vcpu_ioctl_run+0x2ac/0xab8
+On Thu, 25 Jun 2020 14:14:12 +0100,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> From: Andrew Scull <ascull@google.com>
+> 
+> hyp-init.S contains the identity mapped initialisation code for the
+> non-VHE code that runs at EL2. It is only used for non-VHE.
+> 
+> Adjust code that calls into this to use the prefixed symbol name.
+> 
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> 
+> [David: pass idmap_t0sz as an argument]
 
-Note that the bug was always there, it is only the switch to
-using percpu accessors that made it obvious.
-The fix is to wrap these accesses in a preempt-disabled section,
-so that we sample a coherent context on trap from the guest.
+It is unclear to me why moving the way idmap_t0sz is passed is
+required at this stage. I understand that you want to minimise the
+amount of shared data between EL1 and EL2, but it hardly seems
+relevant here.
 
-Fixes: 435e53fb5e21 ("arm64: KVM: Enable VHE support for :G/:H perf event modifiers")
-Cc:: Andrew Murray <amurray@thegoodpenguin.co.uk>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/pmu.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Or is it, as I expect, to avoid yet another symbol renaming issue?
+If so, it would be preferable to have the symbol alias, keep the setup
+hypercall as is, and have a later, separate patch that deals with the
+the idmap. And I am pretty sure that, as we move to a more autonomous
+EL2, we won't have to deal with it at all and we'll simply delete this
+code.
 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index b5ae3a5d509e..3c224162b3dd 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -159,7 +159,10 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
- }
+I'm planning to squash the following diff into this patch, effectively
+reverting the idmap_t0sz related changes. Let me know if you're OK
+with it.
+
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 8ba32bff7bb2..9e897c500237 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -83,6 +83,9 @@ KVM_NVHE_ALIAS(panic);
+ /* Vectors installed by hyp-init on reset HVC. */
+ KVM_NVHE_ALIAS(__hyp_stub_vectors);
  
- /*
-- * On VHE ensure that only guest events have EL0 counting enabled
-+ * On VHE ensure that only guest events have EL0 counting enabled.
-+ * This is called from both vcpu_{load,put} and the sysreg handling.
-+ * Since the latter is preemptible, special care must be taken to
-+ * disable preemption.
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
-@@ -169,12 +172,14 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- 	if (!has_vhe())
- 		return;
++/* IDMAP TCR_EL1.T0SZ as computed by the EL1 init code */
++KVM_NVHE_ALIAS(idmap_t0sz);
++
+ /* Kernel symbol used by icache_is_vpipt(). */
+ KVM_NVHE_ALIAS(__icache_flags);
  
-+	preempt_disable();
- 	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 8ca2c111cec2..0bf2cf5614c6 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1296,7 +1296,7 @@ static void cpu_init_hyp_mode(void)
+ 	 * cpus_have_const_cap() wrapper.
+ 	 */
+ 	BUG_ON(!system_capabilities_finalized());
+-	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2, idmap_t0sz);
++	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2);
  
- 	kvm_vcpu_pmu_enable_el0(events_guest);
- 	kvm_vcpu_pmu_disable_el0(events_host);
-+	preempt_enable();
- }
+ 	/*
+ 	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 7bb75acbede0..6e6ed5581eed 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -47,24 +47,23 @@ __invalid:
+ 	 * x1: HYP stack
+ 	 * x2: HYP vectors
+ 	 * x3: per-CPU offset
+-	 * x4: idmap_t0sz
+ 	 */
+ __do_hyp_init:
+ 	/* Check for a stub HVC call */
+ 	cmp	x0, #HVC_STUB_HCALL_NR
+ 	b.lo	__kvm_handle_stub_hvc
  
- /*
+-	phys_to_ttbr x5, x0
++	phys_to_ttbr x4, x0
+ alternative_if ARM64_HAS_CNP
+-	orr	x5, x5, #TTBR_CNP_BIT
++	orr	x4, x4, #TTBR_CNP_BIT
+ alternative_else_nop_endif
+-	msr	ttbr0_el2, x5
++	msr	ttbr0_el2, x4
+ 
+-	mrs	x5, tcr_el1
+-	mov_q	x6, TCR_EL2_MASK
+-	and	x5, x5, x6
+-	mov	x6, #TCR_EL2_RES1
+-	orr	x5, x5, x6
++	mrs	x4, tcr_el1
++	mov_q	x5, TCR_EL2_MASK
++	and	x4, x4, x5
++	mov	x5, #TCR_EL2_RES1
++	orr	x4, x4, x5
+ 
+ 	/*
+ 	 * The ID map may be configured to use an extended virtual address
+@@ -80,14 +79,15 @@ alternative_else_nop_endif
+ 	 *
+ 	 * So use the same T0SZ value we use for the ID map.
+ 	 */
+-	bfi	x5, x4, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
++	ldr_l	x5, idmap_t0sz
++	bfi	x4, x5, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
+ 
+ 	/*
+ 	 * Set the PS bits in TCR_EL2.
+ 	 */
+-	tcr_compute_pa_size x5, #TCR_EL2_PS_SHIFT, x4, x6
++	tcr_compute_pa_size x4, #TCR_EL2_PS_SHIFT, x5, x6
+ 
+-	msr	tcr_el2, x5
++	msr	tcr_el2, x4
+ 
+ 	mrs	x4, mair_el1
+ 	msr	mair_el2, x4
+
+Thanks,
+
+	M.
+
 -- 
-2.27.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
