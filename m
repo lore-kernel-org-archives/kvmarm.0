@@ -2,87 +2,68 @@ Return-Path: <SRS0=KDMR=AR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD13EC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0553FC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 15:49:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83FC82073E
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:56:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oh2HdaGu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83FC82073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8637320722
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 15:49:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8637320722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CD514B41D;
-	Mon,  6 Jul 2020 08:56:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E330A4B3B1;
+	Mon,  6 Jul 2020 11:49:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hk8dJUjMLbGs; Mon,  6 Jul 2020 08:56:06 -0400 (EDT)
+	with ESMTP id U++VBE-QuJTT; Mon,  6 Jul 2020 11:49:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA564B3E0;
-	Mon,  6 Jul 2020 08:56:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2594B3F0;
+	Mon,  6 Jul 2020 11:49:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3FA4B35B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:56:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 849574B3F0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 11:49:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LZ-F3ujojZew for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2020 08:56:03 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 934754B3E0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:56:01 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A32D02088E;
- Mon,  6 Jul 2020 12:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594040160;
- bh=CC6A47nxAmRdpF3iRuUznEhc1tT4BBkjxev642A2AW4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Oh2HdaGufdtB+Mu12X/L9dfXHg4VBdo+bk+BIAkF2nJY17I6S89MsKtIaYzmvPZ35
- Uu0/NAVbwbVcZPpSt2BjTOoKLiVLGRe7KZQZxZRi5xfYwWHZwJ9P3fr3qvI02vuHq7
- 7sJrCOocEUEU7JwMoc6GCQX01TAbxb6uhq+t5WSU=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jsQeE-009SCo-R1; Mon, 06 Jul 2020 13:55:03 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH v3 11/17] KVM: arm64: Make struct kvm_regs userspace-only
-Date: Mon,  6 Jul 2020 13:54:19 +0100
-Message-Id: <20200706125425.1671020-12-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200706125425.1671020-1-maz@kernel.org>
-References: <20200706125425.1671020-1-maz@kernel.org>
+ with ESMTP id 0sV7jPovVNx2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2020 11:49:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F89E4B3B1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 11:49:12 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EC64C0A;
+ Mon,  6 Jul 2020 08:49:11 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C2183F68F;
+ Mon,  6 Jul 2020 08:49:09 -0700 (PDT)
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+To: Marc Zyngier <maz@kernel.org>
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+ <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
+ <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7fae512d-a4a4-f66c-92c7-d3d3f7ebd488@arm.com>
+Date: Mon, 6 Jul 2020 16:49:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com,
- gcherian@marvell.com, prime.zeng@hisilicon.com, ascull@google.com,
- will@kernel.org, mark.rutland@arm.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>,
- George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>
+In-Reply-To: <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,451 +75,68 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-struct kvm_regs is used by userspace to indicate which register gets
-accessed by the {GET,SET}_ONE_REG API. But as we're about to refactor
-the layout of the in-kernel register structures, we need the kernel to
-move away from it.
-
-Let's make kvm_regs userspace only, and let the kernel map it to its own
-internal representation.
-
-Reviewed-by: James Morse <james.morse@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h       | 18 +++---
- arch/arm64/include/asm/kvm_host.h          | 12 +++-
- arch/arm64/kernel/asm-offsets.c            |  3 +-
- arch/arm64/kvm/fpsimd.c                    |  2 +-
- arch/arm64/kvm/guest.c                     | 70 +++++++++++++++++-----
- arch/arm64/kvm/hyp/entry.S                 |  3 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h    |  4 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 24 ++++----
- arch/arm64/kvm/regmap.c                    |  6 +-
- arch/arm64/kvm/reset.c                     |  2 +-
- 10 files changed, 96 insertions(+), 48 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 269a76cd51ff..cd607999abc2 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -124,12 +124,12 @@ static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
- 
- static __always_inline unsigned long *vcpu_pc(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pc;
-+	return (unsigned long *)&vcpu_gp_regs(vcpu)->pc;
- }
- 
- static inline unsigned long *__vcpu_elr_el1(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->elr_el1;
-+	return (unsigned long *)&vcpu->arch.ctxt.elr_el1;
- }
- 
- static inline unsigned long vcpu_read_elr_el1(const struct kvm_vcpu *vcpu)
-@@ -150,7 +150,7 @@ static inline void vcpu_write_elr_el1(const struct kvm_vcpu *vcpu, unsigned long
- 
- static __always_inline unsigned long *vcpu_cpsr(const struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.pstate;
-+	return (unsigned long *)&vcpu_gp_regs(vcpu)->pstate;
- }
- 
- static __always_inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
-@@ -179,14 +179,14 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
- static __always_inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
- 					 u8 reg_num)
- {
--	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs.regs[reg_num];
-+	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs[reg_num];
- }
- 
- static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 				unsigned long val)
- {
- 	if (reg_num != 31)
--		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
-+		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
- }
- 
- static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
-@@ -197,7 +197,7 @@ static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.sysregs_loaded_on_cpu)
- 		return read_sysreg_el1(SYS_SPSR);
- 	else
--		return vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1];
-+		return vcpu->arch.ctxt.spsr[KVM_SPSR_EL1];
- }
- 
- static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
-@@ -210,7 +210,7 @@ static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
- 	if (vcpu->arch.sysregs_loaded_on_cpu)
- 		write_sysreg_el1(v, SYS_SPSR);
- 	else
--		vcpu_gp_regs(vcpu)->spsr[KVM_SPSR_EL1] = v;
-+		vcpu->arch.ctxt.spsr[KVM_SPSR_EL1] = v;
- }
- 
- /*
-@@ -519,11 +519,11 @@ static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_i
- static __always_inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
--	vcpu->arch.ctxt.gp_regs.regs.pstate = read_sysreg_el2(SYS_SPSR);
-+	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
- 
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
- 
--	write_sysreg_el2(vcpu->arch.ctxt.gp_regs.regs.pstate, SYS_SPSR);
-+	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
- }
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d9360f91ef44..bc1e91573d00 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -236,7 +236,15 @@ enum vcpu_sysreg {
- #define NR_COPRO_REGS	(NR_SYS_REGS * 2)
- 
- struct kvm_cpu_context {
--	struct kvm_regs	gp_regs;
-+	struct user_pt_regs regs;	/* sp = sp_el0 */
-+
-+	u64	sp_el1;
-+	u64	elr_el1;
-+
-+	u64	spsr[KVM_NR_SPSR];
-+
-+	struct user_fpsimd_state fp_regs;
-+
- 	union {
- 		u64 sys_regs[NR_SYS_REGS];
- 		u32 copro[NR_COPRO_REGS];
-@@ -402,7 +410,7 @@ struct kvm_vcpu_arch {
- 				  system_supports_generic_auth()) && \
- 				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
- 
--#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
-+#define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
- 
- /*
-  * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 0577e2142284..7d32fc959b1a 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -102,13 +102,12 @@ int main(void)
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-   DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
-   DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
--  DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-+  DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-   DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
-   DEFINE(CPU_APIBKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIBKEYLO_EL1]));
-   DEFINE(CPU_APDAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APDAKEYLO_EL1]));
-   DEFINE(CPU_APDBKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APDBKEYLO_EL1]));
-   DEFINE(CPU_APGAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APGAKEYLO_EL1]));
--  DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-   DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
-   DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
- #endif
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index e503caff14d1..3e081d556e81 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -85,7 +85,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- 	WARN_ON_ONCE(!irqs_disabled());
- 
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
--		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.gp_regs.fp_regs,
-+		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
- 					 vcpu->arch.sve_state,
- 					 vcpu->arch.sve_max_vl);
- 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index aea43ec60f37..9dd5bbeefae6 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -101,19 +101,60 @@ static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
- 	return size;
- }
- 
--static int validate_core_offset(const struct kvm_vcpu *vcpu,
--				const struct kvm_one_reg *reg)
-+static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	u64 off = core_reg_offset_from_id(reg->id);
- 	int size = core_reg_size_from_offset(vcpu, off);
- 
- 	if (size < 0)
--		return -EINVAL;
-+		return NULL;
- 
- 	if (KVM_REG_SIZE(reg->id) != size)
--		return -EINVAL;
-+		return NULL;
- 
--	return 0;
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+		off -= KVM_REG_ARM_CORE_REG(regs.regs[0]);
-+		off /= 2;
-+		return &vcpu->arch.ctxt.regs.regs[off];
-+
-+	case KVM_REG_ARM_CORE_REG(regs.sp):
-+		return &vcpu->arch.ctxt.regs.sp;
-+
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+		return &vcpu->arch.ctxt.regs.pc;
-+
-+	case KVM_REG_ARM_CORE_REG(regs.pstate):
-+		return &vcpu->arch.ctxt.regs.pstate;
-+
-+	case KVM_REG_ARM_CORE_REG(sp_el1):
-+		return &vcpu->arch.ctxt.sp_el1;
-+
-+	case KVM_REG_ARM_CORE_REG(elr_el1):
-+		return &vcpu->arch.ctxt.elr_el1;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
-+	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
-+		off -= KVM_REG_ARM_CORE_REG(spsr[0]);
-+		off /= 2;
-+		return &vcpu->arch.ctxt.spsr[off];
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
-+		off -= KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]);
-+		off /= 4;
-+		return &vcpu->arch.ctxt.fp_regs.vregs[off];
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
-+		return &vcpu->arch.ctxt.fp_regs.fpsr;
-+
-+	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
-+		return &vcpu->arch.ctxt.fp_regs.fpcr;
-+
-+	default:
-+		return NULL;
-+	}
- }
- 
- static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-@@ -125,8 +166,8 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	 * off the index in the "array".
- 	 */
- 	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
--	struct kvm_regs *regs = vcpu_gp_regs(vcpu);
--	int nr_regs = sizeof(*regs) / sizeof(__u32);
-+	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
-+	void *addr;
- 	u32 off;
- 
- 	/* Our ID is an index into the kvm_regs struct. */
-@@ -135,10 +176,11 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
- 		return -ENOENT;
- 
--	if (validate_core_offset(vcpu, reg))
-+	addr = core_reg_addr(vcpu, reg);
-+	if (!addr)
- 		return -EINVAL;
- 
--	if (copy_to_user(uaddr, ((u32 *)regs) + off, KVM_REG_SIZE(reg->id)))
-+	if (copy_to_user(uaddr, addr, KVM_REG_SIZE(reg->id)))
- 		return -EFAULT;
- 
- 	return 0;
-@@ -147,10 +189,9 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	__u32 __user *uaddr = (__u32 __user *)(unsigned long)reg->addr;
--	struct kvm_regs *regs = vcpu_gp_regs(vcpu);
--	int nr_regs = sizeof(*regs) / sizeof(__u32);
-+	int nr_regs = sizeof(struct kvm_regs) / sizeof(__u32);
- 	__uint128_t tmp;
--	void *valp = &tmp;
-+	void *valp = &tmp, *addr;
- 	u64 off;
- 	int err = 0;
- 
-@@ -160,7 +201,8 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
- 		return -ENOENT;
- 
--	if (validate_core_offset(vcpu, reg))
-+	addr = core_reg_addr(vcpu, reg);
-+	if (!addr)
- 		return -EINVAL;
- 
- 	if (KVM_REG_SIZE(reg->id) > sizeof(tmp))
-@@ -198,7 +240,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		}
- 	}
- 
--	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
-+	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
- 
- 	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
- 		int i;
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index dfb4e6d359ab..ee32a7743389 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -16,8 +16,7 @@
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_ptrauth.h>
- 
--#define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
--#define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
-+#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
- #define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
- 
- 	.text
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 70367699d69a..784a581071fc 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -266,11 +266,11 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 
- 	if (sve_guest) {
- 		sve_load_state(vcpu_sve_pffr(vcpu),
--			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
-+			       &vcpu->arch.ctxt.fp_regs.fpsr,
- 			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
- 		write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL12);
- 	} else {
--		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
-+		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
- 	}
- 
- 	/* Skip restoring fpexc32 for AArch64 guests */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 37ef3e2cdbef..50938093cc5d 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -46,15 +46,15 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
- 
--	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
--	ctxt->gp_regs.elr_el1		= read_sysreg_el1(SYS_ELR);
--	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(SYS_SPSR);
-+	ctxt->sp_el1			= read_sysreg(sp_el1);
-+	ctxt->elr_el1			= read_sysreg_el1(SYS_ELR);
-+	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
- }
- 
- static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- {
--	ctxt->gp_regs.regs.pc		= read_sysreg_el2(SYS_ELR);
--	ctxt->gp_regs.regs.pstate	= read_sysreg_el2(SYS_SPSR);
-+	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
-+	ctxt->regs.pstate		= read_sysreg_el2(SYS_SPSR);
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
- 		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
-@@ -125,14 +125,14 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
- 	}
- 
--	write_sysreg(ctxt->gp_regs.sp_el1,		sp_el1);
--	write_sysreg_el1(ctxt->gp_regs.elr_el1,		SYS_ELR);
--	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],SYS_SPSR);
-+	write_sysreg(ctxt->sp_el1,			sp_el1);
-+	write_sysreg_el1(ctxt->elr_el1,			SYS_ELR);
-+	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
- }
- 
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
- {
--	u64 pstate = ctxt->gp_regs.regs.pstate;
-+	u64 pstate = ctxt->regs.pstate;
- 	u64 mode = pstate & PSR_AA32_MODE_MASK;
- 
- 	/*
-@@ -149,7 +149,7 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
- 	if (!(mode & PSR_MODE32_BIT) && mode >= PSR_MODE_EL2t)
- 		pstate = PSR_MODE_EL2h | PSR_IL_BIT;
- 
--	write_sysreg_el2(ctxt->gp_regs.regs.pc,		SYS_ELR);
-+	write_sysreg_el2(ctxt->regs.pc,			SYS_ELR);
- 	write_sysreg_el2(pstate,			SYS_SPSR);
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
-@@ -163,7 +163,7 @@ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	spsr = vcpu->arch.ctxt.gp_regs.spsr;
-+	spsr = vcpu->arch.ctxt.spsr;
- 
- 	spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
- 	spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
-@@ -184,7 +184,7 @@ static inline void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	spsr = vcpu->arch.ctxt.gp_regs.spsr;
-+	spsr = vcpu->arch.ctxt.spsr;
- 
- 	write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
- 	write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
-diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-index a900181e3867..b1596f314087 100644
---- a/arch/arm64/kvm/regmap.c
-+++ b/arch/arm64/kvm/regmap.c
-@@ -100,7 +100,7 @@ static const unsigned long vcpu_reg_offsets[VCPU_NR_MODES][16] = {
-  */
- unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
- {
--	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.gp_regs.regs;
-+	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.regs;
- 	unsigned long mode = *vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK;
- 
- 	switch (mode) {
-@@ -148,7 +148,7 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
- 	int spsr_idx = vcpu_spsr32_mode(vcpu);
- 
- 	if (!vcpu->arch.sysregs_loaded_on_cpu)
--		return vcpu_gp_regs(vcpu)->spsr[spsr_idx];
-+		return vcpu->arch.ctxt.spsr[spsr_idx];
- 
- 	switch (spsr_idx) {
- 	case KVM_SPSR_SVC:
-@@ -171,7 +171,7 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
- 	int spsr_idx = vcpu_spsr32_mode(vcpu);
- 
- 	if (!vcpu->arch.sysregs_loaded_on_cpu) {
--		vcpu_gp_regs(vcpu)->spsr[spsr_idx] = v;
-+		vcpu->arch.ctxt.spsr[spsr_idx] = v;
- 		return;
- 	}
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index d3b209023727..8ca8607f5a9f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -288,7 +288,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- 	/* Reset core registers */
- 	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
--	vcpu_gp_regs(vcpu)->regs.pstate = pstate;
-+	vcpu_gp_regs(vcpu)->pstate = pstate;
- 
- 	/* Reset system registers */
- 	kvm_reset_sys_regs(vcpu);
--- 
-2.27.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDcvNi8yMCAxOjE3IFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAy
+MC0wNi0yNSAxMzoxOSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4gSGkgTWFyYywKPj4KPj4g
+T24gNi8xNi8yMCA1OjE4IFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+PiBIaSBBbGV4YW5kcnUs
+Cj4+PiBbLi5dCj4+Pj4+IFsuLl0KPj4+Pj4KPj4+Pj4gwqAvKioKPj4+Pj4gLSAqIGt2bV9hbGxv
+Y19zdGFnZTJfcGdkIC0gYWxsb2NhdGUgbGV2ZWwtMSB0YWJsZSBmb3Igc3RhZ2UtMiB0cmFuc2xh
+dGlvbi4KPj4+Pj4gLSAqIEBrdm06wqDCoMKgIFRoZSBLVk0gc3RydWN0IHBvaW50ZXIgZm9yIHRo
+ZSBWTS4KPj4+Pj4gKyAqIGt2bV9pbml0X3N0YWdlMl9tbXUgLSBJbml0aWFsaXNlIGEgUzIgTU1V
+IHN0cnVjcnVyZQo+Pj4+PiArICogQGt2bTrCoMKgwqAgVGhlIHBvaW50ZXIgdG8gdGhlIEtWTSBz
+dHJ1Y3R1cmUKPj4+Pj4gKyAqIEBtbXU6wqDCoMKgIFRoZSBwb2ludGVyIHRvIHRoZSBzMiBNTVUg
+c3RydWN0dXJlCj4+Pj4+IMKgICoKPj4+Pj4gwqAgKiBBbGxvY2F0ZXMgb25seSB0aGUgc3RhZ2Ut
+MiBIVyBQR0QgbGV2ZWwgdGFibGUocykgb2Ygc2l6ZSBkZWZpbmVkIGJ5Cj4+Pj4+IC0gKiBzdGFn
+ZTJfcGdkX3NpemUoa3ZtKS4KPj4+Pj4gKyAqIHN0YWdlMl9wZ2Rfc2l6ZShtbXUtPmt2bSkuCj4+
+Pj4+IMKgICoKPj4+Pj4gwqAgKiBOb3RlIHdlIGRvbid0IG5lZWQgbG9ja2luZyBoZXJlIGFzIHRo
+aXMgaXMgb25seSBjYWxsZWQgd2hlbiB0aGUgVk0gaXMKPj4+Pj4gwqAgKiBjcmVhdGVkLCB3aGlj
+aCBjYW4gb25seSBiZSBkb25lIG9uY2UuCj4+Pj4+IMKgICovCj4+Pj4+IC1pbnQga3ZtX2FsbG9j
+X3N0YWdlMl9wZ2Qoc3RydWN0IGt2bSAqa3ZtKQo+Pj4+PiAraW50IGt2bV9pbml0X3N0YWdlMl9t
+bXUoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3MyX21tdSAqbW11KQo+Pj4+PiDCoHsKPj4+
+Pj4gwqDCoMKgwqAgcGh5c19hZGRyX3QgcGdkX3BoeXM7Cj4+Pj4+IMKgwqDCoMKgIHBnZF90ICpw
+Z2Q7Cj4+Pj4+ICvCoMKgwqAgaW50IGNwdTsKPj4+Pj4KPj4+Pj4gLcKgwqDCoCBpZiAoa3ZtLT5h
+cmNoLnBnZCAhPSBOVUxMKSB7Cj4+Pj4+ICvCoMKgwqAgaWYgKG1tdS0+cGdkICE9IE5VTEwpIHsK
+Pj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBrdm1fZXJyKCJrdm1fYXJjaCBhbHJlYWR5IGluaXRpYWxp
+emVkP1xuIik7Cj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU5WQUw7Cj4+Pj4+IMKg
+wqDCoMKgIH0KPj4+Pj4gQEAgLTEwMjQsOCArMTA0MCwyMCBAQCBpbnQga3ZtX2FsbG9jX3N0YWdl
+Ml9wZ2Qoc3RydWN0IGt2bSAqa3ZtKQo+Pj4+PiDCoMKgwqDCoCBpZiAoV0FSTl9PTihwZ2RfcGh5
+cyAmIH5rdm1fdnR0YnJfYmFkZHJfbWFzayhrdm0pKSkKPj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCBy
+ZXR1cm4gLUVJTlZBTDsKPj4+Pgo+Pj4+IFdlIGRvbid0IGZyZWUgdGhlIHBnZCBpZiB3ZSBnZXQg
+dGhlIGVycm9yIGFib3ZlLCBidXQgd2UgZG8gZnJlZSBpdCBiZWxvdywgaWYKPj4+PiBhbGxvY2F0
+aW5nIGxhc3RfdmNwdV9yYW4gZmFpbHMuIFNob3VsZG4ndCB3ZSBmcmVlIGl0IGluIGJvdGggY2Fz
+ZXM/Cj4+Pgo+Pj4gV29ydGggaW52ZXN0aWdhdGluZy4gVGhpcyBjb2RlIGdldHMgbWFqb3JseSBy
+ZXZhbXBlZCBpbiB0aGUgTlYgc2VyaWVzLCBzbyBpdCBpcwo+Pj4gbGlrZWx5IHRoYXQgSSBtaXNz
+ZWQgc29tZXRoaW5nIGluIHRoZSBtaWRkbGUuCj4+Cj4+IFlvdSBkaWRuJ3QgbWlzcyBhbnl0aGlu
+ZywgSSBjaGVja2VkIGFuZCBpdCdzIHRoZSBzYW1lIGluIHRoZSB1cHN0cmVhbQo+PiB2ZXJzaW9u
+IG9mIEtWTS4KPj4KPj4ga3ZtX2FyY2hfaW5pdF92bSgpIHJldHVybnMgd2l0aCBhbiBlcnJvciBp
+ZiB0aGlzIGZ1bmN0aW9ucyBmYWlscywgc28gaXQncyB1cCB0bwo+PiB0aGUgZnVuY3Rpb24gdG8g
+ZG8gdGhlIGNsZWFuIHVwLiBrdm1fYWxsb2NfcGFnZXNfZXhhY3QoKSByZXR1cm5zIE5VTEwKPj4g
+b24gZXJyb3IsIHNvCj4+IGF0IHRoaXMgcG9pbnQgd2UgaGF2ZSBhIHZhbGlkIGFsbG9jYXRpb24g
+b2YgcGh5c2ljYWwgY29udGlndW91cyBwYWdlcy4KPj4gRmFpbGluZyB0bwo+PiBjcmVhdGUgYSBW
+TSBpcyBub3QgYSBmYXRhbCBlcnJvciBmb3IgdGhlIHN5c3RlbSwgc28gSSdtIHRoaW5raW5nIHRo
+YXQgbWF5YmUgd2UKPj4gc2hvdWxkIGZyZWUgdGhvc2UgcGFnZXMgZm9yIHRoZSByZXN0IG9mIHRo
+ZSBzeXN0ZW0gdG8gdXNlLiBIb3dldmVyLCB0aGlzIGlzIGEKPj4gbWlub3IgaXNzdWUsIGFuZCB0
+aGUgcGF0Y2ggaXNuJ3Qgc3VwcG9zZWQgdG8gbWFrZSBhbnkgZnVuY3Rpb25hbCBjaGFuZ2VzLCBz
+byBpdAo+PiBjYW4gYmUgcHJvYmFibHkgYmUgbGVmdCBmb3IgYW5vdGhlciBwYXRjaCBhbmQgbm90
+IGFkZCBtb3JlIHRvIGFuCj4+IGFscmVhZHkgYmlnIHNlcmllcy4KPgo+IENvb2wuIFdpbGwgeW91
+IGJlIHBvc3Rpbmcgc3VjaCBwYXRjaD8KCkkgd2FzIGNvbnNpZGVyaW5nIG9uZSwgYnV0IHRoZW4g
+SSByZWFsaXplZCB0aGVyZSdzIHNvbWV0aGluZyB0aGF0IEkgc3RpbGwgZG9uJ3QKdW5kZXJzdGFu
+ZC4KCmFsbG9jX3BhZ2VzX2V4YWN0KCkgYWxsb2NhdGVzIDJeb3JkZXIgcGFnZXMgKHdoZXJlIDJe
+b3JkZXIgcGFnZXMgPj0Kc3RhZ2UyX3BnZF9zaXplKCkpIHZpYSBfX2dldF9mcmVlX3BhZ2VzIC0+
+IGFsbG9jX3BhZ2VzKCksIHRoZW4gaXQgZnJlZXMgdGhlCnVubmVlZGVkIHBhZ2VzIGF0IHRoZSAq
+ZW5kKiBvZiB0aGUgYWxsb2NhdGlvbiBpbiBtYWtlX2FsbG9jX2V4YWN0KCkuIFNvIHRoZQpiZWdp
+bm5pbmcgb2YgdGhlIGFsbG9jYXRlZCBwaHlzaWNhbCBhcmVhIHJlbWFpbnMgYWxpZ25lZCB0byAy
+Xm9yZGVyIHBhZ2VzLCBhbmQKaW1wbGljaXRseSB0byBzdGFnZTJfcGdkX3NpemUoKS4KCkJ1dCBu
+b3cgSSBjYW4ndCBmaWd1cmUgb3V0IHdoeSBrdm1fdnR0YnJfYmFkZHJfbWFzaygpIGlzbid0IHNp
+bXBseSBkZWZpbmVkIGFzCn5zdGFnZTJfcGdkX3NpemUoKS4gSXMgaXQgcG9zc2libGUgZm9yIGt2
+bV92dHRicl9iYWRkcl9tYXNrKCkgdG8gcmV0dXJuIGFuCmFsaWdubWVudCBsYXJnZXIgdGhhbiB0
+aGUgc2l6ZSBvZiB0aGUgdGFibGU/IEkgY2FuJ3Qgc2VlbSB0byBmaW5kIGFueXRoaW5nIHRvIHRo
+YXQKZWZmZWN0IGluIEFSTSBhcm0gKGJ1dCB0aGF0IGRvZXNuJ3QgbWVhbiB0aGF0IEkgZGlkbid0
+IG1pc3MgYW55dGhpbmcpLgoKVGhhbmtzLApBbGV4Cl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
