@@ -2,82 +2,90 @@ Return-Path: <SRS0=KDMR=AR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458F8C433DF
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 11:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 739CFC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:15:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F275D20702
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 11:05:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA7992070C
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPPxbLSc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F275D20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="saieF4wX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7992070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7804B3C0;
-	Mon,  6 Jul 2020 07:05:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75B714B3D6;
+	Mon,  6 Jul 2020 08:15:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GyeNoYlNVbrV; Mon,  6 Jul 2020 07:05:39 -0400 (EDT)
+	with ESMTP id JyxYmc4BxrUd; Mon,  6 Jul 2020 08:15:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57F014B3FB;
-	Mon,  6 Jul 2020 07:05:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 551374B398;
+	Mon,  6 Jul 2020 08:15:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41F424B3FB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 07:05:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3662E4B392
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:15:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N20iFKrzM4Hf for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2020 07:05:36 -0400 (EDT)
+ with ESMTP id 0wvY6ajbtOML for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2020 08:15:21 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F6834B3C5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 07:05:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E259E4B1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:15:20 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 585DA2074F;
- Mon,  6 Jul 2020 11:05:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A2C61206F5;
+ Mon,  6 Jul 2020 12:15:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594033535;
- bh=ne2J8vyCp/Y6iHEupXhOGaq1tyGoUY8NAoyklBzAMhM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gPPxbLScSuxO7A2wjgyIbzKcQNeXJSz7yTshFMQ9vlr6Z6nZzYOYKk+BJg9PfjFGm
- eOnJqfq5bxQjvKclByrRhsPRDJ2UvQE9+AuWGEYUTVE07SJJrf57N57oSDAl9ObR4/
- 1DSaK4Nes8BjHR4r6ocF1k4OZp62TXVD7JNMevso=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ s=default; t=1594037719;
+ bh=Ln+M2VEKf+2mtxon2h+buvSO35oHmKw8UDIzRkCs7sA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=saieF4wXnaKrbWcQ5wO2kfilaGu99az6f3JpECUt5GG3aTMC2oGsFBTUettThgzPo
+ 3SKUHtcXYqY5+H9rHbd8VcoaBwyNyWMMvaKddoHl9Vrb/WbcauHdy9jXJcqGk+M5hs
+ xj8axU4pzxZSt0bkqp09RKxTIR0kqec2TsGaT8xc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jsOwH-009Qgb-Pg; Mon, 06 Jul 2020 12:05:34 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 2/2] KVM: arm64: Stop clobbering x0 for HVC_SOFT_RESTART
-Date: Mon,  6 Jul 2020 12:05:21 +0100
-Message-Id: <20200706110521.1615794-3-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200706110521.1615794-1-maz@kernel.org>
-References: <20200706110521.1615794-1-maz@kernel.org>
+ id 1jsQ1m-009Rbc-6A; Mon, 06 Jul 2020 13:15:18 +0100
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, ascull@google.com,
- amurray@thegoodpenguin.co.uk, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- stable@vger.kernel.org
+Date: Mon, 06 Jul 2020 13:15:18 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 06/17] KVM: arm64: Introduce accessor for ctxt->sys_reg
+In-Reply-To: <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-7-maz@kernel.org>
+ <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <2595cd556bcb8bd996f60ef527b512ef@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ Dave.Martin@arm.com, jintack@cs.columbia.edu, gcherian@marvell.com,
+ prime.zeng@hisilicon.com, ascull@google.com, will@kernel.org,
+ catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Andrew Murray <amurray@thegoodpenguin.co.uk>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,60 +97,111 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Scull <ascull@google.com>
+Hi Alex,
 
-HVC_SOFT_RESTART is given values for x0-2 that it should installed
-before exiting to the new address so should not set x0 to stub HVC
-success or failure code.
+On 2020-06-26 16:39, Alexandru Elisei wrote:
+> Hi,
+> 
+> On 6/15/20 2:27 PM, Marc Zyngier wrote:
+>> In order to allow the disintegration of the per-vcpu sysreg array,
+>> let's introduce a new helper (ctxt_sys_reg()) that returns the
+>> in-memory copy of a system register, picked from a given context.
+>> 
+>> __vcpu_sys_reg() is rewritten to use this helper.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
+>>  1 file changed, 10 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_host.h 
+>> b/arch/arm64/include/asm/kvm_host.h
+>> index e7fd03271e52..5314399944e7 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -405,12 +405,17 @@ struct kvm_vcpu_arch {
+>>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+>> 
+>>  /*
+>> - * Only use __vcpu_sys_reg if you know you want the memory backed 
+>> version of a
+>> - * register, and not the one most recently accessed by a running 
+>> VCPU.  For
+>> - * example, for userspace access or for system registers that are 
+>> never context
+>> - * switched, but only emulated.
+>> + * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
+>> + * memory backed version of a register, and not the one most recently
+>> + * accessed by a running VCPU.  For example, for userspace access or
+>> + * for system registers that are never context switched, but only
+>> + * emulated.
+>>   */
+>> -#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
+>> +#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
+>> +
+>> +#define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+>> +
+>> +#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
+> 
+> This is confusing - __vcpu_sys_reg() returns the value, but 
+> __ctxt_sys_reg()
+> return a pointer to the value. Because of that, I made the mistake of 
+> thinking
+> that __vcpu_sys_reg() returns a pointer when reviewing the next patch 
+> in the
+> series, and I got really worried that stuff was seriously broken (it 
+> was not).
 
-Fixes: af42f20480bf1 ("arm64: hyp-stub: Zero x0 on successful stub handling")
-Cc: stable@vger.kernel.org
-Signed-off-by: Andrew Scull <ascull@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200706095259.1338221-1-ascull@google.com
----
- arch/arm64/kvm/hyp-init.S | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+This is intentional (the behaviour, not the confusing aspect... ;-), as
+__ctx_sys_reg() gets further rewritten as such:
 
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 6e6ed5581eed..e76c0e89d48e 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -136,11 +136,15 @@ SYM_CODE_START(__kvm_handle_stub_hvc)
- 
- 1:	cmp	x0, #HVC_RESET_VECTORS
- 	b.ne	1f
--reset:
+-#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
++static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, 
+int r)
++{
++	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
++		return &ctxt->vncr_array[r - __VNCR_START__];
 +
- 	/*
--	 * Reset kvm back to the hyp stub. Do not clobber x0-x4 in
--	 * case we coming via HVC_SOFT_RESTART.
-+	 * Set the HVC_RESET_VECTORS return code before entering the common
-+	 * path so that we do not clobber x0-x2 in case we are coming via
-+	 * HVC_SOFT_RESTART.
- 	 */
-+	mov	x0, xzr
-+reset:
-+	/* Reset kvm back to the hyp stub. */
- 	mrs	x5, sctlr_el2
- 	mov_q	x6, SCTLR_ELx_FLAGS
- 	bic	x5, x5, x6		// Clear SCTL_M and etc
-@@ -151,7 +155,6 @@ reset:
- 	/* Install stub vectors */
- 	adr_l	x5, __hyp_stub_vectors
- 	msr	vbar_el2, x5
--	mov	x0, xzr
- 	eret
- 
- 1:	/* Bad stub call */
--- 
-2.27.0
++	return (u64 *)&ctxt->sys_regs[r];
++}
 
+to deal with the VNCR page (depending on whether you use nesting or not,
+the sysreg is backed by the VNCR page or the usual sysreg array).
+
+To be clear, there shouldn't be much use of __ctxt_sys_reg (there is 
+only
+3 in the current code), all for good reasons (core_reg_addr definitely
+wants the address of a register).
+
+> I'm not sure what the reasonable solution is, or even if there is one.
+> 
+> Some thoughts: we could have just one macro, ctxt_sys_reg() and 
+> dereference that
+> when we want the value; we could keep both and swap the macro 
+> definitions; or we
+> could encode the fact that a macro returns a pointer in the macro name 
+> (so we
+> would end up with __ctxt_sys_reg() -> __ctxt_sys_regp() and 
+> ctxt_sys_reg ->
+> __ctxt_sys_reg()).
+> 
+> What do you think?
+
+I'm not opposed to any of this, provided that it doesn't create
+unnecessary churn and additional confusion. I'll keep it as such
+in the meantime, but I'm definitely willing to take a patch going
+over this if you think this is necessary.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
