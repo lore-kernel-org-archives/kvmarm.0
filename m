@@ -2,90 +2,93 @@ Return-Path: <SRS0=KDMR=AR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 739CFC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3AAC433DF
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:17:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA7992070C
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:15:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D58D20739
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 12:17:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="saieF4wX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7992070C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgttgXoa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D58D20739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75B714B3D6;
-	Mon,  6 Jul 2020 08:15:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAAD34B3E0;
+	Mon,  6 Jul 2020 08:17:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JyxYmc4BxrUd; Mon,  6 Jul 2020 08:15:23 -0400 (EDT)
+	with ESMTP id B2ocM7AZu2+x; Mon,  6 Jul 2020 08:17:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 551374B398;
-	Mon,  6 Jul 2020 08:15:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE5BE4B392;
+	Mon,  6 Jul 2020 08:17:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3662E4B392
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:15:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A8B4B2B3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:17:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0wvY6ajbtOML for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2020 08:15:21 -0400 (EDT)
+ with ESMTP id SqVtCs9wKi21 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2020 08:17:34 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E259E4B1FA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:15:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CC144B29A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 08:17:34 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A2C61206F5;
- Mon,  6 Jul 2020 12:15:19 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 49A3F2070C;
+ Mon,  6 Jul 2020 12:17:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594037719;
- bh=Ln+M2VEKf+2mtxon2h+buvSO35oHmKw8UDIzRkCs7sA=;
+ s=default; t=1594037853;
+ bh=KuxlYi/WPeTd60f/cMp3naUg3QZOGwvNaBWXU66jIVE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=saieF4wXnaKrbWcQ5wO2kfilaGu99az6f3JpECUt5GG3aTMC2oGsFBTUettThgzPo
- 3SKUHtcXYqY5+H9rHbd8VcoaBwyNyWMMvaKddoHl9Vrb/WbcauHdy9jXJcqGk+M5hs
- xj8axU4pzxZSt0bkqp09RKxTIR0kqec2TsGaT8xc=
+ b=CgttgXoal5cvnNee8/vDQpHse3xCG5b9UzDhFHkcuTafKGilaGK2bDf0F0nsTECi5
+ vpQnUWxcleiB4DOEcoQ90TVvF1AYQEUmfZZ9243cL4JvJa3nfLQKAwtpRj1M2ncV/r
+ GU0xUFi+YHrWj9cX8fvPCLkse+RK0KbdaUylhHyE=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jsQ1m-009Rbc-6A; Mon, 06 Jul 2020 13:15:18 +0100
+ id 1jsQ3v-009Rdk-KW; Mon, 06 Jul 2020 13:17:31 +0100
 MIME-Version: 1.0
-Date: Mon, 06 Jul 2020 13:15:18 +0100
+Date: Mon, 06 Jul 2020 13:17:31 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 06/17] KVM: arm64: Introduce accessor for ctxt->sys_reg
-In-Reply-To: <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+In-Reply-To: <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
 References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-7-maz@kernel.org>
- <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+ <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <2595cd556bcb8bd996f60ef527b512ef@kernel.org>
+Message-ID: <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- Dave.Martin@arm.com, jintack@cs.columbia.edu, gcherian@marvell.com,
- prime.zeng@hisilicon.com, ascull@google.com, will@kernel.org,
- catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, mark.rutland@arm.com,
+ kernel-team@android.com, kvm@vger.kernel.org, suzuki.poulose@arm.com,
+ jintack@cs.columbia.edu, andre.przywara@arm.com, christoffer.dall@arm.com,
+ kvmarm@lists.cs.columbia.edu, gcherian@marvell.com, james.morse@arm.com,
+ ascull@google.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com,
+ julien.thierry.kdev@gmail.com, will@kernel.org, Dave.Martin@arm.com,
+ linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
- George Cherian <gcherian@marvell.com>,
+ Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
  "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+ Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,112 +100,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 2020-06-26 16:39, Alexandru Elisei wrote:
-> Hi,
-> 
-> On 6/15/20 2:27 PM, Marc Zyngier wrote:
->> In order to allow the disintegration of the per-vcpu sysreg array,
->> let's introduce a new helper (ctxt_sys_reg()) that returns the
->> in-memory copy of a system register, picked from a given context.
->> 
->> __vcpu_sys_reg() is rewritten to use this helper.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
->>  1 file changed, 10 insertions(+), 5 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index e7fd03271e52..5314399944e7 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -405,12 +405,17 @@ struct kvm_vcpu_arch {
->>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->> 
->>  /*
->> - * Only use __vcpu_sys_reg if you know you want the memory backed 
->> version of a
->> - * register, and not the one most recently accessed by a running 
->> VCPU.  For
->> - * example, for userspace access or for system registers that are 
->> never context
->> - * switched, but only emulated.
->> + * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
->> + * memory backed version of a register, and not the one most recently
->> + * accessed by a running VCPU.  For example, for userspace access or
->> + * for system registers that are never context switched, but only
->> + * emulated.
->>   */
->> -#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
->> +#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
->> +
->> +#define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
->> +
->> +#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
-> 
-> This is confusing - __vcpu_sys_reg() returns the value, but 
-> __ctxt_sys_reg()
-> return a pointer to the value. Because of that, I made the mistake of 
-> thinking
-> that __vcpu_sys_reg() returns a pointer when reviewing the next patch 
-> in the
-> series, and I got really worried that stuff was seriously broken (it 
-> was not).
-
-This is intentional (the behaviour, not the confusing aspect... ;-), as
-__ctx_sys_reg() gets further rewritten as such:
-
--#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
-+static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, 
-int r)
-+{
-+	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
-+		return &ctxt->vncr_array[r - __VNCR_START__];
-+
-+	return (u64 *)&ctxt->sys_regs[r];
-+}
-
-to deal with the VNCR page (depending on whether you use nesting or not,
-the sysreg is backed by the VNCR page or the usual sysreg array).
-
-To be clear, there shouldn't be much use of __ctxt_sys_reg (there is 
-only
-3 in the current code), all for good reasons (core_reg_addr definitely
-wants the address of a register).
-
-> I'm not sure what the reasonable solution is, or even if there is one.
-> 
-> Some thoughts: we could have just one macro, ctxt_sys_reg() and 
-> dereference that
-> when we want the value; we could keep both and swap the macro 
-> definitions; or we
-> could encode the fact that a macro returns a pointer in the macro name 
-> (so we
-> would end up with __ctxt_sys_reg() -> __ctxt_sys_regp() and 
-> ctxt_sys_reg ->
-> __ctxt_sys_reg()).
-> 
-> What do you think?
-
-I'm not opposed to any of this, provided that it doesn't create
-unnecessary churn and additional confusion. I'll keep it as such
-in the meantime, but I'm definitely willing to take a patch going
-over this if you think this is necessary.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0wNi0yNSAxMzoxOSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPiBIaSBNYXJjLAo+
+IAo+IE9uIDYvMTYvMjAgNToxOCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+PiBIaSBBbGV4YW5k
+cnUsCj4+IFsuLl0KPj4+PiBbLi5dCj4+Pj4gCj4+Pj4gwqAvKioKPj4+PiAtICoga3ZtX2FsbG9j
+X3N0YWdlMl9wZ2QgLSBhbGxvY2F0ZSBsZXZlbC0xIHRhYmxlIGZvciBzdGFnZS0yIAo+Pj4+IHRy
+YW5zbGF0aW9uLgo+Pj4+IC0gKiBAa3ZtOsKgwqDCoCBUaGUgS1ZNIHN0cnVjdCBwb2ludGVyIGZv
+ciB0aGUgVk0uCj4+Pj4gKyAqIGt2bV9pbml0X3N0YWdlMl9tbXUgLSBJbml0aWFsaXNlIGEgUzIg
+TU1VIHN0cnVjcnVyZQo+Pj4+ICsgKiBAa3ZtOsKgwqDCoCBUaGUgcG9pbnRlciB0byB0aGUgS1ZN
+IHN0cnVjdHVyZQo+Pj4+ICsgKiBAbW11OsKgwqDCoCBUaGUgcG9pbnRlciB0byB0aGUgczIgTU1V
+IHN0cnVjdHVyZQo+Pj4+IMKgICoKPj4+PiDCoCAqIEFsbG9jYXRlcyBvbmx5IHRoZSBzdGFnZS0y
+IEhXIFBHRCBsZXZlbCB0YWJsZShzKSBvZiBzaXplIGRlZmluZWQgCj4+Pj4gYnkKPj4+PiAtICog
+c3RhZ2UyX3BnZF9zaXplKGt2bSkuCj4+Pj4gKyAqIHN0YWdlMl9wZ2Rfc2l6ZShtbXUtPmt2bSku
+Cj4+Pj4gwqAgKgo+Pj4+IMKgICogTm90ZSB3ZSBkb24ndCBuZWVkIGxvY2tpbmcgaGVyZSBhcyB0
+aGlzIGlzIG9ubHkgY2FsbGVkIHdoZW4gdGhlIAo+Pj4+IFZNIGlzCj4+Pj4gwqAgKiBjcmVhdGVk
+LCB3aGljaCBjYW4gb25seSBiZSBkb25lIG9uY2UuCj4+Pj4gwqAgKi8KPj4+PiAtaW50IGt2bV9h
+bGxvY19zdGFnZTJfcGdkKHN0cnVjdCBrdm0gKmt2bSkKPj4+PiAraW50IGt2bV9pbml0X3N0YWdl
+Ml9tbXUoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3MyX21tdSAqbW11KQo+Pj4+IMKgewo+
+Pj4+IMKgwqDCoMKgIHBoeXNfYWRkcl90IHBnZF9waHlzOwo+Pj4+IMKgwqDCoMKgIHBnZF90ICpw
+Z2Q7Cj4+Pj4gK8KgwqDCoCBpbnQgY3B1Owo+Pj4+IAo+Pj4+IC3CoMKgwqAgaWYgKGt2bS0+YXJj
+aC5wZ2QgIT0gTlVMTCkgewo+Pj4+ICvCoMKgwqAgaWYgKG1tdS0+cGdkICE9IE5VTEwpIHsKPj4+
+PiDCoMKgwqDCoMKgwqDCoMKgIGt2bV9lcnIoImt2bV9hcmNoIGFscmVhZHkgaW5pdGlhbGl6ZWQ/
+XG4iKTsKPj4+PiDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAtRUlOVkFMOwo+Pj4+IMKgwqDCoMKg
+IH0KPj4+PiBAQCAtMTAyNCw4ICsxMDQwLDIwIEBAIGludCBrdm1fYWxsb2Nfc3RhZ2UyX3BnZChz
+dHJ1Y3Qga3ZtICprdm0pCj4+Pj4gwqDCoMKgwqAgaWYgKFdBUk5fT04ocGdkX3BoeXMgJiB+a3Zt
+X3Z0dGJyX2JhZGRyX21hc2soa3ZtKSkpCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVJ
+TlZBTDsKPj4+IAo+Pj4gV2UgZG9uJ3QgZnJlZSB0aGUgcGdkIGlmIHdlIGdldCB0aGUgZXJyb3Ig
+YWJvdmUsIGJ1dCB3ZSBkbyBmcmVlIGl0IAo+Pj4gYmVsb3csIGlmCj4+PiBhbGxvY2F0aW5nIGxh
+c3RfdmNwdV9yYW4gZmFpbHMuIFNob3VsZG4ndCB3ZSBmcmVlIGl0IGluIGJvdGggY2FzZXM/Cj4+
+IAo+PiBXb3J0aCBpbnZlc3RpZ2F0aW5nLiBUaGlzIGNvZGUgZ2V0cyBtYWpvcmx5IHJldmFtcGVk
+IGluIHRoZSBOViBzZXJpZXMsIAo+PiBzbyBpdCBpcwo+PiBsaWtlbHkgdGhhdCBJIG1pc3NlZCBz
+b21ldGhpbmcgaW4gdGhlIG1pZGRsZS4KPiAKPiBZb3UgZGlkbid0IG1pc3MgYW55dGhpbmcsIEkg
+Y2hlY2tlZCBhbmQgaXQncyB0aGUgc2FtZSBpbiB0aGUgdXBzdHJlYW0KPiB2ZXJzaW9uIG9mIEtW
+TS4KPiAKPiBrdm1fYXJjaF9pbml0X3ZtKCkgcmV0dXJucyB3aXRoIGFuIGVycm9yIGlmIHRoaXMg
+ZnVuY3Rpb25zIGZhaWxzLCBzbyAKPiBpdCdzIHVwIHRvCj4gdGhlIGZ1bmN0aW9uIHRvIGRvIHRo
+ZSBjbGVhbiB1cC4ga3ZtX2FsbG9jX3BhZ2VzX2V4YWN0KCkgcmV0dXJucyBOVUxMCj4gb24gZXJy
+b3IsIHNvCj4gYXQgdGhpcyBwb2ludCB3ZSBoYXZlIGEgdmFsaWQgYWxsb2NhdGlvbiBvZiBwaHlz
+aWNhbCBjb250aWd1b3VzIHBhZ2VzLgo+IEZhaWxpbmcgdG8KPiBjcmVhdGUgYSBWTSBpcyBub3Qg
+YSBmYXRhbCBlcnJvciBmb3IgdGhlIHN5c3RlbSwgc28gSSdtIHRoaW5raW5nIHRoYXQgCj4gbWF5
+YmUgd2UKPiBzaG91bGQgZnJlZSB0aG9zZSBwYWdlcyBmb3IgdGhlIHJlc3Qgb2YgdGhlIHN5c3Rl
+bSB0byB1c2UuIEhvd2V2ZXIsIAo+IHRoaXMgaXMgYQo+IG1pbm9yIGlzc3VlLCBhbmQgdGhlIHBh
+dGNoIGlzbid0IHN1cHBvc2VkIHRvIG1ha2UgYW55IGZ1bmN0aW9uYWwgCj4gY2hhbmdlcywgc28g
+aXQKPiBjYW4gYmUgcHJvYmFibHkgYmUgbGVmdCBmb3IgYW5vdGhlciBwYXRjaCBhbmQgbm90IGFk
+ZCBtb3JlIHRvIGFuCj4gYWxyZWFkeSBiaWcgc2VyaWVzLgoKQ29vbC4gV2lsbCB5b3UgYmUgcG9z
+dGluZyBzdWNoIHBhdGNoPwoKVGhhbmtzLAoKICAgICAgICAgTS4KLS0gCkphenogaXMgbm90IGRl
+YWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
