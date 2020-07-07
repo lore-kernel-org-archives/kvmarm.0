@@ -1,56 +1,86 @@
-Return-Path: <SRS0=KDMR=AR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=EuCB=AS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A7CC433DF
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 17:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8DDC433DF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 08:51:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF232070C
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jul 2020 17:28:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF232070C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0F02B206C3
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 08:51:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0KDoDrX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F02B206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE10B4B3BC;
-	Mon,  6 Jul 2020 13:28:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D19C4B10D;
+	Tue,  7 Jul 2020 04:51:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QcikI6ZbNaNx; Mon,  6 Jul 2020 13:28:05 -0400 (EDT)
+	with ESMTP id HJQ0crU6s6e9; Tue,  7 Jul 2020 04:51:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE30D4B3C9;
-	Mon,  6 Jul 2020 13:28:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 329B44B127;
+	Tue,  7 Jul 2020 04:51:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E24B4B3BC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 13:28:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 406664B113
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 04:51:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QQ3TQdN-9sWK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2020 13:28:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6E64B38B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2020 13:28:03 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05C7331B;
- Mon,  6 Jul 2020 10:28:03 -0700 (PDT)
-Received: from gaia (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 979C73F68F;
- Mon,  6 Jul 2020 10:27:59 -0700 (PDT)
-Date: Mon, 6 Jul 2020 18:27:48 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+ with ESMTP id ocLMq+Rm-YSD for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jul 2020 04:51:15 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7DC24B10D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 04:51:15 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8FB05206C3;
+ Tue,  7 Jul 2020 08:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1594111874;
+ bh=gm0s9URnfKoM+Mp5/NVoezYw+cdGKKelHr4qyKi0wGg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=J0KDoDrXpqpK1OUy9dsjGwQiB0OyQBcA5oAU/kgyr7sH9PiK0NfSJ4htyaHwDkVcu
+ nktNyTV5oHiBKwix0bSY/eogdSpshkIRXnPCJfWYeUCVEFCLJAPsjZgFcbsSi8TgWA
+ 8gehuafDcYGb0BJyv3d0xKLfBx+kDJUGjxG+kupo=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jsjJo-009gSu-Po; Tue, 07 Jul 2020 09:51:13 +0100
+Date: Tue, 07 Jul 2020 09:51:11 +0100
+Message-ID: <87mu4bemio.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [PATCH v3 00/17] KVM: arm64: Preliminary NV patches
-Message-ID: <20200706172725.GL28170@gaia>
+In-Reply-To: <20200706172725.GL28170@gaia>
 References: <20200706125425.1671020-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200706125425.1671020-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+ <20200706172725.GL28170@gaia>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com,
+ gcherian@marvell.com, prime.zeng@hisilicon.com, ascull@google.com,
+ will@kernel.org, mark.rutland@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
  Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
@@ -72,21 +102,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2020 at 01:54:08PM +0100, Marc Zyngier wrote:
-> Catalin: How do you want to proceed for patches 2, 3, and 4? I could
-> make a stable branch that gets you pull into the arm64 tree, or the
-> other way around. Just let me know.
+Hi Catalin,
 
-Please create a separate branch for the S2 TTL patches (ideally based on
-no later than -rc3). I plan to queue the rest of Zhenyu's patches on
-top.
+On Mon, 06 Jul 2020 18:27:48 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Mon, Jul 06, 2020 at 01:54:08PM +0100, Marc Zyngier wrote:
+> > Catalin: How do you want to proceed for patches 2, 3, and 4? I could
+> > make a stable branch that gets you pull into the arm64 tree, or the
+> > other way around. Just let me know.
+> 
+> Please create a separate branch for the S2 TTL patches (ideally based on
+> no later than -rc3). I plan to queue the rest of Zhenyu's patches on
+> top.
+> 
+> https://lore.kernel.org/linux-arm-kernel/20200625080314.230-1-yezhenyu2@huawei.com/
 
-https://lore.kernel.org/linux-arm-kernel/20200625080314.230-1-yezhenyu2@huawei.com/
+I've now pushed out this branch[1], containing the three patches in
+isolation. Unless you tell me otherwise, I will push this into -next
+today, together with the rest of the KVM/arm64 queue.
 
-Thanks.
+Thanks,
+
+	M.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/ttl-for-arm64
+
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
