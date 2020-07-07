@@ -2,63 +2,89 @@ Return-Path: <SRS0=EuCB=AS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D82C433E1
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 11:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75E1C433DF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 11:49:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 96B67206F6
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 11:47:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B67206F6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 7734E20739
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jul 2020 11:49:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZAo+Yhj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7734E20739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEC9C4B158;
-	Tue,  7 Jul 2020 07:47:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08BDE4B156;
+	Tue,  7 Jul 2020 07:49:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gxsmYVMN3AZ8; Tue,  7 Jul 2020 07:47:34 -0400 (EDT)
+	with ESMTP id XJkECkaiwMVK; Tue,  7 Jul 2020 07:49:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B70F4B124;
-	Tue,  7 Jul 2020 07:47:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF2654B110;
+	Tue,  7 Jul 2020 07:49:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D414B110
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 07:47:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC2594B110
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 07:49:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tqIuQEoEUL9x for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jul 2020 07:47:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D13EC4B10C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 07:47:31 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1540E1FB;
- Tue,  7 Jul 2020 04:47:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0B733F71E;
- Tue,  7 Jul 2020 04:47:29 -0700 (PDT)
+ with ESMTP id FDqF0rrG9aZx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jul 2020 07:49:24 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5192D4B10C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2020 07:49:24 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0E822206DF;
+ Tue,  7 Jul 2020 11:49:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1594122563;
+ bh=HsLqdAohKiqT7umIeVpFcBHJCRP29j3lOXD0jVG2vMs=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=NZAo+YhjSP+fOdA4tk5sYKDs87kiGkgUk9icZPb+wAZDGHI9ZVYZEcZD/Lnz9nHQd
+ 3b3zmFjK9AWcRgaNSW9y0xyQEf7YAvJ8Ca1gKkRB9lKVqRA54DW5UCIopV7dyvrSQZ
+ PM6PyfY04RyR6SNRdlvhlvXys18OkoUdP3GNaFqw=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jsm6D-009jPD-ES; Tue, 07 Jul 2020 12:49:21 +0100
+MIME-Version: 1.0
+Date: Tue, 07 Jul 2020 12:49:21 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v3 00/17] KVM: arm64: Preliminary NV patches
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+In-Reply-To: <c5cd34b2-3360-e634-fe0f-9bbb91275235@arm.com>
 References: <20200706125425.1671020-1-maz@kernel.org>
  <c5cd34b2-3360-e634-fe0f-9bbb91275235@arm.com>
-Message-ID: <45c17750-1cc2-9a44-9b71-55481870f522@arm.com>
-Date: Tue, 7 Jul 2020 12:48:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <c5cd34b2-3360-e634-fe0f-9bbb91275235@arm.com>
-Content-Language: en-US
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <336e9d1e8d2566d131e4326d71ddd161@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ Dave.Martin@arm.com, jintack@cs.columbia.edu, gcherian@marvell.com,
+ prime.zeng@hisilicon.com, ascull@google.com, will@kernel.org,
+ mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
  George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,37 +96,36 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On 7/7/20 12:24 PM, Alexandru Elisei wrote:
+On 2020-07-07 12:24, Alexandru Elisei wrote:
 > Hi,
->
+> 
 > On 7/6/20 1:54 PM, Marc Zyngier wrote:
 >> Hi all,
->>
+>> 
 >> In order not to repeat the 90+ patch series that resulted in a
 >> deafening silence last time, I've extracted a smaller set of patches
 >> that form the required dependencies that allow the rest of the 65 NV
 >> patches to be added on top. Yes, it is that bad.
->>
+>> 
 >> The one real feature here is support for the ARMv8.4-TTL extension at
 >> Stage-2 only. The reason to support it is that it helps the hypervisor
 >> a lot when it comes to finding out how much to invalidate. It is thus
 >> always "supported" with NV.
->>
+>> 
 >> The rest doesn't contain any functionality change. Most of it reworks
 >> existing data structures and adds new accessors for the things that
 >> get moved around. The reason for this is that:
->>
+>> 
 >> - With NV, we end-up with multiple Stage-2 MMU contexts per VM instead
 >>   of a single one. This requires we divorce struct kvm from the S2 MMU
->>   configuration. Of course, we stick with a single MMU context for now.
->>
+>>   configuration. Of course, we stick with a single MMU context for 
+>> now.
+>> 
 >> - With ARMv8.4-NV, a number of system register accesses are turned
 >>   into memory accesses into the so-called VNCR page. It is thus
 >>   convenient to make this VNCR page part of the vcpu context and avoid
@@ -108,37 +133,46 @@ On 7/7/20 12:24 PM, Alexandru Elisei wrote:
 >>   that all the VNCR-aware sysregs are moved into our per-vcpu sys_regs
 >>   array instead of leaving in other data structures (the timers, for
 >>   example). The VNCR page itself isn't introduced with these patches.
->>
+>> 
 >> - As some of these data structures change, we need a way to isolate
 >>   the userspace ABI from such change.
->>
+>> 
 >> There is also a number of cleanups that were in the full fat series
 >> that I decided to move early to get them out of the way.
->>
+>> 
 >> The whole this is a bit of a mix of vaguely unrelated "stuff", but it
 >> all comes together if you look at the final series. This applies on
 >> top of David Brazdil's series splitting the VHE and nVHE objects.
->>
+>> 
 >> I plan on taking this early into v5.9, and I really mean it this time!
->>
+>> 
 >> Catalin: How do you want to proceed for patches 2, 3, and 4? I could
 >> make a stable branch that gets you pull into the arm64 tree, or the
 >> other way around. Just let me know.
->>
+>> 
 >> Thanks,
->>
+>> 
 >> 	M.
->>
+>> 
 >> * From v2:
 >>   - Rebased on top of David's el2-obj series
-> I tried to apply the patches on top of v5.8-rc1, but I get a conflict on the very
-> first patch. I guess it's because I don't have the el2-obj series. Is that v4 of
+> 
+> I tried to apply the patches on top of v5.8-rc1, but I get a conflict
+> on the very
+> first patch. I guess it's because I don't have the el2-obj series. Is 
+> that v4 of
 > "Split off nVHE hyp code" patches from David Brazil?
 
-Nevermind, figured it out and used your kvm-arm64/el2-obj-4.1 branch as a base.
+You need the slightly amended version (kvm-arm6/el2-obj-v4.1 from my 
+tree).
+Otherwise, just pick kvmarm/next, which has everything put together
+in one scary lot.
 
 Thanks,
-Alex
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
