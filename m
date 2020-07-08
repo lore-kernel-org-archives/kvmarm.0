@@ -4,56 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0A3C433DF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E463C433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:38:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 06834206DF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:27:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06834206DF
+	by mail.kernel.org (Postfix) with ESMTP id 98F7120663
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:38:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F7120663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C8D4B103;
-	Wed,  8 Jul 2020 12:27:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AE14B180;
+	Wed,  8 Jul 2020 12:38:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pZdjjKm37NXL; Wed,  8 Jul 2020 12:27:40 -0400 (EDT)
+	with ESMTP id nej1iBEK168L; Wed,  8 Jul 2020 12:38:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 076C64B127;
-	Wed,  8 Jul 2020 12:27:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5071C4B1A1;
+	Wed,  8 Jul 2020 12:38:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA0454B101
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:27:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AE84B154
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:38:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mRuFS5ZWCadk for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2020 12:27:37 -0400 (EDT)
+ with ESMTP id 3ESaehmM6NR1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jul 2020 12:38:33 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 397C64B100
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:27:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61F234B151
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:38:33 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC57231B;
- Wed,  8 Jul 2020 09:27:36 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2841F3F68F;
- Wed,  8 Jul 2020 09:27:36 -0700 (PDT)
-Date: Wed, 8 Jul 2020 17:27:34 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH] arm64: kvm: Remove redundant KVM_ARM64_FP_HOST flag
-Message-ID: <20200708162733.GO10992@arm.com>
-References: <20200707145713.287710-1-ascull@google.com>
- <20200707165958.GL10992@arm.com>
- <20200707213350.GA1390624@google.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C493931B;
+ Wed,  8 Jul 2020 09:38:32 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F0E03F68F;
+ Wed,  8 Jul 2020 09:38:30 -0700 (PDT)
+Subject: Re: [PATCH v3 17/17] KVM: arm64: timers: Move timer registers to the
+ sys_regs file
+To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20200706125425.1671020-1-maz@kernel.org>
+ <20200706125425.1671020-18-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <56a06ee3-279e-0ee9-6664-c1d21ee8e936@arm.com>
+Date: Wed, 8 Jul 2020 17:39:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200707213350.GA1390624@google.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: maz@kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200706125425.1671020-18-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,244 +75,414 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jul 07, 2020 at 10:33:50PM +0100, Andrew Scull wrote:
-> On Tue, Jul 07, 2020 at 05:59:58PM +0100, Dave Martin wrote:
-> > On Tue, Jul 07, 2020 at 03:57:13PM +0100, Andrew Scull wrote:
-> > > The FPSIMD registers can be in one of three states:
-> > >  (a) loaded with the user task's state
-> > >  (b) loaded with the vcpu's state
-> > >  (c) dirty with transient state
-> > > 
-> > > KVM_ARM64_FP_HOST identifies the case (a). When loading the vcpu state,
-> > > this is used to decide whether to save the current FPSIMD registers to
-> > > the user task.
-> > > 
-> > > However, at the point of loading the vcpu's FPSIMD state, it is known
-> > > that we are not in state (b). States (a) and (c) can be distinguished by
-> > > by checking the TIF_FOREIGN_FPSTATE bit, as was previously being done to
-> > > prepare the KVM_ARM64_FP_HOST flag but without the need for mirroring
-> > > the state.
-> > 
-> > In general there's another case
-> > 
-> > 	(d) loaded with some unrelated user task's state
-> > 
-> > I have a vague memory that the hyp trap code is supposed to save state
-> > back to whatever task it belonged to -- but functions like
-> > kvm_arch_vcpu_run_map_fp() make me suspicious that if this can happen,
-> > it doesn't work correctly.
-> > 
-> > Since you're digging anyway, I'll answer in the form of a question:
-> > when we reach __hyp_handle_fpsimd(), can the state in the FPSIMD/SVE
-> > regs be unsaved data belonging to another task?  I'd hope not, because
-> > fpsimd_thread_switch() should have saved any dirty regs when scheduling
-> > that other thread out.
-> 
-> IIUC, (d) would fall under state (c) as the switch to the vcpu's user
-> task will have set the TIF_FOREIGN_FPSTATE bit after saving the previous
-> task's state in fpsimd_thread_switch, as you hoped.
-> 
-> > If the regs can't be owned by another task, then there may be some scope
-> > for simplifying the code along the lines you suggest...
-> > 
-> > (See also below)
-> > 
-> > > 
-> > > Signed-off-by: Andrew Scull <ascull@google.com>
-> > > ---
-> > > This is the result of trying to get my head around the FPSIMD handling.
-> > > If I've misunderstood something I'll be very happy to have it explained
-> > > to me :)
-> > 
-> > Er, me too.  It's a while since I worked on this ;)
-> 
-> Thank you for the detailed reply, it's given me some very helpful
-> context!
-> 
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h       | 11 +++++----
-> > >  arch/arm64/kvm/fpsimd.c                 |  1 -
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h | 30 +++++++++++++++++--------
-> > >  3 files changed, 26 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index e0920df1d0c1..d3652745282d 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -370,12 +370,11 @@ struct kvm_vcpu_arch {
-> > >  /* vcpu_arch flags field values: */
-> > >  #define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
-> > >  #define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
-> > > -#define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
-> > > -#define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
-> > > -#define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
-> > > -#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
-> > > -#define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
-> > > -#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
-> > > +#define KVM_ARM64_HOST_SVE_IN_USE	(1 << 2) /* backup for host TIF_SVE */
-> > > +#define KVM_ARM64_HOST_SVE_ENABLED	(1 << 3) /* SVE enabled for EL0 */
-> > > +#define KVM_ARM64_GUEST_HAS_SVE		(1 << 4) /* SVE exposed to guest */
-> > > +#define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 5) /* SVE config completed */
-> > > +#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 6) /* PTRAUTH exposed to guest */
-> > >  
-> > >  #define vcpu_has_sve(vcpu) (system_supports_sve() && \
-> > >  			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
-> > > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > > index e329a36b2bee..4e9afeb31989 100644
-> > > --- a/arch/arm64/kvm/fpsimd.c
-> > > +++ b/arch/arm64/kvm/fpsimd.c
-> > > @@ -65,7 +65,6 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> > >  	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
-> > >  			      KVM_ARM64_HOST_SVE_IN_USE |
-> > >  			      KVM_ARM64_HOST_SVE_ENABLED);
-> > > -	vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-> > 
-> > I'm wondering whether the original code is buggy here.
-> > 
-> > If the FPSIMD/SVE regs contain some other task's data, we'd overwrite
-> > current's regs with that data when running __hyp_handle_fpsimd().
-> > 
-> > Maybe we should have been checking TIF_FOREIGN_FPSTATE here.  If the
-> > issue can happen, your version may fix it.
-> > 
-> > If we wanted to keep the separate flag (see below for some rationale),
-> > it might make sense to do:
-> > 
-> >   	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
-> >   			      KVM_ARM64_HOST_SVE_IN_USE |
-> >   			      KVM_ARM64_HOST_SVE_ENABLED |
-> > 			      KVM_ARM64_FP_HOST);
-> > 	if (!test_thread_flag(TIF_FOREIGN_FPSTATE))
-> > 		vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-> 
-> This suggestion looks like a nicer way of writing the current behaviour.
-> The code at the moment checks the TIF_FOREIGN_FPSTATE bit in
-> update_fp_enabled and clears the host flag if it is set. So it doesn't
-> appear to be buggy but this would be a nice patch.
-> 
-> > >  	if (test_thread_flag(TIF_SVE))
-> > >  		vcpu->arch.flags |= KVM_ARM64_HOST_SVE_IN_USE;
-> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > > index 8f622688fa64..beadf17f12a6 100644
-> > > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > > @@ -33,16 +33,24 @@ extern const char __hyp_panic_string[];
-> > >  static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	/*
-> > > -	 * When the system doesn't support FP/SIMD, we cannot rely on
-> > > -	 * the _TIF_FOREIGN_FPSTATE flag. However, we always inject an
-> > > -	 * abort on the very first access to FP and thus we should never
-> > > -	 * see KVM_ARM64_FP_ENABLED. For added safety, make sure we always
-> > > +	 * When entering the vcpu during a KVM_VCPU_RUN call before the vcpu
-> > > +	 * has used FPSIMD, FPSIMD is disabled for the vcpu and will trap when
-> > > +	 * it is first used. The FPSIMD state currently bound to the cpu is
-> > > +	 * that of the user task.
-> > > +	 *
-> > > +	 * After the vcpu has used FPSIMD, on subsequent entries into the vcpu
-> > > +	 * for the same KVM_VCPU_RUN call, the vcpu's FPSIMD state is bound to
-> > > +	 * the cpu. Therefore, if _TIF_FOREIGN_FPSTATE is set, we know the
-> > > +	 * FPSIMD registers no longer contain the vcpu's state. In this case we
-> > > +	 * must, once again, disable FPSIMD.
-> > > +	 *
-> > > +	 * When the system doesn't support FPSIMD, we cannot rely on the
-> > > +	 * _TIF_FOREIGN_FPSTATE flag. For added safety, make sure we always
-> > >  	 * trap the accesses.
-> > >  	 */
-> > >  	if (!system_supports_fpsimd() ||
-> > >  	    vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE)
-> > > -		vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
-> > > -				      KVM_ARM64_FP_HOST);
-> > > +		vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
-> > >  
-> > >  	return !!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED);
-> > >  }
-> > > @@ -245,7 +253,13 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	isb();
-> > >  
-> > > -	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
-> > > +	/*
-> > > +	 * The trap means that the vcpu's FPSIMD state is not loaded. If
-> > > +	 * _TIF_FOREIGN_FPSTATE is set, the current state does not need to be
-> > > +	 * saved. Otherwise, the user task's state is currently loaded and
-> > > +	 * needs to be saved.
-> > > +	 */
-> > > +	if (!(vcpu->arch.host_thread_info->flags & _TIF_FOREIGN_FPSTATE)) {
-> > >  		/*
-> > >  		 * In the SVE case, VHE is assumed: it is enforced by
-> > >  		 * Kconfig and kvm_arch_init().
-> > > @@ -260,8 +274,6 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
-> > >  		} else {
-> > >  			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
-> > >  		}
-> > > -
-> > > -		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
-> > 
-> > Without this, there is no record that we did anything.  Are you sure we
-> > can't save junk data into the host context the next time we take this
-> > trap?  Will we re-enable the trap unnecessarily?
-> 
-> The record keeping is a little strange. In this handler, the FP_ENABLED
-> flag gets set and then, on exit to the host, kvm_arch_vcpu_ctxsync_fp
-> binds the vcpu FPSIMD state.
-> 
-> I've assumed that the vcpu state will remain enabled and the trap
-> disabled until the next exit to host. Maybe that is too brittle an
-> assumption to make?
-> 
-> > I think previously I was trying to avoid things like
-> > test_and_clear_thread_flag() here because there were limitations on what
-> > we could call from the hyp code.  Maybe that's not such an issue now.
-> > 
-> > I'm slightly uneasy about setting TIF_FOREIGN_FPSTATE from the hyp
-> > switch code however.  The order in which this flag is touched with
-> > respect to other metadata is important in preemptible code, so I
-> > preferred to avoid bare writing of this thread flag: rather it should
-> > be set and cleared through the fpsimd_bind_*() and fpsimd_flush_*()
-> > functions if at all possible, but these didn't seem suitable for calling
-> > from hyp at the time.
-> > 
-> > In the hyp code we are of course not preemptible, so we would probably
-> > get away with a bare set_thread_flag() in practice.
-> 
-> I'm not familiar with the different contexts required for these updates
-> so I'll have to do a bit more learning to saw anything meaningful on
-> this one!
-> 
-> > Overall, it felt a bit cleaner to have separate metdata for the hyp
-> > code, and sync it with the host's metadata in clearly defined places
-> > (the functions in arch/arm64/kvm/fpsimd.c).  KVM_ARM64_FP_HOST plays
-> > that role for the hyp code at present.
-> 
-> This makes sense. At the very least I hope to add some explanation to
-> aid future readers if there aren't any simplification that can be made.
+Hi Marc,
 
-This is all starting to come back to me, but I'll need to spend a bit of
-time going over it.
+At first I was a bit apprehensive about adding yet another layer of indirection to
+the arch timer. But after spending some time trying to figure out if there's a
+better way to do it, I came to the conclusion that the patch is actually an
+improvement because it makes it obvious what timers we are emulating today, and
+the registers associated with each of them.
 
-From memory there may be some partial redundancy between some of the
-flags, but most of it is there for a reason... in some cases just to
-keep host context switch and vcpu context handling as separate as
-possible.
+On 7/6/20 1:54 PM, Marc Zyngier wrote:
+> Move the timer gsisters to the sysreg file. This will further help when
 
+s/gsisters/registers
 
-Note that the kvm_arch_vcpu_ctxsync_fp() thing is there because a
-softirq that uses kernel_neon_begin() may trigger a lazy fp save on the
-host side once we enable interrupts, even if we don't get preempted.
-This means that host needs to be told where to save the context if that
-occurs.
+> they are directly changed by a nesting hypervisor in the VNCR page.
+>
+> This requires moving the initialisation of the timer struct so that some
+> of the helpers (such as arch_timer_ctx_index) can work correctly at an
+> early stage.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   6 ++
+>  arch/arm64/kvm/arch_timer.c       | 155 +++++++++++++++++++++++-------
+>  arch/arm64/kvm/trace_arm.h        |   8 +-
+>  include/kvm/arm_arch_timer.h      |  11 +--
+>  4 files changed, 136 insertions(+), 44 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 91b1adb6789c..e1a32c0707bb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -189,6 +189,12 @@ enum vcpu_sysreg {
+>  	SP_EL1,
+>  	SPSR_EL1,
+>  
+> +	CNTVOFF_EL2,
+> +	CNTV_CVAL_EL0,
+> +	CNTV_CTL_EL0,
+> +	CNTP_CVAL_EL0,
+> +	CNTP_CTL_EL0,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 33d85a504720..32ba6fbc3814 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -51,6 +51,93 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  			      struct arch_timer_context *timer,
+>  			      enum kvm_arch_timer_regs treg);
+>  
+> +u32 timer_get_ctl(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
+> +	case TIMER_PTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
+> +	default:
+> +		WARN_ON(1);
+> +		return 0;
+> +	}
+> +}
+> +
+> +u64 timer_get_cval(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
+> +	case TIMER_PTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
+> +	default:
+> +		WARN_ON(1);
+> +		return 0;
+> +	}
+> +}
+> +
+> +static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +	default:
+> +		return 0;
 
-To observe this kind of thing, you can try adding some code to the
-timer softirq handler that does
+How about adding a TIMER_PTIMER case that returns 0, and adding a warning to the
+default case?
 
-	kernel_neon_begin();
-	asm volatile ( /* add code here to splat the fp regs */
-			::: "memory" );
-	kernel_neon_end();
+> +	}
+> +}
+> +
+> +static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) = ctl;
+> +		break;
+> +	case TIMER_PTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = ctl;
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +	}
+> +}
+> +
+> +static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) = cval;
+> +		break;
+> +	case TIMER_PTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = cval;
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +	}
+> +}
+> +
+> +static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch(arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER:
+> +		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +		break;
+> +	default:
+> +		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
 
-Cheers
----Dave
+Hmm.. looks to me like the warning isn't triggered when the offset is
+TIMER_PTIMER, which is 0.
+
+A more general remark about the accessors. They only access the copy in memory,
+perhaps it's worth adding a WARN_ON(ctxt->loaded) to catch future errors.
+
+I've checked the rest of the patch, and the changes look semantically equivalent
+to me.
+
+Thanks,
+Alex
+> +	}
+> +}
+> +
+>  u64 kvm_phys_timer_read(void)
+>  {
+>  	return timecounter->cc->read(timecounter->cc);
+> @@ -124,8 +211,8 @@ static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
+>  {
+>  	u64 cval, now;
+>  
+> -	cval = timer_ctx->cnt_cval;
+> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+> +	cval = timer_get_cval(timer_ctx);
+> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
+>  
+>  	if (now < cval) {
+>  		u64 ns;
+> @@ -144,8 +231,8 @@ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
+>  {
+>  	WARN_ON(timer_ctx && timer_ctx->loaded);
+>  	return timer_ctx &&
+> -	       !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> -		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
+> +		((timer_get_ctl(timer_ctx) &
+> +		  (ARCH_TIMER_CTRL_IT_MASK | ARCH_TIMER_CTRL_ENABLE)) == ARCH_TIMER_CTRL_ENABLE);
+>  }
+>  
+>  /*
+> @@ -256,8 +343,8 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  	if (!kvm_timer_irq_can_fire(timer_ctx))
+>  		return false;
+>  
+> -	cval = timer_ctx->cnt_cval;
+> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
+> +	cval = timer_get_cval(timer_ctx);
+> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
+>  
+>  	return cval <= now;
+>  }
+> @@ -350,8 +437,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
+> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTV_CVAL);
+> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTV_CTL);
+> @@ -359,8 +446,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  		break;
+>  	case TIMER_PTIMER:
+> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
+> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTP_CVAL);
+> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+>  
+>  		/* Disable the timer */
+>  		write_sysreg_el0(0, SYS_CNTP_CTL);
+> @@ -429,14 +516,14 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTV_CVAL);
+> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+>  		isb();
+> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTV_CTL);
+> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTP_CVAL);
+> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
+>  		isb();
+> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTP_CTL);
+> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+>  		break;
+>  	case NR_KVM_TIMERS:
+>  		BUG();
+> @@ -528,7 +615,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  		kvm_timer_vcpu_load_nogic(vcpu);
+>  	}
+>  
+> -	set_cntvoff(map.direct_vtimer->cntvoff);
+> +	set_cntvoff(timer_get_offset(map.direct_vtimer));
+>  
+>  	kvm_timer_unblocking(vcpu);
+>  
+> @@ -639,8 +726,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  	 * resets the timer to be disabled and unmasked and is compliant with
+>  	 * the ARMv7 architecture.
+>  	 */
+> -	vcpu_vtimer(vcpu)->cnt_ctl = 0;
+> -	vcpu_ptimer(vcpu)->cnt_ctl = 0;
+> +	timer_set_ctl(vcpu_vtimer(vcpu), 0);
+> +	timer_set_ctl(vcpu_ptimer(vcpu), 0);
+>  
+>  	if (timer->enabled) {
+>  		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
+> @@ -668,13 +755,13 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>  
+>  	mutex_lock(&kvm->lock);
+>  	kvm_for_each_vcpu(i, tmp, kvm)
+> -		vcpu_vtimer(tmp)->cntvoff = cntvoff;
+> +		timer_set_offset(vcpu_vtimer(tmp), cntvoff);
+>  
+>  	/*
+>  	 * When called from the vcpu create path, the CPU being created is not
+>  	 * included in the loop above, so we just set it here as well.
+>  	 */
+> -	vcpu_vtimer(vcpu)->cntvoff = cntvoff;
+> +	timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
+>  	mutex_unlock(&kvm->lock);
+>  }
+>  
+> @@ -684,9 +771,12 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> +	vtimer->vcpu = vcpu;
+> +	ptimer->vcpu = vcpu;
+> +
+>  	/* Synchronize cntvoff across all vtimers of a VM. */
+>  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+> -	ptimer->cntvoff = 0;
+> +	timer_set_offset(ptimer, 0);
+>  
+>  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+> @@ -704,9 +794,6 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  
+>  	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
+>  	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
+> -
+> -	vtimer->vcpu = vcpu;
+> -	ptimer->vcpu = vcpu;
+>  }
+>  
+>  static void kvm_timer_init_interrupt(void *info)
+> @@ -756,10 +843,12 @@ static u64 read_timer_ctl(struct arch_timer_context *timer)
+>  	 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
+>  	 * regardless of ENABLE bit for our implementation convenience.
+>  	 */
+> +	u32 ctl = timer_get_ctl(timer);
+> +
+>  	if (!kvm_timer_compute_delta(timer))
+> -		return timer->cnt_ctl | ARCH_TIMER_CTRL_IT_STAT;
+> -	else
+> -		return timer->cnt_ctl;
+> +		ctl |= ARCH_TIMER_CTRL_IT_STAT;
+> +
+> +	return ctl;
+>  }
+>  
+>  u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
+> @@ -795,8 +884,8 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  
+>  	switch (treg) {
+>  	case TIMER_REG_TVAL:
+> -		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
+> -		val &= lower_32_bits(val);
+> +		val = timer_get_cval(timer) - kvm_phys_timer_read() + timer_get_offset(timer);
+> +		val = lower_32_bits(val);
+>  		break;
+>  
+>  	case TIMER_REG_CTL:
+> @@ -804,11 +893,11 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  		break;
+>  
+>  	case TIMER_REG_CVAL:
+> -		val = timer->cnt_cval;
+> +		val = timer_get_cval(timer);
+>  		break;
+>  
+>  	case TIMER_REG_CNT:
+> -		val = kvm_phys_timer_read() - timer->cntvoff;
+> +		val = kvm_phys_timer_read() - timer_get_offset(timer);
+>  		break;
+>  
+>  	default:
+> @@ -842,15 +931,15 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
+>  {
+>  	switch (treg) {
+>  	case TIMER_REG_TVAL:
+> -		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
+> +		timer_set_cval(timer, kvm_phys_timer_read() - timer_get_offset(timer) + (s32)val);
+>  		break;
+>  
+>  	case TIMER_REG_CTL:
+> -		timer->cnt_ctl = val & ~ARCH_TIMER_CTRL_IT_STAT;
+> +		timer_set_ctl(timer, val & ~ARCH_TIMER_CTRL_IT_STAT);
+>  		break;
+>  
+>  	case TIMER_REG_CVAL:
+> -		timer->cnt_cval = val;
+> +		timer_set_cval(timer, val);
+>  		break;
+>  
+>  	default:
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 4c71270cc097..4691053c5ee4 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -301,8 +301,8 @@ TRACE_EVENT(kvm_timer_save_state,
+>  	),
+>  
+>  	TP_fast_assign(
+> -		__entry->ctl			= ctx->cnt_ctl;
+> -		__entry->cval			= ctx->cnt_cval;
+> +		__entry->ctl			= timer_get_ctl(ctx);
+> +		__entry->cval			= timer_get_cval(ctx);
+>  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
+>  	),
+>  
+> @@ -323,8 +323,8 @@ TRACE_EVENT(kvm_timer_restore_state,
+>  	),
+>  
+>  	TP_fast_assign(
+> -		__entry->ctl			= ctx->cnt_ctl;
+> -		__entry->cval			= ctx->cnt_cval;
+> +		__entry->ctl			= timer_get_ctl(ctx);
+> +		__entry->cval			= timer_get_cval(ctx);
+>  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
+>  	),
+>  
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index a821dd1df0cf..51c19381108c 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -26,16 +26,9 @@ enum kvm_arch_timer_regs {
+>  struct arch_timer_context {
+>  	struct kvm_vcpu			*vcpu;
+>  
+> -	/* Registers: control register, timer value */
+> -	u32				cnt_ctl;
+> -	u64				cnt_cval;
+> -
+>  	/* Timer IRQ */
+>  	struct kvm_irq_level		irq;
+>  
+> -	/* Virtual offset */
+> -	u64				cntvoff;
+> -
+>  	/* Emulated Timer (may be unused) */
+>  	struct hrtimer			hrtimer;
+>  
+> @@ -109,4 +102,8 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+>  				enum kvm_arch_timer_regs treg,
+>  				u64 val);
+>  
+> +/* Needed for tracing */
+> +u32 timer_get_ctl(struct arch_timer_context *ctxt);
+> +u64 timer_get_cval(struct arch_timer_context *ctxt);
+> +
+>  #endif
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
