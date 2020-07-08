@@ -2,63 +2,81 @@ Return-Path: <SRS0=frvT=AT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E463C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB292C433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:59:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 98F7120663
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:38:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F7120663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 3735B206F6
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 16:59:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPOU23/W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3735B206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AE14B180;
-	Wed,  8 Jul 2020 12:38:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6EFB4B167;
+	Wed,  8 Jul 2020 12:59:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nej1iBEK168L; Wed,  8 Jul 2020 12:38:36 -0400 (EDT)
+	with ESMTP id w6gITSt6kyLt; Wed,  8 Jul 2020 12:59:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5071C4B1A1;
-	Wed,  8 Jul 2020 12:38:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC9F54B1A4;
+	Wed,  8 Jul 2020 12:59:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AE84B154
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:38:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4803B4B1A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:59:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3ESaehmM6NR1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2020 12:38:33 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61F234B151
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:38:33 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C493931B;
- Wed,  8 Jul 2020 09:38:32 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F0E03F68F;
- Wed,  8 Jul 2020 09:38:30 -0700 (PDT)
-Subject: Re: [PATCH v3 17/17] KVM: arm64: timers: Move timer registers to the
- sys_regs file
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20200706125425.1671020-1-maz@kernel.org>
- <20200706125425.1671020-18-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <56a06ee3-279e-0ee9-6664-c1d21ee8e936@arm.com>
-Date: Wed, 8 Jul 2020 17:39:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id blH0qrNEn5AY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jul 2020 12:59:32 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50F7B4B1A4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 12:59:32 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id EFD11206F6;
+ Wed,  8 Jul 2020 16:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1594227571;
+ bh=uh4+uFjSS8z4pzDfvQDdc+cDo68c1srgnsXeCX9tkrM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=LPOU23/WvkxwZI/Js3Zh7GK/6l9f479mhy5NmU59FlaNEvxCW0kiCAXv03Cq25GdU
+ 0Q7cNxfNnZ5pAnPqAswpQedsrGbgbH250JStUEa1C+5lH13PgW38dBl/PbI4olK495
+ wprTQbPlJqgZVFFbs3QBnEqdjTdZ60UZMHgeHm4A=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jtDPt-00A9GR-GX; Wed, 08 Jul 2020 17:59:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200706125425.1671020-18-maz@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>, Will Deacon <will@kernel.org>
+Date: Wed, 08 Jul 2020 17:59:29 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Fix definition of PAGE_HYP_DEVICE
+In-Reply-To: <20200708162546.26176-1-will@kernel.org>
+References: <20200708162546.26176-1-will@kernel.org>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <aa1d1bc3bbef499a909ca6367d1bc77b@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kernel-team@android.com, catalin.marinas@arm.com,
+ james.morse@arm.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, stable@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,419 +88,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-At first I was a bit apprehensive about adding yet another layer of indirection to
-the arch timer. But after spending some time trying to figure out if there's a
-better way to do it, I came to the conclusion that the patch is actually an
-improvement because it makes it obvious what timers we are emulating today, and
-the registers associated with each of them.
-
-On 7/6/20 1:54 PM, Marc Zyngier wrote:
-> Move the timer gsisters to the sysreg file. This will further help when
-
-s/gsisters/registers
-
-> they are directly changed by a nesting hypervisor in the VNCR page.
->
-> This requires moving the initialisation of the timer struct so that some
-> of the helpers (such as arch_timer_ctx_index) can work correctly at an
-> early stage.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On 2020-07-08 17:25, Will Deacon wrote:
+> PAGE_HYP_DEVICE is intended to encode attribute bits for an EL2 stage-1
+> pte mapping a device. Unfortunately, it includes PROT_DEVICE_nGnRE 
+> which
+> encodes attributes for EL1 stage-1 mappings such as UXN and nG, which 
+> are
+> RES0 for EL2, and DBM which is meaningless as TCR_EL2.HD is not set.
+> 
+> Fix the definition of PAGE_HYP_DEVICE so that it doesn't set RES0 bits
+> at EL2.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h |   6 ++
->  arch/arm64/kvm/arch_timer.c       | 155 +++++++++++++++++++++++-------
->  arch/arm64/kvm/trace_arm.h        |   8 +-
->  include/kvm/arm_arch_timer.h      |  11 +--
->  4 files changed, 136 insertions(+), 44 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 91b1adb6789c..e1a32c0707bb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -189,6 +189,12 @@ enum vcpu_sysreg {
->  	SP_EL1,
->  	SPSR_EL1,
->  
-> +	CNTVOFF_EL2,
-> +	CNTV_CVAL_EL0,
-> +	CNTV_CTL_EL0,
-> +	CNTP_CVAL_EL0,
-> +	CNTP_CTL_EL0,
-> +
->  	/* 32bit specific registers. Keep them at the end of the range */
->  	DACR32_EL2,	/* Domain Access Control Register */
->  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 33d85a504720..32ba6fbc3814 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -51,6 +51,93 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  			      struct arch_timer_context *timer,
->  			      enum kvm_arch_timer_regs treg);
->  
-> +u32 timer_get_ctl(struct arch_timer_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		return __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
-> +	case TIMER_PTIMER:
-> +		return __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
-> +	default:
-> +		WARN_ON(1);
-> +		return 0;
-> +	}
-> +}
-> +
-> +u64 timer_get_cval(struct arch_timer_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		return __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
-> +	case TIMER_PTIMER:
-> +		return __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-> +	default:
-> +		WARN_ON(1);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static u64 timer_get_offset(struct arch_timer_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
-> +	default:
-> +		return 0;
+> Marc -- I'm happy to take this as a fix via arm64 with your Ack.
+> Please just let me know.
+> 
+>  arch/arm64/include/asm/pgtable-prot.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-How about adding a TIMER_PTIMER case that returns 0, and adding a warning to the
-default case?
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-> +	}
-> +}
-> +
-> +static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		__vcpu_sys_reg(vcpu, CNTV_CTL_EL0) = ctl;
-> +		break;
-> +	case TIMER_PTIMER:
-> +		__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = ctl;
-> +		break;
-> +	default:
-> +		WARN_ON(1);
-> +	}
-> +}
-> +
-> +static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0) = cval;
-> +		break;
-> +	case TIMER_PTIMER:
-> +		__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = cval;
-> +		break;
-> +	default:
-> +		WARN_ON(1);
-> +	}
-> +}
-> +
-> +static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
-> +
-> +	switch(arch_timer_ctx_index(ctxt)) {
-> +	case TIMER_VTIMER:
-> +		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
-> +		break;
-> +	default:
-> +		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+Thanks for fixing this!
 
-Hmm.. looks to me like the warning isn't triggered when the offset is
-TIMER_PTIMER, which is 0.
-
-A more general remark about the accessors. They only access the copy in memory,
-perhaps it's worth adding a WARN_ON(ctxt->loaded) to catch future errors.
-
-I've checked the rest of the patch, and the changes look semantically equivalent
-to me.
-
-Thanks,
-Alex
-> +	}
-> +}
-> +
->  u64 kvm_phys_timer_read(void)
->  {
->  	return timecounter->cc->read(timecounter->cc);
-> @@ -124,8 +211,8 @@ static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
->  {
->  	u64 cval, now;
->  
-> -	cval = timer_ctx->cnt_cval;
-> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
-> +	cval = timer_get_cval(timer_ctx);
-> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
->  
->  	if (now < cval) {
->  		u64 ns;
-> @@ -144,8 +231,8 @@ static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx)
->  {
->  	WARN_ON(timer_ctx && timer_ctx->loaded);
->  	return timer_ctx &&
-> -	       !(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
-> -		(timer_ctx->cnt_ctl & ARCH_TIMER_CTRL_ENABLE);
-> +		((timer_get_ctl(timer_ctx) &
-> +		  (ARCH_TIMER_CTRL_IT_MASK | ARCH_TIMER_CTRL_ENABLE)) == ARCH_TIMER_CTRL_ENABLE);
->  }
->  
->  /*
-> @@ -256,8 +343,8 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
->  	if (!kvm_timer_irq_can_fire(timer_ctx))
->  		return false;
->  
-> -	cval = timer_ctx->cnt_cval;
-> -	now = kvm_phys_timer_read() - timer_ctx->cntvoff;
-> +	cval = timer_get_cval(timer_ctx);
-> +	now = kvm_phys_timer_read() - timer_get_offset(timer_ctx);
->  
->  	return cval <= now;
->  }
-> @@ -350,8 +437,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
->  
->  	switch (index) {
->  	case TIMER_VTIMER:
-> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
-> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTV_CVAL);
-> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
-> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
->  
->  		/* Disable the timer */
->  		write_sysreg_el0(0, SYS_CNTV_CTL);
-> @@ -359,8 +446,8 @@ static void timer_save_state(struct arch_timer_context *ctx)
->  
->  		break;
->  	case TIMER_PTIMER:
-> -		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
-> -		ctx->cnt_cval = read_sysreg_el0(SYS_CNTP_CVAL);
-> +		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
-> +		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
->  
->  		/* Disable the timer */
->  		write_sysreg_el0(0, SYS_CNTP_CTL);
-> @@ -429,14 +516,14 @@ static void timer_restore_state(struct arch_timer_context *ctx)
->  
->  	switch (index) {
->  	case TIMER_VTIMER:
-> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTV_CVAL);
-> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
->  		isb();
-> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTV_CTL);
-> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
->  		break;
->  	case TIMER_PTIMER:
-> -		write_sysreg_el0(ctx->cnt_cval, SYS_CNTP_CVAL);
-> +		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
->  		isb();
-> -		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTP_CTL);
-> +		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
->  		break;
->  	case NR_KVM_TIMERS:
->  		BUG();
-> @@ -528,7 +615,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->  		kvm_timer_vcpu_load_nogic(vcpu);
->  	}
->  
-> -	set_cntvoff(map.direct_vtimer->cntvoff);
-> +	set_cntvoff(timer_get_offset(map.direct_vtimer));
->  
->  	kvm_timer_unblocking(vcpu);
->  
-> @@ -639,8 +726,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
->  	 * resets the timer to be disabled and unmasked and is compliant with
->  	 * the ARMv7 architecture.
->  	 */
-> -	vcpu_vtimer(vcpu)->cnt_ctl = 0;
-> -	vcpu_ptimer(vcpu)->cnt_ctl = 0;
-> +	timer_set_ctl(vcpu_vtimer(vcpu), 0);
-> +	timer_set_ctl(vcpu_ptimer(vcpu), 0);
->  
->  	if (timer->enabled) {
->  		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
-> @@ -668,13 +755,13 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
->  
->  	mutex_lock(&kvm->lock);
->  	kvm_for_each_vcpu(i, tmp, kvm)
-> -		vcpu_vtimer(tmp)->cntvoff = cntvoff;
-> +		timer_set_offset(vcpu_vtimer(tmp), cntvoff);
->  
->  	/*
->  	 * When called from the vcpu create path, the CPU being created is not
->  	 * included in the loop above, so we just set it here as well.
->  	 */
-> -	vcpu_vtimer(vcpu)->cntvoff = cntvoff;
-> +	timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
->  	mutex_unlock(&kvm->lock);
->  }
->  
-> @@ -684,9 +771,12 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
->  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
->  
-> +	vtimer->vcpu = vcpu;
-> +	ptimer->vcpu = vcpu;
-> +
->  	/* Synchronize cntvoff across all vtimers of a VM. */
->  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
-> -	ptimer->cntvoff = 0;
-> +	timer_set_offset(ptimer, 0);
->  
->  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
->  	timer->bg_timer.function = kvm_bg_timer_expire;
-> @@ -704,9 +794,6 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  
->  	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
->  	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
-> -
-> -	vtimer->vcpu = vcpu;
-> -	ptimer->vcpu = vcpu;
->  }
->  
->  static void kvm_timer_init_interrupt(void *info)
-> @@ -756,10 +843,12 @@ static u64 read_timer_ctl(struct arch_timer_context *timer)
->  	 * UNKNOWN when ENABLE bit is 0, so we chose to set ISTATUS bit
->  	 * regardless of ENABLE bit for our implementation convenience.
->  	 */
-> +	u32 ctl = timer_get_ctl(timer);
-> +
->  	if (!kvm_timer_compute_delta(timer))
-> -		return timer->cnt_ctl | ARCH_TIMER_CTRL_IT_STAT;
-> -	else
-> -		return timer->cnt_ctl;
-> +		ctl |= ARCH_TIMER_CTRL_IT_STAT;
-> +
-> +	return ctl;
->  }
->  
->  u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
-> @@ -795,8 +884,8 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  
->  	switch (treg) {
->  	case TIMER_REG_TVAL:
-> -		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
-> -		val &= lower_32_bits(val);
-> +		val = timer_get_cval(timer) - kvm_phys_timer_read() + timer_get_offset(timer);
-> +		val = lower_32_bits(val);
->  		break;
->  
->  	case TIMER_REG_CTL:
-> @@ -804,11 +893,11 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  		break;
->  
->  	case TIMER_REG_CVAL:
-> -		val = timer->cnt_cval;
-> +		val = timer_get_cval(timer);
->  		break;
->  
->  	case TIMER_REG_CNT:
-> -		val = kvm_phys_timer_read() - timer->cntvoff;
-> +		val = kvm_phys_timer_read() - timer_get_offset(timer);
->  		break;
->  
->  	default:
-> @@ -842,15 +931,15 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
->  {
->  	switch (treg) {
->  	case TIMER_REG_TVAL:
-> -		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + (s32)val;
-> +		timer_set_cval(timer, kvm_phys_timer_read() - timer_get_offset(timer) + (s32)val);
->  		break;
->  
->  	case TIMER_REG_CTL:
-> -		timer->cnt_ctl = val & ~ARCH_TIMER_CTRL_IT_STAT;
-> +		timer_set_ctl(timer, val & ~ARCH_TIMER_CTRL_IT_STAT);
->  		break;
->  
->  	case TIMER_REG_CVAL:
-> -		timer->cnt_cval = val;
-> +		timer_set_cval(timer, val);
->  		break;
->  
->  	default:
-> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> index 4c71270cc097..4691053c5ee4 100644
-> --- a/arch/arm64/kvm/trace_arm.h
-> +++ b/arch/arm64/kvm/trace_arm.h
-> @@ -301,8 +301,8 @@ TRACE_EVENT(kvm_timer_save_state,
->  	),
->  
->  	TP_fast_assign(
-> -		__entry->ctl			= ctx->cnt_ctl;
-> -		__entry->cval			= ctx->cnt_cval;
-> +		__entry->ctl			= timer_get_ctl(ctx);
-> +		__entry->cval			= timer_get_cval(ctx);
->  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
->  	),
->  
-> @@ -323,8 +323,8 @@ TRACE_EVENT(kvm_timer_restore_state,
->  	),
->  
->  	TP_fast_assign(
-> -		__entry->ctl			= ctx->cnt_ctl;
-> -		__entry->cval			= ctx->cnt_cval;
-> +		__entry->ctl			= timer_get_ctl(ctx);
-> +		__entry->cval			= timer_get_cval(ctx);
->  		__entry->timer_idx		= arch_timer_ctx_index(ctx);
->  	),
->  
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index a821dd1df0cf..51c19381108c 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -26,16 +26,9 @@ enum kvm_arch_timer_regs {
->  struct arch_timer_context {
->  	struct kvm_vcpu			*vcpu;
->  
-> -	/* Registers: control register, timer value */
-> -	u32				cnt_ctl;
-> -	u64				cnt_cval;
-> -
->  	/* Timer IRQ */
->  	struct kvm_irq_level		irq;
->  
-> -	/* Virtual offset */
-> -	u64				cntvoff;
-> -
->  	/* Emulated Timer (may be unused) */
->  	struct hrtimer			hrtimer;
->  
-> @@ -109,4 +102,8 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
->  				enum kvm_arch_timer_regs treg,
->  				u64 val);
->  
-> +/* Needed for tracing */
-> +u32 timer_get_ctl(struct arch_timer_context *ctxt);
-> +u64 timer_get_cval(struct arch_timer_context *ctxt);
-> +
->  #endif
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
