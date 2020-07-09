@@ -1,70 +1,109 @@
-Return-Path: <SRS0=frvT=AT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=7isg=AU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01023C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 22:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3FCC433DF
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jul 2020 12:14:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6FCB120775
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jul 2020 22:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CE432077D
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jul 2020 12:14:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zy98ets4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FCB120775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+nG7tey"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE432077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3FBB4B09C;
-	Wed,  8 Jul 2020 18:03:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 609734B1D1;
+	Thu,  9 Jul 2020 08:14:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KQCv1l1Lad2o; Wed,  8 Jul 2020 18:03:07 -0400 (EDT)
+	with ESMTP id YtL6WTZLpjMj; Thu,  9 Jul 2020 08:14:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E97B54B188;
-	Wed,  8 Jul 2020 18:03:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36CBB4B189;
+	Thu,  9 Jul 2020 08:14:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D70A54B103
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 18:03:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04CD94B189
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2020 08:14:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id biWaNyih6o+q for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2020 18:03:05 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF23C4B09C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2020 18:03:05 -0400 (EDT)
-Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
- [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 65AF72078B;
- Wed,  8 Jul 2020 22:03:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594245784;
- bh=e728ffDVeqv3WeOeJ7GNFTrNtwbhwF2eVYgQ+USzSnI=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Zy98ets4HLJmLAdBvOCQPsDA1OhRQuMl+JiDC0T5A7ygtUZwqdMy6GtRuZR4MLp6C
- mqbLq25w8Mv3FBLj/VfgSomNK58RRM2Nvp1b1jtKvaxFlg2wkxJ15Qorwma5G5vyjR
- eGOTyRSmV8d+RnZ5OF0bNApntkE1LM6iOmL6JXb0=
-From: Will Deacon <will@kernel.org>
-To: Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] KVM: arm64: Fix definition of PAGE_HYP_DEVICE
-Date: Wed,  8 Jul 2020 23:02:39 +0100
-Message-Id: <159424054981.2034173.14116435447086960033.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200708162546.26176-1-will@kernel.org>
-References: <20200708162546.26176-1-will@kernel.org>
+ with ESMTP id LXRz+SrRbQ-D for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jul 2020 08:14:34 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8E4E4B185
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2020 08:14:34 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1594296874;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kwRIPXQdD58+F7cV0LER43YEzOAqv3hHNiA5thj41Io=;
+ b=T+nG7teysCQg9Wgr5b8XmzUEiYcCai/DdYNiuEWUrAuset/I638gBJLBFxoLDnOWtgDTf7
+ +DnxG87twGbH6fsfLMIa9TnTkWoJdVATePkGGYliHaTqrFDzvyi0JN0bGv+v0HvDQ6XK6S
+ 2mDyQfmsrCJ8zVtmqiOR6iyfm6S0/to=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-PflsolDKOrm50sSHtpT2mA-1; Thu, 09 Jul 2020 08:14:32 -0400
+X-MC-Unique: PflsolDKOrm50sSHtpT2mA-1
+Received: by mail-wr1-f71.google.com with SMTP id f5so1714186wrv.22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jul 2020 05:14:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kwRIPXQdD58+F7cV0LER43YEzOAqv3hHNiA5thj41Io=;
+ b=ryCqe3o1/MCSXuymGsCPtPGZk11xpaHpzNZE9IeCgusFV0gTkV1jmkhKpqFEsH+6i3
+ 8JWBmsOzTdnQK4IQQEmBjj66FDi/GB+l35Cv83hU5hVf7LFQkwN6P/M5vvu6WLuWdqQu
+ SKCzq385iWCDPdq6qWlMj67Z4LyFIlZrHS9pTLKX+AEs8BpUZvEc4XsOjutIa4Bi3XCX
+ f4qK+9TehhLEW7Ek7/hAWcocxQKy/XRyrsGJndFu06K/JcbV6F9y3S3ci3qeoNCz1HLx
+ TQ8qdx+78tLHTiVPtIihyl1Dl7JZjPdOJh+diKeLfSrz0LcD4N5xHM9PpAZl6pMSYYRj
+ 8q9Q==
+X-Gm-Message-State: AOAM530JH8kMvi3dTJMs6vodft8rCjhqKs1QFc3NOrMioN8HfNfc2sL1
+ Xx7/Yu9ogjb/ecyZ7tkl++OgC14+wqilNxItBSkfUoCTM9bYgQwAjPqn5tPUGv1LO9lJuL3363S
+ zHdAviA8YL1Xmuo1JOihNWYVL
+X-Received: by 2002:a7b:c92e:: with SMTP id h14mr13361809wml.36.1594296871532; 
+ Thu, 09 Jul 2020 05:14:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwRhPo7g5kUipBnsOFe+3r9VY5ESGX0vtcsJ/9+mosHc1rT3gI7GlSh2CG+AM/UAt8pI6ZlHQ==
+X-Received: by 2002:a7b:c92e:: with SMTP id h14mr13361761wml.36.1594296871306; 
+ Thu, 09 Jul 2020 05:14:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9541:9439:cb0f:89c?
+ ([2001:b07:6468:f312:9541:9439:cb0f:89c])
+ by smtp.gmail.com with ESMTPSA id c206sm4897543wmf.36.2020.07.09.05.14.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jul 2020 05:14:30 -0700 (PDT)
+Subject: Re: [PATCH v3 00/21] KVM: Cleanup and unify kvm_mmu_memory_cache usage
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>
+References: <20200703023545.8771-1-sean.j.christopherson@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9cce79d8-bc8a-8a3a-060a-c9a882dd7e07@redhat.com>
+Date: Thu, 9 Jul 2020 14:14:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Cc: catalin.marinas@arm.com, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, stable@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>
+In-Reply-To: <20200703023545.8771-1-sean.j.christopherson@intel.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: linux-arch@vger.kernel.org, Junaid Shahid <junaids@google.com>,
+ Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Joerg Roedel <joro@8bytes.org>, Peter Shier <pshier@google.com>,
+ linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Ben Gardon <bgardon@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Peter Feiner <pfeiner@google.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,27 +120,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 8 Jul 2020 17:25:46 +0100, Will Deacon wrote:
-> PAGE_HYP_DEVICE is intended to encode attribute bits for an EL2 stage-1
-> pte mapping a device. Unfortunately, it includes PROT_DEVICE_nGnRE which
-> encodes attributes for EL1 stage-1 mappings such as UXN and nG, which are
-> RES0 for EL2, and DBM which is meaningless as TCR_EL2.HD is not set.
+On 03/07/20 04:35, Sean Christopherson wrote:
+> The only interesting delta from v2 is that patch 18 is updated to handle
+> a conflict with arm64's p4d rework.  Resolution was straightforward
+> (famous last words).
 > 
-> Fix the definition of PAGE_HYP_DEVICE so that it doesn't set RES0 bits
-> at EL2.
+> 
+> This series resurrects Christoffer Dall's series[1] to provide a common
+> MMU memory cache implementation that can be shared by x86, arm64 and MIPS.
+> 
+> It also picks up a suggested change from Ben Gardon[2] to clear shadow
+> page tables during initial allocation so as to avoid clearing entire
+> pages while holding mmu_lock.
+> 
+> The front half of the patches do house cleaning on x86's memory cache
+> implementation in preparation for moving it to common code, along with a
+> fair bit of cleanup on the usage.  The middle chunk moves the patches to
+> common KVM, and the last two chunks convert arm64 and MIPS to the common
+> implementation.
+> 
+> Fully tested on x86 only.  Compile tested patches 14-21 on arm64, MIPS,
+> s390 and PowerPC.
 
-Applied to arm64 (for-next/fixes), thanks!
+Queued, thanks.
 
-[1/1] KVM: arm64: Fix definition of PAGE_HYP_DEVICE
-      https://git.kernel.org/arm64/c/68cf617309b5
+Paolo
 
-Cheers,
--- 
-Will
+> v3:
+>   - Rebased to kvm/queue, commit a037ff353ba6 ("Merge ... into HEAD")
+>   - Collect more review tags. [Ben]
+> 
+> v2:
+>   - Rebase to kvm-5.8-2, commit 49b3deaad345 ("Merge tag ...").
+>   - Use an asm-generic kvm_types.h for s390 and PowerPC instead of an
+>     empty arch-specific file. [Marc]
+>   - Explicit document "GFP_PGTABLE_USER == GFP_KERNEL_ACCOUNT | GFP_ZERO"
+>     in the arm64 conversion patch. [Marc]
+>   - Collect review tags. [Ben]
+> 
+> Sean Christopherson (21):
+>   KVM: x86/mmu: Track the associated kmem_cache in the MMU caches
+>   KVM: x86/mmu: Consolidate "page" variant of memory cache helpers
+>   KVM: x86/mmu: Use consistent "mc" name for kvm_mmu_memory_cache locals
+>   KVM: x86/mmu: Remove superfluous gotos from mmu_topup_memory_caches()
+>   KVM: x86/mmu: Try to avoid crashing KVM if a MMU memory cache is empty
+>   KVM: x86/mmu: Move fast_page_fault() call above
+>     mmu_topup_memory_caches()
+>   KVM: x86/mmu: Topup memory caches after walking GVA->GPA
+>   KVM: x86/mmu: Clean up the gorilla math in mmu_topup_memory_caches()
+>   KVM: x86/mmu: Separate the memory caches for shadow pages and gfn
+>     arrays
+>   KVM: x86/mmu: Make __GFP_ZERO a property of the memory cache
+>   KVM: x86/mmu: Zero allocate shadow pages (outside of mmu_lock)
+>   KVM: x86/mmu: Skip filling the gfn cache for guaranteed direct MMU
+>     topups
+>   KVM: x86/mmu: Prepend "kvm_" to memory cache helpers that will be
+>     global
+>   KVM: Move x86's version of struct kvm_mmu_memory_cache to common code
+>   KVM: Move x86's MMU memory cache helpers to common KVM code
+>   KVM: arm64: Drop @max param from mmu_topup_memory_cache()
+>   KVM: arm64: Use common code's approach for __GFP_ZERO with memory
+>     caches
+>   KVM: arm64: Use common KVM implementation of MMU memory caches
+>   KVM: MIPS: Drop @max param from mmu_topup_memory_cache()
+>   KVM: MIPS: Account pages used for GPA page tables
+>   KVM: MIPS: Use common KVM implementation of MMU memory caches
+> 
+>  arch/arm64/include/asm/kvm_host.h  |  11 ---
+>  arch/arm64/include/asm/kvm_types.h |   8 ++
+>  arch/arm64/kvm/arm.c               |   2 +
+>  arch/arm64/kvm/mmu.c               |  56 +++----------
+>  arch/mips/include/asm/kvm_host.h   |  11 ---
+>  arch/mips/include/asm/kvm_types.h  |   7 ++
+>  arch/mips/kvm/mmu.c                |  44 ++--------
+>  arch/powerpc/include/asm/Kbuild    |   1 +
+>  arch/s390/include/asm/Kbuild       |   1 +
+>  arch/x86/include/asm/kvm_host.h    |  14 +---
+>  arch/x86/include/asm/kvm_types.h   |   7 ++
+>  arch/x86/kvm/mmu/mmu.c             | 129 +++++++++--------------------
+>  arch/x86/kvm/mmu/paging_tmpl.h     |  10 +--
+>  include/asm-generic/kvm_types.h    |   5 ++
+>  include/linux/kvm_host.h           |   7 ++
+>  include/linux/kvm_types.h          |  19 +++++
+>  virt/kvm/kvm_main.c                |  55 ++++++++++++
+>  17 files changed, 176 insertions(+), 211 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_types.h
+>  create mode 100644 arch/mips/include/asm/kvm_types.h
+>  create mode 100644 arch/x86/include/asm/kvm_types.h
+>  create mode 100644 include/asm-generic/kvm_types.h
+> 
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
