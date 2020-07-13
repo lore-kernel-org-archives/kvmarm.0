@@ -4,71 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0DDC433E2
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 22:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8D7C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 23:23:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4661320890
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 22:40:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4661320890
+	by mail.kernel.org (Postfix) with ESMTP id A411E20DD4
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 23:23:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A411E20DD4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61A4C4B20C;
-	Mon, 13 Jul 2020 18:40:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C824B1DB;
+	Mon, 13 Jul 2020 19:23:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cgjSdNtG1tSG; Mon, 13 Jul 2020 18:39:59 -0400 (EDT)
+	with ESMTP id TiTRWaMN9ZZL; Mon, 13 Jul 2020 19:23:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 227554B1D4;
-	Mon, 13 Jul 2020 18:39:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD8F4B1E0;
+	Mon, 13 Jul 2020 19:23:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8B704B1CA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 18:39:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFE084B1DC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 19:23:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RL2qo8NIaVkC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jul 2020 18:39:55 -0400 (EDT)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECBFE4B121
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 18:39:54 -0400 (EDT)
-IronPort-SDR: yinuAHOuaVGwH4cbsHH0Z8zEU0MxVdaci9BeYAIbwuz0PDoTZmevzs/gGxfMe2jzrTze5ZZ+lC
- /NNhjs08q9/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="233596674"
+ with ESMTP id I6+fDIbZQ3DU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jul 2020 19:23:17 -0400 (EDT)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC6DD4B185
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 19:23:16 -0400 (EDT)
+IronPort-SDR: fY187GVA6UxUDTbRsJqZMX78dwPTgdTatWOXeAYcD/NmEs/zLIhIaENkEMyom/fvUN03vuFYT9
+ Q0OXf8zY9v+A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="136905208"
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
- d="gz'50?scan'50,208,50";a="233596674"
+ d="gz'50?scan'50,208,50";a="136905208"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Jul 2020 15:39:53 -0700
-IronPort-SDR: Q3fd4Lnw9iDLMynlbuKnSQaV8MDaN2mfBiKAO6kjkVBfCLjuENmozpoJVI8VQ12KFM4fNKV7YB
- Kki0jH97IaQg==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Jul 2020 16:23:14 -0700
+IronPort-SDR: dAUEmR2G9dMQULc9DgRhT4aMjNKv7I+R1PSFS75GvK9tquvwsapw1pIbEakl/Kdat16YIgbAlR
+ pbY+h537rgVw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,349,1589266800"; 
- d="gz'50?scan'50,208,50";a="485651428"
+ d="gz'50?scan'50,208,50";a="324376989"
 Received: from lkp-server02.sh.intel.com (HELO fb03a464a2e3) ([10.239.97.151])
- by fmsmga005.fm.intel.com with ESMTP; 13 Jul 2020 15:39:49 -0700
+ by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2020 16:23:10 -0700
 Received: from kbuild by fb03a464a2e3 with local (Exim 4.92)
  (envelope-from <lkp@intel.com>)
- id 1jv76z-00010s-1A; Mon, 13 Jul 2020 22:39:49 +0000
-Date: Tue, 14 Jul 2020 06:38:52 +0800
+ id 1jv7mv-00011v-OL; Mon, 13 Jul 2020 23:23:09 +0000
+Date: Tue, 14 Jul 2020 07:22:19 +0800
 From: kernel test robot <lkp@intel.com>
 To: Steven Price <steven.price@arm.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
  Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/2] arm64: kvm: Save/restore MTE registers
-Message-ID: <202007140616.D9IVkDUv%lkp@intel.com>
-References: <20200713100102.53664-2-steven.price@arm.com>
+Subject: Re: [PATCH 2/2] arm64: kvm: Introduce MTE VCPU feature
+Message-ID: <202007140705.FhVeZhMs%lkp@intel.com>
+References: <20200713100102.53664-3-steven.price@arm.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="UugvWAfsgieZRqgk"
+Content-Type: multipart/mixed; boundary="VS++wcV0S1rZb1Fb"
 Content-Disposition: inline
-In-Reply-To: <20200713100102.53664-2-steven.price@arm.com>
+In-Reply-To: <20200713100102.53664-3-steven.price@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
  Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
@@ -88,7 +88,7 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---UugvWAfsgieZRqgk
+--VS++wcV0S1rZb1Fb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -117,52 +117,165 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   arch/arm64/kernel/relocate_kernel.S: Assembler messages:
->> arch/arm64/kernel/relocate_kernel.S:44: Error: non-constant expression in ".if" statement
->> arch/arm64/kernel/relocate_kernel.S:44: Error: non-constant expression in ".if" statement
->> arch/arm64/kernel/relocate_kernel.S:44: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/relocate_kernel.S:44: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/relocate_kernel.S:44: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/relocate_kernel.S:44: Error: invalid operands (*ABS* and *UND* sections) for `|'
+   In file included from arch/arm64/kvm/arm.c:37:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
 --
-   arch/arm64/kernel/cpu-reset.S: Assembler messages:
->> arch/arm64/kernel/cpu-reset.S:35: Error: non-constant expression in ".if" statement
->> arch/arm64/kernel/cpu-reset.S:35: Error: non-constant expression in ".if" statement
->> arch/arm64/kernel/cpu-reset.S:35: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/cpu-reset.S:35: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/cpu-reset.S:35: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kernel/cpu-reset.S:35: Error: invalid operands (*ABS* and *UND* sections) for `|'
+   In file included from arch/arm64/kvm/mmu.c:19:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
+   arch/arm64/kvm/mmu.c: In function 'unmap_hyp_puds':
+   arch/arm64/kvm/mmu.c:574:15: warning: variable 'start_pud' set but not used [-Wunused-but-set-variable]
+     574 |  pud_t *pud, *start_pud;
+         |               ^~~~~~~~~
+   arch/arm64/kvm/mmu.c: In function 'unmap_hyp_p4ds':
+   arch/arm64/kvm/mmu.c:591:15: warning: variable 'start_p4d' set but not used [-Wunused-but-set-variable]
+     591 |  p4d_t *p4d, *start_p4d;
+         |               ^~~~~~~~~
+   arch/arm64/kvm/mmu.c: In function 'stage2_get_p4d':
+   arch/arm64/kvm/mmu.c:1129:9: warning: variable 'p4d' set but not used [-Wunused-but-set-variable]
+    1129 |  p4d_t *p4d;
+         |         ^~~
+   arch/arm64/kvm/mmu.c: In function 'user_mem_abort':
+>> arch/arm64/kvm/mmu.c:1943:6: error: implicit declaration of function 'system_supports_mte'; did you mean 'system_supports_bti'? [-Werror=implicit-function-declaration]
+    1943 |  if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
+         |      ^~~~~~~~~~~~~~~~~~~
+         |      system_supports_bti
+>> arch/arm64/kvm/mmu.c:1953:26: error: 'PG_mte_tagged' undeclared (first use in this function)
+    1953 |    if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+         |                          ^~~~~~~~~~~~~
+>> arch/arm64/kvm/mmu.c:1954:5: error: implicit declaration of function 'mte_clear_page_tags' [-Werror=implicit-function-declaration]
+    1954 |     mte_clear_page_tags(page_address(page));
+         |     ^~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
 --
-   arch/arm64/kvm/hyp-init.S: Assembler messages:
->> arch/arm64/kvm/hyp-init.S:105: Error: non-constant expression in ".if" statement
->> arch/arm64/kvm/hyp-init.S:105: Error: non-constant expression in ".if" statement
-   arch/arm64/kvm/hyp-init.S:149: Error: non-constant expression in ".if" statement
-   arch/arm64/kvm/hyp-init.S:149: Error: non-constant expression in ".if" statement
->> arch/arm64/kvm/hyp-init.S:105: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kvm/hyp-init.S:105: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kvm/hyp-init.S:105: Error: invalid operands (*ABS* and *UND* sections) for `|'
->> arch/arm64/kvm/hyp-init.S:105: Error: invalid operands (*ABS* and *UND* sections) for `|'
-   arch/arm64/kvm/hyp-init.S:149: Error: invalid operands (*ABS* and *UND* sections) for `|'
-   arch/arm64/kvm/hyp-init.S:149: Error: invalid operands (*ABS* and *UND* sections) for `|'
-   arch/arm64/kvm/hyp-init.S:149: Error: invalid operands (*ABS* and *UND* sections) for `|'
-   arch/arm64/kvm/hyp-init.S:149: Error: invalid operands (*ABS* and *UND* sections) for `|'
+   In file included from arch/arm64/kvm/handle_exit.c:18:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
+   arch/arm64/kvm/handle_exit.c: At top level:
+   arch/arm64/kvm/handle_exit.c:178:21: warning: initialized field overwritten [-Woverride-init]
+     178 |  [ESR_ELx_EC_WFx] = kvm_handle_wfx,
+         |                     ^~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:178:21: note: (near initialization for 'arm_exit_handlers[1]')
+   arch/arm64/kvm/handle_exit.c:179:25: warning: initialized field overwritten [-Woverride-init]
+     179 |  [ESR_ELx_EC_CP15_32] = kvm_handle_cp15_32,
+         |                         ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:179:25: note: (near initialization for 'arm_exit_handlers[3]')
+   arch/arm64/kvm/handle_exit.c:180:25: warning: initialized field overwritten [-Woverride-init]
+     180 |  [ESR_ELx_EC_CP15_64] = kvm_handle_cp15_64,
+         |                         ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:180:25: note: (near initialization for 'arm_exit_handlers[4]')
+   arch/arm64/kvm/handle_exit.c:181:25: warning: initialized field overwritten [-Woverride-init]
+     181 |  [ESR_ELx_EC_CP14_MR] = kvm_handle_cp14_32,
+         |                         ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:181:25: note: (near initialization for 'arm_exit_handlers[5]')
+   arch/arm64/kvm/handle_exit.c:182:25: warning: initialized field overwritten [-Woverride-init]
+     182 |  [ESR_ELx_EC_CP14_LS] = kvm_handle_cp14_load_store,
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:182:25: note: (near initialization for 'arm_exit_handlers[6]')
+   arch/arm64/kvm/handle_exit.c:183:25: warning: initialized field overwritten [-Woverride-init]
+     183 |  [ESR_ELx_EC_CP14_64] = kvm_handle_cp14_64,
+         |                         ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:183:25: note: (near initialization for 'arm_exit_handlers[12]')
+   arch/arm64/kvm/handle_exit.c:184:23: warning: initialized field overwritten [-Woverride-init]
+     184 |  [ESR_ELx_EC_HVC32] = handle_hvc,
+         |                       ^~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:184:23: note: (near initialization for 'arm_exit_handlers[18]')
+   arch/arm64/kvm/handle_exit.c:185:23: warning: initialized field overwritten [-Woverride-init]
+     185 |  [ESR_ELx_EC_SMC32] = handle_smc,
+         |                       ^~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:185:23: note: (near initialization for 'arm_exit_handlers[19]')
+   arch/arm64/kvm/handle_exit.c:186:23: warning: initialized field overwritten [-Woverride-init]
+     186 |  [ESR_ELx_EC_HVC64] = handle_hvc,
+         |                       ^~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:186:23: note: (near initialization for 'arm_exit_handlers[22]')
+   arch/arm64/kvm/handle_exit.c:187:23: warning: initialized field overwritten [-Woverride-init]
+     187 |  [ESR_ELx_EC_SMC64] = handle_smc,
+         |                       ^~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:187:23: note: (near initialization for 'arm_exit_handlers[23]')
+   arch/arm64/kvm/handle_exit.c:188:23: warning: initialized field overwritten [-Woverride-init]
+     188 |  [ESR_ELx_EC_SYS64] = kvm_handle_sys_reg,
+         |                       ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:188:23: note: (near initialization for 'arm_exit_handlers[24]')
+   arch/arm64/kvm/handle_exit.c:189:21: warning: initialized field overwritten [-Woverride-init]
+     189 |  [ESR_ELx_EC_SVE] = handle_sve,
+         |                     ^~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:189:21: note: (near initialization for 'arm_exit_handlers[25]')
+   arch/arm64/kvm/handle_exit.c:190:26: warning: initialized field overwritten [-Woverride-init]
+     190 |  [ESR_ELx_EC_IABT_LOW] = kvm_handle_guest_abort,
+         |                          ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:190:26: note: (near initialization for 'arm_exit_handlers[32]')
+   arch/arm64/kvm/handle_exit.c:191:26: warning: initialized field overwritten [-Woverride-init]
+     191 |  [ESR_ELx_EC_DABT_LOW] = kvm_handle_guest_abort,
+         |                          ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:191:26: note: (near initialization for 'arm_exit_handlers[36]')
+   arch/arm64/kvm/handle_exit.c:192:28: warning: initialized field overwritten [-Woverride-init]
+     192 |  [ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:192:28: note: (near initialization for 'arm_exit_handlers[50]')
+   arch/arm64/kvm/handle_exit.c:193:28: warning: initialized field overwritten [-Woverride-init]
+     193 |  [ESR_ELx_EC_WATCHPT_LOW]= kvm_handle_guest_debug,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:193:28: note: (near initialization for 'arm_exit_handlers[52]')
+   arch/arm64/kvm/handle_exit.c:194:28: warning: initialized field overwritten [-Woverride-init]
+     194 |  [ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
+         |                            ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:194:28: note: (near initialization for 'arm_exit_handlers[48]')
+   arch/arm64/kvm/handle_exit.c:195:24: warning: initialized field overwritten [-Woverride-init]
+     195 |  [ESR_ELx_EC_BKPT32] = kvm_handle_guest_debug,
+         |                        ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:195:24: note: (near initialization for 'arm_exit_handlers[56]')
+   arch/arm64/kvm/handle_exit.c:196:23: warning: initialized field overwritten [-Woverride-init]
+     196 |  [ESR_ELx_EC_BRK64] = kvm_handle_guest_debug,
+         |                       ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:196:23: note: (near initialization for 'arm_exit_handlers[60]')
+   arch/arm64/kvm/handle_exit.c:197:26: warning: initialized field overwritten [-Woverride-init]
+     197 |  [ESR_ELx_EC_FP_ASIMD] = handle_no_fpsimd,
+         |                          ^~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:197:26: note: (near initialization for 'arm_exit_handlers[7]')
+   arch/arm64/kvm/handle_exit.c:198:21: warning: initialized field overwritten [-Woverride-init]
+     198 |  [ESR_ELx_EC_PAC] = kvm_handle_ptrauth,
+         |                     ^~~~~~~~~~~~~~~~~~
+   arch/arm64/kvm/handle_exit.c:198:21: note: (near initialization for 'arm_exit_handlers[9]')
 --
+   In file included from arch/arm64/kvm/reset.c:29:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
+   arch/arm64/kvm/reset.c: In function 'kvm_reset_vcpu':
+>> arch/arm64/kvm/reset.c:279:8: error: implicit declaration of function 'system_supports_mte'; did you mean 'system_supports_bti'? [-Werror=implicit-function-declaration]
+     279 |   if (!system_supports_mte()) {
+         |        ^~~~~~~~~~~~~~~~~~~
+         |        system_supports_bti
+   cc1: some warnings being treated as errors
+--
+   In file included from arch/arm64/kvm/sys_regs.c:24:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
    In file included from arch/arm64/kvm/sys_regs.c:32:
->> arch/arm64/kvm/sys_regs.c:1524:13: error: 'SYS_RGSR_EL1' undeclared here (not in a function); did you mean 'SYS_DISR_EL1'?
-    1524 |  { SYS_DESC(SYS_RGSR_EL1), trap_raz_wi, reset_unknown, RGSR_EL1 },
+   arch/arm64/kvm/sys_regs.c: At top level:
+   arch/arm64/kvm/sys_regs.c:1525:13: error: 'SYS_RGSR_EL1' undeclared here (not in a function); did you mean 'SYS_DISR_EL1'?
+    1525 |  { SYS_DESC(SYS_RGSR_EL1), trap_raz_wi, reset_unknown, RGSR_EL1 },
          |             ^~~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.h:156:25: note: in definition of macro 'Op0'
-     156 | #define Op0(_x)  .Op0 = _x
-         |                         ^~
-   arch/arm64/kvm/sys_regs.h:164:6: note: in expansion of macro 'sys_reg_Op0'
-     164 |  Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)), \
-         |      ^~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:1524:4: note: in expansion of macro 'SYS_DESC'
-    1524 |  { SYS_DESC(SYS_RGSR_EL1), trap_raz_wi, reset_unknown, RGSR_EL1 },
-         |    ^~~~~~~~
->> arch/arm64/kvm/sys_regs.c:1525:13: error: 'SYS_GCR_EL1' undeclared here (not in a function); did you mean 'SYS_TCR_EL1'?
-    1525 |  { SYS_DESC(SYS_GCR_EL1), trap_raz_wi, reset_unknown, GCR_EL1 },
-         |             ^~~~~~~~~~~
    arch/arm64/kvm/sys_regs.h:156:25: note: in definition of macro 'Op0'
      156 | #define Op0(_x)  .Op0 = _x
          |                         ^~
@@ -170,10 +283,22 @@ All errors (new ones prefixed by >>):
      164 |  Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)), \
          |      ^~~~~~~~~~~
    arch/arm64/kvm/sys_regs.c:1525:4: note: in expansion of macro 'SYS_DESC'
-    1525 |  { SYS_DESC(SYS_GCR_EL1), trap_raz_wi, reset_unknown, GCR_EL1 },
+    1525 |  { SYS_DESC(SYS_RGSR_EL1), trap_raz_wi, reset_unknown, RGSR_EL1 },
          |    ^~~~~~~~
->> arch/arm64/kvm/sys_regs.c:1550:13: error: 'SYS_TFSR_EL1' undeclared here (not in a function); did you mean 'SYS_DISR_EL1'?
-    1550 |  { SYS_DESC(SYS_TFSR_EL1), trap_raz_wi, reset_unknown, TFSR_EL1 },
+   arch/arm64/kvm/sys_regs.c:1526:13: error: 'SYS_GCR_EL1' undeclared here (not in a function); did you mean 'SYS_TCR_EL1'?
+    1526 |  { SYS_DESC(SYS_GCR_EL1), trap_raz_wi, reset_unknown, GCR_EL1 },
+         |             ^~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.h:156:25: note: in definition of macro 'Op0'
+     156 | #define Op0(_x)  .Op0 = _x
+         |                         ^~
+   arch/arm64/kvm/sys_regs.h:164:6: note: in expansion of macro 'sys_reg_Op0'
+     164 |  Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)), \
+         |      ^~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:1526:4: note: in expansion of macro 'SYS_DESC'
+    1526 |  { SYS_DESC(SYS_GCR_EL1), trap_raz_wi, reset_unknown, GCR_EL1 },
+         |    ^~~~~~~~
+   arch/arm64/kvm/sys_regs.c:1551:13: error: 'SYS_TFSR_EL1' undeclared here (not in a function); did you mean 'SYS_DISR_EL1'?
+    1551 |  { SYS_DESC(SYS_TFSR_EL1), trap_raz_wi, reset_unknown, TFSR_EL1 },
          |             ^~~~~~~~~~~~
    arch/arm64/kvm/sys_regs.h:156:25: note: in definition of macro 'Op0'
      156 | #define Op0(_x)  .Op0 = _x
@@ -181,11 +306,11 @@ All errors (new ones prefixed by >>):
    arch/arm64/kvm/sys_regs.h:164:6: note: in expansion of macro 'sys_reg_Op0'
      164 |  Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)), \
          |      ^~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:1550:4: note: in expansion of macro 'SYS_DESC'
-    1550 |  { SYS_DESC(SYS_TFSR_EL1), trap_raz_wi, reset_unknown, TFSR_EL1 },
+   arch/arm64/kvm/sys_regs.c:1551:4: note: in expansion of macro 'SYS_DESC'
+    1551 |  { SYS_DESC(SYS_TFSR_EL1), trap_raz_wi, reset_unknown, TFSR_EL1 },
          |    ^~~~~~~~
->> arch/arm64/kvm/sys_regs.c:1551:13: error: 'SYS_TFSRE0_EL1' undeclared here (not in a function); did you mean 'SYS_AFSR0_EL1'?
-    1551 |  { SYS_DESC(SYS_TFSRE0_EL1), trap_raz_wi, reset_unknown, TFSRE0_EL1 },
+   arch/arm64/kvm/sys_regs.c:1552:13: error: 'SYS_TFSRE0_EL1' undeclared here (not in a function); did you mean 'SYS_AFSR0_EL1'?
+    1552 |  { SYS_DESC(SYS_TFSRE0_EL1), trap_raz_wi, reset_unknown, TFSRE0_EL1 },
          |             ^~~~~~~~~~~~~~
    arch/arm64/kvm/sys_regs.h:156:25: note: in definition of macro 'Op0'
      156 | #define Op0(_x)  .Op0 = _x
@@ -193,406 +318,93 @@ All errors (new ones prefixed by >>):
    arch/arm64/kvm/sys_regs.h:164:6: note: in expansion of macro 'sys_reg_Op0'
      164 |  Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)), \
          |      ^~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:1551:4: note: in expansion of macro 'SYS_DESC'
-    1551 |  { SYS_DESC(SYS_TFSRE0_EL1), trap_raz_wi, reset_unknown, TFSRE0_EL1 },
+   arch/arm64/kvm/sys_regs.c:1552:4: note: in expansion of macro 'SYS_DESC'
+    1552 |  { SYS_DESC(SYS_TFSRE0_EL1), trap_raz_wi, reset_unknown, TFSRE0_EL1 },
          |    ^~~~~~~~
 --
+   In file included from arch/arm64/kvm/hyp/sysreg-sr.c:12:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
    arch/arm64/kvm/hyp/sysreg-sr.c: In function '__sysreg_save_common_state':
->> arch/arm64/kvm/hyp/sysreg-sr.c:30:6: error: implicit declaration of function 'system_supports_mte'; did you mean 'system_supports_bti'? [-Werror=implicit-function-declaration]
+   arch/arm64/kvm/hyp/sysreg-sr.c:30:6: error: implicit declaration of function 'system_supports_mte'; did you mean 'system_supports_bti'? [-Werror=implicit-function-declaration]
       30 |  if (system_supports_mte()) {
          |      ^~~~~~~~~~~~~~~~~~~
          |      system_supports_bti
    cc1: some warnings being treated as errors
+--
+   In file included from arch/arm64/kvm/hyp/switch.c:19:
+   arch/arm64/include/asm/kvm_emulate.h: In function 'vcpu_reset_hcr':
+>> arch/arm64/include/asm/kvm_emulate.h:84:25: error: 'HCR_ATA' undeclared (first use in this function); did you mean 'HCR_PTW'?
+      84 |   vcpu->arch.hcr_el2 |= HCR_ATA;
+         |                         ^~~~~~~
+         |                         HCR_PTW
+   arch/arm64/include/asm/kvm_emulate.h:84:25: note: each undeclared identifier is reported only once for each function it appears in
+   arch/arm64/kvm/hyp/switch.c: At top level:
+   arch/arm64/kvm/hyp/switch.c:924:28: warning: no previous prototype for 'hyp_panic' [-Wmissing-prototypes]
+     924 | void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
+         |                            ^~~~~~~~~
 
-vim +1524 arch/arm64/kvm/sys_regs.c
+vim +84 arch/arm64/include/asm/kvm_emulate.h
 
-  1391	
-  1392	/*
-  1393	 * Architected system registers.
-  1394	 * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-  1395	 *
-  1396	 * Debug handling: We do trap most, if not all debug related system
-  1397	 * registers. The implementation is good enough to ensure that a guest
-  1398	 * can use these with minimal performance degradation. The drawback is
-  1399	 * that we don't implement any of the external debug, none of the
-  1400	 * OSlock protocol. This should be revisited if we ever encounter a
-  1401	 * more demanding guest...
-  1402	 */
-  1403	static const struct sys_reg_desc sys_reg_descs[] = {
-  1404		{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-  1405		{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-  1406		{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-  1407	
-  1408		DBG_BCR_BVR_WCR_WVR_EL1(0),
-  1409		DBG_BCR_BVR_WCR_WVR_EL1(1),
-  1410		{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
-  1411		{ SYS_DESC(SYS_MDSCR_EL1), trap_debug_regs, reset_val, MDSCR_EL1, 0 },
-  1412		DBG_BCR_BVR_WCR_WVR_EL1(2),
-  1413		DBG_BCR_BVR_WCR_WVR_EL1(3),
-  1414		DBG_BCR_BVR_WCR_WVR_EL1(4),
-  1415		DBG_BCR_BVR_WCR_WVR_EL1(5),
-  1416		DBG_BCR_BVR_WCR_WVR_EL1(6),
-  1417		DBG_BCR_BVR_WCR_WVR_EL1(7),
-  1418		DBG_BCR_BVR_WCR_WVR_EL1(8),
-  1419		DBG_BCR_BVR_WCR_WVR_EL1(9),
-  1420		DBG_BCR_BVR_WCR_WVR_EL1(10),
-  1421		DBG_BCR_BVR_WCR_WVR_EL1(11),
-  1422		DBG_BCR_BVR_WCR_WVR_EL1(12),
-  1423		DBG_BCR_BVR_WCR_WVR_EL1(13),
-  1424		DBG_BCR_BVR_WCR_WVR_EL1(14),
-  1425		DBG_BCR_BVR_WCR_WVR_EL1(15),
-  1426	
-  1427		{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
-  1428		{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
-  1429		{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
-  1430		{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
-  1431		{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
-  1432		{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-  1433		{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
-  1434		{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
-  1435	
-  1436		{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
-  1437		{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
-  1438		// DBGDTR[TR]X_EL0 share the same encoding
-  1439		{ SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
-  1440	
-  1441		{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
-  1442	
-  1443		{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
-  1444	
-  1445		/*
-  1446		 * ID regs: all ID_SANITISED() entries here must have corresponding
-  1447		 * entries in arm64_ftr_regs[].
-  1448		 */
-  1449	
-  1450		/* AArch64 mappings of the AArch32 ID registers */
-  1451		/* CRm=1 */
-  1452		ID_SANITISED(ID_PFR0_EL1),
-  1453		ID_SANITISED(ID_PFR1_EL1),
-  1454		ID_SANITISED(ID_DFR0_EL1),
-  1455		ID_HIDDEN(ID_AFR0_EL1),
-  1456		ID_SANITISED(ID_MMFR0_EL1),
-  1457		ID_SANITISED(ID_MMFR1_EL1),
-  1458		ID_SANITISED(ID_MMFR2_EL1),
-  1459		ID_SANITISED(ID_MMFR3_EL1),
-  1460	
-  1461		/* CRm=2 */
-  1462		ID_SANITISED(ID_ISAR0_EL1),
-  1463		ID_SANITISED(ID_ISAR1_EL1),
-  1464		ID_SANITISED(ID_ISAR2_EL1),
-  1465		ID_SANITISED(ID_ISAR3_EL1),
-  1466		ID_SANITISED(ID_ISAR4_EL1),
-  1467		ID_SANITISED(ID_ISAR5_EL1),
-  1468		ID_SANITISED(ID_MMFR4_EL1),
-  1469		ID_SANITISED(ID_ISAR6_EL1),
-  1470	
-  1471		/* CRm=3 */
-  1472		ID_SANITISED(MVFR0_EL1),
-  1473		ID_SANITISED(MVFR1_EL1),
-  1474		ID_SANITISED(MVFR2_EL1),
-  1475		ID_UNALLOCATED(3,3),
-  1476		ID_SANITISED(ID_PFR2_EL1),
-  1477		ID_HIDDEN(ID_DFR1_EL1),
-  1478		ID_SANITISED(ID_MMFR5_EL1),
-  1479		ID_UNALLOCATED(3,7),
-  1480	
-  1481		/* AArch64 ID registers */
-  1482		/* CRm=4 */
-  1483		ID_SANITISED(ID_AA64PFR0_EL1),
-  1484		ID_SANITISED(ID_AA64PFR1_EL1),
-  1485		ID_UNALLOCATED(4,2),
-  1486		ID_UNALLOCATED(4,3),
-  1487		{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, .visibility = sve_id_visibility },
-  1488		ID_UNALLOCATED(4,5),
-  1489		ID_UNALLOCATED(4,6),
-  1490		ID_UNALLOCATED(4,7),
-  1491	
-  1492		/* CRm=5 */
-  1493		ID_SANITISED(ID_AA64DFR0_EL1),
-  1494		ID_SANITISED(ID_AA64DFR1_EL1),
-  1495		ID_UNALLOCATED(5,2),
-  1496		ID_UNALLOCATED(5,3),
-  1497		ID_HIDDEN(ID_AA64AFR0_EL1),
-  1498		ID_HIDDEN(ID_AA64AFR1_EL1),
-  1499		ID_UNALLOCATED(5,6),
-  1500		ID_UNALLOCATED(5,7),
-  1501	
-  1502		/* CRm=6 */
-  1503		ID_SANITISED(ID_AA64ISAR0_EL1),
-  1504		ID_SANITISED(ID_AA64ISAR1_EL1),
-  1505		ID_UNALLOCATED(6,2),
-  1506		ID_UNALLOCATED(6,3),
-  1507		ID_UNALLOCATED(6,4),
-  1508		ID_UNALLOCATED(6,5),
-  1509		ID_UNALLOCATED(6,6),
-  1510		ID_UNALLOCATED(6,7),
-  1511	
-  1512		/* CRm=7 */
-  1513		ID_SANITISED(ID_AA64MMFR0_EL1),
-  1514		ID_SANITISED(ID_AA64MMFR1_EL1),
-  1515		ID_SANITISED(ID_AA64MMFR2_EL1),
-  1516		ID_UNALLOCATED(7,3),
-  1517		ID_UNALLOCATED(7,4),
-  1518		ID_UNALLOCATED(7,5),
-  1519		ID_UNALLOCATED(7,6),
-  1520		ID_UNALLOCATED(7,7),
-  1521	
-  1522		{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
-  1523		{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-> 1524		{ SYS_DESC(SYS_RGSR_EL1), trap_raz_wi, reset_unknown, RGSR_EL1 },
-> 1525		{ SYS_DESC(SYS_GCR_EL1), trap_raz_wi, reset_unknown, GCR_EL1 },
-  1526		{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
-  1527		{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-  1528		{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
-  1529		{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
-  1530	
-  1531		PTRAUTH_KEY(APIA),
-  1532		PTRAUTH_KEY(APIB),
-  1533		PTRAUTH_KEY(APDA),
-  1534		PTRAUTH_KEY(APDB),
-  1535		PTRAUTH_KEY(APGA),
-  1536	
-  1537		{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
-  1538		{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
-  1539		{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-  1540	
-  1541		{ SYS_DESC(SYS_ERRIDR_EL1), trap_raz_wi },
-  1542		{ SYS_DESC(SYS_ERRSELR_EL1), trap_raz_wi },
-  1543		{ SYS_DESC(SYS_ERXFR_EL1), trap_raz_wi },
-  1544		{ SYS_DESC(SYS_ERXCTLR_EL1), trap_raz_wi },
-  1545		{ SYS_DESC(SYS_ERXSTATUS_EL1), trap_raz_wi },
-  1546		{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
-  1547		{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
-  1548		{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
-  1549	
-> 1550		{ SYS_DESC(SYS_TFSR_EL1), trap_raz_wi, reset_unknown, TFSR_EL1 },
-> 1551		{ SYS_DESC(SYS_TFSRE0_EL1), trap_raz_wi, reset_unknown, TFSRE0_EL1 },
-  1552	
-  1553		{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
-  1554		{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
-  1555	
-  1556		{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-  1557		{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-  1558	
-  1559		{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
-  1560		{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-  1561	
-  1562		{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-  1563		{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
-  1564		{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
-  1565		{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
-  1566		{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
-  1567	
-  1568		{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-  1569		{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
-  1570	
-  1571		{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
-  1572		{ SYS_DESC(SYS_ICC_EOIR0_EL1), read_from_write_only },
-  1573		{ SYS_DESC(SYS_ICC_HPPIR0_EL1), write_to_read_only },
-  1574		{ SYS_DESC(SYS_ICC_DIR_EL1), read_from_write_only },
-  1575		{ SYS_DESC(SYS_ICC_RPR_EL1), write_to_read_only },
-  1576		{ SYS_DESC(SYS_ICC_SGI1R_EL1), access_gic_sgi },
-  1577		{ SYS_DESC(SYS_ICC_ASGI1R_EL1), access_gic_sgi },
-  1578		{ SYS_DESC(SYS_ICC_SGI0R_EL1), access_gic_sgi },
-  1579		{ SYS_DESC(SYS_ICC_IAR1_EL1), write_to_read_only },
-  1580		{ SYS_DESC(SYS_ICC_EOIR1_EL1), read_from_write_only },
-  1581		{ SYS_DESC(SYS_ICC_HPPIR1_EL1), write_to_read_only },
-  1582		{ SYS_DESC(SYS_ICC_SRE_EL1), access_gic_sre },
-  1583	
-  1584		{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
-  1585		{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
-  1586	
-  1587		{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
-  1588	
-  1589		{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
-  1590		{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
-  1591		{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-  1592		{ SYS_DESC(SYS_CTR_EL0), access_ctr },
-  1593	
-  1594		{ SYS_DESC(SYS_PMCR_EL0), access_pmcr, reset_pmcr, PMCR_EL0 },
-  1595		{ SYS_DESC(SYS_PMCNTENSET_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
-  1596		{ SYS_DESC(SYS_PMCNTENCLR_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
-  1597		{ SYS_DESC(SYS_PMOVSCLR_EL0), access_pmovs, reset_unknown, PMOVSSET_EL0 },
-  1598		{ SYS_DESC(SYS_PMSWINC_EL0), access_pmswinc, reset_unknown, PMSWINC_EL0 },
-  1599		{ SYS_DESC(SYS_PMSELR_EL0), access_pmselr, reset_unknown, PMSELR_EL0 },
-  1600		{ SYS_DESC(SYS_PMCEID0_EL0), access_pmceid },
-  1601		{ SYS_DESC(SYS_PMCEID1_EL0), access_pmceid },
-  1602		{ SYS_DESC(SYS_PMCCNTR_EL0), access_pmu_evcntr, reset_unknown, PMCCNTR_EL0 },
-  1603		{ SYS_DESC(SYS_PMXEVTYPER_EL0), access_pmu_evtyper },
-  1604		{ SYS_DESC(SYS_PMXEVCNTR_EL0), access_pmu_evcntr },
-  1605		/*
-  1606		 * PMUSERENR_EL0 resets as unknown in 64bit mode while it resets as zero
-  1607		 * in 32bit mode. Here we choose to reset it as zero for consistency.
-  1608		 */
-  1609		{ SYS_DESC(SYS_PMUSERENR_EL0), access_pmuserenr, reset_val, PMUSERENR_EL0, 0 },
-  1610		{ SYS_DESC(SYS_PMOVSSET_EL0), access_pmovs, reset_unknown, PMOVSSET_EL0 },
-  1611	
-  1612		{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
-  1613		{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
-  1614	
-  1615		{ SYS_DESC(SYS_AMCR_EL0), access_amu },
-  1616		{ SYS_DESC(SYS_AMCFGR_EL0), access_amu },
-  1617		{ SYS_DESC(SYS_AMCGCR_EL0), access_amu },
-  1618		{ SYS_DESC(SYS_AMUSERENR_EL0), access_amu },
-  1619		{ SYS_DESC(SYS_AMCNTENCLR0_EL0), access_amu },
-  1620		{ SYS_DESC(SYS_AMCNTENSET0_EL0), access_amu },
-  1621		{ SYS_DESC(SYS_AMCNTENCLR1_EL0), access_amu },
-  1622		{ SYS_DESC(SYS_AMCNTENSET1_EL0), access_amu },
-  1623		AMU_AMEVCNTR0_EL0(0),
-  1624		AMU_AMEVCNTR0_EL0(1),
-  1625		AMU_AMEVCNTR0_EL0(2),
-  1626		AMU_AMEVCNTR0_EL0(3),
-  1627		AMU_AMEVCNTR0_EL0(4),
-  1628		AMU_AMEVCNTR0_EL0(5),
-  1629		AMU_AMEVCNTR0_EL0(6),
-  1630		AMU_AMEVCNTR0_EL0(7),
-  1631		AMU_AMEVCNTR0_EL0(8),
-  1632		AMU_AMEVCNTR0_EL0(9),
-  1633		AMU_AMEVCNTR0_EL0(10),
-  1634		AMU_AMEVCNTR0_EL0(11),
-  1635		AMU_AMEVCNTR0_EL0(12),
-  1636		AMU_AMEVCNTR0_EL0(13),
-  1637		AMU_AMEVCNTR0_EL0(14),
-  1638		AMU_AMEVCNTR0_EL0(15),
-  1639		AMU_AMEVTYPE0_EL0(0),
-  1640		AMU_AMEVTYPE0_EL0(1),
-  1641		AMU_AMEVTYPE0_EL0(2),
-  1642		AMU_AMEVTYPE0_EL0(3),
-  1643		AMU_AMEVTYPE0_EL0(4),
-  1644		AMU_AMEVTYPE0_EL0(5),
-  1645		AMU_AMEVTYPE0_EL0(6),
-  1646		AMU_AMEVTYPE0_EL0(7),
-  1647		AMU_AMEVTYPE0_EL0(8),
-  1648		AMU_AMEVTYPE0_EL0(9),
-  1649		AMU_AMEVTYPE0_EL0(10),
-  1650		AMU_AMEVTYPE0_EL0(11),
-  1651		AMU_AMEVTYPE0_EL0(12),
-  1652		AMU_AMEVTYPE0_EL0(13),
-  1653		AMU_AMEVTYPE0_EL0(14),
-  1654		AMU_AMEVTYPE0_EL0(15),
-  1655		AMU_AMEVCNTR1_EL0(0),
-  1656		AMU_AMEVCNTR1_EL0(1),
-  1657		AMU_AMEVCNTR1_EL0(2),
-  1658		AMU_AMEVCNTR1_EL0(3),
-  1659		AMU_AMEVCNTR1_EL0(4),
-  1660		AMU_AMEVCNTR1_EL0(5),
-  1661		AMU_AMEVCNTR1_EL0(6),
-  1662		AMU_AMEVCNTR1_EL0(7),
-  1663		AMU_AMEVCNTR1_EL0(8),
-  1664		AMU_AMEVCNTR1_EL0(9),
-  1665		AMU_AMEVCNTR1_EL0(10),
-  1666		AMU_AMEVCNTR1_EL0(11),
-  1667		AMU_AMEVCNTR1_EL0(12),
-  1668		AMU_AMEVCNTR1_EL0(13),
-  1669		AMU_AMEVCNTR1_EL0(14),
-  1670		AMU_AMEVCNTR1_EL0(15),
-  1671		AMU_AMEVTYPE1_EL0(0),
-  1672		AMU_AMEVTYPE1_EL0(1),
-  1673		AMU_AMEVTYPE1_EL0(2),
-  1674		AMU_AMEVTYPE1_EL0(3),
-  1675		AMU_AMEVTYPE1_EL0(4),
-  1676		AMU_AMEVTYPE1_EL0(5),
-  1677		AMU_AMEVTYPE1_EL0(6),
-  1678		AMU_AMEVTYPE1_EL0(7),
-  1679		AMU_AMEVTYPE1_EL0(8),
-  1680		AMU_AMEVTYPE1_EL0(9),
-  1681		AMU_AMEVTYPE1_EL0(10),
-  1682		AMU_AMEVTYPE1_EL0(11),
-  1683		AMU_AMEVTYPE1_EL0(12),
-  1684		AMU_AMEVTYPE1_EL0(13),
-  1685		AMU_AMEVTYPE1_EL0(14),
-  1686		AMU_AMEVTYPE1_EL0(15),
-  1687	
-  1688		{ SYS_DESC(SYS_CNTP_TVAL_EL0), access_arch_timer },
-  1689		{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
-  1690		{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
-  1691	
-  1692		/* PMEVCNTRn_EL0 */
-  1693		PMU_PMEVCNTR_EL0(0),
-  1694		PMU_PMEVCNTR_EL0(1),
-  1695		PMU_PMEVCNTR_EL0(2),
-  1696		PMU_PMEVCNTR_EL0(3),
-  1697		PMU_PMEVCNTR_EL0(4),
-  1698		PMU_PMEVCNTR_EL0(5),
-  1699		PMU_PMEVCNTR_EL0(6),
-  1700		PMU_PMEVCNTR_EL0(7),
-  1701		PMU_PMEVCNTR_EL0(8),
-  1702		PMU_PMEVCNTR_EL0(9),
-  1703		PMU_PMEVCNTR_EL0(10),
-  1704		PMU_PMEVCNTR_EL0(11),
-  1705		PMU_PMEVCNTR_EL0(12),
-  1706		PMU_PMEVCNTR_EL0(13),
-  1707		PMU_PMEVCNTR_EL0(14),
-  1708		PMU_PMEVCNTR_EL0(15),
-  1709		PMU_PMEVCNTR_EL0(16),
-  1710		PMU_PMEVCNTR_EL0(17),
-  1711		PMU_PMEVCNTR_EL0(18),
-  1712		PMU_PMEVCNTR_EL0(19),
-  1713		PMU_PMEVCNTR_EL0(20),
-  1714		PMU_PMEVCNTR_EL0(21),
-  1715		PMU_PMEVCNTR_EL0(22),
-  1716		PMU_PMEVCNTR_EL0(23),
-  1717		PMU_PMEVCNTR_EL0(24),
-  1718		PMU_PMEVCNTR_EL0(25),
-  1719		PMU_PMEVCNTR_EL0(26),
-  1720		PMU_PMEVCNTR_EL0(27),
-  1721		PMU_PMEVCNTR_EL0(28),
-  1722		PMU_PMEVCNTR_EL0(29),
-  1723		PMU_PMEVCNTR_EL0(30),
-  1724		/* PMEVTYPERn_EL0 */
-  1725		PMU_PMEVTYPER_EL0(0),
-  1726		PMU_PMEVTYPER_EL0(1),
-  1727		PMU_PMEVTYPER_EL0(2),
-  1728		PMU_PMEVTYPER_EL0(3),
-  1729		PMU_PMEVTYPER_EL0(4),
-  1730		PMU_PMEVTYPER_EL0(5),
-  1731		PMU_PMEVTYPER_EL0(6),
-  1732		PMU_PMEVTYPER_EL0(7),
-  1733		PMU_PMEVTYPER_EL0(8),
-  1734		PMU_PMEVTYPER_EL0(9),
-  1735		PMU_PMEVTYPER_EL0(10),
-  1736		PMU_PMEVTYPER_EL0(11),
-  1737		PMU_PMEVTYPER_EL0(12),
-  1738		PMU_PMEVTYPER_EL0(13),
-  1739		PMU_PMEVTYPER_EL0(14),
-  1740		PMU_PMEVTYPER_EL0(15),
-  1741		PMU_PMEVTYPER_EL0(16),
-  1742		PMU_PMEVTYPER_EL0(17),
-  1743		PMU_PMEVTYPER_EL0(18),
-  1744		PMU_PMEVTYPER_EL0(19),
-  1745		PMU_PMEVTYPER_EL0(20),
-  1746		PMU_PMEVTYPER_EL0(21),
-  1747		PMU_PMEVTYPER_EL0(22),
-  1748		PMU_PMEVTYPER_EL0(23),
-  1749		PMU_PMEVTYPER_EL0(24),
-  1750		PMU_PMEVTYPER_EL0(25),
-  1751		PMU_PMEVTYPER_EL0(26),
-  1752		PMU_PMEVTYPER_EL0(27),
-  1753		PMU_PMEVTYPER_EL0(28),
-  1754		PMU_PMEVTYPER_EL0(29),
-  1755		PMU_PMEVTYPER_EL0(30),
-  1756		/*
-  1757		 * PMCCFILTR_EL0 resets as unknown in 64bit mode while it resets as zero
-  1758		 * in 32bit mode. Here we choose to reset it as zero for consistency.
-  1759		 */
-  1760		{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
-  1761	
-  1762		{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-  1763		{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-  1764		{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
-  1765	};
-  1766	
+    43	
+    44	static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+    45	{
+    46		vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
+    47		if (is_kernel_in_hyp_mode())
+    48			vcpu->arch.hcr_el2 |= HCR_E2H;
+    49		if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+    50			/* route synchronous external abort exceptions to EL2 */
+    51			vcpu->arch.hcr_el2 |= HCR_TEA;
+    52			/* trap error record accesses */
+    53			vcpu->arch.hcr_el2 |= HCR_TERR;
+    54		}
+    55	
+    56		if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+    57			vcpu->arch.hcr_el2 |= HCR_FWB;
+    58		} else {
+    59			/*
+    60			 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
+    61			 * get set in SCTLR_EL1 such that we can detect when the guest
+    62			 * MMU gets turned on and do the necessary cache maintenance
+    63			 * then.
+    64			 */
+    65			vcpu->arch.hcr_el2 |= HCR_TVM;
+    66		}
+    67	
+    68		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+    69			vcpu->arch.hcr_el2 &= ~HCR_RW;
+    70	
+    71		/*
+    72		 * TID3: trap feature register accesses that we virtualise.
+    73		 * For now this is conditional, since no AArch32 feature regs
+    74		 * are currently virtualised.
+    75		 */
+    76		if (!vcpu_el1_is_32bit(vcpu))
+    77			vcpu->arch.hcr_el2 |= HCR_TID3;
+    78	
+    79		if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+    80		    vcpu_el1_is_32bit(vcpu))
+    81			vcpu->arch.hcr_el2 |= HCR_TID2;
+    82	
+    83		if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
+  > 84			vcpu->arch.hcr_el2 |= HCR_ATA;
+    85	}
+    86	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---UugvWAfsgieZRqgk
+--VS++wcV0S1rZb1Fb
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICBvNDF8AAy5jb25maWcAnDzZcty2su/5iqn4JXmIz2yS5bqlBwwIcpDhZgKcGemFNUce
+H4sICCTlDF8AAy5jb25maWcAnDzZcty2su/5iqn4JXmIz2yS5bqlBwwIcpDhZgKcGemFNUce
 O6pjSzmSnOXvbzfApQGCiu91ZTG7sTQajd7QmDc/vJmxby+PX08v93enL1/+nn0+P5yfTi/n
 j7NP91/O/zOLille6JmIpH4LjdP7h29//ev09PVyPbt4e/V2/svT3cVsd356OH+Z8ceHT/ef
 v0H3+8eHH978wIs8lknDebMXlZJF3mhx1Nc/nk5Pd79drn/5goP98vnubvZTwvnPs/dvV2/n
@@ -1955,7 +1767,7 @@ UwMXaNkqTpdtvZnFq4GiwJOlF1YJdgxdJMeGb4uOh5Yc3CZWMHDUvI02rntFFvlSImgPv87M
 Odm3kzRMYH2v5cCRpiLtR/G0K3Imepgo6DohggJY5BnXySXW8fHF3yKY8ysTwxhdPWW+kXQ4
 pf4/ZA+IutPBBAA=
 
---UugvWAfsgieZRqgk
+--VS++wcV0S1rZb1Fb
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1966,4 +1778,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---UugvWAfsgieZRqgk--
+--VS++wcV0S1rZb1Fb--
