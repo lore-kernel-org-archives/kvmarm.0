@@ -2,73 +2,58 @@ Return-Path: <SRS0=IpCr=AY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FE2C433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 07:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 555E0C433E7
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 08:26:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C797520674
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 07:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C797520674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTP id C92D52067D
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 08:26:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C92D52067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CE944B30B;
-	Mon, 13 Jul 2020 03:44:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E61A4B2FF;
+	Mon, 13 Jul 2020 04:26:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aYSomaUf5bxl; Mon, 13 Jul 2020 03:44:08 -0400 (EDT)
+	with ESMTP id VB36bAdkuyzE; Mon, 13 Jul 2020 04:26:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19C5B4B2F9;
-	Mon, 13 Jul 2020 03:44:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EEAF4B2EC;
+	Mon, 13 Jul 2020 04:26:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA6D4B285
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Jul 2020 23:07:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA8674B2EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 04:26:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L5whY5N6iYFG for <kvmarm@lists.cs.columbia.edu>;
- Sun, 12 Jul 2020 23:07:29 -0400 (EDT)
-Received: from out30-131.freemail.mail.aliyun.com
- (out30-131.freemail.mail.aliyun.com [115.124.30.131])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 993714B274
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Jul 2020 23:07:27 -0400 (EDT)
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R191e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e01355;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=37; SR=0;
- TI=SMTPD_---0U2UhFSb_1594609639; 
-Received: from 30.25.206.74(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0U2UhFSb_1594609639) by smtp.aliyun-inc.com(127.0.0.1);
- Mon, 13 Jul 2020 11:07:21 +0800
-Subject: Re: [PATCH v4 5/7] KVM: PPC: clean up redundant kvm_run parameters in
- assembly
-To: Paul Mackerras <paulus@ozlabs.org>
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <20200427043514.16144-6-tianjia.zhang@linux.alibaba.com>
- <20200526055924.GD282305@thinks.paulus.ozlabs.org>
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <c3540a4b-a568-3428-0427-ae2a1f30dbe2@linux.alibaba.com>
-Date: Mon, 13 Jul 2020 11:07:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id glbaFNg2Zl1c for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jul 2020 04:26:01 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 869674B2EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 04:26:01 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19C2330E;
+ Mon, 13 Jul 2020 01:26:01 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 088D83F887;
+ Mon, 13 Jul 2020 01:25:59 -0700 (PDT)
+Subject: Re: [PATCH 0/5] KVM: arm64: pvtime: Fixes and a new cap
+To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20200711100434.46660-1-drjones@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <81e3cf61-afa6-134b-e532-419d34349b04@arm.com>
+Date: Mon, 13 Jul 2020 09:25:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200526055924.GD282305@thinks.paulus.ozlabs.org>
-X-Mailman-Approved-At: Mon, 13 Jul 2020 03:44:07 -0400
-Cc: wanpengli@tencent.com, kvm@vger.kernel.org, david@redhat.com,
- benh@kernel.crashing.org, heiko.carstens@de.ibm.com,
- linux-mips@vger.kernel.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu,
- linux-s390@vger.kernel.org, frankja@linux.ibm.com, chenhuacai@gmail.com,
- maz@kernel.org, joro@8bytes.org, x86@kernel.org, borntraeger@de.ibm.com,
- mingo@redhat.com, thuth@redhat.com, gor@linux.ibm.com, kvm-ppc@vger.kernel.org,
- bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org,
- jmattson@google.com, tsbogend@alpha.franken.de, cohuck@redhat.com,
- sean.j.christopherson@intel.com, linux-kernel@vger.kernel.org,
- mpe@ellerman.id.au, pbonzini@redhat.com, vkuznets@redhat.com,
- linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <20200711100434.46660-1-drjones@redhat.com>
+Content-Language: en-GB
+Cc: pbonzini@redhat.com, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,91 +70,40 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On 11/07/2020 11:04, Andrew Jones wrote:
+> The first three patches in the series are fixes that come from testing
+> and reviewing pvtime code while writing the QEMU support (I'll reply
+> to this mail with a link to the QEMU patches after posting - which I'll
+> do shortly). The last patch is only a convenience for userspace, and I
+> wouldn't be heartbroken if it wasn't deemed worth it. The QEMU patches
+> I'll be posting are currently written without the cap. However, if the
+> cap is accepted, then I'll change the QEMU code to use it.
 
+Thanks for this, you've already got my r-b on the last two patches. For 
+the others:
 
-On 2020/5/26 13:59, Paul Mackerras wrote:
-> On Mon, Apr 27, 2020 at 12:35:12PM +0800, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
+Reviewed-by: Steven Price <steven.price@arm.com>
+
+> Thanks,
+> drew
 > 
-> Some of these changes don't look completely correct to me, see below.
-> If you're expecting these patches to go through my tree, I can fix up
-> the patch and commit it (with you as author), noting the changes I
-> made in the commit message.  Do you want me to do that?
+> Andrew Jones (5):
+>    KVM: arm64: pvtime: steal-time is only supported when configured
+>    KVM: arm64: pvtime: Fix potential loss of stolen time
+>    KVM: arm64: pvtime: Fix stolen time accounting across migration
+>    KVM: Documentation minor fixups
+>    arm64/x86: KVM: Introduce steal-time cap
+> 
+>   Documentation/virt/kvm/api.rst    | 20 ++++++++++++++++----
+>   arch/arm64/include/asm/kvm_host.h |  2 +-
+>   arch/arm64/kvm/arm.c              |  3 +++
+>   arch/arm64/kvm/pvtime.c           | 31 +++++++++++++++----------------
+>   arch/x86/kvm/x86.c                |  3 +++
+>   include/linux/kvm_host.h          | 19 +++++++++++++++++++
+>   include/uapi/linux/kvm.h          |  1 +
+>   7 files changed, 58 insertions(+), 21 deletions(-)
 > 
 
-I am very glad for you to do so, although I have submitted a new version 
-of patch, I still prefer you to fix up and commit it.
-
-Thanks and best,
-Tianjia
-
->> diff --git a/arch/powerpc/kvm/book3s_interrupts.S b/arch/powerpc/kvm/book3s_interrupts.S
->> index f7ad99d972ce..0eff749d8027 100644
->> --- a/arch/powerpc/kvm/book3s_interrupts.S
->> +++ b/arch/powerpc/kvm/book3s_interrupts.S
->> @@ -55,8 +55,7 @@
->>    ****************************************************************************/
->>   
->>   /* Registers:
->> - *  r3: kvm_run pointer
->> - *  r4: vcpu pointer
->> + *  r3: vcpu pointer
->>    */
->>   _GLOBAL(__kvmppc_vcpu_run)
->>   
->> @@ -68,8 +67,8 @@ kvm_start_entry:
->>   	/* Save host state to the stack */
->>   	PPC_STLU r1, -SWITCH_FRAME_SIZE(r1)
->>   
->> -	/* Save r3 (kvm_run) and r4 (vcpu) */
->> -	SAVE_2GPRS(3, r1)
->> +	/* Save r3 (vcpu) */
->> +	SAVE_GPR(3, r1)
->>   
->>   	/* Save non-volatile registers (r14 - r31) */
->>   	SAVE_NVGPRS(r1)
->> @@ -82,11 +81,11 @@ kvm_start_entry:
->>   	PPC_STL	r0, _LINK(r1)
->>   
->>   	/* Load non-volatile guest state from the vcpu */
->> -	VCPU_LOAD_NVGPRS(r4)
->> +	VCPU_LOAD_NVGPRS(r3)
->>   
->>   kvm_start_lightweight:
->>   	/* Copy registers into shadow vcpu so we can access them in real mode */
->> -	mr	r3, r4
->> +	mr	r4, r3
-> 
-> This mr doesn't seem necessary.
-> 
->>   	bl	FUNC(kvmppc_copy_to_svcpu)
->>   	nop
->>   	REST_GPR(4, r1)
-> 
-> This should be loading r4 from GPR3(r1), not GPR4(r1) - which is what
-> REST_GPR(4, r1) will do.
-> 
-> Then, in the file but not in the patch context, there is this line:
-> 
-> 	PPC_LL	r3, GPR4(r1)		/* vcpu pointer */
-> 
-> where once again GPR4 needs to be GPR3.
-> 
->> @@ -191,10 +190,10 @@ after_sprg3_load:
->>   	PPC_STL	r31, VCPU_GPR(R31)(r7)
->>   
->>   	/* Pass the exit number as 3rd argument to kvmppc_handle_exit */
-> 
-> The comment should be modified to say "2nd" instead of "3rd",
-> otherwise it is confusing.
-> 
-> The rest of the patch looks OK.
-> 
-> Paul.
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
