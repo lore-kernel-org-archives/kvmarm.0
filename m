@@ -2,93 +2,83 @@ Return-Path: <SRS0=IpCr=AY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DCEC433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 14:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300F9C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 14:53:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 025F220738
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 14:20:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADBC020738
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 14:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2qb5AmGP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 025F220738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6JqMGiL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADBC020738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 706424B251;
-	Mon, 13 Jul 2020 10:20:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F63A4B2B1;
+	Mon, 13 Jul 2020 10:53:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AkN3TpREGmbI; Mon, 13 Jul 2020 10:20:38 -0400 (EDT)
+	with ESMTP id xC79p4jOrhhc; Mon, 13 Jul 2020 10:53:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49A704B275;
-	Mon, 13 Jul 2020 10:20:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D91B54B2B4;
+	Mon, 13 Jul 2020 10:53:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4139E4B264
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 10:20:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C5454B2B2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 10:53:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZQxVpA7zmeEj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jul 2020 10:20:36 -0400 (EDT)
+ with ESMTP id 2przDm7+irDa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jul 2020 10:53:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C2604B251
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 10:20:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 505A74B2B1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 10:53:15 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CDA3B2065F;
- Mon, 13 Jul 2020 14:20:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 119282065F;
+ Mon, 13 Jul 2020 14:53:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594650034;
- bh=zUwoNoCrggFRdIInMLNsTGvOlBIbjNqvOW3tq9C2+8E=;
+ s=default; t=1594651994;
+ bh=EjfvvZ9mCy0Nn4W1XoYpiKz6WaWR9epCuB7E8hYvnKk=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=2qb5AmGPVv2DSYwXg/6nux5vau7Gc4iRBzfGQKrjW/3cszhCJQijNp0xXaX5ZKTrR
- Kv4B5sLCIEB2iIK2a7ep6RvDfX6Qf4CKrEAYUKDEfXlQ7xlYE961iTelRBSgd2sMSi
- lZ971y6X/r5uGw/ELHkUKr4jFJQedIVf0wmPpqZQ=
+ b=n6JqMGiL6MVc6+omoi+KMKl3hEIcFh1ygmMEEBo369A2/kQNSgFfhgoAsjnqwrE3B
+ RMk0/j00xZZuGwIx7J+gd4ySKN/3Kx2R8+xFEi9ep84AmcACS5uHW9Yh3X15XUwY/V
+ wN1NetEG2Lg8GfFjtaT0pacDPLYSlZ0NUgN8ugx0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1juzJp-00BNAJ-7R; Mon, 13 Jul 2020 15:20:33 +0100
-Date: Mon, 13 Jul 2020 15:20:31 +0100
-Message-ID: <87o8ojxzrk.wl-maz@kernel.org>
+ id 1juzpQ-00BNfI-J8; Mon, 13 Jul 2020 15:53:12 +0100
+Date: Mon, 13 Jul 2020 15:53:11 +0100
+Message-ID: <87mu43xy94.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
- from struct kvm
-In-Reply-To: <20200713094749.GA1705612@google.com>
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-2-maz@kernel.org>
- <20200713094749.GA1705612@google.com>
+To: zhukeqian <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v2 0/8] KVM: arm64: Support HW dirty log based on DBM
+In-Reply-To: <4eee3e4c-db73-c4ce-ca3d-d665ee87d66a@huawei.com>
+References: <20200702135556.36896-1-zhukeqian1@huawei.com>
+ <e120ec04-24d5-f1cb-3aa2-8baf3d6da1db@huawei.com>
+ <015847afd67e8bd4f8a158b604854838@kernel.org>
+ <4eee3e4c-db73-c4ce-ca3d-d665ee87d66a@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu,
- alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- kernel-team@android.com
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, catalin.marinas@arm.com,
+ kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
- Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,81 +95,144 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 13 Jul 2020 10:47:49 +0100,
-Andrew Scull <ascull@google.com> wrote:
-> 
-> On Mon, Jun 15, 2020 at 02:27:03PM +0100, Marc Zyngier wrote:
-> > -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
-> > +static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm_s2_mmu *mmu,
-> >  						  struct tlb_inv_context *cxt)
-> >  {
-> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> > @@ -79,22 +79,19 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
-> >  		isb();
-> >  	}
-> >  
-> > -	/* __load_guest_stage2() includes an ISB for the workaround. */
-> > -	__load_guest_stage2(kvm);
-> > -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
-> > +	__load_guest_stage2(mmu);
-> >  }
-> 
-> Just noticed that this drops the ISB when the speculative AT workaround
-> is not active.
-> 
-> This alternative is 'backwards' to avoid a double ISB as there is one in
-> __load_guest_stage2 when the workaround is active. I hope to address
-> this smell in an upcoming series but, for now, we should at least have
-> an ISB.
+Hi Keqian,
 
-Indeed. I must have messed up a conflict resolution here. I'll stick
-this fix on top.
+On Mon, 13 Jul 2020 03:47:25 +0100,
+zhukeqian <zhukeqian1@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> Sorry for the delay reply.
+> 
+> On 2020/7/6 15:54, Marc Zyngier wrote:
+> > Hi Keqian,
+> > 
+> > On 2020-07-06 02:28, zhukeqian wrote:
+> >> Hi Catalin and Marc,
+> >>
+> >> On 2020/7/2 21:55, Keqian Zhu wrote:
+> >>> This patch series add support for dirty log based on HW DBM.
+> >>>
+> >>> It works well under some migration test cases, including VM with 4K
+> >>> pages or 2M THP. I checked the SHA256 hash digest of all memory and
+> >>> they keep same for source VM and destination VM, which means no dirty
+> >>> pages is missed under hardware DBM.
+> >>>
+> >>> Some key points:
+> >>>
+> >>> 1. Only support hardware updates of dirty status for PTEs. PMDs and PUDs
+> >>>    are not involved for now.
+> >>>
+> >>> 2. About *performance*: In RFC patch, I have mentioned that for every 64GB
+> >>>    memory, KVM consumes about 40ms to scan all PTEs to collect dirty log.
+> >>>    This patch solves this problem through two ways: HW/SW dynamic switch
+> >>>    and Multi-core offload.
+> >>>
+> >>>    HW/SW dynamic switch: Give userspace right to enable/disable hw dirty
+> >>>    log. This adds a new KVM cap named KVM_CAP_ARM_HW_DIRTY_LOG. We can
+> >>>    achieve this by change the kvm->arch.vtcr value and kick vCPUs out to
+> >>>    reload this value to VCTR_EL2. Then userspace can enable hw dirty log
+> >>>    at the begining and disable it when dirty pages is little and about to
+> >>>    stop VM, so VM downtime is not affected.
+> >>>
+> >>>    Multi-core offload: Offload the PT scanning workload to multi-core can
+> >>>    greatly reduce scanning time. To promise we can complete in time, I use
+> >>>    smp_call_fuction to realize this policy, which utilize IPI to dispatch
+> >>>    workload to other CPUs. Under 128U Kunpeng 920 platform, it just takes
+> >>>    about 5ms to scan PTs of 256 RAM (use mempress and almost all PTs have
+> >>>    been established). And We dispatch workload iterately (every CPU just
+> >>>    scan PTs of 512M RAM for each iteration), so it won't affect physical
+> >>>    CPUs seriously.
+> >>
+> >> What do you think of these two methods to solve high-cost PTs scaning? Maybe
+> >> you are waiting for PML like feature on ARM :-) , but for my test, DBM is usable
+> >> after these two methods applied.
+> > 
+> > Useable, maybe. But leaving to userspace the decision to switch from one
+> > mode to another isn't an acceptable outcome. Userspace doesn't need nor
+> > want to know about this.
+> > 
+> OK, maybe this is worth discussing. The switch logic can be
+> encapsulated into Qemu and can not be seen from VM users. Well, I
+> think it maybe acceptable. :)
+
+I'm sorry, but no, this isn't acceptable. Userspace is concerned with
+finding out about the dirty pages, and nothing else. The method by
+which you exposes which pages are dirty is not the business of
+userspace *at all*.
+
+> 
+> > Another thing is that sending IPIs all over to trigger scanning may
+> > work well on a system that runs a limited number of guests (or some
+> > other userspace, actually), but I seriously doubt that it is impact
+> > free once you start doing this on an otherwise loaded system.
+> > 
+> Yes, it is not suitable to send IPIs to all other physical
+> CPUs. Currently I just want to show you my idea and to prove it is
+> effective. In real cloud product, we have resource isolation
+> mechanism, so we will have a bit worse result (compared to 5ms) but
+> we won't effect other VMs.
+
+If you limit the IPIs to the CPUs running the VM, they you are already
+in a situation where you effectively stop the guest to parse the S2
+page tables.
+
+> 
+> > You may have better results by having an alternative mapping of your
+> > S2 page tables so that they are accessible linearly, which would
+> > sidestep the PT parsing altogether, probably saving some cycles. But
+> Yeah, this is a good idea. But for my understanding, to make them
+> linear, we have to preserve enough physical memory at VM start (may
+> waste much memory), and the effect of this optimization *maybe* not
+> obvious.
+
+Well, you'd have to have another set of PT to map the S2
+linearly. Yes, it consumes memory.
+
+> 
+> > this is still a marginal gain compared to the overall overhead of
+> > scanning 4kB of memory per 2MB of guest RAM, as opposed to 64 *bytes*
+> > per 2MB (assuming strict 4kB mappings at S2, no block mappings).
+> > 
+> I ever tested scanning PTs by reading only one byte of each PTE and
+> the test result keeps same.  So, when we scan PTs using just one
+> core, the bottle-neck is CPU speed, instead of memory bandwidth.
+
+But you are still reading the leaf entries of the PTs, hence defeating
+any sort of prefetch that the CPU could do for you. And my claim is
+that reading the bitmap is much faster than parsing the PTs. Are you
+saying that this isn't the case?
+
+> > Finally, this doesn't work with pages dirtied from DMA, which is the
+> > biggest problem. If you cannot track pages that are dirtied behind your
+> > back, what is the purpose of scanning the dirty bits?
+> > 
+> > As for a PML-like feature, this would only be useful if the SMMU
+> > architecture took part in it and provided consistent logging of
+> > the dirtied pages in the IPA space. Only having it at the CPU level
+> > would be making the exact same mistake.
+>
+> Even SMMU is equipped with PML like feature, we still rely on device
+> suspend to avoid omitting dirty pages, so I think the only advantage
+> of PML is reducing dirty log sync time compared to multi-core
+> offload. Maybe I missing something?
+
+I don't see why you would rely on stopping DMA if you can track all
+the dirty pages in a unified way (SMMU + CPU sharing a single log). It
+doesn't matter anyway, since such HW doesn't exist, and won't exist
+for the foreseeable future.
+
+As for the S2 DBM, I still remain unconvinced. My take still is that
+without a good story for tracking DMA, this only makes the S2 MMU code
+more complex, without any concrete benefit. Without DMA, what we have
+today is adequate, and doesn't require exposing yet another userspace
+interface.
+
+If you solve the DMA issue, I'll be more than happy to reconsider.
 
 Thanks,
 
 	M.
-
-From 997c17ffe879dcad40b49a0c844c39f5d071dee9 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Mon, 13 Jul 2020 15:15:14 +0100
-Subject: [PATCH] KVM: arm64: Restore missing ISB on nVHE __tlb_switch_to_guest
-
-Commit a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table
-data from struct kvm") dropped the ISB after __load_guest_stage2(),
-only leaving the one that is required when the speculative AT
-workaround is in effect.
-
-As Andrew points it: "This alternative is 'backwards' to avoid a
-double ISB as there is one in __load_guest_stage2 when the workaround
-is active."
-
-Restore the missing ISB, conditionned on the AT workaround not being
-active.
-
-Fixes: a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from struct kvm")
-Reported-by: Andrew Scull <ascull@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/tlb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 69eae608d670..f31185272b50 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -31,7 +31,9 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 		isb();
- 	}
- 
-+	/* __load_guest_stage2() includes an ISB for the workaround. */
- 	__load_guest_stage2(mmu);
-+	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
- }
- 
- static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
--- 
-2.27.0
-
 
 -- 
 Without deviation from the norm, progress is not possible.
