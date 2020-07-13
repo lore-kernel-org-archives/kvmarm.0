@@ -2,58 +2,94 @@ Return-Path: <SRS0=IpCr=AY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555E0C433E7
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 08:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26344C433E7
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 09:48:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C92D52067D
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 08:26:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C92D52067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 96B562076D
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Jul 2020 09:47:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="A7ZsCQpb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B562076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E61A4B2FF;
-	Mon, 13 Jul 2020 04:26:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 190344B2EC;
+	Mon, 13 Jul 2020 05:47:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VB36bAdkuyzE; Mon, 13 Jul 2020 04:26:04 -0400 (EDT)
+	with ESMTP id sjVqm-VriCLo; Mon, 13 Jul 2020 05:47:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EEAF4B2EC;
-	Mon, 13 Jul 2020 04:26:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1665D4B319;
+	Mon, 13 Jul 2020 05:47:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA8674B2EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 04:26:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 885F64B316
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 05:47:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id glbaFNg2Zl1c for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jul 2020 04:26:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 869674B2EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 04:26:01 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19C2330E;
- Mon, 13 Jul 2020 01:26:01 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 088D83F887;
- Mon, 13 Jul 2020 01:25:59 -0700 (PDT)
-Subject: Re: [PATCH 0/5] KVM: arm64: pvtime: Fixes and a new cap
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-References: <20200711100434.46660-1-drjones@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <81e3cf61-afa6-134b-e532-419d34349b04@arm.com>
-Date: Mon, 13 Jul 2020 09:25:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ with ESMTP id FbPTGOZRN81y for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jul 2020 05:47:56 -0400 (EDT)
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
+ [209.85.128.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E67F4B315
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 05:47:56 -0400 (EDT)
+Received: by mail-wm1-f67.google.com with SMTP id l17so12674122wmj.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2020 02:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=wU36Y0dkg3gAVd6d1AcAnpID0ooqTkwf12/Wn37dSh8=;
+ b=A7ZsCQpbegT8axsNvUlyF9UT89ZbeiGiZkLrgxw1YmwTLxFMJeSBX5PVPDvwemiCQf
+ +xdOx4uXQ04sxIVCK4z4DHESzUOUwvxMl1Pbr2+u1DqVXylIXHlVdC9tQ8cu4q2bMAkp
+ 3wcfRjrV8MULjMq8vbKugMS7E27X5BQMVf3Gk7wUolkk8AQHn380jLXMJcIFP+iHcONA
+ wF86WUEtjwWADcagCLRleHr0e33uzB5lqVIMz3Q7LzU4PjbEaF6qRmFAEMcxtiKTvCaW
+ lbrWyFdP56eeGYvwuHdtddQQo1T2XJL+8FS5TzY3Ak5EL5I/kkTT71VshclQHeN7BbpE
+ 25RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wU36Y0dkg3gAVd6d1AcAnpID0ooqTkwf12/Wn37dSh8=;
+ b=IOc9W+Zu1HcnknwDRSMH4FaJiqKSBuZprXoicNRMSSHiTevEfVMUGfUP9WSlwXa4FF
+ As4Om4/00off/THrZmvEXGomR5+ndbJaZ4YG1RmQxb0Pz9TL1XCoKjbpgIhcAidu/CfH
+ f8627yrbiLLDo8bF8d15JD/M5MM4A2iEXoRDiuAL6u+yJPKbcrQ6DR7lgzn1H6U38IqH
+ 92pjGGmP+n+QK+y7tOkqByUEd37gt9NqxiGYlEAS9A+5T7HMLkcvJl0t41AG143++Agu
+ eNd68maMRMsDWNl0C7k7v+JhIkFkbtcl3IJsWnrorknXS5pfI3MYGzkYAY+qhWUJ2gZM
+ ozSw==
+X-Gm-Message-State: AOAM530+IaHdDzDTb8k5gdtq49hX0dhb9h3kOEGTWCd2u03nyV2PeXXj
+ Ma/0wX6nhkV9fF1how7IdgceuA==
+X-Google-Smtp-Source: ABdhPJwyciHJulV8GXvdtkPxOyujpSo+cQuGQ3mGaHjDjrbR5btQ2IIFf/d0BtLDW6TxzTCNb06wKA==
+X-Received: by 2002:a1c:c387:: with SMTP id t129mr17858571wmf.27.1594633675285; 
+ Mon, 13 Jul 2020 02:47:55 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
+ by smtp.gmail.com with ESMTPSA id z6sm19636364wmf.33.2020.07.13.02.47.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jul 2020 02:47:54 -0700 (PDT)
+Date: Mon, 13 Jul 2020 10:47:49 +0100
+From: Andrew Scull <ascull@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+Message-ID: <20200713094749.GA1705612@google.com>
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200711100434.46660-1-drjones@redhat.com>
-Content-Language: en-GB
-Cc: pbonzini@redhat.com, maz@kernel.org
+Content-Disposition: inline
+In-Reply-To: <20200615132719.1932408-2-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will@kernel.org>, George Cherian <gcherian@marvell.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,45 +101,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/07/2020 11:04, Andrew Jones wrote:
-> The first three patches in the series are fixes that come from testing
-> and reviewing pvtime code while writing the QEMU support (I'll reply
-> to this mail with a link to the QEMU patches after posting - which I'll
-> do shortly). The last patch is only a convenience for userspace, and I
-> wouldn't be heartbroken if it wasn't deemed worth it. The QEMU patches
-> I'll be posting are currently written without the cap. However, if the
-> cap is accepted, then I'll change the QEMU code to use it.
+On Mon, Jun 15, 2020 at 02:27:03PM +0100, Marc Zyngier wrote:
+> -static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+> +static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm_s2_mmu *mmu,
+>  						  struct tlb_inv_context *cxt)
+>  {
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> @@ -79,22 +79,19 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+>  		isb();
+>  	}
+>  
+> -	/* __load_guest_stage2() includes an ISB for the workaround. */
+> -	__load_guest_stage2(kvm);
+> -	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+> +	__load_guest_stage2(mmu);
+>  }
 
-Thanks for this, you've already got my r-b on the last two patches. For 
-the others:
+Just noticed that this drops the ISB when the speculative AT workaround
+is not active.
 
-Reviewed-by: Steven Price <steven.price@arm.com>
-
-> Thanks,
-> drew
-> 
-> Andrew Jones (5):
->    KVM: arm64: pvtime: steal-time is only supported when configured
->    KVM: arm64: pvtime: Fix potential loss of stolen time
->    KVM: arm64: pvtime: Fix stolen time accounting across migration
->    KVM: Documentation minor fixups
->    arm64/x86: KVM: Introduce steal-time cap
-> 
->   Documentation/virt/kvm/api.rst    | 20 ++++++++++++++++----
->   arch/arm64/include/asm/kvm_host.h |  2 +-
->   arch/arm64/kvm/arm.c              |  3 +++
->   arch/arm64/kvm/pvtime.c           | 31 +++++++++++++++----------------
->   arch/x86/kvm/x86.c                |  3 +++
->   include/linux/kvm_host.h          | 19 +++++++++++++++++++
->   include/uapi/linux/kvm.h          |  1 +
->   7 files changed, 58 insertions(+), 21 deletions(-)
-> 
-
+This alternative is 'backwards' to avoid a double ISB as there is one in
+__load_guest_stage2 when the workaround is active. I hope to address
+this smell in an upcoming series but, for now, we should at least have
+an ISB.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
