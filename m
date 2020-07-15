@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2782DC433E5
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7BDC433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D7A6820672
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47F9F20672
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="o75352bN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A6820672
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Wc8zEvVt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F9F20672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B6A4B3F9;
-	Wed, 15 Jul 2020 14:46:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0348D4B316;
+	Wed, 15 Jul 2020 14:46:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PshEn2dnjVXD; Wed, 15 Jul 2020 14:45:59 -0400 (EDT)
+	with ESMTP id yNTSIel+Ah6J; Wed, 15 Jul 2020 14:46:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 885024B41E;
-	Wed, 15 Jul 2020 14:45:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE594B3FB;
+	Wed, 15 Jul 2020 14:46:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93DB54B170
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C545D4B3F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:46:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lrc7CF2lVHhg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:45:57 -0400 (EDT)
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
- [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EC2B4B3FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:57 -0400 (EDT)
-Received: by mail-qk1-f201.google.com with SMTP id 124so2084322qko.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:57 -0700 (PDT)
+ with ESMTP id bTPHl7QS-0gx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:45:59 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 909E74B414
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:59 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id x37so1877404qvf.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=iVU/LQgPVV7MKdopSyPrjaM27WZtO9bMI7n5fXqw88g=;
- b=o75352bNhQIOh3SrbrDZddfhVt1YCwucFpx2NKpaz61MrZCLgRuUElNuLG0KoVDc2W
- 0mnVwFgP24kx3HciSuFzt9PQrpACNqpqqRe9P6GW1homOm1qH6ruNw9/paTu4T1eYCNS
- P3qdO0KrgqzXeB60nlk2pZW/XIdWIHRlwJ2uSkStG+4PKi5f0VUbEdqYCpwu+v9xsLXL
- A5p0DQ1VxRVJi+Bqcxhp+REPfbli9axa+JWfBtBwO7MysUp6/a4vvSqyq4AXMdBcW/I4
- jJ9cw8VPU07fFBGi+8lfuLbF3wWe/8aVA6mbBzvw+fuMz4ynTJxWova3v2v305SNlbMn
- etAg==
+ :cc; bh=71/TOdECH5CUV1KOjaMf3rmU/Fwlx3ePs9xJ3fmTKuI=;
+ b=Wc8zEvVtxfhmUXqp0w+VacSYS1XEWZu1YR4qEwjhSS+KFHv935Rj7vI0eclacsyWjT
+ MAda4tZzfhd4ZkfhNda3zsmmNUK6VrY7EFC4S/h++jRFRqFjyxuV5to7kcusopAoLJIJ
+ OwseiEvfuCCuCJbUBiMX9lWacL7y40cjarOiPiy2oPAy1CbnOIQ+3/hUVKC5ZVHsOztb
+ V0dg1FScYkM/DVlykBKo2+Y59H49Fl84lJXB7sq3mK7cHeuCSBLXOFHw/4beolULTu4S
+ AI+WgPGvDeNLuO+8Nzwyht69PIMFT5gtlFATv+vl77dbIPoBBPxkCr9T5nDbyVzxJEt3
+ dbjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=iVU/LQgPVV7MKdopSyPrjaM27WZtO9bMI7n5fXqw88g=;
- b=VQZU0k0d7Eadw50+je6Nexr3Nu4IvOmepEp07xTHuQJ/S501n9KDw6uLESzgfbC4IT
- DHBwY91XEu/hiShtCStYs5uvSCP3wD+vK3xP2fuU6GuToc4Y/J2d14OkUJl7m9UPqJ+L
- NQ8Cc3FZfSJJPFSQ5dhb11CKJ6FS+bT+bpnXCeOzQSDYVnNIKCo2hR8eZY/307qT81QA
- mAHf4MT2s9Te3AvulpUB1bNbPN1LqsQUcRU6zXscBm/ZBr4jZ8uiRn4GwdxQpAAkQWKP
- ZbGvxGarSJL/ZBSgRWWh6kJmnrKN/R08byQHld5a2VW+ElH58GYNsGZpF8djoh+Eoh7M
- S/Yw==
-X-Gm-Message-State: AOAM530Q4w/xlYjZqftjgyb10wfvBkGuA2TC16+sL3Ttw7W6/g9afDY1
- hwssNAIswslHaAj2iBekF7PJWiqrAItSkjwnBio3uKiwvrysQAGdiffXV2ejJnhtW2Wl+sWEM6g
- +nIPtDfLi0Okb2vE5si3fENTNYvoU/9h3UBtxPyKQwUhL84MBntVyF93YXnHo3a4az9j6WA==
-X-Google-Smtp-Source: ABdhPJyX5Dws739rJeXSgxWwcFaJXnaI18SyM/sJAV3uHPKYJqZOuwLf+pVAfOZ6wxagmpppSkBhEaWwfDI=
-X-Received: by 2002:a0c:d44e:: with SMTP id r14mr691071qvh.105.1594838756797; 
- Wed, 15 Jul 2020 11:45:56 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:32 +0100
+ bh=71/TOdECH5CUV1KOjaMf3rmU/Fwlx3ePs9xJ3fmTKuI=;
+ b=cPXuEzyQ5qT1w8yqergfCtmlkLS8D5FTBAijqDK4a5DXxco2HS59fHNDlVq/NlqlNb
+ 73YllSnB5/NZMqY7GJFWlXvBSVmExFFeZmWnQtaN/dt6iKEivzq8T29gctPDuOFpBmam
+ OHpmlQGue83eUpVdEiBY154Ynn6CAFj3ko6TONxpmSDIot2cRFMcianakLccRyqXde4N
+ mVNSL4zoqKh7tYmfd7+21uzuOmdEiC6XSnTJ4fAbBHcNUdBFBUHMaoNJE1BfONxdBlmr
+ Z6RUNC4FhSfcg9krMm9a751FOdKGCfT8IIQRBeEgLE7r2vOEYJRhRi2Ml6GJGGpXPgDE
+ tLpA==
+X-Gm-Message-State: AOAM532SLF1NXL+ZpI29Wo69epWZtRShjTpCPn+9X86FqfNs7qq4pjAp
+ dLh6KW8jR3fCqK4+zq7gi1ApzIqZAcVk/f3ci/S1Xgp/eTqwEW0GZ+s4UhjQiLL3Lm+PhDw1jpM
+ 4vMsVAwmtjyvJ8Br1WKDuyrxxuzbKaNDQqKnjLEDlA5ZR8P15fn1rQPMNQv4msvE3N3rXYg==
+X-Google-Smtp-Source: ABdhPJxPcT816I/mowhrxU8rIpggB3iBfWJ6isUIhqTqnqv7jgvgoGJCjy7/bYYKmqTwt9LF0F5Hj82ZijI=
+X-Received: by 2002:ad4:4bb0:: with SMTP id i16mr760210qvw.42.1594838759017;
+ Wed, 15 Jul 2020 11:45:59 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:33 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-32-ascull@google.com>
+Message-Id: <20200715184438.1390996-33-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 31/37] KVM: arm64: Move speculative AT ISBs into context
+Subject: [PATCH 32/37] KVM: arm64: nVHE: Unify sysreg state restoration paths
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -95,83 +95,243 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-VHE's workaround requires an ISB between the configuration of the S2
-translation and the update of HCR_EL2. It's much easier to see when and
-why this is happening if it all happens at the same place in the same
-file.
-
-nVHE's workaround does not require an immediate ISB after the
-configuration of the S2 translation as the necessary synchronization
-happens at a later stage.
+These sets of state are moved together as nVHE's speculative AT
+workaround depends on their correct interaction. As a consequence of
+this change, the workaround is much simpler as both the host and the
+guests now share the same code path.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 7 -------
- arch/arm64/kvm/hyp/nvhe/tlb.c    | 2 +-
- arch/arm64/kvm/hyp/vhe/switch.c  | 1 +
- arch/arm64/kvm/hyp/vhe/tlb.c     | 4 ++--
- 4 files changed, 4 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 48 ++++-------
+ arch/arm64/kvm/hyp/nvhe/switch.c           | 96 +++++++++-------------
+ 2 files changed, 54 insertions(+), 90 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 22157ded04ca..835d3fe2f781 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -596,13 +596,6 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 0c24c922bae8..cffe7dd3df41 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -75,25 +75,6 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
  {
- 	write_sysreg(kern_hyp_va(mmu->kvm)->arch.vtcr, vtcr_el2);
- 	write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
+ 	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
+ 	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
 -
+-	if (has_vhe() ||
+-	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+-	} else	if (!ctxt->is_host) {
+-		/*
+-		 * Must only be done for guest registers, hence the context
+-		 * test. Pairs with nVHE's __activate_traps().
+-		 */
+-		write_sysreg_el1((ctxt_sys_reg(ctxt, TCR_EL1) |
+-				  TCR_EPD1_MASK | TCR_EPD0_MASK),
+-				 SYS_TCR);
+-		isb();
+-		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1] | SCTLR_ELx_M,
+-				 SYS_SCTLR);
+-		isb();
+-	}
+-
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, CPACR_EL1),	SYS_CPACR);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL1),	SYS_TTBR0);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL1),	SYS_TTBR1);
+@@ -109,23 +90,24 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
+ 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
+ 
+-	if (!has_vhe() &&
+-	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
+-	    ctxt->is_host) {
++	if (!has_vhe()) {
+ 		/*
+-		 * Must only be done for host registers, hence the context
+-		 * test. Pairs with nVHE's __deactivate_traps().
++		 * For CPUs that are affected by the speculative AT errata,
++		 * ensure the vcpu's stage 1 and stage 2 translations have been
++		 * configured before before updating TCR_EL1 and SCTLR_EL1 to
++		 * potentially allow any speculative walks to occur. The stage
++		 * 2 will have already been configured by the nVHE switching
++		 * code before calling this function.
+ 		 */
+-		isb();
+-		/*
+-		 * At this stage, and thanks to the above isb(), S2 is
+-		 * deconfigured and disabled. We can now restore the host's
+-		 * S1 configuration: SCTLR, and only then TCR.
+-		 */
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+-		isb();
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
++		asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
++	}
++
++	write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
++	if (!has_vhe()) {
++		/* Ensure S1 MMU state is restored before allowing S1 walks. */
++		asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
+ 	}
++	write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+ 
+ 	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 25c64392356b..c87b0a709d35 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -43,43 +43,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	write_sysreg(val, cptr_el2);
+-
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+-
+-		isb();
+-		/*
+-		 * At this stage, and thanks to the above isb(), S2 is
+-		 * configured and enabled. We can now restore the guest's S1
+-		 * configuration: SCTLR, and only then TCR.
+-		 */
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
+-		isb();
+-		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
+-	}
+ }
+ 
+ static void __deactivate_traps(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *vcpu)
+ {
+ 	___deactivate_traps(vcpu);
+ 
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+-		u64 val;
+-
+-		/*
+-		 * Set the TCR and SCTLR registers in the exact opposite
+-		 * sequence as __activate_traps (first prevent walks,
+-		 * then force the MMU on). A generous sprinkling of isb()
+-		 * ensure that things happen in this exact order.
+-		 */
+-		val = read_sysreg_el1(SYS_TCR);
+-		write_sysreg_el1(val | TCR_EPD1_MASK | TCR_EPD0_MASK, SYS_TCR);
+-		isb();
+-		val = read_sysreg_el1(SYS_SCTLR);
+-		write_sysreg_el1(val | SCTLR_ELx_M, SYS_SCTLR);
+-		isb();
+-	}
+-
+ 	__deactivate_traps_common();
+ 
+ 	write_sysreg(host_vcpu->arch.mdcr_el2, mdcr_el2);
+@@ -87,9 +56,12 @@ static void __deactivate_traps(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *vcpu
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
+-static void __deactivate_vm(struct kvm_vcpu *vcpu)
++static void __restore_stage2(struct kvm_vcpu *vcpu)
+ {
+-	write_sysreg(0, vttbr_el2);
++	if (vcpu->arch.hcr_el2 & HCR_VM)
++		__activate_vm(kern_hyp_va(vcpu->arch.hw_mmu));
++	else
++		write_sysreg(0, vttbr_el2);
+ }
+ 
+ /* Save VGICv3 state on non-VHE systems */
+@@ -147,8 +119,6 @@ static void __pmu_switch_to_host(void)
+ static void __kvm_vcpu_switch_to_guest(struct kvm_vcpu *host_vcpu,
+ 				       struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+-
+ 	/*
+ 	 * Having IRQs masked via PMR when entering the guest means the GIC
+ 	 * will not signal the CPU of interrupts of lower priority, and the
+@@ -162,35 +132,14 @@ static void __kvm_vcpu_switch_to_guest(struct kvm_vcpu *host_vcpu,
+ 
+ 	__pmu_switch_to_guest();
+ 
 -	/*
--	 * ARM errata 1165522 and 1530923 require the actual execution of the
--	 * above before we can switch to the EL1/EL0 translation regime used by
--	 * the guest.
+-	 * We must restore the 32-bit state before the sysregs, thanks
+-	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
+-	 *
+-	 * Also, and in order to be able to deal with erratum #1319537 (A57)
+-	 * and #1319367 (A72), we must ensure that all VM-related sysreg are
+-	 * restored before we enable S2 translation.
 -	 */
--	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
+-	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_state_nvhe(guest_ctxt);
+-
+-	__activate_vm(kern_hyp_va(vcpu->arch.hw_mmu));
+-	__activate_traps(vcpu);
+-
+ 	__timer_enable_traps(vcpu);
  }
  
- #endif /* __ASSEMBLY__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 16fa06ff0554..2a0de9d67f00 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -38,7 +38,7 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ static void __kvm_vcpu_switch_to_host(struct kvm_vcpu *host_vcpu,
+ 				      struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+-
+ 	__timer_disable_traps(vcpu);
  
- 	/* __load_guest_stage2() includes an ISB for the workaround. */
- 	__load_guest_stage2(mmu);
--	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
-+	isb();
- }
+-	__deactivate_traps(host_vcpu, vcpu);
+-	__deactivate_vm(vcpu);
+-
+-	__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
+-
+ 	__pmu_switch_to_host();
  
- static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 3c475cc83a2d..04ee01774ea2 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -126,6 +126,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	 * (among other things).
- 	 */
- 	__activate_vm(vcpu->arch.hw_mmu);
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
- 	__activate_traps(vcpu);
+ 	/* Returning to host will clear PSR.I, remask PMR if needed */
+@@ -228,6 +177,39 @@ static void __vcpu_restore_state(struct kvm_vcpu *vcpu, bool restore_debug)
+ 	else
+ 		__kvm_vcpu_switch_to_guest(running_vcpu, vcpu);
  
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index fd7895945bbc..b9abd17c1180 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -50,10 +50,10 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 	 *
- 	 * ARM erratum 1165522 requires some special handling (again),
- 	 * as we need to make sure both stages of translation are in
--	 * place before clearing TGE. __load_guest_stage2() already
--	 * has an ISB in order to deal with this.
-+	 * place before clearing TGE.
- 	 */
- 	__load_guest_stage2(mmu);
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
- 	val = read_sysreg(hcr_el2);
- 	val &= ~HCR_TGE;
- 	write_sysreg(val, hcr_el2);
++	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
++		u64 val;
++
++		/*
++		 * Set the TCR and SCTLR registers to prevent any stage 1 or 2
++		 * page table walks or TLB allocations. A generous sprinkling
++		 * of isb() ensure that things happen in this exact order.
++		 */
++		val = read_sysreg_el1(SYS_TCR);
++		write_sysreg_el1(val | TCR_EPD1_MASK | TCR_EPD0_MASK, SYS_TCR);
++		isb();
++		val = read_sysreg_el1(SYS_SCTLR);
++		write_sysreg_el1(val | SCTLR_ELx_M, SYS_SCTLR);
++		isb();
++	}
++
++	/*
++	 * We must restore the 32-bit state before the sysregs, thanks to
++	 * erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
++	 *
++	 * Also, and in order to deal with the speculative AT errata, we must
++	 * ensure the S2 translation is restored before allowing page table
++	 * walks and TLB allocations when the sysregs are restored.
++	 */
++	__restore_stage2(vcpu);
++	__sysreg32_restore_state(vcpu);
++	__sysreg_restore_state_nvhe(&vcpu->arch.ctxt);
++
++	if (vcpu->arch.ctxt.is_host)
++		__deactivate_traps(vcpu, running_vcpu);
++	else
++		__activate_traps(vcpu);
++
+ 	__hyp_vgic_restore_state(vcpu);
+ 
+ 	/*
+@@ -300,7 +282,7 @@ void __noreturn hyp_panic(void)
+ 	if (vcpu != host_vcpu) {
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(host_vcpu, vcpu);
+-		__deactivate_vm(vcpu);
++		__restore_stage2(host_vcpu);
+ 		__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
+ 	}
+ 
 -- 
 2.27.0.389.gc38d7665816-goog
 
