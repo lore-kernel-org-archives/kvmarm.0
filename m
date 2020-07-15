@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFD7C433E3
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C89DCC433F4
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2DDDB20771
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82907207BC
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="FfJ8yrfM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DDDB20771
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="tsWjcYpf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82907207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4A94B238;
-	Wed, 15 Jul 2020 14:45:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5B14B3B0;
+	Wed, 15 Jul 2020 14:45:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yX2eWI0gvK+U; Wed, 15 Jul 2020 14:45:14 -0400 (EDT)
+	with ESMTP id Tt6Qf5ATZimz; Wed, 15 Jul 2020 14:45:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F994B3C1;
-	Wed, 15 Jul 2020 14:45:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15ACE4B388;
+	Wed, 15 Jul 2020 14:45:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18CD34B213
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06ECC4B3C0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QFf2rvdytCsu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:45:11 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E5334B1CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:11 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id d202so3967174ybh.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:11 -0700 (PDT)
+ with ESMTP id Vr8OiD74iSsn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:45:19 -0400 (EDT)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D06054B3C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:19 -0400 (EDT)
+Received: by mail-qk1-f202.google.com with SMTP id h4so2062704qkl.23
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Pe+OeVkFdVfdLCR9l3Rkbn829uq1fiFz6g2wLHYGq3k=;
- b=FfJ8yrfM2AzmdQnBJY2PX/wVHJyHyQaGnSzd7zACLhQloJ5FUk0nzlR4Adju1URDBN
- Hs5JgwE+eNLzG3B7BoGWzCxqeiOtt5jAadkGZSXdI1AzdgZ8DJ8YBwMenArjAKxBPQNH
- 7p0e5FJOZXXJwp9v3u8FDjiJcPcv8JhaEdeqVoAVPPmQEtzNwMg+6LefU6vuQp7FJ7VY
- /DDBlgYN3eACPWVog5donf+EP33ogjDzYxHDjJBbeGcEuzzA9f+fKk1J33bKsRXUQgXT
- ThuNDORp72QkCDCDMzoj9qKKuRfOt6irnk6NV36hs2AEAmdqfKLfysfk4GLw4Y91mfHC
- moPg==
+ :cc; bh=gUi+pL95nHangpHU9mv6/1nVTrQ0ibsC6/EzxOy4I0k=;
+ b=tsWjcYpfCiIv/NdRvEviXMESDU77Qb4IjecaJ2NKRFCpgr5QrjM/TE+qbqh8o6rRWm
+ WmWv5Is0iNqElYbkadL30rxWDaD/0jo++s42+0iUoOEJrdrkPsNQ5X1KGalih3mRXAcd
+ zu9teHTLQASZ14CO2zAEKrbGxwLVYDG7yY0azsv9ZDoSnQUOYhq5FLb2GfdPGUqPw9FC
+ fmG3k04WEoJCfroyfLSGQS9rq6MBo09OulfT8aJBjlunViIAaDWXiOm7KvnfQT843ShO
+ zCRQnXFAYKnLVKW+YNSrzzBhfZQahQvfDUAdjRkPGtuxbT7OijNr3pnFgv72s6Rz3jEC
+ L59Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Pe+OeVkFdVfdLCR9l3Rkbn829uq1fiFz6g2wLHYGq3k=;
- b=oRAHuaXItrXquZK+pOaqm+eRWXJMGA4OUA5M4uKkJPTvVRHhp2b2RwgWkXSHh1W7Sx
- wQBFkR88o/UKB93qXgcKqs/YWyQztry0N1rFoIZE2o4cI1FPLjnp1vCOE0ee4TaUGsJX
- YG6E0775Y9TP/aIypsgs3CViJy3JAkoidk7Y0J621k/EDAK4U3jOgVHLgk8KbaNspljr
- YvNS2Yzav84NG92ytqX67OY2oRKuTXYc/L97KvA/SPZtbtXBg6A5QZQsP+guVYQZ+yZP
- 1LI5xgz6OISfcRUPWGgjh3VKTk8RZLGLh3N6mBMkIqhzJZavAivjUE5/5Jdl8My0ADz9
- xXzg==
-X-Gm-Message-State: AOAM531o3Q4796CwNiCLTdTLo8cXw60Dh5L54jIrjHUZsUXQhIrlaoYJ
- zSjC+MeTBkBnTqgGBbq50YSoQS4rQmknkxLTwpNyf/zFh8WXu1XkHDD5N3QMpRIvP6p4AUglyIX
- jU/dSr/LneDSRrNgDRbENB3hMJ50DXs7nlaWRxJ09k4Gf1vGvk155UCB2siqLlUkuQi2Z9g==
-X-Google-Smtp-Source: ABdhPJywioEiXWVrSK1+7gkaaiKWFzNLdUSFQv9Z6v46oVWxWDk1eRf+Nw0gKU/MltCP9AxcWNbivtkdtHM=
-X-Received: by 2002:a5b:4ca:: with SMTP id u10mr597339ybp.128.1594838710592;
- Wed, 15 Jul 2020 11:45:10 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:11 +0100
+ bh=gUi+pL95nHangpHU9mv6/1nVTrQ0ibsC6/EzxOy4I0k=;
+ b=P7usJwLMnyggNfwh/95NK8KHTEZJR8hC3h0AomWy7pB8zp2+Bq2X4Qsbjt6R0SCn2C
+ QHSiIygz/TTrMrKiOe+4oRYohgC8E47W5n/y7A+7z0mVLGSMC5MUs8k2qlwNjd4edpxg
+ LYyZlAKh1GOgOBKD2q6qodDN8d+RoweCv2KhuMOIkqh8Tt/1CkXBb1CWh+s249imBQfY
+ XBUMg+FCBxgDKnccE6Rzqrws8n/48q5/6RdNaZKDk8NZTbZffL7nCm7VA87LrxAeBkF4
+ 7Pp9CnFsl119x9IkgIgexnuTAt8sxi/zfQKfML2N+yiJRL+WWhb2BIUsWo/SBTWEgr8S
+ dVSQ==
+X-Gm-Message-State: AOAM531O2s95uIL680wBz8qRrxj4H3zzNyxk3lnvhR2h+mIsovioYg0b
+ KzwWdM4cHVlE0r4rFz69rSlkKpC7MyB01Hjwd5FCHFEEH2eFmc1ob1Ssixx1SshmoNMROB4TaSB
+ 6u6NXedNmD8Nbyk6oZT3yL1cjwZt1KinJ33GdVlQC13ny2lUe2w2sAtrlmW3kYziZu//h3Q==
+X-Google-Smtp-Source: ABdhPJwXsv4DZeg+KMEwxfy93xzIr+bZH1QIB2LdNhZgA+3SRBBAF3Mlbjp3yRE5BZM1xUn3SSz68QbMyOA=
+X-Received: by 2002:a0c:d84d:: with SMTP id i13mr649517qvj.167.1594838719321; 
+ Wed, 15 Jul 2020 11:45:19 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:15 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-11-ascull@google.com>
+Message-Id: <20200715184438.1390996-15-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 10/37] KVM: arm64: nVHE: Migrate hyp interface to SMCCC
+Subject: [PATCH 14/37] KVM: arm64: nVHE: Use __kvm_vcpu_run for the host vcpu
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -95,281 +95,211 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Rather than passing arbitrary function pointers to run at hyp, define
-and equivalent set of SMCCC functions.
+Keeping the assumption that transitions will only be from the host to a
+guest and vice-versa, make __kvm_vcpu_run switch to the requested vcpu
+and run it.
 
-Since the SMCCC functions are strongly tied to the original function
-prototypes, it is not expected for the host to ever call an invalid ID
-but a warning is raised if this does ever occur.
+The context is only switched when it is not currently active allowing
+the host to be run repeatedly when servicing HVCs.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
-Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h   |  24 +++++++
- arch/arm64/include/asm/kvm_host.h  |  26 +++++---
- arch/arm64/kvm/arm.c               |   4 +-
- arch/arm64/kvm/hyp.S               |  25 ++-----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 104 +++++++++++++++++++++++++----
- 5 files changed, 139 insertions(+), 44 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 22 ++-----
+ arch/arm64/kvm/hyp/nvhe/switch.c   | 95 ++++++++++++++++++++++--------
+ 2 files changed, 74 insertions(+), 43 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ebe9d582f360..ff27c18b9fd6 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -38,6 +38,30 @@
- 
- #define __SMCCC_WORKAROUND_1_SMC_SZ 36
- 
-+#define KVM_HOST_SMCCC_ID(id)						\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_64,				\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,		\
-+			   (id))
-+
-+#define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
-+
-+#define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
-+#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		1
-+#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		2
-+#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		3
-+#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	4
-+#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		5
-+#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			6
-+#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_ich_vtr_el2		8
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
-+#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
-+#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
-+
- #ifndef __ASSEMBLY__
- 
- #include <linux/mm.h>
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 183312340d2c..5603d2f465eb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -11,6 +11,7 @@
- #ifndef __ARM64_KVM_HOST_H__
- #define __ARM64_KVM_HOST_H__
- 
-+#include <linux/arm-smccc.h>
- #include <linux/bitmap.h>
- #include <linux/types.h>
- #include <linux/jump_label.h>
-@@ -492,18 +493,21 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
- 
--u64 __kvm_call_hyp(void *hypfn, ...);
-+u64 __kvm_call_hyp_init(phys_addr_t pgd_ptr,
-+			unsigned long hyp_stack_ptr,
-+			unsigned long vector_ptr,
-+			unsigned long start_hyp,
-+			unsigned long tpidr_el2);
- 
--#define kvm_call_hyp_nvhe(f, ...)					\
--	do {								\
--		DECLARE_KVM_NVHE_SYM(f);				\
--		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
--	} while(0)
--
--#define kvm_call_hyp_nvhe_ret(f, ...)					\
-+#define kvm_call_hyp_nvhe(f, ...)						\
- 	({								\
--		DECLARE_KVM_NVHE_SYM(f);				\
--		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
-+		struct arm_smccc_res res;				\
-+									\
-+		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
-+				  ##__VA_ARGS__, &res);			\
-+		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
-+									\
-+		res.a1;							\
- 	})
- 
- /*
-@@ -529,7 +533,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
- 			ret = f(__VA_ARGS__);				\
- 			isb();						\
- 		} else {						\
--			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
-+			ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
- 		}							\
- 									\
- 		ret;							\
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8bd4630666ca..c42c00c8141a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1290,8 +1290,8 @@ static void cpu_init_hyp_mode(void)
- 	 * cpus_have_const_cap() wrapper.
- 	 */
- 	BUG_ON(!system_capabilities_finalized());
--	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, start_hyp,
--		       tpidr_el2);
-+	__kvm_call_hyp_init(pgd_ptr, hyp_stack_ptr, vector_ptr, start_hyp,
-+			    tpidr_el2);
- 
- 	/*
- 	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 3c79a1124af2..0891625c8648 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -11,24 +11,13 @@
- #include <asm/cpufeature.h>
- 
- /*
-- * u64 __kvm_call_hyp(void *hypfn, ...);
-- *
-- * This is not really a variadic function in the classic C-way and care must
-- * be taken when calling this to ensure parameters are passed in registers
-- * only, since the stack will change between the caller and the callee.
-- *
-- * Call the function with the first argument containing a pointer to the
-- * function you wish to call in Hyp mode, and subsequent arguments will be
-- * passed as x0, x1, and x2 (a maximum of 3 arguments in addition to the
-- * function pointer can be passed).  The function being called must be mapped
-- * in Hyp mode (see init_hyp_mode in arch/arm/kvm/arm.c).  Return values are
-- * passed in x0.
-- *
-- * A function pointer with a value less than 0xfff has a special meaning,
-- * and is used to implement hyp stubs in the same way as in
-- * arch/arm64/kernel/hyp_stub.S.
-+ * u64 __kvm_call_hyp_init(phys_addr_t pgd_ptr,
-+ * 			   unsigned long hyp_stack_ptr,
-+ * 			   unsigned long vector_ptr,
-+ * 			   unsigned long start_hyp,
-+ * 			   unsigned long tpidr_el2);
-  */
--SYM_FUNC_START(__kvm_call_hyp)
-+SYM_FUNC_START(__kvm_call_hyp_init)
- 	hvc	#0
- 	ret
--SYM_FUNC_END(__kvm_call_hyp)
-+SYM_FUNC_END(__kvm_call_hyp_init)
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 9b58d58d6cfa..7e7c074f8093 100644
+index 2d621bf5ac3e..213977634601 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -11,23 +11,101 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
+@@ -115,10 +115,8 @@ void __noreturn kvm_hyp_main(void)
+ {
+ 	/* Set tpidr_el2 for use by HYP */
+ 	struct kvm_vcpu *host_vcpu;
+-	struct kvm_cpu_context *hyp_ctxt;
  
--typedef unsigned long (*hypcall_fn_t)
--	(unsigned long, unsigned long, unsigned long);
-+#include <kvm/arm_hypercalls.h>
-+
-+static void handle_host_hcall(unsigned long func_id, struct kvm_vcpu *host_vcpu)
-+{
-+	unsigned long ret = 0;
-+
-+	switch (func_id) {
-+	case KVM_HOST_SMCCC_FUNC(__kvm_flush_vm_context):
-+		__kvm_flush_vm_context();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid_ipa): {
-+			struct kvm_s2_mmu *mmu =
-+				(struct kvm_s2_mmu *)smccc_get_arg1(host_vcpu);
-+			phys_addr_t ipa = smccc_get_arg2(host_vcpu);
-+			int level = smccc_get_arg3(host_vcpu);
-+
-+			__kvm_tlb_flush_vmid_ipa(mmu, ipa, level);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid): {
-+			struct kvm_s2_mmu *mmu =
-+				(struct kvm_s2_mmu *)smccc_get_arg1(host_vcpu);
-+
-+			__kvm_tlb_flush_vmid(mmu);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_local_vmid): {
-+			struct kvm_s2_mmu *mmu =
-+				(struct kvm_s2_mmu *)smccc_get_arg1(host_vcpu);
-+
-+			__kvm_tlb_flush_local_vmid(mmu);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__kvm_timer_set_cntvoff): {
-+			u64 cntvoff = smccc_get_arg1(host_vcpu);
-+
-+			__kvm_timer_set_cntvoff(cntvoff);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__kvm_vcpu_run): {
-+			struct kvm_vcpu *vcpu =
-+				(struct kvm_vcpu *)smccc_get_arg1(host_vcpu);
-+
-+			ret = __kvm_vcpu_run(vcpu);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__kvm_enable_ssbs):
-+		__kvm_enable_ssbs();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_get_ich_vtr_el2):
-+		ret = __vgic_v3_get_ich_vtr_el2();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_read_vmcr):
-+		ret = __vgic_v3_read_vmcr();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_write_vmcr): {
-+			u32 vmcr = smccc_get_arg1(host_vcpu);
-+
-+			__vgic_v3_write_vmcr(vmcr);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_init_lrs):
-+		__vgic_v3_init_lrs();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__kvm_get_mdcr_el2):
-+		ret = __kvm_get_mdcr_el2();
-+		break;
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_save_aprs): {
-+			struct vgic_v3_cpu_if *cpu_if =
-+				(struct vgic_v3_cpu_if *)smccc_get_arg1(host_vcpu);
-+
-+			__vgic_v3_save_aprs(cpu_if);
-+			break;
-+		}
-+	case KVM_HOST_SMCCC_FUNC(__vgic_v3_restore_aprs): {
-+			struct vgic_v3_cpu_if *cpu_if =
-+				(struct vgic_v3_cpu_if *)smccc_get_arg1(host_vcpu);
-+
-+			__vgic_v3_restore_aprs(cpu_if);
-+			break;
-+		}
-+	default:
-+		/* Invalid host HVC. */
-+		smccc_set_retval(host_vcpu, SMCCC_RET_NOT_SUPPORTED, 0, 0, 0);
-+		return;
-+	}
-+
-+	smccc_set_retval(host_vcpu, SMCCC_RET_SUCCESS, ret, 0, 0);
-+}
+ 	host_vcpu = __hyp_this_cpu_ptr(kvm_host_vcpu);
+-	hyp_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
  
- static void handle_trap(struct kvm_vcpu *host_vcpu) {
- 	if (kvm_vcpu_trap_get_class(host_vcpu) == ESR_ELx_EC_HVC64) {
--		hypcall_fn_t func;
--		unsigned long ret;
-+		unsigned long func_id = smccc_get_function(host_vcpu);
+ 	kvm_init_host_cpu_context(&host_vcpu->arch.ctxt);
+ 
+@@ -131,24 +129,14 @@ void __noreturn kvm_hyp_main(void)
+ 	 */
+ 	smccc_set_retval(host_vcpu, SMCCC_RET_SUCCESS, 0, 0, 0);
+ 
++	/* The host is already loaded so note it as the running vcpu. */
++	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = host_vcpu;
++
+ 	while (true) {
+ 		u64 exit_code;
  
 -		/*
--		 * __kvm_call_hyp takes a pointer in the host address space and
--		 * up to three arguments.
+-		 * Set the running cpu for the vectors to pass to __guest_exit
+-		 * so it can get the cpu context.
 -		 */
--		func = (hypcall_fn_t)kern_hyp_va(vcpu_get_reg(host_vcpu, 0));
--		ret = func(vcpu_get_reg(host_vcpu, 1),
--			   vcpu_get_reg(host_vcpu, 2),
--			   vcpu_get_reg(host_vcpu, 3));
--		vcpu_set_reg(host_vcpu, 0, ret);
-+		handle_host_hcall(func_id, host_vcpu);
+-		*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = host_vcpu;
+-
+-		/*
+-		 * Enter the host now that we feel like we're in charge.
+-		 *
+-		 * This should merge with __kvm_vcpu_run as host becomes more
+-		 * vcpu-like.
+-		 */
+-		do {
+-			exit_code = __guest_enter(host_vcpu, hyp_ctxt);
+-		} while (fixup_guest_exit(host_vcpu, &exit_code));
++		/* Enter the host now that we feel like we're in charge. */
++		exit_code = __kvm_vcpu_run(host_vcpu);
+ 
+ 		switch (ARM_EXCEPTION_CODE(exit_code)) {
+ 		case ARM_EXCEPTION_TRAP:
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 81cdf33f92bc..36140686e1d8 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -119,7 +119,7 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+ /**
+  * Disable host events, enable guest events
+  */
+-static bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
++static void __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+ {
+ 	struct kvm_host_data *host;
+ 	struct kvm_pmu_events *pmu;
+@@ -132,8 +132,6 @@ static bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+ 
+ 	if (pmu->events_guest)
+ 		write_sysreg(pmu->events_guest, pmcntenset_el0);
+-
+-	return (pmu->events_host || pmu->events_guest);
+ }
+ 
+ /**
+@@ -154,13 +152,10 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
+ 
+-/* Switch to the guest for legacy non-VHE systems */
+-int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
++				       struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_cpu_context *host_ctxt;
+-	struct kvm_cpu_context *guest_ctxt;
+-	bool pmu_switch_needed;
+-	u64 exit_code;
++	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 
+ 	/*
+ 	 * Having IRQs masked via PMR when entering the guest means the GIC
+@@ -173,11 +168,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		pmr_sync();
  	}
  
- 	/* Other traps are ignored. */
+-	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+-	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = vcpu;
+-	guest_ctxt = &vcpu->arch.ctxt;
+-
+-	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++	__pmu_switch_to_guest(host_ctxt);
+ 
+ 	__sysreg_save_state_nvhe(host_ctxt);
+ 
+@@ -199,17 +190,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	__timer_enable_traps(vcpu);
+ 
+ 	__debug_switch_to_guest(vcpu);
++}
+ 
+-	__set_vcpu_arch_workaround_state(vcpu);
+-
+-	do {
+-		/* Jump in the fire! */
+-		exit_code = __guest_enter(vcpu, host_ctxt);
+-
+-		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
+-
+-	__set_hyp_arch_workaround_state(vcpu);
++static void __kvm_vcpu_switch_to_host(struct kvm_cpu_context *host_ctxt,
++				      struct kvm_vcpu *host_vcpu,
++				      struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+@@ -230,12 +217,68 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
+-	if (pmu_switch_needed)
+-		__pmu_switch_to_host(host_ctxt);
++	__pmu_switch_to_host(host_ctxt);
+ 
+ 	/* Returning to host will clear PSR.I, remask PMR if needed */
+ 	if (system_uses_irq_prio_masking())
+ 		gic_write_pmr(GIC_PRIO_IRQOFF);
++}
++
++static void __vcpu_switch_to(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_vcpu *running_vcpu;
++
++	/*
++	 * Restoration is not yet pure so it still makes use of the previously
++	 * running vcpu.
++	 */
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
++	running_vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
++
++	if (vcpu->arch.ctxt.is_host)
++		__kvm_vcpu_switch_to_host(host_ctxt, vcpu, running_vcpu);
++	else
++		__kvm_vcpu_switch_to_guest(host_ctxt, vcpu);
++
++	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = vcpu;
++}
++
++/* Switch to the guest for legacy non-VHE systems */
++int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_vcpu *running_vcpu;
++	u64 exit_code;
++
++	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
++	running_vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
++
++	if (running_vcpu != vcpu) {
++		if (!running_vcpu->arch.ctxt.is_host &&
++		    !vcpu->arch.ctxt.is_host) {
++			/*
++			 * There are still assumptions that the switch will
++			 * always be between a guest and the host so double
++			 * check that is the case. If it isn't, pretending
++			 * there was an interrupt is a harmless way to bail.
++			 */
++			return ARM_EXCEPTION_IRQ;
++		}
++
++		__vcpu_switch_to(vcpu);
++	}
++
++	__set_vcpu_arch_workaround_state(vcpu);
++
++	do {
++		/* Jump in the fire! */
++		exit_code = __guest_enter(vcpu, host_ctxt);
++
++		/* And we're baaack! */
++	} while (fixup_guest_exit(vcpu, &exit_code));
++
++	__set_hyp_arch_workaround_state(vcpu);
+ 
+ 	return exit_code;
+ }
 -- 
 2.27.0.389.gc38d7665816-goog
 
