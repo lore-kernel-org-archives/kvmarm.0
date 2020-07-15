@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF74C433F2
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F7DC433EA
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD3B207BB
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFF93207BC
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="EdocCqMI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD3B207BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ShyoY1k1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF93207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55A524B3D0;
-	Wed, 15 Jul 2020 14:45:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C684B381;
+	Wed, 15 Jul 2020 14:45:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XQ6D9LTPMvqw; Wed, 15 Jul 2020 14:45:25 -0400 (EDT)
+	with ESMTP id feS0SIRwNSn9; Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 315714B3C0;
-	Wed, 15 Jul 2020 14:45:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 784114B3DE;
+	Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3850F4B170
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF73F4B3C3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sx92mvseJfAe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:45:23 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19AD64B3D7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:22 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id x1so3963027ybg.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:22 -0700 (PDT)
+ with ESMTP id mtHv6ko0zA5w for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:45:27 -0400 (EDT)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6F494B3DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:26 -0400 (EDT)
+Received: by mail-wm1-f73.google.com with SMTP id g6so1755330wmk.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=hHJnqDO6tZwOu8efN18XUjctMX/oYEHWNmg+LgZYzVw=;
- b=EdocCqMIxlC7QxpxvM0J/lCXIN/cVt09OdJE4kn6kTzaoVAKuBTsCVK8RcfggsG/Yu
- +6kyfskCgAFjbMVRs3/bbUlYCxgY05vD+fOFyYtEx8j0g2M6F9gMrqOQXNwhSIXvIJvb
- uryfy+IpWbaio6k9sOYkwefe2z3IzRoOd+jrym3nZOZLblP7Z9M9IgcFMyeuCpF7nWRV
- rAkccGsV0d9hoGH+S+vKHReg39XeyG8SyOFmWqXENf13e1UVg/bj8owNFI1wegGJCSNk
- GTu1thIdDNjrO90lqf7r2jcDX9tarz6GCaBVPbdPrtAAOmarT2em5rlvNgn2+RUvLIVG
- ysWg==
+ :cc; bh=VT2yUZAMgbSbYqRqxmiodXt9JjJ+rlB+A9pxnjrPrQk=;
+ b=ShyoY1k1CxIgGwlU2mJ6DkzDMb1WhXXMFB4P5zlQDrUGUiA4etlRbLPlZNPM+QAnGS
+ yq/vYkbKnOQnHWrM0n/3JZTzYqAxTCxPPtK+ywYhsuZ5JSiDgINnmrOptzFQvtZWB6zv
+ rSk6dzrA20IAotyfhTxkPu7smPV7C7oRDHbgCvqNMUAeKfWMf4/D8nhXIy1C1itShT9S
+ tOFhLQb2WR7IkjelCOsDeJ5Yv1S5HJWDMahy78QRbcT7ihnvbHyuvA3mp7H4CAsj2xg5
+ RsAar6cqBd1hCMZM5KluX9Avo3v8/4qK+0gdYeSs4VzOSbcH8wD/v47w3UEo+6TtI9oj
+ 8Rpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=hHJnqDO6tZwOu8efN18XUjctMX/oYEHWNmg+LgZYzVw=;
- b=lGa2+NjbzueN226Me4nFBbbej62hZ42En0z+AMzeSF41snHpofIJeh+zw4TIiAiS3D
- ZH4m1uEjZVYb20dTCwRpDXCIblSnqe4hAcOGW/xFJrezVCel2vdiA8w48zE84vcNv0T9
- w7UMySdDJ/bNeuIHme1ngz9Phoiol32aL0EVYf3gDxfxo5/Ua4bszhIMn6m23WxQ/f1E
- 0tQPFuNriXqxuutrIwuSNBEuop6+QJsnLAjdU4l+fTvXE89Z9FY2qzZ1/W5EaCB7sP1R
- LgD7J53OLFvvoeUs3i+yfpqQyhPRPAsKvekyd9mQcFkTWl3QtMoVsGk1v86c1qND99Sk
- D5Xw==
-X-Gm-Message-State: AOAM530KxigaRvbdOu47VphmfOssz7/7ZsUwnbAgJSEW2bFJmUz4TrTh
- mhRGjX/cD+qtzbiyDX15ChEtdNEnbvtkBHryTu4CH/N9JDdkBvJ0VoXMWVRnnYV48a4Hrrz2fRd
- 7tAdFHAAhfNkS+sxjmGS2kse5y1I4ASqiHxbK/3iLbCVAKSo18C00ZqmrfagnPs0xLcw/Hw==
-X-Google-Smtp-Source: ABdhPJyo5brUJ+RY/S4CV291QQHPiJIVpLC6fza7NLvgCB37ByTolFKQzIpb27LV06nVZOzEYd6czWpg6uo=
-X-Received: by 2002:a25:4c81:: with SMTP id z123mr491621yba.309.1594838721552; 
- Wed, 15 Jul 2020 11:45:21 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:16 +0100
+ bh=VT2yUZAMgbSbYqRqxmiodXt9JjJ+rlB+A9pxnjrPrQk=;
+ b=qawrVWA4uxZhPzK7VYfngRa5LTTGr2agQ7LnEwdHX6vP48F0Dz//l73VzdcYgoWuhJ
+ llmSp+fLtrl/v6gvKry6txvaBjcLMY67oickfsBE6H3G7RoOppc7GKSLQVhQ5HnuDDg9
+ 2AyUWCa/BpwB3Rqw0FgGPO42Z0qiGaILOwgoqaKpgxVsFaMVhMiEZuXqh+gQ+z0xDtZG
+ AsxXKZzgrLwNHKJiFUR8XTbL5Tja7cBWq4FMd4UnP+NY9cBFZGWWI5ARire3KTqRBsTH
+ 8HuY4AS7hbC7/7GIWeeauiGC2BRn/yB2xe5RzHQqZPqf1pAW3/9com1zBeO3eCrUB8XU
+ 4y3g==
+X-Gm-Message-State: AOAM533u/mPibVinWwdfcqCkejKmwFSmlnNOtrpaoLCoVtZg2Lndw/d1
+ mA/a6eo+jALDvoFZAjdPXEt3UrIJOauw8x0CLkCjlRpokLGChAPzmYwuKXR9bP+u86vkogXJcZH
+ hMyG9TyYaKatI41JeXt6X6Buz37URxMVKDH4/mAR8dLZpM3QfYJ9mHcsXMXBSgp5cA/Q4XA==
+X-Google-Smtp-Source: ABdhPJzFf2fg/dcjQBH4Krs8WYYhzlpTbXX31A/UgsdstDQl4XMweYemyKzl2o1zAtVZDhC3RbLTsiq7d+s=
+X-Received: by 2002:a05:6000:1283:: with SMTP id
+ f3mr758075wrx.106.1594838726059; 
+ Wed, 15 Jul 2020 11:45:26 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:18 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-16-ascull@google.com>
+Message-Id: <20200715184438.1390996-18-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 15/37] KVM: arm64: Share some context save and restore macros
+Subject: [PATCH 17/37] KVM: arm64: nVHE: Store host sysregs in host vcpu
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -95,138 +96,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These macros should be used to avoid repeating the context save and
-restore sequences.
+These registers were previously being stored in kvm_host_data, however,
+there is a vcpu specifically for the host state waiting to be used.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h    | 39 +++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/entry.S          | 39 -----------------------------
- arch/arm64/kvm/hyp/nvhe/hyp-start.S |  2 --
- 3 files changed, 39 insertions(+), 41 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ff27c18b9fd6..1b2c718fa58f 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -212,6 +212,45 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
- 	add	\reg, \reg, #HOST_DATA_CONTEXT
- .endm
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 36140686e1d8..ac19f98bdb60 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -153,6 +153,7 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ }
  
-+#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
-+#define CPU_LR_OFFSET		CPU_XREG_OFFSET(30)
-+#define CPU_SP_EL0_OFFSET	(CPU_LR_OFFSET + 8)
-+
-+/*
-+ * We treat x18 as callee-saved as the host may use it as a platform
-+ * register (e.g. for shadow call stack).
-+ */
-+.macro save_callee_saved_regs ctxt
-+	str	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
-+	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
-+
-+.macro restore_callee_saved_regs ctxt
-+	// We require \ctxt is not x18-x28
-+	ldr	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
-+	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
-+
-+.macro save_sp_el0 ctxt, tmp
-+	mrs	\tmp,	sp_el0
-+	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
-+.endm
-+
-+.macro restore_sp_el0 ctxt, tmp
-+	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
-+	msr	sp_el0, \tmp
-+.endm
-+
- #endif
+ static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
++				       struct kvm_vcpu *host_vcpu,
+ 				       struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+@@ -170,7 +171,7 @@ static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
  
- #endif /* __ARM_KVM_ASM_H__ */
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index da349c152791..63d484059c01 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -7,7 +7,6 @@
- #include <linux/linkage.h>
+ 	__pmu_switch_to_guest(host_ctxt);
  
- #include <asm/alternative.h>
--#include <asm/asm-offsets.h>
- #include <asm/assembler.h>
- #include <asm/fpsimdmacros.h>
- #include <asm/kvm.h>
-@@ -16,46 +15,8 @@
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_ptrauth.h>
+-	__sysreg_save_state_nvhe(host_ctxt);
++	__sysreg_save_state_nvhe(&host_vcpu->arch.ctxt);
  
--#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
--#define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
--
- 	.text
+ 	/*
+ 	 * We must restore the 32-bit state before the sysregs, thanks
+@@ -206,7 +207,7 @@ static void __kvm_vcpu_switch_to_host(struct kvm_cpu_context *host_ctxt,
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
  
--/*
-- * We treat x18 as callee-saved as the host may use it as a platform
-- * register (e.g. for shadow call stack).
-- */
--.macro save_callee_saved_regs ctxt
--	str	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
--	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
--	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
--	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
--	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
--	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
--	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
--.endm
--
--.macro restore_callee_saved_regs ctxt
--	// We require \ctxt is not x18-x28
--	ldr	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
--	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
--	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
--	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
--	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
--	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
--	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
--.endm
--
--.macro save_sp_el0 ctxt, tmp
--	mrs	\tmp,	sp_el0
--	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
--.endm
--
--.macro restore_sp_el0 ctxt, tmp
--	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
--	msr	sp_el0, \tmp
--.endm
--
- /*
-  * u64 __guest_enter(struct kvm_vcpu *vcpu,
-  *		     struct kvm_cpu_context *host_ctxt);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-start.S b/arch/arm64/kvm/hyp/nvhe/hyp-start.S
-index dd955e022963..d7744dcfd184 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-start.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-start.S
-@@ -13,8 +13,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_ptrauth.h>
+-	__sysreg_restore_state_nvhe(host_ctxt);
++	__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
  
--#define CPU_LR_OFFSET (CPU_USER_PT_REGS + (8 * 30))
--
- /*
-  * Initialize ptrauth in the hyp ctxt by populating it with the keys of the
-  * host, which are the keys currently installed.
+ 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+ 		__fpsimd_save_fpexc32(vcpu);
+@@ -239,7 +240,7 @@ static void __vcpu_switch_to(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.ctxt.is_host)
+ 		__kvm_vcpu_switch_to_host(host_ctxt, vcpu, running_vcpu);
+ 	else
+-		__kvm_vcpu_switch_to_guest(host_ctxt, vcpu);
++		__kvm_vcpu_switch_to_guest(host_ctxt, running_vcpu, vcpu);
+ 
+ 	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = vcpu;
+ }
+@@ -288,14 +289,15 @@ void __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
+ 	u64 spsr = read_sysreg_el2(SYS_SPSR);
+ 	u64 elr = read_sysreg_el2(SYS_ELR);
+ 	u64 par = read_sysreg(par_el1);
++	struct kvm_vcpu *host_vcpu = __hyp_this_cpu_ptr(kvm_host_vcpu);
+ 	struct kvm_vcpu *vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
+ 	unsigned long str_va;
+ 
+-	if (read_sysreg(vttbr_el2)) {
++	if (vcpu != host_vcpu) {
+ 		__timer_disable_traps(vcpu);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_state_nvhe(host_ctxt);
++		__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
+ 	}
+ 
+ 	/*
 -- 
 2.27.0.389.gc38d7665816-goog
 
