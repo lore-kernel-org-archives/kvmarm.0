@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB1DC433E6
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F88C433EA
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:44:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C0E620672
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3995207BC
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="kEJUXUd4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0E620672
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="APtYDCsG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3995207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 253A84B3C6;
-	Wed, 15 Jul 2020 14:44:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E9814B3C5;
+	Wed, 15 Jul 2020 14:44:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HPjN5AuVLfY9; Wed, 15 Jul 2020 14:44:54 -0400 (EDT)
+	with ESMTP id GBLyy10yGPYG; Wed, 15 Jul 2020 14:44:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D5A14B3AC;
-	Wed, 15 Jul 2020 14:44:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8704B3CF;
+	Wed, 15 Jul 2020 14:44:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E42B4B3B2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:44:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8234B39D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:44:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BA8tRhWMXngz for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:44:51 -0400 (EDT)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39CAE4B318
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:44:51 -0400 (EDT)
-Received: by mail-wr1-f74.google.com with SMTP id d11so1958601wrw.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:44:51 -0700 (PDT)
+ with ESMTP id 9kVehgS5ve7b for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:44:53 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDD1D4B3B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:44:52 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id r19so1864948qvz.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:44:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=CxbJHBcHZru0xFqw3l0boR0IICd3yNXkAPCLVGR4CDQ=;
- b=kEJUXUd45JplO4wfvQsZ4cF5Q8SFdepEeLIJ353u5JpKcpud/Blhb3wEwbkbqT3WhL
- R25Sy0AX7mBD42azFk5d9HCcN7Ysfpig8wMKsEwnENsErxqia0cVpOUzKN9yQJ/zj0Vg
- 9TDlKBqPs/FZeEDglFuKMYPjhpteXkgAVkseGUgxC0FA7gTn7bOEzu5n5VaAwlH5oWCF
- aSpRglZZ9epbxQzE/OT5wL4+XuND35ONnz9NHVfxDq5uNY85aXVBK+QgrpPpj1+tCu14
- I6tbcb0J+Fyd3iJZKikZEgLQTj53prsxdPI/tyVLq0Dll+0Ij4diKbVqnQmKrheuViT3
- 1wvQ==
+ :cc; bh=mQ7378wZm0+9C/eSND8Chn1p7u1ATSvIrnVzbbOROIE=;
+ b=APtYDCsG/uQlacUSImH4QWuA7tUZ/XxUdNgCabFtE0n1GPzlycZREuIXLC5D1uQAlh
+ R0LfxLKh5g9kxcf2FEqkJyIUj8bDOLuciXmTfcfrll1S+kA3FUMO/NllBs50st2g+7mA
+ dWZUCoe2CKLgjD5py/xV3aFvZPklT09ItTXE5rvrm/vR+FPDDodziQGJ/fqlkkPi2eYz
+ s4hxab4HdMNxyuQV8hbaRYdRAhHS5A0ypHJJQxxKOMGYY8z+IBFQ9++322oKMAyPrJMm
+ j8LSK2cGC2tZBhhfL+9JTUOzOEayLJ+l4Vtg2gH1EO4D6cXMClkGnMb4wFzY+VOnl5bL
+ mCSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=CxbJHBcHZru0xFqw3l0boR0IICd3yNXkAPCLVGR4CDQ=;
- b=rAMb3mT7e28+ysgLSH5ciFRno2+K+CJW1HRyjssMcrMS0NQ6s6rNXRsXzn7yVApsfh
- z9boQDDCvhSZA/er3gdJq4gGIRWijHrwC3tIkDUk9pnwfSJ2wciU47qxVPDa5qhVN+hq
- 4ySCFbg7U/KdttS142vfpnMRmre35xIisl72UTF8uCFlYSZoLYkn/f5uCnTeqIiaPfB1
- 4Rc6Ml32giSrME2/Jb5Te/mw1mJToa8cN4rccR12h2pDkwMsXQMFdng9eM6EUn9z+rQZ
- VsR5Vx45pn5cXDXEYncmihAlLixC77so0JPcXaXmptMrI1x6mOIFF51tLfz6Zx6/aGbs
- EsMw==
-X-Gm-Message-State: AOAM530/hctRhVtjPL7SOHZwikz6GMuhVzrcn3CK8NzBm4ki9dYmAKZ/
- Zty6sx9lewXVx3pvDsDxpeQYNKWbEpb9YOCZegV9PSPJhN+V9QS7va2qnBvMy6FP1tT4lZhL7B3
- rVyOflE0LCCtZ1nfN3db1W24c9Zn9PrcJyRQBsrIfgI0mQIziZTD7jfB9WsJr/K3chxoo7w==
-X-Google-Smtp-Source: ABdhPJz1hHVZZeLjlkQlwLOQoWgRvtKcaOmXop9RnXWR0L3GEqMYXCou8dx3a34+rftgEMURKrvWLVQDtNs=
-X-Received: by 2002:a1c:408b:: with SMTP id n133mr768108wma.88.1594838690385; 
- Wed, 15 Jul 2020 11:44:50 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:02 +0100
+ bh=mQ7378wZm0+9C/eSND8Chn1p7u1ATSvIrnVzbbOROIE=;
+ b=HTDx4ZAv4enwWUmF24nS2kCy29+gOitHcCyx897EnshKd952FO6uHQ/5KOFmifHke+
+ G18K733cWbyNyy4CLWluvDQpEJakktczbBfw/VIt4v9JcLBGVNbS4zrVfltDgKOUEUxH
+ PyvOdQ1j8CNUn5eAJMI8LIcLGEPFVqdRmTCSxhO6I3IS/U+uFArdm4xX2KCH95/LKiK5
+ Nj/+Ih/DaLLiOcizGtvaYKK9o/gaUaQj2sV0N0fvqmvoBld3Qt61buaDQKiRNbrqqrJT
+ ItX56UeQ0qLtdpzvj/o0XTRNMQrs2k2YzIyqpdzjz7ukZnjT/0A62xhLPdzekr1hFT8d
+ Jb7A==
+X-Gm-Message-State: AOAM532rpc3hC7DTTXyHF99rdBEP8bBUhp+Mq4/lGGLvv1XPwcOxCrAq
+ W6T+8FupxRqTDMMWw2lf0LOyU2KUBpkUYU7HHximRDmIGs7J7YNNiGK0TJeDmFp2f55FSo07mQm
+ 3UTA09h5fIWYFbhBAgRKLpB/gqWkC+kqoZULsYi+8Q7or+1LiLDUMPKX+REoII4kztMU/YQ==
+X-Google-Smtp-Source: ABdhPJzLI6XbhVBDkpelh41Zi71HjMW6+7/BNcaGoQLNU2ESEZ3Dy8lrNLhRAW9sEPO82AcYfVGNmJW9gzE=
+X-Received: by 2002:ad4:434c:: with SMTP id q12mr667056qvs.203.1594838692289; 
+ Wed, 15 Jul 2020 11:44:52 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:03 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-2-ascull@google.com>
+Message-Id: <20200715184438.1390996-3-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 01/37] smccc: Make constants available to assembly
+Subject: [PATCH 02/37] KVM: arm64: Move clearing of vcpu debug dirty bit
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -95,82 +95,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These do no need to be restricted only to C code so move them out next
-to the other constants in the file.
+Note: this has been sent out to kvmarm separately
+
+The dirty bit was previously being cleared by hyp however it is more
+consistent to leave the management of the bit outside of hyp and for hyp
+to read and respect the state it is given.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- include/linux/arm-smccc.h | 44 +++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/kvm_host.h         | 2 +-
+ arch/arm64/kvm/debug.c                    | 2 ++
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h | 2 --
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 56d6a5c6e353..efcbde731f03 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -81,6 +81,28 @@
- 			   ARM_SMCCC_SMC_32,				\
- 			   0, 0x7fff)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e1a32c0707bb..b06f24b5f443 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -404,7 +404,7 @@ struct kvm_vcpu_arch {
+ })
  
-+/* Paravirtualised time calls (defined by ARM DEN0057A) */
-+#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x20)
+ /* vcpu_arch flags field values: */
+-#define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
++#define KVM_ARM64_DEBUG_DIRTY		(1 << 0) /* vcpu is using debug */
+ #define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
+ #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+ #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 7a7e425616b5..e9932618a362 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -209,6 +209,8 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+ {
+ 	trace_kvm_arm_clear_debug(vcpu->guest_debug);
+ 
++	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
 +
-+#define ARM_SMCCC_HV_PV_TIME_ST					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x21)
-+
-+/*
-+ * Return codes defined in ARM DEN 0070A
-+ * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
-+ */
-+#define SMCCC_RET_SUCCESS			0
-+#define SMCCC_RET_NOT_SUPPORTED			-1
-+#define SMCCC_RET_NOT_REQUIRED			-2
-+#define SMCCC_RET_INVALID_PARAMETER		-3
-+
- #ifndef __ASSEMBLY__
+ 	if (vcpu->guest_debug) {
+ 		restore_guest_debug_regs(vcpu);
  
- #include <linux/linkage.h>
-@@ -331,15 +353,6 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
-  */
- #define arm_smccc_1_1_hvc(...)	__arm_smccc_1_1(SMCCC_HVC_INST, __VA_ARGS__)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+index 0297dc63988c..50ca5d048017 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+@@ -161,8 +161,6 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
  
--/*
-- * Return codes defined in ARM DEN 0070A
-- * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
-- */
--#define SMCCC_RET_SUCCESS			0
--#define SMCCC_RET_NOT_SUPPORTED			-1
--#define SMCCC_RET_NOT_REQUIRED			-2
--#define SMCCC_RET_INVALID_PARAMETER		-3
+ 	__debug_save_state(guest_dbg, guest_ctxt);
+ 	__debug_restore_state(host_dbg, host_ctxt);
 -
- /*
-  * Like arm_smccc_1_1* but always returns SMCCC_RET_NOT_SUPPORTED.
-  * Used when the SMCCC conduit is not defined. The empty asm statement
-@@ -385,18 +398,5 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 		method;							\
- 	})
+-	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
+ }
  
--/* Paravirtualised time calls (defined by ARM DEN0057A) */
--#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
--	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
--			   ARM_SMCCC_SMC_64,			\
--			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
--			   0x20)
--
--#define ARM_SMCCC_HV_PV_TIME_ST					\
--	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
--			   ARM_SMCCC_SMC_64,			\
--			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
--			   0x21)
--
- #endif /*__ASSEMBLY__*/
- #endif /*__LINUX_ARM_SMCCC_H*/
+ #endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
 -- 
 2.27.0.389.gc38d7665816-goog
 
