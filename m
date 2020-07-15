@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024D7C433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B18C433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AC80920787
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6031020787
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:46:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="A1n8WACM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC80920787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OBDCmtH2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6031020787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 669C14B410;
-	Wed, 15 Jul 2020 14:46:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A6BE4B1B1;
+	Wed, 15 Jul 2020 14:46:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2Q3okd2fQeBg; Wed, 15 Jul 2020 14:46:12 -0400 (EDT)
+	with ESMTP id q2YwKSA2xr+A; Wed, 15 Jul 2020 14:46:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 524B74B419;
-	Wed, 15 Jul 2020 14:46:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4524B412;
+	Wed, 15 Jul 2020 14:46:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB09D4B40B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:46:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CD1B4B3D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:46:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jbXXyERoOniA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:46:09 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC9914B32C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:46:09 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id e15so1745651wme.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:46:09 -0700 (PDT)
+ with ESMTP id F5+9Cl7QnT6y for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:46:12 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 418274B32C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:46:11 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id t7so4036455ybk.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=f1rxnMCctAcF/Sb7gTNBkNap+c21g4RCSpaXg2fG2tY=;
- b=A1n8WACMGzCWgAyl0jGB/sbZhd5RNnbWTRQ/SXmUY4pYo9ZdFECf5LdcSTI5jOrp1k
- wYKZf4M7IgPixV3rXRVWk3lMrV5o7+orsyMhvV2JHqMdJ+hJWG3OtWKUrVlRLp++R3QI
- tilEYI3AFESqtDQGDoamj5SZ9P+qXjxHGxlpydXsvYqDIk8BKLvtjYjT8GtU5rgJZLrR
- FHgMnTc2lTcKugeA7AdHfGUXK7toJjnCOFUQsnRINXwkbp56stMVgCoP1qimOTNWIp3y
- aozMWzJQh8Ho960xQZBoUCXl5s7hAqNfBzTtQOlK2vbxgqjcJwyp86Y/HW17s65VnALh
- qmtQ==
+ :cc; bh=1h5yiVlEcGSjp9MBOFB9/KxLYEWTdRezK4/MxuPKPQc=;
+ b=OBDCmtH2wegRr+gXO7OzWZ/BBpjtI0m1anex4KziDwrdaVrFJzx7qU+UEr/3rNh0kv
+ GXk5atmvsjfX/KsT6FqEKqcLtCY4Jmhe2SNe9CbsLDaKQsBsjweJBeawLtWlTcYM7fK3
+ Tmg+yyg0WZOEZq1lCr6tmaQSr15HL1ZqebqM1BgjkhOGnrn7csGos7tLcGmiU9/lwtuw
+ 9D5YOjWqD8Q6ysmcfoxlbg2SsdusuESjgkckwa4PqVfU2wvhvkXIIlyufoF6GiaFf8Q+
+ +2LPSz2r8VJWp/d+CpwZFasYseR0w6RChbPcAbHbIsVBbEDSw4uf/MX0TqMKIkgxCzMl
+ S9Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=f1rxnMCctAcF/Sb7gTNBkNap+c21g4RCSpaXg2fG2tY=;
- b=LyVAdnRX1VRZ1nMSj0jmk13gnMQOleX9KM4fGidt+RamRr74hXLAxX+1ehU7F3gqZg
- GCD/pykB55v1bQ0qysNx2h1rP3iEcSzQsoYIA9CQZTH9lFJZ2bxamlzd1cCye/88hUmQ
- gDS8LcFDyvPc1emfP63qVBicSrb14ew/s5mzYwkgDHabnj5pJhbT7YQenzCH4HiPTeIW
- cBrquF1W9DuuSfmRBFFQcCGwJfZNfNIqEOKfFRRpR95NNok1o+Y9x7V0VyA7WQhzPm6/
- ASC+Z+bzJmIy3oB0rIT86Dp+b4sZR+0SiD2ZG6rqtD1yrY3hdOLBtAJvQLNa2/HmYDWi
- et7Q==
-X-Gm-Message-State: AOAM533bmlsrDaZmrK169KeyZjmEEn4s4EQbxmLnJNyCif8+x6apInN/
- 6JvtrytNLvzOtbUZGvyremiJK3hCi3PTsAoLFokbLLwzDsQfBSmxJJEHw8uAzqYRSsDvOOcwFEs
- 3cCD9M9g4QTqyM+PNFgB9wlPcGKGDQUk5vlRDX3484SdU+vFLQ0gvICS2hQMgXMY7mi09pA==
-X-Google-Smtp-Source: ABdhPJwtiEE89PaFZot5Yai71sS1zdAH79PengTjXu+YhK9BCZeyd806E0XtjwqKu3gT8u3KT83ye0piNC0=
-X-Received: by 2002:a7b:c1d8:: with SMTP id a24mr1315540wmj.0.1594838768218;
- Wed, 15 Jul 2020 11:46:08 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:37 +0100
+ bh=1h5yiVlEcGSjp9MBOFB9/KxLYEWTdRezK4/MxuPKPQc=;
+ b=toO+x3GZaSVef9WErDKnHGJJMWvOD6hGbxW/kl7bQuHt71pb3I1zMcejcPk+l81HQz
+ Y+XLikOWTAkZpx5nziYjA3A7MeapLd0VHJRa09WiZAKWG7D0fHlnjkIl8jXtTsl06+KC
+ Z/mIAx5fp/ZLp008xChzLtAR0zE30h5urmrBkKZIEbnwmH6QBoiNd2FoKq8wls8lKArq
+ ZXzNkSoqXIOaG8Lv17NQzgzoJx69ypfEOmhqRL0iPvM8y0L4ukXeNfpR+/bcHcZi09dd
+ oCinFH3AIA1fr/Se1jriT9q3s9Lz9JlWZwiZNtCzzZj+YR1naSZ1Le7ZWibLR+P2Vq29
+ ew9A==
+X-Gm-Message-State: AOAM5339Boy7k9aNts4zY+dxm+jh4YQQCXtjh2PM7CTcvRL30A/NTDwF
+ Y+dK7HN8C2lE31ON/WLC3bGyo62fGBMRX2pjrgegdTkS1cGNDY8Zrb9uO0G4jaHu9NBXKpAvWjg
+ OfkZZqCx4WAI9ZqYAh1Hq5BrGFH2ZVOBFkMyRp1CvMsZdNG6Pj2BW5tMw1pDI1lz6RJzkDA==
+X-Google-Smtp-Source: ABdhPJyI3zp2R0zq9z+DRZTR0QXAwy5Aa1yAlCGVWokjzc9zNBdWQ1JE90RUFE4y3kcsU8J0CRUxG8ax3ao=
+X-Received: by 2002:a25:abe3:: with SMTP id v90mr679496ybi.36.1594838770659;
+ Wed, 15 Jul 2020 11:46:10 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:38 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-37-ascull@google.com>
+Message-Id: <20200715184438.1390996-38-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 36/37] KVM: arm64: nVHE: Unify GIC PMR restoration paths
+Subject: [PATCH 37/37] KVM: arm64: Separate save and restore of vcpu trap state
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -95,95 +95,117 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Different actions are taken depending on whether the vcpu is the host or
-not.
+Pending virtual interrupts are saved in the saving phase and restoration
+enables or disables traps depending on whether or not the host is being
+restored.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 50 ++++++++++++++------------------
- 1 file changed, 22 insertions(+), 28 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 28 +++++++++++--------------
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ 3 files changed, 14 insertions(+), 18 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 84fd6b0601b2..65a29d029c53 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -113,7 +113,7 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+ }
+ 
+-static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
++static inline void __save_traps(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+ 	 * If we pended a virtual abort, preserve it until it gets
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index d37386b8ded8..260c5cbb6717 100644
+index 260c5cbb6717..0f7670dabf50 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -88,6 +88,26 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
- 	}
+@@ -45,10 +45,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(val, cptr_el2);
  }
  
-+void __hyp_gic_pmr_restore(struct kvm_vcpu *vcpu)
+-static void __deactivate_traps(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *vcpu)
++static void __deactivate_traps(struct kvm_vcpu *host_vcpu)
+ {
+-	___deactivate_traps(vcpu);
+-
+ 	__deactivate_traps_common();
+ 
+ 	write_sysreg(host_vcpu->arch.mdcr_el2, mdcr_el2);
+@@ -56,6 +54,14 @@ static void __deactivate_traps(struct kvm_vcpu *host_vcpu, struct kvm_vcpu *vcpu
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
++static void __restore_traps(struct kvm_vcpu *vcpu)
 +{
-+	if (!system_uses_irq_prio_masking())
-+		return;
-+
-+	if (vcpu->arch.ctxt.is_host) {
-+		/* Returning to host will clear PSR.I, remask PMR if needed */
-+		gic_write_pmr(GIC_PRIO_IRQOFF);
-+	} else {
-+		/*
-+		 * Having IRQs masked via PMR when entering the guest means the
-+		 * GIC will not signal the CPU of interrupts of lower priority,
-+		 * and the only way to get out will be via guest exceptions.
-+		 * Naturally, we want to avoid this.
-+		 */
-+		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
-+		pmr_sync();
-+	}
++	if (vcpu->arch.ctxt.is_host)
++		__deactivate_traps(vcpu);
++	else
++		__activate_traps(vcpu);
 +}
 +
- static void __pmu_restore(struct kvm_vcpu *vcpu)
+ static void __restore_stage2(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_pmu_events *pmu = __hyp_this_cpu_ptr(kvm_pmu_events);
-@@ -106,29 +126,6 @@ static void __pmu_restore(struct kvm_vcpu *vcpu)
- 	write_sysreg(set, pmcntenset_el0);
- }
+ 	if (vcpu->arch.hcr_el2 & HCR_VM)
+@@ -134,6 +140,7 @@ static void __vcpu_save_state(struct kvm_vcpu *vcpu, bool save_debug)
  
--static void __kvm_vcpu_switch_to_guest(struct kvm_vcpu *host_vcpu,
--				       struct kvm_vcpu *vcpu)
--{
+ 	__fpsimd_save_fpexc32(vcpu);
+ 
++	__save_traps(vcpu);
+ 	__debug_save_spe(vcpu);
+ 
+ 	if (save_debug)
+@@ -143,14 +150,6 @@ static void __vcpu_save_state(struct kvm_vcpu *vcpu, bool save_debug)
+ 
+ static void __vcpu_restore_state(struct kvm_vcpu *vcpu, bool restore_debug)
+ {
+-	struct kvm_vcpu *running_vcpu;
+-
 -	/*
--	 * Having IRQs masked via PMR when entering the guest means the GIC
--	 * will not signal the CPU of interrupts of lower priority, and the
--	 * only way to get out will be via guest exceptions.
--	 * Naturally, we want to avoid this.
+-	 * Restoration is not yet pure so it still makes use of the previously
+-	 * running vcpu.
 -	 */
--	if (system_uses_irq_prio_masking()) {
--		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
--		pmr_sync();
--	}
--}
--
--static void __kvm_vcpu_switch_to_host(struct kvm_vcpu *host_vcpu,
--				      struct kvm_vcpu *vcpu)
--{
--	/* Returning to host will clear PSR.I, remask PMR if needed */
--	if (system_uses_irq_prio_masking())
--		gic_write_pmr(GIC_PRIO_IRQOFF);
--}
--
- static void __vcpu_save_state(struct kvm_vcpu *vcpu, bool save_debug)
- {
- 	__sysreg_save_state_nvhe(&vcpu->arch.ctxt);
-@@ -154,11 +151,6 @@ static void __vcpu_restore_state(struct kvm_vcpu *vcpu, bool restore_debug)
- 	 */
- 	running_vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
- 
--	if (vcpu->arch.ctxt.is_host)
--		__kvm_vcpu_switch_to_host(vcpu, running_vcpu);
--	else
--		__kvm_vcpu_switch_to_guest(running_vcpu, vcpu);
+-	running_vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
 -
  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
  		u64 val;
  
-@@ -207,6 +199,8 @@ static void __vcpu_restore_state(struct kvm_vcpu *vcpu, bool restore_debug)
+@@ -179,10 +178,7 @@ static void __vcpu_restore_state(struct kvm_vcpu *vcpu, bool restore_debug)
+ 	__sysreg32_restore_state(vcpu);
+ 	__sysreg_restore_state_nvhe(&vcpu->arch.ctxt);
  
- 	__pmu_restore(vcpu);
+-	if (vcpu->arch.ctxt.is_host)
+-		__deactivate_traps(vcpu, running_vcpu);
+-	else
+-		__activate_traps(vcpu);
++	__restore_traps(vcpu);
  
-+	__hyp_gic_pmr_restore(vcpu);
-+
- 	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = vcpu;
- }
+ 	__hyp_vgic_restore_state(vcpu);
+ 	__timer_restore_traps(vcpu);
+@@ -260,7 +256,7 @@ void __noreturn hyp_panic(void)
+ 
+ 	if (vcpu != host_vcpu) {
+ 		__timer_restore_traps(host_vcpu);
+-		__deactivate_traps(host_vcpu, vcpu);
++		__restore_traps(host_vcpu);
+ 		__restore_stage2(host_vcpu);
+ 		__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
+ 	}
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index bc372629e1c1..bc5939581f61 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -67,7 +67,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	extern char vectors[];	/* kernel exception vectors */
+ 
+-	___deactivate_traps(vcpu);
++	__save_traps(vcpu);
+ 
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
  
 -- 
 2.27.0.389.gc38d7665816-goog
