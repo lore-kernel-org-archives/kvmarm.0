@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F7DC433EA
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0898C433E6
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CFF93207BC
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BC782065F
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ShyoY1k1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF93207BC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="o6xqu6jb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC782065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C684B381;
-	Wed, 15 Jul 2020 14:45:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 265914B3DC;
+	Wed, 15 Jul 2020 14:45:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id feS0SIRwNSn9; Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
+	with ESMTP id Jsrz-RoaEdJo; Wed, 15 Jul 2020 14:45:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 784114B3DE;
-	Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CE0C4B3C3;
+	Wed, 15 Jul 2020 14:45:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF73F4B3C3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6274B314
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mtHv6ko0zA5w for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:45:27 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6F494B3DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:26 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id g6so1755330wmk.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:26 -0700 (PDT)
+ with ESMTP id bjzOIKZfYFtA for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
+ [209.85.128.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CB1A4B381
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:29 -0400 (EDT)
+Received: by mail-wm1-f74.google.com with SMTP id l5so1750833wml.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=VT2yUZAMgbSbYqRqxmiodXt9JjJ+rlB+A9pxnjrPrQk=;
- b=ShyoY1k1CxIgGwlU2mJ6DkzDMb1WhXXMFB4P5zlQDrUGUiA4etlRbLPlZNPM+QAnGS
- yq/vYkbKnOQnHWrM0n/3JZTzYqAxTCxPPtK+ywYhsuZ5JSiDgINnmrOptzFQvtZWB6zv
- rSk6dzrA20IAotyfhTxkPu7smPV7C7oRDHbgCvqNMUAeKfWMf4/D8nhXIy1C1itShT9S
- tOFhLQb2WR7IkjelCOsDeJ5Yv1S5HJWDMahy78QRbcT7ihnvbHyuvA3mp7H4CAsj2xg5
- RsAar6cqBd1hCMZM5KluX9Avo3v8/4qK+0gdYeSs4VzOSbcH8wD/v47w3UEo+6TtI9oj
- 8Rpw==
+ :cc; bh=DdxW5bWPjF7WiqULCWM0TFle6+z3CGUtYWg99SV1BbQ=;
+ b=o6xqu6jbaRGrjG+6LzgyQV6iRGAw2l9F9hxOvPoxRQ1rzFc4LwpgnVsLWhjbGyVLpB
+ yMVz8L9+juyIu/l37oMEZ1r4rx3yZbCV5QkEJotMeyBFXkZPNW63iB5OHCzyFFHTO2aa
+ n7JZU6PNmZk0/9M1SLrhVUziWsQJgJwC7EaMxEheSu0+l5qiYpAK6W0YF5Zbk9mFEg5m
+ ehWam8DsG2nTiFIPH55CmbMp0UFhlvoC7xmCSkkXS4s6fhho3BE3sNXGSedflZP6Wy1X
+ aVdq63YPEPQsVDesJ29Fzi2QUbomotw+6OSBaxvrUsu0l42Rl7TTEvgbmzCQ0mfzKiAP
+ uqgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=VT2yUZAMgbSbYqRqxmiodXt9JjJ+rlB+A9pxnjrPrQk=;
- b=qawrVWA4uxZhPzK7VYfngRa5LTTGr2agQ7LnEwdHX6vP48F0Dz//l73VzdcYgoWuhJ
- llmSp+fLtrl/v6gvKry6txvaBjcLMY67oickfsBE6H3G7RoOppc7GKSLQVhQ5HnuDDg9
- 2AyUWCa/BpwB3Rqw0FgGPO42Z0qiGaILOwgoqaKpgxVsFaMVhMiEZuXqh+gQ+z0xDtZG
- AsxXKZzgrLwNHKJiFUR8XTbL5Tja7cBWq4FMd4UnP+NY9cBFZGWWI5ARire3KTqRBsTH
- 8HuY4AS7hbC7/7GIWeeauiGC2BRn/yB2xe5RzHQqZPqf1pAW3/9com1zBeO3eCrUB8XU
- 4y3g==
-X-Gm-Message-State: AOAM533u/mPibVinWwdfcqCkejKmwFSmlnNOtrpaoLCoVtZg2Lndw/d1
- mA/a6eo+jALDvoFZAjdPXEt3UrIJOauw8x0CLkCjlRpokLGChAPzmYwuKXR9bP+u86vkogXJcZH
- hMyG9TyYaKatI41JeXt6X6Buz37URxMVKDH4/mAR8dLZpM3QfYJ9mHcsXMXBSgp5cA/Q4XA==
-X-Google-Smtp-Source: ABdhPJzFf2fg/dcjQBH4Krs8WYYhzlpTbXX31A/UgsdstDQl4XMweYemyKzl2o1zAtVZDhC3RbLTsiq7d+s=
-X-Received: by 2002:a05:6000:1283:: with SMTP id
- f3mr758075wrx.106.1594838726059; 
- Wed, 15 Jul 2020 11:45:26 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:18 +0100
+ bh=DdxW5bWPjF7WiqULCWM0TFle6+z3CGUtYWg99SV1BbQ=;
+ b=thE5EOpjf61reac2+HYD0hMRhkrOCCwd6c2jEtj06F7OCN41vH5Lii9AnAbAc0Gmw2
+ VUOnstBkxDtnDq/lHu2q1twvCy7L+J2Dgo2rTS8xYJcIOm8DFMn/jbCnt/24lPiyQiXi
+ L6GpziM4bG24RTkwucqsKlOPkktluEtt+6sx36CFXl9KCf8fNDKwQUhKYz4WUR/hR2qq
+ +nC4BWlTgtxHfTjBmY89PfT8IiNLGqJkGRWfP3dqPgw7ErvRhv69/RGBbkn5uW0z0IHB
+ qHO5Zz9b1o9sQZPZGoYp6F52Z196oiCROLZlbjwKbgt/Z8uDZ71vTyR6pgRiOAY83+OD
+ ABBg==
+X-Gm-Message-State: AOAM5301HhpKXBEGS4d7nhAMaCFYRcm88dEo6xZyiQhDViMzZ6LRmSB0
+ f9prEXONPX35ZzEKHgtLJ8ZekIywkneenVvVKEapsV8s47GazSlfFtSq7oWqmkNT19rLixiZJMK
+ 6gnVz+qkQbla8efVpbnM8XLVTWA4GU9b5DTUM+BQuFHlfvQnuAwhOFw9S9lNqY+swFgwK4g==
+X-Google-Smtp-Source: ABdhPJz+AI6jBPWhPt48UgkdIvHQPFShmmtSw1DVZ0H1XIU8MA+t06WJ50cV8OYZgUl+0wRMBaILjA4rzAg=
+X-Received: by 2002:adf:81c7:: with SMTP id 65mr686489wra.47.1594838728237;
+ Wed, 15 Jul 2020 11:45:28 -0700 (PDT)
+Date: Wed, 15 Jul 2020 19:44:19 +0100
 In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-18-ascull@google.com>
+Message-Id: <20200715184438.1390996-19-ascull@google.com>
 Mime-Version: 1.0
 References: <20200715184438.1390996-1-ascull@google.com>
 X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 17/37] KVM: arm64: nVHE: Store host sysregs in host vcpu
+Subject: [PATCH 18/37] KVM: arm64: nVHE: Access pmu_events directly in
+ kvm_host_data
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, kernel-team@android.com
@@ -96,71 +96,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These registers were previously being stored in kvm_host_data, however,
-there is a vcpu specifically for the host state waiting to be used.
+The assumption that kvm_host_data is the container of the host
+kvm_cpu_context will not be true when the migration into kvm_host_vcpu
+has completed. Fortunately, a reference to kvm_host_data can easily be
+gained as it is a percpu variable.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 36140686e1d8..ac19f98bdb60 100644
+index ac19f98bdb60..8cd280a18dc2 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -153,6 +153,7 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
- }
- 
- static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
-+				       struct kvm_vcpu *host_vcpu,
- 				       struct kvm_vcpu *vcpu)
+@@ -119,13 +119,9 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+ /**
+  * Disable host events, enable guest events
+  */
+-static void __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
++static void __pmu_switch_to_guest(void)
  {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-@@ -170,7 +171,7 @@ static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
+-	struct kvm_host_data *host;
+-	struct kvm_pmu_events *pmu;
+-
+-	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+-	pmu = &host->pmu_events;
++	struct kvm_pmu_events *pmu = &__hyp_this_cpu_ptr(kvm_host_data)->pmu_events;
  
- 	__pmu_switch_to_guest(host_ctxt);
+ 	if (pmu->events_host)
+ 		write_sysreg(pmu->events_host, pmcntenclr_el0);
+@@ -137,13 +133,9 @@ static void __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+ /**
+  * Disable guest events, enable host events
+  */
+-static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
++static void __pmu_switch_to_host(void)
+ {
+-	struct kvm_host_data *host;
+-	struct kvm_pmu_events *pmu;
+-
+-	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+-	pmu = &host->pmu_events;
++	struct kvm_pmu_events *pmu = &__hyp_this_cpu_ptr(kvm_host_data)->pmu_events;
  
--	__sysreg_save_state_nvhe(host_ctxt);
-+	__sysreg_save_state_nvhe(&host_vcpu->arch.ctxt);
- 
- 	/*
- 	 * We must restore the 32-bit state before the sysregs, thanks
-@@ -206,7 +207,7 @@ static void __kvm_vcpu_switch_to_host(struct kvm_cpu_context *host_ctxt,
- 	__deactivate_traps(vcpu);
- 	__deactivate_vm(vcpu);
- 
--	__sysreg_restore_state_nvhe(host_ctxt);
-+	__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
- 
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
- 		__fpsimd_save_fpexc32(vcpu);
-@@ -239,7 +240,7 @@ static void __vcpu_switch_to(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.ctxt.is_host)
- 		__kvm_vcpu_switch_to_host(host_ctxt, vcpu, running_vcpu);
- 	else
--		__kvm_vcpu_switch_to_guest(host_ctxt, vcpu);
-+		__kvm_vcpu_switch_to_guest(host_ctxt, running_vcpu, vcpu);
- 
- 	*__hyp_this_cpu_ptr(kvm_hyp_running_vcpu) = vcpu;
- }
-@@ -288,14 +289,15 @@ void __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
- 	u64 spsr = read_sysreg_el2(SYS_SPSR);
- 	u64 elr = read_sysreg_el2(SYS_ELR);
- 	u64 par = read_sysreg(par_el1);
-+	struct kvm_vcpu *host_vcpu = __hyp_this_cpu_ptr(kvm_host_vcpu);
- 	struct kvm_vcpu *vcpu = __hyp_this_cpu_read(kvm_hyp_running_vcpu);
- 	unsigned long str_va;
- 
--	if (read_sysreg(vttbr_el2)) {
-+	if (vcpu != host_vcpu) {
- 		__timer_disable_traps(vcpu);
- 		__deactivate_traps(vcpu);
- 		__deactivate_vm(vcpu);
--		__sysreg_restore_state_nvhe(host_ctxt);
-+		__sysreg_restore_state_nvhe(&host_vcpu->arch.ctxt);
+ 	if (pmu->events_guest)
+ 		write_sysreg(pmu->events_guest, pmcntenclr_el0);
+@@ -169,7 +161,7 @@ static void __kvm_vcpu_switch_to_guest(struct kvm_cpu_context *host_ctxt,
+ 		pmr_sync();
  	}
  
- 	/*
+-	__pmu_switch_to_guest(host_ctxt);
++	__pmu_switch_to_guest();
+ 
+ 	__sysreg_save_state_nvhe(&host_vcpu->arch.ctxt);
+ 
+@@ -218,7 +210,7 @@ static void __kvm_vcpu_switch_to_host(struct kvm_cpu_context *host_ctxt,
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
+-	__pmu_switch_to_host(host_ctxt);
++	__pmu_switch_to_host();
+ 
+ 	/* Returning to host will clear PSR.I, remask PMR if needed */
+ 	if (system_uses_irq_prio_masking())
 -- 
 2.27.0.389.gc38d7665816-goog
 
