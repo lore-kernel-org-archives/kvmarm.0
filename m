@@ -1,84 +1,77 @@
-Return-Path: <SRS0=T00w=A2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=M1Jp=A3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A57BCC433F1
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66747C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:08:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 640EA207BC
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jul 2020 18:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF96D2074B
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:08:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="WCkXUeWk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640EA207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXwi/yat"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF96D2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DD114B3DC;
-	Wed, 15 Jul 2020 14:45:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A95A4B49A;
+	Thu, 16 Jul 2020 08:08:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rIO5HJPi7Duy; Wed, 15 Jul 2020 14:45:19 -0400 (EDT)
+	with ESMTP id qiL-NgTIlKXu; Thu, 16 Jul 2020 08:08:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA1A44B238;
-	Wed, 15 Jul 2020 14:45:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FCD94B492;
+	Thu, 16 Jul 2020 08:08:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 168B44B1CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 204AB4B476
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:08:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xVEOmConIHZM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jul 2020 14:45:18 -0400 (EDT)
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
- [209.85.160.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C449B4B3E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 14:45:17 -0400 (EDT)
-Received: by mail-qt1-f202.google.com with SMTP id t36so1992501qtc.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jul 2020 11:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=DzLM30YLaDahBmFN2vdswcf6xS4U0YF4/in7tp2e7Ac=;
- b=WCkXUeWkGWipxkJCnWezDbCCye5WPmn66w/ehPc0Z+l4toQG+0YCSl7fVleP8jhhgW
- uugm9ZqV3oEtfBPpC+awJS7TWFvCoVyYiI1lWmJCrJuP8GQBQ0ShSQjzSzQS5p7GN+MR
- XKt/prGdwBu/JEwQKYsaSiuVdoRBDDmDBCz+MXPbUfQn/ir3YXBtoBlTU6izDGkDl03b
- w857hVaR/7JH/pIYsV9d2yidZAzaveOevBG4byZs9XsQak6XwYprLKUL9g6KAmzVQ5El
- osO9X33dyLac7cgFNOmd0mTe3MVXgjzP501wWF+UKJmXuIqMwbnsjDCKbIIxuo21InCb
- uBVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=DzLM30YLaDahBmFN2vdswcf6xS4U0YF4/in7tp2e7Ac=;
- b=agTFVLGLvFqtEZZOOXneZ4V88b1p7O3Pc2ccoYDCoSUgctTIWzhzkObdN2665Yq4by
- T7wjzS/JhVMwB06rA8Y+2VmJuY2WlFtTC7n3u9pX5NjfS1Zuvayxe2z7FSg8OnhoBls6
- YhEXHAoa+3lHqWjvEl50bRrab/xGmUMdlvyzv/RV5pJIQYdLySRS+F6L1l1wpOFMlBGa
- jXT30aWSwj7/hyDHPLPBCXQOxUm8AXPlFuyXgJ9C9Ao0QVBl7jXWj96Bil9eaWDCU1z3
- IzJVyi+M6F2ygwgPJcya9T/r8dPmRB4zgLbzC+J3z5RdAfUJeZ4Al+0V5wpz3aTsxCF3
- 6vuA==
-X-Gm-Message-State: AOAM531CBFaY/i4JjDj3yey8DVilywPC3SIsoFZD5Cx/2m9GMa2pms1c
- m7SyPzAU3UksD4RvUZmnVxp7V5SLippWM5tC36UBZX8K9n7MSA7TnVQ1zXkRAcsWmOSCcFdbdNG
- iUHlTyLBSBJ5OHp/us5qq8Nqd8NqPPidXHrs84BtYfRAlepGsfHzqaRRHrCCNTfB58vuXxQ==
-X-Google-Smtp-Source: ABdhPJz07yNAPawl1Q7Sa9Gv1Ygjsv3jpDz+jg0pE43kpSN1W13sgdR3OGkk29zNgxuysvvAQvOjhQt9dpM=
-X-Received: by 2002:a0c:ea26:: with SMTP id t6mr708145qvp.220.1594838717224;
- Wed, 15 Jul 2020 11:45:17 -0700 (PDT)
-Date: Wed, 15 Jul 2020 19:44:14 +0100
-In-Reply-To: <20200715184438.1390996-1-ascull@google.com>
-Message-Id: <20200715184438.1390996-14-ascull@google.com>
-Mime-Version: 1.0
-References: <20200715184438.1390996-1-ascull@google.com>
-X-Mailer: git-send-email 2.27.0.389.gc38d7665816-goog
-Subject: [PATCH 13/37] KVM: arm64: Rename workaround 2 helpers
-From: Andrew Scull <ascull@google.com>
+ with ESMTP id 8PjWOcXjNplD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jul 2020 08:08:11 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3A874B472
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:08:10 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B31302074B;
+ Thu, 16 Jul 2020 12:08:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1594901289;
+ bh=3PipD2VgqpMm6NsDZAGjXt1uT7SJIOeABIEJHpL222Q=;
+ h=From:To:Cc:Subject:Date:From;
+ b=rXwi/yatQ9N3eqMd3+e05P1NKXMpa2fhrezNvIvWkkCo83u/x/SrD4e2gIUA9CY43
+ gNhNZ98RIG45MZ8yoUg4cLP8SFQC7tz5gQ99iboC201BRJuvJ2h5JEDn9ioqi0w7QJ
+ E++j+ak1gTjcFHTdM9xdD3gRdyO+e3IM2Iiz6n3g=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jw2gK-00CIGX-0B; Thu, 16 Jul 2020 13:08:08 +0100
+From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Cc: maz@kernel.org, kernel-team@android.com
+Subject: [kvmtool][PATCH] arm64: Use default kernel offset when the image file
+ can't be seeked
+Date: Thu, 16 Jul 2020 13:08:01 +0100
+Message-Id: <20200716120801.2996-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, will@kernel.org,
+ julien.thierry.kdev@gmail.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,105 +88,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Change the names from 'guest' and 'host' to terms that can also apply
-when the host is treated as a vcpu and hyp has its own state.
+While introducing new code to extract the kernel offset from the
+image, commit fd0a05b ("arm64: Obtain text offset from kernel image")
+introduced a regression where something such as:
 
-'guest' becomes 'vcpu' as the host is now also a vcpu.
+  ./lkvm run -c 8 -p earlycon <(zcat /boot/vmlinuz-5.8.0-rc5-00172-ga161216e31ba)
 
-'host' becomes 'hyp' as the nVHE hyp is gaining indepedent state and the
-VHE hyp _is_ the host anyway.
+now fails to load the kernel, as the file descriptor cannot be
+seeked.
 
-Signed-off-by: Andrew Scull <ascull@google.com>
+Let's assume the good old 0x80000 offset when the seek syscall fails,
+with a warning for a good measure.
+
+Fixes: fd0a05b ("arm64: Obtain text offset from kernel image")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
- arch/arm64/kvm/hyp/nvhe/switch.c        |  4 ++--
- arch/arm64/kvm/hyp/vhe/switch.c         |  4 ++--
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ arm/aarch64/kvm.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 248f434c5de6..fa62c2b21b4b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -484,15 +484,15 @@ static inline bool __needs_ssbd_off(struct kvm_vcpu *vcpu)
- 	if (!cpus_have_final_cap(ARM64_SSBD))
- 		return false;
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+index a46d438..49e1dd3 100644
+--- a/arm/aarch64/kvm.c
++++ b/arm/aarch64/kvm.c
+@@ -15,6 +15,7 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+ 	struct arm64_image_header header;
+ 	off_t cur_offset;
+ 	ssize_t size;
++	const char *warn_str;
  
--	return !(vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG);
-+	return !kvm_arm_get_vcpu_workaround_2_flag(vcpu);
+ 	/* the 32bit kernel offset is a well known value */
+ 	if (kvm->cfg.arch.aarch32_guest)
+@@ -22,8 +23,10 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+ 
+ 	cur_offset = lseek(fd, 0, SEEK_CUR);
+ 	if (cur_offset == (off_t)-1 ||
+-	    lseek(fd, 0, SEEK_SET) == (off_t)-1)
+-		die("Failed to seek in image file");
++	    lseek(fd, 0, SEEK_SET) == (off_t)-1) {
++		warn_str = "Failed to seek in kernel image file";
++		goto fail;
++	}
+ 
+ 	size = xread(fd, &header, sizeof(header));
+ 	if (size < 0 || (size_t)size < sizeof(header))
+@@ -37,7 +40,9 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
+ 	if (le64_to_cpu(header.image_size))
+ 		return le64_to_cpu(header.text_offset);
+ 
+-	pr_warning("Image size is 0, assuming TEXT_OFFSET to be 0x80000");
++	warn_str = "Image size is 0";
++fail:
++	pr_warning("%s, assuming TEXT_OFFSET to be 0x80000", warn_str);
+ 	return 0x80000;
  }
- 
--static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
-+static inline void __set_vcpu_arch_workaround_state(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_ARM64_SSBD
- 	/*
--	 * The host runs with the workaround always present. If the
--	 * guest wants it disabled, so be it...
-+	 * The hyp runs with the workaround always present. If the
-+	 * vpu wants it disabled, so be it...
- 	 */
- 	if (__needs_ssbd_off(vcpu) &&
- 	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-@@ -500,11 +500,11 @@ static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
- #endif
- }
- 
--static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
-+static inline void __set_hyp_arch_workaround_state(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_ARM64_SSBD
- 	/*
--	 * If the guest has disabled the workaround, bring it back on.
-+	 * If the vcpu has disabled the workaround, bring it back on.
- 	 */
- 	if (__needs_ssbd_off(vcpu) &&
- 	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index d866bff8a142..81cdf33f92bc 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -200,7 +200,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_guest(vcpu);
- 
--	__set_guest_arch_workaround_state(vcpu);
-+	__set_vcpu_arch_workaround_state(vcpu);
- 
- 	do {
- 		/* Jump in the fire! */
-@@ -209,7 +209,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
--	__set_host_arch_workaround_state(vcpu);
-+	__set_hyp_arch_workaround_state(vcpu);
- 
- 	__sysreg_save_state_nvhe(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 366dc386224c..d871e79fceaf 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -131,7 +131,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
--	__set_guest_arch_workaround_state(vcpu);
-+	__set_vcpu_arch_workaround_state(vcpu);
- 
- 	do {
- 		/* Jump in the fire! */
-@@ -140,7 +140,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
- 
--	__set_host_arch_workaround_state(vcpu);
-+	__set_hyp_arch_workaround_state(vcpu);
- 
- 	sysreg_save_guest_state_vhe(guest_ctxt);
  
 -- 
-2.27.0.389.gc38d7665816-goog
+2.27.0
 
 _______________________________________________
 kvmarm mailing list
