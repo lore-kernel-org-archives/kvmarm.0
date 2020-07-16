@@ -2,76 +2,70 @@ Return-Path: <SRS0=M1Jp=A3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66747C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6908AC433E1
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:23:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF96D2074B
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB2482065F
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:23:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXwi/yat"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF96D2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFLmdRM9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2482065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A95A4B49A;
-	Thu, 16 Jul 2020 08:08:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EDA04B4A5;
+	Thu, 16 Jul 2020 08:23:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qiL-NgTIlKXu; Thu, 16 Jul 2020 08:08:14 -0400 (EDT)
+	with ESMTP id CM0unHrZw+P6; Thu, 16 Jul 2020 08:23:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FCD94B492;
-	Thu, 16 Jul 2020 08:08:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C3A04B49C;
+	Thu, 16 Jul 2020 08:23:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 204AB4B476
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:08:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD6B4B499
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:23:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8PjWOcXjNplD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jul 2020 08:08:11 -0400 (EDT)
+ with ESMTP id jzEA2Ud8HUXT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jul 2020 08:23:53 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3A874B472
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:08:10 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9075E4B497
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:23:53 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B31302074B;
- Thu, 16 Jul 2020 12:08:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8809D2065F;
+ Thu, 16 Jul 2020 12:23:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594901289;
- bh=3PipD2VgqpMm6NsDZAGjXt1uT7SJIOeABIEJHpL222Q=;
- h=From:To:Cc:Subject:Date:From;
- b=rXwi/yatQ9N3eqMd3+e05P1NKXMpa2fhrezNvIvWkkCo83u/x/SrD4e2gIUA9CY43
- gNhNZ98RIG45MZ8yoUg4cLP8SFQC7tz5gQ99iboC201BRJuvJ2h5JEDn9ioqi0w7QJ
- E++j+ak1gTjcFHTdM9xdD3gRdyO+e3IM2Iiz6n3g=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jw2gK-00CIGX-0B; Thu, 16 Jul 2020 13:08:08 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [kvmtool][PATCH] arm64: Use default kernel offset when the image file
+ s=default; t=1594902232;
+ bh=+Ghs4LOaDAoadOr3B+4gz1tLJsknayclNEj2KVTuQ3g=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=MFLmdRM94McqLPi9kL70+1Nq2bwhjFuQisNFhs9+SyOQ6tnplhLpRHd5zplqmTdwP
+ 0/S4c1iyblhcyoTwqM+vMKc+t4AqtTF3/vO9UR3gJvQJZkVl1pBSbIXDWLuIGr7Ms6
+ U4AM3cWGoDKqWkAW+M6bFZFFCIrGiHGNDxx3uoWM=
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] arm64: Use default kernel offset when the image file
  can't be seeked
-Date: Thu, 16 Jul 2020 13:08:01 +0100
-Message-Id: <20200716120801.2996-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
+Date: Thu, 16 Jul 2020 13:23:46 +0100
+Message-Id: <159490198219.132431.9609124940381442265.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200716120801.2996-1-maz@kernel.org>
+References: <20200716120801.2996-1-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, will@kernel.org,
- julien.thierry.kdev@gmail.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
+Cc: catalin.marinas@arm.com, kernel-team@android.com,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,63 +82,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-While introducing new code to extract the kernel offset from the
-image, commit fd0a05b ("arm64: Obtain text offset from kernel image")
-introduced a regression where something such as:
+On Thu, 16 Jul 2020 13:08:01 +0100, Marc Zyngier wrote:
+> While introducing new code to extract the kernel offset from the
+> image, commit fd0a05b ("arm64: Obtain text offset from kernel image")
+> introduced a regression where something such as:
+> 
+>   ./lkvm run -c 8 -p earlycon <(zcat /boot/vmlinuz-5.8.0-rc5-00172-ga161216e31ba)
+> 
+> now fails to load the kernel, as the file descriptor cannot be
+> seeked.
+> 
+> [...]
 
-  ./lkvm run -c 8 -p earlycon <(zcat /boot/vmlinuz-5.8.0-rc5-00172-ga161216e31ba)
+Applied to kvmtool (master), thanks!
 
-now fails to load the kernel, as the file descriptor cannot be
-seeked.
+[1/1] arm64: Use default kernel offset when the image file can't be seeked
+      https://git.kernel.org/will/kvmtool/c/c9acdae1d2e7
 
-Let's assume the good old 0x80000 offset when the seek syscall fails,
-with a warning for a good measure.
-
-Fixes: fd0a05b ("arm64: Obtain text offset from kernel image")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arm/aarch64/kvm.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index a46d438..49e1dd3 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -15,6 +15,7 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
- 	struct arm64_image_header header;
- 	off_t cur_offset;
- 	ssize_t size;
-+	const char *warn_str;
- 
- 	/* the 32bit kernel offset is a well known value */
- 	if (kvm->cfg.arch.aarch32_guest)
-@@ -22,8 +23,10 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
- 
- 	cur_offset = lseek(fd, 0, SEEK_CUR);
- 	if (cur_offset == (off_t)-1 ||
--	    lseek(fd, 0, SEEK_SET) == (off_t)-1)
--		die("Failed to seek in image file");
-+	    lseek(fd, 0, SEEK_SET) == (off_t)-1) {
-+		warn_str = "Failed to seek in kernel image file";
-+		goto fail;
-+	}
- 
- 	size = xread(fd, &header, sizeof(header));
- 	if (size < 0 || (size_t)size < sizeof(header))
-@@ -37,7 +40,9 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
- 	if (le64_to_cpu(header.image_size))
- 		return le64_to_cpu(header.text_offset);
- 
--	pr_warning("Image size is 0, assuming TEXT_OFFSET to be 0x80000");
-+	warn_str = "Image size is 0";
-+fail:
-+	pr_warning("%s, assuming TEXT_OFFSET to be 0x80000", warn_str);
- 	return 0x80000;
- }
- 
+Cheers,
 -- 
-2.27.0
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
