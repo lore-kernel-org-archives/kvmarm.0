@@ -1,70 +1,59 @@
-Return-Path: <SRS0=M1Jp=A3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=EkBd=A4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6908AC433E1
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D029C433E3
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 08:05:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DB2482065F
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jul 2020 12:23:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFLmdRM9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2482065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id CB7B920737
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 08:05:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB7B920737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EDA04B4A5;
-	Thu, 16 Jul 2020 08:23:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2824B2D4;
+	Fri, 17 Jul 2020 04:05:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CM0unHrZw+P6; Thu, 16 Jul 2020 08:23:55 -0400 (EDT)
+	with ESMTP id C0+aLDeqmG2e; Fri, 17 Jul 2020 04:05:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C3A04B49C;
-	Thu, 16 Jul 2020 08:23:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 119B54B2D0;
+	Fri, 17 Jul 2020 04:05:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD6B4B499
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:23:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAE504B2D0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 04:05:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jzEA2Ud8HUXT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jul 2020 08:23:53 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9075E4B497
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jul 2020 08:23:53 -0400 (EDT)
-Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
- [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8809D2065F;
- Thu, 16 Jul 2020 12:23:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1594902232;
- bh=+Ghs4LOaDAoadOr3B+4gz1tLJsknayclNEj2KVTuQ3g=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MFLmdRM94McqLPi9kL70+1Nq2bwhjFuQisNFhs9+SyOQ6tnplhLpRHd5zplqmTdwP
- 0/S4c1iyblhcyoTwqM+vMKc+t4AqtTF3/vO9UR3gJvQJZkVl1pBSbIXDWLuIGr7Ms6
- U4AM3cWGoDKqWkAW+M6bFZFFCIrGiHGNDxx3uoWM=
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.cs.columbia.edu,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] arm64: Use default kernel offset when the image file
- can't be seeked
-Date: Thu, 16 Jul 2020 13:23:46 +0100
-Message-Id: <159490198219.132431.9609124940381442265.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200716120801.2996-1-maz@kernel.org>
-References: <20200716120801.2996-1-maz@kernel.org>
+ with ESMTP id VKBTGHp6zaTX for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2020 04:05:39 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 687744B2C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 04:05:39 -0400 (EDT)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 06DC456026DCBC285F91;
+ Fri, 17 Jul 2020 16:05:36 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.22) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 17 Jul 2020 16:05:26 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+Subject: [PATCH] drivers: arm arch timer: Correct fault programming of
+ CNTKCTL_EL1.EVNTI
+Date: Fri, 17 Jul 2020 16:05:15 +0800
+Message-ID: <20200717080515.19088-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Cc: catalin.marinas@arm.com, kernel-team@android.com,
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -82,30 +71,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 16 Jul 2020 13:08:01 +0100, Marc Zyngier wrote:
-> While introducing new code to extract the kernel offset from the
-> image, commit fd0a05b ("arm64: Obtain text offset from kernel image")
-> introduced a regression where something such as:
-> 
->   ./lkvm run -c 8 -p earlycon <(zcat /boot/vmlinuz-5.8.0-rc5-00172-ga161216e31ba)
-> 
-> now fails to load the kernel, as the file descriptor cannot be
-> seeked.
-> 
-> [...]
+ARM virtual counter supports event stream, it can only trigger an event
+when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0 changes,
+so the actual period of event stream is 2^(cntkctl_evnti + 1). For example,
+when the trigger bit is 0, then virtual counter trigger an event for every
+two cycles.
 
-Applied to kvmtool (master), thanks!
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-[1/1] arm64: Use default kernel offset when the image file can't be seeked
-      https://git.kernel.org/will/kvmtool/c/c9acdae1d2e7
-
-Cheers,
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index ecf7b7db2d05..bc019dd0975b 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
+ static void arch_timer_evtstrm_enable(int divider)
+ {
+ 	u32 cntkctl = arch_timer_get_cntkctl();
++	int cntkctl_evnti;
++
++	/*
++	 * Note that it can only trigger an event when the trigger bit
++	 * of CNTVCT_EL0 changes, so the actual period of event stream
++	 * is 2^(cntkctl_evnti + 1).
++	 */
++	cntkctl_evnti = divider - 1;
++	cntkctl_evnti = min(cntkctl_evnti, 15);
++	cntkctl_evnti = max(cntkctl_evnti, 0);
+ 
+ 	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
+ 	/* Set the divider and enable virtual event stream */
+-	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
++	cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+ 			| ARCH_TIMER_VIRT_EVT_EN;
+ 	arch_timer_set_cntkctl(cntkctl);
+ 	arch_timer_set_evtstrm_feature();
+@@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
+ 	/* Find the closest power of two to the divisor */
+ 	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
+ 	pos = fls(evt_stream_div);
+-	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
++	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
+ 		pos--;
++
+ 	/* enable event stream */
+-	arch_timer_evtstrm_enable(min(pos, 15));
++	arch_timer_evtstrm_enable(pos);
+ }
+ 
+ static void arch_counter_set_user_access(void)
 -- 
-Will
+2.19.1
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
