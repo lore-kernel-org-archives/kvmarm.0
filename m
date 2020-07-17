@@ -2,59 +2,83 @@ Return-Path: <SRS0=EkBd=A4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 797DBC433E1
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 09:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC3C433E1
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:21:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 043C420691
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 09:21:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043C420691
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 7EED22065F
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:21:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="doDX1bjI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EED22065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 534584B313;
-	Fri, 17 Jul 2020 05:21:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0A74B195;
+	Fri, 17 Jul 2020 12:21:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bJwqOppovYQz; Fri, 17 Jul 2020 05:21:28 -0400 (EDT)
+	with ESMTP id jnHSAFFPvEyq; Fri, 17 Jul 2020 12:21:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A64B4B314;
-	Fri, 17 Jul 2020 05:21:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A260F4B179;
+	Fri, 17 Jul 2020 12:21:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 834714B30E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 05:21:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC8D24B178
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:21:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SmXD6GRmU00L for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2020 05:21:26 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06E014B309
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 05:21:25 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 73228D0B5AF77BBC20AC;
- Fri, 17 Jul 2020 17:21:21 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.22) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 17 Jul 2020 17:21:12 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-Subject: [RESEND PATCH] drivers: arm arch timer: Correct fault programming of
- CNTKCTL_EL1.EVNTI
-Date: Fri, 17 Jul 2020 17:21:04 +0800
-Message-ID: <20200717092104.15428-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-MIME-Version: 1.0
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
+ with ESMTP id 3pDk6pmdjEdW for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2020 12:21:46 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7666D4B151
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:21:46 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 338B02065F;
+ Fri, 17 Jul 2020 16:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1595002905;
+ bh=GbgH6FsbvovtvIfcORnCEbTLg2XQTMXQCpfwMWFlCvw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=doDX1bjI6VbrVy6+oAbEaF/ZSyrU3FyFzsyb+JzpPCvyPhO3K+BouzIweRSqL1jX8
+ yQkkciJi6vdJJNkAdF3TWVguAezkMiHLF/z/O5bkNS4rQ7rWI7opZQgSRhqNvJb7gq
+ 1jiikJ+DQN4eRj666kx3FqWzeZ2mPmYjNGvChdrg=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1jwT7H-00CgMW-EX; Fri, 17 Jul 2020 17:21:43 +0100
+Date: Fri, 17 Jul 2020 17:21:42 +0100
+Message-ID: <87blkexgbt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH 06/37] KVM: arm64: Only check pending interrupts if it
+ would trap
+In-Reply-To: <20200715184438.1390996-7-ascull@google.com>
+References: <20200715184438.1390996-1-ascull@google.com>
+ <20200715184438.1390996-7-ascull@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,60 +95,160 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ARM virtual counter supports event stream. It can only trigger an event
-when the trigger bit of CNTVCT_EL0 changes from 0 to 1 (or from 1 to 0),
-so the actual period of event stream is 2 ^ (cntkctl_evnti + 1). For
-example, when the trigger bit is 0, then it triggers an event for every
-two cycles.
+Hi Andrew,
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+On Wed, 15 Jul 2020 19:44:07 +0100,
+Andrew Scull <ascull@google.com> wrote:
+> 
+> Allow entry to a vcpu that can handle interrupts if there is an
+> interrupts pending. Entry will still be aborted if the vcpu cannot
+> handle interrupts.
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index ecf7b7db2d05..06d99a4b1b9b 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
- static void arch_timer_evtstrm_enable(int divider)
- {
- 	u32 cntkctl = arch_timer_get_cntkctl();
-+	int cntkctl_evnti;
-+
-+	/*
-+	 * Note that it can only trigger an event when the trigger bit
-+	 * of CNTVCT_EL0 changes from 1 to 0 (or from 0 to 1), so the
-+	 * actual period of event stream is 2 ^ (cntkctl_evnti + 1).
-+	 */
-+	cntkctl_evnti = divider - 1;
-+	cntkctl_evnti = min(cntkctl_evnti, 15);
-+	cntkctl_evnti = max(cntkctl_evnti, 0);
+This is pretty confusing. All vcpus can handle interrupts, it's just
+that there are multiple classes of interrupts (physical or virtual).
+Instead, this should outline *where* physical interrupt are taken.
+
+Something like:
+
+  When entering a vcpu for which physical interrupts are not taken to
+  EL2, don't bother evaluating ISR_EL1 to work out whether we should
+  go back to EL2 early. Instead, just enter the guest without any
+  further ado. This is done by checking HCR_EL2.IMO bit.
+
+> 
+> This allows use of __guest_enter to enter into the host.
+> 
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> ---
+>  arch/arm64/kvm/hyp/entry.S | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index ee32a7743389..6a641fcff4f7 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -73,13 +73,17 @@ SYM_FUNC_START(__guest_enter)
+>  	save_sp_el0	x1, x2
+>  
+>  	// Now the host state is stored if we have a pending RAS SError it must
+> -	// affect the host. If any asynchronous exception is pending we defer
+> -	// the guest entry. The DSB isn't necessary before v8.2 as any SError
+> -	// would be fatal.
+> +	// affect the host. If physical IRQ interrupts are going to be trapped
+> +	// and there are already asynchronous exceptions pending then we defer
+> +	// the entry. The DSB isn't necessary before v8.2 as any SError would
+> +	// be fatal.
+>  alternative_if ARM64_HAS_RAS_EXTN
+>  	dsb	nshst
+>  	isb
+>  alternative_else_nop_endif
+> +	mrs	x1, hcr_el2
+> +	and	x1, x1, #HCR_IMO
+> +	cbz	x1, 1f
+
+Do we really want to take the overhead of the above DSB/ISB when on
+the host? We're not even evaluating ISR_EL1, so what is the gain?
+
+This also assumes that IMO/FMO/AMO are all set together, which
+deserves to be documented.
+
+Another thing is that you are also restoring registers that the host
+vcpu expects to be corrupted (the caller-saved registers, X0-17).
+You probably should just zero them instead if leaking data from EL2 is
+your concern. Yes, this is a departure from SMCCC 1.1, but I think
+this is a valid one, as EL2 isn't a fully independent piece of SW.
+Same goes on the __guest_exit() path. PtrAuth is another concern (I'm
+pretty sure this doesn't do what we want, but I haven't tried on a model).
+
+I've hacked the following patch together, which allowed me to claw
+back about 10% of the performance loss. I'm pretty sure there are
+similar places where you have introduced extra overhead, and we should
+hunt them down.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 6c3a6b27a96c..2d1a71bd7baa 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -33,6 +33,10 @@ SYM_FUNC_START(__guest_enter)
+ 	// Save the hyp's sp_el0
+ 	save_sp_el0	x1, x2
  
- 	cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
- 	/* Set the divider and enable virtual event stream */
--	cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
-+	cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
- 			| ARCH_TIMER_VIRT_EVT_EN;
- 	arch_timer_set_cntkctl(cntkctl);
- 	arch_timer_set_evtstrm_feature();
-@@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
- 	/* Find the closest power of two to the divisor */
- 	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
- 	pos = fls(evt_stream_div);
--	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-+	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
- 		pos--;
++	mrs	x1, hcr_el2
++	and	x1, x1, #HCR_IMO
++	cbz	x1, 2f
 +
- 	/* enable event stream */
--	arch_timer_evtstrm_enable(min(pos, 15));
-+	arch_timer_evtstrm_enable(pos);
- }
+ 	// Now the hyp state is stored if we have a pending RAS SError it must
+ 	// affect the hyp. If physical IRQ interrupts are going to be trapped
+ 	// and there are already asynchronous exceptions pending then we defer
+@@ -42,9 +46,6 @@ alternative_if ARM64_HAS_RAS_EXTN
+ 	dsb	nshst
+ 	isb
+ alternative_else_nop_endif
+-	mrs	x1, hcr_el2
+-	and	x1, x1, #HCR_IMO
+-	cbz	x1, 1f
+ 	mrs	x1, isr_el1
+ 	cbz	x1,  1f
+ 	mov	x0, #ARM_EXCEPTION_IRQ
+@@ -81,6 +82,31 @@ alternative_else_nop_endif
+ 	eret
+ 	sb
  
- static void arch_counter_set_user_access(void)
++2:
++	add	x29, x0, #VCPU_CONTEXT
++
++	// Macro ptrauth_switch_to_guest format:
++	// 	ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3)
++	// The below macro to restore guest keys is not implemented in C code
++	// as it may cause Pointer Authentication key signing mismatch errors
++	// when this feature is enabled for kernel code.
++	ptrauth_switch_to_guest x29, x0, x1, x2
++
++	// Restore the guest's sp_el0
++	restore_sp_el0 x29, x0
++
++	.irp n,4,5,6,7,8,9,10,11,12,13,14,15,16,17
++	mov	x\n, xzr
++	.endr
++
++	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
++	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
++
++	// Restore guest regs x18-x29, lr
++	restore_callee_saved_regs x29
++	eret
++	sb
++
+ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	// x0: return code
+ 	// x1: vcpu
+@@ -99,6 +125,11 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 
+ 	// Store the guest regs x0-x1 and x4-x17
+ 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(0)]
++
++	mrs	x2, hcr_el2
++	and	x2, x2, #HCR_IMO
++	cbz	x2, 1f
++
+ 	stp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
+ 	stp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
+ 	stp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
+@@ -107,6 +138,7 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+ 	stp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
+ 	stp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
+ 
++1:
+ 	// Store the guest regs x18-x29, lr
+ 	save_callee_saved_regs x1
+ 
+
 -- 
-2.19.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
