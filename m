@@ -2,83 +2,56 @@ Return-Path: <SRS0=EkBd=A4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC3C433E1
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A13FC433E2
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:46:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7EED22065F
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:21:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="doDX1bjI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EED22065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 630E520704
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 16:46:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 630E520704
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0A74B195;
-	Fri, 17 Jul 2020 12:21:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D954F4B1A7;
+	Fri, 17 Jul 2020 12:46:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jnHSAFFPvEyq; Fri, 17 Jul 2020 12:21:48 -0400 (EDT)
+	with ESMTP id 3sP9lF8Ju6ET; Fri, 17 Jul 2020 12:46:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A260F4B179;
-	Fri, 17 Jul 2020 12:21:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC16C4B1A8;
+	Fri, 17 Jul 2020 12:46:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC8D24B178
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:21:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 334C24B1A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:46:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3pDk6pmdjEdW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2020 12:21:46 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7666D4B151
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:21:46 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 338B02065F;
- Fri, 17 Jul 2020 16:21:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595002905;
- bh=GbgH6FsbvovtvIfcORnCEbTLg2XQTMXQCpfwMWFlCvw=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=doDX1bjI6VbrVy6+oAbEaF/ZSyrU3FyFzsyb+JzpPCvyPhO3K+BouzIweRSqL1jX8
- yQkkciJi6vdJJNkAdF3TWVguAezkMiHLF/z/O5bkNS4rQ7rWI7opZQgSRhqNvJb7gq
- 1jiikJ+DQN4eRj666kx3FqWzeZ2mPmYjNGvChdrg=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jwT7H-00CgMW-EX; Fri, 17 Jul 2020 17:21:43 +0100
-Date: Fri, 17 Jul 2020 17:21:42 +0100
-Message-ID: <87blkexgbt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 06/37] KVM: arm64: Only check pending interrupts if it
- would trap
-In-Reply-To: <20200715184438.1390996-7-ascull@google.com>
-References: <20200715184438.1390996-1-ascull@google.com>
- <20200715184438.1390996-7-ascull@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id gaJAHULdEbFN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2020 12:46:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B84A4B1A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 12:46:44 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2E3612FC;
+ Fri, 17 Jul 2020 09:46:43 -0700 (PDT)
+Received: from monolith.arm.com (unknown [10.37.8.27])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B06213F68F;
+ Fri, 17 Jul 2020 09:46:42 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics for
+ GCC >= 10
+Date: Fri, 17 Jul 2020 17:47:27 +0100
+Message-Id: <20200717164727.75580-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Cc: pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,160 +68,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
+GCC 10.1.0 introduced the -m{,no-}outline-atomics flags which, according to
+man 1 gcc:
 
-On Wed, 15 Jul 2020 19:44:07 +0100,
-Andrew Scull <ascull@google.com> wrote:
-> 
-> Allow entry to a vcpu that can handle interrupts if there is an
-> interrupts pending. Entry will still be aborted if the vcpu cannot
-> handle interrupts.
+"Enable or disable calls to out-of-line helpers to implement atomic
+operations.  These helpers will, at runtime, determine if the LSE
+instructions from ARMv8.1-A can be used; if not, they will use the
+load/store-exclusive instructions that are present in the base ARMv8.0 ISA.
+[..] This option is on by default."
 
-This is pretty confusing. All vcpus can handle interrupts, it's just
-that there are multiple classes of interrupts (physical or virtual).
-Instead, this should outline *where* physical interrupt are taken.
+Unfortunately the option causes the following error at compile time:
 
-Something like:
+aarch64-linux-gnu-ld -nostdlib -pie -n -o arm/spinlock-test.elf -T /path/to/kvm-unit-tests/arm/flat.lds \
+	arm/spinlock-test.o arm/cstart64.o lib/libcflat.a lib/libfdt/libfdt.a /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a lib/arm/libeabi.a arm/spinlock-test.aux.o
+aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
+lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
 
-  When entering a vcpu for which physical interrupts are not taken to
-  EL2, don't bother evaluating ISR_EL1 to work out whether we should
-  go back to EL2 early. Instead, just enter the guest without any
-  further ado. This is done by checking HCR_EL2.IMO bit.
+This is happening because we are linking against our own libcflat which
+doesn't implement the function __getauxval().
 
-> 
-> This allows use of __guest_enter to enter into the host.
-> 
-> Signed-off-by: Andrew Scull <ascull@google.com>
-> ---
->  arch/arm64/kvm/hyp/entry.S | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index ee32a7743389..6a641fcff4f7 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -73,13 +73,17 @@ SYM_FUNC_START(__guest_enter)
->  	save_sp_el0	x1, x2
->  
->  	// Now the host state is stored if we have a pending RAS SError it must
-> -	// affect the host. If any asynchronous exception is pending we defer
-> -	// the guest entry. The DSB isn't necessary before v8.2 as any SError
-> -	// would be fatal.
-> +	// affect the host. If physical IRQ interrupts are going to be trapped
-> +	// and there are already asynchronous exceptions pending then we defer
-> +	// the entry. The DSB isn't necessary before v8.2 as any SError would
-> +	// be fatal.
->  alternative_if ARM64_HAS_RAS_EXTN
->  	dsb	nshst
->  	isb
->  alternative_else_nop_endif
-> +	mrs	x1, hcr_el2
-> +	and	x1, x1, #HCR_IMO
-> +	cbz	x1, 1f
+Disable the use of the out-of-line functions by compiling with
+-mno-outline-atomics if we detect a GCC version greater than 10.
 
-Do we really want to take the overhead of the above DSB/ISB when on
-the host? We're not even evaluating ISR_EL1, so what is the gain?
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
 
-This also assumes that IMO/FMO/AMO are all set together, which
-deserves to be documented.
+Tested with gcc versions 10.1.0 and 5.4.0 (cross-compilation), 9.3.0
+(native).
 
-Another thing is that you are also restoring registers that the host
-vcpu expects to be corrupted (the caller-saved registers, X0-17).
-You probably should just zero them instead if leaking data from EL2 is
-your concern. Yes, this is a departure from SMCCC 1.1, but I think
-this is a valid one, as EL2 isn't a fully independent piece of SW.
-Same goes on the __guest_exit() path. PtrAuth is another concern (I'm
-pretty sure this doesn't do what we want, but I haven't tried on a model).
+I've been able to suss out the reason for the build failure from this
+rejected gcc patch [1].
 
-I've hacked the following patch together, which allowed me to claw
-back about 10% of the performance loss. I'm pretty sure there are
-similar places where you have introduced extra overhead, and we should
-hunt them down.
+[1] https://patches.openembedded.org/patch/172460/
 
-Thanks,
+ arm/Makefile.arm64 | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-	M.
-
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 6c3a6b27a96c..2d1a71bd7baa 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -33,6 +33,10 @@ SYM_FUNC_START(__guest_enter)
- 	// Save the hyp's sp_el0
- 	save_sp_el0	x1, x2
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index dfd0c56fe8fb..3223cb966789 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -9,6 +9,12 @@ ldarch = elf64-littleaarch64
+ arch_LDFLAGS = -pie -n
+ CFLAGS += -mstrict-align
  
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_IMO
-+	cbz	x1, 2f
++# The -mno-outline-atomics flag is only valid for GCC versions 10 and greater.
++GCC_MAJOR_VERSION=$(shell $(CC) -dumpversion 2> /dev/null | cut -f1 -d.)
++ifeq ($(shell expr "$(GCC_MAJOR_VERSION)" ">=" "10"), 1)
++CFLAGS += -mno-outline-atomics
++endif
 +
- 	// Now the hyp state is stored if we have a pending RAS SError it must
- 	// affect the hyp. If physical IRQ interrupts are going to be trapped
- 	// and there are already asynchronous exceptions pending then we defer
-@@ -42,9 +46,6 @@ alternative_if ARM64_HAS_RAS_EXTN
- 	dsb	nshst
- 	isb
- alternative_else_nop_endif
--	mrs	x1, hcr_el2
--	and	x1, x1, #HCR_IMO
--	cbz	x1, 1f
- 	mrs	x1, isr_el1
- 	cbz	x1,  1f
- 	mov	x0, #ARM_EXCEPTION_IRQ
-@@ -81,6 +82,31 @@ alternative_else_nop_endif
- 	eret
- 	sb
- 
-+2:
-+	add	x29, x0, #VCPU_CONTEXT
-+
-+	// Macro ptrauth_switch_to_guest format:
-+	// 	ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3)
-+	// The below macro to restore guest keys is not implemented in C code
-+	// as it may cause Pointer Authentication key signing mismatch errors
-+	// when this feature is enabled for kernel code.
-+	ptrauth_switch_to_guest x29, x0, x1, x2
-+
-+	// Restore the guest's sp_el0
-+	restore_sp_el0 x29, x0
-+
-+	.irp n,4,5,6,7,8,9,10,11,12,13,14,15,16,17
-+	mov	x\n, xzr
-+	.endr
-+
-+	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
-+	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
-+
-+	// Restore guest regs x18-x29, lr
-+	restore_callee_saved_regs x29
-+	eret
-+	sb
-+
- SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 	// x0: return code
- 	// x1: vcpu
-@@ -99,6 +125,11 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 
- 	// Store the guest regs x0-x1 and x4-x17
- 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(0)]
-+
-+	mrs	x2, hcr_el2
-+	and	x2, x2, #HCR_IMO
-+	cbz	x2, 1f
-+
- 	stp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
- 	stp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
- 	stp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
-@@ -107,6 +138,7 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 	stp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
- 	stp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
- 
-+1:
- 	// Store the guest regs x18-x29, lr
- 	save_callee_saved_regs x1
- 
-
+ define arch_elf_check =
+ 	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+ 		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
 -- 
-Without deviation from the norm, progress is not possible.
+2.27.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
