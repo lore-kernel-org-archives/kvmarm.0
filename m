@@ -6,66 +6,64 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1E1C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 20:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA31C433E2
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 20:52:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3AB512076D
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 20:52:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AB512076D
+	by mail.kernel.org (Postfix) with ESMTP id 3EA932074B
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jul 2020 20:52:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA932074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C49CB4B175;
-	Fri, 17 Jul 2020 16:52:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4434B162;
+	Fri, 17 Jul 2020 16:52:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LZfhKSMc3gIf; Fri, 17 Jul 2020 16:52:39 -0400 (EDT)
+	with ESMTP id DpCVs4zfHqF5; Fri, 17 Jul 2020 16:52:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3D384B168;
-	Fri, 17 Jul 2020 16:52:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF6404B13C;
+	Fri, 17 Jul 2020 16:52:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B33474B132
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 16:52:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E06134B13C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 16:52:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ggvgwsjEPfuL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2020 16:52:36 -0400 (EDT)
-Received: from mail-il1-f193.google.com (mail-il1-f193.google.com
- [209.85.166.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C43D14B15A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 16:52:36 -0400 (EDT)
-Received: by mail-il1-f193.google.com with SMTP id x9so8472811ila.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 13:52:36 -0700 (PDT)
+ with ESMTP id sni89V1l9kCu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2020 16:52:38 -0400 (EDT)
+Received: from mail-il1-f195.google.com (mail-il1-f195.google.com
+ [209.85.166.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 386764B146
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 16:52:38 -0400 (EDT)
+Received: by mail-il1-f195.google.com with SMTP id r12so8460348ilh.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2020 13:52:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lA6y1484mCfujwLhJ510Qn2HTKproByu1gKdBQz37Eo=;
- b=a5Rhn0xFV/BfTmgA2c0oCq01PoaKdaHfbH83Mmg9PPn0f2n5S6ujM/PsD1TVeHPBCx
- GGKN9XKIPp5BXvPWS/E9WxdV9E3hOcJQKkcdZ2xQ/Dx3PbksFH9Hkvs6bYsg6Ob6WyY7
- pxNGD/J0ZPmdTAd/UREgCr5yrdNqkWFCqskV8Mn5XT5PxeiCopI2dV1TyFNtzjke3cFt
- obEbPXghyJnO01d3waQdWwksb6e+ZmM+YO0Xa9lViYUPlloiBHxaVNjtHLfEiYrzJHRd
- nUiZpoROREkKAhzN7Gl/DRJoMhtk2OFROJ36ydzYiccVNP+FFAuTToJEK/2DRRc+Sy3o
- X8ig==
-X-Gm-Message-State: AOAM530vZITLRqe0RpUtt7zhqw62cW50lR6zWxZtIbohMQQew/8HyOpL
- sq+zY40kCpUbaQQgDXKD9A==
-X-Google-Smtp-Source: ABdhPJyx/gulu/KTsFX3iauAwSag59A89mCNqY2i4r9k8OMUlJTecA50WQpkSdggWHrYVxGOD+Zqdw==
-X-Received: by 2002:a05:6e02:ead:: with SMTP id
- u13mr11850062ilj.46.1595019156351; 
- Fri, 17 Jul 2020 13:52:36 -0700 (PDT)
+ bh=8xBC3nAXSULrgwmXIdCxH6li3ZbD31n6G3URGbOpyNA=;
+ b=Y+2tj29mA4aK7UtE6XEU7lUZRhZApoDGbiohSrwCEg7JJ/U6jILUklAJBcA2SKFmVo
+ Fpzh9ET2X1EPldS9ZWd/1/4Xi7P/d89DNYR5mVXPB21BPHwEWYBEw5J0BF54cIfZKOZp
+ ftlAi8V96uN/7YKO0Owziu3PTXbPZRkHrq3Hu6mTK++5FjJfpBLmic/e/WwT2U1XlSE3
+ jDXNT3FLM7Aa2Ug0UDyYyNKyTfGV8P1cela7baSjGvWwOXsmHqEnCraD6vOt9LF5q9Cg
+ yDm4Tl+OLj3zPeNJT9kTEvqV1WLKQun3dG/UMyOE54TTpAzSKkeuA9bOXDmEDOhQUyjQ
+ 6jzw==
+X-Gm-Message-State: AOAM533nJR/etUNZKCzKyiO0aakV9HHzWUxzkcrc16X5ZCng/cw2rJbi
+ NmDNDiJiy0jDvXh04TQBwQ==
+X-Google-Smtp-Source: ABdhPJy8mgc4UM9YOfWN2tVTpEn8zFJxxWpEna2HHMu6Jr2fMtP0xf94c7w434YTdNuK6Qh4nl9epw==
+X-Received: by 2002:a92:1b8c:: with SMTP id f12mr11194653ill.93.1595019157750; 
+ Fri, 17 Jul 2020 13:52:37 -0700 (PDT)
 Received: from xps15.herring.priv ([64.188.179.252])
- by smtp.googlemail.com with ESMTPSA id 136sm4737492iou.50.2020.07.17.13.52.35
+ by smtp.googlemail.com with ESMTPSA id 136sm4737492iou.50.2020.07.17.13.52.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jul 2020 13:52:35 -0700 (PDT)
+ Fri, 17 Jul 2020 13:52:37 -0700 (PDT)
 From: Rob Herring <robh@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v3 1/3] KVM: arm64: Print warning when cpu erratum can cause
- guests to deadlock
-Date: Fri, 17 Jul 2020 14:52:31 -0600
-Message-Id: <20200717205233.903344-2-robh@kernel.org>
+Subject: [PATCH v3 2/3] arm64: Add part number for Arm Cortex-A77
+Date: Fri, 17 Jul 2020 14:52:32 -0600
+Message-Id: <20200717205233.903344-3-robh@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200717205233.903344-1-robh@kernel.org>
 References: <20200717205233.903344-1-robh@kernel.org>
@@ -87,44 +85,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If guests don't have certain CPU erratum workarounds implemented, then
-there is a possibility a guest can deadlock the system. IOW, only trusted
-guests should be used on systems with the erratum.
+Add the MIDR part number info for the Arm Cortex-A77.
 
-This is the case for Cortex-A57 erratum 832075.
-
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-v3:
- - s/work-arounds/workarounds/
+ arch/arm64/include/asm/cputype.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
- arch/arm64/kvm/arm.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 90cb90561446..9b070b5e212b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1653,6 +1653,10 @@ int kvm_arch_init(void *opaque)
- 		return -ENODEV;
- 	}
-
-+	if (cpus_have_const_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE))
-+		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
-+			 "Only trusted guests should be used on this system.\n");
-+
- 	for_each_online_cpu(cpu) {
- 		smp_call_function_single(cpu, check_kvm_target_cpu, &ret, 1);
- 		if (ret < 0) {
---
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index a87a93f67671..7a2d3c336579 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -71,6 +71,7 @@
+ #define ARM_CPU_PART_CORTEX_A55		0xD05
+ #define ARM_CPU_PART_CORTEX_A76		0xD0B
+ #define ARM_CPU_PART_NEOVERSE_N1	0xD0C
++#define ARM_CPU_PART_CORTEX_A77		0xD0D
+ 
+ #define APM_CPU_PART_POTENZA		0x000
+ 
+@@ -104,6 +105,7 @@
+ #define MIDR_CORTEX_A55 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A55)
+ #define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
+ #define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
++#define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
+ #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+ #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
+ #define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
+-- 
 2.25.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
