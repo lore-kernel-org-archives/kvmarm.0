@@ -3,81 +3,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42081C433E2
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 09:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A666C433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 09:12:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD1F82065D
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 09:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0556D2073E
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 09:12:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQJjSMq7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD1F82065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dht1ICi+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0556D2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D4B4B12E;
-	Sat, 18 Jul 2020 05:00:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AADB4B130;
+	Sat, 18 Jul 2020 05:12:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lC4h8JQWgg7P; Sat, 18 Jul 2020 05:00:44 -0400 (EDT)
+	with ESMTP id QA0oZC+Hu-Dh; Sat, 18 Jul 2020 05:11:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9B494B125;
-	Sat, 18 Jul 2020 05:00:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 297F64B101;
+	Sat, 18 Jul 2020 05:11:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F0B14B113
- for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 05:00:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB634B101
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 05:11:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qwMzYS6nBYnE for <kvmarm@lists.cs.columbia.edu>;
- Sat, 18 Jul 2020 05:00:42 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 584154B109
- for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 05:00:42 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id pEBHK1rNzPm7 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 18 Jul 2020 05:11:56 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 296614B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 05:11:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595063515;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=YXOyeyfK3ACOD6XEjJUczttBFVxRcGvCcA2SsYw5mIg=;
+ b=Dht1ICi+kezNktMHFziX1jzu5fEw2zZADXcvF7V5nNtzAvCSRzjcrh2grefmG4OOiG3/gl
+ 1GKvB7UQQHxyXsH4HIdpOddZG08PJuKmb4lu0QjjbHDA6BOsj0Kif4vhAAzCOWz9EBeYYE
+ nkcAy1EZ5MTGf193kes7hcT/4o2q4YI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-_T1zoGe8MImMO1oaIkj20Q-1; Sat, 18 Jul 2020 05:11:51 -0400
+X-MC-Unique: _T1zoGe8MImMO1oaIkj20Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0EE752065D;
- Sat, 18 Jul 2020 09:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595062833;
- bh=DIxzMhiONY5no3uQC/pQdFmGAw3pRQCnfUTXNpqOtD0=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=GQJjSMq7PYMW5HyclQ/YDhHqDtPsLZiHi0DA8FO6m/qLwwrcYKzpN33wQ4ljzMCB0
- 6OT67tKAt35QYWiEZm8fNIUNaOevidHHBo5x+Ud8ggbaNN3rAYjUEPLi9UNXng2PQd
- A+Ki/5cO/ZSAqJv+LoHau8bpW3Wx3/sXivx6UMlU=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jwihr-00Cr9t-5K; Sat, 18 Jul 2020 10:00:31 +0100
-Date: Sat, 18 Jul 2020 10:00:30 +0100
-Message-ID: <87a6zxxknl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 07/37] KVM: arm64: Separate SError detection from VAXorcism
-In-Reply-To: <20200715184438.1390996-8-ascull@google.com>
-References: <20200715184438.1390996-1-ascull@google.com>
- <20200715184438.1390996-8-ascull@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 894FA800463;
+ Sat, 18 Jul 2020 09:11:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 09EF460BE2;
+ Sat, 18 Jul 2020 09:11:48 +0000 (UTC)
+Date: Sat, 18 Jul 2020 11:11:45 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics
+ for GCC >= 10
+Message-ID: <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
+References: <20200717164727.75580-1-alexandru.elisei@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20200717164727.75580-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,147 +91,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On Wed, 15 Jul 2020 19:44:08 +0100,
-Andrew Scull <ascull@google.com> wrote:
+On Fri, Jul 17, 2020 at 05:47:27PM +0100, Alexandru Elisei wrote:
+> GCC 10.1.0 introduced the -m{,no-}outline-atomics flags which, according to
+> man 1 gcc:
 > 
-> When exiting a guest, just check whether there is an SError pending and
-> set the bit in the exit code. The fixup then initiates the ceremony
-> should it be required.
+> "Enable or disable calls to out-of-line helpers to implement atomic
+> operations.  These helpers will, at runtime, determine if the LSE
+> instructions from ARMv8.1-A can be used; if not, they will use the
+> load/store-exclusive instructions that are present in the base ARMv8.0 ISA.
+> [..] This option is on by default."
 > 
-> The separation allows for easier choices to be made as to whether the
-> demonic consultation should proceed.
-
-Such as?
-
+> Unfortunately the option causes the following error at compile time:
 > 
-> Signed-off-by: Andrew Scull <ascull@google.com>
+> aarch64-linux-gnu-ld -nostdlib -pie -n -o arm/spinlock-test.elf -T /path/to/kvm-unit-tests/arm/flat.lds \
+> 	arm/spinlock-test.o arm/cstart64.o lib/libcflat.a lib/libfdt/libfdt.a /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a lib/arm/libeabi.a arm/spinlock-test.aux.o
+> aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
+> lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
+> 
+> This is happening because we are linking against our own libcflat which
+> doesn't implement the function __getauxval().
+> 
+> Disable the use of the out-of-line functions by compiling with
+> -mno-outline-atomics if we detect a GCC version greater than 10.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h        |  2 ++
->  arch/arm64/kvm/hyp/entry.S              | 27 +++++++++++++++++--------
->  arch/arm64/kvm/hyp/hyp-entry.S          |  1 -
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++++
->  4 files changed, 25 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 07745d9c49fc..50a774812761 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -91,6 +91,8 @@ void deactivate_traps_vhe_put(void);
->  
->  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
->  
-> +void __vaxorcize_serror(void);
-
-I think a VAXorsist reference in the comments is plenty. The code can
-definitely stay architectural. Something like "__handle_SEI()" should
-be good. I'm not *that* fun.
-
-> +
->  void __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt);
->  #ifdef __KVM_NVHE_HYPERVISOR__
->  void __noreturn __hyp_do_panic(unsigned long, ...);
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index 6a641fcff4f7..dc4e3e7e7407 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -174,18 +174,31 @@ alternative_if ARM64_HAS_RAS_EXTN
->  	mrs_s	x2, SYS_DISR_EL1
->  	str	x2, [x1, #(VCPU_FAULT_DISR - VCPU_CONTEXT)]
->  	cbz	x2, 1f
-> -	msr_s	SYS_DISR_EL1, xzr
->  	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
-> -1:	ret
-> +	nop
-> +1:
->  alternative_else
->  	dsb	sy		// Synchronize against in-flight ld/st
->  	isb			// Prevent an early read of side-effect free ISR
->  	mrs	x2, isr_el1
-> -	tbnz	x2, #8, 2f	// ISR_EL1.A
-> -	ret
-> -	nop
-> +	tbz	x2, #8, 2f	// ISR_EL1.A
-> +	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
->  2:
->  alternative_endif
-> +
-> +	ret
-> +SYM_FUNC_END(__guest_enter)
-> +
-> +/*
-> + * void __vaxorcize_serror(void);
-> + */
-> +SYM_FUNC_START(__vaxorcize_serror)
-> +
-> +alternative_if ARM64_HAS_RAS_EXTN
-> +	msr_s	SYS_DISR_EL1, xzr
-> +	ret
-> +alternative_else_nop_endif
-> +
->  	// We know we have a pending asynchronous abort, now is the
->  	// time to flush it out. From your VAXorcist book, page 666:
->  	// "Threaten me not, oh Evil one!  For I speak with
-> @@ -193,7 +206,6 @@ alternative_endif
->  	mrs	x2, elr_el2
->  	mrs	x3, esr_el2
->  	mrs	x4, spsr_el2
-> -	mov	x5, x0
->  
->  	msr	daifclr, #4	// Unmask aborts
->  
-> @@ -217,6 +229,5 @@ abort_guest_exit_end:
->  	msr	elr_el2, x2
->  	msr	esr_el2, x3
->  	msr	spsr_el2, x4
-> -	orr	x0, x0, x5
->  1:	ret
-> -SYM_FUNC_END(__guest_enter)
-> +SYM_FUNC_END(__vaxorcize_serror)
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index e727bee8e110..c441aabb8ab0 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -177,7 +177,6 @@ el2_error:
->  	adr	x1, abort_guest_exit_end
->  	ccmp	x0, x1, #4, ne
->  	b.ne	__hyp_panic
-> -	mov	x0, #(1 << ARM_EXIT_WITH_SERROR_BIT)
->  	eret
->  	sb
->  
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 0511af14dc81..14a774d1a35a 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -405,6 +405,10 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->   */
->  static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
-> +	/* Flush guest SErrors. */
-> +	if (ARM_SERROR_PENDING(*exit_code))
-> +		__vaxorcize_serror();
-> +
->  	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
->  		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
->  
-> -- 
-> 2.27.0.389.gc38d7665816-goog
+> Tested with gcc versions 10.1.0 and 5.4.0 (cross-compilation), 9.3.0
+> (native).
 > 
+> I've been able to suss out the reason for the build failure from this
+> rejected gcc patch [1].
 > 
+> [1] https://patches.openembedded.org/patch/172460/
+> 
+>  arm/Makefile.arm64 | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index dfd0c56fe8fb..3223cb966789 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -9,6 +9,12 @@ ldarch = elf64-littleaarch64
+>  arch_LDFLAGS = -pie -n
+>  CFLAGS += -mstrict-align
+>  
+> +# The -mno-outline-atomics flag is only valid for GCC versions 10 and greater.
+> +GCC_MAJOR_VERSION=$(shell $(CC) -dumpversion 2> /dev/null | cut -f1 -d.)
+> +ifeq ($(shell expr "$(GCC_MAJOR_VERSION)" ">=" "10"), 1)
+> +CFLAGS += -mno-outline-atomics
+> +endif
 
-I'm not against this patch, but I wonder whether it actually helps
-with anything. It spreads the handling across multiple paths, making
-it harder to read. Could you explain the rational beyond "it's
-easier"?
+How about this patch instead?
+
+diff --git a/Makefile b/Makefile
+index 3ff2f91600f6..0e21a49096ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+ 
+ .PHONY: arch_clean clean distclean cscope
+ 
++# cc-option
++# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
++cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
++              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
++
+ #make sure env CFLAGS variable is not used
+ CFLAGS =
+ 
+@@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
+ #include architecture specific make rules
+ include $(SRCDIR)/$(TEST_DIR)/Makefile
+ 
+-# cc-option
+-# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+-
+-cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
+-              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+-
+ COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
+ COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
+ COMMON_CFLAGS += -Wignored-qualifiers -Werror
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index dfd0c56fe8fb..dbc7524d3070 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
+ arch_LDFLAGS = -pie -n
+ CFLAGS += -mstrict-align
+ 
++mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
++CFLAGS += $(mno_outline_atomics)
++
+ define arch_elf_check =
+ 	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+ 		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+
 
 Thanks,
+drew
 
-	M.
+> +
+>  define arch_elf_check =
+>  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+>  		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> -- 
+> 2.27.0
+> 
 
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
