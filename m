@@ -1,61 +1,77 @@
-Return-Path: <SRS0=+9g1=A5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=coVF=A7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED98C433E2
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 13:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F99C433E4
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jul 2020 13:04:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CDBCF2073A
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Jul 2020 13:49:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDBCF2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 4679A22B4D
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jul 2020 13:04:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tNkIcLz0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4679A22B4D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 299BF4B15D;
-	Sat, 18 Jul 2020 09:49:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCC4C4B09F;
+	Mon, 20 Jul 2020 09:04:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SYyjWoVIoeAF; Sat, 18 Jul 2020 09:49:36 -0400 (EDT)
+	with ESMTP id whLt61HI31go; Mon, 20 Jul 2020 09:04:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE8F24B141;
-	Sat, 18 Jul 2020 09:49:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD1F64B15F;
+	Mon, 20 Jul 2020 09:04:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C4C14B141
- for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 09:49:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E4B14B198
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2020 09:04:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CHShZ7zAS91x for <kvmarm@lists.cs.columbia.edu>;
- Sat, 18 Jul 2020 09:49:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC514B113
- for <kvmarm@lists.cs.columbia.edu>; Sat, 18 Jul 2020 09:49:34 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4952B12FC;
- Sat, 18 Jul 2020 06:49:34 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC3B93F718;
- Sat, 18 Jul 2020 06:49:33 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics
- for GCC >= 10
-To: Andrew Jones <drjones@redhat.com>
-References: <20200717164727.75580-1-alexandru.elisei@arm.com>
- <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <202d475d-95df-2350-a8e9-9264144993ac@arm.com>
-Date: Sat, 18 Jul 2020 14:50:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id ZoT4uMqnDY8t for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Jul 2020 09:04:02 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 331994B09F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2020 09:04:02 -0400 (EDT)
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl
+ [83.86.89.107])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7D53C207FC;
+ Mon, 20 Jul 2020 13:04:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1595250241;
+ bh=IrHumJNNwPA5DDR5b4RIKODfqPUkFXljRiSqzAuKtGw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=tNkIcLz0gZ/B1LVcyqZLazYMATcvmu5gT0QMb0tiDqsxFc4v6SZXGw1VlZaqhQy9n
+ twMPX7AlSdky7q3P0paxzBfuPK9vj4P/udpzlSxrjfk0Yavud541HD/KKlapC5JXp5
+ XA9a3VYcWoV7x9fzL87yw3Qbsh0i6d+an7eaxAe0=
+Date: Mon, 20 Jul 2020 15:04:11 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH stable v4.9 v2] arm64: entry: Place an SB sequence
+ following an ERET instruction
+Message-ID: <20200720130411.GB494210@kroah.com>
+References: <20200709195034.15185-1-f.fainelli@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
-Content-Language: en-US
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20200709195034.15185-1-f.fainelli@gmail.com>
+Cc: Nick Desaulniers <ndesaulniers@google.com>,
+ Fangrui Song <maskray@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>,
+ stable@vger.kernel.org,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Mark Brown <broonie@kernel.org>,
+ Sami Tolvanen <samitolvanen@google.com>, Marc Zyngier <maz@kernel.org>,
+ Kristina Martsenko <kristina.martsenko@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,117 +88,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Thu, Jul 09, 2020 at 12:50:23PM -0700, Florian Fainelli wrote:
+> From: Will Deacon <will.deacon@arm.com>
+> 
+> commit 679db70801da9fda91d26caf13bf5b5ccc74e8e8 upstream
+> 
+> Some CPUs can speculate past an ERET instruction and potentially perform
+> speculative accesses to memory before processing the exception return.
+> Since the register state is often controlled by a lower privilege level
+> at the point of an ERET, this could potentially be used as part of a
+> side-channel attack.
+> 
+> This patch emits an SB sequence after each ERET so that speculation is
+> held up on exception return.
+> 
+> Signed-off-by: Will Deacon <will.deacon@arm.com>
+> [florian: Adjust hyp-entry.S to account for the label
+>  added change to hyp/entry.S]
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+> Changes in v2:
+> 
+> - added missing hunk in hyp/entry.S per Will's feedback
 
-On 7/18/20 10:11 AM, Andrew Jones wrote:
-> On Fri, Jul 17, 2020 at 05:47:27PM +0100, Alexandru Elisei wrote:
->> GCC 10.1.0 introduced the -m{,no-}outline-atomics flags which, according to
->> man 1 gcc:
->>
->> "Enable or disable calls to out-of-line helpers to implement atomic
->> operations.  These helpers will, at runtime, determine if the LSE
->> instructions from ARMv8.1-A can be used; if not, they will use the
->> load/store-exclusive instructions that are present in the base ARMv8.0 ISA.
->> [..] This option is on by default."
->>
->> Unfortunately the option causes the following error at compile time:
->>
->> aarch64-linux-gnu-ld -nostdlib -pie -n -o arm/spinlock-test.elf -T /path/to/kvm-unit-tests/arm/flat.lds \
->> 	arm/spinlock-test.o arm/cstart64.o lib/libcflat.a lib/libfdt/libfdt.a /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a lib/arm/libeabi.a arm/spinlock-test.aux.o
->> aarch64-linux-gnu-ld: /usr/lib/gcc/aarch64-linux-gnu/10.1.0/libgcc.a(lse-init.o): in function `init_have_lse_atomics':
->> lse-init.c:(.text.startup+0xc): undefined reference to `__getauxval'
->>
->> This is happening because we are linking against our own libcflat which
->> doesn't implement the function __getauxval().
->>
->> Disable the use of the out-of-line functions by compiling with
->> -mno-outline-atomics if we detect a GCC version greater than 10.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>
->> Tested with gcc versions 10.1.0 and 5.4.0 (cross-compilation), 9.3.0
->> (native).
->>
->> I've been able to suss out the reason for the build failure from this
->> rejected gcc patch [1].
->>
->> [1] https://patches.openembedded.org/patch/172460/
->>
->>  arm/Makefile.arm64 | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index dfd0c56fe8fb..3223cb966789 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -9,6 +9,12 @@ ldarch = elf64-littleaarch64
->>  arch_LDFLAGS = -pie -n
->>  CFLAGS += -mstrict-align
->>  
->> +# The -mno-outline-atomics flag is only valid for GCC versions 10 and greater.
->> +GCC_MAJOR_VERSION=$(shell $(CC) -dumpversion 2> /dev/null | cut -f1 -d.)
->> +ifeq ($(shell expr "$(GCC_MAJOR_VERSION)" ">=" "10"), 1)
->> +CFLAGS += -mno-outline-atomics
->> +endif
-> How about this patch instead?
->
-> diff --git a/Makefile b/Makefile
-> index 3ff2f91600f6..0e21a49096ba 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -17,6 +17,11 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
->  
->  .PHONY: arch_clean clean distclean cscope
->  
-> +# cc-option
-> +# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> +cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> +              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-> +
->  #make sure env CFLAGS variable is not used
->  CFLAGS =
->  
-> @@ -43,12 +48,6 @@ OBJDIRS += $(LIBFDT_objdir)
->  #include architecture specific make rules
->  include $(SRCDIR)/$(TEST_DIR)/Makefile
->  
-> -# cc-option
-> -# Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-> -
-> -cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-> -              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-> -
->  COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
->  COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
->  COMMON_CFLAGS += -Wignored-qualifiers -Werror
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index dfd0c56fe8fb..dbc7524d3070 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -9,6 +9,9 @@ ldarch = elf64-littleaarch64
->  arch_LDFLAGS = -pie -n
->  CFLAGS += -mstrict-align
->  
-> +mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
-> +CFLAGS += $(mno_outline_atomics)
-> +
->  define arch_elf_check =
->  	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
->  		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
->
->
-> Thanks,
-> drew
+What about 4.19.y and 4.14.y trees?  I can't take something for 4.9.y
+and then have a regression if someone moves to a newer release, right?
 
-Looks much better than my version. Do you want me to spin a v2 or do you want to
-send it as a separate patch? If that's the case, I tested the same way I did my
-patch (gcc 10.1.0 and 5.4.0 for cross-compiling, 9.3.0 native):
+thanks,
 
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
