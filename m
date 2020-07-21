@@ -2,64 +2,91 @@ Return-Path: <SRS0=7ri5=BA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B50C433E5
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jul 2020 03:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDCAC433E2
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jul 2020 09:45:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1721720792
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jul 2020 03:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1721720792
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 8C2DD2072E
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jul 2020 09:45:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="pKahYClp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2DD2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DBE24B28A;
-	Mon, 20 Jul 2020 23:26:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C54124B110;
+	Tue, 21 Jul 2020 05:44:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6iqJr4pdiFWr; Mon, 20 Jul 2020 23:26:46 -0400 (EDT)
+	with ESMTP id KkK6m472pMwx; Tue, 21 Jul 2020 05:44:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE1A14B276;
-	Mon, 20 Jul 2020 23:26:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B94984B197;
+	Tue, 21 Jul 2020 05:44:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E9C4B276
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2020 23:26:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C3F24B14C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jul 2020 05:44:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mBLeyBCY08X7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Jul 2020 23:26:43 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5AE5E4B186
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2020 23:26:43 -0400 (EDT)
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id A0D07E63F265E152B026;
- Tue, 21 Jul 2020 11:26:39 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 21 Jul 2020 11:26:31 +0800
-Subject: Re: [PATCH 0/9] arm64: Stolen time support
-To: Steven Price <steven.price@arm.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
-From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <1611996b-1ec1-dee7-ed61-b3b9df23f138@huawei.com>
-Date: Tue, 21 Jul 2020 11:26:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <20190802145017.42543-1-steven.price@arm.com>
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ with ESMTP id Sl4AK9w3pkFf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jul 2020 05:44:56 -0400 (EDT)
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
+ [209.85.128.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D02844B110
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jul 2020 05:44:56 -0400 (EDT)
+Received: by mail-wm1-f67.google.com with SMTP id 17so2218376wmo.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jul 2020 02:44:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=oay/q/Jq6u5HCNMFK6qus7veTfF7oH0EkEyRRbWbBuo=;
+ b=pKahYClpT7rbPBcaiNecELPYrFpNr1sOL/KBnAvFlQ/TUhvOxhwaV1ieuOvT9p1us4
+ 7pAMGHA/F5puU5alUBQzKCc28k+Z7+mKr70H2brQsauG36WtQ6blvcQgr3ZF1Dr6dJaS
+ NL9Gt6qiOUhFlbqwCHXnO0ZA2YCc5HCN5QvsQ1TrMrhwSb8hvm+Wwew6xBo0PTh1NWvE
+ zM7e0VS6eULENmw536jEVb8MBPO5pzsXLmYGcyVGyt6wLUAOk9SdqPLtQfySwLojPCT1
+ RxEs3sxrFuQdRj/H1OeiHeUP39Z3NLk78zuf6JvG/zOh96HuCYNOv3II/OKGccw/SIin
+ tgEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=oay/q/Jq6u5HCNMFK6qus7veTfF7oH0EkEyRRbWbBuo=;
+ b=BmMUqdkUOnVE8qNzZ4vcDce/epp/bPDEC9Tp/dYtBuNkNofJbEO1dtFFSffkM1hhNq
+ 5GByxQyTJarX20n1MW9iLUwXAnwjKL5oBZyqyOZ8ckHhZKJqZnEiDRAjjG8SXrqvo86T
+ oMVU+HPgIJOHD4U6hQ6WEUbptAw3RC1i91PUMQfLZVBy205NoxTQ1R8crzl+y44cJTgT
+ Jdltc7AUIoua3dCneDHvjgLcIblpq0qHZtM9kSuOR0Mx+wxr6YN1aiCkN0kMcSZ/Ab1m
+ N8HmsgMFCGUSk44z9ajZoYZN51XKdoLJAm9hfxleo8cKsOiQgJ/dXWsju16vrMZMT04R
+ 0fWA==
+X-Gm-Message-State: AOAM531QyPs0jB9KWvfzmz5OlHPUTDonaxBE0v8dul46HlIueF1sIUQL
+ asBxuE5/H4LzsY5G31DrCIGrgA==
+X-Google-Smtp-Source: ABdhPJxngyOwJYmlqV/5VQl0CDeLGpyMwcxXJSKOOd8cTePn/msAa3i6Sezc+NNalflZifuYHyrtpQ==
+X-Received: by 2002:a7b:c090:: with SMTP id r16mr3007999wmh.143.1595324695605; 
+ Tue, 21 Jul 2020 02:44:55 -0700 (PDT)
+Received: from localhost ([2a01:4b00:8523:2d03:cd93:4ca4:af31:19e5])
+ by smtp.gmail.com with ESMTPSA id t3sm5442414wre.41.2020.07.21.02.44.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jul 2020 02:44:54 -0700 (PDT)
+From: David Brazdil <dbrazdil@google.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- yebiaoxiang@huawei.com, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ James Morse <james.morse@arm.com>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH 0/2] Unify non-VHE ASLR features behind CONFIG_RANDOMIZE_BASE
+Date: Tue, 21 Jul 2020 10:44:43 +0100
+Message-Id: <20200721094445.82184-1-dbrazdil@google.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Cc: android-kvm@google.com, linux-kernel@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,83 +103,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Steven,
+There is currently no way to disable nVHE ASLR, e.g. for debugging, so the
+first patch in this series makes it conditional on RANDOMIZE_BASE, same as
+KASLR. Note that the 'nokaslr' command line flag has no effect here.
 
-On 2019/8/2 22:50, Steven Price wrote:
-> This series add support for paravirtualized time for arm64 guests and
-> KVM hosts following the specification in Arm's document DEN 0057A:
-> 
-> https://developer.arm.com/docs/den0057/a
-> 
-> It implements support for stolen time, allowing the guest to
-> identify time when it is forcibly not executing.
-> 
-> It doesn't implement support for Live Physical Time (LPT) as there are
-> some concerns about the overheads and approach in the above
-Do you plan to pick up LPT support? As there is demand of cross-frequency migration
-(from older platform to newer platform).
+Second patch unifies the HARDEN_EL2_VECTORS errate for A57 and A72 behind
+the same Kconfig for simplicity. Happy to make it just depend on
+RANDOMIZE_BASE if having an option to keep randomization on but hardenning
+off is preferred.
 
-I am not clear about the overheads and approach problem here, could you please
-give some detail information? Maybe we can work together to solve these concerns. :-)
+David Brazdil (2):
+  KVM: arm64: Make nVHE ASLR conditional on RANDOMIZE_BASE
+  KVM: arm64: Substitute RANDOMIZE_BASE for HARDEN_EL2_VECTORS
 
-Thanks,
-Keqian
-> specification, and I expect an updated version of the specification to
-> be released soon with just the stolen time parts.
-> 
-> I previously posted a series including LPT (as well as stolen time):
-> https://lore.kernel.org/kvmarm/20181212150226.38051-1-steven.price@arm.com/
-> 
-> Patches 2, 5, 7 and 8 are cleanup patches and could be taken separately.
-> 
-> Christoffer Dall (1):
->   KVM: arm/arm64: Factor out hypercall handling from PSCI code
-> 
-> Steven Price (8):
->   KVM: arm64: Document PV-time interface
->   KVM: arm64: Implement PV_FEATURES call
->   KVM: arm64: Support stolen time reporting via shared structure
->   KVM: Allow kvm_device_ops to be const
->   KVM: arm64: Provide a PV_TIME device to user space
->   arm/arm64: Provide a wrapper for SMCCC 1.1 calls
->   arm/arm64: Make use of the SMCCC 1.1 wrapper
->   arm64: Retrieve stolen time as paravirtualized guest
-> 
->  Documentation/virtual/kvm/arm/pvtime.txt | 107 +++++++++++++
->  arch/arm/kvm/Makefile                    |   2 +-
->  arch/arm/kvm/handle_exit.c               |   2 +-
->  arch/arm/mm/proc-v7-bugs.c               |  13 +-
->  arch/arm64/include/asm/kvm_host.h        |  13 +-
->  arch/arm64/include/asm/kvm_mmu.h         |   2 +
->  arch/arm64/include/asm/pvclock-abi.h     |  20 +++
->  arch/arm64/include/uapi/asm/kvm.h        |   6 +
->  arch/arm64/kernel/Makefile               |   1 +
->  arch/arm64/kernel/cpu_errata.c           |  80 ++++------
->  arch/arm64/kernel/kvm.c                  | 155 ++++++++++++++++++
->  arch/arm64/kvm/Kconfig                   |   1 +
->  arch/arm64/kvm/Makefile                  |   2 +
->  arch/arm64/kvm/handle_exit.c             |   4 +-
->  include/kvm/arm_hypercalls.h             |  44 ++++++
->  include/kvm/arm_psci.h                   |   2 +-
->  include/linux/arm-smccc.h                |  58 +++++++
->  include/linux/cpuhotplug.h               |   1 +
->  include/linux/kvm_host.h                 |   4 +-
->  include/linux/kvm_types.h                |   2 +
->  include/uapi/linux/kvm.h                 |   2 +
->  virt/kvm/arm/arm.c                       |  18 +++
->  virt/kvm/arm/hypercalls.c                | 138 ++++++++++++++++
->  virt/kvm/arm/mmu.c                       |  44 ++++++
->  virt/kvm/arm/psci.c                      |  84 +---------
->  virt/kvm/arm/pvtime.c                    | 190 +++++++++++++++++++++++
->  virt/kvm/kvm_main.c                      |   6 +-
->  27 files changed, 848 insertions(+), 153 deletions(-)
->  create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
->  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
->  create mode 100644 arch/arm64/kernel/kvm.c
->  create mode 100644 include/kvm/arm_hypercalls.h
->  create mode 100644 virt/kvm/arm/hypercalls.c
->  create mode 100644 virt/kvm/arm/pvtime.c
-> 
+ arch/arm64/Kconfig             | 16 ----------------
+ arch/arm64/include/asm/mmu.h   |  6 ++----
+ arch/arm64/kernel/cpu_errata.c |  4 ++--
+ arch/arm64/kvm/Kconfig         |  2 +-
+ arch/arm64/kvm/va_layout.c     |  2 +-
+ 5 files changed, 6 insertions(+), 24 deletions(-)
+
+-- 
+2.27.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
