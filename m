@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBC4C433E4
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D09DC433E7
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C49FC2080D
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6C2622C9C
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="nDh5CTG/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C49FC2080D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="FdmUXfPp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C2622C9C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B7E74B2C6;
-	Wed, 22 Jul 2020 12:45:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 813664B2A9;
+	Wed, 22 Jul 2020 12:45:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ITwCwfXz0Xmu; Wed, 22 Jul 2020 12:45:07 -0400 (EDT)
+	with ESMTP id mG16RkXBsQJP; Wed, 22 Jul 2020 12:45:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E6F64B2A9;
-	Wed, 22 Jul 2020 12:45:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 792D14B2DC;
+	Wed, 22 Jul 2020 12:45:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7501D4B2A8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DDA84B2BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qd7qGViizg8f for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jul 2020 12:45:04 -0400 (EDT)
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
- [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E39E94B2B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:03 -0400 (EDT)
-Received: by mail-wr1-f66.google.com with SMTP id f1so2008899wro.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:03 -0700 (PDT)
+ with ESMTP id OvH4UCrtSeWz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jul 2020 12:45:08 -0400 (EDT)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52FB64B2C3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:07 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id y3so2558514wrl.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=eImpnhEO4VwAZh9DFGEK47etMR4IqLUuZar0HHVWIYc=;
- b=nDh5CTG/ZDTR3Wf0MrlsOp7iOd3+YLoaPlpD6Bd+S6cx9plMTW+TRhrMPSNz0g4YON
- B5/2L0zyt4puhDMJz8i6g/0fcnTYdFbJxnxZgDwO+8D1f4p5pEoaT6WIWZsWLRM6bfqq
- Z9gycLLkiEyo1xBqk7+sLoqPv6LI3xNvDihpVjjCunFBjCHJSpqgg+wVlHfLsKtUNSTt
- 6iygFJoWDq2Do8PRj+neXgNJhvpHt58Ho9lS3sLZXjpIlAR0snEIbO9PjwlFMn5v+RZR
- QlQzorddi/Bcy8kczzNq8nBrmuBMF2CiOtImpTwevuKkiAJOM44tYdE0qATGIa9HlmtK
- /hng==
+ bh=ZXiAbLOq4ubRUcURJC9B1BLv2xJ+3CpTn0EBGii9veo=;
+ b=FdmUXfPpY7o9uEYvSP5nVu4ofg8PL0EkzaQt7c+IphnlbncN6veKPYDXPYLTXRODhI
+ 6vN22+BUNOewLPRoB+VyntfTGU4957QCwvCWV4Rw7/XkrQ5nCgRdII3n6ncKJXismyaG
+ QS0jI990BiiNf12aOl1OO24EJqhL4eaTHvJhZbTDwwVFTC3dpmWz+SUWBIJik8UNPp67
+ ECuHSrQPykTUctnyqBj2l7S9VS7/jA1LuCpMeq71p8zbNS1+omtsRiI4ZMO+HJbglaMO
+ Mum0PSJ1/kp1e9/TTPm0RAKKWXHtacAuaJYN4Yme80qiYihUdK+xHTp+LbJ5sEzZYVCJ
+ fGDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=eImpnhEO4VwAZh9DFGEK47etMR4IqLUuZar0HHVWIYc=;
- b=qEvXuZyk29SMoAETj1bzlip6BUkphLpPfJMt2g9Jc5JUC97v5zRUIz/Klg/v5/P/Dd
- LGZ7y0JJQC299hpjCNBAsoN6AgEI/NyQnKpJWHh0kHHVGO20ZKcnbbrEvKMfWzq9fTQ9
- c+d+kJm2Py2RahY2bN5bFV6j5L9DENX1v/wurJbeNEsO2mdB87eeosouXS1EWin14WJv
- NwLWiWywY8No4ufYcG/vkgsiWoQFoiHOf4unets7ZzWiMm9A8fWUZXv0KJBM6bncNKw1
- 9NFupmWnHJD9WDm2JsaDNC848M+0DXBt1zRX2J5+Itk3zVvXZQcchSlXfnSnXxIOmMKV
- m9nw==
-X-Gm-Message-State: AOAM532x4K43Q5UesbNZ5CLSSugx3c7poTSkM5Gx6AQGQaFIyesiF8ar
- GHkLv/0Mv1UG0rNjZw6oRWeLNw==
-X-Google-Smtp-Source: ABdhPJyxyJUAxG9reBle7yXKCyrv+T4kQrCRc8RdgMK057wOMWcrkVqWbo9PqLlkpstGMWqATZ6LGw==
-X-Received: by 2002:adf:bc54:: with SMTP id a20mr371420wrh.227.1595436302760; 
- Wed, 22 Jul 2020 09:45:02 -0700 (PDT)
+ bh=ZXiAbLOq4ubRUcURJC9B1BLv2xJ+3CpTn0EBGii9veo=;
+ b=bYJ9+yOE7MjZ8/YXNOINj1YggglLwWvsR3Sp5gq1739C0UZu5FdJEVkw4RTFSiYIgC
+ xMAyxrlSdiZtgPL7iHktSYfa5UbtBgj/8BvG613UobPCWzC0WFZk7EHf3Vb9fbEk9hzn
+ w1uRSlwIa9QGcb3mC5yxCWBUlTZm0e62FTa1rYKGwq1cS1llHaJyI9kT6aDIktm3t0Cu
+ k+ORtkplrCbO4FAtyivVEiDEOmCszFMccrOg4xhoqnlAQG+kTHsxgHTC9G19kb18T9AA
+ X6GU75qncmecdS4C9mtsd7COwdWNjlJVe7+FG1FJqRbScnnhFwpfseCKjXsN1BIYKuE1
+ NMzQ==
+X-Gm-Message-State: AOAM533g7RS09lKCHN+e1J9NSo9eip9BUHAF0bJcrBos4MFrGtXqaVpj
+ 2fP5smv5KeQWsC5SyGn3v2Iqaw==
+X-Google-Smtp-Source: ABdhPJzJgI+HFT65fE1fBmZ9mEiYEXOQtPMo4T9cTDa2bRmHKYwwP+XUbleLmCwLMIPgGxnThsRfXw==
+X-Received: by 2002:a5d:6288:: with SMTP id k8mr347278wru.373.1595436306334;
+ Wed, 22 Jul 2020 09:45:06 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:b0ee:900a:e004:b9d0])
- by smtp.gmail.com with ESMTPSA id d13sm469069wrq.89.2020.07.22.09.45.01
+ by smtp.gmail.com with ESMTPSA id 33sm590292wri.16.2020.07.22.09.45.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jul 2020 09:45:02 -0700 (PDT)
+ Wed, 22 Jul 2020 09:45:05 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Dennis Zhou <dennis@kernel.org>,
  Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/9] kvm: arm64: Remove __hyp_this_cpu_read
-Date: Wed, 22 Jul 2020 17:44:17 +0100
-Message-Id: <20200722164424.42225-3-dbrazdil@google.com>
+Subject: [PATCH 4/9] kvm: arm64: Add helpers for accessing nVHE hyp per-cpu
+ vars
+Date: Wed, 22 Jul 2020 17:44:19 +0100
+Message-Id: <20200722164424.42225-5-dbrazdil@google.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200722164424.42225-1-dbrazdil@google.com>
 References: <20200722164424.42225-1-dbrazdil@google.com>
@@ -104,215 +105,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-this_cpu_ptr is meant for use in kernel proper because it selects between
-TPIDR_EL1/2 based on nVHE/VHE. __hyp_this_cpu_ptr was used in hyp to always
-select TPIDR_EL2. Unify all users behind this_cpu_ptr and friends by
-selecting _EL2 register under __KVM_NVHE_HYPERVISOR__.
-
-Under CONFIG_DEBUG_PREEMPT, the kernel helpers perform a preemption check
-which is omitted by the hyp helpers. Preserve the behavior for nVHE by
-overriding the corresponding macros under __KVM_NVHE_HYPERVISOR__. Extend
-the checks into VHE hyp code.
+Defining a per-CPU variable in hyp/nvhe will result in its name being prefixed
+with __kvm_nvhe_. Add helpers for declaring these variables in kernel proper
+and accessing them with this_cpu_ptr and per_cpu_ptr.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h          | 20 --------------
- arch/arm64/include/asm/percpu.h           | 33 +++++++++++++++++++++--
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 +--
- arch/arm64/kvm/hyp/include/hyp/switch.h   |  6 ++---
- arch/arm64/kvm/hyp/nvhe/switch.c          |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c           |  2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 +--
- 7 files changed, 40 insertions(+), 31 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index fb1a922b31ba..da4a0826cacd 100644
+index bbd14e205aba..3d69cab873e4 100644
 --- a/arch/arm64/include/asm/kvm_asm.h
 +++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -149,26 +149,6 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
- 		addr;							\
- 	})
+@@ -60,9 +60,21 @@
+ 	DECLARE_KVM_VHE_SYM(sym);		\
+ 	DECLARE_KVM_NVHE_SYM(sym)
  
--/*
-- * Home-grown __this_cpu_{ptr,read} variants that always work at HYP,
-- * provided that sym is really a *symbol* and not a pointer obtained from
-- * a data structure. As for SHIFT_PERCPU_PTR(), the creative casting keeps
-- * sparse quiet.
-- */
--#define __hyp_this_cpu_ptr(sym)						\
--	({								\
--		void *__ptr;						\
--		__verify_pcpu_ptr(&sym);				\
--		__ptr = hyp_symbol_addr(sym);				\
--		__ptr += read_sysreg(tpidr_el2);			\
--		(typeof(sym) __kernel __force *)__ptr;			\
--	 })
--
--#define __hyp_this_cpu_read(sym)					\
--	({								\
--		*__hyp_this_cpu_ptr(sym);				\
--	 })
--
- #else /* __ASSEMBLY__ */
- 
- .macro hyp_adr_this_cpu reg, sym, tmp
-diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
-index 0b6409b89e5e..b4008331475b 100644
---- a/arch/arm64/include/asm/percpu.h
-+++ b/arch/arm64/include/asm/percpu.h
-@@ -19,7 +19,21 @@ static inline void set_my_cpu_offset(unsigned long off)
- 			:: "r" (off) : "memory");
- }
- 
--static inline unsigned long __my_cpu_offset(void)
-+static inline unsigned long __hyp_my_cpu_offset(void)
-+{
-+	unsigned long off;
++#define DECLARE_KVM_VHE_PER_CPU(type, sym)	\
++	DECLARE_PER_CPU(type, sym)
++#define DECLARE_KVM_NVHE_PER_CPU(type, sym)	\
++	DECLARE_PER_CPU(type, kvm_nvhe_sym(sym))
 +
-+	/*
-+	 * We want to allow caching the value, so avoid using volatile and
-+	 * instead use a fake stack read to hazard against barrier().
-+	 */
-+	asm("mrs %0, tpidr_el2" : "=r" (off) :
-+		"Q" (*(const unsigned long *)current_stack_pointer));
++#define DECLARE_KVM_HYP_PER_CPU(type, sym)	\
++	DECLARE_KVM_VHE_PER_CPU(type, sym);	\
++	DECLARE_KVM_NVHE_PER_CPU(type, sym)
 +
-+	return off;
-+}
+ #define CHOOSE_VHE_SYM(sym)	sym
+ #define CHOOSE_NVHE_SYM(sym)	kvm_nvhe_sym(sym)
+ 
++#define this_cpu_ptr_nvhe(sym)		this_cpu_ptr(&kvm_nvhe_sym(sym))
++#define per_cpu_ptr_nvhe(sym, cpu)	per_cpu_ptr(&kvm_nvhe_sym(sym), cpu)
 +
-+static inline unsigned long __kern_my_cpu_offset(void)
- {
- 	unsigned long off;
- 
-@@ -35,7 +49,12 @@ static inline unsigned long __my_cpu_offset(void)
- 
- 	return off;
- }
--#define __my_cpu_offset __my_cpu_offset()
-+
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+#define __my_cpu_offset __hyp_my_cpu_offset()
-+#else
-+#define __my_cpu_offset __kern_my_cpu_offset()
-+#endif
- 
- #define PERCPU_RW_OPS(sz)						\
- static inline unsigned long __percpu_read_##sz(void *ptr)		\
-@@ -227,4 +246,14 @@ PERCPU_RET_OP(add, add, ldadd)
- 
- #include <asm-generic/percpu.h>
- 
-+/* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its dependencies. */
-+#if defined(__KVM_NVHE_HYPERVISOR__) && defined(CONFIG_DEBUG_PREEMPT)
-+#undef	this_cpu_ptr
-+#define	this_cpu_ptr		raw_cpu_ptr
-+#undef	__this_cpu_read
-+#define	__this_cpu_read		raw_cpu_read
-+#undef	__this_cpu_write
-+#define	__this_cpu_write	raw_cpu_write
-+#endif
-+
- #endif /* __ASM_PERCPU_H */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-index 0297dc63988c..3b2056a225ff 100644
---- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-@@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-@@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 0511af14dc81..e69c2c6098a1 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -382,7 +382,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	    !esr_is_ptrauth_trap(kvm_vcpu_get_esr(vcpu)))
- 		return false;
- 
--	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	__ptrauth_save_key(ctxt, APIA);
- 	__ptrauth_save_key(ctxt, APIB);
- 	__ptrauth_save_key(ctxt, APDA);
-@@ -491,7 +491,7 @@ static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
- 	 * guest wants it disabled, so be it...
- 	 */
- 	if (__needs_ssbd_off(vcpu) &&
--	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-+	    __this_cpu_read(arm64_ssbd_callback_required))
- 		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 0, NULL);
+ #ifndef __KVM_NVHE_HYPERVISOR__
+ /*
+  * BIG FAT WARNINGS:
+@@ -75,12 +87,21 @@
+  * - Don't let the nVHE hypervisor have access to this, as it will
+  *   pick the *wrong* symbol (yes, it runs at EL2...).
+  */
+-#define CHOOSE_HYP_SYM(sym)	(is_kernel_in_hyp_mode() ? CHOOSE_VHE_SYM(sym) \
++#define CHOOSE_HYP_SYM(sym)		(is_kernel_in_hyp_mode()	\
++					   ? CHOOSE_VHE_SYM(sym)	\
+ 					   : CHOOSE_NVHE_SYM(sym))
++#define this_cpu_ptr_hyp(sym)		(is_kernel_in_hyp_mode()	\
++					   ? this_cpu_ptr(&sym)		\
++					   : this_cpu_ptr_nvhe(sym))
++#define per_cpu_ptr_hyp(sym, cpu)	(is_kernel_in_hyp_mode()	\
++					   ? per_cpu_ptr(&sym, cpu)	\
++					   : per_cpu_ptr_nvhe(sym, cpu))
+ #else
+ /* The nVHE hypervisor shouldn't even try to access anything */
+ extern void *__nvhe_undefined_symbol;
+-#define CHOOSE_HYP_SYM(sym)	__nvhe_undefined_symbol
++#define CHOOSE_HYP_SYM(sym)		__nvhe_undefined_symbol
++#define this_cpu_ptr_hyp(sym)		&__nvhe_undefined_symbol
++#define per_cpu_ptr_hyp(sym, cpu)	&__nvhe_undefined_symbol
  #endif
- }
-@@ -503,7 +503,7 @@ static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
- 	 * If the guest has disabled the workaround, bring it back on.
- 	 */
- 	if (__needs_ssbd_off(vcpu) &&
--	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-+	    __this_cpu_read(arm64_ssbd_callback_required))
- 		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 1, NULL);
- #endif
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 341be2f2f312..ddb602ffb022 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -175,7 +175,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
  
- 	vcpu = kern_hyp_va(vcpu);
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c52d714e0d75..746fcc3974c7 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -108,7 +108,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 996471e4c138..2a0b8c88d74f 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -66,7 +66,7 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
- 
- 	/*
-@@ -100,7 +100,7 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
- 
--	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put();
- 
- 	__sysreg_save_el1_state(guest_ctxt);
+ /* Translate a kernel address @ptr into its equivalent linear mapping */
 -- 
 2.27.0
 
