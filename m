@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FEEC433E5
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C530C433F4
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3EAF8207CD
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC19A22BEF
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="MVr23i9E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EAF8207CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="EHDURTcB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC19A22BEF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBB514B26F;
-	Wed, 22 Jul 2020 12:45:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 748414B297;
+	Wed, 22 Jul 2020 12:45:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TZe5OtdgAJNd; Wed, 22 Jul 2020 12:45:08 -0400 (EDT)
+	with ESMTP id UIIxpk6gkj7p; Wed, 22 Jul 2020 12:45:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D8A64B2CC;
-	Wed, 22 Jul 2020 12:45:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 336564B2E2;
+	Wed, 22 Jul 2020 12:45:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30B854B2AC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B104B26F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qDzR585ZbZ1e for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jul 2020 12:45:06 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C5404B2AF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:05 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id z15so2543621wrl.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:05 -0700 (PDT)
+ with ESMTP id PFo359BgoMY4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jul 2020 12:45:16 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E91914B2B7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:15 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id q5so2553980wru.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UzkCazi9IF2R2fovvI4XRbgeSUfI2aZOTLYWCOQmH7Y=;
- b=MVr23i9EY3adsavlnzqKlwywAbRQmWnYu/O0PqHFO5h2mZINEVU5vdwtCNcmVIzmqc
- HuDpvw4REHKGW2v9gawHMWOspu7nYKIcm7m1oe8P0DG0AG/jVj8RQJM+fncEU8eAoeFW
- Q4grx48wtHAnOBBbFmFB/F65EWt+ytE4kp9aCo51/gz5p+jKu5T4002eOYPYmq7uEzE1
- NJ+zdUhBvFRvtHM/RZLaDZ3LPvYeZlJRJrm4vb3JYln4uQgm1YmjZZ9WkIcvE4+s0QMo
- wpBITPMxNDcLOEuTS6TvgjT2x1TCzG34+CS/lKZmQkI5ELNGsHGz5y5Vo26RHLtMkgdF
- k+3A==
+ bh=0Zoc4jT5D/PnpX6Ge9Fh8+yTlt5xAHFadpjWGBF1q0w=;
+ b=EHDURTcBkVhJJVi3ujf/kQeTfFBT7h/B9rxoO/V6rVCgVwVesI6SzZIa06WBR4XrFl
+ EEc9WcBPE7DBmvVrqXAG2TZ6AgH9fDPkjcr/cpkZ3YeIKVPt1DBo+pvWJi6VB3G/JmeX
+ fSgzbviAYvO/KtVcj8dE8gdhqC3wxBnOf4JlONMDO93pAlrrfS5v4nv9Avm7ELmCflWd
+ 3AltLvlQCDsboajAG8AeCOm8lC6ewgH11gH6xtNGdjO5UFpz3uUW8GRmqYaHIa02jYdR
+ vH1wWLWsSKtXiU7d9T/LJrWMnSBWw2shzP30T5TVW0Z4QbYHatf6n/Uz3oyeSyz0QFKE
+ 7YXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UzkCazi9IF2R2fovvI4XRbgeSUfI2aZOTLYWCOQmH7Y=;
- b=MMgdsnV77PJr9Kd1KJZexKrMXLLLZ/Kxqjt0K3Q9HWDtCOZeLy9LI5f/+Pby8RlMRO
- rM2+rVPaU7pF7QgQDyaIB9E1asMADOjFl6nxZCMXDFBg25pcWHRWOyOBO52vetktOM8x
- 3IOSlZAlXeCOuyoCq7kMwqWLIJTiDzLrHZ44baVMoGglmgnpMSgjaWWwFDh7A2TYsUaE
- 9wLhI8BAmkZ9ATME8RxuWaw+Vpq+804ULz16ohQtZgsyMfyT0+O66vlHqaw9z4Z+ub81
- gcMPqgHUyEUF3+Fsk4IQsfSYnM3YRxPFxDKkHjP/rfMF5hDPnlpNtSzwO8f9J0l3bz6b
- Zx4g==
-X-Gm-Message-State: AOAM532P8HUibgaNU5EFAcxcWEgI15A7H8UplnO0X71hDfyEz54EagZE
- qMEEvl2m1oU+LqDyyTaZ00GFmQ==
-X-Google-Smtp-Source: ABdhPJx/qEkJrXuwujIJYy6c8DcTNrb907z4XGsmWjlpmktsrboRRdsmuZeU2BTNkn5zyZPYZ1dJqQ==
-X-Received: by 2002:a5d:4a45:: with SMTP id v5mr417138wrs.228.1595436304534;
- Wed, 22 Jul 2020 09:45:04 -0700 (PDT)
+ bh=0Zoc4jT5D/PnpX6Ge9Fh8+yTlt5xAHFadpjWGBF1q0w=;
+ b=nanJ7gytumvwXB+0JZ9xbaLhDPPX2+R/Bj2v5XbZAzC8yGjyf++07D0OpA0EbrKGGv
+ O1tA13Za0JIVpeiQ3vyOI63iGJuNmOimiYvKWGYmcAd1ZVoI27iWc/O+PIuorG1StnzY
+ tp1jxcmsosyzU54mOe5/T3OaqjxmfIsYGzKvs3FKkC0umrxfhLx7JBbrRjMrryIT/Lnn
+ tXKvULWUJ9397tdv6gARfQR6OmroEyi91pYgX65O9o7rECvLxEkFYiLatLJ7qz7igQt3
+ m06x/9AQp/dDfyLRzcZQq7BOYApLQZLC12XUefmI+2LNI+hME8bAkw8FgSq8lnCXanhq
+ h2GA==
+X-Gm-Message-State: AOAM533YrO5UZKcol5ISWH92JerRCGBmeDdeuAmd14hj1Kb2XpNAnfMV
+ m5FLwG1UFaJBq/K5lliijjODig==
+X-Google-Smtp-Source: ABdhPJzLKmKG9pub1HFuNdCsYrh8zqcSQp68qHq5cvDc4U/7vFwUWtKwLOPhPUQibgTF3FLak/t0vg==
+X-Received: by 2002:a5d:548f:: with SMTP id h15mr365969wrv.331.1595436314869; 
+ Wed, 22 Jul 2020 09:45:14 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:b0ee:900a:e004:b9d0])
- by smtp.gmail.com with ESMTPSA id 2sm250421wmo.44.2020.07.22.09.45.03
+ by smtp.gmail.com with ESMTPSA id t2sm242165wma.43.2020.07.22.09.45.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jul 2020 09:45:03 -0700 (PDT)
+ Wed, 22 Jul 2020 09:45:14 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Dennis Zhou <dennis@kernel.org>,
  Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 3/9] kvm: arm64: Remove hyp_adr/ldr_this_cpu
-Date: Wed, 22 Jul 2020 17:44:18 +0100
-Message-Id: <20200722164424.42225-4-dbrazdil@google.com>
+Subject: [PATCH 9/9] kvm: arm64: Remove unnecessary hyp mappings
+Date: Wed, 22 Jul 2020 17:44:24 +0100
+Message-Id: <20200722164424.42225-10-dbrazdil@google.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200722164424.42225-1-dbrazdil@google.com>
 References: <20200722164424.42225-1-dbrazdil@google.com>
@@ -104,111 +104,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The hyp_adr/ldr_this_cpu helpers were introduced for use in hyp code because
-they always needed to use TPIDR_EL2 for base, while adr/ldr_this_cpu from
-kernel proper would select between TPIDR_EL2 and _EL1 based on VHE/nVHE.
-
-Simplify this now that the nVHE hyp mode case can be handled using the
-__KVM_NVHE_HYPERVISOR__ macro. VHE hyp code selects _EL2 with alternatives.
+With all nVHE per-CPU variables being part of the hyp per-CPU region,
+mapping them individual is not necessary any longer. They are mapped to hyp
+as part of the overall per-CPU region.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/assembler.h | 27 +++++++++++++++++----------
- arch/arm64/include/asm/kvm_asm.h   | 14 +-------------
- arch/arm64/kvm/hyp/hyp-entry.S     |  2 +-
- 3 files changed, 19 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 25 +++++++------------------
+ arch/arm64/kvm/arm.c             | 17 +----------------
+ 2 files changed, 8 insertions(+), 34 deletions(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 54d181177656..b392a977efb6 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -218,6 +218,21 @@ lr	.req	x30		// link register
- 	str	\src, [\tmp, :lo12:\sym]
- 	.endm
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e9e5875274cb..1a66089cf4f4 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -531,28 +531,17 @@ static inline int kvm_map_vectors(void)
+ DECLARE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
+ DECLARE_KVM_NVHE_PER_CPU(u64, arm64_ssbd_callback_required);
  
-+	/*
-+	 * @dst: destination register (32 or 64 bit wide)
-+	 */
-+	.macro	this_cpu_offset, dst
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+	mrs	\dst, tpidr_el2
-+#else
-+alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
-+	mrs	\dst, tpidr_el1
-+alternative_else
-+	mrs	\dst, tpidr_el2
-+alternative_endif
-+#endif
-+	.endm
-+
- 	/*
- 	 * @dst: Result of per_cpu(sym, smp_processor_id()) (can be SP)
- 	 * @sym: The name of the per-cpu variable
-@@ -226,11 +241,7 @@ lr	.req	x30		// link register
- 	.macro adr_this_cpu, dst, sym, tmp
- 	adrp	\tmp, \sym
- 	add	\dst, \tmp, #:lo12:\sym
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	mrs	\tmp, tpidr_el1
--alternative_else
--	mrs	\tmp, tpidr_el2
--alternative_endif
-+	this_cpu_offset \tmp
- 	add	\dst, \dst, \tmp
- 	.endm
+-static inline int hyp_init_aux_data(void)
++static inline void hyp_init_aux_data(void)
+ {
+-	int cpu, err;
++	int cpu;
  
-@@ -241,11 +252,7 @@ alternative_endif
- 	 */
- 	.macro ldr_this_cpu dst, sym, tmp
- 	adr_l	\dst, \sym
--alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
--	mrs	\tmp, tpidr_el1
--alternative_else
--	mrs	\tmp, tpidr_el2
--alternative_endif
-+	this_cpu_offset \tmp
- 	ldr	\dst, [\dst, \tmp]
- 	.endm
- 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index da4a0826cacd..bbd14e205aba 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -151,20 +151,8 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
- 
- #else /* __ASSEMBLY__ */
- 
--.macro hyp_adr_this_cpu reg, sym, tmp
--	adr_l	\reg, \sym
--	mrs	\tmp, tpidr_el2
--	add	\reg, \reg, \tmp
--.endm
+-	for_each_possible_cpu(cpu) {
+-		u64 *ptr;
 -
--.macro hyp_ldr_this_cpu reg, sym, tmp
--	adr_l	\reg, \sym
--	mrs	\tmp, tpidr_el2
--	ldr	\reg,  [\reg, \tmp]
--.endm
+-		ptr = per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu);
+-		err = create_hyp_mappings(ptr, ptr + 1, PAGE_HYP);
+-		if (err)
+-			return err;
 -
- .macro get_host_ctxt reg, tmp
--	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
-+	adr_this_cpu \reg, kvm_host_data, \tmp
- 	add	\reg, \reg, #HOST_DATA_CONTEXT
- .endm
+-		/* Copy value from kernel to hyp. */
+-		*ptr = per_cpu(arm64_ssbd_callback_required, cpu);
+-	}
+-	return 0;
++	/* Copy arm64_ssbd_callback_required values from kernel to hyp. */
++	for_each_possible_cpu(cpu)
++		*(per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu)) =
++			per_cpu(arm64_ssbd_callback_required, cpu);
+ }
+ #else
+-static inline int hyp_init_aux_data(void)
+-{
+-	return 0;
+-}
++static inline void hyp_init_aux_data(void) {}
+ #endif
  
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 689fccbc9de7..0a0cb1d3acd3 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -108,7 +108,7 @@ alternative_cb_end
- 	str	x0, [x2, #VCPU_WORKAROUND_FLAGS]
+ #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index bbbc5c1519a9..f2e537d99d2b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1628,22 +1628,7 @@ static int init_hyp_mode(void)
+ 		}
+ 	}
  
- 	/* Check that we actually need to perform the call */
--	hyp_ldr_this_cpu x0, arm64_ssbd_callback_required, x2
-+	ldr_this_cpu x0, arm64_ssbd_callback_required, x2
- 	cbz	x0, wa2_end
+-	for_each_possible_cpu(cpu) {
+-		kvm_host_data_t *cpu_data;
+-
+-		cpu_data = per_cpu_ptr_hyp(kvm_host_data, cpu);
+-		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
+-
+-		if (err) {
+-			kvm_err("Cannot map host CPU state: %d\n", err);
+-			goto out_err;
+-		}
+-	}
+-
+-	err = hyp_init_aux_data();
+-	if (err)
+-		kvm_err("Cannot map host auxiliary data: %d\n", err);
+-
++	hyp_init_aux_data();
+ 	return 0;
  
- 	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
+ out_err:
 -- 
 2.27.0
 
