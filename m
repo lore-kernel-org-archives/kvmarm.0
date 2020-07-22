@@ -2,81 +2,59 @@ Return-Path: <SRS0=oF2v=BB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B21C433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BEBBC433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:24:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C63DB2065F
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:23:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="udcoRBeZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C63DB2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F28342065F
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:24:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F28342065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1734B298;
-	Wed, 22 Jul 2020 12:23:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0424B294;
+	Wed, 22 Jul 2020 12:24:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bmQ15pvmkVlY; Wed, 22 Jul 2020 12:23:09 -0400 (EDT)
+	with ESMTP id 9w+FZM-2Rpyh; Wed, 22 Jul 2020 12:23:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 542D64B2B0;
-	Wed, 22 Jul 2020 12:23:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E964B2B0;
+	Wed, 22 Jul 2020 12:23:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C72F74B2AE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:23:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 545B44B2AE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:23:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cVmyqSSxPszC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jul 2020 12:23:06 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4C054B298
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:23:06 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 983052065F;
- Wed, 22 Jul 2020 16:23:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595434985;
- bh=JDuAd/IXbI8mLdXTBjc0KnzENivxsT/B90lZcHtXwho=;
- h=From:To:Cc:Subject:Date:From;
- b=udcoRBeZF9RGPjhoURMUpD3UOr/OOnpMCD9pTkbd3aDurKJl11MY/yzD6rpZoRjA6
- Z/t+wAijL9lSdZLAeCBTU4LBlpf4oj26sPVCr3uXmGNTNIZC46aunqF46m2n5U1Fnb
- T9gu5YQz2f6mdtoBlP32JjoZHYvc1cawuc1feO5c=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1jyHWJ-00E1Ih-Uq; Wed, 22 Jul 2020 17:23:04 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL
- functions
-Date: Wed, 22 Jul 2020 17:22:31 +0100
-Message-Id: <20200722162231.3689767-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
+ with ESMTP id LY6DVi3GNty1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jul 2020 12:23:57 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0266C4B298
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:23:56 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F5C531B;
+ Wed, 22 Jul 2020 09:23:56 -0700 (PDT)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 256623F66E;
+ Wed, 22 Jul 2020 09:23:54 -0700 (PDT)
+Date: Wed, 22 Jul 2020 17:23:41 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: arm64: Predicate FPSIMD vcpu flags on
+ feature support
+Message-ID: <20200722162340.GL30452@arm.com>
+References: <20200713210505.2959828-1-ascull@google.com>
+ <20200713210505.2959828-3-ascull@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org,
- kernel-team@android.com, natechancellor@gmail.com, ndesaulniers@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Nick Desaulniers <ndesaulniers@google.com>,
- linux-arm-kernel@lists.infradead.org,
- Nathan Chancellor <natechancellor@gmail.com>, Will Deacon <will@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20200713210505.2959828-3-ascull@google.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Cc: maz@kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,50 +71,117 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-So far, vcpu_has_ptrauth() is implemented in terms of system_supports_*_auth()
-calls, which are declared "inline". In some specific conditions (clang
-and SCS), the "inline" very much turns into an "out of line", which
-leads to a fireworks when this predicate is evaluated on a non-VHE
-system (right at the beginning of __hyp_handle_ptrauth).
+On Mon, Jul 13, 2020 at 10:05:03PM +0100, Andrew Scull wrote:
+> If the system doesn't support FPSIMD features then the flags must never
 
-Instead, make sure vcpu_has_ptrauth gets expanded inline by directly
-using the cpus_have_final_cap() helpers, which are __always_inline,
-generate much better code, and are the only thing that make sense when
-running at EL2 on a nVHE system.
+Mustn't they?  Why not?  I think the flags are currently ignored in this
+case, which is just as good.
 
-Fixes: 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
-Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+I'm not disagreeing with the change here; I just want to be clear on the
+rationale.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 147064314abf..a8278f6873e6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -391,9 +391,14 @@ struct kvm_vcpu_arch {
- #define vcpu_has_sve(vcpu) (system_supports_sve() && \
- 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
- 
--#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
--				  system_supports_generic_auth()) && \
--				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+#define vcpu_has_ptrauth(vcpu)						\
-+	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
-+	  cpus_have_final_cap(ARM64_HAS_GENERIC_AUTH)) &&		\
-+	 (vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
-+#else
-+#define vcpu_has_ptrauth(vcpu)		false
-+#endif
- 
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
- 
--- 
-2.28.0.rc0.142.g3c755180ce-goog
+> be set. These are the same feature checks performed by hyp when handling
+> an FPSIMD trap.
 
+Nit: Try to ensure that the commit message make sense even without the
+subject line: i.e., the subject line is just a one-line summary of the
+commit message and should not add any new information.
+
+(This makes life easier for users of mailers that invoke an editor on
+the message body only when replying -- i.e., Mutt and probably some
+others.  It also helps with understanding the state in .git/rebase-apply/
+during a rebase, where the subject line and the rest of the message end
+up in different places.)
+
+
+Also, it's worth nothing the comment additions here, since they look
+substantial and it's not clear from just looking at this patch that the
+new comments are just clarifying the existing behaviour.
+
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> ---
+>  arch/arm64/kvm/fpsimd.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 3e081d556e81..c6b3197f6754 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -52,7 +52,7 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+>   * Prepare vcpu for saving the host's FPSIMD state and loading the guest's.
+>   * The actual loading is done by the FPSIMD access trap taken to hyp.
+>   *
+> - * Here, we just set the correct metadata to indicate that the FPSIMD
+> + * Here, we just set the correct metadata to indicate whether the FPSIMD
+>   * state in the cpu regs (if any) belongs to current on the host.
+>   *
+>   * TIF_SVE is backed up here, since it may get clobbered with guest state.
+> @@ -63,15 +63,29 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+>  	BUG_ON(!current->mm);
+>  
+>  	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
+> +			      KVM_ARM64_FP_HOST |
+>  			      KVM_ARM64_HOST_SVE_IN_USE |
+>  			      KVM_ARM64_HOST_SVE_ENABLED);
+> +
+> +	if (!system_supports_fpsimd())
+> +		return;
+> +
+> +	/*
+> +	 * Having just come from the user task, if any FP state is loaded it
+> +	 * will be that of the task. Make a note of this but, just before
+> +	 * entering the vcpu, it will be double checked that the loaded FP
+> +	 * state isn't transient because things could change between now and
+> +	 * then.
+> +	 */
+
+Can we avoid this word "transient"?  Just because the state isn't our
+state doesn't mean it will be thrown away.
+
+If the regs contains the state for task foo, and we exit the run loop
+before taking an FP trap from the guest, then we might context switch
+back to foo before re-entering userspace in the KVM thread.  In that
+case the regs aren't reloaded.  Unless someone called
+fpsimd_flush_cpu_state() in the meantime, the regs will be assumed still
+to be correctly loaded for foo.
+
+To be clear, TIF_FOREIGN_FPSTATE doesn't mean that the regs are garbage,
+just that they don't contain the right state for current.
+
+
+This may not matter that much for this code, but I don't want people to
+get confused when maintaining related code...
+
+
+Here, does it make sense to say something like:
+
+--8<--
+
+Having just come from the user task, if the FP regs contain state for
+current then it is definitely host user state, not vcpu state.  Note
+this here, ready for the first entry to the guest.
+
+-->8--
+
+>  	vcpu->arch.flags |= KVM_ARM64_FP_HOST;
+>  
+> -	if (test_thread_flag(TIF_SVE))
+> -		vcpu->arch.flags |= KVM_ARM64_HOST_SVE_IN_USE;
+> +	if (system_supports_sve()) {
+> +		if (test_thread_flag(TIF_SVE))
+> +			vcpu->arch.flags |= KVM_ARM64_HOST_SVE_IN_USE;
+>  
+> -	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
+> -		vcpu->arch.flags |= KVM_ARM64_HOST_SVE_ENABLED;
+> +		if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
+> +			vcpu->arch.flags |= KVM_ARM64_HOST_SVE_ENABLED;
+> +	}
+>  }
+
+[...]
+
+Cheers
+---Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
