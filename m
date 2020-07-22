@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B478C433EA
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA231C433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B230F207CD
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EC9D206F5
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ktMgAg7h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B230F207CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="l8EUVZgC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC9D206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B5654B2B4;
-	Wed, 22 Jul 2020 12:45:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46E124B2AA;
+	Wed, 22 Jul 2020 12:45:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pcFOXzKL6dvM; Wed, 22 Jul 2020 12:45:13 -0400 (EDT)
+	with ESMTP id q4PVQBYtZhLf; Wed, 22 Jul 2020 12:45:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93F404B2B7;
-	Wed, 22 Jul 2020 12:45:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DD594B297;
+	Wed, 22 Jul 2020 12:45:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D77F64B2C8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 276164B2A8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ddVHDEEyvEDR for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jul 2020 12:45:10 -0400 (EDT)
+ with ESMTP id WH91y+gyPFAl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jul 2020 12:45:02 -0400 (EDT)
 Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
  [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CB154B2B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:09 -0400 (EDT)
-Received: by mail-wm1-f67.google.com with SMTP id j18so2510669wmi.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:09 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1331E4B2A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 12:45:02 -0400 (EDT)
+Received: by mail-wm1-f67.google.com with SMTP id 9so2505243wmj.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 09:45:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WoKr+d4xzFa2q5doiKo+Ma/Mr0IRgGSBGk/CKLNfxgY=;
- b=ktMgAg7h984Iz5zq71o5DN+J0+FK13F2J9HPBy4DmLuxJ090jgw+CMnoSZwyQY49Ma
- f6yJhxgSogcgx3bETDFW+KqXCwbYzTtFr6O5sgMkcsR2Hq6w19IrrZuEIpXicZJ3EGVV
- U78Tpy9fh1G98eE0Ys41it7n1SVaRQbQTvPQg94IRPQEXLYEtTYwgo1TOaoUoep+eDoZ
- H8rq8GLCnQ+9r8ihbCiMv+byr7bxzMtmDd5XPLTWCHHOKBCD5MR8gklAapKIjdYlZp+I
- wtYhzP8MLjT3vX1DeAvbZBQhzDpQKV5uegI4SY3ESoosnDFzNvhkcvlbO6uy2d3oSVQM
- fH5w==
+ bh=6iEzS/K7FKWZpD3ua8htStuWzJAGtakSYjlBsBpxZ/4=;
+ b=l8EUVZgCpIRU1QL7F3sHnMulBx+ndcr+hiyAH/9TDLEfZ3e4nRnvYcMRlw8pJ1RZDD
+ usP3/tJ/orr9olI8t2Qx+Sj/5tEnhSWSaxwGyGsDcxf+AzwpzLvAQgo1GARi5BT9Pose
+ fSVvL492qfWaMefMcn5RNZm4KMBSxUa2R4mITHBHTG4G42tVvAyz5XC8X1EHjDPKKVTC
+ gnO+1g9xzqhkqboMF9feb+jULlJjKVO8BTsdu5IB3Jql+dhjkP+s/fUtYQxamWeUqX3k
+ YELPwGsw80aBmerABn4F7VHRlZuY5XWbtJqzVum5e1OoTgXIAeaBwQQFl2H3zHD4YBs6
+ 8Exw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WoKr+d4xzFa2q5doiKo+Ma/Mr0IRgGSBGk/CKLNfxgY=;
- b=Pl1Eb8LKxyADScsSLAEXhfbDDyCYCMp/CFCOeULas/khhrN5epCeK3/WGAMphht7Ec
- 01Vm4cdOBMIlwk2NjliBvRM4VUrCkUh/GIB5Q77nkPZI5tlKpx5N7ofju7TZlNe6DroY
- k/QtlMfhRknP/fIo4hj+dFSg+9DZSQaf44OUp00Ovw+KT/S3namqAkgnAUqHKuqi3Fc3
- 7I/4z7FICddw/XSbsPYUSK8zanOJCtbFxLb+LLT4F9EkA3D9Dp7MXZvx2/y0ArHGWOt7
- eMMShkKJ0EgBYqslsPVQUCo/4AKHEuQIDivszvRjT/iSluzYeLymh0ec/DV2cKJjPNZx
- AF6w==
-X-Gm-Message-State: AOAM530UCGtC31lulzXcIIhyEF57s/SwWDBI+wPvmTmt5l4LURDme11X
- Eycg1qBY/cHZbLXdQitfNcUnoA==
-X-Google-Smtp-Source: ABdhPJxouZ/81xeqagm6vGSDX+SrQHkz8Q+jvvRw7wYTEIvvg6ju/O9IEPfOIvKPbqVtxczJyAFxwg==
-X-Received: by 2002:a1c:d8:: with SMTP id 207mr432561wma.81.1595436307978;
- Wed, 22 Jul 2020 09:45:07 -0700 (PDT)
+ bh=6iEzS/K7FKWZpD3ua8htStuWzJAGtakSYjlBsBpxZ/4=;
+ b=MtrDBpPLQs6uT7rC3KE//ouugCAFDWwy9vVNV01jepuHxZzfOFQat3b+yNFrHFOoAb
+ Swp8opsk4L7d7qZaEEzUXu1yMuMSFAzZYl4nNQFHKdD2x5oaiLe7JnswKHQKSrChBVv6
+ gqh5ODd/9aelL+x2P/nzwGN92THqdZbWf6J5YVP9Fb2K7nYzxkkeEgS5jw7jh1BfW6SA
+ j8vMkTMK+voa+LAFz6MIz7S02hAm5+RTH2NifYo9SShkca68xEVY3mF6eVQGS/zm5rvU
+ pfMccoVPONc0OQYnp7ZzsBEiPczk8We3PDEhpLHa0lEu7ISndlRmvVCP7bx5Y5KgxWQy
+ Zp2A==
+X-Gm-Message-State: AOAM532HhcJsBk8+L55nYaBJRW2AHgHr0CubYlkuP6ctdfKbf7j4MMAz
+ jaw1YTwpv76HUFpFc5GUmI9BLw==
+X-Google-Smtp-Source: ABdhPJyvvcrdUvKbE/hxCmWbSibjaaJ7nEtZ3HDL894GJKBpxshjcuwx5vl2E/hVxnCbvqkXRidabQ==
+X-Received: by 2002:a1c:a756:: with SMTP id q83mr457233wme.168.1595436300851; 
+ Wed, 22 Jul 2020 09:45:00 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:b0ee:900a:e004:b9d0])
- by smtp.gmail.com with ESMTPSA id g14sm538679wrw.83.2020.07.22.09.45.06
+ by smtp.gmail.com with ESMTPSA id u20sm265826wmm.15.2020.07.22.09.44.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jul 2020 09:45:07 -0700 (PDT)
+ Wed, 22 Jul 2020 09:45:00 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Dennis Zhou <dennis@kernel.org>,
  Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
  Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 5/9] kvm: arm64: Duplicate arm64_ssbd_callback_required for
- nVHE hyp
-Date: Wed, 22 Jul 2020 17:44:20 +0100
-Message-Id: <20200722164424.42225-6-dbrazdil@google.com>
+Subject: [PATCH 1/9] Macros to override naming of percpu symbols and sections
+Date: Wed, 22 Jul 2020 17:44:16 +0100
+Message-Id: <20200722164424.42225-2-dbrazdil@google.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200722164424.42225-1-dbrazdil@google.com>
 References: <20200722164424.42225-1-dbrazdil@google.com>
@@ -105,95 +104,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hyp keeps track of which cores require SSBD callback by accessing a
-kernel-proper global variable. Create an nVHE symbol of the same name
-and copy the value from kernel proper to nVHE at KVM init time.
+Modify generic linker script macros to generate section/symbol names for
+percpu area using overridable macros. No functional changes.
 
-Done in preparation for separating percpu memory owned by kernel
-proper and nVHE.
+This will allow arm64 linker script to define a second KVM-specific percpu
+data section using the generic PERCPU_SECTION macro.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 10 +++++++---
- arch/arm64/kernel/image-vars.h   |  1 -
- arch/arm64/kvm/arm.c             |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c |  3 +++
- 4 files changed, 11 insertions(+), 5 deletions(-)
+ include/asm-generic/vmlinux.lds.h | 40 +++++++++++++++++++++----------
+ 1 file changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 22157ded04ca..e9e5875274cb 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -529,23 +529,27 @@ static inline int kvm_map_vectors(void)
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index db600ef218d7..1bfc002ecfce 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -892,6 +892,20 @@
+ #define INIT_RAM_FS
+ #endif
  
- #ifdef CONFIG_ARM64_SSBD
- DECLARE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
-+DECLARE_KVM_NVHE_PER_CPU(u64, arm64_ssbd_callback_required);
- 
--static inline int hyp_map_aux_data(void)
-+static inline int hyp_init_aux_data(void)
- {
- 	int cpu, err;
- 
- 	for_each_possible_cpu(cpu) {
- 		u64 *ptr;
- 
--		ptr = per_cpu_ptr(&arm64_ssbd_callback_required, cpu);
-+		ptr = per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu);
- 		err = create_hyp_mappings(ptr, ptr + 1, PAGE_HYP);
- 		if (err)
- 			return err;
++/*
++ * Macros to override the naming of percpu symbols and sections.
++ * Used by arm64 linker script to define a separate percpu area for KVM.
++ */
++#define PERCPU_SECTION_BASE_NAME .data..percpu
 +
-+		/* Copy value from kernel to hyp. */
-+		*ptr = per_cpu(arm64_ssbd_callback_required, cpu);
- 	}
- 	return 0;
- }
++#ifndef PERCPU_SECTION_NAME
++#define PERCPU_SECTION_NAME(suffix) PERCPU_SECTION_BASE_NAME ## suffix
++#endif
++
++#ifndef PERCPU_SYMBOL_NAME
++#define PERCPU_SYMBOL_NAME(name) name
++#endif
++
+ /*
+  * Memory encryption operates on a page basis. Since we need to clear
+  * the memory encryption mask for this section, it needs to be aligned
+@@ -903,7 +917,7 @@
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
+ #define PERCPU_DECRYPTED_SECTION					\
+ 	. = ALIGN(PAGE_SIZE);						\
+-	*(.data..percpu..decrypted)					\
++	*(PERCPU_SECTION_NAME(..decrypted))				\
+ 	. = ALIGN(PAGE_SIZE);
  #else
--static inline int hyp_map_aux_data(void)
-+static inline int hyp_init_aux_data(void)
- {
- 	return 0;
- }
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 9e897c500237..034cf21e67ce 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -69,7 +69,6 @@ KVM_NVHE_ALIAS(kvm_patch_vector_branch);
- KVM_NVHE_ALIAS(kvm_update_va_mask);
+ #define PERCPU_DECRYPTED_SECTION
+@@ -947,17 +961,17 @@
+  * sharing between subsections for different purposes.
+  */
+ #define PERCPU_INPUT(cacheline)						\
+-	__per_cpu_start = .;						\
+-	*(.data..percpu..first)						\
++	PERCPU_SYMBOL_NAME(__per_cpu_start) = .;			\
++	*(PERCPU_SECTION_NAME(..first))					\
+ 	. = ALIGN(PAGE_SIZE);						\
+-	*(.data..percpu..page_aligned)					\
++	*(PERCPU_SECTION_NAME(..page_aligned))				\
+ 	. = ALIGN(cacheline);						\
+-	*(.data..percpu..read_mostly)					\
++	*(PERCPU_SECTION_NAME(..read_mostly))				\
+ 	. = ALIGN(cacheline);						\
+-	*(.data..percpu)						\
+-	*(.data..percpu..shared_aligned)				\
++	*(PERCPU_SECTION_NAME())					\
++	*(PERCPU_SECTION_NAME(..shared_aligned))			\
+ 	PERCPU_DECRYPTED_SECTION					\
+-	__per_cpu_end = .;
++	PERCPU_SYMBOL_NAME(__per_cpu_end) = .;
  
- /* Global kernel state accessed by nVHE hyp code. */
--KVM_NVHE_ALIAS(arm64_ssbd_callback_required);
- KVM_NVHE_ALIAS(kvm_host_data);
- KVM_NVHE_ALIAS(kvm_vgic_global_state);
+ /**
+  * PERCPU_VADDR - define output section for percpu area
+@@ -984,11 +998,11 @@
+  * address, use PERCPU_SECTION.
+  */
+ #define PERCPU_VADDR(cacheline, vaddr, phdr)				\
+-	__per_cpu_load = .;						\
+-	.data..percpu vaddr : AT(__per_cpu_load - LOAD_OFFSET) {	\
++	PERCPU_SYMBOL_NAME(__per_cpu_load) = .;				\
++	PERCPU_SECTION_NAME() vaddr : AT(PERCPU_SYMBOL_NAME(__per_cpu_load) - LOAD_OFFSET) { \
+ 		PERCPU_INPUT(cacheline)					\
+ 	} phdr								\
+-	. = __per_cpu_load + SIZEOF(.data..percpu);
++	. = PERCPU_SYMBOL_NAME(__per_cpu_load) + SIZEOF(PERCPU_SECTION_NAME());
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 98f05bdac3c1..a53e87305fa0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1547,7 +1547,7 @@ static int init_hyp_mode(void)
- 		}
+ /**
+  * PERCPU_SECTION - define output section for percpu area, simple version
+@@ -1004,8 +1018,8 @@
+  */
+ #define PERCPU_SECTION(cacheline)					\
+ 	. = ALIGN(PAGE_SIZE);						\
+-	.data..percpu	: AT(ADDR(.data..percpu) - LOAD_OFFSET) {	\
+-		__per_cpu_load = .;					\
++	PERCPU_SECTION_NAME() : AT(ADDR(PERCPU_SECTION_NAME()) - LOAD_OFFSET) { \
++		PERCPU_SYMBOL_NAME(__per_cpu_load) = .;			\
+ 		PERCPU_INPUT(cacheline)					\
  	}
  
--	err = hyp_map_aux_data();
-+	err = hyp_init_aux_data();
- 	if (err)
- 		kvm_err("Cannot map host auxiliary data: %d\n", err);
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index ddb602ffb022..8c2bd04df813 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -27,6 +27,9 @@
- #include <asm/processor.h>
- #include <asm/thread_info.h>
- 
-+/* Non-VHE copy of the kernel symbol. */
-+DEFINE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
-+
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
 -- 
 2.27.0
 
