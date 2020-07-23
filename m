@@ -2,93 +2,70 @@ Return-Path: <SRS0=bqG1=BC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A72C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jul 2020 10:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0432EC433EB
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jul 2020 10:08:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C8BB220737
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jul 2020 10:04:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84E6F2086A
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jul 2020 10:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4Tjc4MS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BB220737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="znBEr0fj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84E6F2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 397FE4B32B;
-	Thu, 23 Jul 2020 06:04:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FB1B4B2D9;
+	Thu, 23 Jul 2020 06:08:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bXXVxa2KHG2T; Thu, 23 Jul 2020 06:04:23 -0400 (EDT)
+	with ESMTP id TH8LYG63dNTJ; Thu, 23 Jul 2020 06:08:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F75F4B2F9;
-	Thu, 23 Jul 2020 06:04:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1A14B2BE;
+	Thu, 23 Jul 2020 06:08:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD1AA4B306
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 22:51:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C54614B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jul 2020 06:08:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s8dl3bDZNKyd for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jul 2020 22:51:46 -0400 (EDT)
-Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com
- [209.85.160.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB8F54B2FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 22:51:45 -0400 (EDT)
-Received: by mail-qt1-f194.google.com with SMTP id j10so3405367qtq.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jul 2020 19:51:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=3FGTIJsMWiuqsdJoUqDQziqKZol4pbNpNal4MX+V3kg=;
- b=D4Tjc4MSqAmk0rC//KBKh1MiOvF64ETmR5erHLkBNz/8G+d73CGhYZI1//N88xp3ZB
- PvKfFZuUeECW1tLVijoi3JQv9Up/t+hwwQgH3c8cswSdN6b+/Up9tW7+AtjRsHCmSMCX
- r4n01aNGXw77bOe/qpolDszh83WgniXUkiV5FRZrDN+31aJwo7pQVXKpIKpw5aIEsGtc
- Aec8VcRO62DibdZaLmJbPEQHsaxCYOcSRLIzgJUrA1mrdcESDQmhishwfqeMnn4kmy0s
- /liNR1YE0Fl6tdMi+cbCOMBaisHdmnJ3esEqnEFXLgeP+Ir4bBfTpC1fKWXfgCvzYJdD
- Sxeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=3FGTIJsMWiuqsdJoUqDQziqKZol4pbNpNal4MX+V3kg=;
- b=EGWv00NxiNzV/N3FxpJAfRPu4rIyFfsd+aFjxFD9RotpwvXIsvPYXGD11YlcJ0TTPa
- hbFCU+CueE3NfDEkgt2saVfAzaH1Jy7gitwEwUHTuY4SbxUeGrgd4NlgVphggeAfZbdM
- BrfmWUpXQervMswPmhs4rBag8X+V3j5U6BhGt5BaV5VkUbMciajlMmiU8Jru2pOQlHeZ
- fGaPHOdSOKfic7aV5sqPVx4Rpkt9hVqv303cksIKIFEX6PtUNpDQRW0iYjbKBxOvbeAy
- We2u5+Wp/rDsxh4cTw3FutVeReWA2E0TP8ylqAaFlbeySCwOiQCIY5Jd/LSyYvDOmX0H
- h+Hg==
-X-Gm-Message-State: AOAM530a/jGJ5bn44Ki75TqjjuiztPEX4VEL5/hayGOKyoX+yerH/j5x
- WF3eNMwedWzxn9UUW3gLWe0=
-X-Google-Smtp-Source: ABdhPJzB3i+6fJCaN7bK3FLHzxEfYv91xyQg7+WuzYFSVlcaYRmb6plJdBFlgj+XI2n9fahxWfbf8A==
-X-Received: by 2002:ac8:464f:: with SMTP id f15mr2224175qto.211.1595472705344; 
- Wed, 22 Jul 2020 19:51:45 -0700 (PDT)
-Received: from ubuntu-n2-xlarge-x86 ([2604:1380:45d1:2600::1])
- by smtp.gmail.com with ESMTPSA id x13sm1288730qts.57.2020.07.22.19.51.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 19:51:44 -0700 (PDT)
-Date: Wed, 22 Jul 2020 19:51:42 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL
- functions
-Message-ID: <20200723025142.GA361584@ubuntu-n2-xlarge-x86>
-References: <20200722162231.3689767-1-maz@kernel.org>
+ with ESMTP id H6YV+slP2Nj0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Jul 2020 06:08:49 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98AFA4B1CF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jul 2020 06:08:49 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4CBB22086A;
+ Thu, 23 Jul 2020 10:08:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1595498928;
+ bh=AML2GZZ2Ph91q1oR/Eg49IMw55Q5QbxKvzvu1iz4bIg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=znBEr0fjlV5rdxomE2c2cQfMuQCavRErZqYac5EeyDHjYb8f0l2fdRZsHNZmfC2wq
+ yy/ZPIbgy+ilYflMX3t24hpAMnehRlU3O/PJIcrtIvDsQtxVLtJH/IKUVkubqYQZ+J
+ lp0pMsjHDo6n8wGKQefFPgy22LP0Efb/r3nN81AE=
+Date: Thu, 23 Jul 2020 11:08:44 +0100
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't inherit exec permission across
+ page-table levels
+Message-ID: <20200723100843.GA15711@willie-the-truck>
+References: <20200722131511.14639-1-will@kernel.org>
+ <20200722155428.GA275809@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200722162231.3689767-1-maz@kernel.org>
-X-Mailman-Approved-At: Thu, 23 Jul 2020 06:04:22 -0400
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Nick Desaulniers <ndesaulniers@google.com>,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200722155428.GA275809@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, stable@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,68 +82,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 22, 2020 at 05:22:31PM +0100, Marc Zyngier wrote:
-> So far, vcpu_has_ptrauth() is implemented in terms of system_supports_*_auth()
-> calls, which are declared "inline". In some specific conditions (clang
-> and SCS), the "inline" very much turns into an "out of line", which
-> leads to a fireworks when this predicate is evaluated on a non-VHE
-> system (right at the beginning of __hyp_handle_ptrauth).
+Hi Quentin,
+
+On Wed, Jul 22, 2020 at 04:54:28PM +0100, Quentin Perret wrote:
+> On Wednesday 22 Jul 2020 at 14:15:10 (+0100), Will Deacon wrote:
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 8c0035cab6b6..69dc36d1d486 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1326,7 +1326,7 @@ static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
+> >  	return true;
+> >  }
+> >  
+> > -static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+> > +static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr, unsigned long sz)
+> >  {
+> >  	pud_t *pudp;
+> >  	pmd_t *pmdp;
+> > @@ -1338,9 +1338,9 @@ static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+> >  		return false;
+> >  
+> >  	if (pudp)
+> > -		return kvm_s2pud_exec(pudp);
+> > +		return sz == PUD_SIZE && kvm_s2pud_exec(pudp);
+> >  	else if (pmdp)
+> > -		return kvm_s2pmd_exec(pmdp);
+> > +		return sz == PMD_SIZE && kvm_s2pmd_exec(pmdp);
+> >  	else
+> >  		return kvm_s2pte_exec(ptep);
 > 
-> Instead, make sure vcpu_has_ptrauth gets expanded inline by directly
-> using the cpus_have_final_cap() helpers, which are __always_inline,
-> generate much better code, and are the only thing that make sense when
-> running at EL2 on a nVHE system.
+> This wants a 'sz == PAGE_SIZE' check, otherwise you'll happily inherit
+> the exec flag when a PTE has exec rights while you create a block
+> mapping on top.
+
+Nice catch! Somehow I thought we always had PAGE_SIZE in the 'else' case,
+but that's obviously not true now that you've pointed it out.
+
+> Also, I think it should be safe to make the PMD and PUD case more
+> permissive, as 'sz <= PMD_SIZE' for instance, as the icache
+> invalidation shouldn't be an issue there? That probably doesn't matter
+> all that much though.
+
+I'll make that change anyway.
+
+> > @@ -1958,7 +1958,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	 * execute permissions, and we preserve whatever we have.
+> >  	 */
+> >  	needs_exec = exec_fault ||
+> > -		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
+> > +		(fault_status == FSC_PERM &&
+> > +		 stage2_is_exec(kvm, fault_ipa, vma_pagesize));
+> >  
+> >  	if (vma_pagesize == PUD_SIZE) {
+> >  		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
+> > -- 
+> > 2.28.0.rc0.105.gf9edc3c819-goog
+> > 
 > 
-> Fixes: 29eb5a3c57f7 ("KVM: arm64: Handle PtrAuth traps early")
-> Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-> Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> FWIW, I reproduced the issue with a dummy guest accessing memory just
+> the wrong way, and toggling dirty logging at the right moment. And this
+> patch + my suggestion above seems to cure things.
 
-Thank you for the quick fix! I have booted a mainline kernel with this
-patch with Shadow Call Stack enabled and verified that using KVM no
-longer causes a panic.
+Testing?! It'll never catch on...
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-
-For the future, is there an easy way to tell which type of system I am
-using (nVHE or VHE)? I am new to the arm64 KVM world but it is something
-that I am going to continue to test with various clang technologies now
-that I have actual hardware capable of it that can run a mainline
-kernel.
-
-Cheers,
-Nathan
-
-> ---
->  arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> So, with the above applied:
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 147064314abf..a8278f6873e6 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -391,9 +391,14 @@ struct kvm_vcpu_arch {
->  #define vcpu_has_sve(vcpu) (system_supports_sve() && \
->  			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
->  
-> -#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
-> -				  system_supports_generic_auth()) && \
-> -				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +#define vcpu_has_ptrauth(vcpu)						\
-> +	((cpus_have_final_cap(ARM64_HAS_ADDRESS_AUTH) ||		\
-> +	  cpus_have_final_cap(ARM64_HAS_GENERIC_AUTH)) &&		\
-> +	 (vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
-> +#else
-> +#define vcpu_has_ptrauth(vcpu)		false
-> +#endif
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->  
-> -- 
-> 2.28.0.rc0.142.g3c755180ce-goog
-> 
+> Reviewed-by: Quentin Perret <qperret@google.com>
+> Tested-by: Quentin Perret <qperret@google.com>
+
+Cheers. v2 coming up.
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
