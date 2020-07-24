@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D875EC433E5
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B43BC433F4
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 54D9C206D8
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB26320674
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qTwSG62o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D9C206D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pH6pshNX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB26320674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBD244B4AF;
-	Fri, 24 Jul 2020 10:35:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76C6C4B45F;
+	Fri, 24 Jul 2020 10:35:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jKCgW95Sm4-t; Fri, 24 Jul 2020 10:35:17 -0400 (EDT)
+	with ESMTP id jlSvlRpMYSd3; Fri, 24 Jul 2020 10:35:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 948E74B4BE;
-	Fri, 24 Jul 2020 10:35:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B1F34B43C;
+	Fri, 24 Jul 2020 10:35:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C72E4B46F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0CB4AEE2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LKFLqVTJiCpc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jul 2020 10:35:15 -0400 (EDT)
+ with ESMTP id 8NtIBeSIdTdP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jul 2020 10:35:24 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64FA44B4AC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A10F64B08B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:24 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5157D20714;
- Fri, 24 Jul 2020 14:35:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7A08A206F0;
+ Fri, 24 Jul 2020 14:35:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595601314;
- bh=4LRg3VE6PVsumxNfed/x5MvUvbAKTRm7x3AQ3dM6Qg4=;
+ s=default; t=1595601323;
+ bh=RIsZfSCZmrp/wPqTZvZHGiqd/TR+61Y5jeApU2sToMo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qTwSG62oN3ulpiaV7VULoi7GrB5vYx5E5xCY7JiMyiyzb30N5XwIu7vTD8ZMuAH0d
- 366XqaLlIoadq6EhNgruHzbVUEdQ6YdC7fD2gWZrXXlZKOixKxhumcND6ubHwOE+N1
- srXcPf6RyLdsYDOgQKoPnGZ0L62tPtAjHt+vDjQs=
+ b=pH6pshNXOl66q6bN+6OAOkNvX7CEbYgEkUEf79c08LvqRTWh0ZuYyk16AxIUnHETF
+ 2BktErnFvndXfPgMsWYW8y+QSVmikB0qTMfCvpjUkhlj70lPGgjX+uBQ/2yTl+byMF
+ yTQogZqmhbRMLVPz/ryZ16m6ZXiDaksmJzSK+XEU=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 1/7] KVM: arm64: Update comment when skipping guest MMIO
- access instruction
-Date: Fri, 24 Jul 2020 15:35:00 +0100
-Message-Id: <20200724143506.17772-2-will@kernel.org>
+Subject: [PATCH 6/7] KVM: arm64: Handle stage-2 faults on stage-1 page-table
+ walks earlier
+Date: Fri, 24 Jul 2020 15:35:05 +0100
+Message-Id: <20200724143506.17772-7-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200724143506.17772-1-will@kernel.org>
 References: <20200724143506.17772-1-will@kernel.org>
@@ -81,43 +81,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If a 32-bit guest accesses MMIO using a 16-bit Thumb-2 instruction that
-is reported to the hypervisor without a valid syndrom (for example,
-because of the addressing mode), then we may hand off the fault to
-userspace. When resuming the guest, we unconditionally advance the PC
-by 4 bytes, since ESR_EL2.IL is always 1 for data aborts generated without
-a valid syndrome. This is a bit rubbish, but it's also difficult to see
-how we can fix it without potentially introducing regressions in userspace
-MMIO fault handling.
+Stage-2 faults on stage-1 page-table walks can occur on both the I-side
+and the D-side. It is IMPLEMENTATATION DEFINED whether they are reported
+as reads or writes and, in the case that they are generated by an AT
+instruction, they are reported with the CM bit set.
 
-Update the comment when skipping a guest MMIO access instruction so that
-this corner case is at least written down.
+All of this deeply confuses the logic in kvm_handle_guest_abort();
+userspace may or may not see the fault, depending on whether it occurs
+on the data or the instruction side, and an AT instruction may be skipped
+if the translation tables are held in a read-only memslot.
+
+Move the handling of stage-2 faults on stage-1 page-table walks earlier
+so that they consistently result in either a data or an instruction abort
+being re-injected back to the guest.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmio.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/kvm/mmu.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 4e0366759726..b54ea5aa6c06 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -113,6 +113,13 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	/*
- 	 * The MMIO instruction is emulated and should not be re-executed
- 	 * in the guest.
-+	 *
-+	 * Note: If user space handled the emulation because the abort
-+	 * symdrome information was not valid (ISV set in the ESR), then
-+	 * this will assume that the faulting instruction was 32-bit.
-+	 * If the faulting instruction was a 16-bit Thumb instruction,
-+	 * then userspace would need to rewind the PC by 2 bytes prior to
-+	 * resuming the vCPU (yuck!).
- 	 */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index adb933ecd177..9e72e7f4a2c2 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2124,6 +2124,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			goto out;
+ 		}
  
++		if (kvm_vcpu_dabt_iss1tw(vcpu)) {
++			ret = -ENXIO;
++			goto out;
++		}
++
+ 		/*
+ 		 * Check for a cache maintenance operation. Since we
+ 		 * ended-up here, we know it is outside of any memory
+@@ -2157,11 +2162,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			goto out_unlock;
+ 		}
+ 
+-		if (kvm_vcpu_dabt_iss1tw(vcpu)) {
+-			ret = -ENXIO;
+-			goto out;
+-		}
+-
+ 		ret = io_mem_abort(vcpu, run, fault_ipa);
+ 		goto out_unlock;
+ 	}
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
