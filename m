@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16C1C433F1
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E3FC433F7
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9A91620836
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E62DD206F0
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCelo5hc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A91620836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qh8oWoBa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E62DD206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 457D64B418;
-	Fri, 24 Jul 2020 10:35:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A16344A524;
+	Fri, 24 Jul 2020 10:35:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bGHygws97u+k; Fri, 24 Jul 2020 10:35:25 -0400 (EDT)
+	with ESMTP id BHFrRZfNeKrx; Fri, 24 Jul 2020 10:35:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4E54B45F;
-	Fri, 24 Jul 2020 10:35:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6134B4BD;
+	Fri, 24 Jul 2020 10:35:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCE294B43F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0E14B448
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CjwHAX2j-DyL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jul 2020 10:35:22 -0400 (EDT)
+ with ESMTP id GlEcGiPYVC21 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jul 2020 10:35:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC4994B38C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 617CA4B3B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:26 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A56B420714;
- Fri, 24 Jul 2020 14:35:20 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4ECBB2065C;
+ Fri, 24 Jul 2020 14:35:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595601322;
- bh=nRSup5oIqQmb2RxIWwmKIgwnUNAyLD5LZ4z565QIuW4=;
+ s=default; t=1595601325;
+ bh=aH6+b9S0bxa9/SN+80CrqBVkxawU3zO7lLnHFqJKx/Q=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KCelo5hchAth+oQZaQ/g7s+9X9saqctfN4NO81m3gcJa4w01EYmMebeQ5kwJTZbVb
- 71w3pC5VFYzpYtLGbE5fIeEu4dM3CMv9h+458DpnGy3jZ1OZlxAvBLRMv2IoOzmFXq
- rqgxnA9BRTCWMsqhD94w96nTKoEOyl09P6RcsLX4=
+ b=qh8oWoBa5d97kv/5Ec1xVKnU0c7jbVGRWvECJktcuh03XdNewjxMcBYP3kJZeQap5
+ ze1Ac6uT4dw0xZJk4hqEQvVSlsoVcdUlBCG1E99K3NqUPXc8Umc+42BEThUIAKNZCd
+ ewtLa8hzzMldYszFp+8yn/9Fcf8wbqkfer26IgrA=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 5/7] KVM: arm64: Move 'invalid syndrome' logic out of
- io_mem_abort()
-Date: Fri, 24 Jul 2020 15:35:04 +0100
-Message-Id: <20200724143506.17772-6-will@kernel.org>
+Subject: [PATCH 7/7] KVM: arm64: Separate write faults on read-only memslots
+ from MMIO
+Date: Fri, 24 Jul 2020 15:35:06 +0100
+Message-Id: <20200724143506.17772-8-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200724143506.17772-1-will@kernel.org>
 References: <20200724143506.17772-1-will@kernel.org>
@@ -81,109 +81,105 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In preparation for handling stage-2 faults on stage-1 page-table walks
-earlier, move the 'invalid syndrome' logic out of io_mem_abort() and
-into its own function, which can be called from kvm_handle_guest_abort()
-directly.
+Although taking a write-fault on a read-only memslot triggers an MMIO
+exit back to userspace, lumping the handling together in
+kvm_handle_guest_abort() causes some of the early triage to have weird
+effects on userspace. For example, if a guest generates a stage-2 fault
+on a stage-1 translation fault when trying to fetch an instruction from
+a read-only memslot, it will be mistakenly treated as an attempt to
+execute from MMIO and a prefetch abort will be re-injected into the
+guest.
+
+Separate the MMIO handling from the read-only memslot handling, so that
+the latter is left entirely up to userspace. Note that this _will_
+result in more exits than before for read-only memslots, since userspace
+will now see some cache maintenance and instruction-side aborts.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmio.c | 22 ----------------------
- arch/arm64/kvm/mmu.c  | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 32 insertions(+), 22 deletions(-)
+ arch/arm64/kvm/mmu.c | 45 ++++++++++++++++++++++++--------------------
+ 1 file changed, 25 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index b54ea5aa6c06..45a630e480e1 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -136,28 +136,6 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	int len;
- 	u8 data_buf[8];
- 
--	/*
--	 * No valid syndrome? Ask userspace for help if it has
--	 * volunteered to do so, and bail out otherwise.
--	 */
--	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
--		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
--			run->exit_reason = KVM_EXIT_ARM_NISV;
--			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
--			run->arm_nisv.fault_ipa = fault_ipa;
--			return 0;
--		}
--
--		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
--		return -ENOSYS;
--	}
--
--	/* Page table accesses IO mem: tell guest to fix its TTBR */
--	if (kvm_vcpu_dabt_iss1tw(vcpu)) {
--		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
--		return 1;
--	}
--
- 	/*
- 	 * Prepare MMIO operation. First decode the syndrome data we get
- 	 * from the CPU. Then try if some in-kernel emulation feels
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 73e62d360a36..adb933ecd177 100644
+index 9e72e7f4a2c2..2edc6f2412dc 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -2046,6 +2046,20 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 		kvm_set_pfn_accessed(pfn);
- }
+@@ -2117,9 +2117,30 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+ 	write_fault = kvm_is_write_fault(vcpu);
+-	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
++
++	/*
++	 * The IPA is reported as [MAX:12], so we need to complement it with
++	 * the bottom 12 bits from the faulting VA. This is always 12 bits,
++	 * irrespective of the page size.
++	 */
++	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
++
++	/*
++	 * We can perform some early fault triage based purely on the memslot
++	 * information:
++	 *
++	 * Faults on IPAs falling outside of any memslot are re-injected
++	 * into the guest as external aborts if they were either signalled as
++	 * instruction aborts or as a stage-2 fault on a translation table walk.
++	 * If the instruction was a cache maintenance instruction then it is
++	 * quietly skipped, otherwise we exit to userspace for MMIO emulation.
++	 *
++	 * Write faults on IPAs falling within a read-only memslot are reported
++	 * to userspace as MMIO exits. This includes cache maintenance and
++	 * stage-2 faults on translation table walks,
++	 */
++	if (kvm_is_error_hva(hva)) {
+ 		if (kvm_vcpu_trap_is_iabt(vcpu)) {
+-			/* Prefetch Abort on I/O address */
+ 			ret = -ENOEXEC;
+ 			goto out;
+ 		}
+@@ -2129,30 +2150,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			goto out;
+ 		}
  
-+static int handle_error_invalid_dabt(struct kvm_vcpu *vcpu, struct kvm_run *run,
-+				     phys_addr_t fault_ipa)
-+{
-+	if (!vcpu->kvm->arch.return_nisv_io_abort_to_user) {
-+		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
-+		return -ENOSYS;
+-		/*
+-		 * Check for a cache maintenance operation. Since we
+-		 * ended-up here, we know it is outside of any memory
+-		 * slot. But we can't find out if that is for a device,
+-		 * or if the guest is just being stupid. The only thing
+-		 * we know for sure is that this range cannot be cached.
+-		 *
+-		 * So let's assume that the guest is just being
+-		 * cautious, and skip the instruction.
+-		 */
+ 		if (kvm_vcpu_dabt_is_cm(vcpu)) {
+ 			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+ 			ret = 1;
+ 			goto out_unlock;
+ 		}
+ 
+-		/*
+-		 * The IPA is reported as [MAX:12], so we need to
+-		 * complement it with the bottom 12 bits from the
+-		 * faulting VA. This is always 12 bits, irrespective
+-		 * of the page size.
+-		 */
+-		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+-
+ 		/*
+ 		 * No valid syndrome? Ask userspace for help if it has
+ 		 * volunteered to do so, and bail out otherwise.
+@@ -2161,7 +2164,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			ret = handle_error_invalid_dabt(vcpu, run, fault_ipa);
+ 			goto out_unlock;
+ 		}
 +	}
-+
-+	run->exit_reason = KVM_EXIT_ARM_NISV;
-+	run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
-+	run->arm_nisv.fault_ipa = fault_ipa;
-+	return 0;
-+}
-+
- /**
-  * kvm_handle_guest_abort - handles all 2nd stage aborts
-  * @vcpu:	the VCPU pointer
-@@ -2133,6 +2147,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 * of the page size.
- 		 */
- 		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-+
-+		/*
-+		 * No valid syndrome? Ask userspace for help if it has
-+		 * volunteered to do so, and bail out otherwise.
-+		 */
-+		if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-+			ret = handle_error_invalid_dabt(vcpu, run, fault_ipa);
-+			goto out_unlock;
-+		}
-+
-+		if (kvm_vcpu_dabt_iss1tw(vcpu)) {
-+			ret = -ENXIO;
-+			goto out;
-+		}
-+
+ 
++	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
  		ret = io_mem_abort(vcpu, run, fault_ipa);
  		goto out_unlock;
  	}
-@@ -2153,6 +2182,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	if (ret == -ENOEXEC) {
- 		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- 		ret = 1;
-+	} else if (ret == -ENXIO) {
-+		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+		ret = 1;
- 	}
- out_unlock:
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
