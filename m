@@ -1,70 +1,62 @@
-Return-Path: <SRS0=9qIm=BD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=8k27=BE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E3FC433F7
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F253C433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Jul 2020 04:51:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E62DD206F0
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jul 2020 14:35:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qh8oWoBa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E62DD206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F0B132064C
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Jul 2020 04:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B132064C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A16344A524;
-	Fri, 24 Jul 2020 10:35:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AF714B51A;
+	Sat, 25 Jul 2020 00:51:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BHFrRZfNeKrx; Fri, 24 Jul 2020 10:35:28 -0400 (EDT)
+	with ESMTP id fnvqQOZnfVwf; Sat, 25 Jul 2020 00:51:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6134B4BD;
-	Fri, 24 Jul 2020 10:35:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DAB14B588;
+	Sat, 25 Jul 2020 00:51:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0E14B448
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52ECD4B57B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jul 2020 00:51:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GlEcGiPYVC21 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jul 2020 10:35:26 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 617CA4B3B2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2020 10:35:26 -0400 (EDT)
-Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
- [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4ECBB2065C;
- Fri, 24 Jul 2020 14:35:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595601325;
- bh=aH6+b9S0bxa9/SN+80CrqBVkxawU3zO7lLnHFqJKx/Q=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qh8oWoBa5d97kv/5Ec1xVKnU0c7jbVGRWvECJktcuh03XdNewjxMcBYP3kJZeQap5
- ze1Ac6uT4dw0xZJk4hqEQvVSlsoVcdUlBCG1E99K3NqUPXc8Umc+42BEThUIAKNZCd
- ewtLa8hzzMldYszFp+8yn/9Fcf8wbqkfer26IgrA=
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 7/7] KVM: arm64: Separate write faults on read-only memslots
- from MMIO
-Date: Fri, 24 Jul 2020 15:35:06 +0100
-Message-Id: <20200724143506.17772-8-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200724143506.17772-1-will@kernel.org>
-References: <20200724143506.17772-1-will@kernel.org>
+ with ESMTP id cRKUzRboGjJv for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 25 Jul 2020 00:50:59 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C32804B55A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jul 2020 00:50:58 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id C9D95D6D6869A077BC63;
+ Sat, 25 Jul 2020 12:50:54 +0800 (CST)
+Received: from [10.174.185.226] (10.174.185.226) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 25 Jul 2020 12:50:47 +0800
+Subject: Re: kvm-unit-tests: Question about the "no interrupt when timer is
+ disabled" case
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+References: <fd421647-6526-41dd-ef3a-c714f9d513d6@huawei.com>
+ <195f5f7b-b1a4-8c82-c5e3-aac950737ff5@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <fea5457f-379d-4077-6b1d-022f13e16891@huawei.com>
+Date: Sat, 25 Jul 2020 12:50:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <195f5f7b-b1a4-8c82-c5e3-aac950737ff5@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.226]
+X-CFilter-Loop: Reflected
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,113 +68,107 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Although taking a write-fault on a read-only memslot triggers an MMIO
-exit back to userspace, lumping the handling together in
-kvm_handle_guest_abort() causes some of the early triage to have weird
-effects on userspace. For example, if a guest generates a stage-2 fault
-on a stage-1 translation fault when trying to fetch an instruction from
-a read-only memslot, it will be mistakenly treated as an attempt to
-execute from MMIO and a prefetch abort will be re-injected into the
-guest.
+Hi Alex,
 
-Separate the MMIO handling from the read-only memslot handling, so that
-the latter is left entirely up to userspace. Note that this _will_
-result in more exits than before for read-only memslots, since userspace
-will now see some cache maintenance and instruction-side aborts.
+[+cc Nianyao]
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Quentin Perret <qperret@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/mmu.c | 45 ++++++++++++++++++++++++--------------------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+On 2020/7/24 19:08, Alexandru Elisei wrote:
+> Hi Zenghui,
+> 
+> I don't believe this issue can be triggered by a Linux guest. Details below.
+> 
+> On 7/23/20 9:56 AM, Zenghui Yu wrote:
+>> Hi Alexandru,
+>>
+>> I've noticed that the timer case will fail in the -stable 4.19 kernel.
+>> The log is as follows:
+>>
+>> FAIL: vtimer-busy-loop: no interrupt when timer is disabled
+>> FAIL: vtimer-busy-loop: interrupt signal no longer pending
+>>
+>> And it's because the related fix [16e604a437c8, "KVM: arm/arm64: vgic:
+>> Reevaluate level sensitive interrupts on enable"] hasn't been backported
+>> to the stable tree.
+> 
+> This is not an actual fix (hence no "Fixes" tag), this is more like an improvement
+> of the behaviour of the GIC. Like the patch description says, this can happen even
+> on hardware if the GIC hasn't sampled the device interrupt state (or the device
+> itself hasn't updated it) before the CPU re-enables the interrupt.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9e72e7f4a2c2..2edc6f2412dc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2117,9 +2117,30 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
- 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
- 	write_fault = kvm_is_write_fault(vcpu);
--	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-+
-+	/*
-+	 * The IPA is reported as [MAX:12], so we need to complement it with
-+	 * the bottom 12 bits from the faulting VA. This is always 12 bits,
-+	 * irrespective of the page size.
-+	 */
-+	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-+
-+	/*
-+	 * We can perform some early fault triage based purely on the memslot
-+	 * information:
-+	 *
-+	 * Faults on IPAs falling outside of any memslot are re-injected
-+	 * into the guest as external aborts if they were either signalled as
-+	 * instruction aborts or as a stage-2 fault on a translation table walk.
-+	 * If the instruction was a cache maintenance instruction then it is
-+	 * quietly skipped, otherwise we exit to userspace for MMIO emulation.
-+	 *
-+	 * Write faults on IPAs falling within a read-only memslot are reported
-+	 * to userspace as MMIO exits. This includes cache maintenance and
-+	 * stage-2 faults on translation table walks,
-+	 */
-+	if (kvm_is_error_hva(hva)) {
- 		if (kvm_vcpu_trap_is_iabt(vcpu)) {
--			/* Prefetch Abort on I/O address */
- 			ret = -ENOEXEC;
- 			goto out;
- 		}
-@@ -2129,30 +2150,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			goto out;
- 		}
- 
--		/*
--		 * Check for a cache maintenance operation. Since we
--		 * ended-up here, we know it is outside of any memory
--		 * slot. But we can't find out if that is for a device,
--		 * or if the guest is just being stupid. The only thing
--		 * we know for sure is that this range cannot be cached.
--		 *
--		 * So let's assume that the guest is just being
--		 * cautious, and skip the instruction.
--		 */
- 		if (kvm_vcpu_dabt_is_cm(vcpu)) {
- 			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
- 			ret = 1;
- 			goto out_unlock;
- 		}
- 
--		/*
--		 * The IPA is reported as [MAX:12], so we need to
--		 * complement it with the bottom 12 bits from the
--		 * faulting VA. This is always 12 bits, irrespective
--		 * of the page size.
--		 */
--		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
--
- 		/*
- 		 * No valid syndrome? Ask userspace for help if it has
- 		 * volunteered to do so, and bail out otherwise.
-@@ -2161,7 +2164,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			ret = handle_error_invalid_dabt(vcpu, run, fault_ipa);
- 			goto out_unlock;
- 		}
-+	}
- 
-+	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
- 		ret = io_mem_abort(vcpu, run, fault_ipa);
- 		goto out_unlock;
- 	}
--- 
-2.28.0.rc0.142.g3c755180ce-goog
+Fair enough.
 
+>>
+>> Just out of curiosity, _without_ this fix, had you actually seen the
+>> guest getting into trouble due to an un-retired level-sensitive
+>> interrupt and your patch fixed it? Or this was found by code inspection?
+> 
+> This issue was found when running kvm-unit-tests on the model.
+> 
+>>
+>> Take the exact vtimer case as an example, is it possible that the Linux
+>> guest would disable the vtimer (the input interrupt line is driven to 0
+>> but the old KVM doesn't take this into account) and potentially hit this
+>> issue? I'm not familiar with it.
+> 
+> To trigger this, a guest has to do the following steps:
+> 
+> 1. Disable the timer interrupt at the Redistributor level.
+> 2. Trigger the timer interrupt in the timer.
+> 3. Disable the timer entirely (CNT{P,V}_CTL_EL0.ENABLE = 0), which also disables
+> the timer interrupt.
+> 4. Enable the timer interrupt at the Redistributor level.
+> 
+> I believe there are two reasons why this will never happen for a Linux guest:
+> 
+> - This isn't the way Linux handles interrupts. Furthermore, I don't believe Linux
+> will ever disable a specific interrupt at the irqchip level.
+
+This can at least happen in arch_timer_stop() [arm_arch_timer.c], where
+the disable_percpu_irq() API will disable the interrupt (via irq_mask()
+callback which will in turn disable the interrupt at GIC level by
+programming the ICENABLER0).
+
+What I'm worried is something like:
+
+1. Disable the timer interrupt (at RDist level by poking the ICENABLER0,
+    or at CPU level by masking PSTATE.I)
+
+   [ timer interrupt is made pending, and remains pending in (v)GIC. ]
+
+2. Disable the timer
+3. Enable the timer interrupt (at RDist level by poking the ISENABLER0,
+    or at CPU level by unmasking PSTATE.I)
+
+   [ The interrupt is forwarded to (v)CPU, and we end-up re-enabling the
+     timer inside the timer IRQ handler, which may not be as expected. ]
+
+I'm just not sure if this will be a possible scenario in the Linux, and
+is it harmful if this would happen.
+
+> - The timer IRQ handler checks the ISTATUS flag in the timer control register
+> before handling the interrupt. The flag is unset if the timer is disabled.
+
+This actually doesn't match the spec. Arm ARM D13.8.25 has a description
+about the ISTATUS field as below,
+
+"When the value of the ENABLE bit is 0, the ISTATUS field is UNKNOWN."
+
+I guess what Nianyao had posted [*] may address the concern above...
+
+[*] 
+http://lore.kernel.org/r/1595584037-6877-1-git-send-email-zhangshaokun@hisilicon.com/
+
+> 
+> I hope my explanation made sense, please chime in if I missed something or you
+> want more details.
+
+Thanks Alex,
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
