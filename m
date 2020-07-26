@@ -1,87 +1,84 @@
-Return-Path: <SRS0=8k27=BE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=4t/9=BF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7CBC433E8
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Jul 2020 17:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA01C433E1
+	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 11:08:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 35F06206D7
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Jul 2020 17:40:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DBF8206D8
+	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 11:08:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUkwBFhO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F06206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXs7B08Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DBF8206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 968084B6C8;
-	Sat, 25 Jul 2020 13:40:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8334B729;
+	Sun, 26 Jul 2020 07:08:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AOCku5vTvhy4; Sat, 25 Jul 2020 13:40:20 -0400 (EDT)
+	with ESMTP id TQiZYWIfDowZ; Sun, 26 Jul 2020 07:08:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82EB24B625;
-	Sat, 25 Jul 2020 13:40:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A56664B69E;
+	Sun, 26 Jul 2020 07:08:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C7EF4B5B5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jul 2020 13:40:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 810FB4B6FB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 07:08:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dTj3SFuUxpQF for <kvmarm@lists.cs.columbia.edu>;
- Sat, 25 Jul 2020 13:40:16 -0400 (EDT)
+ with ESMTP id wfSoMvBsoRq9 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Jul 2020 07:08:32 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4ED0D4B55D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Jul 2020 13:40:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FCFB4B684
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 07:08:32 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 20514206D7;
- Sat, 25 Jul 2020 17:40:15 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 621252065C;
+ Sun, 26 Jul 2020 11:08:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595698815;
- bh=sJTStXJxf1wWNfeh1Vyqzn+5Ew232NcAG80ITNfG5hI=;
+ s=default; t=1595761711;
+ bh=u8YCmV9EdcDqco3eDuzwVxoNBjOwWr2ep9hBAvkZmdY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=uUkwBFhOHVDjpU7noEGFnVI9DSAoxP2OMDAudhOzaP1GS/psPb4m3M44mvCX+IojX
- xLTQveOr84GVFSSBW3fFF2ds+maI2ShlY5vmyl+b2F4RmKk1ltK0djQfnBtcVcBwTc
- AAXGU3+mxr47wJ9VkoxCZnvT9sMbCB6K5gBCF/Ww=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ b=gXs7B08QvWxUqxfi+Ma+cslpBLa7hIIGKgo4o9uMuaX1FVplKUpCbNIBIsKd7ZdAI
+ TSZXmJQzObyiyusVGbaLREXpIV9uBAv8auF9fXpI4wXC2PW9U8RGt0TjFvtpikatGF
+ /Vm8h40AJj7r60QbhC8H1lM35ip/edQheVYpLZC4=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jzO9d-00EsjE-IF; Sat, 25 Jul 2020 18:40:13 +0100
-MIME-Version: 1.0
-Date: Sat, 25 Jul 2020 18:40:13 +0100
+ id 1jzeW5-00F0xt-SR; Sun, 26 Jul 2020 12:08:30 +0100
+Date: Sun, 26 Jul 2020 12:08:28 +0100
+Message-ID: <87v9iawn2r.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Subject: Re: [RESEND RFC PATCH v1] arm64: kvm: flush tlbs by range in
- unmap_stage2_range function
-In-Reply-To: <20200724134315.805-1-yezhenyu2@huawei.com>
-References: <20200724134315.805-1-yezhenyu2@huawei.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <5d54c860b3b4e7a98e4d53397e6424ae@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, steven.price@arm.com, mark.rutland@arm.com, ascull@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-mm@kvack.org, arm@kernel.org,
- xiexiangyou@huawei.com
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/7] KVM: arm64: Update comment when skipping guest MMIO
+ access instruction
+In-Reply-To: <20200724143506.17772-2-will@kernel.org>
+References: <20200724143506.17772-1-will@kernel.org>
+ <20200724143506.17772-2-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ qperret@google.com, james.morse@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, steven.price@arm.com, linux-mm@kvack.org,
- arm@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,108 +91,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-07-24 14:43, Zhenyu Ye wrote:
-> Now in unmap_stage2_range(), we flush tlbs one by one just after the
-> corresponding pages cleared.  However, this may cause some performance
-> problems when the unmap range is very large (such as when the vm
-> migration rollback, this may cause vm downtime too loog).
-
-You keep resending this patch, but you don't give any numbers
-that would back your assertion.
-
-> This patch moves the kvm_tlb_flush_vmid_ipa() out of loop, and
-> flush tlbs by range after other operations completed.  Because we
-> do not make new mapping for the pages here, so this doesn't violate
-> the Break-Before-Make rules.
+On Fri, 24 Jul 2020 15:35:00 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
+> If a 32-bit guest accesses MMIO using a 16-bit Thumb-2 instruction that
+> is reported to the hypervisor without a valid syndrom (for example,
+> because of the addressing mode), then we may hand off the fault to
+> userspace. When resuming the guest, we unconditionally advance the PC
+> by 4 bytes, since ESR_EL2.IL is always 1 for data aborts generated without
+> a valid syndrome. This is a bit rubbish, but it's also difficult to see
+> how we can fix it without potentially introducing regressions in userspace
+> MMIO fault handling.
+
+Not quite, see below.
+
+> 
+> Update the comment when skipping a guest MMIO access instruction so that
+> this corner case is at least written down.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_asm.h |  2 ++
->  arch/arm64/kvm/hyp/tlb.c         | 36 ++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/mmu.c             | 11 +++++++---
->  3 files changed, 46 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/mmio.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h 
-> b/arch/arm64/include/asm/kvm_asm.h
-> index 352aaebf4198..ef8203d3ca45 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -61,6 +61,8 @@ extern char __kvm_hyp_vector[];
-> 
->  extern void __kvm_flush_vm_context(void);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t 
-> ipa);
-> +extern void __kvm_tlb_flush_vmid_range(struct kvm *kvm, phys_addr_t 
-> start,
-> +				       phys_addr_t end);
->  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
->  extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
-> 
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index d063a576d511..4f4737a7e588 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -189,6 +189,42 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct
-> kvm *kvm, phys_addr_t ipa)
->  	__tlb_switch_to_host(kvm, &cxt);
->  }
-> 
-> +void __hyp_text __kvm_tlb_flush_vmid_range(struct kvm *kvm, 
-> phys_addr_t start,
-> +					   phys_addr_t end)
-> +{
-> +	struct tlb_inv_context cxt;
-> +	unsigned long addr;
-> +
-> +	start = __TLBI_VADDR(start, 0);
-> +	end = __TLBI_VADDR(end, 0);
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	kvm = kern_hyp_va(kvm);
-> +	__tlb_switch_to_guest(kvm, &cxt);
-> +
-> +	if ((end - start) >= 512 << (PAGE_SHIFT - 12)) {
-> +		__tlbi(vmalls12e1is);
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index 4e0366759726..b54ea5aa6c06 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -113,6 +113,13 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  	/*
+>  	 * The MMIO instruction is emulated and should not be re-executed
+>  	 * in the guest.
+> +	 *
+> +	 * Note: If user space handled the emulation because the abort
+> +	 * symdrome information was not valid (ISV set in the ESR), then
 
-And what is this magic value based on? You don't even mention in the
-commit log that you are taking this shortcut.
+nits: syndrome, ISV *clear*.
 
-> +		goto end;
-> +	}
-> +
-> +	for (addr = start; addr < end; addr += 1 << (PAGE_SHIFT - 12))
-> +		__tlbi(ipas2e1is, addr);
-> +
-> +	dsb(ish);
-> +	__tlbi(vmalle1is);
-> +
-> +end:
-> +	dsb(ish);
-> +	isb();
-> +
-> +	if (!has_vhe() && icache_is_vpipt())
-> +		__flush_icache_all();
-> +
-> +	__tlb_switch_to_host(kvm, &cxt);
-> +}
-> +
+> +	 * this will assume that the faulting instruction was 32-bit.
+> +	 * If the faulting instruction was a 16-bit Thumb instruction,
+> +	 * then userspace would need to rewind the PC by 2 bytes prior to
+> +	 * resuming the vCPU (yuck!).
+>  	 */
+>  	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+>  
 
-I'm sorry, but without numbers backing this approach for a number
-of workloads and a representative set of platforms, this is
-going nowhere.
+That's not how I read it. On ESR_EL2.ISV being clear, and in the
+absence of KVM_CAP_ARM_NISV_TO_USER being set, we return a -ENOSYS from
+io_mem_abort(), exiting back to userspace *without* advertising a MMIO
+access. The VMM is free to do whatever it can to handle it (i.e. not
+much), but crucially we don't go via kvm_handle_mmio_return() on
+resuming the vcpu (unless the VMM sets run->exit_reason to
+KVM_EXIT_MMIO, but that's clearly its own decision).
+
+Instead, the expectation is that userspace willing to handle an exit
+resulting in ESR_EL2.ISV being clear would instead request a
+KVM_EXIT_ARM_NISV exit type (by enabling KVM_CAP_ARM_NISV_TO_USER),
+getting extra information in the process such as as the fault
+IPA). KVM_EXIT_ARM_NISV clearly states in the documentation:
+
+  "Note that KVM does not skip the faulting instruction as it does for
+   KVM_EXIT_MMIO, but userspace has to emulate any change to the
+   processing state if it decides to decode and emulate the instruction."
 
 Thanks,
 
-         M.
+	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
