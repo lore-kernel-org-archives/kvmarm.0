@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00991C433E4
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 11:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C92EDC433DF
+	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 13:38:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6EB2B20714
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 11:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 452DE2065F
+	for <kvmarm@archiver.kernel.org>; Sun, 26 Jul 2020 13:38:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="k49dgWGn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EB2B20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CC0MZfoJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452DE2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 038124B08C;
-	Sun, 26 Jul 2020 07:55:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B40CF4B71C;
+	Sun, 26 Jul 2020 09:38:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 62hq6jyhS2Zg; Sun, 26 Jul 2020 07:55:22 -0400 (EDT)
+	with ESMTP id 4nkfikRk07uN; Sun, 26 Jul 2020 09:38:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA2064B742;
-	Sun, 26 Jul 2020 07:55:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A856C4B74A;
+	Sun, 26 Jul 2020 09:38:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F5AE4B740
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 07:55:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 912004B705
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 09:38:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MXxNSsMwmJl1 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 Jul 2020 07:55:20 -0400 (EDT)
+ with ESMTP id imi43pLNfJ7u for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Jul 2020 09:38:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16B1B4B73F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 07:55:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6705C4B6FB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Jul 2020 09:38:42 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EA32520714;
- Sun, 26 Jul 2020 11:55:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7F0762065F;
+ Sun, 26 Jul 2020 13:38:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595764519;
- bh=6aK/0YzeelgXVmJ2084ogyxnC3WG10x7SeQJK5zn1a4=;
+ s=default; t=1595770721;
+ bh=1XM8W5lC/bCqZJ1ZaSXYFBFXTKlsRW1n0ONiwaxojGo=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=k49dgWGn3LW6bHWnyPt4+LvqYxOP/J9ZNOTxdY11uv6Kg2Kv2WVw/M/mOEi2udDXX
- RA3htPnyuSwUNGUS1qeS47neiPahcgAciywDidYOFBGDGVW3o/mxe3koKzUsg+lima
- zaTO698rMjwL1cIfXpBf47iq6dkVstLvbE6d1SYs=
+ b=CC0MZfoJmBZb/U4uu4yv8ixiDNhwX4L5UY0I/+TF7bq/ZeP/2NRm27yCUd17Fq0fd
+ X0LsbEgGet+MwNJjBpIsLezCyoUJHu1225rpTHsqDPtWzRjDC0OQmwXouytLOeQvgu
+ aX8HNebzN1OT9DSHUL1qJhubErrCXTJj98aPXlpQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1jzfFN-00F1VQ-Di; Sun, 26 Jul 2020 12:55:17 +0100
-Date: Sun, 26 Jul 2020 12:55:16 +0100
-Message-ID: <87sgdewkwr.wl-maz@kernel.org>
+ id 1jzgrP-00F2Mh-A3; Sun, 26 Jul 2020 14:38:40 +0100
+Date: Sun, 26 Jul 2020 14:38:38 +0100
+Message-ID: <87r1sywg4h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 5/7] KVM: arm64: Move 'invalid syndrome' logic out of
- io_mem_abort()
-In-Reply-To: <20200724143506.17772-6-will@kernel.org>
+Subject: Re: [PATCH 6/7] KVM: arm64: Handle stage-2 faults on stage-1
+ page-table walks earlier
+In-Reply-To: <20200724143506.17772-7-will@kernel.org>
 References: <20200724143506.17772-1-will@kernel.org>
- <20200724143506.17772-6-will@kernel.org>
+ <20200724143506.17772-7-will@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -96,123 +96,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 24 Jul 2020 15:35:04 +0100,
+On Fri, 24 Jul 2020 15:35:05 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> In preparation for handling stage-2 faults on stage-1 page-table walks
-> earlier, move the 'invalid syndrome' logic out of io_mem_abort() and
-> into its own function, which can be called from kvm_handle_guest_abort()
-> directly.
+> Stage-2 faults on stage-1 page-table walks can occur on both the I-side
+> and the D-side. It is IMPLEMENTATATION DEFINED whether they are reported
+> as reads or writes and, in the case that they are generated by an AT
+> instruction, they are reported with the CM bit set.
+> 
+> All of this deeply confuses the logic in kvm_handle_guest_abort();
+> userspace may or may not see the fault, depending on whether it occurs
+> on the data or the instruction side, and an AT instruction may be skipped
+> if the translation tables are held in a read-only memslot.
+
+Yuk, that's indeed ugly. Well spotted. I guess the saving grace is
+that a S2 trap caused by an ATS1 instruction will be reported as
+S1PTW+CM, while the fault caused by a CMO is reported as *either*
+S1PTW *or* CM, but never both.
+
+> 
+> Move the handling of stage-2 faults on stage-1 page-table walks earlier
+> so that they consistently result in either a data or an instruction abort
+> being re-injected back to the guest.
+
+The instruction abort seems to be happening as the side effect of
+executing outside of a memslot, not really because of a S1PTW.  I
+wonder whether these S1PTW faults should be classified as external
+aborts instead (because putting your page tables outside of a memslot
+seems a bit bonkers).
+
 > 
 > Cc: Marc Zyngier <maz@kernel.org>
 > Cc: Quentin Perret <qperret@google.com>
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/kvm/mmio.c | 22 ----------------------
->  arch/arm64/kvm/mmu.c  | 32 ++++++++++++++++++++++++++++++++
->  2 files changed, 32 insertions(+), 22 deletions(-)
+>  arch/arm64/kvm/mmu.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-> index b54ea5aa6c06..45a630e480e1 100644
-> --- a/arch/arm64/kvm/mmio.c
-> +++ b/arch/arm64/kvm/mmio.c
-> @@ -136,28 +136,6 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	int len;
->  	u8 data_buf[8];
->  
-> -	/*
-> -	 * No valid syndrome? Ask userspace for help if it has
-> -	 * volunteered to do so, and bail out otherwise.
-> -	 */
-> -	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-> -		if (vcpu->kvm->arch.return_nisv_io_abort_to_user) {
-> -			run->exit_reason = KVM_EXIT_ARM_NISV;
-> -			run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
-> -			run->arm_nisv.fault_ipa = fault_ipa;
-> -			return 0;
-> -		}
-> -
-> -		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
-> -		return -ENOSYS;
-> -	}
-> -
-> -	/* Page table accesses IO mem: tell guest to fix its TTBR */
-> -	if (kvm_vcpu_dabt_iss1tw(vcpu)) {
-> -		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> -		return 1;
-> -	}
-> -
->  	/*
->  	 * Prepare MMIO operation. First decode the syndrome data we get
->  	 * from the CPU. Then try if some in-kernel emulation feels
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 73e62d360a36..adb933ecd177 100644
+> index adb933ecd177..9e72e7f4a2c2 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -2046,6 +2046,20 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  		kvm_set_pfn_accessed(pfn);
->  }
+> @@ -2124,6 +2124,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			goto out;
+>  		}
 >  
-> +static int handle_error_invalid_dabt(struct kvm_vcpu *vcpu, struct kvm_run *run,
-
-Nit: why the "_error_"? There isn't any error here, only an awkward
-part of the architecture. I'd rather see something like
-handle_nisv_dabt(), which matches what this function actually does.
-
-> +				     phys_addr_t fault_ipa)
-> +{
-> +	if (!vcpu->kvm->arch.return_nisv_io_abort_to_user) {
-> +		kvm_pr_unimpl("Data abort outside memslots with no valid syndrome info\n");
-> +		return -ENOSYS;
-> +	}
-> +
-> +	run->exit_reason = KVM_EXIT_ARM_NISV;
-> +	run->arm_nisv.esr_iss = kvm_vcpu_dabt_iss_nisv_sanitized(vcpu);
-> +	run->arm_nisv.fault_ipa = fault_ipa;
-> +	return 0;
-> +}
-> +
->  /**
->   * kvm_handle_guest_abort - handles all 2nd stage aborts
->   * @vcpu:	the VCPU pointer
-> @@ -2133,6 +2147,21 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 * of the page size.
->  		 */
->  		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-> +
-> +		/*
-> +		 * No valid syndrome? Ask userspace for help if it has
-> +		 * volunteered to do so, and bail out otherwise.
-> +		 */
-> +		if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-> +			ret = handle_error_invalid_dabt(vcpu, run, fault_ipa);
-> +			goto out_unlock;
-> +		}
-> +
 > +		if (kvm_vcpu_dabt_iss1tw(vcpu)) {
 > +			ret = -ENXIO;
 > +			goto out;
 > +		}
 > +
+>  		/*
+>  		 * Check for a cache maintenance operation. Since we
+>  		 * ended-up here, we know it is outside of any memory
+> @@ -2157,11 +2162,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			goto out_unlock;
+>  		}
+>  
+> -		if (kvm_vcpu_dabt_iss1tw(vcpu)) {
+> -			ret = -ENXIO;
+> -			goto out;
+> -		}
+> -
 >  		ret = io_mem_abort(vcpu, run, fault_ipa);
 >  		goto out_unlock;
 >  	}
-> @@ -2153,6 +2182,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	if (ret == -ENOEXEC) {
->  		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
->  		ret = 1;
-> +	} else if (ret == -ENXIO) {
-> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		ret = 1;
->  	}
->  out_unlock:
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
 > -- 
 > 2.28.0.rc0.142.g3c755180ce-goog
 > 
 > 
 
-Otherwise looks OK.
+Thanks,
 
 	M.
 
