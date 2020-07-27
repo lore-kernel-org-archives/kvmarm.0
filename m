@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09692C433EA
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 10:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B89E6C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 10:30:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7D75B20759
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 10:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CDFE2075A
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 10:30:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2rLyj2Xx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D75B20759
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qlr59OqA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CDFE2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8FC4B97E;
-	Mon, 27 Jul 2020 06:30:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3ACC4B8DC;
+	Mon, 27 Jul 2020 06:30:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B1pGIsjVFMoG; Mon, 27 Jul 2020 06:30:05 -0400 (EDT)
+	with ESMTP id pz5PI-uP62fn; Mon, 27 Jul 2020 06:30:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B98394B9F2;
-	Mon, 27 Jul 2020 06:30:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E44494B9C8;
+	Mon, 27 Jul 2020 06:30:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A91194B97D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 06:30:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF8E4B88B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 06:30:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 53r4VuleahCY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jul 2020 06:30:03 -0400 (EDT)
+ with ESMTP id 6f5RqIyuJF4n for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jul 2020 06:30:34 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7445A4B955
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 06:30:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF15E4B8DC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 06:30:33 -0400 (EDT)
 Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
  bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 11B5320759;
- Mon, 27 Jul 2020 10:30:00 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EC33B20786;
+ Mon, 27 Jul 2020 10:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595845802;
- bh=bBIdOR8KerXNgJkBaW0BIuN1kZZAT3n4JUAKZMpujJY=;
+ s=default; t=1595845833;
+ bh=uUBNvzg2ahFLshwdZjYVVAYODV7Yiud3YVtWJ2BgPlE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=2rLyj2Xxpt2RnkadfmU2HeIRx0je9bDHuu+LW5EkDgXIQhKdeEu9OY71fhmTRZCFr
- Xux6tp0YFApRp6VAYTPeL7wAAy4okEbnq2yQbUvQIhkof9cTBWU2xdiMqLblHyR4Um
- tMtFzKQceI9qd9YnQy9B1D3TbwD6ZUShIL7jzi0U=
-Date: Mon, 27 Jul 2020 11:29:57 +0100
+ b=Qlr59OqAYvDXjI25VMFMB/svOpvvlOOktQKdQ//3ebf/w06fH2l5gz6MEsrFoHjtZ
+ WMKmYQjQ7RAtJBmFMK0ujm64fHijK1WsjK3Xvk8KOIzsYhLUHBjl3VoBZHN/520Ia0
+ kd/UJN+o6UKNqT7cEJdgsE5YbkJFProL0mWMzsFQ=
+Date: Mon, 27 Jul 2020 11:30:28 +0100
 From: Will Deacon <will@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 6/7] KVM: arm64: Handle stage-2 faults on stage-1
- page-table walks earlier
-Message-ID: <20200727102957.GA20194@willie-the-truck>
+Subject: Re: [PATCH 2/7] KVM: arm64: Rename kvm_vcpu_dabt_isextabt()
+Message-ID: <20200727103028.GB20194@willie-the-truck>
 References: <20200724143506.17772-1-will@kernel.org>
- <20200724143506.17772-7-will@kernel.org>
- <87r1sywg4h.wl-maz@kernel.org>
+ <20200724143506.17772-3-will@kernel.org>
+ <87tuxuwmqn.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87r1sywg4h.wl-maz@kernel.org>
+In-Reply-To: <87tuxuwmqn.wl-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -82,76 +81,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Jul 26, 2020 at 02:38:38PM +0100, Marc Zyngier wrote:
-> On Fri, 24 Jul 2020 15:35:05 +0100,
+On Sun, Jul 26, 2020 at 12:15:44PM +0100, Marc Zyngier wrote:
+> On Fri, 24 Jul 2020 15:35:01 +0100,
 > Will Deacon <will@kernel.org> wrote:
 > > 
-> > Stage-2 faults on stage-1 page-table walks can occur on both the I-side
-> > and the D-side. It is IMPLEMENTATATION DEFINED whether they are reported
-> > as reads or writes and, in the case that they are generated by an AT
-> > instruction, they are reported with the CM bit set.
-> > 
-> > All of this deeply confuses the logic in kvm_handle_guest_abort();
-> > userspace may or may not see the fault, depending on whether it occurs
-> > on the data or the instruction side, and an AT instruction may be skipped
-> > if the translation tables are held in a read-only memslot.
+> > kvm_vcpu_dabt_isextabt() is not specific to data aborts and has nothing
+> > to do with sign extension.
 > 
-> Yuk, that's indeed ugly. Well spotted. I guess the saving grace is
-> that a S2 trap caused by an ATS1 instruction will be reported as
-> S1PTW+CM, while the fault caused by a CMO is reported as *either*
-> S1PTW *or* CM, but never both.
-
-Hmm, is that right? If the translation faults at S2 for a CM instruction,
-wouldn't it have both bits set?
-
-> > Move the handling of stage-2 faults on stage-1 page-table walks earlier
-> > so that they consistently result in either a data or an instruction abort
-> > being re-injected back to the guest.
+> Not sign extension, but external abort (it reads as "is external
+> abort?").
 > 
-> The instruction abort seems to be happening as the side effect of
-> executing outside of a memslot, not really because of a S1PTW.
+> This is in keeping with all the other helpers (kvm_vcpu_foo_isbar). If
+> you want to drop the "data" part (which is indeed not correct), how
+> about kvm_vcpu_abt_isexternal? or kvm_vcpu_abt_issea?
 
-Not sure about that. If the instruction fetch generates an S2 abort during
-translation, then we could be executing from within a memslot; it's the
-location of the page-tables that matters.
+kvm_vcpu_abt_issea() would be great -- the problem is that I confused
+kvm_vcpu_dabt_issext() and kvm_vcpu_dabt_isextabt() when I was hacking
+and if you get the wrong one then you're really hosed!
 
-However, I think that means things still aren't quite right with my patches
-because we can end up calling io_mem_abort() from an instruction abort,
-which won't have enough syndrome information to do anything useful. Hmm.
+I'll update for v2.
 
-Stepping back, here's what I _think_ we want, although see the '(?)'
-bits where I'm particularly unsure:
-
-
-S2 instruction abort:
-  * Not in memslot:		inject external iabt to guest
-  * In R/O memslot:
-    - S2 fault on S1 walk:	either EXIT_NISV or inject external iabt
-				to guest (?)
-
-S2 data abort:
-  * Not in memslot:
-    - S2 fault on S1 walk:	inject external dabt to guest
-    - Cache maintenance:	skip instr
-    - Syndrome valid		EXIT_MMIO
-    - Syndrome invalid		EXIT_NISV
-  * In R/O memslot:
-    - S2 fault on S1 walk:	either EXIT_NISV or inject external dabt
-				to guest (?)
-    - Access is write (including cache maintenance (?)):
-      - Syndrome valid		EXIT_MMIO
-      - Syndrome invalid	EXIT_NISV
-
-
-Everything else gets handled by handle_access_fault()/user_mem_abort().
-
-What do you think?
-
-> I wonder whether these S1PTW faults should be classified as external
-> aborts instead (because putting your page tables outside of a memslot
-> seems a bit bonkers).
-
-I think that's what this patch does, since we end up in kvm_inject_dabt().
+Cheers,
 
 Will
 _______________________________________________
