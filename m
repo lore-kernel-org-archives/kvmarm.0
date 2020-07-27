@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B08C433E4
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28010C433E4
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:56:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 81C6B20714
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEA792070B
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:56:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5iBwBIK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81C6B20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5m7WFP3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA792070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BBBD4B7CD;
-	Mon, 27 Jul 2020 13:29:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69D9E4B85E;
+	Mon, 27 Jul 2020 13:56:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mH25V3QZWAvX; Mon, 27 Jul 2020 13:29:55 -0400 (EDT)
+	with ESMTP id M8iLXlhP8jF8; Mon, 27 Jul 2020 13:56:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1CF4B816;
-	Mon, 27 Jul 2020 13:29:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4157D4B7C1;
+	Mon, 27 Jul 2020 13:56:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3934B815
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:29:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF78E4B74E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:56:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7tAqzsOC2dH5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jul 2020 13:29:53 -0400 (EDT)
+ with ESMTP id Sk0SihTVX9Se for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jul 2020 13:56:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39F3C4B7CD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:29:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6C0D4B740
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:56:01 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 229F920714;
- Mon, 27 Jul 2020 17:29:52 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B73CA2070B;
+ Mon, 27 Jul 2020 17:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595870992;
- bh=fqWwMELSuy+/qFam4pMh5T7zeLs7KMWf9QveNurGOnU=;
+ s=default; t=1595872560;
+ bh=v11Epheq5tSy5AvwBVwRwdX6oVjInFx2eoLMFquy0RA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=D5iBwBIKBnxBJrFCHIAlJZ8pGmqz7+/+B3fXLnLR5OCBI+o9EfTdIMCO93+9OJlqz
- GNQnRRmkwWUaCe3jUucrvPQ+eyHjrElHTg0V0jmUIOevFtQYZ+AYKvDMQeYQZd6av6
- 6ZRwk6dLx/EEG9ml6CnCBvci3qdgYRYhRr2hY4L0=
+ b=Z5m7WFP3q6x8fuIeCZan7fGpFiqVVVda9qmiiAI480Y3aJrd5O2sETTQ8j4lZP2Mv
+ RLvYMAkbp1wGuYjzlOl1AqEtB46wXHjYIus9aFIbkoKue3mdFmQSz5XmoIIrjt60vF
+ lYkwjPj3976MbdOAdFWD/88b9UB6vyj4vIfuvIh8=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k06wg-00FNfw-Nz; Mon, 27 Jul 2020 18:29:50 +0100
+ id 1k07Lz-00FO0M-Bc; Mon, 27 Jul 2020 18:55:59 +0100
 MIME-Version: 1.0
-Date: Mon, 27 Jul 2020 18:29:50 +0100
+Date: Mon, 27 Jul 2020 18:55:59 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: pvtime: Fix potential loss of stolen time
-In-Reply-To: <20200711100434.46660-3-drjones@redhat.com>
+Subject: Re: [PATCH 4/5] KVM: Documentation minor fixups
+In-Reply-To: <20200711100434.46660-5-drjones@redhat.com>
 References: <20200711100434.46660-1-drjones@redhat.com>
- <20200711100434.46660-3-drjones@redhat.com>
+ <20200711100434.46660-5-drjones@redhat.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <9044c568f04a2f8e99c548acbb85db4a@kernel.org>
+Message-ID: <7f940c35be5e4c11dc3e7a6188539091@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org,
@@ -93,42 +93,56 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2020-07-11 11:04, Andrew Jones wrote:
-> We should only check current->sched_info.run_delay once when
-> updating stolen time. Otherwise there's a chance there could
-> be a change between checks that we miss (preemption disabling
-> comes after vcpu request checks).
-> 
+> Reviewed-by: Steven Price <steven.price@arm.com>
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arch/arm64/kvm/pvtime.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-> index 2b22214909be..db5ef097a166 100644
-> --- a/arch/arm64/kvm/pvtime.c
-> +++ b/arch/arm64/kvm/pvtime.c
-> @@ -13,6 +13,7 @@
->  void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> +	u64 last_steal = vcpu->arch.steal.last_steal;
->  	u64 steal;
->  	__le64 steal_le;
->  	u64 offset;
-> @@ -24,8 +25,8 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
-> 
->  	/* Let's do the local bookkeeping */
->  	steal = vcpu->arch.steal.steal;
-> -	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
->  	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +	steal += vcpu->arch.steal.last_steal - last_steal;
->  	vcpu->arch.steal.steal = steal;
-> 
->  	steal_le = cpu_to_le64(steal);
 
-Unless you read current->sched_info.run_delay using READ_ONCE,
-there is no guarantee that this will do what you want. The
-compiler is free to rejig this anyway it wants.
+It'd be good to have an actual commit message.
+
+> ---
+>  Documentation/virt/kvm/api.rst | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst 
+> b/Documentation/virt/kvm/api.rst
+> index 320788f81a05..3bd96c1a3962 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6122,7 +6122,7 @@ HvCallSendSyntheticClusterIpi,
+> HvCallSendSyntheticClusterIpiEx.
+>  8.21 KVM_CAP_HYPERV_DIRECT_TLBFLUSH
+>  -----------------------------------
+> 
+> -:Architecture: x86
+> +:Architectures: x86
+> 
+>  This capability indicates that KVM running on top of Hyper-V 
+> hypervisor
+>  enables Direct TLB flush for its guests meaning that TLB flush
+> @@ -6135,16 +6135,17 @@ in CPUID and only exposes Hyper-V
+> identification. In this case, guest
+>  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
+> 
+>  8.22 KVM_CAP_S390_VCPU_RESETS
+> +-----------------------------
+> 
+> -Architectures: s390
+> +:Architectures: s390
+> 
+>  This capability indicates that the KVM_S390_NORMAL_RESET and
+>  KVM_S390_CLEAR_RESET ioctls are available.
+> 
+>  8.23 KVM_CAP_S390_PROTECTED
+> +---------------------------
+> 
+> -Architecture: s390
+> -
+> +:Architectures: s390
+> 
+>  This capability indicates that the Ultravisor has been initialized and
+>  KVM can therefore start protected VMs.
+
+But this seems to be an otherwise unrelated patch.
+I'm happy to take it, but it seems odd here.
 
 Thanks,
 
