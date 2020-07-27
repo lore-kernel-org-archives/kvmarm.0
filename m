@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FB2C433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B08C433E4
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:29:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7FAE20729
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81C6B20714
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IP1gtyvv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7FAE20729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5iBwBIK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81C6B20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 502074B5C1;
-	Mon, 27 Jul 2020 13:25:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BBBD4B7CD;
+	Mon, 27 Jul 2020 13:29:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y+FMbA9VMNxJ; Mon, 27 Jul 2020 13:25:55 -0400 (EDT)
+	with ESMTP id mH25V3QZWAvX; Mon, 27 Jul 2020 13:29:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E90A4B7CD;
-	Mon, 27 Jul 2020 13:25:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1CF4B816;
+	Mon, 27 Jul 2020 13:29:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 935F44B5C1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:25:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3934B815
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:29:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CMMldQAaUdoE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jul 2020 13:25:53 -0400 (EDT)
+ with ESMTP id 7tAqzsOC2dH5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jul 2020 13:29:53 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A22A54B58E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:25:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39F3C4B7CD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:29:53 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A68F120714;
- Mon, 27 Jul 2020 17:25:52 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 229F920714;
+ Mon, 27 Jul 2020 17:29:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595870752;
- bh=vvXv3MqStMqM3NJh9jNTJpPY13GTNJPkpotn8K9FhpE=;
+ s=default; t=1595870992;
+ bh=fqWwMELSuy+/qFam4pMh5T7zeLs7KMWf9QveNurGOnU=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=IP1gtyvvlK0+39RXufLMg06D6Mr2c4oupeOaksv4EiPfYKokBVfaFqw0kUMQWw56U
- +6sRjM1XbMUQaROfF+kju2j7zhv8IiXnuQqZLT+0PRUprsHSdEUnvCWSpmNNcx82uA
- YcgeonMt4LoEnwkzP4fF6xhV7hkzU9vk1IwHEcys=
+ b=D5iBwBIKBnxBJrFCHIAlJZ8pGmqz7+/+B3fXLnLR5OCBI+o9EfTdIMCO93+9OJlqz
+ GNQnRRmkwWUaCe3jUucrvPQ+eyHjrElHTg0V0jmUIOevFtQYZ+AYKvDMQeYQZd6av6
+ 6ZRwk6dLx/EEG9ml6CnCBvci3qdgYRYhRr2hY4L0=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k06sp-00FNbL-02; Mon, 27 Jul 2020 18:25:51 +0100
+ id 1k06wg-00FNfw-Nz; Mon, 27 Jul 2020 18:29:50 +0100
 MIME-Version: 1.0
-Date: Mon, 27 Jul 2020 18:25:50 +0100
+Date: Mon, 27 Jul 2020 18:29:50 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 1/5] KVM: arm64: pvtime: steal-time is only supported when
- configured
-In-Reply-To: <20200711100434.46660-2-drjones@redhat.com>
+Subject: Re: [PATCH 2/5] KVM: arm64: pvtime: Fix potential loss of stolen time
+In-Reply-To: <20200711100434.46660-3-drjones@redhat.com>
 References: <20200711100434.46660-1-drjones@redhat.com>
- <20200711100434.46660-2-drjones@redhat.com>
+ <20200711100434.46660-3-drjones@redhat.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <e2f23a105af0d7cf2daa6f3f8b596177@kernel.org>
+Message-ID: <9044c568f04a2f8e99c548acbb85db4a@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org,
@@ -88,40 +87,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQW5kcmV3LAoKT24gMjAyMC0wNy0xMSAxMTowNCwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+IERv
-bid0IGNvbmZ1c2UgdGhlIGd1ZXN0IGJ5IHNheWluZyBzdGVhbC10aW1lIGlzIHN1cHBvcnRlZCB3
-aGVuCj4gaXQgaGFzbid0IGJlZW4gY29uZmlndXJlZCBieSB1c2Vyc3BhY2UgYW5kIHdvbid0IHdv
-cmsuCj4gCj4gU2lnbmVkLW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+
-Cj4gLS0tCj4gIGFyY2gvYXJtNjQva3ZtL3B2dGltZS5jIHwgNSArKysrLQo+ICAxIGZpbGUgY2hh
-bmdlZCwgNCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2Fy
-Y2gvYXJtNjQva3ZtL3B2dGltZS5jIGIvYXJjaC9hcm02NC9rdm0vcHZ0aW1lLmMKPiBpbmRleCBm
-N2I1MmNlMTU1N2UuLjJiMjIyMTQ5MDliZSAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9w
-dnRpbWUuYwo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3B2dGltZS5jCj4gQEAgLTQyLDkgKzQyLDEy
-IEBAIGxvbmcga3ZtX2h5cGVyY2FsbF9wdl9mZWF0dXJlcyhzdHJ1Y3Qga3ZtX3ZjcHUgCj4gKnZj
-cHUpCj4gCj4gIAlzd2l0Y2ggKGZlYXR1cmUpIHsKPiAgCWNhc2UgQVJNX1NNQ0NDX0hWX1BWX1RJ
-TUVfRkVBVFVSRVM6Cj4gLQljYXNlIEFSTV9TTUNDQ19IVl9QVl9USU1FX1NUOgo+ICAJCXZhbCA9
-IFNNQ0NDX1JFVF9TVUNDRVNTOwo+ICAJCWJyZWFrOwo+ICsJY2FzZSBBUk1fU01DQ0NfSFZfUFZf
-VElNRV9TVDoKPiArCQlpZiAodmNwdS0+YXJjaC5zdGVhbC5iYXNlICE9IEdQQV9JTlZBTElEKQo+
-ICsJCQl2YWwgPSBTTUNDQ19SRVRfU1VDQ0VTUzsKPiArCQlicmVhazsKPiAgCX0KPiAKPiAgCXJl
-dHVybiB2YWw7CgpJJ20gbm90IHNvIHN1cmUgYWJvdXQgdGhpcy4gSSBoYXZlIGFsd2F5cyBjb25z
-aWRlcmVkIHRoZQpkaXNjb3ZlcnkgaW50ZXJmYWNlIHRvIGJlICJkbyB5b3Uga25vdyBhYm91dCB0
-aGlzIFNNQ0NDCmZ1bmN0aW9uIi4gQW5kIGlmIHlvdSBsb29rIGF0IHRoZSBzcGVjLCBpdCBzYXlz
-ICg0LjIsClBWX1RJTUVfRkVBVFVSRVMpOgoKPHF1b3RlPgpJZiBQVl9jYWxsX2lkIGlkZW50aWZp
-ZXMgUFZfVElNRV9GRUFUVVJFUywgdGhpcyBjYWxsIHJldHVybnM6CuKAoiBOT1RfU1VQUE9SVEVE
-ICgtMSkgdG8gaW5kaWNhdGUgdGhhdCBhbGwKcGFyYXZpcnR1YWxpemVkIHRpbWUgZnVuY3Rpb25z
-IGluIHRoaXMgc3BlY2lmaWNhdGlvbiBhcmUgbm90CnN1cHBvcnRlZC4K4oCiIFNVQ0NFU1MgKDAp
-IHRvIGluZGljYXRlIHRoYXQgYWxsIHRoZSBwYXJhdmlydHVhbGl6ZWQgdGltZQpmdW5jdGlvbnMg
-aW4gdGhpcyBzcGVjaWZpY2F0aW9uIGFyZSBzdXBwb3J0ZWQuCjwvcXVvdGU+CgpTbyB0aGUgd2F5
-IEkgdW5kZXJzdGFuZCBpdCwgeW91IGNhbm5vdCByZXR1cm4gInN1cHBvcnRlZCIKZm9yIFBWX1RJ
-TUVfRkVBVFVSRVMsIGFuZCB5ZXQgcmV0dXJuIE5PVF9TVVBQT1JURUQgZm9yClBWX1RJTUVfU1Qu
-IEl0IGFwcGxpZXMgdG8gKmFsbCogZmVhdHVyZXMuCgpZZXMsIHRoaXMgaXMgdmVyeSBiaXphcnJl
-LiBCdXQgSSBkb24ndCB0aGluayB3ZSBjYW4gZGV2aWF0ZQpmcm9tIGl0LgoKVGhhbmtzLAoKICAg
-ICAgICAgTS4KLS0gCkphenogaXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
-aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
-bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 2020-07-11 11:04, Andrew Jones wrote:
+> We should only check current->sched_info.run_delay once when
+> updating stolen time. Otherwise there's a chance there could
+> be a change between checks that we miss (preemption disabling
+> comes after vcpu request checks).
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm64/kvm/pvtime.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+> index 2b22214909be..db5ef097a166 100644
+> --- a/arch/arm64/kvm/pvtime.c
+> +++ b/arch/arm64/kvm/pvtime.c
+> @@ -13,6 +13,7 @@
+>  void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+> +	u64 last_steal = vcpu->arch.steal.last_steal;
+>  	u64 steal;
+>  	__le64 steal_le;
+>  	u64 offset;
+> @@ -24,8 +25,8 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+> 
+>  	/* Let's do the local bookkeeping */
+>  	steal = vcpu->arch.steal.steal;
+> -	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
+>  	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> +	steal += vcpu->arch.steal.last_steal - last_steal;
+>  	vcpu->arch.steal.steal = steal;
+> 
+>  	steal_le = cpu_to_le64(steal);
+
+Unless you read current->sched_info.run_delay using READ_ONCE,
+there is no guarantee that this will do what you want. The
+compiler is free to rejig this anyway it wants.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
