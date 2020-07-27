@@ -2,89 +2,106 @@ Return-Path: <SRS0=4Xsg=BG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BD4C433E5
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1018BC433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1C99E2073E
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:12:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9202C20672
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:25:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQ1Z9K59"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C99E2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STcNhQnQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9202C20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 787514B7AD;
-	Mon, 27 Jul 2020 13:12:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CEF94B818;
+	Mon, 27 Jul 2020 13:25:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QYhH81Xufwc6; Mon, 27 Jul 2020 13:12:40 -0400 (EDT)
+	with ESMTP id IclYkl6mifQ2; Mon, 27 Jul 2020 13:25:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6DF4B7C1;
-	Mon, 27 Jul 2020 13:12:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 140264B5C1;
+	Mon, 27 Jul 2020 13:25:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2422D4B7AD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:12:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34D574B5C1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:25:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lq3Z00CUmwFo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jul 2020 13:12:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD2C14B627
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:12:37 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9B562206E7;
- Mon, 27 Jul 2020 17:12:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595869956;
- bh=WogOJT1SpSbDm9BIS5mq+VMEccrmGTd/fbEvNfTWPgM=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=lQ1Z9K59C8/AlkD1/eM/JwEqvlO7ySlctuRPoQqZ36nRK1Dy7JlBuq/54o4cIjEcD
- cbn9dbymYVSeLmrss7+oAwKbKw0LEVhdVjYi0OVwO3tnBP+DzAKy8Wn2N0a0srie7z
- DjhgZiDTdIYE3B13+xlYN3P1+D7OOQalV77YMcwg=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1k06fy-00FNOn-Va; Mon, 27 Jul 2020 18:12:35 +0100
+ with ESMTP id 6vKGpp07sxfc for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jul 2020 13:25:27 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3A44B58E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:25:27 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595870727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ez7WeArkgioY0VlcfnY8q3j7rpYtHgMsNNYFl+uG8+0=;
+ b=STcNhQnQbKnn8x9zpgNndU8T3QD3POHGUo5rAwNxto/yjB5wPavFkmp/OLoJlXijZeohZl
+ tNbcM/BcWz6rLgDFvxrTagizybDLJ+xQzwS1MZ+erBeH9/jAZ0/NF33M3iPzBD04vn4ECo
+ VrMsiKn9khPDgsb/ExO/C6+SnQmvdjc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-T0iLziDzNW-AYbWyX0tRow-1; Mon, 27 Jul 2020 13:25:25 -0400
+X-MC-Unique: T0iLziDzNW-AYbWyX0tRow-1
+Received: by mail-wr1-f72.google.com with SMTP id h4so4189109wrh.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 10:25:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ez7WeArkgioY0VlcfnY8q3j7rpYtHgMsNNYFl+uG8+0=;
+ b=REKpmFZkfabwwK1eVgltZ2bMlRe8VpvBZ0F1m5WMeUsE4sAi0kRx/K218KFzwVNt0g
+ Wf+0TSK4RA7JbkT0AdK4Al8MTqO4MfVlhkjDjCMkeZsS/pcp7Brf0WdtNiXRXhU3ix0o
+ HCYh/CXmzmYfXebiQ6oAL/fs6Anba94SZXfmEn8/Mm9u6F3Ut+GAZuROdvgJyN6ENX+2
+ z49PiEe68zdW5PpfadOINPX/6p/A1eeA+bC2hEh84qAmCc58h9rUCfXfRKU2ckWw1UBA
+ qiYH06Qc0w115g1uBbwZ6XP0mOeB2XjJZg1WoejsGauypdStq89epHviOsUpBquU14Wv
+ 6x4A==
+X-Gm-Message-State: AOAM530/qCdMGhiyO567jjuQa/iafkn5PoKrSUaz0WkW8hMdiJ8NchqP
+ r55PHnbdQYclElcEYBaJc32dQaXvx32ZSChiMebUvTlpsGkXW/tPnOBFUJag9wvMtv8iP61bpY6
+ WiU0SE0KoIYujhtOh4iMj9fSh
+X-Received: by 2002:a1c:80d0:: with SMTP id b199mr332456wmd.28.1595870722982; 
+ Mon, 27 Jul 2020 10:25:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoV6Ud8vEStX9/KvnrqXEZPu6H8nd0FdSRYXzSjf3jHkiNLbDvOJ4PNJmEyHTo5QR6LuXFIQ==
+X-Received: by 2002:a1c:80d0:: with SMTP id b199mr332449wmd.28.1595870722789; 
+ Mon, 27 Jul 2020 10:25:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:80b0:f446:bb61:1dbb?
+ ([2001:b07:6468:f312:80b0:f446:bb61:1dbb])
+ by smtp.gmail.com with ESMTPSA id v29sm14547080wrv.51.2020.07.27.10.25.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jul 2020 10:25:22 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] arm64: Compile with -mno-outline-atomics
+ for GCC >= 10
+To: Andrew Jones <drjones@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20200717164727.75580-1-alexandru.elisei@arm.com>
+ <20200718091145.zheu46pfjwsntr3a@kamzik.brq.redhat.com>
+ <202d475d-95df-2350-a8e9-9264144993ac@arm.com>
+ <1bf2eab6-c6df-8b4c-b365-7216e7b9a9d7@arm.com>
+ <20200727123031.7v52lu23mmhailar@kamzik.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b47a7fc1-fca6-4401-ab47-4167d37eab8b@redhat.com>
+Date: Mon, 27 Jul 2020 19:25:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Date: Mon, 27 Jul 2020 18:12:34 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Subject: Re: [RESEND RFC PATCH v1] arm64: kvm: flush tlbs by range in
- unmap_stage2_range function
-In-Reply-To: <f74277fd-5af2-c46f-169f-c15a321165cd@huawei.com>
-References: <20200724134315.805-1-yezhenyu2@huawei.com>
- <5d54c860b3b4e7a98e4d53397e6424ae@kernel.org>
- <f74277fd-5af2-c46f-169f-c15a321165cd@huawei.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <fb4756b58892fbc2022cf1f5b9320c27@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, steven.price@arm.com, mark.rutland@arm.com, ascull@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-mm@kvack.org, arm@kernel.org,
- xiexiangyou@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, steven.price@arm.com, linux-mm@kvack.org,
- arm@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200727123031.7v52lu23mmhailar@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,50 +113,30 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Wmhlbnl1LAoKT24gMjAyMC0wNy0yNyAxNTo1MSwgWmhlbnl1IFllIHdyb3RlOgo+IEhpIE1hcmMs
-Cj4gCj4gT24gMjAyMC83LzI2IDE6NDAsIE1hcmMgWnluZ2llciB3cm90ZToKPj4gT24gMjAyMC0w
-Ny0yNCAxNDo0MywgWmhlbnl1IFllIHdyb3RlOgo+Pj4gTm93IGluIHVubWFwX3N0YWdlMl9yYW5n
-ZSgpLCB3ZSBmbHVzaCB0bGJzIG9uZSBieSBvbmUganVzdCBhZnRlciB0aGUKPj4+IGNvcnJlc3Bv
-bmRpbmcgcGFnZXMgY2xlYXJlZC7CoCBIb3dldmVyLCB0aGlzIG1heSBjYXVzZSBzb21lIAo+Pj4g
-cGVyZm9ybWFuY2UKPj4+IHByb2JsZW1zIHdoZW4gdGhlIHVubWFwIHJhbmdlIGlzIHZlcnkgbGFy
-Z2UgKHN1Y2ggYXMgd2hlbiB0aGUgdm0KPj4+IG1pZ3JhdGlvbiByb2xsYmFjaywgdGhpcyBtYXkg
-Y2F1c2Ugdm0gZG93bnRpbWUgdG9vIGxvb2cpLgo+PiAKPj4gWW91IGtlZXAgcmVzZW5kaW5nIHRo
-aXMgcGF0Y2gsIGJ1dCB5b3UgZG9uJ3QgZ2l2ZSBhbnkgbnVtYmVycwo+PiB0aGF0IHdvdWxkIGJh
-Y2sgeW91ciBhc3NlcnRpb24uCj4gCj4gSSBoYXZlIHRlc3RlZCB0aGUgZG93bnRpbWUgb2Ygdm0g
-bWlncmF0aW9uIHJvbGxiYWNrIG9uIGFybTY0LCBhbmQgZm91bmQKPiB0aGUgZG93bnRpbWUgY291
-bGQgZXZlbiB0YWtlIHVwIHRvIDdzLiAgVGhlbiBJIHRyYWNlZCB0aGUgY29zdCBvZgo+IHVubWFw
-X3N0YWdlMl9yYW5nZSgpIGFuZCBmb3VuZCBpdCBjb3VsZCB0YWtlIGEgbWF4aW11bSBvZiAxLjJz
-LiAgVGhlCj4gdm0gY29uZmlndXJhdGlvbiBpcyBhcyBmb2xsb3dzICh3aXRoIGhpZ2ggbWVtb3J5
-IHByZXNzdXJlLCB0aGUgZGlydHkKPiByYXRlIGlzIGFib3V0IDUwME1CL3MpOgo+IAo+ICAgPG1l
-bW9yeSB1bml0PSdHaUInPjE5MjwvbWVtb3J5Pgo+ICAgPHZjcHUgcGxhY2VtZW50PSdzdGF0aWMn
-PjQ4PC92Y3B1Pgo+ICAgPG1lbW9yeUJhY2tpbmc+Cj4gICAgIDxodWdlcGFnZXM+Cj4gICAgICAg
-PHBhZ2Ugc2l6ZT0nMScgdW5pdD0nR2lCJyBub2Rlc2V0PScwJy8+Cj4gICAgIDwvaHVnZXBhZ2Vz
-Pgo+ICAgPC9tZW1vcnlCYWNraW5nPgoKVGhpcyBtZWFucyBub3RoaW5nIHRvIG1lLCBJJ20gYWZy
-YWlkLgoKPiAKPiBBZnRlciB0aGlzIHBhdGNoIGFwcGxpZWQsIHRoZSBjb3N0IG9mIHVubWFwX3N0
-YWdlMl9yYW5nZSgpIGNhbiByZWR1Y2UgCj4gdG8KPiAxNm1zLCBhbmQgVk0gZG93bnRpbWUgY2Fu
-IGJlIGxlc3MgdGhhbiAxcy4KPiAKPiBUaGUgZm9sbG93aW5nIGZpZ3VyZSBzaG93cyBhIGNsZWFy
-IGNvbXBhcmlzb246Cj4gCj4gCSAgICAgIHwJdm0gZG93bnRpbWUgIHwJY29zdCBvZiB1bm1hcF9z
-dGFnZTJfcmFuZ2UoKQo+IC0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBiZWZvcmUgY2hhbmdlIHwJCTdzICAgfAkJMTIwMCBt
-cwo+IGFmdGVyICBjaGFuZ2UgfAkJMXMgICB8CQkgIDE2IG1zCj4gLS0tLS0tLS0tLS0tLS0rLS0t
-LS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKSSBkb24ndCBz
-ZWUgaG93IHlvdSB0dXJuIGEgMS4xODRzIHJlZHVjdGlvbiBpbnRvIGEgNnMgZ2Fpbi4KU3VyZWx5
-IHRoZXJlIGlzIG1vcmUgdG8gaXQgdGhhbiB3aGF0IHlvdSBwb3N0ZWQuCgo+Pj4gKwo+Pj4gK8Kg
-wqDCoCBpZiAoKGVuZCAtIHN0YXJ0KSA+PSA1MTIgPDwgKFBBR0VfU0hJRlQgLSAxMikpIHsKPj4+
-ICvCoMKgwqDCoMKgwqDCoCBfX3RsYmkodm1hbGxzMTJlMWlzKTsKPj4gCj4+IEFuZCB3aGF0IGlz
-IHRoaXMgbWFnaWMgdmFsdWUgYmFzZWQgb24/IFlvdSBkb24ndCBldmVuIG1lbnRpb24gaW4gdGhl
-Cj4+IGNvbW1pdCBsb2cgdGhhdCB5b3UgYXJlIHRha2luZyB0aGlzIHNob3J0Y3V0Lgo+PiAKPiAK
-PiAKPiBJZiB0aGUgcGFnZSBudW0gaXMgYmlnZ2VyIHRoYW4gNTEyLCBmbHVzaCBhbGwgdGxicyBv
-ZiB0aGlzIHZtIHRvIGF2b2lkCj4gc29mdCBsb2NrLXVwcyBvbiBsYXJnZSBUTEIgZmx1c2hpbmcg
-cmFuZ2VzLiAgSnVzdCBsaWtlIHdoYXQgdGhlCj4gZmx1c2hfdGxiX3JhbmdlKCkgZG9lcy4KCkkn
-bSBub3Qgc3VyZSB0aGlzIGlzIGFwcGxpY2FibGUgaGVyZSwgYW5kIGl0IGRvZXNuJ3QgbWVhbgp0
-aGlzIGlzIGFzIGdvb2Qgb24gb3RoZXIgc3lzdGVtcy4KClRoYW5rcywKCiAgICAgICAgIE0uCi0t
-IApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4uLgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 27/07/20 14:30, Andrew Jones wrote:
+>>> Looks much better than my version. Do you want me to spin a v2 or do you want to
+>>> send it as a separate patch? If that's the case, I tested the same way I did my
+>>> patch (gcc 10.1.0 and 5.4.0 for cross-compiling, 9.3.0 native):
+>>>
+>>> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> Gentle ping regarding this.
+>>
+> Hi Alexandru,
+> 
+> I was on vacation all last week and have been digging myself out of email
+> today. I'll send this as a proper patch with your T-b later today or
+> tomorrow.
+
+Same here; will wait for Andrew's patch.
+
+Paolo
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
