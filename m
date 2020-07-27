@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12351C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1204C433E8
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:54:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A9BA9207CD
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6075C2070B
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jul 2020 17:54:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1t5ZrQvD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BA9207CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bRy7I4Hw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6075C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 505644B701;
-	Mon, 27 Jul 2020 13:59:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B18D4B859;
+	Mon, 27 Jul 2020 13:54:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yDXoO8AbhNBI; Mon, 27 Jul 2020 13:58:59 -0400 (EDT)
+	with ESMTP id OvWxLEBE+Zd7; Mon, 27 Jul 2020 13:54:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1876F4B849;
-	Mon, 27 Jul 2020 13:58:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D94004B849;
+	Mon, 27 Jul 2020 13:54:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C20D84B80B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:58:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AE504B84C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:54:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5N3r8rDOrlIb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jul 2020 13:58:56 -0400 (EDT)
+ with ESMTP id b2Jt8cLPbYqE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jul 2020 13:54:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AC264B701
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:58:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06DB24B849
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jul 2020 13:54:25 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8302920775;
- Mon, 27 Jul 2020 17:58:55 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D68F22070B;
+ Mon, 27 Jul 2020 17:54:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595872735;
- bh=wsUQsKrS4r2XL5rYOvlDyIXuxnq1RQPIsbrOgDyx0vE=;
+ s=default; t=1595872465;
+ bh=unMSJDnD2gWLTML1FM1rBLALcFOdgrns4RDfOVlwcHM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=1t5ZrQvDJra1I3FvBS5rx9FUMNktG0piqcjuZ4ckbVKc5CNGhxH5p6qPNxhCL8j53
- +aavIL9jfycRaJrIePLBzpBfT/hayfPlianQGgHSGHjyvSU8FTkAAYIz4e/QwXWmUO
- +urlskp6B8oX33Pk5Ao9AdRLQ/R0Ay3+W3E+D0bg=
+ b=bRy7I4HwiHk9XhVEHfOpH7jRBh+/gmX/4zTdLMuHZocsjrmXYlcFzfEh4VKId7V6N
+ k1trcJiNZ9rs8X507MqUnf+oBbvYHo+Wl+FK3cTW/y1maUeoAjW8Y0mYztRXMvx2hQ
+ sxga2LKttu4KI2Lyd4POThxbsKIU1s9IF2T+oVi0=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k07Oo-00FO4e-5Z; Mon, 27 Jul 2020 18:58:54 +0100
+ id 1k07KR-00FNyz-FA; Mon, 27 Jul 2020 18:54:23 +0100
 MIME-Version: 1.0
-Date: Mon, 27 Jul 2020 18:58:53 +0100
+Date: Mon, 27 Jul 2020 18:54:23 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 5/5] arm64/x86: KVM: Introduce steal-time cap
-In-Reply-To: <20200711100434.46660-6-drjones@redhat.com>
+Subject: Re: [PATCH 3/5] KVM: arm64: pvtime: Fix stolen time accounting across
+ migration
+In-Reply-To: <20200711100434.46660-4-drjones@redhat.com>
 References: <20200711100434.46660-1-drjones@redhat.com>
- <20200711100434.46660-6-drjones@redhat.com>
+ <20200711100434.46660-4-drjones@redhat.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <446e22a04b5f1a63d8fad7ffa35a1314@kernel.org>
+Message-ID: <7f982e4cb6a839f698482686a6be57b3@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org,
@@ -93,120 +94,122 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2020-07-11 11:04, Andrew Jones wrote:
-> arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
-> support for steal-time. However this is unnecessary, as only a KVM
-> fd is required, and it complicates userspace (userspace may prefer
-> delaying vcpu creation until after feature probing). Introduce a cap
-> that can be checked instead. While x86 can already probe steal-time
-> support with a kvm fd (KVM_GET_SUPPORTED_CPUID), we add the cap there
-> too for consistency.
+> When updating the stolen time we should always read the current
+> stolen time from the user provided memory, not from a kernel
+> cache. If we use a cache then we'll end up resetting stolen time
+> to zero on the first update after migration.
 > 
-> Reviewed-by: Steven Price <steven.price@arm.com>
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  Documentation/virt/kvm/api.rst    | 11 +++++++++++
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/arm.c              |  3 +++
->  arch/arm64/kvm/pvtime.c           |  2 +-
->  arch/x86/kvm/x86.c                |  3 +++
->  include/uapi/linux/kvm.h          |  1 +
->  6 files changed, 20 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 -
+>  arch/arm64/kvm/pvtime.c           | 23 +++++++++--------------
+>  include/linux/kvm_host.h          | 19 +++++++++++++++++++
+>  3 files changed, 28 insertions(+), 15 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst 
-> b/Documentation/virt/kvm/api.rst
-> index 3bd96c1a3962..3716d1e29771 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6152,3 +6152,14 @@ KVM can therefore start protected VMs.
->  This capability governs the KVM_S390_PV_COMMAND ioctl and the
->  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
->  guests when the state change is invalid.
-> +
-> +8.24 KVM_CAP_STEAL_TIME
-> +-----------------------
-> +
-> +:Architectures: arm64, x86
-> +
-> +This capability indicates that KVM supports steal time accounting.
-> +When steal time accounting is supported it may be enabled with
-> +architecture-specific interfaces.  For x86 see
-> +Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".  For arm64 see
-> +Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
-
-Maybe add something that indicates that KVM_CAP_STEAL_TIME
-and the architecture specific ioctl aren't allowed to disagree
-about the support?
-
 > diff --git a/arch/arm64/include/asm/kvm_host.h
 > b/arch/arm64/include/asm/kvm_host.h
-> index b01f52b61572..8909c840ea91 100644
+> index c3e6fcc664b1..b01f52b61572 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -500,6 +500,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu 
-> *vcpu);
->  gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
->  void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+> @@ -343,7 +343,6 @@ struct kvm_vcpu_arch {
 > 
-> +bool kvm_arm_pvtime_supported(void);
->  int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
->  			    struct kvm_device_attr *attr);
->  int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 90cb90561446..0f7f8cd2f341 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
-> long ext)
->  		 */
->  		r = 1;
->  		break;
-> +	case KVM_CAP_STEAL_TIME:
-> +		r = kvm_arm_pvtime_supported();
-> +		break;
->  	default:
->  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
->  		break;
+>  	/* Guest PV state */
+>  	struct {
+> -		u64 steal;
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
 > diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-> index 025b5f3a97ef..468bd1ef9c7e 100644
+> index db5ef097a166..025b5f3a97ef 100644
 > --- a/arch/arm64/kvm/pvtime.c
 > +++ b/arch/arm64/kvm/pvtime.c
-> @@ -73,7 +73,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
->  	return base;
->  }
-> 
-> -static bool kvm_arm_pvtime_supported(void)
-> +bool kvm_arm_pvtime_supported(void)
+> @@ -13,26 +13,22 @@
+>  void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
 >  {
->  	return !!sched_info_on();
->  }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 88c593f83b28..27fc86bb28c4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3538,6 +3538,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
-> *kvm, long ext)
->  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
->  		break;
-> +	case KVM_CAP_STEAL_TIME:
-> +		r = sched_info_on();
-> +		break;
->  	default:
->  		break;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4fdf30316582..121fb29ac004 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SECURE_GUEST 181
->  #define KVM_CAP_HALT_POLL 182
->  #define KVM_CAP_ASYNC_PF_INT 183
-> +#define KVM_CAP_STEAL_TIME 184
+>  	struct kvm *kvm = vcpu->kvm;
+> +	u64 base = vcpu->arch.steal.base;
+>  	u64 last_steal = vcpu->arch.steal.last_steal;
+> -	u64 steal;
+> -	__le64 steal_le;
+> -	u64 offset;
+> +	u64 offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
+> +	u64 steal = 0;
+>  	int idx;
+> -	u64 base = vcpu->arch.steal.base;
 > 
->  #ifdef KVM_CAP_IRQ_ROUTING
+>  	if (base == GPA_INVALID)
+>  		return;
+> 
+> -	/* Let's do the local bookkeeping */
+> -	steal = vcpu->arch.steal.steal;
+> -	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> -	steal += vcpu->arch.steal.last_steal - last_steal;
+> -	vcpu->arch.steal.steal = steal;
+> -
+> -	steal_le = cpu_to_le64(steal);
+>  	idx = srcu_read_lock(&kvm->srcu);
+> -	offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
+> -	kvm_put_guest(kvm, base + offset, steal_le, u64);
+> +	if (!kvm_get_guest(kvm, base + offset, steal, u64)) {
+> +		steal = le64_to_cpu(steal);
+> +		vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> +		steal += vcpu->arch.steal.last_steal - last_steal;
+> +		kvm_put_guest(kvm, base + offset, cpu_to_le64(steal), u64);
+> +	}
+>  	srcu_read_unlock(&kvm->srcu, idx);
+>  }
+> 
+> @@ -68,7 +64,6 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+>  	 * Start counting stolen time from the time the guest requests
+>  	 * the feature enabled.
+>  	 */
+> -	vcpu->arch.steal.steal = 0;
+>  	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> 
+>  	idx = srcu_read_lock(&kvm->srcu);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index d564855243d8..e2fc655f0b5b 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -749,6 +749,25 @@ int kvm_write_guest_offset_cached(struct kvm
+> *kvm, struct gfn_to_hva_cache *ghc,
+>  int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache 
+> *ghc,
+>  			      gpa_t gpa, unsigned long len);
+> 
+> +#define __kvm_get_guest(kvm, gfn, offset, x, type)			\
+> +({									\
+> +	unsigned long __addr = gfn_to_hva(kvm, gfn);			\
+> +	type __user *__uaddr = (type __user *)(__addr + offset);	\
 
-Otherwise looks ok.
+Passing the type around is pretty ugly. Can't you use something like:
+
+typeof(x) __user *__uaddr = (typeof(__uaddr))(__addr + offset);
+
+which would avoid passing this type around? kvm_put_guest could
+use the same treatment.
+
+Yes, it forces the caller to rigorously type the inputs to the
+macro. But they should do that anyway.
+
+> +	int __ret = -EFAULT;						\
+> +									\
+> +	if (!kvm_is_error_hva(__addr))					\
+> +		__ret = get_user(x, __uaddr);				\
+> +	__ret;								\
+> +})
+> +
+> +#define kvm_get_guest(kvm, gpa, x, type)				\
+> +({									\
+> +	gpa_t __gpa = gpa;						\
+> +	struct kvm *__kvm = kvm;					\
+> +	__kvm_get_guest(__kvm, __gpa >> PAGE_SHIFT,			\
+> +			offset_in_page(__gpa), x, type);		\
+> +})
+> +
+>  #define __kvm_put_guest(kvm, gfn, offset, value, type)			\
+>  ({									\
+>  	unsigned long __addr = gfn_to_hva(kvm, gfn);			\
 
 Thanks,
 
