@@ -2,87 +2,63 @@ Return-Path: <SRS0=1hyK=BH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F66C433DF
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Jul 2020 11:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B272FC433E5
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jul 2020 11:59:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD80204EA
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Jul 2020 11:04:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVv5HUnM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD80204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 47497206D7
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jul 2020 11:59:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47497206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B9434B9D1;
-	Tue, 28 Jul 2020 07:04:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C6B44BA0B;
+	Tue, 28 Jul 2020 07:59:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DYouHZSyu1QE; Tue, 28 Jul 2020 07:04:40 -0400 (EDT)
+	with ESMTP id 3YZWO95XMeGz; Tue, 28 Jul 2020 07:59:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F5744B9A7;
-	Tue, 28 Jul 2020 07:04:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4058E4B9E5;
+	Tue, 28 Jul 2020 07:59:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C25F34B99E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jul 2020 07:04:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDBDC4B9E2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jul 2020 07:59:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JYMkEOPg54iO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jul 2020 07:04:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D41594B9A7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jul 2020 07:04:38 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9A570204EA;
- Tue, 28 Jul 2020 11:04:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1595934277;
- bh=DgU4yKbmp8OwurHB5DLCGWi9A01qQNe/KIyrPlNU668=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZVv5HUnMOVp2vHnZ9/jtVS2y/XyBACUo9eSxXbsVecuIY/cF0jYniuWzpdyF237jW
- bM6z0VJwVTsJBMSyi4czmL0gVP2+4XvXlcYnaRF2dC0KH1ocPws2APpXg/68W+2rE9
- DZ84dmgv9dkZZJLwx+eHIxFkWz332B+nJWqx/PVc=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1k0NPQ-00FczY-4W; Tue, 28 Jul 2020 12:04:36 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- James Morse <james.morse@arm.com>, David Brazdil <dbrazdil@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 0/2] Unify non-VHE ASLR features behind
- CONFIG_RANDOMIZE_BASE
-Date: Tue, 28 Jul 2020 12:04:31 +0100
-Message-Id: <159593423897.3960510.2442620106516348363.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200721094445.82184-1-dbrazdil@google.com>
-References: <20200721094445.82184-1-dbrazdil@google.com>
+ with ESMTP id BL418GbI6XC5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jul 2020 07:59:22 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55F3A4B93B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jul 2020 07:59:21 -0400 (EDT)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 6DC798DE40530D5A81BE;
+ Tue, 28 Jul 2020 19:59:15 +0800 (CST)
+Received: from [10.174.187.22] (10.174.187.22) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 28 Jul 2020 19:59:06 +0800
+Subject: Re: [RESEND PATCH] drivers: arm arch timer: Correct fault programming
+ of CNTKCTL_EL1.EVNTI
+To: Marc Zyngier <maz@kernel.org>
+References: <20200717092104.15428-1-zhukeqian1@huawei.com>
+ <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <40c70f5d-7156-2b49-00b8-c79e015c2f3c@huawei.com>
+Date: Tue, 28 Jul 2020 19:59:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: will@kernel.org, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, james.morse@arm.com, dbrazdil@google.com,
- catalin.marinas@arm.com, android-kvm@google.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: android-kvm@google.com, kernel-team@android.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <3a95ec8ce3e34d86c09f9b1b4f17d0ad@kernel.org>
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,32 +75,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 21 Jul 2020 10:44:43 +0100, David Brazdil wrote:
-> There is currently no way to disable nVHE ASLR, e.g. for debugging, so the
-> first patch in this series makes it conditional on RANDOMIZE_BASE, same as
-> KASLR. Note that the 'nokaslr' command line flag has no effect here.
+Hi Marc,
+
+On 2020/7/28 18:16, Marc Zyngier wrote:
+> On 2020-07-17 10:21, Keqian Zhu wrote:
+>> ARM virtual counter supports event stream. It can only trigger an event
+>> when the trigger bit of CNTVCT_EL0 changes from 0 to 1 (or from 1 to 0),
+>> so the actual period of event stream is 2 ^ (cntkctl_evnti + 1). For
+>> example, when the trigger bit is 0, then it triggers an event for every
+>> two cycles.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  drivers/clocksource/arm_arch_timer.c | 17 ++++++++++++++---
+>>  1 file changed, 14 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/clocksource/arm_arch_timer.c
+>> b/drivers/clocksource/arm_arch_timer.c
+>> index ecf7b7db2d05..06d99a4b1b9b 100644
+>> --- a/drivers/clocksource/arm_arch_timer.c
+>> +++ b/drivers/clocksource/arm_arch_timer.c
+>> @@ -799,10 +799,20 @@ static void __arch_timer_setup(unsigned type,
+>>  static void arch_timer_evtstrm_enable(int divider)
+>>  {
+>>      u32 cntkctl = arch_timer_get_cntkctl();
+>> +    int cntkctl_evnti;
+>> +
+>> +    /*
+>> +     * Note that it can only trigger an event when the trigger bit
+>> +     * of CNTVCT_EL0 changes from 1 to 0 (or from 0 to 1), so the
+>> +     * actual period of event stream is 2 ^ (cntkctl_evnti + 1).
+>> +     */
+>> +    cntkctl_evnti = divider - 1;
+>> +    cntkctl_evnti = min(cntkctl_evnti, 15);
+>> +    cntkctl_evnti = max(cntkctl_evnti, 0);
+>>
+>>      cntkctl &= ~ARCH_TIMER_EVT_TRIGGER_MASK;
+>>      /* Set the divider and enable virtual event stream */
+>> -    cntkctl |= (divider << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+>> +    cntkctl |= (cntkctl_evnti << ARCH_TIMER_EVT_TRIGGER_SHIFT)
+>>              | ARCH_TIMER_VIRT_EVT_EN;
+>>      arch_timer_set_cntkctl(cntkctl);
+>>      arch_timer_set_evtstrm_feature();
+>> @@ -816,10 +826,11 @@ static void arch_timer_configure_evtstream(void)
+>>      /* Find the closest power of two to the divisor */
+>>      evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
+>>      pos = fls(evt_stream_div);
+>> -    if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
+>> +    if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
+>>          pos--;
+>> +
+>>      /* enable event stream */
+>> -    arch_timer_evtstrm_enable(min(pos, 15));
+>> +    arch_timer_evtstrm_enable(pos);
+>>  }
+>>
+>>  static void arch_counter_set_user_access(void)
 > 
-> Second patch unifies the HARDEN_EL2_VECTORS errate for A57 and A72 behind
-> the same Kconfig for simplicity. Happy to make it just depend on
-> RANDOMIZE_BASE if having an option to keep randomization on but hardenning
-> off is preferred.
+> This looks like a very convoluted fix. If the problem you are
+> trying to fix is that the event frequency is at most half of
+> that of the counter, why isn't the patch below the most
+> obvious fix?
 > 
-> [...]
+> Thanks,
+> 
+>         M.
+> 
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index 6c3e84180146..0a65414b781f 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -824,8 +824,12 @@ static void arch_timer_configure_evtstream(void)
+>  {
+>      int evt_stream_div, pos;
+> 
+> -    /* Find the closest power of two to the divisor */
+> -    evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
+> +    /*
+> +     * Find the closest power of two to the divisor. As the event
+> +     * stream can at most be generated at half the frequency of the
+> +     * counter, use half the frequency when computing the divider.
+> +     */
+> +    evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
+>      pos = fls(evt_stream_div);
+>      if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
+I think here does not consider the case of pos==1 (though it will not occur...)
+>          pos--;
+> 
 
-Applied to kvm-arm64/misc-5.9, thanks!
+It looks good to me.
 
-[1/2] KVM: arm64: Make nVHE ASLR conditional on RANDOMIZE_BASE
-      commit: 24f69c0fa4e252f706884114b7d6353aa07678b5
-[2/2] KVM: arm64: Substitute RANDOMIZE_BASE for HARDEN_EL2_VECTORS
-      commit: a59a2edbbba7397fede86e40a3da17e5beebf98b
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks,
+Keqian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
