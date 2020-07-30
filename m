@@ -2,81 +2,59 @@ Return-Path: <SRS0=3/sM=BJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FEA7C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 13:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E15C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 14:20:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F1B4920829
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 13:58:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bm9nVVGj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1B4920829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id BC66F20829
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 14:20:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC66F20829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B0A24B4FE;
-	Thu, 30 Jul 2020 09:58:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1616F4B505;
+	Thu, 30 Jul 2020 10:20:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vMXGuhRCdkgY; Thu, 30 Jul 2020 09:58:07 -0400 (EDT)
+	with ESMTP id l99kqMWW824u; Thu, 30 Jul 2020 10:20:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D804B4F9;
-	Thu, 30 Jul 2020 09:58:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E30264B504;
+	Thu, 30 Jul 2020 10:20:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E544B4F5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 09:58:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07AD84B504
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 10:20:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Br6rgtSgUdLh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jul 2020 09:58:05 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 697B44B4F4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 09:58:05 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 368962074B;
- Thu, 30 Jul 2020 13:58:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596117484;
- bh=I4VtO+RvTl5dHcnmis2rhMN15keqAvYuB5FZEdImv3A=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bm9nVVGjGZ7XYNnFoyAkAmwjyW5kA9q1IsWKYLKaXwYx5CxsIH156XdZeWk+HBeOn
- nkjkN6aIgkq/OSSDn08riSiwgRXr2P9h+M3dHPFJmZk2HRzvSiuVcc3IOnBZLRq4lG
- bbcdjhffeKKlT7hQJnfY11YZKzgeDrmUju2alRl8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1k194M-00GH3a-Mo; Thu, 30 Jul 2020 14:58:02 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexander Graf <graf@amazon.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm: Add trace name for ARM_NISV
-Date: Thu, 30 Jul 2020 14:57:56 +0100
-Message-Id: <159611742543.1691243.7923791390001583960.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200730094441.18231-1-graf@amazon.com>
-References: <20200730094441.18231-1-graf@amazon.com>
+ with ESMTP id fnmGqYD6t-pW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jul 2020 10:20:05 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 618D24B4FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 10:20:05 -0400 (EDT)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 45E8DC7AD72D78B946C1;
+ Thu, 30 Jul 2020 22:19:58 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.173) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0;
+ Thu, 30 Jul 2020 22:19:49 +0800
+From: Zhenyu Ye <yezhenyu2@huawei.com>
+Subject: [Question] the check of ioeventfd collision in
+ kvm_*assign_ioeventfd_idx
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <gleb@redhat.com>,
+ <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, Xiexiangyou
+ <xiexiangyou@huawei.com>, <ghaskins@novell.com>
+Message-ID: <bbece68b-fb39-d599-9ba7-a8ee8be16525@huawei.com>
+Date: Thu, 30 Jul 2020 22:19:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: graf@amazon.com, kvm@vger.kernel.org, pbonzini@redhat.com,
- xypron.glpk@gmx.de, linux-kernel@vger.kernel.org, christoffer.dall@arm.com,
- kvmarm@lists.cs.columbia.edu, vkuznets@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.174.186.173]
+X-CFilter-Loop: Reflected
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,27 +71,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 30 Jul 2020 11:44:41 +0200, Alexander Graf wrote:
-> Commit c726200dd106d ("KVM: arm/arm64: Allow reporting non-ISV data aborts
-> to userspace") introduced a mechanism to deflect MMIO traffic the kernel
-> can not handle to user space. For that, it introduced a new exit reason.
-> 
-> However, it did not update the trace point array that gives human readable
-> names to these exit reasons inside the trace log.
-> 
-> [...]
+Hi all,
 
-Applied to kvm-arm64/misc-5.9, thanks!
+There are checks of ioeventfd collision in both kvm_assign_ioeventfd_idx()
+and kvm_deassign_ioeventfd_idx(), however, with different logic.
 
-[1/1] KVM: arm: Add trace name for ARM_NISV
-      commit: 1ccf2fe35c30f79102ad129c5aa71059daaaed7f
+In kvm_assign_ioeventfd_idx(), this is done by ioeventfd_check_collision():
+---8<---
+	if (_p->bus_idx == p->bus_idx &&
+	    _p->addr == p->addr &&
+	    (!_p->length || !p->length ||
+	     (_p->length == p->length &&
+	      (_p->wildcard || p->wildcard ||
+	       _p->datamatch == p->datamatch))))
+		// then we consider the two are the same
+---8<---
 
-Cheers,
+The logic in kvm_deassign_ioeventfd_idx() is as follows:
+---8<---
+	if (p->bus_idx != bus_idx ||
+	    p->eventfd != eventfd  ||
+	    p->addr != args->addr  ||
+	    p->length != args->len ||
+	    p->wildcard != wildcard)
+		continue;
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+	if (!p->wildcard && p->datamatch != args->datamatch)
+		continue;
 
+	// then we consider the two are the same
+---8<---
+
+As we can see, there is extra check of p->eventfd in
+
+().  Why we don't check p->eventfd
+in kvm_assign_ioeventfd_idx()? Or should we delete this in
+kvm_deassign_ioeventfd_idx()?
+
+
+Thanks,
+Zhenyu
 
 _______________________________________________
 kvmarm mailing list
