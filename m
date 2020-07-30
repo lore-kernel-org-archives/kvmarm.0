@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6315C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16731C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F94720829
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4CFE2082E
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVTz6xhe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F94720829
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hE9/CItu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CFE2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574494B4D5;
-	Thu, 30 Jul 2020 11:34:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA7A4B4D7;
+	Thu, 30 Jul 2020 11:34:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8S3XEs45R+t0; Thu, 30 Jul 2020 11:34:36 -0400 (EDT)
+	with ESMTP id f78WUpdMq9mv; Thu, 30 Jul 2020 11:34:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 464DB4B49D;
-	Thu, 30 Jul 2020 11:34:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6622C4B4EA;
+	Thu, 30 Jul 2020 11:34:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A965F4B42C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A98694B4B2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6RVjG4ioUekE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jul 2020 11:34:33 -0400 (EDT)
+ with ESMTP id huI8tKiLD1uI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jul 2020 11:34:34 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF6F74B419
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAED14B4CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:34 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 745D022BEA;
- Thu, 30 Jul 2020 15:34:30 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6E45921744;
+ Thu, 30 Jul 2020 15:34:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596123272;
- bh=Mzolep3rykp3n5niGI0YHDUXuLBLmNJe1n4xpLLct1o=;
+ s=default; t=1596123274;
+ bh=0AYdhwlQ/HngOLkjxnzAWxMj4nffGa4GqyCHEGM8djg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NVTz6xheJ5PJiOnwl7BGpMUhmggZmnTVzK/yUX7gkLc9QPF0iBmuB0a0Yb3mgin0d
- IJFxaz//4N59Gh2sBbyzM4aZ4T1uxrCD8uCfZySpqENkTpsi9kEJSnzer8W2et25Sa
- pJEJFooQ/AuJjm7mXFxVNUdCH+Obfp/rqqdLlTeA=
+ b=hE9/CItuxSm8ghKMW2/HT5udgTOde7kDiApNbo9yHIX+Cno4sfRlpUN/pQZVNWA53
+ knhCpiSqoDVgYjXGP5xpuYu+c5acn7hXd9pcFxDJNUlFnF1M+j/LJYTlI5kTIx6Mo+
+ cUaUEcd3FUAYb06UGdQ7j5ufffuKqLP/UEMu/3y0=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 06/20] KVM: arm64: Convert kvm_phys_addr_ioremap() to generic
+Subject: [PATCH 07/20] KVM: arm64: Convert kvm_set_spte_hva() to generic
  page-table API
-Date: Thu, 30 Jul 2020 16:33:52 +0100
-Message-Id: <20200730153406.25136-7-will@kernel.org>
+Date: Thu, 30 Jul 2020 16:33:53 +0100
+Message-Id: <20200730153406.25136-8-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200730153406.25136-1-will@kernel.org>
 References: <20200730153406.25136-1-will@kernel.org>
@@ -82,62 +82,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Convert kvm_phys_addr_ioremap() to use kvm_pgtable_stage2_map() instead
+Convert kvm_set_spte_hva() to use kvm_pgtable_stage2_map() instead
 of stage2_set_pte().
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/mmu.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ecca611f208b..90310fd16d85 100644
+index 90310fd16d85..f6b7220412af 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1171,31 +1171,27 @@ static int stage2_pudp_test_and_clear_young(pud_t *pud)
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable)
+@@ -1924,28 +1924,27 @@ int kvm_unmap_hva_range(struct kvm *kvm,
+ 
+ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
  {
--	phys_addr_t addr, end;
-+	phys_addr_t addr;
- 	int ret = 0;
--	unsigned long pfn;
- 	struct kvm_mmu_memory_cache cache = { 0, };
-+	void *cookie = kvm->arch.mmu.pgt_cookie;
-+	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-+				     KVM_PGTABLE_PROT_R |
-+				     (writable ? KVM_PGTABLE_PROT_W : 0);
+-	pte_t *pte = (pte_t *)data;
++	kvm_pfn_t *pfn = (kvm_pfn_t *)data;
  
--	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
--	pfn = __phys_to_pfn(pa);
--
--	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
--		pte_t pte = kvm_pfn_pte(pfn, PAGE_S2_DEVICE);
--
--		if (writable)
--			pte = kvm_s2pte_mkwrite(pte);
--
-+	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
- 		ret = mmu_topup_memory_cache(kvm, &cache);
- 		if (ret)
- 			break;
+ 	WARN_ON(size != PAGE_SIZE);
 +
- 		spin_lock(&kvm->mmu_lock);
--		ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
--				     KVM_S2PTE_FLAG_IS_IOMAP);
-+		ret = kvm_pgtable_stage2_map(cookie, addr, PAGE_SIZE, pa, prot,
-+					     &cache);
- 		spin_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
+ 	/*
+-	 * We can always call stage2_set_pte with KVM_S2PTE_FLAG_LOGGING_ACTIVE
+-	 * flag clear because MMU notifiers will have unmapped a huge PMD before
+-	 * calling ->change_pte() (which in turn calls kvm_set_spte_hva()) and
+-	 * therefore stage2_set_pte() never needs to clear out a huge PMD
+-	 * through this calling path.
++	 * The MMU notifiers will have unmapped a huge PMD before calling
++	 * ->change_pte() (which in turn calls kvm_set_spte_hva()) and
++	 * therefore we never need to clear out a huge PMD through this
++	 * calling path and a memcache is not required.
+ 	 */
+-	stage2_set_pte(&kvm->arch.mmu, NULL, gpa, pte, 0);
++	WARN_ON(kvm_pgtable_stage2_map(kvm, gpa, PAGE_SIZE, __pfn_to_phys(*pfn),
++				       KVM_PGTABLE_PROT_R, NULL));
+ 	return 0;
+ }
  
--		pfn++;
-+		pa += PAGE_SIZE;
- 	}
+-
+ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+ {
+ 	unsigned long end = hva + PAGE_SIZE;
+ 	kvm_pfn_t pfn = pte_pfn(pte);
+-	pte_t stage2_pte;
  
- 	return ret;
+-	if (!kvm->arch.mmu.pgd)
++	if (!kvm->arch.mmu.pgt_cookie)
+ 		return 0;
+ 
+ 	trace_kvm_set_spte_hva(hva);
+@@ -1955,9 +1954,7 @@ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+ 	 * just like a translation fault and clean the cache to the PoC.
+ 	 */
+ 	clean_dcache_guest_page(pfn, PAGE_SIZE);
+-	stage2_pte = kvm_pfn_pte(pfn, PAGE_S2);
+-	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
+-
++	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pfn);
+ 	return 0;
+ }
+ 
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
