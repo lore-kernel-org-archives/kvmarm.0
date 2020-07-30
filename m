@@ -2,84 +2,66 @@ Return-Path: <SRS0=3/sM=BJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D722C433DF
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6B9C433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B809021744
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:18:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54B1620838
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jul 2020 15:34:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="a7ipzP1V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B809021744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZH/oQLHd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B1620838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59AC24B4D0;
-	Thu, 30 Jul 2020 11:18:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7A054B481;
+	Thu, 30 Jul 2020 11:34:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wgj8vey9r8Q1; Thu, 30 Jul 2020 11:18:42 -0400 (EDT)
+	with ESMTP id KXsBufU+RYt1; Thu, 30 Jul 2020 11:34:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C02D14B4DA;
-	Thu, 30 Jul 2020 11:18:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 647414B47C;
+	Thu, 30 Jul 2020 11:34:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F132D4B3C0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:18:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F8624B419
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jwFd8RVxfI4Q for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jul 2020 11:18:40 -0400 (EDT)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B04024B3C2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:18:40 -0400 (EDT)
-Received: by mail-qt1-f201.google.com with SMTP id k1so4900766qtp.20
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 08:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=I/6Uf2d9hbDFiQ7HjoTBPNAp0ARZKgphdcu6JHcf2Ek=;
- b=a7ipzP1VGRlPVkHgAOg2dsdCP6IVEFuE+81+B0qHZPY/OQUxHADaw2DDDr8wV3iTAD
- lLX8S1SA10j8eZjMMH9E7hq6vvwaXMrbvagI7u8Df+c4bOTvevW4ECuQ5e7vcH1/C8ry
- cgabM91t9qk3QbX2FfP4qfhvJFj1QBpCFZdjHEFnvW/V4V7oHlKzRv5al7Qy82QrQrMd
- 5y5dZzhS3kGsXKTsjtcV3YWX6ah7L+IkgIS8+eny8/JSRklBFYiGkXYBjyczoYrE43cK
- XIvFsKPrAVn3B0DzrGDNEHg49O+rDLk4C0xWfyFK+MK6SeOJC50yeEtAgueXAFqgHSA+
- AcAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=I/6Uf2d9hbDFiQ7HjoTBPNAp0ARZKgphdcu6JHcf2Ek=;
- b=oxECa1M6P7kM++LDbepaEyhbptIKO+zFMFaKqAvOYZsikJ5diNmDpkJ07y8Hjrffta
- IW7Ng9tuFxduFeCHoWyv6Uu8tFkSGYG7NF1MkxQFsXTWV2f2wJWYJnYdcbbz18auypJe
- 281Y/IydkZI/qz67G49hCnwJxVTGh/f3erasi9DHDrhqJtZa17GwVDwMUVhK7EXLBAMb
- 4X1YLBlLHSwa/fyA7hF85DJnTi0PDSlm/QzxT6oNz6qaxXA8bHVd3ssvQwmhcepooM27
- KwIc0l2zBrcwdhCkH5Hlc/oZPcfxepOOH4HdBv08FeFSw59gj4tY2OzA6Is8bU5sXqUt
- u0Jw==
-X-Gm-Message-State: AOAM531vol3NEc29tf1xlWGlwflrj8GwrMZJq1QNJSyGUN8KNM4UX4qL
- chxTZyaN/SMNDlQ+nj8cDa+pFH0OprCPs66vt4lfxfjVhzTuoaeG9kANiDMEmmuOkiiOFhmdya4
- wMcbkzOkQJ19vGtdQyJe7FDAUHL3oKDextcbwf6NxyZdTLT1RfsksQMx0E3YIEQgnXJ2ZxA==
-X-Google-Smtp-Source: ABdhPJy+OYpTTmeuNxcJ60UBVE9UWIpMumFeLAauj9268tGcgvGzpSgOYalB+kxquOu8ERkW5n4jepTNmYQ=
-X-Received: by 2002:a0c:bda7:: with SMTP id n39mr3296313qvg.12.1596122320110; 
- Thu, 30 Jul 2020 08:18:40 -0700 (PDT)
-Date: Thu, 30 Jul 2020 16:18:23 +0100
-In-Reply-To: <20200730151823.1414808-1-ascull@google.com>
-Message-Id: <20200730151823.1414808-2-ascull@google.com>
-Mime-Version: 1.0
-References: <20200730151823.1414808-1-ascull@google.com>
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-Subject: [PATCH 2/2] KVM: arm64: nVHE: Don't consume host SErrors with RAS
-From: Andrew Scull <ascull@google.com>
+ with ESMTP id SBjNQm0h2N0L for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jul 2020 11:34:21 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFBB14B3BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2020 11:34:20 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3B4D320829;
+ Thu, 30 Jul 2020 15:34:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1596123259;
+ bh=avvDhmGN5YEENmQWEvu0ifb5DTujfbvPC6cuJ+c5uvE=;
+ h=From:To:Cc:Subject:Date:From;
+ b=ZH/oQLHdOh5Oev19+BcsO1nIukAVfYxJHRu/9gs1E1JFxjn0sGgyrNEAAYzUNv1/M
+ /bRCeEdWe60tJwdLsFppTCl+/xYbQ2MFAF3YCrVouZQ4qOpgkI4r2OdFP9Tex8eVq0
+ mkOTq4gBsNPV/EUby+GCl1HB4hFymEIpkyXd/O/Q=
+From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
- will@kernel.org
+Subject: [PATCH 00/20] KVM: arm64: Rewrite page-table code and fault handling
+Date: Thu, 30 Jul 2020 16:33:46 +0100
+Message-Id: <20200730153406.25136-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,210 +78,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ESB at the start of the vectors causes any SErrors to be consumed to
-DISR_EL1. If the exception came from the host and the ESB caught an
-SError, it would not be noticed until a guest exits and DISR_EL1 is
-checked. Further, the SError would be attributed to the guest and not
-the host.
+Hi all,
 
-To avoid these problems, use a different exception vector for the host
-that does not use an ESB but instead leaves any host SError pending. A
-guest will not be entered if an SError is pending so it will always be
-the host that will receive and handle it.
+This fairly hefty series rewrites all of KVM's page-table code on arm64.
 
-Hyp initialization is now passed the vector that is used for the host
-and the vector for guests is stored in a percpu variable as
-kvm_get_hyp_vector() is not suitable for calling from nVHE hyp.
+You might be wondering why I've done that, and I can ensure you that it
+wasn't for fun. No, some of the benefits of rewriting this code are as
+follows:
 
-Fixes: 0e5b9c085dce ("KVM: arm64: Consume pending SError as early as possible")
+  * The hypervisor stage-1 and guest stage-2 page tables can now be
+    configured at runtime, independently of each other and of the host
+    kernel's stage-1 configuration. This allows us to remove the extended
+    idmap at EL2 entirely and accept large guest IPA sizes without
+    worrying about the number of levels in use by the host.
+
+  * The code is smaller. We're losing ~500 lines with this series, and
+    that's in spite of a bunch of kerneldoc being added for the new API.
+
+  * It paves the way for managing the stage-2 page-tables at EL2 on nVHE
+    systems, which is a crucial part of the Android "Protected KVM" project,
+    which aims to isolate guest memory from the host kernel.
+
+  * In some cases, the new walker allows us to reduce the number of walks
+    being performed. For example, user_mem_abort() no longer has to walk
+    the page-table twice when handling permission faults.
+
+The series is based on kvmarm/next, plus these two series I sent previously:
+
+  - memcache cleanups:
+  https://lore.kernel.org/r/20200723110227.16001-1-will@kernel.org
+
+  - Early S2 fault fixes:
+  https://lore.kernel.org/r/20200729102821.23392-1-will@kernel.org
+
+It will conflict with Sean's memcache stuff in -next, but that shouldn't
+be too hard to sort out.
+
+I've tried to split up the conversion of kvm/mmu.c into reviewable chunks,
+mopping up all the leftover code at the end. That means bisection will
+warn about unused functions in the middle of the series, but I think it
+makes the changes considerably more focussed and easier to review.
+
+In terms of testing, I've done the usual Debian installer type things, but
+Quentin has also written targetted guest code [1] which we used to
+exercise dirty logging page-table collapse and coalescing. I also wrote a
+silly hack where KVM allocated two S2 page-tables for each VM; one using
+the old code and one using the new code. At PSCI SYSTEM_OFF, a walker
+walked each page-table, using siphash to create a hash of all of the
+entries (but masking out the address fields in table entries). After the
+walk, the hashes were compared for the two tables and I have so far been
+unable to trigger a mismatch. That said, I haven't really kicked the tyres
+outside of defconfig.
+
+To make things easier to work with, I've put the whole lot on a branch
+here:
+
+  https://android-kvm.googlesource.com/linux/+/refs/heads/topic/pgtable
+
+Cheers,
+
+Will
+
+[1] https://android-kvm.googlesource.com/misc/+/refs/heads/qperret/pgtable-test
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>
 Cc: James Morse <james.morse@arm.com>
-Signed-off-by: Andrew Scull <ascull@google.com>
----
- arch/arm64/include/asm/kvm_asm.h  |  2 ++
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kernel/image-vars.h    |  1 +
- arch/arm64/kvm/arm.c              | 15 ++++++++++-
- arch/arm64/kvm/hyp/hyp-entry.S    | 42 +++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c  |  3 +++
- 6 files changed, 63 insertions(+), 1 deletion(-)
+Cc: Suzuki Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kernel-team@android.com
+Cc: linux-arm-kernel@lists.infradead.org
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 413911d6446a..81f29a2c361a 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -98,10 +98,12 @@ struct kvm_vcpu;
- struct kvm_s2_mmu;
- 
- DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
-+DECLARE_KVM_NVHE_SYM(__kvm_hyp_host_vector);
- DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
- #define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
-+#define __kvm_hyp_host_vector	CHOOSE_NVHE_SYM(__kvm_hyp_host_vector)
- #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
- #endif
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e1a32c0707bb..6b21d1c71a83 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -575,6 +575,7 @@ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
- DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
-+DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
- static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
- {
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 9e897c500237..7e93b0c426d4 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -71,6 +71,7 @@ KVM_NVHE_ALIAS(kvm_update_va_mask);
- /* Global kernel state accessed by nVHE hyp code. */
- KVM_NVHE_ALIAS(arm64_ssbd_callback_required);
- KVM_NVHE_ALIAS(kvm_host_data);
-+KVM_NVHE_ALIAS(kvm_hyp_vector);
- KVM_NVHE_ALIAS(kvm_vgic_global_state);
- 
- /* Kernel constant needed to compute idmap addresses. */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 98f05bdac3c1..bb7c74b05fcd 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -47,6 +47,7 @@ __asm__(".arch_extension	virt");
- #endif
- 
- DEFINE_PER_CPU(kvm_host_data_t, kvm_host_data);
-+DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
- 
- /* The VMID used in the VTTBR */
-@@ -1274,7 +1275,10 @@ static void cpu_init_hyp_mode(void)
- 
- 	pgd_ptr = kvm_mmu_get_httbr();
- 	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
--	vector_ptr = (unsigned long)kvm_get_hyp_vector();
-+
-+	/* Get the hyp address of the vectors used for the host and guests. */
-+	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
-+	__this_cpu_write(kvm_hyp_vector, (unsigned long)kvm_get_hyp_vector());
- 
- 	/*
- 	 * Call initialization code, and switch to the full blown HYP code.
-@@ -1537,6 +1541,7 @@ static int init_hyp_mode(void)
- 
- 	for_each_possible_cpu(cpu) {
- 		kvm_host_data_t *cpu_data;
-+		unsigned long *vector;
- 
- 		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
- 		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
-@@ -1545,6 +1550,14 @@ static int init_hyp_mode(void)
- 			kvm_err("Cannot map host CPU state: %d\n", err);
- 			goto out_err;
- 		}
-+
-+		vector = per_cpu_ptr(&kvm_hyp_vector, cpu);
-+		err = create_hyp_mappings(vector, vector + 1, PAGE_HYP);
-+
-+		if (err) {
-+			kvm_err("Cannot map hyp guest vector address\n");
-+			goto out_err;
-+		}
- 	}
- 
- 	err = hyp_map_aux_data();
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 689fccbc9de7..2c5bec3ecb2a 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -213,7 +213,10 @@ SYM_CODE_END(\label)
- 	invalid_vector	el2h_sync_invalid
- 	invalid_vector	el2h_irq_invalid
- 	invalid_vector	el2h_fiq_invalid
-+	invalid_vector	el1_sync_invalid
-+	invalid_vector	el1_irq_invalid
- 	invalid_vector	el1_fiq_invalid
-+	invalid_vector	el1_error_invalid
- 
- 	.ltorg
- 
-@@ -271,6 +274,45 @@ SYM_CODE_START(__kvm_hyp_vector)
- 	valid_vect	el1_error		// Error 32-bit EL1
- SYM_CODE_END(__kvm_hyp_vector)
- 
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+.macro valid_host_vect target
-+	.align 7
-+	stp	x0, x1, [sp, #-16]!
-+	b	\target
-+.endm
-+
-+/*
-+ * The host vectors do not use an ESB instruction in order to avoid consuming
-+ * SErrors that should only be comsumed by the host. The host is also known to
-+ * be 64-bit so any 32-bit exceptions can be treated as invalid.
-+ *
-+ * Indirection is not applied to the host vectors because the host already
-+ * knows the address of hyp by virtue of loading it there.
-+ */
-+	.align 11
-+SYM_CODE_START(__kvm_hyp_host_vector)
-+	invalid_vect	el2t_sync_invalid	// Synchronous EL2t
-+	invalid_vect	el2t_irq_invalid	// IRQ EL2t
-+	invalid_vect	el2t_fiq_invalid	// FIQ EL2t
-+	invalid_vect	el2t_error_invalid	// Error EL2t
-+
-+	valid_host_vect	el2_sync		// Synchronous EL2h
-+	invalid_vect	el2h_irq_invalid	// IRQ EL2h
-+	invalid_vect	el2h_fiq_invalid	// FIQ EL2h
-+	valid_host_vect	el2_error		// Error EL2h
-+
-+	valid_host_vect	el1_sync		// Synchronous 64-bit EL1
-+	valid_host_vect	el1_irq			// IRQ 64-bit EL1
-+	invalid_vect	el1_fiq_invalid		// FIQ 64-bit EL1
-+	valid_host_vect	el1_error		// Error 64-bit EL1
-+
-+	invalid_vect	el1_sync_invalid	// Synchronous 32-bit EL1
-+	invalid_vect	el1_irq_invalid		// IRQ 32-bit EL1
-+	invalid_vect	el1_fiq_invalid		// FIQ 32-bit EL1
-+	invalid_vect	el1_error_invalid	// Error 32-bit EL1
-+SYM_CODE_END(__kvm_hyp_host_vector)
-+#endif
-+
- #ifdef CONFIG_KVM_INDIRECT_VECTORS
- .macro hyp_ventry
- 	.align 7
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 341be2f2f312..3a711449ecd5 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -42,6 +42,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 	}
- 
- 	write_sysreg(val, cptr_el2);
-+	write_sysreg(__hyp_this_cpu_read(kvm_hyp_vector), vbar_el2);
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -60,6 +61,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 
- static void __deactivate_traps(struct kvm_vcpu *vcpu)
- {
-+	extern char __kvm_hyp_host_vector[];
- 	u64 mdcr_el2;
- 
- 	___deactivate_traps(vcpu);
-@@ -91,6 +93,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(mdcr_el2, mdcr_el2);
- 	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
-+	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
- }
- 
- static void __deactivate_vm(struct kvm_vcpu *vcpu)
+--->8
+
+Quentin Perret (4):
+  KVM: arm64: Add support for stage-2 write-protect in generic
+    page-table
+  KVM: arm64: Convert write-protect operation to generic page-table API
+  KVM: arm64: Add support for stage-2 cache flushing in generic
+    page-table
+  KVM: arm64: Convert memslot cache-flushing code to generic page-table
+    API
+
+Will Deacon (16):
+  KVM: arm64: Add stand-alone page-table walker infrastructure
+  KVM: arm64: Add support for creating kernel-agnostic stage-1 page
+    tables
+  KVM: arm64: Use generic allocator for hyp stage-1 page-tables
+  KVM: arm64: Add support for creating kernel-agnostic stage-2 page
+    tables
+  KVM: arm64: Add support for stage-2 map()/unmap() in generic
+    page-table
+  KVM: arm64: Convert kvm_phys_addr_ioremap() to generic page-table API
+  KVM: arm64: Convert kvm_set_spte_hva() to generic page-table API
+  KVM: arm64: Convert unmap_stage2_range() to generic page-table API
+  KVM: arm64: Add support for stage-2 page-aging in generic page-table
+  KVM: arm64: Convert page-aging and access faults to generic page-table
+    API
+  KVM: arm64: Add support for relaxing stage-2 perms in generic
+    page-table code
+  KVM: arm64: Convert user_mem_abort() to generic page-table API
+  KVM: arm64: Check the cookie instead of the pgd when modifying
+    page-table
+  KVM: arm64: Remove unused page-table code
+  KVM: arm64: Remove unused 'pgd' field from 'struct kvm_s2_mmu'
+  KVM: arm64: Don't constrain maximum IPA size based on host
+    configuration
+
+ arch/arm64/include/asm/kvm_host.h       |    2 +-
+ arch/arm64/include/asm/kvm_mmu.h        |  219 +---
+ arch/arm64/include/asm/kvm_pgtable.h    |  269 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h  |   23 -
+ arch/arm64/include/asm/pgtable-prot.h   |   19 -
+ arch/arm64/include/asm/stage2_pgtable.h |  215 ----
+ arch/arm64/kvm/Makefile                 |    2 +-
+ arch/arm64/kvm/mmu.c                    | 1549 +++--------------------
+ arch/arm64/kvm/pgtable.c                |  906 +++++++++++++
+ arch/arm64/kvm/reset.c                  |   38 +-
+ 10 files changed, 1340 insertions(+), 1902 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
+ create mode 100644 arch/arm64/kvm/pgtable.c
+
 -- 
 2.28.0.rc0.142.g3c755180ce-goog
 
