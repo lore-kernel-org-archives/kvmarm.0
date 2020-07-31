@@ -2,90 +2,105 @@ Return-Path: <SRS0=F5E6=BK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D348DC433DF
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 10:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C96EC433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 11:26:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4DAED2245C
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 10:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E99A0208E4
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 11:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BNpQV+Z3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DAED2245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0T1n5+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E99A0208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78CCD4B31E;
-	Fri, 31 Jul 2020 06:21:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E92A4B24A;
+	Fri, 31 Jul 2020 07:26:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CHTQ1FU71tnC; Fri, 31 Jul 2020 06:21:05 -0400 (EDT)
+	with ESMTP id JbKOTWn+4MMA; Fri, 31 Jul 2020 07:26:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B8484B315;
-	Fri, 31 Jul 2020 06:21:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5270D4B293;
+	Fri, 31 Jul 2020 07:26:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCB354B314
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 06:21:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD02C4B237
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 07:26:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 84+JvfKU636h for <kvmarm@lists.cs.columbia.edu>;
- Fri, 31 Jul 2020 06:21:02 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B49DE4B30E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 06:21:02 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id r2so22416313wrs.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 03:21:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=tlyYYf/Awn2T38hBnmjK6jzNxCNHc/2ikQvsgtHicG0=;
- b=BNpQV+Z3S1XPedR/OfLQJCv/YgfZxOKnLWtssDaKzT8mAP5LpnGk1kdHh+9uHgkYvG
- QXlipzP1W22vSvhfPeORPo1UmZjDZu9du7NDWOyUImdiCneKI9BtH9zJxQx4Qc+uG4Wx
- uKlSNdBoq+3iS26imAp2t8QNwxy8EY7Aqs/WWuJ/2h4IIM8soR8KGo6B4eys83HAjzqZ
- UeB5iYmZaSPx3eUjEEeZ8Faxgsk9EUpDpDuBvQatj0qfdC3BNSPL6IUu3+Gh7GpWv0Gy
- HDVVE12kzIlnebfrk6oThLRvQktTyzfHHTJAqMUjJmYey1AaiEMTruJMVkV4/pYp3LQY
- aOzw==
+ with ESMTP id LoS20Ok7MLFj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 31 Jul 2020 07:26:03 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF7C54B233
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 07:26:03 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596194762;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qOaj9Z+2J+hwBOQBlLHm+67/cw8pKJ5RjzcvJzQQPlo=;
+ b=i0T1n5+pWjw02E6d0J1/KA1JwVogtZ703RnSWUGGUlPEHLGXnYRo+84ILJ+1ynzxdjITPK
+ TOhX8GTLaVcqWn5Cn/gWFx71lIsFlQxiWZXIoG2ourw3tRws6Ve5Wj/uexYfjObXeVesYn
+ ERWRoditJWSgW8paA0KLjXIIIwx+oMo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-LBS_OzdIOGeYEFwmumqDTA-1; Fri, 31 Jul 2020 07:26:01 -0400
+X-MC-Unique: LBS_OzdIOGeYEFwmumqDTA-1
+Received: by mail-wr1-f70.google.com with SMTP id k11so8541720wrv.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 04:26:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tlyYYf/Awn2T38hBnmjK6jzNxCNHc/2ikQvsgtHicG0=;
- b=BorwjadncEcpR814ftGlNEBlGakH89gpVnwe8HdEGISVWY/w6Q/GjjS6oM0F2kWPdr
- D/JEF99kf9Q4V/sxy7LJf4vQ0PsfrFh+xRcBEKTRfT9wWS0KiNIWBShOBGaTBtkKGCSm
- s7YQTGXeUcZblDNfLaPDT77NMs14fx0VEXv4F23NA6Cqy/qwQWmNYdVNmtKHW0P26BV6
- CYOLw2rkASCazIKTX4VzR1rVlVKTtwvNLYo8UE6dtcfEut2j6kCibyl4NKJ7V2mmwSDV
- wsAeXu2QyoldXEvLG/33oEd2iYd2MzSV/YXH4EaPokTow5oyLqum1sibgDcriIK+mGoK
- oHrQ==
-X-Gm-Message-State: AOAM531RSM/nJEuSTNYvrJuL03lEYC6otqlJLK3G3Oh0BWXVBkRPdY9+
- y+QcONFQvBI4js33UrMvwiMN7w==
-X-Google-Smtp-Source: ABdhPJxfpNt8qWSwrcd3jCfr2Huys8T1Q7h7GZsQClNi1SPjvvaAcaVT6+1ZBIJVxLflpawQJ1ONUg==
-X-Received: by 2002:a5d:4e8c:: with SMTP id e12mr2881170wru.19.1596190861510; 
- Fri, 31 Jul 2020 03:21:01 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- by smtp.gmail.com with ESMTPSA id g145sm19131790wmg.23.2020.07.31.03.21.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 31 Jul 2020 03:21:00 -0700 (PDT)
-Date: Fri, 31 Jul 2020 11:20:56 +0100
-From: Andrew Scull <ascull@google.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qOaj9Z+2J+hwBOQBlLHm+67/cw8pKJ5RjzcvJzQQPlo=;
+ b=Ev1U4JX16GAC4MSqjDH0CURsXyFLL5B5SMiEjv46f50Nu7Njwfhbsdv+4KQgsYKIVY
+ oueCC3AEXsEbXDoXPPq+duxsGoZj2H12J8EaJ4TYrlvKfocg6O3pfAjvTAfT6WelXCUV
+ yIyERRk1T26N2iwsukRN4ZCLCyFCWTpgqjIZdLqvQPZwMvkH9f6zCg1GPmjQ8gmnHzSA
+ h36+XBbpQYDwvX4c39MJjc/GnYqKQpzqstuKLmC/1xuH+KN/BPbS/ADrnfwMMCNe0apj
+ zfayEjEoEHJ2vfrx7HdjVOA/khX4yj8AauIJqxJb0tX1PDRkLofnz6olDxDNzbZ4ALjE
+ TklA==
+X-Gm-Message-State: AOAM530ZTe9BJ8Y6UZ3vhQGA7bXA78xrcaLtoW5+hdrBuK2IA5k7aoEj
+ Np8/OlvcHiJ5UpXfOuv4D7sDX0UqoaK45PgAJSN3c4EgzHtwmL8UIxzHJWh7iRdnO0FNhYtL52n
+ AQWKiNqyOh1T7InvIZgjQPqch
+X-Received: by 2002:adf:f486:: with SMTP id l6mr3109672wro.265.1596194760248; 
+ Fri, 31 Jul 2020 04:26:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwk/sUGOSyrEXkSz7ip47hO4+s0lhkAC2W0ZVyNgZ4SZAfSzwoO1WyP1uGy8VewJvKt/OOPNQ==
+X-Received: by 2002:adf:f486:: with SMTP id l6mr3109648wro.265.1596194759982; 
+ Fri, 31 Jul 2020 04:25:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778?
+ ([2001:b07:6468:f312:310b:68e5:c01a:3778])
+ by smtp.gmail.com with ESMTPSA id r22sm5313359wmh.45.2020.07.31.04.25.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 31 Jul 2020 04:25:59 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.8, take #4
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: nVHE: Don't consume host SErrors with RAS
-Message-ID: <20200731102056.GA2547274@google.com>
-References: <20200730151823.1414808-1-ascull@google.com>
- <20200730151823.1414808-2-ascull@google.com>
- <20200730223144.GA2022880@google.com>
- <8d469be9de5ce825ffeacdb530731591@kernel.org>
+References: <20200728082255.3864378-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <29d7df19-0621-2589-50c6-c00b726e2c05@redhat.com>
+Date: Fri, 31 Jul 2020 13:25:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <8d469be9de5ce825ffeacdb530731591@kernel.org>
-Cc: kernel-team@android.com, catalin.marinas@arm.com, will@kernel.org,
+In-Reply-To: <20200728082255.3864378-1-maz@kernel.org>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Nathan Chancellor <natechancellor@gmail.com>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -103,76 +118,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 31, 2020 at 09:00:03AM +0100, Marc Zyngier wrote:
-> Hi Andrew,
+On 28/07/20 10:22, Marc Zyngier wrote:
+> Hi Paolo,
 > 
-> On 2020-07-30 23:31, Andrew Scull wrote:
-> > On Thu, Jul 30, 2020 at 04:18:23PM +0100, Andrew Scull wrote:
-> > > The ESB at the start of the vectors causes any SErrors to be
-> > > consumed to
-> > > DISR_EL1. If the exception came from the host and the ESB caught an
-> > > SError, it would not be noticed until a guest exits and DISR_EL1 is
-> > > checked. Further, the SError would be attributed to the guest and not
-> > > the host.
-> > > 
-> > > To avoid these problems, use a different exception vector for the host
-> > > that does not use an ESB but instead leaves any host SError pending. A
-> > > guest will not be entered if an SError is pending so it will always be
-> > > the host that will receive and handle it.
-> > 
-> > Thinking further, I'm not sure this actually solves all of the problem.
-> > It does prevent hyp from causing a host SError to be consumed but, IIUC,
-> > there could be an SError already deferred by the host and logged in
-> > DISR_EL1 that hyp would not preserve if a guest is run.
-> > 
-> > I think the host's DISR_EL1 would need to be saved and restored in the
-> > vcpu context switch which, from a cursory read of the ARM, is possible
-> > without having to virtualize SErrors for the host.
+> This is the last batch of fixes for 5.8. One fixes a long standing MMU
+> issue, while the other addresses a more recent brekage with out-of-line
+> helpers in the nVHE code.
 > 
-> The question is what do you if you have something pending in DISR_EL1
-> at the point where you enter EL2? Context switching it is not going to
-> help. One problem is that you'd need to do an ESB, corrupting DISR_EL1,
-> before any memory access (I'm assuming you can get traps where all
-> registers are live). I can't see how we square this circle.
-
-I'll expand on what I understand (or think I do) about RAS at the
-moment. It should hopefully highlight anything wrong with my reasoning
-for your questions.
-
-DISR_EL1.A being set means a pending physical SError has been
-consumed/cleared. The host has already deferred an SError so saving and
-restoring (i.e. preserving) DISR_EL1 for the host would mean the
-deferred SError is as it was on return to the host.
-
-If there is a pending physical SError, we'd have to keep it pending so
-the host can consume it. __guest_enter has the dsb-isb for RAS so
-SErrors will become pending, but it doesn't consume them. I can't
-remember now whether this was reliable or not; I assumed it was as it is
-gated on the RAS config.
-
-The above didn't need an ESB for the host but incorrect assumptions
-might change that.
-
-> Furthermore, assuming you find a way to do it, what do you do with it?
+> Please pull,
 > 
-> (a) Either there was something pending already and it is still pending,
+> 	M.
+> 
+> The following changes since commit b9e10d4a6c9f5cbe6369ce2c17ebc67d2e5a4be5:
+> 
+>   KVM: arm64: Stop clobbering x0 for HVC_SOFT_RESTART (2020-07-06 11:47:02 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-4
+> 
+> for you to fetch changes up to b757b47a2fcba584d4a32fd7ee68faca510ab96f:
+> 
+>   KVM: arm64: Don't inherit exec permission across page-table levels (2020-07-28 09:03:57 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for Linux 5.8, take #3
+> 
+> - Fix a corner case of a new mapping inheriting exec permission without
+>   and yet bypassing invalidation of the I-cache
+> - Make sure PtrAuth predicates oinly generate inline code for the
+>   non-VHE hypervisor code
+> 
+> ----------------------------------------------------------------
+> Marc Zyngier (1):
+>       KVM: arm64: Prevent vcpu_has_ptrauth from generating OOL functions
+> 
+> Will Deacon (1):
+>       KVM: arm64: Don't inherit exec permission across page-table levels
+> 
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++---
+>  arch/arm64/kvm/mmu.c              | 11 ++++++-----
+>  2 files changed, 14 insertions(+), 8 deletions(-)
+> 
 
-If a physical SError is pending, you leave it pending and go back to the
-host so it can consume it.
+Pulled, thanks.
 
-> (b) Or there was nothing pending and you now have an error that you
->     don't know how to report (the host EL1 never issued an ESB)
+Paolo
 
-If there isn't a physical SError pending, either there is no SError at
-all (easy) or the SError has already been consumed to DISR_EL1 by a host
-ESB and we'd preserve DISR_EL1 for the host to handle however it chooses.
-
-> We could just error out on hypercalls if DISR_EL1 is non-zero, but
-> I don't see how we do that for traps, as it would just confuse the host
-> EL1.
-
-Traps would need to be left pending. Detected but not consumed with the
-dsb-isb in __guest_enter.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
