@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 231F1C433E3
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 07:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 303B3C433DF
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 07:43:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D61802067D
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 07:43:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D61802067D
+	by mail.kernel.org (Postfix) with ESMTP id E84702067D
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 07:43:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E84702067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 905A64B4D1;
-	Fri, 31 Jul 2020 03:43:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BD104B385;
+	Fri, 31 Jul 2020 03:43:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NZxpuouUF-PM; Fri, 31 Jul 2020 03:43:41 -0400 (EDT)
+	with ESMTP id NfxhysuaNwQ4; Fri, 31 Jul 2020 03:43:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C0B54B4D7;
-	Fri, 31 Jul 2020 03:43:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67A874B37D;
+	Fri, 31 Jul 2020 03:43:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEB4C4B37C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 03:43:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 884EC4B4FF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 03:43:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i0icTRSGPeJg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 31 Jul 2020 03:43:36 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C4924B378
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 03:43:36 -0400 (EDT)
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B6649BDBE9EA21171F6C;
+ with ESMTP id OjcBM5XCGX6j for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 31 Jul 2020 03:43:42 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF6774B32B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 03:43:41 -0400 (EDT)
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id D6EE2BF785157088A94E;
  Fri, 31 Jul 2020 15:43:31 +0800 (CST)
 Received: from DESKTOP-FPN2511.china.huawei.com (10.174.187.42) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
  14.3.487.0; Fri, 31 Jul 2020 15:43:24 +0800
 From: Jingyi Wang <wangjingyi11@huawei.com>
 To: <drjones@redhat.com>, <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [kvm-unit-tests PATCH v3 03/10] arm64: microbench: gic: Add ipi
- latency test for gicv4.1 support kvm
-Date: Fri, 31 Jul 2020 15:42:37 +0800
-Message-ID: <20200731074244.20432-4-wangjingyi11@huawei.com>
+Subject: [kvm-unit-tests PATCH v3 02/10] arm64: microbench: Generalize ipi
+ test names
+Date: Fri, 31 Jul 2020 15:42:36 +0800
+Message-ID: <20200731074244.20432-3-wangjingyi11@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
 References: <20200731074244.20432-1-wangjingyi11@huawei.com>
@@ -71,162 +71,107 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If gicv4.1(sgi hardware injection) is supported in kvm, we test ipi
-injection via hw/sw way separately.
+Later patches will use these functions for gic(ipi/lpi/timer) tests.
 
 Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/micro-bench.c    | 62 ++++++++++++++++++++++++++++++++++++++------
- lib/arm/asm/gic-v3.h |  3 +++
- lib/arm/asm/gic.h    |  1 +
- 3 files changed, 58 insertions(+), 8 deletions(-)
+ arm/micro-bench.c | 39 ++++++++++++++++++++++-----------------
+ 1 file changed, 22 insertions(+), 17 deletions(-)
 
 diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index fc4d356..f8314db 100644
+index 794dfac..fc4d356 100644
 --- a/arm/micro-bench.c
 +++ b/arm/micro-bench.c
-@@ -26,6 +26,8 @@
+@@ -25,24 +25,24 @@
+ 
  static u32 cntfrq;
  
- static volatile bool irq_ready, irq_received;
-+static int nr_ipi_received;
-+
+-static volatile bool ipi_ready, ipi_received;
++static volatile bool irq_ready, irq_received;
  static void *vgic_dist_base;
  static void (*write_eoir)(u32 irqstat);
  
-@@ -91,15 +93,55 @@ static void gic_prep_common(void)
- 	assert(irq_ready);
+-static void ipi_irq_handler(struct pt_regs *regs)
++static void gic_irq_handler(struct pt_regs *regs)
+ {
+-	ipi_ready = false;
+-	ipi_received = true;
++	irq_ready = false;
++	irq_received = true;
+ 	gic_write_eoir(gic_read_iar());
+-	ipi_ready = true;
++	irq_ready = true;
+ }
+ 
+-static void ipi_secondary_entry(void *data)
++static void gic_secondary_entry(void *data)
+ {
+-	install_irq_handler(EL1H_IRQ, ipi_irq_handler);
++	install_irq_handler(EL1H_IRQ, gic_irq_handler);
+ 	gic_enable_defaults();
+ 	local_irq_enable();
+-	ipi_ready = true;
++	irq_ready = true;
+ 	while (true)
+ 		cpu_relax();
+ }
+@@ -72,9 +72,9 @@ static bool test_init(void)
+ 		break;
+ 	}
+ 
+-	ipi_ready = false;
++	irq_ready = false;
+ 	gic_enable_defaults();
+-	on_cpu_async(1, ipi_secondary_entry, NULL);
++	on_cpu_async(1, gic_secondary_entry, NULL);
+ 
+ 	cntfrq = get_cntfrq();
+ 	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
+@@ -82,13 +82,18 @@ static bool test_init(void)
+ 	return true;
  }
  
 -static void ipi_prep(void)
-+static bool ipi_prep(void)
-+{
-+	u32 val;
-+
-+	val = readl(vgic_dist_base + GICD_CTLR);
-+	if (readl(vgic_dist_base + GICD_TYPER2) & GICD_TYPER2_nASSGIcap) {
-+		/* nASSGIreq can be changed only when GICD is disabled */
-+		val &= ~GICD_CTLR_ENABLE_G1A;
-+		val &= ~GICD_CTLR_nASSGIreq;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		gicv3_dist_wait_for_rwp();
-+
-+		val |= GICD_CTLR_ENABLE_G1A;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		gicv3_dist_wait_for_rwp();
-+	}
-+
-+	nr_ipi_received = 0;
-+	gic_prep_common();
-+	return true;
++static void gic_prep_common(void)
+ {
+ 	unsigned tries = 1 << 28;
+ 
+-	while (!ipi_ready && tries--)
++	while (!irq_ready && tries--)
+ 		cpu_relax();
+-	assert(ipi_ready);
++	assert(irq_ready);
 +}
 +
-+static bool ipi_hw_prep(void)
- {
-+	u32 val;
-+
-+	val = readl(vgic_dist_base + GICD_CTLR);
-+	if (readl(vgic_dist_base + GICD_TYPER2) & GICD_TYPER2_nASSGIcap) {
-+		/* nASSGIreq can be changed only when GICD is disabled */
-+		val &= ~GICD_CTLR_ENABLE_G1A;
-+		val |= GICD_CTLR_nASSGIreq;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		gicv3_dist_wait_for_rwp();
-+
-+		val |= GICD_CTLR_ENABLE_G1A;
-+		writel(val, vgic_dist_base + GICD_CTLR);
-+		gicv3_dist_wait_for_rwp();
-+	} else {
-+		return false;
-+	}
-+
-+	nr_ipi_received = 0;
- 	gic_prep_common();
-+	return true;
++static void ipi_prep(void)
++{
++	gic_prep_common();
  }
  
  static void ipi_exec(void)
- {
+@@ -96,17 +101,17 @@ static void ipi_exec(void)
  	unsigned tries = 1 << 28;
--	static int received = 0;
+ 	static int received = 0;
  
- 	irq_received = false;
+-	ipi_received = false;
++	irq_received = false;
  
-@@ -109,9 +151,9 @@ static void ipi_exec(void)
+ 	gic_ipi_send_single(1, 1);
+ 
+-	while (!ipi_received && tries--)
++	while (!irq_received && tries--)
  		cpu_relax();
  
- 	if (irq_received)
--		++received;
-+		++nr_ipi_received;
+-	if (ipi_received)
++	if (irq_received)
+ 		++received;
  
--	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
-+	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", nr_ipi_received);
+-	assert_msg(ipi_received, "failed to receive IPI in time, but received %d successfully\n", received);
++	assert_msg(irq_received, "failed to receive IPI in time, but received %d successfully\n", received);
  }
  
  static void hvc_exec(void)
-@@ -147,7 +189,7 @@ static void eoi_exec(void)
- 
- struct exit_test {
- 	const char *name;
--	void (*prep)(void);
-+	bool (*prep)(void);
- 	void (*exec)(void);
- 	bool run;
- };
-@@ -158,6 +200,7 @@ static struct exit_test tests[] = {
- 	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
- 	{"eoi",			NULL,		eoi_exec,		true},
- 	{"ipi",			ipi_prep,	ipi_exec,		true},
-+	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
- };
- 
- struct ns_time {
-@@ -181,9 +224,12 @@ static void loop_test(struct exit_test *test)
- 	uint64_t start, end, total_ticks, ntimes = NTIMES;
- 	struct ns_time total_ns, avg_ns;
- 
--	if (test->prep)
--		test->prep();
--
-+	if (test->prep) {
-+		if(!test->prep()) {
-+			printf("%s test skipped\n", test->name);
-+			return;
-+		}
-+	}
- 	isb();
- 	start = read_sysreg(cntpct_el0);
- 	while (ntimes--)
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index cb72922..b4ce130 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -20,10 +20,13 @@
-  */
- #define GICD_CTLR			0x0000
- #define GICD_CTLR_RWP			(1U << 31)
-+#define GICD_CTLR_nASSGIreq		(1U << 8)
- #define GICD_CTLR_ARE_NS		(1U << 4)
- #define GICD_CTLR_ENABLE_G1A		(1U << 1)
- #define GICD_CTLR_ENABLE_G1		(1U << 0)
- 
-+#define GICD_TYPER2_nASSGIcap		(1U << 8)
-+
- /* Re-Distributor registers, offsets from RD_base */
- #define GICR_TYPER			0x0008
- 
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 38e79b2..1898400 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -13,6 +13,7 @@
- #define GICD_CTLR			0x0000
- #define GICD_TYPER			0x0004
- #define GICD_IIDR			0x0008
-+#define GICD_TYPER2			0x000C
- #define GICD_IGROUPR			0x0080
- #define GICD_ISENABLER			0x0100
- #define GICD_ICENABLER			0x0180
 -- 
 2.19.1
 
