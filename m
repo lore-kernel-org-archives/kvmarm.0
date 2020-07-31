@@ -2,78 +2,78 @@ Return-Path: <SRS0=F5E6=BK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6ACBC433DF
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 12:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00202C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 22:55:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 41C5922B40
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 12:01:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69CC52072A
+	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 22:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8vKXBi5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41C5922B40
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="yz3cQ0qa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69CC52072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5CCB4B39E;
-	Fri, 31 Jul 2020 08:01:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE504B249;
+	Fri, 31 Jul 2020 18:55:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wNFKCccVMAJh; Fri, 31 Jul 2020 08:01:37 -0400 (EDT)
+	with ESMTP id 5DBeyQ9cXvSm; Fri, 31 Jul 2020 18:55:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9395D4B39F;
-	Fri, 31 Jul 2020 08:01:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7DC64B1CC;
+	Fri, 31 Jul 2020 18:55:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 444744B39C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 08:01:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAECB4B1BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 18:55:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J1rZyYzN-Lpj for <kvmarm@lists.cs.columbia.edu>;
- Fri, 31 Jul 2020 08:01:31 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 562EF4B398
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 08:01:31 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596196891;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1lZyrqI3xLbFTyVC9E3z5frdUks/QZNq3MxuxGz/sbI=;
- b=L8vKXBi5C/hwbTaL2Ma76FqkhB4+o/nQKzxUArw5W4waD5Y4S+FaH+HmjfDjYaoN4EjdWU
- t4x5li+4KwxshppcFjhJ0A4r6QkFMurZHRo1LPWJ0Kin0tnCqajZAGR4YnGUajT24nHYiI
- q5mI3HCcVTdPM7zb4TfxVb0Iyg0J04E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-bPznMw3cPcSTHCPxHfRF7g-1; Fri, 31 Jul 2020 08:01:24 -0400
-X-MC-Unique: bPznMw3cPcSTHCPxHfRF7g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 8+4s0cGRt4v8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 31 Jul 2020 18:55:41 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17CD64B1A4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 18:55:41 -0400 (EDT)
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com
+ [209.85.161.53])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EEA0102C84B;
- Fri, 31 Jul 2020 12:01:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.209])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C57619C58;
- Fri, 31 Jul 2020 12:01:20 +0000 (UTC)
-Date: Fri, 31 Jul 2020 14:01:17 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Jingyi Wang <wangjingyi11@huawei.com>
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm/arm64: Add IPI/LPI/vtimer
- latency test
-Message-ID: <20200731120117.5kk22hx2wpbt6kpz@kamzik.brq.redhat.com>
-References: <20200731074244.20432-1-wangjingyi11@huawei.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id 22BB922B42
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 22:55:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1596236139;
+ bh=ghMEH1GO6ahQLU9bD4XySRrfpoyCy8rcO1rNgTMBIe0=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=yz3cQ0qaR6fmr9rUc2QwUjqWwf4dAD+TgulADL03tT+NMBexpOC2RJIbGbWX+fQ+u
+ yB+SkUcdMatRT38ZNKJPZ4+yUiezlfAxxtk9ZomTpxFoEym1R3cKvVQ8FSEmCAHOxD
+ SlYsRj/9yOZMPBasJ/vu2K5676benp0bk69jem2g=
+Received: by mail-oo1-f53.google.com with SMTP id z10so3340681ooi.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 15:55:39 -0700 (PDT)
+X-Gm-Message-State: AOAM5322mgGPPq3rOHUJiNDfn5XgfMRZowhSScc7hRsRKCKdXGC1/1Nq
+ iaYx2whwI5t+x2IM+2LDBlHk+3i9YXPw2T0LYA==
+X-Google-Smtp-Source: ABdhPJxlJLtEGIpm/+Zqu84tYvc+2GV7B03TFpdIhESEDSUxef1FFIW4eI6IM8vt5auvi+1oYO79sm4gwMnETv7iLTQ=
+X-Received: by 2002:a4a:9c0f:: with SMTP id y15mr5040222ooj.81.1596236138482; 
+ Fri, 31 Jul 2020 15:55:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200731074244.20432-1-wangjingyi11@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Cc: kvm@vger.kernel.org, maz@kernel.org, prime.zeng@hisilicon.com,
+References: <20200717205233.903344-1-robh@kernel.org>
+ <20200717205233.903344-4-robh@kernel.org>
+ <20200729163800.GA24572@gaia> <20200730082227.GA24095@willie-the-truck>
+In-Reply-To: <20200730082227.GA24095@willie-the-truck>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 31 Jul 2020 16:55:26 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKhytox6+rbZBbkgs2=Zgh3ZtXeYyzjqSWF6Picn-c27A@mail.gmail.com>
+Message-ID: <CAL_JsqKhytox6+rbZBbkgs2=Zgh3ZtXeYyzjqSWF6Picn-c27A@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] arm64: Add workaround for Arm Cortex-A77 erratum
+ 1508412
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -91,65 +91,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 31, 2020 at 03:42:34PM +0800, Jingyi Wang wrote:
-> With the development of arm gic architecture, we think it will be useful
-> to add some performance test in kut to measure the cost of interrupts.
-> In this series, we add GICv4.1 support for ipi latency test and
-> implement LPI/vtimer latency test.
-> 
-> This series of patches has been tested on GICv4.1 supported hardware.
-> 
-> Note:
-> Based on patch "arm/arm64: timer: Extract irqs at setup time",
-> https://www.spinics.net/lists/kvm-arm/msg41425.html
-> 
-> * From v2:
->   - Code and commit message cleanup
->   - Clear nr_ipi_received before ipi_exec() thanks for Tao Zeng's review
->   - rebase the patch "Add vtimer latency test" on Andrew's patch
+On Thu, Jul 30, 2020 at 2:22 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Wed, Jul 29, 2020 at 05:38:00PM +0100, Catalin Marinas wrote:
+> > On Fri, Jul 17, 2020 at 02:52:33PM -0600, Rob Herring wrote:
+> > > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > > index ce3080834bfa..ce5b0d9b12bf 100644
+> > > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > > @@ -46,6 +46,17 @@
+> > >  #define read_sysreg_el2(r) read_sysreg_elx(r, _EL2, _EL1)
+> > >  #define write_sysreg_el2(v,r)      write_sysreg_elx(v, r, _EL2, _EL1)
+> > >
+> > > +static inline u64 __hyp_text read_sysreg_par(void)
+> > > +{
+> > > +   u64 par;
+> > > +   if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
+> > > +           dmb(sy);
+> > > +   par = read_sysreg(par_el1);
+> > > +   if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
+> > > +           dmb(sy);
+> > > +   return par;
+> > > +}
+> >
+> > Even if that's not always called on a critical path, I agree with Andrew
+> > that we could use alternatives here for dmb(sy).
+>
+> Even then, I'm not sure how this helps if the CPU can speculatively branch
+> to the PAR access without executing the DMB. Is that not possible on A77?
 
-It'd be good if you'd reposted my patch along with this series, since we
-didn't merge mine yet either. Don't worry about now, though, I'll pick it
-up the same time I pick up this series, which I plan to do later today
-or tomorrow.
+I'm told by the h/w folks speculation is not possible in this case.
 
-Getting this series applied will allow me to try out our new and shiny
-gitlab repo :-)
-
-Thanks,
-drew
-
->   - Add test->post() to get actual PPI latency
-> 
-> * From v1:
->   - Fix spelling mistake
->   - Use the existing interface to inject hw sgi to simply the logic
->   - Add two separate patches to limit the running times and time cost
->     of each individual micro-bench test
-> 
-> Jingyi Wang (10):
->   arm64: microbench: get correct ipi received num
->   arm64: microbench: Generalize ipi test names
->   arm64: microbench: gic: Add ipi latency test for gicv4.1 support kvm
->   arm64: its: Handle its command queue wrapping
->   arm64: microbench: its: Add LPI latency test
->   arm64: microbench: Allow each test to specify its running times
->   arm64: microbench: Add time limit for each individual test
->   arm64: microbench: Add vtimer latency test
->   arm64: microbench: Add test->post() to further process test results
->   arm64: microbench: Add timer_post() to get actual PPI latency
-> 
->  arm/micro-bench.c          | 256 ++++++++++++++++++++++++++++++-------
->  lib/arm/asm/gic-v3.h       |   3 +
->  lib/arm/asm/gic.h          |   1 +
->  lib/arm64/gic-v3-its-cmd.c |   3 +-
->  4 files changed, 219 insertions(+), 44 deletions(-)
-> 
-> -- 
-> 2.19.1
-> 
-> 
-
+Rob
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
