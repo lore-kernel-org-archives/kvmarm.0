@@ -1,79 +1,81 @@
-Return-Path: <SRS0=F5E6=BK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Xpyc=BL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D0EC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 23:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C794C433E0
+	for <kvmarm@archiver.kernel.org>; Sat,  1 Aug 2020 16:14:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5DAEC20791
-	for <kvmarm@archiver.kernel.org>; Fri, 31 Jul 2020 23:21:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF4E92076B
+	for <kvmarm@archiver.kernel.org>; Sat,  1 Aug 2020 16:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zQHfcgUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAEC20791
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAuZSUTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF4E92076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E88E84B2E2;
-	Fri, 31 Jul 2020 19:21:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 116354B4C3;
+	Sat,  1 Aug 2020 12:14:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BYY-26+3d6eE; Fri, 31 Jul 2020 19:21:46 -0400 (EDT)
+	with ESMTP id 4xTwE4TP98Md; Sat,  1 Aug 2020 12:14:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90B5E4B1C4;
-	Fri, 31 Jul 2020 19:21:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E83544B4B7;
+	Sat,  1 Aug 2020 12:14:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C8EF4B1B8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 19:21:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B2764B4B7
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  1 Aug 2020 12:14:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YVisVmRhr5DO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 31 Jul 2020 19:21:44 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 648264B1A7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 19:21:44 -0400 (EDT)
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com
- [209.85.167.169])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ with ESMTP id ClKDmeMB1EpX for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  1 Aug 2020 12:14:22 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F6A94B4B5
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  1 Aug 2020 12:14:22 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596298462;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=wf28/+wlXdYgB9veI3c3RN2H8aZsx2Wnibm1Lushe+Q=;
+ b=gAuZSUTInMLZfqUWbexgpaAb17LCGsa3dbbyKjljYUkXrqbmYUcGx4iYRwNYF4CuIczOx6
+ ytm12BXLPW8TSY0F1QVU68oPk/r0MPIZPUxdVyx8VrjIOKk83Io6otZu+RP09Sw35yH18w
+ H1E+Sq3R1YdE8Od61mTOXbaG+TP8S2E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66--WpcgJkzNvSjrdUtlu1sVg-1; Sat, 01 Aug 2020 12:14:20 -0400
+X-MC-Unique: -WpcgJkzNvSjrdUtlu1sVg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 42BD120888
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 23:21:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596237703;
- bh=O43Lpuq7vfYewBlTgQCnArXYf22qg3TUSWFiVVk2lA4=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=zQHfcgUBLOXHeE5sB5ZZ3poFBxfiYQXAwopMHq4AIA2cxdQU2dkMLpjf65+n4bdjm
- u2kiHUkAtv/CbGb3edJDX3/qN/iIldEJaHxuAUQjBXRvN+4RNZcRc64G7vR9SYSL0W
- q/YeBOiGAOU1CSE7h6w1wYZ1Jy1JikQlHL6uCdEM=
-Received: by mail-oi1-f169.google.com with SMTP id e6so7942616oii.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 31 Jul 2020 16:21:43 -0700 (PDT)
-X-Gm-Message-State: AOAM530F9OvgNeCbPxs6JU6riWVY0bdZkJvtiQj9CgLyAVw5yqIJeUYX
- VmN4fjU7p1capeW7LWV5kDeMOy05Rw4n8b20Kw==
-X-Google-Smtp-Source: ABdhPJwHDnMeymJ74OVOp04DULFpegZIhUhKZqgt0EM5CPzgh0SOfFj5Qs6F70qgSh/2nV/GtDDqprxinp9aZ+m/rvM=
-X-Received: by 2002:aca:4844:: with SMTP id v65mr4938636oia.152.1596237702533; 
- Fri, 31 Jul 2020 16:21:42 -0700 (PDT)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9658801504;
+ Sat,  1 Aug 2020 16:13:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.209])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EF0B261A1;
+ Sat,  1 Aug 2020 16:13:44 +0000 (UTC)
+Date: Sat, 1 Aug 2020 18:13:41 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Jingyi Wang <wangjingyi11@huawei.com>
+Subject: Re: [kvm-unit-tests PATCH v3 07/10] arm64: microbench: Add time
+ limit for each individual test
+Message-ID: <20200801161341.cjaqe7tkw2y7uxjm@kamzik.brq.redhat.com>
+References: <20200731074244.20432-1-wangjingyi11@huawei.com>
+ <20200731074244.20432-8-wangjingyi11@huawei.com>
 MIME-Version: 1.0
-References: <20200717205233.903344-1-robh@kernel.org>
- <20200717205233.903344-4-robh@kernel.org>
- <20200729163800.GA24572@gaia>
-In-Reply-To: <20200729163800.GA24572@gaia>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 31 Jul 2020 17:21:31 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLrHgtMmv=N-DwJR_1LDVXdu-5=A1-LMAOUbzpcuCa8cA@mail.gmail.com>
-Message-ID: <CAL_JsqLrHgtMmv=N-DwJR_1LDVXdu-5=A1-LMAOUbzpcuCa8cA@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] arm64: Add workaround for Arm Cortex-A77 erratum
- 1508412
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>,
- "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>, Will Deacon <will@kernel.org>,
+Content-Disposition: inline
+In-Reply-To: <20200731074244.20432-8-wangjingyi11@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc: kvm@vger.kernel.org, maz@kernel.org, prime.zeng@hisilicon.com,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -91,91 +93,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 29, 2020 at 10:38 AM Catalin Marinas
-<catalin.marinas@arm.com> wrote:
->
-> On Fri, Jul 17, 2020 at 02:52:33PM -0600, Rob Herring wrote:
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index ce3080834bfa..ce5b0d9b12bf 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -46,6 +46,17 @@
-> >  #define read_sysreg_el2(r)   read_sysreg_elx(r, _EL2, _EL1)
-> >  #define write_sysreg_el2(v,r)        write_sysreg_elx(v, r, _EL2, _EL1)
-> >
-> > +static inline u64 __hyp_text read_sysreg_par(void)
-> > +{
-> > +     u64 par;
-> > +     if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > +             dmb(sy);
-> > +     par = read_sysreg(par_el1);
-> > +     if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > +             dmb(sy);
-> > +     return par;
-> > +}
->
-> Even if that's not always called on a critical path, I agree with Andrew
-> that we could use alternatives here for dmb(sy).
+On Fri, Jul 31, 2020 at 03:42:41PM +0800, Jingyi Wang wrote:
+> Besides using separate running times parameter, we add time limit
+> for loop_test to make sure each test should be done in a certain
+> time(5 sec here).
+> 
+> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/micro-bench.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 93bd855..09d9d53 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -22,6 +22,7 @@
+>  #include <asm/gic.h>
+>  #include <asm/gic-v3-its.h>
+>  
+> +#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
+>  static u32 cntfrq;
+>  
+>  static volatile bool irq_ready, irq_received;
+> @@ -267,23 +268,26 @@ static void loop_test(struct exit_test *test)
+>  	uint64_t start, end, total_ticks, ntimes = 0;
+>  	struct ns_time total_ns, avg_ns;
+>  
+> +	total_ticks = 0;
+>  	if (test->prep) {
+>  		if(!test->prep()) {
+>  			printf("%s test skipped\n", test->name);
+>  			return;
+>  		}
+>  	}
+> -	isb();
+> -	start = read_sysreg(cntpct_el0);
+> -	while (ntimes < test->times) {
+> +
+> +	while (ntimes < test->times && total_ns.ns < NS_5_SECONDS) {
 
-His suggestion in the KVM code was to use cpus_have_final_cap() rather
-than cpus_have_const_cap. But given it's just a dmb or nop,
-alternatives is a better choice for all of these?
+total_ns.ns is now being used uninitialized here. It needs to be
+initialized to zero above with total_ns = {}.
 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index baf5ce9225ce..3f798e0f1419 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -94,10 +94,16 @@ static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
-> >       case TPIDR_EL1:         *val = read_sysreg_s(SYS_TPIDR_EL1);    break;
-> >       case AMAIR_EL1:         *val = read_sysreg_s(SYS_AMAIR_EL12);   break;
-> >       case CNTKCTL_EL1:       *val = read_sysreg_s(SYS_CNTKCTL_EL12); break;
-> > -     case PAR_EL1:           *val = read_sysreg_s(SYS_PAR_EL1);      break;
-> >       case DACR32_EL2:        *val = read_sysreg_s(SYS_DACR32_EL2);   break;
-> >       case IFSR32_EL2:        *val = read_sysreg_s(SYS_IFSR32_EL2);   break;
-> >       case DBGVCR32_EL2:      *val = read_sysreg_s(SYS_DBGVCR32_EL2); break;
-> > +     case PAR_EL1:
-> > +             if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > +                     dmb(sy);
-> > +             *val = read_sysreg_s(SYS_PAR_EL1);
-> > +             if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > +                     dmb(sy);
-> > +             break;
-> >       default:                return false;
-> >       }
->
-> Can't we use read_sysreg_par() directly here?
+I'll do this fixup myself.
 
-I assumed read_sysreg_s() was used here for some reason instead of
-read_sysreg()?
+Thanks,
+drew
 
-> > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> > index 8afb238ff335..98609532e61a 100644
-> > --- a/arch/arm64/mm/fault.c
-> > +++ b/arch/arm64/mm/fault.c
-> > @@ -260,7 +260,17 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
-> >       local_irq_save(flags);
-> >       asm volatile("at s1e1r, %0" :: "r" (addr));
-> >       isb();
-> > +     /*
-> > +      * Arm Erratum 1508412 requires dmb(sy) before and after reads of
-> > +      * PAR_EL1.
-> > +      * As this location is not a hot path, just condition it on the config
-> > +      * option.
-> > +      */
-> > +     if (IS_ENABLED(CONFIG_ARM64_ERRATUM_1508412))
-> > +             dmb(sy);
-> >       par = read_sysreg(par_el1);
-> > +     if (IS_ENABLED(CONFIG_ARM64_ERRATUM_1508412))
-> > +             dmb(sy);
-> >       local_irq_restore(flags);
->
-> Why not read_sysreg_par()?
+> +		isb();
+> +		start = read_sysreg(cntpct_el0);
+>  		test->exec();
+> +		isb();
+> +		end = read_sysreg(cntpct_el0);
+> +
+>  		ntimes++;
+> +		total_ticks += (end - start);
+> +		ticks_to_ns_time(total_ticks, &total_ns);
+>  	}
+> -	isb();
+> -	end = read_sysreg(cntpct_el0);
+>  
+> -	total_ticks = end - start;
+> -	ticks_to_ns_time(total_ticks, &total_ns);
+>  	avg_ns.ns = total_ns.ns / ntimes;
+>  	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
+>  
+> -- 
+> 2.19.1
+> 
+> 
 
-Okay with read_sysreg_par() going in asm/sysreg.h instead? I was
-hesitant to add it there as there didn't seem to be any other
-instances of a function for a specific register there.
-
-Rob
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
