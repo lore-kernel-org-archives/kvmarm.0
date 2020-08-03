@@ -2,74 +2,91 @@ Return-Path: <SRS0=KyyX=BN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB062C433E1
-	for <kvmarm@archiver.kernel.org>; Mon,  3 Aug 2020 15:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC95C433DF
+	for <kvmarm@archiver.kernel.org>; Mon,  3 Aug 2020 17:13:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 37D4920775
-	for <kvmarm@archiver.kernel.org>; Mon,  3 Aug 2020 15:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38FA920A8B
+	for <kvmarm@archiver.kernel.org>; Mon,  3 Aug 2020 17:13:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CSS0rPpK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D4920775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="A2LguaTJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FA920A8B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D35EA4B4BB;
-	Mon,  3 Aug 2020 11:03:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A4FA4B599;
+	Mon,  3 Aug 2020 13:13:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mNxTo0mek1le; Mon,  3 Aug 2020 11:03:40 -0400 (EDT)
+	with ESMTP id 5BSzhA3gQDsV; Mon,  3 Aug 2020 13:13:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A072D4B37C;
-	Mon,  3 Aug 2020 11:03:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B80B4B59B;
+	Mon,  3 Aug 2020 13:13:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB17D4B2D7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2020 11:03:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D2D4B598
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2020 13:13:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id heeUh8XeZ2aL for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Aug 2020 11:03:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B9E04B2D3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2020 11:03:38 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 25E1820775;
- Mon,  3 Aug 2020 15:03:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596467016;
- bh=pW3bNjWyJcDiHAUU730IG4r/gQzncCYWSqpvkt9UiD4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CSS0rPpKC1jCbHEdRNp9oUvzD8CN/BLw9wNHIX0gFxC5/Sx5/AqB6JJDsuBdZzyDg
- jDoIU5/0+OixUeWTMVGLkVcSeFsGoKWqZxrbHrONDLTjcZmuHpOhOb9KBkZspWxc/n
- /5miLhP0yDRMYVt8WEXMFHSJfjlNjurJfCqJJezg=
-Date: Mon, 3 Aug 2020 16:03:32 +0100
-From: Will Deacon <will@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v3 3/3] arm64: Add workaround for Arm Cortex-A77 erratum
- 1508412
-Message-ID: <20200803150332.GA29247@willie-the-truck>
-References: <20200717205233.903344-1-robh@kernel.org>
- <20200717205233.903344-4-robh@kernel.org>
- <20200729163800.GA24572@gaia>
- <20200730082227.GA24095@willie-the-truck>
- <CAL_JsqKhytox6+rbZBbkgs2=Zgh3ZtXeYyzjqSWF6Picn-c27A@mail.gmail.com>
+ with ESMTP id f-BZEGp0B0KG for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Aug 2020 13:13:04 -0400 (EDT)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F9254B592
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2020 13:13:04 -0400 (EDT)
+Received: by mail-wm1-f68.google.com with SMTP id k20so289277wmi.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Aug 2020 10:13:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=2RPI3rXXGTTh10EN+l9aE7UZRFL4g67sVtHQJK7hRGE=;
+ b=A2LguaTJ3xgcSiwKcayFiBAx6WeljSGOc5DWwg/Xqbf3NiCnBA9WqnB2F3XfRXZt7x
+ QoI31Z37Xbuwt3Wzmn+78QEpnJrhva5GWieGI5X0YG3k27FRSN9p3fHIWy9B9neAckHW
+ jnUL3eDmKmui9vY5YMlKXg+FXR7E3fkHH/If9GEFKWQ2+wfaiP6q7d7GVsKncNkx8i2Q
+ pvIJ0VJfl6QLV/C9isUndIDbR08Ea97t8k9ItPZuHXBhki2jkxyeuApVY3YMehL1xE7d
+ 2VktoDrBt0siG8+IYna2lZSAtRj0B0pHHImPcCoygAHe6VxGNv0xu7MuT8WtVdMBtvZ6
+ C+Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=2RPI3rXXGTTh10EN+l9aE7UZRFL4g67sVtHQJK7hRGE=;
+ b=axVX1bdBNCVa/UvYCoSwc38+5R7uStkKe3xEJUNebFpDEuBz1F4dibLx32UqToWIYq
+ EVAkQNw0i985i3MqaYQV75sX5ZVoe7hzW1OLf9QuOV2Km+qoUBbQvHJ4IXKMMvmQLICM
+ DoFs7xJc7ZMI9MEq6ras/xR5Z06XIgS8e6LEe3nAS75e1uROM0MM0aBKS4UaF6ZkTr5n
+ SNQlCFHgkz3GyzQgFeZEm98yivpZe2rt49SRCYPI9RkBULt3EYN7o+79JwatszjTQ917
+ ZVt5uD9guA0QSjJ8aBwJ3cdYz1YICnHb8uG0mTtFAQyhEPGllgzNR/rPpHGJqcMTP9Uh
+ N3vw==
+X-Gm-Message-State: AOAM531i5asVThRSHSPmB7m1aX8o1dp7VZLtRpfTqCi1GTJepixss/Q6
+ 8XKjmP3e5+Qoh8RJ2JMUcG9cbQ==
+X-Google-Smtp-Source: ABdhPJyxlm/N/A9mtl857SUYnyz2UymhHW/c/jaKdmar2/4Tj8uKRawpksUkllRhOsvjBXK30MrSYg==
+X-Received: by 2002:a1c:720e:: with SMTP id n14mr227341wmc.152.1596474781657; 
+ Mon, 03 Aug 2020 10:13:01 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:110:f693:9fff:fef4:a7ef])
+ by smtp.gmail.com with ESMTPSA id 33sm28160784wri.16.2020.08.03.10.13.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Aug 2020 10:13:01 -0700 (PDT)
+Date: Mon, 3 Aug 2020 18:12:58 +0100
+From: Quentin Perret <qperret@google.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 00/20] KVM: arm64: Rewrite page-table code and fault
+ handling
+Message-ID: <20200803171258.GA2728028@google.com>
+References: <20200730153406.25136-1-will@kernel.org>
+ <20200803081756.6y2plzh3p7uzjljo@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CAL_JsqKhytox6+rbZBbkgs2=Zgh3ZtXeYyzjqSWF6Picn-c27A@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200803081756.6y2plzh3p7uzjljo@kamzik.brq.redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,41 +103,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 31, 2020 at 04:55:26PM -0600, Rob Herring wrote:
-> On Thu, Jul 30, 2020 at 2:22 AM Will Deacon <will@kernel.org> wrote:
-> >
-> > On Wed, Jul 29, 2020 at 05:38:00PM +0100, Catalin Marinas wrote:
-> > > On Fri, Jul 17, 2020 at 02:52:33PM -0600, Rob Herring wrote:
-> > > > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > > > index ce3080834bfa..ce5b0d9b12bf 100644
-> > > > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > > > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > > > @@ -46,6 +46,17 @@
-> > > >  #define read_sysreg_el2(r) read_sysreg_elx(r, _EL2, _EL1)
-> > > >  #define write_sysreg_el2(v,r)      write_sysreg_elx(v, r, _EL2, _EL1)
-> > > >
-> > > > +static inline u64 __hyp_text read_sysreg_par(void)
-> > > > +{
-> > > > +   u64 par;
-> > > > +   if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > > > +           dmb(sy);
-> > > > +   par = read_sysreg(par_el1);
-> > > > +   if (cpus_have_const_cap(ARM64_WORKAROUND_1508412))
-> > > > +           dmb(sy);
-> > > > +   return par;
-> > > > +}
-> > >
-> > > Even if that's not always called on a critical path, I agree with Andrew
-> > > that we could use alternatives here for dmb(sy).
-> >
-> > Even then, I'm not sure how this helps if the CPU can speculatively branch
-> > to the PAR access without executing the DMB. Is that not possible on A77?
+Hi Andrew,
+
+On Monday 03 Aug 2020 at 10:17:56 (+0200), Andrew Jones wrote:
+> On Thu, Jul 30, 2020 at 04:33:46PM +0100, Will Deacon wrote:
+> > In terms of testing, I've done the usual Debian installer type things, but
+> > Quentin has also written targetted guest code [1] which we used to
+> > exercise dirty logging page-table collapse and coalescing.
+> ...
+> > [1] https://android-kvm.googlesource.com/misc/+/refs/heads/qperret/pgtable-test
 > 
-> I'm told by the h/w folks speculation is not possible in this case.
+> Hi Quentin,
+> 
+> Any reason you didn't look into extending
+> 
+>  tools/testing/selftests/kvm/dirty_log_test
+> 
+> and, if necessary, the AArch64 KVM selftests framework?
 
-Thanks. Could you add a comment to that effect, please?
+I did run this particular test, but it didn't seem to exercise the code
+paths I wanted at the time, so I went with a custom-made implementation
+only to get this patch series out of the door as quickly as possible.
 
-Will
+But I have no plan to maintain / push this further, and we should
+definitely be looking at extending the selftest instead to cover this
+use-case. I'll try to get to it at some point but there are a few things
+I need to finish off first :)
+
+I hope that helps!
+
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
