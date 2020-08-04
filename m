@@ -2,78 +2,84 @@ Return-Path: <SRS0=bLIx=BO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23666C433E1
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Aug 2020 17:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B18C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Aug 2020 17:16:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DCBE92086A
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Aug 2020 17:06:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4C6A207FC
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Aug 2020 17:16:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUf2HULJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBE92086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="po6Awiu2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C6A207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9AA4B57A;
-	Tue,  4 Aug 2020 13:06:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 625CB4B1CF;
+	Tue,  4 Aug 2020 13:16:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tYStRxQfY6UY; Tue,  4 Aug 2020 13:06:28 -0400 (EDT)
+	with ESMTP id e+ugHPeMXY46; Tue,  4 Aug 2020 13:16:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 380FC4B795;
-	Tue,  4 Aug 2020 13:06:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0418B4B72D;
+	Tue,  4 Aug 2020 13:16:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A0644B584
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2020 13:06:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72CE94B475
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2020 13:16:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4yS+KlSkKf9o for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Aug 2020 13:06:25 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ECF84B72C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2020 13:06:25 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596560785;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sAkg/Iwx4xnjg6Rnu+uqLzEQ6JwtFTxMfaav6AgT7dU=;
- b=aUf2HULJrvi4X0c6DuuzV1T4Hjs5kfHoo76GSnOa8LGAUNqnfw9nlNuT+WtgggggrrAU6H
- ouS8BiBMQ6Arr1hQ9uSXMoyjW01n8jYxOxx/YyWul3XE0Co7E0+cutjPPXdsrdimPtEXX+
- 2dlIwkJspsePptmD+9eUbClJsJnY11k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-HN4gs_NwNji8AcnAAw6L6A-1; Tue, 04 Aug 2020 13:06:21 -0400
-X-MC-Unique: HN4gs_NwNji8AcnAAw6L6A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id Q1QbVjls0xJB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Aug 2020 13:16:35 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A7FA4B7BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2020 13:16:33 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E15E2800475;
- Tue,  4 Aug 2020 17:06:19 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.120])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F97272E48;
- Tue,  4 Aug 2020 17:06:18 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 6/6] arm64/x86: KVM: Introduce steal-time cap
-Date: Tue,  4 Aug 2020 19:06:04 +0200
-Message-Id: <20200804170604.42662-7-drjones@redhat.com>
-In-Reply-To: <20200804170604.42662-1-drjones@redhat.com>
-References: <20200804170604.42662-1-drjones@redhat.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id 00B8F207FC;
+ Tue,  4 Aug 2020 17:16:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1596561392;
+ bh=KgUSQXHnQmyfVqBx7P8DiLDgLrGMLQ5sEeXPjkKaMgo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=po6Awiu2jyPPa8K7P1obOSX43I7xN26lmV3hDkANXkQYWOVML8pKHGk7i8bZvGsXJ
+ C7YOUuBeHSAf5ybIvPArid5p2sVn2opD172H2vkd7LXJ3RBWN+wElJAYGQ02xwutbi
+ T1rDroNvCn5e/s/uutC20fI/FKFmzW8QVPCvkUro=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1k30YA-00HReQ-IA; Tue, 04 Aug 2020 18:16:30 +0100
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: maz@kernel.org, pbonzini@redhat.com, steven.price@arm.com
+Date: Tue, 04 Aug 2020 18:16:30 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH  v1 3/3] kernel/configs: don't include PCI_QUIRKS in KVM
+ guest configs
+In-Reply-To: <87lfiumnc8.fsf@linaro.org>
+References: <20200804124417.27102-1-alex.bennee@linaro.org>
+ <20200804124417.27102-4-alex.bennee@linaro.org>
+ <f80cfa932a650d8f7e8fc02a1656b4c2@kernel.org> <87r1smmpw5.fsf@linaro.org>
+ <b78f8715bbaec8fc728a85d614b00688@kernel.org> <87lfiumnc8.fsf@linaro.org>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <dd535598ec1886f93f374ed5720b6c74@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alex.bennee@linaro.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,120 +91,40 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
-support for steal-time. However this is unnecessary, as only a KVM
-fd is required, and it complicates userspace (userspace may prefer
-delaying vcpu creation until after feature probing). Introduce a cap
-that can be checked instead. While x86 can already probe steal-time
-support with a kvm fd (KVM_GET_SUPPORTED_CPUID), we add the cap there
-too for consistency.
-
-Reviewed-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- Documentation/virt/kvm/api.rst    | 13 +++++++++++++
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              |  3 +++
- arch/arm64/kvm/pvtime.c           |  2 +-
- arch/x86/kvm/x86.c                |  3 +++
- include/uapi/linux/kvm.h          |  1 +
- 6 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 3bd96c1a3962..51208c5d6ac2 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6152,3 +6152,16 @@ KVM can therefore start protected VMs.
- This capability governs the KVM_S390_PV_COMMAND ioctl and the
- KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
- guests when the state change is invalid.
-+
-+8.24 KVM_CAP_STEAL_TIME
-+-----------------------
-+
-+:Architectures: arm64, x86
-+
-+This capability indicates that KVM supports steal time accounting.
-+When steal time accounting is supported it may be enabled with
-+architecture-specific interfaces.  This capability and the architecture-
-+specific interfaces must be consistent, i.e. if one says the feature
-+is supported, than the other should as well and vice versa.  For arm64
-+see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
-+For x86 see Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1b65dfeb6fed..57c44bc56087 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -505,6 +505,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
- 
-+bool kvm_arm_pvtime_supported(void);
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr);
- int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 90cb90561446..0f7f8cd2f341 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+	case KVM_CAP_STEAL_TIME:
-+		r = kvm_arm_pvtime_supported();
-+		break;
- 	default:
- 		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 75234321d896..920ac43077ad 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -71,7 +71,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	return base;
- }
- 
--static bool kvm_arm_pvtime_supported(void)
-+bool kvm_arm_pvtime_supported(void)
- {
- 	return !!sched_info_on();
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 88c593f83b28..27fc86bb28c4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3538,6 +3538,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
- 		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
- 		break;
-+	case KVM_CAP_STEAL_TIME:
-+		r = sched_info_on();
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4fdf30316582..121fb29ac004 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
-+#define KVM_CAP_STEAL_TIME 184
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.25.4
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0wOC0wNCAxNjo0MCwgQWxleCBCZW5uw6llIHdyb3RlOgo+IE1hcmMgWnluZ2llciA8
+bWF6QGtlcm5lbC5vcmc+IHdyaXRlczoKPiAKPj4gT24gMjAyMC0wOC0wNCAxNTo0NCwgQWxleCBC
+ZW5uw6llIHdyb3RlOgo+Pj4gTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4gd3JpdGVzOgo+
+Pj4gCj4+Pj4gT24gMjAyMC0wOC0wNCAxMzo0NCwgQWxleCBCZW5uw6llIHdyb3RlOgo+Pj4+PiBU
+aGUgVklSVElPX1BDSSBzdXBwb3J0IGlzIGFuIGlkZWFsaXNlZCBQQ0kgYnVzLCB3ZSBkb24ndCBu
+ZWVkIGEgCj4+Pj4+IGJ1bmNoCj4+Pj4+IG9mIGJsb2F0IGZvciByZWFsIHdvcmxkIGhhcmR3YXJl
+IGZvciBhIFZpcnRJTyBndWVzdC4KPj4+PiAKPj4+PiBXaG8gc2F5cyB0aGlzIGd1ZXN0IHdpbGwg
+b25seSBoYXZlIHZpcnRpbyBkZXZpY2VzPwo+Pj4gCj4+PiBUaGlzIGlzIHRydWUgLSBhbHRob3Vn
+aCB3aGF0IGlzIHRoZSBwb2ludCBvZiBrdm1fZ3Vlc3QuY29uZmlnPyBXZQo+Pj4gY2VydGFpbmx5
+IHR1cm4gb24gYSB3aG9sZSBidW5jaCBvZiB2aXJ0IG9wdGltaXNlZCBwYXRod2F5cyB3aXRoCj4+
+PiBQQVJBVklSVAo+Pj4gYW5kIEhZUEVSVklTT1JfR1VFU1QgYWxvbmcgd2l0aCB0aGUgcmVzdCBv
+ZiBWaXJ0SU8uCj4+IAo+PiBNb3N0IG9mIHdoaWNoIGFjdHVhbGx5IHF1YWxpZmllcyBhcyBibG9h
+dCBpdHNlbGYgYXMgZmFyIGFzIEtWTS9hcm02NAo+PiBpcyBjb25jZXJuZWQuLi4KPiAKPiBTbyBo
+ZXJlIGlzIHRoZSBxdWVzdGlvbiAtIGRvZXMgdGhlIGtlcm5lbCBjYXJlIGFib3V0IGhhdmluZyBh
+IGJsZXNzZWQKPiBjb25maWcgZm9yIGEgbWluaW1hbCB2aWFibGUgZ3Vlc3Q/IFRoZXkgYXJlIGNl
+cnRhaW5seSB1c2VkIGluIHRoZSBjbG91ZAo+IGJ1dCBJIHVuZGVyc3RhbmQgdGhlIGtlcm5lbCBp
+cyB0cnlpbmcgdG8gZ2V0IGF3YXkgZnJvbSBoYXZpbmcgYSB6b28gb2YKPiBjb25maWdzLiBXaGF0
+IGlzIHRoZSBhY3R1YWwgcG9pbnQgb2Yga3ZtX2d1ZXN0LmNvbmZpZz8gSnVzdCBhbiBlYXN5Cj4g
+ZW5hYmxpbmcgZm9yIGRldmVsb3BlcnM/CgpUaGUgY2xvdWQgdmVuZG9yIEkga25vdyBjZXJ0YWlu
+bHkgZG9lc24ndCBwcm92aWRlIGEgImR1bWJlZCBkb3duIgprZXJuZWwgY29uZmlndXJhdGlvbi4g
+V2hhdCB0aGV5IHJ1biBpcyBlaXRoZXIgYSBkaXN0cm8ga2VybmVsCm9yIHNvbWV0aGluZyB0aGF0
+IGZpdHMgdGhlaXIgZW52aXJvbm1lbnQgKHdoaWNoIGRvZXMgaW5jbHVkZQpIVyBQQ0kgZGV2aWNl
+cywgYW5kIGhhcmRseSBhbnkgdmlydGlvIGRldmljZSkuCgpNeSB0YWtlIGlzIHRoYXQgdGhpcyBr
+dm0tc3BlY2lhbCBjb25maWcgaXNuJ3QgdGhhdCB1c2VmdWwgaW4KdGhlIHJlYWwgd29ybGQsIGFu
+ZCBJIGRvbid0IGJlbGlldmUgdGhlcmUgaXMgc3VjaCB0aGluZyBhcyBhCiJtaW5pbWFsIHZpYWJs
+ZSBndWVzdCIgY29uZmlnLCBjZXJ0YWlubHkgbm90IGFjcm9zcyBhcmNoaXRlY3R1cmVzCmFuZCBW
+TU1zLiBIb3BlZnVsbHkgaXQgZml0cyBzb21lb25lJ3MgZGV2ZWxvcG1lbnQgd29ya2Zsb3csIGJ1
+dAp0aGF0J3MgcHJvYmFibHkgaXQuCgogICAgICAgICAgTS4KLS0gCkphenogaXMgbm90IGRlYWQu
+IEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVt
+YmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2
+bWFybQo=
