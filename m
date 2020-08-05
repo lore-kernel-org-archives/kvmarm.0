@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E660C433DF
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16951C433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 592CA22D0B
+	by mail.kernel.org (Postfix) with ESMTP id C5C4922D0B
 	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpYPQcmD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592CA22D0B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2rFbbck4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5C4922D0B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 156C04B5AC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 613274B58A;
 	Wed,  5 Aug 2020 14:26:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IjhJG4Tt8P86; Wed,  5 Aug 2020 14:26:20 -0400 (EDT)
+	with ESMTP id Ex7MkXx6TwpB; Wed,  5 Aug 2020 14:26:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563594B5F9;
-	Wed,  5 Aug 2020 14:26:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AB704B5A4;
+	Wed,  5 Aug 2020 14:26:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34A0F4B58D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0444B57A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p6e5EWwsKLY1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 14:26:17 -0400 (EDT)
+ with ESMTP id wgOdZRBJGfS1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 14:26:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19DE44B5A4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5279F4B58A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:15 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 325AF22D37;
- Wed,  5 Aug 2020 18:26:16 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7EF8D22D05;
+ Wed,  5 Aug 2020 18:26:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596651976;
- bh=8U4NY+3WoHdVTU+fP+AabMPVVsdE8YT4a0n3vQEO2sY=;
+ s=default; t=1596651974;
+ bh=p3WNcMvJB/y3Jj8HoY+KqKAm2MlBfzXMw7WEk0zysys=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YpYPQcmD8/DTGUAYtS8OGMS9nx5jL2JI5uW45lasGAyGp0ytxD9jFQJglKe4FOBWo
- U13Wnw+yVfwtybX8OaKp9Aitkr0bU2Tgp8BNiv5g6uSnUJZxifQAOy5Hwixetel0nt
- O6I6BIACZW/0c09kWiSzVhkpJSeULPuZ2+VYwHpU=
+ b=2rFbbck4dYZBBeA5TOv3YBf9m6Zp5JbB0ep8a62uwDKoTkpUZKAkyEw9CBYNXvJhP
+ 4stTYaai8vd6E8rV4bKsdf2n2IQrXwsdTK7/oQKx64Lp0lcKTUgz/+sa0DQpSJhgNN
+ A8I0Ah9urJv3tPrSGFxrmwqYcalNp/+TmyYDJSuc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3Nfo-0004w9-JL; Wed, 05 Aug 2020 18:57:56 +0100
+ id 1k3Ng2-0004w9-PF; Wed, 05 Aug 2020 18:58:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 38/56] KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw
- sys_regs access
-Date: Wed,  5 Aug 2020 18:56:42 +0100
-Message-Id: <20200805175700.62775-39-maz@kernel.org>
+Subject: [PATCH 54/56] KVM: arm64: Handle data and instruction external aborts
+ the same way
+Date: Wed,  5 Aug 2020 18:56:58 +0100
+Message-Id: <20200805175700.62775-55-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -100,32 +100,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we have a wrapper for the sysreg accesses, let's use that
-consistently.
+From: Will Deacon <will@kernel.org>
 
+If the guest generates a synchronous external abort which is not handled
+by the host, we inject it back into the guest as a virtual SError, but
+only if the original fault was reported on the data side. Instruction
+faults are reported as "Unsupported FSC", causing the vCPU run loop to
+bail with -EFAULT.
+
+Although synchronous external aborts from a guest are pretty unusual,
+treat them the same regardless of whether they are taken as data or
+instruction aborts by EL2.
+
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>
+Link: https://lore.kernel.org/r/20200729102821.23392-3-will@kernel.org
 ---
- arch/arm64/kvm/fpsimd.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index e329a36b2bee..e503caff14d1 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -109,12 +109,10 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 	local_irq_save(flags);
- 
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
--		u64 *guest_zcr = &vcpu->arch.ctxt.sys_regs[ZCR_EL1];
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8004f1f68946..14c6a9df5c9f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2079,13 +2079,10 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * For RAS the host kernel may handle this abort.
+ 		 * There is no need to pass the error into the guest.
+ 		 */
+-		if (!kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_esr(vcpu)))
+-			return 1;
 -
- 		fpsimd_save_and_flush_cpu_state();
+-		if (unlikely(!is_iabt)) {
++		if (kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_esr(vcpu)))
+ 			kvm_inject_vabt(vcpu);
+-			return 1;
+-		}
++
++		return 1;
+ 	}
  
- 		if (guest_has_sve)
--			*guest_zcr = read_sysreg_s(SYS_ZCR_EL12);
-+			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_s(SYS_ZCR_EL12);
- 	} else if (host_has_sve) {
- 		/*
- 		 * The FPSIMD/SVE state in the CPU has not been touched, and we
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
 -- 
 2.27.0
 
