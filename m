@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CEFC433DF
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369FAC433E1
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4012822CBB
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D909422D03
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xglUtOcp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4012822CBB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hFyLINeT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D909422D03
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F080E4B56B;
-	Wed,  5 Aug 2020 14:26:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96EDD4B431;
+	Wed,  5 Aug 2020 14:26:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id X09ItEFtfJ36; Wed,  5 Aug 2020 14:25:59 -0400 (EDT)
+	with ESMTP id Ty2E7h3mNUe0; Wed,  5 Aug 2020 14:26:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFE664B463;
-	Wed,  5 Aug 2020 14:25:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4634F4B58D;
+	Wed,  5 Aug 2020 14:26:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86CE74B456
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:25:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1544B4C6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YkNeEpvSHcx5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 14:25:57 -0400 (EDT)
+ with ESMTP id lPENyBM4-n94 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 14:25:59 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77A9B4B4BA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:25:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D1754B4D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:25:59 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9E75F22CAF;
- Wed,  5 Aug 2020 18:25:56 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5F06822CB3;
+ Wed,  5 Aug 2020 18:25:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596651956;
- bh=E+Ur1YArpynRJxY5yv4dxnSV+k4YpldVGdoNOT8smMQ=;
+ s=default; t=1596651958;
+ bh=kQqWB9nR8C721TvBKL/d/pl9SOM/oXtaAvToHBb4mtQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=xglUtOcpGZrvMhPhBOey5GPw5yCccjoRwxvmCD4l4X/12gbVMo9QVHfwibMZ2eEG6
- z0rHHDFVuOTpPmACS9Mt/9ylkYOuFlEjbe2L8Z6bBmr2OGvUJ86lV40Ya0vIrOQ/hB
- g7O+U5pZkJYOqBM7zNShcu0glMkJlVtAy2Q2gJSc=
+ b=hFyLINeTa3ODpWskXd3tK9TWPEwk94Gmw53gzZmMkotYkz93ocPZrFqn9lqaNt7Og
+ jG26z0sWEvvSmROlZzij4WnmFbkce/8ja33vibXRDmaXD/U9yhClELKhaUnVBfxhiB
+ 7W2UwlStd1h9++sYXWw+F1fJ6I5N2Rfi4REhaWp8=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3Nft-0004w9-0s; Wed, 05 Aug 2020 18:58:01 +0100
+ id 1k3NfE-0004w9-Lu; Wed, 05 Aug 2020 18:57:20 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 43/56] KVM: arm64: Move SP_EL1 to the system register array
-Date: Wed,  5 Aug 2020 18:56:47 +0100
-Message-Id: <20200805175700.62775-44-maz@kernel.org>
+Subject: [PATCH 10/56] KVM: arm64: Move ACTLR_EL1 emulation to the
+ sys_reg_descs array
+Date: Wed,  5 Aug 2020 18:56:14 +0100
+Message-Id: <20200805175700.62775-11-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -99,73 +100,129 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SP_EL1 being a VNCR-capable register with ARMv8.4-NV, move it to the
-system register array and update the accessors.
+From: James Morse <james.morse@arm.com>
 
-Reviewed-by: James Morse <james.morse@arm.com>
+The only entry in the genericv8_sys_regs arrays is for emulation of
+ACTLR_EL1. As all targets emulate this in the same way, move it to
+sys_reg_descs[].
+
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200622113317.20477-4-james.morse@arm.com
 ---
- arch/arm64/include/asm/kvm_host.h          | 3 +--
- arch/arm64/kvm/guest.c                     | 2 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 4 ++--
- 3 files changed, 4 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/sys_regs.c            | 28 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs_generic_v8.c | 30 ----------------------------
+ 2 files changed, 28 insertions(+), 30 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f255507dd916..2bd6285eaf4c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -186,6 +186,7 @@ enum vcpu_sysreg {
- 	APGAKEYHI_EL1,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index fb448bfc83ec..f8407cfa9032 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -242,6 +242,25 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
- 	ELR_EL1,
-+	SP_EL1,
++static bool access_actlr(struct kvm_vcpu *vcpu,
++			 struct sys_reg_params *p,
++			 const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		return ignore_write(vcpu, p);
++
++	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
++
++	if (p->is_aarch32) {
++		if (r->Op2 & 2)
++			p->regval = upper_32_bits(p->regval);
++		else
++			p->regval = lower_32_bits(p->regval);
++	}
++
++	return true;
++}
++
+ /*
+  * Trap handler for the GICv3 SGI generation system register.
+  * Forward the request to the VGIC emulation.
+@@ -615,6 +634,12 @@ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_write_sys_reg(vcpu, amair, AMAIR_EL1);
+ }
  
- 	/* 32bit specific registers. Keep them at the end of the range */
- 	DACR32_EL2,	/* Domain Access Control Register */
-@@ -240,8 +241,6 @@ enum vcpu_sysreg {
- struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
++static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	u64 actlr = read_sysreg(actlr_el1);
++	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
++}
++
+ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+ 	u64 mpidr;
+@@ -1518,6 +1543,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(7,7),
  
--	u64	sp_el1;
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
++	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
+ 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
+ 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+@@ -1957,6 +1983,8 @@ static const struct sys_reg_desc cp14_64_regs[] = {
+ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 0), CRm( 0), Op2( 1), access_ctr },
+ 	{ Op1( 0), CRn( 1), CRm( 0), Op2( 0), access_vm_reg, NULL, c1_SCTLR },
++	{ Op1( 0), CRn( 1), CRm( 0), Op2( 1), access_actlr },
++	{ Op1( 0), CRn( 1), CRm( 0), Op2( 3), access_actlr },
+ 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 0), access_vm_reg, NULL, c2_TTBR0 },
+ 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 1), access_vm_reg, NULL, c2_TTBR1 },
+ 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, c2_TTBCR },
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+index a82cc2ccfd44..a7e21e61beea 100644
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+@@ -19,44 +19,14 @@
+ 
+ #include "sys_regs.h"
+ 
+-static bool access_actlr(struct kvm_vcpu *vcpu,
+-			 struct sys_reg_params *p,
+-			 const struct sys_reg_desc *r)
+-{
+-	if (p->is_write)
+-		return ignore_write(vcpu, p);
 -
- 	u64	spsr[KVM_NR_SPSR];
+-	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
+-
+-	if (p->is_aarch32) {
+-		if (r->Op2 & 2)
+-			p->regval = upper_32_bits(p->regval);
+-		else
+-			p->regval = lower_32_bits(p->regval);
+-	}
+-
+-	return true;
+-}
+-
+-static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-{
+-	__vcpu_sys_reg(vcpu, ACTLR_EL1) = read_sysreg(actlr_el1);
+-}
+-
+ /*
+  * Implementation specific sys-reg registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+  */
+ static const struct sys_reg_desc genericv8_sys_regs[] = {
+-	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
+ };
  
- 	struct user_fpsimd_state fp_regs;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 99ff09ad24e8..d614716e073b 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -129,7 +129,7 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		return &vcpu->arch.ctxt.regs.pstate;
+ static const struct sys_reg_desc genericv8_cp15_regs[] = {
+-	/* ACTLR */
+-	{ Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b001),
+-	  access_actlr },
+-	{ Op1(0b000), CRn(0b0001), CRm(0b0000), Op2(0b011),
+-	  access_actlr },
+ };
  
- 	case KVM_REG_ARM_CORE_REG(sp_el1):
--		return &vcpu->arch.ctxt.sp_el1;
-+		return __ctxt_sys_reg(&vcpu->arch.ctxt, SP_EL1);
- 
- 	case KVM_REG_ARM_CORE_REG(elr_el1):
- 		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 9ebbd626d4ab..4c26ba72120e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -46,7 +46,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
- 
--	ctxt->sp_el1			= read_sysreg(sp_el1);
-+	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
- 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
- 	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
- }
-@@ -125,7 +125,7 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
- 	}
- 
--	write_sysreg(ctxt->sp_el1,			sp_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
- 	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
- }
+ struct kvm_sys_reg_target_table genericv8_target_table = {
 -- 
 2.27.0
 
