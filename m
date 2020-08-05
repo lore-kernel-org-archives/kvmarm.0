@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134AAC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580C1C433E1
 	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF78322CA1
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05F7522D08
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vcUqq6D/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF78322CA1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="G7uMxOjz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F7522D08
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 646EF4B558;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A97564B561;
 	Wed,  5 Aug 2020 13:57:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iNRGEVih+aai; Wed,  5 Aug 2020 13:57:24 -0400 (EDT)
+	with ESMTP id CcaxD1AkRrqp; Wed,  5 Aug 2020 13:57:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A8504B5C2;
-	Wed,  5 Aug 2020 13:57:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6934B61A;
+	Wed,  5 Aug 2020 13:57:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B33AA4B587
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CAE4B578
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y72jOA6tsi8y for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 13:57:20 -0400 (EDT)
+ with ESMTP id v-NnnrX4oBnU for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 13:57:23 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 621434B558
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A58C4B397
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:21 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 72F3D22CE3;
- Wed,  5 Aug 2020 17:57:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 36E1722D04;
+ Wed,  5 Aug 2020 17:57:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596650238;
- bh=fAuT8VTgA3l5MxpGKHZ5lW2sGaO4vZ74wkEmAKAFtrA=;
+ s=default; t=1596650240;
+ bh=7ArqvSK8VUGJgeX1OnhoTSQ+a7BydokvwxYLyhHIlMg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=vcUqq6D/d3qBogzUqxDEU1yrJft154JBCm9/Iv2SxFCKg6SWwNAnaoSxtp2W9u4Hi
- 1LHIcd1mWTG2aLoNfI7y9EjiiC3kqdt3YfEY5jdj3KebOg9wC3TqfaAHRqVXwGYtis
- DgzUWUvS16QrvvGac+L0RzYqg7Yp+BFj7y7qV2mg=
+ b=G7uMxOjz8gkR3xFfhtpD82P2khC6WFYs2XifyJqv9j8pemgssW4y6+fB58SANSeRP
+ JQ77MaMaQlXFEK+d4DGnHaObDprDOQn/gb6w67MsmTJ7sTtzuZcgRbP8v8yaA1xICu
+ VgM7p/Ls/izszv+/8S5ybw8tmp00XBEVrDma7XzA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3NfA-0004w9-Vm; Wed, 05 Aug 2020 18:57:17 +0100
+ id 1k3NfC-0004w9-LP; Wed, 05 Aug 2020 18:57:18 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 06/56] KVM: arm64: Allow in-atomic injection of SPIs
-Date: Wed,  5 Aug 2020 18:56:10 +0100
-Message-Id: <20200805175700.62775-7-maz@kernel.org>
+Subject: [PATCH 08/56] KVM: arm64: Drop the target_table[] indirection
+Date: Wed,  5 Aug 2020 18:56:12 +0100
+Message-Id: <20200805175700.62775-9-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -99,90 +99,136 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On a system that uses SPIs to implement MSIs (as it would be
-the case on a GICv2 system exposing a GICv2m to its guests),
-we deny the possibility of injecting SPIs on the in-atomic
-fast-path.
+From: James Morse <james.morse@arm.com>
 
-This results in a very large amount of context-switches
-(roughly equivalent to twice the interrupt rate) on the host,
-and suboptimal performance for the guest (as measured with
-a test workload involving a virtio interface backed by vhost-net).
-Given that GICv2 systems are usually on the low-end of the spectrum
-performance wise, they could do without the aggravation.
+KVM for 32bit arm had a get/set target mechanism to allow for
+micro-architecture differences that are visible in system registers
+to be described.
 
-We solved this for GICv3+ITS by having a translation cache. But
-SPIs do not need any extra infrastructure, and can be immediately
-injected in the virtual distributor as the locking is already
-heavy enough that we don't need to worry about anything.
+KVM's user-space can query the supported targets for a CPU, and
+create vCPUs for that target. The target can override the handling
+of system registers to provide different reset or RES0 behaviour.
+On 32bit arm this was used to provide different ACTLR reset values
+for A7 and A15.
 
-This halves the number of context switches for the same workload.
+On 64bit arm, the first few CPUs out of the gate used this mechanism,
+before it was deemed redundant in commit bca556ac468a ("arm64/kvm:
+Add generic v8 KVM target"). All future CPUs use the
+KVM_ARM_TARGET_GENERIC_V8 target.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+The 64bit target_table[] stuff exists to preserve the ABI to
+user-space. As all targets registers genericv8_target_table, there
+is no reason to look the target up.
+
+Until we can merge genericv8_target_table with the main sys_regs
+array, kvm_register_target_sys_reg_table() becomes
+kvm_check_target_sys_reg_table(), which uses BUG_ON() in keeping
+with the other callers in this file.
+
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20200622113317.20477-2-james.morse@arm.com
 ---
- arch/arm64/kvm/vgic/vgic-irqfd.c | 24 +++++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_coproc.h  |  3 +--
+ arch/arm64/kvm/sys_regs.c            | 16 ++++------------
+ arch/arm64/kvm/sys_regs.h            |  2 ++
+ arch/arm64/kvm/sys_regs_generic_v8.c | 15 ++-------------
+ 4 files changed, 9 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index d8cdfea5cc96..79f8899b234c 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -100,19 +100,33 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
+index 0185ee8b8b5e..4bf0d6d05e0f 100644
+--- a/arch/arm64/include/asm/kvm_coproc.h
++++ b/arch/arm64/include/asm/kvm_coproc.h
+@@ -24,8 +24,7 @@ struct kvm_sys_reg_target_table {
+ 	struct kvm_sys_reg_table table32;
+ };
  
- /**
-  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-- *
-- * Currently only direct MSI injection is supported.
-  */
- int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
- 			      struct kvm *kvm, int irq_source_id, int level,
- 			      bool line_status)
- {
--	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
-+	if (!level)
-+		return -EWOULDBLOCK;
-+
-+	switch (e->type) {
-+	case KVM_IRQ_ROUTING_MSI: {
- 		struct kvm_msi msi;
+-void kvm_register_target_sys_reg_table(unsigned int target,
+-				       struct kvm_sys_reg_target_table *table);
++void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table);
  
-+		if (!vgic_has_its(kvm))
-+			break;
-+
- 		kvm_populate_msi(e, &msi);
--		if (!vgic_its_inject_cached_translation(kvm, &msi))
--			return 0;
-+		return vgic_its_inject_cached_translation(kvm, &msi);
-+	}
-+
-+	case KVM_IRQ_ROUTING_IRQCHIP:
-+		/*
-+		 * Injecting SPIs is always possible in atomic context
-+		 * as long as the damn vgic is initialized.
-+		 */
-+		if (unlikely(!vgic_initialized(kvm)))
-+			break;
-+		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
- 	}
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index baf5ce9225ce..6333a7cd92d3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2109,17 +2109,10 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+ 	return 0;
+ }
  
- 	return -EWOULDBLOCK;
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index c012a52b19f5..40cbaca81333 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -757,9 +757,8 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
- 
- 	db = (u64)msi->address_hi << 32 | msi->address_lo;
- 	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+-/* Target specific emulation tables */
+-static struct kvm_sys_reg_target_table *target_tables[KVM_ARM_NUM_TARGETS];
 -
- 	if (!irq)
--		return -1;
-+		return -EWOULDBLOCK;
+-void kvm_register_target_sys_reg_table(unsigned int target,
+-				       struct kvm_sys_reg_target_table *table)
++void kvm_check_target_sys_reg_table(struct kvm_sys_reg_target_table *table)
+ {
+-	if (check_sysreg_table(table->table64.table, table->table64.num, false) ||
+-	    check_sysreg_table(table->table32.table, table->table32.num, true))
+-		return;
+-
+-	target_tables[target] = table;
++	BUG_ON(check_sysreg_table(table->table64.table, table->table64.num, false));
++	BUG_ON(check_sysreg_table(table->table32.table, table->table32.num, true));
+ }
  
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	irq->pending_latch = true;
+ /* Get specific register table for this target. */
+@@ -2127,9 +2120,8 @@ static const struct sys_reg_desc *get_target_table(unsigned target,
+ 						   bool mode_is_64,
+ 						   size_t *num)
+ {
+-	struct kvm_sys_reg_target_table *table;
++	struct kvm_sys_reg_target_table *table = &genericv8_target_table;
+ 
+-	table = target_tables[target];
+ 	if (mode_is_64) {
+ 		*num = table->table64.num;
+ 		return table->table64.table;
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 5a6fc30f5989..933609e883bf 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -165,4 +165,6 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
+ 	Op2(sys_reg_Op2(reg))
+ 
++extern struct kvm_sys_reg_target_table genericv8_target_table;
++
+ #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+index aa9d356451eb..a82cc2ccfd44 100644
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+@@ -59,7 +59,7 @@ static const struct sys_reg_desc genericv8_cp15_regs[] = {
+ 	  access_actlr },
+ };
+ 
+-static struct kvm_sys_reg_target_table genericv8_target_table = {
++struct kvm_sys_reg_target_table genericv8_target_table = {
+ 	.table64 = {
+ 		.table = genericv8_sys_regs,
+ 		.num = ARRAY_SIZE(genericv8_sys_regs),
+@@ -78,18 +78,7 @@ static int __init sys_reg_genericv8_init(void)
+ 		BUG_ON(cmp_sys_reg(&genericv8_sys_regs[i-1],
+ 			       &genericv8_sys_regs[i]) >= 0);
+ 
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_AEM_V8,
+-					  &genericv8_target_table);
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_FOUNDATION_V8,
+-					  &genericv8_target_table);
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A53,
+-					  &genericv8_target_table);
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CORTEX_A57,
+-					  &genericv8_target_table);
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
+-					  &genericv8_target_table);
+-	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_GENERIC_V8,
+-					  &genericv8_target_table);
++	kvm_check_target_sys_reg_table(&genericv8_target_table);
+ 
+ 	return 0;
+ }
 -- 
 2.27.0
 
