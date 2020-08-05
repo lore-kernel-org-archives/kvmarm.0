@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4728C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F95C433DF
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 89B3D22DA9
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EF9222DA9
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKw2DeJ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B3D22DA9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tzUdwVTU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EF9222DA9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4765E4B45E;
-	Wed,  5 Aug 2020 14:26:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A34F4B463;
+	Wed,  5 Aug 2020 14:26:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DiKaWzzNpJNt; Wed,  5 Aug 2020 14:26:38 -0400 (EDT)
+	with ESMTP id Zqych+O7JImb; Wed,  5 Aug 2020 14:26:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9994B5CC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 832054B5D6;
 	Wed,  5 Aug 2020 14:26:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 354AC4B4CB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AACF94B560
  for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yn+6Cq6qbp90 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 14:26:35 -0400 (EDT)
+ with ESMTP id frA-k6FL8MaN for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 14:26:36 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B21EC4B463
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 480634B4B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:26:35 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A4E4B22D6F;
- Wed,  5 Aug 2020 18:26:32 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 75E8622D6E;
+ Wed,  5 Aug 2020 18:26:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596651992;
- bh=Qb7b2h0IscN4Tyvpc8jbgw5a2ZVsIZ1sqfWWGF8CpAM=;
+ s=default; t=1596651994;
+ bh=NYJ9si41AeBNM/gClyftM9iewSbHDHRYYgjNfO+jb3A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gKw2DeJ/RdK1RClpvJSfLAV84l+4jepEgtvAovq/gvKqzEmiZufvPSfVRduTle6mY
- PeWq+sVDufM864SyLMd2gg9L1mEX8oDtEGSuif3OHeLAFOaGJvdMrnZHTKVbXCho53
- boBOzSsxxTF3JZiCf14Z9UBMy3dczW/Acky9j2tM=
+ b=tzUdwVTUOiCOF64SxT0C4N+Wu1ozHXJQLcW9qWw1FoF7vCMAzUkZKNy9Y7bKygxp6
+ nzT6s9XD9tS94H+BKtE8KfzBSXQzZIdwOc0MzVQXtiHD8PERORQDvXaP+mLlmfIhth
+ 94ixADdS9GeXRbvGnjLT5+CCH6S/08u9lFfFk13Y=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3NfT-0004w9-QC; Wed, 05 Aug 2020 18:57:37 +0100
+ id 1k3NfI-0004w9-Hm; Wed, 05 Aug 2020 18:57:24 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 20/56] KVM: arm64: Duplicate hyp/tlb.c for VHE/nVHE
-Date: Wed,  5 Aug 2020 18:56:24 +0100
-Message-Id: <20200805175700.62775-21-maz@kernel.org>
+Subject: [PATCH 13/56] KVM: arm64: Fix symbol dependency in
+ __hyp_call_panic_nvhe
+Date: Wed,  5 Aug 2020 18:56:17 +0100
+Message-Id: <20200805175700.62775-14-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -101,401 +102,35 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: David Brazdil <dbrazdil@google.com>
 
-tlb.c contains code for flushing the TLB, with code shared between VHE/nVHE.
-Because common code is small, duplicate tlb.c and specialize each copy for
-VHE/nVHE.
+__hyp_call_panic_nvhe contains inline assembly which did not declare
+its dependency on the __hyp_panic_string symbol.
+
+The static-declared string has previously been kept alive because of a use in
+__hyp_call_panic_vhe. Fix this in preparation for separating the source files
+between VHE and nVHE when the two users land in two different compilation
+units. The static variable otherwise gets dropped when compiling the nVHE
+source file, causing an undefined symbol linker error later.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200625131420.71444-9-dbrazdil@google.com
+Link: https://lore.kernel.org/r/20200625131420.71444-2-dbrazdil@google.com
 ---
- arch/arm64/kernel/image-vars.h      |  14 +--
- arch/arm64/kvm/hyp/Makefile         |   2 +-
- arch/arm64/kvm/hyp/nvhe/Makefile    |   2 +-
- arch/arm64/kvm/hyp/{ => nvhe}/tlb.c |  96 +----------------
- arch/arm64/kvm/hyp/vhe/Makefile     |   2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c        | 161 ++++++++++++++++++++++++++++
- 6 files changed, 177 insertions(+), 100 deletions(-)
- rename arch/arm64/kvm/hyp/{ => nvhe}/tlb.c (61%)
- create mode 100644 arch/arm64/kvm/hyp/vhe/tlb.c
+ arch/arm64/kvm/hyp/switch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 63186c91b614..f029f3ea7ffe 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -81,12 +81,6 @@ KVM_NVHE_ALIAS(__kvm_enable_ssbs);
- /* Symbols defined in timer-sr.c (not yet compiled with nVHE build rules). */
- KVM_NVHE_ALIAS(__kvm_timer_set_cntvoff);
- 
--/* Symbols defined in tlb.c (not yet compiled with nVHE build rules). */
--KVM_NVHE_ALIAS(__kvm_flush_vm_context);
--KVM_NVHE_ALIAS(__kvm_tlb_flush_local_vmid);
--KVM_NVHE_ALIAS(__kvm_tlb_flush_vmid);
--KVM_NVHE_ALIAS(__kvm_tlb_flush_vmid_ipa);
--
- /* Symbols defined in vgic-v3-sr.c (not yet compiled with nVHE build rules). */
- KVM_NVHE_ALIAS(__vgic_v3_get_ich_vtr_el2);
- KVM_NVHE_ALIAS(__vgic_v3_init_lrs);
-@@ -116,6 +110,14 @@ KVM_NVHE_ALIAS(__hyp_stub_vectors);
- /* IDMAP TCR_EL1.T0SZ as computed by the EL1 init code */
- KVM_NVHE_ALIAS(idmap_t0sz);
- 
-+/* Kernel symbol used by icache_is_vpipt(). */
-+KVM_NVHE_ALIAS(__icache_flags);
-+
-+/* Kernel symbols needed for cpus_have_final/const_caps checks. */
-+KVM_NVHE_ALIAS(arm64_const_caps_ready);
-+KVM_NVHE_ALIAS(cpu_hwcap_keys);
-+KVM_NVHE_ALIAS(cpu_hwcaps);
-+
- #endif /* CONFIG_KVM */
- 
- #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 8b0cf85080b5..87d3cce2b26e 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -14,7 +14,7 @@ obj-$(CONFIG_KVM) += hyp.o vhe/ nvhe/
- obj-$(CONFIG_KVM_INDIRECT_VECTORS) += smccc_wa.o
- 
- hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
--	 debug-sr.o entry.o switch.o fpsimd.o tlb.o
-+	 debug-sr.o entry.o switch.o fpsimd.o
- 
- # KVM code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index bf2d8dea5400..a5316e97d373 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -6,7 +6,7 @@
- asflags-y := -D__KVM_NVHE_HYPERVISOR__
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__
- 
--obj-y := hyp-init.o ../hyp-entry.o
-+obj-y := tlb.o hyp-init.o ../hyp-entry.o
- 
- obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
- extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-similarity index 61%
-rename from arch/arm64/kvm/hyp/tlb.c
-rename to arch/arm64/kvm/hyp/nvhe/tlb.c
-index d063a576d511..deb48c8c00ee 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -4,64 +4,16 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- 
--#include <linux/irqflags.h>
--
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- #include <asm/tlbflush.h>
- 
- struct tlb_inv_context {
--	unsigned long	flags;
- 	u64		tcr;
--	u64		sctlr;
- };
- 
--static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
--						 struct tlb_inv_context *cxt)
--{
--	u64 val;
--
--	local_irq_save(cxt->flags);
--
--	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
--		/*
--		 * For CPUs that are affected by ARM errata 1165522 or 1530923,
--		 * we cannot trust stage-1 to be in a correct state at that
--		 * point. Since we do not want to force a full load of the
--		 * vcpu state, we prevent the EL1 page-table walker to
--		 * allocate new TLBs. This is done by setting the EPD bits
--		 * in the TCR_EL1 register. We also need to prevent it to
--		 * allocate IPA->PA walks, so we enable the S1 MMU...
--		 */
--		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
--		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
--		write_sysreg_el1(val, SYS_TCR);
--		val = cxt->sctlr = read_sysreg_el1(SYS_SCTLR);
--		val |= SCTLR_ELx_M;
--		write_sysreg_el1(val, SYS_SCTLR);
--	}
--
--	/*
--	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
--	 * most TLB operations target EL2/EL0. In order to affect the
--	 * guest TLBs (EL1/EL0), we need to change one of these two
--	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
--	 * let's flip TGE before executing the TLB operation.
--	 *
--	 * ARM erratum 1165522 requires some special handling (again),
--	 * as we need to make sure both stages of translation are in
--	 * place before clearing TGE. __load_guest_stage2() already
--	 * has an ISB in order to deal with this.
--	 */
--	__load_guest_stage2(kvm);
--	val = read_sysreg(hcr_el2);
--	val &= ~HCR_TGE;
--	write_sysreg(val, hcr_el2);
--	isb();
--}
--
--static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
--						  struct tlb_inv_context *cxt)
-+static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
-+					     struct tlb_inv_context *cxt)
- {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		u64 val;
-@@ -84,37 +36,8 @@ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
- 	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
- }
- 
--static void __hyp_text __tlb_switch_to_guest(struct kvm *kvm,
--					     struct tlb_inv_context *cxt)
--{
--	if (has_vhe())
--		__tlb_switch_to_guest_vhe(kvm, cxt);
--	else
--		__tlb_switch_to_guest_nvhe(kvm, cxt);
--}
--
--static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
--						struct tlb_inv_context *cxt)
--{
--	/*
--	 * We're done with the TLB operation, let's restore the host's
--	 * view of HCR_EL2.
--	 */
--	write_sysreg(0, vttbr_el2);
--	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
--	isb();
--
--	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
--		/* Restore the registers to what they were */
--		write_sysreg_el1(cxt->tcr, SYS_TCR);
--		write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
--	}
--
--	local_irq_restore(cxt->flags);
--}
--
--static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
--						 struct tlb_inv_context *cxt)
-+static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
-+					    struct tlb_inv_context *cxt)
- {
- 	write_sysreg(0, vttbr_el2);
- 
-@@ -126,15 +49,6 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
- 	}
- }
- 
--static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
--					    struct tlb_inv_context *cxt)
--{
--	if (has_vhe())
--		__tlb_switch_to_host_vhe(kvm, cxt);
--	else
--		__tlb_switch_to_host_nvhe(kvm, cxt);
--}
--
- void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	struct tlb_inv_context cxt;
-@@ -183,7 +97,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	 * The moral of this story is: if you have a VPIPT I-cache, then
- 	 * you should be running with VHE enabled.
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index db1c4487d95d..9270b14157b5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -897,7 +897,7 @@ static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par,
+ 	 * making sure it is a kernel address and not a PC-relative
+ 	 * reference.
  	 */
--	if (!has_vhe() && icache_is_vpipt())
-+	if (icache_is_vpipt())
- 		__flush_icache_all();
+-	asm volatile("ldr %0, =__hyp_panic_string" : "=r" (str_va));
++	asm volatile("ldr %0, =%1" : "=r" (str_va) : "S" (__hyp_panic_string));
  
- 	__tlb_switch_to_host(kvm, &cxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makefile
-index 323029e02b4e..704140fc5d66 100644
---- a/arch/arm64/kvm/hyp/vhe/Makefile
-+++ b/arch/arm64/kvm/hyp/vhe/Makefile
-@@ -6,7 +6,7 @@
- asflags-y := -D__KVM_VHE_HYPERVISOR__
- ccflags-y := -D__KVM_VHE_HYPERVISOR__
- 
--obj-y := ../hyp-entry.o
-+obj-y := tlb.o ../hyp-entry.o
- 
- # KVM code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-new file mode 100644
-index 000000000000..b275101e9c9c
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -0,0 +1,161 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ */
-+
-+#include <linux/irqflags.h>
-+
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
-+#include <asm/tlbflush.h>
-+
-+struct tlb_inv_context {
-+	unsigned long	flags;
-+	u64		tcr;
-+	u64		sctlr;
-+};
-+
-+static void __tlb_switch_to_guest(struct kvm *kvm, struct tlb_inv_context *cxt)
-+{
-+	u64 val;
-+
-+	local_irq_save(cxt->flags);
-+
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-+		/*
-+		 * For CPUs that are affected by ARM errata 1165522 or 1530923,
-+		 * we cannot trust stage-1 to be in a correct state at that
-+		 * point. Since we do not want to force a full load of the
-+		 * vcpu state, we prevent the EL1 page-table walker to
-+		 * allocate new TLBs. This is done by setting the EPD bits
-+		 * in the TCR_EL1 register. We also need to prevent it to
-+		 * allocate IPA->PA walks, so we enable the S1 MMU...
-+		 */
-+		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
-+		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
-+		write_sysreg_el1(val, SYS_TCR);
-+		val = cxt->sctlr = read_sysreg_el1(SYS_SCTLR);
-+		val |= SCTLR_ELx_M;
-+		write_sysreg_el1(val, SYS_SCTLR);
-+	}
-+
-+	/*
-+	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
-+	 * most TLB operations target EL2/EL0. In order to affect the
-+	 * guest TLBs (EL1/EL0), we need to change one of these two
-+	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
-+	 * let's flip TGE before executing the TLB operation.
-+	 *
-+	 * ARM erratum 1165522 requires some special handling (again),
-+	 * as we need to make sure both stages of translation are in
-+	 * place before clearing TGE. __load_guest_stage2() already
-+	 * has an ISB in order to deal with this.
-+	 */
-+	__load_guest_stage2(kvm);
-+	val = read_sysreg(hcr_el2);
-+	val &= ~HCR_TGE;
-+	write_sysreg(val, hcr_el2);
-+	isb();
-+}
-+
-+static void __tlb_switch_to_host(struct kvm *kvm, struct tlb_inv_context *cxt)
-+{
-+	/*
-+	 * We're done with the TLB operation, let's restore the host's
-+	 * view of HCR_EL2.
-+	 */
-+	write_sysreg(0, vttbr_el2);
-+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	isb();
-+
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-+		/* Restore the registers to what they were */
-+		write_sysreg_el1(cxt->tcr, SYS_TCR);
-+		write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
-+	}
-+
-+	local_irq_restore(cxt->flags);
-+}
-+
-+void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(ishst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(kvm, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi(ipas2e1is, ipa);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(ish);
-+	__tlbi(vmalle1is);
-+	dsb(ish);
-+	isb();
-+
-+	__tlb_switch_to_host(kvm, &cxt);
-+}
-+
-+void __kvm_tlb_flush_vmid(struct kvm *kvm)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(ishst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(kvm, &cxt);
-+
-+	__tlbi(vmalls12e1is);
-+	dsb(ish);
-+	isb();
-+
-+	__tlb_switch_to_host(kvm, &cxt);
-+}
-+
-+void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct tlb_inv_context cxt;
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(kvm, &cxt);
-+
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(kvm, &cxt);
-+}
-+
-+void __kvm_flush_vm_context(void)
-+{
-+	dsb(ishst);
-+	__tlbi(alle1is);
-+
-+	/*
-+	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-+	 * is necessary across a VMID rollover.
-+	 *
-+	 * VPIPT caches constrain lookup and maintenance to the active VMID,
-+	 * so we need to invalidate lines with a stale VMID to avoid an ABA
-+	 * race after multiple rollovers.
-+	 *
-+	 */
-+	if (icache_is_vpipt())
-+		asm volatile("ic ialluis");
-+
-+	dsb(ish);
-+}
+ 	__hyp_do_panic(str_va,
+ 		       spsr, elr,
 -- 
 2.27.0
 
