@@ -2,68 +2,70 @@ Return-Path: <SRS0=OpMx=BP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5E3C433E1
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDBFC433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69E3F22D07
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85CB522D07
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 17:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fknGdJhK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E3F22D07
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dq0mTS5l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85CB522D07
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ADFD4B5CA;
-	Wed,  5 Aug 2020 13:57:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E26D4B57C;
+	Wed,  5 Aug 2020 13:57:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dVTNXuSkLRdT; Wed,  5 Aug 2020 13:57:18 -0400 (EDT)
+	with ESMTP id vzG3kFsM8cU3; Wed,  5 Aug 2020 13:57:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7281C4B571;
-	Wed,  5 Aug 2020 13:57:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B6A04B579;
+	Wed,  5 Aug 2020 13:57:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 698EC4B4FB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E69804B4EB
  for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rb8Z87mcDh3a for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 13:57:15 -0400 (EDT)
+ with ESMTP id X5GGo1EogYCq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 13:57:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0B6E4B441
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7B474B561
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 13:57:15 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 521BF2173E;
- Wed,  5 Aug 2020 17:57:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 01FEB2250E;
+ Wed,  5 Aug 2020 17:57:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596650233;
- bh=juxLV+E099RYtCa22t1sG7pfJtqygQtV/DctUYidP+8=;
- h=From:To:Cc:Subject:Date:From;
- b=fknGdJhK+d4oiugSSghMjrgTAQf3oBOGIkhxZU5vcURpee/7rXEI+huuFVUTisMKj
- rGTKnkZ2rvdlOxU+m28rcLEOSM9F81K05R5gaeuAOZeUPIdrO+c8WPhgH+actxu8Ny
- ildEsE/4ODjIWwfxcSi3alrx4Agvgi5NLh72wHLA=
+ s=default; t=1596650235;
+ bh=auCGx6XCpPj3YqEfR6NXLz5q29tOXX3dB0MRke0HUQQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=Dq0mTS5ldx9HxUmrCnD0/17fGX0zXjqZ6in/6TXrm92Pc61ToxKYi1AR+F+gYHNTQ
+ n6YBKphf2pcDLWZK+nIM00efMICQMG1YOV26GFBe54ICAMPhw9vRlmi7OFhmAUE4H8
+ hV7YhEKHnG4vhcQ2XZsG/wLq4PhPK4OPOPCq2q+4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3Nf5-0004w9-Pn; Wed, 05 Aug 2020 18:57:11 +0100
+ id 1k3Nf7-0004w9-IK; Wed, 05 Aug 2020 18:57:13 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 updates for 5.9
-Date: Wed,  5 Aug 2020 18:56:04 +0100
-Message-Id: <20200805175700.62775-1-maz@kernel.org>
+Subject: [PATCH 02/56] KVM: arm64: Allow ARM64_PTR_AUTH when ARM64_VHE=n
+Date: Wed,  5 Aug 2020 18:56:06 +0100
+Message-Id: <20200805175700.62775-3-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
+References: <20200805175700.62775-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: pbonzini@redhat.com, graf@amazon.com,
@@ -97,234 +99,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+We currently prevent PtrAuth from even being built if KVM is selected,
+but VHE isn't. It is a bit of a pointless restriction, since we also
+check this at run time (rejecting the enabling of PtrAuth for the
+vcpu if we're not running with VHE).
 
-This is the bulk of the 5.9 patches for KVM/arm64. It is a pretty busy
-merge window for us this time, thanks to the ongoing Protected KVM
-work. We have changes all over the map, but the most important piece
-probably is the way we now build the EL2 code on non-VHE systems. On
-top of giving us better control over what gets pulled in there, it
-allowed us to enable instrumentation on VHE systems.
+Just drop this apparently useless restriction.
 
-The rest is a mixed bag of new features (TTL TLB invalidation, Pointer
-Auth on non-VHE), preliminary patches for NV, some early MMU rework
-before the 5.10 onslaught, and tons of cleanups.
+Acked-by: Andrew Scull <ascull@google.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/Kconfig | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-A few things to notice:
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 31380da53689..d719ea9c596d 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1516,7 +1516,6 @@ menu "ARMv8.3 architectural features"
+ config ARM64_PTR_AUTH
+ 	bool "Enable support for pointer authentication"
+ 	default y
+-	depends on !KVM || ARM64_VHE
+ 	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
+ 	# GCC 9.1 and later inserts a .note.gnu.property section note for PAC
+ 	# which is only understood by binutils starting with version 2.33.1.
+@@ -1543,8 +1542,7 @@ config ARM64_PTR_AUTH
+ 
+ 	  The feature is detected at runtime. If the feature is not present in
+ 	  hardware it will not be advertised to userspace/KVM guest nor will it
+-	  be enabled. However, KVM guest also require VHE mode and hence
+-	  CONFIG_ARM64_VHE=y option to use this feature.
++	  be enabled.
+ 
+ 	  If the feature is present on the boot CPU but not on a late CPU, then
+ 	  the late CPU will be parked. Also, if the boot CPU does not have
+-- 
+2.27.0
 
-- We share a branch with the arm64 tree, which has gone in already.
-
-- There are a number of known conflicts with Sean's MMU cache rework,
-  as well as the late fixes that went in 5.8. The conflicts are pretty
-  simple to resolve, and -next has the right resolutions already.
-
-Please pull,
-
-	M.
-
-The following changes since commit 9ebcfadb0610322ac537dd7aa5d9cbc2b2894c68:
-
-  Linux 5.8-rc3 (2020-06-28 15:00:24 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.9
-
-for you to fetch changes up to 16314874b12b451bd5a1df86bcb69745eb487502:
-
-  Merge branch 'kvm-arm64/misc-5.9' into kvmarm-master/next (2020-07-30 16:13:04 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for Linux 5.9:
-
-- Split the VHE and nVHE hypervisor code bases, build the EL2 code
-  separately, allowing for the VHE code to now be built with instrumentation
-
-- Level-based TLB invalidation support
-
-- Restructure of the vcpu register storage to accomodate the NV code
-
-- Pointer Authentication available for guests on nVHE hosts
-
-- Simplification of the system register table parsing
-
-- MMU cleanups and fixes
-
-- A number of post-32bit cleanups and other fixes
-
-----------------------------------------------------------------
-Alexander Graf (2):
-      KVM: arm64: vgic-its: Change default outer cacheability for {PEND, PROP}BASER
-      KVM: arm: Add trace name for ARM_NISV
-
-Andrew Scull (3):
-      arm64: kvm: Remove kern_hyp_va from get_vcpu_ptr
-      KVM: arm64: Handle calls to prefixed hyp functions
-      KVM: arm64: Move hyp-init.S to nVHE
-
-Christoffer Dall (1):
-      KVM: arm64: Factor out stage 2 page table data from struct kvm
-
-David Brazdil (16):
-      KVM: arm64: Fix symbol dependency in __hyp_call_panic_nvhe
-      KVM: arm64: Move __smccc_workaround_1_smc to .rodata
-      KVM: arm64: Add build rules for separate VHE/nVHE object files
-      KVM: arm64: Use build-time defines in has_vhe()
-      KVM: arm64: Build hyp-entry.S separately for VHE/nVHE
-      KVM: arm64: Duplicate hyp/tlb.c for VHE/nVHE
-      KVM: arm64: Split hyp/switch.c to VHE/nVHE
-      KVM: arm64: Split hyp/debug-sr.c to VHE/nVHE
-      KVM: arm64: Split hyp/sysreg-sr.c to VHE/nVHE
-      KVM: arm64: Duplicate hyp/timer-sr.c for VHE/nVHE
-      KVM: arm64: Compile remaining hyp/ files for both VHE/nVHE
-      KVM: arm64: Remove __hyp_text macro, use build rules instead
-      KVM: arm64: Lift instrumentation restrictions on VHE
-      KVM: arm64: Make nVHE ASLR conditional on RANDOMIZE_BASE
-      KVM: arm64: Substitute RANDOMIZE_BASE for HARDEN_EL2_VECTORS
-      KVM: arm64: Ensure that all nVHE hyp code is in .hyp.text
-
-Gavin Shan (1):
-      KVM: arm64: Rename HSR to ESR
-
-James Morse (5):
-      KVM: arm64: Drop the target_table[] indirection
-      KVM: arm64: Tolerate an empty target_table list
-      KVM: arm64: Move ACTLR_EL1 emulation to the sys_reg_descs array
-      KVM: arm64: Remove target_table from exit handlers
-      KVM: arm64: Remove the target table
-
-Marc Zyngier (31):
-      KVM: arm64: Enable Address Authentication at EL2 if available
-      KVM: arm64: Allow ARM64_PTR_AUTH when ARM64_VHE=n
-      KVM: arm64: Allow PtrAuth to be enabled from userspace on non-VHE systems
-      KVM: arm64: Check HCR_EL2 instead of shadow copy to swap PtrAuth registers
-      KVM: arm64: Simplify PtrAuth alternative patching
-      KVM: arm64: Allow in-atomic injection of SPIs
-      arm64: Detect the ARMv8.4 TTL feature
-      arm64: Document SW reserved PTE/PMD bits in Stage-2 descriptors
-      arm64: Add level-hinted TLB invalidation helper
-      Merge branch 'kvm-arm64/ttl-for-arm64' into HEAD
-      KVM: arm64: Use TTL hint in when invalidating stage-2 translations
-      KVM: arm64: Introduce accessor for ctxt->sys_reg
-      KVM: arm64: hyp: Use ctxt_sys_reg/__vcpu_sys_reg instead of raw sys_regs access
-      KVM: arm64: sve: Use __vcpu_sys_reg() instead of raw sys_regs access
-      KVM: arm64: pauth: Use ctxt_sys_reg() instead of raw sys_regs access
-      KVM: arm64: debug: Drop useless vpcu parameter
-      KVM: arm64: Make struct kvm_regs userspace-only
-      KVM: arm64: Move ELR_EL1 to the system register array
-      KVM: arm64: Move SP_EL1 to the system register array
-      KVM: arm64: Disintegrate SPSR array
-      KVM: arm64: Move SPSR_EL1 to the system register array
-      KVM: arm64: timers: Rename kvm_timer_sync_hwstate to kvm_timer_sync_user
-      KVM: arm64: timers: Move timer registers to the sys_regs file
-      KVM: arm64: Don't use has_vhe() for CHOOSE_HYP_SYM()
-      Merge branch 'kvm-arm64/el2-obj-v4.1' into kvmarm-master/next-WIP
-      Merge branch 'kvm-arm64/pre-nv-5.9' into kvmarm-master/next-WIP
-      Merge branch 'kvm-arm64/ptrauth-nvhe' into kvmarm-master/next-WIP
-      Merge branch 'kvm-arm64/target-table-no-more' into kvmarm-master/next-WIP
-      Merge branch 'kvm-arm64/misc-5.9' into kvmarm-master/next-WIP
-      Merge branch 'kvm-arm64/el2-obj-v4.1' into kvmarm-master/next
-      Merge branch 'kvm-arm64/misc-5.9' into kvmarm-master/next
-
-Peng Hao (1):
-      KVM: arm64: Drop long gone function parameter documentation
-
-Will Deacon (4):
-      KVM: arm64: Rename kvm_vcpu_dabt_isextabt()
-      KVM: arm64: Handle data and instruction external aborts the same way
-      KVM: arm64: Don't skip cache maintenance for read-only memslots
-      KVM: arm64: Move S1PTW S2 fault logic out of io_mem_abort()
-
- arch/arm64/Kconfig                                 |  20 +-
- arch/arm64/include/asm/cpucaps.h                   |   3 +-
- arch/arm64/include/asm/kvm_asm.h                   |  75 +-
- arch/arm64/include/asm/kvm_coproc.h                |   8 -
- arch/arm64/include/asm/kvm_emulate.h               |  75 +-
- arch/arm64/include/asm/kvm_host.h                  |  94 ++-
- arch/arm64/include/asm/kvm_hyp.h                   |  15 +-
- arch/arm64/include/asm/kvm_mmu.h                   |  16 +-
- arch/arm64/include/asm/kvm_ptrauth.h               |  34 +-
- arch/arm64/include/asm/mmu.h                       |   7 -
- arch/arm64/include/asm/pgtable-hwdef.h             |   2 +
- arch/arm64/include/asm/stage2_pgtable.h            |   9 +
- arch/arm64/include/asm/sysreg.h                    |   1 +
- arch/arm64/include/asm/tlbflush.h                  |  45 +
- arch/arm64/include/asm/virt.h                      |  13 +-
- arch/arm64/kernel/asm-offsets.c                    |   3 +-
- arch/arm64/kernel/cpu_errata.c                     |   4 +-
- arch/arm64/kernel/cpufeature.c                     |  11 +
- arch/arm64/kernel/image-vars.h                     |  54 ++
- arch/arm64/kvm/Kconfig                             |   2 +-
- arch/arm64/kvm/Makefile                            |   4 +-
- arch/arm64/kvm/arch_timer.c                        | 157 +++-
- arch/arm64/kvm/arm.c                               |  57 +-
- arch/arm64/kvm/fpsimd.c                            |   6 +-
- arch/arm64/kvm/guest.c                             |  79 +-
- arch/arm64/kvm/handle_exit.c                       |  32 +-
- arch/arm64/kvm/hyp/Makefile                        |  24 +-
- arch/arm64/kvm/hyp/aarch32.c                       |   8 +-
- arch/arm64/kvm/hyp/entry.S                         |   4 +-
- arch/arm64/kvm/hyp/fpsimd.S                        |   1 -
- arch/arm64/kvm/hyp/hyp-entry.S                     |  21 +-
- .../kvm/hyp/{debug-sr.c => include/hyp/debug-sr.h} |  88 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            | 511 +++++++++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         | 193 +++++
- arch/arm64/kvm/hyp/nvhe/Makefile                   |  62 ++
- arch/arm64/kvm/hyp/nvhe/debug-sr.c                 |  77 ++
- arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S           |   5 +
- arch/arm64/kvm/hyp/nvhe/switch.c                   | 272 ++++++
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c                |  46 +
- arch/arm64/kvm/hyp/{ => nvhe}/timer-sr.c           |   6 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                      | 154 ++++
- arch/arm64/kvm/hyp/smccc_wa.S                      |  32 +
- arch/arm64/kvm/hyp/switch.c                        | 936 ---------------------
- arch/arm64/kvm/hyp/sysreg-sr.c                     | 333 --------
- arch/arm64/kvm/hyp/tlb.c                           | 242 ------
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c           |   4 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                    | 134 ++-
- arch/arm64/kvm/hyp/vhe/Makefile                    |  11 +
- arch/arm64/kvm/hyp/vhe/debug-sr.c                  |  26 +
- arch/arm64/kvm/hyp/vhe/switch.c                    | 219 +++++
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 | 114 +++
- arch/arm64/kvm/hyp/vhe/timer-sr.c                  |  12 +
- arch/arm64/kvm/hyp/vhe/tlb.c                       | 162 ++++
- arch/arm64/kvm/inject_fault.c                      |   2 +-
- arch/arm64/kvm/mmio.c                              |   6 -
- arch/arm64/kvm/mmu.c                               | 311 ++++---
- arch/arm64/kvm/regmap.c                            |  37 +-
- arch/arm64/kvm/reset.c                             |  23 +-
- arch/arm64/kvm/sys_regs.c                          | 207 ++---
- arch/arm64/kvm/sys_regs_generic_v8.c               |  96 ---
- arch/arm64/kvm/trace_arm.h                         |   8 +-
- arch/arm64/kvm/va_layout.c                         |   2 +-
- arch/arm64/kvm/vgic/vgic-irqfd.c                   |  24 +-
- arch/arm64/kvm/vgic/vgic-its.c                     |   3 +-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |   2 +-
- include/kvm/arm_arch_timer.h                       |  13 +-
- include/trace/events/kvm.h                         |   2 +-
- scripts/kallsyms.c                                 |   1 +
- 68 files changed, 2883 insertions(+), 2377 deletions(-)
- rename arch/arm64/kvm/hyp/{debug-sr.c => include/hyp/debug-sr.h} (66%)
- create mode 100644 arch/arm64/kvm/hyp/include/hyp/switch.h
- create mode 100644 arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
- create mode 100644 arch/arm64/kvm/hyp/nvhe/debug-sr.c
- rename arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S (95%)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/switch.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
- rename arch/arm64/kvm/hyp/{ => nvhe}/timer-sr.c (84%)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/tlb.c
- create mode 100644 arch/arm64/kvm/hyp/smccc_wa.S
- delete mode 100644 arch/arm64/kvm/hyp/switch.c
- delete mode 100644 arch/arm64/kvm/hyp/sysreg-sr.c
- delete mode 100644 arch/arm64/kvm/hyp/tlb.c
- create mode 100644 arch/arm64/kvm/hyp/vhe/Makefile
- create mode 100644 arch/arm64/kvm/hyp/vhe/debug-sr.c
- create mode 100644 arch/arm64/kvm/hyp/vhe/switch.c
- create mode 100644 arch/arm64/kvm/hyp/vhe/sysreg-sr.c
- create mode 100644 arch/arm64/kvm/hyp/vhe/timer-sr.c
- create mode 100644 arch/arm64/kvm/hyp/vhe/tlb.c
- delete mode 100644 arch/arm64/kvm/sys_regs_generic_v8.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
