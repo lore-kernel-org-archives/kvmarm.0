@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD601C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F661C433DF
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:27:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7707223108
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABD6F23103
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Aug 2020 18:27:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDGokrIv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7707223108
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlXdRpcs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD6F23103
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 340824B45F;
-	Wed,  5 Aug 2020 14:27:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3174B4BA;
+	Wed,  5 Aug 2020 14:27:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KlyN182IDtuY; Wed,  5 Aug 2020 14:27:18 -0400 (EDT)
+	with ESMTP id KUUzPmmz0TxE; Wed,  5 Aug 2020 14:27:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D304D4B65C;
-	Wed,  5 Aug 2020 14:27:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03AA64B671;
+	Wed,  5 Aug 2020 14:27:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A004B480
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:27:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D594B5B9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:27:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fxub3DL+2yTT for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2020 14:27:08 -0400 (EDT)
+ with ESMTP id 5rN9Z7ClrOzi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2020 14:27:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38D844B616
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:27:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B8EE4B4BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2020 14:27:12 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 673B322E03;
- Wed,  5 Aug 2020 18:27:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B2C7B230FF;
+ Wed,  5 Aug 2020 18:27:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1596652024;
- bh=eQ276HpROXTZRcJ8dzk/lIWxDUagJcK2wT54NS6BYfw=;
+ s=default; t=1596652031;
+ bh=+La9Q4eY0rPcjTlQyZQYOR9azky57a4bBmE93pWcyX4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=mDGokrIvFXdLwvG4Hy+22RxZcpnYY1HPGdMlBctI91EvpCWbkbkzD/kupSbGMHGct
- QR7FCbd9FiDYO+KkQjvzR3ADI6dBFW7AgIb2jXFuNuMfHnBsFiu4VvdT15QxkcA27l
- HZdXJK5Cpl3ADP4lXsLxctFMPPMxiNe3GtHimnhA=
+ b=HlXdRpcs48t59SHxb4RDRmvkZqF5v8kOKSjqZKr94qPDHHHBpJgtKKkU/SinWYj0I
+ UvDtbKWy5Qmq0rcTW6KZWRMblLMVBu2XksYzUzgrm65zdASnSfpzKPsUjesMIK3zJF
+ SqHqZnGInNM+EANc8t6eCOMwzoGn3x7gND9JxqIU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k3NfS-0004w9-St; Wed, 05 Aug 2020 18:57:34 +0100
+ id 1k3Ng1-0004w9-29; Wed, 05 Aug 2020 18:58:09 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 19/56] KVM: arm64: Move hyp-init.S to nVHE
-Date: Wed,  5 Aug 2020 18:56:23 +0100
-Message-Id: <20200805175700.62775-20-maz@kernel.org>
+Subject: [PATCH 52/56] KVM: arm: Add trace name for ARM_NISV
+Date: Wed,  5 Aug 2020 18:56:56 +0100
+Message-Id: <20200805175700.62775-53-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 References: <20200805175700.62775-1-maz@kernel.org>
@@ -99,100 +99,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Scull <ascull@google.com>
+From: Alexander Graf <graf@amazon.com>
 
-hyp-init.S contains the identity mapped initialisation code for the
-non-VHE code that runs at EL2. It is only used for non-VHE.
+Commit c726200dd106d ("KVM: arm/arm64: Allow reporting non-ISV data aborts
+to userspace") introduced a mechanism to deflect MMIO traffic the kernel
+can not handle to user space. For that, it introduced a new exit reason.
 
-Adjust code that calls into this to use the prefixed symbol name.
+However, it did not update the trace point array that gives human readable
+names to these exit reasons inside the trace log.
 
-Signed-off-by: Andrew Scull <ascull@google.com>
-Signed-off-by: David Brazdil <dbrazdil@google.com>
+Let's fix that up after the fact, so that trace logs are pretty even when
+we get user space MMIO traps on ARM.
+
+Fixes: c726200dd106d ("KVM: arm/arm64: Allow reporting non-ISV data aborts to userspace")
+Signed-off-by: Alexander Graf <graf@amazon.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200625131420.71444-8-dbrazdil@google.com
+Link: https://lore.kernel.org/r/20200730094441.18231-1-graf@amazon.com
 ---
- arch/arm64/include/asm/kvm_asm.h         | 5 ++---
- arch/arm64/kernel/image-vars.h           | 9 ++++++---
- arch/arm64/kvm/Makefile                  | 2 +-
- arch/arm64/kvm/hyp/nvhe/Makefile         | 2 +-
- arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S | 0
- 5 files changed, 10 insertions(+), 8 deletions(-)
- rename arch/arm64/kvm/{ => hyp/nvhe}/hyp-init.S (100%)
+ include/trace/events/kvm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 6026cbd204ae..3476abb046e3 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -78,10 +78,9 @@
- struct kvm;
- struct kvm_vcpu;
+diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+index 2c735a3e6613..9417a34aad08 100644
+--- a/include/trace/events/kvm.h
++++ b/include/trace/events/kvm.h
+@@ -17,7 +17,7 @@
+ 	ERSN(NMI), ERSN(INTERNAL_ERROR), ERSN(OSI), ERSN(PAPR_HCALL),	\
+ 	ERSN(S390_UCONTROL), ERSN(WATCHDOG), ERSN(S390_TSCH), ERSN(EPR),\
+ 	ERSN(SYSTEM_EVENT), ERSN(S390_STSI), ERSN(IOAPIC_EOI),          \
+-	ERSN(HYPERV)
++	ERSN(HYPERV), ERSN(ARM_NISV)
  
--extern char __kvm_hyp_init[];
--extern char __kvm_hyp_init_end[];
--
-+DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
- DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
-+#define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
- #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
- 
- #ifdef CONFIG_KVM_INDIRECT_VECTORS
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index f28da486b75a..63186c91b614 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -71,9 +71,6 @@ KVM_NVHE_ALIAS(__guest_exit);
- KVM_NVHE_ALIAS(abort_guest_exit_end);
- KVM_NVHE_ALIAS(abort_guest_exit_start);
- 
--/* Symbols defined in hyp-init.S (not yet compiled with nVHE build rules). */
--KVM_NVHE_ALIAS(__kvm_handle_stub_hvc);
--
- /* Symbols defined in switch.c (not yet compiled with nVHE build rules). */
- KVM_NVHE_ALIAS(__kvm_vcpu_run_nvhe);
- KVM_NVHE_ALIAS(hyp_panic);
-@@ -113,6 +110,12 @@ KVM_NVHE_ALIAS(kimage_voffset);
- /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
- KVM_NVHE_ALIAS(panic);
- 
-+/* Vectors installed by hyp-init on reset HVC. */
-+KVM_NVHE_ALIAS(__hyp_stub_vectors);
-+
-+/* IDMAP TCR_EL1.T0SZ as computed by the EL1 init code */
-+KVM_NVHE_ALIAS(idmap_t0sz);
-+
- #endif /* CONFIG_KVM */
- 
- #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 8d3d9513cbfe..152d8845a1a2 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
- kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 $(KVM)/vfio.o $(KVM)/irqchip.o \
- 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
--	 inject_fault.o regmap.o va_layout.o hyp.o hyp-init.o handle_exit.o \
-+	 inject_fault.o regmap.o va_layout.o hyp.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
- 	 aarch32.o arch_timer.o \
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 79eb8eed96a1..bf2d8dea5400 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -6,7 +6,7 @@
- asflags-y := -D__KVM_NVHE_HYPERVISOR__
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__
- 
--obj-y := ../hyp-entry.o
-+obj-y := hyp-init.o ../hyp-entry.o
- 
- obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
- extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-similarity index 100%
-rename from arch/arm64/kvm/hyp-init.S
-rename to arch/arm64/kvm/hyp/nvhe/hyp-init.S
+ TRACE_EVENT(kvm_userspace_exit,
+ 	    TP_PROTO(__u32 reason, int errno),
 -- 
 2.27.0
 
