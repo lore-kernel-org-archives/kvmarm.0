@@ -1,105 +1,107 @@
-Return-Path: <SRS0=lYnr=BR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=1DcR=BT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AC5C433DF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Aug 2020 19:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D32C433DF
+	for <kvmarm@archiver.kernel.org>; Sun,  9 Aug 2020 16:13:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E9DB2086A
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Aug 2020 19:04:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BA352065D
+	for <kvmarm@archiver.kernel.org>; Sun,  9 Aug 2020 16:13:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEYA/snm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9DB2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S70c/ofM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA352065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9321E4B52D;
-	Fri,  7 Aug 2020 15:04:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67E7F4B8DB;
+	Sun,  9 Aug 2020 12:13:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wmbm+S3833gV; Fri,  7 Aug 2020 15:04:00 -0400 (EDT)
+	with ESMTP id kcYZSyWEQ06U; Sun,  9 Aug 2020 12:13:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D85484B66F;
-	Fri,  7 Aug 2020 15:03:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 552554B8D4;
+	Sun,  9 Aug 2020 12:13:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E865F4B8EE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2020 14:17:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 265AB4B8D1
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Aug 2020 12:13:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0PXOhtUzjB7w for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2020 14:17:32 -0400 (EDT)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01C4E4B8ED
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2020 14:17:31 -0400 (EDT)
-Received: by mail-wm1-f65.google.com with SMTP id p14so2502628wmg.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2020 11:17:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+RLcMf039Fja7+NVYfWd7LsUb0HLd5N8YbD0HQCYGKs=;
- b=hEYA/snmkEnBTWT41qnElh5RISovyGYu/KkzthXY5h6DXG3W0hdwlPVFr/1TAoXzeN
- g3hdpKG0rlvrSWBRhz3pHgXCOMaLU4F64766xythYWHQHlIEwrrFLdcqeFPRyJmojb1E
- heapMjHWiXzttkUCvdfk+AGwfd5/QdZ4kkv5nO1iVEmH96vtecMuYb4rsXnqnFW2BoXK
- pLMpM+R+B5IagfhSenzb51rHcZH1tGJMgwVOQRwG6S2/ilDdHL7Dd/kVhwIF3HsUKr17
- VHBukSpEB9zVSSuJ5A3A0ny9PKP+RldiUG6Jami6ucXsNk21I6t1AdOCQvr0jFMJott7
- F22A==
+ with ESMTP id gknMk3avfIcD for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  9 Aug 2020 12:13:14 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 564FB4B837
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Aug 2020 12:13:14 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596989594;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mg/sYUoBZz1byLWR2WieaEgLigz8B2nOGaHe6iDN1Yo=;
+ b=S70c/ofMbOcM/tviHBXg8TuFmE8zmGAYpUxcdgwjc04MPUVF49/UG5c9d3x3J2wHmttRwl
+ cHutnWZmJ1+ak4O5arPnBVxDhGxvWv/DwxVwknF/6cQd3d6TBCrVlj4wyWZSXW3x8FXaIz
+ VYPQ/kMJHMg/VUkcivgC2BCLQI3bMVM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-u5tVcnQLMxqSRK85TK0s5w-1; Sun, 09 Aug 2020 12:13:11 -0400
+X-MC-Unique: u5tVcnQLMxqSRK85TK0s5w-1
+Received: by mail-wm1-f72.google.com with SMTP id c124so1981955wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 09 Aug 2020 09:13:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=+RLcMf039Fja7+NVYfWd7LsUb0HLd5N8YbD0HQCYGKs=;
- b=fyH6TMzmnBAOZ7nWg72nHm09x0h+kd7YVjE1VVA5tK8wQREtfeOSfF3nXeTeyQzMcf
- OBhsnp5Vhl6hllZlv7EHZZyDcuzSft5GBztXc4ZqFbBV5bqGjjIGdXSivKoWXd1ToQ/G
- Zz2W4+NlNHzCP2Nh+Zj3pbdXXTgt+VffV8x+lSBxb510NwGMS5U59dweUR2R56++Wxwe
- 9VUq8DGVh80F6dWzFPxADsOcczpNtTdg/znPYuhNj6SgzgJOHf8MH7Gr8tViBWIwQjQG
- UdTEnd3QQPVluMp8Z+AZRtuxJqW7mwvr7OMqyX3tJL7o50VlQGSy0ICy6CUf7mfXyR4N
- iUgg==
-X-Gm-Message-State: AOAM532RUk8UoRL7hl/bjevMarVkAlf/l5kTBUNuxyQTYNCIpBRRIHUe
- kKbs1XD6HPxzYQRIMeFNB3vo1Fb2
-X-Google-Smtp-Source: ABdhPJw1gAmZHJQX55Ci8aLNAo0vKfunS/WHs1CJQjlHAcjBEZCQV97jdptYDEHSsVMoBeR0Tazsvg==
-X-Received: by 2002:a7b:c38a:: with SMTP id s10mr14609217wmj.13.1596824250547; 
- Fri, 07 Aug 2020 11:17:30 -0700 (PDT)
-Received: from [10.230.30.107] ([192.19.223.252])
- by smtp.gmail.com with ESMTPSA id k184sm11289988wme.1.2020.08.07.11.17.25
+ bh=mg/sYUoBZz1byLWR2WieaEgLigz8B2nOGaHe6iDN1Yo=;
+ b=cP0XDwggKA8mSE5pR6G5vbu7xN1vhqUupsql3XkPj1jRRQJt9Yzc/A049mDNprnfTc
+ ubyixYfF7ousmKtuw3ziRZwTUEG/JhmnHMocu5kuN9Ab48gqeED3CwvuzZ5onASHdDK0
+ 53qT2Gy2gnAwEdoso2H7xu9UbxGaaPcQKJKGWlc5KiD2Pij+xx4LLy3AnGZ76jvmTE0n
+ JLEgMRM+1kF1z0K/4JVZCrqMAJk+ISHGNCT3TTBNZ96F6wYYPq+A2ezYOOCbWvuiC2Ig
+ aXmL/+H0rFOcyZvoiEjQZDzNB66gfYpCv875T4TEsAJAVt0+pm/5UydHxrhMV3iFfBOA
+ hPow==
+X-Gm-Message-State: AOAM532vLy/nrlbeOp8whMd2aOtNc+WYB7Ricmo6n5CmIcC2wv7XpQ0w
+ +xlZ9gurByWgK8L9Q9qA8nyTPSJtK0d9j+JNgIOwLHa8pdPaSNwunWZJz/Gvs7vC1Havi1bZStS
+ WYfuWWk7l0hrY/dYrEVeR9Sfj
+X-Received: by 2002:a7b:cb19:: with SMTP id u25mr20628925wmj.113.1596989590719; 
+ Sun, 09 Aug 2020 09:13:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoaRt4v6dETBL0JGQT56R5w6T3hYkaDa6PIHuw8DyoGUmzXuvVwqp9ViRh/pLxUaOaLGmzkA==
+X-Received: by 2002:a7b:cb19:: with SMTP id u25mr20628892wmj.113.1596989590465; 
+ Sun, 09 Aug 2020 09:13:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8deb:6d34:4b78:b801?
+ ([2001:b07:6468:f312:8deb:6d34:4b78:b801])
+ by smtp.gmail.com with ESMTPSA id y84sm18313519wmg.38.2020.08.09.09.13.09
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Aug 2020 11:17:29 -0700 (PDT)
-Subject: Re: [PATCH stable v4.9 v2] arm64: entry: Place an SB sequence
- following an ERET instruction
-To: Greg KH <gregkh@linuxfoundation.org>, Will Deacon <will.deacon@arm.com>,
- Will Deacon <will@kernel.org>
-References: <20200709195034.15185-1-f.fainelli@gmail.com>
- <20200720130411.GB494210@kroah.com>
- <df1de420-ac59-3647-3b81-a0c163783225@gmail.com>
- <9c29080e-8b3a-571c-3296-e0487fa473fa@gmail.com>
- <20200807131429.GB664450@kroah.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <fb3be972-106e-e171-1c2f-6df20ce186d6@gmail.com>
-Date: Fri, 7 Aug 2020 11:17:23 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Firefox/68.0 Thunderbird/68.10.0
+ Sun, 09 Aug 2020 09:13:09 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm64 updates for 5.9
+To: Marc Zyngier <maz@kernel.org>
+References: <20200805175700.62775-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cb8e16e4-ed3c-6cf8-4f21-57d2e6184fb8@redhat.com>
+Date: Sun, 9 Aug 2020 18:13:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200807131429.GB664450@kroah.com>
+In-Reply-To: <20200805175700.62775-1-maz@kernel.org>
 Content-Language: en-US
-Cc: Nick Desaulniers <ndesaulniers@google.com>,
- Fangrui Song <maskray@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- open list <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Mark Brown <broonie@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Sami Tolvanen <samitolvanen@google.com>,
- Marc Zyngier <maz@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: Peng Hao <richard.peng@oppo.com>, kernel-team@android.com,
+ kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexander Graf <graf@amazon.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,53 +118,13 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On 05/08/20 19:56, Marc Zyngier wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.9
 
+Pulled, thanks.
 
-On 8/7/2020 6:14 AM, Greg KH wrote:
-> On Thu, Aug 06, 2020 at 01:00:54PM -0700, Florian Fainelli wrote:
->>
->>
->> On 7/20/2020 11:26 AM, Florian Fainelli wrote:
->>> On 7/20/20 6:04 AM, Greg KH wrote:
->>>> On Thu, Jul 09, 2020 at 12:50:23PM -0700, Florian Fainelli wrote:
->>>>> From: Will Deacon <will.deacon@arm.com>
->>>>>
->>>>> commit 679db70801da9fda91d26caf13bf5b5ccc74e8e8 upstream
->>>>>
->>>>> Some CPUs can speculate past an ERET instruction and potentially perform
->>>>> speculative accesses to memory before processing the exception return.
->>>>> Since the register state is often controlled by a lower privilege level
->>>>> at the point of an ERET, this could potentially be used as part of a
->>>>> side-channel attack.
->>>>>
->>>>> This patch emits an SB sequence after each ERET so that speculation is
->>>>> held up on exception return.
->>>>>
->>>>> Signed-off-by: Will Deacon <will.deacon@arm.com>
->>>>> [florian: Adjust hyp-entry.S to account for the label
->>>>>  added change to hyp/entry.S]
->>>>> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
->>>>> ---
->>>>> Changes in v2:
->>>>>
->>>>> - added missing hunk in hyp/entry.S per Will's feedback
->>>>
->>>> What about 4.19.y and 4.14.y trees?  I can't take something for 4.9.y
->>>> and then have a regression if someone moves to a newer release, right?
->>>
->>> Sure, send you candidates for 4.14 and 4.19.
->>
->> Greg, did you have a chance to queue those changes for 4.9, 4.14 and 4.19?
->>
->> https://lore.kernel.org/linux-arm-kernel/20200720182538.13304-1-f.fainelli@gmail.com/
->> https://lore.kernel.org/linux-arm-kernel/20200720182937.14099-1-f.fainelli@gmail.com/
->> https://lore.kernel.org/linux-arm-kernel/20200709195034.15185-1-f.fainelli@gmail.com/
-> 
-> Nope, I was waiting for Will's "ack" for these.
+Paolo
 
-OK, Will, can you review those? Thanks
--- 
-Florian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
