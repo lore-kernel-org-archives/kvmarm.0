@@ -2,59 +2,79 @@ Return-Path: <SRS0=hhnY=BX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A37C433E3
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Aug 2020 06:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DC7C433E1
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Aug 2020 09:06:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BCBB820656
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Aug 2020 06:14:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCBB820656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id BB9842074D
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Aug 2020 09:06:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMeRAdO0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9842074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74DEC4B987;
-	Thu, 13 Aug 2020 02:14:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E7B84B7C6;
+	Thu, 13 Aug 2020 05:06:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y0sCL-AQXL4n; Thu, 13 Aug 2020 02:14:26 -0400 (EDT)
+	with ESMTP id q0ymEompmB2S; Thu, 13 Aug 2020 05:06:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA0A4B81C;
-	Thu, 13 Aug 2020 02:14:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E39394B7C7;
+	Thu, 13 Aug 2020 05:06:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1924F4B7CA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2020 02:14:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 420FA4B7C4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2020 05:06:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QakjrwqG3Sjz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Aug 2020 02:14:24 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86F724B991
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2020 02:14:22 -0400 (EDT)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 55FC52C6ECCEE54F846D;
- Thu, 13 Aug 2020 14:14:14 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.175) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 13 Aug 2020 14:14:03 +0800
-From: Peng Liang <liangpeng10@huawei.com>
-To: <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC 1/4] arm64: add a helper function to traverse arm64_ftr_regs
-Date: Thu, 13 Aug 2020 14:05:14 +0800
-Message-ID: <20200813060517.2360048-2-liangpeng10@huawei.com>
-X-Mailer: git-send-email 2.18.4
-In-Reply-To: <20200813060517.2360048-1-liangpeng10@huawei.com>
+ with ESMTP id WXBxsssxmX2T for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Aug 2020 05:06:08 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [205.139.110.61])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FA2C4B7BC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2020 05:06:08 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597309567;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3LDLWpRdM45y3CGQzUX0l93Jm/pS9Hjp6XgzZQT5/zs=;
+ b=HMeRAdO07P/5BJzMkPaEALzLFtGLRXObc4F6+w+F44334G91nSCcVkCIaXRu6H8ueJHH6F
+ GGmH3qMkDbgJugJm9jcHA7X9OGouipwQFGUvEw0TPvv+APiDCForCFiZ3cHApIONODx97o
+ HGslSa6ohTcJjPr2B5kimItNn3WclMs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-yJwGlSVoNoWtdvO_3P6uzw-1; Thu, 13 Aug 2020 05:06:05 -0400
+X-MC-Unique: yJwGlSVoNoWtdvO_3P6uzw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0784D101C8A0;
+ Thu, 13 Aug 2020 09:06:04 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDE811001281;
+ Thu, 13 Aug 2020 09:06:01 +0000 (UTC)
+Date: Thu, 13 Aug 2020 11:05:58 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Peng Liang <liangpeng10@huawei.com>
+Subject: Re: [RFC 2/4] kvm: arm64: emulate the ID registers
+Message-ID: <20200813090558.3eqwoxp7m6jmknft@kamzik.brq.redhat.com>
 References: <20200813060517.2360048-1-liangpeng10@huawei.com>
+ <20200813060517.2360048-3-liangpeng10@huawei.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.175.104.175]
-X-CFilter-Loop: Reflected
+Content-Disposition: inline
+In-Reply-To: <20200813060517.2360048-3-liangpeng10@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Cc: zhang.zhanghailiang@huawei.com, kvm@vger.kernel.org, maz@kernel.org,
- will@kernel.org
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,57 +91,178 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If we want to emulate ID registers, we need to initialize ID registers
-firstly.  This commit is to add a helper function to traverse
-arm64_ftr_regs so that we can initialize ID registers from
-arm64_ftr_regs.
+On Thu, Aug 13, 2020 at 02:05:15PM +0800, Peng Liang wrote:
+> To emulate the ID registers, we need a place to storage the values of
+> the ID regsiters.  Maybe putting in kvm_arch_vcpu is a good idea.
+> 
+> This commit has no functional changes but only code refactor.  When
+> initializing a vcpu, get the values of the ID registers from
+> arm64_ftr_regs and storage them in kvm_arch_vcpu.  And we just read
+> the value from kvm_arch_vcpu when getting/setting the value of the ID
+> regs.
+> 
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/kvm/arm.c              | 20 ++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 27 +++++++++++++++++++++++----
+>  include/uapi/linux/kvm.h          | 11 +++++++++++
+>  4 files changed, 56 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f81151ad3d3c..7f7bd36702f7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -336,6 +336,8 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	struct id_registers idregs;
+>  };
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 73e12869afe3..18ebbe1c64ee 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -262,6 +262,24 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>  	return 0;
+>  }
+>  
+> +static int get_cpu_ftr(u32 id, u64 val, void *argp)
+> +{
+> +	struct id_registers *idregs = argp;
+> +
+> +	/*
+> +	 * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> +	 * where 1<=crm<8, 0<=op2<8.
+> +	 */
+> +	if (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
+> +	    sys_reg_CRn(id) == 0 && sys_reg_CRm(id) > 0) {
+> +		idregs->regs[idregs->num].sys_id = id;
+> +		idregs->regs[idregs->num].sys_val = val;
+> +		idregs->num++;
 
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Peng Liang <liangpeng10@huawei.com>
----
- arch/arm64/include/asm/cpufeature.h |  2 ++
- arch/arm64/kernel/cpufeature.c      | 13 +++++++++++++
- 2 files changed, 15 insertions(+)
+This num++ means we should ensure get_cpu_ftr() is only used once per
+VCPU, but we don't need 'num'. The index can be derived: (crm<<3)|op2
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 89b4f0142c28..2ba7c4f11d8a 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -79,6 +79,8 @@ struct arm64_ftr_reg {
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+>  	int err;
+> @@ -285,6 +303,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	if (err)
+>  		return err;
+>  
+> +	arm64_cpu_ftr_regs_traverse(get_cpu_ftr, &vcpu->arch.idregs);
+> +
+>  	return create_hyp_mappings(vcpu, vcpu + 1, PAGE_HYP);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 138961d7ebe3..776c2757a01e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1092,13 +1092,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static struct id_reg_info *kvm_id_reg(struct kvm_vcpu *vcpu, u64 id)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < vcpu->arch.idregs.num; ++i) {
+> +		if (vcpu->arch.idregs.regs[i].sys_id == id)
+> +			return &vcpu->arch.idregs.regs[i];
+
+With a derived index we don't need to search. Just do
+
+ if (sys_reg_Op0(id) != 3 || sys_reg_Op1(id) != 0 ||
+     sys_reg_CRn(id) != 0 || sys_reg_CRm(id) == 0)
+      return NULL;
+
+ return &vcpu->arch.idregs.regs[(sys_reg_CRm(id)<<3) | sys_reg_Op2(id)]; 
  
- extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
- 
-+int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp);
-+
- /*
-  * CPU capabilities:
-  *
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index a389b999482e..eb4c78b85a35 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1112,6 +1112,19 @@ u64 read_sanitised_ftr_reg(u32 id)
- 	return regp->sys_val;
- }
- 
-+int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i <  ARRAY_SIZE(arm64_ftr_regs); i++) {
-+		ret = (*op)(arm64_ftr_regs[i].sys_id,
-+			    arm64_ftr_regs[i].reg->sys_val, argp);
-+		if (ret < 0)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
- #define read_sysreg_case(r)	\
- 	case r:		return read_sysreg_s(r)
- 
--- 
-2.18.4
+
+> +	}
+> +	return NULL;
+> +}
+> +
+> +static u64 kvm_get_id_reg(struct kvm_vcpu *vcpu, u64 id)
+> +{
+> +	struct id_reg_info *ri = kvm_id_reg(vcpu, id);
+> +
+> +	BUG_ON(!ri);
+> +	return ri->sys_val;
+> +}
+> +
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> +static u64 read_id_reg(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_desc const *r, bool raz)
+>  {
+>  	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+> +	u64 val = raz ? 0 : kvm_get_id_reg(vcpu, id);
+>  
+>  	if (id == SYS_ID_AA64PFR0_EL1) {
+>  		if (!vcpu_has_sve(vcpu))
+> @@ -1238,7 +1257,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+>   * are stored, and for set_id_reg() we don't allow the effective value
+>   * to be changed.
+>   */
+> -static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> +static int __get_id_reg(struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+>  			bool raz)
+>  {
+> @@ -1248,7 +1267,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
+>  	return reg_to_user(uaddr, &val, id);
+>  }
+>  
+> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> +static int __set_id_reg(struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+>  			bool raz)
+>  {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f6d86033c4fa..1029444d04aa 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1272,6 +1272,17 @@ struct kvm_vfio_spapr_tce {
+>  	__s32	tablefd;
+>  };
+>  
+> +#define ID_REG_MAX_NUMS 64
+> +struct id_reg_info {
+> +	uint64_t sys_id;
+> +	uint64_t sys_val;
+
+I'm not sure the 'sys_' prefix is necessary.
+
+> +};
+> +
+> +struct id_registers {
+> +	struct id_reg_info regs[ID_REG_MAX_NUMS];
+> +	uint64_t num;
+> +};
+> +
+
+This is arch specific, so there should be ARMv8 in the names.
+
+>  /*
+>   * ioctls for VM fds
+>   */
+> -- 
+> 2.18.4
+> 
 
 _______________________________________________
 kvmarm mailing list
