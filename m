@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85787C433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 08:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D6CC433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 08:53:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11B9E20758
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 08:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 368282067C
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 08:53:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uof3R/kr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B9E20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="an7O0aBs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368282067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FC734BF6A;
-	Mon, 17 Aug 2020 04:47:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7504BF91;
+	Mon, 17 Aug 2020 04:53:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bw-lloITthmM; Mon, 17 Aug 2020 04:47:50 -0400 (EDT)
+	with ESMTP id bRuQqAcgDgSX; Mon, 17 Aug 2020 04:53:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F32D4BF6E;
-	Mon, 17 Aug 2020 04:47:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD974BF7D;
+	Mon, 17 Aug 2020 04:53:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E55404BF6E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 04:47:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C9484BF7A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 04:53:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kxKvWbYAoknZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2020 04:47:47 -0400 (EDT)
+ with ESMTP id bQcrjYGkR-Ny for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Aug 2020 04:53:09 -0400 (EDT)
 Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E951B4BF6A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 04:47:47 -0400 (EDT)
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 813C44BF71
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 04:53:09 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597654067;
+ s=mimecast20190719; t=1597654389;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=t355WPxa6uPtXL7lonYCwvII2S9kGVc9Ngbl+va3Q60=;
- b=Uof3R/krOg1yAzNoKrFKek7aV/LVfVKB9lE90p7sPmJIXXNP1uub4hTpmJdBBlhHML6MBB
- WX+W13fwbNWLAsc0SSBEp8lglBLp86M4flKfcca5VwOebrCAHEq5gbp6Imab1eOS7iTKK/
- wPDnfKtU0XrRVAZvMKbMLlFNT5lyeL0=
+ bh=0YghR5Mms8jHBUWQxThuVTLlaBCYQmrwY5aHeC7UwVY=;
+ b=an7O0aBsWCgLmaoRMMhgf6p/ja2PpOG8Nk++ie1nAq9bqqUbxqpoPJ9tnlhrxt4kqMBvfB
+ LCiZTEW+21OkbA63xkBlfh3CI24KPUP0CcUHz9G3RMmYq7czqgH5rdXYOfdEcp4zo5BM5Q
+ riF8PydvAgO/07SJqJOXVknF0lUvFss=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-jE_OXeiPPe2LKymmUwTwdQ-1; Mon, 17 Aug 2020 04:47:43 -0400
-X-MC-Unique: jE_OXeiPPe2LKymmUwTwdQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-192-M9b1GrjmO6u9o76KkD9vjw-1; Mon, 17 Aug 2020 04:53:05 -0400
+X-MC-Unique: M9b1GrjmO6u9o76KkD9vjw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A951D81F010;
- Mon, 17 Aug 2020 08:47:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E445425EF;
+ Mon, 17 Aug 2020 08:53:03 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7048D5D9D2;
- Mon, 17 Aug 2020 08:47:38 +0000 (UTC)
-Date: Mon, 17 Aug 2020 10:47:35 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B4A4100EBA4;
+ Mon, 17 Aug 2020 08:53:00 +0000 (UTC)
+Date: Mon, 17 Aug 2020 10:52:57 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Some fixes of PV-time interface document
-Message-ID: <20200817084735.xyfdtgcsuxzwgzyr@kamzik.brq.redhat.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Use kvm_write_guest_lock when init
+ stolen time
+Message-ID: <20200817085257.k3i2nyhqn2nwdotx@kamzik.brq.redhat.com>
 References: <20200817033729.10848-1-zhukeqian1@huawei.com>
- <20200817033729.10848-2-zhukeqian1@huawei.com>
+ <20200817033729.10848-4-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200817033729.10848-2-zhukeqian1@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200817033729.10848-4-zhukeqian1@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  linux-kernel@vger.kernel.org, Steven Price <steven.price@arm.com>,
  Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
@@ -94,38 +95,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Aug 17, 2020 at 11:37:27AM +0800, Keqian Zhu wrote:
-> Rename PV_FEATURES tp PV_TIME_FEATURES
+On Mon, Aug 17, 2020 at 11:37:29AM +0800, Keqian Zhu wrote:
+> There is a lock version kvm_write_guest. Use it to simplify code.
 > 
 > Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 > ---
->  Documentation/virt/kvm/arm/pvtime.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/pvtime.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
-> index 687b60d..94bffe2 100644
-> --- a/Documentation/virt/kvm/arm/pvtime.rst
-> +++ b/Documentation/virt/kvm/arm/pvtime.rst
-> @@ -3,7 +3,7 @@
->  Paravirtualized time support for arm64
->  ======================================
+> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+> index f7b52ce..2b24e7f 100644
+> --- a/arch/arm64/kvm/pvtime.c
+> +++ b/arch/arm64/kvm/pvtime.c
+> @@ -55,7 +55,6 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+>  	struct pvclock_vcpu_stolen_time init_values = {};
+>  	struct kvm *kvm = vcpu->kvm;
+>  	u64 base = vcpu->arch.steal.base;
+> -	int idx;
 >  
-> -Arm specification DEN0057/A defines a standard for paravirtualised time
-> +Arm specification DEN0057/A defines a standard for paravirtualized time
->  support for AArch64 guests:
+>  	if (base == GPA_INVALID)
+>  		return base;
+> @@ -66,10 +65,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+>  	 */
+>  	vcpu->arch.steal.steal = 0;
+>  	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+> -
+> -	idx = srcu_read_lock(&kvm->srcu);
+> -	kvm_write_guest(kvm, base, &init_values, sizeof(init_values));
+> -	srcu_read_unlock(&kvm->srcu, idx);
+> +	kvm_write_guest_lock(kvm, base, &init_values, sizeof(init_values));
 >  
->  https://developer.arm.com/docs/den0057/a
-> @@ -19,8 +19,8 @@ Two new SMCCC compatible hypercalls are defined:
->  
->  These are only available in the SMC64/HVC64 calling convention as
->  paravirtualized time is not available to 32 bit Arm guests. The existence of
-> -the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
-> -mechanism before calling it.
-> +the PV_TIME_FEATURES hypercall should be probed using the SMCCC 1.1
-> +ARCH_FEATURES mechanism before calling it.
->  
->  PV_TIME_FEATURES
->      ============= ========    ==========
+>  	return base;
+>  }
 > -- 
 > 1.8.3.1
 >
