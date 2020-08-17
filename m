@@ -2,86 +2,71 @@ Return-Path: <SRS0=TLTx=B3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF653C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 12:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C61C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 14:16:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 570652072E
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 12:56:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5my1Mwo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570652072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 32DEC208E4
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 14:16:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DEC208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 095874BC43;
-	Mon, 17 Aug 2020 08:56:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9084C0B8;
+	Mon, 17 Aug 2020 10:16:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0MS4xVvfTXY8; Mon, 17 Aug 2020 08:56:52 -0400 (EDT)
+	with ESMTP id J6YPMh2RuwVD; Mon, 17 Aug 2020 10:16:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B6B54BD8A;
-	Mon, 17 Aug 2020 08:56:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 800164C0A8;
+	Mon, 17 Aug 2020 10:16:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CB964BD28
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 08:56:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AABBE4BFD4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 10:15:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LIRqXHzZXJ0c for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2020 08:56:51 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB3FC4BC43
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 08:56:50 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id ADC552072E;
- Mon, 17 Aug 2020 12:56:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1597669009;
- bh=ERpMAdayk233Labrw+Lu7muZTEwuPknh19NdvGNHSMI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=q5my1Mwo8/rP50v751943fs0FGAFtFae1A+Dz+biD7l+GcRGAiMRNkn8qGgI7zspP
- cEpukEBSMsw3z7ejoG8++F6AGY8JyrdeuevwPlIHFlvr6yP17ft7SPLeS6htKMEAqd
- XXVaERjnM8M8XvIYIw2P3xjXzpyt9obh8PR2A21U=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1k7egy-003ZLe-9G; Mon, 17 Aug 2020 13:56:48 +0100
+ with ESMTP id 73a-btaH7Nv7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Aug 2020 10:15:58 -0400 (EDT)
+Received: from huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC9F04C0A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 10:15:57 -0400 (EDT)
+Received: from dggeme755-chm.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 5AC8B462E995EFE33ED2;
+ Mon, 17 Aug 2020 22:15:51 +0800 (CST)
+Received: from [10.174.186.8] (10.174.186.8) by dggeme755-chm.china.huawei.com
+ (10.3.19.101) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Mon, 17
+ Aug 2020 22:15:50 +0800
+Subject: Re: [RFC][PATCH 0/4] arm64:kvm: teach guest sched that VCPUs can be
+ preempted
+To: Marc Zyngier <maz@kernel.org>
+References: <20200721041742.197354-1-sergey.senozhatsky@gmail.com>
+ <20200817020310.GA1210848@jagdpanzerIV.localdomain>
+ <fe72592c-c721-bece-1469-95eebf931299@huawei.com>
+ <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
+From: yezengruan <yezengruan@huawei.com>
+Message-ID: <3ff3b016-3f63-7d03-ed4b-c98d74db4af8@huawei.com>
+Date: Mon, 17 Aug 2020 22:15:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Date: Mon, 17 Aug 2020 13:56:48 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH 2/2] clocksource: arm_arch_timer: Correct fault
- programming of CNTKCTL_EL1.EVNTI
-In-Reply-To: <20200817122415.6568-3-zhukeqian1@huawei.com>
-References: <20200817122415.6568-1-zhukeqian1@huawei.com>
- <20200817122415.6568-3-zhukeqian1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.7
-Message-ID: <b37f6cf6a660f51690f0689509650eed@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, steven.price@arm.com, drjones@redhat.com,
- catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Steven Price <steven.price@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.174.186.8]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggeme755-chm.china.huawei.com (10.3.19.101)
+X-CFilter-Loop: Reflected
+Cc: joelaf@google.com,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, suleiman@google.com,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,66 +78,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-08-17 13:24, Keqian Zhu wrote:
-> ARM virtual counter supports event stream, it can only trigger an event
-> when the trigger bit (the value of CNTKCTL_EL1.EVNTI) of CNTVCT_EL0 
-> changes,
-> so the actual period of event stream is 2^(cntkctl_evnti + 1). For 
-> example,
-> when the trigger bit is 0, then virtual counter trigger an event for 
-> every
-> two cycles.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-I have never given you this tag, you are making it up. Please read
-Documentation/process/submitting-patches.rst to understand what
-tag you can put by yourself.
-
-At best, put "Suggested-by" tag, as this is different from what
-I posted anyway.
-
-Thanks,
-
-         M.
-
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  drivers/clocksource/arm_arch_timer.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/clocksource/arm_arch_timer.c
-> b/drivers/clocksource/arm_arch_timer.c
-> index 6e11c60..4140a37 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -794,10 +794,14 @@ static void arch_timer_configure_evtstream(void)
->  {
->  	int evt_stream_div, pos;
-> 
-> -	/* Find the closest power of two to the divisor */
-> -	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ;
-> +	/*
-> +	 * Find the closest power of two to the divisor. As the event
-> +	 * stream can at most be generated at half the frequency of the
-> +	 * counter, use half the frequency when computing the divider.
-> +	 */
-> +	evt_stream_div = arch_timer_rate / ARCH_TIMER_EVT_STREAM_FREQ / 2;
->  	pos = fls(evt_stream_div);
-> -	if (pos > 1 && !(evt_stream_div & (1 << (pos - 2))))
-> +	if ((pos == 1) || (pos > 1 && !(evt_stream_div & (1 << (pos - 2)))))
->  		pos--;
->  	/* enable event stream */
->  	arch_timer_evtstrm_enable(min(pos, 15));
-
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC84LzE3IDIwOjI1LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAyMC0wOC0xNyAx
+MzowMywgeWV6ZW5ncnVhbiB3cm90ZToKPj4gT24gMjAyMC84LzE3IDEwOjAzLCBTZXJnZXkgU2Vu
+b3poYXRza3kgd3JvdGU6Cj4+PiBPbiAoMjAvMDcvMjEgMTM6MTcpLCBTZXJnZXkgU2Vub3poYXRz
+a3kgd3JvdGU6Cj4+Pj4gSGVsbG8sCj4+Pj4KPj4+PiDCoMKgwqDCoFJGQwo+Pj4+Cj4+Pj4gwqDC
+oMKgwqBXZSBub3RpY2VkIHRoYXQgaW4gYSBudW1iZXIgb2YgY2FzZXMgd2hlbiB3ZSB3YWtlX3Vw
+X3Byb2Nlc3MoKQo+Pj4+IG9uIGFybTY0IGd1ZXN0IHdlIGVuZCB1cCBlbnF1ZXVpbmcgdGhhdCB0
+YXNrIG9uIGEgcHJlZW1wdGVkIFZDUFUuIFRoZSBjdWxwcml0Cj4+Pj4gYXBwZWFycyB0byBiZSB0
+aGUgZmFjdCB0aGF0IGFybTY0IGd1ZXN0cyBhcmUgbm90IGF3YXJlIG9mIFZDUFUgcHJlZW1wdGlv
+bgo+Pj4+IGFzIHN1Y2gsIHNvIHdoZW4gc2NoZWQgcGlja3MgdXAgYW4gaWRsZSBWQ1BVIGl0IGFs
+d2F5cyBhc3N1bWVzIHRoYXQgVkNQVQo+Pj4+IGlzIGF2YWlsYWJsZToKPj4+Pgo+Pj4+IMKgwqDC
+oMKgwqAgd2FrZV91cF9wcm9jZXNzKCkKPj4+PiDCoMKgwqDCoMKgwqAgdHJ5X3RvX3dha2VfdXAo
+KQo+Pj4+IMKgwqDCoMKgwqDCoMKgIHNlbGVjdF90YXNrX3JxX2ZhaXIoKQo+Pj4+IMKgwqDCoMKg
+wqDCoMKgwqAgYXZhaWxhYmxlX2lkbGVfY3B1KCkKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgdmNw
+dV9pc19wcmVlbXB0ZWQoKcKgwqDCoCAvLyByZXR1cm4gZmFsc2U7Cj4+Pj4KPj4+PiBXaGljaCBp
+cywgb2J2aW91c2x5LCBub3QgdGhlIGNhc2UuCj4+Pj4KPj4+PiBUaGlzIFJGQyBwYXRjaCBzZXQg
+YWRkcyBhIHNpbXBsZSB2Y3B1X2lzX3ByZWVtcHRlZCgpIGltcGxlbWVudGF0aW9uIHNvCj4+Pj4g
+dGhhdCBzY2hlZHVsZXIgY2FuIG1ha2UgYmV0dGVyIGRlY2lzaW9ucyB3aGVuIGl0IHNlYXJjaCBm
+b3IgdGhlIGlkbGUKPj4+PiAodilDUFUuCj4+PiBIaSwKPj4+Cj4+PiBBIGdlbnRsZSBwaW5nLgo+
+Pj4KPj4+IMKgwqDCoMKgLXNzCj4+PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwo+Pj4ga3ZtYXJtIG1haWxpbmcgbGlzdAo+Pj4ga3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQo+Pj4gaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9s
+aXN0aW5mby9rdm1hcm0KPj4+IC4KPj4KPj4gSGkgU2VyZ2V5LAo+Pgo+PiBJIGhhdmUgYSBzZXQg
+b2YgcGF0Y2hlcyBzaW1pbGFyIHRvIHlvdXJzLgo+Pgo+PiBodHRwczovL2xvcmUua2VybmVsLm9y
+Zy9sa21sLzIwMTkxMjI2MTM1ODMzLjEwNTItMS15ZXplbmdydWFuQGh1YXdlaS5jb20vCj4KPiBJ
+dCByZWFsbHkgaXNuJ3QgdGhlIHNhbWUgdGhpbmcgYXQgYWxsLiBZb3UgYXJlIGV4cG9zaW5nIFBW
+IHNwaW5sb2NrcywKPiB3aGlsZSBTZXJnZXkgZXhwb3NlcyBwcmVlbXB0aW9uIHRvIHZjcHVzLiBU
+aGUgZm9ybWVyIGlzIGEgbWFzc2l2ZSwKPiBhbmQgcHJvYmFibHkgdW5uZWNlc3Nhcnkgc3VwZXJz
+ZXQgb2YgdGhlIGxhdGVyLCB3aGljaCBvbmx5IGltcGFjdHMKPiB0aGUgc2NoZWR1bGVyIChpdCBk
+b2Vzbid0IGNoYW5nZSB0aGUgd2F5IGxvY2tzIGFyZSBpbXBsZW1lbnRlZCkuCj4KPiBZb3UgcmVh
+bGx5IHNob3VsZG4ndCBjb25mbGF0ZSB0aGUgdHdvICh3aGljaCB5b3UgaGF2ZSBkb25lIGluIHlv
+dXIKPiBzZXJpZXMpLgo+Cj4gwqDCoMKgwqDCoMKgwqAgTS4KCgpIaSBNYXJjLAoKQWN0dWFsbHks
+IGJvdGggc2VyaWVzIHN1cHBvcnQgcGFyYXZpcnR1YWxpemF0aW9uIHZjcHVfaXNfcHJlZW1wdGVk
+LiBNeQpzZXJpZXMgcmVnYXJkIHRoaXMgYXMgUFYgbG9jaywgYnV0IG9ubHkgdGhlIHZjcHVfaXNf
+cHJlZW1wdGVkIGludGVyZmFjZQpvZiBwdl9sb2NrX29wdCBpcyBpbXBsZW1lbnRlZC4KCkV4Y2Vw
+dCB3YWtlX3VwX3Byb2Nlc3MoKSwgdGhlIHZjcHVfaXNfcHJlZW1wdGVkIGludGVyZmFjZSBvZiB0
+aGUgY3VycmVudAprZXJuZWwgaXMgdXNlZCBpbiB0aGUgZm9sbG93aW5nIHNjZW5hcmlvczoKCmtl
+cm5lbC9zY2hlZC9jb3JlLmM6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIDwtLS0tIHdha2VfdXBfcHJvY2VzcygpCi0tLS0tLS0tLS0tLS0tLS0t
+LS0tCmF2YWlsYWJsZV9pZGxlX2NwdQrCoMKgwqAgdmNwdV9pc19wcmVlbXB0ZWQKCmtlcm5lbC9s
+b2NraW5nL3J3c2VtLmM6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCnJ3c2VtX29wdGltaXN0aWNf
+c3BpbgrCoMKgwqAgcndzZW1fc3Bpbl9vbl9vd25lcgrCoMKgwqAgwqDCoMKgIG93bmVyX29uX2Nw
+dQrCoMKgwqAgwqDCoMKgIMKgwqDCoCB2Y3B1X2lzX3ByZWVtcHRlZAoKa2VybmVsL2xvY2tpbmcv
+bXV0ZXguYzoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KbXV0ZXhfb3B0aW1pc3RpY19zcGluCsKg
+wqDCoCBtdXRleF9zcGluX29uX293bmVyCsKgwqDCoCDCoMKgwqAgdmNwdV9pc19wcmVlbXB0ZWQK
+Cmtlcm5lbC9sb2NraW5nL29zcV9sb2NrLmM6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCm9z
+cV9sb2NrCsKgwqDCoCB2Y3B1X2lzX3ByZWVtcHRlZAoKClRoYW5rcywKClplbmdydWFuCgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
+ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
+bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
