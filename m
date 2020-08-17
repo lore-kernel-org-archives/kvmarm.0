@@ -2,80 +2,77 @@ Return-Path: <SRS0=TLTx=B3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC13C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2463C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:05:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 79B182067C
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 857A12067C
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:05:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZAWoVi7b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79B182067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M2UnPZ58"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857A12067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB3D84C00D;
-	Mon, 17 Aug 2020 06:05:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33ED74C01B;
+	Mon, 17 Aug 2020 06:05:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iXntWEEJJ1b3; Mon, 17 Aug 2020 06:05:50 -0400 (EDT)
+	with ESMTP id wWUPT59askaY; Mon, 17 Aug 2020 06:05:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D99734BF95;
-	Mon, 17 Aug 2020 06:05:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 051CA4C009;
+	Mon, 17 Aug 2020 06:05:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 068CC4BF95
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:05:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1620E4BFFA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:05:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bcar-nQc4FrP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2020 06:05:48 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-1.mimecast.com [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AFED4BF8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:05:48 -0400 (EDT)
+ with ESMTP id HZ9k27o9Rf32 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Aug 2020 06:05:51 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F644C005
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:05:51 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597658748;
+ s=mimecast20190719; t=1597658750;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6AlofgTqUEw/nGPN1bXhtMBOTHIkm8lMFe6ktm3rCzQ=;
- b=ZAWoVi7bHQA6bi4Q+L/soFqQ0CakPw8zj+4C9WSlrBtyfCvDv6pIJpmyPoiDTtY1ZCGfSf
- tSLMSh/EWi8VzoSfQy/0/1JKAVRM5UMcE23dndCz232Tj8/UuErlPK9e4KZlx/bcCrcCDz
- NUZFuA2iIwDBlcxP07lrCiUm91keSYo=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=g75ZrE5XjeoAa9GS4qjgn2IQEBfxskCSMkQo08Lrbg0=;
+ b=M2UnPZ58I7cv3ZdEfVXN+Vsz/PhBNYMb2m9oF+P/13wYA7wYGXOA/1K2HC2GhaBmuN16ha
+ m7AI6pvbm1nyMW6X4PvBaRrrE0/rPv8HwhpnyIVleFKc7nc+z5T9IrKja3n3dz+nNmp0fE
+ K/wAHwgtg5d8vYB4oA6eTpqulLe+hb8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-BMgFa0lTM4mkS7urHgAJhw-1; Mon, 17 Aug 2020 06:05:46 -0400
-X-MC-Unique: BMgFa0lTM4mkS7urHgAJhw-1
+ us-mta-532-dwITyxXoPjqksMABUnQb-g-1; Mon, 17 Aug 2020 06:05:42 -0400
+X-MC-Unique: dwITyxXoPjqksMABUnQb-g-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3B8918686C1;
- Mon, 17 Aug 2020 10:05:44 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-130.bne.redhat.com [10.64.54.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1D6F178414;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D4A01DDE6;
  Mon, 17 Aug 2020 10:05:41 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-130.bne.redhat.com [10.64.54.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3EE86784AD;
+ Mon, 17 Aug 2020 10:05:34 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 01/18] drivers/firmware/sdei: Retrieve event signaled property
- on registration
-Date: Mon, 17 Aug 2020 20:05:14 +1000
-Message-Id: <20200817100531.83045-2-gshan@redhat.com>
-In-Reply-To: <20200817100531.83045-1-gshan@redhat.com>
-References: <20200817100531.83045-1-gshan@redhat.com>
+Subject: [PATCH 00/18] Support SDEI Virtualization
+Date: Mon, 17 Aug 2020 20:05:13 +1000
+Message-Id: <20200817100531.83045-1-gshan@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Cc: maz@kernel.org, shan.gavin@gmail.com, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -94,45 +91,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This retrieves the event signaled property when it's created for the
-first time. The property will be needed when SDEI virtualization is
-supported.
+This series intends to support SDEI virtualization. The background is
+the feature (Asynchronous Page Fault) needs virtualized SDEI event to
+deliver page-not-present notification from host to guest. This series
+depends on the series "Refactor SDEI Client Driver", which was posted
+previously. Both series can be found from github:
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- drivers/firmware/arm_sdei.c | 6 ++++++
- include/linux/arm_sdei.h    | 1 +
- 2 files changed, 7 insertions(+)
+   https://developer.arm.com/documentation/den0054/a/
+   https://www.spinics.net/lists/arm-kernel/msg826783.html
+   https://github.com/gwshan/linux  ("sdei_client")
+   https://github.com/gwshan/linux  ("sdei")
 
-diff --git a/drivers/firmware/arm_sdei.c b/drivers/firmware/arm_sdei.c
-index 9c7a6a7c9527..3b34501610f9 100644
---- a/drivers/firmware/arm_sdei.c
-+++ b/drivers/firmware/arm_sdei.c
-@@ -225,6 +225,12 @@ static struct sdei_internal_event *sdei_event_create(u32 event_num,
- 		goto fail;
- 	event->type = result;
- 
-+	err = sdei_api_event_get_info(event_num, SDEI_EVENT_INFO_EV_SIGNALED,
-+				      &result);
-+	if (err)
-+		goto fail;
-+	event->signaled = result;
-+
- 	if (event->type == SDEI_EVENT_TYPE_SHARED) {
- 		reg = kzalloc(sizeof(*reg), GFP_KERNEL);
- 		if (!reg) {
-diff --git a/include/linux/arm_sdei.h b/include/linux/arm_sdei.h
-index 2723a99937f3..447fe4ae8d8b 100644
---- a/include/linux/arm_sdei.h
-+++ b/include/linux/arm_sdei.h
-@@ -26,6 +26,7 @@ struct sdei_event {
- 	u32			event_num;
- 	u8			type;
- 	u8			priority;
-+	u8			signaled;
- };
- 
- /*
+First of all, bits[23:20] of the SDEI event number are reserved to
+indicate the SDEI event type:
+
+   0x0: physical SDEI event number, originated from underly firmware
+   0x1: virtual SDEI event number, passed from KVM because of physical
+        SDEI event. The corresponding SDEI events are also called as
+        passthrou SDEI events.
+   0x2: KVM private SDEI event number, originated from KVM itself.
+
+The implementation supports passthrou and KVM private SDEI events. The
+same SDEI event can be registered and enabled on multiple VMs. So the
+registered SDEI event is represented by "struct kvm_sdei_event" and
+formed into a linked list globally. "struct kvm_sdei_kvm_event" is
+created and inserted into the radix tree in "struct kvm_sdei_event",
+which is indexed by @kvm->userspace_pid if the corresponding SDEI event
+is registered on the particular KVM. Besides, "struct kvm_sdei_vcpu_event"
+is introduced to deliver SDEI event to one particular vCPU. So the data
+structs have different scopes, summaried as below:
+
+   struct kvm_sdei_event: global scope
+   struct kvm_sdei_kvm_event: VM scope
+   struct kvm_sdei_vcpu_event: vCPU sope
+
+For the passthrou SDEI events, the specific handler is registered to the
+underly firmware if it's supported. The core functionality of the handler
+is to route the incoming SDEI events to the target VM and vCPU. For the
+shared SDEI event, it's duplicated to all VMs where the SDEI event was
+registered and enabled. The target vCPU is chosen basing on the setting
+of routing affinity. For private SDEI event, the event received from the
+physical CPU is duplicated and delivered to the vCPUs, which are currently
+running or suspending on the physical CPU. For KVM private event, which is
+pre-defined and represented by "struct kvm_sdei_priv", API (kvm_sdei_inject())
+is always called to deliver the event to the specified vCPU.
+
+The series is organized as below:
+
+PATCH[01-02] Retrieve event signaled property on registration and add API
+             (sdei_event_get_info()) to retrieve event's information from
+             underly firmware for the passthrou SDEI events.
+PATCH[03]    Introduce template for smccc_get_argx().
+PATCH[04]    Adds the needed source files, data structs.
+PATCH[05-13] Support various hypercalls defined in SDEI specification (v1.0).
+PATCH[14]    Implements the SDEI handler to route the incoming passthrou SDEI
+             events to target VMs and vCPUs.
+PATCH[15-16] Support more hypercalls like COMPLETE, COMPLETE_AND_RESUME, and
+             CONTEXT.
+PATCH[17]    Support injecting KVM private SDEI event and expose the SDEI
+             capability.
+PATCH[18]    Add self-test case for KVM private SDEI event
+
+Gavin Shan (18):
+  drivers/firmware/sdei: Retrieve event signaled property on
+    registration
+  drivers/firmware/sdei: Add sdei_event_get_info()
+  arm/smccc: Introduce template for inline functions
+  arm64/kvm: Add SDEI virtualization infrastructure
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_VERSION hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_REGISTER
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_{ENABLE, DISABLE} hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_UNREGISTER hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_STATUS hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_GET_INFO hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_PE_{MASK, UNMASK} hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_{PRIVATE,SHARED}_RESET hypercall
+  arm64/kvm: Implement event handler
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_{COMPLETE,
+    COMPLETE_AND_RESUME} hypercall
+  arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_CONTEXT hypercall
+  arm64/kvm: Expose SDEI capability
+  kvm/selftests: Add SDEI test case
+
+ arch/arm64/include/asm/kvm_emulate.h       |    2 +
+ arch/arm64/include/asm/kvm_host.h          |   10 +
+ arch/arm64/include/asm/kvm_sdei.h          |  117 ++
+ arch/arm64/kvm/Makefile                    |    2 +-
+ arch/arm64/kvm/aarch32.c                   |    8 +
+ arch/arm64/kvm/arm.c                       |   19 +
+ arch/arm64/kvm/hypercalls.c                |   19 +
+ arch/arm64/kvm/inject_fault.c              |   30 +
+ arch/arm64/kvm/reset.c                     |    3 +
+ arch/arm64/kvm/sdei.c                      | 1322 ++++++++++++++++++++
+ drivers/firmware/arm_sdei.c                |   38 +
+ include/kvm/arm_hypercalls.h               |   34 +-
+ include/linux/arm_sdei.h                   |    7 +
+ include/uapi/linux/kvm.h                   |    4 +
+ tools/testing/selftests/kvm/Makefile       |    1 +
+ tools/testing/selftests/kvm/aarch64/sdei.c |  170 +++
+ 16 files changed, 1766 insertions(+), 20 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_sdei.h
+ create mode 100644 arch/arm64/kvm/sdei.c
+ create mode 100644 tools/testing/selftests/kvm/aarch64/sdei.c
+
 -- 
 2.23.0
 
