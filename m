@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A782CC433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159FAC433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:06:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB1A2067C
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:06:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9EF82067C
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Aug 2020 10:06:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELElBq/L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AB1A2067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UCnGFNHp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9EF82067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D783C4C01A;
-	Mon, 17 Aug 2020 06:06:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FAF74BD07;
+	Mon, 17 Aug 2020 06:06:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9dnrsgnb4QtV; Mon, 17 Aug 2020 06:06:21 -0400 (EDT)
+	with ESMTP id JvVD9+GHV04G; Mon, 17 Aug 2020 06:06:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 222874C005;
-	Mon, 17 Aug 2020 06:06:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47EBF4BE67;
+	Mon, 17 Aug 2020 06:06:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E87504C005
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:06:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E2154BD07
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:06:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vPqet0RGDxbI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2020 06:06:19 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [207.211.31.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 121234C030
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:06:19 -0400 (EDT)
+ with ESMTP id 81WFalgB5iZz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Aug 2020 06:06:25 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFA04BC42
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2020 06:06:25 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597658778;
+ s=mimecast20190719; t=1597658785;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=neTCeWODhYEKMd2L6xOhtqxtRppduKQROkpmIo/2ubQ=;
- b=ELElBq/LPPTvl7HrZgZm6/83Vp37um4GcaGfJRZ2Qbi30QHfHCDjvp96uSVPQ3holJIwMv
- X6NuTCVwDHJ9RhN+ZP0cKnw+5JFkaWFtej1G9FA+sjIZO/D1WmneztJ8XvF03OKWOC0q+G
- Akz5RoQRFSeCtSpscUXcxljHOpu7cJE=
+ bh=5aat49L0fxuluS6U1waQ/ZK3v5E+OP7EGb+6AtLw2U8=;
+ b=UCnGFNHpKFk24LXXF76J/7/YrNXsy5VZIAVGIirHIEieMXNB68aM7a2fGUOILnCX2tpQ8A
+ VHYjanFxzB4MrHxLbNYU5h5TYTHpv4+mzUMrdq8Hqf8Bhk1bsXJvD4rVp0T4fM7DXS3Dog
+ YrLUb30RPkhZFLES8hA6GnbOkpg0o30=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-1FdWig4SMyGf7m8U4ix0Rw-1; Mon, 17 Aug 2020 06:06:17 -0400
-X-MC-Unique: 1FdWig4SMyGf7m8U4ix0Rw-1
+ us-mta-159-_Xjai9j_NCyvRHdhReYivA-1; Mon, 17 Aug 2020 06:06:23 -0400
+X-MC-Unique: _Xjai9j_NCyvRHdhReYivA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56FF518551AC;
- Mon, 17 Aug 2020 10:06:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C00E918551AC;
+ Mon, 17 Aug 2020 10:06:22 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-130.bne.redhat.com [10.64.54.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 39F8378414;
- Mon, 17 Aug 2020 10:06:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B994478498;
+ Mon, 17 Aug 2020 10:06:16 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 09/18] arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_STATUS
+Subject: [PATCH 10/18] arm64/kvm: Support SDEI_1_0_FN_SDEI_EVENT_GET_INFO
  hypercall
-Date: Mon, 17 Aug 2020 20:05:22 +1000
-Message-Id: <20200817100531.83045-10-gshan@redhat.com>
+Date: Mon, 17 Aug 2020 20:05:23 +1000
+Message-Id: <20200817100531.83045-11-gshan@redhat.com>
 In-Reply-To: <20200817100531.83045-1-gshan@redhat.com>
 References: <20200817100531.83045-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -95,31 +95,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This supports SDEI_1_0_FN_SDEI_EVENT_STATUS hypercall by adding the
-function kvm_sdei_hypercall_status(). On success, the event's current
-status is returned. Otherwise, errno is returned.
+This supports SDEI_1_0_FN_SDEI_EVENT_GET_INFO hypercall by adding
+kvm_sdei_hypercall_info(). On success, the requested information
+about the event is returned. Otherwise, the errno is returned.
+
+The required information is retrieved from the SDEI event if it
+has been created. Otherwise, it's retrieved from underly firmware
+if applicable.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/kvm/sdei.c | 50 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ arch/arm64/kvm/sdei.c | 125 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
 diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-index 63d621dc9711..2d2135a5c3ea 100644
+index 2d2135a5c3ea..529505c4f0cf 100644
 --- a/arch/arm64/kvm/sdei.c
 +++ b/arch/arm64/kvm/sdei.c
-@@ -414,6 +414,54 @@ static unsigned long kvm_sdei_hypercall_unregister(struct kvm_vcpu *vcpu)
+@@ -38,6 +38,14 @@ static struct sdei_event *kvm_sdei_register_event(unsigned long event_num,
+ 				   cb, arg);
+ }
+ 
++static int kvm_sdei_get_event_info(unsigned long event_num,
++				   unsigned int info,
++				   unsigned long *result)
++{
++	return sdei_event_get_info(kvm_sdei_num_to_std(event_num),
++				   info, (u64 *)result);
++}
++
+ static int kvm_sdei_unregister_event(struct sdei_event *event)
+ {
+ 	return sdei_event_unregister(event);
+@@ -56,6 +64,14 @@ static inline struct sdei_event *kvm_sdei_register_event(
+ 	return NULL;
+ }
+ 
++static inline int kvm_sdei_get_event_info(unsigned long event_num,
++					  unsigned int info,
++					  unsigned long *result)
++{
++	*result = SDEI_NOT_SUPPORTED;
++	return -EPERM;
++}
++
+ static inline int kvm_sdei_unregister_event(struct sdei_event *event)
+ {
+ 	return -EPERM;
+@@ -462,6 +478,113 @@ static unsigned long kvm_sdei_hypercall_status(struct kvm_vcpu *vcpu)
  	return ret;
  }
  
-+static unsigned long kvm_sdei_hypercall_status(struct kvm_vcpu *vcpu)
++static unsigned long kvm_sdei_hypercall_info(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_sdei_event *event = NULL;
 +	struct kvm_sdei_kvm_event *kevent = NULL;
++	struct kvm_sdei_priv *priv = NULL;
 +	unsigned long event_num = smccc_get_arg1(vcpu);
++	unsigned long event_info = smccc_get_arg2(vcpu);
 +	unsigned long event_type;
-+	int index = 0;
++	int index;
 +	unsigned long ret = SDEI_SUCCESS;
 +
 +	/* Validate event number */
@@ -134,27 +170,84 @@ index 63d621dc9711..2d2135a5c3ea 100644
 +		goto out;
 +	}
 +
-+	/* Find the event */
++	/*
++	 * The requested information could be retrieved from the
++	 * registered event, KVM private descriptor or underly
++	 * firmware.
++	 */
 +	spin_lock(&kvm_sdei_lock);
 +	event = kvm_sdei_find_event(kvm, event_num, &kevent, NULL, NULL);
-+	if (!kevent) {
-+		ret = SDEI_INVALID_PARAMETERS;
++	if (kevent) {
++		spin_lock(&event->lock);
++
++		event_type = event->priv ? event->priv->type :
++					   event->event->type;
++		index = (event_type == SDEI_EVENT_TYPE_PRIVATE) ?
++			vcpu->vcpu_idx : 0;
++		if (!test_bit(index, kevent->registered)) {
++			ret = SDEI_INVALID_PARAMETERS;
++			goto unlock;
++		}
++
++		priv = event->priv;
++	} else if (kvm_sdei_num_is_priv(event_num)) {
++		priv = kvm_sdei_find_priv(event_num);
++		if (!priv) {
++			ret = SDEI_INVALID_PARAMETERS;
++			goto unlock;
++		}
++	} else if (kvm_sdei_num_is_virt(event_num)) {
++		if (event_info == SDEI_EVENT_INFO_EV_ROUTING_MODE ||
++		    event_info == SDEI_EVENT_INFO_EV_ROUTING_AFF) {
++			kvm_sdei_get_event_info(event_num,
++						SDEI_EVENT_INFO_EV_TYPE,
++						&event_type);
++			if (event_type != SDEI_EVENT_TYPE_SHARED) {
++				ret = SDEI_INVALID_PARAMETERS;
++				goto unlock;
++			}
++		}
++
++		kvm_sdei_get_event_info(event_num, event_info, &ret);
 +		goto unlock;
 +	}
 +
-+	spin_lock(&event->lock);
++	switch (event_info) {
++	case SDEI_EVENT_INFO_EV_TYPE:
++		ret = priv ? priv->type : event->event->type;
++		break;
++	case SDEI_EVENT_INFO_EV_SIGNALED:
++		ret = priv ? priv->signaled : event->event->signaled;
++		break;
++	case SDEI_EVENT_INFO_EV_PRIORITY:
++		ret = priv ? priv->priority : event->event->priority;
++		break;
++	case SDEI_EVENT_INFO_EV_ROUTING_MODE:
++		event_type = priv ? priv->type : event->event->type;
++		if (event_type != SDEI_EVENT_TYPE_SHARED) {
++			ret = SDEI_INVALID_PARAMETERS;
++			break;
++		}
 +
-+	event_type = event->priv ? event->priv->type : event->event->type;
-+	index = (event_type == SDEI_EVENT_TYPE_PRIVATE) ? vcpu->vcpu_idx : 0;
-+	if (test_bit(index, kevent->registered))
-+		ret |= (1UL << SDEI_EVENT_STATUS_REGISTERED);
-+	if (test_bit(index, kevent->enabled))
-+		ret |= (1UL << SDEI_EVENT_STATUS_ENABLED);
-+	if (kevent->users)
-+		ret |= (1UL << SDEI_EVENT_STATUS_RUNNING);
++		ret = kevent ? kevent->route_mode : priv->route_mode;
++		break;
++	case SDEI_EVENT_INFO_EV_ROUTING_AFF:
++		event_type = priv ? priv->type : event->event->type;
++		if (event_type != SDEI_EVENT_TYPE_SHARED) {
++			ret = SDEI_INVALID_PARAMETERS;
++			break;
++		}
 +
-+	spin_unlock(&event->lock);
++		ret = kevent ? kevent->route_affinity : priv->route_affinity;
++		break;
++	default:
++		ret = SDEI_INVALID_PARAMETERS;
++	}
++
 +unlock:
++	if (kevent)
++		spin_unlock(&event->lock);
++
 +	spin_unlock(&kvm_sdei_lock);
 +out:
 +	return ret;
@@ -163,15 +256,15 @@ index 63d621dc9711..2d2135a5c3ea 100644
  static unsigned long kvm_sdei_reset(struct kvm *kvm, unsigned int types)
  {
  	struct kvm_sdei_event *e, *event = NULL;
-@@ -503,6 +551,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
- 		ret = kvm_sdei_hypercall_unregister(vcpu);
+@@ -554,6 +677,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
+ 		ret = kvm_sdei_hypercall_status(vcpu);
  		break;
- 	case SDEI_1_0_FN_SDEI_EVENT_STATUS:
-+		ret = kvm_sdei_hypercall_status(vcpu);
-+		break;
  	case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
++		ret = kvm_sdei_hypercall_info(vcpu);
++		break;
  	case SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET:
  	case SDEI_1_0_FN_SDEI_PE_MASK:
+ 	case SDEI_1_0_FN_SDEI_PE_UNMASK:
 -- 
 2.23.0
 
