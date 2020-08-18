@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8F0C433E3
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A8CC433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:28:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 631B8207FF
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D5A3207DA
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:28:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="nnIzrgNi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 631B8207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IBdarADJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5A3207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C42D4BD7A;
-	Tue, 18 Aug 2020 09:28:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D854B4BD64;
+	Tue, 18 Aug 2020 09:28:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bh3vgroLYk8B; Tue, 18 Aug 2020 09:28:41 -0400 (EDT)
+	with ESMTP id xXhyT5pjYlXY; Tue, 18 Aug 2020 09:28:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFEC84BD8D;
-	Tue, 18 Aug 2020 09:28:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04A914BDBC;
+	Tue, 18 Aug 2020 09:28:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B424BA0F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:28:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 484BB4BC5F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:28:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SGcnD2BX-Znq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Aug 2020 09:28:37 -0400 (EDT)
+ with ESMTP id E93ETiS4CgrB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Aug 2020 09:28:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA4144BD12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:28:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CBA64BD90
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:28:42 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 710EE206DA;
- Tue, 18 Aug 2020 13:28:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B4545207DE;
+ Tue, 18 Aug 2020 13:28:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1597757317;
- bh=Ze9U9bEOkJMnTpyJuX7J9ml1RhUqsce6dq+SCPQxgHM=;
+ s=default; t=1597757321;
+ bh=9+AkA5ykbWDLrnAEy1Hul4c/Nz61Jg+oLjjRsxPUlX0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=nnIzrgNi3+G2uH0pV5rLBhHwI1EUsXesgMGgTzrA6WLEGy7jmIFoQFJHEkRzYf9mj
- kpYB558Qaen2q46V+ShHQ5jNnvisWvLzrN21/5DjgX2xYwtovfBSLz6pr0r5tXcII2
- nO+uw3KCPcuAo+2TAqoZUuwBF+o/u6REfltfz1Vo=
+ b=IBdarADJ701Xbo4sgIPvoLIaGi+axWnh9ENC1BDS7ZDJv340ZZHaZ7leqvmXhCEaX
+ 137w72XCAkP+qWbTQp9EqWT/AxXPxZTJwqPZkTgbAIlGZDlwIHOuf4zFmxwMj5o/MA
+ urG7rv3QqlnxSjSOrLlyd64fz0sukP01TU96vBgQ=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 04/22] KVM: arm64: Add support for creating kernel-agnostic
- stage-1 page tables
-Date: Tue, 18 Aug 2020 14:28:00 +0100
-Message-Id: <20200818132818.16065-5-will@kernel.org>
+Subject: [PATCH v2 06/22] KVM: arm64: Add support for creating kernel-agnostic
+ stage-2 page tables
+Date: Tue, 18 Aug 2020 14:28:02 +0100
+Message-Id: <20200818132818.16065-7-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200818132818.16065-1-will@kernel.org>
 References: <20200818132818.16065-1-will@kernel.org>
@@ -82,212 +82,223 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The generic page-table walker is pretty useless as it stands, because it
-doesn't understand enough to allocate anything. Teach it about stage-1
-page-tables, and hook up an API for allocating these for the hypervisor
-at EL2.
+Introduce alloc() and free() functions to the generic page-table code
+for guest stage-2 page-tables and plumb these into the existing KVM
+page-table allocator. Subsequent patches will convert other operations
+within the KVM allocator over to the generic code.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  34 +++++++
- arch/arm64/kvm/hyp/pgtable.c         | 131 +++++++++++++++++++++++++++
- 2 files changed, 165 insertions(+)
+ arch/arm64/include/asm/kvm_host.h    |  1 +
+ arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 51 ++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 55 +++++++++++++++-------------
+ 4 files changed, 99 insertions(+), 26 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e52c927aade5..0b7c702b2151 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -81,6 +81,7 @@ struct kvm_s2_mmu {
+ 	 */
+ 	pgd_t		*pgd;
+ 	phys_addr_t	pgd_phys;
++	struct kvm_pgtable *pgt;
+ 
+ 	/* The last vcpu id that ran on each physical CPU */
+ 	int __percpu *last_vcpu_ran;
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 51ccbbb0efae..ec9f98527dcc 100644
+index 2af84ab78cb8..3389f978d573 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -77,6 +77,40 @@ struct kvm_pgtable_walker {
- 	const enum kvm_pgtable_walk_flags	flags;
- };
+@@ -116,6 +116,24 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
+ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+ 			enum kvm_pgtable_prot prot);
  
 +/**
-+ * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
++ * kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
 + * @pgt:	Uninitialised page-table structure to initialise.
-+ * @va_bits:	Maximum virtual address bits.
++ * @kvm:	KVM structure representing the guest virtual machine.
 + *
 + * Return: 0 on success, negative error code on failure.
 + */
-+int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits);
++int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm);
 +
 +/**
-+ * kvm_pgtable_hyp_destroy() - Destroy an unused hypervisor stage-1 page-table.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
++ * kvm_pgtable_stage2_destroy() - Destroy an unused guest stage-2 page-table.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
 + *
 + * The page-table is assumed to be unreachable by any hardware walkers prior
 + * to freeing and therefore no TLB invalidation is performed.
 + */
-+void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
-+
-+/**
-+ * kvm_pgtable_hyp_map() - Install a mapping in a hypervisor stage-1 page-table.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
-+ * @addr:	Virtual address at which to place the mapping.
-+ * @size:	Size of the mapping.
-+ * @phys:	Physical address of the memory to map.
-+ * @prot:	Permissions and attributes for the mapping.
-+ *
-+ * If device attributes are not explicitly requested in @prot, then the
-+ * mapping will be normal, cacheable.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
-+			enum kvm_pgtable_prot prot);
++void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 +
  /**
   * kvm_pgtable_walk() - Walk a page-table.
   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 462001bbe028..d75166823ad9 100644
+index d75166823ad9..b8550ccaef4d 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -24,8 +24,18 @@
- 
- #define KVM_PTE_LEAF_ATTR_LO		GENMASK(11, 2)
- 
-+#define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
-+#define KVM_PTE_LEAF_ATTR_LO_S1_AP	GENMASK(7, 6)
-+#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO	3
-+#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW	1
-+#define KVM_PTE_LEAF_ATTR_LO_S1_SH	GENMASK(9, 8)
-+#define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS	3
-+#define KVM_PTE_LEAF_ATTR_LO_S1_AF	BIT(10)
-+
- #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
- 
-+#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-+
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable		*pgt;
- 	struct kvm_pgtable_walker	*walker;
-@@ -288,3 +298,124 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 
- 	return _kvm_pgtable_walk(&walk_data);
+@@ -419,3 +419,54 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+ 	free_page((unsigned long)pgt->pgd);
+ 	pgt->pgd = NULL;
  }
 +
-+struct hyp_map_data {
-+	u64		phys;
-+	kvm_pte_t	attr;
-+};
-+
-+static int hyp_map_set_prot_attr(enum kvm_pgtable_prot prot,
-+				 struct hyp_map_data *data)
++int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm)
 +{
-+	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
-+	u32 mtype = device ? MT_DEVICE_nGnRE : MT_NORMAL;
-+	kvm_pte_t attr = FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX, mtype);
-+	u32 sh = KVM_PTE_LEAF_ATTR_LO_S1_SH_IS;
-+	u32 ap = (prot & KVM_PGTABLE_PROT_W) ? KVM_PTE_LEAF_ATTR_LO_S1_AP_RW :
-+					       KVM_PTE_LEAF_ATTR_LO_S1_AP_RO;
++	size_t pgd_sz;
++	u64 vtcr = kvm->arch.vtcr;
++	u32 ia_bits = VTCR_EL2_IPA(vtcr);
++	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
++	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
 +
-+	if (!(prot & KVM_PGTABLE_PROT_R))
-+		return -EINVAL;
-+
-+	if (prot & KVM_PGTABLE_PROT_X) {
-+		if (prot & KVM_PGTABLE_PROT_W)
-+			return -EINVAL;
-+
-+		if (device)
-+			return -EINVAL;
-+	} else {
-+		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-+	}
-+
-+	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-+	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
-+	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
-+	data->attr = attr;
-+	return 0;
-+}
-+
-+static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-+				    kvm_pte_t *ptep, struct hyp_map_data *data)
-+{
-+	u64 granule = kvm_granule_size(level), phys = data->phys;
-+
-+	if (!kvm_block_mapping_supported(addr, end, phys, level))
-+		return false;
-+
-+	WARN_ON(!kvm_set_valid_leaf_pte(ptep, phys, data->attr, level));
-+	data->phys += granule;
-+	return true;
-+}
-+
-+static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			  enum kvm_pgtable_walk_flags flag, void * const arg)
-+{
-+	kvm_pte_t *childp;
-+
-+	if (hyp_map_walker_try_leaf(addr, end, level, ptep, arg))
-+		return 0;
-+
-+	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
-+		return -EINVAL;
-+
-+	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
-+	if (!childp)
-+		return -ENOMEM;
-+
-+	kvm_set_table_pte(ptep, childp);
-+	return 0;
-+}
-+
-+int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
-+			enum kvm_pgtable_prot prot)
-+{
-+	int ret;
-+	struct hyp_map_data map_data = {
-+		.phys	= ALIGN_DOWN(phys, PAGE_SIZE),
-+	};
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= hyp_map_walker,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+		.arg	= &map_data,
-+	};
-+
-+	ret = hyp_map_set_prot_attr(prot, &map_data);
-+	if (ret)
-+		return ret;
-+
-+	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-+	dsb(ishst);
-+	isb();
-+	return ret;
-+}
-+
-+int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits)
-+{
-+	pgt->pgd = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
++	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
++	pgt->pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL | __GFP_ZERO);
 +	if (!pgt->pgd)
 +		return -ENOMEM;
 +
-+	pgt->ia_bits		= va_bits;
-+	pgt->start_level	= kvm_start_level(va_bits);
-+	pgt->mmu		= NULL;
++	pgt->ia_bits		= ia_bits;
++	pgt->start_level	= start_level;
++	pgt->mmu		= &kvm->arch.mmu;
 +	return 0;
 +}
 +
-+static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			   enum kvm_pgtable_walk_flags flag, void * const arg)
++static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++			      enum kvm_pgtable_walk_flags flag,
++			      void * const arg)
 +{
-+	free_page((unsigned long)kvm_pte_follow(*ptep));
++	kvm_pte_t pte = *ptep;
++
++	if (!kvm_pte_valid(pte))
++		return 0;
++
++	put_page(virt_to_page(ptep));
++
++	if (kvm_pte_table(pte, level))
++		free_page((unsigned long)kvm_pte_follow(pte));
++
 +	return 0;
 +}
 +
-+void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
++void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
 +{
++	size_t pgd_sz;
 +	struct kvm_pgtable_walker walker = {
-+		.cb	= hyp_free_walker,
-+		.flags	= KVM_PGTABLE_WALK_TABLE_POST,
++		.cb	= stage2_free_walker,
++		.flags	= KVM_PGTABLE_WALK_LEAF |
++			  KVM_PGTABLE_WALK_TABLE_POST,
 +	};
 +
 +	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-+	free_page((unsigned long)pgt->pgd);
++	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
++	free_pages_exact(pgt->pgd, pgd_sz);
 +	pgt->pgd = NULL;
 +}
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index f226a8ea4f2e..fdca6b69944b 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -668,47 +668,49 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+  * @kvm:	The pointer to the KVM structure
+  * @mmu:	The pointer to the s2 MMU structure
+  *
+- * Allocates only the stage-2 HW PGD level table(s) of size defined by
+- * stage2_pgd_size(mmu->kvm).
+- *
++ * Allocates only the stage-2 HW PGD level table(s).
+  * Note we don't need locking here as this is only called when the VM is
+  * created, which can only be done once.
+  */
+ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+ {
+-	phys_addr_t pgd_phys;
+-	pgd_t *pgd;
+-	int cpu;
++	int cpu, err;
++	struct kvm_pgtable *pgt;
+ 
+-	if (mmu->pgd != NULL) {
++	if (mmu->pgt != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+-	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
+-	if (!pgd)
++	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL);
++	if (!pgt)
+ 		return -ENOMEM;
+ 
+-	pgd_phys = virt_to_phys(pgd);
+-	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+-		return -EINVAL;
++	err = kvm_pgtable_stage2_init(pgt, kvm);
++	if (err)
++		goto out_free_pgtable;
+ 
+ 	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
+ 	if (!mmu->last_vcpu_ran) {
+-		free_pages_exact(pgd, stage2_pgd_size(kvm));
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto out_destroy_pgtable;
+ 	}
+ 
+ 	for_each_possible_cpu(cpu)
+ 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+ 
+ 	mmu->kvm = kvm;
+-	mmu->pgd = pgd;
+-	mmu->pgd_phys = pgd_phys;
++	mmu->pgt = pgt;
++	mmu->pgd_phys = __pa(pgt->pgd);
++	mmu->pgd = (void *)pgt->pgd;
+ 	mmu->vmid.vmid_gen = 0;
+-
+ 	return 0;
++
++out_destroy_pgtable:
++	kvm_pgtable_stage2_destroy(pgt);
++out_free_pgtable:
++	kfree(pgt);
++	return err;
+ }
+ 
+ static void stage2_unmap_memslot(struct kvm *kvm,
+@@ -781,20 +783,21 @@ void stage2_unmap_vm(struct kvm *kvm)
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ {
+ 	struct kvm *kvm = mmu->kvm;
+-	void *pgd = NULL;
++	struct kvm_pgtable *pgt = NULL;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	if (mmu->pgd) {
+-		unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
+-		pgd = READ_ONCE(mmu->pgd);
++	pgt = mmu->pgt;
++	if (pgt) {
+ 		mmu->pgd = NULL;
++		mmu->pgd_phys = 0;
++		mmu->pgt = NULL;
++		free_percpu(mmu->last_vcpu_ran);
+ 	}
+ 	spin_unlock(&kvm->mmu_lock);
+ 
+-	/* Free the HW pgd, one page at a time */
+-	if (pgd) {
+-		free_pages_exact(pgd, stage2_pgd_size(kvm));
+-		free_percpu(mmu->last_vcpu_ran);
++	if (pgt) {
++		kvm_pgtable_stage2_destroy(pgt);
++		kfree(pgt);
+ 	}
+ }
+ 
 -- 
 2.28.0.220.ged08abb693-goog
 
