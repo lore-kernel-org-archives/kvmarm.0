@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F19C433E1
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F10AEC433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:29:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BCFD2080C
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A98F6207DE
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 13:29:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOyoYtuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BCFD2080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="yu8S0gzT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A98F6207DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53B314BDA2;
-	Tue, 18 Aug 2020 09:29:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6414BF07;
+	Tue, 18 Aug 2020 09:29:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0ZprdH2zQfFl; Tue, 18 Aug 2020 09:29:02 -0400 (EDT)
+	with ESMTP id GUESsdUIsaVV; Tue, 18 Aug 2020 09:29:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50D194BF82;
-	Tue, 18 Aug 2020 09:29:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 696C84BF77;
+	Tue, 18 Aug 2020 09:29:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 048364BC5F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:29:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD4AF4BD0A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:29:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KdgMun8Qlf4k for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Aug 2020 09:29:00 -0400 (EDT)
+ with ESMTP id YoFWtMgL51bH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Aug 2020 09:29:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF2244BB98
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:28:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D84144BE4F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 09:29:01 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 94C48207DE;
- Tue, 18 Aug 2020 13:28:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9F68F2076D;
+ Tue, 18 Aug 2020 13:28:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1597757339;
- bh=Tr8sOdOVfJrIYM6Sy1u0tcmXVTxJtaXgQnmKMOCVnMc=;
+ s=default; t=1597757341;
+ bh=avTv+1Ql92LZg4TS5GXb7H/dLu6XS19BQ5Emh3J76cI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=WOyoYtuDVDAWfd/jqvCFKU3WrGtTnOVgaIrAmmVn7dTkbYWOy7z22lZ2pqigyL5sl
- IGYJ1S0cElTAiQQZmZiB6HL/iCh4CUB/JDQTIiBIad8W7ofCd2oznADUogs85TGoU4
- q1FEnYnwj4H5Js6k8X4qKp78hDCaOK52hjBes2Uk=
+ b=yu8S0gzTsZ5fQa1Dkt2RD+LFw4IxFivZF9A/dbzYEne3o9+qLMle+DTCkYNFmiVAH
+ Gs4Zub8oY25zricFqUqb6m/UafAjVX92Xp5RxzqVUknGhJgbmPk7P5KKli2Wzz0cw7
+ mb15WOr/fjUbzvU31CtpdPJfZ2DGJOS11pIEZGuo=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 15/22] KVM: arm64: Add support for stage-2 cache flushing
- in generic page-table
-Date: Tue, 18 Aug 2020 14:28:11 +0100
-Message-Id: <20200818132818.16065-16-will@kernel.org>
+Subject: [PATCH v2 16/22] KVM: arm64: Convert memslot cache-flushing code to
+ generic page-table API
+Date: Tue, 18 Aug 2020 14:28:12 +0100
+Message-Id: <20200818132818.16065-17-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200818132818.16065-1-will@kernel.org>
 References: <20200818132818.16065-1-will@kernel.org>
@@ -84,77 +84,44 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Quentin Perret <qperret@google.com>
 
-Add support for cache flushing a range of the stage-2 address space to
-the generic page-table code.
+Convert stage2_flush_memslot() to call the kvm_pgtable_stage2_flush()
+function of the generic page-table code instead of walking the page-table
+directly.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 12 ++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 26 ++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/arm64/kvm/mmu.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 0c96b78d791d..ea823fe31913 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -226,6 +226,18 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
-  */
- bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 60f021430fcc..7b569bb1314f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -455,21 +455,10 @@ static void stage2_flush_p4ds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+-	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
+-	phys_addr_t next;
+-	pgd_t *pgd;
+-
+-	pgd = mmu->pgd + stage2_pgd_index(kvm, addr);
+-	do {
+-		next = stage2_pgd_addr_end(kvm, addr, end);
+-		if (!stage2_pgd_none(kvm, *pgd))
+-			stage2_flush_p4ds(mmu, pgd, addr, next);
  
-+/**
-+ * kvm_pgtable_stage2_flush_range() - Clean and invalidate data cache to Point
-+ * 				      of Coherency for guest stage-2 address
-+ *				      range.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-+ * @addr:	Intermediate physical address from which to flush.
-+ * @size:	Size of the range.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-+
- /**
-  * kvm_pgtable_walk() - Walk a page-table.
-  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c218651f8eba..75887185f1e2 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -762,6 +762,32 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
- 	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
+-		if (next != end)
+-			cond_resched_lock(&kvm->mmu_lock);
+-	} while (pgd++, addr = next, addr != end);
++	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
  }
  
-+static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			       enum kvm_pgtable_walk_flags flag,
-+			       void * const arg)
-+{
-+	kvm_pte_t pte = *ptep;
-+
-+	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pte))
-+		return 0;
-+
-+	stage2_flush_dcache(kvm_pte_follow(pte), kvm_granule_size(level));
-+	return 0;
-+}
-+
-+int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+{
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= stage2_flush_walker,
-+		.flags	= KVM_PGTABLE_WALK_LEAF,
-+	};
-+
-+	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-+		return 0;
-+
-+	return kvm_pgtable_walk(pgt, addr, size, &walker);
-+}
-+
- int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm)
- {
- 	size_t pgd_sz;
+ /**
 -- 
 2.28.0.220.ged08abb693-goog
 
