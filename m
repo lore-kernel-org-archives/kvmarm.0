@@ -2,92 +2,77 @@ Return-Path: <SRS0=sZMl=B5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55376C433DF
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 11:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDEFC433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 12:50:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CBE512075E
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 11:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41EBD206B5
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 12:50:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RWwvXWnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE512075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQVS7KCT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41EBD206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3156D4BA5B;
-	Wed, 19 Aug 2020 07:04:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F72A4BABE;
+	Wed, 19 Aug 2020 08:50:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CEXby+xlyP-i; Wed, 19 Aug 2020 07:04:39 -0400 (EDT)
+	with ESMTP id j3nxpHmrZZJA; Wed, 19 Aug 2020 08:50:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6F204BA43;
-	Wed, 19 Aug 2020 07:04:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 881764BA79;
+	Wed, 19 Aug 2020 08:50:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3374BBFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 19:24:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8EC44BA63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 08:50:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PxyImbiemtRc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Aug 2020 19:24:53 -0400 (EDT)
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com
- [207.171.190.10])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FF644B142
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 19:24:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1597793094; x=1629329094;
- h=subject:to:cc:references:from:message-id:date:
- mime-version:in-reply-to:content-transfer-encoding;
- bh=jR5nOW7+DwOgmrIAsVN7fuyxto6g5YRtj8aNKuXqjKc=;
- b=RWwvXWnX4Ws/BuYXkBwZuWH9pLCuh0Bkf8skXsKXW+lWEozUNmQ2sKN0
- SxxYYGKXzVderagGf5BF1FgZEmnNVj1n05DohpYqTIzmAMm/uov9eNd8j
- vdx8J/crdYf3w5kb37FnvQJgj5/rsF65MaBUPvlTL+i0/M5P6euTapYX2 8=;
-X-IronPort-AV: E=Sophos;i="5.76,329,1592870400"; d="scan'208";a="67808757"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
- email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.47.23.38])
- by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP;
- 18 Aug 2020 23:24:19 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
- by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS
- id 7E7F3A1826; Tue, 18 Aug 2020 23:24:15 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 18 Aug 2020 23:24:14 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.162.228) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 18 Aug 2020 23:24:11 +0000
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Add PMU event filtering infrastructure
-To: Marc Zyngier <maz@kernel.org>, Auger Eric <eric.auger@redhat.com>
-References: <20200309124837.19908-1-maz@kernel.org>
- <20200309124837.19908-2-maz@kernel.org>
- <70e712fc-6789-2384-c21c-d932b5e1a32f@redhat.com>
- <0027398587e8746a6a7459682330855f@kernel.org>
- <7c9e2e55-95c8-a212-e566-c48f5d3bc417@redhat.com>
- <470c88271ef8c4f92ecf990b7b86658e@kernel.org>
-From: Alexander Graf <graf@amazon.com>
-Message-ID: <0647b63c-ac27-8ec9-c9da-9a5e5163cb5d@amazon.com>
-Date: Wed, 19 Aug 2020 01:24:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+ with ESMTP id FpVeZ1h56Ye7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Aug 2020 08:50:48 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1AD14BA4D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 08:50:48 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597841448;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aNBcx8w5XcYHoCczqsi+mPWxfzakAJQKH//rEDM3Lhc=;
+ b=FQVS7KCT3xqgAaX/dD41D3PoZnEWTk7OynEyLZ3qdZFdmYNmQXEQK+VkA3uHgbZ4c6IOO/
+ nT/pz3DXLq4UKVMYcbb35XKc8MljCn+dfrZZdNv6N32Fes/MtoYiqka93f8feQxXkvh83h
+ Y+HMHxKfzIRI3ZF94LnKnnKcNbfcaYY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-115-UIJLDnhOOpG-5dsXR4xkIw-1; Wed, 19 Aug 2020 08:50:31 -0400
+X-MC-Unique: UIJLDnhOOpG-5dsXR4xkIw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90209425DE;
+ Wed, 19 Aug 2020 12:50:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AAD169C9D;
+ Wed, 19 Aug 2020 12:50:29 +0000 (UTC)
+Date: Wed, 19 Aug 2020 14:50:26 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2 0/6] KVM: arm64: pvtime: Fixes and a new cap
+Message-ID: <20200819125026.fsbzvim74qp7sene@kamzik.brq.redhat.com>
+References: <20200804170604.42662-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <470c88271ef8c4f92ecf990b7b86658e@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.228]
-X-ClientProxiedBy: EX13D17UWC003.ant.amazon.com (10.43.162.206) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-X-Mailman-Approved-At: Wed, 19 Aug 2020 07:04:38 -0400
-Cc: kvm@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200804170604.42662-1-drjones@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: maz@kernel.org, steven.price@arm.com, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,106 +84,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDEwLjAzLjIwIDE5OjAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gMjAy
-MC0wMy0xMCAxNzo0MCwgQXVnZXIgRXJpYyB3cm90ZToKPj4gSGkgTWFyYywKPj4KPj4gT24gMy8x
-MC8yMCAxMjowMyBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gSGkgRXJpYywKPj4+Cj4+PiBP
-biAyMDIwLTAzLTA5IDE4OjA1LCBBdWdlciBFcmljIHdyb3RlOgo+Pj4+IEhpIE1hcmMsCj4+Pj4K
-Pj4+PiBPbiAzLzkvMjAgMTo0OCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4+PiBJdCBjYW4g
-YmUgZGVzaXJhYmxlIHRvIGV4cG9zZSBhIFBNVSB0byBhIGd1ZXN0LCBhbmQgeWV0IG5vdCB3YW50
-IHRoZQo+Pj4+PiBndWVzdCB0byBiZSBhYmxlIHRvIGNvdW50IHNvbWUgb2YgdGhlIGltcGxlbWVu
-dGVkIGV2ZW50cyAoYmVjYXVzZSB0aGlzCj4+Pj4+IHdvdWxkIGdpdmUgaW5mb3JtYXRpb24gb24g
-c2hhcmVkIHJlc291cmNlcywgZm9yIGV4YW1wbGUuCj4+Pj4+Cj4+Pj4+IEZvciB0aGlzLCBsZXQn
-cyBleHRlbmQgdGhlIFBNVXYzIGRldmljZSBBUEksIGFuZCBvZmZlciBhIHdheSB0byAKPj4+Pj4g
-c2V0dXAgYQo+Pj4+PiBiaXRtYXAgb2YgdGhlIGFsbG93ZWQgZXZlbnRzICh0aGUgZGVmYXVsdCBi
-ZWluZyBubyBiaXRtYXAsIGFuZCB0aHVzIG5vCj4+Pj4+IGZpbHRlcmluZykuCj4+Pj4+Cj4+Pj4+
-IFVzZXJzcGFjZSBjYW4gdGh1cyBhbGxvdy9kZW55IHJhbmdlcyBvZiBldmVudC4gVGhlIGRlZmF1
-bHQgcG9saWN5Cj4+Pj4+IGRlcGVuZHMgb24gdGhlICJwb2xhcml0eSIgb2YgdGhlIGZpcnN0IGZp
-bHRlciBzZXR1cCAoZGVmYXVsdCBkZW55IAo+Pj4+PiBpZiB0aGUKPj4+Pj4gZmlsdGVyIGFsbG93
-cyBldmVudHMsIGFuZCBkZWZhdWx0IGFsbG93IGlmIHRoZSBmaWx0ZXIgZGVuaWVzIGV2ZW50cyku
-Cj4+Pj4+IFRoaXMgYWxsb3dzIHRvIHNldHVwIGV4YWN0bHkgd2hhdCBpcyBhbGxvd2VkIGZvciBh
-IGdpdmVuIGd1ZXN0Lgo+Pj4+Pgo+Pj4+PiBOb3RlIHRoYXQgYWx0aG91Z2ggdGhlIGlvY3RsIGlz
-IHBlci12Y3B1LCB0aGUgbWFwIG9mIGFsbG93ZWQgZXZlbnRzIGlzCj4+Pj4+IGdsb2JhbCB0byB0
-aGUgVk0gKGl0IGNhbiBiZSBzZXR1cCBmcm9tIGFueSB2Y3B1IHVudGlsIHRoZSB2Y3B1IFBNVSBp
-cwo+Pj4+PiBpbml0aWFsaXplZCkuCj4+Pj4+Cj4+Pj4+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnlu
-Z2llciA8bWF6QGtlcm5lbC5vcmc+Cj4+Pj4+IC0tLQo+Pj4+PiDCoGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCB8wqAgNiArKysKPj4+Pj4gwqBhcmNoL2FybTY0L2luY2x1ZGUvdWFw
-aS9hc20va3ZtLmggfCAxNiArKysrKysKPj4+Pj4gwqB2aXJ0L2t2bS9hcm0vYXJtLmPCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDIgKwo+Pj4+PiDCoHZpcnQva3ZtL2FybS9wbXUu
-Y8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDg0IAo+Pj4+PiArKysrKysrKysrKysr
-KysrKysrKysrKysrLS0tLS0tCj4+Pj4+IMKgNCBmaWxlcyBjaGFuZ2VkLCA5MiBpbnNlcnRpb25z
-KCspLCAxNiBkZWxldGlvbnMoLSkKPj4+Pj4KPj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-aW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+PiBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3Zt
-X2hvc3QuaAo+Pj4+PiBpbmRleCA1N2ZkNDZhY2QwNTguLjhlNjNjNjE4Njg4ZCAxMDA2NDQKPj4+
-Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+Pj4+ICsrKyBiL2Fy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+PiBAQCAtOTEsNiArOTEsMTIgQEAg
-c3RydWN0IGt2bV9hcmNoIHsKPj4+Pj4gwqDCoMKgwqDCoCAqIHN1cHBvcnRlZC4KPj4+Pj4gwqDC
-oMKgwqDCoCAqLwo+Pj4+PiDCoMKgwqDCoCBib29sIHJldHVybl9uaXN2X2lvX2Fib3J0X3RvX3Vz
-ZXI7Cj4+Pj4+ICsKPj4+Pj4gK8KgwqDCoCAvKgo+Pj4+PiArwqDCoMKgwqAgKiBWTS13aWRlIFBN
-VSBmaWx0ZXIsIGltcGxlbWVudGVkIGFzIGEgYml0bWFwIGFuZCBiaWcgZW5vdWdoCj4+Pj4+ICvC
-oMKgwqDCoCAqIGZvciB1cCB0byA2NTUzNiBldmVudHMKPj4+Pj4gK8KgwqDCoMKgICovCj4+Pj4+
-ICvCoMKgwqAgdW5zaWduZWQgbG9uZyAqcG11X2ZpbHRlcjsKPj4+Pj4gwqB9Owo+Pj4+Pgo+Pj4+
-PiDCoCNkZWZpbmUgS1ZNX05SX01FTV9PQkpTwqDCoMKgwqAgNDAKPj4+Pj4gZGlmZiAtLWdpdCBh
-L2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBpbmRleCBiYTg1YmIyM2YwNjAuLjdiMTUxMWQ2Y2U0
-NCAxMDA2NDQKPj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+
-Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4+PiBAQCAtMTU5
-LDYgKzE1OSwyMSBAQCBzdHJ1Y3Qga3ZtX3N5bmNfcmVncyB7Cj4+Pj4+IMKgc3RydWN0IGt2bV9h
-cmNoX21lbW9yeV9zbG90IHsKPj4+Pj4gwqB9Owo+Pj4+Pgo+Pj4+PiArLyoKPj4+Pj4gKyAqIFBN
-VSBmaWx0ZXIgc3RydWN0dXJlLiBEZXNjcmliZSBhIHJhbmdlIG9mIGV2ZW50cyB3aXRoIGEgcGFy
-dGljdWxhcgo+Pj4+PiArICogYWN0aW9uLiBUbyBiZSB1c2VkIHdpdGggS1ZNX0FSTV9WQ1BVX1BN
-VV9WM19GSUxURVIuCj4+Pj4+ICsgKi8KPj4+Pj4gK3N0cnVjdCBrdm1fcG11X2V2ZW50X2ZpbHRl
-ciB7Cj4+Pj4+ICvCoMKgwqAgX191MTbCoMKgwqAgYmFzZV9ldmVudDsKPj4+Pj4gK8KgwqDCoCBf
-X3UxNsKgwqDCoCBuZXZlbnRzOwo+Pj4+PiArCj4+Pj4+ICsjZGVmaW5lIEtWTV9QTVVfRVZFTlRf
-QUxMT1fCoMKgwqAgMAo+Pj4+PiArI2RlZmluZSBLVk1fUE1VX0VWRU5UX0RFTlnCoMKgwqAgMQo+
-Pj4+PiArCj4+Pj4+ICvCoMKgwqAgX191OMKgwqDCoCBhY3Rpb247Cj4+Pj4+ICvCoMKgwqAgX191
-OMKgwqDCoCBwYWRbM107Cj4+Pj4+ICt9Owo+Pj4+PiArCj4+Pj4+IMKgLyogZm9yIEtWTV9HRVQv
-U0VUX1ZDUFVfRVZFTlRTICovCj4+Pj4+IMKgc3RydWN0IGt2bV92Y3B1X2V2ZW50cyB7Cj4+Pj4+
-IMKgwqDCoMKgIHN0cnVjdCB7Cj4+Pj4+IEBAIC0zMjksNiArMzQ0LDcgQEAgc3RydWN0IGt2bV92
-Y3B1X2V2ZW50cyB7Cj4+Pj4+IMKgI2RlZmluZSBLVk1fQVJNX1ZDUFVfUE1VX1YzX0NUUkzCoMKg
-wqAgMAo+Pj4+PiDCoCNkZWZpbmXCoMKgIEtWTV9BUk1fVkNQVV9QTVVfVjNfSVJRwqDCoMKgIDAK
-Pj4+Pj4gwqAjZGVmaW5lwqDCoCBLVk1fQVJNX1ZDUFVfUE1VX1YzX0lOSVTCoMKgwqAgMQo+Pj4+
-PiArI2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1BNVV9WM19GSUxURVLCoMKgwqAgMgo+Pj4+PiDC
-oCNkZWZpbmUgS1ZNX0FSTV9WQ1BVX1RJTUVSX0NUUkzCoMKgwqDCoMKgwqDCoCAxCj4+Pj4+IMKg
-I2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1RJTUVSX0lSUV9WVElNRVLCoMKgwqDCoMKgwqDCoCAw
-Cj4+Pj4+IMKgI2RlZmluZcKgwqAgS1ZNX0FSTV9WQ1BVX1RJTUVSX0lSUV9QVElNRVLCoMKgwqDC
-oMKgwqDCoCAxCj4+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJtLmMgYi92aXJ0L2t2
-bS9hcm0vYXJtLmMKPj4+Pj4gaW5kZXggZWRhN2I2MjRlYWI4Li44ZDg0OWFjODhhNDQgMTAwNjQ0
-Cj4+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9hcm0uYwo+Pj4+PiArKysgYi92aXJ0L2t2bS9hcm0v
-YXJtLmMKPj4+Pj4gQEAgLTE2NCw2ICsxNjQsOCBAQCB2b2lkIGt2bV9hcmNoX2Rlc3Ryb3lfdm0o
-c3RydWN0IGt2bSAqa3ZtKQo+Pj4+PiDCoMKgwqDCoCBmcmVlX3BlcmNwdShrdm0tPmFyY2gubGFz
-dF92Y3B1X3Jhbik7Cj4+Pj4+IMKgwqDCoMKgIGt2bS0+YXJjaC5sYXN0X3ZjcHVfcmFuID0gTlVM
-TDsKPj4+Pj4KPj4+Pj4gK8KgwqDCoCBiaXRtYXBfZnJlZShrdm0tPmFyY2gucG11X2ZpbHRlcik7
-Cj4+Pj4+ICsKPj4+Pj4gwqDCoMKgwqAgZm9yIChpID0gMDsgaSA8IEtWTV9NQVhfVkNQVVM7ICsr
-aSkgewo+Pj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChrdm0tPnZjcHVzW2ldKSB7Cj4+Pj4+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fdmNwdV9kZXN0cm95KGt2bS0+dmNwdXNbaV0pOwo+
-Pj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3BtdS5jIGIvdmlydC9rdm0vYXJtL3BtdS5j
-Cj4+Pj4+IGluZGV4IGYwZDAzMTJjMGE1NS4uOWYwZmQwMjI0ZDViIDEwMDY0NAo+Pj4+PiAtLS0g
-YS92aXJ0L2t2bS9hcm0vcG11LmMKPj4+Pj4gKysrIGIvdmlydC9rdm0vYXJtL3BtdS5jCj4+Pj4+
-IEBAIC01NzksMTAgKzU3OSwxOSBAQCBzdGF0aWMgdm9pZCBrdm1fcG11X2NyZWF0ZV9wZXJmX2V2
-ZW50KHN0cnVjdAo+Pj4+PiBrdm1fdmNwdSAqdmNwdSwgdTY0IHNlbGVjdF9pZHgpCj4+Pj4+Cj4+
-Pj4+IMKgwqDCoMKgIGt2bV9wbXVfc3RvcF9jb3VudGVyKHZjcHUsIHBtYyk7Cj4+Pj4+IMKgwqDC
-oMKgIGV2ZW50c2VsID0gZGF0YSAmIEFSTVY4X1BNVV9FVlRZUEVfRVZFTlQ7Cj4+Pj4+ICvCoMKg
-wqAgaWYgKHBtYy0+aWR4ID09IEFSTVY4X1BNVV9DWUNMRV9JRFgpCj4+Pj4+ICvCoMKgwqDCoMKg
-wqDCoCBldmVudHNlbCA9IEFSTVY4X1BNVVYzX1BFUkZDVFJfQ1BVX0NZQ0xFUzsKPj4+PiBuaXQ6
-Cj4+Pj4gwqDCoMKgwqBpZiAocG1jLT5pZHggPT0gQVJNVjhfUE1VX0NZQ0xFX0lEWCkKPj4+PiDC
-oMKgwqDCoMKgwqDCoCBldmVudHNlbCA9IEFSTVY4X1BNVVYzX1BFUkZDVFJfQ1BVX0NZQ0xFUzsK
-Pj4+PiDCoMKgwqDCoGVsc2UKPj4+PiDCoMKgwqDCoMKgwqDCoCBldmVudHNlbCA9IGRhdGEgJiBB
-Uk1WOF9QTVVfRVZUWVBFX0VWRU5UOwo+Pj4KPj4+IFlvdSBkb24ndCBsaWtlIGl0PyA7LSkKPj4g
-PyBldmVudHNldCBzZXQgb25seSBvbmNlIGluc3RlYWQgb2YgMiB0aW1lcwo+IAo+IFRoZSBjb21w
-aWxlciBkb2VzIHRoZSByaWdodCB0aGluZywgYnV0IHNvcmUsIEknbGwgY2hhbmdlIGl0LgoKSSBo
-YXZlbid0IHNlZW4gYSB2MyBmb2xsb3ctdXAgYWZ0ZXIgdGhpcy4gRG8geW91IGhhcHBlbiB0byBo
-YXZlIHRoYXQgCnNvbWV3aGVyZSBpbiBhIGxvY2FsIGJyYW5jaCBhbmQganVzdCBuZWVkIHRvIHNl
-bmQgaXQgb3V0IG9yIHdvdWxkIHlvdSAKcHJlZmVyIGlmIEkgcGljayB1cCB2MiBhbmQgYWRkcmVz
-cyB0aGUgY29tbWVudHM/CgoKVGhhbmtzLAoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2Vu
-dGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1
-ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBh
-bSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVy
-bGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+On Tue, Aug 04, 2020 at 07:05:58PM +0200, Andrew Jones wrote:
+> v2:
+>   - ARM_SMCCC_HV_PV_TIME_FEATURES now also returns SMCCC_RET_NOT_SUPPORTED
+>     when steal time is not supported
+>   - Added READ_ONCE() for the run_delay read
+>   - Reworked kvm_put/get_guest to not require type as a parameter
+>   - Added some more text to the documentation for KVM_CAP_STEAL_TIME
+>   - Enough changed that I didn't pick up Steven's r-b's
+> 
+> 
+> The first four patches in the series are fixes that come from testing
+> and reviewing pvtime code while writing the QEMU support[*]. The last
+> patch is only a convenience for userspace, and I wouldn't be heartbroken
+> if it wasn't deemed worth it. The QEMU patches are currently written
+> without the cap. However, if the cap is accepted, then I'll change the
+> QEMU code to use it.
+> 
+> Thanks,
+> drew
+> 
+> [*] https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg03856.html
+>     (a v2 of this series will also be posted shortly)
+> 
+> Andrew Jones (6):
+>   KVM: arm64: pvtime: steal-time is only supported when configured
+>   KVM: arm64: pvtime: Fix potential loss of stolen time
+>   KVM: arm64: Drop type input from kvm_put_guest
+>   KVM: arm64: pvtime: Fix stolen time accounting across migration
+>   KVM: Documentation: Minor fixups
+>   arm64/x86: KVM: Introduce steal-time cap
+> 
+>  Documentation/virt/kvm/api.rst    | 22 ++++++++++++++++++----
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/kvm/arm.c              |  3 +++
+>  arch/arm64/kvm/pvtime.c           | 29 +++++++++++++----------------
+>  arch/x86/kvm/x86.c                |  3 +++
+>  include/linux/kvm_host.h          | 31 ++++++++++++++++++++++++++-----
+>  include/uapi/linux/kvm.h          |  1 +
+>  7 files changed, 65 insertions(+), 26 deletions(-)
+> 
+> -- 
+> 2.25.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
+
+Hi Marc,
+
+Gentle ping. I'd like to to switch the QEMU code to using the proposed
+KVM cap, if the cap is accepted.
+
+Thanks,
+drew 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
