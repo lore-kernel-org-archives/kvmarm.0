@@ -1,88 +1,95 @@
-Return-Path: <SRS0=un+q=B4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=sZMl=B5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E569CC433E1
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 14:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4766EC433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 04:38:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 722E72087D
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Aug 2020 14:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B68FA2078B
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 04:38:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOCKY6z/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722E72087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btBqRnok"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68FA2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F2C4BBFB;
-	Tue, 18 Aug 2020 10:41:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16B924B9EB;
+	Wed, 19 Aug 2020 00:38:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HHY2px4VGTKV; Tue, 18 Aug 2020 10:41:06 -0400 (EDT)
+	with ESMTP id z5CK1DirgUG1; Wed, 19 Aug 2020 00:38:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6174BC11;
-	Tue, 18 Aug 2020 10:41:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 068FB4B9CF;
+	Wed, 19 Aug 2020 00:38:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B084BBFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 10:41:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21E494B9C6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 00:38:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RPO8Uq1PfQBr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Aug 2020 10:41:04 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA5544BB98
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2020 10:41:04 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id NdbcCszk-Plv for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Aug 2020 00:38:51 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-2.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D89264B90F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 00:38:51 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597811931;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VRdgNMkQwVuG00VIpQl/DsMlfi6VqkYpcwWD5ujuhtU=;
+ b=btBqRnok6EvFu2/UgnhpbW6XgeC4bbnbcx2DGyQMbLOflxe1Zz3kguz/slDw2tFtSooCAG
+ kPGuLq1T/KjaVn+boeLZOOzBWoFkGhnweujG5AkipTf4bVA/FOzm4PKbGb4zhZdxqLfgjv
+ xOH+KKkBfws7VRp4jI1fDLlg8J6UK+w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-Jz_5CkvTNPGgx4CrGc2ODg-1; Wed, 19 Aug 2020 00:38:47 -0400
+X-MC-Unique: Jz_5CkvTNPGgx4CrGc2ODg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 70C852083B;
- Tue, 18 Aug 2020 14:41:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1597761663;
- bh=bJPOt4B5MgpMDT2n+zzNZ+rE9AaQj654FX1OxJw6sDk=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=AOCKY6z/atNldeFw82NlnljvDaIkZ1FqC+aSBMu3yFXm9qvkAyP1Gs4olwzL0n+JN
- KtfqIK08IDgo0RkpYl8PMbUn6s3DUAhVyXc/EQOmH1F+zB4VF2sIxTbf7BWv2kFOUi
- VkiNd596tsEYNkhmbOs65QaPxRz3BbwlGWmAiHAI=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1k82nN-003vcz-O3; Tue, 18 Aug 2020 15:41:01 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AE20186A561;
+ Wed, 19 Aug 2020 04:38:46 +0000 (UTC)
+Received: from [10.64.54.198] (vpn2-54-198.bne.redhat.com [10.64.54.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20EDA7849A;
+ Wed, 19 Aug 2020 04:38:43 +0000 (UTC)
+Subject: Re: [PATCH v2 01/22] KVM: arm64: Don't free memcache pages in
+ kvm_phys_addr_ioremap()
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200818132818.16065-1-will@kernel.org>
+ <20200818132818.16065-2-will@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <47f7bfc2-1880-908f-4345-b25da500b0ff@redhat.com>
+Date: Wed, 19 Aug 2020 14:38:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Date: Tue, 18 Aug 2020 15:41:01 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
-In-Reply-To: <20200817084110.2672-1-zhukeqian1@huawei.com>
-References: <20200817084110.2672-1-zhukeqian1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.7
-Message-ID: <8308f52e4c906cad710575724f9e3855@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, steven.price@arm.com, catalin.marinas@arm.com,
- will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Steven Price <steven.price@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200818132818.16065-2-will@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -96,60 +103,62 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-08-17 09:41, Keqian Zhu wrote:
-> Hi all,
-> 
-> This patch series picks up the LPT pvtime feature originally developed
-> by Steven Price: https://patchwork.kernel.org/cover/10726499/
-> 
-> Backgroud:
-> 
-> There is demand for cross-platform migration, which means we have to
-> solve different CPU features and arch counter frequency between hosts.
-> This patch series can solve the latter problem.
-> 
-> About LPT:
-> 
-> This implements support for Live Physical Time (LPT) which provides the
-> guest with a method to derive a stable counter of time during which the
-> guest is executing even when the guest is being migrated between hosts
-> with different physical counter frequencies.
-> 
-> Changes on Steven Price's work:
-> 1. LPT structure: use symmatical semantics of scale multiplier, and use
->    fraction bits instead of "shift" to make everything clear.
-> 2. Structure allocation: host kernel does not allocates the LPT 
-> structure,
->    instead it is allocated by userspace through VM attributes. The 
-> save/restore
->    functionality can be removed.
-> 3. Since LPT structure just need update once for each guest run, add a 
-> flag to
->    indicate the update status. This has two benifits: 1) avoid multiple 
-> update
->    by each vCPUs. 2) If the update flag is not set, then return NOT 
-> SUPPORT for
->    coressponding guest HVC call.
-> 4. Add VM device attributes interface for userspace configuration.
-> 5. Add a base LPT read/write layer to reduce code.
-> 6. Support ptimer scaling.
-> 7. Support timer event stream translation.
-> 
-> Things need concern:
-> 1. https://developer.arm.com/docs/den0057/a needs update.
+Hi Will,
 
-LPT was explicitly removed from the spec because it doesn't really
-solve the problem, specially for the firmware: EFI knows
-nothing about this, for example. How is it going to work?
-Also, nobody was ever able to explain how this would work for
-nested virt.
+On 8/18/20 11:27 PM, Will Deacon wrote:
+> kvm_phys_addr_ioremap() unconditionally empties out the memcache pages
+> for the current vCPU on return. This causes subsequent topups to allocate
+> fresh pages and is at odds with the behaviour when mapping memory in
+> user_mem_abort().
+> 
+> Remove the call to kvm_mmu_free_memory_cache() from
+> kvm_phys_addr_ioremap(), allowing the cached pages to be used by a later
+> mapping.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>   arch/arm64/kvm/mmu.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 662b0c99a63d..4a24ebdc6fc6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1489,19 +1489,17 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   		ret = kvm_mmu_topup_memory_cache(&cache,
+>   						 kvm_mmu_cache_min_pages(kvm));
+>   		if (ret)
+> -			goto out;
+> +			break;
+>   		spin_lock(&kvm->mmu_lock);
+>   		ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
+>   				     KVM_S2PTE_FLAG_IS_IOMAP);
+>   		spin_unlock(&kvm->mmu_lock);
+>   		if (ret)
+> -			goto out;
+> +			break;
+>   
+>   		pfn++;
+>   	}
+>   
+> -out:
+> -	kvm_mmu_free_memory_cache(&cache);
+>   	return ret;
+>   }
+>   
 
-ARMv8.4 and ARMv8.6 have the feature set that is required to solve
-this problem without adding more PV to the kernel.
+It seems incorrect. The cache is tracked by local variable (@cache),
+meaning the cache is only visible to kvm_phys_addr_ioremap() and its
+callee. So it's correct to free unused pages in two cases: (1) error
+is returned (2) high level of page tables were previously populated
+and not all pre-allocated pages are used. Otherwise, this leads to
+memory leakage.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
