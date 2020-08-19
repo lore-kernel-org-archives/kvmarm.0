@@ -2,60 +2,71 @@ Return-Path: <SRS0=sZMl=B5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07295C433E1
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 08:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E56C433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 09:03:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 88AD6207BB
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 08:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88AD6207BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 097F5207DE
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 09:03:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="QsDw5AKj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 097F5207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1EC4B98D;
-	Wed, 19 Aug 2020 04:54:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FE9F4B9AA;
+	Wed, 19 Aug 2020 05:03:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vTfum5NOnE2H; Wed, 19 Aug 2020 04:54:50 -0400 (EDT)
+	with ESMTP id 4xKSL08rt+-Z; Wed, 19 Aug 2020 05:03:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E55E4B97D;
-	Wed, 19 Aug 2020 04:54:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6064E4B993;
+	Wed, 19 Aug 2020 05:03:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44BB84B96C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 04:54:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6C9D4B993
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 05:03:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EgN9lAMpQZzc for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Aug 2020 04:54:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA35D4B963
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 04:54:47 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30EB231B;
- Wed, 19 Aug 2020 01:54:47 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C32DD3F6CF;
- Wed, 19 Aug 2020 01:54:45 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
-To: Marc Zyngier <maz@kernel.org>, Keqian Zhu <zhukeqian1@huawei.com>
-References: <20200817084110.2672-1-zhukeqian1@huawei.com>
- <8308f52e4c906cad710575724f9e3855@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
-Date: Wed, 19 Aug 2020 09:54:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id reb50lAkGikL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Aug 2020 05:03:25 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8C644B990
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 05:03:25 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9FAC62072D;
+ Wed, 19 Aug 2020 09:03:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1597827804;
+ bh=8kMWMJqJUJqNeM/ruIfhFAMr0aImeONy4Dxz30p1h+k=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=QsDw5AKjG2Ub121PVC7oJ2IZHerVgrzG6ds/tRSZtWbMP36/uoAF7wLu5getqMiDt
+ 8Gq/fPoNCj8tmvzUB7+rHLajdSvO/3h5FYmvC4+TpHmbTAHrqHDqeDvZb4tF3PINH8
+ zMVh5xcJ7rdAPaF5ULeMz4SGzLedvY2FQxYbVvkg=
+Date: Wed, 19 Aug 2020 10:03:20 +0100
+From: Will Deacon <will@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 01/22] KVM: arm64: Don't free memcache pages in
+ kvm_phys_addr_ioremap()
+Message-ID: <20200819090320.GA17517@willie-the-truck>
+References: <20200818132818.16065-1-will@kernel.org>
+ <20200818132818.16065-2-will@kernel.org>
+ <47f7bfc2-1880-908f-4345-b25da500b0ff@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8308f52e4c906cad710575724f9e3855@kernel.org>
-Content-Language: en-GB
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <47f7bfc2-1880-908f-4345-b25da500b0ff@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,62 +78,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTgvMDgvMjAyMCAxNTo0MSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDIwMjAtMDgtMTcg
-MDk6NDEsIEtlcWlhbiBaaHUgd3JvdGU6Cj4+IEhpIGFsbCwKPj4KPj4gVGhpcyBwYXRjaCBzZXJp
-ZXMgcGlja3MgdXAgdGhlIExQVCBwdnRpbWUgZmVhdHVyZSBvcmlnaW5hbGx5IGRldmVsb3BlZAo+
-PiBieSBTdGV2ZW4gUHJpY2U6IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvY292ZXIvMTA3
-MjY0OTkvCj4+Cj4+IEJhY2tncm91ZDoKPj4KPj4gVGhlcmUgaXMgZGVtYW5kIGZvciBjcm9zcy1w
-bGF0Zm9ybSBtaWdyYXRpb24sIHdoaWNoIG1lYW5zIHdlIGhhdmUgdG8KPj4gc29sdmUgZGlmZmVy
-ZW50IENQVSBmZWF0dXJlcyBhbmQgYXJjaCBjb3VudGVyIGZyZXF1ZW5jeSBiZXR3ZWVuIGhvc3Rz
-Lgo+PiBUaGlzIHBhdGNoIHNlcmllcyBjYW4gc29sdmUgdGhlIGxhdHRlciBwcm9ibGVtLgo+Pgo+
-PiBBYm91dCBMUFQ6Cj4+Cj4+IFRoaXMgaW1wbGVtZW50cyBzdXBwb3J0IGZvciBMaXZlIFBoeXNp
-Y2FsIFRpbWUgKExQVCkgd2hpY2ggcHJvdmlkZXMgdGhlCj4+IGd1ZXN0IHdpdGggYSBtZXRob2Qg
-dG8gZGVyaXZlIGEgc3RhYmxlIGNvdW50ZXIgb2YgdGltZSBkdXJpbmcgd2hpY2ggdGhlCj4+IGd1
-ZXN0IGlzIGV4ZWN1dGluZyBldmVuIHdoZW4gdGhlIGd1ZXN0IGlzIGJlaW5nIG1pZ3JhdGVkIGJl
-dHdlZW4gaG9zdHMKPj4gd2l0aCBkaWZmZXJlbnQgcGh5c2ljYWwgY291bnRlciBmcmVxdWVuY2ll
-cy4KPj4KPj4gQ2hhbmdlcyBvbiBTdGV2ZW4gUHJpY2UncyB3b3JrOgo+PiAxLiBMUFQgc3RydWN0
-dXJlOiB1c2Ugc3ltbWF0aWNhbCBzZW1hbnRpY3Mgb2Ygc2NhbGUgbXVsdGlwbGllciwgYW5kIHVz
-ZQo+PiDCoMKgIGZyYWN0aW9uIGJpdHMgaW5zdGVhZCBvZiAic2hpZnQiIHRvIG1ha2UgZXZlcnl0
-aGluZyBjbGVhci4KPj4gMi4gU3RydWN0dXJlIGFsbG9jYXRpb246IGhvc3Qga2VybmVsIGRvZXMg
-bm90IGFsbG9jYXRlcyB0aGUgTFBUIAo+PiBzdHJ1Y3R1cmUsCj4+IMKgwqAgaW5zdGVhZCBpdCBp
-cyBhbGxvY2F0ZWQgYnkgdXNlcnNwYWNlIHRocm91Z2ggVk0gYXR0cmlidXRlcy4gVGhlIAo+PiBz
-YXZlL3Jlc3RvcmUKPj4gwqDCoCBmdW5jdGlvbmFsaXR5IGNhbiBiZSByZW1vdmVkLgo+PiAzLiBT
-aW5jZSBMUFQgc3RydWN0dXJlIGp1c3QgbmVlZCB1cGRhdGUgb25jZSBmb3IgZWFjaCBndWVzdCBy
-dW4sIGFkZCBhIAo+PiBmbGFnIHRvCj4+IMKgwqAgaW5kaWNhdGUgdGhlIHVwZGF0ZSBzdGF0dXMu
-IFRoaXMgaGFzIHR3byBiZW5pZml0czogMSkgYXZvaWQgCj4+IG11bHRpcGxlIHVwZGF0ZQo+PiDC
-oMKgIGJ5IGVhY2ggdkNQVXMuIDIpIElmIHRoZSB1cGRhdGUgZmxhZyBpcyBub3Qgc2V0LCB0aGVu
-IHJldHVybiBOT1QgCj4+IFNVUFBPUlQgZm9yCj4+IMKgwqAgY29yZXNzcG9uZGluZyBndWVzdCBI
-VkMgY2FsbC4KPj4gNC4gQWRkIFZNIGRldmljZSBhdHRyaWJ1dGVzIGludGVyZmFjZSBmb3IgdXNl
-cnNwYWNlIGNvbmZpZ3VyYXRpb24uCj4+IDUuIEFkZCBhIGJhc2UgTFBUIHJlYWQvd3JpdGUgbGF5
-ZXIgdG8gcmVkdWNlIGNvZGUuCj4+IDYuIFN1cHBvcnQgcHRpbWVyIHNjYWxpbmcuCj4+IDcuIFN1
-cHBvcnQgdGltZXIgZXZlbnQgc3RyZWFtIHRyYW5zbGF0aW9uLgo+Pgo+PiBUaGluZ3MgbmVlZCBj
-b25jZXJuOgo+PiAxLiBodHRwczovL2RldmVsb3Blci5hcm0uY29tL2RvY3MvZGVuMDA1Ny9hIG5l
-ZWRzIHVwZGF0ZS4KPiAKPiBMUFQgd2FzIGV4cGxpY2l0bHkgcmVtb3ZlZCBmcm9tIHRoZSBzcGVj
-IGJlY2F1c2UgaXQgZG9lc24ndCByZWFsbHkKPiBzb2x2ZSB0aGUgcHJvYmxlbSwgc3BlY2lhbGx5
-IGZvciB0aGUgZmlybXdhcmU6IEVGSSBrbm93cwo+IG5vdGhpbmcgYWJvdXQgdGhpcywgZm9yIGV4
-YW1wbGUuIEhvdyBpcyBpdCBnb2luZyB0byB3b3JrPwo+IEFsc28sIG5vYm9keSB3YXMgZXZlciBh
-YmxlIHRvIGV4cGxhaW4gaG93IHRoaXMgd291bGQgd29yayBmb3IKPiBuZXN0ZWQgdmlydC4KPiAK
-PiBBUk12OC40IGFuZCBBUk12OC42IGhhdmUgdGhlIGZlYXR1cmUgc2V0IHRoYXQgaXMgcmVxdWly
-ZWQgdG8gc29sdmUKPiB0aGlzIHByb2JsZW0gd2l0aG91dCBhZGRpbmcgbW9yZSBQViB0byB0aGUg
-a2VybmVsLgoKSGkgTWFyYywKClRoZXNlIGFyZSBnb29kIHBvaW50cywgaG93ZXZlciB3ZSBkbyBz
-dGlsbCBoYXZlIHRoZSBzaXR1YXRpb24gdGhhdCBDUFVzIAp0aGF0IGRvbid0IGhhdmUgQVJNdjgu
-NC84LjYgY2xlYXJseSBjYW5ub3QgaW1wbGVtZW50IHRoaXMuIEkgcHJlc3VtZSB0aGUgCnVzZS1j
-YXNlIEtlcWlhbiBpcyBsb29raW5nIGF0IHByZWRhdGVzIHRoZSBuZWNlc3Nhcnkgc3VwcG9ydCBp
-biB0aGUgQ1BVIAotIEtlcWlhbiBpZiB5b3UgY2FuIHByb3ZpZGUgbW9yZSBkZXRhaWxzIG9uIHRo
-ZSBhcmNoaXRlY3R1cmUocykgaW52b2x2ZWQgCnRoYXQgd291bGQgYmUgaGVscGZ1bC4KCk5lc3Rl
-ZCB2aXJ0IGlzIGluZGVlZCBtb3JlIG9mIGFuIGlzc3VlIC0gd2UgZGlkIGhhdmUgc29tZSBpZGVh
-cyBhcm91bmQgCnVzaW5nIFNERUkgdGhhdCBuZXZlciBtYWRlIGl0IHRvIHRoZSBzcGVjLiBIb3dl
-dmVyIEkgd291bGQgYXJndWUgdGhhdCAKdGhlIG1vc3QgcHJhZ21hdGljIGFwcHJvYWNoIHdvdWxk
-IGJlIHRvIG5vdCBzdXBwb3J0IHRoZSBjb21iaW5hdGlvbiBvZiAKbmVzdGVkIHZpcnQgYW5kIExQ
-VC4gSG9wZWZ1bGx5IHRoYXQgY2FuIHdhaXQgdW50aWwgdGhlIGNvdW50ZXIgc2NhbGluZyAKc3Vw
-cG9ydCBpcyBhdmFpbGFibGUgYW5kIG5vdCByZXF1aXJlIFBWLgoKV2UgYXJlIGRpc2N1c3Npbmcg
-KHJlLSlyZWxlYXNpbmcgdGhlIHNwZWMgd2l0aCB0aGUgTFBUIHBhcnRzIGFkZGVkLiBJZiAKeW91
-IGhhdmUgZnVuZGFtZW50YWwgb2JqZWN0aW9ucyB0aGVuIHBsZWFzZSBtZSBrbm93LgoKVGhhbmtz
-LAoKU3RldmUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
-bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Gavin,
+
+Cheers for taking a look.
+
+On Wed, Aug 19, 2020 at 02:38:39PM +1000, Gavin Shan wrote:
+> On 8/18/20 11:27 PM, Will Deacon wrote:
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 662b0c99a63d..4a24ebdc6fc6 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1489,19 +1489,17 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> >   		ret = kvm_mmu_topup_memory_cache(&cache,
+> >   						 kvm_mmu_cache_min_pages(kvm));
+> >   		if (ret)
+> > -			goto out;
+> > +			break;
+> >   		spin_lock(&kvm->mmu_lock);
+> >   		ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
+> >   				     KVM_S2PTE_FLAG_IS_IOMAP);
+> >   		spin_unlock(&kvm->mmu_lock);
+> >   		if (ret)
+> > -			goto out;
+> > +			break;
+> >   		pfn++;
+> >   	}
+> > -out:
+> > -	kvm_mmu_free_memory_cache(&cache);
+> >   	return ret;
+> >   }
+> 
+> It seems incorrect. The cache is tracked by local variable (@cache),
+> meaning the cache is only visible to kvm_phys_addr_ioremap() and its
+> callee. So it's correct to free unused pages in two cases: (1) error
+> is returned (2) high level of page tables were previously populated
+> and not all pre-allocated pages are used. Otherwise, this leads to
+> memory leakage.
+
+Well spotted, you're completely right. I was _sure_ this was the vCPU
+memcache and I even said as much in the commit meesage, but it's not, and it
+never was, so I can drop this patch. If there are any other patches I can
+drop in the series, please let me know! I did test with kmemleak enabled,
+but I guess that doesn't track page allocations into the memcache.
+
+It _might_ be an idea to have a per-VM memcache to handle these allocations,
+as that might offer some reuse over sticking one on the stack each time, but
+then again kvm_phys_addr_ioremap() is hardly a fastpath.
+
+Will
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
