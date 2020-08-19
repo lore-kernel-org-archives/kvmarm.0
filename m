@@ -2,59 +2,72 @@ Return-Path: <SRS0=sZMl=B5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CC7C433E3
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 13:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53671C433DF
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DE65F204FD
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 13:35:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE65F204FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C0106208DB
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="gH5pV1aU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0106208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8698E4B95D;
-	Wed, 19 Aug 2020 09:35:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 515C24B8D1;
+	Wed, 19 Aug 2020 19:57:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+X-Amavis-Alert: BAD HEADER SECTION, Header field occurs more than once: "To"
+	occurs 3 times
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uapX-N20wBCR; Wed, 19 Aug 2020 09:35:46 -0400 (EDT)
+	with ESMTP id gXEVhnkWHboI; Wed, 19 Aug 2020 19:57:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5819C4BA26;
-	Wed, 19 Aug 2020 09:35:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D1604B8D2;
+	Wed, 19 Aug 2020 19:57:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B15974B941
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 09:35:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1612F4B8CB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 19:57:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+X-Amavis-Alert: BAD HEADER SECTION, Header field occurs more than once: "To"
+ occurs 3 times
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Uf8eBCv+m6BI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Aug 2020 09:35:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B4A4B8DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 09:35:43 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4428142F;
- Wed, 19 Aug 2020 06:35:43 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 660F13F71F;
- Wed, 19 Aug 2020 06:35:42 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 2/2] irqchip/gic-v3: Support pseudo-NMIs when SCR_EL3.FIQ
- == 0
-Date: Wed, 19 Aug 2020 14:36:30 +0100
-Message-Id: <20200819133630.527243-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200819133630.527243-1-alexandru.elisei@arm.com>
-References: <20200819133630.527243-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Cc: jason@lakedaemon.net, maz@kernel.org, catalin.marinas@arm.com,
- tglx@linutronix.de, will@kernel.org
+ with ESMTP id OMlsxL+4xFCn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Aug 2020 19:57:06 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC8DA4B8BD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2020 19:57:06 -0400 (EDT)
+Received: from localhost (unknown [70.37.104.77])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 81746214F1;
+ Wed, 19 Aug 2020 23:57:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1597881425;
+ bh=wRIeCId+LGO7Hn8sD6X/dRYQCCdyvlfe/NUcIoPq9OE=;
+ h=Date:From:To:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
+ References:From;
+ b=gH5pV1aUFjRriPe0EuUybV43Bue3tqhsSgulwu0xcJpYoRzSqAkliOA1YGXaHUVz6
+ +8GFnvnLDPkkqhqNfU5KH1gAm2h/SVeKoOVAQdK4wp0NDCMnq8mjugTe/kroRuJmhS
+ qEvtF+czTjBBRRYuqTl0WDF+J3uRZDp/NQWJykfw=
+Date: Wed, 19 Aug 2020 23:57:04 +0000
+From: Sasha Levin <sashal@kernel.org>
+To: Sasha Levin <sashal@kernel.org>
+To: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: Pass MMU notifier range flags to
+ kvm_unmap_hva_range()
+In-Reply-To: <20200811102725.7121-2-will@kernel.org>
+References: <20200811102725.7121-2-will@kernel.org>
+Message-Id: <20200819235705.81746214F1@mail.kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,307 +79,97 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The GIC's internal view of the priority mask register and the assigned
-interrupt priorities are based on whether GIC security is enabled and
-whether firmware routes Group 0 interrupts to EL3. At the moment, we
-support priority masking when ICC_PMR_EL1 and interrupt priorities are
-either both modified by the GIC, or both left unchanged.
+Hi
 
-Trusted Firmware-A's default interrupt routing model allows Group 0
-interrupts to be delivered to the non-secure world (SCR_EL3.FIQ == 0).
-Unfortunately, this is precisely the case that the GIC driver doesn't
-support: ICC_PMR_EL1 remains unchanged, but the GIC's view of interrupt
-priorities is different from the software programmed values.
+[This is an automated email]
 
-Support pseudo-NMIs when SCR_EL3.FIQ == 0 by using a different value to
-mask regular interrupts. All the other values remain the same.
+This commit has been processed because it contains a -stable tag.
+The stable tag indicates that it's relevant for the following trees: all
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/include/asm/arch_gicv3.h |  8 ++++-
- arch/arm64/include/asm/daifflags.h  |  4 +--
- arch/arm64/include/asm/irqflags.h   | 18 ++++++----
- arch/arm64/include/asm/ptrace.h     | 12 +++++++
- arch/arm64/kernel/entry.S           |  2 +-
- arch/arm64/kernel/image-vars.h      |  2 ++
- arch/arm64/kvm/hyp/nvhe/switch.c    |  2 +-
- drivers/irqchip/irq-gic-v3.c        | 52 ++++++++++++++++++++++-------
- 8 files changed, 77 insertions(+), 23 deletions(-)
+The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58, v4.19.139, v4.14.193, v4.9.232, v4.4.232.
 
-diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
-index 6647ae4f0231..908152e8659b 100644
---- a/arch/arm64/include/asm/arch_gicv3.h
-+++ b/arch/arm64/include/asm/arch_gicv3.h
-@@ -162,7 +162,13 @@ static inline void gic_pmr_mask_irqs(void)
- 	 * are applied to IRQ priorities
- 	 */
- 	BUILD_BUG_ON((0x80 | (GICD_INT_DEF_PRI >> 1)) >= GIC_PRIO_IRQON);
--	gic_write_pmr(GIC_PRIO_IRQOFF);
-+	/*
-+	 * Same situation as above, but now we make sure that we can mask
-+	 * regular interrupts.
-+	 */
-+	BUILD_BUG_ON((0x80 | (GICD_INT_DEF_PRI >> 1)) < (GIC_PRIO_IRQOFF_NS |
-+							 GIC_PRIO_PSR_I_SET));
-+	gic_write_pmr(gic_prio_irqoff());
- }
- 
- static inline void gic_arch_enable_irqs(void)
-diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-index ec213b4a1650..3efa240a6c48 100644
---- a/arch/arm64/include/asm/daifflags.h
-+++ b/arch/arm64/include/asm/daifflags.h
-@@ -22,7 +22,7 @@
- static inline void local_daif_mask(void)
- {
- 	WARN_ON(system_has_prio_mask_debugging() &&
--		(read_sysreg_s(SYS_ICC_PMR_EL1) == (GIC_PRIO_IRQOFF |
-+		(read_sysreg_s(SYS_ICC_PMR_EL1) == (gic_prio_irqoff() |
- 						    GIC_PRIO_PSR_I_SET)));
- 
- 	asm volatile(
-@@ -87,7 +87,7 @@ static inline void local_daif_restore(unsigned long flags)
- 			 * asynchronous errors, we can take NMIs
- 			 */
- 			flags &= ~PSR_I_BIT;
--			pmr = GIC_PRIO_IRQOFF;
-+			pmr = gic_prio_irqoff();
- 		} else {
- 			pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
- 		}
-diff --git a/arch/arm64/include/asm/irqflags.h b/arch/arm64/include/asm/irqflags.h
-index aa4b6521ef14..af353c78d5f8 100644
---- a/arch/arm64/include/asm/irqflags.h
-+++ b/arch/arm64/include/asm/irqflags.h
-@@ -28,10 +28,13 @@
-  */
- static inline void arch_local_irq_enable(void)
- {
-+	u64 pmr_irqon = GIC_PRIO_IRQON;
-+
- 	if (system_has_prio_mask_debugging()) {
--		u32 pmr = read_sysreg_s(SYS_ICC_PMR_EL1);
-+		u64 pmr = read_sysreg_s(SYS_ICC_PMR_EL1);
-+		u64 pmr_irqoff = gic_prio_irqoff();
- 
--		WARN_ON_ONCE(pmr != GIC_PRIO_IRQON && pmr != GIC_PRIO_IRQOFF);
-+		WARN_ON_ONCE(pmr != pmr_irqon && pmr != pmr_irqoff);
- 	}
- 
- 	asm volatile(ALTERNATIVE(
-@@ -39,7 +42,7 @@ static inline void arch_local_irq_enable(void)
- 		__msr_s(SYS_ICC_PMR_EL1, "%0"),
- 		ARM64_HAS_IRQ_PRIO_MASKING)
- 		:
--		: "r" ((unsigned long) GIC_PRIO_IRQON)
-+		: "r" (pmr_irqon)
- 		: "memory");
- 
- 	pmr_sync();
-@@ -47,10 +50,13 @@ static inline void arch_local_irq_enable(void)
- 
- static inline void arch_local_irq_disable(void)
- {
-+	u64 pmr_irqoff = gic_prio_irqoff();
-+
- 	if (system_has_prio_mask_debugging()) {
--		u32 pmr = read_sysreg_s(SYS_ICC_PMR_EL1);
-+		u64 pmr = read_sysreg_s(SYS_ICC_PMR_EL1);
-+		u64 pmr_irqon = GIC_PRIO_IRQON;
- 
--		WARN_ON_ONCE(pmr != GIC_PRIO_IRQON && pmr != GIC_PRIO_IRQOFF);
-+		WARN_ON_ONCE(pmr != pmr_irqon && pmr != pmr_irqoff);
- 	}
- 
- 	asm volatile(ALTERNATIVE(
-@@ -58,7 +64,7 @@ static inline void arch_local_irq_disable(void)
- 		__msr_s(SYS_ICC_PMR_EL1, "%0"),
- 		ARM64_HAS_IRQ_PRIO_MASKING)
- 		:
--		: "r" ((unsigned long) GIC_PRIO_IRQOFF)
-+		: "r" (pmr_irqoff)
- 		: "memory");
- }
- 
-diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
-index 966ed30ed5f7..a19cd6ff4d1b 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -32,6 +32,7 @@
-  */
- #define GIC_PRIO_IRQON			0xe0
- #define GIC_PRIO_IRQOFF			(GIC_PRIO_IRQON & ~0x80)
-+#define GIC_PRIO_IRQOFF_NS		0xa0
- #define GIC_PRIO_PSR_I_SET		(1 << 4)
- 
- /* Additional SPSR bits not exposed in the UABI */
-@@ -129,6 +130,17 @@
- #define compat_sp_fiq	regs[29]
- #define compat_lr_fiq	regs[30]
- 
-+#define gic_prio_irqoff()						\
-+	({								\
-+		extern struct static_key_false gic_nonsecure_priorities;\
-+		u8 __prio = GIC_PRIO_IRQOFF;				\
-+									\
-+		if (static_branch_unlikely(&gic_nonsecure_priorities))	\
-+			__prio = GIC_PRIO_IRQOFF_NS;			\
-+									\
-+		__prio;							\
-+	})
-+
- static inline unsigned long compat_psr_to_pstate(const unsigned long psr)
- {
- 	unsigned long pstate;
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index 2646178c8329..e4fa944dbf1d 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -653,7 +653,7 @@ alternative_else_nop_endif
- #ifdef CONFIG_ARM64_PSEUDO_NMI
- 	/*
- 	 * When using IRQ priority masking, we can get spurious interrupts while
--	 * PMR is set to GIC_PRIO_IRQOFF. An NMI might also have occurred in a
-+	 * PMR is set to mask interrupts. An NMI might also have occurred in a
- 	 * section with interrupts disabled. Skip tracing in those cases.
- 	 */
- 	test_irqs_unmasked	res=x0, pmr=x20
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 9e897c500237..c4476a99dee8 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -101,6 +101,8 @@ KVM_NVHE_ALIAS(vgic_v3_cpuif_trap);
- /* Static key checked in pmr_sync(). */
- #ifdef CONFIG_ARM64_PSEUDO_NMI
- KVM_NVHE_ALIAS(gic_pmr_sync);
-+/* Static key checked in gic_prio_irqoff(). */
-+KVM_NVHE_ALIAS(gic_nonsecure_priorities);
- #endif
- 
- #endif /* CONFIG_KVM */
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 341be2f2f312..729a3a59ad6a 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -237,7 +237,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	/* Returning to host will clear PSR.I, remask PMR if needed */
- 	if (system_uses_irq_prio_masking())
--		gic_write_pmr(GIC_PRIO_IRQOFF);
-+		gic_write_pmr(gic_prio_irqoff());
- 
- 	return exit_code;
- }
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index ce8944ae1b84..19e52c025c59 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -75,16 +75,14 @@ static DEFINE_STATIC_KEY_TRUE(supports_deactivate_key);
-  *
-  * If SCR_EL3.FIQ == 1, the values writen to/read from PMR and RPR at non-secure
-  * EL1 are subject to a similar operation thus matching the priorities presented
-- * from the (re)distributor when security is enabled.
-+ * from the (re)distributor when security is enabled. When SCR_EL3.FIQ == 0,
-+ * these values are unchanched by the GIC.
-  *
-  * see GICv3/GICv4 Architecture Specification (IHI0069D):
-  * - section 4.8.1 Non-secure accesses to register fields for Secure interrupt
-  *   priorities.
-  * - Figure 4-7 Secure read of the priority field for a Non-secure Group 1
-  *   interrupt.
-- *
-- * For now, we only support pseudo-NMIs if we have non-secure view of
-- * priorities.
-  */
- static DEFINE_STATIC_KEY_FALSE(supports_pseudo_nmis);
- 
-@@ -97,6 +95,9 @@ static DEFINE_STATIC_KEY_FALSE(supports_pseudo_nmis);
- DEFINE_STATIC_KEY_FALSE(gic_pmr_sync);
- EXPORT_SYMBOL(gic_pmr_sync);
- 
-+DEFINE_STATIC_KEY_FALSE(gic_nonsecure_priorities);
-+EXPORT_SYMBOL(gic_nonsecure_priorities);
-+
- /* ppi_nmi_refs[n] == number of cpus having ppi[n + 16] set as NMI */
- static refcount_t *ppi_nmi_refs;
- 
-@@ -932,14 +933,16 @@ static void gic_cpu_sys_reg_init(void)
- 	/* Set priority mask register */
- 	if (!gic_prio_masking_enabled()) {
- 		write_gicreg(DEFAULT_PMR_VALUE, ICC_PMR_EL1);
--	} else {
-+	} else if (gic_supports_nmi()) {
- 		/*
- 		 * Mismatch configuration with boot CPU, the system is likely
- 		 * to die as interrupt masking will not work properly on all
- 		 * CPUs
- 		 */
--		WARN_ON(gic_supports_nmi() && group0 &&
--			!gic_dist_security_disabled());
-+		if (static_branch_unlikely(&gic_nonsecure_priorities))
-+			WARN_ON(!group0 || gic_dist_security_disabled());
-+		else
-+			WARN_ON(group0 && !gic_dist_security_disabled());
- 	}
- 
- 	/*
-@@ -1544,11 +1547,6 @@ static void gic_enable_nmi_support(void)
- 	if (!gic_prio_masking_enabled())
- 		return;
- 
--	if (gic_has_group0() && !gic_dist_security_disabled()) {
--		pr_warn("SCR_EL3.FIQ is cleared, cannot enable use of pseudo-NMIs\n");
--		return;
--	}
--
- 	ppi_nmi_refs = kcalloc(gic_data.ppi_nr, sizeof(*ppi_nmi_refs), GFP_KERNEL);
- 	if (!ppi_nmi_refs)
- 		return;
-@@ -1567,6 +1565,36 @@ static void gic_enable_nmi_support(void)
- 	pr_info("Pseudo-NMIs enabled using %s ICC_PMR_EL1 synchronisation\n",
- 		static_branch_unlikely(&gic_pmr_sync) ? "forced" : "relaxed");
- 
-+	/*
-+	 * How priority values are used by the GIC depends on two things:
-+	 * the security state of the GIC (controlled by the GICD_CTRL.DS bit)
-+	 * and if Group 0 interrupts can be delivered to Linux in the non-secure
-+	 * world as FIQs (controlled by the SCR_EL3.FIQ bit). These affect the
-+	 * the ICC_PMR_EL1 register and the priority that software assigns to
-+	 * interrupts:
-+	 *
-+	 * GICD_CTRL.DS | SCR_EL3.FIQ | ICC_PMR_EL1 | Group 1 priority
-+	 * -----------------------------------------------------------
-+	 *      1       |      -      |  unchanged  |    unchanged
-+	 * -----------------------------------------------------------
-+	 *      0       |      1      |  non-secure |    non-secure
-+	 * -----------------------------------------------------------
-+	 *      0       |      0      |  unchanged  |    non-secure
-+	 *
-+	 * where non-secure means that the value is right-shifted by one and the
-+	 * MSB bit set, to make it fit in the non-secure priority range.
-+	 *
-+	 * In the first two cases, where ICC_PMR_EL1 and the interrupt priority
-+	 * are both either modified, or unchanged, we can use the same set of
-+	 * priorities.
-+	 *
-+	 * In the last case, where only the interrupt priorities are modified to
-+	 * be in the non-secure range, we use a different PMR value to mask IRQs
-+	 * and the rest of the values that we use remain unchanged.
-+	 */
-+	if (gic_has_group0() && !gic_dist_security_disabled())
-+		static_branch_enable(&gic_nonsecure_priorities);
-+
- 	static_branch_enable(&supports_pseudo_nmis);
- 
- 	if (static_branch_likely(&supports_deactivate_key))
+v5.8.1: Build OK!
+v5.7.15: Build OK!
+v5.4.58: Build OK!
+v4.19.139: Failed to apply! Possible dependencies:
+    18fc7bf8e041 ("arm64: KVM: Allow for direct call of HYP functions when using VHE")
+    208243c752a7 ("KVM: arm64: Move hyp-init.S to nVHE")
+    25357de01b95 ("KVM: arm64: Clean up kvm makefiles")
+    33e45234987e ("arm64: initialize and switch ptrauth kernel keys")
+    396244692232 ("arm64: preempt: Provide our own implementation of asm/preempt.h")
+    3f58bf634555 ("KVM: arm/arm64: Share common code in user_mem_abort()")
+    6396b852e46e ("KVM: arm/arm64: Re-factor setting the Stage 2 entry to exec on fault")
+    748c0e312fce ("KVM: Make kvm_set_spte_hva() return int")
+    750319756256 ("arm64: add basic pointer authentication support")
+    7621712918ad ("KVM: arm64: Add build rules for separate VHE/nVHE object files")
+    7aa8d1464165 ("arm/arm64: KVM: Introduce kvm_call_hyp_ret()")
+    86d0dd34eaff ("arm64: cpufeature: add feature for CRC32 instructions")
+    90776dd1c427 ("arm64/efi: Move variable assignments after SECTIONS")
+    95b861a4a6d9 ("arm64: arch_timer: Add workaround for ARM erratum 1188873")
+    a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data from struct kvm")
+    b877e9849d41 ("KVM: arm64: Build hyp-entry.S separately for VHE/nVHE")
+    bd4fb6d270bc ("arm64: Add support for SB barrier and patch in over DSB; ISB sequences")
+    be1298425665 ("arm64: install user ptrauth keys at kernel exit time")
+    d82755b2e781 ("KVM: arm64: Kill off CONFIG_KVM_ARM_HOST")
+    f50b6f6ae131 ("KVM: arm64: Handle calls to prefixed hyp functions")
+    f56063c51f9f ("arm64: add image head flag definitions")
+    f8df73388ee2 ("KVM: arm/arm64: Introduce helpers to manipulate page table entries")
+
+v4.14.193: Failed to apply! Possible dependencies:
+    0db9dd8a0fbd ("KVM: arm/arm64: Stop using the kernel's {pmd,pud,pgd}_populate helpers")
+    17ab9d57deba ("KVM: arm/arm64: Drop vcpu parameter from guest cache maintenance operartions")
+    3f58bf634555 ("KVM: arm/arm64: Share common code in user_mem_abort()")
+    6396b852e46e ("KVM: arm/arm64: Re-factor setting the Stage 2 entry to exec on fault")
+    694556d54f35 ("KVM: arm/arm64: Clean dcache to PoC when changing PTE due to CoW")
+    748c0e312fce ("KVM: Make kvm_set_spte_hva() return int")
+    88dc25e8ea7c ("KVM: arm/arm64: Consolidate page-table accessors")
+    91c703e0382a ("arm: KVM: Add optimized PIPT icache flushing")
+    a15f693935a9 ("KVM: arm/arm64: Split dcache/icache flushing")
+    a9c0e12ebee5 ("KVM: arm/arm64: Only clean the dcache on translation fault")
+    d0e22b4ac3ba ("KVM: arm/arm64: Limit icache invalidation to prefetch aborts")
+    f8df73388ee2 ("KVM: arm/arm64: Introduce helpers to manipulate page table entries")
+
+v4.9.232: Failed to apply! Possible dependencies:
+    1534b3964901 ("KVM: MIPS/MMU: Simplify ASID restoration")
+    1581ff3dbf69 ("KVM: MIPS/MMU: Move preempt/ASID handling to implementation")
+    1880afd6057f ("KVM: MIPS/T&E: Add lockless GVA access helpers")
+    411740f5422a ("KVM: MIPS/MMU: Implement KVM_CAP_SYNC_MMU")
+    748c0e312fce ("KVM: Make kvm_set_spte_hva() return int")
+    91cdee5710d5 ("KVM: MIPS/T&E: Restore host asid on return to host")
+    a2c046e40ff1 ("KVM: MIPS: Add vcpu_run() & vcpu_reenter() callbacks")
+    a31b50d741bd ("KVM: MIPS/MMU: Invalidate GVA PTs on ASID changes")
+    a60b8438bdba ("KVM: MIPS: Convert get/set_regs -> vcpu_load/put")
+    a7ebb2e410f8 ("KVM: MIPS/T&E: active_mm = init_mm in guest context")
+    aba8592950f1 ("KVM: MIPS/MMU: Invalidate stale GVA PTEs on TLBW")
+    c550d53934d8 ("KVM: MIPS: Remove duplicated ASIDs from vcpu")
+
+v4.4.232: Failed to apply! Possible dependencies:
+    16d100db245a ("MIPS: Move Cause.ExcCode trap codes to mipsregs.h")
+    1880afd6057f ("KVM: MIPS/T&E: Add lockless GVA access helpers")
+    19d194c62b25 ("MIPS: KVM: Simplify TLB_* macros")
+    411740f5422a ("KVM: MIPS/MMU: Implement KVM_CAP_SYNC_MMU")
+    748c0e312fce ("KVM: Make kvm_set_spte_hva() return int")
+    8cffd1974851 ("MIPS: KVM: Convert code to kernel sized types")
+    9fbfb06a4065 ("MIPS: KVM: Arrayify struct kvm_mips_tlb::tlb_lo*")
+    ba049e93aef7 ("kvm: rename pfn_t to kvm_pfn_t")
+    bdb7ed8608f8 ("MIPS: KVM: Convert headers to kernel sized types")
+    ca64c2beecd4 ("MIPS: KVM: Abstract guest ASID mask")
+    caa1faa7aba6 ("MIPS: KVM: Trivial whitespace and style fixes")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
 -- 
-2.28.0
-
+Thanks
+Sasha
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
