@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6AAC433E1
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D13AC433E4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 73ED520639
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B42AB20639
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="IHhApn87"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73ED520639
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="dnVyOT5y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B42AB20639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29C054B86A;
-	Thu, 20 Aug 2020 06:35:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67AFE4B86C;
+	Thu, 20 Aug 2020 06:35:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WxgSe9XmSyFW; Thu, 20 Aug 2020 06:35:39 -0400 (EDT)
+	with ESMTP id GQ4ad6-em-6y; Thu, 20 Aug 2020 06:35:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AA5A4B886;
-	Thu, 20 Aug 2020 06:35:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4390B4B88F;
+	Thu, 20 Aug 2020 06:35:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD944B888
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09D9A4B83E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zR3AhiA885Yf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Aug 2020 06:35:37 -0400 (EDT)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EF2B4B83E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:36 -0400 (EDT)
-Received: by mail-wm1-f74.google.com with SMTP id d22so636095wmd.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:36 -0700 (PDT)
+ with ESMTP id lAx12jj1zDnd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Aug 2020 06:35:38 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 272D44B888
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:38 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id d9so1012572qvl.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=/QX7EylRJ/FExG7A40+IjYbpo4wIFPAOSGmhSNIkFzQ=;
- b=IHhApn87zJAR0+Rthp+j95Ysv1+rnywvTokZnmx5mS5byQB5tQxxDsWwoYVP+gaKEW
- 71Hp7fBOd9rA26IKAxO/yyNGVP+vYsqVLnRlrkk07SWYaFI+mJQWx1RX1sCPCZ32zkND
- gzpoXbdknmPOjj7K9i1YmjSac0jE6klUEMy7NP/QSCe6pwftEpxzN1+wnBR1lLRbcIPa
- KWlL0hBPvAH96noxP47gSGlvos2QhiC/vyZD07hWYzHWZdV2DFPrfD/naCD6Jv1n+2t7
- dk9J0QgazEUaOHGhibDqDKqMjiqxI9BmdrCgKbDMasb/j71Sw3qS/F7OpdzkqOyeUdDX
- RU4g==
+ :from:to:cc; bh=BmbAKV/m7ypqUR0lW+5iQoAhiw2axY9TAu1aTPaDE28=;
+ b=dnVyOT5yZ/CbAgWsodXttzOq3jwrI+1rpZm8LfTGlXqGQU4VYJ6C6Lch+WjQBjhAFq
+ h6t5WD0QDGyWnVLu5vdxGS4swfEgpusX+On71Wl6l549i6kT0Iu+KmrvVElWM3oc2OqJ
+ KN5ccer+ntMN27vddRgGpBXwUZwMy7UeVoFBf+cVCreb74ZoHl9WURk6wL88rQsH1pc9
+ dAvU2biHq6iGz0dtUYi9PDZQbSH61EWkGqQJFyiXQE53fxeNStNor7kcQ6J499KitvmB
+ A5nD9CcemrqUscqv/cFq35t7/TtgOmLwlYkqfJZ7ztEQg6McPMJ8IEmu8TpTlDv2r/FO
+ hexQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=/QX7EylRJ/FExG7A40+IjYbpo4wIFPAOSGmhSNIkFzQ=;
- b=Lesa8gDaZLCuo4U4PR6bjR+HOTSppMqvFxdE3V4CLPSwSHfgu7Y4dTc16ssmZaO1N2
- KvwTTFFoBFY1ZhGxg97COWNiqOaHIApkwheyic0Re9PPH/Z1hrIafg8HcBR6u+rvKmin
- Z3NpkHzsIOIdgl5c+/XzBR/6ZVKV6gXewkESuTrrB0yC2fDfCkYkHNoTfbQpxDnm0Xqt
- HLdK7VIKsc8/qEJz9ntME8/WVQov7PyrYy4j7yuM6pkBwGUguG9eL2djcmWQBi2ts4g9
- dK/zlJyIGEkpsvsizo1e5ams0bzv4y+RBeu/HTdx8MDmhqL4nkiDLaWFnst4L1A77hr5
- Dwkw==
-X-Gm-Message-State: AOAM5306cUlDSvTUPa8X+09djDvx0ZYjc0VE8g1NS6DjXtSFHwy1LSJD
- X6oz4Y/fohTSqsXzlRvJg+ifWvwQReSJXCOeultYMlC9rxz/3odVEN4eZuy6vnnnwitRYPmZKVd
- 6waufUGMl88LYl+AgH3cd32+7V0FUYQOMnq2rPw/GackzMvcd4zdHpx/yG45CljMQeYfC+g==
-X-Google-Smtp-Source: ABdhPJzg3Plo66Qc18GYT6LlmTM0ZH2VCTtKR3/KsvG5ZrhyMpf4Y2VYjscneeGBFSBzxXgBGoPlI94x6O8=
+ bh=BmbAKV/m7ypqUR0lW+5iQoAhiw2axY9TAu1aTPaDE28=;
+ b=DSmb9l5zT+zaHieBALpJi/qCWbA6D5dx07ubQVIlSYAodWz69v9tVLAhndYi7EKjy4
+ +PKqSFm4/GVUsmYjC6FlXp4yL/XKhPlEyFsU9Ra5LJCrzq9oXvQURqc2xQbCVpeIDxzv
+ EPdRqaLp3cPA8F0eEj1gGUVjIKCyvrQxDTyhw0+XeJf1J6K/NtBNYgpLV1toe+HG9wOp
+ Wtl07Er21y70+rYviZv4o2t+rJpCUT/DmXSs6YHIhWewnGrgoehBKksaxfTTFORMmnRO
+ 64tK+8DsE0jFcLbj2tlPi2ZgToi3lg/pt2OPXdJlHRcsIhdi2Llcog7yh1SM35tXS//K
+ VGJg==
+X-Gm-Message-State: AOAM533rxezuqObqgrmDZTWbTQsxeVKIImIewvO3IFiWptZCgFysgSlg
+ T8q3vKGD7dGlmd8jl3ymsdDaGfE8st/WBzgvRy2uewj32+ejFoYiFZq8hGHsD5u+h8vGaV6r85X
+ 6eN2sSC7cQBvUI+HPsee64umZWP6L8j6tu+ShoOwTzX+vVkuoPbJ+dkAL7scvtEm3qe7PCA==
+X-Google-Smtp-Source: ABdhPJxS8aMsiew65YygRuhFkrEdWeDneRoOb3pQVcpupjRzP3AM3yLOnGQyhHExIhvvZqrepsO7702zqfM=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a5d:540c:: with SMTP id
- g12mr2528159wrv.120.1597919735573; 
- Thu, 20 Aug 2020 03:35:35 -0700 (PDT)
-Date: Thu, 20 Aug 2020 11:34:33 +0100
+ (user=ascull job=sendgmr) by 2002:a0c:8d4a:: with SMTP id
+ s10mr2337167qvb.34.1597919737610; 
+ Thu, 20 Aug 2020 03:35:37 -0700 (PDT)
+Date: Thu, 20 Aug 2020 11:34:34 +0100
 In-Reply-To: <20200820103446.959000-1-ascull@google.com>
-Message-Id: <20200820103446.959000-8-ascull@google.com>
+Message-Id: <20200820103446.959000-9-ascull@google.com>
 Mime-Version: 1.0
 References: <20200820103446.959000-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH v2 07/20] KVM: arm64: nVHE: Don't consume host SErrors with ESB
+Subject: [PATCH v2 08/20] KVM: arm64: Preserve host DISR_EL1
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -100,45 +100,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ESB at the start of the host vector may cause SErrors to be consumed
-to DISR_EL1. However, this is not checked for the host so the SError
-could go unhandled.
+With the RAS extension available, guest exits can overwrite DISR_EL1
+after checking for any guest SErrors. If the host was using DISR_EL1 to
+track a deferred SError, it would be lost so save and restore DISR_EL1
+for the host.
 
-Remove the ESB so that SErrors are not consumed but are instead left
-pending for the host to consume. __guest_enter already defers entry into
-a guest if there are any SErrors pending.
-
-Fixes: 0e5b9c085dce ("KVM: arm64: Consume pending SError as early as possible")
 Cc: James Morse <james.morse@arm.com>
 Signed-off-by: Andrew Scull <ascull@google.com>
----
- arch/arm64/kvm/hyp/nvhe/host.S | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 9c96b9a3b71d..5a7380c342c8 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -24,7 +24,6 @@ SYM_FUNC_END(__hyp_do_panic)
+---
+This may not be necessary if it is a safe assumption that the host
+doesn't mind that DISR_EL1 is clobbered across the kvm_vcpu_run call.
+---
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 7a986030145f..a549f8698bd4 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -56,8 +56,12 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
+ 	ctxt->regs.pstate		= read_sysreg_el2(SYS_SPSR);
  
- .macro valid_host_el1_sync_vect
- 	.align 7
--	esb
- 	stp	x0, x1, [sp, #-16]!
+-	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+-		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
++	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
++		if (ctxt->__hyp_running_vcpu)
++			ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_DISR_EL1);
++		else
++			ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
++	}
+ }
  
- 	mrs	x0, esr_el2
-@@ -77,6 +76,11 @@ SYM_FUNC_END(__hyp_do_panic)
- .endm
+ static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+@@ -152,8 +156,12 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
+ 	write_sysreg_el2(ctxt->regs.pc,			SYS_ELR);
+ 	write_sysreg_el2(pstate,			SYS_SPSR);
  
- /*
-+ * The host vector does not use an ESB instruction in order to avoid consuming
-+ * SErrors that should only be consumed by the host. Guest entry is deferred by
-+ * __guest_enter if there are any pending asynchronous exceptions so hyp will
-+ * always return to the host without having consumerd host SErrors.
-+ *
-  * CONFIG_KVM_INDIRECT_VECTORS is not applied to the host vector because the
-  * host already knows the address of hyp by virtue of loading it there.
-  */
+-	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+-		write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_VDISR_EL2);
++	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
++		if (ctxt->__hyp_running_vcpu)
++			write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_DISR_EL1);
++		else
++			write_sysreg_s(ctxt_sys_reg(ctxt, DISR_EL1), SYS_VDISR_EL2);
++	}
+ }
+ 
+ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
 -- 
 2.28.0.220.ged08abb693-goog
 
