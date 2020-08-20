@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2ADC433E5
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D082FC433DF
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 084EB2078D
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81E5F20639
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="LrB0Zugw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084EB2078D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OVOsIi24"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E5F20639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B39B34B86C;
-	Thu, 20 Aug 2020 06:35:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9B44B852;
+	Thu, 20 Aug 2020 06:35:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ioikxuwligGe; Thu, 20 Aug 2020 06:35:31 -0400 (EDT)
+	with ESMTP id feWl2Bmu5dsM; Thu, 20 Aug 2020 06:35:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B25B64B898;
-	Thu, 20 Aug 2020 06:35:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D59254B888;
+	Thu, 20 Aug 2020 06:35:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 632DC4B852
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B13F84B81A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id No4w+2HKXHZj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Aug 2020 06:35:30 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 029464B364
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:30 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id 5so502284wrc.17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:29 -0700 (PDT)
+ with ESMTP id TdZXWbFppRmP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Aug 2020 06:35:31 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6B344B89E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:31 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id y7so1010976qvj.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=zg5ZCTDpTnAIwbW0OhMsxSkivd5OxG/LbJPtzF+miBk=;
- b=LrB0ZugwdF5h7TPZl8CkNKrCjsf5pd/akzCsAoBT1qEZ+nbPTSoavGcomf8W94MslZ
- gXsgWbVtP9jbbHWIlMMkyiIbT80M/DI6ZmrLyBhVupLPbtbCjVqyfxMEmxw7yDUsCNv1
- YTJFz0qfRC/G/+79GMx2+s/RkqEcgMBJRmKAHG1XMnA9mKDKSkYTYYx3re3gy2b0BkqQ
- F3lz4P6n2UG7DdJ8OWmYWpIx52GCiIslvFqrF2GdkNhTvm76pP4veH+FKMSIlPVc9saQ
- VhFsP3Is2XsjzIqBur0yYpea66HrQ/6nOP5398M+7BXx0Pf8F1s6iL4fsrxKdWNYGK6O
- 3Zeg==
+ :from:to:cc; bh=37zpMdjcndUFVD4+uS94TLYior1Sf4KsI6kIarwDjl4=;
+ b=OVOsIi243JYWAw6YuRdKFan/r8KFf4/6BdxTaZjT8YwEKwQtJ5r/Z6afR6P88if59N
+ 7NnrzuRZe4avYB6A+Sd1mx6qfnOjuDquokyWWQ5Jb767pbdR/cIbjoL5EDFda1xl2OsD
+ Jr8mthVA/rvXcQjokli2Mji0sTQzKU/OFhSJdJ4Ght+3u9qyNgB3Hua6NJHY8LlpWxSR
+ Y93B9rG5nCUn8j+LaXZbFX1e0jcPiGEAFntoNnvUIY8xw+xD8HXKAja1StYZZeRSUKFr
+ HKyUN0MM7xD76isoBXYEOgFx9gxXIoyG4LztPBn2EyAFa3/dFmT90ZQqnyxbNltIkzZg
+ RZBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=zg5ZCTDpTnAIwbW0OhMsxSkivd5OxG/LbJPtzF+miBk=;
- b=Wf/t+wT9Ghglv8Wjtscf5Y0qpYe5s1cfU5YQGs8x/S3L0t/rjno964AjeN1wkBFeZm
- NBDNZRNUo4TRd5OKCqzR9hlDilBAFBZJBrU8m+ivDWCPZ8ypgIHsH5ti3IVq2HBiScLJ
- inGjmioe7oDc4+tFGCqLVTuAmZVukV7tZc/28aqP4rsIe/MCoEM+Jg8WpBHHbx0eRdUq
- jwcFIeHHGOO+kMyonoYkAt8U4HCfZ1Bp08Xs7eVnQJjgG507XNJJomxXXnv/D9RJKnX/
- OKy8phQ0Uhpp6I70+1GWNF2hzPHqiCgz1EAjHd5LGdtnMF57yxXBw6XxPCJ3TP0yx+uX
- DXTg==
-X-Gm-Message-State: AOAM53177YpxZLL1FHGG2BChtQC3p5IooMkeTJOHo/JNNEvl+tzehr37
- qtU8Z4LV/g/M0LCgRS/H056c7V7LBwnTqtAjKoNfklpaADDgy+jQA2fFJwc89TMYA2Cxs+ZCcnY
- 2Rg0GMbFcy5+wLc4JA+b0Lhk1Ifw998bw+xJaZV2rcF/tnovs4rX6Aukfmm/QRdLBdYJ8EQ==
-X-Google-Smtp-Source: ABdhPJzfOA5qp7a1O1IL7iOCrtlzm8NkS7Hs81tc02Xjy1IkmUObXohL2sbMg098SNSOjlVsrOnzi/sjaDU=
+ bh=37zpMdjcndUFVD4+uS94TLYior1Sf4KsI6kIarwDjl4=;
+ b=C2POHiobKKOsJEgrMHmvY14DMzTClAbyciIvbV2zE+3zBu0o2QjfV/RpJ50HOL5cBW
+ OuJMJ5VDacZSwmlbisasWl+Rv85WclvMnwNoCedwfGmBqX9e2PwjoF1+aZyT1Wvto2eo
+ +KZNEeaASddSpZrQm6LfpEaWgN/wCQULueLtvpTGVvygCDC0FN16TVYTDrpVgJAxpiJ6
+ ZpO+P0hMj0bek+hr+maG4U93xhNOZI5jSW3hAYfQ2FsGsN6LwiC2pdZvOGHs1NG+ximE
+ 6CouTMw8up6TqCyah4WcW6AuCy22rbJ+1xvepi9XmBImzdL2Ll7SKl1hM0flUJTTU+Um
+ IyqQ==
+X-Gm-Message-State: AOAM5306BnsM2is8ip43fUILtVdKgMC1NmT30t5UoNMzb2R+FkFO3/eJ
+ kK256xbq44xYAhvqtvR87QgQDn4P/wNUlmpTM6olF4Q/8oGu3hkIsYj8mZ8XCUSfp9kxxD8y/j2
+ 4iJpMZ9PxZ/TJsJPPpQgqo6XiDukE70q5wuse1YIks7Eo02VcSjdA3Lsj/8XwuUxIf2PYGA==
+X-Google-Smtp-Source: ABdhPJzNjftrIqn+OHJCp1q4uT2Q7nzJdUixaBmiasMHtpSaYAECUIJZUnuTb3oQIgpS8hgiVikwnxhxk7Y=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a1c:66c5:: with SMTP id
- a188mr2782833wmc.173.1597919729137; 
- Thu, 20 Aug 2020 03:35:29 -0700 (PDT)
-Date: Thu, 20 Aug 2020 11:34:30 +0100
+ (user=ascull job=sendgmr) by 2002:a0c:ec01:: with SMTP id
+ y1mr2212111qvo.167.1597919731182; 
+ Thu, 20 Aug 2020 03:35:31 -0700 (PDT)
+Date: Thu, 20 Aug 2020 11:34:31 +0100
 In-Reply-To: <20200820103446.959000-1-ascull@google.com>
-Message-Id: <20200820103446.959000-5-ascull@google.com>
+Message-Id: <20200820103446.959000-6-ascull@google.com>
 Mime-Version: 1.0
 References: <20200820103446.959000-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH v2 04/20] KVM: arm64: Restrict symbol aliasing to outside nVHE
+Subject: [PATCH v2 05/20] KVM: arm64: Save chosen hyp vector to a percpu
+ variable
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -100,33 +101,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-nVHE symbols are prefixed but this is sometimes hidden from the host by
-aliasing the non-prefixed symbol to the prefixed version with a macro.
-This runs into problems if nVHE tries to use the symbol as it becomes
-doubly prefixed. Avoid this by omitting the aliasing macro for nVHE.
+Introduce a percpu variable to hold the address of the selected hyp
+vector that will be used with guests. This avoids the selection process
+each time a guest is being entered and can be used by nVHE when a
+separate vector is introduced for the host.
 
-Cc: David Brazdil <dbrazdil@google.com>
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_hyp.h | 2 ++
+ arch/arm64/kvm/arm.c             | 5 ++++-
+ arch/arm64/kvm/hyp/vhe/switch.c  | 2 +-
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index fb1a922b31ba..413911d6446a 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -99,8 +99,11 @@ struct kvm_s2_mmu;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 3de99b323061..1e2491da324e 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -12,6 +12,8 @@
+ #include <asm/alternative.h>
+ #include <asm/sysreg.h>
  
- DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
- DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
++DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
 +
-+#ifndef __KVM_NVHE_HYPERVISOR__
- #define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
- #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
-+#endif
+ #define read_sysreg_elx(r,nvh,vh)					\
+ 	({								\
+ 		u64 reg;						\
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6b09c0f3365c..d779814f0da6 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -47,6 +47,7 @@ __asm__(".arch_extension	virt");
+ #endif
  
- #ifdef CONFIG_KVM_INDIRECT_VECTORS
- extern atomic_t arm64_el2_vector_last_slot;
+ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
++DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+ 
+ /* The VMID used in the VTTBR */
+@@ -1276,7 +1277,7 @@ static void cpu_init_hyp_mode(void)
+ 
+ 	pgd_ptr = kvm_mmu_get_httbr();
+ 	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
+-	vector_ptr = (unsigned long)kvm_get_hyp_vector();
++	vector_ptr = __this_cpu_read(kvm_hyp_vector);
+ 
+ 	/*
+ 	 * Call initialization code, and switch to the full blown HYP code.
+@@ -1309,6 +1310,8 @@ static void cpu_hyp_reinit(void)
+ 
+ 	cpu_hyp_reset();
+ 
++	__this_cpu_write(kvm_hyp_vector, (unsigned long)kvm_get_hyp_vector());
++
+ 	if (is_kernel_in_hyp_mode())
+ 		kvm_timer_init_vhe();
+ 	else
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 099bfa78011c..20ee901fd4ff 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -59,7 +59,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	write_sysreg(val, cpacr_el1);
+ 
+-	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
++	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
+ }
+ NOKPROBE_SYMBOL(__activate_traps);
+ 
 -- 
 2.28.0.220.ged08abb693-goog
 
