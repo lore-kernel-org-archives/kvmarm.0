@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3774AC433E1
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E14AC433E1
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E337A20639
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1443220738
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Aug 2020 10:35:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="JPDDcVeX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E337A20639
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="bU6jB95W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1443220738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D7D14B364;
-	Thu, 20 Aug 2020 06:35:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C32534B846;
+	Thu, 20 Aug 2020 06:35:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id acIqCrQnOLny; Thu, 20 Aug 2020 06:35:43 -0400 (EDT)
+	with ESMTP id aRlEWdzAo559; Thu, 20 Aug 2020 06:35:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63B064B882;
-	Thu, 20 Aug 2020 06:35:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 915F74B845;
+	Thu, 20 Aug 2020 06:35:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87BE74B88D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE88E4B845
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zgJ3Gq0M6dW9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Aug 2020 06:35:40 -0400 (EDT)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77C594B889
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:40 -0400 (EDT)
-Received: by mail-qt1-f201.google.com with SMTP id r9so1226711qtp.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:40 -0700 (PDT)
+ with ESMTP id skDZpX7i3Rbx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Aug 2020 06:35:43 -0400 (EDT)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0726D4B83E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 06:35:43 -0400 (EDT)
+Received: by mail-wm1-f73.google.com with SMTP id u14so1722570wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Aug 2020 03:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=daYABbX6iJk7tLt6lLRhHpebeTM9ZtzekCJLt7eBfqQ=;
- b=JPDDcVeXJmOwOyXGTqunMpM0EUpufQPjdlT+c4SM2HcF8GDanNRsoAA9v8ngTo+3SZ
- PYyiETnuu3irsIpwj0SZpNMgx5If33I7tQMSvDRCKWmGx9KICRULBplrJmHG/nbfRGQl
- tms4zFShm5qV2odrWdvAvVUL39//JV8yLJnlEfiKIH6udrY/XjyvnpA6vsP/WC8jcZOR
- jBS0/Dn+X+tbXAu6UD5plUuafKM1YUs0s+pDLErzZBBQhyUObnt5sOoK8obh52B4Vis6
- eBqgtqKWYV1zm6xj41lkVr7bSb/KatxjupxxdYoUtkK0EjlDC6UAJvb1IvEvdb/mPSm8
- T/8A==
+ :from:to:cc; bh=jml8hsX+WAS4ZVzEE/taO1Ose+FoMtNwJ1ulVnbmoEs=;
+ b=bU6jB95WVd9ufaJhtdKEl0R/DZLfwMsnejZbXy4BBXaR4iizJvH7+uY5jcNH7I1/U1
+ 6xBLFU4+quc31skSnlUP5y5pzz8yUwdZm4LaRgnS4E9XSfPw/A7O0ceKzOE1A5HW1yJx
+ Z6I2uNlWSzP0auzClq/IC6KA8cJYi9CvRq4bU4q8KcVC9WH+A10Vw+icMwo4JqcpWA7F
+ PP92QfHGNzg3Jn51F1XQrIyimz7Aci43z/MnzarzXMstSUieBd6xkd4ZyVmdc6lSm2YN
+ rdkQ//YDSl0NFUeZ1vp8CMNPtKhII+I50Eer8pIqVNVNPzT7jgDCft3BQWQeKN/8fbfl
+ AgkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=daYABbX6iJk7tLt6lLRhHpebeTM9ZtzekCJLt7eBfqQ=;
- b=lqWqL+5PX1VporEUTQYP+2xYUD6zwYMUGVKe+MdyfpY5n6GVUxVbg3DC3HqLlZDI11
- hXa0oQ8yMynFUMsU404fln9OFnL7U2eKLw+ZUBr+NaEJucFsBY/H6ba46QytLYu7pvBi
- v3CQ3Q9cWuI5XqlAmbprKMnst3v+fHICnA+CRbrmy/pWySNCBQRB04ZJ+7S7l/Qh0Q4C
- X/GxdiRUc5AOZ1OrZZUyhT3qyzNdsA0P9i/732oiM94sQje8TzpUw2+SGGR8aGo1085E
- KyGweeLrjOlxJR9vTUCoR+hS3KgAMcQIWYMCsOMhEjkH48gvgTGw56krXmGhjaVPz1zQ
- UbCA==
-X-Gm-Message-State: AOAM532grJIA590UdGZGZYtoh2DCV55bM8EO8WqqgBCKI3Ki2VVoMoEW
- YZFVPvDYFngrppVOq3K6DxjD9socnua+5TR+MKiwWpZ2AAdRW8zTo85ocMIlKj6czkEjKbxwwLr
- yST8IrKthnWjRtHwR2kuD40AOGmUBT18nlchMm6lYuMTHJVUXuPT/reoMZWqnPDFtilaL/Q==
-X-Google-Smtp-Source: ABdhPJxYy/cNMKAnDkBF1dR3EoAF0MiRdnXYfC0UPBZq53/otWfBCo5DYgOpH4YSN99gsQ2/6cMdIdnNnMw=
+ bh=jml8hsX+WAS4ZVzEE/taO1Ose+FoMtNwJ1ulVnbmoEs=;
+ b=Q5Aj2rf2E2mqs9mSH2jGPtF2mz9k0UpfvK6W+hc8eCXXRTH7Mmhgnp9f3yNH47nXoc
+ Xad+zRXanUxQAliSk3rdv9GYavdE+ZtK6z06gU8rwe8o49t7VJAnFPcpPbLpqbsth0Pa
+ dHdjPnbWnn4FMdGscDBAe66WimBntNEsrEfeNIMpLBMdwjrRGQ/zi0p5XM/K98lGAUAF
+ iCkknH8TU0TZB+h9JUXDE34r6HMT+mO3HkYtdtAbvMoB8eUJO9EiVt4pb58gWGFvnq7O
+ CqvHHodtDupjtXRVb1pry03ctYKcNyIMdJUmeTlyoJ4vqw6KdC8+djefbK3HNMtfYKdR
+ vxjQ==
+X-Gm-Message-State: AOAM531K4l5xWkpKpYn5UhyvkPtaDZ8gbV2otkuIGZ4ESHLB56RaSIDZ
+ a7cQd+JQRmxWuAv9BsWyGbaMwMboSpZDj99hSd1lrSTTqZQosgLhSnMh8qs3uLSAqZj/n15xeyE
+ M+mDoP5oibz2Gv+Eswy9DsODA4h+CvGuSFooUHpN3Ewk7pTy0rCI5jTEWPMB2ERkMDwwHKQ==
+X-Google-Smtp-Source: ABdhPJywriXDQqNyDlGtOFrbdcFJQNr3aF/n9CjNI9lPE/hc3BBx21/d0hoQdW7YmLc8dcvs+En9d6dypC8=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a05:6214:d46:: with SMTP id
- 6mr2313812qvr.240.1597919739962; Thu, 20 Aug 2020 03:35:39 -0700 (PDT)
-Date: Thu, 20 Aug 2020 11:34:35 +0100
+ (user=ascull job=sendgmr) by 2002:a5d:414e:: with SMTP id
+ c14mr2755336wrq.57.1597919742155; 
+ Thu, 20 Aug 2020 03:35:42 -0700 (PDT)
+Date: Thu, 20 Aug 2020 11:34:36 +0100
 In-Reply-To: <20200820103446.959000-1-ascull@google.com>
-Message-Id: <20200820103446.959000-10-ascull@google.com>
+Message-Id: <20200820103446.959000-11-ascull@google.com>
 Mime-Version: 1.0
 References: <20200820103446.959000-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH v2 09/20] KVM: arm64: Introduce hyp context
+Subject: [PATCH v2 10/20] KVM: arm64: Update context references from host to
+ hyp
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -99,161 +101,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-During __guest_enter, save and restore from a new hyp context rather
-than the host context. This is preparation for separation of the hyp and
-host context in nVHE.
+Hyp now has its own nominal context for saving and restoring its state
+when switching to and from a guest. Update the related comments and
+utilities to match the new name.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
- arch/arm64/kernel/image-vars.h          |  1 +
- arch/arm64/kvm/arm.c                    | 10 ++++++++++
- arch/arm64/kvm/hyp/entry.S              | 10 +++++-----
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
- 7 files changed, 21 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_ptrauth.h |  6 +++---
+ arch/arm64/kvm/hyp/entry.S           | 22 +++++++++++-----------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 1e2491da324e..0b525e05e5bf 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -12,6 +12,7 @@
- #include <asm/alternative.h>
- #include <asm/sysreg.h>
- 
-+DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
- #define read_sysreg_elx(r,nvh,vh)					\
-@@ -89,7 +90,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
- void deactivate_traps_vhe_put(void);
- #endif
- 
--u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-+u64 __guest_enter(struct kvm_vcpu *vcpu);
- 
- void __noreturn hyp_panic(void);
- #ifdef __KVM_NVHE_HYPERVISOR__
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 7e93b0c426d4..ca1d730e143c 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -71,6 +71,7 @@ KVM_NVHE_ALIAS(kvm_update_va_mask);
- /* Global kernel state accessed by nVHE hyp code. */
- KVM_NVHE_ALIAS(arm64_ssbd_callback_required);
- KVM_NVHE_ALIAS(kvm_host_data);
-+KVM_NVHE_ALIAS(kvm_hyp_ctxt);
- KVM_NVHE_ALIAS(kvm_hyp_vector);
- KVM_NVHE_ALIAS(kvm_vgic_global_state);
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c6f76fdabecb..0e3bdb7cb9d0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -47,6 +47,7 @@ __asm__(".arch_extension	virt");
- #endif
- 
- DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
-+DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
- 
-@@ -1542,6 +1543,7 @@ static int init_hyp_mode(void)
- 
- 	for_each_possible_cpu(cpu) {
- 		struct kvm_host_data *cpu_data;
-+		struct kvm_cpu_context *hyp_ctxt;
- 		unsigned long *vector;
- 
- 		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
-@@ -1552,6 +1554,14 @@ static int init_hyp_mode(void)
- 			goto out_err;
- 		}
- 
-+		hyp_ctxt = per_cpu_ptr(&kvm_hyp_ctxt, cpu);
-+		err = create_hyp_mappings(hyp_ctxt, hyp_ctxt + 1, PAGE_HYP);
-+
-+		if (err) {
-+			kvm_err("Cannot map hyp context: %d\n", err);
-+			goto out_err;
-+		}
-+
- 		vector = per_cpu_ptr(&kvm_hyp_vector, cpu);
- 		err = create_hyp_mappings(vector, vector + 1, PAGE_HYP);
- 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index ee32a7743389..dbf746478f7e 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -57,15 +57,15 @@
+diff --git a/arch/arm64/include/asm/kvm_ptrauth.h b/arch/arm64/include/asm/kvm_ptrauth.h
+index 0ddf98c3ba9f..0cd0965255d2 100644
+--- a/arch/arm64/include/asm/kvm_ptrauth.h
++++ b/arch/arm64/include/asm/kvm_ptrauth.h
+@@ -60,7 +60,7 @@
  .endm
  
  /*
-- * u64 __guest_enter(struct kvm_vcpu *vcpu,
-- *		     struct kvm_cpu_context *host_ctxt);
-+ * u64 __guest_enter(struct kvm_vcpu *vcpu);
-  */
- SYM_FUNC_START(__guest_enter)
- 	// x0: vcpu
--	// x1: host context
--	// x2-x17: clobbered by macros
-+	// x1-x17: clobbered by macros
- 	// x29: guest context
+- * Both ptrauth_switch_to_guest and ptrauth_switch_to_host macros will
++ * Both ptrauth_switch_to_guest and ptrauth_switch_to_hyp macros will
+  * check for the presence ARM64_HAS_ADDRESS_AUTH, which is defined as
+  * (ARM64_HAS_ADDRESS_AUTH_ARCH || ARM64_HAS_ADDRESS_AUTH_IMP_DEF) and
+  * then proceed ahead with the save/restore of Pointer Authentication
+@@ -78,7 +78,7 @@ alternative_else_nop_endif
+ .L__skip_switch\@:
+ .endm
  
-+	hyp_adr_this_cpu x1, kvm_hyp_ctxt, x2
-+
- 	// Store the host regs
+-.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
++.macro ptrauth_switch_to_hyp g_ctxt, h_ctxt, reg1, reg2, reg3
+ alternative_if_not ARM64_HAS_ADDRESS_AUTH
+ 	b	.L__skip_switch\@
+ alternative_else_nop_endif
+@@ -96,7 +96,7 @@ alternative_else_nop_endif
+ #else /* !CONFIG_ARM64_PTR_AUTH */
+ .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+ .endm
+-.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
++.macro ptrauth_switch_to_hyp g_ctxt, h_ctxt, reg1, reg2, reg3
+ .endm
+ #endif /* CONFIG_ARM64_PTR_AUTH */
+ #endif /* __ASSEMBLY__ */
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index dbf746478f7e..e95cd7f2ff86 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -66,16 +66,16 @@ SYM_FUNC_START(__guest_enter)
+ 
+ 	hyp_adr_this_cpu x1, kvm_hyp_ctxt, x2
+ 
+-	// Store the host regs
++	// Store the hyp regs
  	save_callee_saved_regs x1
  
-@@ -148,7 +148,7 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 	// Store the guest's sp_el0
+-	// Save the host's sp_el0
++	// Save hyp's sp_el0
  	save_sp_el0	x1, x2
  
--	get_host_ctxt	x2, x3
-+	hyp_adr_this_cpu x2, kvm_hyp_ctxt, x3
+-	// Now the host state is stored if we have a pending RAS SError it must
+-	// affect the host. If any asynchronous exception is pending we defer
+-	// the guest entry. The DSB isn't necessary before v8.2 as any SError
+-	// would be fatal.
++	// Now the hyp state is stored if we have a pending RAS SError it must
++	// affect the host or hyp. If any asynchronous exception is pending we
++	// defer the guest entry. The DSB isn't necessary before v8.2 as any
++	// SError would be fatal.
+ alternative_if ARM64_HAS_RAS_EXTN
+ 	dsb	nshst
+ 	isb
+@@ -150,17 +150,17 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
  
- 	// Macro ptrauth_switch_to_guest format:
- 	// 	ptrauth_switch_to_host(guest cxt, host cxt, tmp1, tmp2, tmp3)
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index d07777d857a3..e9382c7e100a 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -377,7 +377,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	    !esr_is_ptrauth_trap(kvm_vcpu_get_esr(vcpu)))
- 		return false;
+ 	hyp_adr_this_cpu x2, kvm_hyp_ctxt, x3
  
--	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-+	ctxt = __hyp_this_cpu_ptr(kvm_hyp_ctxt);
- 	__ptrauth_save_key(ctxt, APIA);
- 	__ptrauth_save_key(ctxt, APIB);
- 	__ptrauth_save_key(ctxt, APDA);
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 05bb0b472091..375163b7f777 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -209,7 +209,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+-	// Macro ptrauth_switch_to_guest format:
+-	// 	ptrauth_switch_to_host(guest cxt, host cxt, tmp1, tmp2, tmp3)
++	// Macro ptrauth_switch_to_hyp format:
++	// 	ptrauth_switch_to_hyp(guest cxt, host cxt, tmp1, tmp2, tmp3)
+ 	// The below macro to save/restore keys is not implemented in C code
+ 	// as it may cause Pointer Authentication key signing mismatch errors
+ 	// when this feature is enabled for kernel code.
+-	ptrauth_switch_to_host x1, x2, x3, x4, x5
++	ptrauth_switch_to_hyp x1, x2, x3, x4, x5
  
- 	do {
- 		/* Jump in the fire! */
--		exit_code = __guest_enter(vcpu, host_ctxt);
-+		exit_code = __guest_enter(vcpu);
+-	// Restore the hosts's sp_el0
++	// Restore hyp's sp_el0
+ 	restore_sp_el0 x2, x3
  
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 20ee901fd4ff..987b0225436c 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -135,7 +135,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+-	// Now restore the host regs
++	// Now restore the hyp regs
+ 	restore_callee_saved_regs x2
  
- 	do {
- 		/* Jump in the fire! */
--		exit_code = __guest_enter(vcpu, host_ctxt);
-+		exit_code = __guest_enter(vcpu);
- 
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
+ alternative_if ARM64_HAS_RAS_EXTN
 -- 
 2.28.0.220.ged08abb693-goog
 
