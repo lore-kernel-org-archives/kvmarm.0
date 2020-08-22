@@ -2,82 +2,87 @@ Return-Path: <SRS0=YmwB=CA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542B8C433DF
-	for <kvmarm@archiver.kernel.org>; Sat, 22 Aug 2020 10:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5CCC433E1
+	for <kvmarm@archiver.kernel.org>; Sat, 22 Aug 2020 10:32:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C8239207C3
-	for <kvmarm@archiver.kernel.org>; Sat, 22 Aug 2020 10:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC5C72075E
+	for <kvmarm@archiver.kernel.org>; Sat, 22 Aug 2020 10:32:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1MeNnNU6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8239207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lU3SZupP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC5C72075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2141F4C666;
-	Sat, 22 Aug 2020 06:01:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD034C9D6;
+	Sat, 22 Aug 2020 06:32:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P9WfnIP6bI-W; Sat, 22 Aug 2020 06:01:47 -0400 (EDT)
+	with ESMTP id 3-QZjxaGD6nm; Sat, 22 Aug 2020 06:32:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FDFB4C6C1;
-	Sat, 22 Aug 2020 06:01:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E69934C9DA;
+	Sat, 22 Aug 2020 06:32:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB27F4C666
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Aug 2020 06:01:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C67414C988
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Aug 2020 06:31:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gIaI6Xevqa7i for <kvmarm@lists.cs.columbia.edu>;
- Sat, 22 Aug 2020 06:01:44 -0400 (EDT)
+ with ESMTP id 1TPQxRooEaNo for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 22 Aug 2020 06:31:58 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FC974C520
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Aug 2020 06:01:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 797664C769
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Aug 2020 06:31:58 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 34752207C3;
- Sat, 22 Aug 2020 10:01:43 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5377A206BE;
+ Sat, 22 Aug 2020 10:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1598090503;
- bh=CY4X9/e7cUk+6T4E0hQMk+pXKeuJVADK8FD+qHpfQfM=;
+ s=default; t=1598092317;
+ bh=ocK8X0Jkb3+E68Wyft6gMd42NDDxBZpEPNLe3L8tiFA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=1MeNnNU6itHystDyD0OAKjy/iinVG/VcEi95Y6jupneG27DYKQEaVI1U81rIsgZ52
- xM0VHyECe8yio1qwygJYvJc3+fnYu/Qt1OI5JX6T1JA5tU/N7r//CwhSiZYzoxVlY7
- jk8Tt2cYrYXlnATI1efxel/VQNdCbHnosRJ+vGzU=
+ b=lU3SZupPsSEbWsG7BWE6VTh2YeVqi1JjfQ/B7k1YaBj4wCWceoVYs8S7/7FqLnRCe
+ qQTBV2o0mNpFLA69hKO29VM9/VBk/bBM8e9t9c2PqeTatcLsVPuwMIUdUEOPq1Iudh
+ 8SZnFRe+DyqO6vfRuPulTfb9bBOMn0WYzDIg3vOo=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1k9QLF-0058Zs-Gd; Sat, 22 Aug 2020 11:01:41 +0100
-Date: Sat, 22 Aug 2020 11:01:40 +0100
-Message-ID: <87imdbm22j.wl-maz@kernel.org>
+ id 1k9QoV-0058m9-8B; Sat, 22 Aug 2020 11:31:55 +0100
+Date: Sat, 22 Aug 2020 11:31:54 +0100
+Message-ID: <87h7svm0o5.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] arm64/kvm: Fix zapping stage2 page table wrongly
-In-Reply-To: <20200822024444.28132-1-gshan@redhat.com>
-References: <20200822024444.28132-1-gshan@redhat.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
+In-Reply-To: <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
+References: <20200817084110.2672-1-zhukeqian1@huawei.com>
+ <8308f52e4c906cad710575724f9e3855@kernel.org>
+ <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
- eric.auger@redhat.com, shan.gavin@gmail.com, suzuki.poulose@arm.com,
- james.morse@arm.com, qperret@google.com, will@kernel.org
+X-SA-Exim-Rcpt-To: steven.price@arm.com, zhukeqian1@huawei.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+ wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: shan.gavin@gmail.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,97 +94,92 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Gavin,
-
-Adding the usual suspects to the Cc list.
-
-On Sat, 22 Aug 2020 03:44:44 +0100,
-Gavin Shan <gshan@redhat.com> wrote:
-> 
-> Depending on the kernel configuration, PUD_SIZE could be equal to
-> PMD_SIZE. For example, both of them are 512MB with the following
-> kernel configuration. In this case, both PUD and PMD are folded
-> to PGD.
-> 
->    CONFIG_ARM64_64K_PAGES   y
->    CONFIG_ARM64_VA_BITS     42
->    CONFIG_PGTABLE_LEVELS    2
-> 
-> With the above configuration, the stage2 PUD is used to backup the
-> 512MB huge page when the stage2 mapping is built. During the mapping,
-> the PUD and its subordinate levels of page table entries are unmapped
-> if the PUD is present and not huge page sensitive in stage2_set_pud_huge().
-> Unfornately, the @addr isn't aligned to S2_PUD_SIZE and wrong page table
-> entries are zapped. It eventually leads to PUD's present bit can't be
-> cleared successfully and infinite loop in stage2_set_pud_huge().
-> 
-> This fixes the issue by checking with S2_{PUD, PMD}_SIZE instead of
-> {PUD, PMD}_SIZE to determine if stage2 PUD or PMD is used to back the
-> huge page. For this particular case, the stage2 PMD entry should be
-> used to backup the 512MB huge page with stage2_set_pmd_huge().
-
-It isn't obvious to me how S2_PMD_SIZE can be different from PMD_SIZE,
-and the current code certainly expects both to be equal (just look at
-how often S2_*_SIZE is used in the current code to convince yourself).
-
-My guess is that some lesser tested configurations (such as 64k pages)
-break that assumption, and result in the wrong thing happening. Could
-you please shed some light on it?
-
-> Fixes: 3c3736cd32bf ("KVM: arm/arm64: Fix handling of stage2 huge mappings")
-
-This commit doesn't seem to match the code your changing (it doesn't
-even come near user_mem_abort()). Are there any intermediate commits
-that would better explain the problem?
-
-> Cc: stable@vger.kernel.org # v5.1+
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arch/arm64/kvm/mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 0121ef2c7c8d..deb1819ba9e2 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1964,7 +1964,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		(fault_status == FSC_PERM &&
->  		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
->  
-> -	if (vma_pagesize == PUD_SIZE) {
-> +	if (vma_pagesize == S2_PUD_SIZE) {
->  		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->  
->  		new_pud = kvm_pud_mkhuge(new_pud);
-> @@ -1975,7 +1975,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			new_pud = kvm_s2pud_mkexec(new_pud);
->  
->  		ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
-> -	} else if (vma_pagesize == PMD_SIZE) {
-> +	} else if (vma_pagesize == S2_PMD_SIZE) {
->  		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
->  
->  		new_pmd = kvm_pmd_mkhuge(new_pmd);
-> -- 
-> 2.23.0
-> 
-> 
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgU3RldmVuLAoKT24gV2VkLCAxOSBBdWcgMjAyMCAwOTo1NDo0MCArMDEwMCwKU3RldmVuIFBy
+aWNlIDxzdGV2ZW4ucHJpY2VAYXJtLmNvbT4gd3JvdGU6Cj4gCj4gT24gMTgvMDgvMjAyMCAxNTo0
+MSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+ID4gT24gMjAyMC0wOC0xNyAwOTo0MSwgS2VxaWFuIFpo
+dSB3cm90ZToKPiA+PiBIaSBhbGwsCj4gPj4gCj4gPj4gVGhpcyBwYXRjaCBzZXJpZXMgcGlja3Mg
+dXAgdGhlIExQVCBwdnRpbWUgZmVhdHVyZSBvcmlnaW5hbGx5IGRldmVsb3BlZAo+ID4+IGJ5IFN0
+ZXZlbiBQcmljZTogaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9jb3Zlci8xMDcyNjQ5OS8K
+PiA+PiAKPiA+PiBCYWNrZ3JvdWQ6Cj4gPj4gCj4gPj4gVGhlcmUgaXMgZGVtYW5kIGZvciBjcm9z
+cy1wbGF0Zm9ybSBtaWdyYXRpb24sIHdoaWNoIG1lYW5zIHdlIGhhdmUgdG8KPiA+PiBzb2x2ZSBk
+aWZmZXJlbnQgQ1BVIGZlYXR1cmVzIGFuZCBhcmNoIGNvdW50ZXIgZnJlcXVlbmN5IGJldHdlZW4g
+aG9zdHMuCj4gPj4gVGhpcyBwYXRjaCBzZXJpZXMgY2FuIHNvbHZlIHRoZSBsYXR0ZXIgcHJvYmxl
+bS4KPiA+PiAKPiA+PiBBYm91dCBMUFQ6Cj4gPj4gCj4gPj4gVGhpcyBpbXBsZW1lbnRzIHN1cHBv
+cnQgZm9yIExpdmUgUGh5c2ljYWwgVGltZSAoTFBUKSB3aGljaCBwcm92aWRlcyB0aGUKPiA+PiBn
+dWVzdCB3aXRoIGEgbWV0aG9kIHRvIGRlcml2ZSBhIHN0YWJsZSBjb3VudGVyIG9mIHRpbWUgZHVy
+aW5nIHdoaWNoIHRoZQo+ID4+IGd1ZXN0IGlzIGV4ZWN1dGluZyBldmVuIHdoZW4gdGhlIGd1ZXN0
+IGlzIGJlaW5nIG1pZ3JhdGVkIGJldHdlZW4gaG9zdHMKPiA+PiB3aXRoIGRpZmZlcmVudCBwaHlz
+aWNhbCBjb3VudGVyIGZyZXF1ZW5jaWVzLgo+ID4+IAo+ID4+IENoYW5nZXMgb24gU3RldmVuIFBy
+aWNlJ3Mgd29yazoKPiA+PiAxLiBMUFQgc3RydWN0dXJlOiB1c2Ugc3ltbWF0aWNhbCBzZW1hbnRp
+Y3Mgb2Ygc2NhbGUgbXVsdGlwbGllciwgYW5kIHVzZQo+ID4+IMKgwqAgZnJhY3Rpb24gYml0cyBp
+bnN0ZWFkIG9mICJzaGlmdCIgdG8gbWFrZSBldmVyeXRoaW5nIGNsZWFyLgo+ID4+IDIuIFN0cnVj
+dHVyZSBhbGxvY2F0aW9uOiBob3N0IGtlcm5lbCBkb2VzIG5vdCBhbGxvY2F0ZXMgdGhlIExQVAo+
+ID4+IHN0cnVjdHVyZSwKPiA+PiDCoMKgIGluc3RlYWQgaXQgaXMgYWxsb2NhdGVkIGJ5IHVzZXJz
+cGFjZSB0aHJvdWdoIFZNIGF0dHJpYnV0ZXMuIFRoZQo+ID4+IHNhdmUvcmVzdG9yZQo+ID4+IMKg
+wqAgZnVuY3Rpb25hbGl0eSBjYW4gYmUgcmVtb3ZlZC4KPiA+PiAzLiBTaW5jZSBMUFQgc3RydWN0
+dXJlIGp1c3QgbmVlZCB1cGRhdGUgb25jZSBmb3IgZWFjaCBndWVzdCBydW4sCj4gPj4gYWRkIGEg
+ZmxhZyB0bwo+ID4+IMKgwqAgaW5kaWNhdGUgdGhlIHVwZGF0ZSBzdGF0dXMuIFRoaXMgaGFzIHR3
+byBiZW5pZml0czogMSkgYXZvaWQKPiA+PiBtdWx0aXBsZSB1cGRhdGUKPiA+PiDCoMKgIGJ5IGVh
+Y2ggdkNQVXMuIDIpIElmIHRoZSB1cGRhdGUgZmxhZyBpcyBub3Qgc2V0LCB0aGVuIHJldHVybiBO
+T1QKPiA+PiBTVVBQT1JUIGZvcgo+ID4+IMKgwqAgY29yZXNzcG9uZGluZyBndWVzdCBIVkMgY2Fs
+bC4KPiA+PiA0LiBBZGQgVk0gZGV2aWNlIGF0dHJpYnV0ZXMgaW50ZXJmYWNlIGZvciB1c2Vyc3Bh
+Y2UgY29uZmlndXJhdGlvbi4KPiA+PiA1LiBBZGQgYSBiYXNlIExQVCByZWFkL3dyaXRlIGxheWVy
+IHRvIHJlZHVjZSBjb2RlLgo+ID4+IDYuIFN1cHBvcnQgcHRpbWVyIHNjYWxpbmcuCj4gPj4gNy4g
+U3VwcG9ydCB0aW1lciBldmVudCBzdHJlYW0gdHJhbnNsYXRpb24uCj4gPj4gCj4gPj4gVGhpbmdz
+IG5lZWQgY29uY2VybjoKPiA+PiAxLiBodHRwczovL2RldmVsb3Blci5hcm0uY29tL2RvY3MvZGVu
+MDA1Ny9hIG5lZWRzIHVwZGF0ZS4KPiA+IAo+ID4gTFBUIHdhcyBleHBsaWNpdGx5IHJlbW92ZWQg
+ZnJvbSB0aGUgc3BlYyBiZWNhdXNlIGl0IGRvZXNuJ3QgcmVhbGx5Cj4gPiBzb2x2ZSB0aGUgcHJv
+YmxlbSwgc3BlY2lhbGx5IGZvciB0aGUgZmlybXdhcmU6IEVGSSBrbm93cwo+ID4gbm90aGluZyBh
+Ym91dCB0aGlzLCBmb3IgZXhhbXBsZS4gSG93IGlzIGl0IGdvaW5nIHRvIHdvcms/Cj4gPiBBbHNv
+LCBub2JvZHkgd2FzIGV2ZXIgYWJsZSB0byBleHBsYWluIGhvdyB0aGlzIHdvdWxkIHdvcmsgZm9y
+Cj4gPiBuZXN0ZWQgdmlydC4KPiA+IAo+ID4gQVJNdjguNCBhbmQgQVJNdjguNiBoYXZlIHRoZSBm
+ZWF0dXJlIHNldCB0aGF0IGlzIHJlcXVpcmVkIHRvIHNvbHZlCj4gPiB0aGlzIHByb2JsZW0gd2l0
+aG91dCBhZGRpbmcgbW9yZSBQViB0byB0aGUga2VybmVsLgo+IAo+IEhpIE1hcmMsCj4gCj4gVGhl
+c2UgYXJlIGdvb2QgcG9pbnRzLCBob3dldmVyIHdlIGRvIHN0aWxsIGhhdmUgdGhlIHNpdHVhdGlv
+biB0aGF0Cj4gQ1BVcyB0aGF0IGRvbid0IGhhdmUgQVJNdjguNC84LjYgY2xlYXJseSBjYW5ub3Qg
+aW1wbGVtZW50IHRoaXMuIEkKPiBwcmVzdW1lIHRoZSB1c2UtY2FzZSBLZXFpYW4gaXMgbG9va2lu
+ZyBhdCBwcmVkYXRlcyB0aGUgbmVjZXNzYXJ5Cj4gc3VwcG9ydCBpbiB0aGUgQ1BVIC0gS2VxaWFu
+IGlmIHlvdSBjYW4gcHJvdmlkZSBtb3JlIGRldGFpbHMgb24gdGhlCj4gYXJjaGl0ZWN0dXJlKHMp
+IGludm9sdmVkIHRoYXQgd291bGQgYmUgaGVscGZ1bC4KCk15IHRha2Ugb24gdGhpcyBpcyB0aGF0
+IGl0IGlzIGEgZmljdGlvbmFsIHVzZSBjYXNlLiBJbiBteSBleHBlcmllbmNlLAptaWdyYXRpb24g
+aGFwcGVucyBhY3Jvc3MgKmlkZW50aWNhbCogc3lzdGVtcywgYW5kICphbnkqIGRpZmZlcmVuY2UK
+dmlzaWJsZSB0byBndWVzdHMgd2lsbCBjYXVzZSB0aGluZ3MgdG8gZ28gd3JvbmcuIEVycmF0YSBt
+YW5hZ2VtZW50CmdldHMgaW4gdGhlIHdheSwgYXMgdXN1YWwgKG5hbWUgKm9uZSogaW50ZWdyYXRp
+b24gdGhhdCBpc24ndCBicm9rZW4Kb25lIHdheSBvciBhbm90aGVyISkuCgpBbGxvd2luZyBtaWdy
+YXRpb24gYWNyb3NzIGhldGVyb2dlbmVvdXMgaG9zdHMgcmVxdWlyZXMgYSBzb2x1dGlvbiB0bwp0
+aGUgZXJyYXRhIG1hbmFnZW1lbnQgcHJvYmxlbSwgd2hpY2ggZXZlcnlvbmUgKGluY2x1ZGluZyBt
+ZSkgaGFzCmRlY2lkZWQgdG8gaWdub3JlIHNvIGZhciAoYW5kIEkgY2xhaW0gdGhhdCBub3QgaGF2
+aW5nIGEgY29uc3RhbnQgdGltZXIKZnJlcXVlbmN5IGV4cG9zZWQgdG8gZ3Vlc3RzIGlzIGFuIGFy
+Y2hpdGVjdHVyZSBidWcpLgoKPiBOZXN0ZWQgdmlydCBpcyBpbmRlZWQgbW9yZSBvZiBhbiBpc3N1
+ZSAtIHdlIGRpZCBoYXZlIHNvbWUgaWRlYXMgYXJvdW5kCj4gdXNpbmcgU0RFSSB0aGF0IG5ldmVy
+IG1hZGUgaXQgdG8gdGhlIHNwZWMuCgpTREVJPyBTaWdoLi4uIFdoeSB3b3VsZCBTREVJIGJlIHVz
+ZWZ1bCBmb3IgTlYgYW5kIG5vdCBmb3IgIU5WPwoKPiBIb3dldmVyIEkgd291bGQgYXJndWUgdGhh
+dCB0aGUgbW9zdCBwcmFnbWF0aWMgYXBwcm9hY2ggd291bGQgYmUgdG8KPiBub3Qgc3VwcG9ydCB0
+aGUgY29tYmluYXRpb24gb2YgbmVzdGVkIHZpcnQgYW5kIExQVC4gSG9wZWZ1bGx5IHRoYXQKPiBj
+YW4gd2FpdCB1bnRpbCB0aGUgY291bnRlciBzY2FsaW5nIHN1cHBvcnQgaXMgYXZhaWxhYmxlIGFu
+ZCBub3QKPiByZXF1aXJlIFBWLgoKQW5kIGhhdmUgeWV0IGFub3RoZXIgc2V0IG9mIGJhbmQgYWlk
+cyB0aGF0IHBhcGVyIG92ZXIgdGhlIGZhY3QgdGhhdCB3ZQpjYW4ndCBnZXQgYSBjb25zaXN0ZW50
+IHN0b3J5IG9uIHZpcnR1YWxpemF0aW9uPyBObywgdGhhbmsgeW91LgoKTlYgaXMgKElNSE8pIG11
+Y2ggbW9yZSBpbXBvcnRhbnQgdGhhbiBMUFQgYXMgaXQgaGFzIGEgY2hhbmNlIG9mCmdldHRpbmcg
+dXNlZC4gTFBUIGlzIGp1c3QgYW5vdGhlciB0aWNrIGJveCwgYW5kIHRoZSBmYWN0IHRoYXQgQVJN
+IGlzCnJlYWR5IHRvIGlnbm9yZSBzaWRlbGluZSBhIGRlY2VudCBwb3J0aW9uIG9mIHRoZSBhcmNo
+aXRlY3R1cmUgaXMgYQpjbGVhciBzaWduIHRoYXQgaXQgaGFzbid0IGJlZW4gdGhvdWdodCBvdXQu
+Cgo+IFdlIGFyZSBkaXNjdXNzaW5nIChyZS0pcmVsZWFzaW5nIHRoZSBzcGVjIHdpdGggdGhlIExQ
+VCBwYXJ0cyBhZGRlZC4gSWYKPiB5b3UgaGF2ZSBmdW5kYW1lbnRhbCBvYmplY3Rpb25zIHRoZW4g
+cGxlYXNlIG1lIGtub3cuCgpJIGRvLCBzZWUgYWJvdmUuIEknbSBzdGF0aW5nIHRoYXQgdGhlIHVz
+ZSBjYXNlIGRvZXNuJ3QgcmVhbGx5IGV4aXN0CmdpdmVuIHRoZSBzdGF0ZSBvZiB0aGUgYXZhaWxh
+YmxlIEhXIGFuZCB0aGUgZnJhZ21lbnRhdGlvbiBvZiB0aGUKYXJjaGl0ZWN0dXJlLCBhbmQgdGhh
+dCBpZ25vcmluZyB0aGUgbW9zdCBpbXBvcnRhbnQgaW5ub3ZhdGlvbiBpbiB0aGUKdmlydHVhbGl6
+YXRpb24gYXJjaGl0ZWN0dXJlIHNpbmNlIEFSTXY3IGlzIGF0IGJlc3Qgc2hvcnQtc2lnaHRlZC4K
+ClRpbWUgc2NhbGluZyBpcyBqdXN0IGFuIGluc3RhbmNlIG9mIHRoZSBlcnJhdGEgbWFuYWdlbWVu
+dCBwcm9ibGVtLCBhbmQKdGhhdCBpcyB0aGUgaXNzdWUgdGhhdCBuZWVkcyBzb2x2aW5nLiBQYXBl
+cmluZyBvdmVyIHBhcnQgb2YgdGhlCnByb2JsZW0gaXMgbm90IGhlbHBpbmcuCgoJTS4KCi0tIApX
+aXRob3V0IGRldmlhdGlvbiBmcm9tIHRoZSBub3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUu
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
