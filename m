@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF8AC433E1
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Aug 2020 18:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A729C433E1
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Aug 2020 18:36:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 22C3B2074D
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Aug 2020 18:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 104F820FC3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Aug 2020 18:36:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJIDOILb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C3B2074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DXXQnvZp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 104F820FC3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFB214CC21;
-	Mon, 24 Aug 2020 14:36:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC7714CC8D;
+	Mon, 24 Aug 2020 14:36:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VgTHVvglqMjc; Mon, 24 Aug 2020 14:36:30 -0400 (EDT)
+	with ESMTP id 4a7m-UAMhRhi; Mon, 24 Aug 2020 14:36:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EF194CC93;
-	Mon, 24 Aug 2020 14:36:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD8154CCA4;
+	Mon, 24 Aug 2020 14:36:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D7D64CC19
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 14:36:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23DDA4CC23
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 14:36:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZHD5veGsvlmM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Aug 2020 14:36:28 -0400 (EDT)
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com
- [209.85.210.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2348D4CB32
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 14:36:28 -0400 (EDT)
-Received: by mail-pf1-f196.google.com with SMTP id m8so5303357pfh.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 11:36:28 -0700 (PDT)
+ with ESMTP id we4zJuCpHF5m for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Aug 2020 14:36:30 -0400 (EDT)
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com
+ [209.85.215.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0515D4CC0B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 14:36:30 -0400 (EDT)
+Received: by mail-pg1-f195.google.com with SMTP id m34so4973451pgl.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Aug 2020 11:36:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=b96xElma2wVNkZLWPyInMIgVAkPIrOZeVr/+MC3kMPQ=;
- b=kJIDOILbYl/7UguWLWS2J4Ts2X2NdD8kL8uqUY5o65T9vBehdn1gGl4vgizV6s8rVE
- B2euk//REx4SjEjprw+qtTl8QzH2yI3G+JTE8e8gSkGADHzc+Qp1k3ITuesmITUK27rz
- Vl7l62szu+Mw3v3Kyp70IdshpPjbRfTJSi6m4R5vCr/ZYlA3/78lFUYrscQMWK4BOWwM
- WM/D6Izu1r26KTHmwEK63H2D5yTTyQFZ1px05D97BaEmM8qZOPNF8bcM4hsj2067WCL/
- PZ71fawRO5V1MVoC26lU2gTUznvnvnlCOV3v5OiM1KDpNGTsumW1VKRC/Q4/KYFhSDAJ
- BVYg==
+ bh=3q7TgN3lxewyLqAIBfP9LryeeItLVKAQXHJvLwyIaWM=;
+ b=DXXQnvZpQdBxWWuTfbWVY5FLOwytb0aSgYz9mPH9jwhVJ/ogBB2JP13Gr4jK7HM73T
+ pc/bkX58u16w83O633eIk/waD+bT8E/aoCcgOOg01+1vouzqLJH0+zGQjpzQJFyg0FZM
+ mauzJky23s4DKNw2+aNYSjn1sV7zZZvHGKo4/0BHmr5FKsNRLRZXrAxTyrW6tvy3xhDC
+ /27GPtZ1Tm5+yzrDJZcaCnxIN0oRlJybvVM6DWCbdS2+r7BgXNLnHHCtzQ1epJHThmTq
+ nuiTZWKKuwFHf58c5DAoL1PXrjj4dXftqHFIRq8jatyM8kSLLpJJ4ZP+WD0NdXeYZWYa
+ 7m1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=b96xElma2wVNkZLWPyInMIgVAkPIrOZeVr/+MC3kMPQ=;
- b=NvRH+1WQR9v5RxiRtYjaCkjHHrW3o6RvHYMDey0TQUYXP5V57vV6b2mlEhYdA8e+PV
- eHi1vq3gDtxm6UeptY1FeoCXxKi0zDTtHlfN5nsFMalGe4KQ1Ia63sDLPJIfvhHjsxlO
- KdA5YeE6FweqnY5xaRZrq8sNfbhCHxjtYZW1HH0jET4tAjHQW15hnPkyxzv+QT2KLmhi
- ebrMIbyIdRL78Sl0+quO85eQ5IujTk1y9wdOe6V4RNgc+ZX3O1lo0TAqdS5uAansFaPs
- RaoFLHh4SlMY9kEkybgFGT8A5ajouM4wt29wMe1xCgIpI6/ahY91CmE/L81mUn7o98DZ
- Rg2g==
-X-Gm-Message-State: AOAM531ScgKe7E08hPHiETM5r+/QpEXOctfOJzYHvI7stjkSzM4cfqp9
- arnE6cObDQwF2r0jBn76Udg=
-X-Google-Smtp-Source: ABdhPJwWVMNmiDhLowr36OW1PpCPBDb47C7dITpAO+Rb9ymj/lluEnztUgICYD9TJI0Q4fOtPRo/HA==
-X-Received: by 2002:a63:f44d:: with SMTP id p13mr4113885pgk.363.1598294187273; 
- Mon, 24 Aug 2020 11:36:27 -0700 (PDT)
+ bh=3q7TgN3lxewyLqAIBfP9LryeeItLVKAQXHJvLwyIaWM=;
+ b=gNipoynqD9MktE+jdw1gZlqGWSJTjgDdhVjvMGU8Y20wnhAjeXoobQVwAdfFaSoDw1
+ VK9SCbAt0+jvx3Jf7OHolgdIpairlb0kTTtM5EGwPcGu5N5c/x+E+k8AWNBpVH9Cp4lX
+ Qd8FtTyPWFMhM7FCioCWE+m9E0YtVzetPpJGjjYKrnxdKt8++bLXLfUFqd7dX/CcFA7+
+ llXwguUF9N8fgj6VEc17fl+XTNcm5JvSPsKU613vEC8ZSgFTEiTH5Hf2Wnb+vBltD/NS
+ OyLylj6xkR4Ga7xh146uasg+Lx4lmq0Oe5zunqD31TDixDj2d5ttIFul9rGxFSOuAFp1
+ 7dMA==
+X-Gm-Message-State: AOAM532TFJ0uJ6ZzfzdOad+W1DK9ggb7jrG+99sdYBO+0/dTnicwPB1N
+ uEYPw0bEZMIXNVidVRSrNZM=
+X-Google-Smtp-Source: ABdhPJySaZYGlENv2qyFf9K7SCA9acModoq5qtLXOSnFpr5ZYYJUffRqri+Bu8C1bsjf+rWbXYMz0A==
+X-Received: by 2002:a17:902:8690:: with SMTP id
+ g16mr2883173plo.257.1598294189292; 
+ Mon, 24 Aug 2020 11:36:29 -0700 (PDT)
 Received: from stbirv-lnx-3.igp.broadcom.net ([192.19.223.252])
- by smtp.gmail.com with ESMTPSA id u191sm10235065pgu.56.2020.08.24.11.36.25
+ by smtp.gmail.com with ESMTPSA id u191sm10235065pgu.56.2020.08.24.11.36.27
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 24 Aug 2020 11:36:26 -0700 (PDT)
+ Mon, 24 Aug 2020 11:36:28 -0700 (PDT)
 From: Florian Fainelli <f.fainelli@gmail.com>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH stable 4.9 v3 1/2] arm64: Add support for SB barrier and patch
- in over DSB; ISB sequences
-Date: Mon, 24 Aug 2020 11:36:21 -0700
-Message-Id: <1598294182-34012-2-git-send-email-f.fainelli@gmail.com>
+Subject: [PATCH stable 4.9 v3 2/2] arm64: entry: Place an SB sequence
+ following an ERET instruction
+Date: Mon, 24 Aug 2020 11:36:22 -0700
+Message-Id: <1598294182-34012-3-git-send-email-f.fainelli@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1598294182-34012-1-git-send-email-f.fainelli@gmail.com>
 References: <1598294182-34012-1-git-send-email-f.fainelli@gmail.com>
@@ -111,208 +112,101 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Will Deacon <will.deacon@arm.com>
 
-commit bd4fb6d270bc423a9a4098108784f7f9254c4e6d upstream
+commit 679db70801da9fda91d26caf13bf5b5ccc74e8e8 upstream
 
-We currently use a DSB; ISB sequence to inhibit speculation in set_fs().
-Whilst this works for current CPUs, future CPUs may implement a new SB
-barrier instruction which acts as an architected speculation barrier.
+Some CPUs can speculate past an ERET instruction and potentially perform
+speculative accesses to memory before processing the exception return.
+Since the register state is often controlled by a lower privilege level
+at the point of an ERET, this could potentially be used as part of a
+side-channel attack.
 
-On CPUs that support it, patch in an SB; NOP sequence over the DSB; ISB
-sequence and advertise the presence of the new instruction to userspace.
+This patch emits an SB sequence after each ERET so that speculation is
+held up on exception return.
 
 Signed-off-by: Will Deacon <will.deacon@arm.com>
-[florian:
-- adjust number capabilities
-- wire decoding of ftr_id_aa64_isar1
-- __emit_inst -> __inst_arm
-- sys_insn -> sys_reg]
+[florian: Adjust hyp-entry.S to account for the label
+ added change to hyp/entry.S]
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm64/include/asm/assembler.h  | 13 +++++++++++++
- arch/arm64/include/asm/barrier.h    |  4 ++++
- arch/arm64/include/asm/cpucaps.h    |  3 ++-
- arch/arm64/include/asm/sysreg.h     | 13 +++++++++++++
- arch/arm64/include/asm/uaccess.h    |  3 +--
- arch/arm64/include/uapi/asm/hwcap.h |  1 +
- arch/arm64/kernel/cpufeature.c      | 22 +++++++++++++++++++++-
- arch/arm64/kernel/cpuinfo.c         |  1 +
- 8 files changed, 56 insertions(+), 4 deletions(-)
+ arch/arm64/kernel/entry.S      | 2 ++
+ arch/arm64/kvm/hyp/entry.S     | 2 ++
+ arch/arm64/kvm/hyp/hyp-entry.S | 4 ++++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 3f85bbcd7e40..0f689aa0b300 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -95,6 +95,19 @@
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index ca978d7d98eb..3408c782702c 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -255,6 +255,7 @@ alternative_insn eret, nop, ARM64_UNMAP_KERNEL_AT_EL0
+ 	.else
+ 	eret
+ 	.endif
++	sb
  	.endm
  
- /*
-+ * Speculation barrier
-+ */
-+	.macro	sb
-+alternative_if_not ARM64_HAS_SB
-+	dsb	nsh
-+	isb
-+alternative_else
-+	SB_BARRIER_INSN
-+	nop
-+alternative_endif
-+	.endm
-+
-+/*
-  * Sanitise a 64-bit bounded index wrt speculation, returning zero if out
-  * of bounds.
-  */
-diff --git a/arch/arm64/include/asm/barrier.h b/arch/arm64/include/asm/barrier.h
-index 0b0755c961ac..159329160fb4 100644
---- a/arch/arm64/include/asm/barrier.h
-+++ b/arch/arm64/include/asm/barrier.h
-@@ -33,6 +33,10 @@
+ 	.macro	get_thread_info, rd
+@@ -945,6 +946,7 @@ __ni_sys_trace:
+ 	mrs	x30, far_el1
+ 	.endif
+ 	eret
++	sb
+ 	.endm
  
- #define csdb()		asm volatile("hint #20" : : : "memory")
+ 	.align	11
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index a360ac6e89e9..93704e6894d2 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -83,6 +83,7 @@ ENTRY(__guest_enter)
  
-+#define spec_bar()	asm volatile(ALTERNATIVE("dsb nsh\nisb\n",		\
-+						 SB_BARRIER_INSN"nop\n",	\
-+						 ARM64_HAS_SB))
-+
- #define mb()		dsb(sy)
- #define rmb()		dsb(ld)
- #define wmb()		dsb(st)
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 8c7c4b23a8b1..8a25f6e39f3a 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -38,7 +38,8 @@
- #define ARM64_HARDEN_BRANCH_PREDICTOR		17
- #define ARM64_SSBD				18
- #define ARM64_MISMATCHED_CACHE_TYPE		19
-+#define ARM64_HAS_SB				20
+ 	// Do not touch any register after this!
+ 	eret
++	sb
+ ENDPROC(__guest_enter)
  
--#define ARM64_NCAPS				20
-+#define ARM64_NCAPS				21
+ ENTRY(__guest_exit)
+@@ -195,4 +196,5 @@ alternative_endif
+ 	ldp	x0, x1, [sp], #16
  
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 88bbe364b6ae..1c49eaac1938 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -86,6 +86,12 @@
- #define SET_PSTATE_UAO(x) __inst_arm(0xd5000000 | REG_PSTATE_UAO_IMM |\
- 				     (!!x)<<8 | 0x1f)
+ 	eret
++	sb
+ ENDPROC(__fpsimd_guest_restore)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bf4988f9dae8..3675e7f0ab72 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -97,6 +97,7 @@ el1_sync:				// Guest trapped into EL2
+ 	do_el2_call
  
-+#define __SYS_BARRIER_INSN(CRm, op2, Rt) \
-+	__inst_arm(0xd5000000 | sys_reg(0, 3, 3, (CRm), (op2)) | ((Rt) & 0x1f))
-+
-+#define SB_BARRIER_INSN			__SYS_BARRIER_INSN(0, 7, 31)
-+
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_EE    (1 << 25)
- #define SCTLR_ELx_I	(1 << 12)
-@@ -116,6 +122,13 @@
- #define ID_AA64ISAR0_SHA1_SHIFT		8
- #define ID_AA64ISAR0_AES_SHIFT		4
+ 2:	eret
++	sb
  
-+/* id_aa64isar1 */
-+#define ID_AA64ISAR1_SB_SHIFT		36
-+#define ID_AA64ISAR1_LRCPC_SHIFT	20
-+#define ID_AA64ISAR1_FCMA_SHIFT		16
-+#define ID_AA64ISAR1_JSCVT_SHIFT	12
-+#define ID_AA64ISAR1_DPB_SHIFT		0
-+
- /* id_aa64pfr0 */
- #define ID_AA64PFR0_CSV3_SHIFT		60
- #define ID_AA64PFR0_CSV2_SHIFT		56
-diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-index f5cd96c60eb9..195323089e5a 100644
---- a/arch/arm64/include/asm/uaccess.h
-+++ b/arch/arm64/include/asm/uaccess.h
-@@ -71,8 +71,7 @@ static inline void set_fs(mm_segment_t fs)
- 	 * Prevent a mispredicted conditional call to set_fs from forwarding
- 	 * the wrong address limit to access_ok under speculation.
- 	 */
--	dsb(nsh);
--	isb();
-+	spec_bar();
- 
+ el1_hvc_guest:
  	/*
- 	 * Enable/disable UAO so that copy_to_user() etc can access
-diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
-index a739287ef6a3..3aa659624968 100644
---- a/arch/arm64/include/uapi/asm/hwcap.h
-+++ b/arch/arm64/include/uapi/asm/hwcap.h
-@@ -30,5 +30,6 @@
- #define HWCAP_ATOMICS		(1 << 8)
- #define HWCAP_FPHP		(1 << 9)
- #define HWCAP_ASIMDHP		(1 << 10)
-+#define HWCAP_SB		(1 << 29)
+@@ -147,6 +148,7 @@ wa_epilogue:
+ 	mov	x0, xzr
+ 	add	sp, sp, #16
+ 	eret
++	sb
  
- #endif /* _UAPI__ASM_HWCAP_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 8cf001baee21..1a5879c0b711 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -93,6 +93,15 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
- 	ARM64_FTR_END,
- };
+ el1_trap:
+ 	get_vcpu_ptr	x1, x0
+@@ -198,6 +200,7 @@ el2_error:
+ 	b.ne	__hyp_panic
+ 	mov	x0, #(1 << ARM_EXIT_WITH_SERROR_BIT)
+ 	eret
++	sb
  
-+static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
-+	ARM64_FTR_BITS(FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_SB_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_DPB_SHIFT, 4, 0),
-+	ARM64_FTR_END,
-+};
-+
- static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	ARM64_FTR_BITS(FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_CSV2_SHIFT, 4, 0),
-@@ -326,7 +335,7 @@ static const struct __ftr_reg_entry {
+ ENTRY(__hyp_do_panic)
+ 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+@@ -206,6 +209,7 @@ ENTRY(__hyp_do_panic)
+ 	ldr	lr, =panic
+ 	msr	elr_el2, lr
+ 	eret
++	sb
+ ENDPROC(__hyp_do_panic)
  
- 	/* Op1 = 0, CRn = 0, CRm = 6 */
- 	ARM64_FTR_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0),
--	ARM64_FTR_REG(SYS_ID_AA64ISAR1_EL1, ftr_aa64raz),
-+	ARM64_FTR_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1),
- 
- 	/* Op1 = 0, CRn = 0, CRm = 7 */
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
-@@ -949,6 +958,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.enable = kpti_install_ng_mappings,
- 	},
- #endif
-+	{
-+		.desc = "Speculation barrier (SB)",
-+		.capability = ARM64_HAS_SB,
-+		.def_scope = SCOPE_SYSTEM,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64ISAR1_EL1,
-+		.field_pos = ID_AA64ISAR1_SB_SHIFT,
-+		.sign = FTR_UNSIGNED,
-+		.min_field_value = 1,
-+	},
- 	{},
- };
- 
-@@ -976,6 +995,7 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
- 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_FP_SHIFT, FTR_SIGNED, 1, CAP_HWCAP, HWCAP_FPHP),
- 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_ASIMD_SHIFT, FTR_SIGNED, 0, CAP_HWCAP, HWCAP_ASIMD),
- 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_ASIMD_SHIFT, FTR_SIGNED, 1, CAP_HWCAP, HWCAP_ASIMDHP),
-+	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_SB_SHIFT, FTR_UNSIGNED, 1, CAP_HWCAP, HWCAP_SB),
- 	{},
- };
- 
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index b3d5b3e8fbcb..5de2d55a999e 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -63,6 +63,7 @@ static const char *const hwcap_str[] = {
- 	"atomics",
- 	"fphp",
- 	"asimdhp",
-+	"sb",
- 	NULL
- };
- 
+ ENTRY(__hyp_panic)
 -- 
 2.7.4
 
