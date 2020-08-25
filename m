@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC735C433DF
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71ABC433E1
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A0A520786
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70C4F20706
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBgyK3XQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0A520786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWTqJdbg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C4F20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 137C74BE45;
-	Tue, 25 Aug 2020 05:40:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2750C4C0DE;
+	Tue, 25 Aug 2020 05:40:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4fBnsNsWwyHQ; Tue, 25 Aug 2020 05:40:44 -0400 (EDT)
+	with ESMTP id KajtPiaUKZAO; Tue, 25 Aug 2020 05:40:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA0854C08A;
-	Tue, 25 Aug 2020 05:40:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BCFC4C117;
+	Tue, 25 Aug 2020 05:40:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1718E4C0A1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3234C042
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CR5ogRXeOP6X for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
+ with ESMTP id C4-P7eGcUsVM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Aug 2020 05:40:46 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 100D14C042
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B896D4C08A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:46 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A504620782;
- Tue, 25 Aug 2020 09:40:39 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 41B152075B;
+ Tue, 25 Aug 2020 09:40:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1598348441;
- bh=yVsnDNqmsCKOI889e7gVw1ZMCVSe0E2SrrGrtX/Cj+8=;
+ s=default; t=1598348446;
+ bh=MfFO9Dzbbbv5rbZaGAyLGGI9xZoBrqu6sFc/sASz1Vs=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YBgyK3XQD3aFQBuieMubbjKiHrDeXTQmhn0Wwkm4gqcOe7jBiPGOKSQIyh2tiBqs3
- gq6uODLWpLG/wKWdSvFy2arDVcDllh0AgrMEMvcIeOAySnX9cEU5v29GIVX9F+b0hX
- rfysZ4LOn2+uhHV8dQMm6uQlXKxBsSLXW2IRm0+o=
+ b=cWTqJdbg7WHvg6J7YIoL7yAiDWzx+gh/9dHMqjplX26LeZfYdV3TkOQfOuh5pGpf0
+ njymQNYd6MqyK9bwC1U48MuDxn7lF/kXzaJ4TLuwI1eYinU/U4LDtSBplOA6OD/jBn
+ oJuL6f666IKFHxGLK8yuikGsFKCNzsbZKGAlQqkg=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 18/21] KVM: arm64: Check the pgt instead of the pgd when
- modifying page-table
-Date: Tue, 25 Aug 2020 10:39:50 +0100
-Message-Id: <20200825093953.26493-19-will@kernel.org>
+Subject: [PATCH v3 20/21] KVM: arm64: Remove unused 'pgd' field from 'struct
+ kvm_s2_mmu'
+Date: Tue, 25 Aug 2020 10:39:52 +0100
+Message-Id: <20200825093953.26493-21-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200825093953.26493-1-will@kernel.org>
 References: <20200825093953.26493-1-will@kernel.org>
@@ -82,47 +82,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In preparation for removing the 'pgd' field of 'struct kvm_s2_mmu',
-update the few remaining users to check the 'pgt' field instead.
+The stage-2 page-tables are entirely encapsulated by the 'pgt' field of
+'struct kvm_s2_mmu', so remove the unused 'pgd' field.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 1 -
+ arch/arm64/kvm/mmu.c              | 2 --
+ 2 files changed, 3 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0b7c702b2151..41caf29bd93c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -79,7 +79,6 @@ struct kvm_s2_mmu {
+ 	 * for vEL1/EL0 with vHCR_EL2.VM == 0.  In that case, we use the
+ 	 * canonical stage-2 page tables.
+ 	 */
+-	pgd_t		*pgd;
+ 	phys_addr_t	pgd_phys;
+ 	struct kvm_pgtable *pgt;
+ 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index cfbf32cae3a5..050eab71de31 100644
+index ddeec0b03666..f28e03dcb897 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1813,7 +1813,7 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *dat
- int kvm_unmap_hva_range(struct kvm *kvm,
- 			unsigned long start, unsigned long end, unsigned flags)
- {
--	if (!kvm->arch.mmu.pgd)
-+	if (!kvm->arch.mmu.pgt)
- 		return 0;
+@@ -384,7 +384,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+ 	mmu->kvm = kvm;
+ 	mmu->pgt = pgt;
+ 	mmu->pgd_phys = __pa(pgt->pgd);
+-	mmu->pgd = (void *)pgt->pgd;
+ 	mmu->vmid.vmid_gen = 0;
+ 	return 0;
  
- 	trace_kvm_unmap_hva_range(start, end);
-@@ -1876,7 +1876,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
- 
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
- {
--	if (!kvm->arch.mmu.pgd)
-+	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 	trace_kvm_age_hva(start, end);
- 	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
-@@ -1884,7 +1884,7 @@ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
- 
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- {
--	if (!kvm->arch.mmu.pgd)
-+	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 	trace_kvm_test_age_hva(hva);
- 	return handle_hva_to_gpa(kvm, hva, hva + PAGE_SIZE,
+@@ -470,7 +469,6 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	spin_lock(&kvm->mmu_lock);
+ 	pgt = mmu->pgt;
+ 	if (pgt) {
+-		mmu->pgd = NULL;
+ 		mmu->pgd_phys = 0;
+ 		mmu->pgt = NULL;
+ 		free_percpu(mmu->last_vcpu_ran);
 -- 
 2.28.0.297.g1956fa8f8d-goog
 
