@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8539EC433E1
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05378C433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E3CA2074D
+	by mail.kernel.org (Postfix) with ESMTP id B28D32075F
 	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/EHqD5I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3CA2074D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcAR0cnH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B28D32075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBAEC4C084;
-	Tue, 25 Aug 2020 05:40:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BCA44C08B;
+	Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WUVUiXgcgq5E; Tue, 25 Aug 2020 05:40:40 -0400 (EDT)
+	with ESMTP id dsKTn9sNDMSg; Tue, 25 Aug 2020 05:40:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0794C0A5;
-	Tue, 25 Aug 2020 05:40:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 922C64C06B;
+	Tue, 25 Aug 2020 05:40:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 781004C060
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ED334C060
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mScVRBk74RJe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Aug 2020 05:40:38 -0400 (EDT)
+ with ESMTP id n+OwNpWxM3Rg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Aug 2020 05:40:37 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0DF84C0A1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A284E4C0EA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:35 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 641D62075F;
- Tue, 25 Aug 2020 09:40:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 428602071E;
+ Tue, 25 Aug 2020 09:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1598348437;
- bh=75KEwgZ+tvBM7cpd5EYQEOQ/vUC5e1zgjaiaKK8He2k=;
+ s=default; t=1598348435;
+ bh=fBAx+GV8RLH4tFQsP/19CGTAt/FtXq6X8dYmjfoUAys=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O/EHqD5II9CDp57dE4t+5iF0de+g2lsDLRrVERHe/pe6XHasPPxIHFg+mwFPdlVc8
- fF50Q2NF21g/Yf6SKUAstkWde0U25vvO3GEWkCclpsh4Op1B7GIddEUxcRoBh0iw1B
- 1ZKk5UhgbKOehlHyLJVUrJqYXSG77N14qsBaexCE=
+ b=VcAR0cnHSWHzBliFu1OW1XdpDUkZGRVSOtRSOKOmkFmh18HlZPbIvvqnpFlhYNtqR
+ RrHqVSLdR9N7ELBJy35tnW5udRhd5N6/2uQP4Uyg/LIPTWyQ65W82BEV5QGhhJ6vzI
+ FcM1/QG2Y0zfBo/xbMO569cc0bf8P9yFQb2egc4o=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 16/21] KVM: arm64: Add support for relaxing stage-2 perms
- in generic page-table code
-Date: Tue, 25 Aug 2020 10:39:48 +0100
-Message-Id: <20200825093953.26493-17-will@kernel.org>
+Subject: [PATCH v3 15/21] KVM: arm64: Convert memslot cache-flushing code to
+ generic page-table API
+Date: Tue, 25 Aug 2020 10:39:47 +0100
+Message-Id: <20200825093953.26493-16-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200825093953.26493-1-will@kernel.org>
 References: <20200825093953.26493-1-will@kernel.org>
@@ -82,76 +82,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add support for relaxing the permissions of a stage-2 mapping (i.e.
-adding additional permissions) to the generic page-table code.
+From: Quentin Perret <qperret@google.com>
+
+Convert stage2_flush_memslot() to call the kvm_pgtable_stage2_flush()
+function of the generic page-table code instead of walking the page-table
+directly.
 
 Cc: Marc Zyngier <maz@kernel.org>
-Cc: Quentin Perret <qperret@google.com>
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ arch/arm64/kvm/mmu.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index ea823fe31913..0d7077c34152 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -216,6 +216,23 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr);
-  */
- kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index ca2c37c91e0b..d4b0716a6ab4 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -455,21 +455,10 @@ static void stage2_flush_p4ds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+-	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
+-	phys_addr_t next;
+-	pgd_t *pgd;
+-
+-	pgd = mmu->pgd + stage2_pgd_index(kvm, addr);
+-	do {
+-		next = stage2_pgd_addr_end(kvm, addr, end);
+-		if (!stage2_pgd_none(kvm, *pgd))
+-			stage2_flush_p4ds(mmu, pgd, addr, next);
  
-+/**
-+ * kvm_pgtable_stage2_relax_perms() - Relax the permissions enforced by a
-+ *				      page-table entry.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-+ * @addr:	Intermediate physical address to identify the page-table entry.
-+ * @prot:	Additional permissions to grant for the mapping.
-+ *
-+ * If there is a valid, leaf page-table entry used to translate @addr, then
-+ * relax the permissions in that entry according to the read, write and
-+ * execute permissions specified by @prot. No permissions are removed, and
-+ * TLB invalidation is performed after updating the entry.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-+				   enum kvm_pgtable_prot prot);
-+
- /**
-  * kvm_pgtable_stage2_is_young() - Test whether a page-table entry has the
-  *				   access flag set.
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 75887185f1e2..6e8ca1ec12b4 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -762,6 +762,26 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
- 	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
+-		if (next != end)
+-			cond_resched_lock(&kvm->mmu_lock);
+-	} while (pgd++, addr = next, addr != end);
++	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
  }
  
-+int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-+				   enum kvm_pgtable_prot prot)
-+{
-+	int ret;
-+	kvm_pte_t set = 0, clr = 0;
-+
-+	if (prot & KVM_PGTABLE_PROT_R)
-+		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-+
-+	if (prot & KVM_PGTABLE_PROT_W)
-+		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-+
-+	if (prot & KVM_PGTABLE_PROT_X)
-+		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+
-+	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL);
-+	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, 0);
-+	return ret;
-+}
-+
- static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 			       enum kvm_pgtable_walk_flags flag,
- 			       void * const arg)
+ /**
 -- 
 2.28.0.297.g1956fa8f8d-goog
 
