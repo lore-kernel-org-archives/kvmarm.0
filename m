@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9C9C433DF
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC735C433DF
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 52E112075F
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A0A520786
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Aug 2020 09:40:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3EizB2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E112075F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBgyK3XQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0A520786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC0C4C0A1;
-	Tue, 25 Aug 2020 05:40:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 137C74BE45;
+	Tue, 25 Aug 2020 05:40:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dkSY+8JBkSwI; Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
+	with ESMTP id 4fBnsNsWwyHQ; Tue, 25 Aug 2020 05:40:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD5764C080;
-	Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA0854C08A;
+	Tue, 25 Aug 2020 05:40:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52A3A4C060
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1718E4C0A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ddz4fJ1trBJR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Aug 2020 05:40:40 -0400 (EDT)
+ with ESMTP id CR5ogRXeOP6X for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 023924C063
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 100D14C042
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2020 05:40:42 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8530B2074D;
- Tue, 25 Aug 2020 09:40:37 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A504620782;
+ Tue, 25 Aug 2020 09:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1598348439;
- bh=ZqruD7NUkYHUMv+lEUtfsZ7SZ0k+m14NML8BVmhe19U=;
+ s=default; t=1598348441;
+ bh=yVsnDNqmsCKOI889e7gVw1ZMCVSe0E2SrrGrtX/Cj+8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=i3EizB2VGfpM2CDqMpdc3aXlf1/frKzXRNlX2jXbFZTzy92/jIZwG8Bh0Co1xFKbp
- dGgCe1diJzl9nyHD1XzYP/mFQg1dfQ/bC0YhRJgBmaYBTgaeEkszkDjy3Y9MxnjSu/
- PPhRlHFzGMbNRZBPcLp7CXbq3a1PFLdK99nr0GDI=
+ b=YBgyK3XQD3aFQBuieMubbjKiHrDeXTQmhn0Wwkm4gqcOe7jBiPGOKSQIyh2tiBqs3
+ gq6uODLWpLG/wKWdSvFy2arDVcDllh0AgrMEMvcIeOAySnX9cEU5v29GIVX9F+b0hX
+ rfysZ4LOn2+uhHV8dQMm6uQlXKxBsSLXW2IRm0+o=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 17/21] KVM: arm64: Convert user_mem_abort() to generic
- page-table API
-Date: Tue, 25 Aug 2020 10:39:49 +0100
-Message-Id: <20200825093953.26493-18-will@kernel.org>
+Subject: [PATCH v3 18/21] KVM: arm64: Check the pgt instead of the pgd when
+ modifying page-table
+Date: Tue, 25 Aug 2020 10:39:50 +0100
+Message-Id: <20200825093953.26493-19-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200825093953.26493-1-will@kernel.org>
 References: <20200825093953.26493-1-will@kernel.org>
@@ -82,190 +82,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Convert user_mem_abort() to call kvm_pgtable_stage2_relax_perms() when
-handling a stage-2 permission fault and kvm_pgtable_stage2_map() when
-handling a stage-2 translation fault, rather than walking the page-table
-manually.
+In preparation for removing the 'pgd' field of 'struct kvm_s2_mmu',
+update the few remaining users to check the 'pgt' field instead.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 112 +++++++++++++------------------------------
- 1 file changed, 34 insertions(+), 78 deletions(-)
+ arch/arm64/kvm/mmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d4b0716a6ab4..cfbf32cae3a5 100644
+index cfbf32cae3a5..050eab71de31 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1491,7 +1491,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+@@ -1813,7 +1813,7 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *dat
+ int kvm_unmap_hva_range(struct kvm *kvm,
+ 			unsigned long start, unsigned long end, unsigned flags)
  {
- 	int ret;
- 	bool write_fault, writable, force_pte = false;
--	bool exec_fault, needs_exec;
-+	bool exec_fault;
-+	bool device = false;
- 	unsigned long mmu_seq;
- 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
- 	struct kvm *kvm = vcpu->kvm;
-@@ -1499,10 +1500,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct vm_area_struct *vma;
- 	short vma_shift;
- 	kvm_pfn_t pfn;
--	pgprot_t mem_type = PAGE_S2;
- 	bool logging_active = memslot_is_logging(memslot);
--	unsigned long vma_pagesize, flags = 0;
--	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
-+	unsigned long vma_pagesize;
-+	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-+	struct kvm_pgtable *pgt;
+-	if (!kvm->arch.mmu.pgd)
++	if (!kvm->arch.mmu.pgt)
+ 		return 0;
  
- 	write_fault = kvm_is_write_fault(vcpu);
- 	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
-@@ -1535,22 +1536,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		vma_pagesize = PAGE_SIZE;
- 	}
+ 	trace_kvm_unmap_hva_range(start, end);
+@@ -1876,7 +1876,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
  
--	/*
--	 * The stage2 has a minimum of 2 level table (For arm64 see
--	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
--	 * use PMD_SIZE huge mappings (even when the PMD is folded into PGD).
--	 * As for PUD huge maps, we must make sure that we have at least
--	 * 3 levels, i.e, PMD is not folded.
--	 */
--	if (vma_pagesize == PMD_SIZE ||
--	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
-+	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
- 		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
- 	mmap_read_unlock(current->mm);
+ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+ {
+-	if (!kvm->arch.mmu.pgd)
++	if (!kvm->arch.mmu.pgt)
+ 		return 0;
+ 	trace_kvm_age_hva(start, end);
+ 	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
+@@ -1884,7 +1884,7 @@ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
  
--	/* We need minimum second+third level pages */
--	ret = kvm_mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm));
--	if (ret)
--		return ret;
-+	if (fault_status != FSC_PERM) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
- 
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	/*
-@@ -1573,28 +1568,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return -EFAULT;
- 
- 	if (kvm_is_device_pfn(pfn)) {
--		mem_type = PAGE_S2_DEVICE;
--		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
--	} else if (logging_active) {
--		/*
--		 * Faults on pages in a memslot with logging enabled
--		 * should not be mapped with huge pages (it introduces churn
--		 * and performance degradation), so force a pte mapping.
--		 */
--		flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
--
-+		device = true;
-+	} else if (logging_active && !write_fault) {
- 		/*
- 		 * Only actually map the page as writable if this was a write
- 		 * fault.
- 		 */
--		if (!write_fault)
--			writable = false;
-+		writable = false;
- 	}
- 
--	if (exec_fault && is_iomap(flags))
-+	if (exec_fault && device)
- 		return -ENOEXEC;
- 
- 	spin_lock(&kvm->mmu_lock);
-+	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
- 
-@@ -1605,62 +1592,31 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PAGE_SIZE && !force_pte)
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
--	if (writable)
-+	if (writable) {
-+		prot |= KVM_PGTABLE_PROT_W;
- 		kvm_set_pfn_dirty(pfn);
-+		mark_page_dirty(kvm, gfn);
-+	}
- 
--	if (fault_status != FSC_PERM && !is_iomap(flags))
-+	if (fault_status != FSC_PERM && !device)
- 		clean_dcache_guest_page(pfn, vma_pagesize);
- 
--	if (exec_fault)
-+	if (exec_fault) {
-+		prot |= KVM_PGTABLE_PROT_X;
- 		invalidate_icache_guest_page(pfn, vma_pagesize);
-+	}
- 
--	/*
--	 * If we took an execution fault we have made the
--	 * icache/dcache coherent above and should now let the s2
--	 * mapping be executable.
--	 *
--	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
--	 * execute permissions, and we preserve whatever we have.
--	 */
--	needs_exec = exec_fault ||
--		(fault_status == FSC_PERM &&
--		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
--
--	if (vma_pagesize == PUD_SIZE) {
--		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
--
--		new_pud = kvm_pud_mkhuge(new_pud);
--		if (writable)
--			new_pud = kvm_s2pud_mkwrite(new_pud);
--
--		if (needs_exec)
--			new_pud = kvm_s2pud_mkexec(new_pud);
--
--		ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
--	} else if (vma_pagesize == PMD_SIZE) {
--		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
--
--		new_pmd = kvm_pmd_mkhuge(new_pmd);
--
--		if (writable)
--			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
--
--		if (needs_exec)
--			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-+	if (device)
-+		prot |= KVM_PGTABLE_PROT_DEVICE;
-+	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-+		prot |= KVM_PGTABLE_PROT_X;
- 
--		ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
-+	if (fault_status == FSC_PERM) {
-+		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
- 	} else {
--		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
--
--		if (writable) {
--			new_pte = kvm_s2pte_mkwrite(new_pte);
--			mark_page_dirty(kvm, gfn);
--		}
--
--		if (needs_exec)
--			new_pte = kvm_s2pte_mkexec(new_pte);
--
--		ret = stage2_set_pte(mmu, memcache, fault_ipa, &new_pte, flags);
-+		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
-+					     __pfn_to_phys(pfn), prot,
-+					     memcache);
- 	}
- 
- out_unlock:
+ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
+ {
+-	if (!kvm->arch.mmu.pgd)
++	if (!kvm->arch.mmu.pgt)
+ 		return 0;
+ 	trace_kvm_test_age_hva(hva);
+ 	return handle_hva_to_gpa(kvm, hva, hva + PAGE_SIZE,
 -- 
 2.28.0.297.g1956fa8f8d-goog
 
