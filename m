@@ -2,85 +2,60 @@ Return-Path: <SRS0=xBPq=CG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2418C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3986EC433E7
 	for <kvmarm@archiver.kernel.org>; Fri, 28 Aug 2020 11:23:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5920E207DF
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Aug 2020 11:23:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3nMQOdr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5920E207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 9380D207DF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Aug 2020 11:23:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9380D207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 030DC4B8AF;
-	Fri, 28 Aug 2020 07:23:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91404C1EF;
+	Fri, 28 Aug 2020 07:23:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xPA-4oOGF58z; Fri, 28 Aug 2020 07:23:42 -0400 (EDT)
+	with ESMTP id nPbH+G4ZBojv; Fri, 28 Aug 2020 07:23:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C01764C22E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1E4A4C216;
 	Fri, 28 Aug 2020 07:23:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C73654BD21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Aug 2020 04:41:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1786E4C1D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2020 23:18:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jnk4Ij4vYIjN for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Aug 2020 04:41:14 -0400 (EDT)
-Received: from mail-io1-f68.google.com (mail-io1-f68.google.com
- [209.85.166.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 781024B972
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Aug 2020 04:41:14 -0400 (EDT)
-Received: by mail-io1-f68.google.com with SMTP id b16so449044ioj.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Aug 2020 01:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Rv9t9DBMT4Y9Uv16M/8E2uBNqN9bviSqC1cfMDj55qk=;
- b=O3nMQOdrhgjp6pS91SYY1V/rXLQgfKSIVRfsltF1r3lM5xYWjM/3hPwTifUchnhBE+
- cmbau7uFPuSgsqd/68IVYDK4FHCm/lfYzfVg7K3e29J6HZ6Ef1Or2+6wluD1hkRq+2G0
- 1ETSdruDkdU8FyzBQy4yjKSi/XyjlcyJgmQwyMU+SRCQ37xSkwnHvj1VSa7xU7QgARj9
- 3A8yLY3Uu7pCN85wgCo5cUUCkbvCXdpjcDjyqKk9y9MFvw7HBi6+VnGTKC1fSUswjwCB
- K05hk9A2PKgFCMDBkCbnIDXWedvJ9QXfAZMkzqsR+m4YX7no1t8v3O4O0dwtCM5cSRGQ
- l2bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Rv9t9DBMT4Y9Uv16M/8E2uBNqN9bviSqC1cfMDj55qk=;
- b=XYN0BOjxW5wNXMMKwjvheapt6S23I45UzAq/oF+7EafYM/yDG/AJlnsx6Wo4q3dctE
- q+Ck3zsTcKss/yKjkOW33yIJENzS32OsFfvTygt6DoCAEBrpKf3XuhG3OVsJPYNjjlKq
- D7MXRAZIMpzHD/R1csE7F56U4EKhIOfVAV1WWcMODDggd1jK0mNYK8/IMXwPJ0t9KiCW
- 8ATx0xOGV7dnjpF/4iO7IKqrOgef82Hfg/tjalfB2QDpXU4xPSR68XhYfJBdjw5S6So4
- 9sANud3z4Z7GUAj3xOSWWW4Wb9COZGmIrek3eEnW3C6cRw5SKCPXP6PQapZMbwvKnKoi
- sLcA==
-X-Gm-Message-State: AOAM531xH79cEgY7ipny0hPuhxGEMEro5LiICMoMpE7/JvYIvr1QXS+L
- hQyO8B/xrilGy+4N8BL8vDS0mo6Lah+YdLWstw==
-X-Google-Smtp-Source: ABdhPJxIX0fJi9w6dYvAGIo8yULiAYghXMHvu5eHGaixZLaaGSv3j99yakmktgVk8wFUKdTWYhT3m0gbG/uomOq1HDA=
-X-Received: by 2002:a5e:9e0a:: with SMTP id i10mr455714ioq.41.1598604073846;
- Fri, 28 Aug 2020 01:41:13 -0700 (PDT)
+ with ESMTP id or25JtwfVd2Q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Aug 2020 23:18:35 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A02314BDA9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2020 23:18:35 -0400 (EDT)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 353D0A606CB6908B1DDD;
+ Fri, 28 Aug 2020 11:18:31 +0800 (CST)
+Received: from use12-sp2.huawei.com (10.67.189.174) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 28 Aug 2020 11:18:24 +0800
+From: Xiaoming Ni <nixiaoming@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <mark.rutland@arm.com>,
+ <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
+ <julien.thierry.kdev@gmail.com>, <suzuki.poulose@arm.com>
+Subject: [PATCH] arm64: fix some spelling mistakes in the comments by codespell
+Date: Fri, 28 Aug 2020 11:18:22 +0800
+Message-ID: <20200828031822.35928-1-nixiaoming@huawei.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <1597241133-3630-1-git-send-email-kernelfans@gmail.com>
- <50ccd1aa-797f-bc97-d675-8d6732d9ae06@arm.com>
-In-Reply-To: <50ccd1aa-797f-bc97-d675-8d6732d9ae06@arm.com>
-From: Pingfan Liu <kernelfans@gmail.com>
-Date: Fri, 28 Aug 2020 16:41:02 +0800
-Message-ID: <CAFgQCTvy0UGq73AxBmGKPNZATRRggGLkSqksXJaz_-ZOj2YCrg@mail.gmail.com>
-Subject: Re: [PATCH] arm(64)/kvm: improve the documentation about HVC calls
-To: James Morse <james.morse@arm.com>
+X-Originating-IP: [10.67.189.174]
+X-CFilter-Loop: Reflected
 X-Mailman-Approved-At: Fri, 28 Aug 2020 07:23:40 -0400
-Cc: Marc Zyngier <maz@kernel.org>, linux-doc@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+Cc: wangle6@huawei.com, nixiaoming@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,73 +72,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 27, 2020 at 2:10 AM James Morse <james.morse@arm.com> wrote:
->
-> Hi Pingfan,
->
-> On 12/08/2020 15:05, Pingfan Liu wrote:
-> > Both arm and arm64 kernel entry point have the following prerequisite:
-> >   MMU = off, D-cache = off, I-cache = dont care.
-> >
-> > HVC_SOFT_RESTART call should meet this prerequisite before jumping to the
-> > new kernel.
->
-> I think you have this the wrong way up. This should describe what HVC_SOFT_RESTART does.
-Yes, it is a wrong way.
+arch/arm64/include/asm/cpu_ops.h:24: necesary ==> necessary
+arch/arm64/include/asm/kvm_arm.h:69: maintainance ==> maintenance
+arch/arm64/include/asm/cpufeature.h:361: capabilties ==> capabilities
+arch/arm64/kernel/perf_regs.c:19: compatability ==> compatibility
+arch/arm64/kernel/smp_spin_table.c:86: endianess ==> endianness
+arch/arm64/kernel/smp_spin_table.c:88: endianess ==> endianness
+arch/arm64/kvm/vgic/vgic-mmio-v3.c:1004: targetting ==> targeting
+arch/arm64/kvm/vgic/vgic-mmio-v3.c:1005: targetting ==> targeting
 
->
-> We want to remove some extra work kexec does on arm64, and both implementations of
-> HVC_SOFT_RESTART on arm64 already do what we need. The change here should be to document
-> that the D/I bits are cleared after a HVC_SOFT_RESTART on arm64.
->
->
-> > Furthermore, on arm64, el2_setup doesn't set I+C bits and keeps EL2 MMU
-> > off, and KVM resets them when its unload. These are achieved by
-> > HVC_RESET_VECTORS call.
-> >
-> > Improve the document.
->
->
-> > diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
-> > index d9eba93..a95bc30 100644
-> > --- a/Documentation/virt/kvm/arm/hyp-abi.rst
-> > +++ b/Documentation/virt/kvm/arm/hyp-abi.rst
-> > @@ -40,9 +40,9 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
-> >
-> >  * ::
-> >
-> > -    r0/x0 = HVC_RESET_VECTORS
-> > +    x0 = HVC_RESET_VECTORS (arm64 only)
-> >
-> > -  Turn HYP/EL2 MMU off, and reset HVBAR/VBAR_EL2 to the initials
-> > +  Disable HYP/EL2 MMU and D-cache, and reset HVBAR/VBAR_EL2 to the initials
-> >    stubs' exception vector value. This effectively disables an existing
-> >    hypervisor.
->
-> I don't think we should remove this. KVM on 32bit was the only implementer, but if there
-> ever is another, this is how it should work.
->
->
-> > @@ -54,7 +54,7 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
-> >      x3 = x1's value when entering the next payload (arm64)
-> >      x4 = x2's value when entering the next payload (arm64)
-> >
-> > -  Mask all exceptions, disable the MMU, move the arguments into place
-> > +  Mask all exceptions, disable the MMU and D-cache, move the arguments into place
-> >    (arm64 only), and jump to the restart address while at HYP/EL2. This
-> >    hypercall is not expected to return to its caller.
->
-> (I don't think disable the D-cache is what the bit does, it forces the attributes that are
-> used for a data access).
->
-> Please just describe this as the on arm64 the D and I bits are cleared.
-OK, I will do it.
+Signed-off-by: Xiaoming Ni <nixiaoming@huawei.com>
+---
+ arch/arm64/include/asm/cpu_ops.h    | 2 +-
+ arch/arm64/include/asm/cpufeature.h | 2 +-
+ arch/arm64/include/asm/kvm_arm.h    | 2 +-
+ arch/arm64/kernel/perf_regs.c       | 2 +-
+ arch/arm64/kernel/smp_spin_table.c  | 4 ++--
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c  | 4 ++--
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-> (it might be true on 32bit, I can't work the assembly out).
-I will leave 32bit as it is.
+diff --git a/arch/arm64/include/asm/cpu_ops.h b/arch/arm64/include/asm/cpu_ops.h
+index d28e8f37d3b4..e95c4df83911 100644
+--- a/arch/arm64/include/asm/cpu_ops.h
++++ b/arch/arm64/include/asm/cpu_ops.h
+@@ -21,7 +21,7 @@
+  *		mechanism for doing so, tests whether it is possible to boot
+  *		the given CPU.
+  * @cpu_boot:	Boots a cpu into the kernel.
+- * @cpu_postboot: Optionally, perform any post-boot cleanup or necesary
++ * @cpu_postboot: Optionally, perform any post-boot cleanup or necessary
+  *		synchronisation. Called from the cpu being booted.
+  * @cpu_can_disable: Determines whether a CPU can be disabled based on
+  *		mechanism-specific information.
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 89b4f0142c28..3a42dc8e697c 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -358,7 +358,7 @@ static inline int cpucap_default_scope(const struct arm64_cpu_capabilities *cap)
+ }
+ 
+ /*
+- * Generic helper for handling capabilties with multiple (match,enable) pairs
++ * Generic helper for handling capabilities with multiple (match,enable) pairs
+  * of call backs, sharing the same capability bit.
+  * Iterate over each entry to see if at least one matches.
+  */
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 51c1d9918999..21f91aebc052 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -66,7 +66,7 @@
+  * TWI:		Trap WFI
+  * TIDCP:	Trap L2CTLR/L2ECTLR
+  * BSU_IS:	Upgrade barriers to the inner shareable domain
+- * FB:		Force broadcast of all maintainance operations
++ * FB:		Force broadcast of all maintenance operations
+  * AMO:		Override CPSR.A and enable signaling with VA
+  * IMO:		Override CPSR.I and enable signaling with VI
+  * FMO:		Override CPSR.F and enable signaling with VF
+diff --git a/arch/arm64/kernel/perf_regs.c b/arch/arm64/kernel/perf_regs.c
+index 666b225aeb3a..94e8718e7229 100644
+--- a/arch/arm64/kernel/perf_regs.c
++++ b/arch/arm64/kernel/perf_regs.c
+@@ -16,7 +16,7 @@ u64 perf_reg_value(struct pt_regs *regs, int idx)
+ 
+ 	/*
+ 	 * Our handling of compat tasks (PERF_SAMPLE_REGS_ABI_32) is weird, but
+-	 * we're stuck with it for ABI compatability reasons.
++	 * we're stuck with it for ABI compatibility reasons.
+ 	 *
+ 	 * For a 32-bit consumer inspecting a 32-bit task, then it will look at
+ 	 * the first 16 registers (see arch/arm/include/uapi/asm/perf_regs.h).
+diff --git a/arch/arm64/kernel/smp_spin_table.c b/arch/arm64/kernel/smp_spin_table.c
+index c8a3fee00c11..5892e79fa429 100644
+--- a/arch/arm64/kernel/smp_spin_table.c
++++ b/arch/arm64/kernel/smp_spin_table.c
+@@ -83,9 +83,9 @@ static int smp_spin_table_cpu_prepare(unsigned int cpu)
+ 
+ 	/*
+ 	 * We write the release address as LE regardless of the native
+-	 * endianess of the kernel. Therefore, any boot-loaders that
++	 * endianness of the kernel. Therefore, any boot-loaders that
+ 	 * read this address need to convert this address to the
+-	 * boot-loader's endianess before jumping. This is mandated by
++	 * boot-loader's endianness before jumping. This is mandated by
+ 	 * the boot protocol.
+ 	 */
+ 	writeq_relaxed(__pa_symbol(secondary_holding_pen), release_addr);
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 5c786b915cd3..52d6f24f65dc 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1001,8 +1001,8 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 
+ 		/*
+-		 * An access targetting Group0 SGIs can only generate
+-		 * those, while an access targetting Group1 SGIs can
++		 * An access targeting Group0 SGIs can only generate
++		 * those, while an access targeting Group1 SGIs can
+ 		 * generate interrupts of either group.
+ 		 */
+ 		if (!irq->group || allow_group1) {
+-- 
+2.27.0
 
-Thanks,
-Pingfan
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
