@@ -1,63 +1,79 @@
-Return-Path: <SRS0=xBPq=CG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Zhuu=CJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B600C433E2
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Aug 2020 16:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EADCC433E2
+	for <kvmarm@archiver.kernel.org>; Mon, 31 Aug 2020 19:34:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CFFE520872
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Aug 2020 16:31:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFE520872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id ADDD120EDD
+	for <kvmarm@archiver.kernel.org>; Mon, 31 Aug 2020 19:34:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9aOyu3f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADDD120EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 557A14C266;
-	Fri, 28 Aug 2020 12:31:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC0A94B318;
+	Mon, 31 Aug 2020 15:34:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0jkxDE4IkDY0; Fri, 28 Aug 2020 12:31:23 -0400 (EDT)
+	with ESMTP id Ul-n9IgmvzpE; Mon, 31 Aug 2020 15:34:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 260B94C25C;
-	Fri, 28 Aug 2020 12:31:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A0D4B253;
+	Mon, 31 Aug 2020 15:34:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71F404C25C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Aug 2020 12:31:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E3F4B261
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Aug 2020 15:34:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1gcOw4uyVkHl for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Aug 2020 12:31:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4132C4C239
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Aug 2020 12:31:20 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F5781FB;
- Fri, 28 Aug 2020 09:31:19 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C69B83F71F;
- Fri, 28 Aug 2020 09:31:18 -0700 (PDT)
-Subject: Re: [PATCH v3 04/21] KVM: arm64: Use generic allocator for hyp
- stage-1 page-tables
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-5-will@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <35435dcb-e821-3769-ac0f-e75b1ede237f@arm.com>
-Date: Fri, 28 Aug 2020 17:32:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ with ESMTP id IQlNPun117h7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Aug 2020 15:34:27 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE2474B24B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Aug 2020 15:34:27 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598902467;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=YQWthbnL/F8A9JG87S9VWHvNqxsIM98exPrIcod4sws=;
+ b=T9aOyu3fQqH4pxh02B3U6HPr7uEhqdaIEsPnWyY0FZG347GH/d1IV9GqcV0LnH4GPFom6z
+ dL1U8Fsm5zsgLtgayVQJDrBUOVENJQOL5n3FxN1fMAza0aWIa9464L513xqvjuRzaU6ouX
+ eRnfaMWUbHOGQi3yOLZ3uEVbqm+Dklw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-ei-P5MgSPnS9WN3J5PB5aA-1; Mon, 31 Aug 2020 15:34:25 -0400
+X-MC-Unique: ei-P5MgSPnS9WN3J5PB5aA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84DCE18A2243;
+ Mon, 31 Aug 2020 19:34:22 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-112-112.ams2.redhat.com [10.36.112.112])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE3F37EB7B;
+ Mon, 31 Aug 2020 19:34:16 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, drjones@redhat.com,
+ andrew.murray@arm.com, sudeep.holla@arm.com, maz@kernel.org,
+ will@kernel.org, haibo.xu@linaro.org
+Subject: [kvm-unit-tests RFC 0/4] KVM: arm64: Statistical Profiling Extension
+ Tests
+Date: Mon, 31 Aug 2020 21:34:10 +0200
+Message-Id: <20200831193414.6951-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200825093953.26493-5-will@kernel.org>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,47 +90,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+This series implements tests exercising the Statistical Profiling
+Extensions.
 
-The code looks much nicer with the el2 page table allocator. One minor nitpick below.
+This was tested with associated unmerged kernel [1] and QEMU [2]
+series.
 
-On 8/25/20 10:39 AM, Will Deacon wrote:
-> Now that we have a shiny new page-table allocator, replace the hyp
-> page-table code with calls into the new API. This also allows us to
-> remove the extended idmap code, as we can now simply ensure that the
-> VA size is large enough to map everything we need.
->
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h       |  78 +----
->  arch/arm64/include/asm/kvm_pgtable.h   |   5 +
->  arch/arm64/include/asm/pgtable-hwdef.h |   6 -
->  arch/arm64/include/asm/pgtable-prot.h  |   6 -
->  arch/arm64/kvm/mmu.c                   | 414 +++----------------------
->  5 files changed, 45 insertions(+), 464 deletions(-)
->
-> [..]
-> @@ -2356,6 +2028,7 @@ static int kvm_map_idmap_text(pgd_t *pgd)
->  int kvm_mmu_init(void)
->  {
->  	int err;
-> +	u32 hyp_va_bits;
->  
->  	hyp_idmap_start = __pa_symbol(__hyp_idmap_text_start);
->  	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
-> @@ -2369,6 +2042,8 @@ int kvm_mmu_init(void)
->  	 */
->  	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
->  
-> +	hyp_va_bits = 64 - ((idmap_t0sz & TCR_T0SZ_MASK) >> TCR_T0SZ_OFFSET);
+Depending on the comments, I can easily add other tests checking
+more configs, additional events and testing migration too. I hope
+this can be useful when respinning both series.
 
-idmap_t0sz is defined in mm/mmu.c as: TCR_T0SZ(VA_BITS) = (UL(64) - VA_BITS) <<
-TCR_T0SZ_OFFSET. Looks to me like hyp_va_bits == VA_BITS.
+All SPE tests can be launched with:
+./run_tests.sh -g spe
+Tests also can be launched individually. For example:
+./arm-run arm/spe.flat -append 'spe-buffer'
 
-Thanks,
-Alex
+The series can be found at:
+https://github.com/eauger/kut/tree/spe_rfc
+
+References:
+[1] [PATCH v2 00/18] arm64: KVM: add SPE profiling support
+[2] [PATCH 0/7] target/arm: Add vSPE support to KVM guest
+
+Eric Auger (4):
+  arm64: Move get_id_aa64dfr0() in processor.h
+  spe: Probing and Introspection Test
+  spe: Add profiling buffer test
+  spe: Test Profiling Buffer Events
+
+ arm/Makefile.common       |   1 +
+ arm/pmu.c                 |   1 -
+ arm/spe.c                 | 463 ++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg         |  24 ++
+ lib/arm64/asm/barrier.h   |   1 +
+ lib/arm64/asm/processor.h |   5 +
+ 6 files changed, 494 insertions(+), 1 deletion(-)
+ create mode 100644 arm/spe.c
+
+-- 
+2.21.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
