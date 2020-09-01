@@ -2,83 +2,62 @@ Return-Path: <SRS0=zihn=CK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCACC433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 16:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F57C433E6
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 17:07:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 01AEA20767
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 16:51:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbosT5jq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01AEA20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2AFD42071B
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 17:07:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AFD42071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81DDD4B101;
-	Tue,  1 Sep 2020 12:51:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8594C4B1A5;
+	Tue,  1 Sep 2020 13:07:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xar4ZWk3TZPP; Tue,  1 Sep 2020 12:51:03 -0400 (EDT)
+	with ESMTP id lWqQIfCn8-3i; Tue,  1 Sep 2020 13:07:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23CFE4B103;
-	Tue,  1 Sep 2020 12:51:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 406364B190;
+	Tue,  1 Sep 2020 13:07:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CA934B101
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 12:51:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A26A04B186
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 13:07:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hkQ8o9JygLkZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Sep 2020 12:51:00 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA5174B0F8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 12:51:00 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 763DA20767;
- Tue,  1 Sep 2020 16:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1598979059;
- bh=1nmnZ3FKPqcbnnw74A1zVpz7b4ZKMHUOGqdVtujWcTQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=XbosT5jqmXyS3rmjfk2Np7k6aZ/j01Shnd2cvsAvR45REomU6AQ0GoYXQLaNcax+Q
- P4g+2SQpALlCHHxLfRoTBHZVC1WfvE+9lhUaiMrvwCWemJHqReImC3ayZsjAfSxyNr
- ipnuDisRlwKhfG5AJSAp648xvjLDyBh0RM7yQVvs=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kD9Un-008MrJ-SA; Tue, 01 Sep 2020 17:50:58 +0100
+ with ESMTP id FFau17zMS+A5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Sep 2020 13:07:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 356A14B184
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 13:07:04 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D7B9E1FB;
+ Tue,  1 Sep 2020 10:07:03 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 131503F71F;
+ Tue,  1 Sep 2020 10:07:02 -0700 (PDT)
+Subject: Re: [PATCH v3 07/21] KVM: arm64: Convert kvm_phys_addr_ioremap() to
+ generic page-table API
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200825093953.26493-1-will@kernel.org>
+ <20200825093953.26493-8-will@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <a25db0df-0238-4f81-b0ab-27a55e1de932@arm.com>
+Date: Tue, 1 Sep 2020 18:08:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Date: Tue, 01 Sep 2020 17:50:57 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] arm64/kvm: Fix zapping stage2 page table wrongly
-In-Reply-To: <cadec9ec-3d56-a86d-0da1-f17208221692@redhat.com>
-References: <20200822024444.28132-1-gshan@redhat.com>
- <87imdbm22j.wl-maz@kernel.org>
- <cadec9ec-3d56-a86d-0da1-f17208221692@redhat.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <361e3092fc04063eeced68648e8c8994@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
- eric.auger@redhat.com, shan.gavin@gmail.com, suzuki.poulose@arm.com,
- james.morse@arm.com, qperret@google.com, will@kernel.org,
- alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: shan.gavin@gmail.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200825093953.26493-8-will@kernel.org>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,172 +69,123 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Gavin,
+Hi Will,
 
-On 2020-08-23 00:59, Gavin Shan wrote:
-> Hi Marc,
-> 
-> On 8/22/20 8:01 PM, Marc Zyngier wrote:
->> On Sat, 22 Aug 2020 03:44:44 +0100,
->> Gavin Shan <gshan@redhat.com> wrote:
->>> 
->>> Depending on the kernel configuration, PUD_SIZE could be equal to
->>> PMD_SIZE. For example, both of them are 512MB with the following
->>> kernel configuration. In this case, both PUD and PMD are folded
->>> to PGD.
->>> 
->>>     CONFIG_ARM64_64K_PAGES   y
->>>     CONFIG_ARM64_VA_BITS     42
->>>     CONFIG_PGTABLE_LEVELS    2
->>> 
->>> With the above configuration, the stage2 PUD is used to backup the
->>> 512MB huge page when the stage2 mapping is built. During the mapping,
->>> the PUD and its subordinate levels of page table entries are unmapped
->>> if the PUD is present and not huge page sensitive in 
->>> stage2_set_pud_huge().
->>> Unfornately, the @addr isn't aligned to S2_PUD_SIZE and wrong page 
->>> table
->>> entries are zapped. It eventually leads to PUD's present bit can't be
->>> cleared successfully and infinite loop in stage2_set_pud_huge().
->>> 
->>> This fixes the issue by checking with S2_{PUD, PMD}_SIZE instead of
->>> {PUD, PMD}_SIZE to determine if stage2 PUD or PMD is used to back the
->>> huge page. For this particular case, the stage2 PMD entry should be
->>> used to backup the 512MB huge page with stage2_set_pmd_huge().
->> 
->> It isn't obvious to me how S2_PMD_SIZE can be different from PMD_SIZE,
->> and the current code certainly expects both to be equal (just look at
->> how often S2_*_SIZE is used in the current code to convince yourself).
->> 
->> My guess is that some lesser tested configurations (such as 64k pages)
->> break that assumption, and result in the wrong thing happening. Could
->> you please shed some light on it?
->> 
-> 
-> With the following kernel configuration, PUD_SIZE and PMD_SIZE are 
-> equal
-> and both of them are 512MB because P4D/PUD/PMD are folded into PGD.
-> 
->    CONFIG_ARM64_64K_PAGES   y
->    CONFIG_ARM64_VA_BITS     42
->    CONFIG_PGTABLE_LEVELS    2
->    PMD_SIZE                 512MB
-> (include/asm-generic/pgtable-no-pud.h)
->    PUD_SIZE                 512MB
-> (include/asm-generic/pgtable-no-pmd.h)
->    P4D_SIZE                 512MB
-> (include/asm-generic/pgtable-nop4d.h)
->    S2_PMD_SIZE              512MB               (stage2_pgtable.h)
->    S2_PUD_SIZE                4TB               (stage2_pgtable.h)
+The patch looks correct to me. I also had another look at the pre-order visitor
+for kvm_pgtable_stage2_map, and it will not try to map the address range using a
+block mapping (kvm_block_mapping_supported returns false).
 
-For a start, this last value makes no sense at all. If that we only
-have 2 levels, S2_PUD_SIZE is wrong, and should either be ignored or
-be the same as S2_PMD_SIZE (4TB represents the whole of the guest's
-IPA space).
+One nitpick below.
 
-> For this particular case, S2_PMD_SIZE and PMD_SIZE are equal and both
-> of them are 512MB. However, the issue is wrong size (PMD_SIZE/PUD_SIZE)
-> is checked to call stage2_set_pud_huge() or stage2_set_pmd_huge() in
-> user_mem_abort(). It causes stage2_set_pud_huge() is called to map the
-> 512MB huge page, meaning stage2 PUD is used to back the 512MB huge 
-> page.
+On 8/25/20 10:39 AM, Will Deacon wrote:
+> Convert kvm_phys_addr_ioremap() to use kvm_pgtable_stage2_map() instead
+> of stage2_set_pte().
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 14 +-------------
+>  arch/arm64/kvm/mmu.c         | 29 ++++++++++++-----------------
+>  2 files changed, 13 insertions(+), 30 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 41ee8f3c0369..6f65d3841ec9 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -439,18 +439,6 @@ struct stage2_map_data {
+>  	struct kvm_mmu_memory_cache	*memcache;
+>  };
+>  
+> -static kvm_pte_t *stage2_memcache_alloc_page(struct stage2_map_data *data)
+> -{
+> -	kvm_pte_t *ptep = NULL;
+> -	struct kvm_mmu_memory_cache *mc = data->memcache;
+> -
+> -	/* Allocated with GFP_PGTABLE_USER, so no need to zero */
+> -	if (mc && mc->nobjs)
+> -		ptep = mc->objects[--mc->nobjs];
+> -
+> -	return ptep;
+> -}
+> -
+>  static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+>  				    struct stage2_map_data *data)
+>  {
+> @@ -531,7 +519,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+>  		return -EINVAL;
+>  
+> -	childp = stage2_memcache_alloc_page(data);
+> +	childp = kvm_mmu_memory_cache_alloc(data->memcache);
 
-Which should be fine, because that's all we can map. 2 levels, remember?
-The real bug is that we consider that mapping a PUD is valid, while 
-there
-is no real PUD in this context.
+I think this hunk and the above could have been squashed in the previous patch, I
+think we could have used kvm_mmu_memory_cache_alloc directly from the start.
 
-> 
-> In stage2_set_pud_huge(), the S2 page table entries are zapped for the
-> range ((addr & S2_PUD_MASK), S2_PUD_SIZE), whose size is 4TB. However,
-> we're mapping 512MB huge page (block). It means unrelated page table
-> entries are cleared.
+Thanks,
 
-We can't map 4TB. That's not possible for such configuration (and I
-doubt you have more than 4TB of contiguous memory on your system).
+Alex
 
-> 
-> static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->                           struct kvm_memory_slot *memslot, unsigned 
-> long hva,
->                           unsigned long fault_status)
-> {
->     :
->     if (vma_pagesize == PUD_SIZE) {           /* PUD_SIZE == 512MB */
->         ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
->     } else if (vma_pagesize == PMD_SIZE) {    /* PMD_SIZE == 512MB */
->         ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
->     } else {
->         ret = stage2_set_pte(mmu, memcache, fault_ipa, &new_pte, 
-> flags);
->     }
->     :
-> }
-> 
-> The issue was initially reported by Eric and it can be reproduced on
-> upstream kernel/qemu with the configurations to enable 64KB page size
-> and 42-bits VA bits (CONFIG_ARM64_VA_BITS). Here is the command I used
-> to reproduce the issue. Note that the IPA limit reported from the 
-> machine
-> where I reproduced the issue is 44-bits, but qemu just uses 40-bits. It
-> means the stage2 pagetable has 3 levels.
-
-No. KVM, in its current form, cannot have more levels at stage-2 than it
-has at stage-1 (that's one the things we are fixing with Will's 
-patches).
-
-> 
-> start_vm_aarch64_hugetlbfs() {
->    echo 32 > /sys/kernel/mm/hugepages/hugepages-524288kB/nr_hugepages
-
-Ah, hugetlb. I wonder if we have something funky here. Alexandru (cc'd)
-was looking at something in this area (see [1]).
-
-> 
->    /home/gavin/sandbox/qemu.main/aarch64-softmmu/qemu-system-aarch64    
->        \
->    --enable-kvm -machine virt,gic-version=host                          
->        \
->    -cpu host -smp 8,sockets=8,cores=1,threads=1                         
->        \
->    -m 8G -mem-prealloc -mem-path /dev/hugepages                         
->        \
->    -monitor none -serial mon:stdio -nographic -s                        
->        \
->    -bios /home/gavin/sandbox/qemu.main/pc-bios/edk2-aarch64-code.fd     
->        \
->    -kernel /home/gavin/sandbox/linux.guest/arch/arm64/boot/Image        
->        \
->    -initrd /home/gavin/sandbox/images/rootfs.cpio.xz                    
->        \
->    -append "earlycon=pl011,mmio,0x9000000"                              
->        \
->    -device virtio-net-pci,netdev=unet,mac=52:54:00:f1:26:a6             
->        \
->    -netdev user,id=unet,hostfwd=tcp::50959-:22                          
->        \
->    -drive 
-> file=/home/gavin/sandbox/images/vm.img,if=none,format=raw,id=nvme0   \
->    -device nvme,drive=nvme0,serial=foo                                  
->        \
->    -drive 
-> file=/home/gavin/sandbox/images/vm1.img,if=none,format=raw,id=nvme1  \
->    -device nvme,drive=nvme1,serial=foo1
-> }
-
-I'll try to reproduce this.
-
-         M.
-
-[1] 
-https://lore.kernel.org/r/20200901133357.52640-1-alexandru.elisei@arm.com
--- 
-Jazz is not dead. It just smells funny...
+>  	if (!childp)
+>  		return -ENOMEM;
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 4607e9ca60a2..33146d3dc93a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1154,35 +1154,30 @@ static int stage2_pudp_test_and_clear_young(pud_t *pud)
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable)
+>  {
+> -	phys_addr_t addr, end;
+> +	phys_addr_t addr;
+>  	int ret = 0;
+> -	unsigned long pfn;
+>  	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> +				     KVM_PGTABLE_PROT_R |
+> +				     (writable ? KVM_PGTABLE_PROT_W : 0);
+>  
+> -	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
+> -	pfn = __phys_to_pfn(pa);
+> -
+> -	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
+> -		pte_t pte = kvm_pfn_pte(pfn, PAGE_S2_DEVICE);
+> -
+> -		if (writable)
+> -			pte = kvm_s2pte_mkwrite(pte);
+> -
+> +	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
+>  		ret = kvm_mmu_topup_memory_cache(&cache,
+>  						 kvm_mmu_cache_min_pages(kvm));
+>  		if (ret)
+> -			goto out;
+> +			break;
+> +
+>  		spin_lock(&kvm->mmu_lock);
+> -		ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
+> -				     KVM_S2PTE_FLAG_IS_IOMAP);
+> +		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
+> +					     &cache);
+>  		spin_unlock(&kvm->mmu_lock);
+>  		if (ret)
+> -			goto out;
+> +			break;
+>  
+> -		pfn++;
+> +		pa += PAGE_SIZE;
+>  	}
+>  
+> -out:
+>  	kvm_mmu_free_memory_cache(&cache);
+>  	return ret;
+>  }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
