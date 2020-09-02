@@ -1,66 +1,94 @@
-Return-Path: <SRS0=zihn=CK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=SHPB=CL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F57C433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 17:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C0B0C433E6
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 00:57:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2AFD42071B
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Sep 2020 17:07:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AFD42071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 704FE206EF
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 00:57:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AV+gKTSr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 704FE206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8594C4B1A5;
-	Tue,  1 Sep 2020 13:07:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D94D4B186;
+	Tue,  1 Sep 2020 20:57:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lWqQIfCn8-3i; Tue,  1 Sep 2020 13:07:07 -0400 (EDT)
+	with ESMTP id ySTVPokU6nVP; Tue,  1 Sep 2020 20:57:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 406364B190;
-	Tue,  1 Sep 2020 13:07:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 907664B178;
+	Tue,  1 Sep 2020 20:57:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A26A04B186
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 13:07:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EB054B141
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 20:57:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FFau17zMS+A5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Sep 2020 13:07:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 356A14B184
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 13:07:04 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D7B9E1FB;
- Tue,  1 Sep 2020 10:07:03 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 131503F71F;
- Tue,  1 Sep 2020 10:07:02 -0700 (PDT)
-Subject: Re: [PATCH v3 07/21] KVM: arm64: Convert kvm_phys_addr_ioremap() to
- generic page-table API
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-8-will@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a25db0df-0238-4f81-b0ab-27a55e1de932@arm.com>
-Date: Tue, 1 Sep 2020 18:08:01 +0100
+ with ESMTP id iGIxRdRBY6iE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Sep 2020 20:57:28 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 204634B140
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2020 20:57:28 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599008247;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0AV/T2u1f98roGh/3/tKuFH1AKZXTucTwPPAsuYXRGI=;
+ b=AV+gKTSr8ZAj9GbARGQM4LvBUSpBLGTagoHI2OZzp92/W2qbFFnfsNRYmJ9j02Dp5FeRmu
+ Q5Mxa3niRuBS0x79i0palbeAD3/7QuzFiRiaJAfW6fYEjbWYnRNiacZyMnzMRquzbR4stE
+ oodO2SKqcxyz9mgYzcm/vnCBjwzfyLo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-PDF6Y4MkNFm5No1CK3cYyw-1; Tue, 01 Sep 2020 20:57:26 -0400
+X-MC-Unique: PDF6Y4MkNFm5No1CK3cYyw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B41110059A7;
+ Wed,  2 Sep 2020 00:57:25 +0000 (UTC)
+Received: from [10.64.54.147] (vpn2-54-147.bne.redhat.com [10.64.54.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 914207A4D0;
+ Wed,  2 Sep 2020 00:57:23 +0000 (UTC)
+Subject: Re: [PATCH 1/2] KVM: arm64: Update page shift if stage 2 block
+ mapping not supported
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+References: <20200901133357.52640-1-alexandru.elisei@arm.com>
+ <20200901133357.52640-2-alexandru.elisei@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <99cba8bb-65bf-ee95-5bb9-fb084491acdb@redhat.com>
+Date: Wed, 2 Sep 2020 10:57:20 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200825093953.26493-8-will@kernel.org>
+In-Reply-To: <20200901133357.52640-2-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -69,123 +97,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
-
-The patch looks correct to me. I also had another look at the pre-order visitor
-for kvm_pgtable_stage2_map, and it will not try to map the address range using a
-block mapping (kvm_block_mapping_supported returns false).
-
-One nitpick below.
-
-On 8/25/20 10:39 AM, Will Deacon wrote:
-> Convert kvm_phys_addr_ioremap() to use kvm_pgtable_stage2_map() instead
-> of stage2_set_pte().
->
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
+On 9/1/20 11:33 PM, Alexandru Elisei wrote:
+> Commit 196f878a7ac2e (" KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+> hwpoison memory") modifies user_mem_abort() to send a SIGBUS signal when
+> the fault IPA maps to a hwpoisoned page. Commit 1559b7583ff6 ("KVM:
+> arm/arm64: Re-check VMA on detecting a poisoned page") changed
+> kvm_send_hwpoison_signal() to use the page shift instead of the VMA because
+> at that point the code had already released the mmap lock, which means
+> userspace could have modified the VMA.
+> 
+> If userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
+> map the guest fault IPA using block mappings in stage 2. That is not always
+> possible, if, for example, userspace uses dirty page logging for the VM.
+> Update the page shift appropriately in those cases when we downgrade the
+> stage 2 entry from a block mapping to a page.
+> 
+> Fixes: 1559b7583ff6 ("KVM: arm/arm64: Re-check VMA on detecting a poisoned page")
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 14 +-------------
->  arch/arm64/kvm/mmu.c         | 29 ++++++++++++-----------------
->  2 files changed, 13 insertions(+), 30 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 41ee8f3c0369..6f65d3841ec9 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -439,18 +439,6 @@ struct stage2_map_data {
->  	struct kvm_mmu_memory_cache	*memcache;
->  };
->  
-> -static kvm_pte_t *stage2_memcache_alloc_page(struct stage2_map_data *data)
-> -{
-> -	kvm_pte_t *ptep = NULL;
-> -	struct kvm_mmu_memory_cache *mc = data->memcache;
-> -
-> -	/* Allocated with GFP_PGTABLE_USER, so no need to zero */
-> -	if (mc && mc->nobjs)
-> -		ptep = mc->objects[--mc->nobjs];
-> -
-> -	return ptep;
-> -}
-> -
->  static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
->  				    struct stage2_map_data *data)
->  {
-> @@ -531,7 +519,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->  	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
->  		return -EINVAL;
->  
-> -	childp = stage2_memcache_alloc_page(data);
-> +	childp = kvm_mmu_memory_cache_alloc(data->memcache);
 
-I think this hunk and the above could have been squashed in the previous patch, I
-think we could have used kvm_mmu_memory_cache_alloc directly from the start.
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Thanks,
-
-Alex
-
->  	if (!childp)
->  		return -ENOMEM;
->  
+>   arch/arm64/kvm/mmu.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 4607e9ca60a2..33146d3dc93a 100644
+> index ba00bcc0c884..25e7dc52c086 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1154,35 +1154,30 @@ static int stage2_pudp_test_and_clear_young(pud_t *pud)
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable)
->  {
-> -	phys_addr_t addr, end;
-> +	phys_addr_t addr;
->  	int ret = 0;
-> -	unsigned long pfn;
->  	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> +				     KVM_PGTABLE_PROT_R |
-> +				     (writable ? KVM_PGTABLE_PROT_W : 0);
->  
-> -	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
-> -	pfn = __phys_to_pfn(pa);
-> -
-> -	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
-> -		pte_t pte = kvm_pfn_pte(pfn, PAGE_S2_DEVICE);
-> -
-> -		if (writable)
-> -			pte = kvm_s2pte_mkwrite(pte);
-> -
-> +	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
->  		ret = kvm_mmu_topup_memory_cache(&cache,
->  						 kvm_mmu_cache_min_pages(kvm));
->  		if (ret)
-> -			goto out;
-> +			break;
-> +
->  		spin_lock(&kvm->mmu_lock);
-> -		ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
-> -				     KVM_S2PTE_FLAG_IS_IOMAP);
-> +		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
-> +					     &cache);
->  		spin_unlock(&kvm->mmu_lock);
->  		if (ret)
-> -			goto out;
-> +			break;
->  
-> -		pfn++;
-> +		pa += PAGE_SIZE;
->  	}
->  
-> -out:
->  	kvm_mmu_free_memory_cache(&cache);
->  	return ret;
->  }
+> @@ -1877,6 +1877,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+>   		force_pte = true;
+>   		vma_pagesize = PAGE_SIZE;
+> +		vma_shift = PAGE_SHIFT;
+>   	}
+>   
+>   	/*
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
