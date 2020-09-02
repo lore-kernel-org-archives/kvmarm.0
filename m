@@ -2,62 +2,71 @@ Return-Path: <SRS0=SHPB=CL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A23C433E7
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 10:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4205C433E7
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 10:36:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9D96B2071B
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 10:09:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D96B2071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 508562071B
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 10:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZeRA3wU6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508562071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD974B125;
-	Wed,  2 Sep 2020 06:09:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5584B277;
+	Wed,  2 Sep 2020 06:36:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xmmy5YedgRUT; Wed,  2 Sep 2020 06:09:13 -0400 (EDT)
+	with ESMTP id ZUYoJKsldLUs; Wed,  2 Sep 2020 06:36:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B380F4B284;
-	Wed,  2 Sep 2020 06:09:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A51574B1B1;
+	Wed,  2 Sep 2020 06:36:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57C704B125
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 06:09:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EAB04B179
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 06:36:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dfe+Ys8FzWmK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Sep 2020 06:09:11 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE4F64B281
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 06:09:11 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E238D6E;
- Wed,  2 Sep 2020 03:09:11 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF5313F66F;
- Wed,  2 Sep 2020 03:09:09 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Add pvtime LPT support
-To: Marc Zyngier <maz@kernel.org>
-References: <20200817084110.2672-1-zhukeqian1@huawei.com>
- <8308f52e4c906cad710575724f9e3855@kernel.org>
- <f14cfd5b-c103-5d56-82fb-59d0371c6f21@arm.com> <87h7svm0o5.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <75ce4c12-f0e3-32c4-604f-9745980022e0@arm.com>
-Date: Wed, 2 Sep 2020 11:09:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id UCawrEUShbDf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2020 06:36:54 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C0DA4B117
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 06:36:54 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0558D2071B;
+ Wed,  2 Sep 2020 10:36:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599043013;
+ bh=KYQU/1AZaeeller7OqNszZ//HzPO7daN7JxytFc/APg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZeRA3wU6hJhAbym2EENEm8GdnNzeGkCoqnzEbglDMFCiH9VjbROPKxI8EW0PBSDVN
+ 2DWVNb14qT9YgOGfyTmzNUcNHIuWojU1nWUYR7EzL+FB3Ah/gLtXzYkBJCkdaSp/xI
+ 157/FDjXwVSJ6ibikCmsHmEvTFcJRCKxwBSqo6CQ=
+Date: Wed, 2 Sep 2020 11:36:49 +0100
+From: Will Deacon <will@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 02/21] KVM: arm64: Add stand-alone page-table walker
+ infrastructure
+Message-ID: <20200902103648.GC5567@willie-the-truck>
+References: <20200825093953.26493-1-will@kernel.org>
+ <20200825093953.26493-3-will@kernel.org>
+ <9de812eb-1067-08bf-69cd-eb205dfbda35@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <87h7svm0o5.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <9de812eb-1067-08bf-69cd-eb205dfbda35@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,128 +78,165 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Aug 27, 2020 at 05:27:13PM +0100, Alexandru Elisei wrote:
+> It looks to me like the fact that code doesn't take into account the fact that we
+> can have concatenated pages at the initial level of lookup. Am I missing
+> something? Is it added in later patches and I missed it? I've commented below in a
+> few places where I noticed that.
 
-Sorry for the slow response, I've been on holiday.
+(seems like you figured some of this out in a later reply).
 
-On 22/08/2020 11:31, Marc Zyngier wrote:
-> Hi Steven,
-> 
-> On Wed, 19 Aug 2020 09:54:40 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> On 18/08/2020 15:41, Marc Zyngier wrote:
->>> On 2020-08-17 09:41, Keqian Zhu wrote:
+> On 8/25/20 10:39 AM, Will Deacon wrote:
+> > The KVM page-table code is intricately tied into the kernel page-table
+> > code and re-uses the pte/pmd/pud/p4d/pgd macros directly in an attempt
+> > to reduce code duplication. Unfortunately, the reality is that there is
+> > an awful lot of code required to make this work, and at the end of the
+> > day you're limited to creating page-tables with the same configuration
+> > as the host kernel. Furthermore, lifting the page-table code to run
+> > directly at EL2 on a non-VHE system (as we plan to to do in future
+> > patches) is practically impossible due to the number of dependencies it
+> > has on the core kernel.
+> >
+> > Introduce a framework for walking Armv8 page-tables configured
+> > independently from the host kernel.
+> >
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Quentin Perret <qperret@google.com>
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 101 ++++++++++
+> >  arch/arm64/kvm/hyp/Makefile          |   2 +-
+> >  arch/arm64/kvm/hyp/pgtable.c         | 290 +++++++++++++++++++++++++++
+> >  3 files changed, 392 insertions(+), 1 deletion(-)
+> >  create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
+> >  create mode 100644 arch/arm64/kvm/hyp/pgtable.c
+
 [...]
->>>>
->>>> Things need concern:
->>>> 1. https://developer.arm.com/docs/den0057/a needs update.
->>>
->>> LPT was explicitly removed from the spec because it doesn't really
->>> solve the problem, specially for the firmware: EFI knows
->>> nothing about this, for example. How is it going to work?
->>> Also, nobody was ever able to explain how this would work for
->>> nested virt.
->>>
->>> ARMv8.4 and ARMv8.6 have the feature set that is required to solve
->>> this problem without adding more PV to the kernel.
->>
->> Hi Marc,
->>
->> These are good points, however we do still have the situation that
->> CPUs that don't have ARMv8.4/8.6 clearly cannot implement this. I
->> presume the use-case Keqian is looking at predates the necessary
->> support in the CPU - Keqian if you can provide more details on the
->> architecture(s) involved that would be helpful.
+
+> > +static u64 kvm_granule_shift(u32 level)
+> > +{
+> > +	return (KVM_PGTABLE_MAX_LEVELS - level) * (PAGE_SHIFT - 3) + 3;
 > 
-> My take on this is that it is a fictional use case. In my experience,
-> migration happens across *identical* systems, and *any* difference
-> visible to guests will cause things to go wrong. Errata management
-> gets in the way, as usual (name *one* integration that isn't broken
-> one way or another!).
+> Isn't that the same same thing as the macro ARM64_HW_PGTABLE_LEVEL_SHIFT(n) from
+> pgtable-hwdef.h? I think the header is already included, as this file uses
+> PTRS_PER_PTE and that's the only place I found it defined.
 
-Keqian appears to have a use case - but obviously I don't know the 
-details. I guess Keqian needs to convince you of that.
+Hmm, that's an interesting one. If we ever want to adjust KVM_PGTABLE_MAX_LEVELS
+things will break, so we just need to take that into account should future
+architecture extensions add an extra level. I suppose I can add a comment
+to that effect and use ARM64_HW_PGTABLE_LEVEL_SHIFT() instead.
 
-> Allowing migration across heterogeneous hosts requires a solution to
-> the errata management problem, which everyone (including me) has
-> decided to ignore so far (and I claim that not having a constant timer
-> frequency exposed to guests is an architecture bug).
-
-I agree - errata management needs to be solved before LPT. Between 
-restricted subsets of hosts this doesn't seem impossible, but I guess we 
-should stall LPT until a credible solution is proposed. I'm certainly 
-not proposing one at the moment.
-
->> Nested virt is indeed more of an issue - we did have some ideas around
->> using SDEI that never made it to the spec.
 > 
-> SDEI? Sigh... Why would SDEI be useful for NV and not for !NV?
-
-SDEI provides a way of injecting a synchronous exception on migration - 
-although that certainly isn't the only possible mechanism. For NV we 
-have the problem that a guest-guest may be running at the point of 
-migration. However it's not practical for the host hypervisor to provide 
-the necessary table directly to the guest-guest which means the 
-guest-hypervisor must update the tables before the guest-guest is 
-allowed to run on the new host. The only plausible route I could see for 
-this is injecting a synchronous exception into the guest (per VCPU) to 
-ensure any guest-guests running are exited at migration time.
-
-!NV is easier because we don't have to worry about multiple levels of 
-para-virtualisation.
-
->> However I would argue that the most pragmatic approach would be to
->> not support the combination of nested virt and LPT. Hopefully that
->> can wait until the counter scaling support is available and not
->> require PV.
+> > +}
+> > +
+> > +static u64 kvm_granule_size(u32 level)
+> > +{
+> > +	return BIT(kvm_granule_shift(level));
+> > +}
+> > +
+> > +static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+> > +{
+> > +	u64 granule = kvm_granule_size(level);
+> > +
+> > +	/*
+> > +	 * Reject invalid block mappings and don't bother with 4TB mappings for
+> > +	 * 52-bit PAs.
+> > +	 */
+> > +	if (level == 0 || (PAGE_SIZE != SZ_4K && level == 1))
+> > +		return false;
+> > +
+> > +	if (granule > (end - addr))
+> > +		return false;
+> > +
+> > +	return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+> > +}
 > 
-> And have yet another set of band aids that paper over the fact that we
-> can't get a consistent story on virtualization? No, thank you.
+> This is a very nice rewrite of fault_supports_stage2_huge_mapping, definitely
+> easier to understand.
+
+Thanks!
+
+> > +static u32 kvm_start_level(u64 ia_bits)
+> > +{
+> > +	u64 levels = DIV_ROUND_UP(ia_bits - PAGE_SHIFT, PAGE_SHIFT - 3);
 > 
-> NV is (IMHO) much more important than LPT as it has a chance of
-> getting used. LPT is just another tick box, and the fact that ARM is
-> ready to ignore sideline a decent portion of the architecture is a
-> clear sign that it hasn't been thought out.
+> Isn't that the same same thing as the macro ARM64_HW_PGTABLE_LEVELS from
+> pgtable-hwdef.h?
 
-Different people have different priorities. NV is definitely important 
-for many people. LPT may also be important if you've already got a bunch 
-of VMs running on machines and you want to be able to (gradually) 
-replace them with newer hosts which happen to have a different clock 
-frequency. Those VMs running now clearly aren't using NV.
+Yes, although this is slightly more idiomatic due to its use of
+DIV_ROUND_UP imo. But happy to replace it.
 
-However, I have to admit it's not me that has the use-case, so I'll 
-leave it for others who might actually know the specifics to explain the 
-details.
-
->> We are discussing (re-)releasing the spec with the LPT parts added. If
->> you have fundamental objections then please me know.
 > 
-> I do, see above. I'm stating that the use case doesn't really exist
-> given the state of the available HW and the fragmentation of the
-> architecture, and that ignoring the most important innovation in the
-> virtualization architecture since ARMv7 is at best short-sighted.
+> > +	return KVM_PGTABLE_MAX_LEVELS - levels;
 > 
-> Time scaling is just an instance of the errata management problem, and
-> that is the issue that needs solving. Papering over part of the
-> problem is not helping.
+> I tried to verify this formula and I think there's something that I don't
+> understand or I'm missing. For the default KVM setup, where the user doesn't
+> specify an IPA size different from the 40 bits default: ia_bits = 40 (IPA =
+> [39:0]), 4KB pages, translation starting at level 1 with 2 concatenated level 1
+> tables (VTCR_EL2.T0SZ = 24, VTCR_EL2.SL0 = 1, VTCR_EL2.TG0 = 0, starting level
+> from table D5-13 at page D5-2566, ARM DDI 0487F.b), according to the formula I get:
+> 
+> levels = DIV_ROUND_UP(40 - 12, 12 -3) = DIV_ROUND_UP(28, 9) = 4
+> return 4 - 4 = 0
+> 
+> which means the resulting starting level is 0 instead of 1.
 
-I fully agree - errata management is definitely the first step that 
-needs solving. This is why I abandoned LPT originally because I don't 
-have a generic solution and the testing I did involved really ugly hacks 
-just to make the migration possible.
+Yeah, this is fiddly. kvm_start_level() doesn't cater for concatenation at
+all and it's only used to determine the start level for the hypervisor
+stage-1 table. For the stage-2 page-tables, we actually extract the start
+level back out of the vtcr, as that gets configured separately and so we
+just parameterise ourselves around that.
 
-For now I propose we (again) park LPT until some progress has been made 
-on errata management.
+I think I'll remove kvm_start_level() entirely, and just inlined it into
+its single call site (which will be neater using ARM64_HW_PGTABLE_LEVELS).
 
-Thanks,
+> 
+> > +}
+> > +
+> > +static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+> > +{
+> > +	u64 shift = kvm_granule_shift(level);
+> > +	u64 mask = BIT(PAGE_SHIFT - 3) - 1;
+> 
+> This doesn't seem to take into account the fact that we can have concatenated
+> initial page tables.
 
-Steve
+This is ok, as we basically process the PGD one page at a time so that the
+details of concatenation only really need to be exposed to the iterator.
+See the use of kvm_pgd_page_idx() in _kvm_pgtable_walk().
+
+> > +static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+> > +				      kvm_pte_t *ptep, u32 level)
+> > +{
+> > +	int ret = 0;
+> > +	u64 addr = data->addr;
+> > +	kvm_pte_t *childp, pte = *ptep;
+> > +	bool table = kvm_pte_table(pte, level);
+> > +	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> > +
+> > +	if (table && (flags & KVM_PGTABLE_WALK_TABLE_PRE)) {
+> > +		ret = kvm_pgtable_visitor_cb(data, addr, level, ptep,
+> > +					     KVM_PGTABLE_WALK_TABLE_PRE);
+> 
+> I see that below we check if the visitor modified the leaf entry and turned into a
+> table. Is it not allowed for a visitor to turn a table into a block mapping?
+
+It is allowed, but in that case we don't revisit the block entry, as there's
+really no need. Compare that with installing a table, where you may well
+want to descend into the new table to initialise the new entries in there.
+
+The kerneldoc for kvm_pgtable_walk() talks a bit about this. (aside: that
+function isn't actually used, but it felt useful to expose it as an
+interface).
+
+Thanks for the review,
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
