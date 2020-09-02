@@ -2,93 +2,65 @@ Return-Path: <SRS0=SHPB=CL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23ED0C433E6
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 06:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C681DC433E7
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 09:01:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 97B4620758
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 06:40:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4u7OgY+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97B4620758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 37B4820709
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Sep 2020 09:01:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37B4820709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 236974B210;
-	Wed,  2 Sep 2020 02:40:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563724B23E;
+	Wed,  2 Sep 2020 05:01:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KgMZ6nJVex3m; Wed,  2 Sep 2020 02:40:14 -0400 (EDT)
+	with ESMTP id iA4MBR0UB5rC; Wed,  2 Sep 2020 05:01:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C06FD4B1F4;
-	Wed,  2 Sep 2020 02:40:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1844D4B236;
+	Wed,  2 Sep 2020 05:01:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 611374B1E4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 02:40:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BAC74B228
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 05:01:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id djZs9OU7tze3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Sep 2020 02:40:12 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32B6A4B1E2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 02:40:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599028812;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tgrlGxdrvM8uJv8i/HBzwz3RVf5rBosWTxZvDHQbaCs=;
- b=R4u7OgY+kPdIxLjlAplr+TXRVzhh+rEUoC6kNv8G3P2n1k92DGYH89oQdtusacN0R8FYgi
- i9ZwNLA0CBsr4o/hqiQc46UkpLSX1Gn7JplQ+bx9M3SFfJXmAn+CI2pzv1IYkmvC91mN0w
- p3dpDqqfWjTegpZr3RPCULCrP+haBKM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-K4Z35uSrNimFcl2HQuMqfw-1; Wed, 02 Sep 2020 02:40:10 -0400
-X-MC-Unique: K4Z35uSrNimFcl2HQuMqfw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95EB61084C84;
- Wed,  2 Sep 2020 06:40:08 +0000 (UTC)
-Received: from [10.64.54.147] (vpn2-54-147.bne.redhat.com [10.64.54.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B4F9710098AC;
- Wed,  2 Sep 2020 06:40:05 +0000 (UTC)
-Subject: Re: [PATCH v3 05/21] KVM: arm64: Add support for creating
- kernel-agnostic stage-2 page tables
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-6-will@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <e0b07673-bc32-95e4-be7a-382c80240000@redhat.com>
-Date: Wed, 2 Sep 2020 16:40:03 +1000
+ with ESMTP id 3l-rc0woK53A for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2020 05:01:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24A954B227
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2020 05:01:04 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D9DC31B;
+ Wed,  2 Sep 2020 02:01:03 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E2B043F68F;
+ Wed,  2 Sep 2020 02:01:02 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: arm64: Try PMD block mappings if PUD mappings
+ are not supported
+To: Gavin Shan <gshan@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20200901133357.52640-1-alexandru.elisei@arm.com>
+ <20200901133357.52640-3-alexandru.elisei@arm.com>
+ <583211e4-b997-8539-6147-d86cc0cbdbb2@redhat.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <694973e4-2754-1ef4-914b-d7200472cccb@arm.com>
+Date: Wed, 2 Sep 2020 10:01:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200825093953.26493-6-will@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <583211e4-b997-8539-6147-d86cc0cbdbb2@redhat.com>
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -97,248 +69,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
-
-On 8/25/20 7:39 PM, Will Deacon wrote:
-> Introduce alloc() and free() functions to the generic page-table code
-> for guest stage-2 page-tables and plumb these into the existing KVM
-> page-table allocator. Subsequent patches will convert other operations
-> within the KVM allocator over to the generic code.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_host.h    |  1 +
->   arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++
->   arch/arm64/kvm/hyp/pgtable.c         | 51 ++++++++++++++++++++++++++
->   arch/arm64/kvm/mmu.c                 | 55 +++++++++++++++-------------
->   4 files changed, 99 insertions(+), 26 deletions(-)
-> 
-
-With the following one question resolved:
-
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e52c927aade5..0b7c702b2151 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -81,6 +81,7 @@ struct kvm_s2_mmu {
->   	 */
->   	pgd_t		*pgd;
->   	phys_addr_t	pgd_phys;
-> +	struct kvm_pgtable *pgt;
->   
->   	/* The last vcpu id that ran on each physical CPU */
->   	int __percpu *last_vcpu_ran;
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 2af84ab78cb8..3389f978d573 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -116,6 +116,24 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
->   int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
->   			enum kvm_pgtable_prot prot);
->   
-> +/**
-> + * kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
-> + * @pgt:	Uninitialised page-table structure to initialise.
-> + * @kvm:	KVM structure representing the guest virtual machine.
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm);
-> +
-> +/**
-> + * kvm_pgtable_stage2_destroy() - Destroy an unused guest stage-2 page-table.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-> + *
-> + * The page-table is assumed to be unreachable by any hardware walkers prior
-> + * to freeing and therefore no TLB invalidation is performed.
-> + */
-> +void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-> +
->   /**
->    * kvm_pgtable_walk() - Walk a page-table.
->    * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index d75166823ad9..b8550ccaef4d 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -419,3 +419,54 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
->   	free_page((unsigned long)pgt->pgd);
->   	pgt->pgd = NULL;
->   }
-> +
-> +int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm)
-> +{
-> +	size_t pgd_sz;
-> +	u64 vtcr = kvm->arch.vtcr;
-> +	u32 ia_bits = VTCR_EL2_IPA(vtcr);
-> +	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
-> +	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
-> +
-> +	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
-> +	pgt->pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL | __GFP_ZERO);
-> +	if (!pgt->pgd)
-> +		return -ENOMEM;
-> +
-> +	pgt->ia_bits		= ia_bits;
-> +	pgt->start_level	= start_level;
-> +	pgt->mmu		= &kvm->arch.mmu;
-> +	return 0;
-> +}
-> +
-> +static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +			      enum kvm_pgtable_walk_flags flag,
-> +			      void * const arg)
-> +{
-> +	kvm_pte_t pte = *ptep;
-> +
-> +	if (!kvm_pte_valid(pte))
-> +		return 0;
-> +
-> +	put_page(virt_to_page(ptep));
-> +
-> +	if (kvm_pte_table(pte, level))
-> +		free_page((unsigned long)kvm_pte_follow(pte));
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-> +{
-> +	size_t pgd_sz;
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= stage2_free_walker,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF |
-> +			  KVM_PGTABLE_WALK_TABLE_POST,
-> +	};
-> +
-> +	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-> +	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
-> +	free_pages_exact(pgt->pgd, pgd_sz);
-> +	pgt->pgd = NULL;
-> +}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index fabd72b0c8a4..4607e9ca60a2 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -668,47 +668,49 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->    * @kvm:	The pointer to the KVM structure
->    * @mmu:	The pointer to the s2 MMU structure
->    *
-> - * Allocates only the stage-2 HW PGD level table(s) of size defined by
-> - * stage2_pgd_size(mmu->kvm).
-> - *
-> + * Allocates only the stage-2 HW PGD level table(s).
->    * Note we don't need locking here as this is only called when the VM is
->    * created, which can only be done once.
->    */
->   int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->   {
-> -	phys_addr_t pgd_phys;
-> -	pgd_t *pgd;
-> -	int cpu;
-> +	int cpu, err;
-> +	struct kvm_pgtable *pgt;
->   
-> -	if (mmu->pgd != NULL) {
-> +	if (mmu->pgt != NULL) {
->   		kvm_err("kvm_arch already initialized?\n");
->   		return -EINVAL;
->   	}
->   
-> -	/* Allocate the HW PGD, making sure that each page gets its own refcount */
-> -	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
-> -	if (!pgd)
-> +	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL);
-> +	if (!pgt)
->   		return -ENOMEM;
->   
-> -	pgd_phys = virt_to_phys(pgd);
-> -	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
-> -		return -EINVAL;
-> +	err = kvm_pgtable_stage2_init(pgt, kvm);
-> +	if (err)
-> +		goto out_free_pgtable;
->   
->   	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
->   	if (!mmu->last_vcpu_ran) {
-> -		free_pages_exact(pgd, stage2_pgd_size(kvm));
-> -		return -ENOMEM;
-> +		err = -ENOMEM;
-> +		goto out_destroy_pgtable;
->   	}
->   
->   	for_each_possible_cpu(cpu)
->   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
->   
->   	mmu->kvm = kvm;
-> -	mmu->pgd = pgd;
-> -	mmu->pgd_phys = pgd_phys;
-> +	mmu->pgt = pgt;
-> +	mmu->pgd_phys = __pa(pgt->pgd);
-> +	mmu->pgd = (void *)pgt->pgd;
->   	mmu->vmid.vmid_gen = 0;
-> -
->   	return 0;
-> +
-> +out_destroy_pgtable:
-> +	kvm_pgtable_stage2_destroy(pgt);
-> +out_free_pgtable:
-> +	kfree(pgt);
-> +	return err;
->   }
->
-
-kvm_pgtable_stage2_destroy() might not needed here because
-the stage2 page pgtable is empty so far. However, it should
-be rare to hit the case. If I'm correct, what we need to do
-is just freeing the PGDs.
-
-    
->   static void stage2_unmap_memslot(struct kvm *kvm,
-> @@ -781,20 +783,21 @@ void stage2_unmap_vm(struct kvm *kvm)
->   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   {
->   	struct kvm *kvm = mmu->kvm;
-> -	void *pgd = NULL;
-> +	struct kvm_pgtable *pgt = NULL;
->   
->   	spin_lock(&kvm->mmu_lock);
-> -	if (mmu->pgd) {
-> -		unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
-> -		pgd = READ_ONCE(mmu->pgd);
-> +	pgt = mmu->pgt;
-> +	if (pgt) {
->   		mmu->pgd = NULL;
-> +		mmu->pgd_phys = 0;
-> +		mmu->pgt = NULL;
-> +		free_percpu(mmu->last_vcpu_ran);
->   	}
->   	spin_unlock(&kvm->mmu_lock);
->   
-> -	/* Free the HW pgd, one page at a time */
-> -	if (pgd) {
-> -		free_pages_exact(pgd, stage2_pgd_size(kvm));
-> -		free_percpu(mmu->last_vcpu_ran);
-> +	if (pgt) {
-> +		kvm_pgtable_stage2_destroy(pgt);
-> +		kfree(pgt);
->   	}
->   }
->   
-
-Thanks,
-Gavin
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgR2F2aW4sCgpNYW55IHRoYW5rcyBmb3IgaGF2aW5nIGEgbG9vayBhdCB0aGUgcGF0Y2hlcyEK
+Ck9uIDkvMi8yMCAyOjIzIEFNLCBHYXZpbiBTaGFuIHdyb3RlOgo+IEhpIEFsZXhhbmRydSwKPgo+
+IE9uIDkvMS8yMCAxMTozMyBQTSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4gV2hlbiB1c2Vy
+c3BhY2UgdXNlcyBodWdldGxiZnMgZm9yIHRoZSBWTSBtZW1vcnksIHVzZXJfbWVtX2Fib3J0KCkg
+dHJpZXMgdG8KPj4gdXNlIHRoZSBzYW1lIGJsb2NrIHNpemUgdG8gbWFwIHRoZSBmYXVsdGluZyBJ
+UEEgaW4gc3RhZ2UgMi4gSWYgc3RhZ2UgMgo+PiBjYW5ub3QgdXNlIHRoZSBzYW1lIHNpemUgbWFw
+cGluZyBiZWNhdXNlIHRoZSBibG9jayBzaXplIGRvZXNuJ3QgZml0IGluIHRoZQo+PiBtZW1zbG90
+IG9yIHRoZSBtZW1zbG90IGlzIG5vdCBwcm9wZXJseSBhbGlnbmVkLCB1c2VyX21lbV9hYm9ydCgp
+IHdpbGwgZmFsbAo+PiBiYWNrIHRvIGEgcGFnZSBtYXBwaW5nLCByZWdhcmRsZXNzIG9mIHRoZSBi
+bG9jayBzaXplLiBXZSBjYW4gZG8gYmV0dGVyIGZvcgo+PiBQVUQgYmFja2VkIGh1Z2V0bGJmcyBi
+eSBjaGVja2luZyBpZiBhIFBNRCBibG9jayBtYXBwaW5nIGlzIHBvc3NpYmxlIGJlZm9yZQo+PiBk
+ZWNpZGluZyB0byB1c2UgYSBwYWdlLgo+Pgo+PiB2bWFfcGFnZXNpemUgaXMgYW4gdW5zaWduZWQg
+bG9uZywgdXNlIDFVTCBpbnN0ZWFkIG9mIDFVTEwgd2hlbiBhc3NpZ25pbmcKPj4gaXRzIHZhbHVl
+Lgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4YW5kcnUgRWxpc2VpIDxhbGV4YW5kcnUuZWxpc2Vp
+QGFybS5jb20+Cj4+IC0tLQo+PiDCoCBhcmNoL2FybTY0L2t2bS9tbXUuYyB8IDE5ICsrKysrKysr
+KysrKysrLS0tLS0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDUgZGVs
+ZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9tbXUuYyBiL2FyY2gv
+YXJtNjQva3ZtL21tdS5jCj4+IGluZGV4IDI1ZTdkYzUyYzA4Ni4uZjU5MGY3MzU1Y2RhIDEwMDY0
+NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9tbXUuYwo+PiArKysgYi9hcmNoL2FybTY0L2t2bS9t
+bXUuYwo+PiBAQCAtMTg3MSwxNSArMTg3MSwyNCBAQCBzdGF0aWMgaW50IHVzZXJfbWVtX2Fib3J0
+KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gcGh5c19hZGRyX3QgZmF1bHRfaXBhLAo+PiDCoMKg
+wqDCoMKgIGVsc2UKPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHZtYV9zaGlmdCA9IFBBR0VfU0hJRlQ7
+Cj4+IMKgIC3CoMKgwqAgdm1hX3BhZ2VzaXplID0gMVVMTCA8PCB2bWFfc2hpZnQ7Cj4+IMKgwqDC
+oMKgwqAgaWYgKGxvZ2dpbmdfYWN0aXZlIHx8Cj4+IC3CoMKgwqDCoMKgwqDCoCAodm1hLT52bV9m
+bGFncyAmIFZNX1BGTk1BUCkgfHwKPj4gLcKgwqDCoMKgwqDCoMKgICFmYXVsdF9zdXBwb3J0c19z
+dGFnZTJfaHVnZV9tYXBwaW5nKG1lbXNsb3QsIGh2YSwgdm1hX3BhZ2VzaXplKSkgewo+PiArwqDC
+oMKgwqDCoMKgwqAgKHZtYS0+dm1fZmxhZ3MgJiBWTV9QRk5NQVApKSB7Cj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoCBmb3JjZV9wdGUgPSB0cnVlOwo+PiAtwqDCoMKgwqDCoMKgwqAgdm1hX3BhZ2VzaXpl
+ID0gUEFHRV9TSVpFOwo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgdm1hX3NoaWZ0ID0gUEFHRV9TSElG
+VDsKPj4gwqDCoMKgwqDCoCB9Cj4+IMKgCj4KPiBJdCBsb29rcyBpbmNvcnJlY3QgYmVjYXVzZSBA
+dm1hX3BhZ2VzaXplIHdhc24ndCBpbml0aWFsaXplZCB3aGVuCj4gaXQncyBwYXNzZWQgdG8gZmF1
+bHRfc3VwcG9ydHNfc3RhZ2UyX2h1Z2VfbWFwcGluZygpIGZvciB0aGUgY2hlY2tpbmcuCj4gSXQn
+cyBhc3N1bWVkIHlvdSBtaXNzZWQgdGhlIGZvbGxvd2luZyBjaGFuZ2VzIGFjY29yZGluZyB0byB0
+aGUgY29tbWl0Cj4gbG9nOgo+Cj4gwqDCoCBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBw
+aW5nKG1lbXNsb3QsIGh2YSwgKDFVTCA8PCB2bWFfc2hpZnQpKQoKSSdtIG5vdCBzdXJlIHdoYXQg
+eW91IG1lYW4uIE1heWJlIHlvdSd2ZSBtaXNyZWFkIHRoZSBkaWZmPyBCZWNhdXNlIHRoZSBhYm92
+ZSBjYWxsCnRvIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKSB3YXMgcmVtb3Zl
+ZCBieSB0aGUgcGF0Y2guCgpUaGFua3MsCgpBbGV4Cgo+IMKgCj4+ICvCoMKgwqAgaWYgKHZtYV9z
+aGlmdCA9PSBQVURfU0hJRlQgJiYKPj4gK8KgwqDCoMKgwqDCoMKgICFmYXVsdF9zdXBwb3J0c19z
+dGFnZTJfaHVnZV9tYXBwaW5nKG1lbXNsb3QsIGh2YSwgUFVEX1NJWkUpKQo+PiArwqDCoMKgwqDC
+oMKgwqAgdm1hX3NoaWZ0ID0gUE1EX1NISUZUOwo+PiArCj4+ICvCoMKgwqAgaWYgKHZtYV9zaGlm
+dCA9PSBQTURfU0hJRlQgJiYKPj4gK8KgwqDCoMKgwqDCoMKgICFmYXVsdF9zdXBwb3J0c19zdGFn
+ZTJfaHVnZV9tYXBwaW5nKG1lbXNsb3QsIGh2YSwgUE1EX1NJWkUpKSB7Cj4+ICvCoMKgwqDCoMKg
+wqDCoCBmb3JjZV9wdGUgPSB0cnVlOwo+PiArwqDCoMKgwqDCoMKgwqAgdm1hX3NoaWZ0ID0gUEFH
+RV9TSElGVDsKPj4gK8KgwqDCoCB9Cj4+ICsKPj4gK8KgwqDCoCB2bWFfcGFnZXNpemUgPSAxVUwg
+PDwgdm1hX3NoaWZ0Owo+PiArPsKgwqDCoMKgwqDCoCAvKgo+PiDCoMKgwqDCoMKgwqAgKiBUaGUg
+c3RhZ2UyIGhhcyBhIG1pbmltdW0gb2YgMiBsZXZlbCB0YWJsZSAoRm9yIGFybTY0IHNlZQo+PiDC
+oMKgwqDCoMKgwqAgKiBrdm1fYXJtX3NldHVwX3N0YWdlMigpKS4gSGVuY2UsIHdlIGFyZSBndWFy
+YW50ZWVkIHRoYXQgd2UgY2FuCj4+IEBAIC0xODg5LDcgKzE4OTgsNyBAQCBzdGF0aWMgaW50IHVz
+ZXJfbWVtX2Fib3J0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gcGh5c19hZGRyX3QgZmF1bHRf
+aXBhLAo+PiDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqDCoCBpZiAodm1hX3BhZ2VzaXplID09
+IFBNRF9TSVpFIHx8Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoCAodm1hX3BhZ2VzaXplID09IFBVRF9T
+SVpFICYmIGt2bV9zdGFnZTJfaGFzX3BtZChrdm0pKSkKPj4gLcKgwqDCoMKgwqDCoMKgIGdmbiA9
+IChmYXVsdF9pcGEgJiBodWdlX3BhZ2VfbWFzayhoc3RhdGVfdm1hKHZtYSkpKSA+PiBQQUdFX1NI
+SUZUOwo+PiArwqDCoMKgwqDCoMKgwqAgZ2ZuID0gKGZhdWx0X2lwYSAmIH4odm1hX3BhZ2VzaXpl
+IC0gMSkpID4+IFBBR0VfU0hJRlQ7Cj4+IMKgwqDCoMKgwqAgbW1hcF9yZWFkX3VubG9jayhjdXJy
+ZW50LT5tbSk7Cj4+IMKgIMKgwqDCoMKgwqAgLyogV2UgbmVlZCBtaW5pbXVtIHNlY29uZCt0aGly
+ZCBsZXZlbCBwYWdlcyAqLwo+Pgo+Cj4gVGhhbmtzLAo+IEdhdmluCj4KX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
