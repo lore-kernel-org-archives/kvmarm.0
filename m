@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FFF9C433E2
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 05:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C104C433E2
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 06:03:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DF6C420758
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 05:28:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 642692071B
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 06:03:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HFDs37de"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6C420758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPkYZ047"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642692071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 694424B3A3;
-	Thu,  3 Sep 2020 01:28:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C50A4B3B3;
+	Thu,  3 Sep 2020 02:02:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hGrMakgc0Tuq; Thu,  3 Sep 2020 01:28:10 -0400 (EDT)
+	with ESMTP id q8ijMlXvDPLq; Thu,  3 Sep 2020 02:02:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E18F84B36A;
-	Thu,  3 Sep 2020 01:28:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFF314B3A6;
+	Thu,  3 Sep 2020 02:02:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CA5E4B393
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 01:28:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 664904B3A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 02:02:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nIiiBacFO-9z for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 01:28:08 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [205.139.110.61])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A22C14B36A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 01:28:08 -0400 (EDT)
+ with ESMTP id iyQafiKW7Vrx for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 02:02:53 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C09E4B379
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 02:02:53 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599110888;
+ s=mimecast20190719; t=1599112972;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RQY/iuazkhQJ4933P0MIwoq8z48tymYU55cn/THM2w4=;
- b=HFDs37deb7rHWYM1RBEGahBIlnh0YGBFKQvmpxj8OvYaZbu2yVqYIgloaFeJijVqm69CAf
- HGePXsf3pkP3cNIVbSO1a0c13ubZQITD22ZGzjil0TfN4y3GBc8iRhFyUCO8PsP0cYkdcS
- 2NF6aIOV/K3wqt7AwH6L+jkWMoYFswQ=
+ bh=X4ATHyuxkS/3ymRrhCc6AXlsHISwTiYu0MkDxmZ41MI=;
+ b=jPkYZ047xyQSkQKxKmE4LXhycBE6U2ucvFnCjtWKTYclZQd647oTUIH0fe8i/XdUWj2O4v
+ S28KA3GoGCy8XeHu/yA9v2S2cY/Ve1xL6cegCY6/VRc6413fjjNYaZNuNKAYmWVg9fQ+vV
+ 29CNBIIZ3Ia7xv5xDzNX1DjMhEMCHrI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-etH5KZYIOEWgf8mLAtK51g-1; Thu, 03 Sep 2020 01:28:02 -0400
-X-MC-Unique: etH5KZYIOEWgf8mLAtK51g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-100-CFZors48Oh-MRcTaoj3c6Q-1; Thu, 03 Sep 2020 02:02:48 -0400
+X-MC-Unique: CFZors48Oh-MRcTaoj3c6Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 794031074664;
- Thu,  3 Sep 2020 05:28:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AED78030BD;
+ Thu,  3 Sep 2020 06:02:47 +0000 (UTC)
 Received: from [10.64.54.159] (vpn2-54-159.bne.redhat.com [10.64.54.159])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB38D6198B;
- Thu,  3 Sep 2020 05:27:57 +0000 (UTC)
-Subject: Re: [PATCH v3 06/21] KVM: arm64: Add support for stage-2
- map()/unmap() in generic page-table
-From: Gavin Shan <gshan@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 026D71C4;
+ Thu,  3 Sep 2020 06:02:43 +0000 (UTC)
+Subject: Re: [PATCH v3 19/21] KVM: arm64: Remove unused page-table code
 To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-7-will@kernel.org>
- <0f3054a2-275c-a4d7-ba7c-3bdd64e97210@redhat.com>
-Message-ID: <57f37305-8b22-c060-f1b0-d2909cae1678@redhat.com>
-Date: Thu, 3 Sep 2020 15:27:55 +1000
+ <20200825093953.26493-20-will@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <1ae284c9-52e1-a6e1-be5c-cedacf461b0f@redhat.com>
+Date: Thu, 3 Sep 2020 16:02:41 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <0f3054a2-275c-a4d7-ba7c-3bdd64e97210@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200825093953.26493-20-will@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
@@ -98,253 +96,1323 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgV2lsbCwKCk9uIDkvMy8yMCAxMjo1NyBQTSwgR2F2aW4gU2hhbiB3cm90ZToKPiBPbiA4LzI1
-LzIwIDc6MzkgUE0sIFdpbGwgRGVhY29uIHdyb3RlOgo+PiBBZGQgc3RhZ2UtMiBtYXAoKSBhbmQg
-dW5tYXAoKSBvcGVyYXRpb25zIHRvIHRoZSBnZW5lcmljIHBhZ2UtdGFibGUgY29kZS4KPj4KPj4g
-Q2M6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+Cj4+IENjOiBRdWVudGluIFBlcnJldCA8
-cXBlcnJldEBnb29nbGUuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbEBr
-ZXJuZWwub3JnPgo+PiAtLS0KPj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fcGd0YWJs
-ZS5oIHzCoCAzOSArKysrCj4+IMKgIGFyY2gvYXJtNjQva3ZtL2h5cC9wZ3RhYmxlLmPCoMKgwqDC
-oMKgwqDCoMKgIHwgMjYyICsrKysrKysrKysrKysrKysrKysrKysrKysrKwo+PiDCoCAyIGZpbGVz
-IGNoYW5nZWQsIDMwMSBpbnNlcnRpb25zKCspCj4+Cj4gCj4gV2l0aCB0aGUgZm9sbG93aW5nIHF1
-ZXN0aW9ucyByZXNvbHZlZDoKPiAKPiBSZXZpZXdlZC1ieTogR2F2aW4gU2hhbiA8Z3NoYW5AcmVk
-aGF0LmNvbT4KPiAKPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX3Bn
-dGFibGUuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX3BndGFibGUuaAo+PiBpbmRleCAz
-Mzg5Zjk3OGQ1NzMuLjhhYjBkNWY0MzgxNyAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9rdm1fcGd0YWJsZS5oCj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3Zt
-X3BndGFibGUuaAo+PiBAQCAtMTM0LDYgKzEzNCw0NSBAQCBpbnQga3ZtX3BndGFibGVfc3RhZ2Uy
-X2luaXQoc3RydWN0IGt2bV9wZ3RhYmxlICpwZ3QsIHN0cnVjdCBrdm0gKmt2bSk7Cj4+IMKgwqAg
-Ki8KPj4gwqAgdm9pZCBrdm1fcGd0YWJsZV9zdGFnZTJfZGVzdHJveShzdHJ1Y3Qga3ZtX3BndGFi
-bGUgKnBndCk7Cj4+ICsvKioKPj4gKyAqIGt2bV9wZ3RhYmxlX3N0YWdlMl9tYXAoKSAtIEluc3Rh
-bGwgYSBtYXBwaW5nIGluIGEgZ3Vlc3Qgc3RhZ2UtMiBwYWdlLXRhYmxlLgo+PiArICogQHBndDrC
-oMKgwqAgUGFnZS10YWJsZSBzdHJ1Y3R1cmUgaW5pdGlhbGlzZWQgYnkga3ZtX3BndGFibGVfc3Rh
-Z2UyX2luaXQoKS4KPj4gKyAqIEBhZGRyOsKgwqDCoCBJbnRlcm1lZGlhdGUgcGh5c2ljYWwgYWRk
-cmVzcyBhdCB3aGljaCB0byBwbGFjZSB0aGUgbWFwcGluZy4KPj4gKyAqIEBzaXplOsKgwqDCoCBT
-aXplIG9mIHRoZSBtYXBwaW5nLgo+PiArICogQHBoeXM6wqDCoMKgIFBoeXNpY2FsIGFkZHJlc3Mg
-b2YgdGhlIG1lbW9yeSB0byBtYXAuCj4+ICsgKiBAcHJvdDrCoMKgwqAgUGVybWlzc2lvbnMgYW5k
-IGF0dHJpYnV0ZXMgZm9yIHRoZSBtYXBwaW5nLgo+PiArICogQG1jOsKgwqDCoMKgwqDCoMKgIENh
-Y2hlIG9mIHByZS1hbGxvY2F0ZWQgR0ZQX1BHVEFCTEVfVVNFUiBtZW1vcnkgZnJvbSB3aGljaCB0
-bwo+PiArICrCoMKgwqDCoMKgwqDCoCBhbGxvY2F0ZSBwYWdlLXRhYmxlIHBhZ2VzLgo+PiArICoK
-Pj4gKyAqIElmIGRldmljZSBhdHRyaWJ1dGVzIGFyZSBub3QgZXhwbGljaXRseSByZXF1ZXN0ZWQg
-aW4gQHByb3QsIHRoZW4gdGhlCj4+ICsgKiBtYXBwaW5nIHdpbGwgYmUgbm9ybWFsLCBjYWNoZWFi
-bGUuCj4+ICsgKgo+PiArICogTm90ZSB0aGF0IHRoaXMgZnVuY3Rpb24gd2lsbCBib3RoIGNvYWxl
-c2NlIGV4aXN0aW5nIHRhYmxlIGVudHJpZXMgYW5kIHNwbGl0Cj4+ICsgKiBleGlzdGluZyBibG9j
-ayBtYXBwaW5ncywgcmVseWluZyBvbiBwYWdlLWZhdWx0cyB0byBmYXVsdCBiYWNrIGFyZWFzIG91
-dHNpZGUKPj4gKyAqIG9mIHRoZSBuZXcgbWFwcGluZyBsYXppbHkuCj4+ICsgKgo+PiArICogUmV0
-dXJuOiAwIG9uIHN1Y2Nlc3MsIG5lZ2F0aXZlIGVycm9yIGNvZGUgb24gZmFpbHVyZS4KPj4gKyAq
-Lwo+PiAraW50IGt2bV9wZ3RhYmxlX3N0YWdlMl9tYXAoc3RydWN0IGt2bV9wZ3RhYmxlICpwZ3Qs
-IHU2NCBhZGRyLCB1NjQgc2l6ZSwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdTY0
-IHBoeXMsIGVudW0ga3ZtX3BndGFibGVfcHJvdCBwcm90LAo+PiArwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBzdHJ1Y3Qga3ZtX21tdV9tZW1vcnlfY2FjaGUgKm1jKTsKPj4gKwo+PiArLyoq
-Cj4+ICsgKiBrdm1fcGd0YWJsZV9zdGFnZTJfdW5tYXAoKSAtIFJlbW92ZSBhIG1hcHBpbmcgZnJv
-bSBhIGd1ZXN0IHN0YWdlLTIgcGFnZS10YWJsZS4KPj4gKyAqIEBwZ3Q6wqDCoMKgIFBhZ2UtdGFi
-bGUgc3RydWN0dXJlIGluaXRpYWxpc2VkIGJ5IGt2bV9wZ3RhYmxlX3N0YWdlMl9pbml0KCkuCj4+
-ICsgKiBAYWRkcjrCoMKgwqAgSW50ZXJtZWRpYXRlIHBoeXNpY2FsIGFkZHJlc3MgZnJvbSB3aGlj
-aCB0byByZW1vdmUgdGhlIG1hcHBpbmcuCj4+ICsgKiBAc2l6ZTrCoMKgwqAgU2l6ZSBvZiB0aGUg
-bWFwcGluZy4KPj4gKyAqCj4+ICsgKiBUTEIgaW52YWxpZGF0aW9uIGlzIHBlcmZvcm1lZCBmb3Ig
-ZWFjaCBwYWdlLXRhYmxlIGVudHJ5IGNsZWFyZWQgZHVyaW5nIHRoZQo+PiArICogdW5tYXBwaW5n
-IG9wZXJhdGlvbiBhbmQgdGhlIHJlZmVyZW5jZSBjb3VudCBmb3IgdGhlIHBhZ2UtdGFibGUgcGFn
-ZQo+PiArICogY29udGFpbmluZyB0aGUgY2xlYXJlZCBlbnRyeSBpcyBkZWNyZW1lbnRlZCwgd2l0
-aCB1bnJlZmVyZW5jZWQgcGFnZXMgYmVpbmcKPj4gKyAqIGZyZWVkLiBVbm1hcHBpbmcgYSBjYWNo
-ZWFibGUgcGFnZSB3aWxsIGVuc3VyZSB0aGF0IGl0IGlzIGNsZWFuIHRvIHRoZSBQb0MgaWYKPj4g
-KyAqIEZXQiBpcyBub3Qgc3VwcG9ydGVkIGJ5IHRoZSBDUFUuCj4+ICsgKgo+PiArICogUmV0dXJu
-OiAwIG9uIHN1Y2Nlc3MsIG5lZ2F0aXZlIGVycm9yIGNvZGUgb24gZmFpbHVyZS4KPj4gKyAqLwo+
-PiAraW50IGt2bV9wZ3RhYmxlX3N0YWdlMl91bm1hcChzdHJ1Y3Qga3ZtX3BndGFibGUgKnBndCwg
-dTY0IGFkZHIsIHU2NCBzaXplKTsKPj4gKwo+PiDCoCAvKioKPj4gwqDCoCAqIGt2bV9wZ3RhYmxl
-X3dhbGsoKSAtIFdhbGsgYSBwYWdlLXRhYmxlLgo+PiDCoMKgICogQHBndDrCoMKgwqAgUGFnZS10
-YWJsZSBzdHJ1Y3R1cmUgaW5pdGlhbGlzZWQgYnkga3ZtX3BndGFibGVfKl9pbml0KCkuCj4+IGRp
-ZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAvcGd0YWJsZS5jIGIvYXJjaC9hcm02NC9rdm0v
-aHlwL3BndGFibGUuYwo+PiBpbmRleCBiODU1MGNjYWVmNGQuLjQxZWU4ZjNjMDM2OSAxMDA2NDQK
-Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaHlwL3BndGFibGUuYwo+PiArKysgYi9hcmNoL2FybTY0
-L2t2bS9oeXAvcGd0YWJsZS5jCj4+IEBAIC0zMiwxMCArMzIsMTkgQEAKPj4gwqAgI2RlZmluZSBL
-Vk1fUFRFX0xFQUZfQVRUUl9MT19TMV9TSF9JU8KgwqDCoCAzCj4+IMKgICNkZWZpbmUgS1ZNX1BU
-RV9MRUFGX0FUVFJfTE9fUzFfQUbCoMKgwqAgQklUKDEwKQo+PiArI2RlZmluZSBLVk1fUFRFX0xF
-QUZfQVRUUl9MT19TMl9NRU1BVFRSwqDCoMKgIEdFTk1BU0soNSwgMikKPj4gKyNkZWZpbmUgS1ZN
-X1BURV9MRUFGX0FUVFJfTE9fUzJfUzJBUF9SwqDCoMKgIEJJVCg2KQo+PiArI2RlZmluZSBLVk1f
-UFRFX0xFQUZfQVRUUl9MT19TMl9TMkFQX1fCoMKgwqAgQklUKDcpCj4+ICsjZGVmaW5lIEtWTV9Q
-VEVfTEVBRl9BVFRSX0xPX1MyX1NIwqDCoMKgIEdFTk1BU0soOSwgOCkKPj4gKyNkZWZpbmUgS1ZN
-X1BURV9MRUFGX0FUVFJfTE9fUzJfU0hfSVPCoMKgwqAgMwo+PiArI2RlZmluZSBLVk1fUFRFX0xF
-QUZfQVRUUl9MT19TMl9BRsKgwqDCoCBCSVQoMTApCj4+ICsKPj4gwqAgI2RlZmluZSBLVk1fUFRF
-X0xFQUZfQVRUUl9IScKgwqDCoMKgwqDCoMKgIEdFTk1BU0soNjMsIDUxKQo+PiDCoCAjZGVmaW5l
-IEtWTV9QVEVfTEVBRl9BVFRSX0hJX1MxX1hOwqDCoMKgIEJJVCg1NCkKPj4gKyNkZWZpbmUgS1ZN
-X1BURV9MRUFGX0FUVFJfSElfUzJfWE7CoMKgwqAgQklUKDU0KQo+PiArCj4+IMKgIHN0cnVjdCBr
-dm1fcGd0YWJsZV93YWxrX2RhdGEgewo+PiDCoMKgwqDCoMKgIHN0cnVjdCBrdm1fcGd0YWJsZcKg
-wqDCoMKgwqDCoMKgICpwZ3Q7Cj4+IMKgwqDCoMKgwqAgc3RydWN0IGt2bV9wZ3RhYmxlX3dhbGtl
-csKgwqDCoCAqd2Fsa2VyOwo+PiBAQCAtNDIwLDYgKzQyOSwyNTkgQEAgdm9pZCBrdm1fcGd0YWJs
-ZV9oeXBfZGVzdHJveShzdHJ1Y3Qga3ZtX3BndGFibGUgKnBndCkKPj4gwqDCoMKgwqDCoCBwZ3Qt
-PnBnZCA9IE5VTEw7Cj4+IMKgIH0KPj4gK3N0cnVjdCBzdGFnZTJfbWFwX2RhdGEgewo+PiArwqDC
-oMKgIHU2NMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwaHlzOwo+PiArwqDCoMKgIGt2
-bV9wdGVfdMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYXR0cjsKPj4gKwo+PiArwqDCoMKgIGt2bV9w
-dGVfdMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKmFuY2hvcjsKPj4gKwo+PiArwqDCoMKgIHN0cnVj
-dCBrdm1fczJfbW11wqDCoMKgwqDCoMKgwqAgKm1tdTsKPj4gK8KgwqDCoCBzdHJ1Y3Qga3ZtX21t
-dV9tZW1vcnlfY2FjaGXCoMKgwqAgKm1lbWNhY2hlOwo+PiArfTsKPj4gKwo+PiArc3RhdGljIGt2
-bV9wdGVfdCAqc3RhZ2UyX21lbWNhY2hlX2FsbG9jX3BhZ2Uoc3RydWN0IHN0YWdlMl9tYXBfZGF0
-YSAqZGF0YSkKPj4gK3sKPj4gK8KgwqDCoCBrdm1fcHRlX3QgKnB0ZXAgPSBOVUxMOwo+PiArwqDC
-oMKgIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZSAqbWMgPSBkYXRhLT5tZW1jYWNoZTsKPj4g
-Kwo+PiArwqDCoMKgIC8qIEFsbG9jYXRlZCB3aXRoIEdGUF9QR1RBQkxFX1VTRVIsIHNvIG5vIG5l
-ZWQgdG8gemVybyAqLwo+PiArwqDCoMKgIGlmIChtYyAmJiBtYy0+bm9ianMpCj4+ICvCoMKgwqDC
-oMKgwqDCoCBwdGVwID0gbWMtPm9iamVjdHNbLS1tYy0+bm9ianNdOwo+PiArCj4+ICvCoMKgwqAg
-cmV0dXJuIHB0ZXA7Cj4+ICt9Cj4+ICsKPiAKPiBUaGlzIGZ1bmN0aW9uIGlzIGludHJvZHVjZWQg
-YnkgdGhpcyAoUEFUQ0hbNl0pLCBidXQgcmVwbGFjZWQgYnkKPiB0aGUgZ2VuZXJpYyBvbmUgKGt2
-bV9tbXVfbWVtb3J5X2NhY2hlX2FsbG9jKCkpIGluIFBBVENIWzddLiBJCj4gdGhpbmsgd2UgbWln
-aHQgdXNlIHRoZSBnZW5lcmljIG9uZSBmcm9tIFBBVENIWzddLgo+IAoKQ29ycmVjdGlvbjogSSB0
-aGluayB3ZSBtaWdodCB0aGUgZ2VuZXJpYyBmdW5jdGlvbiBmcm9tIHRoZSBiZWdpbm5pbmcsCmNv
-cnJyZXNwb25kaW5nIHRvIHRoaXMgKFBBVENIWzZdKS4KCj4+ICtzdGF0aWMgaW50IHN0YWdlMl9t
-YXBfc2V0X3Byb3RfYXR0cihlbnVtIGt2bV9wZ3RhYmxlX3Byb3QgcHJvdCwKPj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBzdGFnZTJfbWFwX2RhdGEgKmRh
-dGEpCj4+ICt7Cj4+ICvCoMKgwqAgYm9vbCBkZXZpY2UgPSBwcm90ICYgS1ZNX1BHVEFCTEVfUFJP
-VF9ERVZJQ0U7Cj4+ICvCoMKgwqAga3ZtX3B0ZV90IGF0dHIgPSBkZXZpY2UgPyBQQUdFX1MyX01F
-TUFUVFIoREVWSUNFX25HblJFKSA6Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-UEFHRV9TMl9NRU1BVFRSKE5PUk1BTCk7Cj4+ICvCoMKgwqAgdTMyIHNoID0gS1ZNX1BURV9MRUFG
-X0FUVFJfTE9fUzJfU0hfSVM7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoIShwcm90ICYgS1ZNX1BHVEFC
-TEVfUFJPVF9YKSkKPj4gK8KgwqDCoMKgwqDCoMKgIGF0dHIgfD0gS1ZNX1BURV9MRUFGX0FUVFJf
-SElfUzJfWE47Cj4+ICvCoMKgwqAgZWxzZSBpZiAoZGV2aWNlKQo+PiArwqDCoMKgwqDCoMKgwqAg
-cmV0dXJuIC1FSU5WQUw7Cj4+ICsKPj4gK8KgwqDCoCBpZiAocHJvdCAmIEtWTV9QR1RBQkxFX1BS
-T1RfUikKPj4gK8KgwqDCoMKgwqDCoMKgIGF0dHIgfD0gS1ZNX1BURV9MRUFGX0FUVFJfTE9fUzJf
-UzJBUF9SOwo+PiArCj4+ICvCoMKgwqAgaWYgKHByb3QgJiBLVk1fUEdUQUJMRV9QUk9UX1cpCj4+
-ICvCoMKgwqDCoMKgwqDCoCBhdHRyIHw9IEtWTV9QVEVfTEVBRl9BVFRSX0xPX1MyX1MyQVBfVzsK
-Pj4gKwo+PiArwqDCoMKgIGF0dHIgfD0gRklFTERfUFJFUChLVk1fUFRFX0xFQUZfQVRUUl9MT19T
-Ml9TSCwgc2gpOwo+PiArwqDCoMKgIGF0dHIgfD0gS1ZNX1BURV9MRUFGX0FUVFJfTE9fUzJfQUY7
-Cj4+ICvCoMKgwqAgZGF0YS0+YXR0ciA9IGF0dHI7Cj4+ICvCoMKgwqAgcmV0dXJuIDA7Cj4+ICt9
-Cj4+ICsKPj4gK3N0YXRpYyBib29sIHN0YWdlMl9tYXBfd2Fsa2VyX3RyeV9sZWFmKHU2NCBhZGRy
-LCB1NjQgZW5kLCB1MzIgbGV2ZWwsCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBrdm1fcHRlX3QgKnB0ZXAsCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3Qgc3RhZ2UyX21hcF9kYXRhICpkYXRhKQo+PiAr
-ewo+PiArwqDCoMKgIHU2NCBncmFudWxlID0ga3ZtX2dyYW51bGVfc2l6ZShsZXZlbCksIHBoeXMg
-PSBkYXRhLT5waHlzOwo+PiArCj4+ICvCoMKgwqAgaWYgKCFrdm1fYmxvY2tfbWFwcGluZ19zdXBw
-b3J0ZWQoYWRkciwgZW5kLCBwaHlzLCBsZXZlbCkpCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4g
-ZmFsc2U7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoa3ZtX3NldF92YWxpZF9sZWFmX3B0ZShwdGVwLCBw
-aHlzLCBkYXRhLT5hdHRyLCBsZXZlbCkpCj4+ICvCoMKgwqDCoMKgwqDCoCBnb3RvIG91dDsKPj4g
-Kwo+PiArwqDCoMKgIGt2bV9zZXRfaW52YWxpZF9wdGUocHRlcCk7Cj4+ICvCoMKgwqAga3ZtX2Nh
-bGxfaHlwKF9fa3ZtX3RsYl9mbHVzaF92bWlkX2lwYSwgZGF0YS0+bW11LCBhZGRyLCBsZXZlbCk7
-Cj4+ICvCoMKgwqAga3ZtX3NldF92YWxpZF9sZWFmX3B0ZShwdGVwLCBwaHlzLCBkYXRhLT5hdHRy
-LCBsZXZlbCk7Cj4+ICtvdXQ6Cj4+ICvCoMKgwqAgZGF0YS0+cGh5cyArPSBncmFudWxlOwo+PiAr
-wqDCoMKgIHJldHVybiB0cnVlOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgaW50IHN0YWdlMl9tYXBf
-d2Fsa190YWJsZV9wcmUodTY0IGFkZHIsIHU2NCBlbmQsIHUzMiBsZXZlbCwKPj4gK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX3B0ZV90ICpwdGVwLAo+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3Qgc3RhZ2UyX21hcF9k
-YXRhICpkYXRhKQo+PiArewo+PiArwqDCoMKgIGlmIChkYXRhLT5hbmNob3IpCj4+ICvCoMKgwqDC
-oMKgwqDCoCByZXR1cm4gMDsKPj4gKwo+PiArwqDCoMKgIGlmICgha3ZtX2Jsb2NrX21hcHBpbmdf
-c3VwcG9ydGVkKGFkZHIsIGVuZCwgZGF0YS0+cGh5cywgbGV2ZWwpKQo+PiArwqDCoMKgwqDCoMKg
-wqAgcmV0dXJuIDA7Cj4+ICsKPj4gK8KgwqDCoCBrdm1fc2V0X2ludmFsaWRfcHRlKHB0ZXApOwo+
-PiArwqDCoMKgIGt2bV9jYWxsX2h5cChfX2t2bV90bGJfZmx1c2hfdm1pZF9pcGEsIGRhdGEtPm1t
-dSwgYWRkciwgMCk7Cj4+ICvCoMKgwqAgZGF0YS0+YW5jaG9yID0gcHRlcDsKPj4gK8KgwqDCoCBy
-ZXR1cm4gMDsKPj4gK30KPj4gKwo+PiArc3RhdGljIGludCBzdGFnZTJfbWFwX3dhbGtfbGVhZih1
-NjQgYWRkciwgdTY0IGVuZCwgdTMyIGxldmVsLCBrdm1fcHRlX3QgKnB0ZXAsCj4+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IHN0YWdlMl9tYXBfZGF0YSAqZGF0YSkKPj4g
-K3sKPj4gK8KgwqDCoCBrdm1fcHRlX3QgKmNoaWxkcCwgcHRlID0gKnB0ZXA7Cj4+ICvCoMKgwqAg
-c3RydWN0IHBhZ2UgKnBhZ2UgPSB2aXJ0X3RvX3BhZ2UocHRlcCk7Cj4+ICsKPj4gK8KgwqDCoCBp
-ZiAoZGF0YS0+YW5jaG9yKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAoa3ZtX3B0ZV92YWxpZChw
-dGUpKQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwdXRfcGFnZShwYWdlKTsKPj4gKwo+PiAr
-wqDCoMKgwqDCoMKgwqAgcmV0dXJuIDA7Cj4+ICvCoMKgwqAgfQo+PiArCj4+ICvCoMKgwqAgaWYg
-KHN0YWdlMl9tYXBfd2Fsa2VyX3RyeV9sZWFmKGFkZHIsIGVuZCwgbGV2ZWwsIHB0ZXAsIGRhdGEp
-KQo+PiArwqDCoMKgwqDCoMKgwqAgZ290byBvdXRfZ2V0X3BhZ2U7Cj4+ICsKPj4gK8KgwqDCoCBp
-ZiAoV0FSTl9PTihsZXZlbCA9PSBLVk1fUEdUQUJMRV9NQVhfTEVWRUxTIC0gMSkpCj4+ICvCoMKg
-wqDCoMKgwqDCoCByZXR1cm4gLUVJTlZBTDsKPj4gKwo+PiArwqDCoMKgIGNoaWxkcCA9IHN0YWdl
-Ml9tZW1jYWNoZV9hbGxvY19wYWdlKGRhdGEpOwo+PiArwqDCoMKgIGlmICghY2hpbGRwKQo+PiAr
-wqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FTk9NRU07Cj4+ICsKPj4gK8KgwqDCoCAvKgo+PiArwqDC
-oMKgwqAgKiBJZiB3ZSd2ZSBydW4gaW50byBhbiBleGlzdGluZyBibG9jayBtYXBwaW5nIHRoZW4g
-cmVwbGFjZSBpdCB3aXRoCj4+ICvCoMKgwqDCoCAqIGEgdGFibGUuIEFjY2Vzc2VzIGJleW9uZCAn
-ZW5kJyB0aGF0IGZhbGwgd2l0aGluIHRoZSBuZXcgdGFibGUKPj4gK8KgwqDCoMKgICogd2lsbCBi
-ZSBtYXBwZWQgbGF6aWx5Lgo+PiArwqDCoMKgwqAgKi8KPj4gK8KgwqDCoCBpZiAoa3ZtX3B0ZV92
-YWxpZChwdGUpKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBrdm1fc2V0X2ludmFsaWRfcHRlKHB0ZXAp
-Owo+PiArwqDCoMKgwqDCoMKgwqAga3ZtX2NhbGxfaHlwKF9fa3ZtX3RsYl9mbHVzaF92bWlkX2lw
-YSwgZGF0YS0+bW11LCBhZGRyLCBsZXZlbCk7Cj4+ICvCoMKgwqDCoMKgwqDCoCBwdXRfcGFnZShw
-YWdlKTsKPj4gK8KgwqDCoCB9Cj4+ICsKPj4gK8KgwqDCoCBrdm1fc2V0X3RhYmxlX3B0ZShwdGVw
-LCBjaGlsZHApOwo+PiArCj4+ICtvdXRfZ2V0X3BhZ2U6Cj4+ICvCoMKgwqAgZ2V0X3BhZ2UocGFn
-ZSk7Cj4+ICvCoMKgwqAgcmV0dXJuIDA7Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyBpbnQgc3RhZ2Uy
-X21hcF93YWxrX3RhYmxlX3Bvc3QodTY0IGFkZHIsIHU2NCBlbmQsIHUzMiBsZXZlbCwKPj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fcHRlX3QgKnB0ZXAs
-Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IHN0
-YWdlMl9tYXBfZGF0YSAqZGF0YSkKPj4gK3sKPj4gK8KgwqDCoCBpbnQgcmV0ID0gMDsKPj4gKwo+
-PiArwqDCoMKgIGlmICghZGF0YS0+YW5jaG9yKQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIDA7
-Cj4+ICsKPj4gK8KgwqDCoCBmcmVlX3BhZ2UoKHVuc2lnbmVkIGxvbmcpa3ZtX3B0ZV9mb2xsb3co
-KnB0ZXApKTsKPj4gK8KgwqDCoCBwdXRfcGFnZSh2aXJ0X3RvX3BhZ2UocHRlcCkpOwo+PiArCj4+
-ICvCoMKgwqAgaWYgKGRhdGEtPmFuY2hvciA9PSBwdGVwKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBk
-YXRhLT5hbmNob3IgPSBOVUxMOwo+PiArwqDCoMKgwqDCoMKgwqAgcmV0ID0gc3RhZ2UyX21hcF93
-YWxrX2xlYWYoYWRkciwgZW5kLCBsZXZlbCwgcHRlcCwgZGF0YSk7Cj4+ICvCoMKgwqAgfQo+PiAr
-Cj4+ICvCoMKgwqAgcmV0dXJuIHJldDsKPj4gK30KPj4gKwo+IAo+IHN0YWdlMl9tYXBfd2Fsa19s
-ZWFmKCkgdHJpZXMgdG8gYnVpbGQgdGhlIGh1Z2UgKGJsb2NrPykgbWFwcGluZy4gSXQgdGhlbgo+
-IHBvcHVsYXRlIG5leHQtbGV2ZWwgcGFnZSB0YWJsZSBpZiB0aGF0IGZhaWxzLiBTbyBpdCBoYXMg
-bW9yZSB0aGFuIHdoYXQgd2UKPiB3YW50LiBJIHRoaW5rIHdlIG1pZ2h0IG5lZWQgY2FsbCB0byBz
-dGFnZTJfbWFwX3dhbGtlcl90cnlfbGVhZigpIGhlcmUuCj4gSG93ZXZlciwgdGhlcmUgaXMgbm90
-aGluZyB3cm9uZyB0byBtZSA6KQo+IAo+PiArc3RhdGljIGludCBzdGFnZTJfbWFwX3dhbGtlcih1
-NjQgYWRkciwgdTY0IGVuZCwgdTMyIGxldmVsLCBrdm1fcHRlX3QgKnB0ZXAsCj4+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlbnVtIGt2bV9wZ3RhYmxlX3dhbGtfZmxhZ3MgZmxh
-Zywgdm9pZCAqIGNvbnN0IGFyZykKPj4gK3sKPj4gK8KgwqDCoCBzdHJ1Y3Qgc3RhZ2UyX21hcF9k
-YXRhICpkYXRhID0gYXJnOwo+PiArCj4+ICvCoMKgwqAgc3dpdGNoIChmbGFnKSB7Cj4+ICvCoMKg
-wqAgY2FzZSBLVk1fUEdUQUJMRV9XQUxLX1RBQkxFX1BSRToKPj4gK8KgwqDCoMKgwqDCoMKgIHJl
-dHVybiBzdGFnZTJfbWFwX3dhbGtfdGFibGVfcHJlKGFkZHIsIGVuZCwgbGV2ZWwsIHB0ZXAsIGRh
-dGEpOwo+PiArwqDCoMKgIGNhc2UgS1ZNX1BHVEFCTEVfV0FMS19MRUFGOgo+PiArwqDCoMKgwqDC
-oMKgwqAgcmV0dXJuIHN0YWdlMl9tYXBfd2Fsa19sZWFmKGFkZHIsIGVuZCwgbGV2ZWwsIHB0ZXAs
-IGRhdGEpOwo+PiArwqDCoMKgIGNhc2UgS1ZNX1BHVEFCTEVfV0FMS19UQUJMRV9QT1NUOgo+PiAr
-wqDCoMKgwqDCoMKgwqAgcmV0dXJuIHN0YWdlMl9tYXBfd2Fsa190YWJsZV9wb3N0KGFkZHIsIGVu
-ZCwgbGV2ZWwsIHB0ZXAsIGRhdGEpOwo+PiArwqDCoMKgIH0KPj4gKwo+PiArwqDCoMKgIHJldHVy
-biAtRUlOVkFMOwo+PiArfQo+PiArCj4+ICtpbnQga3ZtX3BndGFibGVfc3RhZ2UyX21hcChzdHJ1
-Y3Qga3ZtX3BndGFibGUgKnBndCwgdTY0IGFkZHIsIHU2NCBzaXplLAo+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCB1NjQgcGh5cywgZW51bSBrdm1fcGd0YWJsZV9wcm90IHByb3QsCj4+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNo
-ZSAqbWMpCj4+ICt7Cj4+ICvCoMKgwqAgaW50IHJldDsKPj4gK8KgwqDCoCBzdHJ1Y3Qgc3RhZ2Uy
-X21hcF9kYXRhIG1hcF9kYXRhID0gewo+PiArwqDCoMKgwqDCoMKgwqAgLnBoeXPCoMKgwqDCoMKg
-wqDCoCA9IEFMSUdOX0RPV04ocGh5cywgUEFHRV9TSVpFKSwKPj4gK8KgwqDCoMKgwqDCoMKgIC5t
-bXXCoMKgwqDCoMKgwqDCoCA9IHBndC0+bW11LAo+PiArwqDCoMKgwqDCoMKgwqAgLm1lbWNhY2hl
-wqDCoMKgID0gbWMsCj4+ICvCoMKgwqAgfTsKPj4gK8KgwqDCoCBzdHJ1Y3Qga3ZtX3BndGFibGVf
-d2Fsa2VyIHdhbGtlciA9IHsKPj4gK8KgwqDCoMKgwqDCoMKgIC5jYsKgwqDCoMKgwqDCoMKgID0g
-c3RhZ2UyX21hcF93YWxrZXIsCj4+ICvCoMKgwqDCoMKgwqDCoCAuZmxhZ3PCoMKgwqDCoMKgwqDC
-oCA9IEtWTV9QR1RBQkxFX1dBTEtfVEFCTEVfUFJFIHwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgS1ZNX1BHVEFCTEVfV0FMS19MRUFGIHwKPj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgS1ZNX1BHVEFCTEVfV0FMS19UQUJMRV9QT1NULAo+PiArwqDC
-oMKgwqDCoMKgwqAgLmFyZ8KgwqDCoMKgwqDCoMKgID0gJm1hcF9kYXRhLAo+PiArwqDCoMKgIH07
-Cj4+ICsKPj4gK8KgwqDCoCByZXQgPSBzdGFnZTJfbWFwX3NldF9wcm90X2F0dHIocHJvdCwgJm1h
-cF9kYXRhKTsKPj4gK8KgwqDCoCBpZiAocmV0KQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHJl
-dDsKPj4gKwo+PiArwqDCoMKgIHJldCA9IGt2bV9wZ3RhYmxlX3dhbGsocGd0LCBhZGRyLCBzaXpl
-LCAmd2Fsa2VyKTsKPj4gK8KgwqDCoCBkc2IoaXNoc3QpOwo+PiArwqDCoMKgIHJldHVybiByZXQ7
-Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyB2b2lkIHN0YWdlMl9mbHVzaF9kY2FjaGUodm9pZCAqYWRk
-ciwgdTY0IHNpemUpCj4+ICt7Cj4+ICvCoMKgwqAgaWYgKGNwdXNfaGF2ZV9jb25zdF9jYXAoQVJN
-NjRfSEFTX1NUQUdFMl9GV0IpKQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuOwo+PiArCj4+ICvC
-oMKgwqAgX19mbHVzaF9kY2FjaGVfYXJlYShhZGRyLCBzaXplKTsKPj4gK30KPj4gKwo+PiArc3Rh
-dGljIGJvb2wgc3RhZ2UyX3B0ZV9jYWNoZWFibGUoa3ZtX3B0ZV90IHB0ZSkKPj4gK3sKPj4gK8Kg
-wqDCoCB1NjQgbWVtYXR0ciA9IEZJRUxEX0dFVChLVk1fUFRFX0xFQUZfQVRUUl9MT19TMl9NRU1B
-VFRSLCBwdGUpOwo+PiArwqDCoMKgIHJldHVybiBtZW1hdHRyID09IFBBR0VfUzJfTUVNQVRUUihO
-T1JNQUwpOwo+PiArfQo+PiArCj4+ICtzdGF0aWMgaW50IHN0YWdlMl91bm1hcF93YWxrZXIodTY0
-IGFkZHIsIHU2NCBlbmQsIHUzMiBsZXZlbCwga3ZtX3B0ZV90ICpwdGVwLAo+PiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVudW0ga3ZtX3BndGFibGVfd2Fsa19mbGFncyBm
-bGFnLAo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKiBjb25z
-dCBhcmcpCj4+ICt7Cj4+ICvCoMKgwqAgc3RydWN0IGt2bV9zMl9tbXUgKm1tdSA9IGFyZzsKPj4g
-K8KgwqDCoCBrdm1fcHRlX3QgcHRlID0gKnB0ZXAsICpjaGlsZHAgPSBOVUxMOwo+PiArwqDCoMKg
-IGJvb2wgbmVlZF9mbHVzaCA9IGZhbHNlOwo+PiArCj4+ICvCoMKgwqAgaWYgKCFrdm1fcHRlX3Zh
-bGlkKHB0ZSkpCj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKPj4gKwo+PiArwqDCoMKgIGlm
-IChrdm1fcHRlX3RhYmxlKHB0ZSwgbGV2ZWwpKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBjaGlsZHAg
-PSBrdm1fcHRlX2ZvbGxvdyhwdGUpOwo+PiArCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAocGFnZV9j
-b3VudCh2aXJ0X3RvX3BhZ2UoY2hpbGRwKSkgIT0gMSkKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgcmV0dXJuIDA7Cj4+ICvCoMKgwqAgfSBlbHNlIGlmIChzdGFnZTJfcHRlX2NhY2hlYWJsZShw
-dGUpKSB7Cj4+ICvCoMKgwqDCoMKgwqDCoCBuZWVkX2ZsdXNoID0gdHJ1ZTsKPj4gK8KgwqDCoCB9
-Cj4+ICsKPj4gK8KgwqDCoCAvKgo+PiArwqDCoMKgwqAgKiBUaGlzIGlzIHNpbWlsYXIgdG8gdGhl
-IG1hcCgpIHBhdGggaW4gdGhhdCB3ZSB1bm1hcCB0aGUgZW50aXJlCj4+ICvCoMKgwqDCoCAqIGJs
-b2NrIGVudHJ5IGFuZCByZWx5IG9uIHRoZSByZW1haW5pbmcgcG9ydGlvbnMgYmVpbmcgZmF1bHRl
-ZAo+PiArwqDCoMKgwqAgKiBiYWNrIGxhemlseS4KPj4gK8KgwqDCoMKgICovCj4+ICvCoMKgwqAg
-a3ZtX3NldF9pbnZhbGlkX3B0ZShwdGVwKTsKPj4gK8KgwqDCoCBrdm1fY2FsbF9oeXAoX19rdm1f
-dGxiX2ZsdXNoX3ZtaWRfaXBhLCBtbXUsIGFkZHIsIGxldmVsKTsKPj4gK8KgwqDCoCBwdXRfcGFn
-ZSh2aXJ0X3RvX3BhZ2UocHRlcCkpOwo+PiArCj4+ICvCoMKgwqAgaWYgKG5lZWRfZmx1c2gpIHsK
-Pj4gK8KgwqDCoMKgwqDCoMKgIHN0YWdlMl9mbHVzaF9kY2FjaGUoa3ZtX3B0ZV9mb2xsb3cocHRl
-KSwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGt2bV9ncmFudWxl
-X3NpemUobGV2ZWwpKTsKPj4gK8KgwqDCoCB9Cj4+ICsKPj4gK8KgwqDCoCBpZiAoY2hpbGRwKQo+
-PiArwqDCoMKgwqDCoMKgwqAgZnJlZV9wYWdlKCh1bnNpZ25lZCBsb25nKWNoaWxkcCk7Cj4+ICsK
-Pj4gK8KgwqDCoCByZXR1cm4gMDsKPj4gK30KPj4gKwo+PiAraW50IGt2bV9wZ3RhYmxlX3N0YWdl
-Ml91bm1hcChzdHJ1Y3Qga3ZtX3BndGFibGUgKnBndCwgdTY0IGFkZHIsIHU2NCBzaXplKQo+PiAr
-ewo+PiArwqDCoMKgIHN0cnVjdCBrdm1fcGd0YWJsZV93YWxrZXIgd2Fsa2VyID0gewo+PiArwqDC
-oMKgwqDCoMKgwqAgLmNiwqDCoMKgID0gc3RhZ2UyX3VubWFwX3dhbGtlciwKPj4gK8KgwqDCoMKg
-wqDCoMKgIC5hcmfCoMKgwqAgPSBwZ3QtPm1tdSwKPj4gK8KgwqDCoMKgwqDCoMKgIC5mbGFnc8Kg
-wqDCoCA9IEtWTV9QR1RBQkxFX1dBTEtfTEVBRiB8IEtWTV9QR1RBQkxFX1dBTEtfVEFCTEVfUE9T
-VCwKPj4gK8KgwqDCoCB9Owo+PiArCj4+ICvCoMKgwqAgcmV0dXJuIGt2bV9wZ3RhYmxlX3dhbGso
-cGd0LCBhZGRyLCBzaXplLCAmd2Fsa2VyKTsKPj4gK30KPj4gKwo+PiDCoCBpbnQga3ZtX3BndGFi
-bGVfc3RhZ2UyX2luaXQoc3RydWN0IGt2bV9wZ3RhYmxlICpwZ3QsIHN0cnVjdCBrdm0gKmt2bSkK
-Pj4gwqAgewo+PiDCoMKgwqDCoMKgIHNpemVfdCBwZ2Rfc3o7Cj4+CgpUaGFua3MsCkdhdmluCgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Will,
+
+On 8/25/20 7:39 PM, Will Deacon wrote:
+> Now that KVM is using the generic page-table code to manage the guest
+> stage-2 page-tables, we can remove a bunch of unused macros, #defines
+> and static inline functions from the old implementation.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_mmu.h        | 141 -----
+>   arch/arm64/include/asm/pgtable-hwdef.h  |  17 -
+>   arch/arm64/include/asm/pgtable-prot.h   |  13 -
+>   arch/arm64/include/asm/stage2_pgtable.h | 215 -------
+>   arch/arm64/kvm/mmu.c                    | 755 ------------------------
+>   5 files changed, 1141 deletions(-)
+> 
+
+With the following questions resolved:
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 42fb50cfe0d8..13ff00d9f16d 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -135,123 +135,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+>   phys_addr_t kvm_mmu_get_httbr(void);
+>   phys_addr_t kvm_get_idmap_vector(void);
+>   int kvm_mmu_init(void);
+> -#define kvm_mk_pmd(ptep)					\
+> -	__pmd(__phys_to_pmd_val(__pa(ptep)) | PMD_TYPE_TABLE)
+> -#define kvm_mk_pud(pmdp)					\
+> -	__pud(__phys_to_pud_val(__pa(pmdp)) | PMD_TYPE_TABLE)
+> -#define kvm_mk_p4d(pmdp)					\
+> -	__p4d(__phys_to_p4d_val(__pa(pmdp)) | PUD_TYPE_TABLE)
+> -
+> -#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
+> -
+> -#define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
+> -#define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
+> -#define kvm_pfn_pud(pfn, prot)		pfn_pud(pfn, prot)
+> -
+> -#define kvm_pud_pfn(pud)		pud_pfn(pud)
+> -
+> -#define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
+> -#define kvm_pud_mkhuge(pud)		pud_mkhuge(pud)
+> -
+> -static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+> -{
+> -	pte_val(pte) |= PTE_S2_RDWR;
+> -	return pte;
+> -}
+> -
+> -static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
+> -{
+> -	pmd_val(pmd) |= PMD_S2_RDWR;
+> -	return pmd;
+> -}
+> -
+> -static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
+> -{
+> -	pud_val(pud) |= PUD_S2_RDWR;
+> -	return pud;
+> -}
+> -
+> -static inline pte_t kvm_s2pte_mkexec(pte_t pte)
+> -{
+> -	pte_val(pte) &= ~PTE_S2_XN;
+> -	return pte;
+> -}
+> -
+> -static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
+> -{
+> -	pmd_val(pmd) &= ~PMD_S2_XN;
+> -	return pmd;
+> -}
+> -
+> -static inline pud_t kvm_s2pud_mkexec(pud_t pud)
+> -{
+> -	pud_val(pud) &= ~PUD_S2_XN;
+> -	return pud;
+> -}
+> -
+> -static inline void kvm_set_s2pte_readonly(pte_t *ptep)
+> -{
+> -	pteval_t old_pteval, pteval;
+> -
+> -	pteval = READ_ONCE(pte_val(*ptep));
+> -	do {
+> -		old_pteval = pteval;
+> -		pteval &= ~PTE_S2_RDWR;
+> -		pteval |= PTE_S2_RDONLY;
+> -		pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, pteval);
+> -	} while (pteval != old_pteval);
+> -}
+> -
+> -static inline bool kvm_s2pte_readonly(pte_t *ptep)
+> -{
+> -	return (READ_ONCE(pte_val(*ptep)) & PTE_S2_RDWR) == PTE_S2_RDONLY;
+> -}
+> -
+> -static inline bool kvm_s2pte_exec(pte_t *ptep)
+> -{
+> -	return !(READ_ONCE(pte_val(*ptep)) & PTE_S2_XN);
+> -}
+> -
+> -static inline void kvm_set_s2pmd_readonly(pmd_t *pmdp)
+> -{
+> -	kvm_set_s2pte_readonly((pte_t *)pmdp);
+> -}
+> -
+> -static inline bool kvm_s2pmd_readonly(pmd_t *pmdp)
+> -{
+> -	return kvm_s2pte_readonly((pte_t *)pmdp);
+> -}
+> -
+> -static inline bool kvm_s2pmd_exec(pmd_t *pmdp)
+> -{
+> -	return !(READ_ONCE(pmd_val(*pmdp)) & PMD_S2_XN);
+> -}
+> -
+> -static inline void kvm_set_s2pud_readonly(pud_t *pudp)
+> -{
+> -	kvm_set_s2pte_readonly((pte_t *)pudp);
+> -}
+> -
+> -static inline bool kvm_s2pud_readonly(pud_t *pudp)
+> -{
+> -	return kvm_s2pte_readonly((pte_t *)pudp);
+> -}
+> -
+> -static inline bool kvm_s2pud_exec(pud_t *pudp)
+> -{
+> -	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
+> -}
+> -
+> -static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+> -{
+> -	return pud_mkyoung(pud);
+> -}
+> -
+> -static inline bool kvm_s2pud_young(pud_t pud)
+> -{
+> -	return pud_young(pud);
+> -}
+> -
+>   
+>   struct kvm;
+>   
+> @@ -293,30 +176,6 @@ static inline void __invalidate_icache_guest_page(kvm_pfn_t pfn,
+>   	}
+>   }
+>   
+> -static inline void __kvm_flush_dcache_pte(pte_t pte)
+> -{
+> -	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+> -		struct page *page = pte_page(pte);
+> -		kvm_flush_dcache_to_poc(page_address(page), PAGE_SIZE);
+> -	}
+> -}
+> -
+> -static inline void __kvm_flush_dcache_pmd(pmd_t pmd)
+> -{
+> -	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+> -		struct page *page = pmd_page(pmd);
+> -		kvm_flush_dcache_to_poc(page_address(page), PMD_SIZE);
+> -	}
+> -}
+> -
+> -static inline void __kvm_flush_dcache_pud(pud_t pud)
+> -{
+> -	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+> -		struct page *page = pud_page(pud);
+> -		kvm_flush_dcache_to_poc(page_address(page), PUD_SIZE);
+> -	}
+> -}
+> -
+>   void kvm_set_way_flush(struct kvm_vcpu *vcpu);
+>   void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+>   
+
+There are more stuff in arch/arm64/include/asm/kvm_mmu.h to be dropped:
+
+static inline bool kvm_page_empty(void *ptr)
+static inline int arm64_vttbr_x(u32 ipa_shift, u32 levels)
+static inline u64 vttbr_baddr_mask(u32 ipa_shift, u32 levels)
+static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
+
+
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index 1a989353144e..bb97d464f42b 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -172,23 +172,6 @@
+>   #define PTE_ATTRINDX(t)		(_AT(pteval_t, (t)) << 2)
+>   #define PTE_ATTRINDX_MASK	(_AT(pteval_t, 7) << 2)
+>   
+> -/*
+> - * 2nd stage PTE definitions
+> - */
+> -#define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
+> -#define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
+> -#define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
+> -#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for SW */
+> -
+> -#define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
+> -#define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+> -#define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+> -#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for SW */
+> -
+> -#define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
+> -#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
+> -#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
+> -
+>   /*
+>    * Memory Attribute override for Stage-2 (MemAttr[3:0])
+>    */
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index 88acd7e1cd05..8f094c43072a 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -73,19 +73,6 @@ extern bool arm64_use_ng_mappings;
+>   		__val;							\
+>   	 })
+>   
+> -#define PAGE_S2_XN							\
+> -	({								\
+> -		u64 __val;						\
+> -		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))		\
+> -			__val = 0;					\
+> -		else							\
+> -			__val = PTE_S2_XN;				\
+> -		__val;							\
+> -	})
+> -
+> -#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
+> -#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+> -
+>   #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+>   /* shared+writable pages are clean by default, hence PTE_RDONLY|PTE_WRITE */
+>   #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
+> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+> index 996bf98f0cab..fe341a6578c3 100644
+> --- a/arch/arm64/include/asm/stage2_pgtable.h
+> +++ b/arch/arm64/include/asm/stage2_pgtable.h
+> @@ -8,7 +8,6 @@
+>   #ifndef __ARM64_S2_PGTABLE_H_
+>   #define __ARM64_S2_PGTABLE_H_
+>   
+> -#include <linux/hugetlb.h>
+>   #include <linux/pgtable.h>
+>   
+>   /*
+> @@ -36,21 +35,6 @@
+>   #define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
+>   #define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
+>   
+> -/*
+> - * The number of PTRS across all concatenated stage2 tables given by the
+> - * number of bits resolved at the initial level.
+> - * If we force more levels than necessary, we may have (stage2_pgdir_shift > IPA),
+> - * in which case, stage2_pgd_ptrs will have one entry.
+> - */
+> -#define pgd_ptrs_shift(ipa, pgdir_shift)	\
+> -	((ipa) > (pgdir_shift) ? ((ipa) - (pgdir_shift)) : 0)
+> -#define __s2_pgd_ptrs(ipa, lvls)		\
+> -	(1 << (pgd_ptrs_shift((ipa), pt_levels_pgdir_shift(lvls))))
+> -#define __s2_pgd_size(ipa, lvls)	(__s2_pgd_ptrs((ipa), (lvls)) * sizeof(pgd_t))
+> -
+> -#define stage2_pgd_ptrs(kvm)		__s2_pgd_ptrs(kvm_phys_shift(kvm), kvm_stage2_levels(kvm))
+> -#define stage2_pgd_size(kvm)		__s2_pgd_size(kvm_phys_shift(kvm), kvm_stage2_levels(kvm))
+> -
+>   /*
+>    * kvm_mmmu_cache_min_pages() is the number of pages required to install
+>    * a stage-2 translation. We pre-allocate the entry level page table at
+> @@ -58,196 +42,6 @@
+>    */
+>   #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
+>   
+> -/* Stage2 PUD definitions when the level is present */
+> -static inline bool kvm_stage2_has_pud(struct kvm *kvm)
+> -{
+> -	return (CONFIG_PGTABLE_LEVELS > 3) && (kvm_stage2_levels(kvm) > 3);
+> -}
+> -
+> -#define S2_PUD_SHIFT			ARM64_HW_PGTABLE_LEVEL_SHIFT(1)
+> -#define S2_PUD_SIZE			(1UL << S2_PUD_SHIFT)
+> -#define S2_PUD_MASK			(~(S2_PUD_SIZE - 1))
+> -
+> -#define stage2_pgd_none(kvm, pgd)		pgd_none(pgd)
+> -#define stage2_pgd_clear(kvm, pgd)		pgd_clear(pgd)
+> -#define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
+> -#define stage2_pgd_populate(kvm, pgd, p4d)	pgd_populate(NULL, pgd, p4d)
+> -
+> -static inline p4d_t *stage2_p4d_offset(struct kvm *kvm,
+> -				       pgd_t *pgd, unsigned long address)
+> -{
+> -	return p4d_offset(pgd, address);
+> -}
+> -
+> -static inline void stage2_p4d_free(struct kvm *kvm, p4d_t *p4d)
+> -{
+> -}
+> -
+> -static inline bool stage2_p4d_table_empty(struct kvm *kvm, p4d_t *p4dp)
+> -{
+> -	return false;
+> -}
+> -
+> -static inline phys_addr_t stage2_p4d_addr_end(struct kvm *kvm,
+> -					      phys_addr_t addr, phys_addr_t end)
+> -{
+> -	return end;
+> -}
+> -
+> -static inline bool stage2_p4d_none(struct kvm *kvm, p4d_t p4d)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		return p4d_none(p4d);
+> -	else
+> -		return 0;
+> -}
+> -
+> -static inline void stage2_p4d_clear(struct kvm *kvm, p4d_t *p4dp)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		p4d_clear(p4dp);
+> -}
+> -
+> -static inline bool stage2_p4d_present(struct kvm *kvm, p4d_t p4d)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		return p4d_present(p4d);
+> -	else
+> -		return 1;
+> -}
+> -
+> -static inline void stage2_p4d_populate(struct kvm *kvm, p4d_t *p4d, pud_t *pud)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		p4d_populate(NULL, p4d, pud);
+> -}
+> -
+> -static inline pud_t *stage2_pud_offset(struct kvm *kvm,
+> -				       p4d_t *p4d, unsigned long address)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		return pud_offset(p4d, address);
+> -	else
+> -		return (pud_t *)p4d;
+> -}
+> -
+> -static inline void stage2_pud_free(struct kvm *kvm, pud_t *pud)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		free_page((unsigned long)pud);
+> -}
+> -
+> -static inline bool stage2_pud_table_empty(struct kvm *kvm, pud_t *pudp)
+> -{
+> -	if (kvm_stage2_has_pud(kvm))
+> -		return kvm_page_empty(pudp);
+> -	else
+> -		return false;
+> -}
+> -
+> -static inline phys_addr_t
+> -stage2_pud_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+> -{
+> -	if (kvm_stage2_has_pud(kvm)) {
+> -		phys_addr_t boundary = (addr + S2_PUD_SIZE) & S2_PUD_MASK;
+> -
+> -		return (boundary - 1 < end - 1) ? boundary : end;
+> -	} else {
+> -		return end;
+> -	}
+> -}
+> -
+> -/* Stage2 PMD definitions when the level is present */
+> -static inline bool kvm_stage2_has_pmd(struct kvm *kvm)
+> -{
+> -	return (CONFIG_PGTABLE_LEVELS > 2) && (kvm_stage2_levels(kvm) > 2);
+> -}
+> -
+> -#define S2_PMD_SHIFT			ARM64_HW_PGTABLE_LEVEL_SHIFT(2)
+> -#define S2_PMD_SIZE			(1UL << S2_PMD_SHIFT)
+> -#define S2_PMD_MASK			(~(S2_PMD_SIZE - 1))
+> -
+> -static inline bool stage2_pud_none(struct kvm *kvm, pud_t pud)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		return pud_none(pud);
+> -	else
+> -		return 0;
+> -}
+> -
+> -static inline void stage2_pud_clear(struct kvm *kvm, pud_t *pud)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		pud_clear(pud);
+> -}
+> -
+> -static inline bool stage2_pud_present(struct kvm *kvm, pud_t pud)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		return pud_present(pud);
+> -	else
+> -		return 1;
+> -}
+> -
+> -static inline void stage2_pud_populate(struct kvm *kvm, pud_t *pud, pmd_t *pmd)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		pud_populate(NULL, pud, pmd);
+> -}
+> -
+> -static inline pmd_t *stage2_pmd_offset(struct kvm *kvm,
+> -				       pud_t *pud, unsigned long address)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		return pmd_offset(pud, address);
+> -	else
+> -		return (pmd_t *)pud;
+> -}
+> -
+> -static inline void stage2_pmd_free(struct kvm *kvm, pmd_t *pmd)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		free_page((unsigned long)pmd);
+> -}
+> -
+> -static inline bool stage2_pud_huge(struct kvm *kvm, pud_t pud)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		return pud_huge(pud);
+> -	else
+> -		return 0;
+> -}
+> -
+> -static inline bool stage2_pmd_table_empty(struct kvm *kvm, pmd_t *pmdp)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm))
+> -		return kvm_page_empty(pmdp);
+> -	else
+> -		return 0;
+> -}
+> -
+> -static inline phys_addr_t
+> -stage2_pmd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+> -{
+> -	if (kvm_stage2_has_pmd(kvm)) {
+> -		phys_addr_t boundary = (addr + S2_PMD_SIZE) & S2_PMD_MASK;
+> -
+> -		return (boundary - 1 < end - 1) ? boundary : end;
+> -	} else {
+> -		return end;
+> -	}
+> -}
+> -
+> -static inline bool stage2_pte_table_empty(struct kvm *kvm, pte_t *ptep)
+> -{
+> -	return kvm_page_empty(ptep);
+> -}
+> -
+> -static inline unsigned long stage2_pgd_index(struct kvm *kvm, phys_addr_t addr)
+> -{
+> -	return (((addr) >> stage2_pgdir_shift(kvm)) & (stage2_pgd_ptrs(kvm) - 1));
+> -}
+> -
+>   static inline phys_addr_t
+>   stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+>   {
+> @@ -256,13 +50,4 @@ stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+>   	return (boundary - 1 < end - 1) ? boundary : end;
+>   }
+>   
+> -/*
+> - * Level values for the ARMv8.4-TTL extension, mapping PUD/PMD/PTE and
+> - * the architectural page-table level.
+> - */
+> -#define S2_NO_LEVEL_HINT	0
+> -#define S2_PUD_LEVEL		1
+> -#define S2_PMD_LEVEL		2
+> -#define S2_PTE_LEVEL		3
+> -
+>   #endif	/* __ARM64_S2_PGTABLE_H_ */
+
+In arch/arm64/include/stage2_pgtable.h, there are several
+macros are only used by stage2_pgd_addr_end(), which is defined
+in same header file. I guess they might be moved to the function
+and make them function scoped:
+
+/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
+#define stage2_pgdir_shift(kvm)         pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
+#define stage2_pgdir_size(kvm)          (1ULL << stage2_pgdir_shift(kvm))
+#define stage2_pgdir_mask(kvm)          ~(stage2_pgdir_size(kvm) - 1)
+
+
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 050eab71de31..ddeec0b03666 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -31,13 +31,6 @@ static phys_addr_t hyp_idmap_vector;
+>   
+>   static unsigned long io_map_base;
+>   
+> -#define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+> -#define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+> -
+> -static bool is_iomap(unsigned long flags)
+> -{
+> -	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+> -}
+>   
+>   /*
+>    * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+> @@ -85,154 +78,11 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>   	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+>   }
+>   
+> -static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+> -				   int level)
+> -{
+> -	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ipa, level);
+> -}
+> -
+> -/*
+> - * D-Cache management functions. They take the page table entries by
+> - * value, as they are flushing the cache using the kernel mapping (or
+> - * kmap on 32bit).
+> - */
+> -static void kvm_flush_dcache_pte(pte_t pte)
+> -{
+> -	__kvm_flush_dcache_pte(pte);
+> -}
+> -
+> -static void kvm_flush_dcache_pmd(pmd_t pmd)
+> -{
+> -	__kvm_flush_dcache_pmd(pmd);
+> -}
+> -
+> -static void kvm_flush_dcache_pud(pud_t pud)
+> -{
+> -	__kvm_flush_dcache_pud(pud);
+> -}
+> -
+>   static bool kvm_is_device_pfn(unsigned long pfn)
+>   {
+>   	return !pfn_valid(pfn);
+>   }
+>   
+> -/**
+> - * stage2_dissolve_pmd() - clear and flush huge PMD entry
+> - * @mmu:	pointer to mmu structure to operate on
+> - * @addr:	IPA
+> - * @pmd:	pmd pointer for IPA
+> - *
+> - * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
+> - */
+> -static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
+> -{
+> -	if (!pmd_thp_or_huge(*pmd))
+> -		return;
+> -
+> -	pmd_clear(pmd);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+> -	put_page(virt_to_page(pmd));
+> -}
+> -
+> -/**
+> - * stage2_dissolve_pud() - clear and flush huge PUD entry
+> - * @mmu:	pointer to mmu structure to operate on
+> - * @addr:	IPA
+> - * @pud:	pud pointer for IPA
+> - *
+> - * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs.
+> - */
+> -static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t *pudp)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -
+> -	if (!stage2_pud_huge(kvm, *pudp))
+> -		return;
+> -
+> -	stage2_pud_clear(kvm, pudp);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+> -	put_page(virt_to_page(pudp));
+> -}
+> -
+> -static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	p4d_t *p4d_table __maybe_unused = stage2_p4d_offset(kvm, pgd, 0UL);
+> -	stage2_pgd_clear(kvm, pgd);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+> -	stage2_p4d_free(kvm, p4d_table);
+> -	put_page(virt_to_page(pgd));
+> -}
+> -
+> -static void clear_stage2_p4d_entry(struct kvm_s2_mmu *mmu, p4d_t *p4d, phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, p4d, 0);
+> -	stage2_p4d_clear(kvm, p4d);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+> -	stage2_pud_free(kvm, pud_table);
+> -	put_page(virt_to_page(p4d));
+> -}
+> -
+> -static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
+> -
+> -	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
+> -	stage2_pud_clear(kvm, pud);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+> -	stage2_pmd_free(kvm, pmd_table);
+> -	put_page(virt_to_page(pud));
+> -}
+> -
+> -static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr_t addr)
+> -{
+> -	pte_t *pte_table = pte_offset_kernel(pmd, 0);
+> -	VM_BUG_ON(pmd_thp_or_huge(*pmd));
+> -	pmd_clear(pmd);
+> -	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
+> -	free_page((unsigned long)pte_table);
+> -	put_page(virt_to_page(pmd));
+> -}
+> -
+> -static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
+> -{
+> -	WRITE_ONCE(*ptep, new_pte);
+> -	dsb(ishst);
+> -}
+> -
+> -static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
+> -{
+> -	WRITE_ONCE(*pmdp, new_pmd);
+> -	dsb(ishst);
+> -}
+> -
+> -static inline void kvm_pmd_populate(pmd_t *pmdp, pte_t *ptep)
+> -{
+> -	kvm_set_pmd(pmdp, kvm_mk_pmd(ptep));
+> -}
+> -
+> -static inline void kvm_pud_populate(pud_t *pudp, pmd_t *pmdp)
+> -{
+> -	WRITE_ONCE(*pudp, kvm_mk_pud(pmdp));
+> -	dsb(ishst);
+> -}
+> -
+> -static inline void kvm_p4d_populate(p4d_t *p4dp, pud_t *pudp)
+> -{
+> -	WRITE_ONCE(*p4dp, kvm_mk_p4d(pudp));
+> -	dsb(ishst);
+> -}
+> -
+> -static inline void kvm_pgd_populate(pgd_t *pgdp, p4d_t *p4dp)
+> -{
+> -#ifndef __PAGETABLE_P4D_FOLDED
+> -	WRITE_ONCE(*pgdp, kvm_mk_pgd(p4dp));
+> -	dsb(ishst);
+> -#endif
+> -}
+> -
+>   /*
+>    * Unmapping vs dcache management:
+>    *
+> @@ -257,108 +107,6 @@ static inline void kvm_pgd_populate(pgd_t *pgdp, p4d_t *p4dp)
+>    * we then fully enforce cacheability of RAM, no matter what the guest
+>    * does.
+>    */
+> -static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
+> -		       phys_addr_t addr, phys_addr_t end)
+> -{
+> -	phys_addr_t start_addr = addr;
+> -	pte_t *pte, *start_pte;
+> -
+> -	start_pte = pte = pte_offset_kernel(pmd, addr);
+> -	do {
+> -		if (!pte_none(*pte)) {
+> -			pte_t old_pte = *pte;
+> -
+> -			kvm_set_pte(pte, __pte(0));
+> -			kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
+> -
+> -			/* No need to invalidate the cache for device mappings */
+> -			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
+> -				kvm_flush_dcache_pte(old_pte);
+> -
+> -			put_page(virt_to_page(pte));
+> -		}
+> -	} while (pte++, addr += PAGE_SIZE, addr != end);
+> -
+> -	if (stage2_pte_table_empty(mmu->kvm, start_pte))
+> -		clear_stage2_pmd_entry(mmu, pmd, start_addr);
+> -}
+> -
+> -static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+> -		       phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	phys_addr_t next, start_addr = addr;
+> -	pmd_t *pmd, *start_pmd;
+> -
+> -	start_pmd = pmd = stage2_pmd_offset(kvm, pud, addr);
+> -	do {
+> -		next = stage2_pmd_addr_end(kvm, addr, end);
+> -		if (!pmd_none(*pmd)) {
+> -			if (pmd_thp_or_huge(*pmd)) {
+> -				pmd_t old_pmd = *pmd;
+> -
+> -				pmd_clear(pmd);
+> -				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+> -
+> -				kvm_flush_dcache_pmd(old_pmd);
+> -
+> -				put_page(virt_to_page(pmd));
+> -			} else {
+> -				unmap_stage2_ptes(mmu, pmd, addr, next);
+> -			}
+> -		}
+> -	} while (pmd++, addr = next, addr != end);
+> -
+> -	if (stage2_pmd_table_empty(kvm, start_pmd))
+> -		clear_stage2_pud_entry(mmu, pud, start_addr);
+> -}
+> -
+> -static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, p4d_t *p4d,
+> -		       phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	phys_addr_t next, start_addr = addr;
+> -	pud_t *pud, *start_pud;
+> -
+> -	start_pud = pud = stage2_pud_offset(kvm, p4d, addr);
+> -	do {
+> -		next = stage2_pud_addr_end(kvm, addr, end);
+> -		if (!stage2_pud_none(kvm, *pud)) {
+> -			if (stage2_pud_huge(kvm, *pud)) {
+> -				pud_t old_pud = *pud;
+> -
+> -				stage2_pud_clear(kvm, pud);
+> -				kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+> -				kvm_flush_dcache_pud(old_pud);
+> -				put_page(virt_to_page(pud));
+> -			} else {
+> -				unmap_stage2_pmds(mmu, pud, addr, next);
+> -			}
+> -		}
+> -	} while (pud++, addr = next, addr != end);
+> -
+> -	if (stage2_pud_table_empty(kvm, start_pud))
+> -		clear_stage2_p4d_entry(mmu, p4d, start_addr);
+> -}
+> -
+> -static void unmap_stage2_p4ds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+> -		       phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	phys_addr_t next, start_addr = addr;
+> -	p4d_t *p4d, *start_p4d;
+> -
+> -	start_p4d = p4d = stage2_p4d_offset(kvm, pgd, addr);
+> -	do {
+> -		next = stage2_p4d_addr_end(kvm, addr, end);
+> -		if (!stage2_p4d_none(kvm, *p4d))
+> -			unmap_stage2_puds(mmu, p4d, addr, next);
+> -	} while (p4d++, addr = next, addr != end);
+> -
+> -	if (stage2_p4d_table_empty(kvm, start_p4d))
+> -		clear_stage2_pgd_entry(mmu, pgd, start_addr);
+> -}
+> -
+>   /**
+>    * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+>    * @kvm:   The VM pointer
+> @@ -387,71 +135,6 @@ static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 si
+>   	__unmap_stage2_range(mmu, start, size, true);
+>   }
+>   
+> -static void stage2_flush_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
+> -			      phys_addr_t addr, phys_addr_t end)
+> -{
+> -	pte_t *pte;
+> -
+> -	pte = pte_offset_kernel(pmd, addr);
+> -	do {
+> -		if (!pte_none(*pte) && !kvm_is_device_pfn(pte_pfn(*pte)))
+> -			kvm_flush_dcache_pte(*pte);
+> -	} while (pte++, addr += PAGE_SIZE, addr != end);
+> -}
+> -
+> -static void stage2_flush_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+> -			      phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pmd_t *pmd;
+> -	phys_addr_t next;
+> -
+> -	pmd = stage2_pmd_offset(kvm, pud, addr);
+> -	do {
+> -		next = stage2_pmd_addr_end(kvm, addr, end);
+> -		if (!pmd_none(*pmd)) {
+> -			if (pmd_thp_or_huge(*pmd))
+> -				kvm_flush_dcache_pmd(*pmd);
+> -			else
+> -				stage2_flush_ptes(mmu, pmd, addr, next);
+> -		}
+> -	} while (pmd++, addr = next, addr != end);
+> -}
+> -
+> -static void stage2_flush_puds(struct kvm_s2_mmu *mmu, p4d_t *p4d,
+> -			      phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pud;
+> -	phys_addr_t next;
+> -
+> -	pud = stage2_pud_offset(kvm, p4d, addr);
+> -	do {
+> -		next = stage2_pud_addr_end(kvm, addr, end);
+> -		if (!stage2_pud_none(kvm, *pud)) {
+> -			if (stage2_pud_huge(kvm, *pud))
+> -				kvm_flush_dcache_pud(*pud);
+> -			else
+> -				stage2_flush_pmds(mmu, pud, addr, next);
+> -		}
+> -	} while (pud++, addr = next, addr != end);
+> -}
+> -
+> -static void stage2_flush_p4ds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+> -			      phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	p4d_t *p4d;
+> -	phys_addr_t next;
+> -
+> -	p4d = stage2_p4d_offset(kvm, pgd, addr);
+> -	do {
+> -		next = stage2_p4d_addr_end(kvm, addr, end);
+> -		if (!stage2_p4d_none(kvm, *p4d))
+> -			stage2_flush_puds(mmu, p4d, addr, next);
+> -	} while (p4d++, addr = next, addr != end);
+> -}
+> -
+>   static void stage2_flush_memslot(struct kvm *kvm,
+>   				 struct kvm_memory_slot *memslot)
+>   {
+> @@ -800,348 +483,6 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   	}
+>   }
+>   
+> -static p4d_t *stage2_get_p4d(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
+> -			     phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pgd_t *pgd;
+> -	p4d_t *p4d;
+> -
+> -	pgd = mmu->pgd + stage2_pgd_index(kvm, addr);
+> -	if (stage2_pgd_none(kvm, *pgd)) {
+> -		if (!cache)
+> -			return NULL;
+> -		p4d = kvm_mmu_memory_cache_alloc(cache);
+> -		stage2_pgd_populate(kvm, pgd, p4d);
+> -		get_page(virt_to_page(pgd));
+> -	}
+> -
+> -	return stage2_p4d_offset(kvm, pgd, addr);
+> -}
+> -
+> -static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
+> -			     phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	p4d_t *p4d;
+> -	pud_t *pud;
+> -
+> -	p4d = stage2_get_p4d(mmu, cache, addr);
+> -	if (stage2_p4d_none(kvm, *p4d)) {
+> -		if (!cache)
+> -			return NULL;
+> -		pud = kvm_mmu_memory_cache_alloc(cache);
+> -		stage2_p4d_populate(kvm, p4d, pud);
+> -		get_page(virt_to_page(p4d));
+> -	}
+> -
+> -	return stage2_pud_offset(kvm, p4d, addr);
+> -}
+> -
+> -static pmd_t *stage2_get_pmd(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
+> -			     phys_addr_t addr)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pud;
+> -	pmd_t *pmd;
+> -
+> -	pud = stage2_get_pud(mmu, cache, addr);
+> -	if (!pud || stage2_pud_huge(kvm, *pud))
+> -		return NULL;
+> -
+> -	if (stage2_pud_none(kvm, *pud)) {
+> -		if (!cache)
+> -			return NULL;
+> -		pmd = kvm_mmu_memory_cache_alloc(cache);
+> -		stage2_pud_populate(kvm, pud, pmd);
+> -		get_page(virt_to_page(pud));
+> -	}
+> -
+> -	return stage2_pmd_offset(kvm, pud, addr);
+> -}
+> -
+> -static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
+> -			       struct kvm_mmu_memory_cache *cache,
+> -			       phys_addr_t addr, const pmd_t *new_pmd)
+> -{
+> -	pmd_t *pmd, old_pmd;
+> -
+> -retry:
+> -	pmd = stage2_get_pmd(mmu, cache, addr);
+> -	VM_BUG_ON(!pmd);
+> -
+> -	old_pmd = *pmd;
+> -	/*
+> -	 * Multiple vcpus faulting on the same PMD entry, can
+> -	 * lead to them sequentially updating the PMD with the
+> -	 * same value. Following the break-before-make
+> -	 * (pmd_clear() followed by tlb_flush()) process can
+> -	 * hinder forward progress due to refaults generated
+> -	 * on missing translations.
+> -	 *
+> -	 * Skip updating the page table if the entry is
+> -	 * unchanged.
+> -	 */
+> -	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+> -		return 0;
+> -
+> -	if (pmd_present(old_pmd)) {
+> -		/*
+> -		 * If we already have PTE level mapping for this block,
+> -		 * we must unmap it to avoid inconsistent TLB state and
+> -		 * leaking the table page. We could end up in this situation
+> -		 * if the memory slot was marked for dirty logging and was
+> -		 * reverted, leaving PTE level mappings for the pages accessed
+> -		 * during the period. So, unmap the PTE level mapping for this
+> -		 * block and retry, as we could have released the upper level
+> -		 * table in the process.
+> -		 *
+> -		 * Normal THP split/merge follows mmu_notifier callbacks and do
+> -		 * get handled accordingly.
+> -		 */
+> -		if (!pmd_thp_or_huge(old_pmd)) {
+> -			unmap_stage2_range(mmu, addr & S2_PMD_MASK, S2_PMD_SIZE);
+> -			goto retry;
+> -		}
+> -		/*
+> -		 * Mapping in huge pages should only happen through a
+> -		 * fault.  If a page is merged into a transparent huge
+> -		 * page, the individual subpages of that huge page
+> -		 * should be unmapped through MMU notifiers before we
+> -		 * get here.
+> -		 *
+> -		 * Merging of CompoundPages is not supported; they
+> -		 * should become splitting first, unmapped, merged,
+> -		 * and mapped back in on-demand.
+> -		 */
+> -		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+> -		pmd_clear(pmd);
+> -		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PMD_LEVEL);
+> -	} else {
+> -		get_page(virt_to_page(pmd));
+> -	}
+> -
+> -	kvm_set_pmd(pmd, *new_pmd);
+> -	return 0;
+> -}
+> -
+> -static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
+> -			       struct kvm_mmu_memory_cache *cache,
+> -			       phys_addr_t addr, const pud_t *new_pudp)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pudp, old_pud;
+> -
+> -retry:
+> -	pudp = stage2_get_pud(mmu, cache, addr);
+> -	VM_BUG_ON(!pudp);
+> -
+> -	old_pud = *pudp;
+> -
+> -	/*
+> -	 * A large number of vcpus faulting on the same stage 2 entry,
+> -	 * can lead to a refault due to the stage2_pud_clear()/tlb_flush().
+> -	 * Skip updating the page tables if there is no change.
+> -	 */
+> -	if (pud_val(old_pud) == pud_val(*new_pudp))
+> -		return 0;
+> -
+> -	if (stage2_pud_present(kvm, old_pud)) {
+> -		/*
+> -		 * If we already have table level mapping for this block, unmap
+> -		 * the range for this block and retry.
+> -		 */
+> -		if (!stage2_pud_huge(kvm, old_pud)) {
+> -			unmap_stage2_range(mmu, addr & S2_PUD_MASK, S2_PUD_SIZE);
+> -			goto retry;
+> -		}
+> -
+> -		WARN_ON_ONCE(kvm_pud_pfn(old_pud) != kvm_pud_pfn(*new_pudp));
+> -		stage2_pud_clear(kvm, pudp);
+> -		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PUD_LEVEL);
+> -	} else {
+> -		get_page(virt_to_page(pudp));
+> -	}
+> -
+> -	kvm_set_pud(pudp, *new_pudp);
+> -	return 0;
+> -}
+> -
+> -/*
+> - * stage2_get_leaf_entry - walk the stage2 VM page tables and return
+> - * true if a valid and present leaf-entry is found. A pointer to the
+> - * leaf-entry is returned in the appropriate level variable - pudpp,
+> - * pmdpp, ptepp.
+> - */
+> -static bool stage2_get_leaf_entry(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+> -				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pudp;
+> -	pmd_t *pmdp;
+> -	pte_t *ptep;
+> -
+> -	*pudpp = NULL;
+> -	*pmdpp = NULL;
+> -	*ptepp = NULL;
+> -
+> -	pudp = stage2_get_pud(mmu, NULL, addr);
+> -	if (!pudp || stage2_pud_none(kvm, *pudp) || !stage2_pud_present(kvm, *pudp))
+> -		return false;
+> -
+> -	if (stage2_pud_huge(kvm, *pudp)) {
+> -		*pudpp = pudp;
+> -		return true;
+> -	}
+> -
+> -	pmdp = stage2_pmd_offset(kvm, pudp, addr);
+> -	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
+> -		return false;
+> -
+> -	if (pmd_thp_or_huge(*pmdp)) {
+> -		*pmdpp = pmdp;
+> -		return true;
+> -	}
+> -
+> -	ptep = pte_offset_kernel(pmdp, addr);
+> -	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
+> -		return false;
+> -
+> -	*ptepp = ptep;
+> -	return true;
+> -}
+> -
+> -static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr, unsigned long sz)
+> -{
+> -	pud_t *pudp;
+> -	pmd_t *pmdp;
+> -	pte_t *ptep;
+> -	bool found;
+> -
+> -	found = stage2_get_leaf_entry(mmu, addr, &pudp, &pmdp, &ptep);
+> -	if (!found)
+> -		return false;
+> -
+> -	if (pudp)
+> -		return sz <= PUD_SIZE && kvm_s2pud_exec(pudp);
+> -	else if (pmdp)
+> -		return sz <= PMD_SIZE && kvm_s2pmd_exec(pmdp);
+> -	else
+> -		return sz == PAGE_SIZE && kvm_s2pte_exec(ptep);
+> -}
+> -
+> -static int stage2_set_pte(struct kvm_s2_mmu *mmu,
+> -			  struct kvm_mmu_memory_cache *cache,
+> -			  phys_addr_t addr, const pte_t *new_pte,
+> -			  unsigned long flags)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pud;
+> -	pmd_t *pmd;
+> -	pte_t *pte, old_pte;
+> -	bool iomap = flags & KVM_S2PTE_FLAG_IS_IOMAP;
+> -	bool logging_active = flags & KVM_S2_FLAG_LOGGING_ACTIVE;
+> -
+> -	VM_BUG_ON(logging_active && !cache);
+> -
+> -	/* Create stage-2 page table mapping - Levels 0 and 1 */
+> -	pud = stage2_get_pud(mmu, cache, addr);
+> -	if (!pud) {
+> -		/*
+> -		 * Ignore calls from kvm_set_spte_hva for unallocated
+> -		 * address ranges.
+> -		 */
+> -		return 0;
+> -	}
+> -
+> -	/*
+> -	 * While dirty page logging - dissolve huge PUD, then continue
+> -	 * on to allocate page.
+> -	 */
+> -	if (logging_active)
+> -		stage2_dissolve_pud(mmu, addr, pud);
+> -
+> -	if (stage2_pud_none(kvm, *pud)) {
+> -		if (!cache)
+> -			return 0; /* ignore calls from kvm_set_spte_hva */
+> -		pmd = kvm_mmu_memory_cache_alloc(cache);
+> -		stage2_pud_populate(kvm, pud, pmd);
+> -		get_page(virt_to_page(pud));
+> -	}
+> -
+> -	pmd = stage2_pmd_offset(kvm, pud, addr);
+> -	if (!pmd) {
+> -		/*
+> -		 * Ignore calls from kvm_set_spte_hva for unallocated
+> -		 * address ranges.
+> -		 */
+> -		return 0;
+> -	}
+> -
+> -	/*
+> -	 * While dirty page logging - dissolve huge PMD, then continue on to
+> -	 * allocate page.
+> -	 */
+> -	if (logging_active)
+> -		stage2_dissolve_pmd(mmu, addr, pmd);
+> -
+> -	/* Create stage-2 page mappings - Level 2 */
+> -	if (pmd_none(*pmd)) {
+> -		if (!cache)
+> -			return 0; /* ignore calls from kvm_set_spte_hva */
+> -		pte = kvm_mmu_memory_cache_alloc(cache);
+> -		kvm_pmd_populate(pmd, pte);
+> -		get_page(virt_to_page(pmd));
+> -	}
+> -
+> -	pte = pte_offset_kernel(pmd, addr);
+> -
+> -	if (iomap && pte_present(*pte))
+> -		return -EFAULT;
+> -
+> -	/* Create 2nd stage page table mapping - Level 3 */
+> -	old_pte = *pte;
+> -	if (pte_present(old_pte)) {
+> -		/* Skip page table update if there is no change */
+> -		if (pte_val(old_pte) == pte_val(*new_pte))
+> -			return 0;
+> -
+> -		kvm_set_pte(pte, __pte(0));
+> -		kvm_tlb_flush_vmid_ipa(mmu, addr, S2_PTE_LEVEL);
+> -	} else {
+> -		get_page(virt_to_page(pte));
+> -	}
+> -
+> -	kvm_set_pte(pte, *new_pte);
+> -	return 0;
+> -}
+> -
+> -#ifndef __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
+> -static int stage2_ptep_test_and_clear_young(pte_t *pte)
+> -{
+> -	if (pte_young(*pte)) {
+> -		*pte = pte_mkold(*pte);
+> -		return 1;
+> -	}
+> -	return 0;
+> -}
+> -#else
+> -static int stage2_ptep_test_and_clear_young(pte_t *pte)
+> -{
+> -	return __ptep_test_and_clear_young(pte);
+> -}
+> -#endif
+> -
+> -static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
+> -{
+> -	return stage2_ptep_test_and_clear_young((pte_t *)pmd);
+> -}
+> -
+> -static int stage2_pudp_test_and_clear_young(pud_t *pud)
+> -{
+> -	return stage2_ptep_test_and_clear_young((pte_t *)pud);
+> -}
+> -
+>   /**
+>    * kvm_phys_addr_ioremap - map a device range to guest IPA
+>    *
+> @@ -1181,102 +522,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>   	return ret;
+>   }
+>   
+> -/**
+> - * stage2_wp_ptes - write protect PMD range
+> - * @pmd:	pointer to pmd entry
+> - * @addr:	range start address
+> - * @end:	range end address
+> - */
+> -static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
+> -{
+> -	pte_t *pte;
+> -
+> -	pte = pte_offset_kernel(pmd, addr);
+> -	do {
+> -		if (!pte_none(*pte)) {
+> -			if (!kvm_s2pte_readonly(pte))
+> -				kvm_set_s2pte_readonly(pte);
+> -		}
+> -	} while (pte++, addr += PAGE_SIZE, addr != end);
+> -}
+> -
+> -/**
+> - * stage2_wp_pmds - write protect PUD range
+> - * kvm:		kvm instance for the VM
+> - * @pud:	pointer to pud entry
+> - * @addr:	range start address
+> - * @end:	range end address
+> - */
+> -static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+> -			   phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pmd_t *pmd;
+> -	phys_addr_t next;
+> -
+> -	pmd = stage2_pmd_offset(kvm, pud, addr);
+> -
+> -	do {
+> -		next = stage2_pmd_addr_end(kvm, addr, end);
+> -		if (!pmd_none(*pmd)) {
+> -			if (pmd_thp_or_huge(*pmd)) {
+> -				if (!kvm_s2pmd_readonly(pmd))
+> -					kvm_set_s2pmd_readonly(pmd);
+> -			} else {
+> -				stage2_wp_ptes(pmd, addr, next);
+> -			}
+> -		}
+> -	} while (pmd++, addr = next, addr != end);
+> -}
+> -
+> -/**
+> - * stage2_wp_puds - write protect P4D range
+> - * @p4d:	pointer to p4d entry
+> - * @addr:	range start address
+> - * @end:	range end address
+> - */
+> -static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, p4d_t *p4d,
+> -			    phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	pud_t *pud;
+> -	phys_addr_t next;
+> -
+> -	pud = stage2_pud_offset(kvm, p4d, addr);
+> -	do {
+> -		next = stage2_pud_addr_end(kvm, addr, end);
+> -		if (!stage2_pud_none(kvm, *pud)) {
+> -			if (stage2_pud_huge(kvm, *pud)) {
+> -				if (!kvm_s2pud_readonly(pud))
+> -					kvm_set_s2pud_readonly(pud);
+> -			} else {
+> -				stage2_wp_pmds(mmu, pud, addr, next);
+> -			}
+> -		}
+> -	} while (pud++, addr = next, addr != end);
+> -}
+> -
+> -/**
+> - * stage2_wp_p4ds - write protect PGD range
+> - * @pgd:	pointer to pgd entry
+> - * @addr:	range start address
+> - * @end:	range end address
+> - */
+> -static void  stage2_wp_p4ds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+> -			    phys_addr_t addr, phys_addr_t end)
+> -{
+> -	struct kvm *kvm = mmu->kvm;
+> -	p4d_t *p4d;
+> -	phys_addr_t next;
+> -
+> -	p4d = stage2_p4d_offset(kvm, pgd, addr);
+> -	do {
+> -		next = stage2_p4d_addr_end(kvm, addr, end);
+> -		if (!stage2_p4d_none(kvm, *p4d))
+> -			stage2_wp_puds(mmu, p4d, addr, next);
+> -	} while (p4d++, addr = next, addr != end);
+> -}
+> -
+>   /**
+>    * stage2_wp_range() - write protect stage2 memory region range
+>    * @kvm:	The KVM pointer
+> 
+
+Thanks,
+Gavin
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
