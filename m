@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA018C433E2
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 16:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFF4C433E2
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 17:57:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 542D8206A5
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 16:50:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF2F120709
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 17:57:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="riheCyTm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 542D8206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYIl2/io"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF2F120709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0286A4B2AC;
-	Thu,  3 Sep 2020 12:50:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44EA84B272;
+	Thu,  3 Sep 2020 13:57:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KTNhapq42cLF; Thu,  3 Sep 2020 12:50:29 -0400 (EDT)
+	with ESMTP id WLpdZbupi0fP; Thu,  3 Sep 2020 13:57:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0D384B1DD;
-	Thu,  3 Sep 2020 12:50:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE494B2AE;
+	Thu,  3 Sep 2020 13:57:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D91A54B1DD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 12:50:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C92C24B275
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 13:57:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ipK6C9CVblb1 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 12:50:27 -0400 (EDT)
+ with ESMTP id YTLywGyt8d9H for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 13:57:09 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA1E14B15B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 12:50:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEFE14B272
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 13:57:09 -0400 (EDT)
 Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
  bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6EAA720716;
- Thu,  3 Sep 2020 16:50:24 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1B16B20709;
+ Thu,  3 Sep 2020 17:57:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599151826;
- bh=SxV6b5DWiuiTUilOGP66Lgu5Un5sWRs6Gj8Z2yo4omc=;
+ s=default; t=1599155828;
+ bh=2XdIHt52yGXUwXroS4penvSseXtOpwUM7768fr+Nxs0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=riheCyTmfxInRrx88zbQ8sBXKp4yggB/z/YyrSr15LQMjv2uuV+qPHWC8WVPyRGNQ
- u4EqozjnlMG16YprsMQg+1ToDtZGATEEPuOgQLW0Pqi33/Wvq8T9hhn0h7z+esH6yw
- ctAuoOJi2VrP1gth4+sNVczenTzze1hDhVlvPqbM=
-Date: Thu, 3 Sep 2020 17:50:21 +0100
+ b=OYIl2/iooQM9oQC0nlZG9sDIqd/xYwgtOg6VMWOLVBG4LJQzN18kpFAz5sd852tDv
+ NG33WdJFquZEcbGDKCg7hi+/v8nnMY+vsl1pUFPfNaSfswAIS5v34skZcsjyVr76Rb
+ pcUgNYMtgvTMaN7siXy1EFuzPJvLsIQH4el3Jw1A=
+Date: Thu, 3 Sep 2020 18:57:03 +0100
 From: Will Deacon <will@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 20/21] KVM: arm64: Remove unused 'pgd' field from
- 'struct kvm_s2_mmu'
-Message-ID: <20200903165020.GC7791@willie-the-truck>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 09/21] KVM: arm64: Convert unmap_stage2_range() to
+ generic page-table API
+Message-ID: <20200903175702.GA8078@willie-the-truck>
 References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-21-will@kernel.org>
- <f0a64bb2-5371-9f44-1c64-035cbc6dcf5b@redhat.com>
+ <20200825093953.26493-10-will@kernel.org>
+ <1f2e88b7-0265-195f-3bd8-4e1d5b8694e3@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <f0a64bb2-5371-9f44-1c64-035cbc6dcf5b@redhat.com>
+In-Reply-To: <1f2e88b7-0265-195f-3bd8-4e1d5b8694e3@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,65 +84,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 03, 2020 at 03:07:17PM +1000, Gavin Shan wrote:
-> On 8/25/20 7:39 PM, Will Deacon wrote:
-> > The stage-2 page-tables are entirely encapsulated by the 'pgt' field of
-> > 'struct kvm_s2_mmu', so remove the unused 'pgd' field.
-> > 
+On Wed, Sep 02, 2020 at 05:23:08PM +0100, Alexandru Elisei wrote:
+> On 8/25/20 10:39 AM, Will Deacon wrote:
+> > Convert unmap_stage2_range() to use kvm_pgtable_stage2_unmap() instead
+> > of walking the page-table directly.
+> >
 > > Cc: Marc Zyngier <maz@kernel.org>
 > > Cc: Quentin Perret <qperret@google.com>
 > > Signed-off-by: Will Deacon <will@kernel.org>
 > > ---
-> >   arch/arm64/include/asm/kvm_host.h | 1 -
-> >   arch/arm64/kvm/mmu.c              | 2 --
-> >   2 files changed, 3 deletions(-)
-> > 
-> 
-> I think this might be folded into PATCH[18] as both patches are
-> simple enough. I'm not sure the changes introduced in PATCH[19]
-> prevent us doing this.
-> 
-> There is another question below.
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 0b7c702b2151..41caf29bd93c 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -79,7 +79,6 @@ struct kvm_s2_mmu {
-> >   	 * for vEL1/EL0 with vHCR_EL2.VM == 0.  In that case, we use the
-> >   	 * canonical stage-2 page tables.
-> >   	 */
-> > -	pgd_t		*pgd;
-> >   	phys_addr_t	pgd_phys;
-> >   	struct kvm_pgtable *pgt;
+> >  arch/arm64/kvm/mmu.c | 57 +++++++++++++++++++++++++-------------------
+> >  1 file changed, 32 insertions(+), 25 deletions(-)
+> >
 > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index ddeec0b03666..f28e03dcb897 100644
+> > index 704b471a48ce..751ce2462765 100644
 > > --- a/arch/arm64/kvm/mmu.c
 > > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -384,7 +384,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
-> >   	mmu->kvm = kvm;
-> >   	mmu->pgt = pgt;
-> >   	mmu->pgd_phys = __pa(pgt->pgd);
-> > -	mmu->pgd = (void *)pgt->pgd;
-> >   	mmu->vmid.vmid_gen = 0;
-> >   	return 0;
-> > @@ -470,7 +469,6 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
-> >   	spin_lock(&kvm->mmu_lock);
-> >   	pgt = mmu->pgt;
-> >   	if (pgt) {
-> > -		mmu->pgd = NULL;
-> >   		mmu->pgd_phys = 0;
-> >   		mmu->pgt = NULL;
-> >   		free_percpu(mmu->last_vcpu_ran);
-> > 
+> > @@ -39,6 +39,33 @@ static bool is_iomap(unsigned long flags)
+> >  	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+> >  }
+> >  
+> > +/*
+> > + * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+> > + * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
+> > + * CONFIG_LOCKUP_DETECTOR, CONFIG_LOCKDEP. Additionally, holding the lock too
+> > + * long will also starve other vCPUs. We have to also make sure that the page
+> > + * tables are not freed while we released the lock.
+> > + */
+> > +#define stage2_apply_range(kvm, addr, end, fn, resched)			\
+> > +({									\
+> > +	int ret;							\
+> > +	struct kvm *__kvm = (kvm);					\
+> > +	bool __resched = (resched);					\
+> > +	u64 next, __addr = (addr), __end = (end);			\
+> > +	do {								\
+> > +		struct kvm_pgtable *pgt = __kvm->arch.mmu.pgt;		\
+> > +		if (!pgt)						\
+> > +			break;						\
 > 
-> I guess mmu->pgd_phys might be removed either because kvm_get_vttbr()
-> is the only consumer.
+> I'm 100% sure there's a reason why we've dropped the READ_ONCE, but it still looks
+> to me like the compiler might decide to optimize by reading pgt once at the start
+> of the loop and stashing it in a register. Would you mind explaining what I am
+> missing?
 
-Hmm, but kvm_get_vttbr() is still used after these patches, so I think
-the pgd_phys field needs to stick around.
+The load always happens with the mmu_lock held, so I think it's not a
+problem because it means that the pointer is stable.
+spin_lock()/spin_unlock() imply compiler barriers.
+
+> > +		next = stage2_pgd_addr_end(__kvm, __addr, __end);	\
+> > +		ret = fn(pgt, __addr, next - __addr);			\
+> > +		if (ret)						\
+> > +			break;						\
+> > +		if (__resched && next != __end)				\
+> > +			cond_resched_lock(&__kvm->mmu_lock);		\
+> > +	} while (__addr = next, __addr != __end);			\
+> > +	ret;								\
+> > +})
+> 
+> This seems unusual to me. We have a non-trivial, multiline macro which calls
+> cond_resched(), has 6 local variables, and is called from exactly one place.I am
+> curious why we are not open coding the loop in __unmap_stage2_range() or using a
+> function.
+
+It's called from three places. That said, I think it's like this because in
+an earlier life it was used as an iterator and therefore had to be a macro.
+I can try moving it into a function instead.
 
 Will
 _______________________________________________
