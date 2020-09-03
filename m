@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2134BC43461
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD2CC433E2
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8E912098B
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE27E208B3
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="dw6VWu9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E912098B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="aLacCg2v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE27E208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 647F64B31D;
-	Thu,  3 Sep 2020 09:53:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8E84B1DD;
+	Thu,  3 Sep 2020 09:53:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xjg5lLFRpmmx; Thu,  3 Sep 2020 09:53:46 -0400 (EDT)
+	with ESMTP id x1+Z3rKk1SEe; Thu,  3 Sep 2020 09:53:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 793524B2FC;
-	Thu,  3 Sep 2020 09:53:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3F214B280;
+	Thu,  3 Sep 2020 09:53:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D74084B2FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50EAF4B14C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EuVgIKGi8bAK for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 09:53:43 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE8294B2AF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:43 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id y32so1881931qve.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Sep 2020 06:53:43 -0700 (PDT)
+ with ESMTP id sJ2x1VN4L+xm for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 09:53:47 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 382094B300
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:47 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id l67so2898640ybb.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Sep 2020 06:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=8tun+mNUouTN1gi05pQv0+5fko5re9VKERyIyBMpl10=;
- b=dw6VWu9ebKXKWqq3fPYyUjJFAFbdkjKJ8Ytc9InKLnLfvALeugKsL/vlecuCO3XeHE
- wRZCKv+oSOAMdAGo+W6RvjY/FS7zXbywxPnblTM2qIiR4cZNyGkl0D5NhOQ2SkxGVoFn
- 2i0Q8u1u9b5tuzYWK6UpLg/eWkDOm8WkR/uIYmqoqwtq4jXJbzqeWtbUJTyr4W1l1QGU
- SkXFKbAh16zKLBfEuqaScgXBnW/2U0Ma91wPiu/w0ZbNw/jy0Y9NeQLAlxMzwqJINpXk
- jirT3TyG7j04UbIWaTQY4zIHndgXrCT5N9hvIdKo0zk8ZIzpPef8C5VkUew77bpAY4hg
- MhBQ==
+ :from:to:cc; bh=4iP/0UmEC3+yJOjmYc8EWVC/sjbrwx1IUcG157f2HaQ=;
+ b=aLacCg2v86hUnmf7odV/s5z/WAbRXvfyamfg7rnFPyJ0c/AHAKFrNblQS/fgSB/ADY
+ A9sP3/R4n9SEbVvduYpp+0MFCoPjIVgZcs6lJy5QEM9Yc3qf2FN6pWSH5QvdS3UWxbLQ
+ mF3Ye2t2/OkpzyifnZjywJToU0kyuZFZdvGy3N9NDBX0TzrKASbz1u0JLN9EepS+VNhh
+ qb3I2rUipw8AKHuLwvfMXzOxixwN58bkmXFIViVmkc6y41aBhclNvE9VESvtX7S6ORQF
+ eYSLOt+17oIAkdySsgqNRt4S5RV/OHHcWHjTmY0xoEsrky1C/3s0GgScRt37729gkU5t
+ tWNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=8tun+mNUouTN1gi05pQv0+5fko5re9VKERyIyBMpl10=;
- b=C0sFCRy8bGANlRBhPVtrRPQka/SI9UMi1HMr+2Iq0g8NlE8OWfzWQgRQCeyma0VySs
- dUQhOD9bIU76GZH56F1N6qS5YEkLEDCXZ7j6262ovjtn7Rm6r2RPN6Pu2B3Ct0d1jF4Y
- x7agb+D9tmkDPuAimEVsi9NgZ7QXytRBFCg+tGQ5DTmW3p97HOTImdBUXUJ7Cy8rKk3r
- MQGAZiiz6gqhMOtphQNXLHaHay/+219kFY/grtzIkB0nthCc4rl+RGbc2FXx+kCWyzK0
- qJcJfyw+dbPl0zelbDDtXqVDLy+uzjDsXz4ffD5IQBDdT7wlLikiPf0NYCw4SnNbpUvO
- CWmg==
-X-Gm-Message-State: AOAM532tNlhjiMaWyM6mcp08T6a/u8nX+DZEImpdO18eBRBe6lAVb5gf
- FinbWMr/eGZ+At4sJXC6KVnCyj7pgeLgEMS0bUmzF52yrZq4DgVLmsej54qq1YG4Wrs3oZKQCo7
- /uDeOCBuJAXygzBvJT8/Xs0X4radtwnRfXLcGNbrzZqgqSJca/+sj17b1lLrajO5qW99/ww==
-X-Google-Smtp-Source: ABdhPJx+4w9R7rTpAdHDa+2P8yo/me/0lKUZwjHaFi6O27rkEcpudYYqEBfyZiyTwHgX6y8wNl/xEi8FyvI=
+ bh=4iP/0UmEC3+yJOjmYc8EWVC/sjbrwx1IUcG157f2HaQ=;
+ b=KrIxIrDcuH4s1BpBkba4hWpGWotE2U9xbFmfREK0XZ751uaP3aRmsmfjsARPrEyCXF
+ KiY77cY0drsdFEP2H0faK3FMWOi4Yx9vT2AViav63lthERPPNMNvjkn6sA0LkaGt/h2l
+ deqf93rXc/apasdzXOXeU8sdHGqmuVHa9fHAtz9Zpi55bbBV/1mGp+b0ANfP1z08rvC2
+ YMe1+j+yI8223ueQEn7i81zc+TVrgH4tfx2rAq9k5YWagj02m+mgXCRo0BEgH90JvUlL
+ /v1xiAAEgGjSWDJv051ACRokdh5Iu7Yz9EZ3SQP9lcBvEb+83I8Vx9HC8rPGtK8BfitK
+ I6HQ==
+X-Gm-Message-State: AOAM530ymOI83/4xjHREIitGbikHIssOPuqF66zs5J5Ucj8D0J0tu+1o
+ teLDI+T+8tmYw4FXCSr62z7dyIShOIcZHqwJjfoS5UIJuaN3vFhoS/tyTbhNCp5tVr/KYBbsDfC
+ XROx7ql6sF6x3SzZLTcLPvP/Bsiv3rp1rn04jSxVi0snE79PlApdH5l6Deh4MqrM3somRyw==
+X-Google-Smtp-Source: ABdhPJxRFkOJikYMz+BDwt8BKYMA4bhps+QNVk7nAdKaPI6HmB+eD97tWpk67Ge43bFov2pZjNujt2Ge5eU=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a0c:f48e:: with SMTP id
- i14mr1950105qvm.5.1599141223418; 
- Thu, 03 Sep 2020 06:53:43 -0700 (PDT)
-Date: Thu,  3 Sep 2020 14:53:03 +0100
+ (user=ascull job=sendgmr) by 2002:a25:3891:: with SMTP id
+ f139mr2838638yba.174.1599141225490; 
+ Thu, 03 Sep 2020 06:53:45 -0700 (PDT)
+Date: Thu,  3 Sep 2020 14:53:04 +0100
 In-Reply-To: <20200903135307.251331-1-ascull@google.com>
-Message-Id: <20200903135307.251331-15-ascull@google.com>
+Message-Id: <20200903135307.251331-16-ascull@google.com>
 Mime-Version: 1.0
 References: <20200903135307.251331-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.402.g5ffc5be6b7-goog
-Subject: [PATCH v3 14/18] smccc: Cast arguments to unsigned long
+Subject: [PATCH v3 15/18] KVM: arm64: nVHE: Pass pointers consistently to
+ hyp-init
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -100,77 +101,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To avoid warning about implicit casting, make the casting explicit. This
-allows, for example, pointers to be used as arguments as are used in the
-KVM hyp interface.
+Rather than some being kernel pointer and others being hyp pointers,
+standardize on all pointers being hyp pointers.
 
-Cc: Sudeep Holla <sudeep.holla@arm.com>
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- include/linux/arm-smccc.h | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/arm.c               | 1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 15c706fb0a37..3bb109a35554 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -260,7 +260,7 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 	typeof(a1) __a1 = a1;						\
- 	struct arm_smccc_res   *___res = res;				\
- 	register unsigned long r0 asm("r0") = (u32)a0;			\
--	register unsigned long r1 asm("r1") = __a1;			\
-+	register unsigned long r1 asm("r1") = (unsigned long)__a1;	\
- 	register unsigned long r2 asm("r2");				\
- 	register unsigned long r3 asm("r3")
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ae4b34f91e94..6b7180072c8d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1278,6 +1278,7 @@ static void cpu_init_hyp_mode(void)
  
-@@ -269,8 +269,8 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 	typeof(a2) __a2 = a2;						\
- 	struct arm_smccc_res   *___res = res;				\
- 	register unsigned long r0 asm("r0") = (u32)a0;			\
--	register unsigned long r1 asm("r1") = __a1;			\
--	register unsigned long r2 asm("r2") = __a2;			\
-+	register unsigned long r1 asm("r1") = (unsigned long)__a1;	\
-+	register unsigned long r2 asm("r2") = (unsigned long)__a2;	\
- 	register unsigned long r3 asm("r3")
+ 	pgd_ptr = kvm_mmu_get_httbr();
+ 	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
++	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
+ 	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
  
- #define __declare_arg_3(a0, a1, a2, a3, res)				\
-@@ -279,29 +279,29 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
- 	typeof(a3) __a3 = a3;						\
- 	struct arm_smccc_res   *___res = res;				\
- 	register unsigned long r0 asm("r0") = (u32)a0;			\
--	register unsigned long r1 asm("r1") = __a1;			\
--	register unsigned long r2 asm("r2") = __a2;			\
--	register unsigned long r3 asm("r3") = __a3
-+	register unsigned long r1 asm("r1") = (unsigned long)__a1;	\
-+	register unsigned long r2 asm("r2") = (unsigned long)__a2;	\
-+	register unsigned long r3 asm("r3") = (unsigned long)__a3
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index d9434e90c06d..abe885e26fe2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -114,7 +114,6 @@ alternative_else_nop_endif
+ 	isb
  
- #define __declare_arg_4(a0, a1, a2, a3, a4, res)			\
- 	typeof(a4) __a4 = a4;						\
- 	__declare_arg_3(a0, a1, a2, a3, res);				\
--	register unsigned long r4 asm("r4") = __a4
-+	register unsigned long r4 asm("r4") = (unsigned long)__a4
+ 	/* Set the stack and new vectors */
+-	kern_hyp_va	x1
+ 	mov	sp, x1
+ 	msr	vbar_el2, x2
  
- #define __declare_arg_5(a0, a1, a2, a3, a4, a5, res)			\
- 	typeof(a5) __a5 = a5;						\
- 	__declare_arg_4(a0, a1, a2, a3, a4, res);			\
--	register unsigned long r5 asm("r5") = __a5
-+	register unsigned long r5 asm("r5") = (unsigned long)__a5
- 
- #define __declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res)		\
- 	typeof(a6) __a6 = a6;						\
- 	__declare_arg_5(a0, a1, a2, a3, a4, a5, res);			\
--	register unsigned long r6 asm("r6") = __a6
-+	register unsigned long r6 asm("r6") = (unsigned long)__a6
- 
- #define __declare_arg_7(a0, a1, a2, a3, a4, a5, a6, a7, res)		\
- 	typeof(a7) __a7 = a7;						\
- 	__declare_arg_6(a0, a1, a2, a3, a4, a5, a6, res);		\
--	register unsigned long r7 asm("r7") = __a7
-+	register unsigned long r7 asm("r7") = (unsigned long)__a7
- 
- #define ___declare_args(count, ...) __declare_arg_ ## count(__VA_ARGS__)
- #define __declare_args(count, ...)  ___declare_args(count, __VA_ARGS__)
 -- 
 2.28.0.402.g5ffc5be6b7-goog
 
