@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D92CC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D484DC43461
 	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 53C2B208B3
+	by mail.kernel.org (Postfix) with ESMTP id 8CF4F208FE
 	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1oJVtoOj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C2B208B3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1UjjiO2e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CF4F208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C1784B32B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC564B2F6;
 	Thu,  3 Sep 2020 11:56:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PYu9gUQ4Jb+s; Thu,  3 Sep 2020 11:56:09 -0400 (EDT)
+	with ESMTP id WFFsWguh5XVw; Thu,  3 Sep 2020 11:56:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D43344B2F4;
-	Thu,  3 Sep 2020 11:56:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC7324B2CA;
+	Thu,  3 Sep 2020 11:56:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E68F4B249
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B498B4B2CA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H-39Zzhr7ZnE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 11:56:07 -0400 (EDT)
+ with ESMTP id n7rtGPwxs803 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 11:56:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AA514B2C7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59AE94B2AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:04 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 54E4B20775;
- Thu,  3 Sep 2020 15:56:05 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 763C62072A;
+ Thu,  3 Sep 2020 15:56:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599148565;
- bh=BmshpFlV+n7bQmpjLopkOVFKcvTuVvSTl9VMzmtkbv4=;
+ s=default; t=1599148563;
+ bh=RtheV7zntSjszuTkTZNq3N4qWHVjJZ30ZDdbYBqb6bQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=1oJVtoOjR7FgrGeGiYdGO8mweovEh7c6U9WSv1EPU8Y17MkDVEfGpwTE4B7OXAuTO
- qJEFPHJAIhL+WJu3ISTXo6V4rnG8vYzSrKWlzEu9w07rXUw3lw7SWXQoxbWSByqjv7
- 1veGfPOUuITYAykVdRc3pU0BMNCEt2Vu/h6mcAhg=
+ b=1UjjiO2eov6+tvS5ukHhmY1PUoxZ30d8DWaNcfYPOqEntFLNM9uB8uj2vp+R7lsxB
+ EXf8cBNX5Zx6iSVlKXXyFqwsbT/oQgaKTFAFxNRTHCZttUzN4qoHaVNODXJ2RZBwOR
+ Bq1FPFjCsXrG3/Ao577lZ56K9HWIxXEeHMWjEFI4=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kDr8B-008vT9-SM; Thu, 03 Sep 2020 16:26:31 +0100
+ id 1kDr8A-008vT9-M8; Thu, 03 Sep 2020 16:26:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 18/23] KVM: arm64: Move set_owner into irqchip_flow
-Date: Thu,  3 Sep 2020 16:26:05 +0100
-Message-Id: <20200903152610.1078827-19-maz@kernel.org>
+Subject: [PATCH 16/23] KVM: arm64: Move interrupt injection to irqchip_flow
+Date: Thu,  3 Sep 2020 16:26:03 +0100
+Message-Id: <20200903152610.1078827-17-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200903152610.1078827-1-maz@kernel.org>
 References: <20200903152610.1078827-1-maz@kernel.org>
@@ -93,110 +93,198 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the set_owner callback into irqchip_flow. It's not that
-useful an API anyway, and we should consider getting rid of it.
+As we continue abstracting away the VGIC, let's make a small
+change while we're at it: Let's offer two callbacks for "wired"
+interrupt injection:
+
+- Interrupts generated from the kernel itself
+- Interrupts generated by userspace via the KVM_IRQ_LINE ioctl
+
+The various checks are pushed into the vgic code. MSI injection,
+such as the one used by userspace to tickle the ITS are left alone
+for now.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_irq.h | 4 ++++
- arch/arm64/kvm/arch_timer.c      | 4 ++--
- arch/arm64/kvm/pmu-emul.c        | 4 ++--
- arch/arm64/kvm/vgic/vgic-init.c  | 1 +
- arch/arm64/kvm/vgic/vgic.h       | 1 +
- include/kvm/arm_vgic.h           | 2 --
- 6 files changed, 10 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_irq.h | 11 +++++++++++
+ arch/arm64/kvm/arch_timer.c      |  8 ++++----
+ arch/arm64/kvm/arm.c             | 12 ++++--------
+ arch/arm64/kvm/pmu-emul.c        |  4 ++--
+ arch/arm64/kvm/vgic/vgic-init.c  |  2 ++
+ arch/arm64/kvm/vgic/vgic.c       | 20 +++++++++++++++++++-
+ arch/arm64/kvm/vgic/vgic.h       |  6 ++++++
+ include/kvm/arm_vgic.h           |  2 --
+ 8 files changed, 48 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
-index 16556417bd4a..d1fc86b54f2d 100644
+index 92aaec05ee75..f816d4814fcf 100644
 --- a/arch/arm64/include/asm/kvm_irq.h
 +++ b/arch/arm64/include/asm/kvm_irq.h
-@@ -38,6 +38,7 @@ struct kvm_irqchip_flow {
- 	int  (*irqchip_map_phys_irq)(struct kvm_vcpu *, unsigned int,
- 				     u32, bool (*)(int));
- 	int  (*irqchip_unmap_phys_irq)(struct kvm_vcpu *, unsigned int);
-+	int  (*irqchip_set_owner)(struct kvm_vcpu *, unsigned int, void *);
+@@ -28,6 +28,11 @@ struct kvm_irqchip_flow {
+ 	int  (*irqchip_vcpu_first_run)(struct kvm_vcpu *);
+ 	void (*irqchip_vcpu_flush_hwstate)(struct kvm_vcpu *);
+ 	void (*irqchip_vcpu_sync_hwstate)(struct kvm_vcpu *);
++	int  (*irqchip_inject_irq)(struct kvm *, unsigned int cpu,
++				   unsigned int intid, bool, void *);
++	int  (*irqchip_inject_userspace_irq)(struct kvm *, unsigned int type,
++					     unsigned int cpu,
++					     unsigned int intid, bool);
  };
  
  /*
-@@ -114,4 +115,7 @@ struct kvm_irqchip_flow {
- #define kvm_irqchip_unmap_phys_irq(v, ...)		\
- 	__vcpu_irqchip_action_ret((v), unmap_phys_irq, (v), __VA_ARGS__)
+@@ -86,4 +91,10 @@ struct kvm_irqchip_flow {
+ #define kvm_irqchip_vcpu_sync_hwstate(v)		\
+ 	__vcpu_irqchip_action((v), vcpu_sync_hwstate, (v))
  
-+#define kvm_irqchip_set_owner(v, ...)		\
-+	__vcpu_irqchip_action_ret((v), set_owner, (v), __VA_ARGS__)
++#define kvm_irqchip_inject_irq(k, ...)			\
++	__kvm_irqchip_action_ret((k), inject_irq, (k), __VA_ARGS__)
++
++#define kvm_irqchip_inject_userspace_irq(k, ...)	\
++	__kvm_irqchip_action_ret((k), inject_userspace_irq, (k), __VA_ARGS__)
 +
  #endif
 diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 16999de299a7..706fd0c63273 100644
+index 32ba6fbc3814..397bd7aea1f5 100644
 --- a/arch/arm64/kvm/arch_timer.c
 +++ b/arch/arm64/kvm/arch_timer.c
-@@ -1083,12 +1083,12 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
- 	int i, ret;
+@@ -388,10 +388,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 				   timer_ctx->irq.level);
  
- 	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
--	ret = kvm_vgic_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
-+	ret = kvm_irqchip_set_owner(vcpu, vtimer_irq, vcpu_vtimer(vcpu));
- 	if (ret)
- 		return false;
+ 	if (!userspace_irqchip(vcpu->kvm)) {
+-		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-					  timer_ctx->irq.irq,
+-					  timer_ctx->irq.level,
+-					  timer_ctx);
++		ret = kvm_irqchip_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++					     timer_ctx->irq.irq,
++					     timer_ctx->irq.level,
++					     timer_ctx);
+ 		WARN_ON(ret);
+ 	}
+ }
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 875e68514661..139f4154038b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -870,18 +870,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 		if (!vcpu)
+ 			return -EINVAL;
  
- 	ptimer_irq = vcpu_ptimer(vcpu)->irq.irq;
--	ret = kvm_vgic_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
-+	ret = kvm_irqchip_set_owner(vcpu, ptimer_irq, vcpu_ptimer(vcpu));
- 	if (ret)
- 		return false;
- 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index f31ee6ad3444..d87f71845a64 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -758,8 +758,8 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 		if (!kvm_arm_pmu_irq_initialized(vcpu))
+-		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
+-			return -EINVAL;
+-
+-		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level, NULL);
++		return kvm_irqchip_inject_userspace_irq(kvm, irq_type, vcpu_idx,
++							irq_num, level);
+ 	case KVM_ARM_IRQ_TYPE_SPI:
+ 		if (!irqchip_in_kernel(kvm))
  			return -ENXIO;
  
--		ret = kvm_vgic_set_owner(vcpu, vcpu->arch.pmu.irq_num,
--					 &vcpu->arch.pmu);
-+		ret = kvm_irqchip_set_owner(vcpu, vcpu->arch.pmu.irq_num,
-+					    &vcpu->arch.pmu);
- 		if (ret)
- 			return ret;
+-		if (irq_num < VGIC_NR_PRIVATE_IRQS)
+-			return -EINVAL;
+-
+-		return kvm_vgic_inject_irq(kvm, 0, irq_num, level, NULL);
++		return kvm_irqchip_inject_userspace_irq(kvm, irq_type, 0,
++							irq_num, level);
  	}
+ 
+ 	return -EINVAL;
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index f0d0312c0a55..f31ee6ad3444 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -378,8 +378,8 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
+ 	pmu->irq_level = overflow;
+ 
+ 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
+-		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-					      pmu->irq_num, overflow, pmu);
++		int ret = kvm_irqchip_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++						 pmu->irq_num, overflow, pmu);
+ 		WARN_ON(ret);
+ 	}
+ }
 diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index ed62c0a27b53..6ace624b439d 100644
+index 53fadbf4ca89..7a8504a5b634 100644
 --- a/arch/arm64/kvm/vgic/vgic-init.c
 +++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -33,6 +33,7 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
- 	.irqchip_reset_mapped_irq	= kvm_vgic_reset_mapped_irq,
- 	.irqchip_map_phys_irq		= kvm_vgic_map_phys_irq,
- 	.irqchip_unmap_phys_irq		= kvm_vgic_unmap_phys_irq,
-+	.irqchip_set_owner		= kvm_vgic_set_owner,
+@@ -27,6 +27,8 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
+ 	.irqchip_vcpu_first_run		= kvm_vgic_vcpu_first_run,
+ 	.irqchip_vcpu_flush_hwstate	= kvm_vgic_flush_hwstate,
+ 	.irqchip_vcpu_sync_hwstate	= kvm_vgic_sync_hwstate,
++	.irqchip_inject_irq		= kvm_vgic_inject_irq,
++	.irqchip_inject_userspace_irq	= kvm_vgic_inject_userspace_irq,
  };
  
  /*
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index f576273c5608..d676c010e45f 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -434,7 +434,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+  * level-sensitive interrupts.  You can think of the level parameter as 1
+  * being HIGH and 0 being LOW and all devices being active-HIGH.
+  */
+-int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
++int kvm_vgic_inject_irq(struct kvm *kvm, unsigned int cpuid, unsigned int intid,
+ 			bool level, void *owner)
+ {
+ 	struct kvm_vcpu *vcpu;
+@@ -476,6 +476,24 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	return 0;
+ }
+ 
++int kvm_vgic_inject_userspace_irq(struct kvm *kvm, unsigned int type,
++				  unsigned int cpuid, unsigned int intid,
++				  bool level)
++{
++	switch (type) {
++	case KVM_ARM_IRQ_TYPE_PPI:
++		if (intid < VGIC_NR_SGIS || intid >= VGIC_NR_PRIVATE_IRQS)
++			return -EINVAL;
++		return kvm_vgic_inject_irq(kvm, cpuid, intid, level, NULL);
++	case KVM_ARM_IRQ_TYPE_SPI:
++		if (intid < VGIC_NR_PRIVATE_IRQS)
++			return -EINVAL;
++		return kvm_vgic_inject_irq(kvm, 0, intid, level, NULL);
++	default:
++		return -EINVAL;
++	}
++}
++
+ /* @irq->irq_lock must be held */
+ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 			    unsigned int host_irq,
 diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index af4a0e5f31c1..c9e14a6cddf6 100644
+index 48e9efda9d8b..cddbd9b951e4 100644
 --- a/arch/arm64/kvm/vgic/vgic.h
 +++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -334,6 +334,7 @@ void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 			  u32 vintid, bool (*get_input_level)(int));
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
-+int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
+@@ -232,6 +232,12 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vcpu_blocking(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vcpu_unblocking(struct kvm_vcpu *vcpu);
  
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
++int kvm_vgic_inject_irq(struct kvm *kvm, unsigned int cpuid, unsigned int intid,
++			bool level, void *owner);
++int kvm_vgic_inject_userspace_irq(struct kvm *kvm, unsigned int type,
++				  unsigned int cpuid, unsigned int intid,
++				  bool level);
++
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index ff8c49c0ebbd..f753110e24f9 100644
+index 4b3a334185fa..fba68129337d 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -362,8 +362,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
-  */
- int kvm_vgic_setup_default_irq_routing(struct kvm *kvm);
+@@ -339,8 +339,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type);
+ int kvm_vgic_hyp_init(void);
+ void kvm_vgic_init_cpu_hardware(void);
  
--int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner);
--
- struct kvm_kernel_irq_routing_entry;
- 
- int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+-int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+-			bool level, void *owner);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 			  u32 vintid, bool (*get_input_level)(int vindid));
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
 -- 
 2.27.0
 
