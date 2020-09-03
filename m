@@ -2,69 +2,69 @@ Return-Path: <SRS0=ROvZ=CM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D87B4C433E9
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D78C433E9
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 873FC206EB
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C8F12072A
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:56:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0fS08Vm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873FC206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s/yMoN+W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8F12072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A79B4B2F6;
-	Thu,  3 Sep 2020 11:56:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD67B4B2F3;
+	Thu,  3 Sep 2020 11:56:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XMga6-wup3jM; Thu,  3 Sep 2020 11:56:17 -0400 (EDT)
+	with ESMTP id gZJGs6l9xaH3; Thu,  3 Sep 2020 11:56:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71FBF4B33C;
-	Thu,  3 Sep 2020 11:56:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95E684B2F4;
+	Thu,  3 Sep 2020 11:56:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7954B227
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CF1D4B2CB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RD6bNjmiFy6c for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 11:56:15 -0400 (EDT)
+ with ESMTP id iBSU64RDJWxG for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 11:56:22 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51B784B2C5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C5384B2F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:56:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5DFE3208C7;
- Thu,  3 Sep 2020 15:56:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 350A020775;
+ Thu,  3 Sep 2020 15:56:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599148573;
- bh=ixc6smJXqyfDNyAO1JLLkDueX6FgJ+DaRlFRfhqH6bI=;
+ s=default; t=1599148575;
+ bh=EUAnw+lWQ+cQMNjPnrjGEu/3OgEkhBEkYZ7J3y/Lfa4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=o0fS08VmaCSc3sU0V226iALI31gEEJGuXoqjjAKIXVvcrH8vdNC4e77mAh8ejY11B
- dnc8Li1k8JlAhBELkVoyJ5Nnf+74Li7dsfrUMouoXvQqw6OpF28chxiub9PYHNb+8S
- QRkOJIst0b2txuTpdK4U3sZPqOLrnCuQPaJqNAWk=
+ b=s/yMoN+W2anQfzITjpc+JTuk6Xq6VnN3WDqBgtQAQZiT/Yphxl771Tpeg6fORHqPl
+ vdhN46HuDry2tT0/F2jjip/4/e0eREqymzdJG7NrJPF2YnfG+cEd+zvXBre+fkR+mA
+ PP5EGIM97bGGCgaQ1AzkIROOTrNkZVlMe2P7OtT0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kDr8B-008vT9-9b; Thu, 03 Sep 2020 16:26:31 +0100
+ id 1kDr8G-008vT9-JA; Thu, 03 Sep 2020 16:26:37 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 17/23] KVM: arm64: Move mapping of HW interrupts into
- irqchip_flow
-Date: Thu,  3 Sep 2020 16:26:04 +0100
-Message-Id: <20200903152610.1078827-18-maz@kernel.org>
+Subject: [PATCH 23/23] KVM: arm64: Add debugfs files for the rVIC/rVID
+ implementation
+Date: Thu,  3 Sep 2020 16:26:10 +0100
+Message-Id: <20200903152610.1078827-24-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200903152610.1078827-1-maz@kernel.org>
 References: <20200903152610.1078827-1-maz@kernel.org>
@@ -94,158 +94,198 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we continue cutting a VGIC-shaped hole in KVM, let's indirect
-all of the handling of mapped interrupts into the bit irqchip_flow
-bucket.
+It turns out that having these debugfs information is really
+useful when trying to understand what is going wrong in a
+guest, or even in the host kernel...
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_irq.h | 17 +++++++++++++++++
- arch/arm64/kvm/arch_timer.c      | 22 +++++++++++-----------
- arch/arm64/kvm/vgic/vgic-init.c  |  4 ++++
- arch/arm64/kvm/vgic/vgic.h       |  6 ++++++
- include/kvm/arm_vgic.h           |  7 -------
- 5 files changed, 38 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/rvic-cpu.c | 140 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 140 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
-index f816d4814fcf..16556417bd4a 100644
---- a/arch/arm64/include/asm/kvm_irq.h
-+++ b/arch/arm64/include/asm/kvm_irq.h
-@@ -33,6 +33,11 @@ struct kvm_irqchip_flow {
- 	int  (*irqchip_inject_userspace_irq)(struct kvm *, unsigned int type,
- 					     unsigned int cpu,
- 					     unsigned int intid, bool);
-+	bool (*irqchip_map_is_active)(struct kvm_vcpu *, unsigned in);
-+	void (*irqchip_reset_mapped_irq)(struct kvm_vcpu *, u32);
-+	int  (*irqchip_map_phys_irq)(struct kvm_vcpu *, unsigned int,
-+				     u32, bool (*)(int));
-+	int  (*irqchip_unmap_phys_irq)(struct kvm_vcpu *, unsigned int);
- };
+diff --git a/arch/arm64/kvm/rvic-cpu.c b/arch/arm64/kvm/rvic-cpu.c
+index 5fb200c637d9..0e91bf6633d5 100644
+--- a/arch/arm64/kvm/rvic-cpu.c
++++ b/arch/arm64/kvm/rvic-cpu.c
+@@ -6,6 +6,7 @@
+  * Author: Marc Zyngier <maz@kernel.org>
+  */
  
- /*
-@@ -97,4 +102,16 @@ struct kvm_irqchip_flow {
- #define kvm_irqchip_inject_userspace_irq(k, ...)	\
- 	__kvm_irqchip_action_ret((k), inject_userspace_irq, (k), __VA_ARGS__)
++#include <linux/debugfs.h>
+ #include <linux/kernel.h>
+ #include <linux/kvm_host.h>
+ #include <linux/list.h>
+@@ -707,6 +708,8 @@ static int rvic_inject_userspace_irq(struct kvm *kvm, unsigned int type,
+ 	}
+ }
  
-+#define kvm_irqchip_map_is_active(v, ...)		\
-+	__vcpu_irqchip_action_ret((v), map_is_active, (v), __VA_ARGS__)
++static void rvic_create_debugfs(struct kvm_vcpu *vcpu);
 +
-+#define kvm_irqchip_reset_mapped_irq(v, ...)		\
-+	__vcpu_irqchip_action((v), reset_mapped_irq, (v), __VA_ARGS__)
+ static int rvic_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct rvic_vm_data *data = vcpu->kvm->arch.irqchip_data;
+@@ -743,6 +746,8 @@ static int rvic_vcpu_init(struct kvm_vcpu *vcpu)
+ 		irq->line_level		= false;
+ 	}
+ 
++	rvic_create_debugfs(vcpu);
 +
-+#define kvm_irqchip_map_phys_irq(v, ...)		\
-+	__vcpu_irqchip_action_ret((v), map_phys_irq, (v), __VA_ARGS__)
+ 	return 0;
+ }
+ 
+@@ -913,6 +918,8 @@ static void rvic_device_destroy(struct kvm_device *dev)
+ 	kfree(dev);
+ }
+ 
++static void rvid_create_debugfs(struct kvm *kvm);
 +
-+#define kvm_irqchip_unmap_phys_irq(v, ...)		\
-+	__vcpu_irqchip_action_ret((v), unmap_phys_irq, (v), __VA_ARGS__)
-+
- #endif
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 397bd7aea1f5..16999de299a7 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -562,7 +562,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
- 	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
- 
- 	if (irqchip_in_kernel(vcpu->kvm))
--		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
-+		phys_active = kvm_irqchip_map_is_active(vcpu, ctx->irq.irq);
- 
- 	phys_active |= ctx->irq.level;
- 
-@@ -734,9 +734,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
- 
- 		if (irqchip_in_kernel(vcpu->kvm)) {
--			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
-+			kvm_irqchip_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
- 			if (map.direct_ptimer)
--				kvm_vgic_reset_mapped_irq(vcpu, map.direct_ptimer->irq.irq);
-+				kvm_irqchip_reset_mapped_irq(vcpu, map.direct_ptimer->irq.irq);
+ static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+ {
+ 	struct rvic_vm_data *data;
+@@ -969,6 +976,7 @@ static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
  		}
- 	}
  
-@@ -1139,18 +1139,18 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 		dev->kvm->arch.irqchip_data = data;
++		rvid_create_debugfs(dev->kvm);
  
- 	get_timer_map(vcpu, &map);
- 
--	ret = kvm_vgic_map_phys_irq(vcpu,
--				    map.direct_vtimer->host_timer_irq,
--				    map.direct_vtimer->irq.irq,
--				    kvm_arch_timer_get_input_level);
-+	ret = kvm_irqchip_map_phys_irq(vcpu,
-+				       map.direct_vtimer->host_timer_irq,
-+				       map.direct_vtimer->irq.irq,
-+				       kvm_arch_timer_get_input_level);
- 	if (ret)
- 		return ret;
- 
- 	if (map.direct_ptimer) {
--		ret = kvm_vgic_map_phys_irq(vcpu,
--					    map.direct_ptimer->host_timer_irq,
--					    map.direct_ptimer->irq.irq,
--					    kvm_arch_timer_get_input_level);
-+		ret = kvm_irqchip_map_phys_irq(vcpu,
-+					       map.direct_ptimer->host_timer_irq,
-+					       map.direct_ptimer->irq.irq,
-+					       kvm_arch_timer_get_input_level);
- 	}
- 
- 	if (ret)
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 7a8504a5b634..ed62c0a27b53 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -29,6 +29,10 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
- 	.irqchip_vcpu_sync_hwstate	= kvm_vgic_sync_hwstate,
- 	.irqchip_inject_irq		= kvm_vgic_inject_irq,
- 	.irqchip_inject_userspace_irq	= kvm_vgic_inject_userspace_irq,
-+	.irqchip_map_is_active		= kvm_vgic_map_is_active,
-+	.irqchip_reset_mapped_irq	= kvm_vgic_reset_mapped_irq,
-+	.irqchip_map_phys_irq		= kvm_vgic_map_phys_irq,
-+	.irqchip_unmap_phys_irq		= kvm_vgic_unmap_phys_irq,
- };
- 
- /*
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index cddbd9b951e4..af4a0e5f31c1 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -329,6 +329,12 @@ int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
- void vgic_v4_configure_vsgis(struct kvm *kvm);
- 
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
-+void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
-+			  u32 vintid, bool (*get_input_level)(int));
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+ 		ret = 0;
+ 		break;
+@@ -1071,3 +1079,135 @@ int kvm_register_rvic_device(void)
+ {
+ 	return kvm_register_device_ops(&rvic_dev_ops, KVM_DEV_TYPE_ARM_RVIC);
+ }
 +
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
- void kvm_vgic_load(struct kvm_vcpu *vcpu);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index fba68129337d..ff8c49c0ebbd 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -339,17 +339,10 @@ int kvm_vgic_create(struct kvm *kvm, u32 type);
- int kvm_vgic_hyp_init(void);
- void kvm_vgic_init_cpu_hardware(void);
- 
--int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid, bool (*get_input_level)(int vindid));
--int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
--bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
--
- #define vgic_initialized(k)	((k)->arch.vgic.initialized)
- #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
- 			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
- 
--void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
--
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1);
- 
- /**
++static void rvic_irq_debug_show_one(struct seq_file *s, struct rvic_irq *irq)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&irq->lock, flags);
++
++	seq_printf(s, "%d: [%d] %c %c %ps %c %c\n",
++		   irq->intid, irq->host_irq,
++		   irq->pending ? 'P' : 'p',
++		   irq->masked ? 'M' : 'm',
++		   irq->get_line_level,
++		   irq->get_line_level ? 'x' : (irq->line_level ? 'H' : 'L'),
++		   rvic_irq_queued(irq) ? 'Q' : 'i');
++
++	spin_unlock_irqrestore(&irq->lock, flags);
++}
++
++static int rvic_irq_debug_show(struct seq_file *s, void *p)
++{
++	rvic_irq_debug_show_one(s, s->private);
++	return 0;
++}
++
++static int rvic_irq_debug_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, rvic_irq_debug_show, inode->i_private);
++}
++
++static const struct file_operations rvic_irq_debug_fops = {
++	.open		= rvic_irq_debug_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
++static int rvic_debug_show(struct seq_file *s, void *p)
++{
++	struct kvm_vcpu *vcpu = s->private;
++	struct rvic *rvic = kvm_vcpu_to_rvic(vcpu);
++	struct rvic_irq *irq;
++	unsigned long flags;
++
++	spin_lock_irqsave(&rvic->lock, flags);
++
++	seq_printf(s, "%s\n", rvic->enabled ? "Enabled" : "Disabled");
++	seq_printf(s, "%d Trusted\n", rvic->nr_trusted);
++	seq_printf(s, "%d Total\n", rvic->nr_total);
++	list_for_each_entry(irq, &rvic->delivery, delivery_entry)
++		rvic_irq_debug_show_one(s, irq);
++
++	spin_unlock_irqrestore(&rvic->lock, flags);
++
++	return 0;
++}
++
++static int rvic_debug_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, rvic_debug_show, inode->i_private);
++}
++
++static const struct file_operations rvic_debug_fops = {
++	.open		= rvic_debug_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
++static void rvic_create_debugfs(struct kvm_vcpu *vcpu)
++{
++	struct rvic *rvic = kvm_vcpu_to_rvic(vcpu);
++	struct dentry *rvic_root;
++	char dname[128];
++	int i;
++
++	snprintf(dname, sizeof(dname), "rvic-%d", vcpu->vcpu_id);
++	rvic_root = debugfs_create_dir(dname, vcpu->kvm->debugfs_dentry);
++	if (!rvic_root)
++		return;
++
++	debugfs_create_file("state", 0444, rvic_root, vcpu, &rvic_debug_fops);
++	for (i = 0; i < rvic->nr_total; i++) {
++		snprintf(dname, sizeof(dname), "%d", i);
++		debugfs_create_file(dname, 0444, rvic_root,
++				    rvic_get_irq(rvic, i),
++				    &rvic_irq_debug_fops);
++	}
++}
++
++static int rvid_debug_show(struct seq_file *s, void *p)
++{
++	struct kvm *kvm = s->private;
++	struct rvic_vm_data *data = kvm->arch.irqchip_data;
++	unsigned long flags;
++	int i;
++
++	spin_lock_irqsave(&data->lock, flags);
++
++	seq_printf(s, "%d Trusted\n", data->nr_trusted);
++	seq_printf(s, "%d Total\n", data->nr_total);
++
++	for (i = 0; i < rvic_nr_untrusted(data); i++) {
++		if (data->rvid_map[i].intid < data->nr_trusted)
++			continue;
++
++		seq_printf(s, "%4u: vcpu-%u %u\n",
++			   i, data->rvid_map[i].target_vcpu,
++			   data->rvid_map[i].intid);
++	}
++
++	spin_unlock_irqrestore(&data->lock, flags);
++
++	return 0;
++}
++
++static int rvid_debug_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, rvid_debug_show, inode->i_private);
++}
++
++static const struct file_operations rvid_debug_fops = {
++	.open		= rvid_debug_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
++static void rvid_create_debugfs(struct kvm *kvm)
++{
++	debugfs_create_file("rvid", 0444, kvm->debugfs_dentry,
++			    kvm, &rvid_debug_fops);
++}
 -- 
 2.27.0
 
