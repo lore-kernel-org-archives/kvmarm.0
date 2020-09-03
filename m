@@ -2,89 +2,78 @@ Return-Path: <SRS0=ROvZ=CM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913D4C433E2
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20652C43461
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:26:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 343E6208FE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 13:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 958C1208CA
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Sep 2020 15:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="CumNjUfG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 343E6208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFusFhxU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958C1208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5F844B341;
-	Thu,  3 Sep 2020 09:53:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48ACC4B25A;
+	Thu,  3 Sep 2020 11:26:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9sGx1HHd9Ngf; Thu,  3 Sep 2020 09:53:55 -0400 (EDT)
+	with ESMTP id 6zHLmlcQM767; Thu,  3 Sep 2020 11:26:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15AD74B326;
-	Thu,  3 Sep 2020 09:53:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 866AF4B2BB;
+	Thu,  3 Sep 2020 11:26:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5A34B2FD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A29F14B280
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:26:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zclbSiqti27q for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2020 09:53:53 -0400 (EDT)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B40B4B280
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 09:53:53 -0400 (EDT)
-Received: by mail-wr1-f74.google.com with SMTP id n15so1092611wrv.23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Sep 2020 06:53:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=SSMgwsDERxeH1C9AIeHiykVI2xNip90xe/fTZ0SwDeI=;
- b=CumNjUfGOifQba/B20PBpMeVCu238q477osYFMnInIKZ39dhnbrvjngo7wBzWTmCKC
- Go4DwQ971jvo6zoBV9wicpTNNZJMvCU62KK1u0OD/uKpMG5+5WgdEICJv3u20hrRmYR9
- jCSU0e4Pkv9CrEIKJVJ33WsLXWhLJAA8JyNaKPJfMCs6tIc/pzoRO3RCFQukKiuH7tqq
- hVWfEL7Qo6T0EsJIX1UKESlaAXs9inDivqh7Q3OzUy8INeqQmUcXj+aaNAkWzv0icVHs
- R8x68VIxvFrp09fsd9eThK3z6OGx3zPYL5X+2LSZ9LCCVMKjJqJiBB+ycX8V67mAq5mR
- rNwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=SSMgwsDERxeH1C9AIeHiykVI2xNip90xe/fTZ0SwDeI=;
- b=ltv8vqZslc2aHHWR+510pGgPU6FUM/woJrhcd41lWymbyEUzccnMyS4HkXJ3yILQoD
- EpRcu28U3+T8cmPInpHFuRf2n8EXe913cXTUt67PDfWD4OvkTOtMAsmYZNmXUXKQYJay
- i7LxNYD/B1/8TDML3ghIE2SR99nl5paZpKB24z3NBBYSE6t8DpEXTtzFrYGHFIh4CKeg
- mctuNn7wWwCxWbGkjmnRnUZjaDVs46GPxYVcX2WXXmL9hs1N6COWEzvCKUtPDRzECWqa
- fVqZGJM4rGAQf+h9blfTYvUjvT3Pr7wHE+UU/EXmII4Yojtar3wHOYuLSAtsNa6OKWIG
- x0/w==
-X-Gm-Message-State: AOAM532q20aunrBguvuYjTwbE2wp0KNLAUrhev35qQHSOF3v6/sQI3+8
- wyDD9SrDmgrlgZ/4Y4d6DBWq3o+NX/Yit+D0gF8YDrCkknMAlrejYVMsJnE1RSHkOCNuGt0+jJ1
- kSUyQ+KyeCrc7hZ+p7kiC+aB000vmVwZQ0oXjivbkr2okzVbA60R3cvjeNo5osROTLY2tcA==
-X-Google-Smtp-Source: ABdhPJxOcTfOHi/LwXdsaDwL4B6glURhxFGbKkKrQXNsKtuhTeaH3Zh6brvCBzoCoiXV3lduNp3jGqzw+tM=
-X-Received: from ascull.lon.corp.google.com
- ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a1c:8109:: with SMTP id
- c9mr2665815wmd.130.1599141232149; 
- Thu, 03 Sep 2020 06:53:52 -0700 (PDT)
-Date: Thu,  3 Sep 2020 14:53:07 +0100
-In-Reply-To: <20200903135307.251331-1-ascull@google.com>
-Message-Id: <20200903135307.251331-19-ascull@google.com>
-Mime-Version: 1.0
-References: <20200903135307.251331-1-ascull@google.com>
-X-Mailer: git-send-email 2.28.0.402.g5ffc5be6b7-goog
-Subject: [PATCH v3 18/18] KVM: arm64: nVHE: Fix pointers during SMCCC
- convertion
-From: Andrew Scull <ascull@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- maz@kernel.org, Sudeep Holla <sudeep.holla@arm.com>, catalin.marinas@arm.com,
- will@kernel.org
+ with ESMTP id m2L-toPFpQdX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2020 11:26:24 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0BCF44B2BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2020 11:26:24 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AB6642072A;
+ Thu,  3 Sep 2020 15:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599146782;
+ bh=8diWhh0vQL5HYykVI49PgHaLPAgX0kRPHzqmaQWLOls=;
+ h=From:To:Cc:Subject:Date:From;
+ b=eFusFhxUiCVyfGJetxIodBv0tSPJaTcDRpy7v6ycgpd2p15loF0UoUChIv4AjVfyl
+ E1EWwVo2fCbfwJ/7OdVnj01XzPbA8i5+AXlAKJCKpC6Ws+d/cbKNTbwo5/WRuCYFjh
+ NINfTBstZUih33OaWbnO04zoCyb3pg4xfJbKKjaM=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kDr80-008vT9-Qx; Thu, 03 Sep 2020 16:26:20 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 00/23] KVM: arm64: rVIC/rVID PV interrupt controller
+Date: Thu,  3 Sep 2020 16:25:47 +0100
+Message-Id: <20200903152610.1078827-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ Christoffer.Dall@arm.com, lorenzo.pieralisi@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,135 +90,169 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The host need not concern itself with the pointer differences for the
-hyp interfaces that are shared between VHE and nVHE so leave it to the
-hyp to handle.
+Anyone vaguely familiar with the ARM interrupt architecture (also
+known as GIC) would certainly agree that it isn't the simplest thing
+to deal with. Its features are ranging from simple, bare metal
+interrupt delivery to full blown direct injection into a guest.
 
-As the SMCCC function IDs are converted into function calls, it is a
-suitable place to also convert any pointer arguments into hyp pointers.
-This, additionally, eases the reuse of the handlers in different
-contexts.
+It is also horribly complex, full of backward[-compatibility]
+features, and it is very hard to reason about what is going on in the
+system at any given time. For a hypervisor such as KVM, the GIC is an
+invasive beast that accounts for a large part of the privileged
+software we run, as it implements the whole of the architecture with
+bells and whistles as it tries to cater for all possible guests.
 
-Signed-off-by: Andrew Scull <ascull@google.com>
----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 ++++++------
- arch/arm64/kvm/hyp/nvhe/switch.c   |  2 --
- arch/arm64/kvm/hyp/nvhe/tlb.c      |  2 --
- arch/arm64/kvm/vgic/vgic-v3.c      |  4 ++--
- 4 files changed, 8 insertions(+), 12 deletions(-)
+At the same time, we have an ongoing effort to make KVM/arm64 a more
+"verifiable" hypervisor, by allowing only a small amount of code to
+run at EL2. Moving most of the GIC emulation to userspace would
+involve sacrificing performance (the architecture really doesn't lend
+itself to a split model, despite the appearances), and proving that it
+is actually completely safe is almost an impossible task (I have seen
+people trying!).
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 13093df70c87..78d7afcefbb8 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -27,7 +27,7 @@ static void handle_host_hcall(unsigned long func_id,
- 		struct kvm_vcpu *vcpu =
- 			(struct kvm_vcpu *)host_ctxt->regs.regs[1];
- 
--		ret = __kvm_vcpu_run(vcpu);
-+		ret = __kvm_vcpu_run(kern_hyp_va(vcpu));
- 		goto out;
- 	}
- 
-@@ -41,21 +41,21 @@ static void handle_host_hcall(unsigned long func_id,
- 			phys_addr_t ipa = host_ctxt->regs.regs[2];
- 			int level = host_ctxt->regs.regs[3];
- 
--			__kvm_tlb_flush_vmid_ipa(mmu, ipa, level);
-+			__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- 			break;
- 		}
- 	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid): {
- 			struct kvm_s2_mmu *mmu =
- 				(struct kvm_s2_mmu *)host_ctxt->regs.regs[1];
- 
--			__kvm_tlb_flush_vmid(mmu);
-+			__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
- 			break;
- 		}
- 	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_local_vmid): {
- 			struct kvm_s2_mmu *mmu =
- 				(struct kvm_s2_mmu *)host_ctxt->regs.regs[1];
- 
--			__kvm_tlb_flush_local_vmid(mmu);
-+			__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
- 			break;
- 		}
- 	case KVM_HOST_SMCCC_FUNC(__kvm_timer_set_cntvoff): {
-@@ -89,14 +89,14 @@ static void handle_host_hcall(unsigned long func_id,
- 			struct vgic_v3_cpu_if *cpu_if =
- 				(struct vgic_v3_cpu_if *)host_ctxt->regs.regs[1];
- 
--			__vgic_v3_save_aprs(cpu_if);
-+			__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
- 			break;
- 		}
- 	case KVM_HOST_SMCCC_FUNC(__vgic_v3_restore_aprs): {
- 			struct vgic_v3_cpu_if *cpu_if =
- 				(struct vgic_v3_cpu_if *)host_ctxt->regs.regs[1];
- 
--			__vgic_v3_restore_aprs(cpu_if);
-+			__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
- 			break;
- 		}
- 	default:
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index b4f6ae1d579a..6443ef91bff4 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -176,8 +176,6 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 		pmr_sync();
- 	}
- 
--	vcpu = kern_hyp_va(vcpu);
--
- 	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 69eae608d670..544bca3072b7 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -54,7 +54,6 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	mmu = kern_hyp_va(mmu);
- 	__tlb_switch_to_guest(mmu, &cxt);
- 
- 	/*
-@@ -108,7 +107,6 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- 	dsb(ishst);
- 
- 	/* Switch to requested VMID */
--	mmu = kern_hyp_va(mmu);
- 	__tlb_switch_to_guest(mmu, &cxt);
- 
- 	__tlbi(vmalls12e1is);
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 76e2d85789ed..9cdf39a94a63 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -662,7 +662,7 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
- 	if (likely(cpu_if->vgic_sre))
- 		kvm_call_hyp(__vgic_v3_write_vmcr, cpu_if->vgic_vmcr);
- 
--	kvm_call_hyp(__vgic_v3_restore_aprs, kern_hyp_va(cpu_if));
-+	kvm_call_hyp(__vgic_v3_restore_aprs, cpu_if);
- 
- 	if (has_vhe())
- 		__vgic_v3_activate_traps(cpu_if);
-@@ -686,7 +686,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- 
- 	vgic_v3_vmcr_sync(vcpu);
- 
--	kvm_call_hyp(__vgic_v3_save_aprs, kern_hyp_va(cpu_if));
-+	kvm_call_hyp(__vgic_v3_save_aprs, cpu_if);
- 
- 	if (has_vhe())
- 		__vgic_v3_deactivate_traps(cpu_if);
+Another approach is to bite the bullet, and design from the ground up
+an interrupt controller that:
+
+- works well enough for workloads that mostly deal with virtual
+  interrupts (no device assignment),
+
+- is as simple as possible for the hypervisor to implement.
+
+Since we cannot retrospectively hack the HW, this is a paravirtualized
+interrupt controller, where every single operation results in a trap.
+Yes, it looks like it would be terribly expensive. Or not.
+
+The result of the above is a specification from ARM [1] that defines
+the RVIC and RVID components that make the interrupt controller. It is
+an *Alpha* spec, to it is very much subject to changes (the hypercall
+numbers have been redacted out to make that explicit).
+
+The result of the above result is this patch series, which provides
+Linux drivers for rVIC and rVID, as well as a KVM implementation that
+can be exposed to guests. Most of the patches are a big refactor of
+the KVM/arm64 code to allow a non-GIC irqchip to be exposed to the
+guest, as the code that actually deals with delivering interrupts is
+pretty simple. I intend to carry on refactoring this as more
+structures could be made irqchip agnostic.
+
+We have:
+
+- Support for the rVIC/rVID PV interrupt controller architecture in a
+  guest
+
+- A large rework of the way the vgic integrates with the rest of KVM,
+  mostly punching a vgic-shaped hole in the code, and replacing it with
+  a set of optional callbacks that an interrupt controller
+  implementation can provide, or not.
+
+- A rVIC/rVID implementation for KVM/arm64.
+
+This is based on my previously posted IPI-as-IRQ series
+
+How does it fare? Well, it's not even bad. There is a bit more
+overhead than with an actual GIC, but you need to squint really hard
+to see a difference. Turns out that interacting with a HW interrupt
+controller isn't free either... Of course, YMMV, and I'd happily look
+at performance figures if someone has the guts to put them together.
+
+What is missing:
+
+- Patches for userspace to actually start a rVIC-equipped guest. I
+  have pushed a kvmtool branch at [2]. This is just a terrible pile of
+  hacks, don't trust it to do anything right. It works well enough to
+  spawn a guest with virtio-pci and deliver MSIs though.
+
+- DT bindings, which I need to write up
+
+- ACPI? Why not...
+
+Things that are *not* in the spec:
+
+- MSIs. I've made them up in the driver and KVM, and I don't think we
+  can do without them. I intend to feed that requirement back to ARM.
+
+- RVID level interrupts. We need them to implement PCI INTx.
+
+- Priorities. Not clear whether we really need those, and it would
+  certainly complixify the design.
+
+This has been lightly tested on a A55-based system running VHE, and
+equipped with a GICv2, as well as a couple of nVHE systems with both
+GICv2 and GICv3. VHE+GICv3 is still untested, as I lack the platform
+(someone please send me an Ampere Altra box ;-).
+
+Patches are based on v5.9-rc3 + the IPI patches, and a branch with
+everything stacked together is at [3].
+
+[1] https://developer.arm.com/architectures/system-architectures/software-standards/rvic
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=rvic
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=irq/rvic
+
+Marc Zyngier (23):
+  irqchip: Add Reduced Virtual Interrupt Controller driver
+  irqchip/rvic: Add support for untrusted interrupt allocation
+  irqchip: Add Reduced Virtual Interrupt Distributor support
+  irqchip/rvid: Add PCI MSI support
+  KVM: arm64: Move GIC model out of the distributor
+  KVM: arm64: vgic-v3: Move early init to kvm_vgic_create()
+  KVM: arm64: Add irqchip callback structure to kvm_arch
+  KVM: arm64: Move kvm_vgic_destroy to kvm_irqchip_flow
+  KVM: arm64: Move kvm_vgic_vcpu_init() to irqchip_flow
+  KVM: arm64: Move kvm_vgic_vcpu_[un]blocking() to irqchip_flow
+  KVM: arm64: Move kvm_vgic_vcpu_load/put() to irqchip_flow
+  KVM: arm64: Move kvm_vgic_vcpu_pending_irq() to irqchip_flow
+  KVM: arm64: Move vgic resource mapping on first run to irqchip_flow
+  KVM: arm64: Move kvm_vgic_vcpu_{sync,flush}_hwstate() to irqchip_flow
+  KVM: arm64: nVHE: Only save/restore GICv3 state if modeling a GIC
+  KVM: arm64: Move interrupt injection to irqchip_flow
+  KVM: arm64: Move mapping of HW interrupts into irqchip_flow
+  KVM: arm64: Move set_owner into irqchip_flow
+  KVM: arm64: Turn vgic_initialized into irqchip_finalized
+  KVM: arm64: Move irqfd routing to irqchip_flow
+  KVM: arm64: Tighten msis_require_devid reporting
+  KVM: arm64: Add a rVIC/rVID in-kernel implementation
+  KVM: arm64: Add debugfs files for the rVIC/rVID implementation
+
+ arch/arm64/include/asm/kvm_host.h     |   11 +-
+ arch/arm64/include/asm/kvm_irq.h      |  136 +++
+ arch/arm64/include/uapi/asm/kvm.h     |    9 +
+ arch/arm64/kvm/Makefile               |    2 +-
+ arch/arm64/kvm/arch_timer.c           |   36 +-
+ arch/arm64/kvm/arm.c                  |  141 ++-
+ arch/arm64/kvm/hyp/nvhe/switch.c      |   12 +-
+ arch/arm64/kvm/hypercalls.c           |    7 +
+ arch/arm64/kvm/pmu-emul.c             |   10 +-
+ arch/arm64/kvm/rvic-cpu.c             | 1213 +++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-debug.c      |    7 +-
+ arch/arm64/kvm/vgic/vgic-init.c       |  133 ++-
+ arch/arm64/kvm/vgic/vgic-irqfd.c      |   72 +-
+ arch/arm64/kvm/vgic/vgic-its.c        |    2 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c |   18 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    |    2 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c       |   10 +-
+ arch/arm64/kvm/vgic/vgic-v2.c         |    5 -
+ arch/arm64/kvm/vgic/vgic-v3.c         |   26 +-
+ arch/arm64/kvm/vgic/vgic.c            |   55 +-
+ arch/arm64/kvm/vgic/vgic.h            |   37 +
+ drivers/irqchip/Kconfig               |   12 +
+ drivers/irqchip/Makefile              |    2 +
+ drivers/irqchip/irq-rvic.c            |  595 ++++++++++++
+ drivers/irqchip/irq-rvid.c            |  441 +++++++++
+ include/kvm/arm_rvic.h                |   41 +
+ include/kvm/arm_vgic.h                |   33 -
+ include/linux/cpuhotplug.h            |    1 +
+ include/linux/irqchip/irq-rvic.h      |  100 ++
+ include/uapi/linux/kvm.h              |    2 +
+ 30 files changed, 2907 insertions(+), 264 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_irq.h
+ create mode 100644 arch/arm64/kvm/rvic-cpu.c
+ create mode 100644 drivers/irqchip/irq-rvic.c
+ create mode 100644 drivers/irqchip/irq-rvid.c
+ create mode 100644 include/kvm/arm_rvic.h
+ create mode 100644 include/linux/irqchip/irq-rvic.h
+
 -- 
-2.28.0.402.g5ffc5be6b7-goog
+2.27.0
 
 _______________________________________________
 kvmarm mailing list
