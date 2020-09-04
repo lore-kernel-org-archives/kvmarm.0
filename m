@@ -6,79 +6,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B00C433E2
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7D2C43461
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:02:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA826206B7
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:59:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97F49206D4
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:02:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvzXgYnB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA826206B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zd3dMbNI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F49206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F81D40152;
-	Fri,  4 Sep 2020 05:59:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2734B32F;
+	Fri,  4 Sep 2020 06:02:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id maGix-P9jKlZ; Fri,  4 Sep 2020 05:59:04 -0400 (EDT)
+	with ESMTP id in6LTnzrHOtd; Fri,  4 Sep 2020 06:02:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CCD34B33C;
-	Fri,  4 Sep 2020 05:59:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 298164B335;
+	Fri,  4 Sep 2020 06:02:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE064B335
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:59:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4D24B337
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:02:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E689eB0YNij0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 05:59:02 -0400 (EDT)
+ with ESMTP id wF90neRl2akT for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 06:02:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BA0F4B2DA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:59:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75EC34B32F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:02:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 05C4B206B7;
- Fri,  4 Sep 2020 09:59:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4A8E3206D4;
+ Fri,  4 Sep 2020 10:02:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599213541;
- bh=JQb0Km8vxsTnUcKSyoKH+85BrdLonv4re0h1/xowQ8o=;
+ s=default; t=1599213762;
+ bh=qlCqTB3DmML4H9RpKM9UtFjoUSVv80a7NHXXOmkdv04=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=uvzXgYnBgMCCGDKm/oK4IyteuvrmWNj+6m92k/fZUzX2At+5/OhA2cSsp15oYddEE
- IW92IlSLJ3mCCHR1X+xZ46BkB/kxNPAy1dS6I3GIBOqhi4bdCA7Klz0iTkxLGRwyhz
- imIz6ynRlUxHizT0/6sbo5kDcL5iPMqkydIZmSSQ=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
+ b=Zd3dMbNIP9jiHcHjpN8bH4rB5z7i63Up40w4Fqpy7AFNJfZRtSk5LeU0VsAu9b4Bh
+ SBWa02xVSreu0W6jhMARTKrhZglo/PPRDG6JqdKLOrqVTOm9jLDRF5bxFb/Cr/aK14
+ Owi1vhEXxkoMrRA2DS7bKg3w+3h3SaBazjVRvHeY=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kE8Ul-0097wX-8D; Fri, 04 Sep 2020 10:58:59 +0100
-Date: Fri, 04 Sep 2020 10:58:58 +0100
-Message-ID: <87sgbx7ti5.wl-maz@kernel.org>
+ id 1kE8YK-0097zt-Pi; Fri, 04 Sep 2020 11:02:40 +0100
+MIME-Version: 1.0
+Date: Fri, 04 Sep 2020 11:02:40 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Try PMD block mappings if PUD mappings
- are not supported
-In-Reply-To: <20200901133357.52640-3-alexandru.elisei@arm.com>
-References: <20200901133357.52640-1-alexandru.elisei@arm.com>
- <20200901133357.52640-3-alexandru.elisei@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 20/21] KVM: arm64: Remove unused 'pgd' field from
+ 'struct kvm_s2_mmu'
+In-Reply-To: <7911796d-9124-cb7c-ace5-51e3b6d2dc28@redhat.com>
+References: <20200825093953.26493-1-will@kernel.org>
+ <20200825093953.26493-21-will@kernel.org>
+ <f0a64bb2-5371-9f44-1c64-035cbc6dcf5b@redhat.com>
+ <20200903165020.GC7791@willie-the-truck>
+ <7911796d-9124-cb7c-ace5-51e3b6d2dc28@redhat.com>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <66b19fd347823e7111aafdb8d8251c14@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: gshan@redhat.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, qperret@google.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, catalin.marinas@arm.com, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,87 +94,96 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+On 2020-09-04 01:59, Gavin Shan wrote:
+> Hi Will,
+> 
+> On 9/4/20 2:50 AM, Will Deacon wrote:
+>> On Thu, Sep 03, 2020 at 03:07:17PM +1000, Gavin Shan wrote:
+>>> On 8/25/20 7:39 PM, Will Deacon wrote:
+>>>> The stage-2 page-tables are entirely encapsulated by the 'pgt' field 
+>>>> of
+>>>> 'struct kvm_s2_mmu', so remove the unused 'pgd' field.
+>>>> 
+>>>> Cc: Marc Zyngier <maz@kernel.org>
+>>>> Cc: Quentin Perret <qperret@google.com>
+>>>> Signed-off-by: Will Deacon <will@kernel.org>
+>>>> ---
+>>>>    arch/arm64/include/asm/kvm_host.h | 1 -
+>>>>    arch/arm64/kvm/mmu.c              | 2 --
+>>>>    2 files changed, 3 deletions(-)
+>>>> 
+>>> 
+>>> I think this might be folded into PATCH[18] as both patches are
+>>> simple enough. I'm not sure the changes introduced in PATCH[19]
+>>> prevent us doing this.
+>>> 
+>>> There is another question below.
+>>> 
+>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>> 
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h 
+>>>> b/arch/arm64/include/asm/kvm_host.h
+>>>> index 0b7c702b2151..41caf29bd93c 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -79,7 +79,6 @@ struct kvm_s2_mmu {
+>>>>    	 * for vEL1/EL0 with vHCR_EL2.VM == 0.  In that case, we use the
+>>>>    	 * canonical stage-2 page tables.
+>>>>    	 */
+>>>> -	pgd_t		*pgd;
+>>>>    	phys_addr_t	pgd_phys;
+>>>>    	struct kvm_pgtable *pgt;
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index ddeec0b03666..f28e03dcb897 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -384,7 +384,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct 
+>>>> kvm_s2_mmu *mmu)
+>>>>    	mmu->kvm = kvm;
+>>>>    	mmu->pgt = pgt;
+>>>>    	mmu->pgd_phys = __pa(pgt->pgd);
+>>>> -	mmu->pgd = (void *)pgt->pgd;
+>>>>    	mmu->vmid.vmid_gen = 0;
+>>>>    	return 0;
+>>>> @@ -470,7 +469,6 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>>>    	spin_lock(&kvm->mmu_lock);
+>>>>    	pgt = mmu->pgt;
+>>>>    	if (pgt) {
+>>>> -		mmu->pgd = NULL;
+>>>>    		mmu->pgd_phys = 0;
+>>>>    		mmu->pgt = NULL;
+>>>>    		free_percpu(mmu->last_vcpu_ran);
+>>>> 
+>>> 
+>>> I guess mmu->pgd_phys might be removed either because kvm_get_vttbr()
+>>> is the only consumer.
+>> 
+>> Hmm, but kvm_get_vttbr() is still used after these patches, so I think
+>> the pgd_phys field needs to stick around.
+>> 
+> 
+> Yes, kvm_get_vttbr() is the only consumer. The corresponding physical
+> address can be figured out in the function, we needn't have the 
+> physical
+> address and cache it in advance. However, it's not a big deal. I 
+> probably
+> post one patch to remove it after this series gets merged.
+> 
+>    baddr = __pa(mmu->pgt->pgd);
 
-On Tue, 01 Sep 2020 14:33:57 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> When userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
-> use the same block size to map the faulting IPA in stage 2. If stage 2
-> cannot use the same size mapping because the block size doesn't fit in the
-> memslot or the memslot is not properly aligned, user_mem_abort() will fall
-> back to a page mapping, regardless of the block size. We can do better for
-> PUD backed hugetlbfs by checking if a PMD block mapping is possible before
-> deciding to use a page.
-> 
-> vma_pagesize is an unsigned long, use 1UL instead of 1ULL when assigning
-> its value.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/kvm/mmu.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 25e7dc52c086..f590f7355cda 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1871,15 +1871,24 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	else
->  		vma_shift = PAGE_SHIFT;
->  
-> -	vma_pagesize = 1ULL << vma_shift;
->  	if (logging_active ||
-> -	    (vma->vm_flags & VM_PFNMAP) ||
-> -	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
-> +	    (vma->vm_flags & VM_PFNMAP)) {
->  		force_pte = true;
-> -		vma_pagesize = PAGE_SIZE;
->  		vma_shift = PAGE_SHIFT;
->  	}
->  
-> +	if (vma_shift == PUD_SHIFT &&
-> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
-> +		vma_shift = PMD_SHIFT;
-> +
-> +	if (vma_shift == PMD_SHIFT &&
-> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> +		force_pte = true;
-> +		vma_shift = PAGE_SHIFT;
-> +	}
-> +
-> +	vma_pagesize = 1UL << vma_shift;
-> +
->  	/*
->  	 * The stage2 has a minimum of 2 level table (For arm64 see
->  	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
-> @@ -1889,7 +1898,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 */
->  	if (vma_pagesize == PMD_SIZE ||
->  	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
-> -		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
-> +		gfn = (fault_ipa & ~(vma_pagesize - 1)) >> PAGE_SHIFT;
->  	mmap_read_unlock(current->mm);
->  
->  	/* We need minimum second+third level pages */
-
-Although this looks like a sensible change, I'm a reluctant to take it
-at this stage, given that we already have a bunch of patches from Will
-to change the way we deal with PTs.
-
-Could you look into how this could fit into the new code instead?
+I'd rather you didn't. The NV patches need it for the AT emulation code,
+so it might as well stay in place.
 
 Thanks,
 
-	M.
-
+          M.
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
