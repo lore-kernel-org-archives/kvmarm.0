@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02314C43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F68BC433E2
 	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A23332087C
+	by mail.kernel.org (Postfix) with ESMTP id F0D3020770
 	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2JIm0h02"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23332087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVnjX2pG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D3020770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A63D4B334;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A55154B363;
 	Fri,  4 Sep 2020 06:46:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cQvuS4G71TzR; Fri,  4 Sep 2020 06:46:14 -0400 (EDT)
+	with ESMTP id G1DpqkVPQ69W; Fri,  4 Sep 2020 06:46:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 402BC4B379;
-	Fri,  4 Sep 2020 06:46:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A0114B360;
+	Fri,  4 Sep 2020 06:46:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD2C04B38F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F003E4B387
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SdKN-Y1dmDtQ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 06:46:07 -0400 (EDT)
+ with ESMTP id 4k1bujV3Xfkh for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 06:46:12 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFDEC4B380
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E0834B35D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:07 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 007C52098B;
- Fri,  4 Sep 2020 10:46:05 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 35FB420C09;
+ Fri,  4 Sep 2020 10:46:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599216365;
- bh=ilKUWag/8Tu9q/FrJ+bDmlF7z3/0PqgWi7jc+PlOCNc=;
+ s=default; t=1599216366;
+ bh=Sn3xphMkTQDWvRiNyZqplkTFaWcKwLKlRGPd6RX796E=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=2JIm0h02Y+6wiuWkJxwtZDa6Kx+NCPBJKQGCXom23NKmaMLOa4mHbwI4TtRGHw4Vc
- /NA2Tav6O0dDk0gsk3PGcv36TMgccB9DV60OKqlS0UbRCNB2aRIzbJdIKONkkHPfhE
- 4BaJv93PIaXEgBxGlafqcXq0cjgfoNLBPLUMit0Q=
+ b=MVnjX2pGF8235OrEkFr1t/AwdrtZfkBdzmLriS2Y7F3JpaYAGMyjfHyDaXuWB2lqH
+ 0pfuaEouIcH+ifAeNDnarxNonLRn++HHpU5Ytma+24/7WU+1JJ0igxBkibyBxBrt82
+ p8YJq81/xUasV7COmawv/jFcv3NpHDplSCqek7xc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kE9EJ-0098oH-G3; Fri, 04 Sep 2020 11:46:03 +0100
+ id 1kE9EK-0098oH-Ke; Fri, 04 Sep 2020 11:46:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 6/9] arm64/x86: KVM: Introduce steal-time cap
-Date: Fri,  4 Sep 2020 11:45:27 +0100
-Message-Id: <20200904104530.1082676-7-maz@kernel.org>
+Subject: [PATCH 8/9] KVM: arm64: Fix address truncation in traces
+Date: Fri,  4 Sep 2020 11:45:29 +0100
+Message-Id: <20200904104530.1082676-9-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
 References: <20200904104530.1082676-1-maz@kernel.org>
@@ -95,115 +95,124 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Jones <drjones@redhat.com>
+Owing to their ARMv7 origins, the trace events are truncating most
+address values to 32bits. That's not really helpful.
 
-arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
-support for steal-time. However this is unnecessary, as only a KVM
-fd is required, and it complicates userspace (userspace may prefer
-delaying vcpu creation until after feature probing). Introduce a cap
-that can be checked instead. While x86 can already probe steal-time
-support with a kvm fd (KVM_GET_SUPPORTED_CPUID), we add the cap there
-too for consistency.
+Expand the printing of such values to their full glory.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Steven Price <steven.price@arm.com>
-Link: https://lore.kernel.org/r/20200804170604.42662-7-drjones@redhat.com
 ---
- Documentation/virt/kvm/api.rst    | 13 +++++++++++++
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              |  3 +++
- arch/arm64/kvm/pvtime.c           |  2 +-
- arch/x86/kvm/x86.c                |  3 +++
- include/uapi/linux/kvm.h          |  1 +
- 6 files changed, 22 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
+ arch/arm64/kvm/trace_handle_exit.h |  6 +++---
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 49af23d2b462..d2b733dc7892 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6160,3 +6160,16 @@ KVM can therefore start protected VMs.
- This capability governs the KVM_S390_PV_COMMAND ioctl and the
- KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
- guests when the state change is invalid.
-+
-+8.24 KVM_CAP_STEAL_TIME
-+-----------------------
-+
-+:Architectures: arm64, x86
-+
-+This capability indicates that KVM supports steal time accounting.
-+When steal time accounting is supported it may be enabled with
-+architecture-specific interfaces.  This capability and the architecture-
-+specific interfaces must be consistent, i.e. if one says the feature
-+is supported, than the other should as well and vice versa.  For arm64
-+see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
-+For x86 see Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index dd9c3b25aa1e..af4989a25bb7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -543,6 +543,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
- gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+index 4691053c5ee4..ff0444352bba 100644
+--- a/arch/arm64/kvm/trace_arm.h
++++ b/arch/arm64/kvm/trace_arm.h
+@@ -23,7 +23,7 @@ TRACE_EVENT(kvm_entry,
+ 		__entry->vcpu_pc		= vcpu_pc;
+ 	),
  
-+bool kvm_arm_pvtime_supported(void);
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr);
- int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 691d21e4c717..57876b0b870b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -206,6 +206,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+	case KVM_CAP_STEAL_TIME:
-+		r = kvm_arm_pvtime_supported();
-+		break;
- 	default:
- 		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 75234321d896..920ac43077ad 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -71,7 +71,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	return base;
- }
+-	TP_printk("PC: 0x%08lx", __entry->vcpu_pc)
++	TP_printk("PC: 0x%016lx", __entry->vcpu_pc)
+ );
  
--static bool kvm_arm_pvtime_supported(void)
-+bool kvm_arm_pvtime_supported(void)
- {
- 	return !!sched_info_on();
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 599d73206299..c44d3a73b8eb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3581,6 +3581,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SMALLER_MAXPHYADDR:
- 		r = (int) allow_smaller_maxphyaddr;
- 		break;
-+	case KVM_CAP_STEAL_TIME:
-+		r = sched_info_on();
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..3d8023474f2a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_STEAL_TIME 187
+ TRACE_EVENT(kvm_exit,
+@@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
+ 		__entry->vcpu_pc		= vcpu_pc;
+ 	),
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
++	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%016lx",
+ 		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
+ 		  __entry->esr_ec,
+ 		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
+@@ -69,7 +69,7 @@ TRACE_EVENT(kvm_guest_fault,
+ 		__entry->ipa			= ipa;
+ 	),
  
+-	TP_printk("ipa %#llx, hsr %#08lx, hxfar %#08lx, pc %#08lx",
++	TP_printk("ipa %#llx, hsr %#08lx, hxfar %#08lx, pc %#016lx",
+ 		  __entry->ipa, __entry->hsr,
+ 		  __entry->hxfar, __entry->vcpu_pc)
+ );
+@@ -131,7 +131,7 @@ TRACE_EVENT(kvm_mmio_emulate,
+ 		__entry->cpsr			= cpsr;
+ 	),
+ 
+-	TP_printk("Emulate MMIO at: 0x%08lx (instr: %08lx, cpsr: %08lx)",
++	TP_printk("Emulate MMIO at: 0x%016lx (instr: %08lx, cpsr: %08lx)",
+ 		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
+ );
+ 
+@@ -149,7 +149,7 @@ TRACE_EVENT(kvm_unmap_hva_range,
+ 		__entry->end		= end;
+ 	),
+ 
+-	TP_printk("mmu notifier unmap range: %#08lx -- %#08lx",
++	TP_printk("mmu notifier unmap range: %#016lx -- %#016lx",
+ 		  __entry->start, __entry->end)
+ );
+ 
+@@ -165,7 +165,7 @@ TRACE_EVENT(kvm_set_spte_hva,
+ 		__entry->hva		= hva;
+ 	),
+ 
+-	TP_printk("mmu notifier set pte hva: %#08lx", __entry->hva)
++	TP_printk("mmu notifier set pte hva: %#016lx", __entry->hva)
+ );
+ 
+ TRACE_EVENT(kvm_age_hva,
+@@ -182,7 +182,7 @@ TRACE_EVENT(kvm_age_hva,
+ 		__entry->end		= end;
+ 	),
+ 
+-	TP_printk("mmu notifier age hva: %#08lx -- %#08lx",
++	TP_printk("mmu notifier age hva: %#016lx -- %#016lx",
+ 		  __entry->start, __entry->end)
+ );
+ 
+@@ -198,7 +198,7 @@ TRACE_EVENT(kvm_test_age_hva,
+ 		__entry->hva		= hva;
+ 	),
+ 
+-	TP_printk("mmu notifier test age hva: %#08lx", __entry->hva)
++	TP_printk("mmu notifier test age hva: %#016lx", __entry->hva)
+ );
+ 
+ TRACE_EVENT(kvm_set_way_flush,
+diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
+index 2c56d1e0f5bd..8d78acc4fba7 100644
+--- a/arch/arm64/kvm/trace_handle_exit.h
++++ b/arch/arm64/kvm/trace_handle_exit.h
+@@ -22,7 +22,7 @@ TRACE_EVENT(kvm_wfx_arm64,
+ 		__entry->is_wfe  = is_wfe;
+ 	),
+ 
+-	TP_printk("guest executed wf%c at: 0x%08lx",
++	TP_printk("guest executed wf%c at: 0x%016lx",
+ 		  __entry->is_wfe ? 'e' : 'i', __entry->vcpu_pc)
+ );
+ 
+@@ -42,7 +42,7 @@ TRACE_EVENT(kvm_hvc_arm64,
+ 		__entry->imm = imm;
+ 	),
+ 
+-	TP_printk("HVC at 0x%08lx (r0: 0x%08lx, imm: 0x%lx)",
++	TP_printk("HVC at 0x%016lx (r0: 0x%016lx, imm: 0x%lx)",
+ 		  __entry->vcpu_pc, __entry->r0, __entry->imm)
+ );
+ 
+@@ -135,7 +135,7 @@ TRACE_EVENT(trap_reg,
+ 		__entry->write_value = write_value;
+ 	),
+ 
+-	TP_printk("%s %s reg %d (0x%08llx)", __entry->fn,  __entry->is_write?"write to":"read from", __entry->reg, __entry->write_value)
++	TP_printk("%s %s reg %d (0x%016llx)", __entry->fn,  __entry->is_write?"write to":"read from", __entry->reg, __entry->write_value)
+ );
+ 
+ TRACE_EVENT(kvm_handle_sys_reg,
 -- 
 2.27.0
 
