@@ -7,51 +7,50 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F934C43461
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D65C28E83
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D750C20770
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D750C20770
+	by mail.kernel.org (Postfix) with ESMTP id D835D20770
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D835D20770
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FE464B255;
-	Fri,  4 Sep 2020 05:29:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BFF14B337;
+	Fri,  4 Sep 2020 05:29:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VbG5+bf77At7; Fri,  4 Sep 2020 05:29:31 -0400 (EDT)
+	with ESMTP id je9-7dcwe6RU; Fri,  4 Sep 2020 05:29:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47B564B238;
-	Fri,  4 Sep 2020 05:29:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FEE34B35C;
+	Fri,  4 Sep 2020 05:29:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB3074B364
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:29:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0C904B238
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:29:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jrtz4s2LJmQZ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 05:29:29 -0400 (EDT)
+ with ESMTP id 5Eacuz5i+F86 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 05:29:35 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9033E4B358
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:29:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D624B35C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 05:29:35 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A704143B;
- Fri,  4 Sep 2020 02:29:29 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6AC031477;
+ Fri,  4 Sep 2020 02:29:35 -0700 (PDT)
 Received: from localhost.localdomain (entos-thunderx2-desktop.shanghai.arm.com
  [10.169.212.215])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 87DAE3F66F;
- Fri,  4 Sep 2020 02:29:23 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B7FC73F66F;
+ Fri,  4 Sep 2020 02:29:29 -0700 (PDT)
 From: Jianyong Wu <jianyong.wu@arm.com>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
  maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
  will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com
-Subject: [PATCH v14 05/10] time: Add mechanism to recognize clocksource in
- time_get_snapshot
-Date: Fri,  4 Sep 2020 17:27:39 +0800
-Message-Id: <20200904092744.167655-6-jianyong.wu@arm.com>
+Subject: [PATCH v14 06/10] clocksource: Add clocksource id for arm arch counter
+Date: Fri,  4 Sep 2020 17:27:40 +0800
+Message-Id: <20200904092744.167655-7-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200904092744.167655-1-jianyong.wu@arm.com>
 References: <20200904092744.167655-1-jianyong.wu@arm.com>
@@ -74,135 +73,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Thomas Gleixner <tglx@linutronix.de>
+Add clocksource id for arm arch counter to let it be identified easily and
+elegantly in ptp_kvm implementation for arm.
 
-System time snapshots are not conveying information about the current
-clocksource which was used, but callers like the PTP KVM guest
-implementation have the requirement to evaluate the clocksource type to
-select the appropriate mechanism.
-
-Introduce a clocksource id field in struct clocksource which is by default
-set to CSID_GENERIC (0). Clocksource implementations can set that field to
-a value which allows to identify the clocksource.
-
-Store the clocksource id of the current clocksource in the
-system_time_snapshot so callers can evaluate which clocksource was used to
-take the snapshot and act accordingly.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 ---
- include/linux/clocksource.h     |  6 ++++++
- include/linux/clocksource_ids.h | 11 +++++++++++
- include/linux/timekeeping.h     | 12 +++++++-----
- kernel/time/clocksource.c       |  2 ++
- kernel/time/timekeeping.c       |  1 +
- 5 files changed, 27 insertions(+), 5 deletions(-)
- create mode 100644 include/linux/clocksource_ids.h
+ drivers/clocksource/arm_arch_timer.c | 2 ++
+ include/linux/clocksource_ids.h      | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/include/linux/clocksource.h b/include/linux/clocksource.h
-index 86d143db6523..1290d0dce840 100644
---- a/include/linux/clocksource.h
-+++ b/include/linux/clocksource.h
-@@ -17,6 +17,7 @@
- #include <linux/timer.h>
- #include <linux/init.h>
- #include <linux/of.h>
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index 6c3e84180146..d55acffb0b90 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -16,6 +16,7 @@
+ #include <linux/cpu_pm.h>
+ #include <linux/clockchips.h>
+ #include <linux/clocksource.h>
 +#include <linux/clocksource_ids.h>
- #include <asm/div64.h>
- #include <asm/io.h>
+ #include <linux/interrupt.h>
+ #include <linux/of_irq.h>
+ #include <linux/of_address.h>
+@@ -191,6 +192,7 @@ static u64 arch_counter_read_cc(const struct cyclecounter *cc)
  
-@@ -62,6 +63,10 @@ struct module;
-  *			400-499: Perfect
-  *				The ideal clocksource. A must-use where
-  *				available.
-+ * @id:			Defaults to CSID_GENERIC. The id value is captured
-+ *			in certain snapshot functions to allow callers to
-+ *			validate the clocksource from which the snapshot was
-+ *			taken.
-  * @flags:		Flags describing special properties
-  * @enable:		Optional function to enable the clocksource
-  * @disable:		Optional function to disable the clocksource
-@@ -100,6 +105,7 @@ struct clocksource {
- 	const char		*name;
- 	struct list_head	list;
- 	int			rating;
-+	enum clocksource_ids	id;
- 	enum vdso_clock_mode	vdso_clock_mode;
- 	unsigned long		flags;
- 
+ static struct clocksource clocksource_counter = {
+ 	.name	= "arch_sys_counter",
++	.id	= CSID_ARM_ARCH_COUNTER,
+ 	.rating	= 400,
+ 	.read	= arch_counter_read,
+ 	.mask	= CLOCKSOURCE_MASK(56),
 diff --git a/include/linux/clocksource_ids.h b/include/linux/clocksource_ids.h
-new file mode 100644
-index 000000000000..4d8e19e05328
---- /dev/null
+index 4d8e19e05328..16775d7d8f8d 100644
+--- a/include/linux/clocksource_ids.h
 +++ b/include/linux/clocksource_ids.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_CLOCKSOURCE_IDS_H
-+#define _LINUX_CLOCKSOURCE_IDS_H
-+
-+/* Enum to give clocksources a unique identifier */
-+enum clocksource_ids {
-+	CSID_GENERIC		= 0,
-+	CSID_MAX,
-+};
-+
-+#endif
-diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-index d5471d6fa778..17be3b6f9f37 100644
---- a/include/linux/timekeeping.h
-+++ b/include/linux/timekeeping.h
-@@ -3,6 +3,7 @@
- #define _LINUX_TIMEKEEPING_H
- 
- #include <linux/errno.h>
-+#include <linux/clocksource_ids.h>
- 
- /* Included from linux/ktime.h */
- 
-@@ -232,11 +233,12 @@ extern void timekeeping_inject_sleeptime64(const struct timespec64 *delta);
-  * @cs_was_changed_seq:	The sequence number of clocksource change events
-  */
- struct system_time_snapshot {
--	u64		cycles;
--	ktime_t		real;
--	ktime_t		raw;
--	unsigned int	clock_was_set_seq;
--	u8		cs_was_changed_seq;
-+	u64			cycles;
-+	ktime_t			real;
-+	ktime_t			raw;
-+	enum clocksource_ids	cs_id;
-+	unsigned int		clock_was_set_seq;
-+	u8			cs_was_changed_seq;
+@@ -5,6 +5,7 @@
+ /* Enum to give clocksources a unique identifier */
+ enum clocksource_ids {
+ 	CSID_GENERIC		= 0,
++	CSID_ARM_ARCH_COUNTER,
+ 	CSID_MAX,
  };
  
- /**
-diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
-index 02441ead3c3b..6b38d4993214 100644
---- a/kernel/time/clocksource.c
-+++ b/kernel/time/clocksource.c
-@@ -928,6 +928,8 @@ int __clocksource_register_scale(struct clocksource *cs, u32 scale, u32 freq)
- 
- 	clocksource_arch_init(cs);
- 
-+	if (WARN_ON_ONCE((unsigned int)cs->id >= CSID_MAX))
-+		cs->id = CSID_GENERIC;
- 	if (cs->vdso_clock_mode < 0 ||
- 	    cs->vdso_clock_mode >= VDSO_CLOCKMODE_MAX) {
- 		pr_warn("clocksource %s registered with invalid VDSO mode %d. Disabling VDSO support.\n",
-diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index 4c47f388a83f..c15dd42241bb 100644
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -982,6 +982,7 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
- 	do {
- 		seq = read_seqcount_begin(&tk_core.seq);
- 		now = tk_clock_read(&tk->tkr_mono);
-+		systime_snapshot->cs_id = tk->tkr_mono.clock->id;
- 		systime_snapshot->cs_was_changed_seq = tk->cs_was_changed_seq;
- 		systime_snapshot->clock_was_set_seq = tk->clock_was_set_seq;
- 		base_real = ktime_add(tk->tkr_mono.base,
 -- 
 2.17.1
 
