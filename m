@@ -2,83 +2,65 @@ Return-Path: <SRS0=jshR=CN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00091C28E83
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89561C43461
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 13:42:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A53C720770
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUoZVg/I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53C720770
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0735620DD4
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 13:42:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0735620DD4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 608094B365;
-	Fri,  4 Sep 2020 06:46:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 506884B3B6;
+	Fri,  4 Sep 2020 09:42:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z-bonD7OWIhu; Fri,  4 Sep 2020 06:46:16 -0400 (EDT)
+	with ESMTP id oUxhAAsuF-Ao; Fri,  4 Sep 2020 09:42:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 717B04B395;
-	Fri,  4 Sep 2020 06:46:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 510D54B3D4;
+	Fri,  4 Sep 2020 09:42:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3264B387
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E50DE4B3B6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 09:42:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c8BI1LKaSnve for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 06:46:12 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA1134B371
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:07 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C5B5820C56;
- Fri,  4 Sep 2020 10:46:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599216366;
- bh=nCc55AZ3IGOEPrvp66HRc9DIbXCNXgxfLuV2k8RKjKk=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=rUoZVg/IjoiVzDx4ku/+fP10lSWGwkW6n/0IGghZaq1Zamg67QAq/IMENy0PZZckW
- JOGO7ScY01EetEYlUnNOJHCHLkzXXtjX9f2Ba8YASKYcUR9+XHawtuzyodpq7NvZ3G
- diwah0+HwJcDfuPEbXoLLjrfMHbaqbx0C3l4gU2c=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kE9EL-0098oH-6W; Fri, 04 Sep 2020 11:46:05 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 9/9] KVM: arm64: Update page shift if stage 2 block mapping
- not supported
-Date: Fri,  4 Sep 2020 11:45:30 +0100
-Message-Id: <20200904104530.1082676-10-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
-References: <20200904104530.1082676-1-maz@kernel.org>
+ with ESMTP id B4u94YmjIZe7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 09:42:06 -0400 (EDT)
+Received: from huawei.com (lhrrgout.huawei.com [185.176.76.210])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18B004B3AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 09:42:06 -0400 (EDT)
+Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id 59EFE247F430A0538772;
+ Fri,  4 Sep 2020 14:42:04 +0100 (IST)
+Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
+ 14:42:03 +0100
+Date: Fri, 4 Sep 2020 14:40:29 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 02/23] irqchip/rvic: Add support for untrusted interrupt
+ allocation
+Message-ID: <20200904144029.000017ca@Huawei.com>
+In-Reply-To: <20200903152610.1078827-3-maz@kernel.org>
+References: <20200903152610.1078827-1-maz@kernel.org>
+ <20200903152610.1078827-3-maz@kernel.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- drjones@redhat.com, eric.auger@redhat.com, gshan@redhat.com,
- steven.price@arm.com, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
+X-Originating-IP: [10.52.125.29]
+X-ClientProxiedBy: lhreml743-chm.china.huawei.com (10.201.108.193) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -96,45 +78,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+On Thu,  3 Sep 2020 16:25:49 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
-Commit 196f878a7ac2e (" KVM: arm/arm64: Signal SIGBUS when stage2 discovers
-hwpoison memory") modifies user_mem_abort() to send a SIGBUS signal when
-the fault IPA maps to a hwpoisoned page. Commit 1559b7583ff6 ("KVM:
-arm/arm64: Re-check VMA on detecting a poisoned page") changed
-kvm_send_hwpoison_signal() to use the page shift instead of the VMA because
-at that point the code had already released the mmap lock, which means
-userspace could have modified the VMA.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Hi Marc,
 
-If userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
-map the guest fault IPA using block mappings in stage 2. That is not always
-possible, if, for example, userspace uses dirty page logging for the VM.
-Update the page shift appropriately in those cases when we downgrade the
-stage 2 entry from a block mapping to a page.
+One trivial comment inline.
 
-Fixes: 1559b7583ff6 ("KVM: arm/arm64: Re-check VMA on detecting a poisoned page")
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Link: https://lore.kernel.org/r/20200901133357.52640-2-alexandru.elisei@arm.com
----
- arch/arm64/kvm/mmu.c | 1 +
- 1 file changed, 1 insertion(+)
+> ---
+>  drivers/irqchip/irq-rvic.c | 47 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 44 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-rvic.c b/drivers/irqchip/irq-rvic.c
+> index 6f37aa4318b6..2747a452202f 100644
+> --- a/drivers/irqchip/irq-rvic.c
+> +++ b/drivers/irqchip/irq-rvic.c
+> @@ -37,6 +37,8 @@ static DEFINE_PER_CPU(unsigned long *, trusted_masked);
+>  struct rvic_data {
+>  	struct fwnode_handle	*fwnode;
+>  	struct irq_domain	*domain;
+> +	unsigned long 		*bitmap;
+> +	struct mutex		lock;
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 16b8660ddbcc..f58d657a898d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1871,6 +1871,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
- 		force_pte = true;
- 		vma_pagesize = PAGE_SIZE;
-+		vma_shift = PAGE_SHIFT;
- 	}
- 
- 	/*
--- 
-2.27.0
+Nitpick. Good to document the scope of that lock. It's obvious in this
+patch but might not be 10 years down the line!
+
+>  	unsigned int		nr_trusted;
+>  	unsigned int		nr_untrusted;
+>  };
+...
 
 _______________________________________________
 kvmarm mailing list
