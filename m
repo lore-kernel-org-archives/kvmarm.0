@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB463C433E2
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29859C433E2
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9850020722
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9850020722
+	by mail.kernel.org (Postfix) with ESMTP id D799A2074D
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D799A2074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CB8A4B392;
-	Fri,  4 Sep 2020 12:00:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B8344B3A0;
+	Fri,  4 Sep 2020 12:00:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ohgHZeeTHogy; Fri,  4 Sep 2020 12:00:33 -0400 (EDT)
+	with ESMTP id kq-HuDjpj4Rv; Fri,  4 Sep 2020 12:00:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 154FB4B397;
-	Fri,  4 Sep 2020 12:00:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C734B3B0;
+	Fri,  4 Sep 2020 12:00:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2154B36C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 306F94B20B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eaQp-ZrP6OcR for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 12:00:30 -0400 (EDT)
+ with ESMTP id G27bVYp71tqH for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 12:00:32 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 210624B2A2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCA094B385
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:32 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C423011D4;
- Fri,  4 Sep 2020 09:00:29 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D3C313D5;
+ Fri,  4 Sep 2020 09:00:32 -0700 (PDT)
 Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60A3C3F66F;
- Fri,  4 Sep 2020 09:00:27 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0724E3F66F;
+ Fri,  4 Sep 2020 09:00:29 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v2 1/2] arm64: kvm: Save/restore MTE registers
-Date: Fri,  4 Sep 2020 17:00:17 +0100
-Message-Id: <20200904160018.29481-2-steven.price@arm.com>
+Subject: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
+Date: Fri,  4 Sep 2020 17:00:18 +0100
+Message-Id: <20200904160018.29481-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
 References: <20200904160018.29481-1-steven.price@arm.com>
@@ -74,139 +74,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Define the new system registers that MTE introduces and context switch
-them. The MTE feature is still hidden from the ID register as it isn't
-supported in a VM yet.
+Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
+on a VCPU. When enabled on any VCPU in the virtual machine this causes
+all pages that are faulted into the VM to have the PG_mte_tagged flag
+set (and the tag storage cleared if this is the first use).
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h          |  4 ++++
- arch/arm64/include/asm/sysreg.h            |  3 ++-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
- arch/arm64/kvm/sys_regs.c                  | 14 ++++++++++----
- 4 files changed, 30 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  3 +++
+ arch/arm64/include/asm/kvm_host.h    |  5 ++++-
+ arch/arm64/include/uapi/asm/kvm.h    |  1 +
+ arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
+ arch/arm64/kvm/reset.c               |  8 ++++++++
+ arch/arm64/kvm/sys_regs.c            |  6 +++++-
+ 6 files changed, 36 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 49a55be2b9a2..0042323a4b7f 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+ 	    vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 |= HCR_TID2;
++
++	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
++		vcpu->arch.hcr_el2 |= HCR_ATA;
+ }
+ 
+ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e52c927aade5..4f4360dd149e 100644
+index 4f4360dd149e..b1190366242b 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -126,6 +126,8 @@ enum vcpu_sysreg {
- 	SCTLR_EL1,	/* System Control Register */
- 	ACTLR_EL1,	/* Auxiliary Control Register */
- 	CPACR_EL1,	/* Coprocessor Access Control */
-+	RGSR_EL1,	/* Random Allocation Tag Seed Register */
-+	GCR_EL1,	/* Tag Control Register */
- 	ZCR_EL1,	/* SVE Control */
- 	TTBR0_EL1,	/* Translation Table Base Register 0 */
- 	TTBR1_EL1,	/* Translation Table Base Register 1 */
-@@ -142,6 +144,8 @@ enum vcpu_sysreg {
- 	TPIDR_EL1,	/* Thread ID, Privileged */
- 	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
- 	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
-+	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
-+	TFSR_EL1,	/* Tag Fault Stauts Register (EL1) */
- 	PAR_EL1,	/* Physical Address Register */
- 	MDSCR_EL1,	/* Monitor Debug System Control Register */
- 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 52eefe2f7d95..cd60677551b7 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -563,7 +563,8 @@
- #define SCTLR_ELx_M	(BIT(0))
+@@ -37,7 +37,7 @@
  
- #define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
--			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
-+			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB | \
-+			 SCTLR_ELx_ITFSB)
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
  
- /* SCTLR_EL2 specific flags. */
- #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 7a986030145f..a124ffa49ba3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -18,6 +18,11 @@
- static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-+	if (system_supports_mte()) {
-+		ctxt_sys_reg(ctxt, RGSR_EL1)	= read_sysreg_s(SYS_RGSR_EL1);
-+		ctxt_sys_reg(ctxt, GCR_EL1)	= read_sysreg_s(SYS_GCR_EL1);
-+		ctxt_sys_reg(ctxt, TFSRE0_EL1)	= read_sysreg_s(SYS_TFSRE0_EL1);
+-#define KVM_VCPU_MAX_FEATURES 7
++#define KVM_VCPU_MAX_FEATURES 8
+ 
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+@@ -110,6 +110,9 @@ struct kvm_arch {
+ 	 * supported.
+ 	 */
+ 	bool return_nisv_io_abort_to_user;
++
++	/* If any VCPU has MTE enabled then all memory must be MTE enabled */
++	bool vcpu_has_mte;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index ba85bb23f060..2677e1ab8c16 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -106,6 +106,7 @@ struct kvm_regs {
+ #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+ #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+ #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
++#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
+ 
+ struct kvm_vcpu_init {
+ 	__u32 target;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index ba00bcc0c884..e8891bacd76f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (vma_pagesize == PAGE_SIZE && !force_pte)
+ 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+ 							   &pfn, &fault_ipa);
++	if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
++		/*
++		 * VM will be able to see the page's tags, so we must ensure
++		 * they have been initialised.
++		 */
++		struct page *page = pfn_to_page(pfn);
++		long i, nr_pages = compound_nr(page);
++
++		/* if PG_mte_tagged is set, tags have already been initialised */
++		for (i = 0; i < nr_pages; i++, page++) {
++			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
++				mte_clear_page_tags(page_address(page));
++		}
 +	}
- }
++
+ 	if (writable)
+ 		kvm_set_pfn_dirty(pfn);
  
- static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-@@ -45,6 +50,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-+	if (system_supports_mte())
-+		ctxt_sys_reg(ctxt, TFSR_EL1) = read_sysreg_el1(SYS_TFSR);
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index ee33875c5c2a..82f3883d717f 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -274,6 +274,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
  
- 	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
- 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
-@@ -63,6 +70,11 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-+	if (system_supports_mte()) {
-+		write_sysreg_s(ctxt_sys_reg(ctxt, RGSR_EL1), SYS_RGSR_EL1);
-+		write_sysreg_s(ctxt_sys_reg(ctxt, GCR_EL1), SYS_GCR_EL1);
-+		write_sysreg_s(ctxt_sys_reg(ctxt, TFSRE0_EL1), SYS_TFSRE0_EL1);
++	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
++		if (!system_supports_mte()) {
++			ret = -EINVAL;
++			goto out;
++		}
++		vcpu->kvm->arch.vcpu_has_mte = true;
 +	}
- }
- 
- static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-@@ -106,6 +118,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
- 	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-+	if (system_supports_mte())
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TFSR_EL1), SYS_TFSR);
- 
- 	if (!has_vhe() &&
- 	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
++
+ 	switch (vcpu->arch.target) {
+ 	default:
+ 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 379f4969d0bd..a655f172b5ad 100644
+index a655f172b5ad..6a971b201e81 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1391,6 +1391,12 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return false;
+@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+ 	} else if (id == SYS_ID_AA64PFR1_EL1) {
+-		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
++		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
++			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+ 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+ 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+ 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *rd)
+ {
++	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
++		return 0;
++
+ 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
  }
  
-+static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	SYS_DESC(SYS_##name),			\
-@@ -1557,8 +1563,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
- 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
- 
--	{ SYS_DESC(SYS_RGSR_EL1), access_mte_regs },
--	{ SYS_DESC(SYS_GCR_EL1), access_mte_regs },
-+	{ SYS_DESC(SYS_RGSR_EL1), access_mte_regs, reset_unknown, RGSR_EL1, .visibility = mte_visibility },
-+	{ SYS_DESC(SYS_GCR_EL1), access_mte_regs, reset_unknown, GCR_EL1, .visibility = mte_visibility },
- 
- 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
- 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-@@ -1584,8 +1590,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
- 	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
- 
--	{ SYS_DESC(SYS_TFSR_EL1), access_mte_regs },
--	{ SYS_DESC(SYS_TFSRE0_EL1), access_mte_regs },
-+	{ SYS_DESC(SYS_TFSR_EL1), access_mte_regs, reset_unknown, TFSR_EL1, .visibility = mte_visibility },
-+	{ SYS_DESC(SYS_TFSRE0_EL1), access_mte_regs, reset_unknown, TFSRE0_EL1, .visibility = mte_visibility },
- 
- 	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
- 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
 -- 
 2.20.1
 
