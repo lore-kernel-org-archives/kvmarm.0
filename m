@@ -4,53 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F222CC43461
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 14:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE4AC433E2
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 14:59:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7BBCF206F2
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 14:39:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBCF206F2
+	by mail.kernel.org (Postfix) with ESMTP id 23C6B2073B
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 14:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23C6B2073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 019174B3B0;
-	Fri,  4 Sep 2020 10:39:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61E394B112;
+	Fri,  4 Sep 2020 10:59:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vPckBtmyeWh3; Fri,  4 Sep 2020 10:39:24 -0400 (EDT)
+	with ESMTP id ivdgyEM3CCCF; Fri,  4 Sep 2020 10:59:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0D204B205;
-	Fri,  4 Sep 2020 10:39:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 446744B118;
+	Fri,  4 Sep 2020 10:59:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0155A4B1FD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 10:39:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 840E34B10E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 10:59:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CvKusT+Xwpp0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 10:39:21 -0400 (EDT)
+ with ESMTP id qa9YKq7JBKVZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 10:59:26 -0400 (EDT)
 Received: from huawei.com (lhrrgout.huawei.com [185.176.76.210])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAB954B1FC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 10:39:21 -0400 (EDT)
-Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 4A63B9CD8D0D45539EAA;
- Fri,  4 Sep 2020 15:39:20 +0100 (IST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7F514B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 10:59:26 -0400 (EDT)
+Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.106])
+ by Forcepoint Email with ESMTP id 5F1A8D0315C00E3B86EB;
+ Fri,  4 Sep 2020 15:59:24 +0100 (IST)
 Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
  (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
- 15:39:19 +0100
-Date: Fri, 4 Sep 2020 15:37:46 +0100
+ 15:59:23 +0100
+Date: Fri, 4 Sep 2020 15:57:50 +0100
 From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 05/23] KVM: arm64: Move GIC model out of the distributor
-Message-ID: <20200904153746.0000521c@Huawei.com>
-In-Reply-To: <20200903152610.1078827-6-maz@kernel.org>
+Subject: Re: [PATCH 12/23] KVM: arm64: Move kvm_vgic_vcpu_pending_irq() to
+ irqchip_flow
+Message-ID: <20200904155750.00000663@Huawei.com>
+In-Reply-To: <20200903152610.1078827-13-maz@kernel.org>
 References: <20200903152610.1078827-1-maz@kernel.org>
- <20200903152610.1078827-6-maz@kernel.org>
+ <20200903152610.1078827-13-maz@kernel.org>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
@@ -77,125 +78,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu,  3 Sep 2020 16:25:52 +0100
+On Thu, 3 Sep 2020 16:25:59 +0100
 Marc Zyngier <maz@kernel.org> wrote:
 
-> In order to allow more than just GIC implementations in the future,
-> let's move the GIC model outside of the distributor. This also
-> allows us to back irqchip_in_kernel() with its own irqchip type
-> (IRQCHIP_USER), removing another field from the distributor.
+> Abstract the calls to kvm_vgic_vcpu_pending_irq() via the irqchip_flow
+> structure.
 > 
-> New helpers are provided as a convenience.
-
-Patch looks fine to me. One observation inline.
-
+> No functional change.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+A couple of stray lines in here that I think should be in patch 14
+
+Jonathan
+
 > ---
->  arch/arm64/include/asm/kvm_host.h     |  2 ++
->  arch/arm64/include/asm/kvm_irq.h      | 20 ++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-debug.c      |  5 +++--
->  arch/arm64/kvm/vgic/vgic-init.c       | 26 ++++++++++++--------------
->  arch/arm64/kvm/vgic/vgic-kvm-device.c | 16 ++++++++++++----
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  2 +-
->  arch/arm64/kvm/vgic/vgic-mmio.c       | 10 ++++------
->  arch/arm64/kvm/vgic/vgic-v3.c         | 20 ++++++++------------
->  include/kvm/arm_vgic.h                |  5 -----
->  9 files changed, 62 insertions(+), 44 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_irq.h
+>  arch/arm64/include/asm/kvm_irq.h | 4 ++++
+>  arch/arm64/kvm/arm.c             | 4 ++--
+>  arch/arm64/kvm/vgic/vgic-init.c  | 1 +
+>  arch/arm64/kvm/vgic/vgic.h       | 6 ++++++
+>  include/kvm/arm_vgic.h           | 3 ---
+>  5 files changed, 13 insertions(+), 5 deletions(-)
 > 
-
-...
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 76e2d85789ed..c6fdb1222453 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -32,7 +32,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_irq.h b/arch/arm64/include/asm/kvm_irq.h
+> index 50dfd641cd67..e7a244176ade 100644
+> --- a/arch/arm64/include/asm/kvm_irq.h
+> +++ b/arch/arm64/include/asm/kvm_irq.h
+> @@ -24,6 +24,7 @@ struct kvm_irqchip_flow {
+>  	void (*irqchip_vcpu_unblocking)(struct kvm_vcpu *);
+>  	void (*irqchip_vcpu_load)(struct kvm_vcpu *);
+>  	void (*irqchip_vcpu_put)(struct kvm_vcpu *);
+> +	int  (*irqchip_vcpu_pending_irq)(struct kvm_vcpu *);
+>  };
+>  
+>  /*
+> @@ -70,4 +71,7 @@ struct kvm_irqchip_flow {
+>  #define kvm_irqchip_vcpu_put(v)				\
+>  	__vcpu_irqchip_action((v), vcpu_put, (v))
+>  
+> +#define kvm_irqchip_vcpu_pending_irq(v)			\
+> +	__vcpu_irqchip_action_ret((v), vcpu_pending_irq, (v))
+> +
+>  #endif
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 84d48c312b84..3496d200e488 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -399,8 +399,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
 >  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
-> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> +	bool is_v3 = irqchip_is_gic_v3(vcpu->kvm);
->  	int lr;
+>  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+> -	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -		&& !v->arch.power_off && !v->arch.pause);
+> +	return ((irq_lines || kvm_irqchip_vcpu_pending_irq(v)) &&
+> +		!v->arch.power_off && !v->arch.pause);
+>  }
 >  
->  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
-> @@ -48,7 +48,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  		cpuid = val & GICH_LR_PHYSID_CPUID;
->  		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 24b3ed9bae5d..8bb847045ef9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -22,6 +22,7 @@ static struct kvm_irqchip_flow vgic_irqchip_flow = {
+>  	.irqchip_vcpu_unblocking	= kvm_vgic_vcpu_unblocking,
+>  	.irqchip_vcpu_load		= kvm_vgic_load,
+>  	.irqchip_vcpu_put		= kvm_vgic_put,
+> +	.irqchip_vcpu_pending_irq	= kvm_vgic_vcpu_pending_irq,
+>  };
 >  
-> -		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> +		if (is_v3) {
->  			intid = val & ICH_LR_VIRTUAL_ID_MASK;
->  		} else {
->  			intid = val & GICH_LR_VIRTUALID;
-> @@ -117,12 +117,11 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  /* Requires the irq to be locked already */
->  void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  {
-> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> +	bool is_v2 = irqchip_is_gic_v2(vcpu->kvm);
->  	u64 val = irq->intid;
->  	bool allow_pending = true, is_v2_sgi;
+>  /*
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 190737402365..c5511823eec5 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -321,7 +321,13 @@ int vgic_v4_init(struct kvm *kvm);
+>  void vgic_v4_teardown(struct kvm *kvm);
+>  void vgic_v4_configure_vsgis(struct kvm *kvm);
 >  
-> -	is_v2_sgi = (vgic_irq_is_sgi(irq->intid) &&
-> -		     model == KVM_DEV_TYPE_ARM_VGIC_V2);
-> +	is_v2_sgi = (vgic_irq_is_sgi(irq->intid) && is_v2);
+> +int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> +
+>  void kvm_vgic_load(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_put(struct kvm_vcpu *vcpu);
 >  
->  	if (irq->active) {
->  		val |= ICH_LR_ACTIVE_BIT;
-> @@ -163,8 +162,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  		if (irq->config == VGIC_CONFIG_EDGE)
->  			irq->pending_latch = false;
->  
-> -		if (vgic_irq_is_sgi(irq->intid) &&
-> -		    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +		if (vgic_irq_is_sgi(irq->intid) && is_v2) {
+> +void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+> +void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
 
-Clearly its true in the original code, but I'm not sure why we
-have a local variable for is_v2_sgi above, but don't use it here.
+Wrong patch?
 
-Looks like it might just be because is_v2_sgi was introduced
-as part of a bug fix that didn't go near this block of code?
+> +
+> +
 
->  			u32 src = ffs(irq->source);
+Nitpick. One line is always enough :)
+
+>  #endif
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index a06d9483e3a6..b2adf9cca334 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -347,14 +347,11 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
 >  
->  			if (WARN_RATELIMIT(!src, "No SGI source for INTID %d\n",
-> @@ -205,10 +203,9 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
->  void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
->  	u32 vmcr;
+> -int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> -
+>  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+>  #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
+>  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
 >  
-> -	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +	if (irqchip_is_gic_v2(vcpu->kvm)) {
->  		vmcr = (vmcrp->ackctl << ICH_VMCR_ACK_CTL_SHIFT) &
->  			ICH_VMCR_ACK_CTL_MASK;
->  		vmcr |= (vmcrp->fiqen << ICH_VMCR_FIQ_EN_SHIFT) &
-> @@ -235,12 +232,11 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
->  {
->  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
->  	u32 vmcr;
->  
->  	vmcr = cpu_if->vgic_vmcr;
->  
-> -	if (model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +	if (irqchip_is_gic_v2(vcpu->kvm)) {
->  		vmcrp->ackctl = (vmcr & ICH_VMCR_ACK_CTL_MASK) >>
->  			ICH_VMCR_ACK_CTL_SHIFT;
->  		vmcrp->fiqen = (vmcr & ICH_VMCR_FIQ_EN_MASK) >>
-> @@ -285,7 +281,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	 * Also, we don't support any form of IRQ/FIQ bypass.
->  	 * This goes with the spec allowing the value to be RAO/WI.
->  	 */
-> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> +	if (irqchip_is_gic_v3(vcpu->kvm)) {
->  		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
->  				     ICC_SRE_EL1_DFB |
->  				     ICC_SRE_EL1_SRE);
+> -bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
 
 
 _______________________________________________
