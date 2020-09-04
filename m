@@ -2,64 +2,90 @@ Return-Path: <SRS0=jshR=CN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC33C2D0A8
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2061C2BB84
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:15:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 684C420797
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:02:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684C420797
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2528120795
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:15:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ylfjen9O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2528120795
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0BA54B3D8;
-	Fri,  4 Sep 2020 12:02:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 886BC4B3D5;
+	Fri,  4 Sep 2020 12:15:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vJ6nVu6+JVNk; Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
+	with ESMTP id utRASpXatzzd; Fri,  4 Sep 2020 12:15:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1B74B3A0;
-	Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30AC34B39A;
+	Fri,  4 Sep 2020 12:15:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC5C4B290
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CC4E4B39A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:15:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DAnbee3sCNzP for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 12:02:13 -0400 (EDT)
-Received: from huawei.com (lhrrgout.huawei.com [185.176.76.210])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 633FF4B20B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:02:13 -0400 (EDT)
-Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id CFC6A44256D8BD91718B;
- Fri,  4 Sep 2020 17:02:10 +0100 (IST)
-Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
- 17:02:10 +0100
-Date: Fri, 4 Sep 2020 17:00:36 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 22/23] KVM: arm64: Add a rVIC/rVID in-kernel implementation
-Message-ID: <20200904170036.00003bda@Huawei.com>
-In-Reply-To: <20200903152610.1078827-23-maz@kernel.org>
-References: <20200903152610.1078827-1-maz@kernel.org>
- <20200903152610.1078827-23-maz@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
-MIME-Version: 1.0
-X-Originating-IP: [10.52.125.29]
-X-ClientProxiedBy: lhreml743-chm.china.huawei.com (10.201.108.193) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id 32Hjs2S6ME+N for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 12:15:07 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E792C4B395
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:15:06 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9CE6220772;
+ Fri,  4 Sep 2020 16:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599236105;
+ bh=MLCvWs5mMUOuDyA36Cda3ffiqLz/l2nBWOyu6v+gLSI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ylfjen9OVhEAldXi2YL5m/SJwvfw2FzkZFvwilNCdh//faS7ZM2l3F7NBZHyuuMOT
+ 2tltCwR2Liv05wA0nPm3STMQXq/1gsz1GB65Ha8dkr1Lg/8YBMQLZ0/LAbMqvW4Ck6
+ qBtu3UNBt0zyLCENgs3p6q75rIvyDtJsoqKi9zP4=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kEEMh-009Dk6-W6; Fri, 04 Sep 2020 17:15:04 +0100
+Date: Fri, 04 Sep 2020 17:15:01 +0100
+Message-ID: <87eenhr01m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH v14 07/10] arm64/kvm: Add hypercall service for kvm ptp.
+In-Reply-To: <20200904092744.167655-8-jianyong.wu@arm.com>
+References: <20200904092744.167655-1-jianyong.wu@arm.com>
+ <20200904092744.167655-8-jianyong.wu@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+ pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ steven.price@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
+ yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -77,285 +103,227 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 3 Sep 2020 16:26:09 +0100
-Marc Zyngier <maz@kernel.org> wrote:
-
-> The rVIC (reduced Virtual Interrupt Controller), and its rVID
-> (reduced Virtual Interrupt Distributor) companion are the two
-> parts of a PV interrupt controller architecture, aiming at supporting
-> VMs with minimal interrupt requirements.
+On Fri, 04 Sep 2020 10:27:41 +0100,
+Jianyong Wu <jianyong.wu@arm.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-A few trivial things from a first read through.
-
+> ptp_kvm will get this service through smccc call.
+> The service offers wall time and counter cycle of host for guest.
+> caller must explicitly determines which cycle of virtual counter or
+> physical counter to return if it needs counter cycle.
+> 
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |    7 +-
->  arch/arm64/include/asm/kvm_irq.h  |    2 +
->  arch/arm64/include/uapi/asm/kvm.h |    9 +
->  arch/arm64/kvm/Makefile           |    2 +-
->  arch/arm64/kvm/arm.c              |    3 +
->  arch/arm64/kvm/hypercalls.c       |    7 +
->  arch/arm64/kvm/rvic-cpu.c         | 1073 +++++++++++++++++++++++++++++
->  include/kvm/arm_rvic.h            |   41 ++
->  include/linux/irqchip/irq-rvic.h  |    4 +
->  include/uapi/linux/kvm.h          |    2 +
->  10 files changed, 1148 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/kvm/rvic-cpu.c
->  create mode 100644 include/kvm/arm_rvic.h
+>  arch/arm64/kvm/Kconfig       |  6 +++++
+>  arch/arm64/kvm/arch_timer.c  |  2 +-
+>  arch/arm64/kvm/hypercalls.c  | 49 ++++++++++++++++++++++++++++++++++++
+>  include/kvm/arm_arch_timer.h |  1 +
+>  include/linux/arm-smccc.h    | 16 ++++++++++++
+>  5 files changed, 73 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 318c8f2df245..bbdfacec4813 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -60,6 +60,12 @@ config KVM_ARM_PMU
+>  config KVM_INDIRECT_VECTORS
+>  	def_bool HARDEN_BRANCH_PREDICTOR || RANDOMIZE_BASE
+>  
+> +config ARM64_KVM_PTP_HOST
+> +	bool "KVM PTP clock host service for arm64"
+
+The "for arm64" is not that useful.
+
+> +	default y
+> +	help
+> +	  virtual kvm ptp clock hypercall service for arm64
+> +
+
+I'm not keen on making this a compile option, because whatever is not
+always on ends up bit-rotting. Please drop the option.
+
+>  endif # KVM
+>  
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 32ba6fbc3814..eb85f6701845 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -81,7 +81,7 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+>  	}
+>  }
+>  
+> -static u64 timer_get_offset(struct arch_timer_context *ctxt)
+> +u64 timer_get_offset(struct arch_timer_context *ctxt)
+>  {
+>  	struct kvm_vcpu *vcpu = ctxt->vcpu;
+>  
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 901c60f119c2..2628ddc13abd 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -3,6 +3,7 @@
+>  
+>  #include <linux/arm-smccc.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/clocksource_ids.h>
+>  
+>  #include <asm/kvm_emulate.h>
+>  
+> @@ -11,6 +12,10 @@
+>  
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	struct system_time_snapshot systime_snapshot;
+> +	u64 cycles = -1;
+> +#endif
+
+Please move all the PTP-related code to its own function, rather than
+keeping it in the main HVC dispatcher. Also assigning a negative value
+to something that is unsigned hurts my eyes. Consider using ~0UL instead.
+See the comment below though.
+
+>  	u32 func_id = smccc_get_function(vcpu);
+>  	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
+>  	u32 feature;
+> @@ -21,6 +26,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		val[0] = ARM_SMCCC_VERSION_1_1;
+>  		break;
+>  	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+> +		/*
+> +		 * Note: keep in mind that feature is u32 and smccc_get_arg1
+> +		 * will return u64, so need auto cast here.
+> +		 */
+>  		feature = smccc_get_arg1(vcpu);
+>  		switch (feature) {
+>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
+> @@ -70,7 +79,47 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		break;
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
+> +#endif
+>  		break;
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	/*
+> +	 * This serves virtual kvm_ptp.
+> +	 * Four values will be passed back.
+> +	 * reg0 stores high 32-bit host ktime;
+> +	 * reg1 stores low 32-bit host ktime;
+> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
+> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+
+This comment doesn't match what I read below.
+
+> +	 */
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> +		/*
+> +		 * system time and counter value must captured in the same
+> +		 * time to keep consistency and precision.
+> +		 */
+> +		ktime_get_snapshot(&systime_snapshot);
+> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
+> +			break;
+> +		val[0] = systime_snapshot.real;
+> +		/*
+> +		 * which of virtual counter or physical counter being
+> +		 * asked for is decided by the r1 value of smccc
+
+nit: s/smccc/SMCCC/
+
+> +		 * call. If no invalid r1 value offered, default cycle
+
+nit: If r1 is an invalid value...
+
+> +		 * value(-1) will return.
+
+nit: will be returned.
+
+> +		 */
+> +		feature = smccc_get_arg1(vcpu);
+> +		switch (feature) {
+> +		case ARM_PTP_VIRT_COUNTER:
+> +			cycles = systime_snapshot.cycles -
+> +				 vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
+
+nit: On a single line, please.
+
+> +			break;
+> +		case ARM_PTP_PHY_COUNTER:
+> +			cycles = systime_snapshot.cycles;
+> +			break;
+
+It'd be a lot clearer if you had a default: case here, handling the
+invalid case.
+
+> +		}
+> +		val[1] = cycles;
+
+Given that cycles is a 64bit value, how does it work for a 32bit
+guest? Or have you removed support for 32bit guests altogether?
+
+> +		break;
+> +#endif
+>  	default:
+>  		return kvm_psci_call(vcpu);
+>  	}
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 51c19381108c..5a2b6da9be7a 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -105,5 +105,6 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+>  /* Needed for tracing */
+>  u32 timer_get_ctl(struct arch_timer_context *ctxt);
+>  u64 timer_get_cval(struct arch_timer_context *ctxt);
+> +u64 timer_get_offset(struct arch_timer_context *ctxt);
+>  
+>  #endif
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index f7b5dd7dbf9f..0724840eb5f7 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -103,6 +103,7 @@
+>  
+>  /* KVM "vendor specific" services */
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>  #define ARM_SMCCC_KVM_NUM_FUNCS			128
+>  
+> @@ -112,6 +113,21 @@
+>  			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+>  			   ARM_SMCCC_KVM_FUNC_FEATURES)
+>  
+> +/*
+> + * ptp_kvm is a feature used for time sync between vm and host.
+> + * ptp_kvm module in guest kernel will get service from host using
+> + * this hypercall ID.
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID                           \
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,                         \
+> +			   ARM_SMCCC_SMC_32,                            \
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,                  \
+> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
+> +
+> +/* ptp_kvm counter type ID */
+> +#define ARM_PTP_VIRT_COUNTER			0
+> +#define ARM_PTP_PHY_COUNTER			1
+> +
+>  /* Paravirtualised time calls (defined by ARM DEN0057A) */
+>  #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+>  	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> -- 
+> 2.17.1
+> 
 > 
 
-...
+Thanks,
 
-> diff --git a/arch/arm64/kvm/rvic-cpu.c b/arch/arm64/kvm/rvic-cpu.c
-> new file mode 100644
-> index 000000000000..5fb200c637d9
-> --- /dev/null
-> +++ b/arch/arm64/kvm/rvic-cpu.c
+	M.
 
-...
-
-> +
-> +static int rvic_inject_irq(struct kvm *kvm, unsigned int cpu,
-> +			   unsigned int intid, bool level, void *owner)
-> +{
-> +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, cpu);
-> +	struct rvic *rvic;
-> +
-> +	if (unlikely(!vcpu))
-> +		return -EINVAL;
-> +
-> +	rvic = kvm_vcpu_to_rvic(vcpu);
-> +	if (unlikely(intid >= rvic->nr_total))
-> +		return -EINVAL;
-> +
-> +	/* Ignore interrupt owner for now */
-> +	rvic_vcpu_inject_irq(vcpu, intid, level);
-
-For consistency blank line?
-
-> +	return 0;
-> +}
-> +
-
-...
-
-> +
-> +static int rvic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
-> +			      struct kvm *kvm, int irq_source_id,
-> +			      int level, bool line_status)
-> +{
-> +	/* Abuse the userspace interface to perform the routing*/
-
-Space before */
-
-> +	return rvic_inject_userspace_irq(kvm, KVM_ARM_IRQ_TYPE_SPI, 0,
-> +					 e->irqchip.pin, level);
-> +}
-> +
-
-...
-
-> +
-> +/* Device management */
-> +static int rvic_device_create(struct kvm_device *dev, u32 type)
-> +{
-> +	struct kvm *kvm = dev->kvm;
-> +	struct kvm_vcpu *vcpu;
-> +	int i, ret;
-
-It's personal preference, but I'd avoid the fiddly
-ret handling in the good path. (up to you though!)
-
-ret = 0;
-> +
-> +	if (irqchip_in_kernel(kvm))
-> +		return -EEXIST;
-> +
-> +	ret = -EBUSY;
-> +	if (!lock_all_vcpus(kvm))
-> +		return ret;
-	if (!lock_all_vcpus(kvm))
-		return -EBUSY;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		if (vcpu->arch.has_run_once) {
-			ret = -EBUSY;
-> +			goto out_unlock;
-		}
-> +	}
-> +
-> +	ret = 0;
-> +
-> +	/*
-> +	 * The good thing about not having any HW is that you don't
-> +	 * get the limitations of the HW...
-> +	 */
-> +	kvm->arch.max_vcpus		= KVM_MAX_VCPUS;
-> +	kvm->arch.irqchip_type		= IRQCHIP_RVIC;
-> +	kvm->arch.irqchip_flow		= rvic_irqchip_flow;
-> +	kvm->arch.irqchip_data		= NULL;
-> +
-> +out_unlock:
-> +	unlock_all_vcpus(kvm);
-> +	return ret;
-> +}
-> +
-> +static void rvic_device_destroy(struct kvm_device *dev)
-> +{
-> +	kfree(dev->kvm->arch.irqchip_data);
-> +	kfree(dev);
-> +}
-> +
-> +static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
-> +{
-> +	struct rvic_vm_data *data;
-> +	struct kvm_vcpu *vcpu;
-> +	u32 __user *uaddr, val;
-> +	u16 trusted, total;
-> +	int i, ret = -ENXIO;
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	switch (attr->group) {
-> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
-> +		if (attr->attr)
-> +			break;
-> +
-> +		if (dev->kvm->arch.irqchip_data) {
-> +			ret = -EBUSY;
-> +			break;
-> +		}
-> +
-> +		uaddr = (u32 __user *)(uintptr_t)attr->addr;
-> +		if (get_user(val, uaddr)) {
-> +			ret = -EFAULT;
-> +			break;
-> +		}
-> +
-> +		trusted = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TRUSTED_MASK, val);
-> +		total   = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TOTAL_MASK, val);
-> +		if (total < trusted || trusted < 32 || total < 64 ||
-> +		    trusted % 32 || total % 32 || total > 2048) {
-
-As I read the spec, we need at least 32 untrusted. (R0058) 
-This condition seems to allow that if trusted = 64 and untrusted = 0
-
-
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		data = kzalloc(struct_size(data, rvid_map, (total - trusted)),
-> +			       GFP_KERNEL);
-> +		if (!data) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +
-> +		data->nr_trusted = trusted;
-> +		data->nr_total = total;
-> +		spin_lock_init(&data->lock);
-> +		/* Default to no mapping */
-> +		for (i = 0; i < (total - trusted); i++) {
-> +			/*
-> +			 * an intid < nr_trusted is invalid as the
-> +			 * result of a translation through the rvid,
-> +			 * hence the input in unmapped.
-> +			 */
-> +			data->rvid_map[i].target_vcpu = 0;
-> +			data->rvid_map[i].intid = 0;
-> +		}
-> +
-> +		dev->kvm->arch.irqchip_data = data;
-> +
-> +		ret = 0;
-> +		break;
-> +
-> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
-> +		if (attr->attr)
-> +			break;
-> +
-> +		if (!dev->kvm->arch.irqchip_data)
-> +			break;
-> +
-> +		ret = 0;
-> +
-> +		/* Init the rvic on any already created vcpu */
-> +		kvm_for_each_vcpu(i, vcpu, dev->kvm) {
-> +			ret = rvic_vcpu_init(vcpu);
-> +			if (ret)
-> +				break;
-> +		}
-> +
-> +		if (!ret)
-> +			ret = rvic_setup_default_irq_routing(dev->kvm);
-> +		if (!ret)
-> +			dev->kvm->arch.irqchip_finalized = true;
-
-Personally I'd prefer the more idiomatic 
-
-		if (ret)
-			break;
-
-		ret =...
-		if (ret)
-			break;
-		dev->kvm->arch.....
-
-> +		break;
-> +
-> +	default:
-> +		break;
-> +	}
-> +
-> +	mutex_unlock(&dev->kvm->lock);
-> +
-> +	return ret;
-> +}
-> +
-
-...
-
-> +static int rvic_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
-> +{
-> +	int ret = -ENXIO;
-> +
-> +	switch (attr->group) {
-> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
-> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
-> +		if (attr->attr)
-> +			break;
-> +		ret = 0;
-
-Trivial:
-Early returns?  Bit shorter and easier to read?
-
-> +		break;
-> +
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static const struct kvm_device_ops rvic_dev_ops = {
-> +	.name		= "kvm-arm-rvic",
-> +	.create		= rvic_device_create,
-> +	.destroy	= rvic_device_destroy,
-> +	.set_attr	= rvic_set_attr,
-> +	.get_attr	= rvic_get_attr,
-> +	.has_attr	= rvic_has_attr,
-> +};
-> +
-> +int kvm_register_rvic_device(void)
-> +{
-> +	return kvm_register_device_ops(&rvic_dev_ops, KVM_DEV_TYPE_ARM_RVIC);
-> +}
-
-
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
