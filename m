@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F68BC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00091C28E83
 	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F0D3020770
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A53C720770
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVnjX2pG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D3020770
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUoZVg/I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53C720770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A55154B363;
-	Fri,  4 Sep 2020 06:46:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 608094B365;
+	Fri,  4 Sep 2020 06:46:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G1DpqkVPQ69W; Fri,  4 Sep 2020 06:46:15 -0400 (EDT)
+	with ESMTP id z-bonD7OWIhu; Fri,  4 Sep 2020 06:46:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A0114B360;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 717B04B395;
 	Fri,  4 Sep 2020 06:46:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F003E4B387
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3264B387
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4k1bujV3Xfkh for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id c8BI1LKaSnve for <kvmarm@lists.cs.columbia.edu>;
  Fri,  4 Sep 2020 06:46:12 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E0834B35D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA1134B371
  for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 06:46:07 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 35FB420C09;
+ by mail.kernel.org (Postfix) with ESMTPSA id C5B5820C56;
  Fri,  4 Sep 2020 10:46:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=default; t=1599216366;
- bh=Sn3xphMkTQDWvRiNyZqplkTFaWcKwLKlRGPd6RX796E=;
+ bh=nCc55AZ3IGOEPrvp66HRc9DIbXCNXgxfLuV2k8RKjKk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MVnjX2pGF8235OrEkFr1t/AwdrtZfkBdzmLriS2Y7F3JpaYAGMyjfHyDaXuWB2lqH
- 0pfuaEouIcH+ifAeNDnarxNonLRn++HHpU5Ytma+24/7WU+1JJ0igxBkibyBxBrt82
- p8YJq81/xUasV7COmawv/jFcv3NpHDplSCqek7xc=
+ b=rUoZVg/IjoiVzDx4ku/+fP10lSWGwkW6n/0IGghZaq1Zamg67QAq/IMENy0PZZckW
+ JOGO7ScY01EetEYlUnNOJHCHLkzXXtjX9f2Ba8YASKYcUR9+XHawtuzyodpq7NvZ3G
+ diwah0+HwJcDfuPEbXoLLjrfMHbaqbx0C3l4gU2c=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kE9EK-0098oH-Ke; Fri, 04 Sep 2020 11:46:04 +0100
+ id 1kE9EL-0098oH-6W; Fri, 04 Sep 2020 11:46:05 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 8/9] KVM: arm64: Fix address truncation in traces
-Date: Fri,  4 Sep 2020 11:45:29 +0100
-Message-Id: <20200904104530.1082676-9-maz@kernel.org>
+Subject: [PATCH 9/9] KVM: arm64: Update page shift if stage 2 block mapping
+ not supported
+Date: Fri,  4 Sep 2020 11:45:30 +0100
+Message-Id: <20200904104530.1082676-10-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
 References: <20200904104530.1082676-1-maz@kernel.org>
@@ -95,124 +96,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Owing to their ARMv7 origins, the trace events are truncating most
-address values to 32bits. That's not really helpful.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Expand the printing of such values to their full glory.
+Commit 196f878a7ac2e (" KVM: arm/arm64: Signal SIGBUS when stage2 discovers
+hwpoison memory") modifies user_mem_abort() to send a SIGBUS signal when
+the fault IPA maps to a hwpoisoned page. Commit 1559b7583ff6 ("KVM:
+arm/arm64: Re-check VMA on detecting a poisoned page") changed
+kvm_send_hwpoison_signal() to use the page shift instead of the VMA because
+at that point the code had already released the mmap lock, which means
+userspace could have modified the VMA.
 
+If userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
+map the guest fault IPA using block mappings in stage 2. That is not always
+possible, if, for example, userspace uses dirty page logging for the VM.
+Update the page shift appropriately in those cases when we downgrade the
+stage 2 entry from a block mapping to a page.
+
+Fixes: 1559b7583ff6 ("KVM: arm/arm64: Re-check VMA on detecting a poisoned page")
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Link: https://lore.kernel.org/r/20200901133357.52640-2-alexandru.elisei@arm.com
 ---
- arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
- arch/arm64/kvm/trace_handle_exit.h |  6 +++---
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/mmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 4691053c5ee4..ff0444352bba 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -23,7 +23,7 @@ TRACE_EVENT(kvm_entry,
- 		__entry->vcpu_pc		= vcpu_pc;
- 	),
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 16b8660ddbcc..f58d657a898d 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1871,6 +1871,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+ 		force_pte = true;
+ 		vma_pagesize = PAGE_SIZE;
++		vma_shift = PAGE_SHIFT;
+ 	}
  
--	TP_printk("PC: 0x%08lx", __entry->vcpu_pc)
-+	TP_printk("PC: 0x%016lx", __entry->vcpu_pc)
- );
- 
- TRACE_EVENT(kvm_exit,
-@@ -42,7 +42,7 @@ TRACE_EVENT(kvm_exit,
- 		__entry->vcpu_pc		= vcpu_pc;
- 	),
- 
--	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
-+	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%016lx",
- 		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
- 		  __entry->esr_ec,
- 		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
-@@ -69,7 +69,7 @@ TRACE_EVENT(kvm_guest_fault,
- 		__entry->ipa			= ipa;
- 	),
- 
--	TP_printk("ipa %#llx, hsr %#08lx, hxfar %#08lx, pc %#08lx",
-+	TP_printk("ipa %#llx, hsr %#08lx, hxfar %#08lx, pc %#016lx",
- 		  __entry->ipa, __entry->hsr,
- 		  __entry->hxfar, __entry->vcpu_pc)
- );
-@@ -131,7 +131,7 @@ TRACE_EVENT(kvm_mmio_emulate,
- 		__entry->cpsr			= cpsr;
- 	),
- 
--	TP_printk("Emulate MMIO at: 0x%08lx (instr: %08lx, cpsr: %08lx)",
-+	TP_printk("Emulate MMIO at: 0x%016lx (instr: %08lx, cpsr: %08lx)",
- 		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
- );
- 
-@@ -149,7 +149,7 @@ TRACE_EVENT(kvm_unmap_hva_range,
- 		__entry->end		= end;
- 	),
- 
--	TP_printk("mmu notifier unmap range: %#08lx -- %#08lx",
-+	TP_printk("mmu notifier unmap range: %#016lx -- %#016lx",
- 		  __entry->start, __entry->end)
- );
- 
-@@ -165,7 +165,7 @@ TRACE_EVENT(kvm_set_spte_hva,
- 		__entry->hva		= hva;
- 	),
- 
--	TP_printk("mmu notifier set pte hva: %#08lx", __entry->hva)
-+	TP_printk("mmu notifier set pte hva: %#016lx", __entry->hva)
- );
- 
- TRACE_EVENT(kvm_age_hva,
-@@ -182,7 +182,7 @@ TRACE_EVENT(kvm_age_hva,
- 		__entry->end		= end;
- 	),
- 
--	TP_printk("mmu notifier age hva: %#08lx -- %#08lx",
-+	TP_printk("mmu notifier age hva: %#016lx -- %#016lx",
- 		  __entry->start, __entry->end)
- );
- 
-@@ -198,7 +198,7 @@ TRACE_EVENT(kvm_test_age_hva,
- 		__entry->hva		= hva;
- 	),
- 
--	TP_printk("mmu notifier test age hva: %#08lx", __entry->hva)
-+	TP_printk("mmu notifier test age hva: %#016lx", __entry->hva)
- );
- 
- TRACE_EVENT(kvm_set_way_flush,
-diff --git a/arch/arm64/kvm/trace_handle_exit.h b/arch/arm64/kvm/trace_handle_exit.h
-index 2c56d1e0f5bd..8d78acc4fba7 100644
---- a/arch/arm64/kvm/trace_handle_exit.h
-+++ b/arch/arm64/kvm/trace_handle_exit.h
-@@ -22,7 +22,7 @@ TRACE_EVENT(kvm_wfx_arm64,
- 		__entry->is_wfe  = is_wfe;
- 	),
- 
--	TP_printk("guest executed wf%c at: 0x%08lx",
-+	TP_printk("guest executed wf%c at: 0x%016lx",
- 		  __entry->is_wfe ? 'e' : 'i', __entry->vcpu_pc)
- );
- 
-@@ -42,7 +42,7 @@ TRACE_EVENT(kvm_hvc_arm64,
- 		__entry->imm = imm;
- 	),
- 
--	TP_printk("HVC at 0x%08lx (r0: 0x%08lx, imm: 0x%lx)",
-+	TP_printk("HVC at 0x%016lx (r0: 0x%016lx, imm: 0x%lx)",
- 		  __entry->vcpu_pc, __entry->r0, __entry->imm)
- );
- 
-@@ -135,7 +135,7 @@ TRACE_EVENT(trap_reg,
- 		__entry->write_value = write_value;
- 	),
- 
--	TP_printk("%s %s reg %d (0x%08llx)", __entry->fn,  __entry->is_write?"write to":"read from", __entry->reg, __entry->write_value)
-+	TP_printk("%s %s reg %d (0x%016llx)", __entry->fn,  __entry->is_write?"write to":"read from", __entry->reg, __entry->write_value)
- );
- 
- TRACE_EVENT(kvm_handle_sys_reg,
+ 	/*
 -- 
 2.27.0
 
