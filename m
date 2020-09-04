@@ -2,62 +2,65 @@ Return-Path: <SRS0=jshR=CN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29859C433E2
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC33C2D0A8
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:02:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D799A2074D
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:00:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D799A2074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 684C420797
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:02:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684C420797
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B8344B3A0;
-	Fri,  4 Sep 2020 12:00:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0BA54B3D8;
+	Fri,  4 Sep 2020 12:02:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kq-HuDjpj4Rv; Fri,  4 Sep 2020 12:00:36 -0400 (EDT)
+	with ESMTP id vJ6nVu6+JVNk; Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C734B3B0;
-	Fri,  4 Sep 2020 12:00:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1B74B3A0;
+	Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 306F94B20B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC5C4B290
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:02:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G27bVYp71tqH for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 12:00:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCA094B385
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:00:32 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D3C313D5;
- Fri,  4 Sep 2020 09:00:32 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0724E3F66F;
- Fri,  4 Sep 2020 09:00:29 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Fri,  4 Sep 2020 17:00:18 +0100
-Message-Id: <20200904160018.29481-3-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
+ with ESMTP id DAnbee3sCNzP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 12:02:13 -0400 (EDT)
+Received: from huawei.com (lhrrgout.huawei.com [185.176.76.210])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 633FF4B20B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:02:13 -0400 (EDT)
+Received: from lhreml710-chm.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id CFC6A44256D8BD91718B;
+ Fri,  4 Sep 2020 17:02:10 +0100 (IST)
+Received: from localhost (10.52.125.29) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Sep 2020
+ 17:02:10 +0100
+Date: Fri, 4 Sep 2020 17:00:36 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 22/23] KVM: arm64: Add a rVIC/rVID in-kernel implementation
+Message-ID: <20200904170036.00003bda@Huawei.com>
+In-Reply-To: <20200903152610.1078827-23-maz@kernel.org>
+References: <20200903152610.1078827-1-maz@kernel.org>
+ <20200903152610.1078827-23-maz@kernel.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Maydell <Peter.Maydell@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.52.125.29]
+X-ClientProxiedBy: lhreml743-chm.china.huawei.com (10.201.108.193) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,141 +77,284 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
-on a VCPU. When enabled on any VCPU in the virtual machine this causes
-all pages that are faulted into the VM to have the PG_mte_tagged flag
-set (and the tag storage cleared if this is the first use).
+On Thu, 3 Sep 2020 16:26:09 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  5 ++++-
- arch/arm64/include/uapi/asm/kvm.h    |  1 +
- arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
- arch/arm64/kvm/reset.c               |  8 ++++++++
- arch/arm64/kvm/sys_regs.c            |  6 +++++-
- 6 files changed, 36 insertions(+), 2 deletions(-)
+> The rVIC (reduced Virtual Interrupt Controller), and its rVID
+> (reduced Virtual Interrupt Distributor) companion are the two
+> parts of a PV interrupt controller architecture, aiming at supporting
+> VMs with minimal interrupt requirements.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 49a55be2b9a2..0042323a4b7f 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4f4360dd149e..b1190366242b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -37,7 +37,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 8
- 
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-@@ -110,6 +110,9 @@ struct kvm_arch {
- 	 * supported.
- 	 */
- 	bool return_nisv_io_abort_to_user;
-+
-+	/* If any VCPU has MTE enabled then all memory must be MTE enabled */
-+	bool vcpu_has_mte;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ba85bb23f060..2677e1ab8c16 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ba00bcc0c884..e8891bacd76f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PAGE_SIZE && !force_pte)
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
-+	if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
-+		/*
-+		 * VM will be able to see the page's tags, so we must ensure
-+		 * they have been initialised.
-+		 */
-+		struct page *page = pfn_to_page(pfn);
-+		long i, nr_pages = compound_nr(page);
-+
-+		/* if PG_mte_tagged is set, tags have already been initialised */
-+		for (i = 0; i < nr_pages; i++, page++) {
-+			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+				mte_clear_page_tags(page_address(page));
-+		}
-+	}
-+
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index ee33875c5c2a..82f3883d717f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -274,6 +274,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
-+		if (!system_supports_mte()) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		vcpu->kvm->arch.vcpu_has_mte = true;
-+	}
-+
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a655f172b5ad..6a971b201e81 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
- 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
- {
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+		return 0;
-+
- 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
- }
- 
--- 
-2.20.1
+A few trivial things from a first read through.
+
+> ---
+>  arch/arm64/include/asm/kvm_host.h |    7 +-
+>  arch/arm64/include/asm/kvm_irq.h  |    2 +
+>  arch/arm64/include/uapi/asm/kvm.h |    9 +
+>  arch/arm64/kvm/Makefile           |    2 +-
+>  arch/arm64/kvm/arm.c              |    3 +
+>  arch/arm64/kvm/hypercalls.c       |    7 +
+>  arch/arm64/kvm/rvic-cpu.c         | 1073 +++++++++++++++++++++++++++++
+>  include/kvm/arm_rvic.h            |   41 ++
+>  include/linux/irqchip/irq-rvic.h  |    4 +
+>  include/uapi/linux/kvm.h          |    2 +
+>  10 files changed, 1148 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/kvm/rvic-cpu.c
+>  create mode 100644 include/kvm/arm_rvic.h
+> 
+
+...
+
+> diff --git a/arch/arm64/kvm/rvic-cpu.c b/arch/arm64/kvm/rvic-cpu.c
+> new file mode 100644
+> index 000000000000..5fb200c637d9
+> --- /dev/null
+> +++ b/arch/arm64/kvm/rvic-cpu.c
+
+...
+
+> +
+> +static int rvic_inject_irq(struct kvm *kvm, unsigned int cpu,
+> +			   unsigned int intid, bool level, void *owner)
+> +{
+> +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, cpu);
+> +	struct rvic *rvic;
+> +
+> +	if (unlikely(!vcpu))
+> +		return -EINVAL;
+> +
+> +	rvic = kvm_vcpu_to_rvic(vcpu);
+> +	if (unlikely(intid >= rvic->nr_total))
+> +		return -EINVAL;
+> +
+> +	/* Ignore interrupt owner for now */
+> +	rvic_vcpu_inject_irq(vcpu, intid, level);
+
+For consistency blank line?
+
+> +	return 0;
+> +}
+> +
+
+...
+
+> +
+> +static int rvic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+> +			      struct kvm *kvm, int irq_source_id,
+> +			      int level, bool line_status)
+> +{
+> +	/* Abuse the userspace interface to perform the routing*/
+
+Space before */
+
+> +	return rvic_inject_userspace_irq(kvm, KVM_ARM_IRQ_TYPE_SPI, 0,
+> +					 e->irqchip.pin, level);
+> +}
+> +
+
+...
+
+> +
+> +/* Device management */
+> +static int rvic_device_create(struct kvm_device *dev, u32 type)
+> +{
+> +	struct kvm *kvm = dev->kvm;
+> +	struct kvm_vcpu *vcpu;
+> +	int i, ret;
+
+It's personal preference, but I'd avoid the fiddly
+ret handling in the good path. (up to you though!)
+
+ret = 0;
+> +
+> +	if (irqchip_in_kernel(kvm))
+> +		return -EEXIST;
+> +
+> +	ret = -EBUSY;
+> +	if (!lock_all_vcpus(kvm))
+> +		return ret;
+	if (!lock_all_vcpus(kvm))
+		return -EBUSY;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (vcpu->arch.has_run_once) {
+			ret = -EBUSY;
+> +			goto out_unlock;
+		}
+> +	}
+> +
+> +	ret = 0;
+> +
+> +	/*
+> +	 * The good thing about not having any HW is that you don't
+> +	 * get the limitations of the HW...
+> +	 */
+> +	kvm->arch.max_vcpus		= KVM_MAX_VCPUS;
+> +	kvm->arch.irqchip_type		= IRQCHIP_RVIC;
+> +	kvm->arch.irqchip_flow		= rvic_irqchip_flow;
+> +	kvm->arch.irqchip_data		= NULL;
+> +
+> +out_unlock:
+> +	unlock_all_vcpus(kvm);
+> +	return ret;
+> +}
+> +
+> +static void rvic_device_destroy(struct kvm_device *dev)
+> +{
+> +	kfree(dev->kvm->arch.irqchip_data);
+> +	kfree(dev);
+> +}
+> +
+> +static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+> +{
+> +	struct rvic_vm_data *data;
+> +	struct kvm_vcpu *vcpu;
+> +	u32 __user *uaddr, val;
+> +	u16 trusted, total;
+> +	int i, ret = -ENXIO;
+> +
+> +	mutex_lock(&dev->kvm->lock);
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
+> +		if (attr->attr)
+> +			break;
+> +
+> +		if (dev->kvm->arch.irqchip_data) {
+> +			ret = -EBUSY;
+> +			break;
+> +		}
+> +
+> +		uaddr = (u32 __user *)(uintptr_t)attr->addr;
+> +		if (get_user(val, uaddr)) {
+> +			ret = -EFAULT;
+> +			break;
+> +		}
+> +
+> +		trusted = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TRUSTED_MASK, val);
+> +		total   = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TOTAL_MASK, val);
+> +		if (total < trusted || trusted < 32 || total < 64 ||
+> +		    trusted % 32 || total % 32 || total > 2048) {
+
+As I read the spec, we need at least 32 untrusted. (R0058) 
+This condition seems to allow that if trusted = 64 and untrusted = 0
+
+
+> +			ret = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		data = kzalloc(struct_size(data, rvid_map, (total - trusted)),
+> +			       GFP_KERNEL);
+> +		if (!data) {
+> +			ret = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		data->nr_trusted = trusted;
+> +		data->nr_total = total;
+> +		spin_lock_init(&data->lock);
+> +		/* Default to no mapping */
+> +		for (i = 0; i < (total - trusted); i++) {
+> +			/*
+> +			 * an intid < nr_trusted is invalid as the
+> +			 * result of a translation through the rvid,
+> +			 * hence the input in unmapped.
+> +			 */
+> +			data->rvid_map[i].target_vcpu = 0;
+> +			data->rvid_map[i].intid = 0;
+> +		}
+> +
+> +		dev->kvm->arch.irqchip_data = data;
+> +
+> +		ret = 0;
+> +		break;
+> +
+> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
+> +		if (attr->attr)
+> +			break;
+> +
+> +		if (!dev->kvm->arch.irqchip_data)
+> +			break;
+> +
+> +		ret = 0;
+> +
+> +		/* Init the rvic on any already created vcpu */
+> +		kvm_for_each_vcpu(i, vcpu, dev->kvm) {
+> +			ret = rvic_vcpu_init(vcpu);
+> +			if (ret)
+> +				break;
+> +		}
+> +
+> +		if (!ret)
+> +			ret = rvic_setup_default_irq_routing(dev->kvm);
+> +		if (!ret)
+> +			dev->kvm->arch.irqchip_finalized = true;
+
+Personally I'd prefer the more idiomatic 
+
+		if (ret)
+			break;
+
+		ret =...
+		if (ret)
+			break;
+		dev->kvm->arch.....
+
+> +		break;
+> +
+> +	default:
+> +		break;
+> +	}
+> +
+> +	mutex_unlock(&dev->kvm->lock);
+> +
+> +	return ret;
+> +}
+> +
+
+...
+
+> +static int rvic_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
+> +{
+> +	int ret = -ENXIO;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
+> +	case KVM_DEV_ARM_RVIC_GRP_INIT:
+> +		if (attr->attr)
+> +			break;
+> +		ret = 0;
+
+Trivial:
+Early returns?  Bit shorter and easier to read?
+
+> +		break;
+> +
+> +	default:
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct kvm_device_ops rvic_dev_ops = {
+> +	.name		= "kvm-arm-rvic",
+> +	.create		= rvic_device_create,
+> +	.destroy	= rvic_device_destroy,
+> +	.set_attr	= rvic_set_attr,
+> +	.get_attr	= rvic_get_attr,
+> +	.has_attr	= rvic_has_attr,
+> +};
+> +
+> +int kvm_register_rvic_device(void)
+> +{
+> +	return kvm_register_device_ops(&rvic_dev_ops, KVM_DEV_TYPE_ARM_RVIC);
+> +}
+
+
 
 _______________________________________________
 kvmarm mailing list
