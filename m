@@ -2,70 +2,70 @@ Return-Path: <SRS0=ERU5=CO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9638DC2BBD0
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86899C433E2
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:16:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E64D320760
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:08:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1A2A2078E
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:16:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3tHfPFH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64D320760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0Zjt1tOp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A2A2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E1824B4A1;
-	Sat,  5 Sep 2020 09:08:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 621F64B4A8;
+	Sat,  5 Sep 2020 09:16:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HjBSuKwlE8sZ; Sat,  5 Sep 2020 09:08:40 -0400 (EDT)
+	with ESMTP id uxN9lZ2rA9hN; Sat,  5 Sep 2020 09:16:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 111C04B4A8;
-	Sat,  5 Sep 2020 09:08:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FDDE4B4AE;
+	Sat,  5 Sep 2020 09:16:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DCF34B49E
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:08:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 985DE4B4A8
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:16:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aK9H8ddXKJUJ for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Sep 2020 09:08:38 -0400 (EDT)
+ with ESMTP id WHpX87iqV5Rd for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Sep 2020 09:16:10 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5105B4B436
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:08:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8453C4B4A1
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:16:10 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EB7A22072D;
- Sat,  5 Sep 2020 13:08:36 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 55E072072D;
+ Sat,  5 Sep 2020 13:16:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599311317;
- bh=HvvGqGKI8323SdXHg2jD/FClfb8tuoa5gcu2Ns7uKzs=;
+ s=default; t=1599311769;
+ bh=yrAZ7cGBODumQCEPLK1ol44lgWUhFr7nPfBOeegGfWY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=j3tHfPFHFgihb72CmyYKwhWYW38bynuxH9HsrZUFAcBe/eX7rspBYKJUX0dRBMn7p
- 02BIem5kvA8/gXIvB7535fA7xIssKj61fSmD2fLMKqnzYMOeJXy2Dd3Xq6rtzAQgs+
- 7P2A/ChqfpGDMUkoXttayRIbWLzJOGQXyZaimkbo=
+ b=0Zjt1tOpVaP0QaDqkJws6HevuqmpCKzvVOUQsKSI0jT2Hrgsq/S8kncaILsIF/RL3
+ H5Mq0bNgQsxfXCe9y+O99Tvywv4viqhZA4cHCFlFcHUJAeCaNDaX+QmTVBKzSuMZ4x
+ EZF5MLu7ZhUUkXea7/nTXXJfk0qjvTlLRVxAZ6iQ=
 Received: from [185.104.136.29] (helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kEXvm-009MzR-Nj; Sat, 05 Sep 2020 14:08:34 +0100
-Date: Sat, 05 Sep 2020 14:08:20 +0100
-Message-ID: <875z8smkvv.wl-maz@kernel.org>
+ id 1kEY35-009N2d-Kr; Sat, 05 Sep 2020 14:16:07 +0100
+Date: Sat, 05 Sep 2020 14:16:06 +0100
+Message-ID: <874kocmkix.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Subject: Re: [PATCH 04/23] irqchip/rvid: Add PCI MSI support
-In-Reply-To: <20200904151538.00003cff@Huawei.com>
+Subject: Re: [PATCH 22/23] KVM: arm64: Add a rVIC/rVID in-kernel implementation
+In-Reply-To: <20200904170036.00003bda@Huawei.com>
 References: <20200903152610.1078827-1-maz@kernel.org>
- <20200903152610.1078827-5-maz@kernel.org>
- <20200904151538.00003cff@Huawei.com>
+ <20200903152610.1078827-23-maz@kernel.org>
+ <20200904170036.00003bda@Huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -97,138 +97,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jonathan,
-
-On Fri, 04 Sep 2020 15:15:38 +0100,
+On Fri, 04 Sep 2020 17:00:36 +0100,
 Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 > 
-> On Thu,  3 Sep 2020 16:25:51 +0100
+> On Thu, 3 Sep 2020 16:26:09 +0100
 > Marc Zyngier <maz@kernel.org> wrote:
-> 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Few minor comments inline.
-> 
-> Thanks,
-> 
-> Jonathan
-> 
-> > ---
-> >  drivers/irqchip/irq-rvid.c | 182 +++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 182 insertions(+)
-> > 
-> > diff --git a/drivers/irqchip/irq-rvid.c b/drivers/irqchip/irq-rvid.c
-> > index 953f654e58d4..250f95ad1a09 100644
-> > --- a/drivers/irqchip/irq-rvid.c
-> > +++ b/drivers/irqchip/irq-rvid.c
-> > @@ -12,12 +12,19 @@
-> >  #include <linux/irq.h>
-> >  #include <linux/irqchip.h>
-> >  #include <linux/irqdomain.h>
-> > +#include <linux/msi.h>
-> >  
-> >  #include <linux/irqchip/irq-rvic.h>
-> >  
-> >  struct rvid_data {
-> >  	struct fwnode_handle	*fwnode;
-> >  	struct irq_domain	*domain;
-> > +	struct irq_domain	*msi_domain;
-> > +	struct irq_domain	*pci_domain;
-> > +	unsigned long		*msi_map;
-> > +	struct mutex		msi_lock;
-> > +	u32			msi_base;
-> > +	u32			msi_nr;
-> >  };
-> >  
-> >  static struct rvid_data rvid;
-> > @@ -209,6 +216,177 @@ static const struct irq_domain_ops rvid_irq_domain_ops = {
-> >  	.deactivate	= rvid_irq_domain_deactivate,
-> >  };
-> >  
-> > +#ifdef CONFIG_PCI_MSI
-> > +/*
-> > + * The MSI irqchip is completely transparent. The only purpose of the
-> > + * corresponding irq domain is to provide the MSI allocator, and feed
-> > + * the allocated inputs to the main rVID irq domain for mapping at the
-> > + * rVIC level.
-> > + */
-> > +static struct irq_chip rvid_msi_chip = {
-> > +	.name			= "rvid-MSI",
-> > +	.irq_mask		= irq_chip_mask_parent,
-> > +	.irq_unmask		= irq_chip_unmask_parent,
-> > +	.irq_eoi		= irq_chip_eoi_parent,
-> > +	.irq_get_irqchip_state	= irq_chip_get_parent_state,
-> > +	.irq_set_irqchip_state	= irq_chip_set_parent_state,
-> > +	.irq_retrigger		= irq_chip_retrigger_hierarchy,
-> > +	.irq_set_type		= irq_chip_set_type_parent,
-> > +	.irq_set_affinity	= irq_chip_set_affinity_parent,
-> > +};
-> > +
-> > +static int rvid_msi_domain_alloc(struct irq_domain *domain, unsigned int virq,
-> > +				 unsigned int nr_irqs, void *arg)
-> > +{
-> > +	int ret, hwirq, i;
-> > +
-> > +	mutex_lock(&rvid.msi_lock);
-> > +	hwirq = bitmap_find_free_region(rvid.msi_map, rvid.msi_nr,
-> > +					get_count_order(nr_irqs));
-> > +	mutex_unlock(&rvid.msi_lock);
-> > +
-> > +	if (hwirq < 0)
-> > +		return -ENOSPC;
-> > +
-> > +	for (i = 0; i < nr_irqs; i++) {
-> > +		/* Use the rVID domain to map the input to something */
-> > +		struct irq_fwspec fwspec = (struct irq_fwspec) {
-> > +			.fwnode		= domain->parent->fwnode,
-> > +			.param_count	= 1,
-> > +			.param[0]	= rvid.msi_base + hwirq + i,
-> > +		};
-> > +
-> > +		ret = irq_domain_alloc_irqs_parent(domain, virq + i, 1, &fwspec);
-> > +		if (WARN_ON(ret))
-> > +			goto out;
-> > +
-> > +		irq_domain_set_hwirq_and_chip(domain, virq + i, hwirq + i,
-> > +					      &rvid_msi_chip, &rvid);
-> > +	}
-> > +
-> > +	return 0;
-> > +
-> > +out:
-> 
-> I missed this on previous patch, but doesn't the error path need to undo the
-> irq_domain_alloc_irqs_parent part? irq_domain_free_irqs_parent()
-
-Yes, this indeed needs some rework.
 
 [...]
 
-> > +static void __init rvid_msi_setup(struct device_node *np)
+> > +static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
 > > +{
-> > +	if (!of_property_read_bool(np, "msi-controller"))
-> > +		return;
+> > +	struct rvic_vm_data *data;
+> > +	struct kvm_vcpu *vcpu;
+> > +	u32 __user *uaddr, val;
+> > +	u16 trusted, total;
+> > +	int i, ret = -ENXIO;
 > > +
-> > +	if (of_property_read_u32_index(np, "msi-range", 0, &rvid.msi_base) ||
-> > +	    of_property_read_u32_index(np, "msi-range", 1, &rvid.msi_nr)) {
+> > +	mutex_lock(&dev->kvm->lock);
+> > +
+> > +	switch (attr->group) {
+> > +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
+> > +		if (attr->attr)
+> > +			break;
+> > +
+> > +		if (dev->kvm->arch.irqchip_data) {
+> > +			ret = -EBUSY;
+> > +			break;
+> > +		}
+> > +
+> > +		uaddr = (u32 __user *)(uintptr_t)attr->addr;
+> > +		if (get_user(val, uaddr)) {
+> > +			ret = -EFAULT;
+> > +			break;
+> > +		}
+> > +
+> > +		trusted = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TRUSTED_MASK, val);
+> > +		total   = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TOTAL_MASK, val);
+> > +		if (total < trusted || trusted < 32 || total < 64 ||
+> > +		    trusted % 32 || total % 32 || total > 2048) {
 > 
-> Looks like msi-range isn't defined in any existing bindings, or my grep
-> fu is broken today.
+> As I read the spec, we need at least 32 untrusted. (R0058) 
+> This condition seems to allow that if trusted = 64 and untrusted = 0
 
-As hinted at in the cover letter, there is no binding whatsoever for
-now, and all the properties are totally made up.
+Well spotted. I think the following would capture the constraints
+correctly:
 
-As for the use of "msi-range", most bindings are using some ad-hoc
-descriptions of their *outputs* to the downstream irqchip. What I am
-describing here is the range of *inputs* into the rVID that can be
-used for MSIs.
+		if (total <= trusted || trusted < 32 || total < 64 ||
+		    trusted % 32 || total % 32 || total > 2048) {
 
-It we wanted to use an abstraction similar to what exists in the
-physical world, then the MSI widget would be a separate component
-upstream of the rVID itself. In a way the driver works like that
-already (there is a separate MSI domain sitting atop the rVID domain),
-and it wouldn't be a big deal to switch to that. We'd need a property
-describing the output range of the widget, similar in essence to what
-is required for the GICv3 MBI ranges.
+On the other hand, I wonder if this code would gain from being
+directly written in terms of trusted/untrusted, rather than
+trusted/total. It could make the reading against the spec easier.
 
 Thanks,
 
