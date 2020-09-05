@@ -4,88 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DF4C433E2
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 11:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9638DC2BBD0
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:08:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8138320757
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 11:33:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E64D320760
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:08:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0KqukYg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8138320757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3tHfPFH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64D320760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E48FB4B163;
-	Sat,  5 Sep 2020 07:33:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E1824B4A1;
+	Sat,  5 Sep 2020 09:08:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IBtIkQ10fVta; Sat,  5 Sep 2020 07:33:28 -0400 (EDT)
+	with ESMTP id HjBSuKwlE8sZ; Sat,  5 Sep 2020 09:08:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9B7E4B464;
-	Sat,  5 Sep 2020 07:33:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 111C04B4A8;
+	Sat,  5 Sep 2020 09:08:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD9834B157
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 07:33:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DCF34B49E
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:08:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5cuoqkCKzJZp for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Sep 2020 07:33:26 -0400 (EDT)
+ with ESMTP id aK9H8ddXKJUJ for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Sep 2020 09:08:38 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D5C44B149
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 07:33:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5105B4B436
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:08:38 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 372082074B;
- Sat,  5 Sep 2020 11:33:25 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EB7A22072D;
+ Sat,  5 Sep 2020 13:08:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599305605;
- bh=nkMhL0eOj9pYn7M+50vdhkwtCvET0nh1reybf9oODE8=;
+ s=default; t=1599311317;
+ bh=HvvGqGKI8323SdXHg2jD/FClfb8tuoa5gcu2Ns7uKzs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=L0KqukYgmLuAblRHiBH8FnIhTLTpryxmse6oKwTmAoR39advkk9fWfWTXV1aLiCUo
- xbliFRMTXQuYuwbWTsHZrCtUa+UHuch5JLtS7Jh34Gs4ni4dXVQmaQ48p/mvng4voo
- UsBLOIPloPtQUHUBpfyO8+KUm14ePBzJc9W1t/+w=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
+ b=j3tHfPFHFgihb72CmyYKwhWYW38bynuxH9HsrZUFAcBe/eX7rspBYKJUX0dRBMn7p
+ 02BIem5kvA8/gXIvB7535fA7xIssKj61fSmD2fLMKqnzYMOeJXy2Dd3Xq6rtzAQgs+
+ 7P2A/ChqfpGDMUkoXttayRIbWLzJOGQXyZaimkbo=
+Received: from [185.104.136.29] (helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kEWRf-009MI9-AC; Sat, 05 Sep 2020 12:33:23 +0100
-Date: Sat, 05 Sep 2020 12:33:22 +0100
-Message-ID: <871rjgmpa5.wl-maz@kernel.org>
+ id 1kEXvm-009MzR-Nj; Sat, 05 Sep 2020 14:08:34 +0100
+Date: Sat, 05 Sep 2020 14:08:20 +0100
+Message-ID: <875z8smkvv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jianyong Wu <jianyong.wu@arm.com>
-Subject: Re: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
-In-Reply-To: <20200904092744.167655-9-jianyong.wu@arm.com>
-References: <20200904092744.167655-1-jianyong.wu@arm.com>
- <20200904092744.167655-9-jianyong.wu@arm.com>
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Subject: Re: [PATCH 04/23] irqchip/rvid: Add PCI MSI support
+In-Reply-To: <20200904151538.00003cff@Huawei.com>
+References: <20200903152610.1078827-1-maz@kernel.org>
+ <20200903152610.1078827-5-maz@kernel.org>
+ <20200904151538.00003cff@Huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
- yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
- pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
- Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
- steven.price@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: Jonathan.Cameron@Huawei.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ lorenzo.pieralisi@arm.com, suzuki.poulose@arm.com, Christoffer.Dall@arm.com,
+ james.morse@arm.com, kernel-team@android.com, julien.thierry.kdev@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
- richardcochran@gmail.com, linux-kernel@vger.kernel.org,
- sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
- yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -103,131 +97,140 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 04 Sep 2020 10:27:42 +0100,
-Jianyong Wu <jianyong.wu@arm.com> wrote:
-> 
-> Currently, there is no mechanism to keep time sync between guest and host
-> in arm64 virtualization environment. Time in guest will drift compared
-> with host after boot up as they may both use third party time sources
-> to correct their time respectively. The time deviation will be in order
-> of milliseconds. But in some scenarios,like in cloud envirenment, we ask
-> for higher time precision.
-> 
-> kvm ptp clock, which choose the host clock source as a reference
-> clock to sync time between guest and host, has been adopted by x86
-> which makes the time sync order from milliseconds to nanoseconds.
-> 
-> This patch enables kvm ptp clock for arm64 and improve clock sync precison
-> significantly.
-> 
-> Test result comparisons between with kvm ptp clock and without it in arm64
-> are as follows. This test derived from the result of command 'chronyc
-> sources'. we should take more care of the last sample column which shows
-> the offset between the local clock and the source at the last measurement.
-> 
-> no kvm ptp in guest:
-> MS Name/IP address   Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   21ms
-> ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   21ms
-> 
-> in host:
-> MS Name/IP address   Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   18ms
-> ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   18ms
-> ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   18ms
-> ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   17ms
-> ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   17ms
-> 
-> The dns1.synet.edu.cn is the network reference clock for guest and
-> 120.25.115.20 is the network reference clock for host. we can't get the
-> clock error between guest and host directly, but a roughly estimated value
-> will be in order of hundreds of us to ms.
-> 
-> with kvm ptp in guest:
-> chrony has been disabled in host to remove the disturb by network clock.
-> 
-> MS Name/IP address         Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> * PHC0                    0   3   377     8     -7ns[   +1ns] +/-    3ns
-> * PHC0                    0   3   377     8     +1ns[  +16ns] +/-    3ns
-> * PHC0                    0   3   377     6     -4ns[   -0ns] +/-    6ns
-> * PHC0                    0   3   377     6     -8ns[  -12ns] +/-    5ns
-> * PHC0                    0   3   377     5     +2ns[   +4ns] +/-    4ns
-> * PHC0                    0   3   377    13     +2ns[   +4ns] +/-    4ns
-> * PHC0                    0   3   377    12     -4ns[   -6ns] +/-    4ns
-> * PHC0                    0   3   377    11     -8ns[  -11ns] +/-    6ns
-> * PHC0                    0   3   377    10    -14ns[  -20ns] +/-    4ns
-> * PHC0                    0   3   377     8     +4ns[   +5ns] +/-    4ns
-> 
-> The PHC0 is the ptp clock which choose the host clock as its source
-> clock. So we can see that the clock difference between host and guest
-> is in order of ns.
-> 
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  drivers/clocksource/arm_arch_timer.c | 24 +++++++++++++
->  drivers/ptp/Kconfig                  |  2 +-
->  drivers/ptp/ptp_kvm_arm64.c          | 53 ++++++++++++++++++++++++++++
->  3 files changed, 78 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+Hi Jonathan,
 
-And I missed that one earlier:
+On Fri, 04 Sep 2020 15:15:38 +0100,
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+> 
+> On Thu,  3 Sep 2020 16:25:51 +0100
+> Marc Zyngier <maz@kernel.org> wrote:
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Few minor comments inline.
+> 
+> Thanks,
+> 
+> Jonathan
+> 
+> > ---
+> >  drivers/irqchip/irq-rvid.c | 182 +++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 182 insertions(+)
+> > 
+> > diff --git a/drivers/irqchip/irq-rvid.c b/drivers/irqchip/irq-rvid.c
+> > index 953f654e58d4..250f95ad1a09 100644
+> > --- a/drivers/irqchip/irq-rvid.c
+> > +++ b/drivers/irqchip/irq-rvid.c
+> > @@ -12,12 +12,19 @@
+> >  #include <linux/irq.h>
+> >  #include <linux/irqchip.h>
+> >  #include <linux/irqdomain.h>
+> > +#include <linux/msi.h>
+> >  
+> >  #include <linux/irqchip/irq-rvic.h>
+> >  
+> >  struct rvid_data {
+> >  	struct fwnode_handle	*fwnode;
+> >  	struct irq_domain	*domain;
+> > +	struct irq_domain	*msi_domain;
+> > +	struct irq_domain	*pci_domain;
+> > +	unsigned long		*msi_map;
+> > +	struct mutex		msi_lock;
+> > +	u32			msi_base;
+> > +	u32			msi_nr;
+> >  };
+> >  
+> >  static struct rvid_data rvid;
+> > @@ -209,6 +216,177 @@ static const struct irq_domain_ops rvid_irq_domain_ops = {
+> >  	.deactivate	= rvid_irq_domain_deactivate,
+> >  };
+> >  
+> > +#ifdef CONFIG_PCI_MSI
+> > +/*
+> > + * The MSI irqchip is completely transparent. The only purpose of the
+> > + * corresponding irq domain is to provide the MSI allocator, and feed
+> > + * the allocated inputs to the main rVID irq domain for mapping at the
+> > + * rVIC level.
+> > + */
+> > +static struct irq_chip rvid_msi_chip = {
+> > +	.name			= "rvid-MSI",
+> > +	.irq_mask		= irq_chip_mask_parent,
+> > +	.irq_unmask		= irq_chip_unmask_parent,
+> > +	.irq_eoi		= irq_chip_eoi_parent,
+> > +	.irq_get_irqchip_state	= irq_chip_get_parent_state,
+> > +	.irq_set_irqchip_state	= irq_chip_set_parent_state,
+> > +	.irq_retrigger		= irq_chip_retrigger_hierarchy,
+> > +	.irq_set_type		= irq_chip_set_type_parent,
+> > +	.irq_set_affinity	= irq_chip_set_affinity_parent,
+> > +};
+> > +
+> > +static int rvid_msi_domain_alloc(struct irq_domain *domain, unsigned int virq,
+> > +				 unsigned int nr_irqs, void *arg)
+> > +{
+> > +	int ret, hwirq, i;
+> > +
+> > +	mutex_lock(&rvid.msi_lock);
+> > +	hwirq = bitmap_find_free_region(rvid.msi_map, rvid.msi_nr,
+> > +					get_count_order(nr_irqs));
+> > +	mutex_unlock(&rvid.msi_lock);
+> > +
+> > +	if (hwirq < 0)
+> > +		return -ENOSPC;
+> > +
+> > +	for (i = 0; i < nr_irqs; i++) {
+> > +		/* Use the rVID domain to map the input to something */
+> > +		struct irq_fwspec fwspec = (struct irq_fwspec) {
+> > +			.fwnode		= domain->parent->fwnode,
+> > +			.param_count	= 1,
+> > +			.param[0]	= rvid.msi_base + hwirq + i,
+> > +		};
+> > +
+> > +		ret = irq_domain_alloc_irqs_parent(domain, virq + i, 1, &fwspec);
+> > +		if (WARN_ON(ret))
+> > +			goto out;
+> > +
+> > +		irq_domain_set_hwirq_and_chip(domain, virq + i, hwirq + i,
+> > +					      &rvid_msi_chip, &rvid);
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +out:
+> 
+> I missed this on previous patch, but doesn't the error path need to undo the
+> irq_domain_alloc_irqs_parent part? irq_domain_free_irqs_parent()
 
-> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> index d55acffb0b90..aaf286e90092 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -1650,3 +1650,27 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
->  }
->  TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
->  #endif
-> +
-> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
-> +#include <linux/arm-smccc.h>
+Yes, this indeed needs some rework.
 
-No conditional includes, please.
+[...]
 
-> +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle, struct timespec64 *ts,
-> +			      struct clocksource **cs)
-> +{
-> +	struct arm_smccc_res hvc_res;
-> +	ktime_t ktime;
-> +
-> +	/* Currently, linux guest will always use the virtual counter */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-> +			     ARM_PTP_VIRT_COUNTER, &hvc_res);
+> > +static void __init rvid_msi_setup(struct device_node *np)
+> > +{
+> > +	if (!of_property_read_bool(np, "msi-controller"))
+> > +		return;
+> > +
+> > +	if (of_property_read_u32_index(np, "msi-range", 0, &rvid.msi_base) ||
+> > +	    of_property_read_u32_index(np, "msi-range", 1, &rvid.msi_nr)) {
+> 
+> Looks like msi-range isn't defined in any existing bindings, or my grep
+> fu is broken today.
 
-You don't need to assume anything. This driver already provides you
-with the information you need to tell the hypervisor which counter to
-use:
+As hinted at in the cover letter, there is no binding whatsoever for
+now, and all the properties are totally made up.
 
-	if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
-		ptp_counter = ARM_PTP_VIRT_COUNTER;
-	else
-		ptp_counter = ARM_PTP_PHYS_COUNTER;
-	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-			     ptp_counter, &hvc_res);
+As for the use of "msi-range", most bindings are using some ad-hoc
+descriptions of their *outputs* to the downstream irqchip. What I am
+describing here is the range of *inputs* into the rVID that can be
+used for MSIs.
 
-At least, this is vaguely future proof.
+It we wanted to use an abstraction similar to what exists in the
+physical world, then the MSI widget would be a separate component
+upstream of the rVID itself. In a way the driver works like that
+already (there is a separate MSI domain sitting atop the rVID domain),
+and it wouldn't be a big deal to switch to that. We'd need a property
+describing the output range of the widget, similar in essence to what
+is required for the GICv3 MBI ranges.
 
-The hypervisor will still have to discriminate between a call between
-a call from vEL1 or vEL2 to decide whether to subtract the offset from
-the counter value, but that's out of scope for now.
+Thanks,
 
 	M.
 
