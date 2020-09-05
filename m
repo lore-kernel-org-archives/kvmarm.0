@@ -1,95 +1,100 @@
-Return-Path: <SRS0=jshR=CN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ERU5=CO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE81EC43461
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D28C43461
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 03:56:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 407A120795
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Sep 2020 16:18:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E374920C56
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 03:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbAHyP97"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407A120795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJPj2WVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E374920C56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5FA84B3E8;
-	Fri,  4 Sep 2020 12:18:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1024B2BB;
+	Fri,  4 Sep 2020 23:56:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z4ecjeIe8WlR; Fri,  4 Sep 2020 12:18:38 -0400 (EDT)
+	with ESMTP id dTcHMiV8hnMQ; Fri,  4 Sep 2020 23:56:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B35734B398;
-	Fri,  4 Sep 2020 12:18:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DCB74B312;
+	Fri,  4 Sep 2020 23:56:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F6974B395
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:18:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 024E94B2BB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 23:56:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id os3GRyknxaip for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2020 12:18:36 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E013A4B2A4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 12:18:35 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id Ma11v4YgmZ-Q for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2020 23:56:49 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5666E4B227
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2020 23:56:49 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599278209;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AzVE8XsOaDOKlySyVREn2RUKhP9ET5IL66EaN6qbs7o=;
+ b=EJPj2WVAW2nCmN5uAKuo2k6DH+cqudYETYjcM0lk+jRsXZOS8OK5ttnCHJfXT2/MthgX0W
+ XyINqaZGOXe3/0ofUoLFHCWvpVs9rLY9PbL62L9g3ZKyIgnUTQ7DEqfQ3suxnYGXzAg94O
+ ZvTRXQnLyXLacTganuRqzQ6wAdR40ks=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-ilt8NMq-M8KOwLKmL9wI3w-1; Fri, 04 Sep 2020 23:56:47 -0400
+X-MC-Unique: ilt8NMq-M8KOwLKmL9wI3w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2DE0520772;
- Fri,  4 Sep 2020 16:18:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599236314;
- bh=FMUhyGV9mlQ4PCYa1i1PWK/1A/emXWY+TPq0ZXZJ+Bw=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=HbAHyP97Z8ZCtyx8SSEgAWNvz8yb4/xTqRy4hs+9Rq/6tNt3h6dIk4tJohGLw0Mw5
- +L3tU9NdFfHoeth2IPPhKDGq8Ud1by7sjegtyVQOQNeYL6JfF4XGBGsF+EYR7RKFH1
- /lFYEMDqn4W4hbMrdUDZRmM756+IleR+BG9ru6UY=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kEEQ4-009DqG-F0; Fri, 04 Sep 2020 17:18:32 +0100
-Date: Fri, 04 Sep 2020 17:18:31 +0100
-Message-ID: <87d031qzvs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jianyong Wu <jianyong.wu@arm.com>
-Subject: Re: [PATCH v14 09/10] doc: add ptp_kvm introduction for arm64 support
-In-Reply-To: <20200904092744.167655-10-jianyong.wu@arm.com>
-References: <20200904092744.167655-1-jianyong.wu@arm.com>
- <20200904092744.167655-10-jianyong.wu@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
- yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
- pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
- Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
- steven.price@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
- richardcochran@gmail.com, linux-kernel@vger.kernel.org,
- sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
- yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A6301DDEA;
+ Sat,  5 Sep 2020 03:56:45 +0000 (UTC)
+Received: from [10.64.54.159] (vpn2-54-159.bne.redhat.com [10.64.54.159])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B0F97ED6F;
+ Sat,  5 Sep 2020 03:56:42 +0000 (UTC)
+Subject: Re: [PATCH v3 00/21] KVM: arm64: Rewrite page-table code and fault
+ handling
+To: Marc Zyngier <maz@kernel.org>
+References: <20200825093953.26493-1-will@kernel.org>
+ <f7e20f9c-e14e-5314-f78f-1d73743da84c@redhat.com>
+ <3f13fc6e-7234-6c53-cfaa-a5052fcabe6d@redhat.com>
+ <29ec59b6-ca36-1bd0-0d19-097ecb999bb2@redhat.com>
+ <20200903121651.GA7412@willie-the-truck>
+ <5aa43d21-30a1-68c8-2620-60a25e4edfa2@redhat.com>
+ <fa494886b9a88ec7b02141f2da44d5a7@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <ad9bb6bc-63e1-af3b-4dfb-b32b11f8f356@redhat.com>
+Date: Sat, 5 Sep 2020 13:56:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <fa494886b9a88ec7b02141f2da44d5a7@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -98,56 +103,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 04 Sep 2020 10:27:43 +0100,
-Jianyong Wu <jianyong.wu@arm.com> wrote:
-> 
-> ptp_kvm implementation depends on hypercall using SMCCC. So we
-> introduce a new SMCCC service ID. This doc explain how we define
-> and use this new ID.
-> 
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  Documentation/virt/kvm/arm/ptp_kvm.rst | 72 ++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
->  create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
-> 
-> diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> new file mode 100644
-> index 000000000000..455591e2587a
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> @@ -0,0 +1,72 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +PTP_KVM support for arm64
-> +=========================
-> +
-> +PTP_KVM is used for time sync between guest and host in a high precison.
-> +It needs get wall time and counter value from host and transfer these data
-> +to guest via hypercall service. So one more hypercall service should be
-> +added.
-> +
-> +This new SMCCC hypercall will be defined as:
-> +
-> +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0xC6000001
-> +
-> +As we only support 64-bits ptp_kvm client, so we choose SMC64/HVC64
-> +calling convention.
+Hi Marc,
 
-This isn't what the code does, as it is explicitly set as an SMC32
-service... Furthermore, we still run 32bit guests, and will do for the
-foreseeable future. Having removed KVM support for 32bit doesn't mean
-32bits are gone.
+On 9/4/20 8:07 PM, Marc Zyngier wrote:
+> On 2020-09-04 01:51, Gavin Shan wrote:
+>> On 9/3/20 10:16 PM, Will Deacon wrote:
+>>> On Thu, Sep 03, 2020 at 09:48:18PM +1000, Gavin Shan wrote:
+>>>> On 9/3/20 9:13 PM, Gavin Shan wrote:
+>>>>> On 9/3/20 5:34 PM, Gavin Shan wrote:
+>>>>>> On 8/25/20 7:39 PM, Will Deacon wrote:
 
-	M.
+[...]
 
--- 
-Without deviation from the norm, progress is not possible.
+>>
+>> Since the the following changes have been folded to v4, I reran the test cases
+>> on v4 and everything works fine.
+> 
+> Thanks a lot for the great testing and reviewing effort!
+> 
+> <shameless ask>
+> Since you obviously have a test rig setup for this: does your TX2 support 16kB
+> pages? If so, could you please do another run with this page size on the host?
+> </shameless ask>
+> 
+
+My TX2 machine doesn't support 16KB page size unfortunately. The
+following output was seen from host when it has 16KB page size.
+Sorry about it.
+
+    CONFIG_ARM64_PAGE_SHIFT=14
+    CONFIG_ARM64_VA_BITS_47=y
+    CONFIG_ARM64_VA_BITS=47
+
+Output from console on host
+===========================
+EFI stub: ERROR: This 16 KB granular kernel is not supported by your CPU
+
+   Failed to boot both default and fallback entries.
+
+Press any key to continue...
+    
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
