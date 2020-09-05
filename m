@@ -2,91 +2,90 @@ Return-Path: <SRS0=ERU5=CO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4054C43461
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 09:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13372C433E2
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 11:01:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0604C20757
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 09:33:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F5872074B
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 11:01:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PYj27YUf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0604C20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qyWXGrxP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F5872074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 401B44B47D;
-	Sat,  5 Sep 2020 05:33:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C45714B431;
+	Sat,  5 Sep 2020 07:01:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oI6AgSAQ9jzd; Sat,  5 Sep 2020 05:33:16 -0400 (EDT)
+	with ESMTP id HWEqXqOlobQ6; Sat,  5 Sep 2020 07:01:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32AD84B483;
-	Sat,  5 Sep 2020 05:33:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712944B42E;
+	Sat,  5 Sep 2020 07:01:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26B404B483
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 05:33:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA2B4B426
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 07:01:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RAytyPPDsdNK for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Sep 2020 05:33:14 -0400 (EDT)
+ with ESMTP id oFd4uUAP9LWi for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Sep 2020 07:01:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 156A34B47D
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 05:33:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB50F4B422
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 07:01:46 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A254A206B5;
- Sat,  5 Sep 2020 09:33:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 96F592074B;
+ Sat,  5 Sep 2020 11:01:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599298392;
- bh=A0XKqaNAhW8GaAquZR65PW2DQx+J0J4XaFWQ+Y0OMqs=;
+ s=default; t=1599303705;
+ bh=osTqwp5BpMzq89ho/FwzSAexu/TNdqbCeQ4p3g+kYzI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=PYj27YUfpz3SOoYLxBdrKxNyTRHY5R7hRdd/3jA0Ne13dYSVeYbgA2yiaLDvvbBJB
- 13fZZ3QA+apwZJhO1B4G5yWBqUJfFGA1TUQMjJ8ylpTHavJE3tQB+Q/5CnUWGgrQ6S
- gLVyVZXQoRSWWDZEcylG5lHyvkS4CN2Umdou2BFo=
+ b=qyWXGrxPdr5xSZKWo90rjBCbkMd6d2Wij1PuYwr+tjkY9KNxgIMTzaMmjTu92UM5m
+ k6pm/f/tzmPc3micqB04z+mMdcRB5zq+BNZu5exoRkE03FNUY2h2WSECJCpCPBPpDO
+ 6s1QPH8JE+9xV/h+I564UojboF1OeYvscQxqWTLc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kEUZK-009LQI-IP; Sat, 05 Sep 2020 10:33:10 +0100
-Date: Sat, 05 Sep 2020 10:33:09 +0100
-Message-ID: <877dt8muui.wl-maz@kernel.org>
+ id 1kEVx1-009M2u-M9; Sat, 05 Sep 2020 12:01:43 +0100
+Date: Sat, 05 Sep 2020 12:01:42 +0100
+Message-ID: <874kocmqqx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 00/21] KVM: arm64: Rewrite page-table code and fault
- handling
-In-Reply-To: <ad9bb6bc-63e1-af3b-4dfb-b32b11f8f356@redhat.com>
-References: <20200825093953.26493-1-will@kernel.org>
- <f7e20f9c-e14e-5314-f78f-1d73743da84c@redhat.com>
- <3f13fc6e-7234-6c53-cfaa-a5052fcabe6d@redhat.com>
- <29ec59b6-ca36-1bd0-0d19-097ecb999bb2@redhat.com>
- <20200903121651.GA7412@willie-the-truck>
- <5aa43d21-30a1-68c8-2620-60a25e4edfa2@redhat.com>
- <fa494886b9a88ec7b02141f2da44d5a7@kernel.org>
- <ad9bb6bc-63e1-af3b-4dfb-b32b11f8f356@redhat.com>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
+In-Reply-To: <20200904092744.167655-9-jianyong.wu@arm.com>
+References: <20200904092744.167655-1-jianyong.wu@arm.com>
+ <20200904092744.167655-9-jianyong.wu@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: gshan@redhat.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, qperret@google.com, james.morse@arm.com,
- suzuki.poulose@arm.com, catalin.marinas@arm.com, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+ pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ steven.price@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
+ yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -104,53 +103,216 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 05 Sep 2020 04:56:39 +0100,
-Gavin Shan <gshan@redhat.com> wrote:
+On Fri, 04 Sep 2020 10:27:42 +0100,
+Jianyong Wu <jianyong.wu@arm.com> wrote:
 > 
-> Hi Marc,
+> Currently, there is no mechanism to keep time sync between guest and host
+> in arm64 virtualization environment. Time in guest will drift compared
+> with host after boot up as they may both use third party time sources
+> to correct their time respectively. The time deviation will be in order
+> of milliseconds. But in some scenarios,like in cloud envirenment, we ask
+> for higher time precision.
 > 
-> On 9/4/20 8:07 PM, Marc Zyngier wrote:
-> > On 2020-09-04 01:51, Gavin Shan wrote:
-> >> On 9/3/20 10:16 PM, Will Deacon wrote:
-> >>> On Thu, Sep 03, 2020 at 09:48:18PM +1000, Gavin Shan wrote:
-> >>>> On 9/3/20 9:13 PM, Gavin Shan wrote:
-> >>>>> On 9/3/20 5:34 PM, Gavin Shan wrote:
-> >>>>>> On 8/25/20 7:39 PM, Will Deacon wrote:
+> kvm ptp clock, which choose the host clock source as a reference
+> clock to sync time between guest and host, has been adopted by x86
+> which makes the time sync order from milliseconds to nanoseconds.
 > 
-> [...]
+> This patch enables kvm ptp clock for arm64 and improve clock sync precison
+> significantly.
 > 
-> >> 
-> >> Since the the following changes have been folded to v4, I reran the test cases
-> >> on v4 and everything works fine.
-> > 
-> > Thanks a lot for the great testing and reviewing effort!
-> > 
-> > <shameless ask>
-> > Since you obviously have a test rig setup for this: does your TX2 support 16kB
-> > pages? If so, could you please do another run with this page size on the host?
-> > </shameless ask>
-> > 
+> Test result comparisons between with kvm ptp clock and without it in arm64
+> are as follows. This test derived from the result of command 'chronyc
+> sources'. we should take more care of the last sample column which shows
+> the offset between the local clock and the source at the last measurement.
 > 
-> My TX2 machine doesn't support 16KB page size unfortunately. The
-> following output was seen from host when it has 16KB page size.
-> Sorry about it.
+> no kvm ptp in guest:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   21ms
+> ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   21ms
 > 
->    CONFIG_ARM64_PAGE_SHIFT=14
->    CONFIG_ARM64_VA_BITS_47=y
->    CONFIG_ARM64_VA_BITS=47
+> in host:
+> MS Name/IP address   Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   18ms
+> ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   17ms
+> ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   17ms
 > 
-> Output from console on host
-> ===========================
-> EFI stub: ERROR: This 16 KB granular kernel is not supported by your CPU
+> The dns1.synet.edu.cn is the network reference clock for guest and
+> 120.25.115.20 is the network reference clock for host. we can't get the
+> clock error between guest and host directly, but a roughly estimated value
+> will be in order of hundreds of us to ms.
 > 
->   Failed to boot both default and fallback entries.
+> with kvm ptp in guest:
+> chrony has been disabled in host to remove the disturb by network clock.
 > 
-> Press any key to continue...
+> MS Name/IP address         Stratum Poll Reach LastRx Last sample
+> ========================================================================
+> * PHC0                    0   3   377     8     -7ns[   +1ns] +/-    3ns
+> * PHC0                    0   3   377     8     +1ns[  +16ns] +/-    3ns
+> * PHC0                    0   3   377     6     -4ns[   -0ns] +/-    6ns
+> * PHC0                    0   3   377     6     -8ns[  -12ns] +/-    5ns
+> * PHC0                    0   3   377     5     +2ns[   +4ns] +/-    4ns
+> * PHC0                    0   3   377    13     +2ns[   +4ns] +/-    4ns
+> * PHC0                    0   3   377    12     -4ns[   -6ns] +/-    4ns
+> * PHC0                    0   3   377    11     -8ns[  -11ns] +/-    6ns
+> * PHC0                    0   3   377    10    -14ns[  -20ns] +/-    4ns
+> * PHC0                    0   3   377     8     +4ns[   +5ns] +/-    4ns
+> 
+> The PHC0 is the ptp clock which choose the host clock as its source
+> clock. So we can see that the clock difference between host and guest
+> is in order of ns.
+> 
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  drivers/clocksource/arm_arch_timer.c | 24 +++++++++++++
+>  drivers/ptp/Kconfig                  |  2 +-
+>  drivers/ptp/ptp_kvm_arm64.c          | 53 ++++++++++++++++++++++++++++
+>  3 files changed, 78 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+> 
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index d55acffb0b90..aaf286e90092 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -1650,3 +1650,27 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
+>  }
+>  TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
+>  #endif
+> +
+> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK_KVM)
+> +#include <linux/arm-smccc.h>
+> +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle, struct timespec64 *ts,
+> +			      struct clocksource **cs)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +	ktime_t ktime;
+> +
+> +	/* Currently, linux guest will always use the virtual counter */
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +			     ARM_PTP_VIRT_COUNTER, &hvc_res);
+> +	if ((long long)(hvc_res.a0) < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	ktime = (long long)hvc_res.a0;
+> +	*ts = ktime_to_timespec64(ktime);
+> +	*cycle = (long long)hvc_res.a1;
+> +	*cs = &clocksource_counter;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_crosststamp);
+> +#endif
+> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+> index 942f72d8151d..127e96f14f89 100644
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -106,7 +106,7 @@ config PTP_1588_CLOCK_PCH
+>  config PTP_1588_CLOCK_KVM
+>  	tristate "KVM virtual PTP clock"
+>  	depends on PTP_1588_CLOCK
+> -	depends on KVM_GUEST && X86
+> +	depends on KVM_GUEST && X86 || ARM64 && ARM_ARCH_TIMER && ARM_PSCI_FW
+>  	default y
+>  	help
+>  	  This driver adds support for using kvm infrastructure as a PTP
+> diff --git a/drivers/ptp/ptp_kvm_arm64.c b/drivers/ptp/ptp_kvm_arm64.c
+> new file mode 100644
+> index 000000000000..961abed93dfd
+> --- /dev/null
+> +++ b/drivers/ptp/ptp_kvm_arm64.c
+> @@ -0,0 +1,53 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + *  Virtual PTP 1588 clock for use with KVM guests
+> + *  Copyright (C) 2019 ARM Ltd.
+> + *  All Rights Reserved
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/err.h>
+> +#include <asm/hypervisor.h>
+> +#include <linux/module.h>
+> +#include <linux/psci.h>
+> +#include <linux/arm-smccc.h>
+> +#include <linux/timecounter.h>
+> +#include <linux/sched/clock.h>
+> +#include <asm/arch_timer.h>
+> +
+> +int kvm_arch_ptp_init(void)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
+> +			     &hvc_res);
+> +	if (!(hvc_res.a0 | BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP)))
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
 
-Ah, fair enough. It was worth trying. I guess I need to try that on
-TX1, which does support 16kB pages. Too bad it is such a pain to use...
+What happens if the ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID function
+isn't implemented (on an old kernel or a non-KVM hypervisor)? The
+expected behaviour is that a0 will contain SMCCC_RET_NOT_SUPPORTED,
+which is -1. The result is that this function always returns
+"supported". Not an acceptable behaviour.
 
-Thanks,
+> +}
+> +
+> +int kvm_arch_ptp_get_clock_generic(struct timespec64 *ts,
+> +				   struct arm_smccc_res *hvc_res)
+
+Why isn't this static?
+
+> +{
+> +	ktime_t ktime;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> +			     hvc_res);
+> +	if ((long long)(hvc_res->a0) < 0)
+> +		return -EOPNOTSUPP;
+
+Really? What if the cycle counter is a full 64 bit value, as it is
+*mandated* on ARMv8.6? It means that the counter is now invalid for
+half the lifetime of the system. Not acceptable either.
+
+> +
+> +	ktime = (long long)hvc_res->a0;
+> +	*ts = ktime_to_timespec64(ktime);
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_arch_ptp_get_clock(struct timespec64 *ts)
+> +{
+> +	struct arm_smccc_res hvc_res;
+> +
+> +	kvm_arch_ptp_get_clock_generic(ts, &hvc_res);
+> +
+> +	return 0;
+> +}
+> -- 
+> 2.17.1
+> 
+> 
+
+It is now obvious that the API between kernel and hypervisor is pretty
+busted, and it goes beyond the 32bit support. I wish you paid more
+attention to this kind of detail.
 
 	M.
 
