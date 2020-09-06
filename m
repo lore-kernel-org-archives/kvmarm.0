@@ -1,4 +1,4 @@
-Return-Path: <SRS0=ERU5=CO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=QEuu=CP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,80 +6,87 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86899C433E2
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7398AC433E2
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Sep 2020 10:00:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F1A2A2078E
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Sep 2020 13:16:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD06D2137B
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Sep 2020 10:00:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0Zjt1tOp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A2A2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="padBi9be"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD06D2137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 621F64B4A8;
-	Sat,  5 Sep 2020 09:16:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BE294B5EA;
+	Sun,  6 Sep 2020 06:00:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uxN9lZ2rA9hN; Sat,  5 Sep 2020 09:16:13 -0400 (EDT)
+	with ESMTP id 1zB2qz8emUw6; Sun,  6 Sep 2020 06:00:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FDDE4B4AE;
-	Sat,  5 Sep 2020 09:16:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B18164B64B;
+	Sun,  6 Sep 2020 06:00:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 985DE4B4A8
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:16:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0214B61F
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Sep 2020 06:00:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WHpX87iqV5Rd for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Sep 2020 09:16:10 -0400 (EDT)
+ with ESMTP id o2qjbDpdP9kP for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Sep 2020 06:00:42 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8453C4B4A1
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Sep 2020 09:16:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A26004B61E
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Sep 2020 06:00:42 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 55E072072D;
- Sat,  5 Sep 2020 13:16:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 72BD020C09;
+ Sun,  6 Sep 2020 10:00:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599311769;
- bh=yrAZ7cGBODumQCEPLK1ol44lgWUhFr7nPfBOeegGfWY=;
+ s=default; t=1599386441;
+ bh=xHQqZTgXCo9bG8b+58U7d9l8AXfNEF3WvvWP0N8iMwA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=0Zjt1tOpVaP0QaDqkJws6HevuqmpCKzvVOUQsKSI0jT2Hrgsq/S8kncaILsIF/RL3
- H5Mq0bNgQsxfXCe9y+O99Tvywv4viqhZA4cHCFlFcHUJAeCaNDaX+QmTVBKzSuMZ4x
- EZF5MLu7ZhUUkXea7/nTXXJfk0qjvTlLRVxAZ6iQ=
-Received: from [185.104.136.29] (helo=wait-a-minute.misterjones.org)
+ b=padBi9beMPCn9TaUhHfcr7u7ocmvU4ZufL8GdW+cTbaDJHVg9mSd1DeCo9qYNxC6V
+ fgfxAIVQDGf7OXYL6/piZvwcld3Sw3Xgwt4bpYyi2q5SWENp5ZpcF1cT3MYmJ+qHOZ
+ ryBpAYpNNwdouDjr86jnFlgJ3P6v/VkLwJVrtvNM=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kEY35-009N2d-Kr; Sat, 05 Sep 2020 14:16:07 +0100
-Date: Sat, 05 Sep 2020 14:16:06 +0100
-Message-ID: <874kocmkix.wl-maz@kernel.org>
+ id 1kErTT-009W75-H7; Sun, 06 Sep 2020 11:00:39 +0100
+Date: Sun, 06 Sep 2020 11:00:37 +0100
+Message-ID: <87363vmdh6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Subject: Re: [PATCH 22/23] KVM: arm64: Add a rVIC/rVID in-kernel implementation
-In-Reply-To: <20200904170036.00003bda@Huawei.com>
-References: <20200903152610.1078827-1-maz@kernel.org>
- <20200903152610.1078827-23-maz@kernel.org>
- <20200904170036.00003bda@Huawei.com>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH v14 08/10] ptp: arm64: Enable ptp_kvm for arm64
+In-Reply-To: <874kocmqqx.wl-maz@kernel.org>
+References: <20200904092744.167655-1-jianyong.wu@arm.com>
+ <20200904092744.167655-9-jianyong.wu@arm.com>
+ <874kocmqqx.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: Jonathan.Cameron@Huawei.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- lorenzo.pieralisi@arm.com, suzuki.poulose@arm.com, Christoffer.Dall@arm.com,
- james.morse@arm.com, kernel-team@android.com, julien.thierry.kdev@gmail.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+ pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ steven.price@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, john.stultz@linaro.org,
+ yangbo.lu@nxp.com, pbonzini@redhat.com, tglx@linutronix.de, nd@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,57 +104,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 04 Sep 2020 17:00:36 +0100,
-Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+On Sat, 05 Sep 2020 12:01:42 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Thu, 3 Sep 2020 16:26:09 +0100
-> Marc Zyngier <maz@kernel.org> wrote:
+> On Fri, 04 Sep 2020 10:27:42 +0100,
+> Jianyong Wu <jianyong.wu@arm.com> wrote:
 
 [...]
 
-> > +static int rvic_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
 > > +{
-> > +	struct rvic_vm_data *data;
-> > +	struct kvm_vcpu *vcpu;
-> > +	u32 __user *uaddr, val;
-> > +	u16 trusted, total;
-> > +	int i, ret = -ENXIO;
+> > +	ktime_t ktime;
 > > +
-> > +	mutex_lock(&dev->kvm->lock);
-> > +
-> > +	switch (attr->group) {
-> > +	case KVM_DEV_ARM_RVIC_GRP_NR_IRQS:
-> > +		if (attr->attr)
-> > +			break;
-> > +
-> > +		if (dev->kvm->arch.irqchip_data) {
-> > +			ret = -EBUSY;
-> > +			break;
-> > +		}
-> > +
-> > +		uaddr = (u32 __user *)(uintptr_t)attr->addr;
-> > +		if (get_user(val, uaddr)) {
-> > +			ret = -EFAULT;
-> > +			break;
-> > +		}
-> > +
-> > +		trusted = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TRUSTED_MASK, val);
-> > +		total   = FIELD_GET(KVM_DEV_ARM_RVIC_GRP_NR_TOTAL_MASK, val);
-> > +		if (total < trusted || trusted < 32 || total < 64 ||
-> > +		    trusted % 32 || total % 32 || total > 2048) {
+> > +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> > +			     hvc_res);
+> > +	if ((long long)(hvc_res->a0) < 0)
+> > +		return -EOPNOTSUPP;
 > 
-> As I read the spec, we need at least 32 untrusted. (R0058) 
-> This condition seems to allow that if trusted = 64 and untrusted = 0
+> Really? What if the cycle counter is a full 64 bit value, as it is
+> *mandated* on ARMv8.6? It means that the counter is now invalid for
+> half the lifetime of the system. Not acceptable either.
 
-Well spotted. I think the following would capture the constraints
-correctly:
-
-		if (total <= trusted || trusted < 32 || total < 64 ||
-		    trusted % 32 || total % 32 || total > 2048) {
-
-On the other hand, I wonder if this code would gain from being
-directly written in terms of trusted/untrusted, rather than
-trusted/total. It could make the reading against the spec easier.
+Having re-read this, this field doesn't contain the cycle counter, but
+the time in ns. So checking for a negative value should actually be
+fine for quite a while. My other comments still stand though.
 
 Thanks,
 
