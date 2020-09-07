@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F21C433E2
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A5CC43461
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:33:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BEC2521481
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:29:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9DCA216C4
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:33:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pxuyyE+x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC2521481
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvgALk8s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9DCA216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 543484B4C9;
-	Mon,  7 Sep 2020 09:29:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14FDB4B4A4;
+	Mon,  7 Sep 2020 09:33:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lQwuBSk72LA4; Mon,  7 Sep 2020 09:29:17 -0400 (EDT)
+	with ESMTP id ys6XYBh8Juw3; Mon,  7 Sep 2020 09:33:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 376FC4B36C;
-	Mon,  7 Sep 2020 09:29:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74AD14B461;
+	Mon,  7 Sep 2020 09:33:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDE9B4B26E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:29:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3197A4B443
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:33:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yYHqKz5JpWd9 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 09:29:15 -0400 (EDT)
+ with ESMTP id 15j2XmDxXXoe for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 09:33:21 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89D624B203
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:29:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 278434B233
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:33:21 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5F25521481;
- Mon,  7 Sep 2020 13:29:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D5CCE207DE;
+ Mon,  7 Sep 2020 13:33:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599485354;
- bh=Bz4JIxDO9TUHhUV5rVe97ztEbDq2ALAeJxcm5p4j9as=;
+ s=default; t=1599485600;
+ bh=hL47qDYxMDTVqevWnCXsSynbDvNsZ02kwtxd7Latxhs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=pxuyyE+x/+qsR4syobZosimZUM1Hu4Ox3vyClrTzTfb0Ne6DpOWTmVLh2repLU7c1
- 3rBEfv2FPqTjBO/u/D9dwtIj1ywTYpfzvi6op21RTQpF3ZmJfdm1z9nrFdIuIwENQV
- TJIT+ngZlJ4b0rshMSIlgZBghlaTutqa+mqpN0dU=
+ b=fvgALk8ss2QOkJYpLJjiyYCZMa7pxqdDJc1c/FaRHbYUzBQBUc93wZ4V0B6+t0vM0
+ gxRZhV/5k6TKoazd4ug9LPb+q0OW89KUVqRKfa0bpSiOIoU7eXmFLi5DXtg5mQNdl5
+ l+zPu1G4omNWjGl/P8NK7gHg5yzapZFvWLqTCqvc=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kFHCq-009lxw-0y; Mon, 07 Sep 2020 14:29:12 +0100
-Date: Mon, 07 Sep 2020 14:29:11 +0100
-Message-ID: <87sgbtlnq0.wl-maz@kernel.org>
+ id 1kFHGo-009m1C-3o; Mon, 07 Sep 2020 14:33:18 +0100
+Date: Mon, 07 Sep 2020 14:33:17 +0100
+Message-ID: <87r1rdlnj6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v3 08/18] KVM: arm64: Introduce hyp context
-In-Reply-To: <20200903135307.251331-9-ascull@google.com>
+Subject: Re: [PATCH v3 14/18] smccc: Cast arguments to unsigned long
+In-Reply-To: <20200903135307.251331-15-ascull@google.com>
 References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-9-ascull@google.com>
+ <20200903135307.251331-15-ascull@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -97,79 +97,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 03 Sep 2020 14:52:57 +0100,
+On Thu, 03 Sep 2020 14:53:03 +0100,
 Andrew Scull <ascull@google.com> wrote:
 > 
-> During __guest_enter, save and restore from a new hyp context rather
-> than the host context. This is preparation for separation of the hyp and
-> host context in nVHE.
+> To avoid warning about implicit casting, make the casting explicit. This
+> allows, for example, pointers to be used as arguments as are used in the
+> KVM hyp interface.
 > 
+> Cc: Sudeep Holla <sudeep.holla@arm.com>
 > Signed-off-by: Andrew Scull <ascull@google.com>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h        |  3 ++-
->  arch/arm64/kernel/image-vars.h          |  1 +
->  arch/arm64/kvm/arm.c                    | 10 ++++++++++
->  arch/arm64/kvm/hyp/entry.S              | 10 +++++-----
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  7 files changed, 21 insertions(+), 9 deletions(-)
+>  include/linux/arm-smccc.h | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 1e2491da324e..0b525e05e5bf 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -12,6 +12,7 @@
->  #include <asm/alternative.h>
->  #include <asm/sysreg.h>
->  
-> +DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
->  
->  #define read_sysreg_elx(r,nvh,vh)					\
-> @@ -89,7 +90,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
->  void deactivate_traps_vhe_put(void);
->  #endif
->  
-> -u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-> +u64 __guest_enter(struct kvm_vcpu *vcpu);
->  
->  void __noreturn hyp_panic(void);
->  #ifdef __KVM_NVHE_HYPERVISOR__
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 54bb0eb34b0f..9f419e4fc66b 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -71,6 +71,7 @@ KVM_NVHE_ALIAS(kvm_update_va_mask);
->  /* Global kernel state accessed by nVHE hyp code. */
->  KVM_NVHE_ALIAS(arm64_ssbd_callback_required);
->  KVM_NVHE_ALIAS(kvm_host_data);
-> +KVM_NVHE_ALIAS(kvm_hyp_ctxt);
->  KVM_NVHE_ALIAS(kvm_hyp_vector);
->  KVM_NVHE_ALIAS(kvm_vgic_global_state);
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index b6442c6be5ad..ae4b34f91e94 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -47,6 +47,7 @@ __asm__(".arch_extension	virt");
->  #endif
->  
->  DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
-> +DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index 15c706fb0a37..3bb109a35554 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -260,7 +260,7 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+>  	typeof(a1) __a1 = a1;						\
+>  	struct arm_smccc_res   *___res = res;				\
+>  	register unsigned long r0 asm("r0") = (u32)a0;			\
+> -	register unsigned long r1 asm("r1") = __a1;			\
+> +	register unsigned long r1 asm("r1") = (unsigned long)__a1;	\
 
-[back to this patch after having reviewed a few of the subsequent
-ones]
+Given the pain we go through to extract the type of each argument, it
+seems odd to end-up with casts everywhere. I'd rather keep the type
+system alive by having:
 
-Given the variety of contexts you are introducing, I wonder if the
-best course of action for most of this isn't simply to use the EL2
-stack rather than defining ad-hoc structures.
+	register typeof(a1) r1 asm("r1") = __a1;
 
-The host save/restore you are introducing in a later patch certainly
-could do without a separate data structure (hello, struct pt_regs) and
-the hyp/host churn.
+Is there any reason why this doesn't work?
 
-What do you think?
+Thanks,
 
 	M.
 
