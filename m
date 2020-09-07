@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFB2C433E2
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B76DC43461
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 14:20:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C1E1B2078E
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D409521481
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 14:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iw+ERmQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E1B2078E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugxc8NXb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D409521481
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C4E74B318;
-	Mon,  7 Sep 2020 09:48:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 349094B4D4;
+	Mon,  7 Sep 2020 10:20:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h9X6osC9FNG2; Mon,  7 Sep 2020 09:48:06 -0400 (EDT)
+	with ESMTP id VaS4xLZHItPS; Mon,  7 Sep 2020 10:20:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7684B388;
-	Mon,  7 Sep 2020 09:48:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAB14B4AA;
+	Mon,  7 Sep 2020 10:20:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0684B30C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:48:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39C014B4A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 10:20:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FPTjUoMv6BIq for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 09:48:03 -0400 (EDT)
+ with ESMTP id e6U94iwittBT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 10:20:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FA814B2EF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:48:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 166B44B4A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 10:20:11 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5C30120757;
- Mon,  7 Sep 2020 13:48:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EB2F221481;
+ Mon,  7 Sep 2020 14:20:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599486482;
- bh=VTa8dsypGLCQ/kgeKikQVM5EjsVYlMzzdc2/AundBo0=;
+ s=default; t=1599488410;
+ bh=xmG2zLYjHHaI4w3YYUB9HtMz6um9lD66REa1f1PLI4U=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Iw+ERmQOtAJmfNSvQcjpnmyyWecGgwZAb3rCAqKbEMofhslaqlbVAPVo+jjCfTrne
- NxcDIaFPh8ZoqTtbVXXTO7HAA82OXDgfBzvd12NBvxIHwK8rrWaekEjZxvozqrUDAu
- fIVd2YaOAJqcWojRmUrjlROwC2djJfDgZWVycJN4=
+ b=ugxc8NXbiNGfJcmHzdcDQe/lJrQ6sYJ9aTRD2q/gCicGZxaf6E86SH6xdY1GbVDeq
+ owICP11rDRh+y4U8KEev8nMTkwVWfBNBzS0v8+UEEqmrFTwMPEAMOzR5hdGoUwJvX1
+ yfxk5MxvNktIg5yFshdmKRhCRKfyGu5jDlhroccM=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kFHV2-009mDK-Ei; Mon, 07 Sep 2020 14:48:00 +0100
-Date: Mon, 07 Sep 2020 14:47:59 +0100
-Message-ID: <87pn6xlmuo.wl-maz@kernel.org>
+ id 1kFI08-009mcx-3x; Mon, 07 Sep 2020 15:20:08 +0100
+Date: Mon, 07 Sep 2020 15:20:07 +0100
+Message-ID: <87o8mhlld4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Scull <ascull@google.com>
 Subject: Re: [PATCH v3 16/18] KVM: arm64: nVHE: Migrate hyp interface to SMCCC
@@ -114,9 +114,6 @@ Andrew Scull <ascull@google.com> wrote:
 > 
 > Signed-off-by: Andrew Scull <ascull@google.com>
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
-
-Who is the author? If it is a co-development, use the ad-hoc tag.
-
 > ---
 >  arch/arm64/include/asm/kvm_asm.h   |  24 ++++++
 >  arch/arm64/include/asm/kvm_host.h  |  25 ++++---
@@ -156,257 +153,9 @@ Who is the author? If it is a co-development, use the ad-hoc tag.
 > +#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
 > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
 > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
-> +
->  #ifndef __ASSEMBLY__
->  
->  #include <linux/mm.h>
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 16adbefde1cc..82c941cf8890 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -11,6 +11,7 @@
->  #ifndef __ARM64_KVM_HOST_H__
->  #define __ARM64_KVM_HOST_H__
->  
-> +#include <linux/arm-smccc.h>
->  #include <linux/bitmap.h>
->  #include <linux/types.h>
->  #include <linux/jump_label.h>
-> @@ -479,18 +480,20 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
->  
-> -u64 __kvm_call_hyp(void *hypfn, ...);
-> +u64 __kvm_call_hyp_init(phys_addr_t pgd_ptr,
-> +			unsigned long hyp_stack_ptr,
-> +			unsigned long vector_ptr,
-> +			unsigned long tpidr_el2);
->  
-> -#define kvm_call_hyp_nvhe(f, ...)					\
-> -	do {								\
-> -		DECLARE_KVM_NVHE_SYM(f);				\
-> -		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
-> -	} while(0)
-> -
-> -#define kvm_call_hyp_nvhe_ret(f, ...)					\
-> +#define kvm_call_hyp_nvhe(f, ...)						\
->  	({								\
-> -		DECLARE_KVM_NVHE_SYM(f);				\
-> -		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
-> +		struct arm_smccc_res res;				\
-> +									\
-> +		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
-> +				  ##__VA_ARGS__, &res);			\
-> +		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
-> +									\
-> +		res.a1;							\
->  	})
->  
->  /*
-> @@ -516,7 +519,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
->  			ret = f(__VA_ARGS__);				\
->  			isb();						\
->  		} else {						\
-> -			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
-> +			ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
 
-nit: Just inline the whole macro here.
-
->  		}							\
->  									\
->  		ret;							\
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6b7180072c8d..49aa08bd26de 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1288,7 +1288,7 @@ static void cpu_init_hyp_mode(void)
->  	 * cpus_have_const_cap() wrapper.
->  	 */
->  	BUG_ON(!system_capabilities_finalized());
-> -	__kvm_call_hyp((void *)pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2);
-> +	__kvm_call_hyp_init(pgd_ptr, hyp_stack_ptr, vector_ptr, tpidr_el2);
->  
->  	/*
->  	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index 3c79a1124af2..12aa426f7559 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -11,24 +11,12 @@
->  #include <asm/cpufeature.h>
->  
->  /*
-> - * u64 __kvm_call_hyp(void *hypfn, ...);
-> - *
-> - * This is not really a variadic function in the classic C-way and care must
-> - * be taken when calling this to ensure parameters are passed in registers
-> - * only, since the stack will change between the caller and the callee.
-> - *
-> - * Call the function with the first argument containing a pointer to the
-> - * function you wish to call in Hyp mode, and subsequent arguments will be
-> - * passed as x0, x1, and x2 (a maximum of 3 arguments in addition to the
-> - * function pointer can be passed).  The function being called must be mapped
-> - * in Hyp mode (see init_hyp_mode in arch/arm/kvm/arm.c).  Return values are
-> - * passed in x0.
-> - *
-> - * A function pointer with a value less than 0xfff has a special meaning,
-> - * and is used to implement hyp stubs in the same way as in
-> - * arch/arm64/kernel/hyp_stub.S.
-> + * u64 __kvm_call_hyp_init(phys_addr_t pgd_ptr,
-> + * 			   unsigned long hyp_stack_ptr,
-> + * 			   unsigned long vector_ptr,
-> + * 			   unsigned long tpidr_el2);
->   */
-> -SYM_FUNC_START(__kvm_call_hyp)
-> +SYM_FUNC_START(__kvm_call_hyp_init)
->  	hvc	#0
->  	ret
-> -SYM_FUNC_END(__kvm_call_hyp)
-> +SYM_FUNC_END(__kvm_call_hyp_init)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index c8938e09f585..13093df70c87 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -12,24 +12,111 @@
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  
-> -typedef unsigned long (*hypcall_fn_t)
-> -	(unsigned long, unsigned long, unsigned long);
-> +#include <kvm/arm_hypercalls.h>
-> +
-> +static void handle_host_hcall(unsigned long func_id,
-> +			      struct kvm_cpu_context *host_ctxt)
-> +{
-> +	unsigned long ret = 0;
-> +
-> +	/*
-> +	 * __kvm_vcpu_run is a hot path of the context switch so identify it
-> +	 * quickly before searching through the other functions IDs.
-> +	 */
-> +	if (func_id == KVM_HOST_SMCCC_FUNC(__kvm_vcpu_run)) {
-> +		struct kvm_vcpu *vcpu =
-> +			(struct kvm_vcpu *)host_ctxt->regs.regs[1];
-> +
-> +		ret = __kvm_vcpu_run(vcpu);
-> +		goto out;
-> +	}
-
-This is terribly ugly. How does it behave if you keep it in the
-switch(), and make it function 0, for example?
-
-> +
-> +	switch (func_id) {
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_flush_vm_context):
-> +		__kvm_flush_vm_context();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid_ipa): {
-> +			struct kvm_s2_mmu *mmu =
-> +				(struct kvm_s2_mmu *)host_ctxt->regs.regs[1];
-> +			phys_addr_t ipa = host_ctxt->regs.regs[2];
-> +			int level = host_ctxt->regs.regs[3];
-> +
-> +			__kvm_tlb_flush_vmid_ipa(mmu, ipa, level);
-> +			break;
-> +		}
-
-nit: The formatting hurts. If you have to use braces, don't introduce
-extra indentation. And given how many times you extract a s2_mmu from
-the first second argument, consider using a helper.
-
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid): {
-> +			struct kvm_s2_mmu *mmu =
-> +				(struct kvm_s2_mmu *)host_ctxt->regs.regs[1];
-> +
-> +			__kvm_tlb_flush_vmid(mmu);
-> +			break;
-> +		}
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_local_vmid): {
-> +			struct kvm_s2_mmu *mmu =
-> +				(struct kvm_s2_mmu *)host_ctxt->regs.regs[1];
-> +
-> +			__kvm_tlb_flush_local_vmid(mmu);
-> +			break;
-> +		}
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_timer_set_cntvoff): {
-> +			u64 cntvoff = host_ctxt->regs.regs[1];
-> +
-> +			__kvm_timer_set_cntvoff(cntvoff);
-> +			break;
-> +		}
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_enable_ssbs):
-> +		__kvm_enable_ssbs();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_get_ich_vtr_el2):
-> +		ret = __vgic_v3_get_ich_vtr_el2();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_read_vmcr):
-> +		ret = __vgic_v3_read_vmcr();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_write_vmcr): {
-> +			u32 vmcr = host_ctxt->regs.regs[1];
-> +
-> +			__vgic_v3_write_vmcr(vmcr);
-> +			break;
-> +		}
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_init_lrs):
-> +		__vgic_v3_init_lrs();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__kvm_get_mdcr_el2):
-> +		ret = __kvm_get_mdcr_el2();
-> +		break;
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_save_aprs): {
-> +			struct vgic_v3_cpu_if *cpu_if =
-> +				(struct vgic_v3_cpu_if *)host_ctxt->regs.regs[1];
-> +
-> +			__vgic_v3_save_aprs(cpu_if);
-> +			break;
-> +		}
-> +	case KVM_HOST_SMCCC_FUNC(__vgic_v3_restore_aprs): {
-> +			struct vgic_v3_cpu_if *cpu_if =
-> +				(struct vgic_v3_cpu_if *)host_ctxt->regs.regs[1];
-> +
-> +			__vgic_v3_restore_aprs(cpu_if);
-> +			break;
-> +		}
-> +	default:
-> +		/* Invalid host HVC. */
-> +		host_ctxt->regs.regs[0] = SMCCC_RET_NOT_SUPPORTED;
-> +		return;
-> +	}
-> +
-> +out:
-> +	host_ctxt->regs.regs[0] = SMCCC_RET_SUCCESS;
-> +	host_ctxt->regs.regs[1] = ret;
-> +}
->  
->  void handle_trap(struct kvm_cpu_context *host_ctxt) {
->  	u64 esr = read_sysreg_el2(SYS_ESR);
-> -	hypcall_fn_t func;
-> -	unsigned long ret;
-> +	unsigned long func_id;
->  
->  	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
->  		hyp_panic();
->  
-> -	/*
-> -	 * __kvm_call_hyp takes a pointer in the host address space and
-> -	 * up to three arguments.
-> -	 */
-> -	func = (hypcall_fn_t)kern_hyp_va(host_ctxt->regs.regs[0]);
-> -	ret = func(host_ctxt->regs.regs[1],
-> -		   host_ctxt->regs.regs[2],
-> -		   host_ctxt->regs.regs[3]);
-> -	host_ctxt->regs.regs[0] = ret;
-> +	func_id = host_ctxt->regs.regs[0];
-> +	handle_host_hcall(func_id, host_ctxt);
->  }
-> -- 
-> 2.28.0.402.g5ffc5be6b7-goog
-> 
-> 
-
-Thanks,
+Wait. This looks broken. How do you distinguish between these and the
+stubs?
 
 	M.
 
