@@ -2,71 +2,70 @@ Return-Path: <SRS0=A5dY=CQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2113BC43461
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 11:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FF6C433E2
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:03:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 65FB7207C3
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 11:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 023F92065E
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:03:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNDGu7mT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65FB7207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlfQ7ZpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023F92065E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEC5E4B5CF;
-	Mon,  7 Sep 2020 07:46:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C4904B233;
+	Mon,  7 Sep 2020 09:03:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0kYdWJFFDm7M; Mon,  7 Sep 2020 07:46:57 -0400 (EDT)
+	with ESMTP id yFMidzmr0tOi; Mon,  7 Sep 2020 09:03:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5264B5C7;
-	Mon,  7 Sep 2020 07:46:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B6B4B2B6;
+	Mon,  7 Sep 2020 09:03:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C061E4B594
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 07:46:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B3AE4B1EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:03:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F+wA3IK7Hiis for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 07:46:55 -0400 (EDT)
+ with ESMTP id tJWlI5ekh1Zj for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 09:03:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF4274B510
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 07:46:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 663C44B233
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:03:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A9B83207C3;
- Mon,  7 Sep 2020 11:46:53 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 41BC720639;
+ Mon,  7 Sep 2020 13:02:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599479213;
- bh=vQO/mkxuUbHFYS++GetY/5IbiGpHZq/A237zPcJhwgM=;
+ s=default; t=1599483779;
+ bh=XtIKwo2Y70DQJvi/4EI88uoMNdVHQCuPOJfsRNOphvo=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=fNDGu7mTBtk8PQxAIPQHwhjGaVbFXr9qH6cLFvurGeCbDr6ln7HI8DW/B9ikeWC3d
- bbrDDN5x05NX2U8o6egXGMq6NsghFnV6h8Is3xvWG28nMunPLzR/HDAkI4uIgQcYwX
- XlCTE4KPsi1fCkRHTWm7xKx8kVX8ZN7FUepOIAfA=
+ b=PlfQ7ZpV6MF3Ay6/P/KZfMiShBRmYs13sZApWq6+1fy26sEuk0UYg42kWWXrBlZwe
+ UiEpRj11IwruSNPova5W54UBFXtJ+FAJrE4xSLEbuFWQOlajZCMgs1wOrHfInorPMn
+ YaihXxRykbfDtMApqbhRmX3bxa847OP0QlSBXMsk=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kFFbn-009kme-Lk; Mon, 07 Sep 2020 12:46:51 +0100
-Date: Mon, 07 Sep 2020 12:46:50 +0100
-Message-ID: <87wo15lsgl.wl-maz@kernel.org>
+ id 1kFGnR-009lg4-61; Mon, 07 Sep 2020 14:02:57 +0100
+Date: Mon, 07 Sep 2020 14:02:54 +0100
+Message-ID: <87v9gploxt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v3 07/18] KVM: arm64: nVHE: Don't consume host SErrors
- with ESB
-In-Reply-To: <20200903135307.251331-8-ascull@google.com>
+Subject: Re: [PATCH v3 12/18] KVM: arm64: nVHE: Switch to hyp context for EL2
+In-Reply-To: <20200903135307.251331-13-ascull@google.com>
 References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-8-ascull@google.com>
+ <20200903135307.251331-13-ascull@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -98,24 +97,205 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 03 Sep 2020 14:52:56 +0100,
+Hi Andrew,
+
+On Thu, 03 Sep 2020 14:53:01 +0100,
 Andrew Scull <ascull@google.com> wrote:
 > 
-> The ESB at the start of the host vector may cause SErrors to be consumed
-> to DISR_EL1. However, this is not checked for the host so the SError
-> could go unhandled.
+> Save and restore the host context when switching to and from hyp. This
+> gives hyp its own context that the host will not see as a step towards a
+> full trust boundary between the two.
 > 
-> Remove the ESB so that SErrors are not consumed but are instead left
-> pending for the host to consume. __guest_enter already defers entry into
-> a guest if there are any SErrors pending.
+> SP_EL0 and pointer authentication keys are currently shared between the
+> host and hyp so don't need to be switched yet.
 > 
-> Fixes: 0e5b9c085dce ("KVM: arm64: Consume pending SError as early as possible")
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/host.S          | 68 ++++++++++++++++++-------
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 35 +++++++++++++
+>  4 files changed, 88 insertions(+), 19 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 821721b78ad9..4536b50ddc06 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -372,6 +372,8 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
+>  	ctxt_sys_reg(ctxt, key ## KEYHI_EL1) = __val;                   \
+>  } while(0)
+>  
+> +DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> +
+>  static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *ctxt;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index ddf98eb07b9d..46c89e8c30bc 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -6,7 +6,7 @@
+>  asflags-y := -D__KVM_NVHE_HYPERVISOR__
+>  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+>  
+> -obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
+> +obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o hyp-main.o
+>  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index d4e8b8084020..1062547853db 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -12,6 +12,55 @@
+>  
+>  	.text
+>  
+> +SYM_FUNC_START(__host_exit)
+> +	stp	x0, x1, [sp, #-16]!
+> +
+> +	get_host_ctxt	x0, x1
+> +
+> +	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
+> +
+> +	/* Store the guest regs x2 and x3 */
 
-I'd drop the Fixes: tag here. The KVM RAS support was never designed
-to use nVHE the first place, and this patch is impossible to backport
-without dragging tons of other patches, turning it into a nightmare.
+These comments are massively confusing. Please stick with the
+conventional KVM terminology, where the host isn't a guest.
 
-The patch itself is fine.
+> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
+> +
+> +	/* Retrieve the guest regs x0-x1 from the stack */
+> +	ldp	x2, x3, [sp], #16	// x0, x1
+> +
+> +	// Store the guest regs x0-x1 and x4-x17
+> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
+> +	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
+> +	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
+> +	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
+> +	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
+> +	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
+> +	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
+> +	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
+> +
+> +	/* Store the guest regs x18-x29, lr */
+> +	save_callee_saved_regs x0
+> +
+> +	/* Save the host context pointer in x29 across the function call */
+> +	mov	x29, x0
+> +	bl	handle_trap
+> +
+> +	/* Restore guest regs x0-x17 */
+> +	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
+> +	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
+> +	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
+> +	ldp	x6, x7,   [x29, #CPU_XREG_OFFSET(6)]
+> +	ldp	x8, x9,   [x29, #CPU_XREG_OFFSET(8)]
+> +	ldp	x10, x11, [x29, #CPU_XREG_OFFSET(10)]
+> +	ldp	x12, x13, [x29, #CPU_XREG_OFFSET(12)]
+> +	ldp	x14, x15, [x29, #CPU_XREG_OFFSET(14)]
+> +	ldp	x16, x17, [x29, #CPU_XREG_OFFSET(16)]
+> +
+> +	/* Restore guest regs x18-x29, lr */
+> +	restore_callee_saved_regs x29
+
+This is a lot of save/restoring on each and every HVC. And I fear that
+at some stage, you will want to restore some EL2-specific registers
+too, adding even more to the overhead.
+
+I'll have a go a measuring by how much we regress with this.
+
+> +
+> +	/* Do not touch any register after this! */
+> +	eret
+> +	sb
+> +SYM_FUNC_END(__host_exit)
+> +
+>  SYM_FUNC_START(__hyp_do_panic)
+>  	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+>  		      PSR_MODE_EL1h)
+> @@ -35,7 +84,7 @@ SYM_FUNC_END(__hyp_do_panic)
+>  
+>  	/* Check for a stub HVC call */
+>  	cmp	x0, #HVC_STUB_HCALL_NR
+> -	b.hs	1f
+> +	b.hs	__host_exit
+>  
+>  	/*
+>  	 * Compute the idmap address of __kvm_handle_stub_hvc and
+> @@ -51,23 +100,6 @@ SYM_FUNC_END(__hyp_do_panic)
+>  	/* x5 = __pa(x5) */
+>  	sub	x5, x5, x6
+>  	br	x5
+> -
+> -1:
+> -	/*
+> -	 * Shuffle the parameters before calling the function
+> -	 * pointed to in x0. Assumes parameters in x[1,2,3].
+> -	 */
+> -	kern_hyp_va	x0
+> -	str	lr, [sp, #-16]!
+> -	mov	lr, x0
+> -	mov	x0, x1
+> -	mov	x1, x2
+> -	mov	x2, x3
+> -	blr	lr
+> -	ldr	lr, [sp], #16
+> -
+> -	eret
+> -	sb
+>  .endm
+>  
+>  .macro invalid_host_vect
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> new file mode 100644
+> index 000000000000..c8938e09f585
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -0,0 +1,35 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2020 - Google Inc
+> + * Author: Andrew Scull <ascull@google.com>
+> + */
+> +
+> +#include <hyp/switch.h>
+> +
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_host.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +typedef unsigned long (*hypcall_fn_t)
+> +	(unsigned long, unsigned long, unsigned long);
+> +
+> +void handle_trap(struct kvm_cpu_context *host_ctxt) {
+
+Coding style.
+
+> +	u64 esr = read_sysreg_el2(SYS_ESR);
+> +	hypcall_fn_t func;
+> +	unsigned long ret;
+> +
+> +	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
+> +		hyp_panic();
+> +
+> +	/*
+> +	 * __kvm_call_hyp takes a pointer in the host address space and
+> +	 * up to three arguments.
+> +	 */
+> +	func = (hypcall_fn_t)kern_hyp_va(host_ctxt->regs.regs[0]);
+> +	ret = func(host_ctxt->regs.regs[1],
+> +		   host_ctxt->regs.regs[2],
+> +		   host_ctxt->regs.regs[3]);
+> +	host_ctxt->regs.regs[0] = ret;
+> +}
+> -- 
+> 2.28.0.402.g5ffc5be6b7-goog
+> 
+> 
 
 Thanks,
 
