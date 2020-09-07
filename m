@@ -2,86 +2,67 @@ Return-Path: <SRS0=A5dY=CQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B76DC43461
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 14:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6AFC43461
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 15:23:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D409521481
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 14:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D43652078E
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 15:23:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugxc8NXb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D409521481
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5iAuxZR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43652078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 349094B4D4;
-	Mon,  7 Sep 2020 10:20:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C9DC4B450;
+	Mon,  7 Sep 2020 11:23:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VaS4xLZHItPS; Mon,  7 Sep 2020 10:20:13 -0400 (EDT)
+	with ESMTP id 3ee6lGg2-M8Z; Mon,  7 Sep 2020 11:23:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAB14B4AA;
-	Mon,  7 Sep 2020 10:20:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0528B4B4B8;
+	Mon,  7 Sep 2020 11:23:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39C014B4A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 10:20:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAEEB4B450
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 11:23:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e6U94iwittBT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 10:20:11 -0400 (EDT)
+ with ESMTP id bK38VwQ1GrC0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 11:23:54 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 166B44B4A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 10:20:11 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF3FD4B391
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 11:23:54 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EB2F221481;
- Mon,  7 Sep 2020 14:20:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D87142078E;
+ Mon,  7 Sep 2020 15:23:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599488410;
- bh=xmG2zLYjHHaI4w3YYUB9HtMz6um9lD66REa1f1PLI4U=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ugxc8NXbiNGfJcmHzdcDQe/lJrQ6sYJ9aTRD2q/gCicGZxaf6E86SH6xdY1GbVDeq
- owICP11rDRh+y4U8KEev8nMTkwVWfBNBzS0v8+UEEqmrFTwMPEAMOzR5hdGoUwJvX1
- yfxk5MxvNktIg5yFshdmKRhCRKfyGu5jDlhroccM=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kFI08-009mcx-3x; Mon, 07 Sep 2020 15:20:08 +0100
-Date: Mon, 07 Sep 2020 15:20:07 +0100
-Message-ID: <87o8mhlld4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v3 16/18] KVM: arm64: nVHE: Migrate hyp interface to SMCCC
-In-Reply-To: <20200903135307.251331-17-ascull@google.com>
-References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-17-ascull@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com,
- sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org,
- dbrazdil@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu
+ s=default; t=1599492233;
+ bh=p5Snu50moHEQm/YntO7vEHnqsKbUapVwzJQltXVKO4Q=;
+ h=From:To:Cc:Subject:Date:From;
+ b=C5iAuxZRQsuAkd/LZYE9KZb1swcHItJwKtEBdzgWQQGGwu5f3hWVK9S3SOi97pCyw
+ sMZ9W3wTXc5oISK5xI6pw+MDixQPkGnikfUECLqrZA0VJB7n/WEBsjuyAQxN4L22wL
+ eOq1GmjjSwKMM3FP8y3idrSv2zUWo5DQHgmM/Twg=
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v4 00/21] KVM: arm64: Rewrite page-table code and fault
+ handling
+Date: Mon,  7 Sep 2020 16:23:23 +0100
+Message-Id: <20200907152344.12978-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,69 +79,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 03 Sep 2020 14:53:05 +0100,
-Andrew Scull <ascull@google.com> wrote:
-> 
-> Rather than passing arbitrary function pointers to run at hyp, define
-> and equivalent set of SMCCC functions.
-> 
-> Since the SMCCC functions are strongly tied to the original function
-> prototypes, it is not expected for the host to ever call an invalid ID
-> but a warning is raised if this does ever occur.
-> 
-> As __kvm_vcpu_run is used for every switch between the host and a guest,
-> it is explicitly singled out to be identified before the other function
-> IDs to improve the performance of the hot path.
-> 
-> Signed-off-by: Andrew Scull <ascull@google.com>
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h   |  24 ++++++
->  arch/arm64/include/asm/kvm_host.h  |  25 ++++---
->  arch/arm64/kvm/arm.c               |   2 +-
->  arch/arm64/kvm/hyp.S               |  24 ++----
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 113 +++++++++++++++++++++++++----
->  5 files changed, 145 insertions(+), 43 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 4bbde3d3989c..4a73f1349151 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -38,6 +38,30 @@
->  
->  #define __SMCCC_WORKAROUND_1_SMC_SZ 36
->  
-> +#define KVM_HOST_SMCCC_ID(id)						\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_64,				\
-> +			   ARM_SMCCC_OWNER_STANDARD_HYP,		\
-> +			   (id))
-> +
-> +#define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
-> +
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		1
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		2
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		3
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	4
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		5
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			6
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_ich_vtr_el2		8
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
+Hi all,
 
-Wait. This looks broken. How do you distinguish between these and the
-stubs?
+Here's version four of the KVM page-table rework I previously posted here:
 
-	M.
+  v1: https://lore.kernel.org/r/20200730153406.25136-1-will@kernel.org
+  v2: https://lore.kernel.org/r/20200818132818.16065-1-will@kernel.org
+  v3: https://lore.kernel.org/r/20200825093953.26493-1-will@kernel.org
+
+Changes since v3 include:
+
+  * Removed some more unused code from the old implementation
+  * Renumbered KVM_PGTABLE_PROT_* to match file permissions in hex dumps
+  * Simplified kvm_granule_shift() and removed kvm_start_level()
+  * Only clear valid bit when invalidating a PTE, leaving phys addr intact
+  * Fail gracefully when attempting to allocate without a memory cache
+  * Rewrote stage2_apply_range() as a function instead of a macro
+  * Fixed fault address rounding with hugetlbfs
+  * Fixed permission fault handling when dirty logging is enabled
+  * Added comments
+  * Added reviewer tags
+
+Many thanks to Alex and Gavin for their comments.
+
+Will
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Gavin Shan <gshan@redhat.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kernel-team@android.com
+Cc: linux-arm-kernel@lists.infradead.org
+
+--->8
+
+Quentin Perret (4):
+  KVM: arm64: Add support for stage-2 write-protect in generic
+    page-table
+  KVM: arm64: Convert write-protect operation to generic page-table API
+  KVM: arm64: Add support for stage-2 cache flushing in generic
+    page-table
+  KVM: arm64: Convert memslot cache-flushing code to generic page-table
+    API
+
+Will Deacon (17):
+  KVM: arm64: Remove kvm_mmu_free_memory_caches()
+  KVM: arm64: Add stand-alone page-table walker infrastructure
+  KVM: arm64: Add support for creating kernel-agnostic stage-1 page
+    tables
+  KVM: arm64: Use generic allocator for hyp stage-1 page-tables
+  KVM: arm64: Add support for creating kernel-agnostic stage-2 page
+    tables
+  KVM: arm64: Add support for stage-2 map()/unmap() in generic
+    page-table
+  KVM: arm64: Convert kvm_phys_addr_ioremap() to generic page-table API
+  KVM: arm64: Convert kvm_set_spte_hva() to generic page-table API
+  KVM: arm64: Convert unmap_stage2_range() to generic page-table API
+  KVM: arm64: Add support for stage-2 page-aging in generic page-table
+  KVM: arm64: Convert page-aging and access faults to generic page-table
+    API
+  KVM: arm64: Add support for relaxing stage-2 perms in generic
+    page-table code
+  KVM: arm64: Convert user_mem_abort() to generic page-table API
+  KVM: arm64: Check the pgt instead of the pgd when modifying page-table
+  KVM: arm64: Remove unused page-table code
+  KVM: arm64: Remove unused 'pgd' field from 'struct kvm_s2_mmu'
+  KVM: arm64: Don't constrain maximum IPA size based on host
+    configuration
+
+ arch/arm64/include/asm/kvm_host.h       |    2 +-
+ arch/arm64/include/asm/kvm_mmu.h        |  251 +---
+ arch/arm64/include/asm/kvm_pgtable.h    |  281 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h  |   23 -
+ arch/arm64/include/asm/pgtable-prot.h   |   19 -
+ arch/arm64/include/asm/stage2_pgtable.h |  215 ---
+ arch/arm64/kvm/arm.c                    |    2 +-
+ arch/arm64/kvm/hyp/Makefile             |    2 +-
+ arch/arm64/kvm/hyp/pgtable.c            |  880 ++++++++++++
+ arch/arm64/kvm/mmu.c                    | 1745 ++++-------------------
+ arch/arm64/kvm/reset.c                  |   38 +-
+ 11 files changed, 1444 insertions(+), 2014 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
+ create mode 100644 arch/arm64/kvm/hyp/pgtable.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.28.0.526.ge36021eeef-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
