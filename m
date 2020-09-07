@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FF6C433E2
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AE4C433E2
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:24:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 023F92065E
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E092D215A4
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 13:24:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlfQ7ZpV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023F92065E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqOQ9SD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E092D215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C4904B233;
-	Mon,  7 Sep 2020 09:03:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43F044B330;
+	Mon,  7 Sep 2020 09:24:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yFMidzmr0tOi; Mon,  7 Sep 2020 09:03:03 -0400 (EDT)
+	with ESMTP id QSYCk4d4hXwB; Mon,  7 Sep 2020 09:24:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B6B4B2B6;
-	Mon,  7 Sep 2020 09:03:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92EE94B2A2;
+	Mon,  7 Sep 2020 09:24:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B3AE4B1EF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:03:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C95174B2A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:24:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tJWlI5ekh1Zj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 09:03:00 -0400 (EDT)
+ with ESMTP id zcj1JDM-iahc for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 09:24:23 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 663C44B233
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:03:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32A7B4B295
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 09:24:23 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 41BC720639;
- Mon,  7 Sep 2020 13:02:59 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0AA13207C3;
+ Mon,  7 Sep 2020 13:24:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599483779;
- bh=XtIKwo2Y70DQJvi/4EI88uoMNdVHQCuPOJfsRNOphvo=;
+ s=default; t=1599485062;
+ bh=0GS6YxNobX4MqotVfC6v3KooyYsW+CylM+R1+qil1ws=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=PlfQ7ZpV6MF3Ay6/P/KZfMiShBRmYs13sZApWq6+1fy26sEuk0UYg42kWWXrBlZwe
- UiEpRj11IwruSNPova5W54UBFXtJ+FAJrE4xSLEbuFWQOlajZCMgs1wOrHfInorPMn
- YaihXxRykbfDtMApqbhRmX3bxa847OP0QlSBXMsk=
+ b=rqOQ9SD+g8abDisblNv0IeB/fi6j/UsjCU7QJGKagFYon5Jy11P4Ln+311J79VrPM
+ krw20FZQXbf+7DNVYtWPKowub9xvouoWiDHEZrnkTIz1ZEebG6zhmoz568AdR1MxTf
+ mw+V3bIwBETzIhB3+gRWKDCexfGC/PkiNTzeaR48=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kFGnR-009lg4-61; Mon, 07 Sep 2020 14:02:57 +0100
-Date: Mon, 07 Sep 2020 14:02:54 +0100
-Message-ID: <87v9gploxt.wl-maz@kernel.org>
+ id 1kFH88-009lu3-2u; Mon, 07 Sep 2020 14:24:20 +0100
+Date: Mon, 07 Sep 2020 14:24:19 +0100
+Message-ID: <87tuw9lny4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v3 12/18] KVM: arm64: nVHE: Switch to hyp context for EL2
-In-Reply-To: <20200903135307.251331-13-ascull@google.com>
+Subject: Re: [PATCH v3 13/18] KVM: arm64: nVHE: Handle hyp panics
+In-Reply-To: <20200903135307.251331-14-ascull@google.com>
 References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-13-ascull@google.com>
+ <20200903135307.251331-14-ascull@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -97,201 +97,232 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On Thu, 03 Sep 2020 14:53:01 +0100,
+On Thu, 03 Sep 2020 14:53:02 +0100,
 Andrew Scull <ascull@google.com> wrote:
 > 
-> Save and restore the host context when switching to and from hyp. This
-> gives hyp its own context that the host will not see as a step towards a
-> full trust boundary between the two.
+> Restore the host context when panicking from hyp to give the best chance
+> of the panic being clean.
 > 
-> SP_EL0 and pointer authentication keys are currently shared between the
-> host and hyp so don't need to be switched yet.
+> The host requires that registers be preserved such as x18 for the shadow
+> callstack. If the panic is caused by an exception from EL1, the host
+> context is still valid so the panic can return straight back to the
+> host. If the panic comes from EL2 then it's most likely that the hyp
+> context is active and the host context needs to be restored.
+> 
+> There are windows before and after the host context is saved and
+> restored that restoration is attempted incorrectly and the panic won't
+> be clean.
 > 
 > Signed-off-by: Andrew Scull <ascull@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +
->  arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
->  arch/arm64/kvm/hyp/nvhe/host.S          | 68 ++++++++++++++++++-------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 35 +++++++++++++
->  4 files changed, 88 insertions(+), 19 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>  arch/arm64/include/asm/kvm_hyp.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/host.S   | 79 +++++++++++++++++++++++---------
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 18 ++------
+>  3 files changed, 63 insertions(+), 36 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 821721b78ad9..4536b50ddc06 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -372,6 +372,8 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
->  	ctxt_sys_reg(ctxt, key ## KEYHI_EL1) = __val;                   \
->  } while(0)
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 0b525e05e5bf..6b664de5ec1f 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -94,7 +94,7 @@ u64 __guest_enter(struct kvm_vcpu *vcpu);
 >  
-> +DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> +
->  static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_cpu_context *ctxt;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index ddf98eb07b9d..46c89e8c30bc 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -6,7 +6,7 @@
->  asflags-y := -D__KVM_NVHE_HYPERVISOR__
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+>  void __noreturn hyp_panic(void);
+>  #ifdef __KVM_NVHE_HYPERVISOR__
+> -void __noreturn __hyp_do_panic(unsigned long, ...);
+> +void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
+>  #endif
 >  
-> -obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
-> +obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o hyp-main.o
->  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
->  	 ../fpsimd.o ../hyp-entry.o
->  
+>  #endif /* __ARM64_KVM_HYP_H__ */
 > diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index d4e8b8084020..1062547853db 100644
+> index 1062547853db..40620c1c87b8 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/host.S
 > +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -12,6 +12,55 @@
+> @@ -47,6 +47,7 @@ SYM_FUNC_START(__host_exit)
+>  	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
+>  	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
+>  	ldp	x6, x7,   [x29, #CPU_XREG_OFFSET(6)]
+> +__host_enter_for_panic:
+
+This definitely deserves a comment as to *why* we need to skip the
+first 8 registers.
+
+>  	ldp	x8, x9,   [x29, #CPU_XREG_OFFSET(8)]
+>  	ldp	x10, x11, [x29, #CPU_XREG_OFFSET(10)]
+>  	ldp	x12, x13, [x29, #CPU_XREG_OFFSET(12)]
+> @@ -57,30 +58,49 @@ SYM_FUNC_START(__host_exit)
+>  	restore_callee_saved_regs x29
 >  
->  	.text
+>  	/* Do not touch any register after this! */
+> +__host_enter_without_restoring:
+>  	eret
+>  	sb
+>  SYM_FUNC_END(__host_exit)
 >  
-> +SYM_FUNC_START(__host_exit)
-> +	stp	x0, x1, [sp, #-16]!
-> +
-> +	get_host_ctxt	x0, x1
-> +
-> +	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
-> +
-> +	/* Store the guest regs x2 and x3 */
-
-These comments are massively confusing. Please stick with the
-conventional KVM terminology, where the host isn't a guest.
-
-> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
-> +
-> +	/* Retrieve the guest regs x0-x1 from the stack */
-> +	ldp	x2, x3, [sp], #16	// x0, x1
-> +
-> +	// Store the guest regs x0-x1 and x4-x17
-> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
-> +	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
-> +	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
-> +	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
-> +	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
-> +	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
-> +	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
-> +	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
-> +
-> +	/* Store the guest regs x18-x29, lr */
-> +	save_callee_saved_regs x0
-> +
-> +	/* Save the host context pointer in x29 across the function call */
-> +	mov	x29, x0
-> +	bl	handle_trap
-> +
-> +	/* Restore guest regs x0-x17 */
-> +	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
-> +	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
-> +	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
-> +	ldp	x6, x7,   [x29, #CPU_XREG_OFFSET(6)]
-> +	ldp	x8, x9,   [x29, #CPU_XREG_OFFSET(8)]
-> +	ldp	x10, x11, [x29, #CPU_XREG_OFFSET(10)]
-> +	ldp	x12, x13, [x29, #CPU_XREG_OFFSET(12)]
-> +	ldp	x14, x15, [x29, #CPU_XREG_OFFSET(14)]
-> +	ldp	x16, x17, [x29, #CPU_XREG_OFFSET(16)]
-> +
-> +	/* Restore guest regs x18-x29, lr */
-> +	restore_callee_saved_regs x29
-
-This is a lot of save/restoring on each and every HVC. And I fear that
-at some stage, you will want to restore some EL2-specific registers
-too, adding even more to the overhead.
-
-I'll have a go a measuring by how much we regress with this.
-
-> +
-> +	/* Do not touch any register after this! */
-> +	eret
-> +	sb
-> +SYM_FUNC_END(__host_exit)
-> +
+> +/*
+> + * void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
+> + */
 >  SYM_FUNC_START(__hyp_do_panic)
+> +	/* Load the format arguments into x1-7 */
+> +	mov	x6, x3
+> +	get_vcpu_ptr x7, x3
+> +	mov	x7, xzr
+
+Is that the vcpu pointer you are zeroing, right after obtaining it?
+
+> +
+> +	mrs	x3, esr_el2
+> +	mrs	x4, far_el2
+> +	mrs	x5, hpfar_el2
+> +
+> +	/* Prepare and exit to the host's panic funciton. */
 >  	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
 >  		      PSR_MODE_EL1h)
-> @@ -35,7 +84,7 @@ SYM_FUNC_END(__hyp_do_panic)
+>  	msr	spsr_el2, lr
+>  	ldr	lr, =panic
+>  	msr	elr_el2, lr
+> -	eret
+> -	sb
+> +
+> +	/*
+> +	 * Set the panic format string and enter the host, conditionally
+> +	 * restoring the host context.
+> +	 */
+> +	cmp	x0, xzr
+> +	ldr	x0, =__hyp_panic_string
+> +	b.eq	__host_enter_without_restoring
+> +	b	__host_enter_for_panic
+>  SYM_FUNC_END(__hyp_do_panic)
+>  
+>  .macro valid_host_el1_sync_vect
+>  	.align 7
+>  	stp	x0, x1, [sp, #-16]!
+> -
+>  	mrs	x0, esr_el2
+>  	lsr	x0, x0, #ESR_ELx_EC_SHIFT
+>  	cmp	x0, #ESR_ELx_EC_HVC64
+> -	b.ne	hyp_panic
+> -
+>  	ldp	x0, x1, [sp], #16
+> +	b.ne	__host_exit
 >  
 >  	/* Check for a stub HVC call */
 >  	cmp	x0, #HVC_STUB_HCALL_NR
-> -	b.hs	1f
-> +	b.hs	__host_exit
->  
->  	/*
->  	 * Compute the idmap address of __kvm_handle_stub_hvc and
-> @@ -51,23 +100,6 @@ SYM_FUNC_END(__hyp_do_panic)
->  	/* x5 = __pa(x5) */
->  	sub	x5, x5, x6
+> @@ -102,16 +122,31 @@ SYM_FUNC_END(__hyp_do_panic)
 >  	br	x5
-> -
-> -1:
-> -	/*
-> -	 * Shuffle the parameters before calling the function
-> -	 * pointed to in x0. Assumes parameters in x[1,2,3].
-> -	 */
-> -	kern_hyp_va	x0
-> -	str	lr, [sp, #-16]!
-> -	mov	lr, x0
-> -	mov	x0, x1
-> -	mov	x1, x2
-> -	mov	x2, x3
-> -	blr	lr
-> -	ldr	lr, [sp], #16
-> -
-> -	eret
-> -	sb
 >  .endm
 >  
->  .macro invalid_host_vect
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> new file mode 100644
-> index 000000000000..c8938e09f585
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -0,0 +1,35 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2020 - Google Inc
-> + * Author: Andrew Scull <ascull@google.com>
-> + */
-> +
-> +#include <hyp/switch.h>
-> +
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_host.h>
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +typedef unsigned long (*hypcall_fn_t)
-> +	(unsigned long, unsigned long, unsigned long);
-> +
-> +void handle_trap(struct kvm_cpu_context *host_ctxt) {
-
-Coding style.
-
-> +	u64 esr = read_sysreg_el2(SYS_ESR);
-> +	hypcall_fn_t func;
-> +	unsigned long ret;
-> +
-> +	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
-> +		hyp_panic();
+> -.macro invalid_host_vect
+> +.macro invalid_host_el2_vect
+>  	.align 7
+>  	/* If a guest is loaded, panic out of it. */
+>  	stp	x0, x1, [sp, #-16]!
+>  	get_loaded_vcpu x0, x1
+>  	cbnz	x0, __guest_exit_panic
+>  	add	sp, sp, #16
 > +
 > +	/*
-> +	 * __kvm_call_hyp takes a pointer in the host address space and
-> +	 * up to three arguments.
+> +	 * The panic may not be clean if the exception is taken before the host
+> +	 * context has been saved by __host_exit or after the hyp context has
+> +	 * been partially clobbered by __host_enter.
 > +	 */
-> +	func = (hypcall_fn_t)kern_hyp_va(host_ctxt->regs.regs[0]);
-> +	ret = func(host_ctxt->regs.regs[1],
-> +		   host_ctxt->regs.regs[2],
-> +		   host_ctxt->regs.regs[3]);
-> +	host_ctxt->regs.regs[0] = ret;
-> +}
+>  	b	hyp_panic
+>  .endm
+>  
+> +.macro invalid_host_el1_vect
+> +	.align 7
+> +	mov	x0, xzr		/* restore_host = false */
+> +	mrs	x1, spsr_el2
+> +	mrs	x2, elr_el2
+> +	mrs	x3, par_el1
+> +	b	__hyp_do_panic
+> +.endm
+> +
+>  /*
+>   * The host vector does not use an ESB instruction in order to avoid consuming
+>   * SErrors that should only be consumed by the host. Guest entry is deferred by
+> @@ -123,23 +158,23 @@ SYM_FUNC_END(__hyp_do_panic)
+>   */
+>  	.align 11
+>  SYM_CODE_START(__kvm_hyp_host_vector)
+> -	invalid_host_vect			// Synchronous EL2t
+> -	invalid_host_vect			// IRQ EL2t
+> -	invalid_host_vect			// FIQ EL2t
+> -	invalid_host_vect			// Error EL2t
+> +	invalid_host_el2_vect			// Synchronous EL2t
+> +	invalid_host_el2_vect			// IRQ EL2t
+> +	invalid_host_el2_vect			// FIQ EL2t
+> +	invalid_host_el2_vect			// Error EL2t
+>  
+> -	invalid_host_vect			// Synchronous EL2h
+> -	invalid_host_vect			// IRQ EL2h
+> -	invalid_host_vect			// FIQ EL2h
+> -	invalid_host_vect			// Error EL2h
+> +	invalid_host_el2_vect			// Synchronous EL2h
+> +	invalid_host_el2_vect			// IRQ EL2h
+> +	invalid_host_el2_vect			// FIQ EL2h
+> +	invalid_host_el2_vect			// Error EL2h
+>  
+>  	valid_host_el1_sync_vect		// Synchronous 64-bit EL1
+> -	invalid_host_vect			// IRQ 64-bit EL1
+> -	invalid_host_vect			// FIQ 64-bit EL1
+> -	invalid_host_vect			// Error 64-bit EL1
+> -
+> -	invalid_host_vect			// Synchronous 32-bit EL1
+> -	invalid_host_vect			// IRQ 32-bit EL1
+> -	invalid_host_vect			// FIQ 32-bit EL1
+> -	invalid_host_vect			// Error 32-bit EL1
+> +	invalid_host_el1_vect			// IRQ 64-bit EL1
+> +	invalid_host_el1_vect			// FIQ 64-bit EL1
+> +	invalid_host_el1_vect			// Error 64-bit EL1
+> +
+> +	invalid_host_el1_vect			// Synchronous 32-bit EL1
+> +	invalid_host_el1_vect			// IRQ 32-bit EL1
+> +	invalid_host_el1_vect			// FIQ 32-bit EL1
+> +	invalid_host_el1_vect			// Error 32-bit EL1
+>  SYM_CODE_END(__kvm_hyp_host_vector)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 72d3e0119299..b4f6ae1d579a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -242,6 +242,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	if (system_uses_irq_prio_masking())
+>  		gic_write_pmr(GIC_PRIO_IRQOFF);
+>  
+> +	host_ctxt->__hyp_running_vcpu = NULL;
+> +
+>  	return exit_code;
+>  }
+>  
+> @@ -253,26 +255,16 @@ void __noreturn hyp_panic(void)
+>  	struct kvm_cpu_context *host_ctxt =
+>  		&__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	struct kvm_vcpu *vcpu = host_ctxt->__hyp_running_vcpu;
+> -	unsigned long str_va;
+> +	bool restore_host = true;
+>  
+> -	if (read_sysreg(vttbr_el2)) {
+> +	if (vcpu) {
+>  		__timer_disable_traps(vcpu);
+>  		__deactivate_traps(vcpu);
+>  		__load_host_stage2();
+>  		__sysreg_restore_state_nvhe(host_ctxt);
+>  	}
+>  
+> -	/*
+> -	 * Force the panic string to be loaded from the literal pool,
+> -	 * making sure it is a kernel address and not a PC-relative
+> -	 * reference.
+> -	 */
+> -	asm volatile("ldr %0, =%1" : "=r" (str_va) : "S" (__hyp_panic_string));
+> -
+> -	__hyp_do_panic(str_va,
+> -		       spsr, elr,
+> -		       read_sysreg(esr_el2), read_sysreg_el2(SYS_FAR),
+> -		       read_sysreg(hpfar_el2), par, vcpu);
+> +	__hyp_do_panic(restore_host, spsr, elr, par);
+>  	unreachable();
+>  }
+>  
 > -- 
 > 2.28.0.402.g5ffc5be6b7-goog
 > 
