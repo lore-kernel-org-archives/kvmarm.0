@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FE0C43461
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 10:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AE6C433E2
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 10:38:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 60A7C21531
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 10:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F03821531
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Sep 2020 10:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="EeMSBb8F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A7C21531
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="2Wie+WkE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F03821531
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B939E4B5BF;
-	Mon,  7 Sep 2020 06:21:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 778D34B444;
+	Mon,  7 Sep 2020 06:38:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 21k1SsIHW3zP; Mon,  7 Sep 2020 06:21:15 -0400 (EDT)
+	with ESMTP id DUshVgavA0Ur; Mon,  7 Sep 2020 06:38:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26FEF4B5C3;
-	Mon,  7 Sep 2020 06:21:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81E504B465;
+	Mon,  7 Sep 2020 06:38:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29BE14B5B0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 06:21:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B5424B444
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 06:38:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0PLKGIYpM71G for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 06:21:13 -0400 (EDT)
+ with ESMTP id 5wXFXCPuT45Z for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2020 06:38:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B3BF4B590
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 06:21:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82C2E4B433
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 06:38:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EA63221481;
- Mon,  7 Sep 2020 10:21:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5AD0B20738;
+ Mon,  7 Sep 2020 10:38:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599474072;
- bh=MT9drlk3MUYMfe58ilgJTEbP9Y17nMXs/5+Jd7Bsq0M=;
+ s=default; t=1599475122;
+ bh=H2zHLW+oJBfNU+V+o/hZ1kbOu3tUvHUQGfWA5z2MjJ4=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=EeMSBb8FInPBpMhTH+h6eB8IjmzMtYgCLaLKj7HgrlLZMNqKCIe5DLXmNLaZTRUph
- Q11yctDKuTrnjrtuH/6ubcXXrMBpzS1WwRDmxNpn+D+JlxtgS5oFpo4VAcEeq+lZdc
- E5cTEMb6wYogiEBBj5+xHNlzWiNXotTJD7nwMSg0=
+ b=2Wie+WkEpBuiVpWC9ofKFwXkMLI1rcFab8jei5mgY8Yr/Jv+gqjznDPaFXNqFqvJX
+ NN9RWx6JS1s1QS1/mNPR+sOyd3C25pOYe5FqmpZYTvOVN85/FGQsGqX4kw+REswFky
+ Q4ga4b/w9GZd9GFqyiHOVwzdhmfGD7DUN8EOzt2g=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kFEGr-009jUx-U9; Mon, 07 Sep 2020 11:21:10 +0100
-Date: Mon, 07 Sep 2020 11:21:08 +0100
-Message-ID: <871rjdnazv.wl-maz@kernel.org>
+ id 1kFEXn-009jtD-Bu; Mon, 07 Sep 2020 11:38:40 +0100
+Date: Mon, 07 Sep 2020 11:38:38 +0100
+Message-ID: <87zh61lvm9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v3 02/18] KVM: arm64: Remove hyp_panic arguments
-In-Reply-To: <20200903135307.251331-3-ascull@google.com>
+Subject: Re: [PATCH v3 04/18] KVM: arm64: Restrict symbol aliasing to outside
+ nVHE
+In-Reply-To: <20200903135307.251331-5-ascull@google.com>
 References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-3-ascull@google.com>
+ <20200903135307.251331-5-ascull@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,7 +75,8 @@ X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
  james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
  will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com,
- sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org
+ sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org,
+ dbrazdil@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -99,45 +101,46 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Andrew,
 
-On Thu, 03 Sep 2020 14:52:51 +0100,
+On Thu, 03 Sep 2020 14:52:53 +0100,
 Andrew Scull <ascull@google.com> wrote:
 > 
-> hyp_panic is able to find all the context it needs from within itself so
-> remove the argument. The __hyp_panic wrapper becomes redundant so is
-> also removed.
+> nVHE symbols are prefixed but this is sometimes hidden from the host by
+> aliasing the non-prefixed symbol to the prefixed version with a macro.
+> This runs into problems if nVHE tries to use the symbol as it becomes
+> doubly prefixed. Avoid this by omitting the aliasing macro for nVHE.
 > 
+> Cc: David Brazdil <dbrazdil@google.com>
 > Signed-off-by: Andrew Scull <ascull@google.com>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h        | 2 +-
->  arch/arm64/kvm/hyp/hyp-entry.S          | 7 +------
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 4 +---
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 4 +++-
->  arch/arm64/kvm/hyp/vhe/switch.c         | 4 +++-
->  5 files changed, 9 insertions(+), 12 deletions(-)
->
-
-[...]
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 3c9c065b3264..1e8a31b7c94c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -242,11 +242,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  	return exit_code;
->  }
+>  arch/arm64/include/asm/kvm_asm.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 6f98fbd0ac81..6f9c4162a764 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -99,8 +99,11 @@ struct kvm_s2_mmu;
 >  
-> -void __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
-> +void __noreturn hyp_panic(void)
->  {
->  	u64 spsr = read_sysreg_el2(SYS_SPSR);
->  	u64 elr = read_sysreg_el2(SYS_ELR);
->  	u64 par = read_sysreg(par_el1);
-> +	struct kvm_cpu_context *host_ctxt =
-> +		&__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
+>  DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
+> +
+> +#ifndef __KVM_NVHE_HYPERVISOR__
+>  #define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
+>  #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
+> +#endif
 
-nit: Please keep assignments on a single line. If that's too long,
-just move it outside of the declaration block. No need to respin the
-series for that though.
+Hmmm. Why do we limit this to these two symbols instead of making it a
+property of the "CHOOSE_*" implementation?
+
+The use of CHOOSE_HYP_SYM is already forbidden in the EL2 code (see
+how any symbol results in __nvhe_undefined_symbol being emitted). Does
+anything break if we have:
+
+#define CHOOSE_NVHE_SYM(x)	x
+
+when __KVM_NVHE_HYPERVISOR__ is defined?
+
+Thanks,
 
 	M.
 
