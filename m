@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A19C43461
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B24FEC10DAA
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:18:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CC9722087C
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29F88208FE
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eE/oZfnW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9722087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VNO1LHvd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F88208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D6844B577;
-	Wed,  9 Sep 2020 04:18:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E67B4B606;
+	Wed,  9 Sep 2020 04:18:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9-1PTcfTFClX; Wed,  9 Sep 2020 04:18:05 -0400 (EDT)
+	with ESMTP id DCbX-xA2-fya; Wed,  9 Sep 2020 04:18:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AC74B599;
-	Wed,  9 Sep 2020 04:18:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 196A04B5AE;
+	Wed,  9 Sep 2020 04:18:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 759BD4B5C4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 14:55:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E58684B3F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 16:57:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id axsmuIaySvHp for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Sep 2020 14:55:08 -0400 (EDT)
-Received: from smtp-fw-9101.amazon.com (smtp-fw-9101.amazon.com
- [207.171.184.25])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A52A4B5BA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 14:55:08 -0400 (EDT)
+ with ESMTP id fOZKYADg1Eio for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Sep 2020 16:57:45 -0400 (EDT)
+Received: from smtp-fw-4101.amazon.com (smtp-fw-4101.amazon.com [72.21.198.25])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD75F4B3B2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 16:57:45 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1599591309; x=1631127309;
+ t=1599598666; x=1631134666;
  h=from:to:cc:subject:date:message-id:mime-version:
  content-transfer-encoding;
- bh=x5jEF96sYCAIy62XD2CkEvqSoI0X9CvEDr0LQID4QSM=;
- b=eE/oZfnW33YWJY+rQ6qKCixK0ioZvWioBje0XfIvXO86+9DZ0Ck0jSWf
- /wkri842o/UvTO6ucis2pNbPFMNOs857qFg5A2m8SiP0MkGZPejIgkCeA
- FaKQjmqxyFGPlIHE+pvw7HazEWxCHaKYMATwOENTHqYUskVIZNgxy0oTU c=;
-X-IronPort-AV: E=Sophos;i="5.76,406,1592870400"; d="scan'208";a="66374160"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
- email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com) ([10.47.23.38])
- by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP;
- 08 Sep 2020 18:55:00 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
- by email-inbound-relay-2b-c7131dcf.us-west-2.amazon.com (Postfix) with ESMTPS
- id 8E7E7A2582; Tue,  8 Sep 2020 18:54:58 +0000 (UTC)
+ bh=w+WDjUguH6wxTf/jOmY/ulveNsmF3SzEEfvwqGmwBIE=;
+ b=VNO1LHvd6X8/8/clAbF7T0MTcXjFwa6z5F7LcL+TBAWhtwjxd0gFl9C7
+ 7NrHnF503i/rCS3SHTzU5G+bBR5GH2fT1tw9817gawOt7t37uDUTYuhpv
+ 4DU9DMyE3wpRPrzCpSX/9uHzr3/znz+p9AWdzSTZfs51ABN2CX8qqaPDc A=;
+X-IronPort-AV: E=Sophos;i="5.76,407,1592870400"; d="scan'208";a="52844612"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.43.8.6])
+ by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP;
+ 08 Sep 2020 20:57:45 +0000
+Received: from EX13MTAUWC002.ant.amazon.com
+ (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+ by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS
+ id E8903A1716; Tue,  8 Sep 2020 20:57:41 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 8 Sep 2020 18:54:56 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.161.85) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 8 Sep 2020 20:57:41 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.215) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 8 Sep 2020 18:54:53 +0000
+ id 15.0.1497.2; Tue, 8 Sep 2020 20:57:38 +0000
 From: Alexander Graf <graf@amazon.com>
 To: <kvmarm@lists.cs.columbia.edu>
-Subject: [PATCH] KVM: arm64: Allow to limit number of PMU counters
-Date: Tue, 8 Sep 2020 20:54:45 +0200
-Message-ID: <20200908185445.22561-1-graf@amazon.com>
+Subject: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+Date: Tue, 8 Sep 2020 22:57:30 +0200
+Message-ID: <20200908205730.23898-1-graf@amazon.com>
 X-Mailer: git-send-email 2.28.0.394.ge197136389
 MIME-Version: 1.0
-X-Originating-IP: [10.43.161.85]
-X-ClientProxiedBy: EX13D12UWC004.ant.amazon.com (10.43.162.182) To
+X-Originating-IP: [10.43.160.215]
+X-ClientProxiedBy: EX13D03UWA002.ant.amazon.com (10.43.160.144) To
  EX13D20UWC001.ant.amazon.com (10.43.162.244)
 X-Mailman-Approved-At: Wed, 09 Sep 2020 04:18:03 -0400
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -113,13 +112,55 @@ Signed-off-by: Alexander Graf <graf@amazon.com>
 Because this patch touches the same code paths as the vPMU filtering one
 and the vPMU filtering generalized a few conditions in the attr path,
 I've based it on top. Please let me know if you want it independent instead.
----
- arch/arm64/include/uapi/asm/kvm.h |  7 ++++---
- arch/arm64/kvm/pmu-emul.c         | 22 ++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c         |  5 +++++
- include/kvm/arm_pmu.h             |  1 +
- 4 files changed, 32 insertions(+), 3 deletions(-)
 
+v1 -> v2:
+
+  - Add documentation
+  - Add read support
+---
+ Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
+ arch/arm64/kvm/pmu-emul.c               | 32 ++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c               |  5 +++++
+ include/kvm/arm_pmu.h                   |  1 +
+ 5 files changed, 67 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index 203b91e93151..1a1c8d8c8b1d 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the cycle counter is possible
+ using event 0x11 (CPU_CYCLES).
+ 
+ 
++1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
++---------------------------------------------
++
++:Parameters: in kvm_device_attr.addr the address for the limit of concurrent
++             events is a pointer to an int
++
++:Returns:
++
++	 =======  ======================================================
++	 -ENODEV: PMUv3 not supported
++	 -EBUSY:  PMUv3 already initialized
++	 -EINVAL: Too large number of events
++	 =======  ======================================================
++
++Reconfigure the limit of concurrent PMU events that the guest can monitor.
++This number is directly exposed as part of the PMCR_EL0 register.
++
++On vcpu creation, this attribute is set to the hardware limit of the current
++platform. If you need to determine the hardware limit, you can read this
++attribute before setting it.
++
++Restrictions: The default value for this property is the number of hardware
++supported events. Only values that are smaller than the hardware limit can
++be set.
++
+ 2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+ =================================
+ 
 diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
 index 7b1511d6ce44..db025c0b5a40 100644
 --- a/arch/arm64/include/uapi/asm/kvm.h
@@ -139,10 +180,10 @@ index 7b1511d6ce44..db025c0b5a40 100644
  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 9f0fd0224d5b..40848e17d0cb 100644
+index 0458860bade2..c7915b95fec0 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -238,6 +238,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+@@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
  
  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
  		pmu->pmc[i].idx = i;
@@ -151,14 +192,14 @@ index 9f0fd0224d5b..40848e17d0cb 100644
  }
  
  /**
-@@ -875,6 +877,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+@@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
  
  		return 0;
  	}
 +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
 +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
 +		int __user *uaddr = (int __user *)(long)attr->addr;
-+		unsigned int num_events;
++		u32 num_events;
 +
 +		if (get_user(num_events, uaddr))
 +			return -EFAULT;
@@ -177,7 +218,24 @@ index 9f0fd0224d5b..40848e17d0cb 100644
  	case KVM_ARM_VCPU_PMU_V3_INIT:
  		return kvm_arm_pmu_v3_init(vcpu);
  	}
-@@ -912,6 +933,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+@@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		irq = vcpu->arch.pmu.irq_num;
+ 		return put_user(irq, uaddr);
+ 	}
++	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		u32 num_events;
++
++		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
++			return -ENODEV;
++
++		num_events = vcpu->arch.pmu.num_events;
++		return put_user(num_events, uaddr);
++	}
+ 	}
+ 
+ 	return -ENXIO;
+@@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
  	case KVM_ARM_VCPU_PMU_V3_IRQ:
  	case KVM_ARM_VCPU_PMU_V3_INIT:
  	case KVM_ARM_VCPU_PMU_V3_FILTER:
@@ -186,7 +244,7 @@ index 9f0fd0224d5b..40848e17d0cb 100644
  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
  			return 0;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 077293b5115f..fca0bba6d97b 100644
+index 20ab2a7d37ca..d51e39600bbd 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
 @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
@@ -202,7 +260,7 @@ index 077293b5115f..fca0bba6d97b 100644
  }
  
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 6db030439e29..5557024edce5 100644
+index 98cbfe885a53..ea3fc96a37d9 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
 @@ -27,6 +27,7 @@ struct kvm_pmu {
