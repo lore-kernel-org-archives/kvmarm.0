@@ -2,94 +2,83 @@ Return-Path: <SRS0=B0kT=CR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F63DC43461
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 01:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F05C43461
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 07:58:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB33A2193E
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 01:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 326DF21D7E
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 07:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMRJxYTt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB33A2193E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1GMiEH9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326DF21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C2874B590;
-	Mon,  7 Sep 2020 21:09:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B124B37C;
+	Tue,  8 Sep 2020 03:58:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HK+GCWdM+4sR; Mon,  7 Sep 2020 21:09:53 -0400 (EDT)
+	with ESMTP id RkpJoHHRb6OI; Tue,  8 Sep 2020 03:58:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98BDD4B503;
-	Mon,  7 Sep 2020 21:09:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A07F4B574;
+	Tue,  8 Sep 2020 03:58:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4974B42A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 21:09:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F16B4B565
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 03:58:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bC1+Oj1uw23Z for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2020 21:09:51 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com
- (us-smtp-delivery-1.mimecast.com [205.139.110.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98F024B39C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2020 21:09:51 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599527391;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WdFWMe9CxATlb9oZqukmPv1W0ZNGNRKiLLyzdDngxMY=;
- b=KMRJxYTtPrznDfU4IuaOjqpHFaXvU6wy7QexGwghN8pU56JoeL6b15HAxqrGvE4+FU94Is
- QNHFzJ9ADxfjzZ6PPe652XruGN8yJsVOzJiyTZ4BfV5bFUXiCeUpsuwCcBNnCBTOwIJgcM
- jEi5QQ7F7wAg3bXf62t3oL4dtlBmkgo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-6XThHEnLOVyuZRBPW6jUcA-1; Mon, 07 Sep 2020 21:09:47 -0400
-X-MC-Unique: 6XThHEnLOVyuZRBPW6jUcA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id kDTroe-0jQUu for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Sep 2020 03:58:50 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A59C4B4F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 03:58:50 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF1E1802B61;
- Tue,  8 Sep 2020 01:09:45 +0000 (UTC)
-Received: from [10.64.54.90] (vpn2-54-90.bne.redhat.com [10.64.54.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C1C65805D2;
- Tue,  8 Sep 2020 01:09:42 +0000 (UTC)
-Subject: Re: [PATCH v4 03/21] KVM: arm64: Add support for creating
- kernel-agnostic stage-1 page tables
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200907152344.12978-1-will@kernel.org>
- <20200907152344.12978-4-will@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <3c18697e-b56c-1c19-90b5-eeaecd65b62a@redhat.com>
-Date: Tue, 8 Sep 2020 11:09:39 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ by mail.kernel.org (Postfix) with ESMTPSA id 7FE312177B;
+ Tue,  8 Sep 2020 07:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599551926;
+ bh=e6KbWIX9OGeN9VN1JOdQtcvcUKxjsb2qiPcRPoyCsHw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=V1GMiEH9/wCXi86KUjxIxMq6EbokUbEMvdMoN9ec2AwdoITqXPXjibb9zdCyFJbRq
+ cWd8wXlxr0/odYmPSOXIFyrc6431tYf+wYKYrSpmoS+O7G0gdPnF3kZp1HEUR11E5E
+ 2H/Pf4DZNNsvKJBvFrH6NuWqVf/Uvf9gSjxy5LbQ=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kFYWa-009zhy-Jg; Tue, 08 Sep 2020 08:58:44 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v3 0/5] KVM: arm64: Filtering PMU events
+Date: Tue,  8 Sep 2020 08:58:25 +0100
+Message-Id: <20200908075830.1161921-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200907152344.12978-4-will@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com,
+ mark.rutland@arm.com, eric.auger@redhat.com, graf@amazon.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, graf@amazon.com,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -98,226 +87,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 9/8/20 1:23 AM, Will Deacon wrote:
-> The generic page-table walker is pretty useless as it stands, because it
-> doesn't understand enough to allocate anything. Teach it about stage-1
-> page-tables, and hook up an API for allocating these for the hypervisor
-> at EL2.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
+It is at times necessary to prevent a guest from being able to sample
+certain events if multiple CPUs share resources such as a cache level. In
+this case, it would be interesting if the VMM could simply prevent certain
+events from being counted instead of hiding the PMU.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Given that most events are not architected, there is no easy way to
+designate which events shouldn't be counted other than specifying the raw
+event number.
 
->   arch/arm64/include/asm/kvm_pgtable.h |  36 ++++++++
->   arch/arm64/kvm/hyp/pgtable.c         | 133 +++++++++++++++++++++++++++
->   2 files changed, 169 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 1c5d981e15c3..91e364804547 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -77,6 +77,42 @@ struct kvm_pgtable_walker {
->   	const enum kvm_pgtable_walk_flags	flags;
->   };
->   
-> +/**
-> + * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
-> + * @pgt:	Uninitialised page-table structure to initialise.
-> + * @va_bits:	Maximum virtual address bits.
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits);
-> +
-> +/**
-> + * kvm_pgtable_hyp_destroy() - Destroy an unused hypervisor stage-1 page-table.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
-> + *
-> + * The page-table is assumed to be unreachable by any hardware walkers prior
-> + * to freeing and therefore no TLB invalidation is performed.
-> + */
-> +void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
-> +
-> +/**
-> + * kvm_pgtable_hyp_map() - Install a mapping in a hypervisor stage-1 page-table.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
-> + * @addr:	Virtual address at which to place the mapping.
-> + * @size:	Size of the mapping.
-> + * @phys:	Physical address of the memory to map.
-> + * @prot:	Permissions and attributes for the mapping.
-> + *
-> + * If device attributes are not explicitly requested in @prot, then the
-> + * mapping will be normal, cacheable. Attempts to install a mapping for
-> + * a virtual address that is already mapped will be rejected with an error
-> + * and a WARN().
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
-> +			enum kvm_pgtable_prot prot);
-> +
->   /**
->    * kvm_pgtable_walk() - Walk a page-table.
->    * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 3fb9d1949a3f..23a1006aa4ef 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -24,8 +24,18 @@
->   
->   #define KVM_PTE_LEAF_ATTR_LO		GENMASK(11, 2)
->   
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP	GENMASK(7, 6)
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO	3
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW	1
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_SH	GENMASK(9, 8)
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS	3
-> +#define KVM_PTE_LEAF_ATTR_LO_S1_AF	BIT(10)
-> +
->   #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
->   
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> +
->   struct kvm_pgtable_walk_data {
->   	struct kvm_pgtable		*pgt;
->   	struct kvm_pgtable_walker	*walker;
-> @@ -283,3 +293,126 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   
->   	return _kvm_pgtable_walk(&walk_data);
->   }
-> +
-> +struct hyp_map_data {
-> +	u64		phys;
-> +	kvm_pte_t	attr;
-> +};
-> +
-> +static int hyp_map_set_prot_attr(enum kvm_pgtable_prot prot,
-> +				 struct hyp_map_data *data)
-> +{
-> +	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
-> +	u32 mtype = device ? MT_DEVICE_nGnRE : MT_NORMAL;
-> +	kvm_pte_t attr = FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX, mtype);
-> +	u32 sh = KVM_PTE_LEAF_ATTR_LO_S1_SH_IS;
-> +	u32 ap = (prot & KVM_PGTABLE_PROT_W) ? KVM_PTE_LEAF_ATTR_LO_S1_AP_RW :
-> +					       KVM_PTE_LEAF_ATTR_LO_S1_AP_RO;
-> +
-> +	if (!(prot & KVM_PGTABLE_PROT_R))
-> +		return -EINVAL;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_X) {
-> +		if (prot & KVM_PGTABLE_PROT_W)
-> +			return -EINVAL;
-> +
-> +		if (device)
-> +			return -EINVAL;
-> +	} else {
-> +		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-> +	}
-> +
-> +	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-> +	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
-> +	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
-> +	data->attr = attr;
-> +	return 0;
-> +}
-> +
-> +static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> +				    kvm_pte_t *ptep, struct hyp_map_data *data)
-> +{
-> +	u64 granule = kvm_granule_size(level), phys = data->phys;
-> +
-> +	if (!kvm_block_mapping_supported(addr, end, phys, level))
-> +		return false;
-> +
-> +	WARN_ON(!kvm_set_valid_leaf_pte(ptep, phys, data->attr, level));
-> +	data->phys += granule;
-> +	return true;
-> +}
-> +
-> +static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +			  enum kvm_pgtable_walk_flags flag, void * const arg)
-> +{
-> +	kvm_pte_t *childp;
-> +
-> +	if (hyp_map_walker_try_leaf(addr, end, level, ptep, arg))
-> +		return 0;
-> +
-> +	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
-> +		return -EINVAL;
-> +
-> +	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
-> +	if (!childp)
-> +		return -ENOMEM;
-> +
-> +	kvm_set_table_pte(ptep, childp);
-> +	return 0;
-> +}
-> +
-> +int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
-> +			enum kvm_pgtable_prot prot)
-> +{
-> +	int ret;
-> +	struct hyp_map_data map_data = {
-> +		.phys	= ALIGN_DOWN(phys, PAGE_SIZE),
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= hyp_map_walker,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +		.arg	= &map_data,
-> +	};
-> +
-> +	ret = hyp_map_set_prot_attr(prot, &map_data);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-> +	dsb(ishst);
-> +	isb();
-> +	return ret;
-> +}
-> +
-> +int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits)
-> +{
-> +	u64 levels = ARM64_HW_PGTABLE_LEVELS(va_bits);
-> +
-> +	pgt->pgd = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
-> +	if (!pgt->pgd)
-> +		return -ENOMEM;
-> +
-> +	pgt->ia_bits		= va_bits;
-> +	pgt->start_level	= KVM_PGTABLE_MAX_LEVELS - levels;
-> +	pgt->mmu		= NULL;
-> +	return 0;
-> +}
-> +
-> +static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +			   enum kvm_pgtable_walk_flags flag, void * const arg)
-> +{
-> +	free_page((unsigned long)kvm_pte_follow(*ptep));
-> +	return 0;
-> +}
-> +
-> +void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
-> +{
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= hyp_free_walker,
-> +		.flags	= KVM_PGTABLE_WALK_TABLE_POST,
-> +	};
-> +
-> +	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-> +	free_page((unsigned long)pgt->pgd);
-> +	pgt->pgd = NULL;
-> +}
-> 
+Since I have no idea whether it is better to use an event whitelist or
+blacklist, the proposed API takes a cue from the x86 version and allows
+either allowing or denying counting of ranges of events. The event space
+being pretty large (16bits on ARMv8.1), the default policy is set by the
+first filter that gets installed (default deny if we first allow, default
+allow if we first deny).
+
+The filter state is global to the guest, despite the PMU being per CPU. I'm
+not sure whether it would be worth it making it CPU-private.
+
+As an example of what can be done in userspace, I have the corresponding
+kvmtool hack here[1].
+
+* From v2:
+  - Split out the error handling refactor for clarity
+  - Added a terrible hack to fish out the PMU version, because BL is great
+  - Update the guest's view of PCMEID{0,1}_EL1
+  - General tidying up
+
+* From v1:
+  - Cleaned up handling of the cycle counter
+  - Documented restrictions on SW_INC, CHAIN and CPU_CYCLES events
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/commit/?h=pmu-filter
+
+Marc Zyngier (5):
+  KVM: arm64: Refactor PMU attribute error handling
+  KVM: arm64: Use event mask matching architecture revision
+  KVM: arm64: Add PMU event filtering infrastructure
+  KVM: arm64: Mask out filtered events in PCMEID{0,1}_EL1
+  KVM: arm64: Document PMU filtering API
+
+ Documentation/virt/kvm/devices/vcpu.rst |  46 ++++++
+ arch/arm64/include/asm/kvm_host.h       |   7 +
+ arch/arm64/include/uapi/asm/kvm.h       |  16 ++
+ arch/arm64/kvm/arm.c                    |   2 +
+ arch/arm64/kvm/pmu-emul.c               | 199 +++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c               |   5 +-
+ include/kvm/arm_pmu.h                   |   5 +
+ 7 files changed, 254 insertions(+), 26 deletions(-)
+
+-- 
+2.28.0
 
 _______________________________________________
 kvmarm mailing list
