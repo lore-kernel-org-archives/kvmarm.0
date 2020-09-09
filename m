@@ -1,62 +1,101 @@
-Return-Path: <SRS0=B0kT=CR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A771C433E2
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 16:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7319C43461
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 03:04:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF5E7206E7
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Sep 2020 16:36:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5E7206E7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 506EA2098B
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 03:04:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUiHeb9P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506EA2098B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 150894B19B;
-	Tue,  8 Sep 2020 12:36:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9431D4B37F;
+	Tue,  8 Sep 2020 23:04:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id elWUYV-nevq0; Tue,  8 Sep 2020 12:36:24 -0400 (EDT)
+	with ESMTP id YcX1rl8byMcg; Tue,  8 Sep 2020 23:04:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C923C4B1CA;
-	Tue,  8 Sep 2020 12:36:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 896324B3C3;
+	Tue,  8 Sep 2020 23:04:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1206F4B139
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 12:36:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEBE54B385
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 23:04:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vnx2IIQuiLis for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Sep 2020 12:36:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F9F4B119
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 12:36:22 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06F9D31B;
- Tue,  8 Sep 2020 09:36:22 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBB243F68F;
- Tue,  8 Sep 2020 09:36:20 -0700 (PDT)
-Subject: Re: [PATCH v4 16/21] KVM: arm64: Add support for relaxing stage-2
- perms in generic page-table code
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200907152344.12978-1-will@kernel.org>
- <20200907152344.12978-17-will@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <8f4ac895-361a-77f0-e68d-fc3b62cab385@arm.com>
-Date: Tue, 8 Sep 2020 17:37:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id G8JGqJHhW-jd for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Sep 2020 23:04:15 -0400 (EDT)
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com
+ [209.85.215.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFCF74B37F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Sep 2020 23:04:15 -0400 (EDT)
+Received: by mail-pg1-f194.google.com with SMTP id t14so981324pgl.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Sep 2020 20:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=C+IfSGe94xucF1QhV7eqJ/jdABpcZgXKQwlmBQeviCo=;
+ b=WUiHeb9P7f0IMWcOhpKSdim26wdrz0WACI9DJVJS9Rf6ALf9F9cAk6XMc0pK8KO1ic
+ YBTSW1kPediH4nT+Mbw19eVe2kh19tIigjpwfsLHNXh5mfTzb4iFHb6ORjRTSwaDkfvH
+ CsrgnHiEeOsLSfwy1J1AarsWh8Ag7iv7YBXNNXOWcgdYA9Z7TqmZyrJoQcL5ExAsLgWE
+ DmOcLzVpNyKFWvZY3IJUO+mU0qDedOnSkU5c9n9ee4hK/lhciJ9jC4pwvKV1xywuSR+4
+ IAlvMIyyy5x6plgIBiAyuHe7iWEHX8qKoPYDLqhxbsaJpVKhOLouZYLYXTOnSqdXsgBO
+ rBVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=C+IfSGe94xucF1QhV7eqJ/jdABpcZgXKQwlmBQeviCo=;
+ b=XOBgwwOxN+2DVhweNvYSVWw2J3c8dKFvCL/XtNJHa3hO60s7Ohr/sEiV9dwHSvEuj8
+ om8cJarQfyAKBirW+XD4kmyVI8hfZARWmbvAD49fZyVfw9kiFjltC7cnSJMdILI0Mv67
+ KgLkoS1R1fw/5RFCe06+mAzd21V6KQMKeaLWG4Hrg3XDXXnxBo9hCaiAw56hz6ZzpNs3
+ gZk6l9SMiUQs46AilGvFLN4YMFBwmD9NEBrQmtdjEOrr5Cf9DBCR8ROoD6LlrcodkUfp
+ M7UU00TsRslVSg8Kg3WvYPED1xjA1hb+WYkzMKYij63uA290QW88Bx5+nMIOnFDobNru
+ E8TQ==
+X-Gm-Message-State: AOAM530eeDgTD/ONDVRka79RxLsdMrIfSGh+uc6lQ3u075KzgW2gZyDu
+ QetGND24jfYE1NIyWgkbyltUDXvFsaQ=
+X-Google-Smtp-Source: ABdhPJwmc2Z0m7EDOxBIMnUo+vv6gABQGHJl1aUKYXH43c2UF//wN0cGJBCTsBPCw/kIMCqlXnpFMQ==
+X-Received: by 2002:a63:f70e:: with SMTP id x14mr1338922pgh.407.1599620654326; 
+ Tue, 08 Sep 2020 20:04:14 -0700 (PDT)
+Received: from [10.230.30.107] ([192.19.223.252])
+ by smtp.gmail.com with ESMTPSA id u10sm738927pfn.122.2020.09.08.20.04.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Sep 2020 20:04:13 -0700 (PDT)
+Subject: Re: [PATCH stable 4.19 v2 0/2] arm64: entry: Place an SB sequence
+ following an ERET instruction
+To: linux-arm-kernel@lists.infradead.org
+References: <1598294112-19197-1-git-send-email-f.fainelli@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <282ca27e-474c-ea1f-beba-52f361f16b20@gmail.com>
+Date: Tue, 8 Sep 2020 20:04:10 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.2.1
 MIME-Version: 1.0
-In-Reply-To: <20200907152344.12978-17-will@kernel.org>
+In-Reply-To: <1598294112-19197-1-git-send-email-f.fainelli@gmail.com>
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Fangrui Song <maskray@google.com>, Marc Zyngier <maz@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ open list <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Mark Brown <broonie@kernel.org>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ Sami Tolvanen <samitolvanen@google.com>, Greg KH <gregkh@linuxfoundation.org>,
+ Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,93 +107,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
 
-Minor nitpick below.
 
-On 9/7/20 4:23 PM, Will Deacon wrote:
-> Add support for relaxing the permissions of a stage-2 mapping (i.e.
-> adding additional permissions) to the generic page-table code.
->
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 17 +++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
->  2 files changed, 37 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index a776bcf74316..5ab4f852a463 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -218,6 +218,23 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr);
->   */
->  kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
->  
-> +/**
-> + * kvm_pgtable_stage2_relax_perms() - Relax the permissions enforced by a
-> + *				      page-table entry.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-> + * @addr:	Intermediate physical address to identify the page-table entry.
-> + * @prot:	Additional permissions to grant for the mapping.
-> + *
-> + * If there is a valid, leaf page-table entry used to translate @addr, then
-> + * relax the permissions in that entry according to the read, write and
-> + * execute permissions specified by @prot. No permissions are removed, and
-> + * TLB invalidation is performed after updating the entry.
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-> +				   enum kvm_pgtable_prot prot);
-> +
->  /**
->   * kvm_pgtable_stage2_is_young() - Test whether a page-table entry has the
->   *				   access flag set.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index ad18ce469041..df705533dc3f 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -782,6 +782,26 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
->  	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
->  }
->  
-> +int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-> +				   enum kvm_pgtable_prot prot)
-> +{
-> +	int ret;
-> +	kvm_pte_t set = 0, clr = 0;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_R)
-> +		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_W)
-> +		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_X)
-> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-> +
-> +	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL);
-> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, 0);
+On 8/24/2020 11:35 AM, Florian Fainelli wrote:
+> Changes in v2:
+> 
+> - included missing preliminary patch to define the SB barrier instruction
+> 
+> Will Deacon (2):
+>    arm64: Add support for SB barrier and patch in over DSB; ISB sequences
+>    arm64: entry: Place an SB sequence following an ERET instruction
 
-The level 0 argument could be replaced by S2_NO_LEVEL_HINT, which is self
-explanatory. However, that means the file needs to include stage2_pgtable.h.
+Does anybody at ARM or Android care about those changes? If so, would 
+you be willing to review these?
 
-Thanks,
-Alex
-> +	return ret;
-> +}
-> +
->  static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->  			       enum kvm_pgtable_walk_flags flag,
->  			       void * const arg)
+Thanks
+
+> 
+>   arch/arm64/include/asm/assembler.h  | 13 +++++++++++++
+>   arch/arm64/include/asm/barrier.h    |  4 ++++
+>   arch/arm64/include/asm/cpucaps.h    |  3 ++-
+>   arch/arm64/include/asm/sysreg.h     |  6 ++++++
+>   arch/arm64/include/asm/uaccess.h    |  3 +--
+>   arch/arm64/include/uapi/asm/hwcap.h |  1 +
+>   arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
+>   arch/arm64/kernel/cpuinfo.c         |  1 +
+>   arch/arm64/kernel/entry.S           |  2 ++
+>   arch/arm64/kvm/hyp/entry.S          |  1 +
+>   arch/arm64/kvm/hyp/hyp-entry.S      |  4 ++++
+>   11 files changed, 47 insertions(+), 3 deletions(-)
+> 
+
+-- 
+Florian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
