@@ -2,65 +2,85 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D9E8C10DAA
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 16:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D857BC43461
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:12:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A4CD2067C
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 16:04:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4CD2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 1E59B21919
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:12:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uh9RRLGt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E59B21919
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77B044B281;
-	Wed,  9 Sep 2020 12:04:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC694B24C;
+	Wed,  9 Sep 2020 13:12:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lXvOxrIq5WPs; Wed,  9 Sep 2020 12:04:22 -0400 (EDT)
+	with ESMTP id dXTmLbR08uhB; Wed,  9 Sep 2020 13:12:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26CAD4B29F;
-	Wed,  9 Sep 2020 12:04:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4824B306;
+	Wed,  9 Sep 2020 13:12:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7AB4B281
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 12:04:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2414D4B306
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:12:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8Os8auepwel9 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 12:04:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F78E4B26E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 12:04:19 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27522101E;
- Wed,  9 Sep 2020 09:04:19 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DC103F66E;
- Wed,  9 Sep 2020 09:04:17 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
-To: Andrew Jones <drjones@redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <857566df-1b98-84f7-9268-d092722dc749@arm.com>
-Date: Wed, 9 Sep 2020 17:04:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id 2B3I2QaMjw+A for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 13:12:32 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B16354B304
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:12:32 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 779AB206E6;
+ Wed,  9 Sep 2020 17:12:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599671551;
+ bh=v0g3QnFoVJU7n7iPmuQiCcTtp7sU8H7GnpEBbQ5WMxE=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Uh9RRLGtjjmyuwrqevOGc27Dwsri1dmOasiQsvBLdrl8suIVeGP9wWc2nUC13P7yP
+ HtWoO926E/qEzewMRqW4pyzI2mekH9gVFzRjOaQiREPmu3LvpnK5HaaEHIpIVOq+zD
+ in6qb1xaj3fcD1BYcUlDB/2y/aHx3vUDYlKdYcnA=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kG3e1-00AQVA-CE; Wed, 09 Sep 2020 18:12:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
-Content-Language: en-GB
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Date: Wed, 09 Sep 2020 18:12:29 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v4 17/21] KVM: arm64: Convert user_mem_abort() to generic
+ page-table API
+In-Reply-To: <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
+References: <20200907152344.12978-1-will@kernel.org>
+ <20200907152344.12978-18-will@kernel.org>
+ <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <c2e5e055251db637327f81da452cea2c@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, qperret@google.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, catalin.marinas@arm.com, gshan@redhat.com,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,140 +97,270 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/09/2020 16:25, Andrew Jones wrote:
-> On Fri, Sep 04, 2020 at 05:00:16PM +0100, Steven Price wrote:
->> Arm's Memory Tagging Extension (MTE) adds 4 bits of tag data to every 16
->> bytes of memory in the system. This along with stashing a tag within the
->> high bit of virtual addresses allows runtime checking of memory
->> accesses.
->>
->> These patches add support to KVM to enable MTE within a guest. They are
->> based on Catalin's v9 MTE user-space support series[1].
->>
->> I'd welcome feedback on the proposed user-kernel ABI. Specifically this
->> series currently:
->>
->     0. Feature probing
+Hi Alex,
+
+On 2020-09-09 15:20, Alexandru Elisei wrote:
+> Hi Will,
 > 
-> Probably a KVM cap, rather than requiring userspace to attempt VCPU
-> features one at a time with a scratch VCPU.
-
-Ah, good point - thanks for pointing that out.
-
->>   1. Requires the VMM to enable MTE per-VCPU.
+> On 9/7/20 4:23 PM, Will Deacon wrote:
+>> Convert user_mem_abort() to call kvm_pgtable_stage2_relax_perms() when
+>> handling a stage-2 permission fault and kvm_pgtable_stage2_map() when
+>> handling a stage-2 translation fault, rather than walking the 
+>> page-table
+>> manually.
+>> 
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Quentin Perret <qperret@google.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Will Deacon <will@kernel.org>
+>> ---
+>>  arch/arm64/kvm/mmu.c | 124 
+>> +++++++++++++++----------------------------
+>>  1 file changed, 44 insertions(+), 80 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 0af48f35c8dd..dc923e873dad 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1496,18 +1496,19 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  {
+>>  	int ret;
+>>  	bool write_fault, writable, force_pte = false;
+>> -	bool exec_fault, needs_exec;
+>> +	bool exec_fault;
+>> +	bool device = false;
+>>  	unsigned long mmu_seq;
+>> -	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+>>  	struct kvm *kvm = vcpu->kvm;
+>>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>>  	struct vm_area_struct *vma;
+>>  	short vma_shift;
+>> +	gfn_t gfn;
+>>  	kvm_pfn_t pfn;
+>> -	pgprot_t mem_type = PAGE_S2;
+>>  	bool logging_active = memslot_is_logging(memslot);
+>> -	unsigned long vma_pagesize, flags = 0;
+>> -	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
+>> +	unsigned long vma_pagesize;
+>> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>> +	struct kvm_pgtable *pgt;
+>> 
+>>  	write_fault = kvm_is_write_fault(vcpu);
+>>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+>> @@ -1540,22 +1541,24 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  		vma_pagesize = PAGE_SIZE;
+>>  	}
+>> 
+>> -	/*
+>> -	 * The stage2 has a minimum of 2 level table (For arm64 see
+>> -	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+>> -	 * use PMD_SIZE huge mappings (even when the PMD is folded into 
+>> PGD).
+>> -	 * As for PUD huge maps, we must make sure that we have at least
+>> -	 * 3 levels, i.e, PMD is not folded.
+>> -	 */
+>> -	if (vma_pagesize == PMD_SIZE ||
+>> -	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+>> -		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+>> +	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+>> +		fault_ipa &= huge_page_mask(hstate_vma(vma));
 > 
-> I suppose. We're collecting many features that are enabling CPU features,
-> so they map nicely to VCPU features, yet they're effectively VM features
-> due to a shared resource such as an irq or memory.
-
-Yeah this is a little weird I'll admit. The architectural feature is 
-described per-CPU (well "processing element"), but it makes little sense 
-to have it only on some CPUs and has effects on the rest of the memory 
-system. Given that it's theoretically possible to build e.g. a 
-big.LITTLE setup with only some CPUs support MTE it seemed more 
-future-proof to design the API to allow it even though I hope no-one 
-will use it.
-
->>   2. Automatically promotes (normal host) memory given to the guest to be
->>      tag enabled (sets PG_mte_tagged), if any VCPU has MTE enabled. The
->>      tags are cleared if the memory wasn't previously MTE enabled.
+> This looks correct to me - if !kvm_stage2_has_pmd(), then PMD is folded 
+> onto PUD
+> and PGD, and PMD_SIZE == PUD_SIZE. Also I like the fact that we update
+> gfn **and**
+> fault_ipa, the previous version updated only gfn, which made gfn !=
+> (fault_ipa >>
+> PAGE_SHIFT).
 > 
-> Shouldn't this be up to the guest? Or, is this required in order for the
-> guest to use tagging at all. Something like making the guest IPAs memtag
-> capable, but if the guest doesn't enable tagging then there is no guest
-> impact? In any case, shouldn't userspace be the one that adds PROT_MTE
-> to the memory regions it wants the guest to be able to use tagging with,
-> rather than KVM adding the attribute page by page?
-
-I think I've probably explained this badly.
-
-The guest can choose how to populate the stage 1 mapping - so can choose 
-which parts of memory are accessed tagged or not. However, the 
-hypervisor cannot restrict this in stage 2 (except by e.g. making the 
-memory uncached but that's obviously not great - however devices forward 
-to the guest can be handled like this).
-
-Because the hypervisor cannot restrict the guest's access to the tags, 
-the hypervisor must assume that all memory given to the guest could have 
-the tags accessed. So it must (a) clear any stale data from the tags, 
-and (b) ensure that the tags are preserved (e.g. when swapping pages out).
-
-Because of the above the current series automatically sets PG_mte_tagged 
-on the pages. Note that this doesn't change the mappings that the VMM 
-has (a non-PROT_MTE mapping will still not have access to the tags).
-
-It's a shame that the stage-2 can't usefully restrict tag access, but 
-this matches the architectural expectation: that if MTE is supported 
-then all standard memory will be MTE-enabled.
-
->>   3. Doesn't provide any new methods for the VMM to access the tags on
->>      memory.
->>
->> (2) and (3) are particularly interesting from the aspect of VM migration.
->> The guest is able to store/retrieve data in the tags (presumably for the
->> purpose of tag checking, but architecturally it could be used as just
->> storage). This means that when migrating a guest the data needs to be
->> transferred (or saved/restored).
->>
->> MTE tags are controlled by the same permission model as normal pages
->> (i.e. a read-only page has read-only tags), so the normal methods of
->> detecting guest changes to pages can be used. But this would also
->> require the tags within a page to be migrated at the same time as the
->> data (since the access control for tags is the same as the normal data
->> within a page).
->>
->> (3) may be problematic and I'd welcome input from those familiar with
->> VMMs. User space cannot access tags unless the memory is mapped with the
->> PROT_MTE flag. However enabling PROT_MTE will also enable tag checking
->> for the user space process (assuming the VMM enables tag checking for
->> the process) and since the tags in memory are controlled by the guest
->> it's unlikely the VMM would have an appropriately tagged pointer for its
->> access. This means the VMM would either need to maintain two mappings of
->> memory (one to access tags, the other to access data) or disable tag
->> checking during the accesses to data.
+>> +
+>> +	gfn = fault_ipa >> PAGE_SHIFT;
+>>  	mmap_read_unlock(current->mm);
+>> 
+>> -	/* We need minimum second+third level pages */
+>> -	ret = kvm_mmu_topup_memory_cache(memcache, 
+>> kvm_mmu_cache_min_pages(kvm));
+>> -	if (ret)
+>> -		return ret;
+>> +	/*
+>> +	 * Permission faults just need to update the existing leaf entry,
+>> +	 * and so normally don't require allocations from the memcache. The
+>> +	 * only exception to this is when dirty logging is enabled at 
+>> runtime
+>> +	 * and a write fault needs to collapse a block entry into a table.
+>> +	 */
+>> +	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+>> +		ret = kvm_mmu_topup_memory_cache(memcache,
+>> +						 kvm_mmu_cache_min_pages(kvm));
+>> +		if (ret)
+>> +			return ret;
+>> +	}
 > 
-> If userspace needs to write to guest memory then it should be due to
-> a device DMA or other specific hardware emulation. Those accesses can
-> be done with tag checking disabled.
-
-Yes, the question is can the VMM (sensibly) wrap the accesses with a 
-disable/renable tag checking for the process sequence. The alternative 
-at the moment is to maintain a separate (untagged) mapping for the 
-purpose which might present it's own problems.
-
->>
->> If it's not practical to either disable tag checking in the VMM or
->> maintain multiple mappings then the alternatives I'm aware of are:
->>
->>   * Provide a KVM-specific method to extract the tags from guest memory.
->>     This might also have benefits in terms of providing an easy way to
->>     read bulk tag data from guest memory (since the LDGM instruction
->>     isn't available at EL0).
+> I'm not 100% sure about this.
 > 
-> Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
-> the tags for all addresses of each dirty page.
-
-Certainly possible, although it seems to conflate two operations: "get 
-list of dirty pages", "get tags from page". It would also require a lot 
-of return space (size of slot/32).
-
->>   * Provide support for user space setting the TCMA0 or TCMA1 bits in
->>     TCR_EL1. These would allow the VMM to generate pointers which are not
->>     tag checked.
+> I don't think we gain much over the previous code - if we had allocated 
+> cache
+> objects which we hadn't used, we would have used them next time 
+> user_mem_abort()
+> is called (kvm_mmu_topup_memory_cache() checks if we have the required 
+> number of
+> objects in the cache and returns early).
 > 
-> So this is necessary to allow the VMM to keep tag checking enabled for
-> itself, plus map guest memory as PROT_MTE, and write to that memory when
-> needed?
+> I'm not sure the condition is entirely correct either - if stage 2 
+> already has a
+> mapping for the IPA and we only need to set write permissions, 
+> according to the
+> condition above we still try to topup the cache, even though we don't 
+> strictly
+> need to.
 
-This is certainly one option. The architecture provides two "magic" 
-values (all-0s and all-1s) which can be configured using TCMAx to be 
-treated differently. The VMM could therefore construct pointers to 
-otherwise tagged memory which would be treated as untagged.
+That's because if you are logging, you may have to split an existing 
+block
+mapping and map a single page instead. This requires (at least) an extra
+level, and that's why you need to top-up the cache in this case.
 
-However, Catalin's user space series doesn't at the moment expose this 
-functionality.
+> 
+>> 
+>>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>>  	/*
+>> @@ -1578,28 +1581,20 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  		return -EFAULT;
+>> 
+>>  	if (kvm_is_device_pfn(pfn)) {
+>> -		mem_type = PAGE_S2_DEVICE;
+>> -		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
+>> -	} else if (logging_active) {
+>> -		/*
+>> -		 * Faults on pages in a memslot with logging enabled
+>> -		 * should not be mapped with huge pages (it introduces churn
+>> -		 * and performance degradation), so force a pte mapping.
+>> -		 */
+>> -		flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
+>> -
+>> +		device = true;
+>> +	} else if (logging_active && !write_fault) {
+>>  		/*
+>>  		 * Only actually map the page as writable if this was a write
+>>  		 * fault.
+>>  		 */
+>> -		if (!write_fault)
+>> -			writable = false;
+>> +		writable = false;
+>>  	}
+>> 
+>> -	if (exec_fault && is_iomap(flags))
+>> +	if (exec_fault && device)
+>>  		return -ENOEXEC;
+>> 
+>>  	spin_lock(&kvm->mmu_lock);
+>> +	pgt = vcpu->arch.hw_mmu->pgt;
+>>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>>  		goto out_unlock;
+>> 
+>> @@ -1610,62 +1605,31 @@ static int user_mem_abort(struct kvm_vcpu 
+>> *vcpu, phys_addr_t fault_ipa,
+>>  	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>>  							   &pfn, &fault_ipa);
+>> -	if (writable)
+>> +	if (writable) {
+>> +		prot |= KVM_PGTABLE_PROT_W;
+>>  		kvm_set_pfn_dirty(pfn);
+>> +		mark_page_dirty(kvm, gfn);
+> 
+> The previous code called mark_page_dirty() only if the vma_pagesize == 
+> PAGE_SIZE
+> (and writable was true, obviously). Is this supposed to fix a bug?
 
-Steve
+No, this is actually introducing one. mark_page_dirty() checks that 
+there is an
+associated bitmap, and thus only happens when writing to a single page, 
+but we
+shouldn't do it for R/O memslots, which the current code avoids. It 
+should be
+guarded by logging_active.
+
+> 
+>> +	}
+>> 
+>> -	if (fault_status != FSC_PERM && !is_iomap(flags))
+>> +	if (fault_status != FSC_PERM && !device)
+>>  		clean_dcache_guest_page(pfn, vma_pagesize);
+>> 
+>> -	if (exec_fault)
+>> +	if (exec_fault) {
+>> +		prot |= KVM_PGTABLE_PROT_X;
+>>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+>> +	}
+>> 
+>> -	/*
+>> -	 * If we took an execution fault we have made the
+>> -	 * icache/dcache coherent above and should now let the s2
+>> -	 * mapping be executable.
+>> -	 *
+>> -	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
+>> -	 * execute permissions, and we preserve whatever we have.
+>> -	 */
+>> -	needs_exec = exec_fault ||
+>> -		(fault_status == FSC_PERM &&
+>> -		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
+>> -
+>> -	if (vma_pagesize == PUD_SIZE) {
+>> -		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
+>> -
+>> -		new_pud = kvm_pud_mkhuge(new_pud);
+>> -		if (writable)
+>> -			new_pud = kvm_s2pud_mkwrite(new_pud);
+>> -
+>> -		if (needs_exec)
+>> -			new_pud = kvm_s2pud_mkexec(new_pud);
+>> -
+>> -		ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
+>> -	} else if (vma_pagesize == PMD_SIZE) {
+>> -		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
+>> -
+>> -		new_pmd = kvm_pmd_mkhuge(new_pmd);
+>> -
+>> -		if (writable)
+>> -			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+>> -
+>> -		if (needs_exec)
+>> -			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+>> +	if (device)
+>> +		prot |= KVM_PGTABLE_PROT_DEVICE;
+>> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+>> +		prot |= KVM_PGTABLE_PROT_X;
+>> 
+>> -		ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
+>> +	if (fault_status == FSC_PERM && !(logging_active && writable)) {
+> 
+> I don't understand the second part of the condition (!(logging_active 
+> &&
+> writable)). With logging active, when we get a fault because of a
+> missing stage 2
+> entry, we map the IPA as read-only at stage 2. If I understand this 
+> code
+> correctly, when the guest then tries to write to the same IPA, writable 
+> == true
+> and we map the IPA again instead of relaxing the permissions. Why is 
+> that?
+
+See my reply above: logging means potentially adding a new level, so we
+treat it as a new mapping altogether (break the block mapping, TLBI, 
+install
+the new mapping one level down).
+
+All the other cases are happily handled by just relaxing the 
+permissions.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
