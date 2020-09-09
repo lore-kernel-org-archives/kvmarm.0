@@ -2,92 +2,88 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C609C43461
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A6AC43461
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:46:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9E0C3215A4
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:30:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1B00215A4
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 08:46:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PoOUXp6N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E0C3215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NGnnfN7r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B00215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD80A4B5EC;
-	Wed,  9 Sep 2020 04:30:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AE314B571;
+	Wed,  9 Sep 2020 04:46:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vvyExLuvw1OL; Wed,  9 Sep 2020 04:30:47 -0400 (EDT)
+	with ESMTP id N4gklnCsI9fm; Wed,  9 Sep 2020 04:46:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C50E24B5B6;
-	Wed,  9 Sep 2020 04:30:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 143724B41D;
+	Wed,  9 Sep 2020 04:46:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C53414B5B6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 04:30:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A5B4B41D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 04:44:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BhPqIa4hOivq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 04:30:45 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A08D54B5AE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 04:30:45 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id a17so1953914wrn.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2020 01:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=vNr2Ku1gGljilbGPEXcAx4EZtt5jVI1d5RcXLInGtb4=;
- b=PoOUXp6NbO1PbgnGP/chdt9lnZCh95AhtuD3rox2+jyV9udkzI+tqmzOuBsywgaRox
- gnpwwMffZ0fAkR3+xn7wEju6UAZWSxk3yVHDrDsitM6IMGZonEXRXovNQ8sdOl5hYG3x
- E5r7YDVfX663k4hv/BGAHOWjMF8GMctg9gJh7SLxtGZjeV+fCPdS7kWkLbYFbW/q6uMC
- BvAnLHnxz8m3tbaomWp+TGOWAaUUEaMyDh7zPuJFyhEVcew9xzEY+L41AeHveLONrl8T
- y/prKnlsJq4zFq48GweKTMJiey7EtHcWdWbg8dS0zPgyG855wkVyVRUcpp9tTwxYm0Xt
- F1gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=vNr2Ku1gGljilbGPEXcAx4EZtt5jVI1d5RcXLInGtb4=;
- b=NJ8f4a0IFZrdVtBIgZkcnq0awBl6JcxaVtg3RdH7c9C+N3yBDpIvLoOOdL23XUnVTw
- Fc1+sIM0+ysyN4CJZUmvxCkpCDAuAjB6BBxxrKJ4q+poxdqRrGDBomI5buegmtPvYxr9
- RuYMGrFQhNI4g/m225ZQx7GiMpGF/9DKPREpdjVCSKWF3rI5P4vocaktZht9/5aiRwnu
- LC9osIdyqnALORzUGY3ks85Z3hGJjBza1kXLGBUrCGFMwUed1oM0DFrh1EQA3nX76r2c
- wVqFlAL6HZiaM3j6839QjLu9djDOsNWjqkaMCy7g7eC9dX3udhzrTBPUkij+NSU6+kqw
- XhHA==
-X-Gm-Message-State: AOAM532rMXUeYn76nRuZQgnDflS8/hMEVBW3VCdH83KS9PJPg5RXZuiu
- u3bRqDAfJqykfkmAKS94JVtf/w==
-X-Google-Smtp-Source: ABdhPJw+71hj8Nq8tqsAAF8sQjgZxHrQ2bOt+j5Y9np5WDNJVjmT47uqrLWSNezwkBA1xUJZ09fWKQ==
-X-Received: by 2002:a5d:67d2:: with SMTP id n18mr2614673wrw.223.1599640244388; 
- Wed, 09 Sep 2020 01:30:44 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- by smtp.gmail.com with ESMTPSA id u66sm2872821wme.12.2020.09.09.01.30.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 01:30:43 -0700 (PDT)
-Date: Wed, 9 Sep 2020 09:30:39 +0100
-From: Andrew Scull <ascull@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 16/18] KVM: arm64: nVHE: Migrate hyp interface to SMCCC
-Message-ID: <20200909083039.GA93664@google.com>
-References: <20200903135307.251331-1-ascull@google.com>
- <20200903135307.251331-17-ascull@google.com>
- <87o8mhlld4.wl-maz@kernel.org>
- <20200908110222.GF3268721@google.com>
+ with ESMTP id Fg2t29RebKlm for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 04:43:56 -0400 (EDT)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com
+ [207.171.184.29])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78BCB4B3F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 04:43:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1599641037; x=1631177037;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=lHG13q4oh+i/9HDrkU/99B0v9sg5oHwRUwfGLVJvGbg=;
+ b=NGnnfN7rN9MwvyMHoaDjrGEPr3dNsO+S6WB5Q1SlJFPY9VZj+hsHV0tX
+ DqGSRJT1S1HMphxLceG3c7tn/yH8pvo0XZfbVkSkuwFB/trdm5iJFce6x
+ Iccw4fJ1PsJhuXUhNLye5tKBQuzwFBp36FpHAoJQNgcvp3ZW6zygaFuLI A=;
+X-IronPort-AV: E=Sophos;i="5.76,409,1592870400"; d="scan'208";a="74720871"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
+ email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com) ([10.47.23.38])
+ by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP;
+ 09 Sep 2020 08:43:51 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+ by email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com (Postfix) with ESMTPS
+ id 67F78A1836; Wed,  9 Sep 2020 08:43:50 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 9 Sep 2020 08:43:49 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.162.55) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 9 Sep 2020 08:43:46 +0000
+Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+To: Andrew Jones <drjones@redhat.com>
+References: <20200908205730.23898-1-graf@amazon.com>
+ <20200909062534.zsqadaeewfeqsgsj@kamzik.brq.redhat.com>
+From: Alexander Graf <graf@amazon.com>
+Message-ID: <fcb9ccab-2118-af76-3109-4d491d888c7c@amazon.com>
+Date: Wed, 9 Sep 2020 10:43:41 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.2.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200908110222.GF3268721@google.com>
-Cc: kernel-team@android.com, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200909062534.zsqadaeewfeqsgsj@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.55]
+X-ClientProxiedBy: EX13D17UWC003.ant.amazon.com (10.43.162.206) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+X-Mailman-Approved-At: Wed, 09 Sep 2020 04:46:23 -0400
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Robin Murphy <robin.murphy@arm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,80 +95,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 08, 2020 at 12:02:22PM +0100, Andrew Scull wrote:
-> On Mon, Sep 07, 2020 at 03:20:07PM +0100, Marc Zyngier wrote:
-> > On Thu, 03 Sep 2020 14:53:05 +0100,
-> > Andrew Scull <ascull@google.com> wrote:
-> > > 
-> > > Rather than passing arbitrary function pointers to run at hyp, define
-> > > and equivalent set of SMCCC functions.
-> > > 
-> > > Since the SMCCC functions are strongly tied to the original function
-> > > prototypes, it is not expected for the host to ever call an invalid ID
-> > > but a warning is raised if this does ever occur.
-> > > 
-> > > As __kvm_vcpu_run is used for every switch between the host and a guest,
-> > > it is explicitly singled out to be identified before the other function
-> > > IDs to improve the performance of the hot path.
-> > > 
-> > > Signed-off-by: Andrew Scull <ascull@google.com>
-> > > Signed-off-by: David Brazdil <dbrazdil@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_asm.h   |  24 ++++++
-> > >  arch/arm64/include/asm/kvm_host.h  |  25 ++++---
-> > >  arch/arm64/kvm/arm.c               |   2 +-
-> > >  arch/arm64/kvm/hyp.S               |  24 ++----
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 113 +++++++++++++++++++++++++----
-> > >  5 files changed, 145 insertions(+), 43 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > > index 4bbde3d3989c..4a73f1349151 100644
-> > > --- a/arch/arm64/include/asm/kvm_asm.h
-> > > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > > @@ -38,6 +38,30 @@
-> > >  
-> > >  #define __SMCCC_WORKAROUND_1_SMC_SZ 36
-> > >  
-> > > +#define KVM_HOST_SMCCC_ID(id)						\
-> > > +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> > > +			   ARM_SMCCC_SMC_64,				\
-> > > +			   ARM_SMCCC_OWNER_STANDARD_HYP,		\
-> > > +			   (id))
-> > > +
-> > > +#define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
-> > > +
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		1
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		2
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		3
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	4
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		5
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			6
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_ich_vtr_el2		8
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
-> > > +#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
-> > > +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
-> > 
-> > Wait. This looks broken. How do you distinguish between these and the
-> > stubs?
-> 
-> The __KVM_HOST_SMCCC_FUNC_* definitions are just the function ID part of
-> the SMCCC x0 argument. KVM_HOST_SMCCC_ID builds it into a 64-bit
-> fastcall owner by the hypervisor. The stubs fall into the legacy region
-> so these don't conflict.
+Hey Drew!
 
-Looking again made me realize that I was using the service call region
-for hypervisor standards rather than vendor hypervisors so I'll be
-defining the vendor hyp region in arm-smccc.h to make use of here.
+On 09.09.20 08:25, Andrew Jones wrote:
+> 
+> On Tue, Sep 08, 2020 at 10:57:30PM +0200, Alexander Graf wrote:
+>> We currently pass through the number of PMU counters that we have available
+>> in hardware to guests. So if my host supports 10 concurrently active PMU
+>> counters, my guest will be able to spawn 10 counters as well.
+>>
+>> This is undesireable if we also want to use the PMU on the host for
+>> monitoring. In that case, we want to split the PMU between guest and
+>> host.
+>>
+>> To help that case, let's add a PMU attr that allows us to limit the number
+>> of PMU counters that we expose. With this patch in place, user space can
+>> keep some counters free for host use.
+> 
+> Hi Alex,
+> 
+> Is there any reason to use the device API instead of just giving the user
+> control over the necessary PMCR_EL0 bits through set/get-one-reg?
+
+I mostly used the attr interface because I was in that particular mental 
+mode after looking at the filtering bits :).
+
+Today, the PMCR_EL0 register gets reset implicitly on every vcpu reset 
+call. How would we persist the counter field across resets? Would we in 
+the first place?
+
+I'm slightly hazy how the ONE_REG API would look like here. Do you have 
+recommendations?
+
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
