@@ -7,60 +7,56 @@ X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28420C433E2
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 10:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A52DAC433E2
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 14:19:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5EDFF21D7A
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 10:56:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EDFF21D7A
+	by mail.kernel.org (Postfix) with ESMTP id EE2D522206
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 14:19:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2D522206
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A40BF4B3CA;
-	Wed,  9 Sep 2020 06:56:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C8484B1F5;
+	Wed,  9 Sep 2020 10:19:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9J27Q4O-cxJR; Wed,  9 Sep 2020 06:56:28 -0400 (EDT)
+	with ESMTP id 5n0oSM1btr6F; Wed,  9 Sep 2020 10:19:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E704B52B;
-	Wed,  9 Sep 2020 06:56:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C20854B27B;
+	Wed,  9 Sep 2020 10:19:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 112524B3C6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 06:56:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A13614B201
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 10:19:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MwLfJgGyVrWF for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 06:56:26 -0400 (EDT)
+ with ESMTP id n4sitgTMplJu for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 10:19:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC6F24B3B1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 06:56:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 340724B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 10:19:22 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CEB531B;
- Wed,  9 Sep 2020 03:56:26 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B671031B;
+ Wed,  9 Sep 2020 07:19:21 -0700 (PDT)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CB323F68F;
- Wed,  9 Sep 2020 03:56:25 -0700 (PDT)
-Subject: Re: [PATCH v3 09/21] KVM: arm64: Convert unmap_stage2_range() to
- generic page-table API
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74E813F66E;
+ Wed,  9 Sep 2020 07:19:20 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Will Deacon <will@kernel.org>
-References: <20200825093953.26493-1-will@kernel.org>
- <20200825093953.26493-10-will@kernel.org>
- <1f2e88b7-0265-195f-3bd8-4e1d5b8694e3@arm.com>
- <20200903175702.GA8078@willie-the-truck>
- <c9c30b62-601a-41e9-3821-6f9c2802d97f@arm.com>
-Message-ID: <3aaf6f41-2a28-910b-553c-7a9e98d91165@arm.com>
-Date: Wed, 9 Sep 2020 11:57:26 +0100
+Subject: Re: [PATCH v4 17/21] KVM: arm64: Convert user_mem_abort() to generic
+ page-table API
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200907152344.12978-1-will@kernel.org>
+ <20200907152344.12978-18-will@kernel.org>
+Message-ID: <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
+Date: Wed, 9 Sep 2020 15:20:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <c9c30b62-601a-41e9-3821-6f9c2802d97f@arm.com>
+In-Reply-To: <20200907152344.12978-18-will@kernel.org>
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,74 +75,234 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Will,
 
-I'm answering my own question, again. See below.
-
-On 9/8/20 2:07 PM, Alexandru Elisei wrote:
-> Hi Will,
+On 9/7/20 4:23 PM, Will Deacon wrote:
+> Convert user_mem_abort() to call kvm_pgtable_stage2_relax_perms() when
+> handling a stage-2 permission fault and kvm_pgtable_stage2_map() when
+> handling a stage-2 translation fault, rather than walking the page-table
+> manually.
 >
-> On 9/3/20 6:57 PM, Will Deacon wrote:
->> On Wed, Sep 02, 2020 at 05:23:08PM +0100, Alexandru Elisei wrote:
->>> On 8/25/20 10:39 AM, Will Deacon wrote:
->>>> Convert unmap_stage2_range() to use kvm_pgtable_stage2_unmap() instead
->>>> of walking the page-table directly.
->>>>
->>>> Cc: Marc Zyngier <maz@kernel.org>
->>>> Cc: Quentin Perret <qperret@google.com>
->>>> Signed-off-by: Will Deacon <will@kernel.org>
->>>> ---
->>>>  arch/arm64/kvm/mmu.c | 57 +++++++++++++++++++++++++-------------------
->>>>  1 file changed, 32 insertions(+), 25 deletions(-)
->>>>
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 704b471a48ce..751ce2462765 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -39,6 +39,33 @@ static bool is_iomap(unsigned long flags)
->>>>  	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
->>>>  }
->>>>  
->>>> +/*
->>>> + * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
->>>> + * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
->>>> + * CONFIG_LOCKUP_DETECTOR, CONFIG_LOCKDEP. Additionally, holding the lock too
->>>> + * long will also starve other vCPUs. We have to also make sure that the page
->>>> + * tables are not freed while we released the lock.
->>>> + */
->>>> +#define stage2_apply_range(kvm, addr, end, fn, resched)			\
->>>> +({									\
->>>> +	int ret;							\
->>>> +	struct kvm *__kvm = (kvm);					\
->>>> +	bool __resched = (resched);					\
->>>> +	u64 next, __addr = (addr), __end = (end);			\
->>>> +	do {								\
->>>> +		struct kvm_pgtable *pgt = __kvm->arch.mmu.pgt;		\
->>>> +		if (!pgt)						\
->>>> +			break;						\
->>> I'm 100% sure there's a reason why we've dropped the READ_ONCE, but it still looks
->>> to me like the compiler might decide to optimize by reading pgt once at the start
->>> of the loop and stashing it in a register. Would you mind explaining what I am
->>> missing?
->> The load always happens with the mmu_lock held, so I think it's not a
->> problem because it means that the pointer is stable.
->> spin_lock()/spin_unlock() imply compiler barriers.
-> I think you are correct, if this is supposed to always execute with kvm->mmu_lock
-> held, then pgt should not change between iterations. It didn't immediately occur
-> to me that that is the case because we check if pgt is NULL every iteration. If we
-> are relying on the lock being held, maybe we should move the pgt load + comparison
-> against NULL out of the loop? That should avoid any confusion and make the code
-> ever so slightly faster.
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 124 +++++++++++++++----------------------------
+>  1 file changed, 44 insertions(+), 80 deletions(-)
 >
-> Also, I see that in __unmap_stage2_range() we check that the mmu_lock is held, but
-> we don't check that at all call sites (for example, in stage2_wp_range()). I
-> realize this is me bikeshedding, but that looks a bit asymmetrical. Should we move
-> the assert_spin_locked(&kvm->mmu_lock) statement in stage2_apply_range(), since
-> the function assumes the pgt will remain unchanged? What do you think?
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 0af48f35c8dd..dc923e873dad 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1496,18 +1496,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  {
+>  	int ret;
+>  	bool write_fault, writable, force_pte = false;
+> -	bool exec_fault, needs_exec;
+> +	bool exec_fault;
+> +	bool device = false;
+>  	unsigned long mmu_seq;
+> -	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>  	struct vm_area_struct *vma;
+>  	short vma_shift;
+> +	gfn_t gfn;
+>  	kvm_pfn_t pfn;
+> -	pgprot_t mem_type = PAGE_S2;
+>  	bool logging_active = memslot_is_logging(memslot);
+> -	unsigned long vma_pagesize, flags = 0;
+> -	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
+> +	unsigned long vma_pagesize;
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> +	struct kvm_pgtable *pgt;
+>  
+>  	write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+> @@ -1540,22 +1541,24 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		vma_pagesize = PAGE_SIZE;
+>  	}
+>  
+> -	/*
+> -	 * The stage2 has a minimum of 2 level table (For arm64 see
+> -	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+> -	 * use PMD_SIZE huge mappings (even when the PMD is folded into PGD).
+> -	 * As for PUD huge maps, we must make sure that we have at least
+> -	 * 3 levels, i.e, PMD is not folded.
+> -	 */
+> -	if (vma_pagesize == PMD_SIZE ||
+> -	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+> -		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+> +	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+> +		fault_ipa &= huge_page_mask(hstate_vma(vma));
 
-What I wrote is wrong, because we can drop the lock in cond_resched_lock(). I
-don't see the need for any changes.
+This looks correct to me - if !kvm_stage2_has_pmd(), then PMD is folded onto PUD
+and PGD, and PMD_SIZE == PUD_SIZE. Also I like the fact that we update gfn **and**
+fault_ipa, the previous version updated only gfn, which made gfn != (fault_ipa >>
+PAGE_SHIFT).
+
+> +
+> +	gfn = fault_ipa >> PAGE_SHIFT;
+>  	mmap_read_unlock(current->mm);
+>  
+> -	/* We need minimum second+third level pages */
+> -	ret = kvm_mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm));
+> -	if (ret)
+> -		return ret;
+> +	/*
+> +	 * Permission faults just need to update the existing leaf entry,
+> +	 * and so normally don't require allocations from the memcache. The
+> +	 * only exception to this is when dirty logging is enabled at runtime
+> +	 * and a write fault needs to collapse a block entry into a table.
+> +	 */
+> +	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+> +		ret = kvm_mmu_topup_memory_cache(memcache,
+> +						 kvm_mmu_cache_min_pages(kvm));
+> +		if (ret)
+> +			return ret;
+> +	}
+
+I'm not 100% sure about this.
+
+I don't think we gain much over the previous code - if we had allocated cache
+objects which we hadn't used, we would have used them next time user_mem_abort()
+is called (kvm_mmu_topup_memory_cache() checks if we have the required number of
+objects in the cache and returns early).
+
+I'm not sure the condition is entirely correct either - if stage 2 already has a
+mapping for the IPA and we only need to set write permissions, according to the
+condition above we still try to topup the cache, even though we don't strictly
+need to.
+
+>  
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	/*
+> @@ -1578,28 +1581,20 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  
+>  	if (kvm_is_device_pfn(pfn)) {
+> -		mem_type = PAGE_S2_DEVICE;
+> -		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
+> -	} else if (logging_active) {
+> -		/*
+> -		 * Faults on pages in a memslot with logging enabled
+> -		 * should not be mapped with huge pages (it introduces churn
+> -		 * and performance degradation), so force a pte mapping.
+> -		 */
+> -		flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
+> -
+> +		device = true;
+> +	} else if (logging_active && !write_fault) {
+>  		/*
+>  		 * Only actually map the page as writable if this was a write
+>  		 * fault.
+>  		 */
+> -		if (!write_fault)
+> -			writable = false;
+> +		writable = false;
+>  	}
+>  
+> -	if (exec_fault && is_iomap(flags))
+> +	if (exec_fault && device)
+>  		return -ENOEXEC;
+>  
+>  	spin_lock(&kvm->mmu_lock);
+> +	pgt = vcpu->arch.hw_mmu->pgt;
+>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>  		goto out_unlock;
+>  
+> @@ -1610,62 +1605,31 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>  							   &pfn, &fault_ipa);
+> -	if (writable)
+> +	if (writable) {
+> +		prot |= KVM_PGTABLE_PROT_W;
+>  		kvm_set_pfn_dirty(pfn);
+> +		mark_page_dirty(kvm, gfn);
+
+The previous code called mark_page_dirty() only if the vma_pagesize == PAGE_SIZE
+(and writable was true, obviously). Is this supposed to fix a bug?
+
+> +	}
+>  
+> -	if (fault_status != FSC_PERM && !is_iomap(flags))
+> +	if (fault_status != FSC_PERM && !device)
+>  		clean_dcache_guest_page(pfn, vma_pagesize);
+>  
+> -	if (exec_fault)
+> +	if (exec_fault) {
+> +		prot |= KVM_PGTABLE_PROT_X;
+>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+> +	}
+>  
+> -	/*
+> -	 * If we took an execution fault we have made the
+> -	 * icache/dcache coherent above and should now let the s2
+> -	 * mapping be executable.
+> -	 *
+> -	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
+> -	 * execute permissions, and we preserve whatever we have.
+> -	 */
+> -	needs_exec = exec_fault ||
+> -		(fault_status == FSC_PERM &&
+> -		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
+> -
+> -	if (vma_pagesize == PUD_SIZE) {
+> -		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
+> -
+> -		new_pud = kvm_pud_mkhuge(new_pud);
+> -		if (writable)
+> -			new_pud = kvm_s2pud_mkwrite(new_pud);
+> -
+> -		if (needs_exec)
+> -			new_pud = kvm_s2pud_mkexec(new_pud);
+> -
+> -		ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
+> -	} else if (vma_pagesize == PMD_SIZE) {
+> -		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
+> -
+> -		new_pmd = kvm_pmd_mkhuge(new_pmd);
+> -
+> -		if (writable)
+> -			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+> -
+> -		if (needs_exec)
+> -			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+> +	if (device)
+> +		prot |= KVM_PGTABLE_PROT_DEVICE;
+> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+> +		prot |= KVM_PGTABLE_PROT_X;
+>  
+> -		ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
+> +	if (fault_status == FSC_PERM && !(logging_active && writable)) {
+
+I don't understand the second part of the condition (!(logging_active &&
+writable)). With logging active, when we get a fault because of a missing stage 2
+entry, we map the IPA as read-only at stage 2. If I understand this code
+correctly, when the guest then tries to write to the same IPA, writable == true
+and we map the IPA again instead of relaxing the permissions. Why is that?
 
 Thanks,
 Alex
+> +		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+>  	} else {
+> -		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
+> -
+> -		if (writable) {
+> -			new_pte = kvm_s2pte_mkwrite(new_pte);
+> -			mark_page_dirty(kvm, gfn);
+> -		}
+> -
+> -		if (needs_exec)
+> -			new_pte = kvm_s2pte_mkexec(new_pte);
+> -
+> -		ret = stage2_set_pte(mmu, memcache, fault_ipa, &new_pte, flags);
+> +		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+> +					     __pfn_to_phys(pfn), prot,
+> +					     memcache);
+>  	}
+>  
+>  out_unlock:
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
