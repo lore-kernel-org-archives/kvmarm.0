@@ -2,85 +2,81 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9F0C43461
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 22:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A7AC433E2
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 23:06:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1E12E21D7E
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 22:47:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E12E21D7E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
+	by mail.kernel.org (Postfix) with ESMTP id F236A21D92
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 23:06:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OylkBU69"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F236A21D92
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B9F4B22F;
-	Wed,  9 Sep 2020 18:47:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61CD64B3B4;
+	Wed,  9 Sep 2020 19:06:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sQ+uT+4UQTNN; Wed,  9 Sep 2020 18:47:35 -0400 (EDT)
+	with ESMTP id 6irs98vWEuJm; Wed,  9 Sep 2020 19:06:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81B2C4B3B8;
-	Wed,  9 Sep 2020 18:47:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12E1C4B358;
+	Wed,  9 Sep 2020 19:06:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3E84B230
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 18:47:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD04F4B34F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 19:06:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xZv5udA5nKfn for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 18:47:33 -0400 (EDT)
-Received: from smtprelay.hostedemail.com (smtprelay0179.hostedemail.com
- [216.40.44.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512604B22F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 18:47:33 -0400 (EDT)
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net
- [216.40.38.60])
- by smtprelay07.hostedemail.com (Postfix) with ESMTP id A42B7181D337B;
- Wed,  9 Sep 2020 22:47:32 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: sort28_6003546270e1
-X-Filterd-Recvd-Size: 3292
-Received: from XPS-9350.home (unknown [47.151.133.149])
- (Authenticated sender: joe@perches.com)
- by omf20.hostedemail.com (Postfix) with ESMTPA;
- Wed,  9 Sep 2020 22:47:25 +0000 (UTC)
-Message-ID: <b3d6f71aea87f4bb88554f1a3fdaee0b2feb158c.camel@perches.com>
-Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough; to
- break;
-From: Joe Perches <joe@perches.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Date: Wed, 09 Sep 2020 15:47:24 -0700
-In-Reply-To: <20200909223602.GJ87483@ziepe.ca>
-References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
- <20200909223602.GJ87483@ziepe.ca>
-User-Agent: Evolution 3.36.4-0ubuntu1 
+ with ESMTP id OZ6Tx3GbZlld for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 19:06:41 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B9BD4B345
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 19:06:41 -0400 (EDT)
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com
+ [209.85.167.177])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6319C21D94
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 23:06:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599692800;
+ bh=e4ObHx53TshJuNw+x6ABTNcL79UDdm3SKoa26EKEcr4=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=OylkBU69KC2ObOw3Y2f/qWESvm721PISifaUxMZ8tadfm1xs7ig5tnQ2mWUbFTrJR
+ WUenHIR/CT+Z5RDequpCWaofBnCDBeVaSyv9sIjrXO5mhzNFyQkBNkxBeH2Y2EG53d
+ 6xeNWu+C/y05EL34FDCVRfMvfmDf9jOqYZ5/rkyQ=
+Received: by mail-oi1-f177.google.com with SMTP id x19so4104865oix.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2020 16:06:40 -0700 (PDT)
+X-Gm-Message-State: AOAM533fUW+rNH3PXLXkql924Aekx/hGCnQR7Vr9LB7NmeXAVWIwMvF2
+ NcX5XGqf3tlilntjfA6efE6IQYMup/deUXqEZA==
+X-Google-Smtp-Source: ABdhPJyCTgHBrqd0NXE8Ds/y2GNDv68P5YNPu7qcquPL2kNDhQSf3Yr4vlMrqCN0geHRZB2j/iesbSou1/AXekuDxVs=
+X-Received: by 2002:aca:fc07:: with SMTP id a7mr2118270oii.106.1599692799649; 
+ Wed, 09 Sep 2020 16:06:39 -0700 (PDT)
 MIME-Version: 1.0
-Cc: linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
- oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
- alsa-devel <alsa-devel@alsa-project.org>, dri-devel@lists.freedesktop.org,
- linux-mips@vger.kernel.org, linux-ide@vger.kernel.org, dm-devel@redhat.com,
- linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
- sparclinux@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-rtc@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-atm-general@lists.sourceforge.net, linux-afs@lists.infradead.org,
- coreteam@netfilter.org, intel-wired-lan@lists.osuosl.org,
- linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
- linux-mmc@vger.kernel.org, Kees Cook <kees.cook@canonical.com>,
- linux-media@vger.kernel.org, linux-pm@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, linux-sctp@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org,
- storagedev@microchip.com, ceph-devel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
- Jiri Kosina <trivial@kernel.org>, linux-parisc@vger.kernel.org,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- Nick Desaulniers <ndesaulniers@google.com>,
- LKML <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org,
- netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20200803193127.3012242-1-robh@kernel.org>
+ <20200803193127.3012242-4-robh@kernel.org>
+ <20200821120659.GB6823@gaia> <20200821121209.GB20833@willie-the-truck>
+ <20200821122633.GC6823@gaia> <8c641833ff20d5a35981c456d4fe1d5a@kernel.org>
+ <20200821140525.GD6823@gaia> <4bc5ca546826da4682ec3b126052daea@kernel.org>
+ <20200821175116.GE6823@gaia>
+In-Reply-To: <20200821175116.GE6823@gaia>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 9 Sep 2020 17:06:28 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJ-s6gkJm=Hh7Rc4LBp0QN0czzb0FC=U=DtKhqKWb7xjA@mail.gmail.com>
+Message-ID: <CAL_JsqJ-s6gkJm=Hh7Rc4LBp0QN0czzb0FC=U=DtKhqKWb7xjA@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] arm64: Add workaround for Arm Cortex-A77 erratum
+ 1508412
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,37 +93,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 2020-09-09 at 19:36 -0300, Jason Gunthorpe wrote:
-> On Wed, Sep 09, 2020 at 01:06:39PM -0700, Joe Perches wrote:
-> > fallthrough to a separate case/default label break; isn't very readable.
-> > 
-> > Convert pseudo-keyword fallthrough; statements to a simple break; when
-> > the next label is case or default and the only statement in the next
-> > label block is break;
-> > 
-> > Found using:
-> > 
-> > $ grep-2.5.4 -rP --include=*.[ch] -n "fallthrough;(\s*(case\s+\w+|default)\s*:\s*){1,7}break;" *
-> > 
-> > Miscellanea:
-> > 
-> > o Move or coalesce a couple label blocks above a default: block.
-> > 
-> > Signed-off-by: Joe Perches <joe@perches.com>
-> > ---
-> > 
-> > Compiled allyesconfig x86-64 only.
-> > A few files for other arches were not compiled.
-> 
-> IB part looks OK, I prefer it like this
-> 
-> You could do the same for continue as well, I saw a few of those..
+On Fri, Aug 21, 2020 at 11:51 AM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> On Fri, Aug 21, 2020 at 06:02:39PM +0100, Marc Zyngier wrote:
+> > On 2020-08-21 15:05, Catalin Marinas wrote:
+> > > On Fri, Aug 21, 2020 at 01:45:40PM +0100, Marc Zyngier wrote:
+> > > > On 2020-08-21 13:26, Catalin Marinas wrote:
+> > > > > On Fri, Aug 21, 2020 at 01:12:10PM +0100, Will Deacon wrote:
+> > > > > > On Fri, Aug 21, 2020 at 01:07:00PM +0100, Catalin Marinas wrote:
+> > > > > > > On Mon, Aug 03, 2020 at 01:31:27PM -0600, Rob Herring wrote:
+> > > > > > > > @@ -979,6 +980,14 @@
+> > > > > > > >           write_sysreg(__scs_new, sysreg);                        \
+> > > > > > > >  } while (0)
+> > > > > > > >
+> > > > > > > > +#define read_sysreg_par() ({                                             \
+> > > > > > > > + u64 par;                                                        \
+> > > > > > > > + asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));    \
+> > > > > > > > + par = read_sysreg(par_el1);                                     \
+> > > > > > > > + asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));    \
+> > > > > > > > + par;                                                            \
+> > > > > > > > +})
+> > > > > > >
+> > > > > > > I was about to queue this up but one more point to clarify: can we get
+> > > > > > > an interrupt at either side of the PAR_EL1 read and the handler do a
+> > > > > > > device read, triggering the erratum? Do we need a DMB at exception
+> > > > > > > entry/return?
+> > > > > >
+> > > > > > Disabling irqs around the PAR access would be simpler, I think
+> > > > > > (assuming
+> > > > > > this is needed).
+> > > > >
+> > > > > This wouldn't work if it interrupts a guest.
+> > > >
+> > > > If we take an interrupt either side of the PAR_EL1 read and that we
+> > > > fully exit, the saving of PAR_EL1 on the way out solves the problem.
+> > > >
+> > > > If we don't fully exit, but instead reenter the guest immediately
+> > > > (fixup_guest_exit() returns true), we'd need a DMB at that point,
+> > > > at least because of the GICv2 proxying code which performs device
+> > > > accesses on the guest's behalf.
+> > >
+> > > If you are ok with the diff below, I can fold it in:
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > index ca88ea416176..8770cf7ccd42 100644
+> > > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > @@ -420,7 +420,7 @@ static inline bool fixup_guest_exit(struct
+> > > kvm_vcpu *vcpu, u64 *exit_code)
+> > >     if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+> > >         kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 &&
+> > >         handle_tx2_tvm(vcpu))
+> > > -           return true;
+> > > +           goto guest;
+> > >
+> > >     /*
+> > >      * We trap the first access to the FP/SIMD to save the host context
+> > > @@ -430,13 +430,13 @@ static inline bool fixup_guest_exit(struct
+> > > kvm_vcpu *vcpu, u64 *exit_code)
+> > >      * Similarly for trapped SVE accesses.
+> > >      */
+> > >     if (__hyp_handle_fpsimd(vcpu))
+> > > -           return true;
+> > > +           goto guest;
+> > >
+> > >     if (__hyp_handle_ptrauth(vcpu))
+> > > -           return true;
+> > > +           goto guest;
+> > >
+> > >     if (!__populate_fault_info(vcpu))
+> > > -           return true;
+> > > +           goto guest;
+> > >
+> > >     if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
+> > >             bool valid;
+> > > @@ -451,7 +451,7 @@ static inline bool fixup_guest_exit(struct
+> > > kvm_vcpu *vcpu, u64 *exit_code)
+> > >                     int ret = __vgic_v2_perform_cpuif_access(vcpu);
+> > >
+> > >                     if (ret == 1)
+> > > -                           return true;
+> > > +                           goto guest;
+> > >
+> > >                     /* Promote an illegal access to an SError.*/
+> > >                     if (ret == -1)
+> > > @@ -467,12 +467,17 @@ static inline bool fixup_guest_exit(struct
+> > > kvm_vcpu *vcpu, u64 *exit_code)
+> > >             int ret = __vgic_v3_perform_cpuif_access(vcpu);
+> > >
+> > >             if (ret == 1)
+> > > -                   return true;
+> > > +                   goto guest;
+> > >     }
+> > >
+> > >  exit:
+> > >     /* Return to the host kernel and handle the exit */
+> > >     return false;
+> > > +
+> > > +guest:
+> > > +   /* Re-enter the guest */
+> > > +   asm(ALTERNATIVE("nop", "dmb sy", ARM64_WORKAROUND_1508412));
+> > > +   return true;
+> > >  }
+> > >
+> > >  static inline bool __needs_ssbd_off(struct kvm_vcpu *vcpu)
+> >
+> > Looks good to me!
+>
+> Thanks Marc. Since it needs the local_irq_save() around the PAR_EL1
+> access in read_sysreg_par(), I'll wait for Rob to update the patches.
+> Rob also asked the hardware guys for clarification on this scenario, so
+> let's see what they reply.
 
-I saw some continue uses as well but wasn't sure
-and didn't look to see if the switch/case with
-continue was in a for/while loop.
+According to the h/w folks, an interrupt after the PAR read is not an
+issue, but an interrupt doing a device read between the 1st DMB and
+the PAR read would be an issue. So v5 coming your way.
 
-
+Rob
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
