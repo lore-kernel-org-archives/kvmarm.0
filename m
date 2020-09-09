@@ -2,85 +2,84 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D857BC43461
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B41C10DAA
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:14:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1E59B21919
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC73B21919
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 17:14:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uh9RRLGt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E59B21919
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyCTlaBo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC73B21919
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC694B24C;
-	Wed,  9 Sep 2020 13:12:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 219FF4B2C7;
+	Wed,  9 Sep 2020 13:14:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dXTmLbR08uhB; Wed,  9 Sep 2020 13:12:36 -0400 (EDT)
+	with ESMTP id DmKE1ugKG4DX; Wed,  9 Sep 2020 13:14:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4824B306;
-	Wed,  9 Sep 2020 13:12:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDFB14B375;
+	Wed,  9 Sep 2020 13:14:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2414D4B306
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:12:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 141514B36A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:14:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2B3I2QaMjw+A for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 13:12:32 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B16354B304
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:12:32 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id l5WPy7hP5j6j for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 13:14:38 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F235D4B2C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 13:14:37 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599671677;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rMR60tcDoXO9K50xEszi4aUwon86WuC1gxtUvojZvdU=;
+ b=LyCTlaBoIeDP1fE/1m8HkIZSZwka+Ajm1+huCfUGaEZghruWm/xGfOeOwDFHcuCixvtWG9
+ tHsKD0zbrUJ8Np47bDm2GZG18SGApn1ipVnILKiw2OZ5CrbyL8hAnnmvb+T6pZVlUjIMS2
+ 7dxgtn8ToIMk/xc8hra7gmdnIVPuDA0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-czylzb4sNfWf3kVGBQE8zw-1; Wed, 09 Sep 2020 13:14:33 -0400
+X-MC-Unique: czylzb4sNfWf3kVGBQE8zw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 779AB206E6;
- Wed,  9 Sep 2020 17:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599671551;
- bh=v0g3QnFoVJU7n7iPmuQiCcTtp7sU8H7GnpEBbQ5WMxE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Uh9RRLGtjjmyuwrqevOGc27Dwsri1dmOasiQsvBLdrl8suIVeGP9wWc2nUC13P7yP
- HtWoO926E/qEzewMRqW4pyzI2mekH9gVFzRjOaQiREPmu3LvpnK5HaaEHIpIVOq+zD
- in6qb1xaj3fcD1BYcUlDB/2y/aHx3vUDYlKdYcnA=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kG3e1-00AQVA-CE; Wed, 09 Sep 2020 18:12:29 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3CFE805EE8;
+ Wed,  9 Sep 2020 17:14:31 +0000 (UTC)
+Received: from [10.36.115.123] (ovpn-115-123.ams2.redhat.com [10.36.115.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A88F9838B0;
+ Wed,  9 Sep 2020 17:14:27 +0000 (UTC)
+Subject: Re: [PATCH v3 3/5] KVM: arm64: Add PMU event filtering infrastructure
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <20200908075830.1161921-1-maz@kernel.org>
+ <20200908075830.1161921-4-maz@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <85e5a904-b1be-5fd5-e420-3b9da3fdde54@redhat.com>
+Date: Wed, 9 Sep 2020 19:14:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Date: Wed, 09 Sep 2020 18:12:29 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 17/21] KVM: arm64: Convert user_mem_abort() to generic
- page-table API
-In-Reply-To: <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
-References: <20200907152344.12978-1-will@kernel.org>
- <20200907152344.12978-18-will@kernel.org>
- <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <c2e5e055251db637327f81da452cea2c@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, qperret@google.com, james.morse@arm.com,
- suzuki.poulose@arm.com, catalin.marinas@arm.com, gshan@redhat.com,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20200908075830.1161921-4-maz@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: kernel-team@android.com, graf@amazon.com,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,275 +91,222 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+Hi Marc,
 
-On 2020-09-09 15:20, Alexandru Elisei wrote:
-> Hi Will,
+On 9/8/20 9:58 AM, Marc Zyngier wrote:
+> It can be desirable to expose a PMU to a guest, and yet not want the
+> guest to be able to count some of the implemented events (because this
+> would give information on shared resources, for example.
 > 
-> On 9/7/20 4:23 PM, Will Deacon wrote:
->> Convert user_mem_abort() to call kvm_pgtable_stage2_relax_perms() when
->> handling a stage-2 permission fault and kvm_pgtable_stage2_map() when
->> handling a stage-2 translation fault, rather than walking the 
->> page-table
->> manually.
->> 
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Quentin Perret <qperret@google.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> Signed-off-by: Will Deacon <will@kernel.org>
->> ---
->>  arch/arm64/kvm/mmu.c | 124 
->> +++++++++++++++----------------------------
->>  1 file changed, 44 insertions(+), 80 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 0af48f35c8dd..dc923e873dad 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1496,18 +1496,19 @@ static int user_mem_abort(struct kvm_vcpu 
->> *vcpu, phys_addr_t fault_ipa,
->>  {
->>  	int ret;
->>  	bool write_fault, writable, force_pte = false;
->> -	bool exec_fault, needs_exec;
->> +	bool exec_fault;
->> +	bool device = false;
->>  	unsigned long mmu_seq;
->> -	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
->>  	struct kvm *kvm = vcpu->kvm;
->>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->>  	struct vm_area_struct *vma;
->>  	short vma_shift;
->> +	gfn_t gfn;
->>  	kvm_pfn_t pfn;
->> -	pgprot_t mem_type = PAGE_S2;
->>  	bool logging_active = memslot_is_logging(memslot);
->> -	unsigned long vma_pagesize, flags = 0;
->> -	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
->> +	unsigned long vma_pagesize;
->> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
->> +	struct kvm_pgtable *pgt;
->> 
->>  	write_fault = kvm_is_write_fault(vcpu);
->>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
->> @@ -1540,22 +1541,24 @@ static int user_mem_abort(struct kvm_vcpu 
->> *vcpu, phys_addr_t fault_ipa,
->>  		vma_pagesize = PAGE_SIZE;
->>  	}
->> 
->> -	/*
->> -	 * The stage2 has a minimum of 2 level table (For arm64 see
->> -	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
->> -	 * use PMD_SIZE huge mappings (even when the PMD is folded into 
->> PGD).
->> -	 * As for PUD huge maps, we must make sure that we have at least
->> -	 * 3 levels, i.e, PMD is not folded.
->> -	 */
->> -	if (vma_pagesize == PMD_SIZE ||
->> -	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
->> -		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->> +	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
->> +		fault_ipa &= huge_page_mask(hstate_vma(vma));
+> For this, let's extend the PMUv3 device API, and offer a way to setup a
+> bitmap of the allowed events (the default being no bitmap, and thus no
+> filtering).
 > 
-> This looks correct to me - if !kvm_stage2_has_pmd(), then PMD is folded 
-> onto PUD
-> and PGD, and PMD_SIZE == PUD_SIZE. Also I like the fact that we update
-> gfn **and**
-> fault_ipa, the previous version updated only gfn, which made gfn !=
-> (fault_ipa >>
-> PAGE_SHIFT).
+> Userspace can thus allow/deny ranges of event. The default policy
+> depends on the "polarity" of the first filter setup (default deny if the
+> filter allows events, and default allow if the filter denies events).
+> This allows to setup exactly what is allowed for a given guest.
 > 
->> +
->> +	gfn = fault_ipa >> PAGE_SHIFT;
->>  	mmap_read_unlock(current->mm);
->> 
->> -	/* We need minimum second+third level pages */
->> -	ret = kvm_mmu_topup_memory_cache(memcache, 
->> kvm_mmu_cache_min_pages(kvm));
->> -	if (ret)
->> -		return ret;
->> +	/*
->> +	 * Permission faults just need to update the existing leaf entry,
->> +	 * and so normally don't require allocations from the memcache. The
->> +	 * only exception to this is when dirty logging is enabled at 
->> runtime
->> +	 * and a write fault needs to collapse a block entry into a table.
->> +	 */
->> +	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
->> +		ret = kvm_mmu_topup_memory_cache(memcache,
->> +						 kvm_mmu_cache_min_pages(kvm));
->> +		if (ret)
->> +			return ret;
->> +	}
+> Note that although the ioctl is per-vcpu, the map of allowed events is
+> global to the VM (it can be setup from any vcpu until the vcpu PMU is
+> initialized).
 > 
-> I'm not 100% sure about this.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  5 +++
+>  arch/arm64/include/uapi/asm/kvm.h | 16 +++++++
+>  arch/arm64/kvm/arm.c              |  2 +
+>  arch/arm64/kvm/pmu-emul.c         | 70 ++++++++++++++++++++++++++++---
+>  4 files changed, 87 insertions(+), 6 deletions(-)
 > 
-> I don't think we gain much over the previous code - if we had allocated 
-> cache
-> objects which we hadn't used, we would have used them next time 
-> user_mem_abort()
-> is called (kvm_mmu_topup_memory_cache() checks if we have the required 
-> number of
-> objects in the cache and returns early).
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 6cd60be69c28..1e64260b7e2b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -111,6 +111,11 @@ struct kvm_arch {
+>  	 */
+>  	bool return_nisv_io_abort_to_user;
+>  
+> +	/*
+> +	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+> +	 * up to 2^10 events (ARMv8.0) or 2^16 events (ARMv8.1+).
+> +	 */
+> +	unsigned long *pmu_filter;
+>  	unsigned int pmuver;
+>  };
+>  
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index ba85bb23f060..7b1511d6ce44 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -159,6 +159,21 @@ struct kvm_sync_regs {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +/*
+> + * PMU filter structure. Describe a range of events with a particular
+> + * action. To be used with KVM_ARM_VCPU_PMU_V3_FILTER.
+> + */
+> +struct kvm_pmu_event_filter {
+> +	__u16	base_event;
+> +	__u16	nevents;
+> +
+> +#define KVM_PMU_EVENT_ALLOW	0
+> +#define KVM_PMU_EVENT_DENY	1
+> +
+> +	__u8	action;
+> +	__u8	pad[3];
+> +};
+> +
+>  /* for KVM_GET/SET_VCPU_EVENTS */
+>  struct kvm_vcpu_events {
+>  	struct {
+> @@ -329,6 +344,7 @@ struct kvm_vcpu_events {
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+>  #define   KVM_ARM_VCPU_PMU_V3_INIT	1
+> +#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 691d21e4c717..0f11d0009c17 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -145,6 +145,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  {
+>  	int i;
+>  
+> +	bitmap_free(kvm->arch.pmu_filter);
+> +
+>  	kvm_vgic_destroy(kvm);
+>  
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 8a5f65763814..67a731bafbc9 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -30,6 +30,7 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+>  	case 6:			/* ARMv8.5 */
+>  		return GENMASK(15, 0);
+>  	default:		/* Shouldn't be there, just for sanity */
+> +		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
+rather belongs to previous patch
+>  		return 0;
+>  	}
+>  }
+> @@ -592,11 +593,21 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  	data = __vcpu_sys_reg(vcpu, reg);
+>  
+>  	kvm_pmu_stop_counter(vcpu, pmc);
+> -	eventsel = data & kvm_pmu_event_mask(vcpu->kvm);;
+> +	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> +		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+So from a filter pov the cycle counter is assimilated to the event
+counter CPU_CYCLES event (0x11). I see there are some differences
+between PMCCNTR and 0x11 counting (wrt PMCR, ...) though. Shouldn't we
+mention the cycle counter is getting filtered as well
+> +	else
+> +		eventsel = data & kvm_pmu_event_mask(vcpu->kvm);
+> +
+> +	/* Software increment event doesn't need to be backed by a perf event */
+> +	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR)
+> +		return;
+>  
+> -	/* Software increment event does't need to be backed by a perf event */
+> -	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
+> -	    pmc->idx != ARMV8_PMU_CYCLE_IDX)
+> +	/*
+> +	 * If we have a filter in place and that the event isn't allowed, do
+> +	 * not install a perf event either.
+> +	 */
+> +	if (vcpu->kvm->arch.pmu_filter &&
+> +	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
+>  		return;
+>  
+>  	memset(&attr, 0, sizeof(struct perf_event_attr));
+> @@ -608,8 +619,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+>  	attr.exclude_hv = 1; /* Don't count EL2 events */
+>  	attr.exclude_host = 1; /* Don't count host events */
+> -	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
+> -		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+> +	attr.config = eventsel;
+>  
+>  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+>  
+> @@ -892,6 +902,53 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		vcpu->arch.pmu.irq_num = irq;
+>  		return 0;
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_FILTER: {
+> +		struct kvm_pmu_event_filter __user *uaddr;
+> +		struct kvm_pmu_event_filter filter;
+> +		int nr_events;
+> +
+> +		nr_events = kvm_pmu_event_mask(vcpu->kvm) + 1;
+> +
+> +		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
+> +
+> +		if (copy_from_user(&filter, uaddr, sizeof(filter)))
+> +			return -EFAULT;
+> +
+> +		if (((u32)filter.base_event + filter.nevents) > nr_events ||
+> +		    (filter.action != KVM_PMU_EVENT_ALLOW &&
+> +		     filter.action != KVM_PMU_EVENT_DENY))
+> +			return -EINVAL;
+> +
+> +		mutex_lock(&vcpu->kvm->lock);
+> +
+> +		if (!vcpu->kvm->arch.pmu_filter) {
+> +			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL);
+> +			if (!vcpu->kvm->arch.pmu_filter) {
+> +				mutex_unlock(&vcpu->kvm->lock);
+> +				return -ENOMEM;
+> +			}
+> +
+> +			/*
+> +			 * The default depends on the first applied filter.
+> +			 * If it allows events, the default is to deny.
+> +			 * Conversely, if the first filter denies a set of
+> +			 * events, the default is to allow.
+> +			 */
+> +			if (filter.action == KVM_PMU_EVENT_ALLOW)
+> +				bitmap_zero(vcpu->kvm->arch.pmu_filter, nr_events);
+> +			else
+> +				bitmap_fill(vcpu->kvm->arch.pmu_filter, nr_events);
+> +		}
+> +
+> +		if (filter.action == KVM_PMU_EVENT_ALLOW)
+> +			bitmap_set(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+> +		else
+> +			bitmap_clear(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+> +
+> +		mutex_unlock(&vcpu->kvm->lock);
+> +
+> +		return 0;
+> +	}
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>  		return kvm_arm_pmu_v3_init(vcpu);
+>  	}
+> @@ -928,6 +985,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+> +	case KVM_ARM_VCPU_PMU_V3_FILTER:
+>  		if (kvm_arm_support_pmu_v3() &&
+>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  			return 0;
 > 
-> I'm not sure the condition is entirely correct either - if stage 2 
-> already has a
-> mapping for the IPA and we only need to set write permissions, 
-> according to the
-> condition above we still try to topup the cache, even though we don't 
-> strictly
-> need to.
+Thanks
 
-That's because if you are logging, you may have to split an existing 
-block
-mapping and map a single page instead. This requires (at least) an extra
-level, and that's why you need to top-up the cache in this case.
+Eric
 
-> 
->> 
->>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->>  	/*
->> @@ -1578,28 +1581,20 @@ static int user_mem_abort(struct kvm_vcpu 
->> *vcpu, phys_addr_t fault_ipa,
->>  		return -EFAULT;
->> 
->>  	if (kvm_is_device_pfn(pfn)) {
->> -		mem_type = PAGE_S2_DEVICE;
->> -		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
->> -	} else if (logging_active) {
->> -		/*
->> -		 * Faults on pages in a memslot with logging enabled
->> -		 * should not be mapped with huge pages (it introduces churn
->> -		 * and performance degradation), so force a pte mapping.
->> -		 */
->> -		flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
->> -
->> +		device = true;
->> +	} else if (logging_active && !write_fault) {
->>  		/*
->>  		 * Only actually map the page as writable if this was a write
->>  		 * fault.
->>  		 */
->> -		if (!write_fault)
->> -			writable = false;
->> +		writable = false;
->>  	}
->> 
->> -	if (exec_fault && is_iomap(flags))
->> +	if (exec_fault && device)
->>  		return -ENOEXEC;
->> 
->>  	spin_lock(&kvm->mmu_lock);
->> +	pgt = vcpu->arch.hw_mmu->pgt;
->>  	if (mmu_notifier_retry(kvm, mmu_seq))
->>  		goto out_unlock;
->> 
->> @@ -1610,62 +1605,31 @@ static int user_mem_abort(struct kvm_vcpu 
->> *vcpu, phys_addr_t fault_ipa,
->>  	if (vma_pagesize == PAGE_SIZE && !force_pte)
->>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->>  							   &pfn, &fault_ipa);
->> -	if (writable)
->> +	if (writable) {
->> +		prot |= KVM_PGTABLE_PROT_W;
->>  		kvm_set_pfn_dirty(pfn);
->> +		mark_page_dirty(kvm, gfn);
-> 
-> The previous code called mark_page_dirty() only if the vma_pagesize == 
-> PAGE_SIZE
-> (and writable was true, obviously). Is this supposed to fix a bug?
-
-No, this is actually introducing one. mark_page_dirty() checks that 
-there is an
-associated bitmap, and thus only happens when writing to a single page, 
-but we
-shouldn't do it for R/O memslots, which the current code avoids. It 
-should be
-guarded by logging_active.
-
-> 
->> +	}
->> 
->> -	if (fault_status != FSC_PERM && !is_iomap(flags))
->> +	if (fault_status != FSC_PERM && !device)
->>  		clean_dcache_guest_page(pfn, vma_pagesize);
->> 
->> -	if (exec_fault)
->> +	if (exec_fault) {
->> +		prot |= KVM_PGTABLE_PROT_X;
->>  		invalidate_icache_guest_page(pfn, vma_pagesize);
->> +	}
->> 
->> -	/*
->> -	 * If we took an execution fault we have made the
->> -	 * icache/dcache coherent above and should now let the s2
->> -	 * mapping be executable.
->> -	 *
->> -	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
->> -	 * execute permissions, and we preserve whatever we have.
->> -	 */
->> -	needs_exec = exec_fault ||
->> -		(fault_status == FSC_PERM &&
->> -		 stage2_is_exec(mmu, fault_ipa, vma_pagesize));
->> -
->> -	if (vma_pagesize == PUD_SIZE) {
->> -		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->> -
->> -		new_pud = kvm_pud_mkhuge(new_pud);
->> -		if (writable)
->> -			new_pud = kvm_s2pud_mkwrite(new_pud);
->> -
->> -		if (needs_exec)
->> -			new_pud = kvm_s2pud_mkexec(new_pud);
->> -
->> -		ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
->> -	} else if (vma_pagesize == PMD_SIZE) {
->> -		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
->> -
->> -		new_pmd = kvm_pmd_mkhuge(new_pmd);
->> -
->> -		if (writable)
->> -			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
->> -
->> -		if (needs_exec)
->> -			new_pmd = kvm_s2pmd_mkexec(new_pmd);
->> +	if (device)
->> +		prot |= KVM_PGTABLE_PROT_DEVICE;
->> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
->> +		prot |= KVM_PGTABLE_PROT_X;
->> 
->> -		ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
->> +	if (fault_status == FSC_PERM && !(logging_active && writable)) {
-> 
-> I don't understand the second part of the condition (!(logging_active 
-> &&
-> writable)). With logging active, when we get a fault because of a
-> missing stage 2
-> entry, we map the IPA as read-only at stage 2. If I understand this 
-> code
-> correctly, when the guest then tries to write to the same IPA, writable 
-> == true
-> and we map the IPA again instead of relaxing the permissions. Why is 
-> that?
-
-See my reply above: logging means potentially adding a new level, so we
-treat it as a new mapping altogether (break the block mapping, TLBI, 
-install
-the new mapping one level down).
-
-All the other cases are happily handled by just relaxing the 
-permissions.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
