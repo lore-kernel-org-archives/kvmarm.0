@@ -2,104 +2,83 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F07C433E2
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 15:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA1DC433E2
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 15:25:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A650F20C09
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 15:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A041522272
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 15:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCm0NzJu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A650F20C09
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYkMbvbj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A041522272
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F072A4B5F8;
-	Wed,  9 Sep 2020 11:20:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFBD54B5FE;
+	Wed,  9 Sep 2020 11:25:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oCbjl5dUh8Ir; Wed,  9 Sep 2020 11:20:38 -0400 (EDT)
+	with ESMTP id d8Jr-I3qO6l5; Wed,  9 Sep 2020 11:25:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E68674B343;
-	Wed,  9 Sep 2020 11:20:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96E8B4B5FA;
+	Wed,  9 Sep 2020 11:25:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33C8D4B2F3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 11:20:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72EE14B5EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 11:25:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oJ2dTo-pa3kh for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 11:20:36 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CE144B2EE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 11:20:36 -0400 (EDT)
+ with ESMTP id xVEQhmIvhAWp for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 11:25:54 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [205.139.110.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CBBA4B2F3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 11:25:54 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599664836;
+ s=mimecast20190719; t=1599665153;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nYNO+AKEPgBW6vTBqHGF1fYVln/0uSeBDRwExSc81XY=;
- b=JCm0NzJuq/7qiguisi4BkcVIPeOFfvfeCKnyEnrzL0B/c3FwMIQMPGB4oJTZN1Le7xnymY
- XfgdbgwXMxYVdPS/fBb9NBr/1Y64jT5eRZ+jjU9M9kaSIglCQbUiy1kPh0WWsMocfCG4G7
- gt7UVJngxDIDnvBYCZcWaH9KiTcrhQM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-LaJ_gEjjPEC2RkHdROfJFw-1; Wed, 09 Sep 2020 11:20:34 -0400
-X-MC-Unique: LaJ_gEjjPEC2RkHdROfJFw-1
-Received: by mail-ej1-f72.google.com with SMTP id gt18so1429092ejb.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2020 08:20:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nYNO+AKEPgBW6vTBqHGF1fYVln/0uSeBDRwExSc81XY=;
- b=aoRqnaI0EnlrU976RsSHW5fzHqqLkiH32vZ/KUjaHGtS5pXb59gwS7PVuQ2ct8oIOB
- LeehPAnCOFYiN6oaXYePuPzPjgMWQN5FR99IugAvIDRrc1KWh/4kZPLSOT0H369vrwS2
- LDhl9oAElUJjycVQFVkOtCUPIz8JUYp0tE87b0gWUY5UkqJp+nS6PAO6pREK2FTOFHhm
- w2yD/h3/QiATk36tpKmnHB5lIu5MhQJ84ll0jolqWCm3s6PmlM0yvu8bwm169Tzjg/1J
- U2wVfKJpAMvBjhfBczJvtn7TptcwMf+gmgtBYLHY7rKn4MqASCo62Lssib0pChPI8T+y
- d0tw==
-X-Gm-Message-State: AOAM530d0eFaZuvdASz6St+YjJD9FI1GPiJ8Ned726qR8kxSo840lteB
- 5vDKHoTdxGOV/7l+JjQn0XhsosFJfk5qTZOEVR20srSNDLMcq0yyikjZKLknUhUObu0y+sc3tBo
- httmfc+EwRz2TkCtHeyhFz8rw
-X-Received: by 2002:aa7:c1c3:: with SMTP id d3mr4712084edp.228.1599664832317; 
- Wed, 09 Sep 2020 08:20:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/buxcR3k3TYh22ywGq6QmpgD+APHFSZ/u2IydDFW2LmR/OY3181D7GwPj31tu14P28jmFEw==
-X-Received: by 2002:aa7:c1c3:: with SMTP id d3mr4712059edp.228.1599664832099; 
- Wed, 09 Sep 2020 08:20:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4025:be55:3943:81a0?
- ([2001:b07:6468:f312:4025:be55:3943:81a0])
- by smtp.gmail.com with ESMTPSA id b10sm2399995eje.65.2020.09.09.08.20.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 08:20:31 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.9
-To: Marc Zyngier <maz@kernel.org>
-References: <20200904104530.1082676-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7afbf0f-2e14-2720-5d23-2cd01982e4d1@redhat.com>
-Date: Wed, 9 Sep 2020 17:20:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=S0HGwn08RTZDvSiMKGm+kokg7Mfm7dvHTLJh8SzogJA=;
+ b=JYkMbvbjTbFY/6all5du3qwzJl50c//GzGBJap5dPAm+u0y6JywBF0+/CC01MoHZ8syYVJ
+ CWUgoxQGX4W5NeA8mbCCLDARzcxDTwJ35jShI8AZKD7g6QOluvcJstQWVMhPCo17j54+2U
+ ucDBU8L+t4BjAkr4QvOpk7kNw5Jlzwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-8uZ_4VOWNSiimj2WvWYA1w-1; Wed, 09 Sep 2020 11:25:50 -0400
+X-MC-Unique: 8uZ_4VOWNSiimj2WvWYA1w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9E011017DC3;
+ Wed,  9 Sep 2020 15:25:47 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 457655C1C2;
+ Wed,  9 Sep 2020 15:25:44 +0000 (UTC)
+Date: Wed, 9 Sep 2020 17:25:40 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
+Message-ID: <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
+References: <20200904160018.29481-1-steven.price@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200904104530.1082676-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,71 +95,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/09/20 12:45, Marc Zyngier wrote:
-> Hi Paolo,
+On Fri, Sep 04, 2020 at 05:00:16PM +0100, Steven Price wrote:
+> Arm's Memory Tagging Extension (MTE) adds 4 bits of tag data to every 16
+> bytes of memory in the system. This along with stashing a tag within the
+> high bit of virtual addresses allows runtime checking of memory
+> accesses.
 > 
-> Here's a bunch of fixes for 5.9. The gist of it is the stolen time
-> rework from Andrew, but we also have a couple of MM fixes that have
-> surfaced as people have started to use hugetlbfs in anger.
+> These patches add support to KVM to enable MTE within a guest. They are
+> based on Catalin's v9 MTE user-space support series[1].
+> 
+> I'd welcome feedback on the proposed user-kernel ABI. Specifically this
+> series currently:
+>
+   0. Feature probing
 
-Hi Marc,
+Probably a KVM cap, rather than requiring userspace to attempt VCPU
+features one at a time with a scratch VCPU.
+ 
+>  1. Requires the VMM to enable MTE per-VCPU.
 
-I'll get to this next Friday.
+I suppose. We're collecting many features that are enabling CPU features,
+so they map nicely to VCPU features, yet they're effectively VM features
+due to a shared resource such as an irq or memory.
 
-Paolo
+>  2. Automatically promotes (normal host) memory given to the guest to be
+>     tag enabled (sets PG_mte_tagged), if any VCPU has MTE enabled. The
+>     tags are cleared if the memory wasn't previously MTE enabled.
 
-> Please pull,
+Shouldn't this be up to the guest? Or, is this required in order for the
+guest to use tagging at all. Something like making the guest IPAs memtag
+capable, but if the guest doesn't enable tagging then there is no guest
+impact? In any case, shouldn't userspace be the one that adds PROT_MTE
+to the memory regions it wants the guest to be able to use tagging with,
+rather than KVM adding the attribute page by page?
+
+>  3. Doesn't provide any new methods for the VMM to access the tags on
+>     memory.
 > 
-> 	M.
+> (2) and (3) are particularly interesting from the aspect of VM migration.
+> The guest is able to store/retrieve data in the tags (presumably for the
+> purpose of tag checking, but architecturally it could be used as just
+> storage). This means that when migrating a guest the data needs to be
+> transferred (or saved/restored).
 > 
-> The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
+> MTE tags are controlled by the same permission model as normal pages
+> (i.e. a read-only page has read-only tags), so the normal methods of
+> detecting guest changes to pages can be used. But this would also
+> require the tags within a page to be migrated at the same time as the
+> data (since the access control for tags is the same as the normal data
+> within a page).
 > 
->   Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
+> (3) may be problematic and I'd welcome input from those familiar with
+> VMMs. User space cannot access tags unless the memory is mapped with the
+> PROT_MTE flag. However enabling PROT_MTE will also enable tag checking
+> for the user space process (assuming the VMM enables tag checking for
+> the process) and since the tags in memory are controlled by the guest
+> it's unlikely the VMM would have an appropriately tagged pointer for its
+> access. This means the VMM would either need to maintain two mappings of
+> memory (one to access tags, the other to access data) or disable tag
+> checking during the accesses to data.
+
+If userspace needs to write to guest memory then it should be due to
+a device DMA or other specific hardware emulation. Those accesses can
+be done with tag checking disabled.
+
 > 
-> are available in the Git repository at:
+> If it's not practical to either disable tag checking in the VMM or
+> maintain multiple mappings then the alternatives I'm aware of are:
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.9-1
+>  * Provide a KVM-specific method to extract the tags from guest memory.
+>    This might also have benefits in terms of providing an easy way to
+>    read bulk tag data from guest memory (since the LDGM instruction
+>    isn't available at EL0).
+
+Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
+the tags for all addresses of each dirty page.
+
+>  * Provide support for user space setting the TCMA0 or TCMA1 bits in
+>    TCR_EL1. These would allow the VMM to generate pointers which are not
+>    tag checked.
+
+So this is necessary to allow the VMM to keep tag checking enabled for
+itself, plus map guest memory as PROT_MTE, and write to that memory when
+needed? 
+
+Thanks,
+drew
+
 > 
-> for you to fetch changes up to 7b75cd5128421c673153efb1236705696a1a9812:
+> Feedback is welcome, and feel free to ask questions if anything in the
+> above doesn't make sense.
 > 
->   KVM: arm64: Update page shift if stage 2 block mapping not supported (2020-09-04 10:53:48 +0100)
+> Changes since the previous v1 posting[2]:
 > 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for Linux 5.9, take #1
+>  * Rebasing clean-ups
+>  * sysreg visibility is now controlled based on whether the VCPU has MTE
+>    enabled or not
 > 
-> - Multiple stolen time fixes, with a new capability to match x86
-> - Fix for hugetlbfs mappings when PUD and PMD are the same level
-> - Fix for hugetlbfs mappings when PTE mappings are enforced
->   (dirty logging, for example)
-> - Fix tracing output of 64bit values
+> [1] https://lore.kernel.org/r/20200904103029.32083-1-catalin.marinas@arm.com
+> [2] https://lore.kernel.org/r/20200713100102.53664-1-steven.price%40arm.com
 > 
-> ----------------------------------------------------------------
-> Alexandru Elisei (1):
->       KVM: arm64: Update page shift if stage 2 block mapping not supported
+> Steven Price (2):
+>   arm64: kvm: Save/restore MTE registers
+>   arm64: kvm: Introduce MTE VCPU feature
 > 
-> Andrew Jones (6):
->       KVM: arm64: pvtime: steal-time is only supported when configured
->       KVM: arm64: pvtime: Fix potential loss of stolen time
->       KVM: arm64: Drop type input from kvm_put_guest
->       KVM: arm64: pvtime: Fix stolen time accounting across migration
->       KVM: Documentation: Minor fixups
->       arm64/x86: KVM: Introduce steal-time cap
+>  arch/arm64/include/asm/kvm_emulate.h       |  3 +++
+>  arch/arm64/include/asm/kvm_host.h          |  9 ++++++++-
+>  arch/arm64/include/asm/sysreg.h            |  3 ++-
+>  arch/arm64/include/uapi/asm/kvm.h          |  1 +
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
+>  arch/arm64/kvm/mmu.c                       | 15 +++++++++++++++
+>  arch/arm64/kvm/reset.c                     |  8 ++++++++
+>  arch/arm64/kvm/sys_regs.c                  | 20 +++++++++++++++-----
+>  8 files changed, 66 insertions(+), 7 deletions(-)
 > 
-> Marc Zyngier (2):
->       KVM: arm64: Do not try to map PUDs when they are folded into PMD
->       KVM: arm64: Fix address truncation in traces
+> -- 
+> 2.20.1
 > 
->  Documentation/virt/kvm/api.rst     | 22 ++++++++++++++++++----
->  arch/arm64/include/asm/kvm_host.h  |  2 +-
->  arch/arm64/kvm/arm.c               |  3 +++
->  arch/arm64/kvm/mmu.c               |  8 +++++++-
->  arch/arm64/kvm/pvtime.c            | 29 +++++++++++++----------------
->  arch/arm64/kvm/trace_arm.h         | 16 ++++++++--------
->  arch/arm64/kvm/trace_handle_exit.h |  6 +++---
->  arch/x86/kvm/x86.c                 |  3 +++
->  include/linux/kvm_host.h           | 31 ++++++++++++++++++++++++++-----
->  include/uapi/linux/kvm.h           |  1 +
->  10 files changed, 83 insertions(+), 38 deletions(-)
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 > 
 
 _______________________________________________
