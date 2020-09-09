@@ -2,66 +2,62 @@ Return-Path: <SRS0=Sq8/=CS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6ECC433E2
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 21:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9F0C43461
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 22:47:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0456E20BED
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 21:09:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIR0n2v6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0456E20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1E12E21D7E
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Sep 2020 22:47:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E12E21D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D054B2B2;
-	Wed,  9 Sep 2020 17:09:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B9F4B22F;
+	Wed,  9 Sep 2020 18:47:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PsAtxLKNFCLb; Wed,  9 Sep 2020 17:09:46 -0400 (EDT)
+	with ESMTP id sQ+uT+4UQTNN; Wed,  9 Sep 2020 18:47:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 787514B2BA;
-	Wed,  9 Sep 2020 17:09:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81B2C4B3B8;
+	Wed,  9 Sep 2020 18:47:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 996CF4B3B6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 16:56:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3E84B230
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 18:47:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ME3Sxx+5Brbw for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 16:56:04 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A940C4B32E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 16:56:04 -0400 (EDT)
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A2AC920BED;
- Wed,  9 Sep 2020 20:56:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599684963;
- bh=HOi/gRnNWCADuH3C2tuPouagH6ACKRSW8Me9mQGESc8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MIR0n2v6jYMLvL9ylCeswSmSkNjM38pD+hUWnq3QNBxdxavUAFW1nFlTLHe2pybfD
- odrRmpSK6VaBtY4y/JW5mI6voxGDP7xP7wyaKsNWcxcK7TIQVymwmw1HPj8MEaIJrr
- wYpwdfF4aTXncxhcjdHkCnRIxxiQ6/mo+8A6FHH4=
-Date: Wed, 9 Sep 2020 13:55:58 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Joe Perches <joe@perches.com>
+ with ESMTP id xZv5udA5nKfn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2020 18:47:33 -0400 (EDT)
+Received: from smtprelay.hostedemail.com (smtprelay0179.hostedemail.com
+ [216.40.44.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512604B22F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 18:47:33 -0400 (EDT)
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net
+ [216.40.38.60])
+ by smtprelay07.hostedemail.com (Postfix) with ESMTP id A42B7181D337B;
+ Wed,  9 Sep 2020 22:47:32 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: sort28_6003546270e1
+X-Filterd-Recvd-Size: 3292
+Received: from XPS-9350.home (unknown [47.151.133.149])
+ (Authenticated sender: joe@perches.com)
+ by omf20.hostedemail.com (Postfix) with ESMTPA;
+ Wed,  9 Sep 2020 22:47:25 +0000 (UTC)
+Message-ID: <b3d6f71aea87f4bb88554f1a3fdaee0b2feb158c.camel@perches.com>
 Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough; to
  break;
-Message-ID: <20200909205558.GA3384631@dhcp-10-100-145-180.wdl.wdc.com>
+From: Joe Perches <joe@perches.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Date: Wed, 09 Sep 2020 15:47:24 -0700
+In-Reply-To: <20200909223602.GJ87483@ziepe.ca>
 References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+ <20200909223602.GJ87483@ziepe.ca>
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
-X-Mailman-Approved-At: Wed, 09 Sep 2020 17:09:45 -0400
 Cc: linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
  oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
  alsa-devel <alsa-devel@alsa-project.org>, dri-devel@lists.freedesktop.org,
@@ -101,24 +97,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 09, 2020 at 01:06:39PM -0700, Joe Perches wrote:
-> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> index eea0f453cfb6..8aac5bc60f4c 100644
-> --- a/crypto/tcrypt.c
-> +++ b/crypto/tcrypt.c
-> @@ -2464,7 +2464,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->  		test_hash_speed("streebog512", sec,
->  				generic_hash_speed_template);
->  		if (mode > 300 && mode < 400) break;
-> -		fallthrough;
-> +		break;
->  	case 399:
->  		break;
+On Wed, 2020-09-09 at 19:36 -0300, Jason Gunthorpe wrote:
+> On Wed, Sep 09, 2020 at 01:06:39PM -0700, Joe Perches wrote:
+> > fallthrough to a separate case/default label break; isn't very readable.
+> > 
+> > Convert pseudo-keyword fallthrough; statements to a simple break; when
+> > the next label is case or default and the only statement in the next
+> > label block is break;
+> > 
+> > Found using:
+> > 
+> > $ grep-2.5.4 -rP --include=*.[ch] -n "fallthrough;(\s*(case\s+\w+|default)\s*:\s*){1,7}break;" *
+> > 
+> > Miscellanea:
+> > 
+> > o Move or coalesce a couple label blocks above a default: block.
+> > 
+> > Signed-off-by: Joe Perches <joe@perches.com>
+> > ---
+> > 
+> > Compiled allyesconfig x86-64 only.
+> > A few files for other arches were not compiled.
+> 
+> IB part looks OK, I prefer it like this
+> 
+> You could do the same for continue as well, I saw a few of those..
 
-Just imho, this change makes the preceding 'if' look even more
-pointless. Maybe the fallthrough was a deliberate choice? Not that my
-opinion matters here as I don't know this module, but it looked a bit
-odd to me.
+I saw some continue uses as well but wasn't sure
+and didn't look to see if the switch/case with
+continue was in a for/while loop.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
