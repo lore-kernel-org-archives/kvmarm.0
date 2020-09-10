@@ -2,83 +2,66 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E2AC2D0A7
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23914C433E2
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 06CC0206D4
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jrd94r/H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06CC0206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 0A88021941
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A88021941
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56D114B34D;
-	Thu, 10 Sep 2020 04:35:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9624B3C5;
+	Thu, 10 Sep 2020 05:21:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AJ7mddvkNDx2; Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
+	with ESMTP id PCAPXT4o+RJC; Thu, 10 Sep 2020 05:21:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7504B36F;
-	Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB86D4B407;
+	Thu, 10 Sep 2020 05:21:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 106764B364
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10BE24B2A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:21:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EzaYjNPtx4pO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 04:35:33 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF704B34D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:35:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599726933;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CYmRoWWniFPaHjjXdipbulnXobK8uQf7JpAYrezYUMM=;
- b=Jrd94r/HLukKL+bmeayIdic1MwPX1kcaTa+3PQ7M16CfACxICj1D+ITY6CmbTiW+kPy6R4
- l/vxTHDnYUBat7s1vdiU+1hyVp9qLKn7mkl4R5EJ2RLQijekrvA+eDBEIQgT+ia0Mncck9
- 3zYIfRWX4HhuDmpHZsV3hefV3IN+1Ow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-543-LSHAAh1-MpCiq8ANKZVVcQ-1; Thu, 10 Sep 2020 04:35:29 -0400
-X-MC-Unique: LSHAAh1-MpCiq8ANKZVVcQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB87E1008308;
- Thu, 10 Sep 2020 08:35:27 +0000 (UTC)
-Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F88E10027A4;
- Thu, 10 Sep 2020 08:35:25 +0000 (UTC)
-Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
-From: Auger Eric <eric.auger@redhat.com>
-To: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu
-References: <20200908205730.23898-1-graf@amazon.com>
- <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
-Message-ID: <366e640b-eb1e-33a2-7865-2751742cae58@redhat.com>
-Date: Thu, 10 Sep 2020 10:35:23 +0200
+ with ESMTP id c0jRLa6pEOUl for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 05:21:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1F2E4B28C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:21:12 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4410101E;
+ Thu, 10 Sep 2020 02:21:11 -0700 (PDT)
+Received: from [192.168.1.79] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E12263F68F;
+ Thu, 10 Sep 2020 02:21:09 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
+To: Andrew Jones <drjones@redhat.com>
+References: <20200904160018.29481-1-steven.price@arm.com>
+ <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
+ <857566df-1b98-84f7-9268-d092722dc749@arm.com>
+ <20200910062958.o55apuvdxmf3uiqb@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <37663bb6-d3a7-6f53-d0cd-88777633a2b2@arm.com>
+Date: Thu, 10 Sep 2020 10:21:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20200910062958.o55apuvdxmf3uiqb@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Cc: Peter Maydell <Peter.Maydell@arm.com>, linux-kernel@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,220 +73,141 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 9/10/20 9:21 AM, Auger Eric wrote:
-> Hi Alex,
-> 
-> On 9/8/20 10:57 PM, Alexander Graf wrote:
->> We currently pass through the number of PMU counters that we have available
->> in hardware to guests. So if my host supports 10 concurrently active PMU
->> counters, my guest will be able to spawn 10 counters as well.
+On 10/09/2020 07:29, Andrew Jones wrote:
+> On Wed, Sep 09, 2020 at 05:04:15PM +0100, Steven Price wrote:
+>> On 09/09/2020 16:25, Andrew Jones wrote:
+>>> On Fri, Sep 04, 2020 at 05:00:16PM +0100, Steven Price wrote:
+>>>>    2. Automatically promotes (normal host) memory given to the guest to be
+>>>>       tag enabled (sets PG_mte_tagged), if any VCPU has MTE enabled. The
+>>>>       tags are cleared if the memory wasn't previously MTE enabled.
+>>>
+>>> Shouldn't this be up to the guest? Or, is this required in order for the
+>>> guest to use tagging at all. Something like making the guest IPAs memtag
+>>> capable, but if the guest doesn't enable tagging then there is no guest
+>>> impact? In any case, shouldn't userspace be the one that adds PROT_MTE
+>>> to the memory regions it wants the guest to be able to use tagging with,
+>>> rather than KVM adding the attribute page by page?
 >>
->> This is undesireable if we also want to use the PMU on the host for
->> monitoring. In that case, we want to split the PMU between guest and
->> host.
-> but don't we have a trap and emulate approach as opposed to current SPE
-> implementation?
-
-Looking again at the switch code (__pmu_switch_to_guest), I see we just
-enable/disable the event counters owned by either the host/guest. I
-thought this was more involved. So now it is clear.
-
-Thanks
-
-Eric
+>> I think I've probably explained this badly.
 >>
->> To help that case, let's add a PMU attr that allows us to limit the number
->> of PMU counters that we expose. With this patch in place, user space can
->> keep some counters free for host use.
+>> The guest can choose how to populate the stage 1 mapping - so can choose
+>> which parts of memory are accessed tagged or not. However, the hypervisor
+>> cannot restrict this in stage 2 (except by e.g. making the memory uncached
+>> but that's obviously not great - however devices forward to the guest can be
+>> handled like this).
 >>
->> Signed-off-by: Alexander Graf <graf@amazon.com>
->>
->> ---
->>
->> Because this patch touches the same code paths as the vPMU filtering one
->> and the vPMU filtering generalized a few conditions in the attr path,
->> I've based it on top. Please let me know if you want it independent instead.
->>
->> v1 -> v2:
->>
->>   - Add documentation
->>   - Add read support
->> ---
->>  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
->>  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
->>  arch/arm64/kvm/pmu-emul.c               | 32 ++++++++++++++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c               |  5 +++++
->>  include/kvm/arm_pmu.h                   |  1 +
->>  5 files changed, 67 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
->> index 203b91e93151..1a1c8d8c8b1d 100644
->> --- a/Documentation/virt/kvm/devices/vcpu.rst
->> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the cycle counter is possible
->>  using event 0x11 (CPU_CYCLES).
->>  
->>  
->> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
->> +---------------------------------------------
->> +
->> +:Parameters: in kvm_device_attr.addr the address for the limit of concurrent
->> +             events is a pointer to an int
->> +
->> +:Returns:
->> +
->> +	 =======  ======================================================
->> +	 -ENODEV: PMUv3 not supported
->> +	 -EBUSY:  PMUv3 already initialized
->> +	 -EINVAL: Too large number of events
-> s/events/event counters
-> 
-> I see that in perf code indeed num_events is used for that but I think
-> for the end-user the event counter terminology is better as it fits the
-> ARM spec.
->> +	 =======  ======================================================
->> +
->> +Reconfigure the limit of concurrent PMU events that the guest can monitor.
-> here also
->> +This number is directly exposed as part of the PMCR_EL0 register.
-> Maybe quote the "N" field
->> +
->> +On vcpu creation, this attribute is set to the hardware limit of the current
->> +platform. If you need to determine the hardware limit, you can read this
->> +attribute before setting it.
->> +
->> +Restrictions: The default value for this property is the number of hardware
->> +supported events. Only values that are smaller than the hardware limit can
-> event counters
->> +be set.
->> +
->>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->>  =================================
->>  
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 7b1511d6ce44..db025c0b5a40 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
->>  
->>  /* Device Control API on vcpu fd */
->>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
->> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
->> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
->> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
->> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
->> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
->> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
->> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
->>  #define KVM_ARM_VCPU_TIMER_CTRL		1
->>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 0458860bade2..c7915b95fec0 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
->>  
->>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
->>  		pmu->pmc[i].idx = i;
->> +
->> +	pmu->num_events = perf_num_counters() - 1;
->>  }
->>  
->>  /**
->> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  
->>  		return 0;
->>  	}
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
->> +		int __user *uaddr = (int __user *)(long)attr->addr;
->> +		u32 num_events;
->> +
->> +		if (get_user(num_events, uaddr))
->> +			return -EFAULT;
->> +
->> +		if (num_events >= perf_num_counters())
->> +			return -EINVAL;
->> +
->> +		vcpu->arch.pmu.num_events = num_events;
->> +
->> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
->> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
->> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
->> +
->> +		return 0;
->> +	}
->>  	case KVM_ARM_VCPU_PMU_V3_INIT:
->>  		return kvm_arm_pmu_v3_init(vcpu);
->>  	}
->> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  		irq = vcpu->arch.pmu.irq_num;
->>  		return put_user(irq, uaddr);
->>  	}
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +		int __user *uaddr = (int __user *)(long)attr->addr;
->> +		u32 num_events;
->> +
->> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->> +			return -ENODEV;
->> +
->> +		num_events = vcpu->arch.pmu.num_events;
->> +		return put_user(num_events, uaddr);
->> +	}
->>  	}
->>  
->>  	return -ENXIO;
->> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
->>  	case KVM_ARM_VCPU_PMU_V3_INIT:
->>  	case KVM_ARM_VCPU_PMU_V3_FILTER:
->> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
->>  		if (kvm_arm_support_pmu_v3() &&
->>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
->>  			return 0;
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 20ab2a7d37ca..d51e39600bbd 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->>  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
->>  	if (!system_supports_32bit_el0())
->>  		val |= ARMV8_PMU_PMCR_LC;
->> +
->> +	/* Override number of event selectors */
->> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
->> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
->> +
->>  	__vcpu_sys_reg(vcpu, r->reg) = val;
->>  }
->>  
->> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
->> index 98cbfe885a53..ea3fc96a37d9 100644
->> --- a/include/kvm/arm_pmu.h
->> +++ b/include/kvm/arm_pmu.h
->> @@ -27,6 +27,7 @@ struct kvm_pmu {
->>  	bool ready;
->>  	bool created;
->>  	bool irq_level;
->> +	u8 num_events;
->>  };
->>  
->>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+>> Because the hypervisor cannot restrict the guest's access to the tags, the
+>> hypervisor must assume that all memory given to the guest could have the
+>> tags accessed. So it must (a) clear any stale data from the tags, and (b)
+>> ensure that the tags are preserved (e.g. when swapping pages out).
 >>
 > 
-> Thanks
-> 
-> Eric
-> 
+> Yes, this is how I understood it.
 
+Ok, I've obviously misunderstood your comment instead ;)
+
+>> Because of the above the current series automatically sets PG_mte_tagged on
+>> the pages. Note that this doesn't change the mappings that the VMM has (a
+>> non-PROT_MTE mapping will still not have access to the tags).
+> 
+> But if userspace created the memslots with memory already set with
+> PROT_MTE, then this wouldn't be necessary, right? And, as long as
+> there's still a way to access the memory with tag checking disabled,
+> then it shouldn't be a problem.
+
+Yes, so one option would be to attempt to validate that the VMM has 
+provided memory pages with the PG_mte_tagged bit set (e.g. by mapping 
+with PROT_MTE). The tricky part here is that we support KVM_CAP_SYNC_MMU 
+which means that the VMM can change the memory backing at any time - so 
+we could end up in user_mem_abort() discovering that a page doesn't have 
+PG_mte_tagged set - at that point there's no nice way of handling it 
+(other than silently upgrading the page) so the VM is dead.
+
+So since enforcing that PG_mte_tagged is set isn't easy and provides a 
+hard-to-debug foot gun to the VMM I decided the better option was to let 
+the kernel set the bit automatically.
+
+>>>
+>>> If userspace needs to write to guest memory then it should be due to
+>>> a device DMA or other specific hardware emulation. Those accesses can
+>>> be done with tag checking disabled.
+>>
+>> Yes, the question is can the VMM (sensibly) wrap the accesses with a
+>> disable/renable tag checking for the process sequence. The alternative at
+>> the moment is to maintain a separate (untagged) mapping for the purpose
+>> which might present it's own problems.
+> 
+> Hmm, so there's no easy way to disable tag checking when necessary? If we
+> don't map the guest ram with PROT_MTE and continue setting the attribute
+> in KVM, as this series does, then we don't need to worry about it tag
+> checking when accessing the memory, but then we can't access the tags for
+> migration.
+
+There's a "TCO" (Tag Check Override) bit in PSTATE which allows 
+disabling tag checking, so if it's reasonable to wrap accesses to the 
+memory you can simply set the TCO bit, perform the memory access and 
+then unset TCO. That would mean a single mapping with MTE enabled would 
+work fine. What I don't have a clue about is whether it's practical in 
+the VMM to wrap guest accesses like this.
+
+>>
+>>>>
+>>>> If it's not practical to either disable tag checking in the VMM or
+>>>> maintain multiple mappings then the alternatives I'm aware of are:
+>>>>
+>>>>    * Provide a KVM-specific method to extract the tags from guest memory.
+>>>>      This might also have benefits in terms of providing an easy way to
+>>>>      read bulk tag data from guest memory (since the LDGM instruction
+>>>>      isn't available at EL0).
+>>>
+>>> Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
+>>> the tags for all addresses of each dirty page.
+>>
+>> Certainly possible, although it seems to conflate two operations: "get list
+>> of dirty pages", "get tags from page". It would also require a lot of return
+>> space (size of slot/32).
+>>
+> 
+> It would require num-set-bits * host-page-size / 16 / 2, right?
+
+Yes, where the worst case is all bits set which is size/32. Since you 
+don't know at the time of the call how many bits are going to be set I'm 
+not sure how you would design the API which doesn't require 
+preallocating the worst case.
+
+>>>>    * Provide support for user space setting the TCMA0 or TCMA1 bits in
+>>>>      TCR_EL1. These would allow the VMM to generate pointers which are not
+>>>>      tag checked.
+>>>
+>>> So this is necessary to allow the VMM to keep tag checking enabled for
+>>> itself, plus map guest memory as PROT_MTE, and write to that memory when
+>>> needed?
+>>
+>> This is certainly one option. The architecture provides two "magic" values
+>> (all-0s and all-1s) which can be configured using TCMAx to be treated
+>> differently. The VMM could therefore construct pointers to otherwise tagged
+>> memory which would be treated as untagged.
+>>
+>> However, Catalin's user space series doesn't at the moment expose this
+>> functionality.
+>>
+> 
+> So if I understand correctly this would allow us to map the guest memory
+> with PAGE_MTE and still access the memory when needed. If so, then this
+> sounds interesting.
+
+Yes - you could derive a pointer which didn't perform tag checking. Note 
+that this also requires the rest of user space to play along (i.e. 
+understand that the tag value is reserved). I believe for user space we 
+have to use the all-0s value which means that a standard pointer 
+(top-byte is 0) would be unchecked.
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
