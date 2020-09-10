@@ -7,94 +7,88 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E35E7C43461
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 01:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A94EC43461
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 04:06:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3F77D206A1
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 01:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CF8421D82
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 04:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u/iv2lgV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F77D206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ogpyzys7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF8421D82
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BBE54B376;
-	Wed,  9 Sep 2020 21:45:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B96C04B380;
+	Thu, 10 Sep 2020 00:06:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XVpH6Xe3xIRM; Wed,  9 Sep 2020 21:45:39 -0400 (EDT)
+	with ESMTP id fNP-QDIIkJEO; Thu, 10 Sep 2020 00:06:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B104B35D;
-	Wed,  9 Sep 2020 21:45:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FE1C4B368;
+	Thu, 10 Sep 2020 00:06:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B6EA4B35D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 21:45:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 232E84B35E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 00:06:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 43KU-SwX+2EC for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2020 21:45:37 -0400 (EDT)
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com
- [209.85.210.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DF634B35C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2020 21:45:37 -0400 (EDT)
-Received: by mail-pf1-f193.google.com with SMTP id o20so3681408pfp.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2020 18:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=srlzi6kO9KxXkI8QJDt5Z43HoR7v2ko9LYXQ8jt4y44=;
- b=u/iv2lgVycfu88AolfBLdcxoQkKwFXlBKbtJ8zj8UK6eoFLqKxQheAfb05BlbcjwKz
- G8IsBcKBAAda2DaUi0COUFu04Hgo/bR90dfH8TpuflZRaHnC1khAEnRbSFJQPHZdmbOU
- 52oCPFtp2JMMYx+7+DIob4TqY2CPbrFgfDAD4HYjqQ0FZNHOF9gB/q+C2Fs3bpOQg0YE
- hue7OYmW6G4eWQeXxXOT1y6I0qdgh2BpgOh4Ybit8LKhLF1Gi1vG2NHllpk0fVbF9hS8
- f0vWsNBOavuocqCQkz3yBm5hrrBsPxXEPuV1wvG1Tk++5ZE9iciU1ZSfbVrnFoMcVRO7
- rjYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=srlzi6kO9KxXkI8QJDt5Z43HoR7v2ko9LYXQ8jt4y44=;
- b=LdpXDn1gTsrDJJHC6ktpzANqSN/NupoEM+woVGFuBnskYvxOvGjOddXJlEPzXEle7p
- Gqg5fzYQjzKqnQTH4sC3kMY3dgEqfOdfnLZw1X6wmstfpQd1bF7xrJpmbirXYJ1cMME2
- wQmldB3FpJyUSjAiKWv4au7JRCXyU36am78R+W2ebY5AOZzY/mOlFDI1W4aUoQGyTxNy
- kPIk+ODypoSjiipIdj4yoGfwfl2Ht5SwqX4w0/bYs4qSKi9jowZ81XWwx/GywLbCo1b9
- jvPerSIBQhCynY8/3rcB+84HrmFgFR3guVvoYp9HR0LiF1iujh78x/EFNr9pFEHqLmla
- B/Fw==
-X-Gm-Message-State: AOAM531kRkIN0AsHUC9h+o3jNrAsS1akMr2HKOWYt/BL8YKWuETVNX5c
- OHvOb7g5XJAKWrN7XlFsTYt6DA==
-X-Google-Smtp-Source: ABdhPJyqpWOeqHuTEIwwj1uDXktA1dBPRjOp1EaAUDe2coNSXU+KFMxtpo7uhsAAcumooCW0G+ElHQ==
-X-Received: by 2002:a62:b407:: with SMTP id h7mr3166747pfn.134.1599702336093; 
- Wed, 09 Sep 2020 18:45:36 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id s20sm3936396pfu.112.2020.09.09.18.45.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 18:45:35 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
-To: Andrew Jones <drjones@redhat.com>, Steven Price <steven.price@arm.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5cb1d7ed-54a5-4337-6c3d-2e3e7df89f17@linaro.org>
-Date: Wed, 9 Sep 2020 18:45:33 -0700
+ with ESMTP id 9S5HBR9rz2-z for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 00:06:32 -0400 (EDT)
+Received: from us-smtp-1.mimecast.com (us-smtp-delivery-1.mimecast.com
+ [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 365CE4B340
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 00:06:32 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599710791;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k7S4zxxxQYlErRgGmXJ+wYF+gTxt1V5R+2Y3W49tJzc=;
+ b=Ogpyzys7m6ZpENgkBtH4/RTFAZkOpR4Pz+jYpRChNkrVzKgT0OoiWlCIsQcs3+JbIsvIzh
+ ODzpHdjFy4BNxs2ZbLsiw8g9Vczt3Zm8HxK8DAquA1FrFv29ukyZkfUDcymRKBwKLEbClx
+ Jk79IlczU+FOxdAA4YP95j2yU/k0a3Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-5o-Q4SMMPRiENsZSv6gtlw-1; Thu, 10 Sep 2020 00:06:29 -0400
+X-MC-Unique: 5o-Q4SMMPRiENsZSv6gtlw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43C3C1008548;
+ Thu, 10 Sep 2020 04:06:27 +0000 (UTC)
+Received: from [10.64.54.123] (vpn2-54-123.bne.redhat.com [10.64.54.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 071CE5D9EF;
+ Thu, 10 Sep 2020 04:06:16 +0000 (UTC)
+Subject: Re: [PATCH v4 00/21] KVM: arm64: Rewrite page-table code and fault
+ handling
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200907152344.12978-1-will@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <4e41d4c5-1d36-fb28-880d-94235def35ed@redhat.com>
+Date: Thu, 10 Sep 2020 14:06:04 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
+In-Reply-To: <20200907152344.12978-1-will@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -103,38 +97,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 9/9/20 8:25 AM, Andrew Jones wrote:
->>  * Provide a KVM-specific method to extract the tags from guest memory.
->>    This might also have benefits in terms of providing an easy way to
->>    read bulk tag data from guest memory (since the LDGM instruction
->>    isn't available at EL0).
+Hi Will and Marc,
+
+On 9/8/20 1:23 AM, Will Deacon wrote:
+> Hi all,
 > 
-> Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
-> the tags for all addresses of each dirty page.
-
-KVM_GET_DIRTY_LOG just provides one bit per dirty page, no?  Then VMM copies
-the data out from its local address to guest memory.
-
-There'd be no difference with or without tags, afaik.  It's just about how VMM
-copies the data, with or without tags.
-
->>  * Provide support for user space setting the TCMA0 or TCMA1 bits in
->>    TCR_EL1. These would allow the VMM to generate pointers which are not
->>    tag checked.
+> Here's version four of the KVM page-table rework I previously posted here:
 > 
-> So this is necessary to allow the VMM to keep tag checking enabled for
-> itself, plus map guest memory as PROT_MTE, and write to that memory when
-> needed? 
+>    v1: https://lore.kernel.org/r/20200730153406.25136-1-will@kernel.org
+>    v2: https://lore.kernel.org/r/20200818132818.16065-1-will@kernel.org
+>    v3: https://lore.kernel.org/r/20200825093953.26493-1-will@kernel.org
+> 
+> Changes since v3 include:
+> 
+>    * Removed some more unused code from the old implementation
+>    * Renumbered KVM_PGTABLE_PROT_* to match file permissions in hex dumps
+>    * Simplified kvm_granule_shift() and removed kvm_start_level()
+>    * Only clear valid bit when invalidating a PTE, leaving phys addr intact
+>    * Fail gracefully when attempting to allocate without a memory cache
+>    * Rewrote stage2_apply_range() as a function instead of a macro
+>    * Fixed fault address rounding with hugetlbfs
+>    * Fixed permission fault handling when dirty logging is enabled
+>    * Added comments
+>    * Added reviewer tags
+> 
+> Many thanks to Alex and Gavin for their comments.
+> 
+> Will
+> 
 
-I don't see a requirement for the VMM to set TCMA0.
+[...]
 
+Eventually, I'm lucky finding a machine from our pool where 16KB page
+size is supported. I tried this series (v4) on this machine, everything
+looks good as we expected:
 
-r~
+    Host:   5.9.0-rc3 + patchset (v4)
+            CONFIG_ARM64_VA_BITS=47
+            CONFIG_ARM64_PAGE_SHIFT=14
+            Hugepagesize: 32768 kB      (from /proc/meminfo)
+    Config: -HugeTLBfs/-THP
+            +HugeTLBfs/-THP
+            -HugeTLBfs/THP
+    Guest:  CONFIG_ARM64_PAGE_SHIFT=12/14/16
+
+Let me know in case there are more tests needed from my side.
+
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
