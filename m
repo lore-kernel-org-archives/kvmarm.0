@@ -2,93 +2,61 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9846EC43461
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C53C433E2
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:19:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E5DCC2145D
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:12:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AA84R5re"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DCC2145D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C8D9320C09
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:19:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8D9320C09
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 190B54B374;
-	Thu, 10 Sep 2020 07:12:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D905D4B401;
+	Thu, 10 Sep 2020 07:19:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id izUr3PX98VfQ; Thu, 10 Sep 2020 07:12:34 -0400 (EDT)
+	with ESMTP id VNhuXYysEC+b; Thu, 10 Sep 2020 07:19:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB9674B32F;
-	Thu, 10 Sep 2020 07:12:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 194A54B3CD;
+	Thu, 10 Sep 2020 07:19:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ECE64B31E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:12:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ECB24B3BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:19:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uYqu3ArnMmQi for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 07:12:32 -0400 (EDT)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E77A04B2BC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:12:31 -0400 (EDT)
-Received: by mail-wm1-f66.google.com with SMTP id z9so5394100wmk.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:12:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=qu8JH/be0rcbIWaaAUE3igFaIOUou49hkjsJpPAPR90=;
- b=AA84R5regpZTTXFRpYdM+Or0tNH+fSOtcqP2pbugiGih/zhtRpJQ9cnshBMxr/2NFT
- FkZa3oj1Xp06SJZG9wz5iZrx1xBELEnEKGxVH1OlRfHsL0dtvMMG2hk7s6PB8W+kvyir
- sX9ek/eZRCmuRjUkFR4kKFs7iBNH565OLxk5AwZyOaq9Qz381ztlKjBTf7fJvXjDMtUv
- k1mlUwbXnd1c0vx4qoZAdUmGXUdFF9d3I2xnTUUYMiE3r4QfZxZNnlyJVqBmH4suoSEl
- a1udckqFeJUhnzcnBF+GizdyEJvpBbXbmvGn+XytRvONjxBJByJ66ZY3U9h6PWwIDfMo
- 1qZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=qu8JH/be0rcbIWaaAUE3igFaIOUou49hkjsJpPAPR90=;
- b=ttgdQsMTadQ9p1eLK40ELrIkuj8wsC/neQPoj9hBmhcnVJUeJLlGHAJGnyhCoYxyU5
- WzxzSLNuOab9KDPd2GVE1Y3PQnHIoZIijQ4s9pG0PLze3tYJ3Tr7t9dnPVXNxvkrSpO/
- lZ4NAdI2wvUa+HiPwNeuCFyTdGzFc2c+OzT+S7YOn1i4Ou+8FyE7QUh2ovRhtopsRZu+
- z/iwYQgIpI3fG783QNejiTCZhGDX9rlKflRwG5tJx6H/rtKlQ9idyYiP3yXbMpbwp5OQ
- D6BzB87szFghkjik4UV3NB99cxHSyIU1vNhgmB+WbnhiCFpjPkI6woQsbW1HO6Xga6ss
- pSqA==
-X-Gm-Message-State: AOAM5325R6fW6n+rOGBwR/ZAjz5VjEp6Ar61YdT1r6yCqZA7H9HHgpv9
- Q1sVJBNu5rpcjTOAhx0KwO7gXQ==
-X-Google-Smtp-Source: ABdhPJxbK5saNRK5bQpLtP1bvSvZb92KMkAB9oGsS0A6wEs9jJX9P12KvSs4xOamCVaMq+VkbnZhCQ==
-X-Received: by 2002:a1c:4886:: with SMTP id v128mr8080271wma.139.1599736350622; 
- Thu, 10 Sep 2020 04:12:30 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- by smtp.gmail.com with ESMTPSA id t15sm2953444wmj.15.2020.09.10.04.12.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 04:12:30 -0700 (PDT)
-Date: Thu, 10 Sep 2020 12:12:25 +0100
-From: Andrew Scull <ascull@google.com>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 03/10] kvm: arm64: Remove __hyp_this_cpu_read
-Message-ID: <20200910111225.GC93664@google.com>
-References: <20200903091712.46456-1-dbrazdil@google.com>
- <20200903091712.46456-4-dbrazdil@google.com>
+ with ESMTP id 85KRDqWcnHxk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 07:19:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8804B3B8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:19:43 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0E811045;
+ Thu, 10 Sep 2020 04:19:42 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E1C93F68F;
+ Thu, 10 Sep 2020 04:19:41 -0700 (PDT)
+Subject: Re: [PATCH v4 06/21] KVM: arm64: Add support for stage-2
+ map()/unmap() in generic page-table
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200907152344.12978-1-will@kernel.org>
+ <20200907152344.12978-7-will@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f5939f12-56e8-794c-8d9b-9ae348bba3c0@arm.com>
+Date: Thu, 10 Sep 2020 12:20:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200903091712.46456-4-dbrazdil@google.com>
-Cc: linux-arch@vger.kernel.org, kernel-team@android.com,
- Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200907152344.12978-7-will@kernel.org>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,246 +73,269 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 03, 2020 at 11:17:05AM +0200, 'David Brazdil' via kernel-team wrote:
-> this_cpu_ptr is meant for use in kernel proper because it selects between
-> TPIDR_EL1/2 based on nVHE/VHE. __hyp_this_cpu_ptr was used in hyp to always
-> select TPIDR_EL2. Unify all users behind this_cpu_ptr and friends by
-> selecting _EL2 register under __KVM_NVHE_HYPERVISOR__.
-> 
-> Under CONFIG_DEBUG_PREEMPT, the kernel helpers perform a preemption check
-> which is omitted by the hyp helpers. Preserve the behavior for nVHE by
-> overriding the corresponding macros under __KVM_NVHE_HYPERVISOR__. Extend
-> the checks into VHE hyp code.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
+Hi Will,
+
+On 9/7/20 4:23 PM, Will Deacon wrote:
+> Add stage-2 map() and unmap() operations to the generic page-table code.
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_asm.h          | 20 --------------
->  arch/arm64/include/asm/percpu.h           | 33 +++++++++++++++++++++--
->  arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 +--
->  arch/arm64/kvm/hyp/include/hyp/switch.h   |  8 +++---
->  arch/arm64/kvm/hyp/nvhe/switch.c          |  2 +-
->  arch/arm64/kvm/hyp/vhe/switch.c           |  2 +-
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 +--
->  7 files changed, 41 insertions(+), 32 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 6f98fbd0ac81..9149079f0269 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -149,26 +149,6 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
->  		addr;							\
->  	})
+>  arch/arm64/include/asm/kvm_pgtable.h |  39 ++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 273 +++++++++++++++++++++++++++
+>  2 files changed, 312 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 85078bb632bb..7258966d3daa 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -136,6 +136,45 @@ int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm);
+>   */
+>  void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 >  
-> -/*
-> - * Home-grown __this_cpu_{ptr,read} variants that always work at HYP,
-> - * provided that sym is really a *symbol* and not a pointer obtained from
-> - * a data structure. As for SHIFT_PERCPU_PTR(), the creative casting keeps
-> - * sparse quiet.
-> - */
-> -#define __hyp_this_cpu_ptr(sym)						\
-> -	({								\
-> -		void *__ptr;						\
-> -		__verify_pcpu_ptr(&sym);				\
-> -		__ptr = hyp_symbol_addr(sym);				\
-> -		__ptr += read_sysreg(tpidr_el2);			\
-> -		(typeof(sym) __kernel __force *)__ptr;			\
-> -	 })
-> -
-> -#define __hyp_this_cpu_read(sym)					\
-> -	({								\
-> -		*__hyp_this_cpu_ptr(sym);				\
-> -	 })
-> -
->  #define __KVM_EXTABLE(from, to)						\
->  	"	.pushsection	__kvm_ex_table, \"a\"\n"		\
->  	"	.align		3\n"					\
-> diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
-> index 0b6409b89e5e..b4008331475b 100644
-> --- a/arch/arm64/include/asm/percpu.h
-> +++ b/arch/arm64/include/asm/percpu.h
-> @@ -19,7 +19,21 @@ static inline void set_my_cpu_offset(unsigned long off)
->  			:: "r" (off) : "memory");
+> +/**
+> + * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
+> + * @addr:	Intermediate physical address at which to place the mapping.
+> + * @size:	Size of the mapping.
+> + * @phys:	Physical address of the memory to map.
+> + * @prot:	Permissions and attributes for the mapping.
+> + * @mc:		Cache of pre-allocated GFP_PGTABLE_USER memory from which to
+> + *		allocate page-table pages.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Note that this function will both coalesce existing table entries and split
+> + * existing block mappings, relying on page-faults to fault back areas outside
+> + * of the new mapping lazily.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			   u64 phys, enum kvm_pgtable_prot prot,
+> +			   struct kvm_mmu_memory_cache *mc);
+> +
+> +/**
+> + * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
+> + * @addr:	Intermediate physical address from which to remove the mapping.
+> + * @size:	Size of the mapping.
+> + *
+> + * TLB invalidation is performed for each page-table entry cleared during the
+> + * unmapping operation and the reference count for the page-table page
+> + * containing the cleared entry is decremented, with unreferenced pages being
+> + * freed. Unmapping a cacheable page will ensure that it is clean to the PoC if
+> + * FWB is not supported by the CPU.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> +
+>  /**
+>   * kvm_pgtable_walk() - Walk a page-table.
+>   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 96e21017830b..4623380cf9de 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -32,10 +32,19 @@
+>  #define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS	3
+>  #define KVM_PTE_LEAF_ATTR_LO_S1_AF	BIT(10)
+>  
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR	GENMASK(5, 2)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R	BIT(6)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W	BIT(7)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_SH	GENMASK(9, 8)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS	3
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_AF	BIT(10)
+> +
+>  #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+>  
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
+> +
+>  struct kvm_pgtable_walk_data {
+>  	struct kvm_pgtable		*pgt;
+>  	struct kvm_pgtable_walker	*walker;
+> @@ -417,6 +426,270 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+>  	pgt->pgd = NULL;
 >  }
 >  
-> -static inline unsigned long __my_cpu_offset(void)
-> +static inline unsigned long __hyp_my_cpu_offset(void)
+> +struct stage2_map_data {
+> +	u64				phys;
+> +	kvm_pte_t			attr;
+> +
+> +	kvm_pte_t			*anchor;
+> +
+> +	struct kvm_s2_mmu		*mmu;
+> +	struct kvm_mmu_memory_cache	*memcache;
+> +};
+> +
+> +static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+> +				    struct stage2_map_data *data)
 > +{
-> +	unsigned long off;
+> +	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> +	kvm_pte_t attr = device ? PAGE_S2_MEMATTR(DEVICE_nGnRE) :
+> +			    PAGE_S2_MEMATTR(NORMAL);
+> +	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
 > +
-> +	/*
-> +	 * We want to allow caching the value, so avoid using volatile and
-> +	 * instead use a fake stack read to hazard against barrier().
-> +	 */
-> +	asm("mrs %0, tpidr_el2" : "=r" (off) :
-> +		"Q" (*(const unsigned long *)current_stack_pointer));
+> +	if (!(prot & KVM_PGTABLE_PROT_X))
+> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> +	else if (device)
+> +		return -EINVAL;
 > +
-> +	return off;
+> +	if (prot & KVM_PGTABLE_PROT_R)
+> +		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> +
+> +	if (prot & KVM_PGTABLE_PROT_W)
+> +		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +
+> +	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> +	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> +	data->attr = attr;
+> +	return 0;
 > +}
 > +
-> +static inline unsigned long __kern_my_cpu_offset(void)
->  {
->  	unsigned long off;
->  
-> @@ -35,7 +49,12 @@ static inline unsigned long __my_cpu_offset(void)
->  
->  	return off;
->  }
-> -#define __my_cpu_offset __my_cpu_offset()
+> +static bool stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> +				       kvm_pte_t *ptep,
+> +				       struct stage2_map_data *data)
+> +{
+> +	u64 granule = kvm_granule_size(level), phys = data->phys;
 > +
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +#define __my_cpu_offset __hyp_my_cpu_offset()
+> +	if (!kvm_block_mapping_supported(addr, end, phys, level))
+> +		return false;
+> +
+> +	if (kvm_set_valid_leaf_pte(ptep, phys, data->attr, level))
+> +		goto out;
+> +
+> +	/* There's an existing valid leaf entry, so perform break-before-make */
+> +	kvm_set_invalid_pte(ptep);
+> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> +	kvm_set_valid_leaf_pte(ptep, phys, data->attr, level);
+> +out:
+> +	data->phys += granule;
+> +	return true;
+> +}
+> +
+> +static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+> +				     kvm_pte_t *ptep,
+> +				     struct stage2_map_data *data)
+> +{
+> +	if (data->anchor)
+> +		return 0;
+> +
+> +	if (!kvm_block_mapping_supported(addr, end, data->phys, level))
+> +		return 0;
+> +
+> +	kvm_set_invalid_pte(ptep);
+> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, 0);
+> +	data->anchor = ptep;
+> +	return 0;
+> +}
+> +
+> +static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				struct stage2_map_data *data)
+> +{
+> +	kvm_pte_t *childp, pte = *ptep;
+> +	struct page *page = virt_to_page(ptep);
+> +
+> +	if (data->anchor) {
+> +		if (kvm_pte_valid(pte))
+> +			put_page(page);
+> +
+> +		return 0;
+> +	}
+> +
+> +	if (stage2_map_walker_try_leaf(addr, end, level, ptep, data))
+> +		goto out_get_page;
+> +
+> +	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+> +		return -EINVAL;
+> +
+> +	if (!data->memcache)
+> +		return -ENOMEM;
+> +
+> +	childp = kvm_mmu_memory_cache_alloc(data->memcache);
+> +	if (!childp)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * If we've run into an existing block mapping then replace it with
+> +	 * a table. Accesses beyond 'end' that fall within the new table
+> +	 * will be mapped lazily.
+> +	 */
+> +	if (kvm_pte_valid(pte)) {
+> +		kvm_set_invalid_pte(ptep);
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> +		put_page(page);
+> +	}
+> +
+> +	kvm_set_table_pte(ptep, childp);
+> +
+> +out_get_page:
+> +	get_page(page);
+> +	return 0;
+> +}
+> +
+> +static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+> +				      kvm_pte_t *ptep,
+> +				      struct stage2_map_data *data)
+> +{
+> +	int ret = 0;
+> +
+> +	if (!data->anchor)
+> +		return 0;
+> +
+> +	free_page((unsigned long)kvm_pte_follow(*ptep));
+> +	put_page(virt_to_page(ptep));
+> +
+> +	if (data->anchor == ptep) {
+> +		data->anchor = NULL;
+> +		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+> +	}
 
-Is there a benefit to this being used for __KVM_VHE_HYPERVISOR__ too
-since that is "hyp" too and doesn't need the alternative since it will
-always pick EL2?
-
-> +#else
-> +#define __my_cpu_offset __kern_my_cpu_offset()
-> +#endif
->  
->  #define PERCPU_RW_OPS(sz)						\
->  static inline unsigned long __percpu_read_##sz(void *ptr)		\
-> @@ -227,4 +246,14 @@ PERCPU_RET_OP(add, add, ldadd)
->  
->  #include <asm-generic/percpu.h>
->  
-> +/* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its dependencies. */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) && defined(CONFIG_DEBUG_PREEMPT)
-> +#undef	this_cpu_ptr
-> +#define	this_cpu_ptr		raw_cpu_ptr
-> +#undef	__this_cpu_read
-> +#define	__this_cpu_read		raw_cpu_read
-> +#undef	__this_cpu_write
-> +#define	__this_cpu_write	raw_cpu_write
-> +#endif
-
-This is an incomplete cherry-picked list of macros that are redefined to
-remove the call to __this_cpu_preempt_check that would result in a
-linker failure since that symbol is not defined for nVHE hyp.
-
-I remember there being some dislike of truely defining that symbol with
-an nVHE hyp implementation but I can't see why. Yes, nVHE hyp is always
-has preemption disabled so the implementation is just an empty function
-but why is is preferrable to redefine some of these macros instead?
+I had another look at this function. If we're back to the anchor entry, then that
+means that we know from the pre-order visitor that 1. the mapping is supported at
+this level and 2. that the pte was invalidated. This means that
+kvm_set_valid_leaf_pte() will succeed in changing the entry. How about instead of
+calling stage2_map_walk_leaf() -> stage2_map_walker_try_leaf() ->
+kvm_set_valid_leaf_pte() we call kvm_set_valid_leaf_pte() directly, followed by
+get_page(virt_to_page(ptep)? It would make the code a lot easier to follow
+(stage2_map_walk_leaf() is pretty complicated, imo, but that can't really be
+avoided), and also slightly faster.
 
 > +
->  #endif /* __ASM_PERCPU_H */
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> index 5e28ea6aa097..4ebe9f558f3a 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> @@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
->  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->  		return;
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	guest_ctxt = &vcpu->arch.ctxt;
->  	host_dbg = &vcpu->arch.host_debug_state.regs;
->  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> @@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
->  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
->  		return;
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	guest_ctxt = &vcpu->arch.ctxt;
->  	host_dbg = &vcpu->arch.host_debug_state.regs;
->  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 5b6b8fa00f0a..f150407fa798 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -386,7 +386,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  	    !esr_is_ptrauth_trap(kvm_vcpu_get_esr(vcpu)))
->  		return false;
->  
-> -	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	__ptrauth_save_key(ctxt, APIA);
->  	__ptrauth_save_key(ctxt, APIB);
->  	__ptrauth_save_key(ctxt, APDA);
-> @@ -495,7 +495,7 @@ static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
->  	 * guest wants it disabled, so be it...
->  	 */
->  	if (__needs_ssbd_off(vcpu) &&
-> -	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-> +	    __this_cpu_read(arm64_ssbd_callback_required))
->  		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 0, NULL);
->  #endif
->  }
-> @@ -507,7 +507,7 @@ static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
->  	 * If the guest has disabled the workaround, bring it back on.
->  	 */
->  	if (__needs_ssbd_off(vcpu) &&
-> -	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
-> +	    __this_cpu_read(arm64_ssbd_callback_required))
->  		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 1, NULL);
->  #endif
->  }
-> @@ -521,7 +521,7 @@ static inline void __kvm_unexpected_el2_exception(void)
->  
->  	entry = hyp_symbol_addr(__start___kvm_ex_table);
->  	end = hyp_symbol_addr(__stop___kvm_ex_table);
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  
->  	while (entry < end) {
->  		addr = (unsigned long)&entry->insn + entry->insn;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 0970442d2dbc..cc4f8e790fb3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -175,7 +175,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  
->  	vcpu = kern_hyp_va(vcpu);
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	host_ctxt->__hyp_running_vcpu = vcpu;
->  	guest_ctxt = &vcpu->arch.ctxt;
->  
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index c1da4f86ccac..575e8054f116 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -108,7 +108,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  	struct kvm_cpu_context *guest_ctxt;
->  	u64 exit_code;
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	host_ctxt->__hyp_running_vcpu = vcpu;
->  	guest_ctxt = &vcpu->arch.ctxt;
->  
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index 996471e4c138..2a0b8c88d74f 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -66,7 +66,7 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
->  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->  	struct kvm_cpu_context *host_ctxt;
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	__sysreg_save_user_state(host_ctxt);
->  
->  	/*
-> @@ -100,7 +100,7 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
->  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->  	struct kvm_cpu_context *host_ctxt;
->  
-> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
-> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	deactivate_traps_vhe_put();
->  
->  	__sysreg_save_el1_state(guest_ctxt);
-> -- 
-> 2.28.0.402.g5ffc5be6b7-goog
-> 
-> -- 
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
-> 
+> +	return ret;
+> +}
+> +
+> +/*
+> + * This is a little fiddly, as we use all three of the walk flags. The idea
+> + * is that the TABLE_PRE callback runs for table entries on the way down,
+> + * looking for table entries which we could conceivably replace with a
+> + * block entry for this mapping. If it finds one, then it sets the 'anchor'
+> + * field in 'struct stage2_map_data' to point at the table entry, before
+> + * clearing the entry to zero and descending into the now detached table.
+> + *
+> + * The behaviour of the LEAF callback then depends on whether or not the
+> + * anchor has been set. If not, then we're not using a block mapping higher
+> + * up the table and we perform the mapping at the existing leaves instead.
+> + * If, on the other hand, the anchor _is_ set, then we drop references to
+> + * all valid leaves so that the pages beneath the anchor can be freed.
+> + *
+> + * Finally, the TABLE_POST callback does nothing if the anchor has not
+> + * been set, but otherwise frees the page-table pages while walking back up
+> + * the page-table, installing the block entry when it revisits the anchor
+> + * pointer and clearing the anchor to NULL.
+> + */
+
+The comment does wonders at explaining what is going on, thank you.
+
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
