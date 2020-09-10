@@ -2,87 +2,93 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6503C433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9846EC43461
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:12:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A3B220C09
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5DCC2145D
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uKyymqVf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3B220C09
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AA84R5re"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DCC2145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF6584B40D;
-	Thu, 10 Sep 2020 07:01:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 190B54B374;
+	Thu, 10 Sep 2020 07:12:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DbUekLYvvV8g; Thu, 10 Sep 2020 07:01:34 -0400 (EDT)
+	with ESMTP id izUr3PX98VfQ; Thu, 10 Sep 2020 07:12:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18B584B47B;
-	Thu, 10 Sep 2020 07:01:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB9674B32F;
+	Thu, 10 Sep 2020 07:12:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 186E94B20D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:18:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ECE64B31E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:12:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NUG3pxbvtzHd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 06:18:27 -0400 (EDT)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com
- [207.171.184.29])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D9254B19E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:18:27 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1599733107; x=1631269107;
- h=subject:to:cc:references:from:message-id:date:
- mime-version:in-reply-to:content-transfer-encoding;
- bh=SRsVjooROyCRFjNlvBdvzKJ6Tdg8KJ7q2QXauQDDOIA=;
- b=uKyymqVfN5RIMylmdOWGVoFh9o23Ap739DEJYJ0fFznJbG+e18p51hmd
- qrPXT+HW2CIokA6ZsGifZvBprd9e2ZOfNr9GEeDykFJj0ADviatJ4I1MI
- PJbXPqhjMwC4nK9A2mtXX7ECr8U6D6bfyd44Q5d1DryI9ykG7E6YwmeQr w=;
-X-IronPort-AV: E=Sophos;i="5.76,412,1592870400"; d="scan'208";a="75073669"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
- email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.47.23.38])
- by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP;
- 10 Sep 2020 10:18:21 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
- by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS
- id 35686A02A5; Thu, 10 Sep 2020 10:18:20 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 10 Sep 2020 10:18:19 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.162.38) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 10 Sep 2020 10:18:16 +0000
-Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
-To: Marc Zyngier <maz@kernel.org>
-References: <20200908205730.23898-1-graf@amazon.com>
- <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
-From: Alexander Graf <graf@amazon.com>
-Message-ID: <07255b9e-95d3-94d4-cfb0-6408e8bf7818@amazon.com>
-Date: Thu, 10 Sep 2020 12:18:13 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.1
+ with ESMTP id uYqu3ArnMmQi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 07:12:32 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E77A04B2BC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 07:12:31 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id z9so5394100wmk.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=qu8JH/be0rcbIWaaAUE3igFaIOUou49hkjsJpPAPR90=;
+ b=AA84R5regpZTTXFRpYdM+Or0tNH+fSOtcqP2pbugiGih/zhtRpJQ9cnshBMxr/2NFT
+ FkZa3oj1Xp06SJZG9wz5iZrx1xBELEnEKGxVH1OlRfHsL0dtvMMG2hk7s6PB8W+kvyir
+ sX9ek/eZRCmuRjUkFR4kKFs7iBNH565OLxk5AwZyOaq9Qz381ztlKjBTf7fJvXjDMtUv
+ k1mlUwbXnd1c0vx4qoZAdUmGXUdFF9d3I2xnTUUYMiE3r4QfZxZNnlyJVqBmH4suoSEl
+ a1udckqFeJUhnzcnBF+GizdyEJvpBbXbmvGn+XytRvONjxBJByJ66ZY3U9h6PWwIDfMo
+ 1qZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=qu8JH/be0rcbIWaaAUE3igFaIOUou49hkjsJpPAPR90=;
+ b=ttgdQsMTadQ9p1eLK40ELrIkuj8wsC/neQPoj9hBmhcnVJUeJLlGHAJGnyhCoYxyU5
+ WzxzSLNuOab9KDPd2GVE1Y3PQnHIoZIijQ4s9pG0PLze3tYJ3Tr7t9dnPVXNxvkrSpO/
+ lZ4NAdI2wvUa+HiPwNeuCFyTdGzFc2c+OzT+S7YOn1i4Ou+8FyE7QUh2ovRhtopsRZu+
+ z/iwYQgIpI3fG783QNejiTCZhGDX9rlKflRwG5tJx6H/rtKlQ9idyYiP3yXbMpbwp5OQ
+ D6BzB87szFghkjik4UV3NB99cxHSyIU1vNhgmB+WbnhiCFpjPkI6woQsbW1HO6Xga6ss
+ pSqA==
+X-Gm-Message-State: AOAM5325R6fW6n+rOGBwR/ZAjz5VjEp6Ar61YdT1r6yCqZA7H9HHgpv9
+ Q1sVJBNu5rpcjTOAhx0KwO7gXQ==
+X-Google-Smtp-Source: ABdhPJxbK5saNRK5bQpLtP1bvSvZb92KMkAB9oGsS0A6wEs9jJX9P12KvSs4xOamCVaMq+VkbnZhCQ==
+X-Received: by 2002:a1c:4886:: with SMTP id v128mr8080271wma.139.1599736350622; 
+ Thu, 10 Sep 2020 04:12:30 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
+ by smtp.gmail.com with ESMTPSA id t15sm2953444wmj.15.2020.09.10.04.12.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 10 Sep 2020 04:12:30 -0700 (PDT)
+Date: Thu, 10 Sep 2020 12:12:25 +0100
+From: Andrew Scull <ascull@google.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 03/10] kvm: arm64: Remove __hyp_this_cpu_read
+Message-ID: <20200910111225.GC93664@google.com>
+References: <20200903091712.46456-1-dbrazdil@google.com>
+ <20200903091712.46456-4-dbrazdil@google.com>
 MIME-Version: 1.0
-In-Reply-To: <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.38]
-X-ClientProxiedBy: EX13D45UWA004.ant.amazon.com (10.43.160.151) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-X-Mailman-Approved-At: Thu, 10 Sep 2020 07:01:29 -0400
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <20200903091712.46456-4-dbrazdil@google.com>
+Cc: linux-arch@vger.kernel.org, kernel-team@android.com,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,323 +100,251 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="windows-1252"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Thu, Sep 03, 2020 at 11:17:05AM +0200, 'David Brazdil' via kernel-team wrote:
+> this_cpu_ptr is meant for use in kernel proper because it selects between
+> TPIDR_EL1/2 based on nVHE/VHE. __hyp_this_cpu_ptr was used in hyp to always
+> select TPIDR_EL2. Unify all users behind this_cpu_ptr and friends by
+> selecting _EL2 register under __KVM_NVHE_HYPERVISOR__.
+> 
+> Under CONFIG_DEBUG_PREEMPT, the kernel helpers perform a preemption check
+> which is omitted by the hyp helpers. Preserve the behavior for nVHE by
+> overriding the corresponding macros under __KVM_NVHE_HYPERVISOR__. Extend
+> the checks into VHE hyp code.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h          | 20 --------------
+>  arch/arm64/include/asm/percpu.h           | 33 +++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 +--
+>  arch/arm64/kvm/hyp/include/hyp/switch.h   |  8 +++---
+>  arch/arm64/kvm/hyp/nvhe/switch.c          |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c           |  2 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 +--
+>  7 files changed, 41 insertions(+), 32 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 6f98fbd0ac81..9149079f0269 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -149,26 +149,6 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
+>  		addr;							\
+>  	})
+>  
+> -/*
+> - * Home-grown __this_cpu_{ptr,read} variants that always work at HYP,
+> - * provided that sym is really a *symbol* and not a pointer obtained from
+> - * a data structure. As for SHIFT_PERCPU_PTR(), the creative casting keeps
+> - * sparse quiet.
+> - */
+> -#define __hyp_this_cpu_ptr(sym)						\
+> -	({								\
+> -		void *__ptr;						\
+> -		__verify_pcpu_ptr(&sym);				\
+> -		__ptr = hyp_symbol_addr(sym);				\
+> -		__ptr += read_sysreg(tpidr_el2);			\
+> -		(typeof(sym) __kernel __force *)__ptr;			\
+> -	 })
+> -
+> -#define __hyp_this_cpu_read(sym)					\
+> -	({								\
+> -		*__hyp_this_cpu_ptr(sym);				\
+> -	 })
+> -
+>  #define __KVM_EXTABLE(from, to)						\
+>  	"	.pushsection	__kvm_ex_table, \"a\"\n"		\
+>  	"	.align		3\n"					\
+> diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
+> index 0b6409b89e5e..b4008331475b 100644
+> --- a/arch/arm64/include/asm/percpu.h
+> +++ b/arch/arm64/include/asm/percpu.h
+> @@ -19,7 +19,21 @@ static inline void set_my_cpu_offset(unsigned long off)
+>  			:: "r" (off) : "memory");
+>  }
+>  
+> -static inline unsigned long __my_cpu_offset(void)
+> +static inline unsigned long __hyp_my_cpu_offset(void)
+> +{
+> +	unsigned long off;
+> +
+> +	/*
+> +	 * We want to allow caching the value, so avoid using volatile and
+> +	 * instead use a fake stack read to hazard against barrier().
+> +	 */
+> +	asm("mrs %0, tpidr_el2" : "=r" (off) :
+> +		"Q" (*(const unsigned long *)current_stack_pointer));
+> +
+> +	return off;
+> +}
+> +
+> +static inline unsigned long __kern_my_cpu_offset(void)
+>  {
+>  	unsigned long off;
+>  
+> @@ -35,7 +49,12 @@ static inline unsigned long __my_cpu_offset(void)
+>  
+>  	return off;
+>  }
+> -#define __my_cpu_offset __my_cpu_offset()
+> +
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define __my_cpu_offset __hyp_my_cpu_offset()
 
+Is there a benefit to this being used for __KVM_VHE_HYPERVISOR__ too
+since that is "hyp" too and doesn't need the alternative since it will
+always pick EL2?
 
-On 10.09.20 12:06, Marc Zyngier wrote:
-> =
+> +#else
+> +#define __my_cpu_offset __kern_my_cpu_offset()
+> +#endif
+>  
+>  #define PERCPU_RW_OPS(sz)						\
+>  static inline unsigned long __percpu_read_##sz(void *ptr)		\
+> @@ -227,4 +246,14 @@ PERCPU_RET_OP(add, add, ldadd)
+>  
+>  #include <asm-generic/percpu.h>
+>  
+> +/* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its dependencies. */
+> +#if defined(__KVM_NVHE_HYPERVISOR__) && defined(CONFIG_DEBUG_PREEMPT)
+> +#undef	this_cpu_ptr
+> +#define	this_cpu_ptr		raw_cpu_ptr
+> +#undef	__this_cpu_read
+> +#define	__this_cpu_read		raw_cpu_read
+> +#undef	__this_cpu_write
+> +#define	__this_cpu_write	raw_cpu_write
+> +#endif
 
-> On 2020-09-08 21:57, Alexander Graf wrote:
->> We currently pass through the number of PMU counters that we have
->> available
->> in hardware to guests. So if my host supports 10 concurrently active
->> PMU
->> counters, my guest will be able to spawn 10 counters as well.
->>
->> This is undesireable if we also want to use the PMU on the host for
->> monitoring. In that case, we want to split the PMU between guest and
->> host.
->>
->> To help that case, let's add a PMU attr that allows us to limit the
->> number
->> of PMU counters that we expose. With this patch in place, user space
->> can
->> keep some counters free for host use.
->>
->> Signed-off-by: Alexander Graf <graf@amazon.com>
->>
->> ---
->>
->> Because this patch touches the same code paths as the vPMU filtering
->> one
->> and the vPMU filtering generalized a few conditions in the attr path,
->> I've based it on top. Please let me know if you want it independent
->> instead.
->>
->> v1 -> v2:
->>
->> =A0 - Add documentation
->> =A0 - Add read support
->> ---
->> =A0Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
->> =A0arch/arm64/include/uapi/asm/kvm.h=A0=A0=A0=A0=A0=A0 |=A0 7 ++++---
->> =A0arch/arm64/kvm/pmu-emul.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=
- 32
->> ++++++++++++++++++++++++++++++++
->> =A0arch/arm64/kvm/sys_regs.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=
-=A0 5 +++++
->> =A0include/kvm/arm_pmu.h=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 |=A0 1 +
->> =A05 files changed, 67 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
->> b/Documentation/virt/kvm/devices/vcpu.rst
->> index 203b91e93151..1a1c8d8c8b1d 100644
->> --- a/Documentation/virt/kvm/devices/vcpu.rst
->> +++ b/Documentation/virt/kvm/devices/vcpu.rst
->> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the
->> cycle counter is possible
->> =A0using event 0x11 (CPU_CYCLES).
->>
->>
->> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
->> +---------------------------------------------
->> +
->> +:Parameters: in kvm_device_attr.addr the address for the limit of
->> concurrent
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 events is a pointer to an int
->> +
->> +:Returns:
->> +
->> +=A0=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +=A0=A0=A0=A0=A0 -ENODEV: PMUv3 not supported
->> +=A0=A0=A0=A0=A0 -EBUSY:=A0 PMUv3 already initialized
->> +=A0=A0=A0=A0=A0 -EINVAL: Too large number of events
->> +=A0=A0=A0=A0=A0 =3D=3D=3D=3D=3D=3D=3D=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +
->> +Reconfigure the limit of concurrent PMU events that the guest can
->> monitor.
->> +This number is directly exposed as part of the PMCR_EL0 register.
->> +
->> +On vcpu creation, this attribute is set to the hardware limit of the
->> current
->> +platform. If you need to determine the hardware limit, you can read
->> this
->> +attribute before setting it.
->> +
->> +Restrictions: The default value for this property is the number of
->> hardware
->> +supported events. Only values that are smaller than the hardware limit
->> can
->> +be set.
->> +
->> =A02. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->> =A0=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h
->> b/arch/arm64/include/uapi/asm/kvm.h
->> index 7b1511d6ce44..db025c0b5a40 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
->>
->> =A0/* Device Control API on vcpu fd */
->> =A0#define KVM_ARM_VCPU_PMU_V3_CTRL=A0=A0=A0=A0 0
->> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_IRQ=A0=A0=A0 0
->> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_INIT=A0=A0 1
->> -#define=A0=A0 KVM_ARM_VCPU_PMU_V3_FILTER 2
->> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_IRQ=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0
->> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_INIT=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 1
->> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_FILTER=A0=A0=A0=A0=A0=A0=A0=A0 2
->> +#define=A0=A0 KVM_ARM_VCPU_PMU_V3_NUM_EVENTS=A0=A0=A0=A0 3
->> =A0#define KVM_ARM_VCPU_TIMER_CTRL=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 1
->> =A0#define=A0=A0 KVM_ARM_VCPU_TIMER_IRQ_VTIMER=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0 0
->> =A0#define=A0=A0 KVM_ARM_VCPU_TIMER_IRQ_PTIMER=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0 1
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 0458860bade2..c7915b95fec0 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
->>
->> =A0=A0=A0=A0=A0 for (i =3D 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pmu->pmc[i].idx =3D i;
->> +
->> +=A0=A0=A0=A0 pmu->num_events =3D perf_num_counters() - 1;
->> =A0}
->>
->> =A0/**
->> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
->> *vcpu, struct kvm_device_attr *attr)
->>
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->> =A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u64 mask =3D ARMV8_PMU_PMCR_N_MASK=
- << ARMV8_PMU_PMCR_N_SHIFT;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int __user *uaddr =3D (int __user =
-*)(long)attr->addr;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u32 num_events;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (get_user(num_events, uaddr))
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EF=
-AULT;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (num_events >=3D perf_num_count=
-ers())
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EI=
-NVAL;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 vcpu->arch.pmu.num_events =3D num_=
-events;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 num_events <<=3D ARMV8_PMU_PMCR_N_=
-SHIFT;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, SYS_PMCR_EL0)=
- &=3D ~mask;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, SYS_PMCR_EL0)=
- |=3D num_events;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->> +=A0=A0=A0=A0 }
->> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return kvm_arm_pmu_v3_init(vcpu);
->> =A0=A0=A0=A0=A0 }
->> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu
->> *vcpu, struct kvm_device_attr *attr)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 irq =3D vcpu->arch.pmu.irq_num;
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return put_user(irq, uaddr);
->> =A0=A0=A0=A0=A0 }
->> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int __user *uaddr =3D (int __user =
-*)(long)attr->addr;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u32 num_events;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (!test_bit(KVM_ARM_VCPU_PMU_V3,=
- vcpu->arch.features))
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EN=
-ODEV;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 num_events =3D vcpu->arch.pmu.num_=
-events;
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return put_user(num_events, uaddr);
->> +=A0=A0=A0=A0 }
->> =A0=A0=A0=A0=A0 }
->>
->> =A0=A0=A0=A0=A0 return -ENXIO;
->> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu
->> *vcpu, struct kvm_device_attr *attr)
->> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_IRQ:
->> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_INIT:
->> =A0=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_FILTER:
->> +=A0=A0=A0=A0 case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (kvm_arm_support_pmu_v3() &&
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 test_bit(KVM_ARM_VCP=
-U_PMU_V3, vcpu->arch.features))
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 20ab2a7d37ca..d51e39600bbd 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu,
->> const struct sys_reg_desc *r)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 | (ARMV8_PMU_PMCR_MASK & 0xdecafbad=
-)) & (~ARMV8_PMU_PMCR_E);
->> =A0=A0=A0=A0=A0 if (!system_supports_32bit_el0())
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 val |=3D ARMV8_PMU_PMCR_LC;
->> +
->> +=A0=A0=A0=A0 /* Override number of event selectors */
->> +=A0=A0=A0=A0 val &=3D ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT=
-);
->> +=A0=A0=A0=A0 val |=3D (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_=
-N_SHIFT;
->> +
->> =A0=A0=A0=A0=A0 __vcpu_sys_reg(vcpu, r->reg) =3D val;
->> =A0}
->>
->> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
->> index 98cbfe885a53..ea3fc96a37d9 100644
->> --- a/include/kvm/arm_pmu.h
->> +++ b/include/kvm/arm_pmu.h
->> @@ -27,6 +27,7 @@ struct kvm_pmu {
->> =A0=A0=A0=A0=A0 bool ready;
->> =A0=A0=A0=A0=A0 bool created;
->> =A0=A0=A0=A0=A0 bool irq_level;
->> +=A0=A0=A0=A0 u8 num_events;
->> =A0};
->>
->> =A0#define kvm_arm_pmu_v3_ready(v)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 ((v)->arch.pmu.ready)
-> =
+This is an incomplete cherry-picked list of macros that are redefined to
+remove the call to __this_cpu_preempt_check that would result in a
+linker failure since that symbol is not defined for nVHE hyp.
 
-> I see several problems with this approach:
-> =
+I remember there being some dislike of truely defining that symbol with
+an nVHE hyp implementation but I can't see why. Yes, nVHE hyp is always
+has preemption disabled so the implementation is just an empty function
+but why is is preferrable to redefine some of these macros instead?
 
-> - userspace doesn't really have a good way to retrieve the number of
->  =A0 counters.
-It does with v2, because it can then just read the register ;). I agree =
-
-that it's clunky though.
-
-> =
-
-> - Limiting the number of counters for the guest doesn't mean anything
->  =A0 when it comes to the actual use of the HW counters, given that we
->  =A0 don't allocate them ourselves (it's all perf doing the actual work).
-
-We do cap the number of actively requestable counters via perf by the =
-
-PMCR.N limit. So in a way, it does mean something.
-
-> - If you want to "pin" counters for the host, why don't you just do
->  =A0 that before starting the guest?
-
-You can do that. Imagine I have 10 counters. I pin 4 of them to the =
-
-host. I still tell my guest that it can use 6. That means perf will then =
-
-time slice and juggle 10 guest event counters on those remaining 6 =
-
-hardware counters. That juggling heavily reduces accuracy.
-
-> I think you need to look at the bigger picture: how to limit the use
-> of physical counter usage for a given userspace task. This needs
-> to happen in perf itself, and not in KVM.
-
-That's definitely another way to look at it that I agree with.
-
-What we really want is to expose the number of counters the guest has =
-
-available, not the number of counters hardware can support at maximum.
-
-So in theory it would be enough to ask perf how many counters it does =
-
-have free for me to consume without overcommitting. But that would =
-
-potentially change between multiple invocations of KVM and thus break =
-
-things like live migration, no?
-
-Maybe what we really want is an interface to perf from user space to say =
-
-"how many counters can you dedicate to me?" and "reserve them for me". =
-
-Then user space could reserve them as dedicated counters and KVM would =
-
-just need to either probe for the reservation or get told by user space =
-
-what to expose via ONE_REG as Drew suggested. It'd be up to user space =
-
-to ensure that the reservation matches the number of exposed counters then.
-
-
-Thoughts?
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+> +
+>  #endif /* __ASM_PERCPU_H */
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> index 5e28ea6aa097..4ebe9f558f3a 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> @@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = &vcpu->arch.host_debug_state.regs;
+>  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> @@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = &vcpu->arch.host_debug_state.regs;
+>  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 5b6b8fa00f0a..f150407fa798 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -386,7 +386,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+>  	    !esr_is_ptrauth_trap(kvm_vcpu_get_esr(vcpu)))
+>  		return false;
+>  
+> -	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	__ptrauth_save_key(ctxt, APIA);
+>  	__ptrauth_save_key(ctxt, APIB);
+>  	__ptrauth_save_key(ctxt, APDA);
+> @@ -495,7 +495,7 @@ static inline void __set_guest_arch_workaround_state(struct kvm_vcpu *vcpu)
+>  	 * guest wants it disabled, so be it...
+>  	 */
+>  	if (__needs_ssbd_off(vcpu) &&
+> -	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
+> +	    __this_cpu_read(arm64_ssbd_callback_required))
+>  		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 0, NULL);
+>  #endif
+>  }
+> @@ -507,7 +507,7 @@ static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
+>  	 * If the guest has disabled the workaround, bring it back on.
+>  	 */
+>  	if (__needs_ssbd_off(vcpu) &&
+> -	    __hyp_this_cpu_read(arm64_ssbd_callback_required))
+> +	    __this_cpu_read(arm64_ssbd_callback_required))
+>  		arm_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, 1, NULL);
+>  #endif
+>  }
+> @@ -521,7 +521,7 @@ static inline void __kvm_unexpected_el2_exception(void)
+>  
+>  	entry = hyp_symbol_addr(__start___kvm_ex_table);
+>  	end = hyp_symbol_addr(__stop___kvm_ex_table);
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  
+>  	while (entry < end) {
+>  		addr = (unsigned long)&entry->insn + entry->insn;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 0970442d2dbc..cc4f8e790fb3 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -175,7 +175,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu = kern_hyp_va(vcpu);
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index c1da4f86ccac..575e8054f116 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -108,7 +108,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	struct kvm_cpu_context *guest_ctxt;
+>  	u64 exit_code;
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> index 996471e4c138..2a0b8c88d74f 100644
+> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> @@ -66,7 +66,7 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
+>  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+>  	struct kvm_cpu_context *host_ctxt;
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	__sysreg_save_user_state(host_ctxt);
+>  
+>  	/*
+> @@ -100,7 +100,7 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
+>  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+>  	struct kvm_cpu_context *host_ctxt;
+>  
+> -	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+> +	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	deactivate_traps_vhe_put();
+>  
+>  	__sysreg_save_el1_state(guest_ctxt);
+> -- 
+> 2.28.0.402.g5ffc5be6b7-goog
+> 
+> -- 
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
