@@ -2,66 +2,94 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 999BBC43461
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA69C43461
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:55:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E7EC2207EA
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7EC2207EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 1BBF620882
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 09:55:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Mp48Y5o3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBF620882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 777E54B431;
-	Thu, 10 Sep 2020 05:21:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C7E14B3E1;
+	Thu, 10 Sep 2020 05:55:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ue94CsCtrypL; Thu, 10 Sep 2020 05:21:17 -0400 (EDT)
+	with ESMTP id yb4-SD83za-j; Thu, 10 Sep 2020 05:55:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 229884B442;
-	Thu, 10 Sep 2020 05:21:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C32C24B394;
+	Thu, 10 Sep 2020 05:55:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C50F4B37C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:21:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 132D44B36A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:55:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gL-x-XkZMkWz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 05:21:14 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA624B2A4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:21:14 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4612A1045;
- Thu, 10 Sep 2020 02:21:14 -0700 (PDT)
-Received: from [192.168.1.79] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BD033F68F;
- Thu, 10 Sep 2020 02:21:12 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-To: Andrew Jones <drjones@redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200904160018.29481-3-steven.price@arm.com>
- <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <3a7e18af-84bd-cee3-d68f-e08f225fc166@arm.com>
-Date: Thu, 10 Sep 2020 10:21:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id xJDuPCPtJzuP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 05:55:00 -0400 (EDT)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD1C94B394
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:55:00 -0400 (EDT)
+Received: by mail-wm1-f65.google.com with SMTP id l9so5156191wme.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 02:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=kBmlII5Vo//A9yPEJvnx3pKLF3xO4ua5qFTJHSq3g7w=;
+ b=Mp48Y5o3UTjqc7GRbcTi2cjvv51nFGNvyAA5DE1UfeTL1TMGbjAHc4RUbolyjBcq78
+ jLfYRxESN0S1R7j1vveSLWJeMYK+nJX28JhMyTmyicQtPHsq5swlYfpyW+55u5AoImfZ
+ oBxeH5Lbwxs2v/dztAijetFrho1Wx6bVj+Oc/dkvUXrE5TyUZWh0epgiUpxiOto85MsG
+ hTEOT+NcLacuqmR7JmXxY+IDVmr5voQ/ECTLxZvFSYbuWjRg4MsOVEUUgTnqbsR0HMQb
+ V0et67mMhX/LXsQcKVGVYQwUkRusWYFa/RLbGrMSils0/fDIHW0nT7CA22W1u9F3htI4
+ NkqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kBmlII5Vo//A9yPEJvnx3pKLF3xO4ua5qFTJHSq3g7w=;
+ b=Ieg7trjEst5zCGqXLVkhVaMTfqLxeuDToorKWaNihfwegBY5Ex0m0rPYPDdTkbGLKZ
+ DiDM+RAsY5kMSjbd0TcWcRiOJXuf3oKh0BD7HANaqEdxfm5Hjun6ME4GypD+Umu9R2GB
+ 0TvXGwDyfujTWKGYdL/WBAAEP4YKtSkuXoUjLJr9XY1Lze86yQ5GktmQHDLEqTnT/ZPP
+ U9BSXc2uYFmKj0BBWcSqqR//8NkfBMpuVL+12NXULzSkLhrUIj2wEtjfV6TzNkg6Hiyy
+ +vQKJfignkCemrX1T7t/2JaZNG50fbQYrOHPlAYrbaBJN8cBFLb6/jf0BuE9VDiEUwEz
+ AP7A==
+X-Gm-Message-State: AOAM53383I/R+MY+SpkaAWTGDQETjfw3r2a1irffId6P9wg3Zi3TAddy
+ 590+vH81v3u9LS1vXTCXZwpr5g==
+X-Google-Smtp-Source: ABdhPJxw2J4g1tLxlXhkthydaDC7Hl8eCBStOVqNL7T4xvp4Dg/q8If7FlfLMGbTnCUpJcon0gm14g==
+X-Received: by 2002:a7b:c14d:: with SMTP id z13mr7474778wmi.19.1599731699416; 
+ Thu, 10 Sep 2020 02:54:59 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
+ by smtp.gmail.com with ESMTPSA id b76sm2975511wme.45.2020.09.10.02.54.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 10 Sep 2020 02:54:58 -0700 (PDT)
+Date: Thu, 10 Sep 2020 10:54:54 +0100
+From: Andrew Scull <ascull@google.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 02/10] kvm: arm64: Partially link nVHE hyp code,
+ simplify HYPCOPY
+Message-ID: <20200910095454.GB93664@google.com>
+References: <20200903091712.46456-1-dbrazdil@google.com>
+ <20200903091712.46456-3-dbrazdil@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
-Content-Language: en-GB
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20200903091712.46456-3-dbrazdil@google.com>
+Cc: linux-arch@vger.kernel.org, kernel-team@android.com,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,184 +101,149 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/09/2020 16:48, Andrew Jones wrote:
-> On Fri, Sep 04, 2020 at 05:00:18PM +0100, Steven Price wrote:
->> Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
->> on a VCPU. When enabled on any VCPU in the virtual machine this causes
->> all pages that are faulted into the VM to have the PG_mte_tagged flag
->> set (and the tag storage cleared if this is the first use).
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h |  3 +++
->>   arch/arm64/include/asm/kvm_host.h    |  5 ++++-
->>   arch/arm64/include/uapi/asm/kvm.h    |  1 +
->>   arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
->>   arch/arm64/kvm/reset.c               |  8 ++++++++
->>   arch/arm64/kvm/sys_regs.c            |  6 +++++-
->>   6 files changed, 36 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 49a55be2b9a2..0042323a4b7f 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->>   	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
->>   	    vcpu_el1_is_32bit(vcpu))
->>   		vcpu->arch.hcr_el2 |= HCR_TID2;
->> +
->> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
->> +		vcpu->arch.hcr_el2 |= HCR_ATA;
->>   }
->>   
->>   static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 4f4360dd149e..b1190366242b 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -37,7 +37,7 @@
->>   
->>   #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
->>   
->> -#define KVM_VCPU_MAX_FEATURES 7
->> +#define KVM_VCPU_MAX_FEATURES 8
->>   
->>   #define KVM_REQ_SLEEP \
->>   	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->> @@ -110,6 +110,9 @@ struct kvm_arch {
->>   	 * supported.
->>   	 */
->>   	bool return_nisv_io_abort_to_user;
->> +
->> +	/* If any VCPU has MTE enabled then all memory must be MTE enabled */
->> +	bool vcpu_has_mte;
+On Thu, Sep 03, 2020 at 11:17:04AM +0200, 'David Brazdil' via kernel-team wrote:
+> Previous series introduced custom build rules for nVHE hyp code, using
+> objcopy to prefix ELF section and symbol names to separate nVHE code
+> into its own "namespace". This approach was limited by the expressiveness
+> of objcopy's command line interface, eg. missing support for wildcards.
 > 
-> It looks like this is unnecessary as it's only used once, where a feature
-> check could be used.
-
-It's used in user_mem_abort(), so every time we fault a page into the VM 
-- so having to iterate over all VCPUs to check if any have the feature 
-bit set seems too expensive.
-
-Although perhaps I should just accept that this is realistically a VM 
-setting and move it out of the VCPU.
-
->>   };
->>   
->>   struct kvm_vcpu_fault_info {
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index ba85bb23f060..2677e1ab8c16 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -106,6 +106,7 @@ struct kvm_regs {
->>   #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
->>   #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
->>   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
->> +#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
->>   
->>   struct kvm_vcpu_init {
->>   	__u32 target;
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index ba00bcc0c884..e8891bacd76f 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	if (vma_pagesize == PAGE_SIZE && !force_pte)
->>   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->>   							   &pfn, &fault_ipa);
->> +	if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
->> +		/*
->> +		 * VM will be able to see the page's tags, so we must ensure
->> +		 * they have been initialised.
->> +		 */
->> +		struct page *page = pfn_to_page(pfn);
->> +		long i, nr_pages = compound_nr(page);
->> +
->> +		/* if PG_mte_tagged is set, tags have already been initialised */
->> +		for (i = 0; i < nr_pages; i++, page++) {
->> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
->> +				mte_clear_page_tags(page_address(page));
->> +		}
->> +	}
->> +
->>   	if (writable)
->>   		kvm_set_pfn_dirty(pfn);
->>   
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index ee33875c5c2a..82f3883d717f 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -274,6 +274,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->>   		}
->>   	}
->>   
->> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
->> +		if (!system_supports_mte()) {
->> +			ret = -EINVAL;
->> +			goto out;
->> +		}
->> +		vcpu->kvm->arch.vcpu_has_mte = true;
->> +	}
+> Improve the build rules by partially linking all '.hyp.o' files and
+> prefixing their ELF section names using a linker script. Continue using
+> objcopy for prefixing ELF symbol names.
 > 
-> We either need a KVM cap or a new CPU feature probing interface to avoid
-> making userspace try features one at a time. It's too bad that VCPU_INIT
-> doesn't clear all offending features from the feature set when returning
-> EINVAL, because then userspace could create a scratch VCPU with everything
-> it supports in order to see what KVM also supports in one go.
+> One immediate advantage of this approach is that all subsections
+> matching a pattern can be merged into a single prefixed section, eg.
+> .text and .text.* can be linked into a single '.hyp.text'. This removes
+> the need for -fno-reorder-functions on GCC and will be useful in the
+> future too: LTO builds use .text subsections, compilers routinely
+> generate .rodata subsections, etc.
 
-If Peter's TELL_ME_WHAT_YOU_HAVE idea works out then perhaps we don't 
-need the cap? Or would it still be useful?
+This certaintly feels like a more robust and controlled approach to the
+sections now that we have an explicit list of those that are allowed.
 
-Thanks,
-
-Steve
-
->> +
->>   	switch (vcpu->arch.target) {
->>   	default:
->>   		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index a655f172b5ad..6a971b201e81 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>   			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
->>   		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
->>   	} else if (id == SYS_ID_AA64PFR1_EL1) {
->> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
->> +		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
->> +			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
->>   	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
->>   		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
->>   			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
->> @@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->>   static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->>   				   const struct sys_reg_desc *rd)
->>   {
->> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
->> +		return 0;
->> +
->>   	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
->>   }
->>   
->> -- 
->> 2.20.1
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>
+> Partially linking all hyp code into a single object file also makes it
+> easier to analyze.
 > 
-> Thanks,
-> drew
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/Makefile  | 56 ++++++++++++++++---------------
+>  arch/arm64/kvm/hyp/nvhe/hyp.lds.S | 14 ++++++++
+>  2 files changed, 43 insertions(+), 27 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp.lds.S
 > 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index aef76487edc2..1b2fbb19f3e8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -10,40 +10,42 @@ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o
+>  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o
+>  
+> -obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+> -extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
+> +##
+> +## Build rules for compiling nVHE hyp code
+> +## Output of this folder is `hyp.o`, a partially linked object file containing
+> +## all nVHE hyp code and data.
+> +##
+>  
+> -$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
+> +hyp-obj := $(patsubst %.o,%.hyp.o,$(obj-y))
+> +obj-y := hyp.o
+> +extra-y := $(hyp-obj) hyp.tmp.o hyp.lds
+> +
+> +# 1) Compile all source files to `.hyp.o` object files. The file extension
+> +#    avoids file name clashes for files shared with VHE.
 
+Very much a nit, but possibly .nvhe.o or .kvm_nvhe.o would make the
+intended distinction more obvious and line up with the prefix being
+applied to the symbols.
+
+> +$(obj)/%.hyp.o: $(src)/%.c FORCE
+>  	$(call if_changed_rule,cc_o_c)
+> -$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
+> +$(obj)/%.hyp.o: $(src)/%.S FORCE
+>  	$(call if_changed_rule,as_o_S)
+> -$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
+> -	$(call if_changed,hypcopy)
+>  
+> -# Disable reordering functions by GCC (enabled at -O2).
+> -# This pass puts functions into '.text.*' sections to aid the linker
+> -# in optimizing ELF layout. See HYPCOPY comment below for more info.
+> -ccflags-y += $(call cc-option,-fno-reorder-functions)
+> +# 2) Compile linker script.
+> +$(obj)/hyp.lds: $(src)/hyp.lds.S FORCE
+> +	$(call if_changed_dep,cpp_lds_S)
+> +
+> +# 3) Partially link all '.hyp.o' files and apply the linker script.
+> +#    Prefixes names of ELF sections with '.hyp', eg. '.hyp.text'.
+> +LDFLAGS_hyp.tmp.o := -r -T $(obj)/hyp.lds
+> +$(obj)/hyp.tmp.o: $(addprefix $(obj)/,$(hyp-obj)) $(obj)/hyp.lds FORCE
+> +	$(call if_changed,ld)
+> +
+> +# 4) Produce the final 'hyp.o', ready to be linked into 'vmlinux'.
+> +#    Prefixes names of ELF symbols with '__kvm_nvhe_'.
+> +$(obj)/hyp.o: $(obj)/hyp.tmp.o FORCE
+> +	$(call if_changed,hypcopy)
+>  
+>  # The HYPCOPY command uses `objcopy` to prefix all ELF symbol names
+> -# and relevant ELF section names to avoid clashes with VHE code/data.
+> -#
+> -# Hyp code is assumed to be in the '.text' section of the input object
+> -# files (with the exception of specialized sections such as
+> -# '.hyp.idmap.text'). This assumption may be broken by a compiler that
+> -# divides code into sections like '.text.unlikely' so as to optimize
+> -# ELF layout. HYPCOPY checks that no such sections exist in the input
+> -# using `objdump`, otherwise they would be linked together with other
+> -# kernel code and not memory-mapped correctly at runtime.
+> +# to avoid clashes with VHE code/data.
+>  quiet_cmd_hypcopy = HYPCOPY $@
+> -      cmd_hypcopy =							\
+> -	if $(OBJDUMP) -h $< | grep -F '.text.'; then			\
+> -		echo "$@: function reordering not supported in nVHE hyp code" >&2; \
+> -		/bin/false;						\
+> -	fi;								\
+> -	$(OBJCOPY) --prefix-symbols=__kvm_nvhe_				\
+> -		   --rename-section=.text=.hyp.text			\
+> -		   $< $@
+> +      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+>  
+>  # Remove ftrace and Shadow Call Stack CFLAGS.
+>  # This is equivalent to the 'notrace' and '__noscs' annotations.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+> new file mode 100644
+> index 000000000000..aaa0ce133a32
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Linker script used during partial linking of nVHE EL2 object files.
+> + * Written by David Brazdil <dbrazdil@google.com>
+> + */
+
+Should this file have the standard copyright line?
+
+> +
+> +/*
+> + * Defines an ELF hyp section from input section @NAME and its subsections.
+> + */
+> +#define HYP_SECTION(NAME) .hyp##NAME : { *(NAME NAME##.[0-9a-zA-Z_]*) }
+> +
+> +SECTIONS {
+> +	HYP_SECTION(.text)
+> +}
+> -- 
+> 2.28.0.402.g5ffc5be6b7-goog
+> 
+> -- 
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
