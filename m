@@ -2,90 +2,83 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3CDEC2D0E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E2AC2D0A7
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B1622076D
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06CC0206D4
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 08:35:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KppkCOGG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B1622076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jrd94r/H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06CC0206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C82D4B3AE;
-	Thu, 10 Sep 2020 04:29:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56D114B34D;
+	Thu, 10 Sep 2020 04:35:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cwqtYVtA1u4k; Thu, 10 Sep 2020 04:29:27 -0400 (EDT)
+	with ESMTP id AJ7mddvkNDx2; Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E51B4B3E3;
-	Thu, 10 Sep 2020 04:29:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7504B36F;
+	Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3DE4B4AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 02:28:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 106764B364
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:35:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FhuVrTAOS4kg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 02:28:27 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 970774B47F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 02:28:27 -0400 (EDT)
-Received: from coco.lan (ip5f5ad5ac.dynamic.kabel-deutschland.de
- [95.90.213.172])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id EzaYjNPtx4pO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 04:35:33 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
+ [207.211.31.81])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF704B34D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:35:33 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599726933;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CYmRoWWniFPaHjjXdipbulnXobK8uQf7JpAYrezYUMM=;
+ b=Jrd94r/HLukKL+bmeayIdic1MwPX1kcaTa+3PQ7M16CfACxICj1D+ITY6CmbTiW+kPy6R4
+ l/vxTHDnYUBat7s1vdiU+1hyVp9qLKn7mkl4R5EJ2RLQijekrvA+eDBEIQgT+ia0Mncck9
+ 3zYIfRWX4HhuDmpHZsV3hefV3IN+1Ow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-LSHAAh1-MpCiq8ANKZVVcQ-1; Thu, 10 Sep 2020 04:35:29 -0400
+X-MC-Unique: LSHAAh1-MpCiq8ANKZVVcQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 79CF6206A1;
- Thu, 10 Sep 2020 06:28:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599719306;
- bh=DjrBPnz1BgCnBYG/64IiUxKEJrMJGKb1A3mRWVpncJk=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KppkCOGGex5Td4qsjLzCFk1NCf4XHbXpibLJsQYMVVaT0bkaAFQjn+ZuEeXf2o77m
- UyE3jBNOXTpotfoeco2l+h7jkiCeDQm7I+A6v3H6sCfl0zDTboY8/bNQu+oaB5Un+6
- r8LmWMYkPZepovOPOzqdHyn81ea3fXGQ2O9gVUL8=
-Date: Thu, 10 Sep 2020 08:28:12 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Joe Perches <joe@perches.com>
-Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough; to
- break;
-Message-ID: <20200910082812.057a04e6@coco.lan>
-In-Reply-To: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
-References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB87E1008308;
+ Thu, 10 Sep 2020 08:35:27 +0000 (UTC)
+Received: from [10.36.112.212] (ovpn-112-212.ams2.redhat.com [10.36.112.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F88E10027A4;
+ Thu, 10 Sep 2020 08:35:25 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+From: Auger Eric <eric.auger@redhat.com>
+To: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu
+References: <20200908205730.23898-1-graf@amazon.com>
+ <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
+Message-ID: <366e640b-eb1e-33a2-7865-2751742cae58@redhat.com>
+Date: Thu, 10 Sep 2020 10:35:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Mailman-Approved-At: Thu, 10 Sep 2020 04:29:24 -0400
-Cc: linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
- oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
- alsa-devel <alsa-devel@alsa-project.org>, dri-devel@lists.freedesktop.org,
- linux-mips@vger.kernel.org, linux-ide@vger.kernel.org, dm-devel@redhat.com,
- linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
- sparclinux@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-rtc@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-atm-general@lists.sourceforge.net, linux-afs@lists.infradead.org,
- coreteam@netfilter.org, intel-wired-lan@lists.osuosl.org,
- linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
- linux-mmc@vger.kernel.org, Kees Cook <kees.cook@canonical.com>,
- linux-media@vger.kernel.org, linux-pm@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, linux-sctp@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org,
- storagedev@microchip.com, ceph-devel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
- Jiri Kosina <trivial@kernel.org>, linux-parisc@vger.kernel.org,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- Nick Desaulniers <ndesaulniers@google.com>,
- LKML <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org,
- netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <79606f01-7638-ed6f-27c8-1183c723cd60@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,46 +95,215 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Em Wed, 09 Sep 2020 13:06:39 -0700
-Joe Perches <joe@perches.com> escreveu:
+Hi Alex,
 
-> fallthrough to a separate case/default label break; isn't very readable.
+On 9/10/20 9:21 AM, Auger Eric wrote:
+> Hi Alex,
 > 
-> Convert pseudo-keyword fallthrough; statements to a simple break; when
-> the next label is case or default and the only statement in the next
-> label block is break;
+> On 9/8/20 10:57 PM, Alexander Graf wrote:
+>> We currently pass through the number of PMU counters that we have available
+>> in hardware to guests. So if my host supports 10 concurrently active PMU
+>> counters, my guest will be able to spawn 10 counters as well.
+>>
+>> This is undesireable if we also want to use the PMU on the host for
+>> monitoring. In that case, we want to split the PMU between guest and
+>> host.
+> but don't we have a trap and emulate approach as opposed to current SPE
+> implementation?
+
+Looking again at the switch code (__pmu_switch_to_guest), I see we just
+enable/disable the event counters owned by either the host/guest. I
+thought this was more involved. So now it is clear.
+
+Thanks
+
+Eric
+>>
+>> To help that case, let's add a PMU attr that allows us to limit the number
+>> of PMU counters that we expose. With this patch in place, user space can
+>> keep some counters free for host use.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>>
+>> ---
+>>
+>> Because this patch touches the same code paths as the vPMU filtering one
+>> and the vPMU filtering generalized a few conditions in the attr path,
+>> I've based it on top. Please let me know if you want it independent instead.
+>>
+>> v1 -> v2:
+>>
+>>   - Add documentation
+>>   - Add read support
+>> ---
+>>  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
+>>  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
+>>  arch/arm64/kvm/pmu-emul.c               | 32 ++++++++++++++++++++++++++++++++
+>>  arch/arm64/kvm/sys_regs.c               |  5 +++++
+>>  include/kvm/arm_pmu.h                   |  1 +
+>>  5 files changed, 67 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+>> index 203b91e93151..1a1c8d8c8b1d 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the cycle counter is possible
+>>  using event 0x11 (CPU_CYCLES).
+>>  
+>>  
+>> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
+>> +---------------------------------------------
+>> +
+>> +:Parameters: in kvm_device_attr.addr the address for the limit of concurrent
+>> +             events is a pointer to an int
+>> +
+>> +:Returns:
+>> +
+>> +	 =======  ======================================================
+>> +	 -ENODEV: PMUv3 not supported
+>> +	 -EBUSY:  PMUv3 already initialized
+>> +	 -EINVAL: Too large number of events
+> s/events/event counters
 > 
-> Found using:
+> I see that in perf code indeed num_events is used for that but I think
+> for the end-user the event counter terminology is better as it fits the
+> ARM spec.
+>> +	 =======  ======================================================
+>> +
+>> +Reconfigure the limit of concurrent PMU events that the guest can monitor.
+> here also
+>> +This number is directly exposed as part of the PMCR_EL0 register.
+> Maybe quote the "N" field
+>> +
+>> +On vcpu creation, this attribute is set to the hardware limit of the current
+>> +platform. If you need to determine the hardware limit, you can read this
+>> +attribute before setting it.
+>> +
+>> +Restrictions: The default value for this property is the number of hardware
+>> +supported events. Only values that are smaller than the hardware limit can
+> event counters
+>> +be set.
+>> +
+>>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>>  =================================
+>>  
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 7b1511d6ce44..db025c0b5a40 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
+>>  
+>>  /* Device Control API on vcpu fd */
+>>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+>> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
+>> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+>> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
+>> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
+>> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
+>> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
+>>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>> index 0458860bade2..c7915b95fec0 100644
+>> --- a/arch/arm64/kvm/pmu-emul.c
+>> +++ b/arch/arm64/kvm/pmu-emul.c
+>> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+>>  
+>>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>>  		pmu->pmc[i].idx = i;
+>> +
+>> +	pmu->num_events = perf_num_counters() - 1;
+>>  }
+>>  
+>>  /**
+>> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  
+>>  		return 0;
+>>  	}
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		u32 num_events;
+>> +
+>> +		if (get_user(num_events, uaddr))
+>> +			return -EFAULT;
+>> +
+>> +		if (num_events >= perf_num_counters())
+>> +			return -EINVAL;
+>> +
+>> +		vcpu->arch.pmu.num_events = num_events;
+>> +
+>> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
+>> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
+>> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
+>> +
+>> +		return 0;
+>> +	}
+>>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>>  		return kvm_arm_pmu_v3_init(vcpu);
+>>  	}
+>> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  		irq = vcpu->arch.pmu.irq_num;
+>>  		return put_user(irq, uaddr);
+>>  	}
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		u32 num_events;
+>> +
+>> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>> +			return -ENODEV;
+>> +
+>> +		num_events = vcpu->arch.pmu.num_events;
+>> +		return put_user(num_events, uaddr);
+>> +	}
+>>  	}
+>>  
+>>  	return -ENXIO;
+>> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
+>>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>>  	case KVM_ARM_VCPU_PMU_V3_FILTER:
+>> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
+>>  		if (kvm_arm_support_pmu_v3() &&
+>>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>>  			return 0;
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 20ab2a7d37ca..d51e39600bbd 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>>  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+>>  	if (!system_supports_32bit_el0())
+>>  		val |= ARMV8_PMU_PMCR_LC;
+>> +
+>> +	/* Override number of event selectors */
+>> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+>> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
+>> +
+>>  	__vcpu_sys_reg(vcpu, r->reg) = val;
+>>  }
+>>  
+>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> index 98cbfe885a53..ea3fc96a37d9 100644
+>> --- a/include/kvm/arm_pmu.h
+>> +++ b/include/kvm/arm_pmu.h
+>> @@ -27,6 +27,7 @@ struct kvm_pmu {
+>>  	bool ready;
+>>  	bool created;
+>>  	bool irq_level;
+>> +	u8 num_events;
+>>  };
+>>  
+>>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+>>
 > 
-> $ grep-2.5.4 -rP --include=*.[ch] -n "fallthrough;(\s*(case\s+\w+|default)\s*:\s*){1,7}break;" *
+> Thanks
 > 
-> Miscellanea:
-> 
-> o Move or coalesce a couple label blocks above a default: block.
-> 
-> Signed-off-by: Joe Perches <joe@perches.com>
-> ---
-> 
-> Compiled allyesconfig x86-64 only.
-> A few files for other arches were not compiled.
+> Eric
 > 
 
-
->  drivers/media/dvb-frontends/drxd_hard.c                   |  2 +-
->  drivers/media/i2c/ov5640.c                                |  2 +-
->  drivers/media/i2c/ov6650.c                                |  5 ++---
->  drivers/media/i2c/smiapp/smiapp-core.c                    |  2 +-
->  drivers/media/i2c/tvp5150.c                               |  2 +-
->  drivers/media/pci/ddbridge/ddbridge-core.c                |  2 +-
->  drivers/media/usb/cpia2/cpia2_core.c                      |  2 +-
-
-For media drivers:
-
-Reviewed-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-
-
-Thanks,
-Mauro
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
