@@ -2,89 +2,81 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4008CC433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 10:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BF1C433E2
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 10:06:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DCCB20882
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 10:01:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9E3F20BED
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 10:06:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHtit0kB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DCCB20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="aexmjgeI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E3F20BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D26244B3FB;
-	Thu, 10 Sep 2020 06:01:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20F1C4B368;
+	Thu, 10 Sep 2020 06:06:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sRK+yJdxlM-Z; Thu, 10 Sep 2020 06:01:17 -0400 (EDT)
+	with ESMTP id yHwsJcfOjEmk; Thu, 10 Sep 2020 06:06:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCB054B3E1;
-	Thu, 10 Sep 2020 06:01:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A48074B39A;
+	Thu, 10 Sep 2020 06:06:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E20C14B393
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:01:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B234B368
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:06:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z91E6taIe9Bn for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 06:01:15 -0400 (EDT)
-Received: from us-smtp-1.mimecast.com (us-smtp-2.mimecast.com [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F924B385
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:01:14 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599732074;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=SAWVsQ1VutHeIxcMMMfasmStNBpMRCAzjajMGXTXbd0=;
- b=eHtit0kB4Q4gqxCFnvs2sI/d1zB45cvF+vS4fBVctNtQB7dyum3wgsgdHAVCkPqmajfyTV
- rK7w4uQVbZNby42gkseiqeFWLxHhIJQAaxPmg/ytNX3fzdBnNrGmLcV5j2FqP0Ql76DS7E
- DrRVbJBNULeZhT/RYaFKC4XS6Hxgjf8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-2ul8F2GxPr6_nDXiBcdcfQ-1; Thu, 10 Sep 2020 06:01:11 -0400
-X-MC-Unique: 2ul8F2GxPr6_nDXiBcdcfQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 7N4U7QG-Q5p3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 06:06:16 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9513C4B353
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 06:06:16 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35E8C801FDF;
- Thu, 10 Sep 2020 10:01:08 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 32A011002D5E;
- Thu, 10 Sep 2020 10:01:04 +0000 (UTC)
-Date: Thu, 10 Sep 2020 12:01:01 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-Message-ID: <20200910100101.4c47ww4xniza7owi@kamzik.brq.redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200904160018.29481-3-steven.price@arm.com>
- <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
- <CAFEAcA_1YnBg3HVmtrSMP8u7GqHY8mtDAJwVcZuNUhwA+q9q=w@mail.gmail.com>
- <20200910063854.vwhtn3lc5tei72fh@kamzik.brq.redhat.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id 41DDD2145D;
+ Thu, 10 Sep 2020 10:06:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1599732375;
+ bh=C+snSaZA8ZBO3q0gc3u/ZtSs9A6Zfxe83fdVxOebxeY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=aexmjgeIlOuf7o8/3vsTxY6s5ghVA4dP4oPjSddZgeEo4OONVkQe/myhLxgJ1tzbV
+ KiuaN+csufQjiaPm5fpwF/tiQ97EeEXINclU22ZfFZ1m8g/1rj6o7LS4O7jMXc6wZU
+ B5u9feq//iW5SBASH+t+o9K8VaPQH/bDeJJKW000=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kGJT3-00Ae10-8R; Thu, 10 Sep 2020 11:06:13 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200910063854.vwhtn3lc5tei72fh@kamzik.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Dave Martin <Dave.Martin@arm.com>
+Date: Thu, 10 Sep 2020 11:06:13 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH v2] KVM: arm64: Allow to limit number of PMU counters
+In-Reply-To: <20200908205730.23898-1-graf@amazon.com>
+References: <20200908205730.23898-1-graf@amazon.com>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <9a4279aa9bf0a40bece3930c11c2f7cb@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: graf@amazon.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robin.murphy@arm.com,
+ mark.rutland@arm.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,54 +88,230 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 10, 2020 at 08:38:54AM +0200, Andrew Jones wrote:
-> On Wed, Sep 09, 2020 at 04:53:02PM +0100, Peter Maydell wrote:
-> > On Wed, 9 Sep 2020 at 16:48, Andrew Jones <drjones@redhat.com> wrote:
-> > > We either need a KVM cap or a new CPU feature probing interface to avoid
-> > > making userspace try features one at a time. It's too bad that VCPU_INIT
-> > > doesn't clear all offending features from the feature set when returning
-> > > EINVAL, because then userspace could create a scratch VCPU with everything
-> > > it supports in order to see what KVM also supports in one go.
-> > 
-> > You could add one if you wanted -- add a new feature bit
-> > TELL_ME_WHAT_YOU_HAVE. If the kernel sees that then on filure
-> > it clears out feature bits it doesn't support and also clears
-> > TELL_ME_WHAT_YOU_HAVE. If QEMU sees EINVAL and TELL_ME_WHAT_YOU_HAVE
-> > is still set, then it knows it's dealing with an old kernel
-> > and has to do one-at-a-time probing. If it sees EINVAL but not
-> > TELL_ME_WHAT_YOU_HAVE then it knows it has a new kernel and
-> > has just got all the info.
-> >
+On 2020-09-08 21:57, Alexander Graf wrote:
+> We currently pass through the number of PMU counters that we have 
+> available
+> in hardware to guests. So if my host supports 10 concurrently active 
+> PMU
+> counters, my guest will be able to spawn 10 counters as well.
 > 
-> That's a great proposal. I'll try to find time to send the patches.
->
+> This is undesireable if we also want to use the PMU on the host for
+> monitoring. In that case, we want to split the PMU between guest and
+> host.
+> 
+> To help that case, let's add a PMU attr that allows us to limit the 
+> number
+> of PMU counters that we expose. With this patch in place, user space 
+> can
+> keep some counters free for host use.
+> 
+> Signed-off-by: Alexander Graf <graf@amazon.com>
+> 
+> ---
+> 
+> Because this patch touches the same code paths as the vPMU filtering 
+> one
+> and the vPMU filtering generalized a few conditions in the attr path,
+> I've based it on top. Please let me know if you want it independent 
+> instead.
+> 
+> v1 -> v2:
+> 
+>   - Add documentation
+>   - Add read support
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h       |  7 ++++---
+>  arch/arm64/kvm/pmu-emul.c               | 32 
+> ++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c               |  5 +++++
+>  include/kvm/arm_pmu.h                   |  1 +
+>  5 files changed, 67 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst
+> b/Documentation/virt/kvm/devices/vcpu.rst
+> index 203b91e93151..1a1c8d8c8b1d 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -102,6 +102,31 @@ isn't strictly speaking an event. Filtering the
+> cycle counter is possible
+>  using event 0x11 (CPU_CYCLES).
+> 
+> 
+> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_NUM_EVENTS
+> +---------------------------------------------
+> +
+> +:Parameters: in kvm_device_attr.addr the address for the limit of 
+> concurrent
+> +             events is a pointer to an int
+> +
+> +:Returns:
+> +
+> +	 =======  ======================================================
+> +	 -ENODEV: PMUv3 not supported
+> +	 -EBUSY:  PMUv3 already initialized
+> +	 -EINVAL: Too large number of events
+> +	 =======  ======================================================
+> +
+> +Reconfigure the limit of concurrent PMU events that the guest can 
+> monitor.
+> +This number is directly exposed as part of the PMCR_EL0 register.
+> +
+> +On vcpu creation, this attribute is set to the hardware limit of the 
+> current
+> +platform. If you need to determine the hardware limit, you can read 
+> this
+> +attribute before setting it.
+> +
+> +Restrictions: The default value for this property is the number of 
+> hardware
+> +supported events. Only values that are smaller than the hardware limit 
+> can
+> +be set.
+> +
+>  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+>  =================================
+> 
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+> b/arch/arm64/include/uapi/asm/kvm.h
+> index 7b1511d6ce44..db025c0b5a40 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -342,9 +342,10 @@ struct kvm_vcpu_events {
+> 
+>  /* Device Control API on vcpu fd */
+>  #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+> -#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+> -#define   KVM_ARM_VCPU_PMU_V3_INIT	1
+> -#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
+> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
+> +#define   KVM_ARM_VCPU_PMU_V3_FILTER		2
+> +#define   KVM_ARM_VCPU_PMU_V3_NUM_EVENTS	3
+>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 0458860bade2..c7915b95fec0 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -253,6 +253,8 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+> 
+>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>  		pmu->pmc[i].idx = i;
+> +
+> +	pmu->num_events = perf_num_counters() - 1;
+>  }
+> 
+>  /**
+> @@ -978,6 +980,25 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu
+> *vcpu, struct kvm_device_attr *attr)
+> 
+>  		return 0;
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+> +		u64 mask = ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT;
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		u32 num_events;
+> +
+> +		if (get_user(num_events, uaddr))
+> +			return -EFAULT;
+> +
+> +		if (num_events >= perf_num_counters())
+> +			return -EINVAL;
+> +
+> +		vcpu->arch.pmu.num_events = num_events;
+> +
+> +		num_events <<= ARMV8_PMU_PMCR_N_SHIFT;
+> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) &= ~mask;
+> +		__vcpu_sys_reg(vcpu, SYS_PMCR_EL0) |= num_events;
+> +
+> +		return 0;
+> +	}
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>  		return kvm_arm_pmu_v3_init(vcpu);
+>  	}
+> @@ -1004,6 +1025,16 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu
+> *vcpu, struct kvm_device_attr *attr)
+>  		irq = vcpu->arch.pmu.irq_num;
+>  		return put_user(irq, uaddr);
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		u32 num_events;
+> +
+> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> +			return -ENODEV;
+> +
+> +		num_events = vcpu->arch.pmu.num_events;
+> +		return put_user(num_events, uaddr);
+> +	}
+>  	}
+> 
+>  	return -ENXIO;
+> @@ -1015,6 +1046,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu
+> *vcpu, struct kvm_device_attr *attr)
+>  	case KVM_ARM_VCPU_PMU_V3_IRQ:
+>  	case KVM_ARM_VCPU_PMU_V3_INIT:
+>  	case KVM_ARM_VCPU_PMU_V3_FILTER:
+> +	case KVM_ARM_VCPU_PMU_V3_NUM_EVENTS:
+>  		if (kvm_arm_support_pmu_v3() &&
+>  		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>  			return 0;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 20ab2a7d37ca..d51e39600bbd 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -672,6 +672,11 @@ static void reset_pmcr(struct kvm_vcpu *vcpu,
+> const struct sys_reg_desc *r)
+>  	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+>  	if (!system_supports_32bit_el0())
+>  		val |= ARMV8_PMU_PMCR_LC;
+> +
+> +	/* Override number of event selectors */
+> +	val &= ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> +	val |= (u32)vcpu->arch.pmu.num_events << ARMV8_PMU_PMCR_N_SHIFT;
+> +
+>  	__vcpu_sys_reg(vcpu, r->reg) = val;
+>  }
+> 
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 98cbfe885a53..ea3fc96a37d9 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -27,6 +27,7 @@ struct kvm_pmu {
+>  	bool ready;
+>  	bool created;
+>  	bool irq_level;
+> +	u8 num_events;
+>  };
+> 
+>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
 
-We also have KVM_ARM_PREFERRED_TARGET, which is documented as
+I see several problems with this approach:
 
-"""
-...
-The ioctl returns struct kvm_vcpu_init instance containing information
-about preferred CPU target type and recommended features for it.  The
-kvm_vcpu_init->features bitmap returned will have feature bits set if
-the preferred target recommends setting these features, but this is
-not mandatory.
-...
-"""
+- userspace doesn't really have a good way to retrieve the number of
+   counters.
 
-But, it says "recommended" features, not "all supported" features,
-and the current implementation of KVM_ARM_PREFERRED_TARGET only
-zeros out features. So, I think we should just leave
-KVM_ARM_PREFERRED_TARGET as is and stick to the plan of extending
-VCPU_INIT.
+- Limiting the number of counters for the guest doesn't mean anything
+   when it comes to the actual use of the HW counters, given that we
+   don't allocate them ourselves (it's all perf doing the actual work).
 
-Thanks,
-drew
+- If you want to "pin" counters for the host, why don't you just do
+   that before starting the guest?
 
+I think you need to look at the bigger picture: how to limit the use
+of physical counter usage for a given userspace task. This needs
+to happen in perf itself, and not in KVM.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
