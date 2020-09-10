@@ -2,87 +2,105 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 079FDC433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 673D7C43461
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 457FE20720
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2C4620720
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="caMPoUSK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 457FE20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoSxMilj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C4620720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CDBD4B417;
-	Thu, 10 Sep 2020 07:01:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 579F34B431;
+	Thu, 10 Sep 2020 07:01:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 88se0sPeWNp7; Thu, 10 Sep 2020 07:01:30 -0400 (EDT)
+	with ESMTP id OouQUihAYam1; Thu, 10 Sep 2020 07:01:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 933FB4B40B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D68EA4B46C;
 	Thu, 10 Sep 2020 07:01:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31E8D4B2F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:47:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B49C14B24C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:24:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UFSqwcKFAex4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 04:47:50 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F8B04B2E1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 04:47:50 -0400 (EDT)
-Received: from saruman (91-155-214-58.elisa-laajakaista.fi [91.155.214.58])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0C4F920770;
- Thu, 10 Sep 2020 08:47:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599727668;
- bh=RPokpgxyglYjppmxdwE4ETpgoWb+FLMn8txdhEbALdk=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=caMPoUSKexLI6/Cqhtg8fT99cl3GRCJBgwM+b8CDUH4fpndiULhN2ZxxlePCqMtm8
- o+PPIhKL0Yab4dKBUBJb9PAX9HTFJdHyhq4ZrB98n0hws/gO34J2oo99WhyXQG8LAo
- ih4L+nIDe5nvGNhsdtsxYZAUrexQb+0pD4TKBRdk=
-From: Felipe Balbi <balbi@kernel.org>
-To: Joe Perches <joe@perches.com>, LKML <linux-kernel@vger.kernel.org>, Jiri
- Kosina <trivial@kernel.org>
-Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough; to
- break;
-In-Reply-To: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
-References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
-Date: Thu, 10 Sep 2020 11:47:27 +0300
-Message-ID: <878sdikogw.fsf@kernel.org>
+ with ESMTP id OZak8QoRsSHJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 05:24:37 -0400 (EDT)
+Received: from mail-io1-f66.google.com (mail-io1-f66.google.com
+ [209.85.166.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 979A14B1E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 05:24:37 -0400 (EDT)
+Received: by mail-io1-f66.google.com with SMTP id m17so6341047ioo.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 02:24:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UyqGiyvWtrvEPIbfLtgakvWHIPcO7f2wwjJnMPORWG0=;
+ b=BoSxMiljYiAjMP/XBn/hYGNVKL/oHxnqnEUJ7qSdwoJLG0pxR2qK3V4/fkUTSaV51s
+ 3pvr292/IyS8ps68VC6dxn72XHdiWpnrMVrw8xogJTOMYamirEZ059PvshX7H4Z5GWuh
+ Vr7j8283bIhfaNsK7sxUGLf6s0Z2Efi6Yl4vefoBSqVlIDK265aYxjjSjS69bDYpqbGV
+ /GSb5UhzJJFq63scKHt5GhqSRkybY6g2zuA571aN2zohyHumpin0aZgpFfaeOPy0WbSg
+ Mpw6iHtgik0cTA/OjEeiGwKuBqjHR2p7i1mxyZ7WrSW4CGvjjQTt8jjc//sWyeGDOFMK
+ 9KBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UyqGiyvWtrvEPIbfLtgakvWHIPcO7f2wwjJnMPORWG0=;
+ b=LJQ11OQ/JE/+EQaIwmExA0AwzgVqnbP3y0HVKaFyRC0WQ7IkKmCrD6qLWN0CeRZDhp
+ VSwsNwG4PS7nTk7om4NAQXJnsiic/300TKP3ZQZ2hFvuu0VHFjjEsoJyPtAm8+LT0chL
+ h3A+/UCOUXc14BcBm9cL/AXwQwbZ1pFEx75qYrTC1c2wGBuT7brr2jBpTYwST2CQvPn1
+ TXlpty1jgYIatmOEr0h3Rbbf8b7Ni1m2sCmAy59SPwJfqGl5noiQXcqr4Sx44m1Yc9fc
+ 4qUk24eBFsQUf4pPw044Z8OsCBW/4nTG5nEJi8G1OD0vGyO9Lz/QiAJrHwkfPNxEwwRW
+ SWwQ==
+X-Gm-Message-State: AOAM533+oyL6N0kmzuDMds40n/4MKEs9f/mgNFzuxxr4YdWIMhqEtTex
+ Wa1zBCC+cAO209hn5EFD0lQnfCVYFL4UrtfdoZY=
+X-Google-Smtp-Source: ABdhPJzJ/LFpexv9kLm1kjwc0/B+7GHCOB8WQagf03Hz+gzhVFwgLWrpkGefOcCCEeSFlcKtCwndocR5oDNlZlvNymM=
+X-Received: by 2002:a5d:8846:: with SMTP id t6mr7056972ios.123.1599729876856; 
+ Thu, 10 Sep 2020 02:24:36 -0700 (PDT)
 MIME-Version: 1.0
+References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+In-Reply-To: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Thu, 10 Sep 2020 11:24:26 +0200
+Message-ID: <CAOi1vP-v77pj3G5Ez94CDYVs2jSO828c4uV_wzNi6sRKp=Yvyg@mail.gmail.com>
+Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough;
+ to break; 
+To: Joe Perches <joe@perches.com>
 X-Mailman-Approved-At: Thu, 10 Sep 2020 07:01:29 -0400
 Cc: linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
  oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
  alsa-devel <alsa-devel@alsa-project.org>, dri-devel@lists.freedesktop.org,
- linux-ide@vger.kernel.org, dm-devel@redhat.com, linux-mtd@lists.infradead.org,
- linux-i2c@vger.kernel.org, sparclinux@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-rtc@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, dccp@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-atm-general@lists.sourceforge.net,
- linux-afs@lists.infradead.org, coreteam@netfilter.org,
- intel-wired-lan@lists.osuosl.org, linux-serial@vger.kernel.org,
- linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
- Kees Cook <kees.cook@canonical.com>, linux-media@vger.kernel.org,
- linux-pm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
- linux-sctp@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-nvme@lists.infradead.org, storagedev@microchip.com,
- ceph-devel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-nfs@vger.kernel.org, linux-parisc@vger.kernel.org,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- Nick Desaulniers <ndesaulniers@google.com>, linux-mips@vger.kernel.org,
- iommu@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
- linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-ide@vger.kernel.org, dm-devel@redhat.com,
+ linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
+ sparclinux@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-rtc@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, linux-afs@lists.infradead.org,
+ coreteam@netfilter.org, intel-wired-lan@lists.osuosl.org,
+ linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-mmc@vger.kernel.org, Kees Cook <kees.cook@canonical.com>,
+ linux-media@vger.kernel.org, linux-pm@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, linux-sctp@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org,
+ storagedev@microchip.com, Ceph Development <ceph-devel@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+ Jiri Kosina <trivial@kernel.org>, linux-parisc@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ LKML <linux-kernel@vger.kernel.org>, iommu@lists.linux-foundation.org,
+ netfilter-devel@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf@vger.kernel.org,
  linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -95,64 +113,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1321368090611648867=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============1321368090611648867==
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha256; protocol="application/pgp-signature"
-
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-Joe Perches <joe@perches.com> writes:
+On Wed, Sep 9, 2020 at 10:10 PM Joe Perches <joe@perches.com> wrote:
+>
+> fallthrough to a separate case/default label break; isn't very readable.
+>
+> Convert pseudo-keyword fallthrough; statements to a simple break; when
+> the next label is case or default and the only statement in the next
+> label block is break;
+>
+> Found using:
+>
+> $ grep-2.5.4 -rP --include=*.[ch] -n "fallthrough;(\s*(case\s+\w+|default)\s*:\s*){1,7}break;" *
+>
+> Miscellanea:
+>
+> o Move or coalesce a couple label blocks above a default: block.
+>
+> Signed-off-by: Joe Perches <joe@perches.com>
+> ---
+>
+> Compiled allyesconfig x86-64 only.
+> A few files for other arches were not compiled.
+>
+>  arch/arm/mach-mmp/pm-pxa910.c                             |  2 +-
+>  arch/arm64/kvm/handle_exit.c                              |  2 +-
+>  arch/mips/kernel/cpu-probe.c                              |  2 +-
+>  arch/mips/math-emu/cp1emu.c                               |  2 +-
+>  arch/s390/pci/pci.c                                       |  2 +-
+>  crypto/tcrypt.c                                           |  4 ++--
+>  drivers/ata/sata_mv.c                                     |  2 +-
+>  drivers/atm/lanai.c                                       |  2 +-
+>  drivers/gpu/drm/i915/display/intel_sprite.c               |  2 +-
+>  drivers/gpu/drm/nouveau/nvkm/engine/disp/hdmi.c           |  2 +-
+>  drivers/hid/wacom_wac.c                                   |  2 +-
+>  drivers/i2c/busses/i2c-i801.c                             |  2 +-
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c                    | 14 +++++++-------
+>  drivers/infiniband/ulp/rtrs/rtrs-srv.c                    |  6 +++---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c               |  2 +-
+>  drivers/irqchip/irq-vic.c                                 |  4 ++--
+>  drivers/md/dm.c                                           |  2 +-
+>  drivers/media/dvb-frontends/drxd_hard.c                   |  2 +-
+>  drivers/media/i2c/ov5640.c                                |  2 +-
+>  drivers/media/i2c/ov6650.c                                |  5 ++---
+>  drivers/media/i2c/smiapp/smiapp-core.c                    |  2 +-
+>  drivers/media/i2c/tvp5150.c                               |  2 +-
+>  drivers/media/pci/ddbridge/ddbridge-core.c                |  2 +-
+>  drivers/media/usb/cpia2/cpia2_core.c                      |  2 +-
+>  drivers/mfd/iqs62x.c                                      |  3 +--
+>  drivers/mmc/host/atmel-mci.c                              |  2 +-
+>  drivers/mtd/nand/raw/nandsim.c                            |  2 +-
+>  drivers/net/ethernet/intel/e1000e/phy.c                   |  2 +-
+>  drivers/net/ethernet/intel/fm10k/fm10k_pf.c               |  2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_adminq.c             |  2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_txrx.c               |  2 +-
+>  drivers/net/ethernet/intel/iavf/iavf_txrx.c               |  2 +-
+>  drivers/net/ethernet/intel/igb/e1000_phy.c                |  2 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c            |  2 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c             |  2 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c            |  2 +-
+>  drivers/net/ethernet/intel/ixgbevf/vf.c                   |  2 +-
+>  drivers/net/ethernet/netronome/nfp/nfpcore/nfp6000_pcie.c |  2 +-
+>  drivers/net/ethernet/qlogic/qed/qed_mcp.c                 |  2 +-
+>  drivers/net/ethernet/sfc/falcon/farch.c                   |  2 +-
+>  drivers/net/ethernet/sfc/farch.c                          |  2 +-
+>  drivers/net/phy/adin.c                                    |  3 +--
+>  drivers/net/usb/pegasus.c                                 |  4 ++--
+>  drivers/net/usb/usbnet.c                                  |  2 +-
+>  drivers/net/wireless/ath/ath5k/eeprom.c                   |  2 +-
+>  drivers/net/wireless/mediatek/mt7601u/dma.c               |  8 ++++----
+>  drivers/nvme/host/core.c                                  | 12 ++++++------
+>  drivers/pcmcia/db1xxx_ss.c                                |  4 ++--
+>  drivers/power/supply/abx500_chargalg.c                    |  2 +-
+>  drivers/power/supply/charger-manager.c                    |  2 +-
+>  drivers/rtc/rtc-pcf85063.c                                |  2 +-
+>  drivers/s390/scsi/zfcp_fsf.c                              |  2 +-
+>  drivers/scsi/aic7xxx/aic79xx_core.c                       |  4 ++--
+>  drivers/scsi/aic94xx/aic94xx_tmf.c                        |  2 +-
+>  drivers/scsi/lpfc/lpfc_sli.c                              |  2 +-
+>  drivers/scsi/smartpqi/smartpqi_init.c                     |  2 +-
+>  drivers/scsi/sr.c                                         |  2 +-
+>  drivers/tty/serial/sunsu.c                                |  2 +-
+>  drivers/tty/serial/sunzilog.c                             |  2 +-
+>  drivers/tty/vt/vt_ioctl.c                                 |  2 +-
 >  drivers/usb/dwc3/core.c                                   |  2 +-
 >  drivers/usb/gadget/legacy/inode.c                         |  2 +-
 >  drivers/usb/gadget/udc/pxa25x_udc.c                       |  4 ++--
+>  drivers/usb/host/ohci-hcd.c                               |  2 +-
+>  drivers/usb/isp1760/isp1760-hcd.c                         |  2 +-
+>  drivers/usb/musb/cppi_dma.c                               |  2 +-
 >  drivers/usb/phy/phy-fsl-usb.c                             |  2 +-
+>  drivers/video/fbdev/stifb.c                               |  2 +-
+>  fs/afs/yfsclient.c                                        |  8 ++++----
+>  fs/ceph/dir.c                                             |  2 +-
 
-for the drivers above:
+For ceph:
 
-Acked-by: Felipe Balbi <balbi@kernel.org>
+Acked-by: Ilya Dryomov <idryomov@gmail.com>
 
-=2D-=20
-balbi
+Thanks,
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJFBAEBCAAvFiEElLzh7wn96CXwjh2IzL64meEamQYFAl9Z6B8RHGJhbGJpQGtl
-cm5lbC5vcmcACgkQzL64meEamQZSCRAAuTv1hrqhd9iVfnwXFrfx8dYquoCMc3VI
-y1IiULV6avnZvLQTqKviHDvZw05WY6dna714mpLFW1laW3WuhLSD4elIu6cqHaiz
-ZgtvtA4bZ/s7ipV+jlZ86S9oIz4MMBbZYhqSN1ZVk50NsUA/1thpcjS0aLI5SAgX
-j2dV6BEEHBSgMDwcWLPNwr6f5R/ycEBx3i6HYSSdNtBr1SK+UhbSkwNxdCA9IzH8
-1WCugmJdohP26DIYNzFZcssjcSFb5wu2iuHXQXuvOmmAfQmro+gRcnq1SOElae7v
-cas67L69RQ5fxskM/XpIYH2AURFnRUNondcJWViUQXHwXF1U0r+FdwXUr8OeFi19
-sVEI4FNu7ZqgvhfUlKMpldyUZRIrWb+WZZ5toBQAKFee/3tqTs4Tqh9cwfLL9IU4
-ho4tG7J/bd6hASfr0x2dH5Pm7oXKskxmtUpmmSVlNaTpXytiD30+pUvOl9Qg7A+X
-tc9h6N3Z6kdVxkJlm1KpUUccPeUtHox549ukAtzKQL4x6PDCdNqBkNDVSIx04FA4
-dgyt4O7w4HaWT1GPHH322pG5nNT1dsGT0CC9QA/2AJkoXTY03YGR3dgDw89GNUrP
-WPj73gtBbWTwRFuwHQQs8F/E8x2UjBC005aawoKcK2bxBR1fzqz1y8daUaiCftnV
-ocu1QwRIgL8=
-=BFTp
------END PGP SIGNATURE-----
---=-=-=--
-
---===============1321368090611648867==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+                Ilya
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1321368090611648867==--
