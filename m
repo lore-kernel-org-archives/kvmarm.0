@@ -2,87 +2,64 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5918DC433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CADC433E2
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:54:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF347208E4
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:39:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SYXtmeZj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF347208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 2AC8D20809
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:54:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC8D20809
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 033F34B175;
-	Thu, 10 Sep 2020 09:39:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C3BC4B1A4;
+	Thu, 10 Sep 2020 09:54:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V31UAdIddDq3; Thu, 10 Sep 2020 09:39:34 -0400 (EDT)
+	with ESMTP id k3UouBsKCPnp; Thu, 10 Sep 2020 09:54:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E49EA4B113;
-	Thu, 10 Sep 2020 09:39:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BAE94B1A6;
+	Thu, 10 Sep 2020 09:54:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B9BF4B113
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:39:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1E1A4B19A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:54:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XvjzOohWBqob for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 09:39:32 -0400 (EDT)
-Received: from us-smtp-delivery-1.mimecast.com (us-smtp-1.mimecast.com
- [207.211.31.81])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 936EE4B10D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:39:32 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599745172;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7Y7Gme+6mP2kIxJBsfheP4T3JUU/zqQQOzX9yjwzzBo=;
- b=SYXtmeZjawLn6nE8Y3E+FaXBAm+5R0T0AR0TljniRwcukmDjUH9B/A2azCzd9wla+IqTWx
- jdOgXTBUCfvGmyfXLPFmKIq8YxZMglMIvrRVyW2b/nKtBpkUoClZKC3stiK6Wl22XISnso
- qgYTOLa7kzN+aZRxzanP37g3nlzydP0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-D1iJLJKcOje_PlRAcUXcZg-1; Thu, 10 Sep 2020 09:39:28 -0400
-X-MC-Unique: D1iJLJKcOje_PlRAcUXcZg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34B0118BA283;
- Thu, 10 Sep 2020 13:39:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ACD1E5D9E8;
- Thu, 10 Sep 2020 13:39:22 +0000 (UTC)
-Date: Thu, 10 Sep 2020 15:39:19 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
-Message-ID: <20200910133919.rkmki6x7iscbaymh@kamzik.brq.redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
- <5cb1d7ed-54a5-4337-6c3d-2e3e7df89f17@linaro.org>
- <20200910054440.pvnzk7p7riiy45e2@kamzik.brq.redhat.com>
- <20200910132748.GF2814@work-vm>
+ with ESMTP id Wv2eSNTReNmx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 09:54:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD0AA4B191
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:54:53 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 566EB113E;
+ Thu, 10 Sep 2020 06:54:53 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 135243F66E;
+ Thu, 10 Sep 2020 06:54:51 -0700 (PDT)
+Subject: Re: [PATCH v4 06/21] KVM: arm64: Add support for stage-2
+ map()/unmap() in generic page-table
+To: Will Deacon <will@kernel.org>
+References: <20200907152344.12978-1-will@kernel.org>
+ <20200907152344.12978-7-will@kernel.org>
+ <f5939f12-56e8-794c-8d9b-9ae348bba3c0@arm.com>
+ <20200910123404.GA18100@willie-the-truck>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ea9677c4-e6c6-6a2a-725b-df86adeefd94@arm.com>
+Date: Thu, 10 Sep 2020 14:55:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200910132748.GF2814@work-vm>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: Peter Maydell <Peter.Maydell@arm.com>, linux-kernel@vger.kernel.org,
- Juan Quintela <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Dave Martin <Dave.Martin@arm.com>
+In-Reply-To: <20200910123404.GA18100@willie-the-truck>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,44 +76,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 10, 2020 at 02:27:48PM +0100, Dr. David Alan Gilbert wrote:
-> * Andrew Jones (drjones@redhat.com) wrote:
-> > On Wed, Sep 09, 2020 at 06:45:33PM -0700, Richard Henderson wrote:
-> > > On 9/9/20 8:25 AM, Andrew Jones wrote:
-> > > >>  * Provide a KVM-specific method to extract the tags from guest memory.
-> > > >>    This might also have benefits in terms of providing an easy way to
-> > > >>    read bulk tag data from guest memory (since the LDGM instruction
-> > > >>    isn't available at EL0).
-> > > > 
-> > > > Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
-> > > > the tags for all addresses of each dirty page.
-> > > 
-> > > KVM_GET_DIRTY_LOG just provides one bit per dirty page, no?  Then VMM copies
-> > > the data out from its local address to guest memory.
-> > > 
-> > > There'd be no difference with or without tags, afaik.  It's just about how VMM
-> > > copies the data, with or without tags.
-> > 
-> > Right, as long as it's fast enough to do
-> > 
-> >   for_each_dirty_page(page, dirty_log)
-> >     for (i = 0; i < host-page-size/16; i += 16)
-> >       append_tag(LDG(page + i))
-> > 
-> > to get all the tags for each dirty page. I understood it would be faster
-> > to use LDGM, but we'd need a new ioctl for that. So I was proposing we
-> > just piggyback on a new dirty-log ioctl instead.
-> 
-> That feels a bad idea to me; there's a couple of different ways dirty
-> page checking work; lets keep extracting the tags separate.
->
+Hi Will,
 
-It's sounding like it was a premature optimization anyway. We don't yet
-know if an ioctl for LDGM is worth it. Looping over LDG may work fine.
+On 9/10/20 1:34 PM, Will Deacon wrote:
+> On Thu, Sep 10, 2020 at 12:20:42PM +0100, Alexandru Elisei wrote:
+>> On 9/7/20 4:23 PM, Will Deacon wrote:
+>>> +static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+>>> +				      kvm_pte_t *ptep,
+>>> +				      struct stage2_map_data *data)
+>>> +{
+>>> +	int ret = 0;
+>>> +
+>>> +	if (!data->anchor)
+>>> +		return 0;
+>>> +
+>>> +	free_page((unsigned long)kvm_pte_follow(*ptep));
+>>> +	put_page(virt_to_page(ptep));
+>>> +
+>>> +	if (data->anchor == ptep) {
+>>> +		data->anchor = NULL;
+>>> +		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+>>> +	}
+>> I had another look at this function. If we're back to the anchor entry, then that
+>> means that we know from the pre-order visitor that 1. the mapping is supported at
+>> this level and 2. that the pte was invalidated. This means that
+>> kvm_set_valid_leaf_pte() will succeed in changing the entry. How about instead of
+>> calling stage2_map_walk_leaf() -> stage2_map_walker_try_leaf() ->
+>> kvm_set_valid_leaf_pte() we call kvm_set_valid_leaf_pte() directly, followed by
+>> get_page(virt_to_page(ptep)? It would make the code a lot easier to follow
+>> (stage2_map_walk_leaf() is pretty complicated, imo, but that can't really be
+>> avoided), and also slightly faster.
+> I'm not sure I agree. I would consider kvm_set_valid_leaf_pte() to be lower
+> level, and not the right function to be calling here. Rather,
+> stage2_map_walk_leaf() is what would have been called if we hadn't spotted
+> the potential for a block mapping anyway, so I much prefer that symmetry. It
+> also means that if stage2_map_walk_leaf() grows some extra logic in future
+> that we need to take into account here, we won't miss anything.
+
+Sure, that makes sense.
 
 Thanks,
-drew 
-
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
