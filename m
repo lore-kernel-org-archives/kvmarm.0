@@ -2,64 +2,88 @@ Return-Path: <SRS0=WCH4=CT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC474C433E2
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD63C43461
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:28:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D35A7208E4
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:19:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D35A7208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AE45B207FB
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Sep 2020 13:28:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzGgN564"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE45B207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 030FD4B3B4;
-	Thu, 10 Sep 2020 09:19:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20F1D4B225;
+	Thu, 10 Sep 2020 09:28:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yCL6KWp1O1TK; Thu, 10 Sep 2020 09:19:22 -0400 (EDT)
+	with ESMTP id nYAlwJ4yxf1u; Thu, 10 Sep 2020 09:28:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4C954B312;
-	Thu, 10 Sep 2020 09:19:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 068674B239;
+	Thu, 10 Sep 2020 09:28:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67ABD4B21A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:19:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 867274B225
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:27:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sdxuHyCH2Hov for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2020 09:19:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E099F4B20C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:19:19 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 808021063;
- Thu, 10 Sep 2020 06:19:19 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ABC53F66E;
- Thu, 10 Sep 2020 06:19:18 -0700 (PDT)
-Subject: Re: [PATCH v4 17/21] KVM: arm64: Convert user_mem_abort() to generic
- page-table API
-To: Marc Zyngier <maz@kernel.org>
-References: <20200907152344.12978-1-will@kernel.org>
- <20200907152344.12978-18-will@kernel.org>
- <2ae77a66-9cc4-f4e1-9e98-a50d5891cf20@arm.com>
- <c2e5e055251db637327f81da452cea2c@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <69db71f4-3733-82c0-386a-683f1e9a1652@arm.com>
-Date: Thu, 10 Sep 2020 14:20:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id 1u0smNarDmRn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Sep 2020 09:27:57 -0400 (EDT)
+Received: from us-smtp-delivery-1.mimecast.com
+ (us-smtp-delivery-1.mimecast.com [207.211.31.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB8A94B222
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2020 09:27:57 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599744477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/m+8BzcTQhMcOHlC8kleMb4zFUjUqXj7v07BC3dfEx0=;
+ b=DzGgN564wsyfSk9eWic4PI8FLT5q1/IDt782KpTB+aRcM1h6imlJdrs3Q4QRSVKaf9TdRI
+ rIRnsKVcn9B+6nHMf07P6w0j4oUAQ0756mTE2lp0vZLhYGOByj8uVvK1uJjbfqu2hKUyq6
+ SOJ4/CP1FtIv92q+4sRPVxA8LbRaPEY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-GGMbtMqWME-oXJaqIo8ZqA-1; Thu, 10 Sep 2020 09:27:55 -0400
+X-MC-Unique: GGMbtMqWME-oXJaqIo8ZqA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B93B425D2;
+ Thu, 10 Sep 2020 13:27:54 +0000 (UTC)
+Received: from work-vm (ovpn-113-128.ams2.redhat.com [10.36.113.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6612F19C59;
+ Thu, 10 Sep 2020 13:27:51 +0000 (UTC)
+Date: Thu, 10 Sep 2020 14:27:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
+Message-ID: <20200910132748.GF2814@work-vm>
+References: <20200904160018.29481-1-steven.price@arm.com>
+ <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
+ <5cb1d7ed-54a5-4337-6c3d-2e3e7df89f17@linaro.org>
+ <20200910054440.pvnzk7p7riiy45e2@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c2e5e055251db637327f81da452cea2c@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200910054440.pvnzk7p7riiy45e2@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc: Peter Maydell <Peter.Maydell@arm.com>, linux-kernel@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,126 +95,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDkvOS8yMCA2OjEyIFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gSGkgQWxl
-eCwKPgo+IE9uIDIwMjAtMDktMDkgMTU6MjAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+IEhp
-IFdpbGwsCj4+Cj4+IE9uIDkvNy8yMCA0OjIzIFBNLCBXaWxsIERlYWNvbiB3cm90ZToKPj4+IENv
-bnZlcnQgdXNlcl9tZW1fYWJvcnQoKSB0byBjYWxsIGt2bV9wZ3RhYmxlX3N0YWdlMl9yZWxheF9w
-ZXJtcygpIHdoZW4KPj4+IGhhbmRsaW5nIGEgc3RhZ2UtMiBwZXJtaXNzaW9uIGZhdWx0IGFuZCBr
-dm1fcGd0YWJsZV9zdGFnZTJfbWFwKCkgd2hlbgo+Pj4gaGFuZGxpbmcgYSBzdGFnZS0yIHRyYW5z
-bGF0aW9uIGZhdWx0LCByYXRoZXIgdGhhbiB3YWxraW5nIHRoZSBwYWdlLXRhYmxlCj4+PiBtYW51
-YWxseS4KPj4+Cj4+PiBDYzogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4KPj4+IENjOiBR
-dWVudGluIFBlcnJldCA8cXBlcnJldEBnb29nbGUuY29tPgo+Pj4gUmV2aWV3ZWQtYnk6IEdhdmlu
-IFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8
-d2lsbEBrZXJuZWwub3JnPgo+Pj4gLS0tCj4+PiDCoGFyY2gvYXJtNjQva3ZtL21tdS5jIHwgMTI0
-ICsrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPj4+IMKgMSBmaWxl
-IGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDgwIGRlbGV0aW9ucygtKQo+Pj4KPj4+IGRpZmYg
-LS1naXQgYS9hcmNoL2FybTY0L2t2bS9tbXUuYyBiL2FyY2gvYXJtNjQva3ZtL21tdS5jCj4+PiBp
-bmRleCAwYWY0OGYzNWM4ZGQuLmRjOTIzZTg3M2RhZCAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJt
-NjQva3ZtL21tdS5jCj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9tbXUuYwo+Pj4gQEAgLTE0OTYs
-MTggKzE0OTYsMTkgQEAgc3RhdGljIGludCB1c2VyX21lbV9hYm9ydChzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsCj4+PiBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsCj4+PiDCoHsKPj4+IMKgwqDCoMKgIGlu
-dCByZXQ7Cj4+PiDCoMKgwqDCoCBib29sIHdyaXRlX2ZhdWx0LCB3cml0YWJsZSwgZm9yY2VfcHRl
-ID0gZmFsc2U7Cj4+PiAtwqDCoMKgIGJvb2wgZXhlY19mYXVsdCwgbmVlZHNfZXhlYzsKPj4+ICvC
-oMKgwqAgYm9vbCBleGVjX2ZhdWx0Owo+Pj4gK8KgwqDCoCBib29sIGRldmljZSA9IGZhbHNlOwo+
-Pj4gwqDCoMKgwqAgdW5zaWduZWQgbG9uZyBtbXVfc2VxOwo+Pj4gLcKgwqDCoCBnZm5fdCBnZm4g
-PSBmYXVsdF9pcGEgPj4gUEFHRV9TSElGVDsKPj4+IMKgwqDCoMKgIHN0cnVjdCBrdm0gKmt2bSA9
-IHZjcHUtPmt2bTsKPj4+IMKgwqDCoMKgIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZSAqbWVt
-Y2FjaGUgPSAmdmNwdS0+YXJjaC5tbXVfcGFnZV9jYWNoZTsKPj4+IMKgwqDCoMKgIHN0cnVjdCB2
-bV9hcmVhX3N0cnVjdCAqdm1hOwo+Pj4gwqDCoMKgwqAgc2hvcnQgdm1hX3NoaWZ0Owo+Pj4gK8Kg
-wqDCoCBnZm5fdCBnZm47Cj4+PiDCoMKgwqDCoCBrdm1fcGZuX3QgcGZuOwo+Pj4gLcKgwqDCoCBw
-Z3Byb3RfdCBtZW1fdHlwZSA9IFBBR0VfUzI7Cj4+PiDCoMKgwqDCoCBib29sIGxvZ2dpbmdfYWN0
-aXZlID0gbWVtc2xvdF9pc19sb2dnaW5nKG1lbXNsb3QpOwo+Pj4gLcKgwqDCoCB1bnNpZ25lZCBs
-b25nIHZtYV9wYWdlc2l6ZSwgZmxhZ3MgPSAwOwo+Pj4gLcKgwqDCoCBzdHJ1Y3Qga3ZtX3MyX21t
-dSAqbW11ID0gdmNwdS0+YXJjaC5od19tbXU7Cj4+PiArwqDCoMKgIHVuc2lnbmVkIGxvbmcgdm1h
-X3BhZ2VzaXplOwo+Pj4gK8KgwqDCoCBlbnVtIGt2bV9wZ3RhYmxlX3Byb3QgcHJvdCA9IEtWTV9Q
-R1RBQkxFX1BST1RfUjsKPj4+ICvCoMKgwqAgc3RydWN0IGt2bV9wZ3RhYmxlICpwZ3Q7Cj4+Pgo+
-Pj4gwqDCoMKgwqAgd3JpdGVfZmF1bHQgPSBrdm1faXNfd3JpdGVfZmF1bHQodmNwdSk7Cj4+PiDC
-oMKgwqDCoCBleGVjX2ZhdWx0ID0ga3ZtX3ZjcHVfdHJhcF9pc19pYWJ0KHZjcHUpOwo+Pj4gQEAg
-LTE1NDAsMjIgKzE1NDEsMjQgQEAgc3RhdGljIGludCB1c2VyX21lbV9hYm9ydChzdHJ1Y3Qga3Zt
-X3ZjcHUgKnZjcHUsCj4+PiBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsCj4+PiDCoMKgwqDCoMKgwqDC
-oMKgIHZtYV9wYWdlc2l6ZSA9IFBBR0VfU0laRTsKPj4+IMKgwqDCoMKgIH0KPj4+Cj4+PiAtwqDC
-oMKgIC8qCj4+PiAtwqDCoMKgwqAgKiBUaGUgc3RhZ2UyIGhhcyBhIG1pbmltdW0gb2YgMiBsZXZl
-bCB0YWJsZSAoRm9yIGFybTY0IHNlZQo+Pj4gLcKgwqDCoMKgICoga3ZtX2FybV9zZXR1cF9zdGFn
-ZTIoKSkuIEhlbmNlLCB3ZSBhcmUgZ3VhcmFudGVlZCB0aGF0IHdlIGNhbgo+Pj4gLcKgwqDCoMKg
-ICogdXNlIFBNRF9TSVpFIGh1Z2UgbWFwcGluZ3MgKGV2ZW4gd2hlbiB0aGUgUE1EIGlzIGZvbGRl
-ZCBpbnRvIFBHRCkuCj4+PiAtwqDCoMKgwqAgKiBBcyBmb3IgUFVEIGh1Z2UgbWFwcywgd2UgbXVz
-dCBtYWtlIHN1cmUgdGhhdCB3ZSBoYXZlIGF0IGxlYXN0Cj4+PiAtwqDCoMKgwqAgKiAzIGxldmVs
-cywgaS5lLCBQTUQgaXMgbm90IGZvbGRlZC4KPj4+IC3CoMKgwqDCoCAqLwo+Pj4gLcKgwqDCoCBp
-ZiAodm1hX3BhZ2VzaXplID09IFBNRF9TSVpFIHx8Cj4+PiAtwqDCoMKgwqDCoMKgwqAgKHZtYV9w
-YWdlc2l6ZSA9PSBQVURfU0laRSAmJiBrdm1fc3RhZ2UyX2hhc19wbWQoa3ZtKSkpCj4+PiAtwqDC
-oMKgwqDCoMKgwqAgZ2ZuID0gKGZhdWx0X2lwYSAmIGh1Z2VfcGFnZV9tYXNrKGhzdGF0ZV92bWEo
-dm1hKSkpID4+IFBBR0VfU0hJRlQ7Cj4+PiArwqDCoMKgIGlmICh2bWFfcGFnZXNpemUgPT0gUE1E
-X1NJWkUgfHwgdm1hX3BhZ2VzaXplID09IFBVRF9TSVpFKQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGZh
-dWx0X2lwYSAmPSBodWdlX3BhZ2VfbWFzayhoc3RhdGVfdm1hKHZtYSkpOwo+Pgo+PiBUaGlzIGxv
-b2tzIGNvcnJlY3QgdG8gbWUgLSBpZiAha3ZtX3N0YWdlMl9oYXNfcG1kKCksIHRoZW4gUE1EIGlz
-IGZvbGRlZCBvbnRvIFBVRAo+PiBhbmQgUEdELCBhbmQgUE1EX1NJWkUgPT0gUFVEX1NJWkUuIEFs
-c28gSSBsaWtlIHRoZSBmYWN0IHRoYXQgd2UgdXBkYXRlCj4+IGdmbiAqKmFuZCoqCj4+IGZhdWx0
-X2lwYSwgdGhlIHByZXZpb3VzIHZlcnNpb24gdXBkYXRlZCBvbmx5IGdmbiwgd2hpY2ggbWFkZSBn
-Zm4gIT0KPj4gKGZhdWx0X2lwYSA+Pgo+PiBQQUdFX1NISUZUKS4KPj4KPj4+ICsKPj4+ICvCoMKg
-wqAgZ2ZuID0gZmF1bHRfaXBhID4+IFBBR0VfU0hJRlQ7Cj4+PiDCoMKgwqDCoCBtbWFwX3JlYWRf
-dW5sb2NrKGN1cnJlbnQtPm1tKTsKPj4+Cj4+PiAtwqDCoMKgIC8qIFdlIG5lZWQgbWluaW11bSBz
-ZWNvbmQrdGhpcmQgbGV2ZWwgcGFnZXMgKi8KPj4+IC3CoMKgwqAgcmV0ID0ga3ZtX21tdV90b3B1
-cF9tZW1vcnlfY2FjaGUobWVtY2FjaGUsIGt2bV9tbXVfY2FjaGVfbWluX3BhZ2VzKGt2bSkpOwo+
-Pj4gLcKgwqDCoCBpZiAocmV0KQo+Pj4gLcKgwqDCoMKgwqDCoMKgIHJldHVybiByZXQ7Cj4+PiAr
-wqDCoMKgIC8qCj4+PiArwqDCoMKgwqAgKiBQZXJtaXNzaW9uIGZhdWx0cyBqdXN0IG5lZWQgdG8g
-dXBkYXRlIHRoZSBleGlzdGluZyBsZWFmIGVudHJ5LAo+Pj4gK8KgwqDCoMKgICogYW5kIHNvIG5v
-cm1hbGx5IGRvbid0IHJlcXVpcmUgYWxsb2NhdGlvbnMgZnJvbSB0aGUgbWVtY2FjaGUuIFRoZQo+
-Pj4gK8KgwqDCoMKgICogb25seSBleGNlcHRpb24gdG8gdGhpcyBpcyB3aGVuIGRpcnR5IGxvZ2dp
-bmcgaXMgZW5hYmxlZCBhdCBydW50aW1lCj4+PiArwqDCoMKgwqAgKiBhbmQgYSB3cml0ZSBmYXVs
-dCBuZWVkcyB0byBjb2xsYXBzZSBhIGJsb2NrIGVudHJ5IGludG8gYSB0YWJsZS4KPj4+ICvCoMKg
-wqDCoCAqLwo+Pj4gK8KgwqDCoCBpZiAoZmF1bHRfc3RhdHVzICE9IEZTQ19QRVJNIHx8IChsb2dn
-aW5nX2FjdGl2ZSAmJiB3cml0ZV9mYXVsdCkpIHsKPj4+ICvCoMKgwqDCoMKgwqDCoCByZXQgPSBr
-dm1fbW11X3RvcHVwX21lbW9yeV9jYWNoZShtZW1jYWNoZSwKPj4+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX21tdV9jYWNoZV9taW5fcGFnZXMo
-a3ZtKSk7Cj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKHJldCkKPj4+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHJldHVybiByZXQ7Cj4+PiArwqDCoMKgIH0KPj4KPj4gSSdtIG5vdCAxMDAlIHN1cmUg
-YWJvdXQgdGhpcy4KPj4KPj4gSSBkb24ndCB0aGluayB3ZSBnYWluIG11Y2ggb3ZlciB0aGUgcHJl
-dmlvdXMgY29kZSAtIGlmIHdlIGhhZCBhbGxvY2F0ZWQgY2FjaGUKPj4gb2JqZWN0cyB3aGljaCB3
-ZSBoYWRuJ3QgdXNlZCwgd2Ugd291bGQgaGF2ZSB1c2VkIHRoZW0gbmV4dCB0aW1lIHVzZXJfbWVt
-X2Fib3J0KCkKPj4gaXMgY2FsbGVkIChrdm1fbW11X3RvcHVwX21lbW9yeV9jYWNoZSgpIGNoZWNr
-cyBpZiB3ZSBoYXZlIHRoZSByZXF1aXJlZCBudW1iZXIgb2YKPj4gb2JqZWN0cyBpbiB0aGUgY2Fj
-aGUgYW5kIHJldHVybnMgZWFybHkpLgo+Pgo+PiBJJ20gbm90IHN1cmUgdGhlIGNvbmRpdGlvbiBp
-cyBlbnRpcmVseSBjb3JyZWN0IGVpdGhlciAtIGlmIHN0YWdlIDIgYWxyZWFkeSBoYXMgYQo+PiBt
-YXBwaW5nIGZvciB0aGUgSVBBIGFuZCB3ZSBvbmx5IG5lZWQgdG8gc2V0IHdyaXRlIHBlcm1pc3Np
-b25zLCBhY2NvcmRpbmcgdG8gdGhlCj4+IGNvbmRpdGlvbiBhYm92ZSB3ZSBzdGlsbCB0cnkgdG8g
-dG9wdXAgdGhlIGNhY2hlLCBldmVuIHRob3VnaCB3ZSBkb24ndCBzdHJpY3RseQo+PiBuZWVkIHRv
-Lgo+Cj4gVGhhdCdzIGJlY2F1c2UgaWYgeW91IGFyZSBsb2dnaW5nLCB5b3UgbWF5IGhhdmUgdG8g
-c3BsaXQgYW4gZXhpc3RpbmcgYmxvY2sKPiBtYXBwaW5nIGFuZCBtYXAgYSBzaW5nbGUgcGFnZSBp
-bnN0ZWFkLiBUaGlzIHJlcXVpcmVzIChhdCBsZWFzdCkgYW4gZXh0cmEKPiBsZXZlbCwgYW5kIHRo
-YXQncyB3aHkgeW91IG5lZWQgdG8gdG9wLXVwIHRoZSBjYWNoZSBpbiB0aGlzIGNhc2UuCj4KPj4K
-Pj4+IFsuLl0KPj4+Cj4+PiAtCj4+PiAtwqDCoMKgwqDCoMKgwqAgaWYgKG5lZWRzX2V4ZWMpCj4+
-PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuZXdfcG1kID0ga3ZtX3MycG1kX21rZXhlYyhuZXdf
-cG1kKTsKPj4+ICvCoMKgwqAgaWYgKGRldmljZSkKPj4+ICvCoMKgwqDCoMKgwqDCoCBwcm90IHw9
-IEtWTV9QR1RBQkxFX1BST1RfREVWSUNFOwo+Pj4gK8KgwqDCoCBlbHNlIGlmIChjcHVzX2hhdmVf
-Y29uc3RfY2FwKEFSTTY0X0hBU19DQUNIRV9ESUMpKQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHByb3Qg
-fD0gS1ZNX1BHVEFCTEVfUFJPVF9YOwo+Pj4KPj4+IC3CoMKgwqDCoMKgwqDCoCByZXQgPSBzdGFn
-ZTJfc2V0X3BtZF9odWdlKG1tdSwgbWVtY2FjaGUsIGZhdWx0X2lwYSwgJm5ld19wbWQpOwo+Pj4g
-K8KgwqDCoCBpZiAoZmF1bHRfc3RhdHVzID09IEZTQ19QRVJNICYmICEobG9nZ2luZ19hY3RpdmUg
-JiYgd3JpdGFibGUpKSB7Cj4+Cj4+IEkgZG9uJ3QgdW5kZXJzdGFuZCB0aGUgc2Vjb25kIHBhcnQg
-b2YgdGhlIGNvbmRpdGlvbiAoIShsb2dnaW5nX2FjdGl2ZSAmJgo+PiB3cml0YWJsZSkpLiBXaXRo
-IGxvZ2dpbmcgYWN0aXZlLCB3aGVuIHdlIGdldCBhIGZhdWx0IGJlY2F1c2Ugb2YgYQo+PiBtaXNz
-aW5nIHN0YWdlIDIKPj4gZW50cnksIHdlIG1hcCB0aGUgSVBBIGFzIHJlYWQtb25seSBhdCBzdGFn
-ZSAyLiBJZiBJIHVuZGVyc3RhbmQgdGhpcyBjb2RlCj4+IGNvcnJlY3RseSwgd2hlbiB0aGUgZ3Vl
-c3QgdGhlbiB0cmllcyB0byB3cml0ZSB0byB0aGUgc2FtZSBJUEEsIHdyaXRhYmxlID09IHRydWUK
-Pj4gYW5kIHdlIG1hcCB0aGUgSVBBIGFnYWluIGluc3RlYWQgb2YgcmVsYXhpbmcgdGhlIHBlcm1p
-c3Npb25zLiBXaHkgaXMgdGhhdD8KPgo+IFNlZSBteSByZXBseSBhYm92ZTogbG9nZ2luZyBtZWFu
-cyBwb3RlbnRpYWxseSBhZGRpbmcgYSBuZXcgbGV2ZWwsIHNvIHdlCj4gdHJlYXQgaXQgYXMgYSBu
-ZXcgbWFwcGluZyBhbHRvZ2V0aGVyIChicmVhayB0aGUgYmxvY2sgbWFwcGluZywgVExCSSwgaW5z
-dGFsbAo+IHRoZSBuZXcgbWFwcGluZyBvbmUgbGV2ZWwgZG93bikuCj4KPiBBbGwgdGhlIG90aGVy
-IGNhc2VzIGFyZSBoYXBwaWx5IGhhbmRsZWQgYnkganVzdCByZWxheGluZyB0aGUgcGVybWlzc2lv
-bnMuCgpJIHRoaW5rIEkgdW5kZXJzdGFuZCBub3csIEkgZGlkbid0IHJlYWxpemUgdGhhdCB3ZSBu
-ZXZlciBjaGVjayBpZiB0aGUgSVBBIGlzCm1hcHBlZCB3aGVuIHdlIGdldCBhIHdyaXRlIGZhdWx0
-IHdpdGggYSBkaXJ0eSBwYWdlIGxvZ2dpbmcgbWVtc2xvdC4gV2UKdW5jb25kaXRpb25hbGx5IG1h
-cCBhIG5ldyBwYWdlIG1hcmtlZCB3cml0YWJsZSwgcmVnYXJkbGVzcyBpZiB0aGUgSVBBIHdhcyBt
-YXBwZWQKb3Igbm90LCBvciBpZiBpdCB3YXMgbWFwcGVkIHVzaW5nIGEgYmxvY2sgbWFwcGluZyBv
-ciBhIHBhZ2UuCgpUaGUgY29kZSBtYWtlcyBzZW5zZSB3aXRoIHRoYXQgaW4gbWluZC4gRm9yIHdo
-YXQgaXQncyB3b3J0aDoKClJldmlld2VkLWJ5OiBBbGV4YW5kcnUgRWxpc2VpIDxhbGV4YW5kcnUu
-ZWxpc2VpQGFybS5jb20+CgpUaGFua3MsCkFsZXgKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
-Zm8va3ZtYXJtCg==
+* Andrew Jones (drjones@redhat.com) wrote:
+> On Wed, Sep 09, 2020 at 06:45:33PM -0700, Richard Henderson wrote:
+> > On 9/9/20 8:25 AM, Andrew Jones wrote:
+> > >>  * Provide a KVM-specific method to extract the tags from guest memory.
+> > >>    This might also have benefits in terms of providing an easy way to
+> > >>    read bulk tag data from guest memory (since the LDGM instruction
+> > >>    isn't available at EL0).
+> > > 
+> > > Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
+> > > the tags for all addresses of each dirty page.
+> > 
+> > KVM_GET_DIRTY_LOG just provides one bit per dirty page, no?  Then VMM copies
+> > the data out from its local address to guest memory.
+> > 
+> > There'd be no difference with or without tags, afaik.  It's just about how VMM
+> > copies the data, with or without tags.
+> 
+> Right, as long as it's fast enough to do
+> 
+>   for_each_dirty_page(page, dirty_log)
+>     for (i = 0; i < host-page-size/16; i += 16)
+>       append_tag(LDG(page + i))
+> 
+> to get all the tags for each dirty page. I understood it would be faster
+> to use LDGM, but we'd need a new ioctl for that. So I was proposing we
+> just piggyback on a new dirty-log ioctl instead.
+
+That feels a bad idea to me; there's a couple of different ways dirty
+page checking work; lets keep extracting the tags separate.
+
+Dave
+
+> Thanks,
+> drew 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
