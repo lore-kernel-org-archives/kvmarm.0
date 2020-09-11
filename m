@@ -2,79 +2,68 @@ Return-Path: <SRS0=CMxQ=CU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8684EC43461
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 08:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C395C43461
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D87442220E
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 08:06:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gptCIC2E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D87442220E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id BD33222206
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD33222206
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=toshiba.co.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9C94B346;
-	Fri, 11 Sep 2020 04:06:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC01A4B2BA;
+	Fri, 11 Sep 2020 05:16:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FTP8rJFAjjKv; Fri, 11 Sep 2020 04:06:33 -0400 (EDT)
+	with ESMTP id ha-UqAVzch9S; Fri, 11 Sep 2020 05:16:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC5264B31F;
-	Fri, 11 Sep 2020 04:06:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 617264B337;
+	Fri, 11 Sep 2020 05:16:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B134B2BF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:06:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF7A34B19B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:34:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id urJVLF6dCMua for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2020 04:06:31 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA0D44B2B8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:06:31 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599811591;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=A1EcRU+tQ69OCpSIz6ObK78n8xFsipE2GkJEuValg6k=;
- b=gptCIC2E3q3hW5GtCvWfIarl6Pq97NLivXcd6w4d4DXwqKxFPNODNBHZ9A3MmnTU1e/vdI
- Lho5XYgcEzLv1luAsxbbkaB+oqH2SNbPoOtS3utdNmr56CE2ni4ESw7WwuOjRkk52ulaN0
- jlu4zWy9HWGU3xUkFywhl1at/eBeQKs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-ljwtwOPeOvG8WeR8B0PnvA-1; Fri, 11 Sep 2020 04:06:27 -0400
-X-MC-Unique: ljwtwOPeOvG8WeR8B0PnvA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA7911019624;
- Fri, 11 Sep 2020 08:06:25 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 523D49CBA;
- Fri, 11 Sep 2020 08:06:20 +0000 (UTC)
-Date: Fri, 11 Sep 2020 10:06:17 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH v3] KVM: arm64: Preserve PMCR immutable values across reset
-Message-ID: <20200911080617.4vcj47vximnzfqvv@kamzik.brq.redhat.com>
-References: <20200910164243.29253-1-graf@amazon.com>
+ with ESMTP id XcUntnOqd8gd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2020 04:34:20 -0400 (EDT)
+Received: from mo-csw.securemx.jp (mo-csw1514.securemx.jp [210.130.202.153])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBE1D4B187
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:34:19 -0400 (EDT)
+Received: by mo-csw.securemx.jp (mx-mo-csw1514) id 08B8Y5k9030833;
+ Fri, 11 Sep 2020 17:34:05 +0900
+X-Iguazu-Qid: 34tMSeeoTP4KRyiZdN
+X-Iguazu-QSIG: v=2; s=0; t=1599813245; q=34tMSeeoTP4KRyiZdN;
+ m=HJVq5MQecyHkcBp+H+KkIyrPGsf3z9XQfg7af2mu9Js=
+Received: from imx2.toshiba.co.jp (imx2.toshiba.co.jp [106.186.93.51])
+ by relay.securemx.jp (mx-mr1512) id 08B8Y3dJ018385;
+ Fri, 11 Sep 2020 17:34:03 +0900
+Received: from enc01.toshiba.co.jp ([106.186.93.100])
+ by imx2.toshiba.co.jp  with ESMTP id 08B8Y3xD025049;
+ Fri, 11 Sep 2020 17:34:03 +0900 (JST)
+Received: from hop001.toshiba.co.jp ([133.199.164.63])
+ by enc01.toshiba.co.jp  with ESMTP id 08B8Y213028891;
+ Fri, 11 Sep 2020 17:34:03 +0900
+From: Punit Agrawal <punit1.agrawal@toshiba.co.jp>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Try PMD block mappings if PUD mappings are
+ not supported
+References: <20200910133351.118191-1-alexandru.elisei@arm.com>
+Date: Fri, 11 Sep 2020 17:34:01 +0900
+In-Reply-To: <20200910133351.118191-1-alexandru.elisei@arm.com> (Alexandru
+ Elisei's message of "Thu, 10 Sep 2020 14:33:51 +0100")
+X-TSB-HOP: ON
+Message-ID: <87363oogp2.fsf@kokedama.swc.toshiba.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200910164243.29253-1-graf@amazon.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Robin Murphy <robin.murphy@arm.com>,
+X-Mailman-Approved-At: Fri, 11 Sep 2020 05:16:14 -0400
+Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -92,56 +81,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 10, 2020 at 06:42:43PM +0200, Alexander Graf wrote:
-> We allow user space to set the PMCR register to any value. However,
-> when time comes for a vcpu reset (for example on PSCI online), PMCR
-> is reset to the hardware capabilities.
-> 
-> I would like to explicitly expose different PMU capabilities (number
-> of supported event counters) to the guest than hardware supports.
-> Ideally across vcpu resets.
-> 
-> So this patch adopts the reset path to only populate the immutable
-> PMCR register bits from hardware when they were not initialized
-> previously. This effectively means that on a normal reset, only the
-> guest settable fields are reset, while on vcpu creation the register
-> gets populated from hardware like before.
-> 
-> With this in place and a change in user space to invoke SET_ONE_REG
-> on the PMCR for every vcpu, I can reliably set the PMU event counter
-> number to arbitrary values.
-> 
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 20ab2a7d37ca..28f67550db7f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -663,7 +663,14 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	u64 pmcr, val;
->  
-> -	pmcr = read_sysreg(pmcr_el0);
-> +	/*
-> +	 * If we already received PMCR from a previous ONE_REG call,
-> +	 * maintain its immutable flags
-> +	 */
-> +	pmcr = __vcpu_sys_reg(vcpu, r->reg);
-> +	if (!__vcpu_sys_reg(vcpu, r->reg))
-> +		pmcr = read_sysreg(pmcr_el0);
-> +
->  	/*
->  	 * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
->  	 * except PMCR.E resetting to zero.
-> -- 
-> 2.16.4
+Hi Alexandru,
+
+Alexandru Elisei <alexandru.elisei@arm.com> writes:
+
+> When userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
+> use the same block size to map the faulting IPA in stage 2. If stage 2
+> cannot the same block mapping because the block size doesn't fit in the
+> memslot or the memslot is not properly aligned, user_mem_abort() will fall
+> back to a page mapping, regardless of the block size. We can do better for
+> PUD backed hugetlbfs by checking if a PMD block mapping is supported before
+> deciding to use a page.
+
+I think this was discussed in the past.
+
+I have a vague recollection of there being a problem if the user and
+stage 2 mappings go out of sync - can't recall the exact details.
+
+Putting it out there in case anybody else on the thread can recall the
+details of the previous discussion (offlist).
+
+Though things may have changed and if it passes testing - then maybe I
+am mis-remembering. I'll take a closer look at the patch and shout out
+if I notice anything.
+
+Thanks,
+Punit
+
 >
-
-Reviewed-by: Andrew Jones <drjones@redhat.com> 
-
+> vma_pagesize is an unsigned long, use 1UL instead of 1ULL when assigning
+> its value.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> Tested on a rockpro64 with 4K pages and hugetlbfs hugepagesz=1G (PUD sized
+> block mappings).  First test, guest RAM starts at 0x8100 0000
+> (memslot->base_gfn not aligned to 1GB); second test, guest RAM starts at
+> 0x8000 0000, but is only 512 MB.  In both cases using PUD mappings is not
+> possible because either the memslot base address is not aligned, or the
+> mapping would extend beyond the memslot.
+>
+> Without the changes, user_mem_abort() uses 4K pages to map the guest IPA.
+> With the patches, user_mem_abort() uses PMD block mappings (2MB) to map the
+> guest RAM, which means less TLB pressure and fewer stage 2 aborts.
+>
+> Changes since v1 [1]:
+> - Rebased on top of Will's stage 2 page table handling rewrite, version 4
+>   of the series [2]. His series is missing the patch "KVM: arm64: Update
+>   page shift if stage 2 block mapping not supported" and there might be a
+>   conflict (it's straightforward to fix).
+>
+> [1] https://www.spinics.net/lists/arm-kernel/msg834015.html
+> [2] https://www.spinics.net/lists/arm-kernel/msg835806.html
+>
+>  arch/arm64/kvm/mmu.c | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1041be1fafe4..39c539d4d4cb 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -776,16 +776,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	else
+>  		vma_shift = PAGE_SHIFT;
+>  
+> -	vma_pagesize = 1ULL << vma_shift;
+>  	if (logging_active ||
+> -	    (vma->vm_flags & VM_PFNMAP) ||
+> -	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+> +	    (vma->vm_flags & VM_PFNMAP)) {
+>  		force_pte = true;
+> -		vma_pagesize = PAGE_SIZE;
+> +		vma_shift = PAGE_SHIFT;
+> +	}
+> +
+> +	if (vma_shift == PUD_SHIFT &&
+> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+> +	       vma_shift = PMD_SHIFT;
+> +
+> +	if (vma_shift == PMD_SHIFT &&
+> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
+> +		force_pte = true;
+> +		vma_shift = PAGE_SHIFT;
+>  	}
+>  
+> +	vma_pagesize = 1UL << vma_shift;
+>  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+> -		fault_ipa &= huge_page_mask(hstate_vma(vma));
+> +		fault_ipa &= ~(vma_pagesize - 1);
+>  
+>  	gfn = fault_ipa >> PAGE_SHIFT;
+>  	mmap_read_unlock(current->mm);
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
