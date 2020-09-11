@@ -2,69 +2,95 @@ Return-Path: <SRS0=CMxQ=CU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C395C43461
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18073C2BC11
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BD33222206
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD33222206
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=toshiba.co.jp
+	by mail.kernel.org (Postfix) with ESMTP id 7111D2087C
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 09:16:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hxpb2Uk3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7111D2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC01A4B2BA;
-	Fri, 11 Sep 2020 05:16:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F19964B368;
+	Fri, 11 Sep 2020 05:16:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ha-UqAVzch9S; Fri, 11 Sep 2020 05:16:15 -0400 (EDT)
+	with ESMTP id jt9VGQq6piEf; Fri, 11 Sep 2020 05:16:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 617264B337;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B0E4B34F;
 	Fri, 11 Sep 2020 05:16:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF7A34B19B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:34:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12BD24B31B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:58:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XcUntnOqd8gd for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2020 04:34:20 -0400 (EDT)
-Received: from mo-csw.securemx.jp (mo-csw1514.securemx.jp [210.130.202.153])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBE1D4B187
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:34:19 -0400 (EDT)
-Received: by mo-csw.securemx.jp (mx-mo-csw1514) id 08B8Y5k9030833;
- Fri, 11 Sep 2020 17:34:05 +0900
-X-Iguazu-Qid: 34tMSeeoTP4KRyiZdN
-X-Iguazu-QSIG: v=2; s=0; t=1599813245; q=34tMSeeoTP4KRyiZdN;
- m=HJVq5MQecyHkcBp+H+KkIyrPGsf3z9XQfg7af2mu9Js=
-Received: from imx2.toshiba.co.jp (imx2.toshiba.co.jp [106.186.93.51])
- by relay.securemx.jp (mx-mr1512) id 08B8Y3dJ018385;
- Fri, 11 Sep 2020 17:34:03 +0900
-Received: from enc01.toshiba.co.jp ([106.186.93.100])
- by imx2.toshiba.co.jp  with ESMTP id 08B8Y3xD025049;
- Fri, 11 Sep 2020 17:34:03 +0900 (JST)
-Received: from hop001.toshiba.co.jp ([133.199.164.63])
- by enc01.toshiba.co.jp  with ESMTP id 08B8Y213028891;
- Fri, 11 Sep 2020 17:34:03 +0900
-From: Punit Agrawal <punit1.agrawal@toshiba.co.jp>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2] KVM: arm64: Try PMD block mappings if PUD mappings are
- not supported
-References: <20200910133351.118191-1-alexandru.elisei@arm.com>
-Date: Fri, 11 Sep 2020 17:34:01 +0900
-In-Reply-To: <20200910133351.118191-1-alexandru.elisei@arm.com> (Alexandru
- Elisei's message of "Thu, 10 Sep 2020 14:33:51 +0100")
-X-TSB-HOP: ON
-Message-ID: <87363oogp2.fsf@kokedama.swc.toshiba.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ with ESMTP id rW6xZimUBzVb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2020 04:58:46 -0400 (EDT)
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com
+ [209.85.215.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA24F4B314
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 04:58:45 -0400 (EDT)
+Received: by mail-pg1-f194.google.com with SMTP id j34so6172439pgi.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 01:58:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=c8nz9oNcqS43/JX3gIjCU/zwWUctvs6c1e4wLHvLc2Y=;
+ b=Hxpb2Uk3qvJAd3R0XfksSYNI8kdRCaccIUM/VdyS2lkhsMLXtOLRME8qLbuhPRhV7y
+ roW/F/u6PTATgscybfZNaRVTOG7YlC66Fa2gylGkaElmNTELAQA87zHgP5W9HZmKY4kG
+ sia/LM9pLookkv7sYkraeIi7fFQ31KlFVIrzmLg16dlNSOTcCroYiyskRO/yjHZnbv7R
+ z29Bg+AdyZGixBqgba5i6ttcQyhAXy54KqdYGJvzHFHmbQG1tVEBDx1raDCT21FKjprb
+ oYqWHsZEzqTjowkA1WkprF/4s4fiLyDEWd2fPD25icFROAkqHGvBCStRHrKWg1xqH6M8
+ 2OJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=c8nz9oNcqS43/JX3gIjCU/zwWUctvs6c1e4wLHvLc2Y=;
+ b=jLVMRH/800FlpzBTT94aqwyc8L0LQaNR0R/F+5M6DgHu/SEqoJGeBoXbQ8FIy7YeyY
+ RO7TOZFfLw0yowIB0iklC9eUl3xD0C/QPLTEgAQVYPalQYPTDHAUxHaYVbd8shEpR4WV
+ wHwarXn2klpGghoUs7a6MDDQd6/f4E/OtGEeqN0oB8REHGDhUktd5aZ1XNXLyPpjOBei
+ BlxPDRWAsZjbWI+nGyTHmKcHjAoVdjJ8lK6DxxYAbWw1B9KImKJd2y3+f4XPT9IIYdTz
+ mYNbNA3c4NavjGLgq2ksOm9F6pMs/wH05TPOCD0NrSGBo5po7Xsy4e5OzoS4dM/fqPxK
+ Dhdg==
+X-Gm-Message-State: AOAM532+aQLelA6uTFh3Yy9IYgbtQDsGzzXSB104v34zAotxX1PD+eBL
+ tuBYGWBh7KsUY2LuaNT+0R0=
+X-Google-Smtp-Source: ABdhPJyoeITgOIN4JjrXohV3LFRjO6CAR/hsMueYMeKLzKIO6N7sKT5jESAJGrqk4eb/udlvx7W2CA==
+X-Received: by 2002:a62:8286:0:b029:13c:1611:6588 with SMTP id
+ w128-20020a6282860000b029013c16116588mr1176188pfd.5.1599814725003; 
+ Fri, 11 Sep 2020 01:58:45 -0700 (PDT)
+Received: from localhost ([2409:10:2e40:5100:6e29:95ff:fe2d:8f34])
+ by smtp.gmail.com with ESMTPSA id u10sm1600580pfn.122.2020.09.11.01.58.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 11 Sep 2020 01:58:44 -0700 (PDT)
+Date: Fri, 11 Sep 2020 17:58:41 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [RFC][PATCH 0/4] arm64:kvm: teach guest sched that VCPUs can be
+ preempted
+Message-ID: <20200911085841.GB562@jagdpanzerIV.localdomain>
+References: <20200721041742.197354-1-sergey.senozhatsky@gmail.com>
+ <20200817020310.GA1210848@jagdpanzerIV.localdomain>
+ <fe72592c-c721-bece-1469-95eebf931299@huawei.com>
+ <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
 X-Mailman-Approved-At: Fri, 11 Sep 2020 05:16:14 -0400
-Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+Cc: joelaf@google.com, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+ linux-kernel@vger.kernel.org, suleiman@google.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,97 +107,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
+My apologies for the slow reply.
 
-Alexandru Elisei <alexandru.elisei@arm.com> writes:
-
-> When userspace uses hugetlbfs for the VM memory, user_mem_abort() tries to
-> use the same block size to map the faulting IPA in stage 2. If stage 2
-> cannot the same block mapping because the block size doesn't fit in the
-> memslot or the memslot is not properly aligned, user_mem_abort() will fall
-> back to a page mapping, regardless of the block size. We can do better for
-> PUD backed hugetlbfs by checking if a PMD block mapping is supported before
-> deciding to use a page.
-
-I think this was discussed in the past.
-
-I have a vague recollection of there being a problem if the user and
-stage 2 mappings go out of sync - can't recall the exact details.
-
-Putting it out there in case anybody else on the thread can recall the
-details of the previous discussion (offlist).
-
-Though things may have changed and if it passes testing - then maybe I
-am mis-remembering. I'll take a closer look at the patch and shout out
-if I notice anything.
-
-Thanks,
-Punit
-
+On (20/08/17 13:25), Marc Zyngier wrote:
 >
-> vma_pagesize is an unsigned long, use 1UL instead of 1ULL when assigning
-> its value.
+> It really isn't the same thing at all. You are exposing PV spinlocks,
+> while Sergey exposes preemption to vcpus.
 >
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> Tested on a rockpro64 with 4K pages and hugetlbfs hugepagesz=1G (PUD sized
-> block mappings).  First test, guest RAM starts at 0x8100 0000
-> (memslot->base_gfn not aligned to 1GB); second test, guest RAM starts at
-> 0x8000 0000, but is only 512 MB.  In both cases using PUD mappings is not
-> possible because either the memslot base address is not aligned, or the
-> mapping would extend beyond the memslot.
->
-> Without the changes, user_mem_abort() uses 4K pages to map the guest IPA.
-> With the patches, user_mem_abort() uses PMD block mappings (2MB) to map the
-> guest RAM, which means less TLB pressure and fewer stage 2 aborts.
->
-> Changes since v1 [1]:
-> - Rebased on top of Will's stage 2 page table handling rewrite, version 4
->   of the series [2]. His series is missing the patch "KVM: arm64: Update
->   page shift if stage 2 block mapping not supported" and there might be a
->   conflict (it's straightforward to fix).
->
-> [1] https://www.spinics.net/lists/arm-kernel/msg834015.html
-> [2] https://www.spinics.net/lists/arm-kernel/msg835806.html
->
->  arch/arm64/kvm/mmu.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1041be1fafe4..39c539d4d4cb 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -776,16 +776,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	else
->  		vma_shift = PAGE_SHIFT;
->  
-> -	vma_pagesize = 1ULL << vma_shift;
->  	if (logging_active ||
-> -	    (vma->vm_flags & VM_PFNMAP) ||
-> -	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
-> +	    (vma->vm_flags & VM_PFNMAP)) {
->  		force_pte = true;
-> -		vma_pagesize = PAGE_SIZE;
-> +		vma_shift = PAGE_SHIFT;
-> +	}
-> +
-> +	if (vma_shift == PUD_SHIFT &&
-> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
-> +	       vma_shift = PMD_SHIFT;
-> +
-> +	if (vma_shift == PMD_SHIFT &&
-> +	    !fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> +		force_pte = true;
-> +		vma_shift = PAGE_SHIFT;
->  	}
->  
-> +	vma_pagesize = 1UL << vma_shift;
->  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
-> -		fault_ipa &= huge_page_mask(hstate_vma(vma));
-> +		fault_ipa &= ~(vma_pagesize - 1);
->  
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mmap_read_unlock(current->mm);
+
+Correct, we see vcpu preemption as a "fundamental" feature, with
+consequences that affect scheduling, which is a core feature :)
+
+Marc, is there anything in particular that you dislike about this RFC
+patch set? Joel has some ideas, which we may discuss offline if that
+works for you.
+
+	-ss
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
