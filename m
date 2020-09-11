@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3834AC43461
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 13:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DDCC433E2
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 13:26:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B3AAA22206
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 13:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D28B122225
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Sep 2020 13:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyWpAvI5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3AAA22206
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zIbtel2p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D28B122225
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 696FB4B3CD;
-	Fri, 11 Sep 2020 09:26:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87DF84B2BC;
+	Fri, 11 Sep 2020 09:26:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rtIZzXzSb7yA; Fri, 11 Sep 2020 09:26:04 -0400 (EDT)
+	with ESMTP id 3yaDE7dTJg4a; Fri, 11 Sep 2020 09:26:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24DF24B3D9;
-	Fri, 11 Sep 2020 09:26:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42F484B3E6;
+	Fri, 11 Sep 2020 09:26:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 109CF4B2D9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 09:26:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D8154B2D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 09:26:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qWFdAvAsOgTS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2020 09:26:02 -0400 (EDT)
+ with ESMTP id 2leunt5fTZ6m for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2020 09:26:03 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB5234B2BC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 09:25:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DFED4B3A9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2020 09:26:02 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4323F22224;
- Fri, 11 Sep 2020 13:25:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AA0F222225;
+ Fri, 11 Sep 2020 13:25:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1599830759;
- bh=bDNRWa7sy5yB5fFkHx0Q6IWAUUzEgMmil4yIKB0Sxk8=;
+ s=default; t=1599830761;
+ bh=4ay5TrojnSOgCRLDVXg3OBrxLTg6M52CZnqCfmoNoEg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=WyWpAvI5wLVMvaznWGdFlzAYB3C3jIQAyp3zxx7Lv77Jo5w2KBEhqwphPsjM6qA0H
- LjWSq6MRRCa9nB525FyAeZ+AlTKnFKoMThurM/zFUAEBnKXZ1KKUiM+KO6ockQgti1
- ob8NPgFUYcvw2UHXB5ipv8vIG4s3EWJPJnheWkQQ=
+ b=zIbtel2p4oT1lU1bHPQDfVz3HPu3aldsSs5eExk4RXX6x2z7A2sRnYlIUJkwHFNB2
+ 4yPQBGQ24MckYowiQbQ+kfWc/oPlgqZRf0hR9irVZH9YB3KgjTQjgcBelOJipIqyNw
+ umRamyxmHDXjL+NrCDrdKCfWmqAbwUCmAIC3iBvY=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v5 09/21] KVM: arm64: Convert unmap_stage2_range() to generic
- page-table API
-Date: Fri, 11 Sep 2020 14:25:17 +0100
-Message-Id: <20200911132529.19844-10-will@kernel.org>
+Subject: [PATCH v5 10/21] KVM: arm64: Add support for stage-2 page-aging in
+ generic page-table
+Date: Fri, 11 Sep 2020 14:25:18 +0100
+Message-Id: <20200911132529.19844-11-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200911132529.19844-1-will@kernel.org>
 References: <20200911132529.19844-1-will@kernel.org>
@@ -82,107 +82,170 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Convert unmap_stage2_range() to use kvm_pgtable_stage2_unmap() instead
-of walking the page-table directly.
+Add stage-2 mkyoung(), mkold() and is_young() operations to the generic
+page-table code.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 62 ++++++++++++++++++++++++++------------------
- 1 file changed, 37 insertions(+), 25 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 44 ++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 86 ++++++++++++++++++++++++++++
+ 2 files changed, 130 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d8cfdd25eac5..f03d3d0af10d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -39,6 +39,38 @@ static bool is_iomap(unsigned long flags)
- 	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 895b2238062b..50782128c861 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -186,6 +186,50 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+  */
+ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+ 
++/**
++ * kvm_pgtable_stage2_mkyoung() - Set the access flag in a page-table entry.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
++ * @addr:	Intermediate physical address to identify the page-table entry.
++ *
++ * The offset of @addr within a page is ignored.
++ *
++ * If there is a valid, leaf page-table entry used to translate @addr, then
++ * set the access flag in that entry.
++ *
++ * Return: The old page-table entry prior to setting the flag, 0 on failure.
++ */
++kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr);
++
++/**
++ * kvm_pgtable_stage2_mkold() - Clear the access flag in a page-table entry.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
++ * @addr:	Intermediate physical address to identify the page-table entry.
++ *
++ * The offset of @addr within a page is ignored.
++ *
++ * If there is a valid, leaf page-table entry used to translate @addr, then
++ * clear the access flag in that entry.
++ *
++ * Note that it is the caller's responsibility to invalidate the TLB after
++ * calling this function to ensure that the updated permissions are visible
++ * to the CPUs.
++ *
++ * Return: The old page-table entry prior to clearing the flag, 0 on failure.
++ */
++kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
++
++/**
++ * kvm_pgtable_stage2_is_young() - Test whether a page-table entry has the
++ *				   access flag set.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
++ * @addr:	Intermediate physical address to identify the page-table entry.
++ *
++ * The offset of @addr within a page is ignored.
++ *
++ * Return: True if the page-table entry has the access flag set, false otherwise.
++ */
++bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
++
+ /**
+  * kvm_pgtable_walk() - Walk a page-table.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 2f9b872f5355..af60ea8ee29d 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -690,6 +690,92 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	return kvm_pgtable_walk(pgt, addr, size, &walker);
  }
  
-+/*
-+ * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
-+ * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
-+ * CONFIG_LOCKUP_DETECTOR, CONFIG_LOCKDEP. Additionally, holding the lock too
-+ * long will also starve other vCPUs. We have to also make sure that the page
-+ * tables are not freed while we released the lock.
-+ */
-+static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
-+			      phys_addr_t end,
-+			      int (*fn)(struct kvm_pgtable *, u64, u64),
-+			      bool resched)
++struct stage2_attr_data {
++	kvm_pte_t	attr_set;
++	kvm_pte_t	attr_clr;
++	kvm_pte_t	pte;
++};
++
++static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++			      enum kvm_pgtable_walk_flags flag,
++			      void * const arg)
 +{
-+	int ret;
-+	u64 next;
++	kvm_pte_t pte = *ptep;
++	struct stage2_attr_data *data = arg;
 +
-+	do {
-+		struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-+		if (!pgt)
-+			return -EINVAL;
++	if (!kvm_pte_valid(pte))
++		return 0;
 +
-+		next = stage2_pgd_addr_end(kvm, addr, end);
-+		ret = fn(pgt, addr, next - addr);
-+		if (ret)
-+			break;
++	data->pte = pte;
++	pte &= ~data->attr_clr;
++	pte |= data->attr_set;
 +
-+		if (resched && next != end)
-+			cond_resched_lock(&kvm->mmu_lock);
-+	} while (addr = next, addr != end);
++	/*
++	 * We may race with the CPU trying to set the access flag here,
++	 * but worst-case the access flag update gets lost and will be
++	 * set on the next access instead.
++	 */
++	if (data->pte != pte)
++		WRITE_ONCE(*ptep, pte);
 +
-+	return ret;
++	return 0;
 +}
 +
- static bool memslot_is_logging(struct kvm_memory_slot *memslot)
++static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
++				    u64 size, kvm_pte_t attr_set,
++				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte)
++{
++	int ret;
++	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
++	struct stage2_attr_data data = {
++		.attr_set	= attr_set & attr_mask,
++		.attr_clr	= attr_clr & attr_mask,
++	};
++	struct kvm_pgtable_walker walker = {
++		.cb		= stage2_attr_walker,
++		.arg		= &data,
++		.flags		= KVM_PGTABLE_WALK_LEAF,
++	};
++
++	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++	if (ret)
++		return ret;
++
++	if (orig_pte)
++		*orig_pte = data.pte;
++	return 0;
++}
++
++kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
++{
++	kvm_pte_t pte = 0;
++	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
++				 &pte);
++	dsb(ishst);
++	return pte;
++}
++
++kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
++{
++	kvm_pte_t pte = 0;
++	stage2_update_leaf_attrs(pgt, addr, 1, 0, KVM_PTE_LEAF_ATTR_LO_S2_AF,
++				 &pte);
++	/*
++	 * "But where's the TLBI?!", you scream.
++	 * "Over in the core code", I sigh.
++	 *
++	 * See the '->clear_flush_young()' callback on the KVM mmu notifier.
++	 */
++	return pte;
++}
++
++bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
++{
++	kvm_pte_t pte = 0;
++	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte);
++	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
++}
++
+ int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm)
  {
- 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
-@@ -220,8 +252,8 @@ static inline void kvm_pgd_populate(pgd_t *pgdp, p4d_t *p4dp)
-  * end up writing old data to disk.
-  *
-  * This is why right after unmapping a page/section and invalidating
-- * the corresponding TLBs, we call kvm_flush_dcache_p*() to make sure
-- * the IO subsystem will never hit in the cache.
-+ * the corresponding TLBs, we flush to make sure the IO subsystem will
-+ * never hit in the cache.
-  *
-  * This is all avoided on systems that have ARM64_HAS_STAGE2_FWB, as
-  * we then fully enforce cacheability of RAM, no matter what the guest
-@@ -344,32 +376,12 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- 				 bool may_block)
- {
- 	struct kvm *kvm = mmu->kvm;
--	pgd_t *pgd;
--	phys_addr_t addr = start, end = start + size;
--	phys_addr_t next;
-+	phys_addr_t end = start + size;
- 
- 	assert_spin_locked(&kvm->mmu_lock);
- 	WARN_ON(size & ~PAGE_MASK);
--
--	pgd = mmu->pgd + stage2_pgd_index(kvm, addr);
--	do {
--		/*
--		 * Make sure the page table is still active, as another thread
--		 * could have possibly freed the page table, while we released
--		 * the lock.
--		 */
--		if (!READ_ONCE(mmu->pgd))
--			break;
--		next = stage2_pgd_addr_end(kvm, addr, end);
--		if (!stage2_pgd_none(kvm, *pgd))
--			unmap_stage2_p4ds(mmu, pgd, addr, next);
--		/*
--		 * If the range is too large, release the kvm->mmu_lock
--		 * to prevent starvation and lockup detector warnings.
--		 */
--		if (may_block && next != end)
--			cond_resched_lock(&kvm->mmu_lock);
--	} while (pgd++, addr = next, addr != end);
-+	WARN_ON(stage2_apply_range(kvm, start, end, kvm_pgtable_stage2_unmap,
-+				   may_block));
- }
- 
- static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+ 	size_t pgd_sz;
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
