@@ -1,84 +1,85 @@
-Return-Path: <SRS0=oQcH=CW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=WazV=CX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F505C2D0E4
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Sep 2020 17:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9946DC2D0E4
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 09:32:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F36CF20723
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Sep 2020 17:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E325C20719
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 09:32:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FFfLcVBF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36CF20723
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rgwL2w94"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E325C20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97EC74B375;
-	Sun, 13 Sep 2020 13:05:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 456564B537;
+	Mon, 14 Sep 2020 05:32:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id U7Qa5LPYJ6YE; Sun, 13 Sep 2020 13:05:36 -0400 (EDT)
+	with ESMTP id J2+U5LGyrEHg; Mon, 14 Sep 2020 05:32:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0886C4B31A;
-	Sun, 13 Sep 2020 13:05:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CEEE4B530;
+	Mon, 14 Sep 2020 05:32:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC6C54B315
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Sep 2020 13:05:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0178A4B4BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 05:32:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id logLOaDgvrQv for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Sep 2020 13:05:32 -0400 (EDT)
+ with ESMTP id t9DkPXwcNsBo for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Sep 2020 05:32:13 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE8C64B331
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Sep 2020 13:05:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C06784B4B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 05:32:13 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E6171206C9;
- Sun, 13 Sep 2020 17:05:31 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9114320719;
+ Mon, 14 Sep 2020 09:32:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1600016732;
- bh=4mSBB5yuCBsb8DtXJKT9RU48Hmo8YtN6lltG9KNfU8A=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FFfLcVBFgUrUWL7xMpiPycH4fqxj2z6l/o1EKkTGKFChr2nvAz9Kcy8L3kPgH0DaS
- GQfH5SexH/ZkGPMPzEYnjI+ZscIYWZgc4dRGrBZNAmrj5PIdfBW8z04ypghazAAL39
- 5tFvhBvsU8JEM/aWeTPXgmhG1RJBJJVzr7v8+g2Q=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.lan) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ s=default; t=1600075932;
+ bh=1BSQE18mOLeieZIEJX3nhtUEcdSn/Db67JaorMfQvkI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=rgwL2w94by8v2vjHBHSfnnk1h3eRTmmv2oVRaG5JPa357oKa8QSu22LQoeMME7+2T
+ D7qlSk95YZo7Ab275csCMuuWwWM8p2F2kO9gsjmQcHxUVmYaMeYb313zZ+cowrKh/3
+ Y766p789qlNpw9QUd5FjzQs5gLNi4/RC0aX0I6pA=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kHVRS-00BTQE-E2; Sun, 13 Sep 2020 18:05:30 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Nishanth Menon <nm@ti.com>, Santosh Shilimkar <ssantosh@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>, Jason Cooper <jason@lakedaemon.net>,
- Thomas Gleixner <tglx@linutronix.de>, Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCH 1/2] irqchip/ti-sci: Simplify with dev_err_probe()
-Date: Sun, 13 Sep 2020 18:05:17 +0100
-Message-Id: <160001658182.6915.14152547552697841903.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200902174615.24695-1-krzk@kernel.org>
-References: <20200902174615.24695-1-krzk@kernel.org>
+ id 1kHkqI-00BdtE-Kf; Mon, 14 Sep 2020 10:32:10 +0100
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, nm@ti.com,
- ssantosh@kernel.org, krzk@kernel.org, jason@lakedaemon.net, tglx@linutronix.de,
- t-kristo@ti.com, will@kernel.org, catalin.marinas@arm.com
+Date: Mon, 14 Sep 2020 10:32:10 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Assume write fault on S1PTW permission fault
+ on instruction fetch
+In-Reply-To: <20200911155912.GB20527@willie-the-truck>
+References: <20200909210527.1926996-1-maz@kernel.org>
+ <20200911155912.GB20527@willie-the-truck>
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <edbb56d954913bbe8422c9f32aee9c76@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: will@kernel.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: catalin.marinas@arm.com, will@kernel.org
+Cc: kvm@vger.kernel.org, stable@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,32 +91,108 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 2 Sep 2020 19:46:14 +0200, Krzysztof Kozlowski wrote:
-> Common pattern of handling deferred probe can be simplified with
-> dev_err_probe().  Less code and the error value gets printed.
+On 2020-09-11 16:59, Will Deacon wrote:
+> On Wed, Sep 09, 2020 at 10:05:27PM +0100, Marc Zyngier wrote:
+>> KVM currently assumes that an instruction abort can never be a write.
+>> This is in general true, except when the abort is triggered by
+>> a S1PTW on instruction fetch that tries to update the S1 page tables
+>> (to set AF, for example).
+>> 
+>> This can happen if the page tables have been paged out and brought
+>> back in without seeing a direct write to them (they are thus marked
+>> read only), and the fault handling code will make the PT executable(!)
+>> instead of writable. The guest gets stuck forever.
+>> 
+>> In these conditions, the permission fault must be considered as
+>> a write so that the Stage-1 update can take place. This is essentially
+>> the I-side equivalent of the problem fixed by 60e21a0ef54c ("arm64: 
+>> KVM:
+>> Take S1 walks into account when determining S2 write faults").
+>> 
+>> Update both kvm_is_write_fault() to return true on IABT+S1PTW, as well
+>> as kvm_vcpu_trap_is_iabt() to return false in the same conditions.
+>> 
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>> This could do with some cleanup (kvm_vcpu_dabt_iss1tw has nothing to 
+>> do
+>> with data aborts), but I've chosen to keep the patch simple in order 
+>> to
+>> ease backporting.
+>> 
+>>  arch/arm64/include/asm/kvm_emulate.h | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h 
+>> b/arch/arm64/include/asm/kvm_emulate.h
+>> index d21676409a24..33d7e16edaa3 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -480,7 +480,8 @@ static __always_inline u8 
+>> kvm_vcpu_trap_get_class(const struct kvm_vcpu *vcpu)
+>> 
+>>  static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+>>  {
+>> -	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+>> +	return (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW &&
+>> +		!kvm_vcpu_dabt_iss1tw(vcpu));
+>>  }
+>> 
+>>  static __always_inline u8 kvm_vcpu_trap_get_fault(const struct 
+>> kvm_vcpu *vcpu)
+>> @@ -520,6 +521,9 @@ static __always_inline int 
+>> kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+>> 
+>>  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>>  {
+>> +	if (kvm_vcpu_dabt_iss1tw(vcpu))
+>> +		return true;
+>> +
 > 
-> There is also no need to assign NULL to 'intr->sci' as it is part of
-> devm-allocated memory.
+> Hmm, I'm a bit uneasy about the interaction of this with
+> kvm_handle_guest_abort() if we take an S1PTW fault on instruction fetch
+> with our page-tables sitting in a read-only memslot. In this case, I
+> think we'll end up injecting a data abort into the guest instead of an
+> instruction abort. It hurts my brain thinking about it though.
 
-Applied to irq/irqchip-next, thanks!
+Good point.
 
-[1/2] irqchip/ti-sci: Simplify with dev_err_probe()
-      commit: ea6c25e6057c0b7c18337696be84b8f9751f19ec
+> 
+> Overall, I'd be inclined to:
+> 
+>   1. Rename kvm_vcpu_dabt_iss1tw() to kvm_vcpu_abt_iss1tw()
+> 
+>   2. Introduce something like kvm_is_exec_fault() as:
+> 
+> 	return kvm_vcpu_trap_is_iabt() && !kvm_vcpu_abt_iss1tw();
+> 
+>   3. Use that new function in user_mem_abort() to assign 'exec_fault'
+> 
+>   4. Hack kvm_is_write_fault() as you have done above.
+> 
+> Which I _think_ should work (famous last words)...
 
-Patch #2 didn't make a lot of sense, so not applied.
+That's what I initially had, but went for ease of backporting instead...
+Back to square one.
 
-Cheers,
+> The only nasty bit is that we then duplicate the kvm_vcpu_dabt_iss1tw()
+> check in both kvm_is_write_fault() and kvm_vcpu_dabt_iswrite(). Perhaps
+> we could remove the latter function in favour of the first? Anyway,
+> obviously this sort of cleanup isn't for stable.
 
-	M.
+I've had a look, and I believe this is safe. We always check for S1PTW
+*before* using kvm_vcpu_dabt_iswrite() anyway. I'll add that as a second
+patch that we can merge later if required.
+
+         M.
 -- 
-Without deviation from the norm, progress is not possible.
-
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
