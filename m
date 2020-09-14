@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D1CC433E2
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F04C43461
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE36120771
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14D7D21D1A
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Ihcd/I42"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE36120771
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="tSsBMUWs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D7D21D1A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A70F4B565;
-	Mon, 14 Sep 2020 13:28:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B9D4B5A5;
+	Mon, 14 Sep 2020 13:28:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id le7Y4Ud1e3XU; Mon, 14 Sep 2020 13:28:17 -0400 (EDT)
+	with ESMTP id NQ7GMroNVfEB; Mon, 14 Sep 2020 13:28:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E064B58D;
-	Mon, 14 Sep 2020 13:28:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B7A84B5B0;
+	Mon, 14 Sep 2020 13:28:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C450B4B58D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7435B4B565
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BSAKA1avR6NC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Sep 2020 13:28:15 -0400 (EDT)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D5B54B5B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:14 -0400 (EDT)
-Received: by mail-wm1-f67.google.com with SMTP id w2so821585wmi.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 10:28:14 -0700 (PDT)
+ with ESMTP id EYfZt4VhJ3Zh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Sep 2020 13:28:16 -0400 (EDT)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6425E4B5A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:16 -0400 (EDT)
+Received: by mail-wr1-f68.google.com with SMTP id a17so506489wrn.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 10:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ev8PHeG2wBS2zSKo7R1VQ4GKo6oUzjZvdtqCLwJ3pDs=;
- b=Ihcd/I42/8bqTmauvPs6wDsvnxOAZx+wYOevPiQvp+xJchPV5GVJkIShVJHhNU2FjO
- Zf1FpuxhmFlq6/3mUCs6IS98Ps2pku3dV/3fh5ECJ4gDZPm9+Ct13ppA30R3IhTtGzSd
- KyjRpOxXeBwr5vS+ttAyiOJy1txvnpeI7w+7wvzy7JfFhvY/m6Hyiw0ksxJxvBH1TKmw
- CpSNjsUVu0fP6g5CeuWF6cI5+zgTBD8gSJA/WEILjUZoiAXavXc7DnpojnXNHupGQsvG
- s7eZ41WyrXa0IMZ4lhH1LzLbNKcQgdbq0M8s5dYCdEOag6uxg2zPjBYciaEkq0N6363O
- Svhw==
+ bh=VE4tiaYIO2WH178ygWtKyTutOHC4+8KlDDbyhHM4F14=;
+ b=tSsBMUWsMvg8+rPbGLC3iYKX0M9xTuJCgz8t9VzFY/lPy2b722XAFrOELq7cSNpIxk
+ N9S5vrz2VcmU/j3WqAfHtIo7s+KuY8ak7B/tAU5NAvf54fH1rh0GHPJ6ElKhZGk3Mdw2
+ ZyUng2UvYJ18NYurvGMI2vrPFIihzVaGyJOS8jOH2ePwigt8T84XvtwVOp5ByrQLnaXd
+ SxgwfYEnrlmxDAAm/fq1xJgaWOPKHUMNCKDRSG5G7oYbjiJGUMoAY65TE+vuPGm9bag9
+ Lh14EdLD9IpUB/n0nxNhI+Mj+Hx5DMLpZMQ3zlrmushDlXv2bFwUMuUlbzXDmKDYSRNl
+ l23w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ev8PHeG2wBS2zSKo7R1VQ4GKo6oUzjZvdtqCLwJ3pDs=;
- b=Yw1SVnwf4HeKnxFnJdla3jbzZBSN5CToSKxSsDDSTqutCHIBF99/HNFxSBy3SmCMZP
- cDr1yB+7JxxeccNnSv0Zs+/cd0aKhcEHQw3ZqZ4oT5hSDZKQNF681Oyq+Xtn7nszG8vu
- LhONXveZhz0SeZd24jVAsuz0DAoG1RwNAdgz1XWKnSriAgGr6BnUfssR0SLjvT1vsCKr
- ouTNfC/okyI3MD/1V7QK1u9+8e/HxWnGC/W+P8tuuK9IfqhL29vGOSm++ZYHoBg+eg4a
- 2AHcFiobH2X5An4DsAS/47v6d0FGrdhyes8/th3KsD3VNNyV2OWbXz/0uL/ktVMkChK+
- 10bw==
-X-Gm-Message-State: AOAM531CGLWCtMkD+sr95GtJaHDflqclO7Arq4FIuHaKxDfx0bgvWqyt
- H0E+06He0MII76BfrXHl0zm6fw==
-X-Google-Smtp-Source: ABdhPJwtapIR59wfa+PjunnI9DEEbaEmNaoIsHmxwFfZkq+7/rS32R8lqozJpnsFIN4Urr9dofZ6Kw==
-X-Received: by 2002:a1c:f619:: with SMTP id w25mr459880wmc.62.1600104493518;
- Mon, 14 Sep 2020 10:28:13 -0700 (PDT)
+ bh=VE4tiaYIO2WH178ygWtKyTutOHC4+8KlDDbyhHM4F14=;
+ b=D6m9ClOamtstm8Pa3Bl7jpoSxS+HF/CSgXRRHl+k9vdHRJNNCD3W+gV++/1eFOVsgB
+ 9jscdN9dF8hg0N3ylwscb488JCBKQs5/EOA7pKUY7SMJMIwGcyPEaKZUwtZ3KR/L8AUt
+ S5iXkKN3HOUk0yDtqP7EdZShRCr9deRniZAyXUptCTKGBUXfhj9iJVc6iDdoaeKvywp2
+ W9ze+7YLjoVVLMYB8UfNNNl28s5z3K9QvCWNk5RsC6pUqQT/iyXkyGXOa9YbEnRUIGNl
+ iVNeJGDg5rSTqsqQTqxx4UxNtL2IvAujNcYR9sWfwXrlhAVEkR+3HGCLU5eCF3QtIBXh
+ 0kJQ==
+X-Gm-Message-State: AOAM530ritqnAEFG2VF/UZp09kE0mIQUTp5usoGWyWZ3IPZi4nROXzq2
+ QwPedv3IgNA3eDFjA4ZrA3M7Lg==
+X-Google-Smtp-Source: ABdhPJwDp0qDmVhRrvPNjBrZkX56Whr339QzJq0eZ5FLOChOIB1ToFOdRxzoHsQ+yPW+W6ciFtGbiw==
+X-Received: by 2002:a5d:50c3:: with SMTP id f3mr16765517wrt.125.1600104495500; 
+ Mon, 14 Sep 2020 10:28:15 -0700 (PDT)
 Received: from localhost (49.222.77.34.bc.googleusercontent.com.
  [34.77.222.49])
- by smtp.gmail.com with ESMTPSA id s12sm13377783wmd.20.2020.09.14.10.28.12
+ by smtp.gmail.com with ESMTPSA id e1sm15404359wrp.49.2020.09.14.10.28.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 10:28:12 -0700 (PDT)
+ Mon, 14 Sep 2020 10:28:14 -0700 (PDT)
 From: George-Aurelian Popescu <georgepope@google.com>
 To: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
  masahiroy@kernel.org, michal.lkml@markovi.net
-Subject: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
-Date: Mon, 14 Sep 2020 17:27:42 +0000
-Message-Id: <20200914172750.852684-7-georgepope@google.com>
+Subject: [PATCH 07/14] KVM: arm64: Enable UBSAN_BOUNDS for the both the kernel
+ and hyp/nVHE
+Date: Mon, 14 Sep 2020 17:27:43 +0000
+Message-Id: <20200914172750.852684-8-georgepope@google.com>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
 In-Reply-To: <20200914172750.852684-1-georgepope@google.com>
 References: <20200914172750.852684-1-georgepope@google.com>
@@ -108,38 +109,115 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: George Popescu <georgepope@google.com>
 
-When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
-the handler call, preventing it from printing any information processed
-inside the buffer.
-For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
--fsanitize=local-bounds, and the latter adds a brk after the handler
-call
+If an out of bounds happens inside the hyp/nVHE code, the
+ubsan_out_of_bounds handler stores the logging data inside the
+kvm_ubsan_buffer. The one responsible for printing is the kernel
+ubsan_out_of_bounds handler. The process of decapsulating the data happens
+in kvm_ubsan_buffer.c.
+
+The struct kvm_ubsan_info contains three main components:
+-enum type, which is used to identify which handler to call from the
+kernel.
+-struct ubsan_values, which stores the operands involved during the
+undefined behaviours, which can be one, two or zero, depending on what
+undefiend behaviour is reported. As an example for: out_of_bounds there
+is only one operand (the index).
+
+Accessing a slot with no type should do nothing. Each slot is marked
+with the UBSAN_NONE tag after it's first usage.
 
 Signed-off-by: George Popescu <georgepope@google.com>
 ---
- scripts/Makefile.ubsan | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_ubsan.h | 19 ++++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/ubsan.c    | 13 ++++++++++++-
+ arch/arm64/kvm/kvm_ubsan_buffer.c  | 13 ++++++++++++-
+ 3 files changed, 42 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
-index 27348029b2b8..3d15ac346c97 100644
---- a/scripts/Makefile.ubsan
-+++ b/scripts/Makefile.ubsan
-@@ -4,7 +4,14 @@ ifdef CONFIG_UBSAN_ALIGNMENT
- endif
+diff --git a/arch/arm64/include/asm/kvm_ubsan.h b/arch/arm64/include/asm/kvm_ubsan.h
+index af607a796376..575881e0bd5f 100644
+--- a/arch/arm64/include/asm/kvm_ubsan.h
++++ b/arch/arm64/include/asm/kvm_ubsan.h
+@@ -11,7 +11,24 @@
+ #define UBSAN_MAX_TYPE 6
+ #define KVM_UBSAN_BUFFER_SIZE 1000
  
- ifdef CONFIG_UBSAN_BOUNDS
--      CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-+      # For Clang -fsanitize=bounds translates to -fsanitize=array-bounds and
-+      # -fsanitize=local-bounds; the latter adds a brk right after the
-+      # handler is called.
-+      ifdef CONFIG_CC_IS_CLANG
-+            CFLAGS_UBSAN += $(call cc-option, -fsanitize=array-bounds)
-+      else
-+            CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-+      endif
- endif
++struct ubsan_values {
++	void *lval;
++	void *rval;
++	char op;
++};
++
+ struct kvm_ubsan_info {
+-	int type;
++	enum {
++		UBSAN_NONE,
++		UBSAN_OUT_OF_BOUNDS
++	} type;
++	union {
++		struct out_of_bounds_data out_of_bounds_data;
++	};
++	union {
++		struct ubsan_values u_val;
++	};
+ };
+ #endif
++
++void __ubsan_handle_out_of_bounds(void *_data, void *index);
+diff --git a/arch/arm64/kvm/hyp/nvhe/ubsan.c b/arch/arm64/kvm/hyp/nvhe/ubsan.c
+index a43c9646e1e8..b2d3404f6215 100644
+--- a/arch/arm64/kvm/hyp/nvhe/ubsan.c
++++ b/arch/arm64/kvm/hyp/nvhe/ubsan.c
+@@ -43,7 +43,18 @@ void __ubsan_handle_type_mismatch(struct type_mismatch_data *data, void *ptr) {}
  
- ifdef CONFIG_UBSAN_MISC
+ void __ubsan_handle_type_mismatch_v1(void *_data, void *ptr) {}
+ 
+-void __ubsan_handle_out_of_bounds(void *_data, void *index) {}
++void __ubsan_handle_out_of_bounds(void *_data, void *index)
++{
++	struct kvm_ubsan_info *slot = NULL;
++	struct out_of_bounds_data *data = _data;
++
++	slot = kvm_ubsan_buffer_next_slot();
++	if (slot) {
++		slot->type = UBSAN_OUT_OF_BOUNDS;
++		slot->out_of_bounds_data = *data;
++		slot->u_val.lval = index;
++	}
++}
+ 
+ void __ubsan_handle_shift_out_of_bounds(void *_data, void *lhs, void *rhs) {}
+ 
+diff --git a/arch/arm64/kvm/kvm_ubsan_buffer.c b/arch/arm64/kvm/kvm_ubsan_buffer.c
+index 28dcf19b5706..ce796bdd027e 100644
+--- a/arch/arm64/kvm/kvm_ubsan_buffer.c
++++ b/arch/arm64/kvm/kvm_ubsan_buffer.c
+@@ -16,6 +16,17 @@
+ 
+ DECLARE_KVM_DEBUG_BUFFER(struct kvm_ubsan_info, kvm_ubsan_buff, KVM_UBSAN_BUFFER_SIZE);
+ 
++void __kvm_check_ubsan_data(struct kvm_ubsan_info *slot)
++{
++	switch (slot->type) {
++	case UBSAN_NONE:
++		break;
++	case UBSAN_OUT_OF_BOUNDS:
++		__ubsan_handle_out_of_bounds(&slot->out_of_bounds_data,
++				slot->u_val.lval);
++		break;
++	}
++}
+ 
+ void __kvm_check_ubsan_buffer(void)
+ {
+@@ -25,7 +36,7 @@ void __kvm_check_ubsan_buffer(void)
+ 
+ 	init_kvm_debug_buffer(kvm_ubsan_buff, struct kvm_ubsan_info, slot, write_ind);
+ 	for_each_kvm_debug_buffer_slot(slot, write_ind, it) {
+-		/* check ubsan data */
++		__kvm_check_ubsan_data(slot);
+ 		slot->type = 0;
+ 	}
+ }
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
