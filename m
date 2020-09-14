@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4E7C2BC11
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C793CC433E2
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1D01A21D1A
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47D6C21D41
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Sep 2020 17:28:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="LDOJW73/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D01A21D1A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="iEFv1oxO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D6C21D41
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC2034B5B8;
-	Mon, 14 Sep 2020 13:28:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECC594B59B;
+	Mon, 14 Sep 2020 13:28:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PYIvenG7qq9L; Mon, 14 Sep 2020 13:28:20 -0400 (EDT)
+	with ESMTP id 0pGdFeIWd1tT; Mon, 14 Sep 2020 13:28:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C9B4B59C;
-	Mon, 14 Sep 2020 13:28:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB78E4B59F;
+	Mon, 14 Sep 2020 13:28:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 872914B59F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 342834B57A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4HHKvL+dVOnN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Sep 2020 13:28:18 -0400 (EDT)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72AAB4B58D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:18 -0400 (EDT)
-Received: by mail-wm1-f68.google.com with SMTP id s13so799923wmh.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 10:28:18 -0700 (PDT)
+ with ESMTP id nUT5HNcHW-5J for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Sep 2020 13:28:22 -0400 (EDT)
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
+ [209.85.128.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F4D34B594
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 13:28:22 -0400 (EDT)
+Received: by mail-wm1-f67.google.com with SMTP id s13so800116wmh.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2020 10:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/EjNih3r7ygkjYASNBWp7YtEX1KLL1OovUvtOR4yQ8E=;
- b=LDOJW73/Nx4NRSF62nukRv0fkeOiLGfPXVP1aJhDKCMUKmk3HmHAf6NWlyYj1Fc30H
- 4ctb86ijJJ+PMUx7pA1+2eEIf+G0cmjOvbtE9oBe55C3Cvn1qkgI3USj0yAzKEsPU9q0
- Kg6zWbX13Nvf35fM5FUm0vCKYp5AV89AlTGoxiq/9SNtkV9H5JeJZSjohjU7p9UCPTCc
- AFzF0SLwziqh80xl5uTlhqNQPcFqdMho3+ObPMEgdgw7XZugj3HlUg9gMeuZ9Wl5vn3G
- sEIZ2338YOSdEnkx35Dj1zujfiD6uqhHIIRpeBrFBUJeHIahNLU31ZLtfIcNVZWFj6tG
- ir0Q==
+ bh=oxR4q2exhcBC90vTFTNwz9/4eynAbLxOPQRAqHe9Mw8=;
+ b=iEFv1oxODcKOHWza+NvTccTL3/wQordMg3U1eoRfqFg8wT2ZdgAAKIR5TqyBMDSz7j
+ p6Two6b4VjgeiaRHbB/+ioQrmadcmqQvnY2N2R59qUqGWhKvSFcPBbecWZMmsRSOU+b8
+ KasiVBhlOh+RhMOjN/LwusWdi6h9O0xedIEU1Db+QSOrCrPoo9U0qsW40Nrzrbp0EX3n
+ +kIWWdPuoVXtvUJpO3w/+q3szInGmWzwUlyfDpMM1RV0gzMMrgepqVoqPV5Re2h4Id55
+ 72djWWoXs5+9bVxRyrIlmei/6++TYwru7YoKIBE4OfzDSAe/C622EhPn8E3Mn02ok9ma
+ srOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/EjNih3r7ygkjYASNBWp7YtEX1KLL1OovUvtOR4yQ8E=;
- b=pT4yiP/76pvUyrwKvuTCl97ogEq2mAjDWGX76eBhZZQQhJ9aUTMMZwLZHCuh73WpUe
- 0AHzBKNwzs/grZ68YsYOnCfZOSwll6ZN2PH+ajyC+xEx8UC3VeQjr8A5TJt05Ragn7c7
- FQnjfn0m5SOkgvm9qnZt5jsfjWo/WUIfPhB3CUecKLaLjt8b6zlUisC6JwoYQ53nBT8q
- j8VoCTR6lz7YJeTLVolBC8jiwZSks6PKaLLzWoqRYi5W0PwLiPKSyAW7RwX3oMV1zIco
- Gn/G5QK3u3jRl1HmeDFtRCAvpfS5DeSvNIxjHiH+2vN4TPHxln3NosSWmu6hd4eriUxB
- fAKg==
-X-Gm-Message-State: AOAM533Mbl7XvqWj9wwOl9XcBzYLvXG8IiGnQZDIOknFETSse7stB6g8
- repveMe1zzs0NLChs8l6hQZJXw==
-X-Google-Smtp-Source: ABdhPJz7n/8ZzKopjoksEbonJHe8/t/B9RylxHy4LiUHqu75FJ9ZhVdcDVjP7yVogd6IknutagEtqw==
-X-Received: by 2002:a1c:a551:: with SMTP id o78mr486952wme.4.1600104497464;
- Mon, 14 Sep 2020 10:28:17 -0700 (PDT)
+ bh=oxR4q2exhcBC90vTFTNwz9/4eynAbLxOPQRAqHe9Mw8=;
+ b=iX7GMffULzZpTcAF12OxDe0pLxd96kIH7Y5F7YQociB5OgxYDoczyO1kbyJdzvab5a
+ oW0RwggoR8dN7pZJHG0d/zhCU/ifE/GJoG+BJcDjH+gUSSjgfztVx8jp5oVQ1IB5VYgu
+ SSleI1Du/EeLzIniEN/3wGs9q9eRg4dF4VXFXikr0PDPDqLQWgurvFsgC1CRkzaaOkYF
+ D48zWDymo1xzMxtHfCvK/9mCutsoMtveQcbsjqNspqziiCUII/+1gwfusf/zDOLvZyUB
+ MZbTi3n5fXlBHsxHLznaH39c4Vm46guw3yBaundV2ldPHY3zBEFKy1WBurBLawic2i7/
+ a7HA==
+X-Gm-Message-State: AOAM533P/hr587DSclDvkaHwrEvAm06HTnwF+LqDXMJRncMazZBqocmv
+ BRfYljYcK8bu+7YErah6oSdgCQ==
+X-Google-Smtp-Source: ABdhPJziHq0hb99caNbhZ6ZpDc46fHJPvgXN25hJZzyvPSDfDyF5i1/XYuIsmSM1xvZxBc9ptSKANw==
+X-Received: by 2002:a1c:6145:: with SMTP id v66mr426746wmb.171.1600104501282; 
+ Mon, 14 Sep 2020 10:28:21 -0700 (PDT)
 Received: from localhost (49.222.77.34.bc.googleusercontent.com.
  [34.77.222.49])
- by smtp.gmail.com with ESMTPSA id a17sm22898300wra.24.2020.09.14.10.28.16
+ by smtp.gmail.com with ESMTPSA id m1sm20204287wmc.28.2020.09.14.10.28.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 14 Sep 2020 10:28:16 -0700 (PDT)
+ Mon, 14 Sep 2020 10:28:20 -0700 (PDT)
 From: George-Aurelian Popescu <georgepope@google.com>
 To: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
  masahiroy@kernel.org, michal.lkml@markovi.net
-Subject: [PATCH 08/14] KVM: arm64: Enable UBsan check for unreachable code
- inside hyp/nVHE code
-Date: Mon, 14 Sep 2020 17:27:44 +0000
-Message-Id: <20200914172750.852684-9-georgepope@google.com>
+Subject: [PATCH 10/14] KVM: arm64: __ubsan_handle_load_invalid_value hyp/nVHE
+ implementation.
+Date: Mon, 14 Sep 2020 17:27:46 +0000
+Message-Id: <20200914172750.852684-11-georgepope@google.com>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
 In-Reply-To: <20200914172750.852684-1-georgepope@google.com>
 References: <20200914172750.852684-1-georgepope@google.com>
@@ -109,71 +109,77 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: George Popescu <georgepope@google.com>
 
-The data from __ubsan_handle_builtin_unreachable is passed to the buffer
-and printed inside the kernel by its symmetric handler.
+The handler for the load invalid value undefined behaviour is
+implemented for hyp/nVHE. The handler's parameters are stored inside
+the buffer.
+
+They are used by the symmetric handler from the kernel.
 
 Signed-off-by: George Popescu <georgepope@google.com>
 ---
  arch/arm64/include/asm/kvm_ubsan.h |  5 ++++-
- arch/arm64/kvm/hyp/nvhe/ubsan.c    | 12 +++++++++++-
- arch/arm64/kvm/kvm_ubsan_buffer.c  |  3 +++
- 3 files changed, 18 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/ubsan.c    | 14 +++++++++++++-
+ arch/arm64/kvm/kvm_ubsan_buffer.c  |  4 ++++
+ 3 files changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_ubsan.h b/arch/arm64/include/asm/kvm_ubsan.h
-index 575881e0bd5f..7fd0d0dfbd82 100644
+index 3130a80cd8b2..b643ac9a4090 100644
 --- a/arch/arm64/include/asm/kvm_ubsan.h
 +++ b/arch/arm64/include/asm/kvm_ubsan.h
-@@ -20,10 +20,12 @@ struct ubsan_values {
- struct kvm_ubsan_info {
- 	enum {
+@@ -22,12 +22,14 @@ struct kvm_ubsan_info {
  		UBSAN_NONE,
--		UBSAN_OUT_OF_BOUNDS
-+		UBSAN_OUT_OF_BOUNDS,
-+		UBSAN_UNREACHABLE_DATA
+ 		UBSAN_OUT_OF_BOUNDS,
+ 		UBSAN_UNREACHABLE_DATA,
+-		UBSAN_SHIFT_OUT_OF_BOUNDS
++		UBSAN_SHIFT_OUT_OF_BOUNDS,
++		UBSAN_INVALID_DATA
  	} type;
  	union {
  		struct out_of_bounds_data out_of_bounds_data;
-+		struct unreachable_data unreachable_data;
+ 		struct unreachable_data unreachable_data;
+ 		struct shift_out_of_bounds_data shift_out_of_bounds_data;
++		struct invalid_value_data invalid_value_data;
  	};
  	union {
  		struct ubsan_values u_val;
-@@ -32,3 +34,4 @@ struct kvm_ubsan_info {
- #endif
- 
+@@ -38,3 +40,4 @@ struct kvm_ubsan_info {
  void __ubsan_handle_out_of_bounds(void *_data, void *index);
-+void __ubsan_handle_builtin_unreachable(void *_data);
+ void __ubsan_handle_builtin_unreachable(void *_data);
+ void __ubsan_handle_shift_out_of_bounds(void *_data, void *lhs, void *rhs);
++void __ubsan_handle_load_invalid_value(void *_data, void *val);
 diff --git a/arch/arm64/kvm/hyp/nvhe/ubsan.c b/arch/arm64/kvm/hyp/nvhe/ubsan.c
-index b2d3404f6215..9497e7f7f397 100644
+index 40b82143e57f..1888a1f51724 100644
 --- a/arch/arm64/kvm/hyp/nvhe/ubsan.c
 +++ b/arch/arm64/kvm/hyp/nvhe/ubsan.c
-@@ -58,6 +58,16 @@ void __ubsan_handle_out_of_bounds(void *_data, void *index)
+@@ -82,4 +82,16 @@ void __ubsan_handle_builtin_unreachable(void *_data)
+ 	}
+ }
  
- void __ubsan_handle_shift_out_of_bounds(void *_data, void *lhs, void *rhs) {}
- 
--void __ubsan_handle_builtin_unreachable(void *_data) {}
-+void __ubsan_handle_builtin_unreachable(void *_data)
+-void __ubsan_handle_load_invalid_value(void *_data, void *val) {}
++void __ubsan_handle_load_invalid_value(void *_data, void *val)
 +{
 +	struct kvm_ubsan_info *slot;
-+	struct unreachable_data *data = _data;
++	struct invalid_value_data *data = _data;
 +
 +	slot = kvm_ubsan_buffer_next_slot();
 +	if (slot) {
-+		slot->type = UBSAN_UNREACHABLE_DATA;
-+		slot->unreachable_data = *data;
++		slot->type = UBSAN_INVALID_DATA;
++		slot->invalid_value_data = *data;
++		slot->u_val.lval = val;
 +	}
++
 +}
- 
- void __ubsan_handle_load_invalid_value(void *_data, void *val) {}
 diff --git a/arch/arm64/kvm/kvm_ubsan_buffer.c b/arch/arm64/kvm/kvm_ubsan_buffer.c
-index ce796bdd027e..f66cc5f7878e 100644
+index b4a282bec91d..01bf2171af9e 100644
 --- a/arch/arm64/kvm/kvm_ubsan_buffer.c
 +++ b/arch/arm64/kvm/kvm_ubsan_buffer.c
-@@ -25,6 +25,9 @@ void __kvm_check_ubsan_data(struct kvm_ubsan_info *slot)
- 		__ubsan_handle_out_of_bounds(&slot->out_of_bounds_data,
- 				slot->u_val.lval);
+@@ -32,6 +32,10 @@ void __kvm_check_ubsan_data(struct kvm_ubsan_info *slot)
+ 		__ubsan_handle_shift_out_of_bounds(&slot->shift_out_of_bounds_data,
+ 				slot->u_val.lval, slot->u_val.rval);
  		break;
-+	case UBSAN_UNREACHABLE_DATA:
-+		__ubsan_handle_builtin_unreachable(&slot->unreachable_data);
++	case UBSAN_INVALID_DATA:
++		__ubsan_handle_load_invalid_value(&slot->invalid_value_data,
++				slot->u_val.lval);
 +		break;
  	}
  }
