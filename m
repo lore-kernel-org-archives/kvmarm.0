@@ -2,55 +2,98 @@ Return-Path: <SRS0=e8ws=CY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADFBC433E2
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA60C433E2
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:45:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9D14F21D43
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:03:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D14F21D43
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E9B2020659
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:45:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="d0JaJ9en"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B2020659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0B294B2AE;
-	Tue, 15 Sep 2020 13:03:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3794D4B2CC;
+	Tue, 15 Sep 2020 13:45:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sJuP0P1CcPIr; Tue, 15 Sep 2020 13:03:51 -0400 (EDT)
+	with ESMTP id kT73kcI65-pB; Tue, 15 Sep 2020 13:45:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCDF94B2B3;
-	Tue, 15 Sep 2020 13:03:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CA694B2B7;
+	Tue, 15 Sep 2020 13:45:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A2A54B22C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:03:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF4FA4B24B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:32:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kNv54o4KVAi4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2020 13:03:49 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 172C64B220
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:03:49 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD59A1FB;
- Tue, 15 Sep 2020 10:03:48 -0700 (PDT)
-Received: from monolith.localdoman (unknown [10.37.8.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 161673F68F;
- Tue, 15 Sep 2020 10:03:46 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Do not flush memslot if FWB is supported
-Date: Tue, 15 Sep 2020 18:04:42 +0100
-Message-Id: <20200915170442.131635-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.28.0
+ with ESMTP id 6ulmPH1V44aI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2020 13:32:41 -0400 (EDT)
+Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com
+ [209.85.161.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB8134B249
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:32:41 -0400 (EDT)
+Received: by mail-oo1-f66.google.com with SMTP id k13so971357oor.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 10:32:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PAtDVfuEJhlt1elf5/lgoBo+0AnWtv6A1Q7VC77Ff04=;
+ b=d0JaJ9en3sRyhoZPnW1QJJsxEdsVuPco3gIwh9SOrfnk19I2FwZ7GOdGlPhvQTrY1k
+ txY0wp2cgnvWub0vDpMs/MJk8Pu0yM9YHo71bPPgXGTmrj9nzguJi8qtik3HijV58bFt
+ d2O3luG/WR9UWz1jRPucM/caqSWmjD+RDDJXnr1xoFcys3qOaGdlWvq4ZmxcVwZrx/uI
+ ozBsIng1hGBF00/o2vwNEvqKXH5n+W0odVBB5j6WYIu+mwKz8DADLNADAd9ic1lxeC/z
+ G1T+PpfVFVmx/i24SgJG/1ndRmiiK8yYYYDVKwOqn1uak0gt53v94/41Wg3i8R6SJtn0
+ JVNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PAtDVfuEJhlt1elf5/lgoBo+0AnWtv6A1Q7VC77Ff04=;
+ b=euTqYcYmg19R2qMydFQAHPap4gUMY28TmYNzgSmifoOKtUBjFhA+bEWu9t76WrHs8/
+ 77/XtVxH+m/gRwI4IR328V6XXP2/3Z1eC8+pHjvfU+jCeJzYmNFc9HaXtHOtD7GrAkT/
+ Ws3F6bOQLblaujYiA2DjD2xjQH+kqIWlBQMGYIG20Y0AfvUNwColKAGJbAhvcayajVLk
+ anQZ2bFv+uPfdljLs+Q/HbDyH2WdUrYtRTqDiu3FnoxxrADnSUcd43S/d7OIbOjAz4XV
+ aIUDFqjZaBvzw8ARTgXBDHDmYcVfZCTzqvpyXhm9NYGHF5tu2UwEYHrTLNTelOieA1rr
+ wxtQ==
+X-Gm-Message-State: AOAM533F1vouYEDy5EA4wM9d0RUkrv9c9NkncdrgpyP2CMrjeU5tdWBt
+ 8pYlgo0wKkYW50ftvMrbXFOxJxi+YCvmqUZYdfduOg==
+X-Google-Smtp-Source: ABdhPJyCzInxRpJlSmxXfBdbgreenCQjI8gKUscz7zGArVGzNAylhuh/sQNja0PJx+ORauOO7/zkeU7+nZkaJKmgHdU=
+X-Received: by 2002:a4a:751a:: with SMTP id j26mr14993283ooc.14.1600191160831; 
+ Tue, 15 Sep 2020 10:32:40 -0700 (PDT)
 MIME-Version: 1.0
-Cc: maz@kernel.org
+References: <20200914172750.852684-1-georgepope@google.com>
+ <20200914172750.852684-7-georgepope@google.com>
+ <202009141509.CDDC8C8@keescook>
+ <20200915102458.GA1650630@google.com>
+ <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
+ <20200915120105.GA2294884@google.com>
+In-Reply-To: <20200915120105.GA2294884@google.com>
+From: Marco Elver <elver@google.com>
+Date: Tue, 15 Sep 2020 19:32:28 +0200
+Message-ID: <CANpmjNPpq7LfTHYesz2wTVw6Pqv0FQ2gc-vmSB6Mdov+XWPZiw@mail.gmail.com>
+Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
+To: George Popescu <georgepope@google.com>
+X-Mailman-Approved-At: Tue, 15 Sep 2020 13:45:45 -0400
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Fangrui Song <maskray@google.com>,
+ maz@kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
+ clang-built-linux <clang-built-linux@googlegroups.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
+ Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, broonie@kernel.org,
+ Nathan Chancellor <natechancellor@gmail.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Michal Marek <michal.lkml@markovi.net>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,41 +110,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As a result of a KVM_SET_USER_MEMORY_REGION ioctl, KVM flushes the
-dcache for the memslot being changed to ensure a consistent view of memory
-between the host and the guest: the host runs with caches enabled, and
-it is possible for the data written by the hypervisor to still be in the
-caches, but the guest is running with stage 1 disabled, meaning data
-accesses are to Device-nGnRnE memory, bypassing the caches entirely.
+On Tue, 15 Sep 2020 at 14:01, George Popescu <georgepope@google.com> wrote:
+>
+> On Tue, Sep 15, 2020 at 01:18:11PM +0200, Marco Elver wrote:
+> > On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
+> > > On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
+> > > > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
+> > > > > From: George Popescu <georgepope@google.com>
+> > > > >
+> > > > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
+> > > > > the handler call, preventing it from printing any information processed
+> > > > > inside the buffer.
+> > > > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
+> > > > > -fsanitize=local-bounds, and the latter adds a brk after the handler
+> > > > > call
+> > > >
+> > > This would mean losing the local-bounds coverage. I tried to  test it without
+> > > local-bounds and with a locally defined array on the stack and it works fine
+> > > (the handler is called and the error reported). For me it feels like
+> > > --array-bounds and --local-bounds are triggered for the same type of
+> > > undefined_behaviours but they are handling them different.
+> >
+> > Does -fno-sanitize-trap=bounds help?>
+>
+> I tried replacing it with:
+>       ifdef CONFIG_CC_IS_CLANG
+>             CFLAGS_UBSAN += $(call cc-option, -fno-sanitize-trap=bounds)
+>             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+>       else
+>             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+>       endif
+>
+> The code traps.
 
-Flushing the dcache is not necessary when KVM enables FWB, because it
-forces the guest to uses cacheable memory accesses.
+What's your config? Do you have CONFIG_UBSAN_TRAP=y? If so, you have 2
+options: honor UBSAN_TRAP and crash the kernel, or have a
+'CFLAGS_REMOVE_... = -fsanitize-undefined-trap-on-error' for the files
+where you can't deal with traps.
 
-The current behaviour does not change, as the dcache flush helpers execute
-the cache operation only if FWB is not enabled, but walking the stage 2
-table is avoided.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9a636b8064f1..c29105c6e975 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2537,7 +2537,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	spin_lock(&kvm->mmu_lock);
- 	if (ret)
- 		unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
--	else
-+	else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
- 		stage2_flush_memslot(kvm, memslot);
- 	spin_unlock(&kvm->mmu_lock);
- out:
--- 
-2.28.0
-
+Thanks,
+-- Marco
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
