@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F57C433E2
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83E4C43461
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD00E21D24
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54D6521D80
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="oo/JRdUQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD00E21D24
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Yrxhb/Ib"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D6521D80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 590F14B311;
-	Tue, 15 Sep 2020 06:47:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 071C64B339;
+	Tue, 15 Sep 2020 06:47:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YqWoMHjwujVN; Tue, 15 Sep 2020 06:47:16 -0400 (EDT)
+	with ESMTP id 7JcFGqlA6VgH; Tue, 15 Sep 2020 06:47:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DECC4B333;
-	Tue, 15 Sep 2020 06:47:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFFF34B38A;
+	Tue, 15 Sep 2020 06:47:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67DBD4B370
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 262744B381
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZyV8pEpm-cGG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2020 06:47:14 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A3074B319
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:14 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id k13so1084807wrl.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 03:47:14 -0700 (PDT)
+ with ESMTP id MSu8g3ET6Bno for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2020 06:47:16 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C62E34B368
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:15 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id p20so1891255qvl.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 03:47:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=+LtBprNCQxqpSJhy1doh+zbhGd6VfOx/lpcq323EYcc=;
- b=oo/JRdUQkyDpmgBCHx0d7D3wtegJE7rUo5QUquMx1wCi1PVPbHkD3mfR44JSWG4HNh
- jOsZ1SSv8ojkI0Gfy3Xz66+n9ykUUDNO9/9//KESM+vEGkbnFdM7GOVBTuRQfJcvoqAJ
- YCq3T4aaWBrKbS9d8kZs3jDcYY8NyOMTbmBCAzNZxzMPIHbtNwEAD3w8aJPWPRfuvCEf
- EmqGdUYK3Y78vNzcmI8zcy/2OvPhzzoqeWOEYHrBYWcn5xRSA8+zYxTLyKMgCRCIGEJY
- ZRkVHKd/lp+Sk+w3CsSESmJ/w7vFJR3TJlg+xRrcAHNGPLx9NrK79b55DomlOlj5HJf8
- wc8A==
+ :from:to:cc; bh=wzFd2Se+hSZFSU9MNWw+evLd20Vc2LmYdGji4Cqfwno=;
+ b=Yrxhb/IbZqs0MnCRYBKrcrZAcxjNPwN8Eg0LpUCBEdK5DW8r+vfUFntl0dVniBVcur
+ YEFy2X9rzGfmEpygefHHNWbkM+zC+z93+L25nUieVxaVXx/V7ni40oMsigqpPigpwABc
+ LgSKRyUdCTNigBQk2RPThRzCDg+horsKnF5Nu6FbJUpGCIKaXUnFvBfpGf5qW1zp+dCf
+ 5cFDDsegiDbKseWvr8CFcGvc5KzELjcMWNvG+poynIp/v4yLKX1dBJ7Mbrile2j4kvEZ
+ X1ooBEnenEODgpU/DoecDxggRQiK8b6HoUtO4LmW4nIQbSzY7gTga9PU39xJYZ+bMDBK
+ HuDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=+LtBprNCQxqpSJhy1doh+zbhGd6VfOx/lpcq323EYcc=;
- b=g/VZy1A9XTLzJvg89V4yJU+JC+Pw8AqROhIR8IVAPawj3rOufvUB/aZljlVEkq1lUm
- Ys0lTCpHFjyLkmnWatULzobDNt1ko6dAxNtSTr1hRhfvI++UBGsNvqpbHVtGjeUGpfn4
- U8Vh1rAJIXG/3SydL8KCwKzi5CQPzx5b2kK4xO9vhF7lw0FYste3swHIKoHevGdJWMXj
- 5maVZ/qIOHHDGveEJllyMSfw2EAt1tL/fWAoMIZ25ekcamg2ncV3NBCJj6pdA5T3Dkzb
- OLOZzKZUj1xfUk7R4qdX2MjiTx1CI/q/tfX3+M6KPylHgvFFO4eLfYDvf8vS932aN0Py
- XrCQ==
-X-Gm-Message-State: AOAM531iOubJBlAwiUUFp2NjAHOgdft64c/9SY9kHA0f3JU6fVkpNv7A
- wdsO1SLmnmZZaRF7ko9HGK6e1X2r/JrNfJSQ5q9xRIWTJmYWPxzL1qlmgjDm/N6VPS0ihkdcDZx
- UA/C05ey/po9NIB49fSzm8t/u7qz9lU1HRHJBXJ7xP5vhfEHqNZfO/wMRDpqQ6DMvMlupKg==
-X-Google-Smtp-Source: ABdhPJwYBdb0ujS8zbAOTvrBnJXmJUZ8yyBlY5iHeIXvhuXdm7xLBm5SGoG8EDLrrWnFy7SHtK2LW1Oijq4=
+ bh=wzFd2Se+hSZFSU9MNWw+evLd20Vc2LmYdGji4Cqfwno=;
+ b=oj58HwXCF+VsKoRhvxrAXSp4k4ZTcE7w+pfEwCR6kSzIZqVrMNx1+JiIBLdKGuEtnm
+ /T5QFXhlz7cnucFESIx0KUvR9tYRtDngFXT4k3vzdikWZs9R5K6HVqlXBNsKSeOAL0Ya
+ 3fugNO9YsYA4iafx9gL2sqB0zeHacqfQB9hgiVp0UOLs0U7UYK3qUvpa1l/P3BRJuK2H
+ q52ECufdUMBRdOY/1tVstORykEoPphmRfFJnVR9bdu+jyNTntkgdBQUyBn9U0PdEjgjB
+ UHfI47WNDnVye9ocnymXRtXIihYg9UBueyiTgA4MeHUZ3Gf93frAGxYdJ5hPoNxGlYRu
+ Um1Q==
+X-Gm-Message-State: AOAM532Zf3vz/rZDMolMs1Ypk0oZUWtp3gJFmXjtmVfwqgxozOoVtnE2
+ o3ZLbWN+qsl2KGtabPwAtML71J+SC+l1UOGubmyTYpaeiiyxh/q01kPL6x/PVa4yhFPIDvQSHhe
+ dDZULTNroJlhzvphbmPJ5HEr2cGtebKCZTMNdQMeEgBnBLSaEkNpAzBrE/Ty2UabISDfYpQ==
+X-Google-Smtp-Source: ABdhPJwdICVtPnTewBkU+0XX56pwR94BGjqfet77o0wGVIPdThjbg/6FNE62pNL2F9jnTFbS5JlbAv7eNUY=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:adf:e843:: with SMTP id
- d3mr20320412wrn.290.1600166833278; 
- Tue, 15 Sep 2020 03:47:13 -0700 (PDT)
-Date: Tue, 15 Sep 2020 11:46:35 +0100
+ (user=ascull job=sendgmr) by 2002:ad4:58e7:: with SMTP id
+ di7mr1042793qvb.36.1600166835280; 
+ Tue, 15 Sep 2020 03:47:15 -0700 (PDT)
+Date: Tue, 15 Sep 2020 11:46:36 +0100
 In-Reply-To: <20200915104643.2543892-1-ascull@google.com>
-Message-Id: <20200915104643.2543892-12-ascull@google.com>
+Message-Id: <20200915104643.2543892-13-ascull@google.com>
 Mime-Version: 1.0
 References: <20200915104643.2543892-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [PATCH v4 11/19] KVM: arm64: Share context save and restore macros
+Subject: [PATCH v4 12/19] KVM: arm64: nVHE: Switch to hyp context for EL2
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -100,124 +100,183 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To avoid duplicating the context save and restore macros, move them into
-a shareable header.
+Save and restore the host context when switching to and from hyp. This
+gives hyp its own context that the host will not see as a step towards a
+full trust boundary between the two.
+
+SP_EL0 and pointer authentication keys are currently shared between the
+host and hyp so don't need to be switched yet.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h | 39 ++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/entry.S       | 39 --------------------------------
- 2 files changed, 39 insertions(+), 39 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S          | 68 ++++++++++++++++++-------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 36 +++++++++++++
+ 4 files changed, 89 insertions(+), 19 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 4df2bd8882bc..4e3073858346 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -261,6 +261,45 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
- 	.popsection
- .endm
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 821721b78ad9..4536b50ddc06 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -372,6 +372,8 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
+ 	ctxt_sys_reg(ctxt, key ## KEYHI_EL1) = __val;                   \
+ } while(0)
  
-+#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
-+#define CPU_LR_OFFSET		CPU_XREG_OFFSET(30)
-+#define CPU_SP_EL0_OFFSET	(CPU_LR_OFFSET + 8)
++DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
 +
-+/*
-+ * We treat x18 as callee-saved as the host may use it as a platform
-+ * register (e.g. for shadow call stack).
-+ */
-+.macro save_callee_saved_regs ctxt
-+	str	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
-+	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
-+
-+.macro restore_callee_saved_regs ctxt
-+	// We require \ctxt is not x18-x28
-+	ldr	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
-+	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
-+
-+.macro save_sp_el0 ctxt, tmp
-+	mrs	\tmp,	sp_el0
-+	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
-+.endm
-+
-+.macro restore_sp_el0 ctxt, tmp
-+	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
-+	msr	sp_el0, \tmp
-+.endm
-+
- #endif
+ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *ctxt;
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index ddf98eb07b9d..46c89e8c30bc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -6,7 +6,7 @@
+ asflags-y := -D__KVM_NVHE_HYPERVISOR__
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__
  
- #endif /* __ARM_KVM_ASM_H__ */
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 4787fc82790c..afaa8d1f2485 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -7,7 +7,6 @@
- #include <linux/linkage.h>
+-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
++obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o hyp-main.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o
  
- #include <asm/alternative.h>
--#include <asm/asm-offsets.h>
- #include <asm/assembler.h>
- #include <asm/fpsimdmacros.h>
- #include <asm/kvm.h>
-@@ -16,46 +15,8 @@
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_ptrauth.h>
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 9ab7814e6114..d26e41773dc4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -12,6 +12,55 @@
  
--#define CPU_XREG_OFFSET(x)	(CPU_USER_PT_REGS + 8*x)
--#define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
--
  	.text
  
--/*
-- * We treat x18 as callee-saved as the host may use it as a platform
-- * register (e.g. for shadow call stack).
-- */
--.macro save_callee_saved_regs ctxt
--	str	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
--	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
--	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
--	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
--	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
--	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
--	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
--.endm
++SYM_FUNC_START(__host_exit)
++	stp	x0, x1, [sp, #-16]!
++
++	get_host_ctxt	x0, x1
++
++	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
++
++	/* Store the host regs x2 and x3 */
++	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
++
++	/* Retrieve the host regs x0-x1 from the stack */
++	ldp	x2, x3, [sp], #16	// x0, x1
++
++	/* Store the host regs x0-x1 and x4-x17 */
++	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
++	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
++	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
++	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
++	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
++	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
++	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
++	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
++
++	/* Store the host regs x18-x29, lr */
++	save_callee_saved_regs x0
++
++	/* Save the host context pointer in x29 across the function call */
++	mov	x29, x0
++	bl	handle_trap
++
++	/* Restore host regs x0-x17 */
++	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
++	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
++	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
++	ldp	x6, x7,   [x29, #CPU_XREG_OFFSET(6)]
++	ldp	x8, x9,   [x29, #CPU_XREG_OFFSET(8)]
++	ldp	x10, x11, [x29, #CPU_XREG_OFFSET(10)]
++	ldp	x12, x13, [x29, #CPU_XREG_OFFSET(12)]
++	ldp	x14, x15, [x29, #CPU_XREG_OFFSET(14)]
++	ldp	x16, x17, [x29, #CPU_XREG_OFFSET(16)]
++
++	/* Restore host regs x18-x29, lr */
++	restore_callee_saved_regs x29
++
++	/* Do not touch any register after this! */
++	eret
++	sb
++SYM_FUNC_END(__host_exit)
++
+ SYM_FUNC_START(__hyp_do_panic)
+ 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+ 		      PSR_MODE_EL1h)
+@@ -34,7 +83,7 @@ SYM_FUNC_END(__hyp_do_panic)
+ 
+ 	/* Check for a stub HVC call */
+ 	cmp	x0, #HVC_STUB_HCALL_NR
+-	b.hs	1f
++	b.hs	__host_exit
+ 
+ 	/*
+ 	 * Compute the idmap address of __kvm_handle_stub_hvc and
+@@ -50,23 +99,6 @@ SYM_FUNC_END(__hyp_do_panic)
+ 	/* x5 = __pa(x5) */
+ 	sub	x5, x5, x6
+ 	br	x5
 -
--.macro restore_callee_saved_regs ctxt
--	// We require \ctxt is not x18-x28
--	ldr	x18,      [\ctxt, #CPU_XREG_OFFSET(18)]
--	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
--	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
--	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
--	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
--	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
--	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
--.endm
+-1:
+-	/*
+-	 * Shuffle the parameters before calling the function
+-	 * pointed to in x0. Assumes parameters in x[1,2,3].
+-	 */
+-	kern_hyp_va	x0
+-	str	lr, [sp, #-16]!
+-	mov	lr, x0
+-	mov	x0, x1
+-	mov	x1, x2
+-	mov	x2, x3
+-	blr	lr
+-	ldr	lr, [sp], #16
 -
--.macro save_sp_el0 ctxt, tmp
--	mrs	\tmp,	sp_el0
--	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
--.endm
--
--.macro restore_sp_el0 ctxt, tmp
--	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
--	msr	sp_el0, \tmp
--.endm
--
- /*
-  * u64 __guest_enter(struct kvm_vcpu *vcpu);
-  */
+-	eret
+-	sb
+ .L__vect_end\@:
+ .if ((.L__vect_end\@ - .L__vect_start\@) > 0x80)
+ 	.error "host_el1_sync_vect larger than vector entry"
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+new file mode 100644
+index 000000000000..570c3896f42e
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2020 - Google Inc
++ * Author: Andrew Scull <ascull@google.com>
++ */
++
++#include <hyp/switch.h>
++
++#include <asm/kvm_asm.h>
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_host.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++
++typedef unsigned long (*hypcall_fn_t)
++	(unsigned long, unsigned long, unsigned long);
++
++void handle_trap(struct kvm_cpu_context *host_ctxt)
++{
++	u64 esr = read_sysreg_el2(SYS_ESR);
++	hypcall_fn_t func;
++	unsigned long ret;
++
++	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
++		hyp_panic();
++
++	/*
++	 * __kvm_call_hyp takes a pointer in the host address space and
++	 * up to three arguments.
++	 */
++	func = (hypcall_fn_t)kern_hyp_va(host_ctxt->regs.regs[0]);
++	ret = func(host_ctxt->regs.regs[1],
++		   host_ctxt->regs.regs[2],
++		   host_ctxt->regs.regs[3]);
++	host_ctxt->regs.regs[0] = ret;
++}
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
