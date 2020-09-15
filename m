@@ -4,88 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C793EC433E2
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 12:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 449F0C433E2
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 13:01:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A08621D7B
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 12:01:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8488020936
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 13:01:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Zb9L1job"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A08621D7B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="CBedkHDF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8488020936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 933B34B1EB;
-	Tue, 15 Sep 2020 08:01:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3784B1D9;
+	Tue, 15 Sep 2020 09:01:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8lRXOo5Sl6A7; Tue, 15 Sep 2020 08:01:10 -0400 (EDT)
+	with ESMTP id HcqGf2FQfGmr; Tue, 15 Sep 2020 09:01:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93A764B163;
-	Tue, 15 Sep 2020 08:01:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D7FB4B205;
+	Tue, 15 Sep 2020 09:01:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7487C4B163
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 08:01:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 780174B23C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 07:18:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-GSKn3Loq+d for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2020 08:01:08 -0400 (EDT)
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
- [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 624184B161
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 08:01:08 -0400 (EDT)
-Received: by mail-wr1-f66.google.com with SMTP id e16so3050739wrm.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 05:01:08 -0700 (PDT)
+ with ESMTP id aIoc-L4GDVud for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2020 07:18:23 -0400 (EDT)
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com
+ [209.85.167.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 846D24B239
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 07:18:23 -0400 (EDT)
+Received: by mail-oi1-f193.google.com with SMTP id 185so3371638oie.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 04:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=D1RHl8ABdhn5KjoXJVQFbK3lZzim3prS8WaJzdIy+Zo=;
- b=Zb9L1jobJQn7TM+/5qKmWs5QBd2EXGxISO/ZkcumPM8Vro0Vr55MmlKUwUifKoKJg+
- zl/iDbZ2w5XqrlxmJkjZgmmZP5NI1934atyy561Ay2MXa+FnuuynbncFOlg6j1nAM8ei
- nQJq5CvBO8QomgfteMuJPONS1P+ZZCvCiP3bLKVjNIYXIcqQgdzXgAjr3TShuD/NTpLq
- WK/qwY8X5PijIrR+U2tADWCc41LFvUI6wRrhWcMVNdBvt24fQOuGsuHn/kO9UmXlrJl9
- lA14MFwIiIxLtPEKAUDzC+4CdfxeTGre++QHrUGZAZncOeGJWO14UVlnAnY/vdGLIltr
- bPKA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vsszHnIr30DAX2BPN/LLCsGS7XfGFhrJzeIuxHrcQeU=;
+ b=CBedkHDFIyVGiS3Lx+LWTTvlrVQleDAbgic65e4G96FygTtFkMq914TzMOizRIfuPu
+ VCbrwdf+0Q2W/F6W7QKym3P+PeHZw6YQMv459vgtmYNXak396wDwGu+380xAhvQTTE8g
+ cWAhxwGXZy9JeRgQPKzXzVW0Ui5AKbuSNXqrDhdPEdIWztw6jdLvOBnhnCGTgBz7ggsZ
+ PNDCgLnt2yO51Qj7Jjvh3lTiGwqUVWZRI0yi/SjHdL6/cmqNRv/6Cj9p0MsPaaMHwvdU
+ 1UD8hq2A8HEs9bROX2DjA+jGrSF1AbVbsvsoY/jZ6vh2Ph2wC0uBgAwS7gblNOLHA+PZ
+ ZHhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=D1RHl8ABdhn5KjoXJVQFbK3lZzim3prS8WaJzdIy+Zo=;
- b=mMkSf2WE95i6N64GT5Z1WzOIq9sczYRzophhDOs3EYNYwQq+JvRdr+TiKDCmrk9LgW
- Nh5amk5LuMmJtW62Ua3yhXd5iLXDxAFxDAxn4ly8vyN+8I0SRvlfok60dTKmL+szaXf1
- yO5k1KNQjl3hbsz4TAu7UJaRm3KOgMXAmZTSBNV//eC85YMYLb/S1fzIS55YUnD+cAa9
- 8KZWmjBtWThq56JxTwb9m4iVtdSLl9nSVDo9JbFMBThNFBkKgnpxwrX+WMJZFqdQ9qYJ
- 09TFKXiYAMgsc/GyZtLLs9qx7iDhldi0QAidqAD3iI6kUSPiwPke5aEWyYRyzuAMI3Y/
- a8SQ==
-X-Gm-Message-State: AOAM5333aXwdB2vISXg8qg7RzTmV67Hy5+qZXrI7w7WJRN5jqMSWytFo
- MstOxjY7Tf4ghGGASJpJIYE6bQ==
-X-Google-Smtp-Source: ABdhPJw9xzBTkm1ex/SpXs3gzQoe/wJz8pjYJNPqDjhDGb9ai+C4+hJhDspqERQLDE8pW/IN0QMg9Q==
-X-Received: by 2002:adf:91c2:: with SMTP id 60mr22458843wri.292.1600171267204; 
- Tue, 15 Sep 2020 05:01:07 -0700 (PDT)
-Received: from google.com (49.222.77.34.bc.googleusercontent.com.
- [34.77.222.49])
- by smtp.gmail.com with ESMTPSA id s124sm25145526wme.29.2020.09.15.05.01.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Sep 2020 05:01:06 -0700 (PDT)
-Date: Tue, 15 Sep 2020 12:01:05 +0000
-From: George Popescu <georgepope@google.com>
-To: Marco Elver <elver@google.com>
-Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
-Message-ID: <20200915120105.GA2294884@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vsszHnIr30DAX2BPN/LLCsGS7XfGFhrJzeIuxHrcQeU=;
+ b=Vrq1/hKs1b6KElDfyBxI7ysoZfITbCyt/jc8ACFpRGprKkHWowXrNaLNZcIfju+H+K
+ 0eMMRAWilZaUOucb8/XPJYQbC+WzG2VRDFwg4NrDcHqgU7D7ciD2CwVdzw6GDqLEcEZo
+ wR/uS2UoautGIi80tk3yw3P3AHBpNbamxXy9nZB/Lk90fx0nqhHr2J0peB7hej8Ys6iX
+ 1xIgc225+O6EegsIsQpmFQ8cl0GboMV3/j+e5YyXKeU4a00cHKXeYoXVxFuHZz8JP9LY
+ LAXbbW85SXYB4/BCenNSoeeVWUHqY3/T4WS9mtcGFa/zo72fYfIL2hnw4EczJCPsP8A9
+ bZ0A==
+X-Gm-Message-State: AOAM532XrK0iJ3jYp/N1w138tFtk/hCblqasPXfhyaqMvzXggB3re+a1
+ 4ImVtB1zbiwmigQkjpVewDf+Bbw9tuyAVyOh6miCEA==
+X-Google-Smtp-Source: ABdhPJxxyr3+yo6yQC3hYUIK/C90MlSgyTKxpkX4r5dqGfnI8B0pV1KvA3KhUXz1Pv6WLnJNX2Q1yKRy1KUwXPG9yYM=
+X-Received: by 2002:aca:54d1:: with SMTP id i200mr2939948oib.172.1600168702680; 
+ Tue, 15 Sep 2020 04:18:22 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200914172750.852684-1-georgepope@google.com>
  <20200914172750.852684-7-georgepope@google.com>
  <202009141509.CDDC8C8@keescook>
  <20200915102458.GA1650630@google.com>
- <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
+In-Reply-To: <20200915102458.GA1650630@google.com>
+From: Marco Elver <elver@google.com>
+Date: Tue, 15 Sep 2020 13:18:11 +0200
+Message-ID: <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
+Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
+To: George Popescu <georgepope@google.com>
+X-Mailman-Approved-At: Tue, 15 Sep 2020 09:01:37 -0400
 Cc: Thomas Gleixner <tglx@linutronix.de>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, maskray@google.com, maz@kernel.org,
@@ -114,39 +108,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 15, 2020 at 01:18:11PM +0200, Marco Elver wrote:
-> On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
-> > On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
-> > > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
-> > > > From: George Popescu <georgepope@google.com>
-> > > >
-> > > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
-> > > > the handler call, preventing it from printing any information processed
-> > > > inside the buffer.
-> > > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
-> > > > -fsanitize=local-bounds, and the latter adds a brk after the handler
-> > > > call
+On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
+> On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
+> > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
+> > > From: George Popescu <georgepope@google.com>
 > > >
-> > This would mean losing the local-bounds coverage. I tried to  test it without
-> > local-bounds and with a locally defined array on the stack and it works fine
-> > (the handler is called and the error reported). For me it feels like
-> > --array-bounds and --local-bounds are triggered for the same type of
-> > undefined_behaviours but they are handling them different.
-> 
-> Does -fno-sanitize-trap=bounds help?>
+> > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
+> > > the handler call, preventing it from printing any information processed
+> > > inside the buffer.
+> > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
+> > > -fsanitize=local-bounds, and the latter adds a brk after the handler
+> > > call
+> >
+> > That sounds like a compiler bug?
 
-I tried replacing it with:
-      ifdef CONFIG_CC_IS_CLANG
-            CFLAGS_UBSAN += $(call cc-option, -fno-sanitize-trap=bounds)
-            CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-      else
-            CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-      endif
+> Actually in clang 12 documentation is written that -fsanitize=bounds
+> expands to that. GCC  doesn't have those two options, only the
+> -fsanitize=bounds which looks similar to -fsanitize=array-bounds from
+> clang. So I don't see it as a compiler bug, just a misuse of flags.
 
-The code traps.
+Clang just allows to be more selective, but ultimately we want to
+cover as many bug-classes as possible. There is little point in giving
+up checks with Clang just because GCC doesn't implement them. If there
+are other valid reasons to give it up, that's fine, but so far it
+seems we never ran into the issue you ran into -- which is also a bit
+odd, because I do see in the instrumentation passes that
+fsanitize=bounds emits traps sometimes.
+
+[...]
+> > >  ifdef CONFIG_UBSAN_BOUNDS
+> > > -      CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+> > > +      # For Clang -fsanitize=bounds translates to -fsanitize=array-bounds and
+> > > +      # -fsanitize=local-bounds; the latter adds a brk right after the
+> > > +      # handler is called.
+> > > +      ifdef CONFIG_CC_IS_CLANG
+> > > +            CFLAGS_UBSAN += $(call cc-option, -fsanitize=array-bounds)
+> >
+> > This would mean losing the local-bounds coverage? Isn't that for locally
+> > defined arrays on the stack?
+
+> This would mean losing the local-bounds coverage. I tried to  test it without
+> local-bounds and with a locally defined array on the stack and it works fine
+> (the handler is called and the error reported). For me it feels like
+> --array-bounds and --local-bounds are triggered for the same type of
+> undefined_behaviours but they are handling them different.
+
+Does -fno-sanitize-trap=bounds help?
 
 Thanks,
-George
+-- Marco
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
