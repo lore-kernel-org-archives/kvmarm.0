@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40DBC433E2
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4CCC43461
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7C7E721D80
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB7AF20B1F
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 10:47:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="i7eptY7r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7E721D80
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AdjWjTtN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB7AF20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 321F14B283;
-	Tue, 15 Sep 2020 06:47:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F974B311;
+	Tue, 15 Sep 2020 06:47:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WaEf9US0H+cY; Tue, 15 Sep 2020 06:47:25 -0400 (EDT)
+	with ESMTP id HEP-siHginJw; Tue, 15 Sep 2020 06:47:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD8A4B24F;
-	Tue, 15 Sep 2020 06:47:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 373CD4B387;
+	Tue, 15 Sep 2020 06:47:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D5CA64B1FC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 604DD4B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c6COuXfPGkBW for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id XCcDMVq58wQX for <kvmarm@lists.cs.columbia.edu>;
  Tue, 15 Sep 2020 06:47:23 -0400 (EDT)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 670BF4B36A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:21 -0400 (EDT)
-Received: by mail-wr1-f74.google.com with SMTP id w7so1084789wrp.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 03:47:21 -0700 (PDT)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FBA34B266
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 06:47:23 -0400 (EDT)
+Received: by mail-wm1-f73.google.com with SMTP id x81so750604wmg.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 03:47:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=WKgOSDUYFOb+eJkVxGRKW9bVuNnxPXprClF7pwLCXS8=;
- b=i7eptY7rhVtgm9AV0JoR4VmOxw1r+oeBdnk5HqzhjpiQcviDhcs0nVqDUXP+zvQfnT
- ClG0GH7mVRjpNVHqotD59O2EAC1c3OsslIop9/dqW5hLOJSy2ovXlxy1w6RTzq+kAZHq
- FNlthgFEjh6EpzpfxNy+J+9ev7/5ku4danbVQp9gyH7oo8Gbs2fxwv1JBzarUPBG9qhc
- AJRMdXne7Ef98lbviuYeGo3F09/BntmCU3SqxeR1Rvs/9kjLrnlSRqi6iY3ayfUVJ4NG
- v36RU9JwEjjni3o5LjoyA1WzpftWNSG/2I6LHrbUCCDKliTIDiA2836cz88svlMIh5PC
- mzHg==
+ :from:to:cc; bh=DjugrIsIo9NbgpMIze2IlMKd7M0s+FgSEpJQc959sAg=;
+ b=AdjWjTtNqBEu8XC0qrI2Doumfnl1u/98nHUb8yV+hWCu2eMCWIXa0Sycs5RDmB6ZQG
+ p63y3SVsXh09J2ZzfrkDW7GbCe0DWwhGxAw+4jI8GC4r6Gv7jGJXaN6tPn7lfYaXdJ3E
+ 4xy9EucREiUvB9BGFWTLbzVMXI1k9+hw3zCjbUHCCsMJT4ldACsbid77iin+lsWQ4/qn
+ mAM60wQraTK6W3utVHMRHlcxDlwj5pwfLeKshZBp2Fut1k+543AShKYpZRfkCEXqErRT
+ xItjbRtfQBG/aSTVEDsmma563zqL9ALiM2w5lQcEXB1Ssm6rPXA6Xzn6VfESMYCZOLty
+ N48g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=WKgOSDUYFOb+eJkVxGRKW9bVuNnxPXprClF7pwLCXS8=;
- b=SlqxsnRk6Xw+DfF8Fx5m7Pb3RsE5JI+7Hszb4Y+UMBRG1x4eEV105MS+2y+lckf+Lq
- q798TbYJ4p7W9DDsP7cBDgjn9prIfOj2hhLM/VMsgplC1xYI4B9h1cQfW45dJWAI8s0A
- 4gj1vwZD4TZ/gALFb12+SELRXD8XSv9eUUOWUJPdxkPG/w3xF0Efe7RiE9PLiXupCwgp
- cfeObfqPblPK6HUPl/1G6lfc18MhmvAJ73cM9VZVlKBW7II0UMZNOEGCb60iOAvjTPvC
- W4KefgTsZIfTf94NBI4wYhFRopiqgQvAj6BAUSyqOO2MkWawTD/dPYAUTTJSIw3Y+oLp
- O7Cw==
-X-Gm-Message-State: AOAM530DRKQRzxsbbWcpFqjz3GSDEdPP9NS/dWwdqrjg/WBlnLX+1Dho
- /Xa0F9n9Lq5QK2/tLZQzxdjBnMGQIAcYplUPcV+3k7bRsk3LiB0jJPEkAbKpw2Tz2Y1NNhnJV2L
- OK4cQReAk9G668DQevlwNkRD8gXd3A4b2dkk+Atazptt3Y+Xw1SGyduSwXNhZuxLiDD0/wA==
-X-Google-Smtp-Source: ABdhPJyMC7oTGqBQzTGN39DyKULVolR1w+A+piT6pirZQBCz8TCQ6ZtKjxnjV1vO9/cmKvNmPAsWUKqFuEY=
+ bh=DjugrIsIo9NbgpMIze2IlMKd7M0s+FgSEpJQc959sAg=;
+ b=EhKiXQrPZfFS2Wv4NMadTR1gZRjAKWltfn6ced/lF6PWcH6KO1KknZRzhv8LhaRZX1
+ xA6sD2Rq4JXiWf397hRLKSKITNPWtskkvMIoefPzzvmn1DVArTHVQn0agG2TimUsIOa4
+ ukl7R0HLjpCmKWYu4ofeC6YS8QCzu/43kTMdGTa2EM52w9ciSIwexjydHtEs3dEBVIjP
+ OKG778/2/o+8tqq1scP+Nq86/pI1CDCDBaKzgHLMAJUfNS61cvGmlN3TkUuXgkfZ+Y51
+ 9eQYI2XQQRo28tarp3Ji1xJUDi5CXjs7uL5qQyqrknKUCKXeZxtw65UEyMXK2Mq+qrqz
+ fx0g==
+X-Gm-Message-State: AOAM5331nD7wiORnUXiwqbwAs+fG/3F6DE78qlwlcvP+F38YLRFIhuUh
+ VXbRk6ZAsgKqrI19GNKaFOE+VQaNhQiBQTzuZjXyP+/o+x9AGBsbQz8rF7o8LEZI7CnSMHMxpoG
+ d5XTqx+hH46ho0igze5xH52U608M4OogXKOL8I5s+H8dfhmHQa5CvThY0j+Bo4STyrpugJg==
+X-Google-Smtp-Source: ABdhPJw8Q7MpHg3xLyRxGPztMJutjDk1DHb2qJ0mm/5d8A9JnUnE9yS13L5VwxR6dx04+UuJJkg1drM3GDw=
 X-Received: from ascull.lon.corp.google.com
  ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- (user=ascull job=sendgmr) by 2002:a7b:c14f:: with SMTP id
- z15mr472005wmi.1.1600166839909; 
- Tue, 15 Sep 2020 03:47:19 -0700 (PDT)
-Date: Tue, 15 Sep 2020 11:46:38 +0100
+ (user=ascull job=sendgmr) by 2002:adf:db52:: with SMTP id
+ f18mr20571197wrj.397.1600166842477; 
+ Tue, 15 Sep 2020 03:47:22 -0700 (PDT)
+Date: Tue, 15 Sep 2020 11:46:39 +0100
 In-Reply-To: <20200915104643.2543892-1-ascull@google.com>
-Message-Id: <20200915104643.2543892-15-ascull@google.com>
+Message-Id: <20200915104643.2543892-16-ascull@google.com>
 Mime-Version: 1.0
 References: <20200915104643.2543892-1-ascull@google.com>
 X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
-Subject: [PATCH v4 14/19] KVM: arm64: nVHE: Pass pointers consistently to
- hyp-init
+Subject: [PATCH v4 15/19] smccc: Define vendor hyp owned service call region
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
@@ -101,39 +100,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Rather than some being kernel pointer and others being hyp pointers,
-standardize on all pointers being hyp pointers.
+Vendor specific hypervisor services have their own region of function
+identifiers reserved by SMCCC. Extend the list of owners to include this
+case.
 
+Cc: Sudeep Holla <sudeep.holla@arm.com>
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/kvm/arm.c               | 1 +
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ include/linux/arm-smccc.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ae4b34f91e94..6b7180072c8d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1278,6 +1278,7 @@ static void cpu_init_hyp_mode(void)
- 
- 	pgd_ptr = kvm_mmu_get_httbr();
- 	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
-+	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
- 	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index d9434e90c06d..abe885e26fe2 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -114,7 +114,6 @@ alternative_else_nop_endif
- 	isb
- 
- 	/* Set the stack and new vectors */
--	kern_hyp_va	x1
- 	mov	sp, x1
- 	msr	vbar_el2, x2
- 
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 15c706fb0a37..ee286f5de239 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -49,6 +49,7 @@
+ #define ARM_SMCCC_OWNER_OEM		3
+ #define ARM_SMCCC_OWNER_STANDARD	4
+ #define ARM_SMCCC_OWNER_STANDARD_HYP	5
++#define ARM_SMCCC_OWNER_VENDOR_HYP	6
+ #define ARM_SMCCC_OWNER_TRUSTED_APP	48
+ #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
+ #define ARM_SMCCC_OWNER_TRUSTED_OS	50
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
