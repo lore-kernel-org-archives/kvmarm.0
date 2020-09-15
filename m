@@ -2,61 +2,55 @@ Return-Path: <SRS0=e8ws=CY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC066C43461
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 16:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADFBC433E2
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:03:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2994B21D41
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 16:15:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2994B21D41
+	by mail.kernel.org (Postfix) with ESMTP id 9D14F21D43
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Sep 2020 17:03:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D14F21D43
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86F724B28A;
-	Tue, 15 Sep 2020 12:15:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0B294B2AE;
+	Tue, 15 Sep 2020 13:03:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id euF8+qlynFw9; Tue, 15 Sep 2020 12:15:16 -0400 (EDT)
+	with ESMTP id sJuP0P1CcPIr; Tue, 15 Sep 2020 13:03:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 637FC4B266;
-	Tue, 15 Sep 2020 12:15:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCDF94B2B3;
+	Tue, 15 Sep 2020 13:03:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 660F34B20A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 12:15:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A2A54B22C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:03:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bJ7SY9Mk1G9F for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2020 12:15:14 -0400 (EDT)
+ with ESMTP id kNv54o4KVAi4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2020 13:03:49 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0654B206
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 12:15:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 172C64B220
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 13:03:49 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E38E1FB;
- Tue, 15 Sep 2020 09:15:13 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33FEF3F68F;
- Tue, 15 Sep 2020 09:15:12 -0700 (PDT)
-Subject: Re: [PATCH v5 16/21] KVM: arm64: Add support for relaxing stage-2
- perms in generic page-table code
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200911132529.19844-1-will@kernel.org>
- <20200911132529.19844-17-will@kernel.org>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD59A1FB;
+ Tue, 15 Sep 2020 10:03:48 -0700 (PDT)
+Received: from monolith.localdoman (unknown [10.37.8.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 161673F68F;
+ Tue, 15 Sep 2020 10:03:46 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <595cc73e-636e-8b3a-f93a-b4e9fb218db8@arm.com>
-Date: Tue, 15 Sep 2020 17:16:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Do not flush memslot if FWB is supported
+Date: Tue, 15 Sep 2020 18:04:42 +0100
+Message-Id: <20200915170442.131635-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200911132529.19844-17-will@kernel.org>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,84 +67,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+As a result of a KVM_SET_USER_MEMORY_REGION ioctl, KVM flushes the
+dcache for the memslot being changed to ensure a consistent view of memory
+between the host and the guest: the host runs with caches enabled, and
+it is possible for the data written by the hypervisor to still be in the
+caches, but the guest is running with stage 1 disabled, meaning data
+accesses are to Device-nGnRnE memory, bypassing the caches entirely.
 
-On 9/11/20 2:25 PM, Will Deacon wrote:
-> Add support for relaxing the permissions of a stage-2 mapping (i.e.
-> adding additional permissions) to the generic page-table code.
->
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 19 +++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
->  2 files changed, 39 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 77c027456c61..52ab38db04c7 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -236,6 +236,25 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr);
->   */
->  kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr);
->  
-> +/**
-> + * kvm_pgtable_stage2_relax_perms() - Relax the permissions enforced by a
-> + *				      page-table entry.
-> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-> + * @addr:	Intermediate physical address to identify the page-table entry.
-> + * @prot:	Additional permissions to grant for the mapping.
-> + *
-> + * The offset of @addr within a page is ignored.
-> + *
-> + * If there is a valid, leaf page-table entry used to translate @addr, then
-> + * relax the permissions in that entry according to the read, write and
-> + * execute permissions specified by @prot. No permissions are removed, and
-> + * TLB invalidation is performed after updating the entry.
-> + *
-> + * Return: 0 on success, negative error code on failure.
-> + */
-> +int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-> +				   enum kvm_pgtable_prot prot);
-> +
->  /**
->   * kvm_pgtable_stage2_is_young() - Test whether a page-table entry has the
->   *				   access flag set.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index d382756a527c..603d6b415337 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -782,6 +782,26 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
->  	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
->  }
->  
-> +int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-> +				   enum kvm_pgtable_prot prot)
-> +{
-> +	int ret;
-> +	kvm_pte_t set = 0, clr = 0;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_R)
-> +		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_W)
-> +		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> +
-> +	if (prot & KVM_PGTABLE_PROT_X)
-> +		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-> +
-> +	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL);
-> +	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, 0);
+Flushing the dcache is not necessary when KVM enables FWB, because it
+forces the guest to uses cacheable memory accesses.
 
-We know the level at which the entry is updated, as the visitor has a "level"
-parameter, I was wondering if it makes sense to do the TLBI invalidation there.
-Struct stage2_attr_data could have an extra field to control if the invalidation
-should be done in the visitor.
+The current behaviour does not change, as the dcache flush helpers execute
+the cache operation only if FWB is not enabled, but walking the stage 2
+table is avoided.
 
-Thanks,
-Alex
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ arch/arm64/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9a636b8064f1..c29105c6e975 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2537,7 +2537,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (ret)
+ 		unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
+-	else
++	else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+ 		stage2_flush_memslot(kvm, memslot);
+ 	spin_unlock(&kvm->mmu_lock);
+ out:
+-- 
+2.28.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
