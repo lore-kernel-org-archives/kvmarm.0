@@ -2,59 +2,105 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CE6C43461
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 02:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E08AC35257
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 07:40:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E38FA20770
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 02:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38FA20770
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 48B762076C
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 07:40:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="gjM7bxmS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B762076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 221FB4B2FE;
-	Tue, 15 Sep 2020 22:02:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADC94B348;
+	Wed, 16 Sep 2020 03:40:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RWUHTwZUs2UE; Tue, 15 Sep 2020 22:02:15 -0400 (EDT)
+	with ESMTP id 6-+40sE9GeNv; Wed, 16 Sep 2020 03:40:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B3D04B2A2;
-	Tue, 15 Sep 2020 22:02:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 752DD4B351;
+	Wed, 16 Sep 2020 03:40:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD2C34B2A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 22:02:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59CA54B348
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 03:40:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2SpgYc-KyIQP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2020 22:02:12 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F3FC4B220
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 22:02:12 -0400 (EDT)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 45A8C72410859EBA9344;
- Wed, 16 Sep 2020 10:02:06 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 16 Sep 2020 10:01:59 +0800
-From: Xiaofei Tan <tanxiaofei@huawei.com>
-To: <maz@kernel.org>, <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>, 
- <suzuki.poulose@arm.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] KVM: arm64: fix doc warnings in mmu code
-Date: Wed, 16 Sep 2020 10:00:39 +0800
-Message-ID: <1600221639-4471-1-git-send-email-tanxiaofei@huawei.com>
-X-Mailer: git-send-email 2.8.1
+ with ESMTP id xMi7TTwKNj8S for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 03:40:31 -0400 (EDT)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6124C4B345
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 03:40:31 -0400 (EDT)
+Received: by mail-wm1-f68.google.com with SMTP id a9so1863590wmm.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 00:40:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=tqvp+bkIU1TWNlZpwcv+TKRU2X5GojmD5HYurFQV7BY=;
+ b=gjM7bxmS6+Hzs07rV/WLqiZ7oypbPZeeynUIbEGf+1I9i5xUZgFTr9pBvxoJKit3lh
+ /TC/qQi6Hp2TtnCO/NeCATHt2bkpPA/JZvcO9Wttw2I/Sc/8JV0ACXRCD1k8lq2qSH2u
+ xFt8e4VclXK6orUp/sR81UNyuRsBU9CKP69jotta8/o3ZN0y/ATIUSrKa0W8LIOgRy2n
+ DkB86wfYPzlKcUglMBue1jJjXIt1v3N2MKI2EvcrO/plB1MItPyrUhAx217Bc/mR4MCH
+ vj2Ii+bGg1WlPNB/9eezKaFrqWjQ4uNrrqwZjwW+1wrycv8XxA+imCdxpWXZ+TBspfEU
+ cO6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=tqvp+bkIU1TWNlZpwcv+TKRU2X5GojmD5HYurFQV7BY=;
+ b=ssdQr4g7PmgTr7SD6VPpeL1Y9LAz/WNh24lYOwD+X6zgBA+kH4HvQ7JwKBpd3YdLtE
+ OQJp7x6wBOFDUjUJJF3UJGQ+gNKvPnXg/yVaFM019wBNUzPqKYu0CPjoasHj4pGSoXHR
+ j9MZqJf3jzmUZqEBEVSmw8J6ZloHaT4pWozgpy5vgtWgjb2boKL3HXKTieJvPZ3HBm0g
+ iXIzg9LpjRH28SkJ6Hrtj0k3x4HAj2Wbl2IeO+o5y9KbcRo6j3XZoVoye2lnIbm4h4Nw
+ tN4LK4pFHXTdYd5bjcFMNfEWyxkfHGv0gCGvEImTI4uh6UuUikht3oClGVkaSSrr8zCN
+ 83eQ==
+X-Gm-Message-State: AOAM532ujnZa6DAji1IZ3ot6O6HaonybuzXwNnU1Ix4FVKLwwgIaa8R/
+ mNiVBlxWDJnHpTODxG0vvtVx6w==
+X-Google-Smtp-Source: ABdhPJx/FHKbG/LfARiaWGrhnM+fErvXhr1oAsC0Dy1+R1K4G2d1MrURncNcx4OJ1k5GECgPKBKUBg==
+X-Received: by 2002:a1c:9a57:: with SMTP id c84mr3177066wme.136.1600242029785; 
+ Wed, 16 Sep 2020 00:40:29 -0700 (PDT)
+Received: from google.com (49.222.77.34.bc.googleusercontent.com.
+ [34.77.222.49])
+ by smtp.gmail.com with ESMTPSA id u66sm3770553wme.12.2020.09.16.00.40.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 00:40:29 -0700 (PDT)
+Date: Wed, 16 Sep 2020 07:40:27 +0000
+From: George Popescu <georgepope@google.com>
+To: Marco Elver <elver@google.com>
+Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
+Message-ID: <20200916074027.GA2946587@google.com>
+References: <20200914172750.852684-1-georgepope@google.com>
+ <20200914172750.852684-7-georgepope@google.com>
+ <202009141509.CDDC8C8@keescook>
+ <20200915102458.GA1650630@google.com>
+ <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
+ <20200915120105.GA2294884@google.com>
+ <CANpmjNPpq7LfTHYesz2wTVw6Pqv0FQ2gc-vmSB6Mdov+XWPZiw@mail.gmail.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
-Cc: linuxarm@huawei.com
+Content-Disposition: inline
+In-Reply-To: <CANpmjNPpq7LfTHYesz2wTVw6Pqv0FQ2gc-vmSB6Mdov+XWPZiw@mail.gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Fangrui Song <maskray@google.com>,
+ maz@kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
+ clang-built-linux <clang-built-linux@googlegroups.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
+ Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, broonie@kernel.org,
+ Nathan Chancellor <natechancellor@gmail.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Michal Marek <michal.lkml@markovi.net>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,56 +117,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Fix following warnings caused by mismatch bewteen function parameters
-and comments.
-arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'mmu' not described in '__unmap_stage2_range'
-arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'may_block' not described in '__unmap_stage2_range'
-arch/arm64/kvm/mmu.c:128: warning: Excess function parameter 'kvm' description in '__unmap_stage2_range'
-arch/arm64/kvm/mmu.c:499: warning: Function parameter or member 'writable' not described in 'kvm_phys_addr_ioremap'
-arch/arm64/kvm/mmu.c:538: warning: Function parameter or member 'mmu' not described in 'stage2_wp_range'
-arch/arm64/kvm/mmu.c:538: warning: Excess function parameter 'kvm' description in 'stage2_wp_range'
+On Tue, Sep 15, 2020 at 07:32:28PM +0200, Marco Elver wrote:
+> On Tue, 15 Sep 2020 at 14:01, George Popescu <georgepope@google.com> wrote:
+> >
+> > On Tue, Sep 15, 2020 at 01:18:11PM +0200, Marco Elver wrote:
+> > > On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
+> > > > On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
+> > > > > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
+> > > > > > From: George Popescu <georgepope@google.com>
+> > > > > >
+> > > > > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
+> > > > > > the handler call, preventing it from printing any information processed
+> > > > > > inside the buffer.
+> > > > > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
+> > > > > > -fsanitize=local-bounds, and the latter adds a brk after the handler
+> > > > > > call
+> > > > >
+> > > > This would mean losing the local-bounds coverage. I tried to  test it without
+> > > > local-bounds and with a locally defined array on the stack and it works fine
+> > > > (the handler is called and the error reported). For me it feels like
+> > > > --array-bounds and --local-bounds are triggered for the same type of
+> > > > undefined_behaviours but they are handling them different.
+> > >
+> > > Does -fno-sanitize-trap=bounds help?>
+> >
+> > I tried replacing it with:
+> >       ifdef CONFIG_CC_IS_CLANG
+> >             CFLAGS_UBSAN += $(call cc-option, -fno-sanitize-trap=bounds)
+> >             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+> >       else
+> >             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
+> >       endif
+> >
+> > The code traps.
+> 
+> What's your config? Do you have CONFIG_UBSAN_TRAP=y? If so, you have 2
+> options: honor UBSAN_TRAP and crash the kernel, or have a
+> 'CFLAGS_REMOVE_... = -fsanitize-undefined-trap-on-error' for the files
+> where you can't deal with traps> 
 
-Signed-off-by: Xiaofei Tan <tanxiaofei@huawei.com>
----
- arch/arm64/kvm/mmu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I don't have CONFIG_UBSAN_TRAP=y. My .config is:
+CONFIG_ARCH_HAS_UBSAN_SANITIZE_ALL=y
+CONFIG_UBSAN=y
+# CONFIG_UBSAN_TRAP is not set
+CONFIG_UBSAN_KCOV_BROKEN=y
+CONFIG_UBSAN_MISC=y
+CONFIG_UBSAN_SANITIZE_ALL=y
+# CONFIG_UBSAN_ALIGNMENT is not set
+CONFIG_TEST_UBSAN=m
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index e8a51799..909e995 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -114,9 +114,10 @@ static bool kvm_is_device_pfn(unsigned long pfn)
-  */
- /**
-  * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-- * @kvm:   The VM pointer
-+ * @mmu:   pointer to mmu structure to operate on
-  * @start: The intermediate physical base address of the range to unmap
-  * @size:  The size of the area to unmap
-+ * @may_block: The flag that if block is allowed here
-  *
-  * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
-  * be called while holding mmu_lock (unless for freeing the stage2 pgd before
-@@ -493,6 +494,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
-  * @guest_ipa:	The IPA at which to insert the mapping
-  * @pa:		The physical address of the device
-  * @size:	The size of the mapping
-+ * @writable:   If it is writable here
-  */
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable)
-@@ -530,7 +532,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- /**
-  * stage2_wp_range() - write protect stage2 memory region range
-- * @kvm:	The KVM pointer
-+ * @mmu:        pointer to mmu structure to operate on
-  * @addr:	Start address of range
-  * @end:	End address of range
-  */
--- 
-2.8.1
-
+Thanks,
+George
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
