@@ -2,86 +2,94 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC443C433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CFDC433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:54:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3F4C621741
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:20:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CF5D22209
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:54:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8Oqer9i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F4C621741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="JyQsV3C/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF5D22209
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9553D4B3AC;
-	Wed, 16 Sep 2020 07:20:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAF0E4B354;
+	Wed, 16 Sep 2020 07:54:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zKyE0Ajsza0i; Wed, 16 Sep 2020 07:20:41 -0400 (EDT)
+	with ESMTP id vGB05la2HtwW; Wed, 16 Sep 2020 07:54:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56B8E4B419;
-	Wed, 16 Sep 2020 07:20:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C09A84B445;
+	Wed, 16 Sep 2020 07:54:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73DB54B411
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:20:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5AF54B445
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:54:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vuy+cZQNt70G for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 07:20:39 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277514B404
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:20:39 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B69F120684;
- Wed, 16 Sep 2020 11:20:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1600255237;
- bh=WiPDLj8v8FbgaKwYbzA0o/4g5mUTN/xOFlhfX1cJ69g=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=n8Oqer9iQ+OJ7Mt1CKYBCp/JO8YaBaA77VEtG4IYPJ62u3bRICHYgMOwZtsLqspea
- 33aVeSPwHdvTLnRY8KacCJ9r3pHX0nF7Nqpt/LQoxC9AD0MWmyo8osvHeTvmXfkiJU
- FQgWu7iMUupmOW8YmCDNnCwN45gjAw5+KDYkDUb8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kIVUJ-00CKp1-Ls; Wed, 16 Sep 2020 12:20:35 +0100
-Date: Wed, 16 Sep 2020 12:20:34 +0100
-Message-ID: <87k0wuq871.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v4 10/19] KVM: arm64: Restore hyp when panicking in guest
- context
-In-Reply-To: <20200915104643.2543892-11-ascull@google.com>
-References: <20200915104643.2543892-1-ascull@google.com>
- <20200915104643.2543892-11-ascull@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com,
- sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 0riUNsbY52Rp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 07:54:07 -0400 (EDT)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F3734B354
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:54:07 -0400 (EDT)
+Received: by mail-wm1-f68.google.com with SMTP id w2so2494752wmi.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 04:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Yh0igFnXFGH3K7pZzQhRNs7ViU5/hMjpnGkORzHpipk=;
+ b=JyQsV3C/yV+HMhjcrBeo4b6vbtbXN/7M7NJbIgBea1ZCl6bB/Wv56zT6tM39MhZYIz
+ 1ePZsPTW5M75mT5wRpRoNtZy/x1FJ8O69Jo5IFaxDlzHdWeRiNrB4GKbyft7T7Rf3m7c
+ aWwz5PsssRQJClQFnacWnvlS5MQg4yUM9L2jw8VuALu4NTPRUxNv67kIW5FUWGPCDVP9
+ yMm7HzrgXsD04qEeBHOQTjc1spMBk+h1ObSRut8UsG0poo7gRH4ptNx9EujbEMj5Cb7U
+ w4FXV2249ahLD5jNOQ2ov9+67BvirUZC0p0CE4a+dXdPSDP2nJyRXQPZXP6lPs90vfLk
+ zTZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Yh0igFnXFGH3K7pZzQhRNs7ViU5/hMjpnGkORzHpipk=;
+ b=WJLvWsSKR0PjP2+HrFr4S8gvLZbxgxTCSGWXMGDd1BvOHqHUiycjqyRdf1AHfxQy2j
+ 7oLce5rvmE1JjQU9q9igZHDORYRvj0rkn+GARawLK8+QCI5s1dhCEgI1VIGsTml8R/in
+ qhXOofJ3iLilrnJwbrkJD3afVx1/wt56t5WpgnOxv9jVbj7OwcD/YS/bdnC0eWCZCdTl
+ 43KzVn3L1bL7v6n+DPYMMMAe/XAeMq0UeuXvHDq/BNoeuWotArtpibx5WdqErJPDP1Nd
+ IaD8+tcsOyDAyzjsYVBJiYSNkUXijRzXSwueahY7e7PVV9lEUfHy6lN5o/aDw1n9d+rF
+ Riwg==
+X-Gm-Message-State: AOAM530OAUSroHdESXGinqVURW3k43unUDf9l28lQ6jVzOLXc6u3+k8/
+ 2P/qAXB/OTmj8B6QIGbXgCqtiA==
+X-Google-Smtp-Source: ABdhPJwEUCld1s87TOjbwzmcs50r5qVIn7ePIrzWPUYEsAFENq0CtkJ+OctMHBN++deLK1KNg4U8hw==
+X-Received: by 2002:a05:600c:2118:: with SMTP id
+ u24mr4258846wml.59.1600257246355; 
+ Wed, 16 Sep 2020 04:54:06 -0700 (PDT)
+Received: from google.com ([2a01:4b00:8523:2d03:e49d:f6be:d31b:ad3c])
+ by smtp.gmail.com with ESMTPSA id u66sm5088416wmg.44.2020.09.16.04.54.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 04:54:05 -0700 (PDT)
+Date: Wed, 16 Sep 2020 12:54:04 +0100
+From: David Brazdil <dbrazdil@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 00/10] Independent per-CPU data section for nVHE
+Message-ID: <20200916115404.rhv4dkyjz35e4x25@google.com>
+References: <20200903091712.46456-1-dbrazdil@google.com>
+ <20200914174008.GA25238@willie-the-truck>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20200914174008.GA25238@willie-the-truck>
+Cc: linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,176 +106,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
+Hi Will,
 
-On Tue, 15 Sep 2020 11:46:34 +0100,
-Andrew Scull <ascull@google.com> wrote:
+On Mon, Sep 14, 2020 at 06:40:09PM +0100, Will Deacon wrote:
+> Hi David,
 > 
-> If the guest context is loaded when a panic is triggered, restore the
-> hyp context so e.g. the shadow call stack works when hyp_panic() is
-> called and SP_EL0 is valid when the host's panic() is called.
+> On Thu, Sep 03, 2020 at 11:17:02AM +0200, David Brazdil wrote:
+> > Introduce '.hyp.data..percpu' as part of ongoing effort to make nVHE
+> > hyp code self-contained and independent of the rest of the kernel.
+> > 
+> > The series builds on top of the "Split off nVHE hyp code" series which
+> > used objcopy to rename '.text' to '.hyp.text' and prefix all ELF
+> > symbols with '__kvm_nvhe' for all object files under kvm/hyp/nvhe.
 > 
-> Use the hyp context's __hyp_running_vcpu field to track when hyp
-> transitions to and from the guest vcpu so the exception handlers know
-> whether the context needs to be restored.
+> I've been playing around with this series this afternoon, trying to see
+> if we can reduce the coupling between the nVHE code and the core code. I've
+> ended up with the diff below on top of your series, but I think it actually
+> removes the need to change the core code at all. The idea is to collapse
+> the percpu sections during prelink, and then we can just deal with the
+> resulting data section a bit like we do for .hyp.text already.
 > 
-> Signed-off-by: Andrew Scull <ascull@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h        | 10 ++++++++++
->  arch/arm64/kvm/hyp/entry.S              | 24 ++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/hyp-entry.S          |  5 ++---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +++-
->  arch/arm64/kvm/hyp/nvhe/host.S          |  5 +++++
->  5 files changed, 44 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index fe51c06d480d..4df2bd8882bc 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -236,6 +236,16 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
->  	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
->  .endm
->  
-> +.macro get_loaded_vcpu vcpu, ctxt
-> +	hyp_adr_this_cpu \ctxt, kvm_hyp_ctxt, \vcpu
-> +	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-> +.endm
-> +
-> +.macro set_loaded_vcpu vcpu, ctxt, tmp
-> +	hyp_adr_this_cpu \ctxt, kvm_hyp_ctxt, \tmp
-> +	str	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-> +.endm
-> +
->  /*
->   * KVM extable for unexpected exceptions.
->   * In the same format _asm_extable, but output to a different section so that
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index 38cca690a6ff..4787fc82790c 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -86,6 +86,8 @@ alternative_else_nop_endif
->  	ret
->  
->  1:
-> +	set_loaded_vcpu x0, x1, x2
-> +
->  	add	x29, x0, #VCPU_CONTEXT
->  
->  	// Macro ptrauth_switch_to_guest format:
-> @@ -116,6 +118,26 @@ alternative_else_nop_endif
->  	eret
->  	sb
->  
-> +SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
-> +	// x2-x29,lr: vcpu regs
-> +	// vcpu x0-x1 on the stack
-> +
-> +	// If the hyp context is loaded, go straight to hyp_panic
-> +	get_loaded_vcpu x0, x1
-> +	cbz	x0, hyp_panic
-> +
-> +	// The hyp context is saved so make sure it is restored to allow
-> +	// hyp_panic to run at hyp and, subsequently, panic to run in the host.
-> +	// This makes use of __guest_exit to avoid duplication but sets the
-> +	// return address to tail call into hyp_panic. As a side effect, the
-> +	// current state is saved to the guest context but it will only be
-> +	// accurate if the guest had been completely restored.
-> +	hyp_adr_this_cpu x0, kvm_hyp_ctxt, x1
-> +	adr	x1, hyp_panic
-> +	str	x1, [x0, #CPU_XREG_OFFSET(30)]
-> +
-> +	get_vcpu_ptr	x1, x0
-> +
->  SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
->  	// x0: return code
->  	// x1: vcpu
-> @@ -163,6 +185,8 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
->  	// Now restore the hyp regs
->  	restore_callee_saved_regs x2
->  
-> +	set_loaded_vcpu xzr, x1, x2
-> +
->  alternative_if ARM64_HAS_RAS_EXTN
->  	// If we have the RAS extensions we can consume a pending error
->  	// without an unmask-SError and isb. The ESB-instruction consumed any
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index f92489250dfc..bc9f53df46f5 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -145,7 +145,7 @@ el2_error:
->  	eret
->  	sb
->  
-> -.macro invalid_vector	label, target = hyp_panic
-> +.macro invalid_vector	label, target = __guest_exit_panic
->  	.align	2
->  SYM_CODE_START(\label)
->  	b \target
-> @@ -186,10 +186,9 @@ check_preamble_length 661b, 662b
->  .macro invalid_vect target
->  	.align 7
->  661:
-> -	b	\target
->  	nop
-> +	stp	x0, x1, [sp, #-16]!
->  662:
-> -	ldp	x0, x1, [sp], #16
->  	b	\target
->  
->  check_preamble_length 661b, 662b
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index afe714056b97..821721b78ad9 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -509,6 +509,7 @@ static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
->  
->  static inline void __kvm_unexpected_el2_exception(void)
->  {
-> +	extern char __guest_exit_panic[];
->  	unsigned long addr, fixup;
->  	struct exception_table_entry *entry, *end;
->  	unsigned long elr_el2 = read_sysreg(elr_el2);
-> @@ -529,7 +530,8 @@ static inline void __kvm_unexpected_el2_exception(void)
->  		return;
->  	}
->  
-> -	hyp_panic();
-> +	/* Trigger a panic after restoring the hyp context. */
-> +	write_sysreg(__guest_exit_panic, elr_el2);
->  }
->  
->  #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index da21fddcef75..9ab7814e6114 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -75,6 +75,11 @@ SYM_FUNC_END(__hyp_do_panic)
->  
->  .macro invalid_host_vect
->  	.align 7
-> +	/* If a guest is loaded, panic out of it. */
-> +	stp	x0, x1, [sp, #-16]!
-> +	get_loaded_vcpu x0, x1
-> +	cbnz	x0, __guest_exit_panic
-> +	add	sp, sp, #16
->  	b	hyp_panic
->  .endm
+> Have I missed something critical?
 
-Given that we have switched vectors when entering the guest, is this
-only to deal with the lack of an ISB when performing the VBAR_EL2
-update?
+I was wondering whether this approach would be sufficient as well because of
+the simplicity. We'd just need to be careful about correctly preserving the
+semantics of the different .data..percpu..* sections.
 
-Thanks,
+For instance, I've noticed you make .hyp..data..percpu page-aligned rather than
+cacheline-aligned. We need that for stage-2 unmapping but it also happens to
+correctly align DEFINE_PER_CPU_PAGE_ALIGNED variables when collapsed into the
+single hyp section. The reason why I ended up reusing the global macro was to
+avoid introducing subtleties like that into the arm64 linker script. Do you
+think it's a worthwhile trade off?
 
-	M.
->  
-> -- 
-> 2.28.0.618.gf4bc123cb7-goog
-> 
-> 
+One place where this approach doesn't work is DEFINE_PER_CPU_FIRST. But I'm
+guessing that's something we can live without.
 
--- 
-Without deviation from the norm, progress is not possible.
+I was also wondering about another approach - using the PERCPU_SECTION macro
+unchanged in the hyp linker script. It would lay out a single .data..percpu and
+we would then prefix it with .hyp and the symbols with __kvm_nvhe_ as with
+everything else. WDYT? Haven't tried that yet, could be a naive idea. 
+
+Thanks for reviewing,
+David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
