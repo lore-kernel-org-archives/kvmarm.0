@@ -2,69 +2,62 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 154B2C433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 08:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 995FCC433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 09:01:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7B1932080C
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 08:38:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qGEn+X97"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1932080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id CB10920738
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 09:01:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB10920738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6644B35D;
-	Wed, 16 Sep 2020 04:38:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26A054B38C;
+	Wed, 16 Sep 2020 05:01:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6I96puJwUyQP; Wed, 16 Sep 2020 04:38:06 -0400 (EDT)
+	with ESMTP id 6Tf4FUOw1vcs; Wed, 16 Sep 2020 05:01:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 004AB4B34D;
-	Wed, 16 Sep 2020 04:38:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E7644B3AB;
+	Wed, 16 Sep 2020 05:01:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E73E4B324
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 04:38:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF404B252
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 22:28:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2yl175tCR15w for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 04:38:03 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E8644B19E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 04:38:03 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A4FA82064E;
- Wed, 16 Sep 2020 08:38:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1600245482;
- bh=ayHqD0TxwK+DKfoaoQ5U/0qGfOY6exkP6goS8angK4c=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=qGEn+X97bm/YN/f+V8umKxtNMSFx/ciTUIo7tQe8epZAfaYwBRvP6AEB5Z5NInYAD
- S3STXFRBhTgYskh7xiRZm9P5KJIN/vOPJWDaBdcjdTou5QCVZYtRIuk2X40h3l80fw
- uQ5jSfJsSaY2ecWqqpn4aTryoCuef03zQiXcvC+s=
-Date: Wed, 16 Sep 2020 09:37:57 +0100
-From: Will Deacon <will@kernel.org>
-To: Xiaofei Tan <tanxiaofei@huawei.com>
-Subject: Re: [PATCH v2] KVM: arm64: fix doc warnings in mmu code
-Message-ID: <20200916083756.GD27496@willie-the-truck>
-References: <1600221639-4471-1-git-send-email-tanxiaofei@huawei.com>
+ with ESMTP id wG-jgKMamUhp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2020 22:28:02 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 74BF64B22E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2020 22:28:02 -0400 (EDT)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 678E9B7BD0C502CE24B5;
+ Wed, 16 Sep 2020 10:27:58 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
+ 10:27:47 +0800
+From: Liu Shixin <liushixin2@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, "Julien
+ Thierry" <julien.thierry.kdev@gmail.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "Will
+ Deacon" <will@kernel.org>
+Subject: [PATCH -next] KVM: arm64: vgic-debug: convert to use
+ DEFINE_SEQ_ATTRIBUTE macro
+Date: Wed, 16 Sep 2020 10:50:23 +0800
+Message-ID: <20200916025023.3992679-1-liushixin2@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1600221639-4471-1-git-send-email-tanxiaofei@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, linuxarm@huawei.com,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.175.113.32]
+X-CFilter-Loop: Reflected
+X-Mailman-Approved-At: Wed, 16 Sep 2020 05:01:11 -0400
+Cc: Liu Shixin <liushixin2@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,61 +74,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 16, 2020 at 10:00:39AM +0800, Xiaofei Tan wrote:
-> Fix following warnings caused by mismatch bewteen function parameters
-> and comments.
-> arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'mmu' not described in '__unmap_stage2_range'
-> arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'may_block' not described in '__unmap_stage2_range'
-> arch/arm64/kvm/mmu.c:128: warning: Excess function parameter 'kvm' description in '__unmap_stage2_range'
-> arch/arm64/kvm/mmu.c:499: warning: Function parameter or member 'writable' not described in 'kvm_phys_addr_ioremap'
-> arch/arm64/kvm/mmu.c:538: warning: Function parameter or member 'mmu' not described in 'stage2_wp_range'
-> arch/arm64/kvm/mmu.c:538: warning: Excess function parameter 'kvm' description in 'stage2_wp_range'
-> 
-> Signed-off-by: Xiaofei Tan <tanxiaofei@huawei.com>
-> ---
->  arch/arm64/kvm/mmu.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index e8a51799..909e995 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -114,9 +114,10 @@ static bool kvm_is_device_pfn(unsigned long pfn)
->   */
->  /**
->   * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-> - * @kvm:   The VM pointer
-> + * @mmu:   pointer to mmu structure to operate on
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
-> + * @may_block: The flag that if block is allowed here
+Use DEFINE_SEQ_ATTRIBUTE macro to simplify the code.
 
-Whether or not we are permitted to block.
+Signed-off-by: Liu Shixin <liushixin2@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-debug.c | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
 
->   *
->   * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
->   * be called while holding mmu_lock (unless for freeing the stage2 pgd before
-> @@ -493,6 +494,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   * @guest_ipa:	The IPA at which to insert the mapping
->   * @pa:		The physical address of the device
->   * @size:	The size of the mapping
-> + * @writable:   If it is writable here
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+index b13a9e3f99dd..f38c40a76251 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -260,34 +260,14 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	return 0;
+ }
+ 
+-static const struct seq_operations vgic_debug_seq_ops = {
++static const struct seq_operations vgic_debug_sops = {
+ 	.start = vgic_debug_start,
+ 	.next  = vgic_debug_next,
+ 	.stop  = vgic_debug_stop,
+ 	.show  = vgic_debug_show
+ };
+ 
+-static int debug_open(struct inode *inode, struct file *file)
+-{
+-	int ret;
+-	ret = seq_open(file, &vgic_debug_seq_ops);
+-	if (!ret) {
+-		struct seq_file *seq;
+-		/* seq_open will have modified file->private_data */
+-		seq = file->private_data;
+-		seq->private = inode->i_private;
+-	}
+-
+-	return ret;
+-};
+-
+-static const struct file_operations vgic_debug_fops = {
+-	.owner   = THIS_MODULE,
+-	.open    = debug_open,
+-	.read    = seq_read,
+-	.llseek  = seq_lseek,
+-	.release = seq_release
+-};
++DEFINE_SEQ_ATTRIBUTE(vgic_debug);
+ 
+ void vgic_debug_init(struct kvm *kvm)
+ {
+-- 
+2.25.1
 
-Whether or not to create a writable mapping.
-
->   */
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable)
-> @@ -530,7 +532,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  
->  /**
->   * stage2_wp_range() - write protect stage2 memory region range
-> - * @kvm:	The KVM pointer
-> + * @mmu:        pointer to mmu structure to operate on
-
-The KVM stage-2 MMU pointer.
-
-Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
