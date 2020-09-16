@@ -2,101 +2,86 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AC9C2BB84
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 09:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC443C433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:20:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDB7E20738
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 09:01:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F4C621741
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 11:20:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PS2WB70x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDB7E20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8Oqer9i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F4C621741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56A9D4B377;
-	Wed, 16 Sep 2020 05:01:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9553D4B3AC;
+	Wed, 16 Sep 2020 07:20:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ar8L2rU6ACtK; Wed, 16 Sep 2020 05:01:15 -0400 (EDT)
+	with ESMTP id zKyE0Ajsza0i; Wed, 16 Sep 2020 07:20:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC4C4B3B1;
-	Wed, 16 Sep 2020 05:01:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56B8E4B419;
+	Wed, 16 Sep 2020 07:20:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E88434B2F6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 04:32:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73DB54B411
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:20:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IcXz5NrkGIjI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 04:32:53 -0400 (EDT)
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
- [209.85.210.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16A014B1B2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 04:32:53 -0400 (EDT)
-Received: by mail-ot1-f66.google.com with SMTP id m12so5959606otr.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 01:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gutnwyq/fY1R+B0kj3zMSfdQMIw4d9tjzY6YslUPxq0=;
- b=PS2WB70x9ySf7kxgHgUr09U5FuNJgjvgaH7MMVEi0w25wj+geORkHkwqZc6VzcevOQ
- hCiEAnLVhUXjSlfOS/9LyAWzsln3c5crRxRoQqAuBiTozsIvZrtIZiM8OPXSSAy9Vae7
- OMDs11gtOlkCkG/6Uw/jn9znWaF+uoVU/C8MX31oKa9yxTGAe460K1qfCI8awGr7H8z3
- 6k+OgXFK6UAPvAOVBG0ab6JFxnyX6o+ajKqqqNU8mHtleCW4IaanfL2KUVXoPA9N90ZA
- qgRYedd2f9Q0CTxAQi3665Ew2/NkBkKd0kVGjtH4Awdg11uBiQ484d2fJCsAhk4O2Zlx
- Meug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gutnwyq/fY1R+B0kj3zMSfdQMIw4d9tjzY6YslUPxq0=;
- b=PU+PZd+duBQ5Jb1KeCdqHdncFKYXtKg3n4h70cUFWkBcwrivKSn22bGRdxABCk/gX4
- GMUhgBRaY4co9qBZRyJa6WpT8G1SGjQHBi2iGc4DMthC/BvdSfYF5xw1JrnsKfqJtKR4
- Nx45AOtWSQOmOybLSb/VhdLuZ52pIr/PKhYPZ/1DcmgaL4U5Ziir1MRdiczW5yH7RKn5
- UlsU7ZdJhjdHz3J/xGIsW/MjeVvMKzC+9kLXos+lC9oAX80exXFlY8CA47phhJHWu1E1
- WOXeDnKqfHWScmXt7NAK/MuIHu1/RpIbWeeqCtfMSz3thKBhd/FVb6AzMACSTTiJPSxX
- qr1w==
-X-Gm-Message-State: AOAM531ezzdSQym5vCkRv/a4adFCc8zhDGO6bSJB1Q/puIbAucY0gXXh
- dkQnTWsRI+fcS4UGoFcMTqv237vVbL5TLscGx20Fdw==
-X-Google-Smtp-Source: ABdhPJwe6y4pKih3pRHaHK/yYYM4kOk8WdhzR+Jnvf9pdfuOu3tT6QfG19o4rzngArJRA/kONhSAKRQW+ccjYcRX+jI=
-X-Received: by 2002:a05:6830:1e8c:: with SMTP id
- n12mr16510993otr.17.1600245172173; 
- Wed, 16 Sep 2020 01:32:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200914172750.852684-1-georgepope@google.com>
- <20200914172750.852684-7-georgepope@google.com>
- <202009141509.CDDC8C8@keescook>
- <20200915102458.GA1650630@google.com>
- <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
- <20200915120105.GA2294884@google.com>
- <CANpmjNPpq7LfTHYesz2wTVw6Pqv0FQ2gc-vmSB6Mdov+XWPZiw@mail.gmail.com>
- <20200916074027.GA2946587@google.com>
-In-Reply-To: <20200916074027.GA2946587@google.com>
-From: Marco Elver <elver@google.com>
-Date: Wed, 16 Sep 2020 10:32:40 +0200
-Message-ID: <CANpmjNMT9-a8qKZSvGWBPAb9x9y1DkrZMSvHGq++_TcEv=7AuA@mail.gmail.com>
-Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
-To: George Popescu <georgepope@google.com>
-X-Mailman-Approved-At: Wed, 16 Sep 2020 05:01:11 -0400
-Cc: Thomas Gleixner <tglx@linutronix.de>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Fangrui Song <maskray@google.com>,
- maz@kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
- clang-built-linux <clang-built-linux@googlegroups.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, broonie@kernel.org,
- Nathan Chancellor <natechancellor@gmail.com>,
- Dmitry Vyukov <dvyukov@google.com>, Michal Marek <michal.lkml@markovi.net>,
- Nick Desaulniers <ndesaulniers@google.com>,
- LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+ with ESMTP id vuy+cZQNt70G for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 07:20:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277514B404
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 07:20:39 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B69F120684;
+ Wed, 16 Sep 2020 11:20:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1600255237;
+ bh=WiPDLj8v8FbgaKwYbzA0o/4g5mUTN/xOFlhfX1cJ69g=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=n8Oqer9iQ+OJ7Mt1CKYBCp/JO8YaBaA77VEtG4IYPJ62u3bRICHYgMOwZtsLqspea
+ 33aVeSPwHdvTLnRY8KacCJ9r3pHX0nF7Nqpt/LQoxC9AD0MWmyo8osvHeTvmXfkiJU
+ FQgWu7iMUupmOW8YmCDNnCwN45gjAw5+KDYkDUb8=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kIVUJ-00CKp1-Ls; Wed, 16 Sep 2020 12:20:35 +0100
+Date: Wed, 16 Sep 2020 12:20:34 +0100
+Message-ID: <87k0wuq871.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH v4 10/19] KVM: arm64: Restore hyp when panicking in guest
+ context
+In-Reply-To: <20200915104643.2543892-11-ascull@google.com>
+References: <20200915104643.2543892-1-ascull@google.com>
+ <20200915104643.2543892-11-ascull@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
+ will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com,
+ sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,58 +98,176 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 16 Sep 2020 at 09:40, George Popescu <georgepope@google.com> wrote:
->
-> On Tue, Sep 15, 2020 at 07:32:28PM +0200, Marco Elver wrote:
-> > On Tue, 15 Sep 2020 at 14:01, George Popescu <georgepope@google.com> wrote:
-> > >
-> > > On Tue, Sep 15, 2020 at 01:18:11PM +0200, Marco Elver wrote:
-> > > > On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
-> > > > > On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
-> > > > > > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
-> > > > > > > From: George Popescu <georgepope@google.com>
-> > > > > > >
-> > > > > > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
-> > > > > > > the handler call, preventing it from printing any information processed
-> > > > > > > inside the buffer.
-> > > > > > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
-> > > > > > > -fsanitize=local-bounds, and the latter adds a brk after the handler
-> > > > > > > call
-> > > > > >
-> > > > > This would mean losing the local-bounds coverage. I tried to  test it without
-> > > > > local-bounds and with a locally defined array on the stack and it works fine
-> > > > > (the handler is called and the error reported). For me it feels like
-> > > > > --array-bounds and --local-bounds are triggered for the same type of
-> > > > > undefined_behaviours but they are handling them different.
-> > > >
-> > > > Does -fno-sanitize-trap=bounds help?>
-> > >
-> > > I tried replacing it with:
-> > >       ifdef CONFIG_CC_IS_CLANG
-> > >             CFLAGS_UBSAN += $(call cc-option, -fno-sanitize-trap=bounds)
-> > >             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-> > >       else
-> > >             CFLAGS_UBSAN += $(call cc-option, -fsanitize=bounds)
-> > >       endif
-> > >
-> > > The code traps.
-> >
-> > What's your config? Do you have CONFIG_UBSAN_TRAP=y? If so, you have 2
-> > options: honor UBSAN_TRAP and crash the kernel, or have a
-> > 'CFLAGS_REMOVE_... = -fsanitize-undefined-trap-on-error' for the files
-> > where you can't deal with traps>
->
-> I don't have CONFIG_UBSAN_TRAP=y. My .config is:
-> CONFIG_ARCH_HAS_UBSAN_SANITIZE_ALL=y
-> CONFIG_UBSAN=y
-> # CONFIG_UBSAN_TRAP is not set
-> CONFIG_UBSAN_KCOV_BROKEN=y
-> CONFIG_UBSAN_MISC=y
-> CONFIG_UBSAN_SANITIZE_ALL=y
-> # CONFIG_UBSAN_ALIGNMENT is not set
-> CONFIG_TEST_UBSAN=m
+Hi Andrew,
 
-Your full config would be good, because it includes compiler version etc.
+On Tue, 15 Sep 2020 11:46:34 +0100,
+Andrew Scull <ascull@google.com> wrote:
+> 
+> If the guest context is loaded when a panic is triggered, restore the
+> hyp context so e.g. the shadow call stack works when hyp_panic() is
+> called and SP_EL0 is valid when the host's panic() is called.
+> 
+> Use the hyp context's __hyp_running_vcpu field to track when hyp
+> transitions to and from the guest vcpu so the exception handlers know
+> whether the context needs to be restored.
+> 
+> Signed-off-by: Andrew Scull <ascull@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h        | 10 ++++++++++
+>  arch/arm64/kvm/hyp/entry.S              | 24 ++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/hyp-entry.S          |  5 ++---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +++-
+>  arch/arm64/kvm/hyp/nvhe/host.S          |  5 +++++
+>  5 files changed, 44 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index fe51c06d480d..4df2bd8882bc 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -236,6 +236,16 @@ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
+>  	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+>  .endm
+>  
+> +.macro get_loaded_vcpu vcpu, ctxt
+> +	hyp_adr_this_cpu \ctxt, kvm_hyp_ctxt, \vcpu
+> +	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+> +.endm
+> +
+> +.macro set_loaded_vcpu vcpu, ctxt, tmp
+> +	hyp_adr_this_cpu \ctxt, kvm_hyp_ctxt, \tmp
+> +	str	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+> +.endm
+> +
+>  /*
+>   * KVM extable for unexpected exceptions.
+>   * In the same format _asm_extable, but output to a different section so that
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 38cca690a6ff..4787fc82790c 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -86,6 +86,8 @@ alternative_else_nop_endif
+>  	ret
+>  
+>  1:
+> +	set_loaded_vcpu x0, x1, x2
+> +
+>  	add	x29, x0, #VCPU_CONTEXT
+>  
+>  	// Macro ptrauth_switch_to_guest format:
+> @@ -116,6 +118,26 @@ alternative_else_nop_endif
+>  	eret
+>  	sb
+>  
+> +SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
+> +	// x2-x29,lr: vcpu regs
+> +	// vcpu x0-x1 on the stack
+> +
+> +	// If the hyp context is loaded, go straight to hyp_panic
+> +	get_loaded_vcpu x0, x1
+> +	cbz	x0, hyp_panic
+> +
+> +	// The hyp context is saved so make sure it is restored to allow
+> +	// hyp_panic to run at hyp and, subsequently, panic to run in the host.
+> +	// This makes use of __guest_exit to avoid duplication but sets the
+> +	// return address to tail call into hyp_panic. As a side effect, the
+> +	// current state is saved to the guest context but it will only be
+> +	// accurate if the guest had been completely restored.
+> +	hyp_adr_this_cpu x0, kvm_hyp_ctxt, x1
+> +	adr	x1, hyp_panic
+> +	str	x1, [x0, #CPU_XREG_OFFSET(30)]
+> +
+> +	get_vcpu_ptr	x1, x0
+> +
+>  SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+>  	// x0: return code
+>  	// x1: vcpu
+> @@ -163,6 +185,8 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+>  	// Now restore the hyp regs
+>  	restore_callee_saved_regs x2
+>  
+> +	set_loaded_vcpu xzr, x1, x2
+> +
+>  alternative_if ARM64_HAS_RAS_EXTN
+>  	// If we have the RAS extensions we can consume a pending error
+>  	// without an unmask-SError and isb. The ESB-instruction consumed any
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index f92489250dfc..bc9f53df46f5 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -145,7 +145,7 @@ el2_error:
+>  	eret
+>  	sb
+>  
+> -.macro invalid_vector	label, target = hyp_panic
+> +.macro invalid_vector	label, target = __guest_exit_panic
+>  	.align	2
+>  SYM_CODE_START(\label)
+>  	b \target
+> @@ -186,10 +186,9 @@ check_preamble_length 661b, 662b
+>  .macro invalid_vect target
+>  	.align 7
+>  661:
+> -	b	\target
+>  	nop
+> +	stp	x0, x1, [sp, #-16]!
+>  662:
+> -	ldp	x0, x1, [sp], #16
+>  	b	\target
+>  
+>  check_preamble_length 661b, 662b
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index afe714056b97..821721b78ad9 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -509,6 +509,7 @@ static inline void __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
+>  
+>  static inline void __kvm_unexpected_el2_exception(void)
+>  {
+> +	extern char __guest_exit_panic[];
+>  	unsigned long addr, fixup;
+>  	struct exception_table_entry *entry, *end;
+>  	unsigned long elr_el2 = read_sysreg(elr_el2);
+> @@ -529,7 +530,8 @@ static inline void __kvm_unexpected_el2_exception(void)
+>  		return;
+>  	}
+>  
+> -	hyp_panic();
+> +	/* Trigger a panic after restoring the hyp context. */
+> +	write_sysreg(__guest_exit_panic, elr_el2);
+>  }
+>  
+>  #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index da21fddcef75..9ab7814e6114 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -75,6 +75,11 @@ SYM_FUNC_END(__hyp_do_panic)
+>  
+>  .macro invalid_host_vect
+>  	.align 7
+> +	/* If a guest is loaded, panic out of it. */
+> +	stp	x0, x1, [sp, #-16]!
+> +	get_loaded_vcpu x0, x1
+> +	cbnz	x0, __guest_exit_panic
+> +	add	sp, sp, #16
+>  	b	hyp_panic
+>  .endm
+
+Given that we have switched vectors when entering the guest, is this
+only to deal with the lack of an ISB when performing the VBAR_EL2
+update?
+
+Thanks,
+
+	M.
+>  
+> -- 
+> 2.28.0.618.gf4bc123cb7-goog
+> 
+> 
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
