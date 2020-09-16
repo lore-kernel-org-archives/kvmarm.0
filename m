@@ -2,79 +2,89 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF87CC433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DE3C433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ECDB8204FD
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1AC32245F
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayYOZwu0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECDB8204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="vGAU2kWR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1AC32245F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14EB44B4C4;
-	Wed, 16 Sep 2020 11:45:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 339144B4E9;
+	Wed, 16 Sep 2020 13:34:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rjtn9wnTc0rN; Wed, 16 Sep 2020 11:45:38 -0400 (EDT)
+	with ESMTP id cMvodcdXmGWK; Wed, 16 Sep 2020 13:34:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8FE54B331;
-	Wed, 16 Sep 2020 11:45:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D694B449;
+	Wed, 16 Sep 2020 13:34:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C9C4B4C8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 11:45:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 665794B3AC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x+Aigaz3oHV3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 11:45:36 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71E7D4B4BC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 11:45:36 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600271136;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=v0Rllmkg6HO+EgoA8KDDJB8xLQsK0SSrwqJJXtiPqOE=;
- b=ayYOZwu0O5TICquBohLuy3B71awiICJw9a+BEc0mnFlQXPTUCFr8MSpVE1XuAG8TLOs4Qt
- 9pJ6H0jJg8CTowFlyWvXyDhOjZh3Na7PSs0np/HLJAenCbQmLtkhm1Xj7aBPQe6a54Yax1
- 0AZJFpv2fhKpeJ3kOre5QY+7xVXkb9Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-QwbzSAHNPgKvaDfgbTlZTw-1; Wed, 16 Sep 2020 11:45:34 -0400
-X-MC-Unique: QwbzSAHNPgKvaDfgbTlZTw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26D891084D75;
- Wed, 16 Sep 2020 15:45:33 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CF35B4D;
- Wed, 16 Sep 2020 15:45:31 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
+ with ESMTP id 4Q-bvg-r2J6m for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 13:34:47 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2075A4B3AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:47 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id a17so7773639wrn.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 10:34:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=7mFDfLRc/4coa4w4PmVZiF39D3EbfTO0poh1JSaf3tg=;
+ b=vGAU2kWRhekFoBDT7sUBYbd7AQ/0NP8rSF7wCZ5cc1mqJHfnkU2LjdxpqgvLSzC8C6
+ HgK02bdPHtLbqtZn4q0RnS1+zmNXG6b9m/TES+lyBYb2TqNi/8kRzN7/jf0y7NjX7EpS
+ pt6qAOuPo6oyK//jwyuGbT6kcxGnovcDDEppAUOdKxofvqiqaZmpGbz73Jb0jc5ytCne
+ Elp8PtK3xec2AV24MDV0HI1V2eP53YwAN77CLySTA5Lm1UefJnEEepbtf3Ad6NktHs8V
+ rKpZjaC58ODG5D60rOWatOiXUAirqTD58E++PKgCBvPwbwpXA3sRP3PQRGW3dcAiasL/
+ Fqgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=7mFDfLRc/4coa4w4PmVZiF39D3EbfTO0poh1JSaf3tg=;
+ b=lhUTn1O/lGCbUjqutAj0T8plZAndMFAQ5xTLI2UdG7c2FMwzpDjviIuc0izwm8u9dk
+ XG/RQttulZRPxKNAYDh+NYjKjZQzDSbc9p2zMUrOrWDXn4uDINXct8er++/V6C8n+ev5
+ U99wlLyJdwdN3XMZNCMnGJCN4LCDHRB1E8tdKz4HJ+CWxbLaQ39vGHS20PaPFGgZiq/Y
+ UDDwDLLnBuHPdiWpjmukCEzeZxELIO68b6DbEpZeub0q5su7hmedvrRaHOSioUgtWFyA
+ L3efXuGzyoDQSu6My0TIzswU9KJpYb/GcIo2xLKjUdvmXH4wluqT4/cvf8Q2dkrRyynm
+ KEww==
+X-Gm-Message-State: AOAM532H15Zbd2flioO7rvIBnRvnSWVuE1CAfKdtDaBlDWDPovLhZN2c
+ K4otKRwmL6X/jlw80+PTqmZ1b/1fVmvQ7hD7
+X-Google-Smtp-Source: ABdhPJzmjFCynjgBuUkJ+b5Puz0KOw8KtSCoG1vuE4eR8lKjcBVC8JI8uRWOwLM4nzTsOVZRlwYx+A==
+X-Received: by 2002:adf:d845:: with SMTP id k5mr26012928wrl.285.1600277685420; 
+ Wed, 16 Sep 2020 10:34:45 -0700 (PDT)
+Received: from localhost ([2a01:4b00:8523:2d03:e49d:f6be:d31b:ad3c])
+ by smtp.gmail.com with ESMTPSA id a5sm246603wrp.37.2020.09.16.10.34.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Sep 2020 10:34:44 -0700 (PDT)
+From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] arm64: paravirt: Initialize steal time when cpu is online
-Date: Wed, 16 Sep 2020 17:45:30 +0200
-Message-Id: <20200916154530.40809-1-drjones@redhat.com>
+Subject: [PATCH v3 00/10] Independent per-CPU data section for nVHE
+Date: Wed, 16 Sep 2020 18:34:28 +0100
+Message-Id: <20200916173439.32265-1-dbrazdil@google.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Cc: maz@kernel.org, steven.price@arm.com
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,123 +101,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Steal time initialization requires mapping a memory region which
-invokes a memory allocation. Doing this at CPU starting time results
-in the following trace when CONFIG_DEBUG_ATOMIC_SLEEP is enabled:
+Introduce '.hyp.data..percpu' as part of ongoing effort to make nVHE
+hyp code self-contained and independent of the rest of the kernel.
 
-BUG: sleeping function called from invalid context at mm/slab.h:498
-in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 0, name: swapper/1
-CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.9.0-rc5+ #1
-Call trace:
- dump_backtrace+0x0/0x208
- show_stack+0x1c/0x28
- dump_stack+0xc4/0x11c
- ___might_sleep+0xf8/0x130
- __might_sleep+0x58/0x90
- slab_pre_alloc_hook.constprop.101+0xd0/0x118
- kmem_cache_alloc_node_trace+0x84/0x270
- __get_vm_area_node+0x88/0x210
- get_vm_area_caller+0x38/0x40
- __ioremap_caller+0x70/0xf8
- ioremap_cache+0x78/0xb0
- memremap+0x9c/0x1a8
- init_stolen_time_cpu+0x54/0xf0
- cpuhp_invoke_callback+0xa8/0x720
- notify_cpu_starting+0xc8/0xd8
- secondary_start_kernel+0x114/0x180
-CPU1: Booted secondary processor 0x0000000001 [0x431f0a11]
+Main benefits:
+ * independent nVHE per-CPU data section that can be unmapped from host,
+ * more robust linking of nVHE hyp code,
+ * no need for hyp-specific macros to access per-CPU variables.
 
-However we don't need to initialize steal time at CPU starting time.
-We can simply wait until CPU online time, just sacrificing a bit of
-accuracy by returning zero for steal time until we know better.
+The series is structured as follows:
 
-While at it, add __init to the functions that are only called by
-pv_time_init() which is __init.
+ - patch 1: Improve existing hyp build rules. This could be sent and merged
+    independently of per-CPU but this series builds on it.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/kernel/paravirt.c | 26 +++++++++++++++-----------
- include/linux/cpuhotplug.h   |  1 -
- 2 files changed, 15 insertions(+), 12 deletions(-)
+ - patches 2-3: Minor cleanups.
 
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index 295d66490584..c07d7a034941 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -50,16 +50,19 @@ static u64 pv_steal_clock(int cpu)
- 	struct pv_time_stolen_time_region *reg;
- 
- 	reg = per_cpu_ptr(&stolen_time_region, cpu);
--	if (!reg->kaddr) {
--		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
--			     cpu);
-+
-+	/*
-+	 * paravirt_steal_clock() may be called before the CPU
-+	 * online notification callback runs. Until the callback
-+	 * has run we just return zero.
-+	 */
-+	if (!reg->kaddr)
- 		return 0;
--	}
- 
- 	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
- }
- 
--static int stolen_time_dying_cpu(unsigned int cpu)
-+static int stolen_time_cpu_down_prepare(unsigned int cpu)
- {
- 	struct pv_time_stolen_time_region *reg;
- 
-@@ -73,7 +76,7 @@ static int stolen_time_dying_cpu(unsigned int cpu)
- 	return 0;
- }
- 
--static int init_stolen_time_cpu(unsigned int cpu)
-+static int stolen_time_cpu_online(unsigned int cpu)
- {
- 	struct pv_time_stolen_time_region *reg;
- 	struct arm_smccc_res res;
-@@ -103,19 +106,20 @@ static int init_stolen_time_cpu(unsigned int cpu)
- 	return 0;
- }
- 
--static int pv_time_init_stolen_time(void)
-+static int __init pv_time_init_stolen_time(void)
- {
- 	int ret;
- 
--	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
--				"hypervisor/arm/pvtime:starting",
--				init_stolen_time_cpu, stolen_time_dying_cpu);
-+	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
-+				"hypervisor/arm/pvtime:online",
-+				stolen_time_cpu_online,
-+				stolen_time_cpu_down_prepare);
- 	if (ret < 0)
- 		return ret;
- 	return 0;
- }
- 
--static bool has_pv_steal_clock(void)
-+static bool __init has_pv_steal_clock(void)
- {
- 	struct arm_smccc_res res;
- 
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 3215023d4852..bf9181cef444 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -142,7 +142,6 @@ enum cpuhp_state {
- 	/* Must be the last timer callback */
- 	CPUHP_AP_DUMMY_TIMER_STARTING,
- 	CPUHP_AP_ARM_XEN_STARTING,
--	CPUHP_AP_ARM_KVMPV_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
- 	CPUHP_AP_ARM64_ISNDEP_STARTING,
+ - patches 4-5: Replace hyp helpers for accessing per-CPU variables
+     with common helpers modified to work correctly in hyp. Per-CPU
+     variables can now be accessed with one API anywhere.
+
+ - patches 6-8: Where VHE and nVHE use per-CPU variables defined in
+     kernel proper, move their definitions to hyp/ where they are
+     duplicated and owned by VHE/nVHE, respectively. Non-VHE hyp code
+     now refers only to per-CPU variables defined in its source files.
+     Helpers are added so that kernel proper can continue to access
+     nVHE hyp variables, same way as it does with other nVHE symbols.
+
+ - patches 9-11: Introduce '.hyp.data..percpu' ELF section and allocate
+     memory for every CPU core during KVM init. All nVHE per-CPU state
+     is now grouped together in ELF and in memory. Introducing a new
+     per-CPU variable does not require adding new memory mappings any
+     more. nVHE hyp code cannot accidentally refer to kernel-proper
+     per-CPU data as it only has the pointer to its own per-CPU memory.
+
+Patches are rebased on v5.9-rc5 and available in branch 'topic/percpu-v3' at:
+    https://android-kvm.googlesource.com/linux
+
+For maintainers: In case of interest, there are patches that remove the need
+for redefining macros under DEBUG_PREEMPT available at the same repo, branch
+'topic/percpu-v3-debug-preempt'. Since they are non-trivial, I am not going
+to post them here so late in the 5.10 window. I plan to post them for 5.11
+when they will also be useful for other patches.
+
+Changes v2 -> v3:
+ * Use PERCPU_INPUT in hyp.ld instead of modifying PERCPU_SECTION
+ * Only pass linker script once to LD (fix error message)
+ * Renamed '.hyp.o' to '.nvhe.o'
+ * Use __KVM_VHE_HYPERVISOR__ to select TPIDR_EL2 instead of alternatives
+ * Move all prefixing-related macros to hyp_image.h
+
+Changes v1 -> v2:
+ * partially link hyp code, add linker script
+
+David Brazdil (11):
+  kvm: arm64: Partially link nVHE hyp code, simplify HYPCOPY
+  kvm: arm64: Move nVHE hyp namespace macros to hyp_image.h
+  kvm: arm64: Only define __kvm_ex_table for CONFIG_KVM
+  kvm: arm64: Remove __hyp_this_cpu_read
+  kvm: arm64: Remove hyp_adr/ldr_this_cpu
+  kvm: arm64: Add helpers for accessing nVHE hyp per-cpu vars
+  kvm: arm64: Duplicate arm64_ssbd_callback_required for nVHE hyp
+  kvm: arm64: Create separate instances of kvm_host_data for VHE/nVHE
+  kvm: arm64: Mark hyp stack pages reserved
+  kvm: arm64: Set up hyp percpu data for nVHE
+  kvm: arm64: Remove unnecessary hyp mappings
+
+ arch/arm64/include/asm/assembler.h        |  27 ++++--
+ arch/arm64/include/asm/hyp_image.h        |  36 +++++++
+ arch/arm64/include/asm/kvm_asm.h          |  82 ++++++++--------
+ arch/arm64/include/asm/kvm_host.h         |   2 +-
+ arch/arm64/include/asm/kvm_mmu.h          |  19 ++--
+ arch/arm64/include/asm/percpu.h           |  33 ++++++-
+ arch/arm64/include/asm/sections.h         |   1 +
+ arch/arm64/kernel/image-vars.h            |   4 -
+ arch/arm64/kernel/vmlinux.lds.S           |  13 +++
+ arch/arm64/kvm/arm.c                      | 109 +++++++++++++++++++---
+ arch/arm64/kvm/hyp/hyp-entry.S            |   2 +-
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h   |   8 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile          |  60 ++++++------
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S         |  19 ++++
+ arch/arm64/kvm/hyp/nvhe/switch.c          |   8 +-
+ arch/arm64/kvm/hyp/vhe/switch.c           |   5 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |   4 +-
+ arch/arm64/kvm/pmu.c                      |  13 ++-
+ 19 files changed, 320 insertions(+), 129 deletions(-)
+ create mode 100644 arch/arm64/include/asm/hyp_image.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+
 -- 
-2.27.0
+2.28.0.618.gf4bc123cb7-goog
 
 _______________________________________________
 kvmarm mailing list
