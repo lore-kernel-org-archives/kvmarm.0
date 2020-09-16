@@ -2,111 +2,79 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4EDC433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF87CC433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:45:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D35DE22450
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECDB8204FD
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 15:45:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PUU8fv2n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D35DE22450
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayYOZwu0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECDB8204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B8E4B41C;
-	Wed, 16 Sep 2020 11:12:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14EB44B4C4;
+	Wed, 16 Sep 2020 11:45:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6QYLmbiU1Tbe; Wed, 16 Sep 2020 11:11:58 -0400 (EDT)
+	with ESMTP id rjtn9wnTc0rN; Wed, 16 Sep 2020 11:45:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0BB94B31D;
-	Wed, 16 Sep 2020 11:11:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8FE54B331;
+	Wed, 16 Sep 2020 11:45:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AEDE4B46B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:40:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C9C4B4C8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 11:45:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 75DKXt23Wlhq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 09:40:38 -0400 (EDT)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB6204B46C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:40:37 -0400 (EDT)
-Received: by mail-wm1-f65.google.com with SMTP id e11so2276100wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 06:40:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=uEjVdCuhEoV9lb5ls6kMmq0ECr43Rh1pbVRxVP/xc0E=;
- b=PUU8fv2nYs0tjxbo5vnP2us18PfVb1Xunkump0q2oq1WUGUGx/Lcgus2dW8plEctBu
- Qs795uckGKFqlBwaeJHxNgTa+zHUOIdMlaH3B20/ByLXLBl1QewIY26uQl3s6wxgl40X
- y7Sl4VoAKpf9y+O370S6csA9+tABN6AXQ9HcHeTZqbP97j+ZCcAFKfcYEXVp30f3T7oT
- AKvU83SX8xyIW8vmTdkzt38dQ3ZZvj9WB+i6K2xhG2tMsoEdmckLp5IrXXlCBCOLWG47
- PpIwBYRZreCvfOOlJ031bSRstEvlHX/qqXpdEFTM3AnwGbd4Y0lA6o8uLVziWP/yTVL3
- MYZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=uEjVdCuhEoV9lb5ls6kMmq0ECr43Rh1pbVRxVP/xc0E=;
- b=GXrMs1+1Z/rqKdVFDM5BQhRzGUBQJYQRQV27zLGOvDN/2uyBLy7msDPmOx2vXiSbDI
- 0kguw/WV6iFLJgZho7yz8ZkeeXflhX1l1FlJb2gCfzxg9FdchVShcVDE816fivpL0iRm
- BDQY1Nlhx1eVk70jCN0BUfmG8AEyKT8GnyxyN72rOKjPY/n6MgVW+IXw0naU2Bzjuzrt
- 0w4vW/Z9zbXEAYe9Fa42D8cv7z8WIOYki0wv5LKtXdW9OvtzYBgc/t1JoPKXJpeOzjYz
- RR7n9EBKHJEi9oj7nmPTPdfwGhNzG+DLal/v5dAoDejeUoCs141C1x1IjwBPy5urmS4M
- LV+Q==
-X-Gm-Message-State: AOAM530FPzDUtdMbkYG2NAD5j0Ic2ooFiiFb/2MT61QfPU2EDte2poue
- lR6VVgtvUghPdjmuXMfe42MG2g==
-X-Google-Smtp-Source: ABdhPJwkYqBdHOlcj/6E3C/Hg3AY0p7Pq+MV0hPCUD7Q9dFfXQXlMg4ViJJ/8esSCNDeaapoa/urtw==
-X-Received: by 2002:a1c:7714:: with SMTP id t20mr5048312wmi.55.1600263636710; 
- Wed, 16 Sep 2020 06:40:36 -0700 (PDT)
-Received: from elver.google.com ([100.105.32.75])
- by smtp.gmail.com with ESMTPSA id o16sm31108612wrp.52.2020.09.16.06.40.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Sep 2020 06:40:35 -0700 (PDT)
-Date: Wed, 16 Sep 2020 15:40:29 +0200
-From: Marco Elver <elver@google.com>
-To: George Popescu <georgepope@google.com>
-Subject: Re: [PATCH 06/14] Fix CFLAGS for UBSAN_BOUNDS on Clang
-Message-ID: <20200916134029.GA1146904@elver.google.com>
-References: <20200914172750.852684-1-georgepope@google.com>
- <20200914172750.852684-7-georgepope@google.com>
- <202009141509.CDDC8C8@keescook>
- <20200915102458.GA1650630@google.com>
- <CANpmjNOTcS_vvZ1swh1iHYaRbTvGKnPAe4Q2DpR1MGhk_oZDeA@mail.gmail.com>
- <20200915120105.GA2294884@google.com>
- <CANpmjNPpq7LfTHYesz2wTVw6Pqv0FQ2gc-vmSB6Mdov+XWPZiw@mail.gmail.com>
- <20200916074027.GA2946587@google.com>
- <CANpmjNMT9-a8qKZSvGWBPAb9x9y1DkrZMSvHGq++_TcEv=7AuA@mail.gmail.com>
- <20200916121401.GA3362356@google.com>
+ with ESMTP id x+Aigaz3oHV3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 11:45:36 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71E7D4B4BC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 11:45:36 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600271136;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=v0Rllmkg6HO+EgoA8KDDJB8xLQsK0SSrwqJJXtiPqOE=;
+ b=ayYOZwu0O5TICquBohLuy3B71awiICJw9a+BEc0mnFlQXPTUCFr8MSpVE1XuAG8TLOs4Qt
+ 9pJ6H0jJg8CTowFlyWvXyDhOjZh3Na7PSs0np/HLJAenCbQmLtkhm1Xj7aBPQe6a54Yax1
+ 0AZJFpv2fhKpeJ3kOre5QY+7xVXkb9Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-QwbzSAHNPgKvaDfgbTlZTw-1; Wed, 16 Sep 2020 11:45:34 -0400
+X-MC-Unique: QwbzSAHNPgKvaDfgbTlZTw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26D891084D75;
+ Wed, 16 Sep 2020 15:45:33 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF35B4D;
+ Wed, 16 Sep 2020 15:45:31 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] arm64: paravirt: Initialize steal time when cpu is online
+Date: Wed, 16 Sep 2020 17:45:30 +0200
+Message-Id: <20200916154530.40809-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200916121401.GA3362356@google.com>
-User-Agent: Mutt/1.14.4 (2020-06-18)
-X-Mailman-Approved-At: Wed, 16 Sep 2020 11:11:57 -0400
-Cc: Thomas Gleixner <tglx@linutronix.de>,
- Catalin Marinas <catalin.marinas@arm.com>, glider@google.com,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Fangrui Song <maskray@google.com>, maz@kernel.org,
- Masahiro Yamada <masahiroy@kernel.org>, kasan-dev@googlegroups.com,
- clang-built-linux <clang-built-linux@googlegroups.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
- Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
- andreyknvl@google.com, broonie@kernel.org,
- Nathan Chancellor <natechancellor@gmail.com>,
- Dmitry Vyukov <dvyukov@google.com>, Michal Marek <michal.lkml@markovi.net>,
- Nick Desaulniers <ndesaulniers@google.com>,
- LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Cc: maz@kernel.org, steven.price@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -123,61 +91,124 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 16, 2020 at 12:14PM +0000, George Popescu wrote:
-> On Wed, Sep 16, 2020 at 10:32:40AM +0200, Marco Elver wrote:
-> > On Wed, 16 Sep 2020 at 09:40, George Popescu <georgepope@google.com> wrote:
-> > > On Tue, Sep 15, 2020 at 07:32:28PM +0200, Marco Elver wrote:
-> > > > On Tue, 15 Sep 2020 at 14:01, George Popescu <georgepope@google.com> wrote:
-> > > > > On Tue, Sep 15, 2020 at 01:18:11PM +0200, Marco Elver wrote:
-> > > > > > On Tue, 15 Sep 2020 at 12:25, George Popescu <georgepope@google.com> wrote:
-> > > > > > > On Mon, Sep 14, 2020 at 03:13:14PM -0700, Kees Cook wrote:
-> > > > > > > > On Mon, Sep 14, 2020 at 05:27:42PM +0000, George-Aurelian Popescu wrote:
-> > > > > > > > > From: George Popescu <georgepope@google.com>
-> > > > > > > > >
-> > > > > > > > > When the kernel is compiled with Clang, UBSAN_BOUNDS inserts a brk after
-> > > > > > > > > the handler call, preventing it from printing any information processed
-> > > > > > > > > inside the buffer.
-> > > > > > > > > For Clang -fsanitize=bounds expands to -fsanitize=array-bounds and
-> > > > > > > > > -fsanitize=local-bounds, and the latter adds a brk after the handler
-> > > > > > > > > call
-> > > > > > > >
-> > > > > > > This would mean losing the local-bounds coverage. I tried to  test it without
-> > > > > > > local-bounds and with a locally defined array on the stack and it works fine
-> > > > > > > (the handler is called and the error reported). For me it feels like
-> > > > > > > --array-bounds and --local-bounds are triggered for the same type of
-> > > > > > > undefined_behaviours but they are handling them different.
-> > > > > >
-> > > > > > Does -fno-sanitize-trap=bounds help?
-[...]
-> > Your full config would be good, because it includes compiler version etc.
-> My full config is:
+Steal time initialization requires mapping a memory region which
+invokes a memory allocation. Doing this at CPU starting time results
+in the following trace when CONFIG_DEBUG_ATOMIC_SLEEP is enabled:
 
-Thanks. Yes, I can reproduce, and the longer I keep digging I start
-wondering why we have local-bounds at all.
+BUG: sleeping function called from invalid context at mm/slab.h:498
+in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 0, name: swapper/1
+CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.9.0-rc5+ #1
+Call trace:
+ dump_backtrace+0x0/0x208
+ show_stack+0x1c/0x28
+ dump_stack+0xc4/0x11c
+ ___might_sleep+0xf8/0x130
+ __might_sleep+0x58/0x90
+ slab_pre_alloc_hook.constprop.101+0xd0/0x118
+ kmem_cache_alloc_node_trace+0x84/0x270
+ __get_vm_area_node+0x88/0x210
+ get_vm_area_caller+0x38/0x40
+ __ioremap_caller+0x70/0xf8
+ ioremap_cache+0x78/0xb0
+ memremap+0x9c/0x1a8
+ init_stolen_time_cpu+0x54/0xf0
+ cpuhp_invoke_callback+0xa8/0x720
+ notify_cpu_starting+0xc8/0xd8
+ secondary_start_kernel+0x114/0x180
+CPU1: Booted secondary processor 0x0000000001 [0x431f0a11]
 
-It appears that local-bounds finds a tiny subset of the issues that
-KASAN finds:
+However we don't need to initialize steal time at CPU starting time.
+We can simply wait until CPU online time, just sacrificing a bit of
+accuracy by returning zero for steal time until we know better.
 
-	http://lists.llvm.org/pipermail/cfe-commits/Week-of-Mon-20131021/091536.html
-	http://llvm.org/viewvc/llvm-project?view=revision&revision=193205
+While at it, add __init to the functions that are only called by
+pv_time_init() which is __init.
 
-fsanitize=undefined also does not include local-bounds:
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arch/arm64/kernel/paravirt.c | 26 +++++++++++++++-----------
+ include/linux/cpuhotplug.h   |  1 -
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-	https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#available-checks
+diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
+index 295d66490584..c07d7a034941 100644
+--- a/arch/arm64/kernel/paravirt.c
++++ b/arch/arm64/kernel/paravirt.c
+@@ -50,16 +50,19 @@ static u64 pv_steal_clock(int cpu)
+ 	struct pv_time_stolen_time_region *reg;
+ 
+ 	reg = per_cpu_ptr(&stolen_time_region, cpu);
+-	if (!reg->kaddr) {
+-		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
+-			     cpu);
++
++	/*
++	 * paravirt_steal_clock() may be called before the CPU
++	 * online notification callback runs. Until the callback
++	 * has run we just return zero.
++	 */
++	if (!reg->kaddr)
+ 		return 0;
+-	}
+ 
+ 	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
+ }
+ 
+-static int stolen_time_dying_cpu(unsigned int cpu)
++static int stolen_time_cpu_down_prepare(unsigned int cpu)
+ {
+ 	struct pv_time_stolen_time_region *reg;
+ 
+@@ -73,7 +76,7 @@ static int stolen_time_dying_cpu(unsigned int cpu)
+ 	return 0;
+ }
+ 
+-static int init_stolen_time_cpu(unsigned int cpu)
++static int stolen_time_cpu_online(unsigned int cpu)
+ {
+ 	struct pv_time_stolen_time_region *reg;
+ 	struct arm_smccc_res res;
+@@ -103,19 +106,20 @@ static int init_stolen_time_cpu(unsigned int cpu)
+ 	return 0;
+ }
+ 
+-static int pv_time_init_stolen_time(void)
++static int __init pv_time_init_stolen_time(void)
+ {
+ 	int ret;
+ 
+-	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
+-				"hypervisor/arm/pvtime:starting",
+-				init_stolen_time_cpu, stolen_time_dying_cpu);
++	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
++				"hypervisor/arm/pvtime:online",
++				stolen_time_cpu_online,
++				stolen_time_cpu_down_prepare);
+ 	if (ret < 0)
+ 		return ret;
+ 	return 0;
+ }
+ 
+-static bool has_pv_steal_clock(void)
++static bool __init has_pv_steal_clock(void)
+ {
+ 	struct arm_smccc_res res;
+ 
+diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+index 3215023d4852..bf9181cef444 100644
+--- a/include/linux/cpuhotplug.h
++++ b/include/linux/cpuhotplug.h
+@@ -142,7 +142,6 @@ enum cpuhp_state {
+ 	/* Must be the last timer callback */
+ 	CPUHP_AP_DUMMY_TIMER_STARTING,
+ 	CPUHP_AP_ARM_XEN_STARTING,
+-	CPUHP_AP_ARM_KVMPV_STARTING,
+ 	CPUHP_AP_ARM_CORESIGHT_STARTING,
+ 	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
+ 	CPUHP_AP_ARM64_ISNDEP_STARTING,
+-- 
+2.27.0
 
-And the reason is that we do want to enable KASAN and UBSAN together;
-but local-bounds is useless overhead if we already have KASAN.
-
-I'm inclined to say that what you propose is reasonable (but the commit
-message needs to be more detailed explaining the relationship with
-KASAN) -- but I have no idea if this is going to break somebody's
-usecase (e.g. find some OOB bugs, but without KASAN -- but then why not
-use KASAN?!)
-
-I'll ask some more people on LLVM side.
-
-Thanks,
--- Marco
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
