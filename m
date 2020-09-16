@@ -2,83 +2,86 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DE3C433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D988C2BB84
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E1AC32245F
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BF9222464
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="vGAU2kWR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1AC32245F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PCdTbfdD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF9222464
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 339144B4E9;
-	Wed, 16 Sep 2020 13:34:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1A0F4B4D2;
+	Wed, 16 Sep 2020 13:34:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cMvodcdXmGWK; Wed, 16 Sep 2020 13:34:50 -0400 (EDT)
+	with ESMTP id HgFbHtJvCPnD; Wed, 16 Sep 2020 13:34:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D694B449;
-	Wed, 16 Sep 2020 13:34:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 236974B4E1;
+	Wed, 16 Sep 2020 13:34:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 665794B3AC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3BE4B4A1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Q-bvg-r2J6m for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 13:34:47 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2075A4B3AA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:47 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id a17so7773639wrn.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 10:34:47 -0700 (PDT)
+ with ESMTP id NJW4rkGo5CbI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 13:34:49 -0400 (EDT)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
+ [209.85.128.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2A7C4B3AC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:34:48 -0400 (EDT)
+Received: by mail-wm1-f52.google.com with SMTP id e17so3581463wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 10:34:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7mFDfLRc/4coa4w4PmVZiF39D3EbfTO0poh1JSaf3tg=;
- b=vGAU2kWRhekFoBDT7sUBYbd7AQ/0NP8rSF7wCZ5cc1mqJHfnkU2LjdxpqgvLSzC8C6
- HgK02bdPHtLbqtZn4q0RnS1+zmNXG6b9m/TES+lyBYb2TqNi/8kRzN7/jf0y7NjX7EpS
- pt6qAOuPo6oyK//jwyuGbT6kcxGnovcDDEppAUOdKxofvqiqaZmpGbz73Jb0jc5ytCne
- Elp8PtK3xec2AV24MDV0HI1V2eP53YwAN77CLySTA5Lm1UefJnEEepbtf3Ad6NktHs8V
- rKpZjaC58ODG5D60rOWatOiXUAirqTD58E++PKgCBvPwbwpXA3sRP3PQRGW3dcAiasL/
- Fqgg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=jeccRoVH2xzd2nQpZdaO6Z+WgudupLqXpR0BDecSqSQ=;
+ b=PCdTbfdDQ/ZI/CI69hr6atdnbbkN1TozI1DD1MkQa16lxMvmQu52uc4k3a9neBl9jh
+ 5nkow1vbp1XzL5hRIFTrHl6gtF7ejYHqYb18RwIHoF+hKN80s197Hu7VywjYXmXbWLMm
+ /sEe6JF5T3Dc2XtbHW64AotI8hwXowHxuZtLJEDTMIRTN655L8AvZxnFuqRqdTDLtafc
+ WhT2AQQp3DBQsic9bNzoZoM9ENaP+DbSEFYaiU5B86/vfNdHhEBSjSR/SXAM4YAgT8+Y
+ ty/yTr3FK4YDXEHSCVra6JmPkydeZ1zmORW7VxGB46T4DW4tnL8OTufsJ0HvX2kPuX4J
+ uTxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7mFDfLRc/4coa4w4PmVZiF39D3EbfTO0poh1JSaf3tg=;
- b=lhUTn1O/lGCbUjqutAj0T8plZAndMFAQ5xTLI2UdG7c2FMwzpDjviIuc0izwm8u9dk
- XG/RQttulZRPxKNAYDh+NYjKjZQzDSbc9p2zMUrOrWDXn4uDINXct8er++/V6C8n+ev5
- U99wlLyJdwdN3XMZNCMnGJCN4LCDHRB1E8tdKz4HJ+CWxbLaQ39vGHS20PaPFGgZiq/Y
- UDDwDLLnBuHPdiWpjmukCEzeZxELIO68b6DbEpZeub0q5su7hmedvrRaHOSioUgtWFyA
- L3efXuGzyoDQSu6My0TIzswU9KJpYb/GcIo2xLKjUdvmXH4wluqT4/cvf8Q2dkrRyynm
- KEww==
-X-Gm-Message-State: AOAM532H15Zbd2flioO7rvIBnRvnSWVuE1CAfKdtDaBlDWDPovLhZN2c
- K4otKRwmL6X/jlw80+PTqmZ1b/1fVmvQ7hD7
-X-Google-Smtp-Source: ABdhPJzmjFCynjgBuUkJ+b5Puz0KOw8KtSCoG1vuE4eR8lKjcBVC8JI8uRWOwLM4nzTsOVZRlwYx+A==
-X-Received: by 2002:adf:d845:: with SMTP id k5mr26012928wrl.285.1600277685420; 
- Wed, 16 Sep 2020 10:34:45 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=jeccRoVH2xzd2nQpZdaO6Z+WgudupLqXpR0BDecSqSQ=;
+ b=KFKQc+6m0zM9dUhhhaSNuSqIMk/tW51bIkBOyoGqVBS6ho39Q7mON+/tyaZu8TgPZq
+ nkM1ZeYo8IKVSnOni0USE1L3CmBp71DttLGEYcdXmc6yUv1h/6Ue44MVfrpqU/ODoet7
+ dgFrlpxWUzVDknA2RkKI3JTjBh9cvuKQZwvf2BqgVKEOOpoOHVJ3+bJnw3mUJQeSo3E7
+ Uo5x2qosQibELWmkdJnIIGMO1bLVri0im4fLu1yvn1+R7c363E0bklnEZiEBa4wo3hiS
+ Ltki02J0scb67LMBgr3AftxtjoIGIoUT/gpgv1sqoqHB69tTN6f8ac5eAsYV1KYHk5g7
+ qE9w==
+X-Gm-Message-State: AOAM532RKR57KEx9aec4oyFRloZYBTeNjIeKp9U9kMPud8RVwSn0JmEK
+ 7JbyGjTWPaUGf/89xRfChbnb7mTG3e8deIuS
+X-Google-Smtp-Source: ABdhPJxtYWNdopesl9Q0NNtQrGFhJvZo052EApCUbh7x2DWg3tiDSUR1Z+UKPrMRUBzu4fiWi1PJnw==
+X-Received: by 2002:a1c:e90b:: with SMTP id q11mr5819113wmc.39.1600277687253; 
+ Wed, 16 Sep 2020 10:34:47 -0700 (PDT)
 Received: from localhost ([2a01:4b00:8523:2d03:e49d:f6be:d31b:ad3c])
- by smtp.gmail.com with ESMTPSA id a5sm246603wrp.37.2020.09.16.10.34.44
+ by smtp.gmail.com with ESMTPSA id z83sm6911988wmb.4.2020.09.16.10.34.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Sep 2020 10:34:44 -0700 (PDT)
+ Wed, 16 Sep 2020 10:34:46 -0700 (PDT)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 00/10] Independent per-CPU data section for nVHE
-Date: Wed, 16 Sep 2020 18:34:28 +0100
-Message-Id: <20200916173439.32265-1-dbrazdil@google.com>
+Subject: [PATCH v3 01/11] kvm: arm64: Partially link nVHE hyp code,
+ simplify HYPCOPY
+Date: Wed, 16 Sep 2020 18:34:29 +0100
+Message-Id: <20200916173439.32265-2-dbrazdil@google.com>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200916173439.32265-1-dbrazdil@google.com>
+References: <20200916173439.32265-1-dbrazdil@google.com>
 MIME-Version: 1.0
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -101,94 +104,160 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce '.hyp.data..percpu' as part of ongoing effort to make nVHE
-hyp code self-contained and independent of the rest of the kernel.
+Relying on objcopy to prefix the ELF section names of the nVHE hyp code
+is brittle and prevents us from using wildcards to match specific
+section names.
 
-Main benefits:
- * independent nVHE per-CPU data section that can be unmapped from host,
- * more robust linking of nVHE hyp code,
- * no need for hyp-specific macros to access per-CPU variables.
+Improve the build rules by partially linking all '.nvhe.o' files and
+prefixing their ELF section names using a linker script. Continue using
+objcopy for prefixing ELF symbol names.
 
-The series is structured as follows:
+One immediate advantage of this approach is that all subsections
+matching a pattern can be merged into a single prefixed section, eg.
+.text and .text.* can be linked into a single '.hyp.text'. This removes
+the need for -fno-reorder-functions on GCC and will be useful in the
+future too: LTO builds use .text subsections, compilers routinely
+generate .rodata subsections, etc.
 
- - patch 1: Improve existing hyp build rules. This could be sent and merged
-    independently of per-CPU but this series builds on it.
+Partially linking all hyp code into a single object file also makes it
+easier to analyze.
 
- - patches 2-3: Minor cleanups.
-
- - patches 4-5: Replace hyp helpers for accessing per-CPU variables
-     with common helpers modified to work correctly in hyp. Per-CPU
-     variables can now be accessed with one API anywhere.
-
- - patches 6-8: Where VHE and nVHE use per-CPU variables defined in
-     kernel proper, move their definitions to hyp/ where they are
-     duplicated and owned by VHE/nVHE, respectively. Non-VHE hyp code
-     now refers only to per-CPU variables defined in its source files.
-     Helpers are added so that kernel proper can continue to access
-     nVHE hyp variables, same way as it does with other nVHE symbols.
-
- - patches 9-11: Introduce '.hyp.data..percpu' ELF section and allocate
-     memory for every CPU core during KVM init. All nVHE per-CPU state
-     is now grouped together in ELF and in memory. Introducing a new
-     per-CPU variable does not require adding new memory mappings any
-     more. nVHE hyp code cannot accidentally refer to kernel-proper
-     per-CPU data as it only has the pointer to its own per-CPU memory.
-
-Patches are rebased on v5.9-rc5 and available in branch 'topic/percpu-v3' at:
-    https://android-kvm.googlesource.com/linux
-
-For maintainers: In case of interest, there are patches that remove the need
-for redefining macros under DEBUG_PREEMPT available at the same repo, branch
-'topic/percpu-v3-debug-preempt'. Since they are non-trivial, I am not going
-to post them here so late in the 5.10 window. I plan to post them for 5.11
-when they will also be useful for other patches.
-
-Changes v2 -> v3:
- * Use PERCPU_INPUT in hyp.ld instead of modifying PERCPU_SECTION
- * Only pass linker script once to LD (fix error message)
- * Renamed '.hyp.o' to '.nvhe.o'
- * Use __KVM_VHE_HYPERVISOR__ to select TPIDR_EL2 instead of alternatives
- * Move all prefixing-related macros to hyp_image.h
-
-Changes v1 -> v2:
- * partially link hyp code, add linker script
-
-David Brazdil (11):
-  kvm: arm64: Partially link nVHE hyp code, simplify HYPCOPY
-  kvm: arm64: Move nVHE hyp namespace macros to hyp_image.h
-  kvm: arm64: Only define __kvm_ex_table for CONFIG_KVM
-  kvm: arm64: Remove __hyp_this_cpu_read
-  kvm: arm64: Remove hyp_adr/ldr_this_cpu
-  kvm: arm64: Add helpers for accessing nVHE hyp per-cpu vars
-  kvm: arm64: Duplicate arm64_ssbd_callback_required for nVHE hyp
-  kvm: arm64: Create separate instances of kvm_host_data for VHE/nVHE
-  kvm: arm64: Mark hyp stack pages reserved
-  kvm: arm64: Set up hyp percpu data for nVHE
-  kvm: arm64: Remove unnecessary hyp mappings
-
- arch/arm64/include/asm/assembler.h        |  27 ++++--
- arch/arm64/include/asm/hyp_image.h        |  36 +++++++
- arch/arm64/include/asm/kvm_asm.h          |  82 ++++++++--------
- arch/arm64/include/asm/kvm_host.h         |   2 +-
- arch/arm64/include/asm/kvm_mmu.h          |  19 ++--
- arch/arm64/include/asm/percpu.h           |  33 ++++++-
- arch/arm64/include/asm/sections.h         |   1 +
- arch/arm64/kernel/image-vars.h            |   4 -
- arch/arm64/kernel/vmlinux.lds.S           |  13 +++
- arch/arm64/kvm/arm.c                      | 109 +++++++++++++++++++---
- arch/arm64/kvm/hyp/hyp-entry.S            |   2 +-
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |   4 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h   |   8 +-
- arch/arm64/kvm/hyp/nvhe/Makefile          |  60 ++++++------
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S         |  19 ++++
- arch/arm64/kvm/hyp/nvhe/switch.c          |   8 +-
- arch/arm64/kvm/hyp/vhe/switch.c           |   5 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |   4 +-
- arch/arm64/kvm/pmu.c                      |  13 ++-
- 19 files changed, 320 insertions(+), 129 deletions(-)
+Signed-off-by: David Brazdil <dbrazdil@google.com>
+---
+ arch/arm64/include/asm/hyp_image.h | 24 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile   | 60 ++++++++++++++++--------------
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S  | 13 +++++++
+ 3 files changed, 70 insertions(+), 27 deletions(-)
  create mode 100644 arch/arm64/include/asm/hyp_image.h
  create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp.lds.S
 
+diff --git a/arch/arm64/include/asm/hyp_image.h b/arch/arm64/include/asm/hyp_image.h
+new file mode 100644
+index 000000000000..5b1e3b9ef376
+--- /dev/null
++++ b/arch/arm64/include/asm/hyp_image.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2020 Google LLC.
++ * Written by David Brazdil <dbrazdil@google.com>
++ */
++
++#ifndef __ARM64_HYP_IMAGE_H__
++#define __ARM64_HYP_IMAGE_H__
++
++#ifdef LINKER_SCRIPT
++
++/*
++ * KVM nVHE ELF section names are prefixed with .hyp, to separate them
++ * from the kernel proper.
++ */
++#define HYP_SECTION_NAME(NAME)	.hyp##NAME
++
++/* Defines an ELF hyp section from input section @NAME and its subsections. */
++#define HYP_SECTION(NAME) \
++	HYP_SECTION_NAME(NAME) : { *(NAME NAME##.[0-9a-zA-Z_]*) }
++
++#endif /* LINKER_SCRIPT */
++
++#endif /* __ARM64_HYP_IMAGE_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index aef76487edc2..2b27b60182f9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -10,40 +10,46 @@ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o
+ 
+-obj-y := $(patsubst %.o,%.hyp.o,$(obj-y))
+-extra-y := $(patsubst %.hyp.o,%.hyp.tmp.o,$(obj-y))
++##
++## Build rules for compiling nVHE hyp code
++## Output of this folder is `kvm_nvhe.o`, a partially linked object
++## file containing all nVHE hyp code and data.
++##
+ 
+-$(obj)/%.hyp.tmp.o: $(src)/%.c FORCE
++hyp-obj := $(patsubst %.o,%.nvhe.o,$(obj-y))
++obj-y := kvm_nvhe.o
++extra-y := $(hyp-obj) kvm_nvhe.tmp.o hyp.lds
++
++# 1) Compile all source files to `.nvhe.o` object files. The file extension
++#    avoids file name clashes for files shared with VHE.
++$(obj)/%.nvhe.o: $(src)/%.c FORCE
+ 	$(call if_changed_rule,cc_o_c)
+-$(obj)/%.hyp.tmp.o: $(src)/%.S FORCE
++$(obj)/%.nvhe.o: $(src)/%.S FORCE
+ 	$(call if_changed_rule,as_o_S)
+-$(obj)/%.hyp.o: $(obj)/%.hyp.tmp.o FORCE
+-	$(call if_changed,hypcopy)
+ 
+-# Disable reordering functions by GCC (enabled at -O2).
+-# This pass puts functions into '.text.*' sections to aid the linker
+-# in optimizing ELF layout. See HYPCOPY comment below for more info.
+-ccflags-y += $(call cc-option,-fno-reorder-functions)
++# 2) Compile linker script.
++$(obj)/hyp.lds: $(src)/hyp.lds.S FORCE
++	$(call if_changed_dep,cpp_lds_S)
++
++# 3) Partially link all '.nvhe.o' files and apply the linker script.
++#    Prefixes names of ELF sections with '.hyp', eg. '.hyp.text'.
++#    Note: The following rule assumes that the 'ld' rule puts LDFLAGS before
++#          the list of dependencies to form '-T $(obj)/hyp.lds'. This is to
++#          keep the dependency on the target while avoiding an error from
++#          GNU ld if the linker script is passed to it twice.
++LDFLAGS_kvm_nvhe.tmp.o := -r -T
++$(obj)/kvm_nvhe.tmp.o: $(obj)/hyp.lds $(addprefix $(obj)/,$(hyp-obj)) FORCE
++	$(call if_changed,ld)
++
++# 4) Produce the final 'kvm_nvhe.o', ready to be linked into 'vmlinux'.
++#    Prefixes names of ELF symbols with '__kvm_nvhe_'.
++$(obj)/kvm_nvhe.o: $(obj)/kvm_nvhe.tmp.o FORCE
++	$(call if_changed,hypcopy)
+ 
+ # The HYPCOPY command uses `objcopy` to prefix all ELF symbol names
+-# and relevant ELF section names to avoid clashes with VHE code/data.
+-#
+-# Hyp code is assumed to be in the '.text' section of the input object
+-# files (with the exception of specialized sections such as
+-# '.hyp.idmap.text'). This assumption may be broken by a compiler that
+-# divides code into sections like '.text.unlikely' so as to optimize
+-# ELF layout. HYPCOPY checks that no such sections exist in the input
+-# using `objdump`, otherwise they would be linked together with other
+-# kernel code and not memory-mapped correctly at runtime.
++# to avoid clashes with VHE code/data.
+ quiet_cmd_hypcopy = HYPCOPY $@
+-      cmd_hypcopy =							\
+-	if $(OBJDUMP) -h $< | grep -F '.text.'; then			\
+-		echo "$@: function reordering not supported in nVHE hyp code" >&2; \
+-		/bin/false;						\
+-	fi;								\
+-	$(OBJCOPY) --prefix-symbols=__kvm_nvhe_				\
+-		   --rename-section=.text=.hyp.text			\
+-		   $< $@
++      cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+ 
+ # Remove ftrace and Shadow Call Stack CFLAGS.
+ # This is equivalent to the 'notrace' and '__noscs' annotations.
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+new file mode 100644
+index 000000000000..3b13d1c7cd1a
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2020 Google LLC.
++ * Written by David Brazdil <dbrazdil@google.com>
++ *
++ * Linker script used for partial linking of nVHE EL2 object files.
++ */
++
++#include <asm/hyp_image.h>
++
++SECTIONS {
++	HYP_SECTION(.text)
++}
 -- 
 2.28.0.618.gf4bc123cb7-goog
 
