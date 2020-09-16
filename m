@@ -2,85 +2,94 @@ Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0645C433E2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 13:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D74C433E2
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 13:35:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C570B22261
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 13:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEB5F222B8
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 13:35:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXLBnEr6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C570B22261
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OpOeI24L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB5F222B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F974B37B;
-	Wed, 16 Sep 2020 09:15:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBEE64B470;
+	Wed, 16 Sep 2020 09:35:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vVqHQZNgWtuc; Wed, 16 Sep 2020 09:15:04 -0400 (EDT)
+	with ESMTP id z-Yr+Af0l3rl; Wed, 16 Sep 2020 09:35:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADB3B4B46F;
-	Wed, 16 Sep 2020 09:15:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 043B44B478;
+	Wed, 16 Sep 2020 09:35:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18E2F4B421
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:15:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E449A4B46A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:35:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t8aUBE9lVjy9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 09:15:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A43114B37B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:15:02 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5FA702225F;
- Wed, 16 Sep 2020 13:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1600262101;
- bh=fbo6I986stQIkRNEU9yZnkOQuTnyuhBLGQoNhgcUg1Q=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=jXLBnEr6egqTDm8T2nwBMCjR74pHXRD3CqA6rBb4V+qVO7vhQfLsuIXSA4rbTidYA
- GbYTweuxY1uUofFd2hco+kJCSkqh2qA6fWlAe20K2bld/OUDsr7jujjc50KVwwqmP7
- j1WFNDMpQk/uQqr898xEHW6Gh1dTU7yvcKMQ7k04=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kIXH1-00CLpj-5K; Wed, 16 Sep 2020 14:14:59 +0100
-Date: Wed, 16 Sep 2020 14:14:58 +0100
-Message-ID: <87imcdrhgt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+ with ESMTP id CvHZ4VD+pi+Y for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 09:35:07 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB4C84B45C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 09:35:07 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id s12so6913981wrw.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 06:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Y0GHMsQrfoNkF8hoL5Nxc0+CH+Sz1FlZ4J0DpK8dO70=;
+ b=OpOeI24LEAE+oDQATH8MdVWdt4mZNQ4qh1Hc0omlnt7RwHiPRKvJrLL01717FgPnnb
+ 1t+n+B6+mnQxwsOhc5OfAHt9THe5P9ok+08CnWZwgPJLemA4xraL3S0LRRaUFrd0nuU7
+ yRKZjwxGHu2Xcb4i1Mdyqj+a2bvB9eJzXsEOa3kbquHPZTCRLg6PiXODmEUA6N/ezqtH
+ WrdIqnvo6yMjPIgfbcKtYQzcIktY+hY7v3S3aaNBZGh1xFeC7rDf3IQUoCoKX+3JD4qH
+ ShFWfgA8F0+G1Or4c6EbK0e67x7FvsJI33FROdF/TI1M6+2DETeMlQ74rxZgNY5SadWE
+ gcLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Y0GHMsQrfoNkF8hoL5Nxc0+CH+Sz1FlZ4J0DpK8dO70=;
+ b=ujKrJx/LLuu3nOiEpiZzKNUwzebn18g9oADWPmvNmRhsZ3IXkf0aItXkbfqHb1y+zq
+ PY4EH8k0DfdIUo+JDey/1Qmw76gXRHWtqqHBvHdYge353gr4EiVq4asWMiPaGrsgk95r
+ r0ybbInBmP+6ITrL7MX31pBj8HOGKK36kGtL+89Z6ndQa5iotQLGWi/WGsjkoUWFxs2W
+ CgUmNRd8h8/BaCkEttzbnaJblOhrBIyREmWju/cnS2rlPjqxJx4/qoI0bi84bgwbOyGJ
+ nkHuO0av34dr6lLCI0LtVEmBBHkOi31ECW1IG6nYsVvGSzRRCuBhep3ZmXKo5w8l9Gns
+ upXg==
+X-Gm-Message-State: AOAM532CJQwSoXAxnRFKRe4pmwaDmXt2c5BVl5CT4Oh2WN/Z98PTGiJ8
+ ENP6zmhEjJi0W3F2nP+l/ZcZnQ==
+X-Google-Smtp-Source: ABdhPJxj1njKOkMy/uGBtiswR54WhjIWwVc4v6yTTlieFUIM6NmtAP4wvPkgHYBaLSDHrvMxwMPqPg==
+X-Received: by 2002:a5d:45cc:: with SMTP id b12mr4416951wrs.395.1600263306480; 
+ Wed, 16 Sep 2020 06:35:06 -0700 (PDT)
+Received: from google.com ([2a01:4b00:8523:2d03:e49d:f6be:d31b:ad3c])
+ by smtp.gmail.com with ESMTPSA id v9sm37780715wrv.35.2020.09.16.06.35.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Sep 2020 06:35:05 -0700 (PDT)
+Date: Wed, 16 Sep 2020 14:35:04 +0100
+From: David Brazdil <dbrazdil@google.com>
 To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH v4 12/19] KVM: arm64: nVHE: Switch to hyp context for EL2
-In-Reply-To: <20200915104643.2543892-13-ascull@google.com>
-References: <20200915104643.2543892-1-ascull@google.com>
- <20200915104643.2543892-13-ascull@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ascull@google.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com,
- sudeep.holla@arm.com, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2 10/10] kvm: arm64: Remove unnecessary hyp mappings
+Message-ID: <20200916133504.7v5j7y5ccajw2a7s@google.com>
+References: <20200903091712.46456-1-dbrazdil@google.com>
+ <20200903091712.46456-11-dbrazdil@google.com>
+ <20200910140738.GE93664@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20200910140738.GE93664@google.com>
+Cc: linux-arch@vger.kernel.org, kernel-team@android.com,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,191 +106,17 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
-
-A few very minor comments below, which we can sort in a subsequent
-patch:
-
-On Tue, 15 Sep 2020 11:46:36 +0100,
-Andrew Scull <ascull@google.com> wrote:
+> > +	for_each_possible_cpu(cpu)
+> > +		*(per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu)) =
+> > +			per_cpu(arm64_ssbd_callback_required, cpu);
 > 
-> Save and restore the host context when switching to and from hyp. This
-> gives hyp its own context that the host will not see as a step towards a
-> full trust boundary between the two.
-> 
-> SP_EL0 and pointer authentication keys are currently shared between the
-> host and hyp so don't need to be switched yet.
-> 
-> Signed-off-by: Andrew Scull <ascull@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +
->  arch/arm64/kvm/hyp/nvhe/Makefile        |  2 +-
->  arch/arm64/kvm/hyp/nvhe/host.S          | 68 ++++++++++++++++++-------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 36 +++++++++++++
->  4 files changed, 89 insertions(+), 19 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 821721b78ad9..4536b50ddc06 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -372,6 +372,8 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
->  	ctxt_sys_reg(ctxt, key ## KEYHI_EL1) = __val;                   \
->  } while(0)
->  
-> +DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> +
+> Careful with breaking allocations across lines, that seems to be taboo
+> in this subsystem.
 
-Why do we need this declaration? Isn't the one from patch 8 enough? Or
-is it just a spurious addition (things seem to compile fine without it).
+Happy to put the `ptr` var back. Sorry *embarrassed emoji*.
 
->  static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_cpu_context *ctxt;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index ddf98eb07b9d..46c89e8c30bc 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -6,7 +6,7 @@
->  asflags-y := -D__KVM_NVHE_HYPERVISOR__
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
->  
-> -obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
-> +obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o hyp-main.o
->  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
->  	 ../fpsimd.o ../hyp-entry.o
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 9ab7814e6114..d26e41773dc4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -12,6 +12,55 @@
->  
->  	.text
->  
-> +SYM_FUNC_START(__host_exit)
-> +	stp	x0, x1, [sp, #-16]!
-> +
-> +	get_host_ctxt	x0, x1
-> +
-> +	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
-> +
-
-It isn't obvious to me why we mess with PAN here. nVHE doesn't have an
-EL0, and the spec says that PAN only exists at EL2 when HCR_EL2.E2H==1.
-
-> +	/* Store the host regs x2 and x3 */
-> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
-> +
-> +	/* Retrieve the host regs x0-x1 from the stack */
-> +	ldp	x2, x3, [sp], #16	// x0, x1
-> +
-> +	/* Store the host regs x0-x1 and x4-x17 */
-> +	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
-> +	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
-> +	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
-> +	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
-> +	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
-> +	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
-> +	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
-> +	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
-> +
-> +	/* Store the host regs x18-x29, lr */
-> +	save_callee_saved_regs x0
-> +
-> +	/* Save the host context pointer in x29 across the function call */
-> +	mov	x29, x0
-> +	bl	handle_trap
-> +
-> +	/* Restore host regs x0-x17 */
-> +	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
-> +	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
-> +	ldp	x4, x5,   [x29, #CPU_XREG_OFFSET(4)]
-> +	ldp	x6, x7,   [x29, #CPU_XREG_OFFSET(6)]
-> +	ldp	x8, x9,   [x29, #CPU_XREG_OFFSET(8)]
-> +	ldp	x10, x11, [x29, #CPU_XREG_OFFSET(10)]
-> +	ldp	x12, x13, [x29, #CPU_XREG_OFFSET(12)]
-> +	ldp	x14, x15, [x29, #CPU_XREG_OFFSET(14)]
-> +	ldp	x16, x17, [x29, #CPU_XREG_OFFSET(16)]
-> +
-> +	/* Restore host regs x18-x29, lr */
-> +	restore_callee_saved_regs x29
-> +
-> +	/* Do not touch any register after this! */
-> +	eret
-> +	sb
-> +SYM_FUNC_END(__host_exit)
-> +
->  SYM_FUNC_START(__hyp_do_panic)
->  	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
->  		      PSR_MODE_EL1h)
-> @@ -34,7 +83,7 @@ SYM_FUNC_END(__hyp_do_panic)
->  
->  	/* Check for a stub HVC call */
->  	cmp	x0, #HVC_STUB_HCALL_NR
-> -	b.hs	1f
-> +	b.hs	__host_exit
->  
->  	/*
->  	 * Compute the idmap address of __kvm_handle_stub_hvc and
-> @@ -50,23 +99,6 @@ SYM_FUNC_END(__hyp_do_panic)
->  	/* x5 = __pa(x5) */
->  	sub	x5, x5, x6
->  	br	x5
-> -
-> -1:
-> -	/*
-> -	 * Shuffle the parameters before calling the function
-> -	 * pointed to in x0. Assumes parameters in x[1,2,3].
-> -	 */
-> -	kern_hyp_va	x0
-> -	str	lr, [sp, #-16]!
-> -	mov	lr, x0
-> -	mov	x0, x1
-> -	mov	x1, x2
-> -	mov	x2, x3
-> -	blr	lr
-> -	ldr	lr, [sp], #16
-> -
-> -	eret
-> -	sb
->  .L__vect_end\@:
->  .if ((.L__vect_end\@ - .L__vect_start\@) > 0x80)
->  	.error "host_el1_sync_vect larger than vector entry"
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> new file mode 100644
-> index 000000000000..570c3896f42e
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -0,0 +1,36 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2020 - Google Inc
-> + * Author: Andrew Scull <ascull@google.com>
-> + */
-> +
-> +#include <hyp/switch.h>
-> +
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_host.h>
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +typedef unsigned long (*hypcall_fn_t)
-> +	(unsigned long, unsigned long, unsigned long);
-> +
-> +void handle_trap(struct kvm_cpu_context *host_ctxt)
-
-This probably needs to have the asmlinkage attribute, although I'm not
-sure we use it for anything on arm64 just yet.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks for reviewing,
+David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
