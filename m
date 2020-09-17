@@ -2,80 +2,94 @@ Return-Path: <SRS0=ijLG=C2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6837AC43461
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 08:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E4FC433E2
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 08:34:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF534221F0
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 08:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DD9420770
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 08:34:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ca/r/7Ct"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF534221F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OqIh71Za"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DD9420770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AEFB4B7FE;
-	Thu, 17 Sep 2020 04:04:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82DAA4B717;
+	Thu, 17 Sep 2020 04:34:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3zr5CJE3ml93; Thu, 17 Sep 2020 04:04:43 -0400 (EDT)
+	with ESMTP id 5YLUTat2IutU; Thu, 17 Sep 2020 04:34:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 369304B7FD;
-	Thu, 17 Sep 2020 04:04:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FE934B60B;
+	Thu, 17 Sep 2020 04:34:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A41E54B7FD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2020 04:04:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67A644B59A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2020 04:34:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JPFa8EM846Nh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Sep 2020 04:04:40 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA844B7FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2020 04:04:40 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1600329880;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=2KPrQh5EWErmHM86gwG9SLynueQ4HadaDegVq2gjLUI=;
- b=ca/r/7CthbEYc5RtY666UBnpbbyqPf2fKblk/qOdN+RtKWAlugYI8ubGdGh0NfjFDht3n7
- dlscb00uPGIstywkRmLw05Wa2tuF/viVIQd74B/ewfZ79DnOZUe/VYek4LdMRyDE7AwK9Y
- 1RyE4Stbx4rxJG+StNPWvRelgdiBDJ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-2PYnQhV6PN6MlWP3Yq4itA-1; Thu, 17 Sep 2020 04:04:36 -0400
-X-MC-Unique: 2PYnQhV6PN6MlWP3Yq4itA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C76185C733;
- Thu, 17 Sep 2020 08:04:35 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3021101416C;
- Thu, 17 Sep 2020 08:04:32 +0000 (UTC)
-Date: Thu, 17 Sep 2020 10:04:29 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
-Message-ID: <20200917080429.jimidzdtdskwhbdx@kamzik.brq.redhat.com>
-References: <20200917023033.1337-1-fangying1@huawei.com>
- <20200917023033.1337-3-fangying1@huawei.com>
- <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
+ with ESMTP id UHEEcDw9sqKN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Sep 2020 04:34:33 -0400 (EDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F4C24B574
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2020 04:34:33 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id z1so1100737wrt.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2020 01:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Pk1ggKwYhiZFij3cWsXPx/AsObXSSswRVDTN18QPE2I=;
+ b=OqIh71Za/Sfud+/Ld2OIcnclZx0GScK1SioXnMYhhN+wJMXNO+nPqZVsSowByH13lC
+ IA6VorWMqWg30MkyELqC6xs0OUIYHEpQ1N2DayLyrSn6ouvhsIfCAuKYtjiTW+wd3ouU
+ jb3YvRKbbD2HnPJAhGCH53RJMDZ6i/Jg/pj2l3dAbI5yyfqfzyqgHU8awtuhdEs/sEHb
+ J5gH3ixTa90rSdfYZcFrvEw9cFofCjgTDONXYlmxjKFrqpT2OyF+JPKkg7+0luusumjR
+ ZI8i1Pjyu6ykougSn/5jMLvYtGPzAD6CVr/1WKJDk5qo6HFoWi/zZ+Ua9z+YFBgCzakv
+ 8CUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Pk1ggKwYhiZFij3cWsXPx/AsObXSSswRVDTN18QPE2I=;
+ b=sD0ic/TNOnJgEC8/b/d7Gg7EmEAmpkrMM+frx+2jizfpFUNlm6pYJ8V3v/ZOPEWWBX
+ RGtALPiZT0H1dW0yxXDbY/Frb6+61aKr9EQ40lBx9VIJrySOm2m08hFIVi/HRA53tSfI
+ GYXMQo8LG79Fg7gClUxA7XEA3/Yp6PZk4OGGr7nnsW+J8KE/AiLG+iCOwwiQahQqKOES
+ cl9LFlqWwYpBzTwAI0CKk6yOBwkrb2kNw2MUSBS8HsuaX/iqroDZDagK0EQU0IGQ6OhW
+ rpMLPdm2673MzZe0Rou9e8oSZ5FU1z0Be92Fqo5a+0Ax/10QT17q0MWAkjo5+cV92nbq
+ ZE6A==
+X-Gm-Message-State: AOAM533Vx50T4fnf/3CSP0+N0hgglzT+Ocbyp9ZW75CaNG+kaWONHEWM
+ k+HyyZc2RUllEtxXCjku/UmWNQ==
+X-Google-Smtp-Source: ABdhPJx4CDiIDgawZUzofKbr1/03K2/UnXYclUCZ/yVoEIhOqk5tUiGj9MxMh78vMqiYe0X3zEL3rw==
+X-Received: by 2002:a5d:4645:: with SMTP id j5mr30654727wrs.230.1600331672159; 
+ Thu, 17 Sep 2020 01:34:32 -0700 (PDT)
+Received: from google.com ([2a01:4b00:8523:2d03:1155:1c40:3244:2fc2])
+ by smtp.gmail.com with ESMTPSA id s17sm39708604wrr.40.2020.09.17.01.34.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Sep 2020 01:34:31 -0700 (PDT)
+Date: Thu, 17 Sep 2020 09:34:30 +0100
+From: David Brazdil <dbrazdil@google.com>
+To: Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH v2 03/10] kvm: arm64: Remove __hyp_this_cpu_read
+Message-ID: <20200917083430.sxe4rpwp2lrdu3hq@google.com>
+References: <20200903091712.46456-1-dbrazdil@google.com>
+ <20200903091712.46456-4-dbrazdil@google.com>
+ <20200910111225.GC93664@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <7a924b0fb27505a0d8b00389fe2f02df@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: zhang.zhanghailiang@huawei.com, kvm@vger.kernel.org, alex.chen@huawei.com,
- Ying Fang <fangying1@huawei.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200910111225.GC93664@google.com>
+Cc: linux-arch@vger.kernel.org, kernel-team@android.com,
+ Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,35 +106,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 17, 2020 at 08:47:42AM +0100, Marc Zyngier wrote:
-> On 2020-09-17 03:30, Ying Fang wrote:
-> > Allow userspace to set MPIDR using vcpu ioctl KVM_ARM_SET_MP_AFFINITY,
-> > so that we can support cpu topology for arm.
+Hey Andrew,
+
+> > +#ifdef __KVM_NVHE_HYPERVISOR__
+> > +#define __my_cpu_offset __hyp_my_cpu_offset()
 > 
-> MPIDR has *nothing* to do with CPU topology in the ARM architecture.
-> I encourage you to have a look at the ARM ARM and find out how often
-> the word "topology" is used in conjunction with the MPIDR_EL1 register.
->
+> Is there a benefit to this being used for __KVM_VHE_HYPERVISOR__ too
+> since that is "hyp" too and doesn't need the alternative since it will
+> always pick EL2?
 
-Hi Marc,
+Minor time and space savings, but you're right, makes sense to treat them
+equally. Updated in v3.
 
-I mostly agree. However, the CPU topology descriptions use MPIDR to
-identify PEs. If userspace wants to build topology descriptions then
-it either needs to
+> > +/* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its dependencies. */
+> > +#if defined(__KVM_NVHE_HYPERVISOR__) && defined(CONFIG_DEBUG_PREEMPT)
+> > +#undef	this_cpu_ptr
+> > +#define	this_cpu_ptr		raw_cpu_ptr
+> > +#undef	__this_cpu_read
+> > +#define	__this_cpu_read		raw_cpu_read
+> > +#undef	__this_cpu_write
+> > +#define	__this_cpu_write	raw_cpu_write
+> > +#endif
+> 
+> This is an incomplete cherry-picked list of macros that are redefined to
+> remove the call to __this_cpu_preempt_check that would result in a
+> linker failure since that symbol is not defined for nVHE hyp.
+> 
+> I remember there being some dislike of truely defining that symbol with
+> an nVHE hyp implementation but I can't see why. Yes, nVHE hyp is always
+> has preemption disabled so the implementation is just an empty function
+> but why is is preferrable to redefine some of these macros instead?
 
-1) build them after instantiating all KVM VCPUs in order to query KVM
-   for each MPIDR, or
-2) have a way to ask KVM for an MPIDR of given VCPU ID in advance
-   (maybe just a scratch VCPU), or
-3) have control over the MPIDRs so it can choose them when it likes,
-   use them for topology descriptions, and then instantiate KVM VCPUs
-   with them.
+That was my initial implementation and we could probably sway others in that
+direction, too. That said, I just tried it on 5.9-rc5 and there are two more
+dependencies. No idea what changed sinced the last time I tried, maybe I simply
+messed up back then.
 
-I think (3) is the most robust approach, and it has the least overhead.
+Basically, this_cpu_ptr translates to:
+  __this_cpu_preempt_check(); per_cpu_ptr(sym, debug_smp_processor_id())
 
-Thanks,
-drew
+__this_cpu_preempt_check: should be empty for hyp
+per_cpu_ptr: needs mapping of the array of bases in hyp, otherwise easy
+debug_smp_processor_id: needs a clone of 'cpu_number' percpu variable
 
+Neither of these is particularly difficult to implement, and two will even be
+useful going forward, but it still feels too fiddly for posting this late in
+the 5.10 cycle. So I suggest we stick to the macro redefines for now and I'll
+post those patches for 5.11. WDYT?
+
+You can find the patches on branch 'topic/percpu-v3-debug-preempt' of
+https://android-kvm.googlesource.com/linux.
+
+David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
