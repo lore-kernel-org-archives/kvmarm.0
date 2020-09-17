@@ -2,54 +2,51 @@ Return-Path: <SRS0=ijLG=C2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF23C2D0E3
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C67BC35265
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BBAFF21D90
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBAFF21D90
+	by mail.kernel.org (Postfix) with ESMTP id ABB1221973
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB1221973
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C14C4B847;
-	Thu, 17 Sep 2020 03:51:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 341AA4B860;
+	Thu, 17 Sep 2020 03:51:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WfbTTzHmabZj; Thu, 17 Sep 2020 03:51:37 -0400 (EDT)
+	with ESMTP id TVZu9EVEJ+ay; Thu, 17 Sep 2020 03:51:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6DA34B85D;
-	Thu, 17 Sep 2020 03:51:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 060234B862;
+	Thu, 17 Sep 2020 03:51:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C27B14B728
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 23:01:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18AE94B720
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 23:01:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nsrY+UJDeBxh for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id FJql88GjzaUp for <kvmarm@lists.cs.columbia.edu>;
  Wed, 16 Sep 2020 23:01:10 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E6FC4B71D
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 181C04B6D0
  for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 23:01:10 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D2AF9D77EE02DDBB6937;
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 2924B8737466F9CFAE96;
  Thu, 17 Sep 2020 11:01:06 +0800 (CST)
-Received: from localhost (10.174.185.104) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 11:00:59 +0800
+Received: from localhost (10.174.185.104) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 11:00:56 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 1/2] KVM: arm64: add KVM_CAP_ARM_MP_AFFINITY extension
-Date: Thu, 17 Sep 2020 11:00:52 +0800
-Message-ID: <20200917030053.1747-2-fangying1@huawei.com>
+Subject: [RFC PATCH 0/2] KVM: arm64: Add support for setting MPIDR
+Date: Thu, 17 Sep 2020 11:00:51 +0800
+Message-ID: <20200917030053.1747-1-fangying1@huawei.com>
 X-Mailer: git-send-email 2.26.0.windows.1
-In-Reply-To: <20200917030053.1747-1-fangying1@huawei.com>
-References: <20200917030053.1747-1-fangying1@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.174.185.104]
 X-CFilter-Loop: Reflected
@@ -72,58 +69,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add KVM_CAP_ARM_MP_AFFINITY extension for userspace to check
-whether KVM supports setting MPIDR on AArch64 platform. Thus
-we can give userspace control over the MPIDR to present
-cpu topology information.
+MPIDR is used to show multiprocessor affinity on arm platform. It is
+also used to provide an additional processor identification mechanism
+for scheduling purposes. To add support for setting MPIDR from usersapce
+an vcpu ioctl KVM_CAP_ARM_MP_AFFINITY is introduced. This patch series is
+needed to help qemu to build the accurate cpu topology for arm.
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- Documentation/virt/kvm/api.rst | 8 ++++++++
- arch/arm64/kvm/arm.c           | 1 +
- include/uapi/linux/kvm.h       | 1 +
- 3 files changed, 10 insertions(+)
+Ying Fang (2):
+  KVM: arm64: add KVM_CAP_ARM_MP_AFFINITY extension
+  kvm/arm: Add mp_affinity for arm vcpu
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index eb3a1316f03e..d2fb18613a34 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6159,3 +6159,11 @@ KVM can therefore start protected VMs.
- This capability governs the KVM_S390_PV_COMMAND ioctl and the
- KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
- guests when the state change is invalid.
-+
-+8.24 KVM_CAP_ARM_MP_AFFINITY
-+----------------------------
-+
-+:Architecture: arm64
-+
-+This capability indicates that KVM_ARM_SET_MP_AFFINITY ioctl is available.
-+It is used by to set MPIDR from userspace.
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 46dc3d75cf13..913c8da539b3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -178,6 +178,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
-+	case KVM_CAP_ARM_MP_AFFINITY:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6d86033c4fa..c4874905cd9c 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1035,6 +1035,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_LAST_CPU 184
- #define KVM_CAP_SMALLER_MAXPHYADDR 185
- #define KVM_CAP_S390_DIAG318 186
-+#define KVM_CAP_ARM_MP_AFFINITY 187
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+ Documentation/virt/kvm/api.rst    |  8 ++++++++
+ arch/arm64/include/asm/kvm_host.h |  5 +++++
+ arch/arm64/kvm/arm.c              |  9 +++++++++
+ arch/arm64/kvm/reset.c            | 11 +++++++++++
+ arch/arm64/kvm/sys_regs.c         | 30 +++++++++++++++++++-----------
+ include/uapi/linux/kvm.h          |  3 +++
+ 6 files changed, 55 insertions(+), 11 deletions(-)
+
 -- 
 2.23.0
 
