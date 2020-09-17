@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A40C35263
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 155D7C2BBD1
 	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47B4F21D43
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47B4F21D43
+	by mail.kernel.org (Postfix) with ESMTP id A138820707
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 07:51:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A138820707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC194B872;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41E774B875;
 	Thu, 17 Sep 2020 03:51:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oQn1TVh5lipN; Thu, 17 Sep 2020 03:51:37 -0400 (EDT)
+	with ESMTP id zDZ6pV2kbXQW; Thu, 17 Sep 2020 03:51:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD4704B843;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE6B84B85A;
 	Thu, 17 Sep 2020 03:51:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E494B71D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 23:01:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0344B6CD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 22:31:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id grl2gD-en66n for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 23:01:10 -0400 (EDT)
+ with ESMTP id Aosnh3Ai7B41 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 22:31:05 -0400 (EDT)
 Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B5EF04B720
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 23:01:10 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D8323A70BE5E9F12EC37;
- Thu, 17 Sep 2020 11:01:06 +0800 (CST)
-Received: from localhost (10.174.185.104) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 11:01:00 +0800
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 996B54B6CF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 22:31:05 -0400 (EDT)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id AB97B844F6BE7C47CA27;
+ Thu, 17 Sep 2020 10:31:03 +0800 (CST)
+Received: from localhost (10.174.185.104) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 10:30:56 +0800
 From: Ying Fang <fangying1@huawei.com>
-To: <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
-Date: Thu, 17 Sep 2020 11:00:53 +0800
-Message-ID: <20200917030053.1747-3-fangying1@huawei.com>
+To: <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <maz@kernel.org>
+Subject: [PATCH 2/2] kvm/arm: Add mp_affinity for arm vcpu
+Date: Thu, 17 Sep 2020 10:30:33 +0800
+Message-ID: <20200917023033.1337-3-fangying1@huawei.com>
 X-Mailer: git-send-email 2.26.0.windows.1
-In-Reply-To: <20200917030053.1747-1-fangying1@huawei.com>
-References: <20200917030053.1747-1-fangying1@huawei.com>
+In-Reply-To: <20200917023033.1337-1-fangying1@huawei.com>
+References: <20200917023033.1337-1-fangying1@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.174.185.104]
 X-CFilter-Loop: Reflected
 X-Mailman-Approved-At: Thu, 17 Sep 2020 03:51:33 -0400
-Cc: zhang.zhanghailiang@huawei.com, maz@kernel.org, alex.chen@huawei.com,
+Cc: zhang.zhanghailiang@huawei.com, alex.chen@huawei.com,
  Ying Fang <fangying1@huawei.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
