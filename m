@@ -1,92 +1,63 @@
-Return-Path: <SRS0=cLXx=CZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ijLG=C2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBCAC35256
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BD7C43461
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 01:38:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4EADF22460
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Sep 2020 17:35:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="XBpFPnVn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EADF22460
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id CE1C72076C
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Sep 2020 01:38:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE1C72076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E769F4B3D6;
-	Wed, 16 Sep 2020 13:35:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B3F24B619;
+	Wed, 16 Sep 2020 21:38:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3laU1b-DjcNV; Wed, 16 Sep 2020 13:35:11 -0400 (EDT)
+	with ESMTP id HJlPaG86fK7p; Wed, 16 Sep 2020 21:38:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EC8E4B51E;
-	Wed, 16 Sep 2020 13:35:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DD374B602;
+	Wed, 16 Sep 2020 21:38:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 742CC4B44B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:35:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6214B5E8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 21:38:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yj4oC0sySsqy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2020 13:35:08 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 676C24B3D6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 13:35:08 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id z4so7804513wrr.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 10:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=EdexJTeSJ1yzSq2NB9sPeJusVOkXFFsSU8w5tX+wAoY=;
- b=XBpFPnVnEXotZ9h7Vi96uiegtXa9f6RsxKZhjfRsj/bVOPdAq6fxcKcQEAWKY2yP/+
- j3PWyy1esATPnLP3uevSBbvUQKYvsCxNVoLaiGC/5iqudT2qc6itwteJuDQZN39vdob3
- QaDJj5Fg7ELcwgZceR5AuZcuIyWWmWGJn9h8tuNgYqFXJvF9GfV92xXB911rmrSm3IJz
- DEVO8XTVwMYWDmqJ1lvnk1kAgNDeDDzO49zUONaiMZF3cfbTO5K+56OTvnR1AU7UXbMn
- LvmycZKfMnvi9K9gtcHdirkVA7EoQe+EhLFDqe8HnRz+8V1xqmA+BY1XfOsJpaZD8LH6
- UDzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=EdexJTeSJ1yzSq2NB9sPeJusVOkXFFsSU8w5tX+wAoY=;
- b=jZaoQWrKeiVktiFyagcn23xW9kO8aSxojkJk8xXY+nXJSdDzLW+3qtzbRzoZO0DUNi
- QKURCk5X8UoEq8pN9+jTJmBfMNQKEapsMA4sKSGQNUUMthw/jf6EOZsbINfYZEgNM6YM
- aXErvmUQtoXpI88ME0i8zG7mg/KS4S4JTmGtVNTxSkkij6mccIQRakDegbBgk0PSVlbd
- xcMAGQcYbcxGu8567kZQjta2Wuf8EukI5KIXJ46YShyzOxaVp6Zkqvyx5os9rBuxsAbF
- dUaIcts5cwqSL3mYJ1ZNWYycCQ4ufnjGKBkRm7vU0jyxqAfwYMOsuAntpTIzZSnaa3j1
- 5qbA==
-X-Gm-Message-State: AOAM530nQQckC9WY8gYHefqRkwh2SJvtLhFExtK49MS1sAJON5l8IyN1
- dw5Yv1CGEQjpIioDcXHNa+loWHqPfKIPy/z+
-X-Google-Smtp-Source: ABdhPJxiNME7o6IoYWEvolPBp1wwKcDxQ2PJwQacH0w0glnZjPPICPGldNZPzVdYDrWU7SS+rM/Ucw==
-X-Received: by 2002:adf:92c2:: with SMTP id 60mr29983169wrn.220.1600277707032; 
- Wed, 16 Sep 2020 10:35:07 -0700 (PDT)
-Received: from localhost ([2a01:4b00:8523:2d03:e49d:f6be:d31b:ad3c])
- by smtp.gmail.com with ESMTPSA id j10sm35693576wrn.2.2020.09.16.10.35.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 16 Sep 2020 10:35:05 -0700 (PDT)
-From: David Brazdil <dbrazdil@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 11/11] kvm: arm64: Remove unnecessary hyp mappings
-Date: Wed, 16 Sep 2020 18:34:39 +0100
-Message-Id: <20200916173439.32265-12-dbrazdil@google.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200916173439.32265-1-dbrazdil@google.com>
-References: <20200916173439.32265-1-dbrazdil@google.com>
+ with ESMTP id QZLhtaQq54Vm for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2020 21:38:36 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D55F94B5E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2020 21:38:35 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 4C4479FA31C5FF9D6CFA;
+ Thu, 17 Sep 2020 09:38:32 +0800 (CST)
+Received: from [127.0.0.1] (10.74.185.4) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
+ 09:38:22 +0800
+Subject: Re: [PATCH v2] KVM: arm64: fix doc warnings in mmu code
+To: Will Deacon <will@kernel.org>
+References: <1600221639-4471-1-git-send-email-tanxiaofei@huawei.com>
+ <20200916083756.GD27496@willie-the-truck>
+From: Xiaofei Tan <tanxiaofei@huawei.com>
+Message-ID: <5F62BE0E.9060208@huawei.com>
+Date: Thu, 17 Sep 2020 09:38:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.5.1
 MIME-Version: 1.0
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>
+In-Reply-To: <20200916083756.GD27496@willie-the-truck>
+X-Originating-IP: [10.74.185.4]
+X-CFilter-Loop: Reflected
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, linuxarm@huawei.com,
+ catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,85 +74,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With all nVHE per-CPU variables being part of the hyp per-CPU region,
-mapping them individual is not necessary any longer. They are mapped to hyp
-as part of the overall per-CPU region.
 
-Acked-by: Andrew Scull<ascull@google.com>
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/include/asm/kvm_mmu.h | 19 +++++--------------
- arch/arm64/kvm/arm.c             | 17 +----------------
- 2 files changed, 6 insertions(+), 30 deletions(-)
+Hi Will,
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 9db93da35606..7d1581bc8b97 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -531,28 +531,19 @@ static inline int kvm_map_vectors(void)
- DECLARE_PER_CPU_READ_MOSTLY(u64, arm64_ssbd_callback_required);
- DECLARE_KVM_NVHE_PER_CPU(u64, arm64_ssbd_callback_required);
- 
--static inline int hyp_init_aux_data(void)
-+static inline void hyp_init_aux_data(void)
- {
--	int cpu, err;
-+	int cpu;
- 
-+	/* Copy arm64_ssbd_callback_required values from kernel to hyp. */
- 	for_each_possible_cpu(cpu) {
--		u64 *ptr;
-+		u64 *ptr = per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu);
- 
--		ptr = per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu);
--		err = create_hyp_mappings(ptr, ptr + 1, PAGE_HYP);
--		if (err)
--			return err;
--
--		/* Copy value from kernel to hyp. */
- 		*ptr = per_cpu(arm64_ssbd_callback_required, cpu);
- 	}
--	return 0;
- }
- #else
--static inline int hyp_init_aux_data(void)
--{
--	return 0;
--}
-+static inline void hyp_init_aux_data(void) {}
- #endif
- 
- #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8293319a32e7..4483b6aca5d7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1634,22 +1634,7 @@ static int init_hyp_mode(void)
- 		}
- 	}
- 
--	for_each_possible_cpu(cpu) {
--		kvm_host_data_t *cpu_data;
--
--		cpu_data = per_cpu_ptr_hyp(kvm_host_data, cpu);
--		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
--
--		if (err) {
--			kvm_err("Cannot map host CPU state: %d\n", err);
--			goto out_err;
--		}
--	}
--
--	err = hyp_init_aux_data();
--	if (err)
--		kvm_err("Cannot map host auxiliary data: %d\n", err);
--
-+	hyp_init_aux_data();
- 	return 0;
- 
- out_err:
+Thanks for your advices, will accept all of them.
+
+On 2020/9/16 16:37, Will Deacon wrote:
+> On Wed, Sep 16, 2020 at 10:00:39AM +0800, Xiaofei Tan wrote:
+>> Fix following warnings caused by mismatch bewteen function parameters
+>> and comments.
+>> arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'mmu' not described in '__unmap_stage2_range'
+>> arch/arm64/kvm/mmu.c:128: warning: Function parameter or member 'may_block' not described in '__unmap_stage2_range'
+>> arch/arm64/kvm/mmu.c:128: warning: Excess function parameter 'kvm' description in '__unmap_stage2_range'
+>> arch/arm64/kvm/mmu.c:499: warning: Function parameter or member 'writable' not described in 'kvm_phys_addr_ioremap'
+>> arch/arm64/kvm/mmu.c:538: warning: Function parameter or member 'mmu' not described in 'stage2_wp_range'
+>> arch/arm64/kvm/mmu.c:538: warning: Excess function parameter 'kvm' description in 'stage2_wp_range'
+>>
+>> Signed-off-by: Xiaofei Tan <tanxiaofei@huawei.com>
+>> ---
+>>  arch/arm64/kvm/mmu.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index e8a51799..909e995 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -114,9 +114,10 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+>>   */
+>>  /**
+>>   * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+>> - * @kvm:   The VM pointer
+>> + * @mmu:   pointer to mmu structure to operate on
+>>   * @start: The intermediate physical base address of the range to unmap
+>>   * @size:  The size of the area to unmap
+>> + * @may_block: The flag that if block is allowed here
+> 
+> Whether or not we are permitted to block.
+> 
+>>   *
+>>   * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+>>   * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+>> @@ -493,6 +494,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>   * @guest_ipa:	The IPA at which to insert the mapping
+>>   * @pa:		The physical address of the device
+>>   * @size:	The size of the mapping
+>> + * @writable:   If it is writable here
+> 
+> Whether or not to create a writable mapping.
+> 
+>>   */
+>>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  			  phys_addr_t pa, unsigned long size, bool writable)
+>> @@ -530,7 +532,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  
+>>  /**
+>>   * stage2_wp_range() - write protect stage2 memory region range
+>> - * @kvm:	The KVM pointer
+>> + * @mmu:        pointer to mmu structure to operate on
+> 
+> The KVM stage-2 MMU pointer.
+> 
+> Will
+> 
+> .
+> 
+
 -- 
-2.28.0.618.gf4bc123cb7-goog
+ thanks
+tanxiaofei
 
 _______________________________________________
 kvmarm mailing list
