@@ -2,73 +2,70 @@ Return-Path: <SRS0=n0cH=C3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A17DC43466
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Sep 2020 09:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E93D2C43463
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Sep 2020 09:24:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF4B320DD4
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Sep 2020 09:24:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xU5lzR1G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4B320DD4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0FAA320DD4
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Sep 2020 09:24:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FAA320DD4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 252494B401;
-	Fri, 18 Sep 2020 05:24:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5041A4B31D;
+	Fri, 18 Sep 2020 05:24:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dhqBaoIAbC3r; Fri, 18 Sep 2020 05:24:10 -0400 (EDT)
+	with ESMTP id 2d-5UFRJtbF0; Fri, 18 Sep 2020 05:24:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F28554B403;
-	Fri, 18 Sep 2020 05:24:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DADB4B223;
+	Fri, 18 Sep 2020 05:24:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8C494B3FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Sep 2020 05:24:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1651B4B1DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Sep 2020 05:24:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pdHKikI+W1wy for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Sep 2020 05:24:07 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9053B4B3FC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Sep 2020 05:24:07 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 238A120DD4;
- Fri, 18 Sep 2020 09:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1600421046;
- bh=5BPFCutNa5VNQMibpDHHB+qvvOTgQcOE09RubxpF1GI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=xU5lzR1Ga0PcfhABCdoUUHXJd6dN4fDFAU+RJC4XjY97A6xGaeDusE+AIxQe09UUe
- cjDXcplObHW/R0vJ/QWHVnEYHNiAmMG2eH98/7f5xG9jUnkaKa5fMSVYDlcCKKQY1K
- 3J3oarxI8eW8I9yOa/ZZSSr5YNbR3x/6bNNhLGVY=
-Date: Fri, 18 Sep 2020 10:24:01 +0100
-From: Will Deacon <will@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v3 06/11] kvm: arm64: Add helpers for accessing nVHE hyp
- per-cpu vars
-Message-ID: <20200918092400.GF30834@willie-the-truck>
-References: <20200916173439.32265-1-dbrazdil@google.com>
- <20200916173439.32265-7-dbrazdil@google.com>
+ with ESMTP id WbvtOUqL4FVJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Sep 2020 05:24:32 -0400 (EDT)
+Received: from huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AA004B1B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Sep 2020 05:24:32 -0400 (EDT)
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id 7D8C03AC03CD0E52EC9B;
+ Fri, 18 Sep 2020 17:24:28 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 18 Sep 2020 17:24:28 +0800
+Received: from [10.174.185.187] (10.174.185.187) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 18 Sep 2020 17:24:28 +0800
+Subject: Re: [RFC v2 1/7] arm64: add a helper function to traverse
+ arm64_ftr_regs
+To: Andrew Jones <drjones@redhat.com>
+References: <20200917120101.3438389-1-liangpeng10@huawei.com>
+ <20200917120101.3438389-2-liangpeng10@huawei.com>
+ <20200918071820.e6hghta4yclio7ca@kamzik.brq.redhat.com>
+From: Peng Liang <liangpeng10@huawei.com>
+Message-ID: <00293b67-e9bb-3ad1-d6db-adb35bcacba6@huawei.com>
+Date: Fri, 18 Sep 2020 17:24:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200916173439.32265-7-dbrazdil@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20200918071820.e6hghta4yclio7ca@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.187]
+X-ClientProxiedBy: dggeme713-chm.china.huawei.com (10.1.199.109) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
+Cc: zhang.zhanghailiang@huawei.com, kvm@vger.kernel.org, maz@kernel.org,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,76 +82,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 16, 2020 at 06:34:34PM +0100, David Brazdil wrote:
-> Defining a per-CPU variable in hyp/nvhe will result in its name being
-> prefixed with __kvm_nvhe_. Add helpers for declaring these variables
-> in kernel proper and accessing them with this_cpu_ptr and per_cpu_ptr.
+On 9/18/2020 3:18 PM, Andrew Jones wrote:
+> On Thu, Sep 17, 2020 at 08:00:55PM +0800, Peng Liang wrote:
+>> If we want to emulate ID registers, we need to initialize ID registers
+>> firstly.  This commit is to add a helper function to traverse
+>> arm64_ftr_regs so that we can initialize ID registers from
+>> arm64_ftr_regs.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+>> ---
+>>  arch/arm64/include/asm/cpufeature.h |  2 ++
+>>  arch/arm64/kernel/cpufeature.c      | 13 +++++++++++++
+>>  2 files changed, 15 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+>> index 89b4f0142c28..2ba7c4f11d8a 100644
+>> --- a/arch/arm64/include/asm/cpufeature.h
+>> +++ b/arch/arm64/include/asm/cpufeature.h
+>> @@ -79,6 +79,8 @@ struct arm64_ftr_reg {
+>>  
+>>  extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
+>>  
+>> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp);
+>> +
+>>  /*
+>>   * CPU capabilities:
+>>   *
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 6424584be01e..698b32705544 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -1112,6 +1112,19 @@ u64 read_sanitised_ftr_reg(u32 id)
+>>  	return regp->sys_val;
+>>  }
+>>  
+>> +int arm64_cpu_ftr_regs_traverse(int (*op)(u32, u64, void *), void *argp)
+>> +{
+>> +	int i, ret;
+>> +
+>> +	for (i = 0; i <  ARRAY_SIZE(arm64_ftr_regs); i++) {
+>> +		ret = (*op)(arm64_ftr_regs[i].sys_id,
+>> +			    arm64_ftr_regs[i].reg->sys_val, argp);
+>> +		if (ret < 0)
+>> +			return ret;
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>>  #define read_sysreg_case(r)	\
+>>  	case r:		return read_sysreg_s(r)
+>>  
+>> -- 
+>> 2.26.2
+>>
 > 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
+> Skimming the rest of the patches to see how this is used I only saw a
+> single callsite. Why wouldn't we just put this simple for-loop right
+> there at that callsite? Or, IOW, I think this traverse function should
+> be dropped.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index cf9456663289..abc03f386b40 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -54,9 +54,21 @@
->  	DECLARE_KVM_VHE_SYM(sym);		\
->  	DECLARE_KVM_NVHE_SYM(sym)
->  
-> +#define DECLARE_KVM_VHE_PER_CPU(type, sym)	\
-> +	DECLARE_PER_CPU(type, sym)
-> +#define DECLARE_KVM_NVHE_PER_CPU(type, sym)	\
-> +	DECLARE_PER_CPU(type, kvm_nvhe_sym(sym))
-> +
-> +#define DECLARE_KVM_HYP_PER_CPU(type, sym)	\
-> +	DECLARE_KVM_VHE_PER_CPU(type, sym);	\
-> +	DECLARE_KVM_NVHE_PER_CPU(type, sym)
-> +
->  #define CHOOSE_VHE_SYM(sym)	sym
->  #define CHOOSE_NVHE_SYM(sym)	kvm_nvhe_sym(sym)
->  
-> +#define this_cpu_ptr_nvhe(sym)		this_cpu_ptr(&kvm_nvhe_sym(sym))
-> +#define per_cpu_ptr_nvhe(sym, cpu)	per_cpu_ptr(&kvm_nvhe_sym(sym), cpu)
+> Thanks,
+> drew
+> 
+> .
+> 
 
-nit: I'd probably stick a _sym suffix on these macros, to make it clear
-that they're just munging the symbol name rather than doing some completely
-different pcpu implementation.
+arm64_ftr_regs is defined as a static array in arch/arm64/kernel/cpufeature.c,
+which is not a virtualization-related file.  Putting this simple for-loop
+right there will make cpufeature.c depend on kvm_host.h.  Is this a good idea?
 
-THat said, do you expect these to be used outside of the pcpu
-implementation? If not, I suggest some underscores as a prefix as well.
-
->  #ifndef __KVM_NVHE_HYPERVISOR__
->  /*
->   * BIG FAT WARNINGS:
-> @@ -69,12 +81,21 @@
->   * - Don't let the nVHE hypervisor have access to this, as it will
->   *   pick the *wrong* symbol (yes, it runs at EL2...).
->   */
-> -#define CHOOSE_HYP_SYM(sym)	(is_kernel_in_hyp_mode() ? CHOOSE_VHE_SYM(sym) \
-> +#define CHOOSE_HYP_SYM(sym)		(is_kernel_in_hyp_mode()	\
-> +					   ? CHOOSE_VHE_SYM(sym)	\
->  					   : CHOOSE_NVHE_SYM(sym))
-> +#define this_cpu_ptr_hyp(sym)		(is_kernel_in_hyp_mode()	\
-> +					   ? this_cpu_ptr(&sym)		\
-> +					   : this_cpu_ptr_nvhe(sym))
-> +#define per_cpu_ptr_hyp(sym, cpu)	(is_kernel_in_hyp_mode()	\
-> +					   ? per_cpu_ptr(&sym, cpu)	\
-> +					   : per_cpu_ptr_nvhe(sym, cpu))
-
-is_kernel_in_hyp_mode() reads a system register to determine the current
-exception level, so this doesn't seem like something we should be doing
-everytime here. Perhaps is_kernel_in_hyp_mode() should avoid read_sysreg()
-and instead use a non-volatile asm to allow the result to be cached by
-the compiler. Hmm.
-
-But I think that can be tackled as a future patch, so with the naming nits
-resolved:
-
-Acked-by: Will Deacon <will@kernel.org>
-
-Will
+Thanks,
+Peng
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
