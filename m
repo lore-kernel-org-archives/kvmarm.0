@@ -2,93 +2,85 @@ Return-Path: <SRS0=bMLL=C6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59051C43466
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Sep 2020 13:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3562DC43465
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Sep 2020 14:15:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C69CD20C09
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Sep 2020 13:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86F0420BED
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Sep 2020 14:15:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PBzsm4Ck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69CD20C09
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtYsAtBp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F0420BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A634B58D;
-	Mon, 21 Sep 2020 09:44:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA7F94B5B4;
+	Mon, 21 Sep 2020 10:15:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MP9LRyxDP4iI; Mon, 21 Sep 2020 09:44:00 -0400 (EDT)
+	with ESMTP id iWjScspPhotG; Mon, 21 Sep 2020 10:15:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAE74B514;
-	Mon, 21 Sep 2020 09:44:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0D574B58F;
+	Mon, 21 Sep 2020 10:15:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 122844B500
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Sep 2020 09:44:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 774CD4B58F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Sep 2020 10:15:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GUsL26mmysBb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Sep 2020 09:43:59 -0400 (EDT)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1C5E4B38B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Sep 2020 09:43:58 -0400 (EDT)
-Received: by mail-wr1-f67.google.com with SMTP id e16so12847875wrm.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Sep 2020 06:43:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=PKSAlhSQ9Eh6fSSb1EiKiqDta1PeLzDdGDQlo2aRDw4=;
- b=PBzsm4CksVIWOwAwH9jC9VQ6MVHjGCDUXFV+y2ttxej8Xuexc6+aKCDyieHrP+XQ6r
- YXLZHVgtFM8leGT+Gsel61/uWf0Zz/wLwz3EmVcnWB/uk9xw8cvoNZaosyrBcTp6czSn
- /b4Kqxzo8vqQjA0Gd0WuUt4yNtDcFnoQJXKIHUnGTRPNaWBYlmiRZZkRM40+F6e2Kd1O
- Oxp/yRU5neltD3kropbYH+zuooXNi8ijWFjVPt38BkmsMGO6oVGBF6Y9lsgGrSZvGwyz
- 8KC52eHwemtmteuByjnIXT6hLwiRh0KKiS6+e8vHDDy7qRkjVf0IOiYsgsfzk2x+eQys
- xQdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=PKSAlhSQ9Eh6fSSb1EiKiqDta1PeLzDdGDQlo2aRDw4=;
- b=DPptoOvGc65h5Vf3VehpCVgdDFAr3FUwwKU4uoQTZCv5gn06Of5eBrhHdEwUNem8Ci
- kl9Wy/qcE0bw13Y+d4Rb2iSTCpU2N5GKv94NW6aZhtV0RaGFw8RuAxrgWoVA3Jcui+yi
- D4GbrMCvKebBsyKa2S05w/+XSzhtSpepY/A8jqLo0m691BgOhG3DtkmdgPXQuIVdFVyO
- 6aZmDi3pXricOnWtA9oVmk+ouMALYBpYNyhTV9ISvM0LQl8RQY+adsQSrtvJrEzJpzEd
- izKbuCBi5gQK+MYdYrn8HB9OmafQUm9yAtlLIgIAdZctVr99gN2veOmrTTeD7q+nPfmz
- kBVw==
-X-Gm-Message-State: AOAM530Xn0yrK1xZhwE7V2e0Es46J6lOI+9n6n0Vzl87LDLwT17976bg
- 2TgUfGAfK/rVNAtHfDwiyEE/1g==
-X-Google-Smtp-Source: ABdhPJz+M60dQM2XcDdmSU16x2fFPZSTR+TQAMTpZYcbvWrpRI6wunJ1bR4T+xWDSV5N+1CvR8M6oA==
-X-Received: by 2002:adf:cf01:: with SMTP id o1mr53523006wrj.421.1600695837833; 
- Mon, 21 Sep 2020 06:43:57 -0700 (PDT)
-Received: from google.com ([2a01:4b00:8523:2d03:e5b6:fa6a:5f89:97d3])
- by smtp.gmail.com with ESMTPSA id q4sm20497820wru.65.2020.09.21.06.43.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 21 Sep 2020 06:43:57 -0700 (PDT)
-Date: Mon, 21 Sep 2020 14:43:55 +0100
-From: David Brazdil <dbrazdil@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 04/11] kvm: arm64: Remove __hyp_this_cpu_read
-Message-ID: <20200921134355.5lzma3qzyiexxepd@google.com>
-References: <20200916173439.32265-1-dbrazdil@google.com>
- <20200916173439.32265-5-dbrazdil@google.com>
- <20200918090029.GC30834@willie-the-truck>
+ with ESMTP id cre7vJBUipFY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Sep 2020 10:15:43 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EAB04B3B6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Sep 2020 10:15:43 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1600697743;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=c28whiQjSDHabTFlVVNJ79y4LDFVv2UNDOXirF/Q+Do=;
+ b=GtYsAtBpb66BnthaSBDrg9ftxgYC2FPjnccSBjKU/lUkgY496lpQwyq8ZWV6/2Cffdr8rd
+ K3zYeIGe3gmFkdqHrpLMNkobZo09nblPzs9WCcZh0pMtSXEHMMsF90Ik/tNr+FiaDCSMUT
+ xjn9dro/79lHoHaJ0JxQT59B7cpyb/s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-m_Uo8ONVPNWahFKvXQTFXg-1; Mon, 21 Sep 2020 10:15:41 -0400
+X-MC-Unique: m_Uo8ONVPNWahFKvXQTFXg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E1611017DDD;
+ Mon, 21 Sep 2020 14:15:40 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDC925C1DC;
+ Mon, 21 Sep 2020 14:15:38 +0000 (UTC)
+Date: Mon, 21 Sep 2020 16:15:35 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Add undocumented return values for PMU
+ device control group
+Message-ID: <20200921141535.g7tehagozjpdfh2f@kamzik.brq.redhat.com>
+References: <20200921130838.37296-1-alexandru.elisei@arm.com>
+ <20200921130838.37296-2-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+In-Reply-To: <20200921130838.37296-2-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <20200918090029.GC30834@willie-the-truck>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,49 +97,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
-
-> > +static inline unsigned long __hyp_my_cpu_offset(void)
-> > +{
-> > +	unsigned long off;
-> > +
-> > +	/*
-> > +	 * We want to allow caching the value, so avoid using volatile and
-> > +	 * instead use a fake stack read to hazard against barrier().
-> > +	 */
+On Mon, Sep 21, 2020 at 02:08:37PM +0100, Alexandru Elisei wrote:
+> KVM_ARM_VCPU_PMU_V3_IRQ returns -EFAULT if get_user() fails when reading
+> the interrupt number from kvm_device_attr.addr.
 > 
-> I don't think we need to copy/paste the comment...
+> KVM_ARM_VCPU_PMU_V3_INIT returns the error value from kvm_vgic_set_owner().
+> kvm_arm_pmu_v3_init() checks that the vgic has been initialized and the
+> interrupt number is valid, but kvm_vgic_set_owner() can still return the
+> error code -EEXIST if another device has already claimed the interrupt.
 > 
-> > +	asm("mrs %0, tpidr_el2" : "=r" (off) :
-> > +		"Q" (*(const unsigned long *)current_stack_pointer));
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> ... especially given that we're not preemptible at EL2 with nVHE, maybe
-> we don't need to play this trick at all because we're always going to be
-> on the same CPU. So we could actually just do:
-> 
-> 	return read_sysreg(tpidr_el2);
-> 
-> which is much better, and the comment should say something to that effect.
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index ca374d3fe085..96d6cf77cb1e 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -25,6 +25,7 @@ Returns:
+>  
+>  	 =======  ========================================================
+>  	 -EBUSY   The PMU overflow interrupt is already set
+> +	 -EFAULT  Error reading interrupt number
+>  	 -ENXIO   The overflow interrupt not set when attempting to get it
+>  	 -ENODEV  PMUv3 not supported
+>  	 -EINVAL  Invalid PMU overflow interrupt number supplied or
+> @@ -45,6 +46,7 @@ all vcpus, while as an SPI it must be a separate number per vcpu.
+>  Returns:
+>  
+>  	 =======  ======================================================
+> +	 -EEXIST  Interrupt number already used
+>  	 -ENODEV  PMUv3 not supported or GIC not initialized
+>  	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
+>  		  configured as required prior to calling this attribute
+> -- 
+> 2.28.0
+>
 
-I must be misinterpreting the comment. I understood that it enables the compiler
-optimizing multiple reads of TPIDR by avoiding 'asm volatile' (signaling that
-the value does not change between reads). So what exactly does it do?
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-read_sysreg expands to 'asm volatile' but I have no problem with priotizing
-readability over a micro-optimization.
-
-> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> > +#define __my_cpu_offset __hyp_my_cpu_offset()
-> 
-> Why would VHE code need to use this? Especially in light of my preemption
-> comments above, shouldn't it now be using __kern_my_cpu_offset()?
-
-During v2 review Andrew Scull pointed out we can avoid alternatives on VHE code
-by using __hyp_my_cpu_offset for it as well. Obviously if __hyp_my_cpu_offset
-becomes nVHE-specific, we can always move VHE back to __kern. This was just
-about saving a few cycles during boot.
-
-David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
