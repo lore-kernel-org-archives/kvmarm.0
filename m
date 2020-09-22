@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA77CC2D0E2
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Sep 2020 17:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95F3C2D0E2
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Sep 2020 18:07:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0566523787
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Sep 2020 17:55:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C00E23787
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Sep 2020 18:07:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="mpb3KRYs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0566523787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="CRd63rpN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C00E23787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50B6D4B3A5;
-	Tue, 22 Sep 2020 13:55:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4836B4B36C;
+	Tue, 22 Sep 2020 14:07:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2kqLDjo4ZSZv; Tue, 22 Sep 2020 13:55:08 -0400 (EDT)
+	with ESMTP id NwWA3Hi7JK9i; Tue, 22 Sep 2020 14:07:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C0524B3BD;
-	Tue, 22 Sep 2020 13:55:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 207B54B39F;
+	Tue, 22 Sep 2020 14:07:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E3964B391
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 13:55:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 992774B38D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 14:07:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B8SL+ROacd+z for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Sep 2020 13:55:05 -0400 (EDT)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 995664B2DA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 13:55:05 -0400 (EDT)
-Received: by mail-wm1-f68.google.com with SMTP id b79so4248811wmb.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 10:55:05 -0700 (PDT)
+ with ESMTP id 1hwBrGJ4bZa1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Sep 2020 14:07:48 -0400 (EDT)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9875A4B36C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 14:07:48 -0400 (EDT)
+Received: by mail-wr1-f68.google.com with SMTP id x14so18082878wrl.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2020 11:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=qDuqWZC1VW8EQfRTwPy1SQY9Ugia7fQLlUkBJbJw2ug=;
- b=mpb3KRYsHGqaV+XbtgbH5xYHePKnUNApKF+8H80qUiSDOh2I7ZkW6cemtP/OqS4sfa
- O9qNFo6rYWvbfjngVHSQJtV39YfrqDBygii/bNyFKYK/QYQXRapOjGChdBZDONhoYCEw
- C+N5zK4PUScYEiO/iwfysMRi+n0SI+ghafp3hF+D0WgIhsd5ca9O2VlvYGUpdDa/xWY4
- +luI/GJNy0LTakzRhcTqnAbxtl2WCkWQNx/vkTpcb4n4t+vYOrtkcYzzAN+/OuBlOs4d
- HuyPtqS/sy82pht3gov8SpLOvtkriDaLFIXFKpyxddBR485hmSZbKMwY9tm6WQ7AYHm7
- u8/A==
+ bh=6y72uZ7YdWD1XXfQ+XTc3NqqPVXw5bQyVkymr14fQGQ=;
+ b=CRd63rpNjyrzDcmAXaGmKY+nIczGjjMJGpL77E2ju9oloTgn2/h43kyf7RWLd6TSb1
+ drxGmpeR76PV5D4kIrtMak0BTXiG5QqFMzjzRfQlbfXHW05r/mynwAVi8WOU7EzJz668
+ 1OQ4vm0VTMoo+qE1KCxXK/ZC2MaA+0D0xpWJECvrWvULe4ay+hp8jpleCDlSQl6ynXDm
+ hdn5fKFjis/9QrlFTJZ65bXGTQnbSyH4tgejSXC753c+nYjHnfeoxaGtt5vIr7zmYhnN
+ eQl+KORPu/uRAmRcXz71wLELsQ70yI9fMXN5m2dnfT3ZLENatNSfDyQyWqxnCJ+hp3Lj
+ Jh9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=qDuqWZC1VW8EQfRTwPy1SQY9Ugia7fQLlUkBJbJw2ug=;
- b=QeGHm6VrgunSVAjqCZ7tx5/zTprqzMxCRgml7DcRL3Lr4IEVGJ1SOlOwq1lJKrnUOs
- zoe33HBOm76ckMygHCsV68Tzq5PsnqjX5TA1vvtzdJhYKCW/+Im7Flpq7d3wYsx4b5Hz
- yZOCJIiVcTR3LUDoOiHFMrfB1h/cqv2toWymdoyiP1z7sKhT1gZmE64DsbpDsdyX2GZY
- PtqytaRIRCsGAvUU7OoneuawbLhDBtTAgMtwlAHw7gQVFkxq3zFtKHf/BVqpT0m45/CO
- kwL/t0apW/cJiUAa+CMHd/QRwlKfXTdTMjzD/1EuXon66wYpj3o6UZm9frJD5/o4+T1S
- zSdA==
-X-Gm-Message-State: AOAM5305MI86vNRTWnn/eVilK3516RO59fTyNE6ytrULnV8PCpdtbG1Y
- DUx2ETyWF3Tbj68gYnNnb6Evww==
-X-Google-Smtp-Source: ABdhPJzolE/26FKJ6uSxzitqtAryO9MchyZJUE0K1lhB7o+h59fgvoQhUwPcnNYz9fEC4TwM5UIGgQ==
-X-Received: by 2002:a7b:c958:: with SMTP id i24mr2379869wml.50.1600797304450; 
- Tue, 22 Sep 2020 10:55:04 -0700 (PDT)
+ bh=6y72uZ7YdWD1XXfQ+XTc3NqqPVXw5bQyVkymr14fQGQ=;
+ b=ipUvHx+1us4fxmfEk8IIJpNd2z1VARpjXFaLcFqnsDgXFB3Nj9q91QkCtGNuztw6DY
+ +EElfVi/OP4FAxIyQ1p9OB+NKMI9O4MQ+OCyWjo3U3XZdK+9uuonnNdZhsaYV/slo8Kr
+ ssIkiFhCnrTxq5kq94/nEH2Wik5SxBYfQFEc+1dxOYshU+A4+hFYypbu3pLFf1vCYJcL
+ Rc3YMKvP2GSmnmcVNSuo22vFEceBVOpLXq2x7SvKbEftPalUxrq89uAwYQ75iTpQWDcv
+ Gw3tlaXhLcd8vahilsR4e6brsNkWOS1l9WOTXeUG1mVXUQTM7NTyaFMQReiOzaTBpw9Y
+ FWFg==
+X-Gm-Message-State: AOAM533Gvw1rHMnIyLDB5fVygIkBrDgqWXy1LJ64JLW3QaG+PJdi3dm4
+ M/bk4KzdQQFoa3jaV8wzgDhkHw==
+X-Google-Smtp-Source: ABdhPJwZPTozi74qAG3/aClHpnw3RnRnKS0i65Quxl7eR1kjuVfhlagjStYPlzzSrntMUCfignnPpQ==
+X-Received: by 2002:a5d:46cf:: with SMTP id g15mr6822937wrs.107.1600798067242; 
+ Tue, 22 Sep 2020 11:07:47 -0700 (PDT)
 Received: from google.com ([2a01:4b00:8523:2d03:55c2:2cdf:ff31:96a3])
- by smtp.gmail.com with ESMTPSA id q4sm26879934wru.65.2020.09.22.10.55.02
+ by smtp.gmail.com with ESMTPSA id e1sm28558820wrp.49.2020.09.22.11.07.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Sep 2020 10:55:03 -0700 (PDT)
-Date: Tue, 22 Sep 2020 18:55:02 +0100
+ Tue, 22 Sep 2020 11:07:46 -0700 (PDT)
+Date: Tue, 22 Sep 2020 19:07:45 +0100
 From: David Brazdil <dbrazdil@google.com>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 01/11] kvm: arm64: Partially link nVHE hyp code,
- simplify HYPCOPY
-Message-ID: <20200922175205.6gacjibejr7mmbgw@google.com>
+Subject: Re: [PATCH v3 07/11] kvm: arm64: Duplicate
+ arm64_ssbd_callback_required for nVHE hyp
+Message-ID: <20200922180745.m6bjgjzz6cwercgf@google.com>
 References: <20200916173439.32265-1-dbrazdil@google.com>
- <20200916173439.32265-2-dbrazdil@google.com>
- <20200918085116.GA30834@willie-the-truck>
+ <20200916173439.32265-8-dbrazdil@google.com>
+ <20200918115911.GB31096@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20200918085116.GA30834@willie-the-truck>
+In-Reply-To: <20200918115911.GB31096@willie-the-truck>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
  Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
@@ -106,29 +106,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-> > +#define HYP_SECTION_NAME(NAME)	.hyp##NAME
+> >  		u64 *ptr;
+> >  
+> > -		ptr = per_cpu_ptr(&arm64_ssbd_callback_required, cpu);
+> > +		ptr = per_cpu_ptr_nvhe(arm64_ssbd_callback_required, cpu);
+> >  		err = create_hyp_mappings(ptr, ptr + 1, PAGE_HYP);
+> >  		if (err)
+> >  			return err;
 > > +
-> > +/* Defines an ELF hyp section from input section @NAME and its subsections. */
-> > +#define HYP_SECTION(NAME) \
-> > +	HYP_SECTION_NAME(NAME) : { *(NAME NAME##.[0-9a-zA-Z_]*) }
+> > +		/* Copy value from kernel to hyp. */
+> > +		*ptr = per_cpu(arm64_ssbd_callback_required, cpu);
 > 
-> I still don't get why we can't just use NAME ## .* for the regex here. That
-> matches what we do elsewhere for linker script wildcarding, e.g. .rodata.*,
-> .init.text.* ...  in asm-generic/vmlinux.lds.h. Why is it different for
-> these sections?
-
-Shouldn't matter. I copied it from a script in the Clang LTO branch. Will align
-it with what's in the main arm64 script.
-
-> > +# 2) Compile linker script.
-> > +$(obj)/hyp.lds: $(src)/hyp.lds.S FORCE
-> > +	$(call if_changed_dep,cpp_lds_S)
+> Hmm. Is this correct for late arriving CPUs, where we don't know whether
+> a callback is required at the point we do the copy?
 > 
-> You need a .gitignore file listing hyp.lds, otherwise some idiot will end
-> up committing it. I definitely didn't do that when playing around with this
-> series. Nope. Not at all.
+> That sounds fiddly to resolve, but this _might_ all be moot because I'm
+> about to post a series that allows us to remove the hyp mapping of this
+> variable entirely. So leave this for now, but maybe stick a comment in
+> that it doesn't work for late cpus.
 
-Thanks for noticing, I never compile in-tree. Added
+Ah, good point. I'll move the value copy at the end of cpu_init_hyp_mode().
+It must be known at that point. And if your series gets rid of this completely,
+even better.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
