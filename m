@@ -2,59 +2,60 @@ Return-Path: <SRS0=RYKq=DB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3ACC4363D
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 10:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F4DC4363D
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 11:06:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E107621D24
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 10:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E107621D24
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
+	by mail.kernel.org (Postfix) with ESMTP id 82003239E5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 11:06:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82003239E5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F2E14B33D;
-	Thu, 24 Sep 2020 06:11:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B81D4B2BB;
+	Thu, 24 Sep 2020 07:06:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vW44HX6zOuq4; Thu, 24 Sep 2020 06:11:00 -0400 (EDT)
+	with ESMTP id eOqHLu4WNoU3; Thu, 24 Sep 2020 07:06:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C7A4B32C;
-	Thu, 24 Sep 2020 06:11:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9774B28E;
+	Thu, 24 Sep 2020 07:06:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 376C34B234
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 06:10:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 400E84B265
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 07:06:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k50XRTIan2Fn for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Sep 2020 06:10:58 -0400 (EDT)
-Received: from gentwo.org (gentwo.org [3.19.106.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3403E4B230
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 06:10:58 -0400 (EDT)
-Received: by gentwo.org (Postfix, from userid 1002)
- id D7A6C3F1AE; Thu, 24 Sep 2020 10:10:52 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
- by gentwo.org (Postfix) with ESMTP id D4FD23F1AA;
- Thu, 24 Sep 2020 10:10:52 +0000 (UTC)
-Date: Thu, 24 Sep 2020 10:10:52 +0000 (UTC)
-From: Christopher Lameter <cl@linux.com>
-X-X-Sender: cl@www.lameter.com
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v4 00/10] Independent per-CPU data section for nVHE
-In-Reply-To: <20200922204910.7265-1-dbrazdil@google.com>
-Message-ID: <alpine.DEB.2.22.394.2009241003100.1613@www.lameter.com>
-References: <20200922204910.7265-1-dbrazdil@google.com>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+ with ESMTP id QvRXyRA4xdjF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Sep 2020 07:06:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D951D4B144
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 07:06:23 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AB9E152B;
+ Thu, 24 Sep 2020 04:06:23 -0700 (PDT)
+Received: from monolith.localdoman (unknown [10.37.8.98])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A0723F73B;
+ Thu, 24 Sep 2020 04:06:20 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v7 5/7] KVM: arm64: pmu: Make overflow handler NMI safe
+Date: Thu, 24 Sep 2020 12:07:04 +0100
+Message-Id: <20200924110706.254996-6-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200924110706.254996-1-alexandru.elisei@arm.com>
+References: <20200924110706.254996-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: sumit.garg@linaro.org, kvm@vger.kernel.org,
+ Marc Zyngier <marc.zyngier@arm.com>, catalin.marinas@arm.com,
+ Will Deacon <will.deacon@arm.com>, swboyd@chromium.org, maz@kernel.org,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,31 +72,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 22 Sep 2020, David Brazdil wrote:
+From: Julien Thierry <julien.thierry@arm.com>
 
-> Introduce '.hyp.data..percpu' as part of ongoing effort to make nVHE
-> hyp code self-contained and independent of the rest of the kernel.
+kvm_vcpu_kick() is not NMI safe. When the overflow handler is called from
+NMI context, defer waking the vcpu to an irq_work queue.
 
-The percpu subsystems point is to enable the use of special hardware
-instructions that can perform address calculation and a memory operation
-in one interruptible instruction. This is in particular useful to avoid
-higher overhead for memory management related counters because preempt
-disable/enable etc can be avoided.
+A vcpu can be freed while it's not running by kvm_destroy_vm(). Prevent
+running the irq_work for a non-existent vcpu by calling irq_work_sync() on
+the PMU destroy path.
 
-ARM cannot do that and thus has a LC/SC loop.
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Tested-by: Sumit Garg <sumit.garg@linaro.org> (Developerbox)
+[Alexandru E.: Added irq_work_sync()]
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+I suggested in v6 that I will add an irq_work_sync() to
+kvm_pmu_vcpu_reset(). It turns out it's not necessary: a vcpu reset is done
+by the vcpu being reset with interrupts enabled, which means all the work
+has had a chance to run before the reset takes place.
 
-This is a patchset for ARM64 so its not clear to me what kind of advantage
-there would be against a simple implementation that does a regular fetch
-from a base address with an offset.
+ arch/arm64/kvm/pmu-emul.c | 26 +++++++++++++++++++++++++-
+ include/kvm/arm_pmu.h     |  1 +
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-> Main benefits:
->  * independent nVHE per-CPU data section that can be unmapped from host,
->  * more robust linking of nVHE hyp code,
->  * no need for hyp-specific macros to access per-CPU variables.
-
-Maybe simply don't use percpu variables for your arm code? Those pointers
-to data will be much more indepedent of the rest of the kernel and allow a
-much higher degree of being self-contained.
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index f0d0312c0a55..81916e360b1e 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -269,6 +269,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 
+ 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+ 		kvm_pmu_release_perf_event(&pmu->pmc[i]);
++	irq_work_sync(&vcpu->arch.pmu.overflow_work);
+ }
+ 
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+@@ -433,6 +434,22 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_update_state(vcpu);
+ }
+ 
++/**
++ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
++ * to the event.
++ * This is why we need a callback to do it once outside of the NMI context.
++ */
++static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_pmu *pmu;
++
++	pmu = container_of(work, struct kvm_pmu, overflow_work);
++	vcpu = kvm_pmc_to_vcpu(pmu->pmc);
++
++	kvm_vcpu_kick(vcpu);
++}
++
+ /**
+  * When the perf event overflows, set the overflow status and inform the vcpu.
+  */
+@@ -465,7 +482,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+ 
+ 	if (kvm_pmu_overflow_status(vcpu)) {
+ 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+-		kvm_vcpu_kick(vcpu);
++
++		if (!in_nmi())
++			kvm_vcpu_kick(vcpu);
++		else
++			irq_work_queue(&vcpu->arch.pmu.overflow_work);
+ 	}
+ 
+ 	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+@@ -764,6 +785,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
+ 
++	init_irq_work(&vcpu->arch.pmu.overflow_work,
++		      kvm_pmu_perf_overflow_notify_vcpu);
++
+ 	vcpu->arch.pmu.created = true;
+ 	return 0;
+ }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 6db030439e29..dbf4f08d42e5 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -27,6 +27,7 @@ struct kvm_pmu {
+ 	bool ready;
+ 	bool created;
+ 	bool irq_level;
++	struct irq_work overflow_work;
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+-- 
+2.28.0
 
 _______________________________________________
 kvmarm mailing list
