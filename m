@@ -1,60 +1,59 @@
-Return-Path: <SRS0=RYKq=DB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HJUM=DC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C89B1C4363D
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 16:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0DCC4363D
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Sep 2020 09:36:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0770121D20
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Sep 2020 16:52:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0770121D20
+	by mail.kernel.org (Postfix) with ESMTP id 5C84020BED
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Sep 2020 09:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C84020BED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 972A34B15C;
-	Thu, 24 Sep 2020 12:52:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2714B493;
+	Fri, 25 Sep 2020 05:36:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BpEOwGSfGi0B; Thu, 24 Sep 2020 12:52:57 -0400 (EDT)
+	with ESMTP id h7Mm6ZDLtAN2; Fri, 25 Sep 2020 05:36:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 967154B139;
-	Thu, 24 Sep 2020 12:52:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44FDE4B47B;
+	Fri, 25 Sep 2020 05:36:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 312DA4B132
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 12:52:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEF654B477
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2020 05:36:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KcKahNqdMinD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Sep 2020 12:52:56 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 121F54B100
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2020 12:52:56 -0400 (EDT)
-Received: from gaia (unknown [31.124.44.166])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id ACECF21D20;
- Thu, 24 Sep 2020 16:52:53 +0000 (UTC)
-Date: Thu, 24 Sep 2020 17:52:51 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v6 2/2] arm64: Add workaround for Arm Cortex-A77 erratum
- 1508412
-Message-ID: <20200924165250.GE28591@gaia>
-References: <20200924134853.2696503-1-robh@kernel.org>
- <20200924134853.2696503-2-robh@kernel.org>
+ with ESMTP id 6Anbjeb0X7ov for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Sep 2020 05:36:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93E794B476
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2020 05:36:20 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBD5C1045;
+ Fri, 25 Sep 2020 02:36:19 -0700 (PDT)
+Received: from e112269-lin.arm.com (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88BF43F718;
+ Fri, 25 Sep 2020 02:36:17 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+Subject: [PATCH v3 0/2] MTE support for KVM guest
+Date: Fri, 25 Sep 2020 10:36:05 +0100
+Message-Id: <20200925093607.3051-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200924134853.2696503-2-robh@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,43 +70,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 24, 2020 at 07:48:53AM -0600, Rob Herring wrote:
-> On Cortex-A77 r0p0 and r1p0, a sequence of a non-cacheable or device load
-> and a store exclusive or PAR_EL1 read can cause a deadlock.
-> 
-> The workaround requires a DMB SY before and after a PAR_EL1 register
-> read. In addition, it's possible an interrupt (doing a device read) or
-> KVM guest exit could be taken between the DMB and PAR read, so we
-> also need a DMB before returning from interrupt and before returning to
-> a guest.
-> 
-> A deadlock is still possible with the workaround as KVM guests must also
-> have the workaround. IOW, a malicious guest can deadlock an affected
-> systems.
-> 
-> This workaround also depends on a firmware counterpart to enable the h/w
-> to insert DMB SY after load and store exclusive instructions. See the
-> errata document SDEN-1152370 v10 [1] for more information.
-> 
-> [1] https://static.docs.arm.com/101992/0010/Arm_Cortex_A77_MP074_Software_Developer_Errata_Notice_v10.pdf
-> 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Signed-off-by: Rob Herring <robh@kernel.org>
+Version 3 of adding MTE support for KVM guests. See the previous (v2)
+posting for background:
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+ https://lore.kernel.org/r/20200904160018.29481-1-steven.price%40arm.com
 
-I'll leave these patches to Will for 5.10.
+These patches add support to KVM to enable MTE within a guest. They are
+based on Catalin's v9 MTE user-space support series[1] (currently in
+next).
 
-Thanks.
+Changes since v2:
+
+ * MTE is no longer a VCPU feature, instead it is a VM cap.
+
+ * Being a VM cap means easier probing (check for KVM_CAP_ARM_MTE).
+
+ * The cap must be set before any VCPUs are created, preventing any
+   shenanigans where MTE is enabled for the guest after memory accesses
+   have been performed.
+
+[1] https://lore.kernel.org/r/20200904103029.32083-1-catalin.marinas@arm.com
+
+Steven Price (2):
+  arm64: kvm: Save/restore MTE registers
+  arm64: kvm: Introduce MTE VCPU feature
+
+ arch/arm64/include/asm/kvm_emulate.h       |  3 +++
+ arch/arm64/include/asm/kvm_host.h          |  7 +++++++
+ arch/arm64/include/asm/sysreg.h            |  3 ++-
+ arch/arm64/kvm/arm.c                       |  9 +++++++++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
+ arch/arm64/kvm/mmu.c                       | 15 +++++++++++++++
+ arch/arm64/kvm/sys_regs.c                  | 20 +++++++++++++++-----
+ include/uapi/linux/kvm.h                   |  1 +
+ 8 files changed, 66 insertions(+), 6 deletions(-)
 
 -- 
-Catalin
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
