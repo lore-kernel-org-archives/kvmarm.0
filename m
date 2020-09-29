@@ -2,60 +2,85 @@ Return-Path: <SRS0=H5U9=DG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ADFC4727F
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Sep 2020 09:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AFBC4346E
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Sep 2020 10:50:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D2E9121548
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Sep 2020 09:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2E9121548
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 21FA620C09
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Sep 2020 10:50:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfTAeyF0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21FA620C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9004B369;
-	Tue, 29 Sep 2020 05:18:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85CFC4B113;
+	Tue, 29 Sep 2020 06:50:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MVgZ7AVdDRDo; Tue, 29 Sep 2020 05:18:14 -0400 (EDT)
+	with ESMTP id nzHyyP5K7qxw; Tue, 29 Sep 2020 06:50:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D69604B22B;
-	Tue, 29 Sep 2020 05:18:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50AE84B134;
+	Tue, 29 Sep 2020 06:50:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 207F34B1F4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2020 05:18:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3DE34B0EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2020 06:50:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pZCQTyD6f5bN for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Sep 2020 05:18:10 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6A254B311
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2020 05:18:09 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B1E9BF27A1E5B154B283;
- Tue, 29 Sep 2020 17:18:07 +0800 (CST)
-Received: from DESKTOP-FPN2511.china.huawei.com (10.174.187.69) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 29 Sep 2020 17:17:58 +0800
-From: Jingyi Wang <wangjingyi11@huawei.com>
-To: <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: [RFC PATCH 3/4] KVM: arm64: Use dynamic TWE Delay value
-Date: Tue, 29 Sep 2020 17:17:26 +0800
-Message-ID: <20200929091727.8692-4-wangjingyi11@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
+ with ESMTP id uRr-m7Vx7k2z for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Sep 2020 06:50:12 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7C344B112
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2020 06:50:12 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 74AC3207C4;
+ Tue, 29 Sep 2020 10:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1601376611;
+ bh=+I6vWV6P/qLfkwTM5yFDXU97X8kNtec29ztsEGOJdkI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=pfTAeyF0I6swVhhX5Ipfkso18w0joB1zkX5353v8f9nLyFPXnGZ15eBJPKN3sHwMd
+ F19mZ62c+2/97x2BqhQwTGlFeDhHY7Fy2B2QqgkGa1nEJzs3NfOiLbN0tpfM2NTcW7
+ md0GD5TzXewY0Es6DVpCAJDNYY+H4ZepDQtRtfVc=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1kNDCz-00FlHa-KA; Tue, 29 Sep 2020 11:50:09 +0100
+MIME-Version: 1.0
+Date: Tue, 29 Sep 2020 11:50:09 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Jingyi Wang <wangjingyi11@huawei.com>
+Subject: Re: [RFC PATCH 0/4] Add support for ARMv8.6 TWED feature
 In-Reply-To: <20200929091727.8692-1-wangjingyi11@huawei.com>
 References: <20200929091727.8692-1-wangjingyi11@huawei.com>
-MIME-Version: 1.0
-X-Originating-IP: [10.174.187.69]
-X-CFilter-Loop: Reflected
-Cc: catalin.marinas@arm.com, fanhenglong@huawei.com, prime.zeng@hisilicon.com,
- maz@kernel.org, will@kernel.org
+User-Agent: Roundcube Webmail/1.4.8
+Message-ID: <913250ae919fb9453feadd0527827d55@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ wanghaibin.wang@huawei.com, yezengruan@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, fanhenglong@huawei.com,
+ prime.zeng@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, fanhenglong@huawei.com,
+ prime.zeng@hisilicon.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,158 +92,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We implement two new kernel parameters for changing the delay adaptively:
-twed_grow and twed_shrink
-twed_grow affects the delay on WFE trap and twed_shrink does it on
-sched_in; depending on their value, the delay is modifier like this:
-
-     twed_shrink/ |
-     twed_grow    | WFE trap exit | sched_in
-    --------------+---------------+------------
-     < 1          | = twed        | = twed
-     otherwise    | = twed + 1    | = twed - 1
-
-Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  6 ++++++
- arch/arm64/include/asm/kvm_host.h    |  6 +++++-
- arch/arm64/kvm/arm.c                 | 32 ++++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c         |  2 ++
- 4 files changed, 45 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 1a9cce836170..546d10b3b534 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -116,16 +116,22 @@ static inline void vcpu_twed_disable(struct kvm_vcpu *vcpu)
- static inline void vcpu_twed_init(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.twed = (u64)twed;
-+	vcpu->arch.twed_dirty = true;
- }
- 
- static inline void vcpu_set_twed(struct kvm_vcpu *vcpu)
- {
- 	u64 delay = vcpu->arch.twed;
-+
-+	if (!vcpu->arch.twed_dirty)
-+		return;
-+
- 	if (delay > HCR_TWEDEL_MAX)
- 		delay = HCR_TWEDEL_MAX;
- 
- 	vcpu->arch.hcr_el2 &= ~HCR_TWEDEL_MASK;
- 	vcpu->arch.hcr_el2 |= (delay << HCR_TWEDEL_SHIFT);
-+	vcpu->arch.twed_dirty = false;
- }
- #else
- static inline void vcpu_twed_enable(struct kvm_vcpu *vcpu) {};
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 380cd9c8ad0f..35d1953d9d35 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -375,6 +375,7 @@ struct kvm_vcpu_arch {
- #ifdef CONFIG_ARM64_TWED
- 	/* WFE trap delay */
- 	u64 twed;
-+	bool twed_dirty;
- #endif
- };
- 
-@@ -595,7 +596,6 @@ void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
- 
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
--static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
- void kvm_arm_init_debug(void);
-@@ -697,8 +697,12 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- #define use_twed() (has_twed() && twed_enable)
- extern bool twed_enable;
- extern unsigned int twed;
-+void grow_twed(struct kvm_vcpu *vcpu);
-+void shrink_twed(struct kvm_vcpu *vcpu);
- #else
- #define use_twed() false
-+static inline void grow_twed(struct kvm_vcpu *vcpu) {};
-+static inline void shrink_twed(struct kvm_vcpu *vcpu) {};
- #endif
- 
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5b5e8b14dcd5..989bffdcb3e9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -65,6 +65,32 @@ module_param(twed_enable, bool, S_IRUGO | S_IWUSR);
- 
- unsigned int twed = 0;
- module_param(twed, uint, S_IRUGO | S_IWUSR);
-+
-+static unsigned int twed_grow = 0;
-+module_param(twed_grow, uint, S_IRUGO | S_IWUSR);
-+
-+static unsigned int twed_shrink = 0;
-+module_param(twed_shrink, uint, S_IRUGO | S_IWUSR);
-+
-+void grow_twed(struct kvm_vcpu *vcpu)
-+{
-+	u64 old = vcpu->arch.twed;
-+
-+	if (old < HCR_TWEDEL_MAX && twed_grow) {
-+		vcpu->arch.twed += 1;
-+		vcpu->arch.twed_dirty = true;
-+	}
-+}
-+
-+void shrink_twed(struct kvm_vcpu *vcpu)
-+{
-+	u64 old = vcpu->arch.twed;
-+
-+	if (old > 0 && twed_shrink) {
-+		vcpu->arch.twed -= 1;
-+		vcpu->arch.twed_dirty = true;
-+	}
-+}
- #endif
- 
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
-@@ -108,6 +134,12 @@ static int kvm_arm_default_max_vcpus(void)
- 	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
- }
- 
-+void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
-+{
-+	if (use_twed())
-+		shrink_twed(vcpu);
-+}
-+
- /**
-  * kvm_arch_init_vm - initializes a VM data structure
-  * @kvm:	pointer to the KVM struct
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 5d690d60ccad..2ad72defa3c9 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -91,6 +91,8 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-+		if (use_twed())
-+			grow_twed(vcpu);
- 		vcpu->stat.wfe_exit_stat++;
- 		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
- 	} else {
--- 
-2.19.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0wOS0yOSAxMDoxNywgSmluZ3lpIFdhbmcgd3JvdGU6Cj4gVFdFIERlbGF5IGlzIGFu
+IG9wdGlvbmFsIGZlYXR1cmUgaW4gQVJNdjguNiBFeHRlbnRpb25zLiBUaGVyZSBpcyBhCj4gcGVy
+Zm9ybWFuY2UgYmVuZWZpdCBpbiB3YWl0aW5nIGZvciBhIHBlcmlvZCBvZiB0aW1lIGZvciBhbiBl
+dmVudCB0bwo+IGFycml2ZSBiZWZvcmUgdGFraW5nIHRoZSB0cmFwIGFzIGl0IGlzIGNvbW1vbiB0
+aGF0IGV2ZW50IHdpbGwgYXJyaXZlCj4g4oCccXVpdGUgc29vbuKAnSBhZnRlciBleGVjdXRpbmcg
+dGhlIFdGRSBpbnN0cnVjdGlvbi4KCkRlZmluZSAicXVpdGUgc29vbiIuIFF1YW50aWZ5ICJwZXJm
+b3JtYW5jZSBiZW5lZml0cyIuIFdoaWNoIGFyZSB0aGUKd29ya2xvYWRzIHRoYXQgYWN0dWFsbHkg
+YmVuZWZpdCBmcm9tIHRoaXMgaW1pdGF0aW9uIG9mIHRoZSB4ODYgUExFPwoKSSB3YXMgb3Bwb3Nl
+ZCB0byB0aGlzIHdoZW4gdGhlIHNwZWMgd2FzIGRyYWZ0ZWQsIGFuZCBJIHN0aWxsIGFtIGdpdmVu
+CnRoYXQgdGhlcmUgaXMgemVybyBzdXBwb3J0aW5nIGV2aWRlbmNlIHRoYXQgaXQgYnJpbmcgYW55
+IGdhaW4gb3ZlcgppbW1lZGlhdGUgdHJhcHBpbmcgaW4gYW4gb3ZlcnN1YnNjcmliZWQgZW52aXJv
+bm1lbnQgKHdoaWNoIGlzIHRoZSBvbmx5CmNhc2Ugd2hlcmUgaXQgbWF0dGVycykuCgpUaGFua3Ms
+CgogICAgICAgICBNLgoKPiAKPiBUaGlzIHNlcmllcyBhZGRzIHN1cHBvcnQgZm9yIFRXRUQgZmVh
+dHVyZSBhbmQgaW1wbGVtZW50cyBUV0UgZGVsYXkKPiB2YWx1ZSBkeW5hbWljIGFkanVzdG1lbnQu
+Cj4gCj4gVGhhbmtzIGZvciBTaGFtZWVyJ3MgYWR2aWNlIG9uIHRoaXMgc2VyaWVzLiBUaGUgZnVu
+Y3Rpb24gb2YgdGhpcyBwYXRjaAo+IGhhcyBiZWVuIHRlc3RlZCBvbiBUV0VEIHN1cHBvcnRlZCBo
+YXJkd2FyZSBhbmQgdGhlIHBlcmZvcm1hbmNlIG9mIGl0IGlzCj4gc3RpbGwgb24gdGVzdCwgYW55
+IGFkdmljZSB3aWxsIGJlIHdlbGNvbWVkLgo+IAo+IEppbmd5aSBXYW5nICgyKToKPiAgIEtWTTog
+YXJtNjQ6IE1ha2UgdXNlIG9mIFRXRUQgZmVhdHVyZQo+ICAgS1ZNOiBhcm02NDogVXNlIGR5bmFt
+aWMgVFdFIERlbGF5IHZhbHVlCj4gCj4gWmVuZ3J1YW4gWWUgKDIpOgo+ICAgYXJtNjQ6IGNwdWZl
+YXR1cmU6IFRXRUQgc3VwcG9ydCBkZXRlY3Rpb24KPiAgIEtWTTogYXJtNjQ6IEFkZCB0cmFjZSBm
+b3IgVFdFRCB1cGRhdGUKPiAKPiAgYXJjaC9hcm02NC9LY29uZmlnICAgICAgICAgICAgICAgICAg
+IHwgMTAgKysrKysKPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVjYXBzLmggICAgIHwgIDMg
+Ky0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fYXJtLmggICAgIHwgIDUgKysrCj4gIGFy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2VtdWxhdGUuaCB8IDM4ICsrKysrKysrKysrKysrKysr
+Kwo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICAgfCAxOSArKysrKysrKy0K
+PiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS92aXJ0LmggICAgICAgIHwgIDggKysrKwo+ICBhcmNo
+L2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgICAgICAgfCAxMiArKysrKysKPiAgYXJjaC9hcm02
+NC9rdm0vYXJtLmMgICAgICAgICAgICAgICAgIHwgNTggKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKwo+ICBhcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jICAgICAgICAgfCAgMiArCj4gIGFy
+Y2gvYXJtNjQva3ZtL3RyYWNlX2FybS5oICAgICAgICAgICB8IDIxICsrKysrKysrKysKPiAgMTAg
+ZmlsZXMgY2hhbmdlZCwgMTc0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgotLSAKSmF6
+eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
