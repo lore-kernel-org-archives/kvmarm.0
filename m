@@ -2,80 +2,96 @@ Return-Path: <SRS0=046z=DI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF4CC4727C
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 08:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679F4C47423
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4F45B20780
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 08:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C47B121531
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hz+UFbqd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F45B20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="hWAwHmbv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47B121531
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A58184B2E6;
-	Thu,  1 Oct 2020 04:31:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EB6C4B109;
+	Thu,  1 Oct 2020 06:08:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mXr0SXajfN9Z; Thu,  1 Oct 2020 04:31:05 -0400 (EDT)
+	with ESMTP id hP4emWkESObt; Thu,  1 Oct 2020 06:07:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F18C4B25B;
-	Thu,  1 Oct 2020 04:31:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D83AB4B220;
+	Thu,  1 Oct 2020 06:07:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B675B4B25B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 04:31:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D494B219
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:07:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 23hjcXOsMWW3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Oct 2020 04:31:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41FD34B0EF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 04:31:02 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4AF3320780;
- Thu,  1 Oct 2020 08:31:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1601541060;
- bh=mOjOwXFy/3k7ygL/qfSOhxFp+h1gkdtJ+osWQg12ZiU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=hz+UFbqd+Liq8djx8/IWbvxqSX01+jnwip+HSQBPL+KwIS/XdQGI/dv4Bn4sOcTVX
- kxO1U+gxF4WZ2nOu2bnr/BNzIAHxF5NKknSosN3OYZ1gvc1Q0ImKnoYUhQBxzQzJNh
- BmByEQdlpKeymL+F2mWGdSdn67tbs364w8SfQMqw=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kNtzO-00GOkS-FP; Thu, 01 Oct 2020 09:30:58 +0100
+ with ESMTP id zoEIsBGMpAD3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Oct 2020 06:07:57 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB2FE4B109
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:07:56 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id t10so4987803wrv.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Oct 2020 03:07:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=NUXTaxsY7NaXachlgBjQGlyIz9BkJJJNfphdb55Lwns=;
+ b=hWAwHmbvpL/fUYlWSvL43XM6O7kxQXolhLytRW4KP0Z6zlw+30mFb+/NKei2wkyFjW
+ AFJtE+PMI/8r5JP1ykHUGVR4ysFO99EDr4a4/9WUldbEdf+iWIoIG2MyvVu/GGNvk/q9
+ CwVZ7wkgPJe+3LCECgMYFCtBvbG7Z3EYknif+gIIDLkj+/ir0S1ToxC9pmbjg1Bfgm14
+ i1ARfg5oRTR6difVdGKpxvzYyyEubV3G0o9JxizzDMIQuHMmG1K87BjB2Wtc9BlxKcIQ
+ wyzQjihFjT1hNaUUEMeAKf4Etzh4HG37dmxP+26a9fblWLk5m9/ErrxU1igmKfxxYVD8
+ KMtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NUXTaxsY7NaXachlgBjQGlyIz9BkJJJNfphdb55Lwns=;
+ b=F2Zin4g2H2FHSrBpxR9vQHF54cRTzZHxxXlU3dfdE+Ia9uyhoXmSn4MOoTGtUHVqM2
+ +wTv8XmsApdfG6zTgTPYfxqEK9ed29th+LiofNT62xhA72/MV/z9Q5mniBmUFuNzgzvb
+ Z3ne+V62BM/dHwa7SNJ3gIjyc7itqp0mmt49TiEtOQfNnmb5f4DF2BRWXgpZjw5OgX09
+ Tt0UmZejM78ZNaZyB+DZEzaxf6osaoGGQirJetdWSPXm2E6bBvV6rLEymp/awcAsYWl+
+ m6xTUHXI7Y7Sbjsg6w4B2Tg5vdpD/bbnk2XYcJLuFNkUAkAy063ncsE9o0bPHoromqVn
+ lNRg==
+X-Gm-Message-State: AOAM530JCS9egaWZ0b9fqPL2uFrUnZptkALdX6CCwgLJL5v04qJIj0L0
+ 4gkTDKR6AEResaayU2aIX7jS/g==
+X-Google-Smtp-Source: ABdhPJw+OAQXeCZAgHYba/uf4iegthEQioEJaaLoGJ3ir7TtqURdZbSjpiI/+z+XYaADHTW1Un++OQ==
+X-Received: by 2002:adf:f750:: with SMTP id z16mr7697659wrp.377.1601546875447; 
+ Thu, 01 Oct 2020 03:07:55 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
+ by smtp.gmail.com with ESMTPSA id p14sm8281917wmc.8.2020.10.01.03.07.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 01 Oct 2020 03:07:54 -0700 (PDT)
+Date: Thu, 1 Oct 2020 11:07:50 +0100
+From: Andrew Scull <ascull@google.com>
+To: George-Aurelian Popescu <georgepope@google.com>
+Subject: Re: [PATCH 03/14] KVM: arm64: Add support for creating and checking
+ a logging buffer inside hyp/nVHE
+Message-ID: <20201001100750.GA541087@google.com>
+References: <20200914172750.852684-1-georgepope@google.com>
+ <20200914172750.852684-4-georgepope@google.com>
 MIME-Version: 1.0
-Date: Thu, 01 Oct 2020 09:30:58 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Thomas Tai <thomas.tai@oracle.com>
-Subject: Re: [PATCH] KVM: arm64: Fixes ARM VM hangs at boot
-In-Reply-To: <20200930221239.488744-1-thomas.tai@oracle.com>
-References: <20200930221239.488744-1-thomas.tai@oracle.com>
-User-Agent: Roundcube Webmail/1.4.8
-Message-ID: <f906ecd23609bbdf4a1db991624943d5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: thomas.tai@oracle.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200914172750.852684-4-georgepope@google.com>
+Cc: tglx@linutronix.de, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, maskray@google.com, maz@kernel.org,
+ masahiroy@kernel.org, clang-built-linux@googlegroups.com,
+ linux-arm-kernel@lists.infradead.org, elver@google.com, keescook@chromium.org,
+ arnd@arndb.de, linux-kbuild@vger.kernel.org, broonie@kernel.org,
+ natechancellor@gmail.com, dvyukov@google.com, michal.lkml@markovi.net,
+ ndesaulniers@google.com, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,75 +103,144 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Thomas,
-
-On 2020-09-30 23:12, Thomas Tai wrote:
-> When using the latest kernel v5.9-rc7 on an ARM server, VMs could
-> hang at boot with no output. The commit a0e50aa3f4a8 removed
-> asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT)),
-> it looks like isb is still needed for non
-> ARM64_WORKAROUND_SPECULATIVE_AT host when switching to guest.
-
-Is that on an eMAG system, by any chance?
-
+On Mon, Sep 14, 2020 at 05:27:39PM +0000, George-Aurelian Popescu wrote:
+> From: George Popescu <georgepope@google.com>
 > 
-> The code fragment for the original patch:
-> -       /* __load_guest_stage2() includes an ISB for the workaround. */
-> -       __load_guest_stage2(kvm);
-> -       asm(ALTERNATIVE("isb", "nop", 
-> ARM64_WORKAROUND_SPECULATIVE_AT));
-> +       __load_guest_stage2(mmu);
+> Share a buffer between the kernel and the hyp/nVHE code by using the
+> macros from kvm_debug_buffer.h.
 > 
-> The code should have been:
-> -       /* __load_guest_stage2() includes an ISB for the workaround. */
-> -       __load_guest_stage2(kvm);
-> -       asm(ALTERNATIVE("isb", "nop", 
-> ARM64_WORKAROUND_SPECULATIVE_AT));
-> +       __load_guest_stage2(mmu);
-> +       asm(ALTERNATIVE("isb", "nop", 
-> ARM64_WORKAROUND_SPECULATIVE_AT));
-> ie, the workaround is still needed.
+> The buffer is composed of a writing index and a statically allocated
+> array. The writing index counts how many elements have been written inside
+> the buffer and should be set to zero whenever the code goes back to
+> EL2 with the clear_kvm_debug_buffer macro.
 > 
-> Fixes: a0e50aa3f4a8 ("KVM: arm64: Factor out stage 2 page table data 
-> from
-> struct kvm")
+> To avoid consistency problems the buffer is defined per_cpu and is designed
+> to be read-only from the kernel perspective.
 > 
-> Signed-off-by: Thomas Tai <thomas.tai@oracle.com>
+> Check if there is any logging data from hyp/nVHE code.
+> 
+> Every time when the state returns back to the kernel after an hvc call,
+> the __kvm_arm_check_debug_buffer macro checks if there is any data inside
+> one of the predefined buffers.
+> 
+> Signed-off-by: George Popescu <georgepope@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/tlb.c | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/arm64/include/asm/kvm_debug_buffer.h | 34 +++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h         |  6 ++++
+>  arch/arm64/kvm/hyp/hyp-entry.S            |  2 +-
+>  3 files changed, 41 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_debug_buffer.h
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c 
-> b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index 69eae60..536496e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -32,6 +32,7 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu 
-> *mmu,
->  	}
+> diff --git a/arch/arm64/include/asm/kvm_debug_buffer.h b/arch/arm64/include/asm/kvm_debug_buffer.h
+> new file mode 100644
+> index 000000000000..30c9b0b1a7bf
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_debug_buffer.h
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright 2020 Google LLC
+> + * Author: George Popescu <georgepope@google.com>
+> + */
+> +#ifndef __ASSEMBLY__
+> +
+> +#include <linux/percpu-defs.h>
+> +#include <asm/kvm_asm.h>
+> +
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define DEFINE_KVM_DEBUG_BUFFER(type_name, buff_name, size)             \
+> +	DEFINE_PER_CPU(type_name, buff_name)[(size)];	                \
+> +	DEFINE_PER_CPU(unsigned long, buff_name##_wr_ind) = 0
+> +
+> +#define DECLARE_KVM_DEBUG_BUFFER(type_name, buff_name, size)            \
+> +	DECLARE_PER_CPU(type_name, buff_name)[(size)];                  \
+> +	DECLARE_PER_CPU(unsigned long, buff_name##_wr_ind)
+> +
+> +#else
+> +
+> +#define DECLARE_KVM_DEBUG_BUFFER(type_name, buff_name, size)            \
+> +	DECLARE_PER_CPU(type_name, kvm_nvhe_sym(buff_name))[(size)];    \
+> +	DECLARE_PER_CPU(unsigned long, kvm_nvhe_sym(buff_name##_wr_ind))
+> +#endif //__KVM_NVHE_HYPERVISOR__
+
+nit: comment style, here and below
+
+> +
+> +#else
+> +
+> +.macro clear_kvm_debug_buffer sym tmp1, tmp2, tmp3
+> +	mov \tmp1, 0
+> +	hyp_str_this_cpu \sym, \tmp1, \tmp2, \tmp3
+> +.endm
+
+Can you can use xzr (zero register) directly rather than moving the
+constant 0 into a temporary?
+
+	hyp_str_this_cpu \sym, xzr, \tmp1, \tmp2
+
+> +
+> +#endif // __ASSEMBLY__
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 905c2b87e05a..adc8957e9321 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -494,6 +494,10 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
+>  	})
+>  
+> +#define __kvm_arm_check_debug_buffer()					\
+> +{									\
+> +}
+> +
+>  /*
+>   * The couple of isb() below are there to guarantee the same behaviour
+>   * on VHE as on !VHE, where the eret to EL1 acts as a context
+> @@ -506,6 +510,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			isb();						\
+>  		} else {						\
+>  			kvm_call_hyp_nvhe(f, ##__VA_ARGS__);		\
+> +			__kvm_arm_check_debug_buffer();			\
+>  		}							\
+>  	} while(0)
+>  
+> @@ -518,6 +523,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  			isb();						\
+>  		} else {						\
+>  			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
+> +			__kvm_arm_check_debug_buffer();			\
+
+As Will was pointing out earlier, does the checking need to have
+preemption disabled in case there is another call into hyp that corrupts
+the buffer while it is being checked?
+
+>  		}							\
+>  									\
+>  		ret;							\
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index 46b4dab933d0..8df0082b9ccf 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -68,7 +68,7 @@ el1_sync:				// Guest trapped into EL2
+>  	cbnz	x1, el1_hvc_guest	// called HVC
+>  
+>  	/* Here, we're pretty sure the host called HVC. */
+> -	ldp	x0, x1, [sp], #16
+> +	ldp	x0, x1,	[sp], #16
+
+Is this a whitespace change? Maybe drop from this patch if it isn't
+related.
+
+>  
+>  	/* Check for a stub HVC call */
+>  	cmp	x0, #HVC_STUB_HCALL_NR
+> -- 
+> 2.28.0.618.gf4bc123cb7-goog
 > 
->  	__load_guest_stage2(mmu);
-> +	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
->  }
-> 
->  static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
-
-Ouch. I remember fixing this a while ago, but somehow dropped it
-after applying it and *not* merging it...
-
-Thanks a lot for the heads up!
-
-         M.
-
-[1] 
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/pre-nv-5.9
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
