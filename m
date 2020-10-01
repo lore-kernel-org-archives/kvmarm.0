@@ -2,96 +2,59 @@ Return-Path: <SRS0=046z=DI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 679F4C47423
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEA4C4727C
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C47B121531
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:08:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="hWAwHmbv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47B121531
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 7E73720838
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:12:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E73720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EB6C4B109;
-	Thu,  1 Oct 2020 06:08:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D25F14B2DB;
+	Thu,  1 Oct 2020 06:12:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hP4emWkESObt; Thu,  1 Oct 2020 06:07:59 -0400 (EDT)
+	with ESMTP id F9m4hhq65Qbi; Thu,  1 Oct 2020 06:12:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D83AB4B220;
-	Thu,  1 Oct 2020 06:07:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90B324B307;
+	Thu,  1 Oct 2020 06:12:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D494B219
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:07:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5F94B2BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:12:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zoEIsBGMpAD3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Oct 2020 06:07:57 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB2FE4B109
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:07:56 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id t10so4987803wrv.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Oct 2020 03:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=NUXTaxsY7NaXachlgBjQGlyIz9BkJJJNfphdb55Lwns=;
- b=hWAwHmbvpL/fUYlWSvL43XM6O7kxQXolhLytRW4KP0Z6zlw+30mFb+/NKei2wkyFjW
- AFJtE+PMI/8r5JP1ykHUGVR4ysFO99EDr4a4/9WUldbEdf+iWIoIG2MyvVu/GGNvk/q9
- CwVZ7wkgPJe+3LCECgMYFCtBvbG7Z3EYknif+gIIDLkj+/ir0S1ToxC9pmbjg1Bfgm14
- i1ARfg5oRTR6difVdGKpxvzYyyEubV3G0o9JxizzDMIQuHMmG1K87BjB2Wtc9BlxKcIQ
- wyzQjihFjT1hNaUUEMeAKf4Etzh4HG37dmxP+26a9fblWLk5m9/ErrxU1igmKfxxYVD8
- KMtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NUXTaxsY7NaXachlgBjQGlyIz9BkJJJNfphdb55Lwns=;
- b=F2Zin4g2H2FHSrBpxR9vQHF54cRTzZHxxXlU3dfdE+Ia9uyhoXmSn4MOoTGtUHVqM2
- +wTv8XmsApdfG6zTgTPYfxqEK9ed29th+LiofNT62xhA72/MV/z9Q5mniBmUFuNzgzvb
- Z3ne+V62BM/dHwa7SNJ3gIjyc7itqp0mmt49TiEtOQfNnmb5f4DF2BRWXgpZjw5OgX09
- Tt0UmZejM78ZNaZyB+DZEzaxf6osaoGGQirJetdWSPXm2E6bBvV6rLEymp/awcAsYWl+
- m6xTUHXI7Y7Sbjsg6w4B2Tg5vdpD/bbnk2XYcJLuFNkUAkAy063ncsE9o0bPHoromqVn
- lNRg==
-X-Gm-Message-State: AOAM530JCS9egaWZ0b9fqPL2uFrUnZptkALdX6CCwgLJL5v04qJIj0L0
- 4gkTDKR6AEResaayU2aIX7jS/g==
-X-Google-Smtp-Source: ABdhPJw+OAQXeCZAgHYba/uf4iegthEQioEJaaLoGJ3ir7TtqURdZbSjpiI/+z+XYaADHTW1Un++OQ==
-X-Received: by 2002:adf:f750:: with SMTP id z16mr7697659wrp.377.1601546875447; 
- Thu, 01 Oct 2020 03:07:55 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
- by smtp.gmail.com with ESMTPSA id p14sm8281917wmc.8.2020.10.01.03.07.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Oct 2020 03:07:54 -0700 (PDT)
-Date: Thu, 1 Oct 2020 11:07:50 +0100
-From: Andrew Scull <ascull@google.com>
-To: George-Aurelian Popescu <georgepope@google.com>
-Subject: Re: [PATCH 03/14] KVM: arm64: Add support for creating and checking
- a logging buffer inside hyp/nVHE
-Message-ID: <20201001100750.GA541087@google.com>
-References: <20200914172750.852684-1-georgepope@google.com>
- <20200914172750.852684-4-georgepope@google.com>
+ with ESMTP id M5YknJLz0k+N for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Oct 2020 06:12:47 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F0864B275
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:12:47 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F2FBD6E;
+ Thu,  1 Oct 2020 03:12:46 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F364A3F70D;
+ Thu,  1 Oct 2020 03:12:45 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Pass level hint to TLBI during stage-2
+ permission fault
+To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+References: <20200930131801.16889-1-will@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <59870762-a477-215a-6266-a94940dbd961@arm.com>
+Date: Thu, 1 Oct 2020 11:13:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20200914172750.852684-4-georgepope@google.com>
-Cc: tglx@linutronix.de, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, maskray@google.com, maz@kernel.org,
- masahiroy@kernel.org, clang-built-linux@googlegroups.com,
- linux-arm-kernel@lists.infradead.org, elver@google.com, keescook@chromium.org,
- arnd@arndb.de, linux-kbuild@vger.kernel.org, broonie@kernel.org,
- natechancellor@gmail.com, dvyukov@google.com, michal.lkml@markovi.net,
- ndesaulniers@google.com, linux-kernel@vger.kernel.org,
- akpm@linux-foundation.org
+In-Reply-To: <20200930131801.16889-1-will@kernel.org>
+Content-Language: en-US
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -108,139 +71,129 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 14, 2020 at 05:27:39PM +0000, George-Aurelian Popescu wrote:
-> From: George Popescu <georgepope@google.com>
-> 
-> Share a buffer between the kernel and the hyp/nVHE code by using the
-> macros from kvm_debug_buffer.h.
-> 
-> The buffer is composed of a writing index and a statically allocated
-> array. The writing index counts how many elements have been written inside
-> the buffer and should be set to zero whenever the code goes back to
-> EL2 with the clear_kvm_debug_buffer macro.
-> 
-> To avoid consistency problems the buffer is defined per_cpu and is designed
-> to be read-only from the kernel perspective.
-> 
-> Check if there is any logging data from hyp/nVHE code.
-> 
-> Every time when the state returns back to the kernel after an hvc call,
-> the __kvm_arm_check_debug_buffer macro checks if there is any data inside
-> one of the predefined buffers.
-> 
-> Signed-off-by: George Popescu <georgepope@google.com>
+Hi,
+
+On 9/30/20 2:18 PM, Will Deacon wrote:
+> Alex pointed out that we don't pass a level hint to the TLBI instruction
+> when handling a stage-2 permission fault, even though the walker does
+> at some point have the level information in its hands.
+>
+> Rework stage2_update_leaf_attrs() so that it can optionally return the
+> level of the updated pte to its caller, which can in turn be used to
+> provide the correct TLBI level hint.
+
+Looks correct to me. I checked and all the functions that don't do a tlbi pass
+NULL as the level pointer, and the level parameter is always set by the walker
+algorithm (if level had an invalid value, no invalidation would have been performed):
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/595cc73e-636e-8b3a-f93a-b4e9fb218db8@arm.com
+> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_debug_buffer.h | 34 +++++++++++++++++++++++
->  arch/arm64/include/asm/kvm_host.h         |  6 ++++
->  arch/arm64/kvm/hyp/hyp-entry.S            |  2 +-
->  3 files changed, 41 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/kvm_debug_buffer.h
-> 
-> diff --git a/arch/arm64/include/asm/kvm_debug_buffer.h b/arch/arm64/include/asm/kvm_debug_buffer.h
-> new file mode 100644
-> index 000000000000..30c9b0b1a7bf
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_debug_buffer.h
-> @@ -0,0 +1,34 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright 2020 Google LLC
-> + * Author: George Popescu <georgepope@google.com>
-> + */
-> +#ifndef __ASSEMBLY__
-> +
-> +#include <linux/percpu-defs.h>
-> +#include <asm/kvm_asm.h>
-> +
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +#define DEFINE_KVM_DEBUG_BUFFER(type_name, buff_name, size)             \
-> +	DEFINE_PER_CPU(type_name, buff_name)[(size)];	                \
-> +	DEFINE_PER_CPU(unsigned long, buff_name##_wr_ind) = 0
-> +
-> +#define DECLARE_KVM_DEBUG_BUFFER(type_name, buff_name, size)            \
-> +	DECLARE_PER_CPU(type_name, buff_name)[(size)];                  \
-> +	DECLARE_PER_CPU(unsigned long, buff_name##_wr_ind)
-> +
-> +#else
-> +
-> +#define DECLARE_KVM_DEBUG_BUFFER(type_name, buff_name, size)            \
-> +	DECLARE_PER_CPU(type_name, kvm_nvhe_sym(buff_name))[(size)];    \
-> +	DECLARE_PER_CPU(unsigned long, kvm_nvhe_sym(buff_name##_wr_ind))
-> +#endif //__KVM_NVHE_HYPERVISOR__
-
-nit: comment style, here and below
-
-> +
-> +#else
-> +
-> +.macro clear_kvm_debug_buffer sym tmp1, tmp2, tmp3
-> +	mov \tmp1, 0
-> +	hyp_str_this_cpu \sym, \tmp1, \tmp2, \tmp3
-> +.endm
-
-Can you can use xzr (zero register) directly rather than moving the
-constant 0 into a temporary?
-
-	hyp_str_this_cpu \sym, xzr, \tmp1, \tmp2
-
-> +
-> +#endif // __ASSEMBLY__
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 905c2b87e05a..adc8957e9321 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -494,6 +494,10 @@ u64 __kvm_call_hyp(void *hypfn, ...);
->  		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
->  	})
+>  arch/arm64/kvm/hyp/pgtable.c | 23 ++++++++++++++++-------
+>  1 file changed, 16 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 603d6b415337..0cdf6e461cbd 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -694,6 +694,7 @@ struct stage2_attr_data {
+>  	kvm_pte_t	attr_set;
+>  	kvm_pte_t	attr_clr;
+>  	kvm_pte_t	pte;
+> +	u32		level;
+>  };
 >  
-> +#define __kvm_arm_check_debug_buffer()					\
-> +{									\
-> +}
+>  static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> @@ -706,6 +707,7 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	if (!kvm_pte_valid(pte))
+>  		return 0;
+>  
+> +	data->level = level;
+>  	data->pte = pte;
+>  	pte &= ~data->attr_clr;
+>  	pte |= data->attr_set;
+> @@ -723,7 +725,8 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  
+>  static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>  				    u64 size, kvm_pte_t attr_set,
+> -				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte)
+> +				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
+> +				    u32 *level)
+>  {
+>  	int ret;
+>  	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
+> @@ -743,20 +746,24 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>  
+>  	if (orig_pte)
+>  		*orig_pte = data.pte;
 > +
->  /*
->   * The couple of isb() below are there to guarantee the same behaviour
->   * on VHE as on !VHE, where the eret to EL1 acts as a context
-> @@ -506,6 +510,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
->  			isb();						\
->  		} else {						\
->  			kvm_call_hyp_nvhe(f, ##__VA_ARGS__);		\
-> +			__kvm_arm_check_debug_buffer();			\
->  		}							\
->  	} while(0)
+> +	if (level)
+> +		*level = data.level;
+>  	return 0;
+>  }
 >  
-> @@ -518,6 +523,7 @@ u64 __kvm_call_hyp(void *hypfn, ...);
->  			isb();						\
->  		} else {						\
->  			ret = kvm_call_hyp_nvhe_ret(f, ##__VA_ARGS__);	\
-> +			__kvm_arm_check_debug_buffer();			\
-
-As Will was pointing out earlier, does the checking need to have
-preemption disabled in case there is another call into hyp that corrupts
-the buffer while it is being checked?
-
->  		}							\
->  									\
->  		ret;							\
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 46b4dab933d0..8df0082b9ccf 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -68,7 +68,7 @@ el1_sync:				// Guest trapped into EL2
->  	cbnz	x1, el1_hvc_guest	// called HVC
+>  int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  {
+>  	return stage2_update_leaf_attrs(pgt, addr, size, 0,
+> -					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W, NULL);
+> +					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+> +					NULL, NULL);
+>  }
 >  
->  	/* Here, we're pretty sure the host called HVC. */
-> -	ldp	x0, x1, [sp], #16
-> +	ldp	x0, x1,	[sp], #16
-
-Is this a whitespace change? Maybe drop from this patch if it isn't
-related.
-
+>  kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>  	kvm_pte_t pte = 0;
+>  	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> -				 &pte);
+> +				 &pte, NULL);
+>  	dsb(ishst);
+>  	return pte;
+>  }
+> @@ -765,7 +772,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>  	kvm_pte_t pte = 0;
+>  	stage2_update_leaf_attrs(pgt, addr, 1, 0, KVM_PTE_LEAF_ATTR_LO_S2_AF,
+> -				 &pte);
+> +				 &pte, NULL);
+>  	/*
+>  	 * "But where's the TLBI?!", you scream.
+>  	 * "Over in the core code", I sigh.
+> @@ -778,7 +785,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+>  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>  	kvm_pte_t pte = 0;
+> -	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte);
+> +	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
+>  	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
+>  }
 >  
->  	/* Check for a stub HVC call */
->  	cmp	x0, #HVC_STUB_HCALL_NR
-> -- 
-> 2.28.0.618.gf4bc123cb7-goog
-> 
+> @@ -786,6 +793,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  				   enum kvm_pgtable_prot prot)
+>  {
+>  	int ret;
+> +	u32 level;
+>  	kvm_pte_t set = 0, clr = 0;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+> @@ -797,8 +805,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_X)
+>  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+>  
+> -	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL);
+> -	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, 0);
+> +	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
+> +	if (!ret)
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
+>  	return ret;
+>  }
+>  
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
