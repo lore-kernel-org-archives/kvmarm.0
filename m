@@ -2,60 +2,96 @@ Return-Path: <SRS0=046z=DI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BEAC4727F
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B94C47420
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:52:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 436DC20848
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:20:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 436DC20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9262120B1F
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Oct 2020 10:52:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="peG/ZBsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9262120B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9943F4B1E3;
-	Thu,  1 Oct 2020 06:20:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB28E4B13B;
+	Thu,  1 Oct 2020 06:52:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id seVkRF99IwSZ; Thu,  1 Oct 2020 06:20:46 -0400 (EDT)
+	with ESMTP id gbc9gsLqRRa1; Thu,  1 Oct 2020 06:52:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30E5C4B181;
-	Thu,  1 Oct 2020 06:20:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A114B109;
+	Thu,  1 Oct 2020 06:52:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF5D84B17E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:20:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AB394B109
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:52:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2onojwITxFge for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Oct 2020 06:20:43 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AE1F4B181
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:20:43 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2A9FD6E;
- Thu,  1 Oct 2020 03:20:42 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F8B93F70D;
- Thu,  1 Oct 2020 03:20:41 -0700 (PDT)
-Subject: Re: [PATCH v5 00/21] KVM: arm64: Rewrite page-table code and fault
- handling
-To: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20200911132529.19844-1-will@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4d89869a-3c36-eadf-ba44-0a65a1fa7d19@arm.com>
-Date: Thu, 1 Oct 2020 11:21:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id cq8pdpTONpbK for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Oct 2020 06:52:06 -0400 (EDT)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D49C64B0EE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2020 06:52:05 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id s12so5119489wrw.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Oct 2020 03:52:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=k2N0J/M9yplh3qBJTgm1trDqAWsQTbieqBVpcxzeRPI=;
+ b=peG/ZBsEykKqm9oTMBx4fR4/bBMNa2xWkWHFuhuoSp0nPd5MDVeQdCOKCO0kN9CmDD
+ zOEavwXdNYiPi/kCnqk+LFRkpLO0FY+b64//p4gpheRsRoOK6OJ0dhW5Mwu6xCQ/hON9
+ H8cV2/1Ra0LflfbdXgYJRQhgBrc4eMajxPOjteMUYyy38iowW7V2U8JOzeNt6mDY7ghf
+ 0mSKl4BBUxSkzLB9wQ5dH0sQKkOpNPrWa5E3/fa7qMkauuksf1AnibTgAhVL0Xp9rcd6
+ 60gOegQinQi70+Ie2OKoyJQnhll6RVXNxDB1cfegJ9LIFjUIt4qIyl5WhQbWjwVIPDLE
+ cAqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=k2N0J/M9yplh3qBJTgm1trDqAWsQTbieqBVpcxzeRPI=;
+ b=csV+38l3zDqhIeBUsZS15CNM1eiQG4+TlYSprdy141hMzdKffRlOMS2A2GJRU+w9eb
+ Kmt2I3YMjrzkbVRYxPaStFAT5ZW69ddttO1gU9kHdiSYtY+RAKajXyVkF5ocFBAW0pvp
+ qMB0gpSfADyBhPY05sXXUHj9nrYhrZ27Jq85M4aAAjXFAFDxXLkxvbbT6bAmm+qJ0Sdp
+ 965NEJOAW0/LNxeWDjoa3mUH5oa2fhEC+Y9VqraZfgI33+VsTZOYh/U16+q8MXA/YB9U
+ rFE3GBYeLp+0Rh02wcGTcm+1v1OWg4GtW4SuY4awemc/c6dFhbXs5Qvl4yfbiqhUmAtX
+ LnUA==
+X-Gm-Message-State: AOAM530+U411L7oq3XmcpO1rDaBH1FDh+U3e/YY4pY3QbkttF13kCbJm
+ 8xPx/hL00cEaHbAcEfmX2ZEMQw==
+X-Google-Smtp-Source: ABdhPJw4xVEknNO9ydWnolFnG34BKOtlr/IEZ4YTGX+i9Dn0gani5VcV6oYIUxM0kGF6DYGs385bBQ==
+X-Received: by 2002:adf:f2d0:: with SMTP id d16mr7896961wrp.332.1601549524567; 
+ Thu, 01 Oct 2020 03:52:04 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:4a0f:cfff:fe4a:6363])
+ by smtp.gmail.com with ESMTPSA id i33sm9151325wri.79.2020.10.01.03.52.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 01 Oct 2020 03:52:03 -0700 (PDT)
+Date: Thu, 1 Oct 2020 11:51:59 +0100
+From: Andrew Scull <ascull@google.com>
+To: George-Aurelian Popescu <georgepope@google.com>
+Subject: Re: [PATCH 05/14] KVM: arm64: Define a buffer that can pass UBSan
+ data from hyp/nVHE to kernel
+Message-ID: <20201001105159.GB541087@google.com>
+References: <20200914172750.852684-1-georgepope@google.com>
+ <20200914172750.852684-6-georgepope@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200911132529.19844-1-will@kernel.org>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20200914172750.852684-6-georgepope@google.com>
+Cc: tglx@linutronix.de, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, maskray@google.com, maz@kernel.org,
+ masahiroy@kernel.org, clang-built-linux@googlegroups.com,
+ linux-arm-kernel@lists.infradead.org, elver@google.com, keescook@chromium.org,
+ arnd@arndb.de, linux-kbuild@vger.kernel.org, broonie@kernel.org,
+ natechancellor@gmail.com, dvyukov@google.com, michal.lkml@markovi.net,
+ ndesaulniers@google.com, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,102 +108,278 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+On Mon, Sep 14, 2020 at 05:27:41PM +0000, George-Aurelian Popescu wrote:
+> From: George Popescu <georgepope@google.com>
+> 
+> Store data, which is collected from UBSan handlers that lives inside hyp/nVHE,
+> into the kvm_ubsan_buffer.
+> This buffer is designed to store only UBSan data because it should not be
+> preoccupied by other mechanisms data structures and functionalities.
+> 
+> Map the buffer and the write iqndex before switching the control to
+> hyp/nVHE.
+> 
+> Map the kernel .data region to read the compile time generated UBSan struct's
+> data from hyp/nVHE.
+> 
+> Signed-off-by: George Popescu <georgepope@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |  3 +++
+>  arch/arm64/include/asm/kvm_host.h  |  6 +++++
+>  arch/arm64/include/asm/kvm_ubsan.h | 17 +++++++++++++
+>  arch/arm64/kvm/Makefile            |  4 ++++
+>  arch/arm64/kvm/arm.c               | 38 +++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/hyp/hyp-entry.S     |  4 ++++
+>  arch/arm64/kvm/hyp/nvhe/ubsan.c    | 24 ++++++++++++++++++-
+>  arch/arm64/kvm/kvm_ubsan_buffer.c  | 32 +++++++++++++++++++++++++
+>  8 files changed, 126 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_ubsan.h
+>  create mode 100644 arch/arm64/kvm/kvm_ubsan_buffer.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 200bb8d0a720..9d4a77f08ffd 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -63,6 +63,9 @@
+>  #define CHOOSE_VHE_SYM(sym)	sym
+>  #define CHOOSE_NVHE_SYM(sym)	kvm_nvhe_sym(sym)
+>  
+> +#define this_cpu_ptr_nvhe(sym)		this_cpu_ptr(&kvm_nvhe_sym(sym))
+> +#define per_cpu_ptr_nvhe(sym, cpu)	per_cpu_ptr(&kvm_nvhe_sym(sym), cpu)
+> +
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+>  /*
+>   * BIG FAT WARNINGS:
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index adc8957e9321..337fd2d0f976 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -494,8 +494,14 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+>  		__kvm_call_hyp(kvm_ksym_ref_nvhe(f), ##__VA_ARGS__);	\
+>  	})
+>  
+> +#ifdef CONFIG_UBSAN
+> +extern void __kvm_check_ubsan_buffer(void);
+> +#endif
+> +
+>  #define __kvm_arm_check_debug_buffer()					\
+>  {									\
+> +	if (IS_ENABLED(CONFIG_UBSAN))					\
+> +		__kvm_check_ubsan_buffer();				\
+>  }
+>  
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_ubsan.h b/arch/arm64/include/asm/kvm_ubsan.h
+> new file mode 100644
+> index 000000000000..af607a796376
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_ubsan.h
+> @@ -0,0 +1,17 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright 2020 Google LLC
+> + * Author: George Popescu <georgepope@google.com>
+> + */
+> +
+> +#ifdef CONFIG_UBSAN
 
-On 9/11/20 2:25 PM, Will Deacon wrote:
-> It's me again, with version five of the KVM page-table rework previously
-> seen at:
->
->   v1: https://lore.kernel.org/r/20200730153406.25136-1-will@kernel.org
->   v2: https://lore.kernel.org/r/20200818132818.16065-1-will@kernel.org
->   v3: https://lore.kernel.org/r/20200825093953.26493-1-will@kernel.org
->   v4: https://lore.kernel.org/r/20200907152344.12978-1-will@kernel.org
->
-> Changes since v4 include:
->
->   * Add comments to the kerneldoc describing alignment behaviour for
->     addresses and size parameters
->   * Fix formatting of IPA size messages
->   * Fix handling of unaligned addresses in kvm_phys_addr_ioremap()
->   * Add DSB after zeroing stage-2 PGD pages
->   * Add reviewer tags
->
-> Once again, thanks to Alex, Gavin and Andrew for their comments.
+The header should have an inclusion guard as well.
 
-I didn't realize that there won't be another iteration of the series. I reviewed
-all the patches with the exception of patch #5 ("KVM: arm64: Use generic allocator
-for hyp stage-1 page-tables") because I don't know much about what needs to mapped
-at EL2 stage 1, everything else looks alright to me. If the commit message can be
-modified, you can add my Reviewed-by tag to the series (sans #5); it's fine if
-that's not possible.
+> +#include <ubsan.h>
 
-Thanks,
-Alex
->
-> Will
->
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Quentin Perret <qperret@google.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Gavin Shan <gshan@redhat.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Cc: Andrew Scull <ascull@google.com>
-> Cc: kernel-team@android.com
-> Cc: linux-arm-kernel@lists.infradead.org
->
-> --->8
->
-> Quentin Perret (4):
->   KVM: arm64: Add support for stage-2 write-protect in generic
->     page-table
->   KVM: arm64: Convert write-protect operation to generic page-table API
->   KVM: arm64: Add support for stage-2 cache flushing in generic
->     page-table
->   KVM: arm64: Convert memslot cache-flushing code to generic page-table
->     API
->
-> Will Deacon (17):
->   KVM: arm64: Remove kvm_mmu_free_memory_caches()
->   KVM: arm64: Add stand-alone page-table walker infrastructure
->   KVM: arm64: Add support for creating kernel-agnostic stage-1 page
->     tables
->   KVM: arm64: Use generic allocator for hyp stage-1 page-tables
->   KVM: arm64: Add support for creating kernel-agnostic stage-2 page
->     tables
->   KVM: arm64: Add support for stage-2 map()/unmap() in generic
->     page-table
->   KVM: arm64: Convert kvm_phys_addr_ioremap() to generic page-table API
->   KVM: arm64: Convert kvm_set_spte_hva() to generic page-table API
->   KVM: arm64: Convert unmap_stage2_range() to generic page-table API
->   KVM: arm64: Add support for stage-2 page-aging in generic page-table
->   KVM: arm64: Convert page-aging and access faults to generic page-table
->     API
->   KVM: arm64: Add support for relaxing stage-2 perms in generic
->     page-table code
->   KVM: arm64: Convert user_mem_abort() to generic page-table API
->   KVM: arm64: Check the pgt instead of the pgd when modifying page-table
->   KVM: arm64: Remove unused page-table code
->   KVM: arm64: Remove unused 'pgd' field from 'struct kvm_s2_mmu'
->   KVM: arm64: Don't constrain maximum IPA size based on host
->     configuration
->
->  arch/arm64/include/asm/kvm_host.h       |    2 +-
->  arch/arm64/include/asm/kvm_mmu.h        |  251 +---
->  arch/arm64/include/asm/kvm_pgtable.h    |  309 ++++
->  arch/arm64/include/asm/pgtable-hwdef.h  |   24 -
->  arch/arm64/include/asm/pgtable-prot.h   |   19 -
->  arch/arm64/include/asm/stage2_pgtable.h |  215 ---
->  arch/arm64/kvm/arm.c                    |    2 +-
->  arch/arm64/kvm/hyp/Makefile             |    2 +-
->  arch/arm64/kvm/hyp/pgtable.c            |  883 ++++++++++++
->  arch/arm64/kvm/mmu.c                    | 1748 ++++-------------------
->  arch/arm64/kvm/reset.c                  |   40 +-
->  11 files changed, 1479 insertions(+), 2016 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_pgtable.h
->  create mode 100644 arch/arm64/kvm/hyp/pgtable.c
->
+Is it possible to only include this from within kvm_ubsan_buffer.c
+similar to how lib/ubsan.c keeps it self contained? Then export
+function for things like mapping it up to hyp?
+
+> +
+> +
+> +#define UBSAN_MAX_TYPE 6
+> +#define KVM_UBSAN_BUFFER_SIZE 1000
+> +
+> +struct kvm_ubsan_info {
+> +	int type;
+> +};
+> +#endif
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 99977c1972cc..92f06cb5b3df 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -24,4 +24,8 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+>  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+>  	 vgic/vgic-its.o vgic/vgic-debug.o
+>  
+> +CFLAGS_kvm_ubsan_buffer.o += -I $(srctree)/lib/
+> +CFLAGS_arm.o += -I $(srctree)/lib
+> +
+> +kvm-$(CONFIG_UBSAN) += kvm_ubsan_buffer.o
+>  kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index b588c3b5c2f0..eff57069e103 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -42,10 +42,17 @@
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_psci.h>
+>  
+> +#include <asm/kvm_debug_buffer.h>
+> +#include <asm/kvm_ubsan.h>
+> +
+>  #ifdef REQUIRES_VIRT
+>  __asm__(".arch_extension	virt");
+>  #endif
+>  
+> +#ifdef CONFIG_UBSAN
+> +DECLARE_KVM_DEBUG_BUFFER(struct kvm_ubsan_info, kvm_ubsan_buff, KVM_UBSAN_BUFFER_SIZE);
+> +#endif
+> +
+>  DEFINE_PER_CPU(kvm_host_data_t, kvm_host_data);
+>  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+>  
+> @@ -1519,7 +1526,15 @@ static int init_hyp_mode(void)
+>  		kvm_err("Cannot map bss section\n");
+>  		goto out_err;
+>  	}
+> -
+> +#ifdef CONFIG_UBSAN
+> +	/* required by ubsan to access the handlers structures fields */
+> +	err = create_hyp_mappings(kvm_ksym_ref(_data),
+> +				  kvm_ksym_ref(__end_once), PAGE_HYP_RO);
+> +	if (err) {
+> +		kvm_err("Cannot map data section\n");
+> +		goto out_err;
+> +	}
+> +#endif
+>  	err = kvm_map_vectors();
+>  	if (err) {
+>  		kvm_err("Cannot map vectors\n");
+> @@ -1552,6 +1567,27 @@ static int init_hyp_mode(void)
+>  		}
+>  	}
+>  
+> +#ifdef CONFIG_UBSAN
+> +	for_each_possible_cpu(cpu) {
+> +		/* map the write index */
+> +		struct kvm_ubsan_info *buff;
+> +		unsigned long *wr_ind;
+> +
+> +		wr_ind = per_cpu_ptr_nvhe(kvm_ubsan_buff_wr_ind, cpu);
+> +		err = create_hyp_mappings(wr_ind, wr_ind + 1, PAGE_HYP);
+> +		if (err) {
+> +			kvm_err("Cannot map the busan buffer write index: %d\n", err);
+> +			goto out_err;
+> +		}
+> +		buff = per_cpu_ptr(kvm_nvhe_sym(kvm_ubsan_buff), cpu);
+> +		err = create_hyp_mappings(buff, buff + KVM_UBSAN_BUFFER_SIZE, PAGE_HYP);
+> +		if (err) {
+> +			kvm_err("Cannot map the ubsan buffer: %d\n", err);
+> +			goto out_err;
+> +		}
+> +	}
+> +#endif
+> +
+>  	err = hyp_map_aux_data();
+>  	if (err)
+>  		kvm_err("Cannot map host auxiliary data: %d\n", err);
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index 8df0082b9ccf..bcdbab4d2e43 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -14,6 +14,7 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/mmu.h>
+> +#include <asm/kvm_debug_buffer.h>
+>  
+>  .macro save_caller_saved_regs_vect
+>  	/* x0 and x1 were saved in the vector entry */
+> @@ -74,6 +75,9 @@ el1_sync:				// Guest trapped into EL2
+>  	cmp	x0, #HVC_STUB_HCALL_NR
+>  	b.hs	1f
+>  
+> +#ifdef CONFIG_UBSAN
+> +	clear_kvm_debug_buffer kvm_ubsan_buff_wr_ind, x4, x5, x6
+> +#endif
+>  	/*
+>  	 * Compute the idmap address of __kvm_handle_stub_hvc and
+>  	 * jump there. Since we use kimage_voffset, do not use the
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ubsan.c b/arch/arm64/kvm/hyp/nvhe/ubsan.c
+> index a5db6b61ceb2..a43c9646e1e8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ubsan.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ubsan.c
+> @@ -3,9 +3,31 @@
+>   * Copyright 2020 Google LLC
+>   * Author: George Popescu <georgepope@google.com>
+>   */
+> +#include <linux/bitops.h>
+>  #include <linux/ctype.h>
+>  #include <linux/types.h>
+> -#include <ubsan.h>
+> +#include <linux/percpu-defs.h>
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_ubsan.h>
+> +#include <asm/kvm_debug_buffer.h>
+> +#include <kvm/arm_pmu.h>
+> +
+> +DEFINE_KVM_DEBUG_BUFFER(struct kvm_ubsan_info, kvm_ubsan_buff, KVM_UBSAN_BUFFER_SIZE);
+> +
+> +static inline struct kvm_ubsan_info *kvm_ubsan_buffer_next_slot(void)
+> +{
+> +	struct kvm_ubsan_info *res;
+> +	struct kvm_ubsan_info *buff;
+> +	unsigned long *buff_ind;
+> +	unsigned long buff_size = KVM_UBSAN_BUFFER_SIZE;
+> +	unsigned int struct_size = sizeof(struct kvm_ubsan_info);
+> +
+> +	init_kvm_debug_buffer(kvm_ubsan_buff, struct kvm_ubsan_info, buff, buff_ind);
+> +	res = kvm_debug_buffer_next_slot(buff, buff_ind, struct_size, buff_size);
+> +	return res;
+> +}
+>  
+>  void __ubsan_handle_add_overflow(void *_data, void *lhs, void *rhs) {}
+>  
+> diff --git a/arch/arm64/kvm/kvm_ubsan_buffer.c b/arch/arm64/kvm/kvm_ubsan_buffer.c
+> new file mode 100644
+> index 000000000000..28dcf19b5706
+> --- /dev/null
+> +++ b/arch/arm64/kvm/kvm_ubsan_buffer.c
+> @@ -0,0 +1,32 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright 2020 Google LLC
+> + * Author: George Popescu <georgepope@google.com>
+> + */
+> +
+> +#include <linux/ctype.h>
+> +#include <linux/types.h>
+> +#include <asm/kvm_debug_buffer.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_asm.h>
+> +#include <kvm/arm_pmu.h>
+> +
+> +#include <ubsan.h>
+> +#include <asm/kvm_ubsan.h>
+> +
+> +DECLARE_KVM_DEBUG_BUFFER(struct kvm_ubsan_info, kvm_ubsan_buff, KVM_UBSAN_BUFFER_SIZE);
+> +
+> +
+> +void __kvm_check_ubsan_buffer(void)
+> +{
+> +	unsigned long *write_ind;
+> +	unsigned long it;
+> +	struct kvm_ubsan_info *slot;
+> +
+> +	init_kvm_debug_buffer(kvm_ubsan_buff, struct kvm_ubsan_info, slot, write_ind);
+> +	for_each_kvm_debug_buffer_slot(slot, write_ind, it) {
+> +		/* check ubsan data */
+> +		slot->type = 0;
+> +	}
+> +}
+> +
+> -- 
+> 2.28.0.618.gf4bc123cb7-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
