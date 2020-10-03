@@ -1,86 +1,71 @@
-Return-Path: <SRS0=jAo2=DJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=06hh=DK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 623EEC4363C
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Oct 2020 16:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7609C4363D
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Oct 2020 08:56:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D3F9320758
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Oct 2020 16:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B2CC206CA
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Oct 2020 08:56:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CzO/HUXZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F9320758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBpryh8U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2CC206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16FAA4B28F;
-	Fri,  2 Oct 2020 12:23:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF194B505;
+	Sat,  3 Oct 2020 04:56:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vtFO5B3TTms4; Fri,  2 Oct 2020 12:23:25 -0400 (EDT)
+	with ESMTP id Wmfz5L7IlPH7; Sat,  3 Oct 2020 04:56:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF4604B27F;
-	Fri,  2 Oct 2020 12:23:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6D04B430;
+	Sat,  3 Oct 2020 04:56:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 305C74B250
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2020 12:23:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D14BB4B430
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Oct 2020 04:56:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K3JdqmUDbkI4 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Oct 2020 12:23:24 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FEF84B24B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2020 12:23:24 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1601655804;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=aye1Pb2hwY0JlLJorHYQNOa61uWEXTTAnRL28wGoWj4=;
- b=CzO/HUXZ3ubZL0rPxAI7ISdhsbM7f1iqgWkWD0WtLPXdCp+Fy/y/duSb+olyC/gWWO4SW6
- xWcD9GjrVtO5slVcX/Y7HpzqeP7KLsk6VTzH/aCCTRjCpI9DtsdCkte/etXxPqyFua46VD
- r9M9egUUN9PcVPeeYbbFbuKRIb9aSFk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-I0rZ_L8FPfijpuy-niMAjw-1; Fri, 02 Oct 2020 12:23:20 -0400
-X-MC-Unique: I0rZ_L8FPfijpuy-niMAjw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id QtsOVqvGoinp for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  3 Oct 2020 04:56:13 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 703694B419
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Oct 2020 04:56:13 -0400 (EDT)
+Received: from e123331-lin.nice.arm.com
+ (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E2380364B;
- Fri,  2 Oct 2020 16:23:18 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.110])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AAF145D9D3;
- Fri,  2 Oct 2020 16:23:13 +0000 (UTC)
-Date: Fri, 2 Oct 2020 18:23:10 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v3 0/2] MTE support for KVM guest
-Message-ID: <20201002162310.zadgljfjl2uezys6@kamzik.brq.redhat.com>
-References: <20200925093607.3051-1-steven.price@arm.com>
- <20201002143640.uzsz3nhr45payhlb@kamzik.brq.redhat.com>
- <b653bbc8-1ebc-7c1a-9653-5441ca1be4b2@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <b653bbc8-1ebc-7c1a-9653-5441ca1be4b2@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: linux-kernel@vger.kernel.org, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id B84FF206CA;
+ Sat,  3 Oct 2020 08:56:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1601715372;
+ bh=6PQ9UY1YgWi3N2h59/B1+5v+PNePVQTT8d1MuxDMU/g=;
+ h=From:To:Cc:Subject:Date:From;
+ b=kBpryh8UYlKBkW5laC45wAmh8YpE5M5B7PmWj0i8aGEDKSc3jY5g6nH++Psizqsat
+ RluYE+Fkg+L3PiKlZlJWgVxE31e1+w4+t7gt9/ANeTlJ3975RdWiJRmKxrT1HBtnCk
+ UyplCVNe2Naa35Y3+U6hYyTxnIRG4IL3o3E9+cz0=
+From: Ard Biesheuvel <ardb@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm64: implement the TRNG hypervisor call
+Date: Sat,  3 Oct 2020 10:56:04 +0200
+Message-Id: <20201003085604.7138-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
+ Laszlo Ersek <lersek@redhat.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Sami Mujawar <sami.mujawar@arm.com>,
+ Leif Lindholm <leif@nuviainc.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,84 +77,227 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 02, 2020 at 04:38:11PM +0100, Steven Price wrote:
-> On 02/10/2020 15:36, Andrew Jones wrote:
-> > On Fri, Sep 25, 2020 at 10:36:05AM +0100, Steven Price wrote:
-> > > Version 3 of adding MTE support for KVM guests. See the previous (v2)
-> > > posting for background:
-> > > 
-> > >   https://lore.kernel.org/r/20200904160018.29481-1-steven.price%40arm.com
-> > > 
-> > > These patches add support to KVM to enable MTE within a guest. They are
-> > > based on Catalin's v9 MTE user-space support series[1] (currently in
-> > > next).
-> > > 
-> > > Changes since v2:
-> > > 
-> > >   * MTE is no longer a VCPU feature, instead it is a VM cap.
-> > > 
-> > >   * Being a VM cap means easier probing (check for KVM_CAP_ARM_MTE).
-> > > 
-> > >   * The cap must be set before any VCPUs are created, preventing any
-> > >     shenanigans where MTE is enabled for the guest after memory accesses
-> > >     have been performed.
-> > > 
-> > > [1] https://lore.kernel.org/r/20200904103029.32083-1-catalin.marinas@arm.com
-> > > 
-> > > Steven Price (2):
-> > >    arm64: kvm: Save/restore MTE registers
-> > >    arm64: kvm: Introduce MTE VCPU feature
-> > > 
-> > >   arch/arm64/include/asm/kvm_emulate.h       |  3 +++
-> > >   arch/arm64/include/asm/kvm_host.h          |  7 +++++++
-> > >   arch/arm64/include/asm/sysreg.h            |  3 ++-
-> > >   arch/arm64/kvm/arm.c                       |  9 +++++++++
-> > >   arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
-> > >   arch/arm64/kvm/mmu.c                       | 15 +++++++++++++++
-> > >   arch/arm64/kvm/sys_regs.c                  | 20 +++++++++++++++-----
-> > >   include/uapi/linux/kvm.h                   |  1 +
-> > >   8 files changed, 66 insertions(+), 6 deletions(-)
-> > > 
-> > > -- 
-> > > 2.20.1
-> > > 
-> > > 
-> > 
-> > Hi Steven,
-> > 
-> > These patches look fine to me, but I'd prefer we have a working
-> > implementation in QEMU before we get too excited about the KVM
-> > bits. kvmtool isn't sufficient since it doesn't support migration
-> > (at least afaik). In the past we've implemented features in KVM
-> > that look fine, but then issues have been discovered when trying
-> > to enable them from QEMU, where we also support migration. This
-> > feature looks like there's risk of issues with the userspace side.
-> > Although these two patches would probably stay the same, even if
-> > userspace requires more support.
-> 
-> I agree kvmtool isn't a great test because it doesn't support migration. The
-> support in this series is just the basic support for MTE in a guest and we'd
-> need to wait for the QEMU implementation before deciding whether we need any
-> extra support (e.g. kernel interfaces for reading/writing tags as discussed
-> before).
-> 
-> However, I don't think there's much danger of the support in this series
-> changing - so extra support can be added when/if it's needed, but I don't
-> think we need to block these series on that - QEMU can just probe for
-> whatever additional support it needs before enabling MTE in a guest. I plan
-> to rebase/repost after -rc1 when the user space support has been merged.
-> 
+Provide a hypervisor implementation of the ARM architected TRNG firmware
+interface described in ARM spec DEN0098. All function IDs are implemented,
+including both 32-bit and 64-bit versions of the TRNG_RND service, which
+is the centerpiece of the API.
 
-Fair enough, but it feels like we'll be merging half a feature, leaving
-the other half for somebody else to pick up later.
+The API is backed by arch_get_random_seed_long(), which is implemented
+in terms of RNDR currently, and will be alternatively backed by a SMC
+call to the secure firmware using same interface after a future patch.
+If neither are available, the kernel's entropy pool is used instead.
 
-Thanks,
-drew
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+Cc: Sudeep Holla <sudeep.holla@arm.com>
+Cc: Sami Mujawar <sami.mujawar@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Leif Lindholm <leif@nuviainc.com>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 +
+ arch/arm64/kvm/Makefile           |  2 +-
+ arch/arm64/kvm/hypercalls.c       |  6 ++
+ arch/arm64/kvm/trng.c             | 91 ++++++++++++++++++++
+ include/linux/arm-smccc.h         | 31 +++++++
+ 5 files changed, 131 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 65568b23868a..f76164d390ea 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -688,4 +688,6 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ #define kvm_arm_vcpu_sve_finalized(vcpu) \
+ 	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+ 
++int kvm_trng_call(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 99977c1972cc..e117d7086500 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 inject_fault.o regmap.o va_layout.o hyp.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+-	 aarch32.o arch_timer.o \
++	 aarch32.o arch_timer.o trng.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 550dfa3e53cd..70c5e815907d 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -62,6 +62,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		if (gpa != GPA_INVALID)
+ 			val = gpa;
+ 		break;
++	case ARM_SMCCC_TRNG_VERSION:
++	case ARM_SMCCC_TRNG_FEATURES:
++	case ARM_SMCCC_TRNG_GET_UUID:
++	case ARM_SMCCC_TRNG_RND:
++	case ARM_SMCCC_TRNG_RND64:
++		return kvm_trng_call(vcpu);
+ 	default:
+ 		return kvm_psci_call(vcpu);
+ 	}
+diff --git a/arch/arm64/kvm/trng.c b/arch/arm64/kvm/trng.c
+new file mode 100644
+index 000000000000..71f704075e4a
+--- /dev/null
++++ b/arch/arm64/kvm/trng.c
+@@ -0,0 +1,91 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2020 Arm Ltd.
++
++#include <linux/arm-smccc.h>
++#include <linux/kvm_host.h>
++
++#include <asm/kvm_emulate.h>
++
++#include <kvm/arm_hypercalls.h>
++
++#define ARM_SMCCC_TRNG_VERSION_1_0	0x10000UL
++
++#define TRNG_SUCCESS			0UL
++#define TRNG_NOT_SUPPORTED		((unsigned long)-1)
++#define TRNG_INVALID_PARAMETER		((unsigned long)-2)
++#define TRNG_NO_ENTROPY			((unsigned long)-3)
++
++#define MAX_BITS32			96
++#define MAX_BITS64			192
++
++static const uuid_t arm_smc_trng_uuid __aligned(4) = UUID_INIT(
++	0x023534a2, 0xe0bc, 0x45ec, 0x95, 0xdd, 0x33, 0x34, 0xc1, 0xcc, 0x31, 0x89);
++
++static int kvm_trng_do_rnd(struct kvm_vcpu *vcpu, int size)
++{
++	u32 num_bits = smccc_get_arg1(vcpu);
++	u64 bits[3];
++	int i;
++
++	if (num_bits > 3 * size) {
++		smccc_set_retval(vcpu, TRNG_NOT_SUPPORTED, 0, 0, 0);
++		return 1;
++	}
++
++	/* get as many bits as we need to fulfil the request */
++	for (i = 0; i < DIV_ROUND_UP(num_bits, 64); i++)
++		/* use the arm64 specific backend directly if one exists */
++		if (!arch_get_random_seed_long((unsigned long *)&bits[i]))
++			bits[i] = get_random_long();
++
++	if (num_bits % 64)
++		bits[i - 1] &= U64_MAX >> (64 - (num_bits % 64));
++
++	while (i < ARRAY_SIZE(bits))
++		bits[i++] = 0;
++
++	if (size == 32)
++		smccc_set_retval(vcpu, TRNG_SUCCESS, lower_32_bits(bits[1]),
++				 upper_32_bits(bits[0]), lower_32_bits(bits[0]));
++	else
++		smccc_set_retval(vcpu, TRNG_SUCCESS, bits[2], bits[1], bits[0]);
++
++	memzero_explicit(bits, sizeof(bits));
++	return 1;
++}
++
++int kvm_trng_call(struct kvm_vcpu *vcpu)
++{
++	const __be32 *u = (__be32 *)arm_smc_trng_uuid.b;
++	u32 func_id = smccc_get_function(vcpu);
++	unsigned long val = TRNG_NOT_SUPPORTED;
++	int size = 64;
++
++	switch (func_id) {
++	case ARM_SMCCC_TRNG_VERSION:
++		val = ARM_SMCCC_TRNG_VERSION_1_0;
++		break;
++	case ARM_SMCCC_TRNG_FEATURES:
++		switch (smccc_get_arg1(vcpu)) {
++		case ARM_SMCCC_TRNG_VERSION:
++		case ARM_SMCCC_TRNG_FEATURES:
++		case ARM_SMCCC_TRNG_GET_UUID:
++		case ARM_SMCCC_TRNG_RND:
++		case ARM_SMCCC_TRNG_RND64:
++			val = TRNG_SUCCESS;
++		}
++		break;
++	case ARM_SMCCC_TRNG_GET_UUID:
++		smccc_set_retval(vcpu, be32_to_cpu(u[3]), be32_to_cpu(u[2]),
++				 be32_to_cpu(u[1]), be32_to_cpu(u[0]));
++		return 1;
++	case ARM_SMCCC_TRNG_RND:
++		size = 32;
++		fallthrough;
++	case ARM_SMCCC_TRNG_RND64:
++		return kvm_trng_do_rnd(vcpu, size);
++	}
++
++	smccc_set_retval(vcpu, val, 0, 0, 0);
++	return 1;
++}
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 15c706fb0a37..9c9decd329b7 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -99,6 +99,37 @@
+ 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+ 			   0x21)
+ 
++/* TRNG entropy source calls (defined by ARM DEN0098) */
++#define ARM_SMCCC_TRNG_VERSION					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x50)
++
++#define ARM_SMCCC_TRNG_FEATURES					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x51)
++
++#define ARM_SMCCC_TRNG_GET_UUID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x52)
++
++#define ARM_SMCCC_TRNG_RND					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++#define ARM_SMCCC_TRNG_RND64					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
+ /*
+  * Return codes defined in ARM DEN 0070A
+  * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
+-- 
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
