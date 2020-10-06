@@ -2,56 +2,86 @@ Return-Path: <SRS0=2vgS=DN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EB5C41604
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Oct 2020 15:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B35FAC46466
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Oct 2020 15:29:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 44822206CB
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Oct 2020 15:04:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44822206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id F19A62075A
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Oct 2020 15:29:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L4a7KgpJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F19A62075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8913E4B98A;
-	Tue,  6 Oct 2020 11:04:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB374B97F;
+	Tue,  6 Oct 2020 11:29:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id biNjU3A-ESyL; Tue,  6 Oct 2020 11:04:23 -0400 (EDT)
+	with ESMTP id lvr-pDxtyl51; Tue,  6 Oct 2020 11:29:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F3764B985;
-	Tue,  6 Oct 2020 11:04:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ED2D4B978;
+	Tue,  6 Oct 2020 11:29:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22D104B949
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2020 11:04:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAF444B835
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2020 11:29:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ofzzEBrNSjLU for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Oct 2020 11:04:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5A04B7BE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2020 11:04:20 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B7F3113E;
- Tue,  6 Oct 2020 08:04:15 -0700 (PDT)
-Received: from monolith.localdoman (unknown [10.37.12.66])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A69653F71F;
- Tue,  6 Oct 2020 08:04:13 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
-Subject: [PATCH] perf: arm_spe: Use Inner Shareable DSB when draining the
- buffer
-Date: Tue,  6 Oct 2020 16:05:20 +0100
-Message-Id: <20201006150520.161985-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.28.0
+ with ESMTP id lOvndFNLn158 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Oct 2020 11:29:36 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09B0A4B808
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2020 11:29:36 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1601998175;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=b3TQyn0r0hHJtyWnHzP2XsiJelQMbh2EnW4oVHas18k=;
+ b=L4a7KgpJqlF5Frn19gxbj/K2uMtGqZksQXEvwofgg+OWuxk6H5/wq5tjmOX0To3lqXKdDc
+ CANrqDFg/dAiLBsfy1V+yB/m68FI1H1AvfInVmKU4IVZfpQaT0eGHQUrpOy/kHzX5o26dA
+ Du4bTRhtDYns2tFdyO2AqUUCgWz0BxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-XNZ3tFqAPmCyxpBT5oD_sA-1; Tue, 06 Oct 2020 11:29:31 -0400
+X-MC-Unique: XNZ3tFqAPmCyxpBT5oD_sA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7226018A072C;
+ Tue,  6 Oct 2020 15:29:29 +0000 (UTC)
+Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C32255764;
+ Tue,  6 Oct 2020 15:29:23 +0000 (UTC)
+Subject: Re: [PATCH v10 11/11] vfio: Document nested stage control
+To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+ yi.l.liu@intel.com, robin.murphy@arm.com
+References: <20200320161911.27494-1-eric.auger@redhat.com>
+ <20200320161911.27494-12-eric.auger@redhat.com>
+ <26a85a63-6cc1-0348-e703-cb31ddd75339@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4df9f189-7a1b-be1f-0b1a-1669534a98d7@redhat.com>
+Date: Tue, 6 Oct 2020 17:29:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org
+In-Reply-To: <26a85a63-6cc1-0348-e703-cb31ddd75339@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,75 +98,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From ARM DDI 0487F.b, page D9-2807:
+Hi Zenghui,
 
-"Although the Statistical Profiling Extension acts as another observer in
-the system, for determining the Shareability domain of the DSB
-instructions, the writes of sample records are treated as coming from the
-PE that is being profiled."
+On 9/24/20 3:42 PM, Zenghui Yu wrote:
+> Hi Eric,
+> 
+> On 2020/3/21 0:19, Eric Auger wrote:
+>> The VFIO API was enhanced to support nested stage control: a bunch of
+>> new iotcls, one DMA FAULT region and an associated specific IRQ.
+>>
+>> Let's document the process to follow to set up nested mode.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> [...]
+> 
+>> +The userspace must be prepared to receive faults. The VFIO-PCI device
+>> +exposes one dedicated DMA FAULT region: it contains a ring buffer and
+>> +its header that allows to manage the head/tail indices. The region is
+>> +identified by the following index/subindex:
+>> +- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT
+>> +
+>> +The DMA FAULT region exposes a VFIO_REGION_INFO_CAP_PRODUCER_FAULT
+>> +region capability that allows the userspace to retrieve the ABI version
+>> +of the fault records filled by the host.
+> 
+> Nit: I don't see this capability in the code.
 
-Similarly, on page D9-2801:
+Thank you very much for the review. I am late doing the respin but I
+will take into account all your comments.
 
-"The memory type and attributes that are used for a write by the
-Statistical Profiling Extension to the Profiling Buffer is taken from the
-translation table entries for the virtual address being written to. That
-is:
-- The writes are treated as coming from an observer that is coherent with
-  all observers in the Shareability domain that is defined by the
-  translation tables."
+Thanks!
 
-All the PEs are in the Inner Shareable domain, use a DSB ISH to make sure
-writes to the profiling buffer have completed.
-
-Fixes: d5d9696b0380 ("drivers/perf: Add support for ARMv8.2 Statistical Profiling Extension")
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-Found by code inspection.
-
-All the places where the buffer was drained were found by using the command
-"grep -r psb_csync".
-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 2 +-
- drivers/perf/arm_spe_pmu.c         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 91a711aa8382..e05a08c5ad1f 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -43,7 +43,7 @@ static void __debug_save_spe(u64 *pmscr_el1)
- 
- 	/* Now drain all buffered data to memory */
- 	psb_csync();
--	dsb(nsh);
-+	dsb(ish);
- }
- 
- static void __debug_restore_spe(u64 pmscr_el1)
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index cc00915ad6d1..402892caef34 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -525,7 +525,7 @@ static void arm_spe_pmu_disable_and_drain_local(void)
- 
- 	/* Drain any buffered data */
- 	psb_csync();
--	dsb(nsh);
-+	dsb(ish);
- 
- 	/* Disable the profiling buffer */
- 	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-@@ -545,7 +545,7 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
- 	 * aborts have been resolved.
- 	 */
- 	psb_csync();
--	dsb(nsh);
-+	dsb(ish);
- 
- 	/* Ensure hardware updates to PMBPTR_EL1 are visible */
- 	isb();
--- 
-2.28.0
+Eric
+> 
+> 
+> Thanks,
+> Zenghui
+> 
 
 _______________________________________________
 kvmarm mailing list
