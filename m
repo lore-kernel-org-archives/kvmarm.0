@@ -2,88 +2,60 @@ Return-Path: <SRS0=pEf/=D2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1A5C433DF
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 11:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B798C433DF
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 12:25:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF75522276
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 11:43:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R55ieoV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF75522276
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id B91C8222B8
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 12:25:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B91C8222B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BCF64B632;
-	Mon, 19 Oct 2020 07:43:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0B6A4B61B;
+	Mon, 19 Oct 2020 08:25:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7qopAvsY493M; Mon, 19 Oct 2020 07:43:50 -0400 (EDT)
+	with ESMTP id UJtbvLwPfZl9; Mon, 19 Oct 2020 08:25:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ACF24B536;
-	Mon, 19 Oct 2020 07:43:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2A54B3FD;
+	Mon, 19 Oct 2020 08:25:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2AC94B51D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 07:43:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E5194B3FD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 08:25:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id khPUGTWrqx+Y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Oct 2020 07:43:45 -0400 (EDT)
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com
- [209.85.208.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8DBB4B393
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 07:43:45 -0400 (EDT)
-Received: by mail-ed1-f68.google.com with SMTP id o18so9893153edq.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 04:43:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lhRyiaF4Mj4SAFapWDuVKTR91M4N1ZAMCfQG7PSQtZE=;
- b=R55ieoV4chafnTnejfeCIzez71tOjmqPt6Eaa9gpHowReSiqasMTu6h/2iyTbC51Sd
- 6qF4op744gdzUEn6hhBRNK860EHqYz2fvdMvGVIWexAZ3R34PR9aDJcgponBXclqPfsY
- Y8wiWlbdaLzy12g+MuBTSN6Gsu1D2DW19vIyb48KXeoB2Q030VvzalZMPdzV9vFYbFIb
- NBm0lKET3zw78IUd4Dsw/mnl1zb7Tv/IZo3rID/MPO2tujGJyLnblNuzy2P+B1WzAsEn
- X1LG7G6PAzvWUbXPogSiaxbOpPedR+fzm+7USziBdsrLxyiUmb7bFpmyIxqKvKHlSkTK
- 3QHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lhRyiaF4Mj4SAFapWDuVKTR91M4N1ZAMCfQG7PSQtZE=;
- b=iif8Xuj95fnUA0DhF5cnU+WZfkD16VEm6VrXxRpBdaXQB6nGRMQmYPAyrQdiyFH77z
- Mnmq9Q43DfhqRv9SkshRKxu++c57mBvMiMuNE95XwzVxDK7Tqfdr8d/5LLr1h8gGKa+N
- SOV66HnZiFOOHQl8osZIs7YgFT0GaiMCCUXkAd2BKSRU+TjRO876q29Y5x5IZWKwWo6a
- GMb6Ke55j0wjh1BZM/SLb/jNhIN3/B5BDcTIw8ugBgMywB3MLttILLc0qFDhIJbSXHls
- I4GGQrIJDgjE4bV/RV9MERvcNQIRXuU2q4keXYTz2MKVm4IPK0kCHvHYsDLxjnV8C8ZB
- i6Bg==
-X-Gm-Message-State: AOAM531uwcic3ed5m2TnDwBAy9CyrJCWv2kJyUtgsFri6fU/QoIObMnj
- y58skuifN2FyjqnUelm5AQV/Ys3jRjl7X4Ve9TkAxw==
-X-Google-Smtp-Source: ABdhPJyWN6vu70FNoDT+mUde/Oxrsko4OlVYRLt7U8r4v0TFnpNAU3f+Bg5gCpqSY5aGvzYrrda8cyfIAg2ZyBrRK8Y=
-X-Received: by 2002:aa7:c683:: with SMTP id n3mr17448774edq.146.1603107824651; 
- Mon, 19 Oct 2020 04:43:44 -0700 (PDT)
+ with ESMTP id jw-wWbQ0Xuzn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Oct 2020 08:25:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F8E4B363
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 08:25:00 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64B3730E;
+ Mon, 19 Oct 2020 05:25:00 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.55.56])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 35F743F719;
+ Mon, 19 Oct 2020 05:24:58 -0700 (PDT)
+Date: Mon, 19 Oct 2020 13:24:55 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] perf: arm_spe: Use Inner Shareable DSB when draining the
+ buffer
+Message-ID: <20201019122455.GD34028@C02TD0UTHF1T.local>
+References: <20201006150520.161985-1-alexandru.elisei@arm.com>
+ <87ft6r4bgd.wl-maz@kernel.org>
+ <8fa8af94-ab08-b43a-95e4-55a13de09efe@arm.com>
 MIME-Version: 1.0
-References: <20201015040639.70C6D414009F@webmail.sinamail.sina.com.cn>
- <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
- <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
- <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
- <20201019113157.GN32292@arm.com>
-In-Reply-To: <20201019113157.GN32292@arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Oct 2020 12:43:33 +0100
-Message-ID: <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, xu910121@sina.com,
- qemu-devel <qemu-devel@nongnu.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Content-Disposition: inline
+In-Reply-To: <8fa8af94-ab08-b43a-95e4-55a13de09efe@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,57 +72,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 19 Oct 2020 at 12:32, Dave Martin <Dave.Martin@arm.com> wrote:
-> I'm not quite sure about Peter's assessment here.
->
-> I agree with the inconsistency identified here: we always enumerate all
-> unallocated ID regs, but we enumerate ID_AA64ZFR0_EL1 conditionally.
-> This doesn't feel right: on a non-SVE guest, ID_AA64ZFR0_EL1 should
-> behave exactly as an unallocated ID register.
->
-> I'm not sure about the proposed fix.
->
-> For one thing, I'm not sure that old hosts will accept writing of 0 to
-> arbitrary ID regs.  This may require some digging, but commit
-> 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-> may be the place to start.
+On Tue, Oct 06, 2020 at 05:13:31PM +0100, Alexandru Elisei wrote:
+> Hi Marc,
+> 
+> Thank you for having a look at the patch!
+> 
+> On 10/6/20 4:32 PM, Marc Zyngier wrote:
+> > Hi Alex,
+> >
+> > On Tue, 06 Oct 2020 16:05:20 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >> From ARM DDI 0487F.b, page D9-2807:
+> >>
+> >> "Although the Statistical Profiling Extension acts as another observer in
+> >> the system, for determining the Shareability domain of the DSB
+> >> instructions, the writes of sample records are treated as coming from the
+> >> PE that is being profiled."
+> >>
+> >> Similarly, on page D9-2801:
+> >>
+> >> "The memory type and attributes that are used for a write by the
+> >> Statistical Profiling Extension to the Profiling Buffer is taken from the
+> >> translation table entries for the virtual address being written to. That
+> >> is:
+> >> - The writes are treated as coming from an observer that is coherent with
+> >>   all observers in the Shareability domain that is defined by the
+> >>   translation tables."
+> >>
+> >> All the PEs are in the Inner Shareable domain, use a DSB ISH to make sure
+> >> writes to the profiling buffer have completed.
+> > I'm a bit sceptical of this change. The SPE writes are per-CPU, and
+> > all we are trying to ensure is that the CPU we are running on has
+> > drained its own queue of accesses.
+> >
+> > The accesses being made within the IS domain doesn't invalidate the
+> > fact that they are still per-CPU, because "the writes of sample
+> > records are treated as coming from the PE that is being profiled.".
+> >
+> > So why should we have an IS-wide synchronisation for accesses that are
+> > purely local?
+> 
+> I think I might have misunderstood how perf spe works. Below is my original train
+> of thought.
+> 
+> In the buffer management event interrupt we drain the buffer, and if the buffer is
+> full, we call arm_spe_perf_aux_output_end() -> perf_aux_output_end(). The comment
+> for perf_aux_output_end() says "Commit the data written by hardware into the ring
+> buffer by adjusting aux_head and posting a PERF_RECORD_AUX into the perf buffer.
+> It is the pmu driver's responsibility to observe ordering rules of the hardware,
+> so that all the data is externally visible before this is called." My conclusion
+> was that after we drain the buffer, the data must be visible to all CPUs.
 
-Well, ID regs are special in the architecture -- they always exist
-and must RAZ/WI, even if they're not actually given any fields yet.
-This is different from other "unused" parts of the system register
-encoding space, which UNDEF.
+FWIW, this reasoning sounds correct to me. The DSB NSH will be
+sufficient to drain the buffer, but we need the DSB ISH to ensure that
+it's visbile to other CPUs at the instant we call perf_aux_output_end().
 
-Older hosts didn't permit writing 0 to all parts of the ID
-register space (and didn't list all ID registers in the KVM_GET_REG_LIST
-list), but that was a kernel bug which we've since fixed.
-(QEMU has workaround code for pre-4.15 kernels for this.)
-Across that older bugfix, migration works from an old kernel to
-a newer one, but wouldn't have worked from a post-bugfix kernel
-to a pre-4.15 one.
+Otherwise, if CPU x is reading the ring-buffer written by CPU y, it
+might see the aux buffer pointers updated before the samples are
+viisble, and hence read junk from the buffer.
 
-> My original idea was that at the source end we should be conservative:
-> enumerate and dump the minimum set of registers relevant to the
-> target -- for compatibility with old hosts that don't handle the
-> unallocated ID regs at all.  At the destination end, modern hosts
-> should be permissive, i.e., allow any ID reg to be set to 0, but don't
-> require the setting of any reg that older source hosts might not send.
+We can add a comment to that effect (or rework perf_aux_output_end()
+somehow to handle that ordering).
 
-The problem is that you've actually removed registers from
-the list that were previously in it (because pre-SVE
-kernels put this ID register in the list as a RAZ/WI register,
-and now it's not in the list if SVE isn't supported).
-
-> So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-> parhaps we should move all ID_UNALLOCATED() regs (and possibly
-> ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
-
-What does this do as far as the user-facing list-of-registers
-is concerned? All these registers need to remain in the
-KVM_GET_REG_LIST list, or you break migration from an old
-kernel to a new one.
-
-thanks
--- PMM
+Thanks,
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
