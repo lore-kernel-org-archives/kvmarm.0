@@ -1,67 +1,57 @@
-Return-Path: <SRS0=pEf/=D2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HfRh=D3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6550C433E7
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 16:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C34F9C433E7
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Oct 2020 12:30:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D3ABC22314
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Oct 2020 16:36:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3ABC22314
+	by mail.kernel.org (Postfix) with ESMTP id EF7FD22265
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Oct 2020 12:30:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7FD22265
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E10B04B27A;
-	Mon, 19 Oct 2020 12:36:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F2B34B47F;
+	Tue, 20 Oct 2020 08:30:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4KyfNXtQ1VcF; Mon, 19 Oct 2020 12:36:56 -0400 (EDT)
+	with ESMTP id nEaEmiqT37wU; Tue, 20 Oct 2020 08:30:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 859BA4B3B3;
-	Mon, 19 Oct 2020 12:36:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E86E64B44A;
+	Tue, 20 Oct 2020 08:30:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 422984B3B3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 12:36:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 216E74B44A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2020 08:30:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 64iIoKZsFYYy for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Oct 2020 12:36:53 -0400 (EDT)
+ with ESMTP id A1RS5x-Fs3+V for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Oct 2020 08:30:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3CE34B27A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2020 12:36:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDF184B419
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2020 08:30:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B6151FB;
- Mon, 19 Oct 2020 09:36:53 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 408C73F66B;
- Mon, 19 Oct 2020 09:36:52 -0700 (PDT)
-Date: Mon, 19 Oct 2020 17:36:49 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-Message-ID: <20201019163648.GR32292@arm.com>
-References: <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
- <20201019113157.GN32292@arm.com>
- <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
- <20201019134043.vqusmzhqp7owjt6x@kamzik.brq.redhat.com>
- <CAFEAcA8RB6MTnv0qavxWs28=pbT16i9dT1pd+0Dy9HxPVk+bZA@mail.gmail.com>
- <20201019145839.GO32292@arm.com>
- <20201019152311.csxcz52sawia4imi@kamzik.brq.redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201019152311.csxcz52sawia4imi@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: Marc Zyngier <maz@kernel.org>, xu910121@sina.com,
- qemu-devel <qemu-devel@nongnu.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0E4030E;
+ Tue, 20 Oct 2020 05:30:37 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D544F3F66E;
+ Tue, 20 Oct 2020 05:30:36 -0700 (PDT)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Marc Zyngier <maz@kernel.org>
+Subject: [PATCH kvmtool] arm64: Determine kernel offset even on non-seekable
+ file descriptors
+Date: Tue, 20 Oct 2020 13:30:32 +0100
+Message-Id: <20201020123032.167234-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,111 +63,147 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 19, 2020 at 05:23:11PM +0200, Andrew Jones wrote:
-> On Mon, Oct 19, 2020 at 03:58:40PM +0100, Dave Martin wrote:
-> > On Mon, Oct 19, 2020 at 03:18:11PM +0100, Peter Maydell wrote:
-> > > On Mon, 19 Oct 2020 at 14:40, Andrew Jones <drjones@redhat.com> wrote:
-> > > >
-> > > > On Mon, Oct 19, 2020 at 12:43:33PM +0100, Peter Maydell wrote:
-> > > > > Well, ID regs are special in the architecture -- they always exist
-> > > > > and must RAZ/WI, even if they're not actually given any fields yet.
-> > > > > This is different from other "unused" parts of the system register
-> > > > > encoding space, which UNDEF.
-> > > >
-> > > > Table D12-2 confirms the register should be RAZ, as it says the register
-> > > > is "RO, but RAZ if SVE is not implemented". Does "RO" imply "WI", though?
-> > > > For the guest we inject an exception on writes, and for userspace we
-> > > > require the value to be preserved on write.
-> > > 
-> > > Sorry, I mis-spoke. They're RAZ, but not WI, just RO (which is to say
-> > > they'll UNDEF if you try to write to them).
-> > > 
-> > > > I think we should follow the spec, even for userspace access, and be RAZ
-> > > > for when the feature isn't implemented. As for writes, assuming the
-> > > > exception injection is what we want for the guest (not WI), then that's
-> > > > correct. For userspace, I think we should continue forcing preservation
-> > > > (which will force preservation of zero when it's RAZ).
-> > > 
-> > > Yes, that sounds right.
-> > 
-> > [...]
-> > 
-> > > > > The problem is that you've actually removed registers from
-> > > > > the list that were previously in it (because pre-SVE
-> > > > > kernels put this ID register in the list as a RAZ/WI register,
-> > > > > and now it's not in the list if SVE isn't supported).
-> > 
-> > Define "previously", though.  IIUC, the full enumeration was added in
-> > v4.15 (with ID_AA64ZFR0_EL1 still not supported at all):
-> > 
-> > v4.15-rc1~110^2~27
-> > 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-> > 
-> > 
-> > And then ID_AA64FZR0_EL1 was removed from the enumeration, also in
-> > v4.15:
-> > 
-> > v4.15-rc1~110^2~5
-> > 07d79fe7c223 ("arm64/sve: KVM: Hide SVE from CPU features exposed to guests")
-> > 
-> > 
-> > So, are there really two upstram kernel tags that are mismatched on
-> > this, or is this just a bisectability issue in v4.14..v4.15?
-> > 
-> > It's a while since I looked at this, and I may have misunderstood the
-> > timeline.
-> > 
-> > 
-> > > > > > So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-> > > > > > parhaps we should move all ID_UNALLOCATED() regs (and possibly
-> > > > > > ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
-> > > > >
-> > > > > What does this do as far as the user-facing list-of-registers
-> > > > > is concerned? All these registers need to remain in the
-> > > > > KVM_GET_REG_LIST list, or you break migration from an old
-> > > > > kernel to a new one.
-> > 
-> > OK, I think I see where you are coming from, now.
-> > 
-> > It may make sense to get rid of the REG_HIDDEN_GUEST / REG_HIDDEN_USER
-> > distinction, and provide the same visibility for userspace as for MSR/
-> > MRS all the time.  This would restore ID_AA64ZFR0_EL1 into the userspace
-> > view, and may also allow a bit of simplification in the code.
-> > 
-> > Won't this will still break migration from the resulting kernel to a
-> > current kernel that hides ID_AA64ZFR0_EL1?  Or have I misunderstood
-> > something.
-> >
-> 
-> Yes, but, while neither direction old -> new nor new -> old is actually
-> something that people should do when using host cpu passthrough (they
-> should only ever migrate between identical hosts, both hardware and
-> host kernel version), migrating from old -> new makes more sense, as
-> that's the upgrade path, and it's more supportable - we can workaround
-> things on the new side. So, long story short, new -> old will fail due
-> to making this change, but it's still probably the right thing to do,
-> as we'll be defining a better pattern for ID registers going forward,
-> and we never claimed new -> old migrations would work anyway with host
-> passthrough.
-> 
-> Thanks,
-> drew
+Commit c9acdae1d2e7 ("arm64: Use default kernel offset when the image
+file can't be seeked") "guessed" the arm64 kernel offset to be the old
+default of 512K if the file descriptor for the kernel image could not
+be seeked. This mostly works today because most modern kernels are
+somewhat forgiving when loaded at the wrong offset, but emit a warning:
 
-Ack, just wanted to make sure I understood the implications correctly.
+[Firmware Bug]: Kernel image misaligned at boot, please fix your bootloader!
 
-I'm still not sure I fully understand why we hit this problem (i.e.,
-ZFR0 enumeration mismatch between host and guest) in the first place,
-unless I've misunderstood which patches make these changes, or unless
-RHEL has cherry-picked odd patches that weren't intended to be applied
-separately...
+To fix this properly, let's drop the seek operation altogether, instead
+give the kernel header parsing function a memory buffer, containing the
+first 64 bytes of the kernel file. We read the rest of the file into the
+right location after this function has decoded the proper kernel offset.
 
-Cheers
----Dave
+This brings back proper loading even for kernels loaded via pipes.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/aarch64/include/kvm/kvm-arch.h |  3 ++-
+ arm/aarch64/kvm.c                  | 26 ++++++++------------------
+ arm/kvm.c                          | 13 ++++++++++---
+ 3 files changed, 20 insertions(+), 22 deletions(-)
+
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 55ef8ed1..7e6cffb6 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -2,7 +2,8 @@
+ #define KVM__KVM_ARCH_H
+ 
+ struct kvm;
+-unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
++unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, void *header,
++					     unsigned int bufsize);
+ 
+ #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+ 				ARM_LOMAP_MAX_MEMORY		:	\
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+index 49e1dd31..9a6460ac 100644
+--- a/arm/aarch64/kvm.c
++++ b/arm/aarch64/kvm.c
+@@ -10,39 +10,29 @@
+  * instead of Little-Endian. BE kernels of this vintage may fail to
+  * boot. See Documentation/arm64/booting.rst in your local kernel tree.
+  */
+-unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd)
++unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm,
++					     void *buffer, unsigned int bufsize)
+ {
+-	struct arm64_image_header header;
+-	off_t cur_offset;
+-	ssize_t size;
++	struct arm64_image_header *header = buffer;
+ 	const char *warn_str;
+ 
+ 	/* the 32bit kernel offset is a well known value */
+ 	if (kvm->cfg.arch.aarch32_guest)
+ 		return 0x8000;
+ 
+-	cur_offset = lseek(fd, 0, SEEK_CUR);
+-	if (cur_offset == (off_t)-1 ||
+-	    lseek(fd, 0, SEEK_SET) == (off_t)-1) {
+-		warn_str = "Failed to seek in kernel image file";
++	if (bufsize < sizeof(*header)) {
++		warn_str = "Provided kernel header too small";
+ 		goto fail;
+ 	}
+ 
+-	size = xread(fd, &header, sizeof(header));
+-	if (size < 0 || (size_t)size < sizeof(header))
+-		die("Failed to read kernel image header");
+-
+-	lseek(fd, cur_offset, SEEK_SET);
+-
+-	if (memcmp(&header.magic, ARM64_IMAGE_MAGIC, sizeof(header.magic)))
++	if (memcmp(&header->magic, ARM64_IMAGE_MAGIC, sizeof(header->magic)))
+ 		pr_warning("Kernel image magic not matching");
+ 
+-	if (le64_to_cpu(header.image_size))
+-		return le64_to_cpu(header.text_offset);
++	if (le64_to_cpu(header->image_size))
++		return le64_to_cpu(header->text_offset);
+ 
+ 	warn_str = "Image size is 0";
+ fail:
+ 	pr_warning("%s, assuming TEXT_OFFSET to be 0x80000", warn_str);
+ 	return 0x80000;
+ }
+-
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 5aea18fe..685fabb1 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -90,12 +90,14 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+ 
+ #define FDT_ALIGN	SZ_2M
+ #define INITRD_ALIGN	4
++#define MAX_KERNEL_HEADER_SIZE	64
+ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 				 const char *kernel_cmdline)
+ {
+ 	void *pos, *kernel_end, *limit;
+ 	unsigned long guest_addr;
+ 	ssize_t file_size;
++	char header[MAX_KERNEL_HEADER_SIZE];
+ 
+ 	/*
+ 	 * Linux requires the initrd and dtb to be mapped inside lowmem,
+@@ -103,16 +105,21 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 	 */
+ 	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
+ 
+-	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, fd_kernel);
++	if (xread(fd_kernel, header, sizeof(header)) != sizeof(header))
++		die_perror("kernel header read");
++	pos = kvm->ram_start + kvm__arch_get_kern_offset(kvm, header,
++							 sizeof(header));
+ 	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
+-	file_size = read_file(fd_kernel, pos, limit - pos);
++	memcpy(pos, header, sizeof(header));
++	file_size = read_file(fd_kernel, pos + sizeof(header),
++			      limit - pos - sizeof(header));
+ 	if (file_size < 0) {
+ 		if (errno == ENOMEM)
+ 			die("kernel image too big to contain in guest memory.");
+ 
+ 		die_perror("kernel read");
+ 	}
+-	kernel_end = pos + file_size;
++	kernel_end = pos + file_size + sizeof(header);
+ 	pr_debug("Loaded kernel to 0x%llx (%zd bytes)",
+ 		 kvm->arch.kern_guest_start, file_size);
+ 
+-- 
+2.17.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
