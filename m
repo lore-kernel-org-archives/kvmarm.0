@@ -1,81 +1,57 @@
-Return-Path: <SRS0=S3n0=D4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=mAhA=D5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D170DC4363A
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Oct 2020 19:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4996BC2D0A3
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Oct 2020 01:56:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D6B5C221F9
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Oct 2020 19:05:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lDdPKWe+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B5C221F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTP id 4243222249
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Oct 2020 01:56:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4243222249
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E126A4B56D;
-	Wed, 21 Oct 2020 15:05:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67A404B649;
+	Wed, 21 Oct 2020 21:56:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JQpiUxewaFus; Wed, 21 Oct 2020 15:05:21 -0400 (EDT)
+	with ESMTP id wVghJTsbbjib; Wed, 21 Oct 2020 21:56:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D155E4B570;
-	Wed, 21 Oct 2020 15:05:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F8E4B63D;
+	Wed, 21 Oct 2020 21:56:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3D544B570
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Oct 2020 12:17:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68B5B4B63D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Oct 2020 21:56:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eF7U3BrEwmdE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Oct 2020 12:17:21 -0400 (EDT)
-Received: from hqnvemgate24.nvidia.com (hqnvemgate24.nvidia.com
- [216.228.121.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEEDA4B56F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Oct 2020 12:17:21 -0400 (EDT)
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5f905eb20001>; Wed, 21 Oct 2020 09:15:46 -0700
-Received: from HQMAIL105.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Wed, 21 Oct 2020 09:17:20 -0700
-X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Wed, 21 Oct 2020 09:17:20 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 21 Oct
- 2020 16:17:17 +0000
-Received: from santosh-System-Product-Name.nvidia.com (10.124.1.5) by
- mail.nvidia.com (172.20.187.12) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 21 Oct 2020 16:17:13 +0000
-From: Santosh Shukla <sashukla@nvidia.com>
-To: <maz@kernel.org>, <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-Date: Wed, 21 Oct 2020 21:46:50 +0530
-Message-ID: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
+ with ESMTP id g7yEg4o7jODi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Oct 2020 21:56:45 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DDC74B639
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Oct 2020 21:56:45 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 8FAC024923C47875ECE4;
+ Thu, 22 Oct 2020 09:56:42 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 22 Oct 2020 09:56:36 +0800
+From: Shaokun Zhang <zhangshaokun@hisilicon.com>
+To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
+Subject: [RFC] KVM: arm64: Don't force broadcast tlbi when guest is running
+Date: Thu, 22 Oct 2020 09:57:09 +0800
+Message-ID: <1603331829-33879-1-git-send-email-zhangshaokun@hisilicon.com>
 X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603296946; bh=/pCPC1opPh5gWz/GYqPevuPPTN8cDasp68thhdStyhk=;
- h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
- MIME-Version:Content-Type;
- b=lDdPKWe+hmHsfh8FmF4KGvcqB0iZH79MKwoN1FVWzuE4uFy5A09ApT/Di0B6sC/Qt
- JJaK1NltiOuxPPymlJ2U7cSQK+4vXjdgKfJPwkbhyynhKdjnKm/k+9XuP/J2oPMdjs
- C8VXY1SNh4wIjdc4LgAPY1Ud+bvuY83kt49NDfsND6jgsFwxjHBdppBMQDaXUluSDA
- bbtpavSfuYshfD2QhrmNdBYwGI58FwQcVOARAQqoFno+S713Z+FytsaYGLclPk7DOW
- UG7pYl747POpNWfEcrOHnVIjV8vXDcMHxX2BhJ1nACogi54cD0NvQNc2R0+1fDJG4G
- HPigAkFj5MWaQ==
-X-Mailman-Approved-At: Wed, 21 Oct 2020 15:05:20 -0400
-Cc: cjia@nvidia.com, Santosh Shukla <sashukla@nvidia.com>,
- linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
+Cc: Shaokun Zhang <zhangshaokun@hisilicon.com>, Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,80 +68,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The Commit:6d674e28 introduces a notion to detect and handle the
-device mapping. The commit checks for the VM_PFNMAP flag is set
-in vma->flags and if set then marks force_pte to true such that
-if force_pte is true then ignore the THP function check
-(/transparent_hugepage_adjust()).
+From: Nianyao Tang <tangnianyao@huawei.com>
 
-There could be an issue with the VM_PFNMAP flag setting and checking.
-For example consider a case where the mdev vendor driver register's
-the vma_fault handler named vma_mmio_fault(), which maps the
-host MMIO region in-turn calls remap_pfn_range() and maps
-the MMIO's vma space. Where, remap_pfn_range implicitly sets
-the VM_PFNMAP flag into vma->flags.
+Now HCR_EL2.FB is set to force broadcast tlbi to all online pcpus,
+even those vcpu do not resident on. It would get worse as system
+gets larger and more pcpus get online.
+Let's disable force-broadcast. We flush tlbi when move vcpu to a
+new pcpu, in case old page mapping still exists on new pcpu.
 
-Now lets assume a mmio fault handing flow where guest first access
-the MMIO region whose 2nd stage translation is not present.
-So that results to arm64-kvm hypervisor executing guest abort handler,
-like below:
-
-kvm_handle_guest_abort() -->
- user_mem_abort()--> {
-
-    ...
-    0. checks the vma->flags for the VM_PFNMAP.
-    1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
-    2. gfn_to_pfn_prot() -->
-        __gfn_to_pfn_memslot() -->
-            fixup_user_fault() -->
-                handle_mm_fault()-->
-                    __do_fault() -->
-                       vma_mmio_fault() --> // vendor's mdev fault handler
-                        remap_pfn_range()--> // Here sets the VM_PFNMAP
-						flag into vma->flags.
-    3. Now that force_pte is set to false in step-2),
-       will execute transparent_hugepage_adjust() func and
-       that lead to Oops [4].
- }
-
-The proposition is to check is_iomap flag before executing the THP
-function transparent_hugepage_adjust().
-
-[4] THP Oops:
-> pc: kvm_is_transparent_hugepage+0x18/0xb0
-> ...
-> ...
-> user_mem_abort+0x340/0x9b8
-> kvm_handle_guest_abort+0x248/0x468
-> handle_exit+0x150/0x1b0
-> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
-> kvm_vcpu_ioctl+0x3c0/0x858
-> ksys_ioctl+0x84/0xb8
-> __arm64_sys_ioctl+0x28/0x38
-
-Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev device.
-Linux tip: 583090b1
-
-Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device mappings")
-Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
+Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 ---
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ arch/arm64/kvm/arm.c             | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 3d26b47..ff15357 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1947,7 +1947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * If we are not forced to use page mapping, check if we are
- 	 * backed by a THP and thus use block mapping if possible.
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 64ce29378467..f85ea9c649cb 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -75,7 +75,7 @@
+  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+-			 HCR_BSU_IS | HCR_FB | HCR_TAC | \
++			 HCR_BSU_IS | HCR_TAC | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO | HCR_PTW )
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index acf9a993dfb6..845be911f885 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -334,8 +334,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	/*
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
++	 * Dirty tlb might still exist when vcpu ran on other pcpu
++	 * and modified page mapping.
  	 */
--	if (vma_pagesize == PAGE_SIZE && !force_pte)
-+	if (vma_pagesize == PAGE_SIZE && !force_pte && !is_iomap(flags))
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
- 	if (writable)
+-	if (*last_ran != vcpu->vcpu_id) {
++	if (*last_ran != vcpu->vcpu_id || vcpu->cpu != cpu) {
+ 		kvm_call_hyp(__kvm_tlb_flush_local_vmid, mmu);
+ 		*last_ran = vcpu->vcpu_id;
+ 	}
 -- 
 2.7.4
 
