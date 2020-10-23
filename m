@@ -2,81 +2,55 @@ Return-Path: <SRS0=V360=D6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A507AC56201
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 11:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A60C55179
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:51:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF323221F9
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 11:29:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0hRdmcfm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF323221F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 769FB2465D
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769FB2465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED0844B63F;
-	Fri, 23 Oct 2020 07:29:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8439C4B6DC;
+	Fri, 23 Oct 2020 12:51:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O746amTyO1Xs; Fri, 23 Oct 2020 07:29:33 -0400 (EDT)
+	with ESMTP id i09QpNJSYkNU; Fri, 23 Oct 2020 12:51:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE7B54B7B3;
-	Fri, 23 Oct 2020 07:29:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F00CA4B5E3;
+	Fri, 23 Oct 2020 12:51:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E15D4B643
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 07:29:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 845FE4B628
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:51:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zVGghMbWmt+U for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Oct 2020 07:29:32 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00DE34B63F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 07:29:31 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A2F46208B3;
- Fri, 23 Oct 2020 11:29:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603452570;
- bh=bQCvdwuGEkGFz0WHYf1HXg6LejBaqMQdjfFY6Wki64E=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=0hRdmcfm0Aburvhe2bvLDQDOYFyL/GecR5rClT+Z+KeG2BA+xrPldyzm1iGGd7y5S
- otZJPzOKD7uVPrvknIfvyTlqNIpyxLh+d49O3E4Ta9e3LKneymhwxrRoUJOMB3aGXG
- 2n7L5C7G5CHD4p7dLX8+zh1mEbghPrEdBYe345jk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kVvGC-003YWJ-K8; Fri, 23 Oct 2020 12:29:28 +0100
+ with ESMTP id hlMmd9G-ca-A for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Oct 2020 12:51:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6184B275
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:51:26 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29DBE113E;
+ Fri, 23 Oct 2020 09:51:26 -0700 (PDT)
+Received: from eglon.eretz (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F3913F719;
+ Fri, 23 Oct 2020 09:51:25 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [RFC PATCH] KVM: arm64: vgic: Allow an injected IRQ to be taken
+ synchronously by the vcpu
+Date: Fri, 23 Oct 2020 17:51:08 +0100
+Message-Id: <20201023165108.15061-1-james.morse@arm.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Date: Fri, 23 Oct 2020 12:29:28 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Santosh Shukla <sashukla@nvidia.com>
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-In-Reply-To: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sashukla@nvidia.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, cjia@nvidia.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,123 +62,225 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Santosh,
+Paravirtualised features like 'asynchronous page fault' want to be able to
+tell a guest that a page of memory isn't available right now, could
+it try again a bit later?
 
-Thanks for this.
+No hardware does this, so it doesn't map nicely onto any existing
+notification method. The notification needs to be synchronous and therefore
+per-cpu. We can't invent a new type exception type,
 
-On 2020-10-21 17:16, Santosh Shukla wrote:
-> The Commit:6d674e28 introduces a notion to detect and handle the
-> device mapping. The commit checks for the VM_PFNMAP flag is set
-> in vma->flags and if set then marks force_pte to true such that
-> if force_pte is true then ignore the THP function check
-> (/transparent_hugepage_adjust()).
-> 
-> There could be an issue with the VM_PFNMAP flag setting and checking.
-> For example consider a case where the mdev vendor driver register's
-> the vma_fault handler named vma_mmio_fault(), which maps the
-> host MMIO region in-turn calls remap_pfn_range() and maps
-> the MMIO's vma space. Where, remap_pfn_range implicitly sets
-> the VM_PFNMAP flag into vma->flags.
-> 
-> Now lets assume a mmio fault handing flow where guest first access
-> the MMIO region whose 2nd stage translation is not present.
-> So that results to arm64-kvm hypervisor executing guest abort handler,
-> like below:
-> 
-> kvm_handle_guest_abort() -->
->  user_mem_abort()--> {
-> 
->     ...
->     0. checks the vma->flags for the VM_PFNMAP.
->     1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
->     2. gfn_to_pfn_prot() -->
->         __gfn_to_pfn_memslot() -->
->             fixup_user_fault() -->
->                 handle_mm_fault()-->
->                     __do_fault() -->
->                        vma_mmio_fault() --> // vendor's mdev fault 
-> handler
->                         remap_pfn_range()--> // Here sets the VM_PFNMAP
-> 						flag into vma->flags.
->     3. Now that force_pte is set to false in step-2),
->        will execute transparent_hugepage_adjust() func and
->        that lead to Oops [4].
->  }
+Using a PPI, would depend on the CPU implementation prioritising
+virtual IRQs higher than synchronous stage2 faults. D1.13.4 "Prioritization
+and recognition of interrupts" of DDI0487F.a has a note:
+| If the first instruction after the context synchronizing event generates
+| a synchronous exception, then the architecture does not define whether the
+| PE takes the interrupt or the synchronous exception first.
 
-Hmmm. Nice. Any chance you could provide us with an actual reproducer?
+Here the synchronous exception would be 'the stage2 fault for a second
+time', meaning a pending IRQ is not guaranteed to be taken.
 
-> 
-> The proposition is to check is_iomap flag before executing the THP
-> function transparent_hugepage_adjust().
-> 
-> [4] THP Oops:
->> pc: kvm_is_transparent_hugepage+0x18/0xb0
->> ...
->> ...
->> user_mem_abort+0x340/0x9b8
->> kvm_handle_guest_abort+0x248/0x468
->> handle_exit+0x150/0x1b0
->> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
->> kvm_vcpu_ioctl+0x3c0/0x858
->> ksys_ioctl+0x84/0xb8
->> __arm64_sys_ioctl+0x28/0x38
-> 
-> Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev 
-> device.
-> Linux tip: 583090b1
-> 
-> Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device 
-> mappings")
-> Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
-> ---
->  arch/arm64/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3d26b47..ff15357 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1947,7 +1947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu,
-> phys_addr_t fault_ipa,
->  	 * If we are not forced to use page mapping, check if we are
->  	 * backed by a THP and thus use block mapping if possible.
->  	 */
-> -	if (vma_pagesize == PAGE_SIZE && !force_pte)
-> +	if (vma_pagesize == PAGE_SIZE && !force_pte && !is_iomap(flags))
->  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->  							   &pfn, &fault_ipa);
->  	if (writable)
+As we can't rely on the hardware to do this for us, do it in software:
+Add a kvm_vgic_inject_taken_irq() helper that injects an IRQ only if
+it can also emulate the exception for the provided vcpu.
 
-Why don't you directly set force_pte to true at the point where we 
-update
-the flags? It certainly would be a bit more readable:
+The IRQ should be a PPI, and the intid should be provided by the VMM.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 3d26b47a1343..7a4ad984d54e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1920,6 +1920,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, 
-phys_addr_t fault_ipa,
-  	if (kvm_is_device_pfn(pfn)) {
-  		mem_type = PAGE_S2_DEVICE;
-  		flags |= KVM_S2PTE_FLAG_IS_IOMAP;
-+		force_pte = true;
-  	} else if (logging_active) {
-  		/*
-  		 * Faults on pages in a memslot with logging enabled
+The caller should have some alternative behaviour if the call fails.
+It should also be prepared for the PPI to be delivered (and emulated
+as taken), but ignored by the guest if it services a higher priority
+interrupt instead. (these may become pending after this call completes).
 
-and almost directly applies to what we have queued for 5.10.
+If kvm_vgic_inject_taken_irq() is called in response to a synchronous
+exception, the caller should be able to detect the same synchronous
+exception being taken a second time.
 
-Thanks,
+This should probably be shared between paravirt services (some kind of
+maintenance interrupt), if so the vgic_validate_injection() check shouldn't
+reject already-pending level-sensitive IRQ. It should be possible for
+user-space to do this for its own paravirt services too (using set_one_reg)
+for the same PPI.
 
-         M.
+irqfd isn't tied to a vcpu, so isn't suitable for a PPI.
+
+This patch is a little simpler than having an in-kernel SDEI dispatcher,
+and has no additional state that would need migrating.
+
+RFC - I haven't tested this. My question is why can't we do it?
+
+CC: Gavin Shan <gshan@redhat.com>
+NAK-bait-for: Marc Zyngier <maz@kernel.org>
+Signed-off-by: James Morse <james.morse@arm.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/inject_fault.c        | 16 ++++++
+ arch/arm64/kvm/vgic/vgic.c           | 85 ++++++++++++++++++++++++++++
+ include/kvm/arm_vgic.h               |  2 +
+ 4 files changed, 104 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 49a55be2b9a2..cab9f1436f68 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -28,6 +28,7 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+ 
++void kvm_inject_irq(struct kvm_vcpu *vcpu);
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index ebfdfc27b2bd..6ff462c83eb6 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -214,6 +214,22 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ 		inject_undef64(vcpu);
+ }
+ 
++
++/**
++ * kvm_inject_irq - inject an irq exception into a 64bit guest
++ *
++ * It is assumed that this code is called from the VCPU thread and that the
++ * VCPU therefore is not currently executing guest code.
++ *
++ * This only injects the irq exception to the VCPU. The guest irqchip must be
++ * updated separately.
++ */
++void kvm_inject_irq(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu_el1_is_32bit(vcpu))
++		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
++}
++
+ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 esr)
+ {
+ 	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index c3643b7f101b..ba52c72e9a24 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -10,6 +10,7 @@
+ #include <linux/list_sort.h>
+ #include <linux/nospec.h>
+ 
++#include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ 
+ #include "vgic.h"
+@@ -476,6 +477,90 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	return 0;
+ }
+ 
++/**
++ * kvm_vgic_inject_taken_ppi - Inject a PPI only if the exception can be forced
++ *			       to be taken immediately by a 64bit guest.
++ * @vcpu:    The vcpu that should take the PPI.
++ * @intid:   The INTID to inject a new state to.
++ * @level:   Edge-triggered:  true:  to trigger the interrupt
++ *			      false: to ignore the call
++ *	     Level-sensitive  true:  raise the input signal
++ *			      false: lower the input signal
++ * @owner:   The opaque pointer to the owner of the IRQ being raised to verify
++ *           that the caller is allowed to inject this IRQ.  Userspace
++ *           injections will have owner == NULL.
++ *
++ * Inject a PPI only if @vcpu could take it immediately, and emulate the irq
++ * exception to force that to happen. The @vcpu must have PSTATE.I clear, have
++ * enable the PPI, and not masked it via PMR. The PPI may not be in the LRs on
++ * the next entry to the guest if higher prioirity interrupts are pending.  A
++ * subsequent higher priority IRQ may become pending after this call, and be
++ * serviced instead by the guest.
++ *
++ * This allows a paravirualised notification via PPI to be taken synchronously
++ * by the guest.
++ *
++ * It is assumed that this code is called from the VCPU thread and that the
++ * VCPU therefore is not currently executing guest code.
++ *
++ * See kvm_vgic_inject_irq() for notes about @level.
++ *
++ * Returns 0 for success, or -EBUSY if the PPI would not be taken.
++ */
++int kvm_vgic_inject_taken_irq(struct kvm_vcpu *vcpu, unsigned int intid,
++			      bool level, void *owner)
++{
++	bool priority_masked, vcpu_irq_masked;
++	struct kvm *kvm = vcpu->kvm;
++	struct vgic_vmcr vmcr;
++	struct vgic_irq *irq;
++	unsigned long flags;
++	int ret;
++
++	trace_vgic_update_irq_pending(vcpu->cpu, intid, level);
++
++	ret = vgic_lazy_init(kvm);
++	if (ret)
++		return ret;
++
++	if (vcpu_el1_is_32bit(vcpu))
++		return -EOPNOTSUPP;
++
++	if (!irq_is_ppi(intid))
++		return -EINVAL;
++
++	irq = vgic_get_irq(kvm, vcpu, intid);
++	if (!irq)
++		return -EINVAL;
++
++	vgic_get_vmcr(vcpu, &vmcr);
++	priority_masked = (irq->priority >= vmcr.pmr);
++	vcpu_irq_masked = (*vcpu_cpsr(vcpu) & PSR_I_BIT);
++
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++
++	if (!irq->enabled || priority_masked || vcpu_irq_masked ||
++	    !vgic_validate_injection(irq, level, owner)) {
++		/* not going to be taken as a new exception */
++		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++		vgic_put_irq(kvm, irq);
++		return -EBUSY;
++	}
++
++	if (irq->config == VGIC_CONFIG_LEVEL)
++		irq->line_level = level;
++	else
++		irq->pending_latch = true;
++
++	vgic_queue_irq_unlock(kvm, irq, flags);
++	vgic_put_irq(kvm, irq);
++
++	kvm_inject_irq(vcpu);
++
++	return 0;
++}
++
++
+ /* @irq->irq_lock must be held */
+ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 			    unsigned int host_irq,
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a8d8fdcd3723..76d147de5489 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -350,6 +350,8 @@ void kvm_vgic_init_cpu_hardware(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level, void *owner);
++int kvm_vgic_inject_taken_irq(struct kvm_vcpu *vcpu, unsigned int intid,
++			      bool level, void *owner);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 			  u32 vintid, bool (*get_input_level)(int vindid));
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
 -- 
-Jazz is not dead. It just smells funny...
+2.28.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
