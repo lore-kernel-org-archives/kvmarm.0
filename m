@@ -2,58 +2,57 @@ Return-Path: <SRS0=V360=D6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEF1C388F9
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4F4C4363A
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:55:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5785F20E65
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5785F20E65
+	by mail.kernel.org (Postfix) with ESMTP id BFADD20E65
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Oct 2020 16:55:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFADD20E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4AC4B74D;
-	Fri, 23 Oct 2020 12:54:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 278034B680;
+	Fri, 23 Oct 2020 12:55:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id toNtMAiEiL4S; Fri, 23 Oct 2020 12:54:53 -0400 (EDT)
+	with ESMTP id 4k5R+vXy0QN8; Fri, 23 Oct 2020 12:55:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F0A44B6DC;
-	Fri, 23 Oct 2020 12:54:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D054C4B697;
+	Fri, 23 Oct 2020 12:55:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3394B5D3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:54:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D8914B65F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:55:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rVd6Mn9lcqnC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Oct 2020 12:54:51 -0400 (EDT)
+ with ESMTP id 5CuE2ELWkfZi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Oct 2020 12:55:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 510524B6CE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:54:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B8174B65E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2020 12:55:43 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 044EB1FB;
- Fri, 23 Oct 2020 09:54:51 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB4971FB;
+ Fri, 23 Oct 2020 09:55:42 -0700 (PDT)
 Received: from [172.16.1.113] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9122B3F719;
- Fri, 23 Oct 2020 09:54:49 -0700 (PDT)
-Subject: Re: [PATCH 3/6] kvm/arm64: Export kvm_handle_user_mem_abort() with
- prefault mode
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8B783F719;
+ Fri, 23 Oct 2020 09:55:41 -0700 (PDT)
+Subject: Re: [PATCH 5/6] drivers/acpi: Import ACPI APF table
 To: Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
 References: <20200818011319.91777-1-gshan@redhat.com>
- <20200818011319.91777-4-gshan@redhat.com>
+ <20200818011319.91777-6-gshan@redhat.com>
 From: James Morse <james.morse@arm.com>
-Message-ID: <43da773d-a218-ffb4-5648-19cc771c55e8@arm.com>
-Date: Fri, 23 Oct 2020 17:54:47 +0100
+Message-ID: <1c18bb2d-ee35-499c-8d8a-2ed889e5d9bb@arm.com>
+Date: Fri, 23 Oct 2020 17:55:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200818011319.91777-4-gshan@redhat.com>
+In-Reply-To: <20200818011319.91777-6-gshan@redhat.com>
 Content-Language: en-GB
 Cc: maz@kernel.org, will@kernel.org, shan.gavin@gmail.com, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -75,30 +74,33 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Gavin,
 
 On 18/08/2020 02:13, Gavin Shan wrote:
-> This renames user_mem_abort() to kvm_handle_user_mem_abort(), and
-> then exports it. The function will be used in asynchronous page fault
-> to populate a page table entry once the corresponding page is populated
-> from the backup device (e.g. swap partition):
+> This defines the struct for ACPI APF table. The information included
+> in this table will be used by guest kernel to retrieve SDEI event
+> number, PPI number and its triggering properties:
 > 
->    * Parameter @fault_status is replace by @esr.
->    * Parameter @prefault is added
+>    * @sdei_event: number of SDEI event used for page-not-present
+>    * @interrupt:  PPI used for page-ready
+>    * @interrupt_flags: PPI's mode and polarity
 > 
-> As the @esr is passed as parameter, not fetched from vCPU struct. This
-> also introduces the necessasry helpers in esr.h, to manupulate the @esr.
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  include/acpi/actbl2.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 
-(Nit: necessary, manipulate)
 
+Whoa! This is not how changes to ACPI work!
 
-> The helpers defined in kvm_emulate.h reuses the newly added helper. This
-> shouldn't cause functional changes.
+We have to work out what is needed, then the standard has to be updated, then the upstream
+acpica project, then these files get synced back across from the 'upstream' acpica project...
 
-user_mem_abort() is deep in the the guts of KVM's arch code. I don't think this should be
-exported. It  must be called on the vcpu thread. It must be called under the VMs srcu
-lock. There are also tricky interactions with whether the vcpu is loaded on this cpu or not...
+If you need an ACPI table, we need something for DT too. I don't think a well designed
+paravirt interface shouldn't need this. Wasn't that the whole point of the KVM "vendor
+specific" services?!
 
-I think it would be much simpler to always let the guest take the stage2-fault a second
-time. This keeps the property that pages are only populate in response to a stage2 fault.
-If the guest behaves, it will only schedule a task that accesses the page once its available.
+The cover-letter message talks of shared memory, which this doesn't describe.
+
+Ideally this stuff would be discovered via SMCCC, or a (readonly?) page of that shared
+memory. That way its the same regardless of ACPI or DT.
 
 
 Thanks,
