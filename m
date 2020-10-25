@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B071C388F7
-	for <kvmarm@archiver.kernel.org>; Sun, 25 Oct 2020 09:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B93C388F7
+	for <kvmarm@archiver.kernel.org>; Sun, 25 Oct 2020 10:05:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6997D22284
-	for <kvmarm@archiver.kernel.org>; Sun, 25 Oct 2020 09:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6817F222D9
+	for <kvmarm@archiver.kernel.org>; Sun, 25 Oct 2020 10:05:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0Sciwr7f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6997D22284
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="dY870apA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6817F222D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9FC64B985;
-	Sun, 25 Oct 2020 05:52:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D25754B515;
+	Sun, 25 Oct 2020 06:05:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fxFF-U3sKhMS; Sun, 25 Oct 2020 05:52:15 -0400 (EDT)
+	with ESMTP id aBfCazf+h2x7; Sun, 25 Oct 2020 06:05:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC554B977;
-	Sun, 25 Oct 2020 05:52:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC414B954;
+	Sun, 25 Oct 2020 06:05:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DE434B93B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Oct 2020 05:52:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D154B954
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Oct 2020 06:05:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MKT9Z5pmB8BD for <kvmarm@lists.cs.columbia.edu>;
- Sun, 25 Oct 2020 05:52:13 -0400 (EDT)
+ with ESMTP id S2rk8zfrAzZu for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 25 Oct 2020 06:05:45 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECCF64B977
- for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Oct 2020 05:52:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEE484B949
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Oct 2020 06:05:44 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9CB5E22284;
- Sun, 25 Oct 2020 09:52:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CB9D320936;
+ Sun, 25 Oct 2020 10:05:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603619531;
- bh=oAXfvHzROiIAchD8Y3+9mWqjMiIAFBfr4ge5LH7qpEg=;
+ s=default; t=1603620343;
+ bh=Yz7CUN4MWFZyCixuGZFuoyPNNqXyaUN69UEhyNH2HD0=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=0Sciwr7fKR4KR1rr5vJ8UDM0uTOSzPJ49v+93GOdbuMF1bhiMIt0qT0UaxXdhzuH1
- aTjfMKWaTgHjUCHwMpbn8THNc7F7aGkfi6H+W5+KCrUEkKSlidVTOwYlq/iIY/ZcaP
- CmjOzW1NRC1tDUzWrv3wX5sxqFn1jlxnc5wt0NCs=
+ b=dY870apAuSGY/RCogszpF34aybCKtDEm80V+RX4x+lW3TQSebvLX2aFmR2X8zc0/I
+ YMredqBWBcB3hQL3Y4AlI3GvNEV1nojrFo1NZKZpScN7nHQHlCe684MVpldc7HK8o7
+ UrHfLnQtylWAkAzQ2OanJNzkpE+bVWQs0ECdw7zI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <maz@kernel.org>)
- id 1kWch7-0041v2-I6; Sun, 25 Oct 2020 09:52:09 +0000
-Date: Sun, 25 Oct 2020 09:52:09 +0000
-Message-ID: <871rhmpr92.wl-maz@kernel.org>
+ id 1kWcuD-00424D-VO; Sun, 25 Oct 2020 10:05:42 +0000
+Date: Sun, 25 Oct 2020 10:05:41 +0000
+Message-ID: <87zh4aoc22.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Check if 52-bits PA is enabled
-In-Reply-To: <20201025002739.5804-2-gshan@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Don't map PUD huge page if it's not
+ available
+In-Reply-To: <20201025002739.5804-3-gshan@redhat.com>
 References: <20201025002739.5804-1-gshan@redhat.com>
- <20201025002739.5804-2-gshan@redhat.com>
+ <20201025002739.5804-3-gshan@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -93,60 +94,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 25 Oct 2020 01:27:37 +0100,
+On Sun, 25 Oct 2020 01:27:38 +0100,
 Gavin Shan <gshan@redhat.com> wrote:
 > 
-> The 52-bits physical address is disabled until CONFIG_ARM64_PA_BITS_52
-> is chosen. This uses option for that check, to avoid the unconditional
-> check on PAGE_SHIFT in the hot path and thus save some CPU cycles.
-
-PAGE_SHIFT is known at compile time, and this code is dropped by the
-compiler if the selected page size is not 64K. This patch really only
-makes the code slightly less readable and the "CPU cycles" argument
-doesn't hold at all.
-
-So what are you trying to solve exactly?
-
-	M.
-
+> PUD huge page isn't available when CONFIG_ARM64_4K_PAGES is disabled.
+> In this case, we needn't try to map the memory through PUD huge pages
+> to save some CPU cycles in the hot path.
+> 
+> This also corrects the code style issue, which was introduced by
+> commit <523b3999e5f6> ("KVM: arm64: Try PMD block mappings if PUD mappings
+> are not supported").
 > 
 > Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/mmu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 0cdf6e461cbd..fd850353ee89 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -132,8 +132,9 @@ static u64 kvm_pte_to_phys(kvm_pte_t pte)
->  {
->  	u64 pa = pte & KVM_PTE_ADDR_MASK;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a816cb8e619b..0f51585adc04 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -787,9 +787,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		vma_shift = PAGE_SHIFT;
+>  	}
 >  
-> -	if (PAGE_SHIFT == 16)
-> -		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
-> +#ifdef CONFIG_ARM64_PA_BITS_52
-> +	pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
+> +#ifdef CONFIG_ARM64_4K_PAGES
+>  	if (vma_shift == PUD_SHIFT &&
+>  	    !fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+> -	       vma_shift = PMD_SHIFT;
+> +		vma_shift = PMD_SHIFT;
 > +#endif
 >  
->  	return pa;
->  }
-> @@ -142,8 +143,9 @@ static kvm_pte_t kvm_phys_to_pte(u64 pa)
->  {
->  	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
->  
-> -	if (PAGE_SHIFT == 16)
-> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> +#ifdef CONFIG_ARM64_PA_BITS_52
-> +	pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> +#endif
->  
->  	return pte;
->  }
-> -- 
-> 2.23.0
-> 
-> 
+>  	if (vma_shift == PMD_SHIFT &&
+>  	    !fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
+
+
+I really don't buy the "CPU cycles" argument here either. Can you
+actually measure any difference here?
+
+You have taken a fault, gone through a full guest exit, triaged it,
+and are about to into a page mapping operation which may result in a
+TLBI, and reenter the guest. It only happen a handful of times per
+page over the lifetime of the guest unless you start swapping. Hot
+path? I don't think so.
+
+	M.
 
 -- 
 Without deviation from the norm, progress is not possible.
