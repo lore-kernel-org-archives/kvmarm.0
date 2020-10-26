@@ -2,61 +2,64 @@ Return-Path: <SRS0=WLU+=EB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F45C2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 15:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE87C4363A
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 15:58:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8EF722450
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 15:57:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EF722450
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 6477222409
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 15:58:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="buCuU0wA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6477222409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59C2F4B503;
-	Mon, 26 Oct 2020 11:57:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E73004B4F8;
+	Mon, 26 Oct 2020 11:58:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SD39emnTPL7X; Mon, 26 Oct 2020 11:57:48 -0400 (EDT)
+	with ESMTP id 2QEETjQ0HhB2; Mon, 26 Oct 2020 11:58:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF05B4B514;
-	Mon, 26 Oct 2020 11:57:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3984B50A;
+	Mon, 26 Oct 2020 11:58:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 809874B4DE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 11:57:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F0E4B4DC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 11:58:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v6HlCI+iDrDj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2020 11:57:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B54F4B500
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 11:57:46 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3F8E11FB;
- Mon, 26 Oct 2020 08:57:45 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 589CC3F719;
- Mon, 26 Oct 2020 08:57:43 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Mon, 26 Oct 2020 15:57:27 +0000
-Message-Id: <20201026155727.36685-3-steven.price@arm.com>
+ with ESMTP id giHhVhTVuNr5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2020 11:58:43 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A2B94B4D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 11:58:43 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6D2D2217A0;
+ Mon, 26 Oct 2020 15:58:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1603727922;
+ bh=rUxavYmnHDlR1WI5Thkd+VTFBF7Ii2Jx0DDSg1Dvyig=;
+ h=From:To:Cc:Subject:Date:From;
+ b=buCuU0wAUWtSRIEAN/R3brLSu69YvktmLKZq13pfny07wcgPPR0kXnyGEqtMiQjbl
+ t195ireEAq6ogpXSLX/ulXBTOrw+n2aHd95mW0hq9yqIzTl7oqTYuGSECjcbFN+3Ps
+ NNkrWOzTPMUbQyWJnabOgGgyrne01gfLVFjc7Lus=
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/9] Rework hyp vector handling
+Date: Mon, 26 Oct 2020 15:58:24 +0000
+Message-Id: <20201026155833.24847-1-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201026155727.36685-1-steven.price@arm.com>
-References: <20201026155727.36685-1-steven.price@arm.com>
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,147 +76,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
-for a VM. This exposes the feature to the guest and automatically tags
-memory pages touched by the VM as PG_mte_tagged (and clears the tags
-storage) to ensure that the guest cannot see stale tags, and so that the
-tags are correctly saved/restored across swap.
+Hi all,
 
-Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  3 +++
- arch/arm64/kvm/arm.c                 |  9 +++++++++
- arch/arm64/kvm/mmu.c                 | 20 ++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c            |  6 +++++-
- include/uapi/linux/kvm.h             |  1 +
- 6 files changed, 41 insertions(+), 1 deletion(-)
+This small series reworks the hyp vector handling for the vectors
+installed when running a guest so that they are more amenable to the
+ongoing "Protected KVM" efforts. Most of the patches here are cosmetic,
+with the bulk of the changes living in patch seven.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5ef2669ccd6c..66c0d9e7c2b4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (vcpu->kvm->arch.mte_enabled)
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 95ab7345dcc8..cd993aec0440 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -118,6 +118,9 @@ struct kvm_arch {
- 	 */
- 	unsigned long *pmu_filter;
- 	unsigned int pmuver;
-+
-+	/* Memory Tagging Extension enabled for the guest */
-+	bool mte_enabled;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f56122eedffc..7ee93bcac017 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -89,6 +89,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		r = 0;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		if (!system_supports_mte() || kvm->created_vcpus)
-+			return -EINVAL;
-+		r = 0;
-+		kvm->arch.mte_enabled = true;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -210,6 +216,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		r = system_supports_mte();
-+		break;
- 	case KVM_CAP_STEAL_TIME:
- 		r = kvm_arm_pvtime_supported();
- 		break;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 19aacc7d64de..38fe25310ca1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PAGE_SIZE && !force_pte)
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
-+
-+	/*
-+	 * The otherwise redundant test for system_supports_mte() allows the
-+	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
-+	 */
-+	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
-+		/*
-+		 * VM will be able to see the page's tags, so we must ensure
-+		 * they have been initialised.
-+		 */
-+		struct page *page = pfn_to_page(pfn);
-+		long i, nr_pages = compound_nr(page);
-+
-+		/* if PG_mte_tagged is set, tags have already been initialised */
-+		for (i = 0; i < nr_pages; i++, page++) {
-+			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+				mte_clear_page_tags(page_address(page));
-+		}
-+	}
-+
- 	if (writable) {
- 		prot |= KVM_PGTABLE_PROT_W;
- 		kvm_set_pfn_dirty(pfn);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 430e36e1a13d..35a3dc448231 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
- 			val |= (1UL << ID_AA64PFR0_CSV2_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!vcpu->kvm->arch.mte_enabled)
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
- {
-+	if (vcpu->kvm->arch.mte_enabled)
-+		return 0;
-+
- 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
- }
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..3e6fb5b580a9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_ARM_MTE 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+The idea is to allocate the vector slots statically, and then refer to
+them using an enumerated type which can later be used as a hypercall
+parameter to identify the vectors that are required.
+
+The series also results in cleaner, simpler code with a slightly negative
+diffstat.
+
+Cheers,
+
+Will
+
+--->8
+
+Will Deacon (9):
+  KVM: arm64: Remove redundant Spectre-v2 code from kvm_map_vector()
+  KVM: arm64: Tidy up kvm_map_vector()
+  KVM: arm64: Move kvm_get_hyp_vector() out of header file
+  KVM: arm64: Make BP hardening globals static instead
+  KVM: arm64: Move BP hardening helpers into spectre.h
+  KVM: arm64: Re-jig logic when patching hardened hyp vectors
+  KVM: arm64: Allocate hyp vectors statically
+  arm64: spectre: Rename ARM64_HARDEN_EL2_VECTORS to ARM64_SPECTRE_V3A
+  arm64: spectre: Consolidate spectre-v3a detection
+
+ Documentation/arm64/memory.rst   |  2 +-
+ arch/arm64/include/asm/cpucaps.h |  2 +-
+ arch/arm64/include/asm/kvm_asm.h |  5 --
+ arch/arm64/include/asm/kvm_mmu.h | 46 -----------------
+ arch/arm64/include/asm/mmu.h     | 29 -----------
+ arch/arm64/include/asm/spectre.h | 63 +++++++++++++++++++++++
+ arch/arm64/kernel/cpu_errata.c   | 19 +++----
+ arch/arm64/kernel/proton-pack.c  | 84 ++++++++++++------------------
+ arch/arm64/kvm/arm.c             | 87 ++++++++++++++++++++------------
+ arch/arm64/kvm/hyp/Makefile      |  2 +-
+ arch/arm64/kvm/hyp/hyp-entry.S   | 72 ++++++++++++++------------
+ arch/arm64/kvm/hyp/smccc_wa.S    | 32 ------------
+ arch/arm64/kvm/va_layout.c       | 23 +--------
+ 13 files changed, 204 insertions(+), 262 deletions(-)
+ delete mode 100644 arch/arm64/kvm/hyp/smccc_wa.S
+
 -- 
-2.20.1
+2.29.0.rc2.309.g374f81d7ae-goog
 
 _______________________________________________
 kvmarm mailing list
