@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE09C2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D938C2D0A3
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:49:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 407DF24641
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:49:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407DF24641
+	by mail.kernel.org (Postfix) with ESMTP id AFCBD2463D
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:49:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFCBD2463D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E684B510;
-	Mon, 26 Oct 2020 09:49:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CBF04B250;
+	Mon, 26 Oct 2020 09:49:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hgX96mz6kMsB; Mon, 26 Oct 2020 09:49:43 -0400 (EDT)
+	with ESMTP id hT63arKJvsz9; Mon, 26 Oct 2020 09:49:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8A4E4B4F8;
-	Mon, 26 Oct 2020 09:49:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C610B4B4F5;
+	Mon, 26 Oct 2020 09:49:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CE5A4B4DA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:49:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B37164B250
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:49:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FCZSPJewsqXo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2020 09:49:41 -0400 (EDT)
+ with ESMTP id ke+BkYLaZ8ac for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2020 09:49:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 729704B4DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:49:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 125F44B500
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:49:43 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2FA451476;
- Mon, 26 Oct 2020 06:49:41 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBA1F1042;
+ Mon, 26 Oct 2020 06:49:42 -0700 (PDT)
 Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4A2483F68F;
- Mon, 26 Oct 2020 06:49:40 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D6B573F68F;
+ Mon, 26 Oct 2020 06:49:41 -0700 (PDT)
 From: Mark Rutland <mark.rutland@arm.com>
 To: kvmarm@lists.cs.columbia.edu,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCHv2 1/3] arm64: kvm: factor out is_{vhe,nvhe}_hyp_code()
-Date: Mon, 26 Oct 2020 13:49:29 +0000
-Message-Id: <20201026134931.28246-2-mark.rutland@arm.com>
+Subject: [PATCHv2 2/3] arm64: cpufeature: reorder cpus_have_{const,
+ final}_cap()
+Date: Mon, 26 Oct 2020 13:49:30 +0000
+Message-Id: <20201026134931.28246-3-mark.rutland@arm.com>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20201026134931.28246-1-mark.rutland@arm.com>
 References: <20201026134931.28246-1-mark.rutland@arm.com>
@@ -70,12 +71,12 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently has_vhe() detects whether it is being compiled for VHE/NVHE
-hyp code based on preprocessor definitions, and uses this knowledge to
-avoid redundant runtime checks.
+In a subsequent patch we'll modify cpus_have_const_cap() to call
+cpus_have_final_cap(), and hence we need to define cpus_have_final_cap()
+first.
 
-There are other cases where we'd like to use this knowledge, so let's
-factor the preprocessor checks out into separate helpers.
+To make subsequent changes easier to follow, this patch reorders the two
+without making any other changes.
 
 There should be no functional change as a result of this patch.
 
@@ -84,46 +85,57 @@ Cc: David Brazdil <dbrazdil@google.com>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/virt.h | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/cpufeature.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 09977acc007d1..300be14ba77b2 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -83,16 +83,27 @@ static inline bool is_kernel_in_hyp_mode(void)
- 	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index f7e7144af174c..5d18c54507e6a 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -428,35 +428,35 @@ static __always_inline bool __cpus_have_const_cap(int num)
  }
  
-+static __always_inline bool is_vhe_hyp_code(void)
-+{
-+	/* Only defined for code run in VHE hyp context */
-+	return __is_defined(__KVM_VHE_HYPERVISOR__);
-+}
-+
-+static __always_inline bool is_nvhe_hyp_code(void)
-+{
-+	/* Only defined for code run in NVHE hyp context */
-+	return __is_defined(__KVM_NVHE_HYPERVISOR__);
-+}
-+
- static __always_inline bool has_vhe(void)
+ /*
+- * Test for a capability, possibly with a runtime check.
++ * Test for a capability without a runtime check.
+  *
+- * Before capabilities are finalized, this behaves as cpus_have_cap().
++ * Before capabilities are finalized, this will BUG().
+  * After capabilities are finalized, this is patched to avoid a runtime check.
+  *
+  * @num must be a compile-time constant.
+  */
+-static __always_inline bool cpus_have_const_cap(int num)
++static __always_inline bool cpus_have_final_cap(int num)
  {
- 	/*
--	 * The following macros are defined for code specic to VHE/nVHE.
--	 * If has_vhe() is inlined into those compilation units, it can
--	 * be determined statically. Otherwise fall back to caps.
-+	 * Code only run in VHE/NVHE hyp context can assume VHE is present or
-+	 * absent. Otherwise fall back to caps.
- 	 */
--	if (__is_defined(__KVM_VHE_HYPERVISOR__))
-+	if (is_vhe_hyp_code())
- 		return true;
--	else if (__is_defined(__KVM_NVHE_HYPERVISOR__))
-+	else if (is_nvhe_hyp_code())
- 		return false;
+ 	if (system_capabilities_finalized())
+ 		return __cpus_have_const_cap(num);
  	else
- 		return cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN);
+-		return cpus_have_cap(num);
++		BUG();
+ }
+ 
+ /*
+- * Test for a capability without a runtime check.
++ * Test for a capability, possibly with a runtime check.
+  *
+- * Before capabilities are finalized, this will BUG().
++ * Before capabilities are finalized, this behaves as cpus_have_cap().
+  * After capabilities are finalized, this is patched to avoid a runtime check.
+  *
+  * @num must be a compile-time constant.
+  */
+-static __always_inline bool cpus_have_final_cap(int num)
++static __always_inline bool cpus_have_const_cap(int num)
+ {
+ 	if (system_capabilities_finalized())
+ 		return __cpus_have_const_cap(num);
+ 	else
+-		BUG();
++		return cpus_have_cap(num);
+ }
+ 
+ static inline void cpus_set_cap(unsigned int num)
 -- 
 2.11.0
 
