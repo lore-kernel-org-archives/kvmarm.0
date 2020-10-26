@@ -2,82 +2,60 @@ Return-Path: <SRS0=WLU+=EB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53035C55178
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A68C4363A
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:56:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C396C22242
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:55:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjfH/rBZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C396C22242
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 31EAB24641
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 13:56:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31EAB24641
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 648FD4B47A;
-	Mon, 26 Oct 2020 09:55:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B04584B3B9;
+	Mon, 26 Oct 2020 09:56:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Zk4IKcl3EM65; Mon, 26 Oct 2020 09:55:24 -0400 (EDT)
+	with ESMTP id R64g6DGuEUxV; Mon, 26 Oct 2020 09:56:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EB414B342;
-	Mon, 26 Oct 2020 09:55:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5884F4B3BC;
+	Mon, 26 Oct 2020 09:56:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D280A4B1F6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:55:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DCE54B257
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:56:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HssnmWIAkpJ6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2020 09:55:21 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 833F14B1EA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:55:21 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9D7532463D;
- Mon, 26 Oct 2020 13:55:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603720520;
- bh=4u87s9JoJb0Kfg4Ca+WJmwLZIYUkNuLBCeeJWFa7pPQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UjfH/rBZsW2+zKP0aZmuGDMu3+OtokmZM+5/6/eDMfJkezYF1m1itmBUBBjy+d4eU
- lmNjes0Of4UEh8nQP9sGe4ph3RH03ihN8lwYUB/+bQSOOKZC7JB7NV/ORk6g5Vkv+2
- ijKWap83QejzdODbNdRg4iNGcD54Ojgrf40j/yNc=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kX2eU-004Kjh-6v; Mon, 26 Oct 2020 13:35:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH 11/11] KVM: arm64: Get rid of the AArch32 register mapping code
-Date: Mon, 26 Oct 2020 13:34:50 +0000
-Message-Id: <20201026133450.73304-12-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201026133450.73304-1-maz@kernel.org>
+ with ESMTP id voliRoHN6hwg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2020 09:56:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A7E44B328
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 09:56:04 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43EB530E;
+ Mon, 26 Oct 2020 06:56:04 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.56.187])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 949C03F68F;
+ Mon, 26 Oct 2020 06:56:02 -0700 (PDT)
+Date: Mon, 26 Oct 2020 13:55:59 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 02/11] KVM: arm64: Move kvm_vcpu_trap_il_is32bit into
+ kvm_skip_instr32()
+Message-ID: <20201026135559.GD12454@C02TD0UTHF1T.local>
 References: <20201026133450.73304-1-maz@kernel.org>
+ <20201026133450.73304-3-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com,
- will@kernel.org, qperret@google.com, dbrazdil@google.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20201026133450.73304-3-maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,222 +72,167 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The only use of the register mapping code was for the sake of the LR
-mapping, which we trivially solved in a previous patch. Get rid of
-the whole thing now.
+On Mon, Oct 26, 2020 at 01:34:41PM +0000, Marc Zyngier wrote:
+> There is no need to feed the result of kvm_vcpu_trap_il_is32bit()
+> to kvm_skip_instr(), as only AArch32 has a variable lenght ISA, and
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h |   2 -
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/guest.c               |  28 +++++-
- arch/arm64/kvm/regmap.c              | 128 ---------------------------
- 4 files changed, 26 insertions(+), 134 deletions(-)
- delete mode 100644 arch/arm64/kvm/regmap.c
+Typo: s/lenght/length/
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3105bb73f539..c8f550a53516 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -33,8 +33,6 @@ enum exception_type {
- 	except_type_serror	= 0x180,
- };
- 
--unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
--
- bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
- void kvm_skip_instr32(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 9b32a89a25c8..60fd181df624 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
- kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 $(KVM)/vfio.o $(KVM)/irqchip.o \
- 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
--	 inject_fault.o regmap.o va_layout.o handle_exit.o \
-+	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
- 	 arch_timer.o \
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfb5218137ca..3f23f7478d2a 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -252,10 +252,32 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
- 
- 	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
--		int i;
-+		int i, nr_reg;
-+
-+		switch (*vcpu_cpsr(vcpu)) {
-+		/*
-+		 * Either we are dealing with user mode, and only the
-+		 * first 15 registers (+ PC) must be narrowed to 32bit.
-+		 * AArch32 r0-r14 conveniently map to AArch64 x0-x14.
-+		 */
-+		case PSR_AA32_MODE_USR:
-+		case PSR_AA32_MODE_SYS:
-+			nr_reg = 15;
-+			break;
-+
-+		/*
-+		 * Otherwide, this is a priviledged mode, and *all* the
-+		 * registers must be narrowed to 32bit.
-+		 */
-+		default:
-+			nr_reg = 31;
-+			break;
-+		}
-+
-+		for (i = 0; i < nr_reg; i++)
-+			vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
- 
--		for (i = 0; i < 16; i++)
--			*vcpu_reg32(vcpu, i) = (u32)*vcpu_reg32(vcpu, i);
-+		*vcpu_pc(vcpu) = (u32)*vcpu_pc(vcpu);
- 	}
- out:
- 	return err;
-diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-deleted file mode 100644
-index ae7e290bb017..000000000000
---- a/arch/arm64/kvm/regmap.c
-+++ /dev/null
-@@ -1,128 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/kvm/emulate.c:
-- * Copyright (C) 2012 - Virtual Open Systems and Columbia University
-- * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-- */
--
--#include <linux/mm.h>
--#include <linux/kvm_host.h>
--#include <asm/kvm_emulate.h>
--#include <asm/ptrace.h>
--
--#define VCPU_NR_MODES 6
--#define REG_OFFSET(_reg) \
--	(offsetof(struct user_pt_regs, _reg) / sizeof(unsigned long))
--
--#define USR_REG_OFFSET(R) REG_OFFSET(compat_usr(R))
--
--static const unsigned long vcpu_reg_offsets[VCPU_NR_MODES][16] = {
--	/* USR Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12), USR_REG_OFFSET(13),	USR_REG_OFFSET(14),
--		REG_OFFSET(pc)
--	},
--
--	/* FIQ Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7),
--		REG_OFFSET(compat_r8_fiq),  /* r8 */
--		REG_OFFSET(compat_r9_fiq),  /* r9 */
--		REG_OFFSET(compat_r10_fiq), /* r10 */
--		REG_OFFSET(compat_r11_fiq), /* r11 */
--		REG_OFFSET(compat_r12_fiq), /* r12 */
--		REG_OFFSET(compat_sp_fiq),  /* r13 */
--		REG_OFFSET(compat_lr_fiq),  /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* IRQ Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_irq), /* r13 */
--		REG_OFFSET(compat_lr_irq), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* SVC Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_svc), /* r13 */
--		REG_OFFSET(compat_lr_svc), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* ABT Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_abt), /* r13 */
--		REG_OFFSET(compat_lr_abt), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* UND Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_und), /* r13 */
--		REG_OFFSET(compat_lr_und), /* r14 */
--		REG_OFFSET(pc)
--	},
--};
--
--/*
-- * Return a pointer to the register number valid in the current mode of
-- * the virtual CPU.
-- */
--unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
--{
--	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.regs;
--	unsigned long mode = *vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK;
--
--	switch (mode) {
--	case PSR_AA32_MODE_USR ... PSR_AA32_MODE_SVC:
--		mode &= ~PSR_MODE32_BIT; /* 0 ... 3 */
--		break;
--
--	case PSR_AA32_MODE_ABT:
--		mode = 4;
--		break;
--
--	case PSR_AA32_MODE_UND:
--		mode = 5;
--		break;
--
--	case PSR_AA32_MODE_SYS:
--		mode = 0;	/* SYS maps to USR */
--		break;
--
--	default:
--		BUG();
--	}
--
--	return reg_array + vcpu_reg_offsets[mode][reg_num];
--}
--- 
-2.28.0
+If there are more typos in the series, I'll ignore them. I assume you
+know how to drive your favourite spellchecker. ;)
 
+> this helper can equally be called from kvm_skip_instr32(), reducing
+> the complexity at all the call sites.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Looks nice!
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 8 ++++----
+>  arch/arm64/kvm/handle_exit.c         | 6 +++---
+>  arch/arm64/kvm/hyp/aarch32.c         | 4 ++--
+>  arch/arm64/kvm/mmio.c                | 2 +-
+>  arch/arm64/kvm/mmu.c                 | 2 +-
+>  arch/arm64/kvm/sys_regs.c            | 2 +-
+>  6 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5ef2669ccd6c..0864f425547d 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -26,7 +26,7 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
+>  void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
+>  
+>  bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+> -void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
+> +void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+>  
+>  void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+>  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> @@ -472,10 +472,10 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>  	return data;		/* Leave LE untouched */
+>  }
+>  
+> -static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
+> +static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> -		kvm_skip_instr32(vcpu, is_wide_instr);
+> +		kvm_skip_instr32(vcpu);
+>  	} else {
+>  		*vcpu_pc(vcpu) += 4;
+>  		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
+> @@ -494,7 +494,7 @@ static __always_inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+>  	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
+>  
+> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +	kvm_skip_instr(vcpu);
+>  
+>  	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
+>  	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 79a720657c47..30bf8e22df54 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -61,7 +61,7 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>  	 * otherwise return to the same address...
+>  	 */
+>  	vcpu_set_reg(vcpu, 0, ~0UL);
+> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +	kvm_skip_instr(vcpu);
+>  	return 1;
+>  }
+>  
+> @@ -100,7 +100,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+>  		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+>  	}
+>  
+> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +	kvm_skip_instr(vcpu);
+>  
+>  	return 1;
+>  }
+> @@ -221,7 +221,7 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
+>  	 * that fail their condition code check"
+>  	 */
+>  	if (!kvm_condition_valid(vcpu)) {
+> -		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +		kvm_skip_instr(vcpu);
+>  		handled = 1;
+>  	} else {
+>  		exit_handle_fn exit_handler;
+> diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
+> index ae56d8a4b382..f98cbe2626a1 100644
+> --- a/arch/arm64/kvm/hyp/aarch32.c
+> +++ b/arch/arm64/kvm/hyp/aarch32.c
+> @@ -123,13 +123,13 @@ static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
+>   * kvm_skip_instr - skip a trapped instruction and proceed to the next
+>   * @vcpu: The vcpu pointer
+>   */
+> -void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
+> +void kvm_skip_instr32(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 pc = *vcpu_pc(vcpu);
+>  	bool is_thumb;
+>  
+>  	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
+> -	if (is_thumb && !is_wide_instr)
+> +	if (is_thumb && !kvm_vcpu_trap_il_is32bit(vcpu))
+>  		pc += 2;
+>  	else
+>  		pc += 4;
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index 6a2826f1bf5e..7e8eb32ae7d2 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -115,7 +115,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  	 * The MMIO instruction is emulated and should not be re-executed
+>  	 * in the guest.
+>  	 */
+> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +	kvm_skip_instr(vcpu);
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 19aacc7d64de..080917c3f960 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1001,7 +1001,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		 * cautious, and skip the instruction.
+>  		 */
+>  		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> -			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +			kvm_skip_instr(vcpu);
+>  			ret = 1;
+>  			goto out_unlock;
+>  		}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d9117bc56237..894e800d6c61 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2199,7 +2199,7 @@ static void perform_access(struct kvm_vcpu *vcpu,
+>  
+>  	/* Skip instruction if instructed so */
+>  	if (likely(r->access(vcpu, params, r)))
+> -		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+> +		kvm_skip_instr(vcpu);
+>  }
+>  
+>  /*
+> -- 
+> 2.28.0
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
