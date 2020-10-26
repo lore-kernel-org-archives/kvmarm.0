@@ -2,90 +2,66 @@ Return-Path: <SRS0=WLU+=EB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,RCVD_DOTEDU_SUSP,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDF5C4363A
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 14:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0649EC2D0A3
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 14:44:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E60F520780
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 14:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8942622265
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 14:44:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Pqj0b7NA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E60F520780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gjzd9m9f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8942622265
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 605EE4B45C;
-	Mon, 26 Oct 2020 10:36:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9BC64B508;
+	Mon, 26 Oct 2020 10:44:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5+jfHlBGfP0c; Mon, 26 Oct 2020 10:36:31 -0400 (EDT)
+	with ESMTP id HxiApk47vKBX; Mon, 26 Oct 2020 10:44:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF404B4C0;
-	Mon, 26 Oct 2020 10:36:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D49BD4B50A;
+	Mon, 26 Oct 2020 10:44:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF9D64B454
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 10:36:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6CA4B508
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 10:44:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OLn59nNiZRN4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2020 10:36:29 -0400 (EDT)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D856F4B43D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 10:36:28 -0400 (EDT)
-Received: by mail-wm1-f68.google.com with SMTP id c16so12721536wmd.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 07:36:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=MerDsv/XmBWBzmLIOlTgREdfdkOm0MotoeVYk/L2CXA=;
- b=Pqj0b7NAxAQeGChbWijWaY4tsNONaAR9oWWuCz66Rw4h3OvJOXQRMudZ+Rp+j3Bo3X
- JncmRLLVjT6tY5sgPuZ7iWz8Bj0uvPru028mnI+pJs8h+/FqmdDCNbgCRnrlFel++ifw
- iOwzQyimqGCGDTwM/i5wxNwoa8GS+9T2U4WXahJW4qImsDZuVCP+BI69yLwIZb0e5TP6
- DVbNdVRVVwWXmBfiPsfcNkKasuDoPIW1bsL3jUbGkGzijWc7CnBMfhG4C+FRJ4ukWyUK
- 5hG0llpleWM1WFGvZNHkZWqZd/2e0t93rAFOREJp1pHqaLHvNnma1EKIcplUoPHwUX9S
- HdLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=MerDsv/XmBWBzmLIOlTgREdfdkOm0MotoeVYk/L2CXA=;
- b=YXj/bSL2FkBmAlFBCI6p+BhtTUav/2XVG0yj/J4RM9S3tfc/dJxbUMmTsdSXuwikyE
- zGGTroZ+LdYnW4Cl2LV3QMiZMJvZMg1tjow/FEcSMuBkQ7VP70gNbTTNpZL1maegFjv5
- 6NyMqQYIvtxgDFxwikGiI6DTna70ZKzr7r4On1gpwX0+r2X5Bh493D7xmkttjqyQbTEo
- 236GOsca3l8v8XDV/VTKgPoiccNtGz4lZUE7ZyNGCdbk3k79B58p6aiX0VoKJ8B2cQH1
- Byfx9AUKU7koez+/z3WAlGZkIqWSy4WQASOJ44lUQBpgL9pvNPCaa0DKj36azDGiaauo
- 3MhA==
-X-Gm-Message-State: AOAM5314naXZapS0rMQAAAVhZY8AcYaNy2ln49AKO9uCTqQZSUMU/tGC
- GX/yRwVY/0uotEi1DGA7477MJg==
-X-Google-Smtp-Source: ABdhPJyeJBArajEh/qV0h65NryMws8JKnoPSvxRiqZYn8gQ8o5uMxcIaCVxiY2Ofp3J6w3GhdnhfXw==
-X-Received: by 2002:a7b:c0d3:: with SMTP id s19mr6858264wmh.102.1603722987718; 
- Mon, 26 Oct 2020 07:36:27 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
- by smtp.gmail.com with ESMTPSA id c18sm20080039wmk.36.2020.10.26.07.36.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 07:36:27 -0700 (PDT)
-Date: Mon, 26 Oct 2020 14:36:23 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/8] KVM: arm64: Don't corrupt tpidr_el2 on failed HVC call
-Message-ID: <20201026143623.GA2229434@google.com>
-References: <20201026095116.72051-1-maz@kernel.org>
- <20201026095116.72051-2-maz@kernel.org>
+ with ESMTP id 67Lz0Cren+yy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2020 10:44:29 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A96E54B506
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 10:44:29 -0400 (EDT)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AF48C22263;
+ Mon, 26 Oct 2020 14:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1603723468;
+ bh=U4JCctgGM9dMZ2zSXjwY50/7DMiPEciLvZwMJzH2zQE=;
+ h=From:To:Cc:Subject:Date:From;
+ b=Gjzd9m9f3l5XOpsriDnRbuHSS4a9GzbpiuC+ZMI5puxSutO8Zfs/lDtltHC6R1HcS
+ 0fZGRWPdEECXuqWmkwHuhIM38RoZd7oVKct0najT9gJczwJBk6N1CPkslxKmegeReU
+ IRmmg4rfqtkJ3JXWaArZpns0uQ/hjDOqxvQJSr8g=
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Allocate stage-2 pgd pages with GFP_KERNEL_ACCOUNT
+Date: Mon, 26 Oct 2020 14:44:23 +0000
+Message-Id: <20201026144423.24683-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201026095116.72051-2-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
+ Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,31 +78,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 26 Oct 2020 at 09:51:09 (+0000), Marc Zyngier wrote:
-> The hyp-init code starts by stashing a register in TPIDR_EL2
-> in in order to free a register. This happens no matter if the
-> HVC call is legal or not.
-> 
-> Although nothing wrong seems to come out of it, it feels odd
-> to alter the EL2 state for something that eventually returns
-> an error.
-> 
-> Instead, use the fact that we know exactly which bits of the
-> __kvm_hyp_init call are non-zero to perform the check with
-> a series of EOR/ROR instructions, combined with a build-time
-> check that the value is the one we expect.
+For consistency with the rest of the stage-2 page-table page allocations
+(performing using a kvm_mmu_memory_cache), ensure that __GFP_ACCOUNT is
+included in the GFP flags for the PGD pages.
 
-Alternatively, could we make __kvm_hyp_init non-SMCCC compliant? While I
-understand how it makes sense to be compliant for 'proper' HVCs, this
-one really is an odd one that only makes sense on a very transient state.
-That would let us define our convention, and we can just say x0-x18 can
-be clobbered like any function call, which eradicates the issue Andrew
-tried to avoid with this tpidr_el2 trick.
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thoughts?
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 0cdf6e461cbd..95141b0d6088 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -846,7 +846,7 @@ int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm)
+ 	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+ 
+ 	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
+-	pgt->pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL | __GFP_ZERO);
++	pgt->pgd = alloc_pages_exact(pgd_sz, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+ 	if (!pgt->pgd)
+ 		return -ENOMEM;
+ 
+-- 
+2.29.0.rc2.309.g374f81d7ae-goog
 
-Thanks,
-Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
