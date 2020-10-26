@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8152AC2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 08:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D597BC5517A
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 08:33:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F506223B0
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 08:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 159A6223B0
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Oct 2020 08:33:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="C51WLzaj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F506223B0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Uc92A6Lw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159A6223B0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFABE4B688;
-	Mon, 26 Oct 2020 04:33:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 920A14B3EB;
+	Mon, 26 Oct 2020 04:33:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zqad3CDeJuFg; Mon, 26 Oct 2020 04:33:21 -0400 (EDT)
+	with ESMTP id bisz5CxEnmqn; Mon, 26 Oct 2020 04:33:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 832A34B452;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C0874B49B;
 	Mon, 26 Oct 2020 04:33:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B63164B47B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 00:56:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1AA4B492
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 02:50:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M6a+NgdF6oIy for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2020 00:56:54 -0400 (EDT)
-Received: from hqnvemgate24.nvidia.com (hqnvemgate24.nvidia.com
- [216.228.121.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFF394B452
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 00:56:53 -0400 (EDT)
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5f96571c0001>; Sun, 25 Oct 2020 21:57:00 -0700
+ with ESMTP id SrW0qdYaQHDO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2020 02:50:31 -0400 (EDT)
+Received: from hqnvemgate25.nvidia.com (hqnvemgate25.nvidia.com
+ [216.228.121.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 890084B480
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2020 02:50:31 -0400 (EDT)
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5f9671ba0000>; Sun, 25 Oct 2020 23:50:34 -0700
 Received: from HQMAIL107.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Sun, 25 Oct 2020 21:56:52 -0700
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Sun, 25 Oct 2020 23:50:30 -0700
 X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Sun, 25 Oct 2020 21:56:52 -0700
+ by hqpgpgate101.nvidia.com on Sun, 25 Oct 2020 23:50:30 -0700
 Received: from [10.40.103.237] (172.20.13.39) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
- 2020 04:56:44 +0000
+ 2020 06:50:22 +0000
 Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
 To: Marc Zyngier <maz@kernel.org>
 References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
  <0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org>
+X-Nvconfidentiality: public
 From: Santosh Shukla <sashukla@nvidia.com>
-Message-ID: <f56e0d71-ceb5-8ecf-e865-4ee857e333e1@nvidia.com>
-Date: Mon, 26 Oct 2020 10:26:41 +0530
+Message-ID: <ea53e63d-4d2b-1323-ac88-242a0bb986b9@nvidia.com>
+Date: Mon, 26 Oct 2020 12:20:19 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.2
+ Thunderbird/78.4.0
 MIME-Version: 1.0
 In-Reply-To: <0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org>
 X-Originating-IP: [172.20.13.39]
@@ -68,16 +69,16 @@ X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
  HQMAIL107.nvidia.com (172.20.187.13)
 Content-Language: en-US
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603688220; bh=AzRHHGkWpntrbD2lE06mNjLuvp6LDyjJklFEptHtizk=;
- h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
- User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
- X-ClientProxiedBy:Content-Type:Content-Language;
- b=C51WLzajLr79HZ1MLmLEgjTvpQT6lOUVOzOXqlxK9DBVHfm1eJRZ9CgNV2t9zJ+a/
- arcw/H1eRf0DKsLrpcFq8dSOSxmp0BU3H0FRtF42no98fdDxPkGSRDSZxnVAW6l9Ha
- Co7l7QdCntMF1efHdfXpfkkkWlBBOg+ObAVHMpiBkQ1gArJWAr6x6jt7u6eIX9pKU+
- iAKAK1aI53fUPi4cr99F7rP+J5eh0h5eV8/zjARLALheB00eDi7H4LjsQgdb7xby57
- z8XrX2ddJrUIZGRKNr/Bi9QIzagKE9iAXSEgdWm09uUV7rff6I7EaMWbSvEjrbZVdm
- D64wHiP/deuNQ==
+ t=1603695034; bh=of7oNGBcNDt/g0Kzh7Jdp4tARYphqmBMOL5KX60AB34=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language;
+ b=Uc92A6LwaIuHVXUKvLBL/LI0z4zZDE1gJ5Eez7qBCqQ0d/7DxcR7bzoZKhSel1Is6
+ 3FBD7m6RgIEF3sqxg819JsR58aXMv0GqBkPNurN3LEUlSQX06zFZSoUmwlGzQfWzpg
+ Mqt8jKOx6qz4CKAp+f4v3jQTcH+652P9zSdyLQwcVQhpf1FnIpr4DCtmDZHGgk6MGx
+ FGxaakD582jIcPJLvpDUlsrdtqHJt60g+s3hRMggEd6ntJVFub1yXEm2W25DOohDaC
+ DsVV4xVWPRHywuO8XgqJPgSxXNZuHvKN3yHlCVCjw/yVpTjMSoKgoAtc//ndeqcCco
+ qMgALWSubWd2g==
 X-Mailman-Approved-At: Mon, 26 Oct 2020 04:33:20 -0400
 Cc: mcrossley@nvidia.com, cjia@nvidia.com, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, kwankhede@nvidia.com,
@@ -93,24 +94,27 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1958668128028338298=="
+Content-Type: multipart/mixed; boundary="===============1467873016557655400=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============1958668128028338298==
+--===============1467873016557655400==
 Content-Type: multipart/alternative;
-	boundary="------------689407E11535ADDFC0C452E2"
+	boundary="------------D5D728E4C79CD4594696414C"
 Content-Language: en-US
 
---------------689407E11535ADDFC0C452E2
+--------------D5D728E4C79CD4594696414C
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+
+Sorry for spamming to/cc, Since my mail client footer not set so re-sending to list.
 
 Hi Marc,
 
 Thanks for the review comment.
 
 On 10/23/2020 4:59 PM, Marc Zyngier wrote:
+>
 >
 > Hi Santosh,
 >
@@ -173,14 +177,14 @@ handler func vfio_pci_mmap_fault().
 So with above, when guest access the MMIO region, this will
 trigger the mmio fault path at arm64-kvm hypervisor layer like below:
 user_mem_abort() {->...
-     --> Check the VM_PFNMAP flag, since not set so marks force_pte=false
-     ....
-     __gfn_to_pfn_memslot()-->
-     ...
-     handle_mm_fault()-->
-     do_fault()-->
-     vfio_pci_mmio_fault()-->
-     remap_pfn_range()--> Now will set the VM_PFNMAP flag.
+     --> Check the VM_PFNMAP flag, since not set so marks force_pte=false
+     ....
+     __gfn_to_pfn_memslot()-->
+     ...
+     handle_mm_fault()-->
+     do_fault()-->
+     vfio_pci_mmio_fault()-->
+     remap_pfn_range()--> will now set the VM_PFNMAP flag.
 }
 
 I have also set the force_pte=true, just to avoid the THP Oops which was
@@ -193,34 +197,30 @@ diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
 index 19aacc7d64de..9ef70dc624cf 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -836,9 +836,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, 
-phys_addr_t fault_ipa,
-         }
-         if (is_error_noslot_pfn(pfn))
-                 return -EFAULT;
+@@ -836,9 +836,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+         }
+         if (is_error_noslot_pfn(pfn))
+                 return -EFAULT;
 -
-         if (kvm_is_device_pfn(pfn)) {
-                 device = true;
-+               force_pte = true;
-         } else if (logging_active && !write_fault) {
-                 /*
-                  * Only actually map the page as writable if this was a 
-write
+         if (kvm_is_device_pfn(pfn)) {
+                 device = true;
++               force_pte = true;
+         } else if (logging_active && !write_fault) {
+                 /*
+                  * Only actually map the page as writable if this was a write
 @@ -1317,6 +1317,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-                 vm_start = max(hva, vma->vm_start);
-                 vm_end = min(reg_end, vma->vm_end);
+                 vm_start = max(hva, vma->vm_start);
+                 vm_end = min(reg_end, vma->vm_end);
 
-+               /* Hack to make sure stage2 mapping not present, thus 
-trigger
-+                * user_mem_abort for stage2 mapping */
-+               if (vma->vm_flags & VM_PFNMAP) {
-+                       vma->vm_flags = vma->vm_flags & (~VM_PFNMAP);
-+               }
-                 if (vma->vm_flags & VM_PFNMAP) {
-                         gpa_t gpa = mem->guest_phys_addr +
-                                     (vm_start - mem->userspace_addr);
++               /* Hack to make sure stage2 mapping not present, thus trigger
++                * user_mem_abort for stage2 mapping */
++               if (vma->vm_flags & VM_PFNMAP) {
++                       vma->vm_flags = vma->vm_flags & (~VM_PFNMAP);
++               }
+                 if (vma->vm_flags & VM_PFNMAP) {
+                         gpa_t gpa = mem->guest_phys_addr +
+                                     (vm_start - mem->userspace_addr);
 
->>
 >> The proposition is to check is_iomap flag before executing the THP
 >> function transparent_hugepage_adjust().
 >>
@@ -266,7 +266,8 @@ trigger
 > update
 > the flags? It certainly would be a bit more readable:
 >
-Yes.
+yes
+
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
 > index 3d26b47a1343..7a4ad984d54e 100644
 > --- a/arch/arm64/kvm/mmu.c
@@ -283,8 +284,8 @@ Yes.
 >
 > and almost directly applies to what we have queued for 5.10.
 >
-Right. I believe - Above code is sightly changed at linux-next commit: 
-9695c4ff
+Right. I believe - Above code is sightly changed at linux-next
+commit: 9695c4ff.
 
 Modified one looks like below:
 
@@ -292,23 +293,17 @@ diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
 index 19aacc7..d4cd253 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -839,6 +839,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, 
-phys_addr_t fault_ipa,
+@@ -839,6 +839,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+  
+         if (kvm_is_device_pfn(pfn)) {
+                 device = true;
++               force_pte = true;
+         } else if (logging_active && !write_fault) {
+                 /*
+                  * Only actually map the page as writable if this was a writepl. let me know if above is okay and will send out v2.
 
-         if (kvm_is_device_pfn(pfn)) {
-                 device = true;
-+               force_pte = true;
-         } else if (logging_active && !write_fault) {
-                 /*
-                  * Only actually map the page as writable if this was a 
-write
-
-pl. let me know if above is okay and will send out v2.
-
-Thanks.
-
+Thanks,
 Santosh
-
 
 > Thanks,
 >
@@ -316,7 +311,7 @@ Santosh
 > -- 
 > Jazz is not dead. It just smells funny...
 
---------------689407E11535ADDFC0C452E2
+--------------D5D728E4C79CD4594696414C
 Content-Type: text/html; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
@@ -325,15 +320,18 @@ Content-Transfer-Encoding: 8bit
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   </head>
   <body>
-    <pre>Hi Marc,
+    <pre>Sorry for spamming to/cc, Since my mail client footer not set so re-sending to list.
 
-Thanks for the review comment.
-</pre>
+Hi Marc,
+
+Thanks for the review comment.</pre>
     <div class="moz-cite-prefix">On 10/23/2020 4:59 PM, Marc Zyngier
       wrote:<br>
     </div>
     <blockquote type="cite"
-      cite="mid:0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org"><br>
+      cite="mid:0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org">
+      <br>
+      <br>
       Hi Santosh,
       <br>
       <br>
@@ -429,85 +427,71 @@ Thanks for the review comment.
       <br>
       <br>
     </blockquote>
-    <p>I tried to create the reproducer scenario with vfio-pci driver
-      using<br>
-      nvidia GPU in PT mode, As because vfio-pci driver now supports<br>
-      vma faulting (/vfio_pci_mmap_fault) so could create a crude
-      reproducer<br>
-      situation with that.<br>
-      <br>
-      To create the repro - I did an ugly hack into arm64/kvm/mmu.c.<br>
-      The hack is to make sure that stage2 mapping are not created<br>
-      at the time of vm_init by unsetting VM_PFNMAP flag. This
-      `unsetting` flag<br>
-      needed because vfio-pci's mmap func(/vfio_pci_mmap) by-default<br>
-      sets the VM_PFNMAP flag for the MMIO region but I want<br>
-      the remap_pfn_range() func to set the _PFNMAP flag via vfio's
-      fault<br>
-      handler func vfio_pci_mmap_fault().<br>
-      <br>
-      So with above, when guest access the MMIO region, this will<br>
-      trigger the mmio fault path at arm64-kvm hypervisor layer like
-      below:<br>
-      user_mem_abort() {-&gt;...<br>
-          --&gt; Check the VM_PFNMAP flag, since not set so marks
-      force_pte=false<br>
-          ....<br>
-          __gfn_to_pfn_memslot()--&gt;<br>
-          ...<br>
-          handle_mm_fault()--&gt;<br>
-          do_fault()--&gt;<br>
-          vfio_pci_mmio_fault()--&gt;<br>
-          remap_pfn_range()--&gt; Now will set the VM_PFNMAP flag.<br>
-      }<br>
-      <br>
-      I have also set the force_pte=true, just to avoid the THP Oops
-      which was<br>
-      mentioned in the previous thread.<br>
-      <br>
-      hackish change to reproduce scenario:</p>
-    <p>---&gt;<br>
-      diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c<br>
-      index 19aacc7d64de..9ef70dc624cf 100644<br>
-      --- a/arch/arm64/kvm/mmu.c<br>
-      +++ b/arch/arm64/kvm/mmu.c<br>
-      @@ -836,9 +836,9 @@ static int user_mem_abort(struct kvm_vcpu
-      *vcpu, phys_addr_t fault_ipa,<br>
-              }<br>
-              if (is_error_noslot_pfn(pfn))<br>
-                      return -EFAULT;<br>
-      -<br>
-              if (kvm_is_device_pfn(pfn)) {<br>
-                      device = true;<br>
-      +               force_pte = true;<br>
-              } else if (logging_active &amp;&amp; !write_fault) {<br>
-                      /*<br>
-                       * Only actually map the page as writable if this
-      was a write<br>
-      @@ -1317,6 +1317,11 @@ int kvm_arch_prepare_memory_region(struct
-      kvm *kvm,<br>
-                      vm_start = max(hva, vma-&gt;vm_start);<br>
-                      vm_end = min(reg_end, vma-&gt;vm_end);<br>
-      <br>
-      +               /* Hack to make sure stage2 mapping not present,
-      thus trigger<br>
-      +                * user_mem_abort for stage2 mapping */<br>
-      +               if (vma-&gt;vm_flags &amp; VM_PFNMAP) {<br>
-      +                       vma-&gt;vm_flags = vma-&gt;vm_flags &amp;
-      (~VM_PFNMAP);<br>
-      +               }<br>
-                      if (vma-&gt;vm_flags &amp; VM_PFNMAP) {<br>
-                              gpa_t gpa = mem-&gt;guest_phys_addr +<br>
-                                          (vm_start -
-      mem-&gt;userspace_addr);<br>
-      <br>
-    </p>
+    <pre>I tried to create the reproducer scenario with vfio-pci driver using
+nvidia GPU in PT mode, As because vfio-pci driver now supports
+vma faulting (/vfio_pci_mmap_fault) so could create a crude reproducer
+situation with that.
+
+To create the repro - I did an ugly hack into arm64/kvm/mmu.c.
+The hack is to make sure that stage2 mapping are not created
+at the time of vm_init by unsetting VM_PFNMAP flag. This `unsetting` flag
+needed because vfio-pci's mmap func(/vfio_pci_mmap) by-default
+sets the VM_PFNMAP flag for the MMIO region but I want
+the remap_pfn_range() func to set the _PFNMAP flag via vfio's fault
+handler func vfio_pci_mmap_fault().
+
+So with above, when guest access the MMIO region, this will
+trigger the mmio fault path at arm64-kvm hypervisor layer like below:
+user_mem_abort() {-&gt;...
+    --&gt; Check the VM_PFNMAP flag, since not set so marks force_pte=false
+    ....
+    __gfn_to_pfn_memslot()--&gt;
+    ...
+    handle_mm_fault()--&gt;
+    do_fault()--&gt;
+    vfio_pci_mmio_fault()--&gt;
+    remap_pfn_range()--&gt; will now set the VM_PFNMAP flag.
+}
+
+I have also set the force_pte=true, just to avoid the THP Oops which was
+mentioned in the previous thread.
+
+hackish change to reproduce scenario:
+
+---&gt;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 19aacc7d64de..9ef70dc624cf 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -836,9 +836,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+        }
+        if (is_error_noslot_pfn(pfn))
+                return -EFAULT;
+-
+        if (kvm_is_device_pfn(pfn)) {
+                device = true;
++               force_pte = true;
+        } else if (logging_active &amp;&amp; !write_fault) {
+                /*
+                 * Only actually map the page as writable if this was a write
+@@ -1317,6 +1317,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+                vm_start = max(hva, vma-&gt;vm_start);
+                vm_end = min(reg_end, vma-&gt;vm_end);
+
++               /* Hack to make sure stage2 mapping not present, thus trigger
++                * user_mem_abort for stage2 mapping */
++               if (vma-&gt;vm_flags &amp; VM_PFNMAP) {
++                       vma-&gt;vm_flags = vma-&gt;vm_flags &amp; (~VM_PFNMAP);
++               }
+                if (vma-&gt;vm_flags &amp; VM_PFNMAP) {
+                        gpa_t gpa = mem-&gt;guest_phys_addr +
+                                    (vm_start - mem-&gt;userspace_addr);
+
+</pre>
     <blockquote type="cite"
       cite="mid:0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org">
-      <blockquote type="cite">
-        <br>
-        The proposition is to check is_iomap flag before executing the
-        THP
+      <blockquote type="cite">The proposition is to check is_iomap flag
+        before executing the THP
         <br>
         function transparent_hugepage_adjust().
         <br>
@@ -602,7 +586,8 @@ Thanks for the review comment.
       <br>
       <br>
     </blockquote>
-    Yes.<br>
+    <pre>yes
+</pre>
     <blockquote type="cite"
       cite="mid:0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org">diff --git
       a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
@@ -638,30 +623,26 @@ Thanks for the review comment.
       <br>
       <br>
     </blockquote>
-    <p>Right. I believe - Above code is sightly changed at linux-next
-      commit: 9695c4ff <br>
-    </p>
-    <p>Modified one looks like below:</p>
-    <p>diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c<br>
-      index 19aacc7..d4cd253 100644<br>
-      --- a/arch/arm64/kvm/mmu.c<br>
-      +++ b/arch/arm64/kvm/mmu.c<br>
-      @@ -839,6 +839,7 @@ static int user_mem_abort(struct kvm_vcpu
-      *vcpu, phys_addr_t fault_ipa,<br>
-       <br>
-              if (kvm_is_device_pfn(pfn)) {<br>
-                      device = true;<br>
-      +               force_pte = true;<br>
-              } else if (logging_active &amp;&amp; !write_fault) {<br>
-                      /*<br>
-                       * Only actually map the page as writable if this
-      was a write<br>
-    </p>
-    <p>pl. let me know if above is okay and will send out v2.</p>
-    <p>Thanks.</p>
-    <p>Santosh</p>
-    <p><br>
-    </p>
+    <pre>Right. I believe - Above code is sightly changed at linux-next
+commit: 9695c4ff.
+
+Modified one looks like below:
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 19aacc7..d4cd253 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -839,6 +839,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+        if (kvm_is_device_pfn(pfn)) {
+                device = true;
++               force_pte = true;
+        } else if (logging_active &amp;&amp; !write_fault) {
+                /*
+                 * Only actually map the page as writable if this was a writepl. let me know if above is okay and will send out v2.</pre>
+    <pre>Thanks,
+Santosh
+</pre>
     <blockquote type="cite"
       cite="mid:0a239ac4481fa01c8d09cf2e56dfdabe@kernel.org">Thanks,
       <br>
@@ -676,9 +657,9 @@ Thanks for the review comment.
   </body>
 </html>
 
---------------689407E11535ADDFC0C452E2--
+--------------D5D728E4C79CD4594696414C--
 
---===============1958668128028338298==
+--===============1467873016557655400==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -689,4 +670,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============1958668128028338298==--
+--===============1467873016557655400==--
