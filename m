@@ -2,83 +2,54 @@ Return-Path: <SRS0=qFti=EC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C04B0C55179
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Oct 2020 16:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE74FC64E7C
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Oct 2020 17:16:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 266E521D7B
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Oct 2020 16:21:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="E617OM8B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266E521D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B5BAC21D24
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Oct 2020 17:16:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BAC21D24
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA244B447;
-	Tue, 27 Oct 2020 12:21:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0BA64B399;
+	Tue, 27 Oct 2020 13:16:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id u8s34JAVNi49; Tue, 27 Oct 2020 12:21:41 -0400 (EDT)
+	with ESMTP id u5ZZTeQd0mps; Tue, 27 Oct 2020 13:16:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35AC64B44A;
-	Tue, 27 Oct 2020 12:21:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD1AF4B3E6;
+	Tue, 27 Oct 2020 13:16:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E50014B447
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2020 12:21:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E3D4B3A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2020 13:16:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LhPVRAsJIuu5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Oct 2020 12:21:39 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A52F84B429
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2020 12:21:39 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 846AD21556;
- Tue, 27 Oct 2020 16:21:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603815698;
- bh=7/rild77xsc5YoD9UYAyYTxObMNYYA88SHHZ2y9TO2Y=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=E617OM8BwNypy4FMxmZ23Wyi2/IfQWoiSQrW/J317vQwIFsrIV+z+Do+ophS4mP0U
- 2zqTqQsOC0H/f9oLIOhzePfDTOsPqwsagSzDW6yUky7zHHGIdB5gyQNt5NwM59yHNw
- 9yqhmsI6UedyfyZ60CDauz++FEuRKFs2vauddgI8=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kXRj6-004oIO-Kk; Tue, 27 Oct 2020 16:21:36 +0000
+ with ESMTP id bX9DiQPvfk4j for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Oct 2020 13:16:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30B294B399
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2020 13:16:35 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC422139F;
+ Tue, 27 Oct 2020 10:16:33 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 236773F719;
+ Tue, 27 Oct 2020 10:16:30 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org
+Subject: [RFC PATCH kvmtool v3 0/3] SPE support
+Date: Tue, 27 Oct 2020 17:17:32 +0000
+Message-Id: <20201027171735.13638-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.29.1
 MIME-Version: 1.0
-Date: Tue, 27 Oct 2020 16:21:36 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 07/11] KVM: arm64: Inject AArch64 exceptions from HYP
-In-Reply-To: <20201026142201.GH12454@C02TD0UTHF1T.local>
-References: <20201026133450.73304-1-maz@kernel.org>
- <20201026133450.73304-8-maz@kernel.org>
- <20201026142201.GH12454@C02TD0UTHF1T.local>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <e38ae1cbc11ea00920067b886e1898d5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
- will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+Cc: will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,70 +61,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-10-26 14:22, Mark Rutland wrote:
-> On Mon, Oct 26, 2020 at 01:34:46PM +0000, Marc Zyngier wrote:
->> Move the AArch64 exception injection code from EL1 to HYP, leaving
->> only the ESR_EL1 updates to EL1. In order to come with the differences
->> between VHE and nVHE, two set of system register accessors are 
->> provided.
->> 
->> SPSR, ELR, PC and PSTATE are now completely handled in the hypervisor.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
->>  void kvm_inject_exception(struct kvm_vcpu *vcpu)
->>  {
->> +	switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
->> +	case KVM_ARM64_EXCEPT_AA64_EL1_SYNC:
->> +		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
->> +		break;
->> +	case KVM_ARM64_EXCEPT_AA64_EL1_IRQ:
->> +		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
->> +		break;
->> +	case KVM_ARM64_EXCEPT_AA64_EL1_FIQ:
->> +		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_fiq);
->> +		break;
->> +	case KVM_ARM64_EXCEPT_AA64_EL1_SERR:
->> +		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_serror);
->> +		break;
->> +	default:
->> +		/* EL2 are unimplemented until we get NV. One day. */
->> +		break;
->> +	}
->>  }
-> 
-> Huh, we're going to allow EL1 to inject IRQ/FIQ/SERROR *exceptions*
-> directly, rather than pending those via HCR_EL2.{VI,VF,VSE}? We never
-> used to have code to do that.
+This series adds userspace support for creating a guest which can use SPE.
+It requires KVM SPE support which is in the RFC phase, hence why this
+series is also RFC. The kvmtool patches can also be found at [1], and the
+KVM SPE patches can be found at [2].
 
-True, and I feel like I got carried away while thinking of NV.
-Though James had some "interesting" use case [1] lately...
+To create a guest with SPE support the following steps must be executed:
 
-> If we're going to support that we'll need to check against the DAIF 
-> bits
-> to make sure we don't inject an exception that can't be architecturally
-> taken.
+1. Set the SPE virtual interrupt ID and then initialize the features on
+every VCPU.
 
-Nah, forget it. Unless we really need to implement something like James'
-idea, I'd rather drop this altogether.
+2. After the guest memory memslots have been created, kvmtool must mlock()
+the VMAs backing the memslots.
 
-> I guess we'll tighten that up along with the synchronous exception
-> checks, but given those three cases aren't needed today it might be
-> worth removing them from the switch for now and/or adding a comment to
-> that effect.
+3. After everything has been copied to the guest's memory, kvmtool must
+execute the KVM_ARM_VM_SPE_CTRL(KVM_ARM_VM_SPE_FINALIZE) on the VM fd.
 
-Agreed.
+The first patch is a simple update to the Linux headers; the second patch
+add a new init list that executes last which is necessary to make sure the
+gest memory will not be touched after that; and the third patch contains
+the actual SPE support.
 
-         M.
+[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v3
+[2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v3
 
-[1] https://lore.kernel.org/r/20201023165108.15061-1-james.morse@arm.com
+Alexandru Elisei (1):
+  init: Add last_{init, exit} list macros
+
+Sudeep Holla (2):
+  update_headers: Sync kvm UAPI headers with linux 5.10-rc1
+  arm64: Add SPE support
+
+ Makefile                                  |   2 +-
+ arm/aarch64/arm-cpu.c                     |   2 +
+ arm/aarch64/include/asm/kvm.h             |  53 +++++++-
+ arm/aarch64/include/kvm/kvm-config-arch.h |   2 +
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    |   3 +-
+ arm/aarch64/kvm-cpu.c                     |   5 +
+ arm/include/arm-common/kvm-config-arch.h  |   1 +
+ arm/include/arm-common/spe.h              |   7 +
+ arm/spe.c                                 | 154 ++++++++++++++++++++++
+ include/kvm/util-init.h                   |   6 +-
+ include/linux/kvm.h                       | 117 +++++++++++++++-
+ powerpc/include/asm/kvm.h                 |   8 ++
+ x86/include/asm/kvm.h                     |  42 +++++-
+ 13 files changed, 387 insertions(+), 15 deletions(-)
+ create mode 100644 arm/include/arm-common/spe.h
+ create mode 100644 arm/spe.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.29.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
