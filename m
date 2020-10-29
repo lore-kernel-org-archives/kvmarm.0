@@ -2,82 +2,78 @@ Return-Path: <SRS0=BReL=EE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB94C2D0A3
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 19:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 593D6C2D0A3
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBAB6207DE
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 19:48:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71D01206DD
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhXr7JY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBAB6207DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzHX12ZX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D01206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2078C4B646;
-	Thu, 29 Oct 2020 15:48:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FDB4B664;
+	Thu, 29 Oct 2020 16:11:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QNpAPR+n5k71; Thu, 29 Oct 2020 15:48:26 -0400 (EDT)
+	with ESMTP id YP1j-D+-8h7n; Thu, 29 Oct 2020 16:11:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 032364B647;
-	Thu, 29 Oct 2020 15:48:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 789F34B629;
+	Thu, 29 Oct 2020 16:11:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE70E4B647
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 15:48:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D05304B5EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N4VYXWFF-iB0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Oct 2020 15:48:23 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 974C44B646
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 15:48:23 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 94CQ3NLnveDB for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Oct 2020 16:11:13 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0268A4B5E8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:12 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604002272;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Tyb8FK5K66va2yhPKLsGL2I54Q1Vv0WaI50wKnda8jY=;
+ b=DzHX12ZXjri9KzPWgVj0cUCJDjFQIsJKo0alguqj4GkKDOUminlVZow0Dh6KoudeecvGHO
+ CXX0PJ4288NJkFyXjI+QiOUzAeSP9cLWFXGm82ILY4jXYESbVJMP7aGHcTOISNQIao65lf
+ ea4uXcCe+trxHy0PEdMkDQ92yW5Wl+E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-UOS6jPAMPiGvakb05KgWhA-1; Thu, 29 Oct 2020 16:11:10 -0400
+X-MC-Unique: UOS6jPAMPiGvakb05KgWhA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3A0F420782;
- Thu, 29 Oct 2020 19:48:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604000902;
- bh=Gyd6eXG74BPu+fVtrjSu2bLsnfDj5UYA7WSAamk71T0=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=BhXr7JY4araNqqHPBbR4B74L2tB5+G57BSRmnYKc4EIz800sbsXjEk8X3HZCHb6SZ
- InQ3YCN+yJTRtBD2XhOoEKZvCHB1ESJ8zcCu8DjnPnPv3MIItUdSPIciWqDSqU3Uyw
- trD071OX8MEkTIMs01UIvNy6CI7uPLT7kYFzFXdc=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kYDuF-005XKA-PT; Thu, 29 Oct 2020 19:48:20 +0000
-Date: Thu, 29 Oct 2020 19:48:16 +0000
-Message-ID: <87ft5werun.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>, will@kernel.org, Catalin
- Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCHv2 0/3]  arm64: kvm: avoid referencing cpu_hwcaps from hyp
-In-Reply-To: <20201026134931.28246-1-mark.rutland@arm.com>
-References: <20201026134931.28246-1-mark.rutland@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, will@kernel.org,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, dbrazdil@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DC5318BA282;
+ Thu, 29 Oct 2020 20:11:09 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 64C8F5C22D;
+ Thu, 29 Oct 2020 20:11:07 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/3] KVM: arm64: Fix get-reg-list regression
+Date: Thu, 29 Oct 2020 21:11:02 +0100
+Message-Id: <20201029201105.101910-1-drjones@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: maz@kernel.org, xu910121@sina.com, Dave.Martin@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,55 +85,32 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[+ Catalin]
-
-On Mon, 26 Oct 2020 13:49:28 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
-> 
-> In a few places we use cpus_have_const_cap() in hyp code, usually
-> because this is hidden within a helper that's also used in regular
-> kernel context. As cpus_have_const_cap() generates code to read the
-> cpu_hwcaps array before capabilities are finalized, this means we
-> generate some potentially-unsound references to regular kernel VAs, but
-> this these are redundant as capabilities are finalized before we
-> initialize the kvm hyp code.
-> 
-> This series gets rid of the redundant code by automatically upgrading
-> cpust_have_const_cap() to cpus_have_final_cap() when used in hyp code.
-> This allows us to avoid creating an NVHE alias for the cpu_hwcaps array,
-> so we can catch if we accidentally introduce an runtime reference to
-> this (e.g. via cpus_have_cap()).
-> 
-> Since v1 [1]:
-> * Trivial rebase to v5.10-rc1
-> 
-> [1] https://lore.kernel.org/r/20201007125211.30043-1-mark.rutland@arm.com
-> 
-> Mark Rutland (3):
->   arm64: kvm: factor out is_{vhe,nvhe}_hyp_code()
->   arm64: cpufeature: reorder cpus_have_{const,final}_cap()
->   arm64: cpufeature: upgrade hyp caps to final
-> 
->  arch/arm64/include/asm/cpufeature.h | 40 ++++++++++++++++++++++++++++---------
->  arch/arm64/include/asm/virt.h       |  9 ++++-----
->  arch/arm64/kernel/image-vars.h      |  1 -
->  3 files changed, 35 insertions(+), 15 deletions(-)
-
-Catalin, Will: can I get an Ack for patches 2 and 3? I'd be quite
-happy to drop yet another reference from the nVHE object...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+5byg5Lic5petIDx4dTkxMDEyMUBzaW5hLmNvbT4gcmVwb3J0ZWQgYSByZWdyZXNzaW9uIHNlZW4g
+d2l0aCBDZW50T1MKd2hlbiBtaWdyYXRpbmcgZnJvbSBhbiBvbGQga2VybmVsIHRvIGEgbmV3IG9u
+ZS4gVGhlIHByb2JsZW0gd2FzCnRoYXQgUUVNVSByZWplY3RlZCB0aGUgbWlncmF0aW9uIHNpbmNl
+IEtWTV9HRVRfUkVHX0xJU1QgcmVwb3J0ZWQKYSByZWdpc3RlciB3YXMgbWlzc2luZyBvbiB0aGUg
+ZGVzdGluYXRpb24uIEV4dHJhIHJlZ2lzdGVycyBhcmUgT0sKb24gdGhlIGRlc3RpbmF0aW9uLCBi
+dXQgbm90IG1pc3Npbmcgb25lcy4gVGhlIHJlZ3Jlc3Npb24gcmVwcm9kdWNlcwp3aXRoIHVwc3Ry
+ZWFtIGtlcm5lbHMgd2hlbiBtaWdyYXRpbmcgZnJvbSBhIDQuMTUgb3IgbGF0ZXIga2VybmVsLAp1
+cCB0byBvbmUgd2l0aCBjb21taXQgNzM0MzM3NjJmY2FlICgiS1ZNOiBhcm02NC9zdmU6IFN5c3Rl
+bSByZWdpc3Rlcgpjb250ZXh0IHN3aXRjaCBhbmQgYWNjZXNzIHN1cHBvcnQiKSwgdG8gYSBrZXJu
+ZWwgdGhhdCBpbmNsdWRlcyB0aGF0CmNvbW1pdCwgZS5nLiB0aGUgbGF0ZXN0IG1haW5saW5lICg1
+LjEwLXJjMSkuCgpUaGUgZmlyc3QgcGF0Y2ggb2YgdGhpcyBzZXJpZXMgaXMgdGhlIGZpeC4gVGhl
+IG5leHQgdHdvIHBhdGNoZXMsCndoaWNoIGRvbid0IGhhdmUgYW55IGludGVuZGVkIGZ1bmN0aW9u
+YWwgY2hhbmdlcywgYWxsb3cgSURfU0FOSVRJU0VECnRvIGJlIHVzZWQgZm9yIHJlZ2lzdGVycyB0
+aGF0IGZsaXAgYmV0d2VlbiBleHBvc2luZyBmZWF0dXJlcyBhbmQKYmVpbmcgUkFaLCB3aGljaCBh
+bGxvd3Mgc29tZSBjb2RlIHRvIGJlIHJlbW92ZWQuCgpBbmRyZXcgSm9uZXMgKDMpOgogIEtWTTog
+YXJtNjQ6IERvbid0IGhpZGUgSUQgcmVnaXN0ZXJzIGZyb20gdXNlcnNwYWNlCiAgS1ZNOiBhcm02
+NDogQ2hlY2sgUkFaIHZpc2liaWxpdHkgaW4gSUQgcmVnaXN0ZXIgYWNjZXNzb3JzCiAgS1ZNOiBh
+cm02NDogUmVtb3ZlIEFBNjRaRlIwX0VMMSBhY2Nlc3NvcnMKCiBhcmNoL2FybTY0L2t2bS9zeXNf
+cmVncy5jIHwgOTYgKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiBhcmNo
+L2FybTY0L2t2bS9zeXNfcmVncy5oIHwgMjAgKysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgNDcg
+aW5zZXJ0aW9ucygrKSwgNjkgZGVsZXRpb25zKC0pCgotLSAKMi4yNy4wCgpfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
+bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
+bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
