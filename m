@@ -2,66 +2,68 @@ Return-Path: <SRS0=BReL=EE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 540E7C4363A
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 14:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F04C4363A
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 15:27:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7440B206DC
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 14:47:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A38A20759
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 15:27:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOhpC2zB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7440B206DC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="romTUC4K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A38A20759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE704B361;
-	Thu, 29 Oct 2020 10:47:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73F1D4B233;
+	Thu, 29 Oct 2020 11:27:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OAFrhl85+fKu; Thu, 29 Oct 2020 10:47:27 -0400 (EDT)
+	with ESMTP id mxIRXnTknXWC; Thu, 29 Oct 2020 11:27:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 891084B55A;
-	Thu, 29 Oct 2020 10:47:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA6A4B53B;
+	Thu, 29 Oct 2020 11:27:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 188AE4B545
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 10:47:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 275504B27F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 11:27:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sy7IHzgNIHx3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Oct 2020 10:47:25 -0400 (EDT)
+ with ESMTP id AcAEXoKKnlP6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Oct 2020 11:27:12 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF1BE4B361
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 10:47:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1654C4B233
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 11:27:12 -0400 (EDT)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9E6CE20732;
- Thu, 29 Oct 2020 14:47:22 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5FED020759;
+ Thu, 29 Oct 2020 15:27:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603982843;
- bh=F+HkcFc+yANZKBaSQmspmybYBo7phJrOJUMejErjoro=;
- h=From:To:Cc:Subject:Date:From;
- b=YOhpC2zB7hHKEGjddkMnjHxTi743wAmsWpMkMbVDo+Q7l2T31UQgUgpqVnyffpolD
- 96Uk0rS9Oa2DjimmC5slz2dqMUhL69RAUgSC+dLnjc1xvDFjF9zNtbacg6eUCBgBDB
- MkKEcq+ZKatazW0Oi1IgqpyYtNgaTPnSKQrvHk2A=
+ s=default; t=1603985230;
+ bh=dHOwPIbu8adLWeK2264PAC3Cqkc4KzVueApZwXwuyiQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=romTUC4KfCDrK+Pyt2kasR5dQnxJiB7Fwz/PL6qsJcV7ZXxhj4ZBloFG/L76Q1xc4
+ bgNQjzmFHF+91/TnvTj2uxeK6k8ioRP8S1I50XrLezds9B9qlVVf02dzAPxx5djzFw
+ M82YDXJI0n0n/rxlT1u5E8YuKdEH4q00IoQDRcJA=
 From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Fix masks in stage2_pte_cacheable()
-Date: Thu, 29 Oct 2020 14:47:16 +0000
-Message-Id: <20201029144716.30476-1-will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, Rob Herring <robh@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v7 1/2] arm64: Add part number for Arm Cortex-A77
+Date: Thu, 29 Oct 2020 15:27:03 +0000
+Message-Id: <160397616208.746530.13318825625774881470.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201028182839.166037-1-robh@kernel.org>
+References: <20201028182839.166037-1-robh@kernel.org>
 MIME-Version: 1.0
 Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
- Marc Zyngier <maz@kernel.org>
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,47 +80,23 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-stage2_pte_cacheable() tries to figure out whether the mapping installed
-in its 'pte' parameter is cacheable or not. Unfortunately, it fails
-miserably because it extracts the memory attributes from the entry using
-FIELD_GET(), which returns the attributes shifted down to bit 0, but then
-compares this with the unshifted value generated by the PAGE_S2_MEMATTR()
-macro.
+On Wed, 28 Oct 2020 13:28:38 -0500, Rob Herring wrote:
+> Add the MIDR part number info for the Arm Cortex-A77.
 
-A direct consequence of this bug is that cache maintenance is silently
-skipped, which in turn causes 32-bit guests to crash early on when their
-set/way maintenance is trapped but not emulated correctly.
+Applied to arm64 (for-next/fixes), thanks!
 
-Fix the broken masks by avoiding the use of FIELD_GET() altogether.
+[1/2] arm64: Add part number for Arm Cortex-A77
+      https://git.kernel.org/arm64/c/8a6b88e66233
+[2/2] arm64: Add workaround for Arm Cortex-A77 erratum 1508412
+      https://git.kernel.org/arm64/c/96d389ca1011
 
-Cc: Quentin Perret <qperret@google.com>
-Reported-by: Marc Zyngier <maz@kernel.org>
-Fixes: 6d9d2115c480 ("KVM: arm64: Add support for stage-2 map()/unmap() in generic page-table")
-Signed-off-by: Will Deacon <will@kernel.org>
----
-
-Applies on top of the other pgtable fix I previously sent here:
-https://lore.kernel.org/r/20201026144423.24683-1-will@kernel.org
-
- arch/arm64/kvm/hyp/pgtable.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 95141b0d6088..0271b4a3b9fe 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -635,7 +635,7 @@ static void stage2_flush_dcache(void *addr, u64 size)
- 
- static bool stage2_pte_cacheable(kvm_pte_t pte)
- {
--	u64 memattr = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR, pte);
-+	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
- 	return memattr == PAGE_S2_MEMATTR(NORMAL);
- }
- 
+Cheers,
 -- 
-2.29.1.341.ge80a0c044ae-goog
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
