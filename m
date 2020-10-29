@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 562ABC4742C
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238D2C4741F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A31CF20720
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59F66206DD
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pqpsj0zA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A31CF20720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JNWoWhiq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F66206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 015674B60F;
-	Thu, 29 Oct 2020 16:11:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E788E4B62F;
+	Thu, 29 Oct 2020 16:11:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qwDprEuRES61; Thu, 29 Oct 2020 16:11:21 -0400 (EDT)
+	with ESMTP id zVSSuEZ+oFt5; Thu, 29 Oct 2020 16:11:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1164B62E;
-	Thu, 29 Oct 2020 16:11:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2A14B67D;
+	Thu, 29 Oct 2020 16:11:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB614B659
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E36084B5EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zxQdPWH+OxuJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Oct 2020 16:11:18 -0400 (EDT)
+ with ESMTP id mgDaRktviGw7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Oct 2020 16:11:23 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56D274B60F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B10D4B64B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:22 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604002278;
+ s=mimecast20190719; t=1604002282;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YV/JAUULy63odP5jr2zTVmEpjhjM3tgKp/yHYcJYAH8=;
- b=Pqpsj0zANFcGhXof5fRRXyltvRsB3PHgXPtDOGN/li5/s8ywHSuIR7tmA76zLusxaFllIf
- uah47MOzjfX0qwGPIl/meJBR+0DTb5N6E/Dj+CETlKn8h4244+VUZqMhCigs41b9VJO8If
- gVgJ52pneEwTUGQD2gykBM8ylpfy7Bk=
+ bh=pR1vjz+uA3tB2wvyUuGDxtuO+UCYt8yWsxNU7bUHOaw=;
+ b=JNWoWhiqthO+uZ/ZMZEauPAAg0oNMd6nAuTQ2lXGVFOyqkBD+NFaxs155HzywCiRmgztrK
+ WqfUlAA+8ASvSPppbOBsgPYKdp4bIWORoggX2aM13fOYQRg6EoTUBDi4XSJA8Ig8Y4a1eC
+ 1N8y0uXRKbbRQr7n2UlNrFdgaiMSsUE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-Vh8yy48ePtiBk6aDgrxTkQ-1; Thu, 29 Oct 2020 16:11:16 -0400
-X-MC-Unique: Vh8yy48ePtiBk6aDgrxTkQ-1
+ us-mta-451-Ra8CBNJ7MaeBtdU0mYhdqQ-1; Thu, 29 Oct 2020 16:11:18 -0400
+X-MC-Unique: Ra8CBNJ7MaeBtdU0mYhdqQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0B0C18BA280;
- Thu, 29 Oct 2020 20:11:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A995618BA281;
+ Thu, 29 Oct 2020 20:11:16 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.219])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 615145C22D;
- Thu, 29 Oct 2020 20:11:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B2AD5C22D;
+ Thu, 29 Oct 2020 20:11:15 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/3] KVM: arm64: Check RAZ visibility in ID register accessors
-Date: Thu, 29 Oct 2020 21:11:04 +0100
-Message-Id: <20201029201105.101910-3-drjones@redhat.com>
+Subject: [PATCH 3/3] KVM: arm64: Remove AA64ZFR0_EL1 accessors
+Date: Thu, 29 Oct 2020 21:11:05 +0100
+Message-Id: <20201029201105.101910-4-drjones@redhat.com>
 In-Reply-To: <20201029201105.101910-1-drjones@redhat.com>
 References: <20201029201105.101910-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -94,116 +94,105 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The instruction encodings of ID registers are preallocated. Until an
-encoding is assigned a purpose the register is RAZ. KVM's general ID
-register accessor functions already support both paths, RAZ or not.
-If for each ID register we can determine if it's RAZ or not, then all
-ID registers can build on the general functions. The register visibility
-function allows us to check whether a register should be completely
-hidden or not, extending it to also report when the register should
-be RAZ or not allows us to use it for ID registers as well.
+The AA64ZFR0_EL1 accessors are just the general accessors with
+its visibility function open-coded. It also skips the if-else
+chain in read_id_reg, but there's no reason not to go there.
+Indeed consolidating ID register accessors and removing lines
+of code make it worthwhile.
 
 No functional change intended.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm64/kvm/sys_regs.c | 19 ++++++++++++++++---
- arch/arm64/kvm/sys_regs.h | 20 ++++++++++++++++++++
- 2 files changed, 36 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 61 +++++++--------------------------------
+ 1 file changed, 11 insertions(+), 50 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d24e66ee59b3..9f6151589460 100644
+index 9f6151589460..1ccaa5f3b081 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1171,7 +1171,9 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	return __access_id_reg(vcpu, p, r, false);
-+	bool raz = sysreg_raz_from_guest(vcpu, r);
-+
-+	return __access_id_reg(vcpu, p, r, raz);
+@@ -1197,55 +1197,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+ 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
  }
  
- static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
-@@ -1283,13 +1285,17 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
- static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	return __get_id_reg(vcpu, rd, uaddr, false);
-+	bool raz = sysreg_raz_from_user(vcpu, rd);
-+
-+	return __get_id_reg(vcpu, rd, uaddr, raz);
- }
- 
- static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      const struct kvm_one_reg *reg, void __user *uaddr)
- {
--	return __set_id_reg(vcpu, rd, uaddr, false);
-+	bool raz = sysreg_raz_from_user(vcpu, rd);
-+
-+	return __set_id_reg(vcpu, rd, uaddr, raz);
- }
- 
- static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-@@ -1375,12 +1381,19 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return false;
- }
- 
-+static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-+				  const struct sys_reg_desc *r)
-+{
-+	return 0;
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	SYS_DESC(SYS_##name),			\
- 	.access	= access_id_reg,		\
- 	.get_user = get_id_reg,			\
- 	.set_user = set_id_reg,			\
-+	.visibility = id_visibility,		\
- }
- 
+-/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
+-static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
+-{
+-	if (!vcpu_has_sve(vcpu))
+-		return 0;
+-
+-	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
+-}
+-
+-static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+-				   struct sys_reg_params *p,
+-				   const struct sys_reg_desc *rd)
+-{
+-	if (p->is_write)
+-		return write_to_read_only(vcpu, p, rd);
+-
+-	p->regval = guest_id_aa64zfr0_el1(vcpu);
+-	return true;
+-}
+-
+-static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+-		const struct sys_reg_desc *rd,
+-		const struct kvm_one_reg *reg, void __user *uaddr)
+-{
+-	u64 val;
+-
+-	val = guest_id_aa64zfr0_el1(vcpu);
+-	return reg_to_user(uaddr, &val, reg->id);
+-}
+-
+-static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+-		const struct sys_reg_desc *rd,
+-		const struct kvm_one_reg *reg, void __user *uaddr)
+-{
+-	const u64 id = sys_reg_to_index(rd);
+-	int err;
+-	u64 val;
+-
+-	err = reg_from_user(&val, uaddr, id);
+-	if (err)
+-		return err;
+-
+-	/* This is what we mean by invariant: you can't change it. */
+-	if (val != guest_id_aa64zfr0_el1(vcpu))
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
  /*
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 5a6fc30f5989..d5add36c130a 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -61,6 +61,8 @@ struct sys_reg_desc {
- 
- #define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
- #define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
-+#define REG_RAZ_USER		(1 << 2) /* RAZ from userspace ioctls */
-+#define REG_RAZ_GUEST		(1 << 3) /* RAZ from guest */
- 
- static __printf(2, 3)
- inline void print_sys_reg_msg(const struct sys_reg_params *p,
-@@ -129,6 +131,24 @@ static inline bool sysreg_hidden_from_user(const struct kvm_vcpu *vcpu,
- 	return r->visibility(vcpu, r) & REG_HIDDEN_USER;
+  * cpufeature ID register user accessors
+  *
+@@ -1384,6 +1335,16 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+ 				  const struct sys_reg_desc *r)
+ {
++	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
++			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
++
++	switch (id) {
++	case SYS_ID_AA64ZFR0_EL1:
++		if (!vcpu_has_sve(vcpu))
++			return REG_RAZ_USER | REG_RAZ_GUEST;
++		break;
++	}
++
+ 	return 0;
  }
  
-+static inline bool sysreg_raz_from_guest(const struct kvm_vcpu *vcpu,
-+					 const struct sys_reg_desc *r)
-+{
-+	if (likely(!r->visibility))
-+		return false;
-+
-+	return r->visibility(vcpu, r) & REG_RAZ_GUEST;
-+}
-+
-+static inline bool sysreg_raz_from_user(const struct kvm_vcpu *vcpu,
-+					const struct sys_reg_desc *r)
-+{
-+	if (likely(!r->visibility))
-+		return false;
-+
-+	return r->visibility(vcpu, r) & REG_RAZ_USER;
-+}
-+
- static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 			      const struct sys_reg_desc *i2)
- {
+@@ -1515,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+-	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, },
++	ID_SANITISED(ID_AA64ZFR0_EL1),
+ 	ID_UNALLOCATED(4,5),
+ 	ID_UNALLOCATED(4,6),
+ 	ID_UNALLOCATED(4,7),
 -- 
 2.27.0
 
