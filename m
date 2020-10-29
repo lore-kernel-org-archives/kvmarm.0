@@ -2,71 +2,75 @@ Return-Path: <SRS0=BReL=EE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 593D6C2D0A3
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F76AC4741F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 71D01206DD
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A697206DD
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Oct 2020 20:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzHX12ZX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D01206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kc/nOuV1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A697206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FDB4B664;
-	Thu, 29 Oct 2020 16:11:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B82684B5EB;
+	Thu, 29 Oct 2020 16:11:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YP1j-D+-8h7n; Thu, 29 Oct 2020 16:11:14 -0400 (EDT)
+	with ESMTP id 4qDsogm6fZkR; Thu, 29 Oct 2020 16:11:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 789F34B629;
-	Thu, 29 Oct 2020 16:11:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0B54B661;
+	Thu, 29 Oct 2020 16:11:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D05304B5EB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA4B34B60F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 94CQ3NLnveDB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Oct 2020 16:11:13 -0400 (EDT)
+ with ESMTP id MDr4fmi4OWAh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Oct 2020 16:11:16 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0268A4B5E8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:12 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE8E84B5EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2020 16:11:16 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604002272;
+ s=mimecast20190719; t=1604002276;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Tyb8FK5K66va2yhPKLsGL2I54Q1Vv0WaI50wKnda8jY=;
- b=DzHX12ZXjri9KzPWgVj0cUCJDjFQIsJKo0alguqj4GkKDOUminlVZow0Dh6KoudeecvGHO
- CXX0PJ4288NJkFyXjI+QiOUzAeSP9cLWFXGm82ILY4jXYESbVJMP7aGHcTOISNQIao65lf
- ea4uXcCe+trxHy0PEdMkDQ92yW5Wl+E=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=thNG7gXBuBd5xJEE4BsdcfOFEgJERLpzQNqMfjfSQZA=;
+ b=Kc/nOuV1COwTkdIdbHMoMwXsNX9bdZq5GOx4SuPfvCGqv0EegZWby3mftV8rkr4tVHvvjI
+ bAJz5FY0x6EPOTP5IgGLOL1C7bCJMv/AeStoLL3ynMPFC8SY2X7UD/5AW5lsZ2gUEZdVV3
+ pjl/zn5dwqOBFVJgCUVI/1QCMfYgtlE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-UOS6jPAMPiGvakb05KgWhA-1; Thu, 29 Oct 2020 16:11:10 -0400
-X-MC-Unique: UOS6jPAMPiGvakb05KgWhA-1
+ us-mta-175-1Bz6w3qcN-OkSGRzYqAzoA-1; Thu, 29 Oct 2020 16:11:14 -0400
+X-MC-Unique: 1Bz6w3qcN-OkSGRzYqAzoA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DC5318BA282;
- Thu, 29 Oct 2020 20:11:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 027A080686E;
+ Thu, 29 Oct 2020 20:11:13 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.219])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64C8F5C22D;
- Thu, 29 Oct 2020 20:11:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7CF415C26A;
+ Thu, 29 Oct 2020 20:11:09 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 0/3] KVM: arm64: Fix get-reg-list regression
-Date: Thu, 29 Oct 2020 21:11:02 +0100
-Message-Id: <20201029201105.101910-1-drjones@redhat.com>
+Subject: [PATCH 1/3] KVM: arm64: Don't hide ID registers from userspace
+Date: Thu, 29 Oct 2020 21:11:03 +0100
+Message-Id: <20201029201105.101910-2-drjones@redhat.com>
+In-Reply-To: <20201029201105.101910-1-drjones@redhat.com>
+References: <20201029201105.101910-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
@@ -90,27 +94,47 @@ Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-5byg5Lic5petIDx4dTkxMDEyMUBzaW5hLmNvbT4gcmVwb3J0ZWQgYSByZWdyZXNzaW9uIHNlZW4g
-d2l0aCBDZW50T1MKd2hlbiBtaWdyYXRpbmcgZnJvbSBhbiBvbGQga2VybmVsIHRvIGEgbmV3IG9u
-ZS4gVGhlIHByb2JsZW0gd2FzCnRoYXQgUUVNVSByZWplY3RlZCB0aGUgbWlncmF0aW9uIHNpbmNl
-IEtWTV9HRVRfUkVHX0xJU1QgcmVwb3J0ZWQKYSByZWdpc3RlciB3YXMgbWlzc2luZyBvbiB0aGUg
-ZGVzdGluYXRpb24uIEV4dHJhIHJlZ2lzdGVycyBhcmUgT0sKb24gdGhlIGRlc3RpbmF0aW9uLCBi
-dXQgbm90IG1pc3Npbmcgb25lcy4gVGhlIHJlZ3Jlc3Npb24gcmVwcm9kdWNlcwp3aXRoIHVwc3Ry
-ZWFtIGtlcm5lbHMgd2hlbiBtaWdyYXRpbmcgZnJvbSBhIDQuMTUgb3IgbGF0ZXIga2VybmVsLAp1
-cCB0byBvbmUgd2l0aCBjb21taXQgNzM0MzM3NjJmY2FlICgiS1ZNOiBhcm02NC9zdmU6IFN5c3Rl
-bSByZWdpc3Rlcgpjb250ZXh0IHN3aXRjaCBhbmQgYWNjZXNzIHN1cHBvcnQiKSwgdG8gYSBrZXJu
-ZWwgdGhhdCBpbmNsdWRlcyB0aGF0CmNvbW1pdCwgZS5nLiB0aGUgbGF0ZXN0IG1haW5saW5lICg1
-LjEwLXJjMSkuCgpUaGUgZmlyc3QgcGF0Y2ggb2YgdGhpcyBzZXJpZXMgaXMgdGhlIGZpeC4gVGhl
-IG5leHQgdHdvIHBhdGNoZXMsCndoaWNoIGRvbid0IGhhdmUgYW55IGludGVuZGVkIGZ1bmN0aW9u
-YWwgY2hhbmdlcywgYWxsb3cgSURfU0FOSVRJU0VECnRvIGJlIHVzZWQgZm9yIHJlZ2lzdGVycyB0
-aGF0IGZsaXAgYmV0d2VlbiBleHBvc2luZyBmZWF0dXJlcyBhbmQKYmVpbmcgUkFaLCB3aGljaCBh
-bGxvd3Mgc29tZSBjb2RlIHRvIGJlIHJlbW92ZWQuCgpBbmRyZXcgSm9uZXMgKDMpOgogIEtWTTog
-YXJtNjQ6IERvbid0IGhpZGUgSUQgcmVnaXN0ZXJzIGZyb20gdXNlcnNwYWNlCiAgS1ZNOiBhcm02
-NDogQ2hlY2sgUkFaIHZpc2liaWxpdHkgaW4gSUQgcmVnaXN0ZXIgYWNjZXNzb3JzCiAgS1ZNOiBh
-cm02NDogUmVtb3ZlIEFBNjRaRlIwX0VMMSBhY2Nlc3NvcnMKCiBhcmNoL2FybTY0L2t2bS9zeXNf
-cmVncy5jIHwgOTYgKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiBhcmNo
-L2FybTY0L2t2bS9zeXNfcmVncy5oIHwgMjAgKysrKysrKysKIDIgZmlsZXMgY2hhbmdlZCwgNDcg
-aW5zZXJ0aW9ucygrKSwgNjkgZGVsZXRpb25zKC0pCgotLSAKMi4yNy4wCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+SUQgcmVnaXN0ZXJzIGFyZSBSQVogdW50aWwgdGhleSd2ZSBiZWVuIGFsbG9jYXRlZCBhIHB1cnBv
+c2UsIGJ1dAp0aGF0IGRvZXNuJ3QgbWVhbiB0aGV5IHNob3VsZCBiZSByZW1vdmVkIGZyb20gdGhl
+IEtWTV9HRVRfUkVHX0xJU1QKbGlzdC4gU28gZmFyIHdlIG9ubHkgaGF2ZSBvbmUgcmVnaXN0ZXIs
+IFNZU19JRF9BQTY0WkZSMF9FTDEsIHRoYXQKaXMgaGlkZGVuIGZyb20gdXNlcnNwYWNlIHdoZW4g
+aXRzIGZ1bmN0aW9uIGlzIG5vdCBwcmVzZW50LiBSZW1vdmluZwp0aGUgdXNlcnNwYWNlIHZpc2li
+aWxpdHkgY2hlY2tzIGlzIGVub3VnaCB0byByZWV4cG9zZSBpdCwgYXMgaXQKYWxyZWFkeSBiZWhh
+dmVzIGFzIFJBWiB3aGVuIHRoZSBmdW5jdGlvbiBpcyBub3QgcHJlc2VudC4KCkZpeGVzOiA3MzQz
+Mzc2MmZjYWUgKCJLVk06IGFybTY0L3N2ZTogU3lzdGVtIHJlZ2lzdGVyIGNvbnRleHQgc3dpdGNo
+IGFuZCBhY2Nlc3Mgc3VwcG9ydCIpClJlcG9ydGVkLWJ5OiDlvKDkuJzml60gPHh1OTEwMTIxQHNp
+bmEuY29tPgpTaWduZWQtb2ZmLWJ5OiBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0LmNvbT4K
+LS0tCiBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIHwgMTggKy0tLS0tLS0tLS0tLS0tLS0tCiAx
+IGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDE3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdp
+dCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5j
+CmluZGV4IGQ5MTE3YmM1NjIzNy4uZDI0ZTY2ZWU1OWIzIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0
+L2t2bS9zeXNfcmVncy5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKQEAgLTExOTUs
+MTYgKzExOTUsNiBAQCBzdGF0aWMgdW5zaWduZWQgaW50IHN2ZV92aXNpYmlsaXR5KGNvbnN0IHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAlyZXR1cm4gUkVHX0hJRERFTl9VU0VSIHwgUkVHX0hJRERF
+Tl9HVUVTVDsKIH0KIAotLyogVmlzaWJpbGl0eSBvdmVycmlkZXMgZm9yIFNWRS1zcGVjaWZpYyBJ
+RCByZWdpc3RlcnMgKi8KLXN0YXRpYyB1bnNpZ25lZCBpbnQgc3ZlX2lkX3Zpc2liaWxpdHkoY29u
+c3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAotCQkJCSAgICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVn
+X2Rlc2MgKnJkKQotewotCWlmICh2Y3B1X2hhc19zdmUodmNwdSkpCi0JCXJldHVybiAwOwotCi0J
+cmV0dXJuIFJFR19ISURERU5fVVNFUjsKLX0KLQogLyogR2VuZXJhdGUgdGhlIGVtdWxhdGVkIElE
+X0FBNjRaRlIwX0VMMSB2YWx1ZSBleHBvc2VkIHRvIHRoZSBndWVzdCAqLwogc3RhdGljIHU2NCBn
+dWVzdF9pZF9hYTY0emZyMF9lbDEoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogewpAQCAt
+MTIzMSw5ICsxMjIxLDYgQEAgc3RhdGljIGludCBnZXRfaWRfYWE2NHpmcjBfZWwxKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwKIHsKIAl1NjQgdmFsOwogCi0JaWYgKFdBUk5fT04oIXZjcHVfaGFzX3N2
+ZSh2Y3B1KSkpCi0JCXJldHVybiAtRU5PRU5UOwotCiAJdmFsID0gZ3Vlc3RfaWRfYWE2NHpmcjBf
+ZWwxKHZjcHUpOwogCXJldHVybiByZWdfdG9fdXNlcih1YWRkciwgJnZhbCwgcmVnLT5pZCk7CiB9
+CkBAIC0xMjQ2LDkgKzEyMzMsNiBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0emZyMF9lbDEoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1LAogCWludCBlcnI7CiAJdTY0IHZhbDsKIAotCWlmIChXQVJOX09O
+KCF2Y3B1X2hhc19zdmUodmNwdSkpKQotCQlyZXR1cm4gLUVOT0VOVDsKLQogCWVyciA9IHJlZ19m
+cm9tX3VzZXIoJnZhbCwgdWFkZHIsIGlkKTsKIAlpZiAoZXJyKQogCQlyZXR1cm4gZXJyOwpAQCAt
+MTUxOCw3ICsxNTAyLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mgc3lzX3Jl
+Z19kZXNjc1tdID0gewogCUlEX1NBTklUSVNFRChJRF9BQTY0UEZSMV9FTDEpLAogCUlEX1VOQUxM
+T0NBVEVEKDQsMiksCiAJSURfVU5BTExPQ0FURUQoNCwzKSwKLQl7IFNZU19ERVNDKFNZU19JRF9B
+QTY0WkZSMF9FTDEpLCBhY2Nlc3NfaWRfYWE2NHpmcjBfZWwxLCAuZ2V0X3VzZXIgPSBnZXRfaWRf
+YWE2NHpmcjBfZWwxLCAuc2V0X3VzZXIgPSBzZXRfaWRfYWE2NHpmcjBfZWwxLCAudmlzaWJpbGl0
+eSA9IHN2ZV9pZF92aXNpYmlsaXR5IH0sCisJeyBTWVNfREVTQyhTWVNfSURfQUE2NFpGUjBfRUwx
+KSwgYWNjZXNzX2lkX2FhNjR6ZnIwX2VsMSwgLmdldF91c2VyID0gZ2V0X2lkX2FhNjR6ZnIwX2Vs
+MSwgLnNldF91c2VyID0gc2V0X2lkX2FhNjR6ZnIwX2VsMSwgfSwKIAlJRF9VTkFMTE9DQVRFRCg0
+LDUpLAogCUlEX1VOQUxMT0NBVEVEKDQsNiksCiAJSURfVU5BTExPQ0FURUQoNCw3KSwKLS0gCjIu
+MjcuMAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
+YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
+dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
