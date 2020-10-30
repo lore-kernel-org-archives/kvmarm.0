@@ -2,59 +2,85 @@ Return-Path: <SRS0=VJ1f=EF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA82C4741F
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 16:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F19DC4741F
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 16:40:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A02922067D
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 16:00:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02922067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 89C8520756
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 16:40:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNUiX9jU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89C8520756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1216F4B590;
-	Fri, 30 Oct 2020 12:00:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4A4E4B388;
+	Fri, 30 Oct 2020 12:40:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M+NVKVna2btU; Fri, 30 Oct 2020 12:00:56 -0400 (EDT)
+	with ESMTP id ITgY2Xz1ME2x; Fri, 30 Oct 2020 12:40:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAE384B576;
-	Fri, 30 Oct 2020 12:00:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C51B34B45B;
+	Fri, 30 Oct 2020 12:40:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41B6D4B579
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 12:00:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDFC64B21C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 12:40:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZiPC+oH9aNp4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Oct 2020 12:00:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E38394B559
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 12:00:53 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93CCD1435;
- Fri, 30 Oct 2020 09:00:53 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F3CA13F719;
- Fri, 30 Oct 2020 09:00:52 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH v2 0/5] arm64: Statistical Profiling
- Extension Tests
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20201027171944.13933-1-alexandru.elisei@arm.com>
-Message-ID: <a231b40f-ff99-1529-387b-d9708862cc62@arm.com>
-Date: Fri, 30 Oct 2020 16:02:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id iwk4mzy0QT1O for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Oct 2020 12:40:26 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C080A4B220
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 12:40:26 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9F2922075E;
+ Fri, 30 Oct 2020 16:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604076025;
+ bh=FdAucMQjtKAFDFTUjWlGgj+oR3wWcmsUGvauZ/aCLXI=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=vNUiX9jU9UztYq5wLUe6zn2MN5nLk0yeP/8ipFoFw1zVxMOrygf15l2IOMLWaVI4L
+ fBFj13z2VYBAxprsTDd+1S2k3kvbKQ3RjeelPPathZusPRrA2BgT2FmDipr+SDzkfO
+ ww+Pzj/t2jJtf0WWc49XNnaiUiop/E+m723XE/l4=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kYXRv-005noK-QG; Fri, 30 Oct 2020 16:40:23 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 02/12] KVM: arm64: Remove leftover kern_hyp_va() in nVHE TLB
+ invalidation
+Date: Fri, 30 Oct 2020 16:40:07 +0000
+Message-Id: <20201030164017.244287-3-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201030164017.244287-1-maz@kernel.org>
+References: <20201030164017.244287-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20201027171944.13933-1-alexandru.elisei@arm.com>
-Content-Language: en-US
-Cc: pbonzini@redhat.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dbrazdil@google.com, gshan@redhat.com,
+ james.morse@arm.com, mark.rutland@arm.com, qais.yousef@arm.com,
+ qperret@google.com, sashukla@nvidia.com, vladimir.murzin@arm.com,
+ will@kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ Qais Yousef <qais.yousef@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,59 +97,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+The new calling convention says that pointers coming from the SMCCC
+interface are turned into their HYP version in the host HVC handler.
+However, there is still a stray kern_hyp_va() in the TLB invalidation
+code, which could result in a corrupted pointer.
 
-Adding Andrew to CC list, somehow I forgot, sorry for that.
+Drop the spurious conversion.
 
-Thanks,
+Fixes: a071261d9318 ("KVM: arm64: nVHE: Fix pointers during SMCCC convertion")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20201026095116.72051-3-maz@kernel.org
+---
+ arch/arm64/kvm/hyp/nvhe/tlb.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Alex
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index 544bca3072b7..ad212d8fa417 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -121,7 +121,6 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	struct tlb_inv_context cxt;
+ 
+ 	/* Switch to requested VMID */
+-	mmu = kern_hyp_va(mmu);
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
+-- 
+2.28.0
 
-On 10/27/20 5:19 PM, Alexandru Elisei wrote:
-> This series implements two basic tests for KVM SPE: one that checks that
-> the reported features match what is specified in the architecture,
-> implemented in patch #3 ("arm64: spe: Add introspection test"), and another
-> test that checks that the buffer management interrupt is asserted
-> correctly, implemented in patch #5 ("am64: spe: Add buffer test"). The rest
-> of the patches are either preparatory patches, or a fix, in the case of
-> patch #2 ("lib/{bitops,alloc_page}.h: Add missing headers").
->
-> This series builds on Eric's initial version [1], to which I've added the
-> buffer tests that I used while developing SPE support for KVM.
->
-> KVM SPE support is current in RFC phase, hence why this series is also sent
-> as RFC. The KVM patches needed for the tests to work can be found at [2].
-> Userspace support is also necessary, which I've implemented for kvmtool;
-> this can be found at [3]. This series is also available in a repo [4] to make
-> testing easier.
->
-> [1] https://www.spinics.net/lists/kvm/msg223792.html
-> [2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v3
-> [3] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v3
-> [4] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/kvm-spe-v2
->
-> Alexandru Elisei (3):
->   lib/{bitops,alloc_page}.h: Add missing headers
->   lib: arm/arm64: Add function to unmap a page
->   am64: spe: Add buffer test
->
-> Eric Auger (2):
->   arm64: Move get_id_aa64dfr0() in processor.h
->   arm64: spe: Add introspection test
->
->  arm/Makefile.arm64        |   1 +
->  lib/arm/asm/mmu-api.h     |   1 +
->  lib/arm64/asm/processor.h |   5 +
->  lib/alloc_page.h          |   2 +
->  lib/bitops.h              |   2 +
->  lib/libcflat.h            |   1 +
->  lib/arm/mmu.c             |  32 +++
->  arm/pmu.c                 |   1 -
->  arm/spe.c                 | 506 ++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg         |  15 ++
->  10 files changed, 565 insertions(+), 1 deletion(-)
->  create mode 100644 arm/spe.c
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
