@@ -6,77 +6,80 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48CEC388F7
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A496C388F9
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:54:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 087962071A
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E315720706
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:54:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqwyMHxw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087962071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="wn/RcwW3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E315720706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 654C44B1CE;
-	Sat, 31 Oct 2020 14:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 546224B60B;
+	Sat, 31 Oct 2020 14:54:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o06buHsqkxlU; Sat, 31 Oct 2020 14:31:08 -0400 (EDT)
+	with ESMTP id 9puPumP-KHlX; Sat, 31 Oct 2020 14:54:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3771C4B250;
-	Sat, 31 Oct 2020 14:31:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C25DF4B630;
+	Sat, 31 Oct 2020 14:54:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 097B84B228
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:31:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4624B617
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:54:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DUUdpJ76GfHI for <kvmarm@lists.cs.columbia.edu>;
- Sat, 31 Oct 2020 14:31:06 -0400 (EDT)
+ with ESMTP id 3wtPGrmvdWS8 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 31 Oct 2020 14:54:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1F7B4B1CE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:31:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99D8A4B60B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:54:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 85FD8206E5;
- Sat, 31 Oct 2020 18:31:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 782A5205ED;
+ Sat, 31 Oct 2020 18:53:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604169064;
- bh=fk8dKMyQkXHV3rvQHoQIo2hwgToSdtJy3/82yLVtOvM=;
+ s=default; t=1604170439;
+ bh=HvDtIcBTZHfDsPAUi0HpgUv6w8RVXhfLSLkNClG2LZE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=LqwyMHxwsS1vCCrzIIevbCOxWDHj+HwROFtGE71/bR1jLCpFp1cl8RT3rz4ukCoxw
- MnOsPwm/Hw0CvNbiGxSIsKqeT9D2B/Qv1vuJpzHgLw5LMBjCkzl8jMS5PIjItZ1RhU
- z5yxm65k9+KgwOm2Xm/Cuvab+WlGN3g7gbeBPbsg=
+ b=wn/RcwW3+g7WQtgl/Qkzckxgw27QWa6gX8garulc+M8QnqMIKuxBMyHSQdAHGTB5T
+ Aax0Ia6pERZzkNQpQ3uyTLMGIvOwbpn/bU4lkl/zWGAcm/mzxyYDBWUz1pHAjKv1+P
+ he5Nxx8CX0hjTHs03RGV4Q97PLc2Rt6pqDURpjgs=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kYveY-00698z-HV; Sat, 31 Oct 2020 18:31:02 +0000
-Date: Sat, 31 Oct 2020 18:31:01 +0000
-Message-ID: <877dr6dz8a.wl-maz@kernel.org>
+ id 1kYw0j-0069TJ-G0; Sat, 31 Oct 2020 18:53:57 +0000
+Date: Sat, 31 Oct 2020 18:53:56 +0000
+Message-ID: <875z6qdy63.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Remove AA64ZFR0_EL1 accessors
-In-Reply-To: <20201029201105.101910-4-drjones@redhat.com>
-References: <20201029201105.101910-1-drjones@redhat.com>
- <20201029201105.101910-4-drjones@redhat.com>
+Subject: Re: [PATCH 3/4] KVM: selftests: Update aarch64 get-reg-list blessed
+ list
+In-Reply-To: <20201029201703.102716-4-drjones@redhat.com>
+References: <20201029201703.102716-1-drjones@redhat.com>
+ <20201029201703.102716-4-drjones@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
- Dave.Martin@arm.com, xu910121@sina.com
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, Dave.Martin@arm.com,
+ peter.maydell@linaro.org, eric.auger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: xu910121@sina.com, kvmarm@lists.cs.columbia.edu, Dave.Martin@arm.com
+Cc: kvm@vger.kernel.org, Dave.Martin@arm.com, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,114 +96,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 29 Oct 2020 20:11:05 +0000,
+On Thu, 29 Oct 2020 20:17:02 +0000,
 Andrew Jones <drjones@redhat.com> wrote:
 > 
-> The AA64ZFR0_EL1 accessors are just the general accessors with
-> its visibility function open-coded. It also skips the if-else
-> chain in read_id_reg, but there's no reason not to go there.
-> Indeed consolidating ID register accessors and removing lines
-> of code make it worthwhile.
+> The new registers come from the following commits:
 > 
-> No functional change intended.
+> commit 99adb567632b ("KVM: arm/arm64: Add save/restore support for
+> firmware workaround state")
+> 
+> commit c773ae2b3476 ("KVM: arm64: Save/Restore guest DISR_EL1")
+> 
+> commit 03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset")
+> 
+> The last commit, which adds ARM64_SYS_REG(3, 3, 9, 12, 0) (PMCR_EL0),
+> and was committed for v5.3, doesn't indicate in its commit message that
+> enumerating it for save/restore was the plan, so doing so may have
+> been by accident.
+
+It definitely was.
+
+> It's a good idea anyway, though, since the other PMU registers have
+> been enumerated since v4.10.
+
+Quite. The state of the PMU is pretty much unknown on restore until then.
+
 > 
 > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 61 +++++++--------------------------------
->  1 file changed, 11 insertions(+), 50 deletions(-)
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9f6151589460..1ccaa5f3b081 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1197,55 +1197,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index 3aeb3de780a1..3ff097f6886e 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -352,7 +352,8 @@ int main(int ac, char **av)
 >  }
 >  
-> -/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
-> -static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
-> -{
-> -	if (!vcpu_has_sve(vcpu))
-> -		return 0;
-> -
-> -	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
-> -}
-> -
-> -static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> -				   struct sys_reg_params *p,
-> -				   const struct sys_reg_desc *rd)
-> -{
-> -	if (p->is_write)
-> -		return write_to_read_only(vcpu, p, rd);
-> -
-> -	p->regval = guest_id_aa64zfr0_el1(vcpu);
-> -	return true;
-> -}
-> -
-> -static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> -		const struct sys_reg_desc *rd,
-> -		const struct kvm_one_reg *reg, void __user *uaddr)
-> -{
-> -	u64 val;
-> -
-> -	val = guest_id_aa64zfr0_el1(vcpu);
-> -	return reg_to_user(uaddr, &val, reg->id);
-> -}
-> -
-> -static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> -		const struct sys_reg_desc *rd,
-> -		const struct kvm_one_reg *reg, void __user *uaddr)
-> -{
-> -	const u64 id = sys_reg_to_index(rd);
-> -	int err;
-> -	u64 val;
-> -
-> -	err = reg_from_user(&val, uaddr, id);
-> -	if (err)
-> -		return err;
-> -
-> -	/* This is what we mean by invariant: you can't change it. */
-> -	if (val != guest_id_aa64zfr0_el1(vcpu))
-> -		return -EINVAL;
-> -
-> -	return 0;
-> -}
-> -
 >  /*
->   * cpufeature ID register user accessors
->   *
-> @@ -1384,6 +1335,16 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->  				  const struct sys_reg_desc *r)
->  {
-> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> +
-> +	switch (id) {
-> +	case SYS_ID_AA64ZFR0_EL1:
-> +		if (!vcpu_has_sve(vcpu))
-> +			return REG_RAZ_USER | REG_RAZ_GUEST;
-> +		break;
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -1515,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	ID_SANITISED(ID_AA64PFR1_EL1),
->  	ID_UNALLOCATED(4,2),
->  	ID_UNALLOCATED(4,3),
-> -	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, },
-> +	ID_SANITISED(ID_AA64ZFR0_EL1),
->  	ID_UNALLOCATED(4,5),
->  	ID_UNALLOCATED(4,6),
->  	ID_UNALLOCATED(4,7),
+> - * The current blessed list comes from kernel version v4.15 with --core-reg-fixup
+> + * The current blessed list was primed with the output of kernel version
+> + * v4.15 with --core-reg-fixup and then later updated with new registers.
 
-I really like this, as it establishes a central location to control
-the visibility of ID regs, should we need to hide a full register.
+Maybe have a reference to the last kernel version this was checked
+against? Either here or in the commit message?
 
-Once we establish the actual need to separate RAZ controls between
-userspace and guest, I'll be happy to take this.
+Thanks,
 
 	M.
 
