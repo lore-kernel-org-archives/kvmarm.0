@@ -1,62 +1,65 @@
-Return-Path: <SRS0=VJ1f=EF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=+BBk=EG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF1CC00A89
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 22:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5CAC388F7
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 07:03:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6ED97221EB
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Oct 2020 22:30:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ED97221EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E45B22076D
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 07:03:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E45B22076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94C674B1F9;
-	Fri, 30 Oct 2020 18:30:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 288014B560;
+	Sat, 31 Oct 2020 03:03:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zARyRKEn9Frz; Fri, 30 Oct 2020 18:30:27 -0400 (EDT)
+	with ESMTP id U3qJsDDJ+Ihg; Sat, 31 Oct 2020 03:03:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 602794B25E;
-	Fri, 30 Oct 2020 18:30:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED6414B4A1;
+	Sat, 31 Oct 2020 03:03:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 766FE4B25C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 18:30:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 299254B4A1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 03:03:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bbaPL+T7nazR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Oct 2020 18:30:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E44F4B25A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2020 18:30:24 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB30F1063;
- Fri, 30 Oct 2020 15:30:23 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C8983F719;
- Fri, 30 Oct 2020 15:30:23 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH v2 0/5] arm64: Statistical Profiling
- Extension Tests
-To: Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-References: <20201027171944.13933-1-alexandru.elisei@arm.com>
- <88f5068a-7a1c-4870-ebc4-e2c45616e905@redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c671a212-2a4b-b28f-e0be-36f9427aecb0@arm.com>
-Date: Fri, 30 Oct 2020 22:31:20 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id V5v2NqlTsMdi for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 31 Oct 2020 03:03:07 -0400 (EDT)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 182104B3A6
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 03:03:07 -0400 (EDT)
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.53])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CNVWD5lG7zQlsF;
+ Sat, 31 Oct 2020 15:03:04 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Sat, 31 Oct 2020 15:03:03 +0800
+Received: from [10.174.185.187] (10.174.185.187) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Sat, 31 Oct 2020 15:03:03 +0800
+To: <maz@kernel.org>
+From: Peng Liang <liangpeng10@huawei.com>
+Subject: VM live migration failed from Linux v5.9 to Linux v5.10-rc1
+Message-ID: <5ade34aa-e725-93e8-7b28-83fb25dcf896@huawei.com>
+Date: Sat, 31 Oct 2020 15:03:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <88f5068a-7a1c-4870-ebc4-e2c45616e905@redhat.com>
 Content-Language: en-US
-Cc: pbonzini@redhat.com
+X-Originating-IP: [10.174.185.187]
+X-ClientProxiedBy: dggeme717-chm.china.huawei.com (10.1.199.113) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
+Cc: kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,94 +76,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+Hi Marc,
+Sorry for disturbing you.
 
-On 10/30/20 6:17 PM, Auger Eric wrote:
-> Hi Alexandru,
->
-> [+ Drew]
->
-> On 10/27/20 6:19 PM, Alexandru Elisei wrote:
->> This series implements two basic tests for KVM SPE: one that checks that
->> the reported features match what is specified in the architecture,
->> implemented in patch #3 ("arm64: spe: Add introspection test"), and another
->> test that checks that the buffer management interrupt is asserted
->> correctly, implemented in patch #5 ("am64: spe: Add buffer test"). The rest
->> of the patches are either preparatory patches, or a fix, in the case of
->> patch #2 ("lib/{bitops,alloc_page}.h: Add missing headers").
->>
->> This series builds on Eric's initial version [1], to which I've added the
->> buffer tests that I used while developing SPE support for KVM.
-> As you respin my series, with my prior agreement, I expected to find
-> most of the code I wrote, obviously with some potential fixes and
-> adaptations to fit your needs for additional tests.
+When I try to migrate a VM from Linux v5.9 to Linux v5.10-rc1, QEMU
+reports errors like this:
+  qemu-system-aarch64: write 0x603000000013c020(0x0100010011111111) to
+kvm failed
+  qemu-system-aarch64: error while loading state for instance 0x0 of
+device 'cpu'
 
-I believe there has been a misunderstanding. I asked you if I can pickup *some* of
-your patches, not all of them.
+(The first error is added by myself:
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 8bb7318378..b361f62f7f 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -560,6 +560,7 @@ bool write_list_to_kvmstate(ARMCPU *cpu, int level)
+              * "you tried to set a register which is constant with
+              * a different value from what it actually contains".
+              */
++            error_report("write 0x%016lx(0x%016lx) to kvm failed",
+cpu->cpreg_indexes[i], cpu->cpreg_values[i]);
+             ok = false;
+         }
+     }
+)
 
->
-> However, in this v2, two significant v1 patches have disappeared:
->
-> 1) [3/4] spe: Add profiling buffer test (170 LOC diffstat)
-> 2) [4/4] spe: Test Profiling Buffer Events (150 LOC diffstat)
->
-> They were actually the crux of the original series (the introspection
-> test being required as a prerequisite but not testing much really ;-).
->
-> 1) consists in a "spe-buffer" test starting the profiling on a mastered
-> sequence of instructions (as done for PMU event counters). It introduces
-> the infra to start the profiling, prepare SPE reset config, the macro
-> definitions, start/stop/drain, the code under profiling and basically
-> checks that the buffer was effectively written. We also check we do not
-> get any spurious event as it is not expected.
->
-> => This test has disappeared and the infra now is diluted in
-> [kvm-unit-tests RFC PATCH v2 5/5] am64: spe: Add buffer test. However no
-> credit is given to my work as my S-o-b has disappeared.
->
-> 2) consists in a "spe-events" test checking we effectively get the
-> buffer full event when duly expected. This introduces the infra to
-> handle interrupts, check the occurence of events by analyzing the
-> syndrome registers, compare occurences against expected ones. This
-> largely mimics what we have with PMU tests.
->
-> => This test is part of [kvm-unit-tests RFC PATCH v2 5/5], relying on a
-> different stop condition, and again the infra is diluted in the same
-> patch, with large arbitrary changes, without any credit given to my
-> work. Those changes may explain why you removed my S-o-b but given the
-> anteriority of my series, this does not look normal to me, in a
-> community environment.
->
-> As discussed privately, this gives me the impression that those two
-> patches were totally ignored while respinning.
+If I try to migrate from Linux v5.10-rc1 to v5.9, then the errors are
+changed to:
+  qemu-system-aarch64: write 0x603000000013c020(0x0000010011111111) to
+kvm failed
+  error while loading state for instance 0x0 of device 'cpu'
 
-Your impression is correct. The buffer test is my original work. No code has been
-borrowed from your patches, hence why the differences might look like arbitrary
-changes.
+However, the migration from v5.9 to v5.9 or from v5.10-rc1 to v5.10-rc1
+are successful.
 
-I believe there are some correctness issues with your patches, and I decided to
-send my own test which I used when developing KVM SPE support instead of rebasing
-your tests.
+The source end and destination end of migration have the same hardware
+and the same softwares except the Linux version. And of course, the
+vCPUs of VMs are host-passthrough.
 
->
-> Please could you restructure the series at least to keep the buffer-full
-> test + infra separate from the new tests and reset a collaborative S-o-b.
->
-> Then if you think there are issues wrt the 1st test, "spe-buffer", not
-> included in this series, please let's discuss and fix/improve but not
-> simply trash it as is (in an everyone growing spirit).
->
-> An alternative is I can take back the ownership of my series and push it
-> upstream in a standard way. Then either you rebase your new tests on top
-> of it or I will be happy to do it for you after discussions on the
-> technical comments.
+I found that the different register and the different field between
+source and destination is ID_AA64PFR0_EL1.CSV2. I searched in git log
+and found that the commit e1026237f9067 ("KVM: arm64: Set CSV2 for
+guests on hardware unaffected by Spectre-v2") may be the cause of the
+failure?
 
-It was not my intention to make you feel that your contribution is not appreciated
-or ignored. Let's work on merging your series first and then I'll rebase and
-resend any tests from my series which were not included.
+So do we need to make it possible to migrate VMs between Linux v5.9 and
+Linux v5.10-rc1 with QEMU?
+
+And here is the information of my environment:
+CPU: Kunpeng-920
+QEMU: v5.1.0, built with `../configure --target-list=aarch64-softmmu
+--disable-werror`
+source end:
+  Linux: v5.9, configured with `make defconfig`
+destination end:
+  Linux: v5.10-rc1, configured with `make defconfig`
 
 Thanks,
-Alex
+Peng
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
