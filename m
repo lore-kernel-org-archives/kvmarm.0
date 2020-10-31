@@ -2,64 +2,80 @@ Return-Path: <SRS0=+BBk=EG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5CAC388F7
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 07:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF94C388F9
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 13:25:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E45B22076D
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 07:03:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E45B22076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id BA16F2071A
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 13:25:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="wM48yeRw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA16F2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 288014B560;
-	Sat, 31 Oct 2020 03:03:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B1A64B628;
+	Sat, 31 Oct 2020 09:25:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id U3qJsDDJ+Ihg; Sat, 31 Oct 2020 03:03:10 -0400 (EDT)
+	with ESMTP id EFxtI1-eN4EQ; Sat, 31 Oct 2020 09:25:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED6414B4A1;
-	Sat, 31 Oct 2020 03:03:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FFBA4B5B6;
+	Sat, 31 Oct 2020 09:25:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 299254B4A1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 03:03:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E66D44B5B6
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 09:25:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V5v2NqlTsMdi for <kvmarm@lists.cs.columbia.edu>;
- Sat, 31 Oct 2020 03:03:07 -0400 (EDT)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 182104B3A6
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 03:03:07 -0400 (EDT)
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.53])
- by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CNVWD5lG7zQlsF;
- Sat, 31 Oct 2020 15:03:04 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Sat, 31 Oct 2020 15:03:03 +0800
-Received: from [10.174.185.187] (10.174.185.187) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Sat, 31 Oct 2020 15:03:03 +0800
-To: <maz@kernel.org>
-From: Peng Liang <liangpeng10@huawei.com>
-Subject: VM live migration failed from Linux v5.9 to Linux v5.10-rc1
-Message-ID: <5ade34aa-e725-93e8-7b28-83fb25dcf896@huawei.com>
-Date: Sat, 31 Oct 2020 15:03:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
-MIME-Version: 1.0
-Content-Language: en-US
-X-Originating-IP: [10.174.185.187]
-X-ClientProxiedBy: dggeme717-chm.china.huawei.com (10.1.199.113) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
-Cc: kvmarm@lists.cs.columbia.edu
+ with ESMTP id 4Tnx3lmP5L-M for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 31 Oct 2020 09:25:21 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76FF24B445
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 09:25:21 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 35D85206B5;
+ Sat, 31 Oct 2020 13:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604150720;
+ bh=ShClWvwecY6yFkfe9JHwhRICR2LK1l3Cvct71Gv3aBk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=wM48yeRwvgiUKqOaCG/A0m4NjXGDo3aBDsyGs22jcY2t2ix7EITOosTys8Ob6OGCC
+ 85onoGRbemWjrkgNMjVO7VZQzBnzLmmbU669WcgYhHRtmEkDbna0QUolPpga1oueTc
+ Ob15zT8dYeYvWQmUuWwGYcDYUlb3j2eimwbeBHDE=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kYqsg-0064uf-6R; Sat, 31 Oct 2020 13:25:18 +0000
+Date: Sat, 31 Oct 2020 13:25:17 +0000
+Message-ID: <87blgieddu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peng Liang <liangpeng10@huawei.com>
+Subject: Re: VM live migration failed from Linux v5.9 to Linux v5.10-rc1
+In-Reply-To: <5ade34aa-e725-93e8-7b28-83fb25dcf896@huawei.com>
+References: <5ade34aa-e725-93e8-7b28-83fb25dcf896@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: liangpeng10@huawei.com, kvmarm@lists.cs.columbia.edu,
+ xiexiangyou@huawei.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,65 +92,228 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-Sorry for disturbing you.
+Hi Peng,
 
-When I try to migrate a VM from Linux v5.9 to Linux v5.10-rc1, QEMU
-reports errors like this:
-  qemu-system-aarch64: write 0x603000000013c020(0x0100010011111111) to
-kvm failed
-  qemu-system-aarch64: error while loading state for instance 0x0 of
-device 'cpu'
+[+Will, as we hacked the new ECE (Ectoplasmic Control Enclosure) together]
 
-(The first error is added by myself:
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 8bb7318378..b361f62f7f 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -560,6 +560,7 @@ bool write_list_to_kvmstate(ARMCPU *cpu, int level)
-              * "you tried to set a register which is constant with
-              * a different value from what it actually contains".
-              */
-+            error_report("write 0x%016lx(0x%016lx) to kvm failed",
-cpu->cpreg_indexes[i], cpu->cpreg_values[i]);
-             ok = false;
-         }
-     }
-)
+On Sat, 31 Oct 2020 07:03:02 +0000,
+Peng Liang <liangpeng10@huawei.com> wrote:
+> 
+> Hi Marc,
+> Sorry for disturbing you.
+> 
+> When I try to migrate a VM from Linux v5.9 to Linux v5.10-rc1, QEMU
+> reports errors like this:
+>   qemu-system-aarch64: write 0x603000000013c020(0x0100010011111111) to
+> kvm failed
+>   qemu-system-aarch64: error while loading state for instance 0x0 of
+> device 'cpu'
+> 
+> (The first error is added by myself:
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 8bb7318378..b361f62f7f 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -560,6 +560,7 @@ bool write_list_to_kvmstate(ARMCPU *cpu, int level)
+>               * "you tried to set a register which is constant with
+>               * a different value from what it actually contains".
+>               */
+> +            error_report("write 0x%016lx(0x%016lx) to kvm failed",
+> cpu->cpreg_indexes[i], cpu->cpreg_values[i]);
+>              ok = false;
+>          }
+>      }
+> )
+> 
+> If I try to migrate from Linux v5.10-rc1 to v5.9, then the errors are
+> changed to:
+>   qemu-system-aarch64: write 0x603000000013c020(0x0000010011111111) to
+> kvm failed
+>   error while loading state for instance 0x0 of device 'cpu'
+> 
+> However, the migration from v5.9 to v5.9 or from v5.10-rc1 to v5.10-rc1
+> are successful.
+> 
+> The source end and destination end of migration have the same hardware
+> and the same softwares except the Linux version. And of course, the
+> vCPUs of VMs are host-passthrough.
+> 
+> I found that the different register and the different field between
+> source and destination is ID_AA64PFR0_EL1.CSV2. I searched in git log
+> and found that the commit e1026237f9067 ("KVM: arm64: Set CSV2 for
+> guests on hardware unaffected by Spectre-v2") may be the cause of the
+> failure?
 
-If I try to migrate from Linux v5.10-rc1 to v5.9, then the errors are
-changed to:
-  qemu-system-aarch64: write 0x603000000013c020(0x0000010011111111) to
-kvm failed
-  error while loading state for instance 0x0 of device 'cpu'
+Thanks for the thorough analysis. Yes, this could well be the issue if
+CSV2 isn't explicitly set at the source, and is now set on the target.
+For confirmation, what is the value of ID_AA64PFR0_EL1.CSV2 on the
+host?  What does /sys/devices/system/cpu/vulnerabilities/spectre_v2
+contain?
 
-However, the migration from v5.9 to v5.9 or from v5.10-rc1 to v5.10-rc1
-are successful.
+> So do we need to make it possible to migrate VMs between Linux v5.9 and
+> Linux v5.10-rc1 with QEMU?
 
-The source end and destination end of migration have the same hardware
-and the same softwares except the Linux version. And of course, the
-vCPUs of VMs are host-passthrough.
+We should fix the migration from 5.9 to 5.10. I don't plan to support
+migrating in the other direction, which is consistent with new sysregs
+and features appearing in the sysreg space over time (although I would
+expect 5.9 -> 5.10 -> 5.9 to work once we fix this issue).
 
-I found that the different register and the different field between
-source and destination is ID_AA64PFR0_EL1.CSV2. I searched in git log
-and found that the commit e1026237f9067 ("KVM: arm64: Set CSV2 for
-guests on hardware unaffected by Spectre-v2") may be the cause of the
-failure?
-
-So do we need to make it possible to migrate VMs between Linux v5.9 and
-Linux v5.10-rc1 with QEMU?
-
-And here is the information of my environment:
-CPU: Kunpeng-920
-QEMU: v5.1.0, built with `../configure --target-list=aarch64-softmmu
---disable-werror`
-source end:
-  Linux: v5.9, configured with `make defconfig`
-destination end:
-  Linux: v5.10-rc1, configured with `make defconfig`
+Could you please give the patch below a go? I have boot-tested it, but
+I'm not really equipped to test live migration.
 
 Thanks,
-Peng
+
+	M.
+
+From 2b9202538365bacc0abd01142800234ea1bc5bde Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sat, 31 Oct 2020 12:28:50 +0000
+Subject: [PATCH] KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2 from
+ userspace
+
+We now expose ID_AA64PFR0_EL1.CSV2=1 to guests running on hosts
+that are immune to Spectre-v2, but that don't have this field set,
+most likely because they predate the specification.
+
+However, this prevents the migration of guests that have started on
+a host the doesn't fake this CSV2 setting to one that does, as KVM
+rejects the write to ID_AA64PFR0_EL2 on the grounds that it isn't
+what is already there.
+
+In order to fix this, allow userspace to set this field as long as
+this doesn't result in a promising more than what is already there
+(setting CSV2 to 0 is acceptable, but setting it to 1 when it is
+already set to 0 isn't).
+
+Fixes: e1026237f9067 ("KVM: arm64: Set CSV2 for guests on hardware unaffected by Spectre-v2")
+Reported-by: Peng Liang <liangpeng10@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              | 21 +++++++++++++++++
+ arch/arm64/kvm/sys_regs.c         | 38 +++++++++++++++++++++++++++----
+ 3 files changed, 57 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0aecbab6a7fb..160d783eaf89 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -118,6 +118,8 @@ struct kvm_arch {
+ 	 */
+ 	unsigned long *pmu_filter;
+ 	unsigned int pmuver;
++
++	u8 pfr0_csv2;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index f56122eedffc..1a944c9b48b4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -102,6 +102,25 @@ static int kvm_arm_default_max_vcpus(void)
+ 	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+ }
+ 
++static void set_default_csv2(struct kvm *kvm)
++{
++	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
++
++	/*
++	 * The default is to expose CSV2 == 1 if the HW isn't affected
++	 * but doesn't have CSV2 baked in the PFR0 register. Although
++	 * this is a per-CPU feature, we make it global because
++	 * asymmetric systems are just a nuisance.
++	 *
++	 * Userspace can override this as long as it doesn't promise
++	 * the impossible.
++	 */
++	kvm->arch.pfr0_csv2 = FIELD_GET(0xfUL << ID_AA64PFR0_CSV2_SHIFT, val);
++	if (!kvm->arch.pfr0_csv2 &&
++	    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
++		kvm->arch.pfr0_csv2 = 1;
++}
++
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -127,6 +146,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+ 	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+ 
++	set_default_csv2(kvm);
++
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d9117bc56237..4f5716abbb19 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1128,9 +1128,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		if (!vcpu_has_sve(vcpu))
+ 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+-		if (!(val & (0xfUL << ID_AA64PFR0_CSV2_SHIFT)) &&
+-		    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+-			val |= (1UL << ID_AA64PFR0_CSV2_SHIFT);
++		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
++		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
+ 	} else if (id == SYS_ID_AA64PFR1_EL1) {
+ 		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+ 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+@@ -1260,6 +1259,36 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd,
++			       const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	const u64 id = sys_reg_to_index(rd);
++	int err;
++	u64 val;
++	u8 csv2;
++
++	err = reg_from_user(&val, uaddr, id);
++	if (err)
++		return err;
++
++	/*
++	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
++	 * it doesn't promise more than what is actually provided (the
++	 * guest could otherwise be covered in ectoplasmic residue).
++	 */
++	csv2 = FIELD_GET(0xfUL << ID_AA64PFR0_CSV2_SHIFT, val);
++	if (csv2 > vcpu->kvm->arch.pfr0_csv2)
++		return -EINVAL;
++	vcpu->kvm->arch.pfr0_csv2 = csv2;
++
++	/* This is what we mean by invariant: you can't change it. */
++	if (val != read_id_reg(vcpu, rd, false))
++		return -EINVAL;
++
++	return 0;
++}
++
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -1514,7 +1543,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* AArch64 ID registers */
+ 	/* CRm=4 */
+-	ID_SANITISED(ID_AA64PFR0_EL1),
++	{ SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
++	  .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+-- 
+2.28.0
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
