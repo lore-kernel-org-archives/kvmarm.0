@@ -2,103 +2,81 @@ Return-Path: <SRS0=+BBk=EG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE3FC388F9
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 14:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F20C388F7
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:10:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AB04F2068D
-	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 14:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 919A0206D5
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Oct 2020 18:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AnkGIgHk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB04F2068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjrC+CCl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 919A0206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0296B4B624;
-	Sat, 31 Oct 2020 10:35:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFF324B4C7;
+	Sat, 31 Oct 2020 14:09:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YK-pYGD-p-Bu; Sat, 31 Oct 2020 10:35:41 -0400 (EDT)
+	with ESMTP id EVhtotp3xb-M; Sat, 31 Oct 2020 14:09:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04B0D4B630;
-	Sat, 31 Oct 2020 10:35:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3BDB4B6D0;
+	Sat, 31 Oct 2020 14:09:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A712F4B62A
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 10:35:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36E134B6CA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:09:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 21BmjqrWefpC for <kvmarm@lists.cs.columbia.edu>;
- Sat, 31 Oct 2020 10:35:38 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB164B624
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 10:35:38 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604154938;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=H0lkAu0LuB0tOs+5f8N9+fz1OpdbLPMVMxAKM8Po2Ws=;
- b=AnkGIgHkHqImsSyjqON4dnWKBBR6YJOI12a0jgbAEaQBfZhDHl+6abVRz8tG5GmbrX4HMC
- f33JQ2ishKRexCV0HhNPZ1mFuRRnBzfkahoBV3vW/pI3jlB6JoQN3nm1QiYubuz6oZItMF
- Quk1Y7FWvY6csti8zwzYKk+jVGH0M6c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-ZxIxgxJ8OIOUP3tmpq2ZOg-1; Sat, 31 Oct 2020 10:35:34 -0400
-X-MC-Unique: ZxIxgxJ8OIOUP3tmpq2ZOg-1
-Received: by mail-wr1-f72.google.com with SMTP id q15so4067355wrw.8
- for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 07:35:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=H0lkAu0LuB0tOs+5f8N9+fz1OpdbLPMVMxAKM8Po2Ws=;
- b=Mcxy+StuUdGCHo4NcmdY/+qc/n5PR5Ek+t0ASLZronuEWEj5rDnO++Y7JNlWEkKZn4
- Iv0eX654SlkCSTE9LKKkfodMvcg0dtpxe8QDiubv16rl7zlszMwpkkG/xmlU3EzqvANi
- 66RxDL0GvI9G+AddHfprIW3XjWBrp4Yes/o1H2AxpgB4+NLAG7EvAZsIc8g1LkRJ3brD
- uLvTirH5inYYM+vCvbJEjWN9mkM7qBPDhwanxjJoloem+r/funrOsTGU4Ia3rDn+cHdG
- sLt/0lwnNZyCBew2DqfA6iIQ3Zau01qzocLSw8HwMdqLDA1u5854+/qdo7HOByzqZl0I
- n59w==
-X-Gm-Message-State: AOAM53157ariH8SGn1pupoSq8JOPVsxcVnNLe4NFQZpQf3FeXp5uOoVX
- 25wV3Ct89H17JdwBKEUNBPWhIaH3lAdbAW5oTccj7sV1jSREaTNXe/pPl9Iyydj7T+xc61V2cbh
- FFQDmX5KXUmf6a1RGB8sx9Z27
-X-Received: by 2002:adf:bc13:: with SMTP id s19mr9937625wrg.338.1604154932833; 
- Sat, 31 Oct 2020 07:35:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRUEvE78CjaR4PD/v54GUMMq51fFQdnVnGD7YpW4KmEScBQ8r2gsS4wkXgkWdYcQLslmW02A==
-X-Received: by 2002:adf:bc13:: with SMTP id s19mr9937597wrg.338.1604154932571; 
- Sat, 31 Oct 2020 07:35:32 -0700 (PDT)
-Received: from [192.168.178.64] ([151.20.250.56])
- by smtp.gmail.com with ESMTPSA id c185sm8913539wma.44.2020.10.31.07.35.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 31 Oct 2020 07:35:31 -0700 (PDT)
-To: Marc Zyngier <maz@kernel.org>
-References: <20201030164017.244287-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.10, take #1
-Message-ID: <6a598342-93dd-58dc-1615-b9773605f32c@redhat.com>
-Date: Sat, 31 Oct 2020 15:35:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201030164017.244287-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- Qais Yousef <qais.yousef@arm.com>
+ with ESMTP id PPdCxI-1gtms for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 31 Oct 2020 14:09:55 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 097C14B6C9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 31 Oct 2020 14:09:55 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 981792068D;
+ Sat, 31 Oct 2020 18:09:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604167793;
+ bh=9tWmBFkeDiHQIRKFyzi0uSM32Eus2PSRL9aCa6uUCmk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=hjrC+CClLnx8UTPkDz8ls6lRFPsPFCZ1Hc2V/OeV9vn94An3DQexcTtNbUX62ZntW
+ yzh/UvXy1gTBxuHxJAKYU06p/E4LxPPOYF0VRYw5wBO3MvKg84/ZpJ1jsukFyvf7yn
+ aB6t0HofgmnVlq4FxZ+b1+N2ZUDr89bsxu4yTw+Q=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kYvK3-0068mF-CL; Sat, 31 Oct 2020 18:09:51 +0000
+Date: Sat, 31 Oct 2020 18:09:50 +0000
+Message-ID: <87a6w2e07l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't hide ID registers from userspace
+In-Reply-To: <20201029201105.101910-2-drjones@redhat.com>
+References: <20201029201105.101910-1-drjones@redhat.com>
+ <20201029201105.101910-2-drjones@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
+ Dave.Martin@arm.com, xu910121@sina.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: xu910121@sina.com, kvmarm@lists.cs.columbia.edu, Dave.Martin@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,28 +88,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 30/10/20 17:40, Marc Zyngier wrote:
-> Hi Paolo,
-> 
-> It was good to see you (and everyone else) at KVM Forum this week!
-> 
-> And to celebrate, here's a first batch of fixes for KVM/arm64. A bunch
-> of them are addressing issues introduced by the invasive changes that
-> took place in the 5.10 merge window (MM, nVHE host entry). A few
-> others are addressing some older bugs (VFIO PTE mappings, AArch32
-> debug, composite huge pages), and a couple of improvements
-> (HYP-visible capabilities are made more robust).
-
-Better now than later! Thanks, pulled.
-
-Paolo
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVGh1LCAyOSBPY3QgMjAyMCAyMDoxMTowMyArMDAwMCwKQW5kcmV3IEpvbmVzIDxkcmpvbmVz
+QHJlZGhhdC5jb20+IHdyb3RlOgo+IAo+IElEIHJlZ2lzdGVycyBhcmUgUkFaIHVudGlsIHRoZXkn
+dmUgYmVlbiBhbGxvY2F0ZWQgYSBwdXJwb3NlLCBidXQKPiB0aGF0IGRvZXNuJ3QgbWVhbiB0aGV5
+IHNob3VsZCBiZSByZW1vdmVkIGZyb20gdGhlIEtWTV9HRVRfUkVHX0xJU1QKPiBsaXN0LiBTbyBm
+YXIgd2Ugb25seSBoYXZlIG9uZSByZWdpc3RlciwgU1lTX0lEX0FBNjRaRlIwX0VMMSwgdGhhdAo+
+IGlzIGhpZGRlbiBmcm9tIHVzZXJzcGFjZSB3aGVuIGl0cyBmdW5jdGlvbiBpcyBub3QgcHJlc2Vu
+dC4gUmVtb3ZpbmcKPiB0aGUgdXNlcnNwYWNlIHZpc2liaWxpdHkgY2hlY2tzIGlzIGVub3VnaCB0
+byByZWV4cG9zZSBpdCwgYXMgaXQKPiBhbHJlYWR5IGJlaGF2ZXMgYXMgUkFaIHdoZW4gdGhlIGZ1
+bmN0aW9uIGlzIG5vdCBwcmVzZW50Lgo+IAo+IEZpeGVzOiA3MzQzMzc2MmZjYWUgKCJLVk06IGFy
+bTY0L3N2ZTogU3lzdGVtIHJlZ2lzdGVyIGNvbnRleHQgc3dpdGNoIGFuZCBhY2Nlc3Mgc3VwcG9y
+dCIpCj4gUmVwb3J0ZWQtYnk6IOW8oOS4nOaXrSA8eHU5MTAxMjFAc2luYS5jb20+Cj4gU2lnbmVk
+LW9mZi1ieTogQW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgpTaW5jZSB0aGlzIHdh
+cyBicm9rZW4gaW4gNS4yLCBpdCBwcm9iYWJseSBkZXNlcnZlcyBhIENjIHN0YWJsZSAod2hpY2gK
+SSBjYW4gYWRkIHdoZW4gYXBwbHlpbmcgdGhpcykuCgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9z
+eXNfcmVncy5jIHwgMTggKy0tLS0tLS0tLS0tLS0tLS0tCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKSwgMTcgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
+a3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4gaW5kZXggZDkxMTdi
+YzU2MjM3Li5kMjRlNjZlZTU5YjMgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3Jl
+Z3MuYwo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPiBAQCAtMTE5NSwxNiArMTE5
+NSw2IEBAIHN0YXRpYyB1bnNpZ25lZCBpbnQgc3ZlX3Zpc2liaWxpdHkoY29uc3Qgc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1LAo+ICAJcmV0dXJuIFJFR19ISURERU5fVVNFUiB8IFJFR19ISURERU5fR1VF
+U1Q7Cj4gIH0KPiAgCj4gLS8qIFZpc2liaWxpdHkgb3ZlcnJpZGVzIGZvciBTVkUtc3BlY2lmaWMg
+SUQgcmVnaXN0ZXJzICovCj4gLXN0YXRpYyB1bnNpZ25lZCBpbnQgc3ZlX2lkX3Zpc2liaWxpdHko
+Y29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+IC0JCQkJICAgICAgY29uc3Qgc3RydWN0IHN5
+c19yZWdfZGVzYyAqcmQpCj4gLXsKPiAtCWlmICh2Y3B1X2hhc19zdmUodmNwdSkpCj4gLQkJcmV0
+dXJuIDA7Cj4gLQo+IC0JcmV0dXJuIFJFR19ISURERU5fVVNFUjsKPiAtfQo+IC0KPiAgLyogR2Vu
+ZXJhdGUgdGhlIGVtdWxhdGVkIElEX0FBNjRaRlIwX0VMMSB2YWx1ZSBleHBvc2VkIHRvIHRoZSBn
+dWVzdCAqLwo+ICBzdGF0aWMgdTY0IGd1ZXN0X2lkX2FhNjR6ZnIwX2VsMShjb25zdCBzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUpCj4gIHsKPiBAQCAtMTIzMSw5ICsxMjIxLDYgQEAgc3RhdGljIGludCBn
+ZXRfaWRfYWE2NHpmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgewo+ICAJdTY0IHZh
+bDsKPiAgCj4gLQlpZiAoV0FSTl9PTighdmNwdV9oYXNfc3ZlKHZjcHUpKSkKPiAtCQlyZXR1cm4g
+LUVOT0VOVDsKPiAtCj4gIAl2YWwgPSBndWVzdF9pZF9hYTY0emZyMF9lbDEodmNwdSk7Cj4gIAly
+ZXR1cm4gcmVnX3RvX3VzZXIodWFkZHIsICZ2YWwsIHJlZy0+aWQpOwo+ICB9Cj4gQEAgLTEyNDYs
+OSArMTIzMyw2IEBAIHN0YXRpYyBpbnQgc2V0X2lkX2FhNjR6ZnIwX2VsMShzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUsCj4gIAlpbnQgZXJyOwo+ICAJdTY0IHZhbDsKPiAgCj4gLQlpZiAoV0FSTl9PTigh
+dmNwdV9oYXNfc3ZlKHZjcHUpKSkKPiAtCQlyZXR1cm4gLUVOT0VOVDsKPiAtCj4gIAllcnIgPSBy
+ZWdfZnJvbV91c2VyKCZ2YWwsIHVhZGRyLCBpZCk7Cj4gIAlpZiAoZXJyKQo+ICAJCXJldHVybiBl
+cnI7Cj4gQEAgLTE1MTgsNyArMTUwMiw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19k
+ZXNjIHN5c19yZWdfZGVzY3NbXSA9IHsKPiAgCUlEX1NBTklUSVNFRChJRF9BQTY0UEZSMV9FTDEp
+LAo+ICAJSURfVU5BTExPQ0FURUQoNCwyKSwKPiAgCUlEX1VOQUxMT0NBVEVEKDQsMyksCj4gLQl7
+IFNZU19ERVNDKFNZU19JRF9BQTY0WkZSMF9FTDEpLCBhY2Nlc3NfaWRfYWE2NHpmcjBfZWwxLCAu
+Z2V0X3VzZXIgPSBnZXRfaWRfYWE2NHpmcjBfZWwxLCAuc2V0X3VzZXIgPSBzZXRfaWRfYWE2NHpm
+cjBfZWwxLCAudmlzaWJpbGl0eSA9IHN2ZV9pZF92aXNpYmlsaXR5IH0sCj4gKwl7IFNZU19ERVND
+KFNZU19JRF9BQTY0WkZSMF9FTDEpLCBhY2Nlc3NfaWRfYWE2NHpmcjBfZWwxLCAuZ2V0X3VzZXIg
+PSBnZXRfaWRfYWE2NHpmcjBfZWwxLCAuc2V0X3VzZXIgPSBzZXRfaWRfYWE2NHpmcjBfZWwxLCB9
+LAo+ICAJSURfVU5BTExPQ0FURUQoNCw1KSwKPiAgCUlEX1VOQUxMT0NBVEVEKDQsNiksCj4gIAlJ
+RF9VTkFMTE9DQVRFRCg0LDcpLAo+IC0tIAo+IDIuMjcuMAo+IAo+IAoKTG9va3MgbGlrZSB0aGUg
+cmlnaHQgdGhpbmcgdG8gZG8sIHRoYW5rcyBmb3IgZm9sbG93aW5nIHVwIG9uIHRoaXMuCkRhdmUs
+IGFyZSB5b3UgaGFwcHkgd2l0aCB0aGlzPwoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJv
+bSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
