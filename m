@@ -2,58 +2,59 @@ Return-Path: <SRS0=lygO=EI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A24C388F2
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 15:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9936C388F2
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:27:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 40C6D2231B
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 15:29:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C6D2231B
+	by mail.kernel.org (Postfix) with ESMTP id 3D487208B6
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:27:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D487208B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8271F4B3B4;
-	Mon,  2 Nov 2020 10:29:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9904B404;
+	Mon,  2 Nov 2020 11:27:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sIsaZyWkhtVe; Mon,  2 Nov 2020 10:29:18 -0500 (EST)
+	with ESMTP id rUTC6uAE695P; Mon,  2 Nov 2020 11:27:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5324D4B41C;
-	Mon,  2 Nov 2020 10:29:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BABD4B3EF;
+	Mon,  2 Nov 2020 11:27:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7163C4B418
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 10:29:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF5AC4B3EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:27:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TF3aLaRuJQdj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 10:29:16 -0500 (EST)
+ with ESMTP id BNUwIZZJCcOm for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 11:27:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 407C64B3B4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 10:29:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E5314B3ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:27:30 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF6F430E;
- Mon,  2 Nov 2020 07:29:15 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54BC931B;
+ Mon,  2 Nov 2020 08:27:30 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A583F66E;
- Mon,  2 Nov 2020 07:29:14 -0800 (PST)
-Subject: Re: [PATCH 7/8] KVM: arm64: Simplify __kvm_enable_ssbs()
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 802183F719;
+ Mon,  2 Nov 2020 08:27:29 -0800 (PST)
+Subject: Re: [PATCH 8/8] KVM: arm64: Avoid repetitive stack access on host EL1
+ to EL2 exception
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20201026095116.72051-1-maz@kernel.org>
- <20201026095116.72051-8-maz@kernel.org>
+ <20201026095116.72051-9-maz@kernel.org>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <efe49392-b8ae-76fa-b581-d7ec8db2cac7@arm.com>
-Date: Mon, 2 Nov 2020 15:30:29 +0000
+Message-ID: <e4fa81b4-1071-e41c-7cc2-62c8116e28ba@arm.com>
+Date: Mon, 2 Nov 2020 16:28:39 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201026095116.72051-8-maz@kernel.org>
+In-Reply-To: <20201026095116.72051-9-maz@kernel.org>
 Content-Language: en-US
 Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -75,58 +76,49 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 10/26/20 9:51 AM, Marc Zyngier wrote:
-> Move the setting of SSBS directly into the HVC handler, using
-> the C helpers rather than the inline asssembly code.
+> Registers x0/x1 get repeateadly pushed and poped during a host
+> HVC call. Instead, leave the registers on the stack, saving
+> a store instruction on the fast path for an add on the slow path.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_asm.h    |  2 --
->  arch/arm64/include/asm/sysreg.h     |  1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c  |  6 +++++-
->  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c | 11 -----------
->  4 files changed, 6 insertions(+), 14 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/host.S | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 54387ccd1ab2..a542c422a036 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -189,8 +189,6 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index e2d316d13180..7b69f9ff8da0 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -13,8 +13,6 @@
+>  	.text
 >  
->  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->  
-> -extern void __kvm_enable_ssbs(void);
+>  SYM_FUNC_START(__host_exit)
+> -	stp	x0, x1, [sp, #-16]!
 > -
->  extern u64 __vgic_v3_get_ich_vtr_el2(void);
->  extern u64 __vgic_v3_read_vmcr(void);
->  extern void __vgic_v3_write_vmcr(u32 vmcr);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index d52c1b3ce589..c9423f36e05c 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -461,6 +461,7 @@
+>  	get_host_ctxt	x0, x1
 >  
->  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
->  
-> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
->  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 2af8a5e902af..5125e934da22 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -58,7 +58,11 @@ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
->  
->  static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
->  {
-> -	__kvm_enable_ssbs();
-> +	u64 tmp;
-> +
-> +	tmp = read_sysreg_el2(SYS_SCTLR);
-> +	tmp |= SCTLR_ELx_DSSBS;
-> +	write_sysreg_el2(tmp, SYS_SCTLR);
+>  	/* Store the host regs x2 and x3 */
+> @@ -99,13 +97,14 @@ SYM_FUNC_END(__hyp_do_panic)
+>  	mrs	x0, esr_el2
+>  	lsr	x0, x0, #ESR_ELx_EC_SHIFT
+>  	cmp	x0, #ESR_ELx_EC_HVC64
+> -	ldp	x0, x1, [sp], #16
+> +	ldp	x0, x1, [sp]		// Don't fixup the stack yet
 
-This looks identical to me to the inline assembly version:
+If I understand get_host_ctxt correctly, it will clobber x0 and x1, and this is
+the first thing that __host_exit does. I think that the values of x0 and x1 are
+only needed in host_el1_sync_vect: x0 to compare with HVC_STUB_HCALL_NR below, and
+x1 for the call to __kvm_handle_stub_hvc. I was thinking that we can restore x0
+just before the comparison with HVC_STUB_HCALL_NR, after the first branch to
+__host_exit, to make it clear that it is not used by __host_exit. Not really
+important, but it might make the code a bit easier to understand (it looks a bit
+weird to me to have x0, x1 clobbered immediately after we restore them from the
+stack).
+
+Either way you prefer, the code looks correct to me: __host_exit assumes that x0
+and x1 are at the top of the stack when it saves them, and the ADD in
+host_el1_sync_vect (when the code doesn't branch to __host_exit) makes sure the
+stack pointer is as expected:
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
@@ -134,28 +126,16 @@ Thanks,
 
 Alex
 
->  }
+>  	b.ne	__host_exit
 >  
->  static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> index 88a25fc8fcd3..29305022bc04 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> @@ -33,14 +33,3 @@ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
->  	__sysreg_restore_user_state(ctxt);
->  	__sysreg_restore_el2_return_state(ctxt);
->  }
-> -
-> -void __kvm_enable_ssbs(void)
-> -{
-> -	u64 tmp;
-> -
-> -	asm volatile(
-> -	"mrs	%0, sctlr_el2\n"
-> -	"orr	%0, %0, %1\n"
-> -	"msr	sctlr_el2, %0"
-> -	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
-> -}
+>  	/* Check for a stub HVC call */
+>  	cmp	x0, #HVC_STUB_HCALL_NR
+>  	b.hs	__host_exit
+>  
+> +	add	sp, sp, #16
+>  	/*
+>  	 * Compute the idmap address of __kvm_handle_stub_hvc and
+>  	 * jump there. Since we use kimage_voffset, do not use the
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
