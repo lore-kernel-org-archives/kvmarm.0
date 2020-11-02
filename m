@@ -2,83 +2,78 @@ Return-Path: <SRS0=lygO=EI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D40C388F2
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDB9C2D0A3
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 18:50:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C4F1422258
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB1182231B
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 18:50:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbWl/dcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F1422258
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVWwRvlp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB1182231B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58CDB4B1AA;
-	Mon,  2 Nov 2020 11:55:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B07E4B528;
+	Mon,  2 Nov 2020 13:50:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PyIEjNgSoRSf; Mon,  2 Nov 2020 11:55:25 -0500 (EST)
+	with ESMTP id qOsLSZS0sYHB; Mon,  2 Nov 2020 13:50:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C6874B2F5;
-	Mon,  2 Nov 2020 11:55:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE1C74B51F;
+	Mon,  2 Nov 2020 13:50:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF1524B1AA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:55:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCE6F4B470
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 13:50:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J3xTM1XbBjjr for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 11:55:22 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9879A4B194
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:55:22 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id s8AAg7TUcELL for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 13:50:46 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97E724B36F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 13:50:46 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604343046;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Pd92Ipbt2G3Km6tdhbm08U/qeddFNn12kHFL3AbfcrQ=;
+ b=fVWwRvlps+mvXaWCjkmRGxRMrNK/pourFak/Ckeey7bn/t6fgFSTmF4pNPJHGwANk/99+t
+ mFpsRLH0R0SvLzehkUfJlc6HN1Wxurpw2fnY+6pWfWoj+yXeTYCBTDJ79O4zU6Th4l36OI
+ t+TzIYUwjWr56oAvY3l3uVpC3xaLRUY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-dY7oM770P_GApuM13bk26Q-1; Mon, 02 Nov 2020 13:50:42 -0500
+X-MC-Unique: dY7oM770P_GApuM13bk26Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9E3CE22268;
- Mon,  2 Nov 2020 16:55:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604336121;
- bh=4u87s9JoJb0Kfg4Ca+WJmwLZIYUkNuLBCeeJWFa7pPQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=JbWl/dcnP36AS0Y8aBH13baXHn0QYzzvYqIxkdb29RquHrLodtZwX1RpFwIdqcG5U
- iT/LDpZkZVHtlGpRBub7iLuQNDhThcsbRS5mbTp8kD4wOlkowJf12ZXPrXE9+zVdKA
- 9byI940Nv7XcU9ArxS4iXgT5U/dtb9vJgFgzH+HE=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kZctK-006jJf-7s; Mon, 02 Nov 2020 16:41:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH v2 11/11] KVM: arm64: Get rid of the AArch32 register mapping
- code
-Date: Mon,  2 Nov 2020 16:40:45 +0000
-Message-Id: <20201102164045.264512-12-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201102164045.264512-1-maz@kernel.org>
-References: <20201102164045.264512-1-maz@kernel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42B5910866A0;
+ Mon,  2 Nov 2020 18:50:41 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FD245C629;
+ Mon,  2 Nov 2020 18:50:39 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/3] KVM: arm64: Fix get-reg-list regression
+Date: Mon,  2 Nov 2020 19:50:34 +0100
+Message-Id: <20201102185037.49248-1-drjones@redhat.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com,
- will@kernel.org, mark.rutland@arm.com, qperret@google.com, dbrazdil@google.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: maz@kernel.org, xu910121@sina.com, Dave.Martin@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,228 +85,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The only use of the register mapping code was for the sake of the LR
-mapping, which we trivially solved in a previous patch. Get rid of
-the whole thing now.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h |   2 -
- arch/arm64/kvm/Makefile              |   2 +-
- arch/arm64/kvm/guest.c               |  28 +++++-
- arch/arm64/kvm/regmap.c              | 128 ---------------------------
- 4 files changed, 26 insertions(+), 134 deletions(-)
- delete mode 100644 arch/arm64/kvm/regmap.c
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3105bb73f539..c8f550a53516 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -33,8 +33,6 @@ enum exception_type {
- 	except_type_serror	= 0x180,
- };
- 
--unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
--
- bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
- void kvm_skip_instr32(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 9b32a89a25c8..60fd181df624 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
- kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 $(KVM)/vfio.o $(KVM)/irqchip.o \
- 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
--	 inject_fault.o regmap.o va_layout.o handle_exit.o \
-+	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
- 	 arch_timer.o \
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfb5218137ca..3f23f7478d2a 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -252,10 +252,32 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
- 
- 	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
--		int i;
-+		int i, nr_reg;
-+
-+		switch (*vcpu_cpsr(vcpu)) {
-+		/*
-+		 * Either we are dealing with user mode, and only the
-+		 * first 15 registers (+ PC) must be narrowed to 32bit.
-+		 * AArch32 r0-r14 conveniently map to AArch64 x0-x14.
-+		 */
-+		case PSR_AA32_MODE_USR:
-+		case PSR_AA32_MODE_SYS:
-+			nr_reg = 15;
-+			break;
-+
-+		/*
-+		 * Otherwide, this is a priviledged mode, and *all* the
-+		 * registers must be narrowed to 32bit.
-+		 */
-+		default:
-+			nr_reg = 31;
-+			break;
-+		}
-+
-+		for (i = 0; i < nr_reg; i++)
-+			vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
- 
--		for (i = 0; i < 16; i++)
--			*vcpu_reg32(vcpu, i) = (u32)*vcpu_reg32(vcpu, i);
-+		*vcpu_pc(vcpu) = (u32)*vcpu_pc(vcpu);
- 	}
- out:
- 	return err;
-diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-deleted file mode 100644
-index ae7e290bb017..000000000000
---- a/arch/arm64/kvm/regmap.c
-+++ /dev/null
-@@ -1,128 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/kvm/emulate.c:
-- * Copyright (C) 2012 - Virtual Open Systems and Columbia University
-- * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-- */
--
--#include <linux/mm.h>
--#include <linux/kvm_host.h>
--#include <asm/kvm_emulate.h>
--#include <asm/ptrace.h>
--
--#define VCPU_NR_MODES 6
--#define REG_OFFSET(_reg) \
--	(offsetof(struct user_pt_regs, _reg) / sizeof(unsigned long))
--
--#define USR_REG_OFFSET(R) REG_OFFSET(compat_usr(R))
--
--static const unsigned long vcpu_reg_offsets[VCPU_NR_MODES][16] = {
--	/* USR Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12), USR_REG_OFFSET(13),	USR_REG_OFFSET(14),
--		REG_OFFSET(pc)
--	},
--
--	/* FIQ Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7),
--		REG_OFFSET(compat_r8_fiq),  /* r8 */
--		REG_OFFSET(compat_r9_fiq),  /* r9 */
--		REG_OFFSET(compat_r10_fiq), /* r10 */
--		REG_OFFSET(compat_r11_fiq), /* r11 */
--		REG_OFFSET(compat_r12_fiq), /* r12 */
--		REG_OFFSET(compat_sp_fiq),  /* r13 */
--		REG_OFFSET(compat_lr_fiq),  /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* IRQ Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_irq), /* r13 */
--		REG_OFFSET(compat_lr_irq), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* SVC Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_svc), /* r13 */
--		REG_OFFSET(compat_lr_svc), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* ABT Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_abt), /* r13 */
--		REG_OFFSET(compat_lr_abt), /* r14 */
--		REG_OFFSET(pc)
--	},
--
--	/* UND Registers */
--	{
--		USR_REG_OFFSET(0), USR_REG_OFFSET(1), USR_REG_OFFSET(2),
--		USR_REG_OFFSET(3), USR_REG_OFFSET(4), USR_REG_OFFSET(5),
--		USR_REG_OFFSET(6), USR_REG_OFFSET(7), USR_REG_OFFSET(8),
--		USR_REG_OFFSET(9), USR_REG_OFFSET(10), USR_REG_OFFSET(11),
--		USR_REG_OFFSET(12),
--		REG_OFFSET(compat_sp_und), /* r13 */
--		REG_OFFSET(compat_lr_und), /* r14 */
--		REG_OFFSET(pc)
--	},
--};
--
--/*
-- * Return a pointer to the register number valid in the current mode of
-- * the virtual CPU.
-- */
--unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
--{
--	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.regs;
--	unsigned long mode = *vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK;
--
--	switch (mode) {
--	case PSR_AA32_MODE_USR ... PSR_AA32_MODE_SVC:
--		mode &= ~PSR_MODE32_BIT; /* 0 ... 3 */
--		break;
--
--	case PSR_AA32_MODE_ABT:
--		mode = 4;
--		break;
--
--	case PSR_AA32_MODE_UND:
--		mode = 5;
--		break;
--
--	case PSR_AA32_MODE_SYS:
--		mode = 0;	/* SYS maps to USR */
--		break;
--
--	default:
--		BUG();
--	}
--
--	return reg_array + vcpu_reg_offsets[mode][reg_num];
--}
--- 
-2.28.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+5byg5Lic5petIDx4dTkxMDEyMUBzaW5hLmNvbT4gcmVwb3J0ZWQgYSByZWdyZXNzaW9uIHNlZW4g
+d2l0aCBDZW50T1MKd2hlbiBtaWdyYXRpbmcgZnJvbSBhbiBvbGQga2VybmVsIHRvIGEgbmV3IG9u
+ZS4gVGhlIHByb2JsZW0gd2FzCnRoYXQgUUVNVSByZWplY3RlZCB0aGUgbWlncmF0aW9uIHNpbmNl
+IEtWTV9HRVRfUkVHX0xJU1QgcmVwb3J0ZWQKYSByZWdpc3RlciB3YXMgbWlzc2luZyBvbiB0aGUg
+ZGVzdGluYXRpb24uIEV4dHJhIHJlZ2lzdGVycyBhcmUgT0sKb24gdGhlIGRlc3RpbmF0aW9uLCBi
+dXQgbm90IG1pc3Npbmcgb25lcy4gVGhlIHJlZ3Jlc3Npb24gcmVwcm9kdWNlcwp3aXRoIHVwc3Ry
+ZWFtIGtlcm5lbHMgd2hlbiBtaWdyYXRpbmcgZnJvbSBhIDQuMTUgb3IgbGF0ZXIga2VybmVsLAp1
+cCB0byBvbmUgd2l0aCBjb21taXQgNzM0MzM3NjJmY2FlICgiS1ZNOiBhcm02NC9zdmU6IFN5c3Rl
+bSByZWdpc3Rlcgpjb250ZXh0IHN3aXRjaCBhbmQgYWNjZXNzIHN1cHBvcnQiKSwgdG8gYSBrZXJu
+ZWwgdGhhdCBpbmNsdWRlcyB0aGF0CmNvbW1pdCwgZS5nLiB0aGUgbGF0ZXN0IG1haW5saW5lICg1
+LjEwLXJjMikuCgpUaGUgZmlyc3QgcGF0Y2ggb2YgdGhpcyBzZXJpZXMgaXMgdGhlIGZpeC4gVGhl
+IG5leHQgdHdvIHBhdGNoZXMsCndoaWNoIGRvbid0IGhhdmUgYW55IGludGVuZGVkIGZ1bmN0aW9u
+YWwgY2hhbmdlcywgYWxsb3cgSURfU0FOSVRJU0VECnRvIGJlIHVzZWQgZm9yIHJlZ2lzdGVycyB0
+aGF0IGZsaXAgYmV0d2VlbiBleHBvc2luZyBmZWF0dXJlcyBhbmQKYmVpbmcgUkFaLCB3aGljaCBh
+bGxvd3Mgc29tZSBjb2RlIHRvIGJlIHJlbW92ZWQuCgp2MjoKIC0gQ0Mgc3RhYmxlIFtNYXJjXQog
+LSBPbmx5IG9uZSBSQVogZmxhZyBpcyBlbm91Z2ggW01hcmNdCiAtIE1vdmUgaWRfdmlzaWJpbGl0
+eSgpIHVwIGJ5IHJlYWRfaWRfcmVnKCkgc2luY2UgdGhleSdsbCBsaWtlbHkKICAgYmUgbWFpbnRh
+aW5lZCB0b2dldGhlciBbZHJld10KCkFuZHJldyBKb25lcyAoMyk6CiAgS1ZNOiBhcm02NDogRG9u
+J3QgaGlkZSBJRCByZWdpc3RlcnMgZnJvbSB1c2Vyc3BhY2UKICBLVk06IGFybTY0OiBDaGVjayBS
+QVogdmlzaWJpbGl0eSBpbiBJRCByZWdpc3RlciBhY2Nlc3NvcnMKICBLVk06IGFybTY0OiBSZW1v
+dmUgQUE2NFpGUjBfRUwxIGFjY2Vzc29ycwoKIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgfCA5
+NiArKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIGFyY2gvYXJtNjQva3Zt
+L3N5c19yZWdzLmggfCAxMCArKysrCiAyIGZpbGVzIGNoYW5nZWQsIDM3IGluc2VydGlvbnMoKyks
+IDY5IGRlbGV0aW9ucygtKQoKLS0gCjIuMjYuMgoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
