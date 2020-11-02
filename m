@@ -4,57 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9D3C00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 14:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A24C388F2
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 15:29:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3024F2222B
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 14:18:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3024F2222B
+	by mail.kernel.org (Postfix) with ESMTP id 40C6D2231B
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 15:29:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C6D2231B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5889F4B466;
-	Mon,  2 Nov 2020 09:18:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8271F4B3B4;
+	Mon,  2 Nov 2020 10:29:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q2mY3FWmSCK9; Mon,  2 Nov 2020 09:18:23 -0500 (EST)
+	with ESMTP id sIsaZyWkhtVe; Mon,  2 Nov 2020 10:29:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D736C4B451;
-	Mon,  2 Nov 2020 09:18:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5324D4B41C;
+	Mon,  2 Nov 2020 10:29:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFA094B452
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 09:18:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7163C4B418
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 10:29:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQPlzBoTg1qQ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 09:18:21 -0500 (EST)
+ with ESMTP id TF3aLaRuJQdj for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 10:29:16 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A8044B32F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 09:18:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 407C64B3B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 10:29:16 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA62630E;
- Mon,  2 Nov 2020 06:18:20 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF6F430E;
+ Mon,  2 Nov 2020 07:29:15 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F065E3F66E;
- Mon,  2 Nov 2020 06:18:19 -0800 (PST)
-Subject: Re: [PATCH 5/8] KVM: arm64: Turn host HVC handling into a dispatch
- table
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A583F66E;
+ Mon,  2 Nov 2020 07:29:14 -0800 (PST)
+Subject: Re: [PATCH 7/8] KVM: arm64: Simplify __kvm_enable_ssbs()
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20201026095116.72051-1-maz@kernel.org>
- <20201026095116.72051-6-maz@kernel.org>
+ <20201026095116.72051-8-maz@kernel.org>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <d7b32bda-1d2d-2f63-3cf1-81baa336efa5@arm.com>
-Date: Mon, 2 Nov 2020 14:19:33 +0000
+Message-ID: <efe49392-b8ae-76fa-b581-d7ec8db2cac7@arm.com>
+Date: Mon, 2 Nov 2020 15:30:29 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201026095116.72051-6-maz@kernel.org>
+In-Reply-To: <20201026095116.72051-8-maz@kernel.org>
 Content-Language: en-US
 Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -76,282 +75,87 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 10/26/20 9:51 AM, Marc Zyngier wrote:
-> Now that we can use function pointer, use a dispatch table to call
-> the individual HVC handlers, leading to more maintainable code.
->
-> Further improvements include helpers to declare the mapping of
-> local variables to values passed in the host context.
+> Move the setting of SSBS directly into the HVC handler, using
+> the C helpers rather than the inline asssembly code.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kernel/image-vars.h     |   1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 227 +++++++++++++++++------------
->  2 files changed, 134 insertions(+), 94 deletions(-)
+>  arch/arm64/include/asm/kvm_asm.h    |  2 --
+>  arch/arm64/include/asm/sysreg.h     |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c  |  6 +++++-
+>  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c | 11 -----------
+>  4 files changed, 6 insertions(+), 14 deletions(-)
 >
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 61684a500914..b5b0fdd1043c 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -64,6 +64,7 @@ __efistub__ctype		= _ctype;
->  /* Alternative callbacks for init-time patching of nVHE hyp code. */
->  KVM_NVHE_ALIAS(kvm_patch_vector_branch);
->  KVM_NVHE_ALIAS(kvm_update_va_mask);
-> +KVM_NVHE_ALIAS(kvm_update_kimg_phys_offset);
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 54387ccd1ab2..a542c422a036 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -189,8 +189,6 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
 >  
->  /* Global kernel state accessed by nVHE hyp code. */
->  KVM_NVHE_ALIAS(kvm_vgic_global_state);
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> -extern void __kvm_enable_ssbs(void);
+> -
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+>  extern u64 __vgic_v3_read_vmcr(void);
+>  extern void __vgic_v3_write_vmcr(u32 vmcr);
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index d52c1b3ce589..c9423f36e05c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -461,6 +461,7 @@
+>  
+>  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+>  
+> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+>  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+>  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
 > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index e2eafe2c93af..2af8a5e902af 100644
+> index 2af8a5e902af..5125e934da22 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -12,106 +12,145 @@
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
+> @@ -58,7 +58,11 @@ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
 >  
-> -#include <kvm/arm_hypercalls.h>
-> -
-> -static void handle_host_hcall(unsigned long func_id,
-> -			      struct kvm_cpu_context *host_ctxt)
-> -{
-> -	unsigned long ret = 0;
-> -
-> -	switch (func_id) {
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_vcpu_run): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct kvm_vcpu *vcpu = (struct kvm_vcpu *)r1;
-> -
-> -		ret = __kvm_vcpu_run(kern_hyp_va(vcpu));
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_flush_vm_context):
-> -		__kvm_flush_vm_context();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid_ipa): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct kvm_s2_mmu *mmu = (struct kvm_s2_mmu *)r1;
-> -		phys_addr_t ipa = host_ctxt->regs.regs[2];
-> -		int level = host_ctxt->regs.regs[3];
-> -
-> -		__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_vmid): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct kvm_s2_mmu *mmu = (struct kvm_s2_mmu *)r1;
-> -
-> -		__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_local_vmid): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct kvm_s2_mmu *mmu = (struct kvm_s2_mmu *)r1;
-> -
-> -		__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_timer_set_cntvoff): {
-> -		u64 cntvoff = host_ctxt->regs.regs[1];
-> -
-> -		__kvm_timer_set_cntvoff(cntvoff);
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_enable_ssbs):
-> -		__kvm_enable_ssbs();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_get_ich_vtr_el2):
-> -		ret = __vgic_v3_get_ich_vtr_el2();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_read_vmcr):
-> -		ret = __vgic_v3_read_vmcr();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_write_vmcr): {
-> -		u32 vmcr = host_ctxt->regs.regs[1];
-> -
-> -		__vgic_v3_write_vmcr(vmcr);
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_init_lrs):
-> -		__vgic_v3_init_lrs();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__kvm_get_mdcr_el2):
-> -		ret = __kvm_get_mdcr_el2();
-> -		break;
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_save_aprs): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct vgic_v3_cpu_if *cpu_if = (struct vgic_v3_cpu_if *)r1;
-> -
-> -		__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-> -		break;
-> -	}
-> -	case KVM_HOST_SMCCC_FUNC(__vgic_v3_restore_aprs): {
-> -		unsigned long r1 = host_ctxt->regs.regs[1];
-> -		struct vgic_v3_cpu_if *cpu_if = (struct vgic_v3_cpu_if *)r1;
-> -
-> -		__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
-> -		break;
-> -	}
-> -	default:
-> -		/* Invalid host HVC. */
-> -		host_ctxt->regs.regs[0] = SMCCC_RET_NOT_SUPPORTED;
-> -		return;
-> -	}
-> -
-> -	host_ctxt->regs.regs[0] = SMCCC_RET_SUCCESS;
-> -	host_ctxt->regs.regs[1] = ret;
-> +#define cpu_reg(ctxt, r)	(ctxt)->regs.regs[r]
-> +#define DECLARE_REG(type, name, ctxt, reg)	\
-> +				type name = (type)cpu_reg(ctxt, (reg))
-> +
-> +static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> +
-> +	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
-> +}
-> +
-> +static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	__kvm_flush_vm_context();
-> +}
-> +
-> +static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-> +	DECLARE_REG(int, level, host_ctxt, 3);
-> +
-> +	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
-> +}
-> +
-> +static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +
-> +	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
-> +}
-> +
-> +static void handle___kvm_tlb_flush_local_vmid(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +
-> +	__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
-> +}
-> +
-> +static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	__kvm_timer_set_cntvoff(cpu_reg(host_ctxt, 1));
-> +}
-> +
-> +static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	__kvm_enable_ssbs();
-> +}
-> +
-> +static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	cpu_reg(host_ctxt, 1) = __vgic_v3_get_ich_vtr_el2();
-> +}
-> +
-> +static void handle___vgic_v3_read_vmcr(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	cpu_reg(host_ctxt, 1) = __vgic_v3_read_vmcr();
-> +}
-> +
-> +static void handle___vgic_v3_write_vmcr(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	__vgic_v3_write_vmcr(cpu_reg(host_ctxt, 1));
-> +}
-> +
-> +static void handle___vgic_v3_init_lrs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	__vgic_v3_init_lrs();
-> +}
-> +
-> +static void handle___kvm_get_mdcr_el2(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	cpu_reg(host_ctxt, 1) = __kvm_get_mdcr_el2();
-> +}
-> +
-> +static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v3_save_aprs(kern_hyp_va(cpu_if));
-> +}
-> +
-> +static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v3_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
-> +}
-> +
-> +#define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = handle_##x
-> +
-> +typedef void (*hcall_t)(struct kvm_cpu_context *);
-> +
-> +static const hcall_t host_hcall[] = {
-> +	HANDLE_FUNC(__kvm_vcpu_run),
-> +	HANDLE_FUNC(__kvm_flush_vm_context),
-> +	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-> +	HANDLE_FUNC(__kvm_tlb_flush_vmid),
-> +	HANDLE_FUNC(__kvm_tlb_flush_local_vmid),
-> +	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-> +	HANDLE_FUNC(__kvm_enable_ssbs),
-> +	HANDLE_FUNC(__vgic_v3_get_ich_vtr_el2),
-> +	HANDLE_FUNC(__vgic_v3_read_vmcr),
-> +	HANDLE_FUNC(__vgic_v3_write_vmcr),
-> +	HANDLE_FUNC(__vgic_v3_init_lrs),
-> +	HANDLE_FUNC(__kvm_get_mdcr_el2),
-> +	HANDLE_FUNC(__vgic_v3_save_aprs),
-> +	HANDLE_FUNC(__vgic_v3_restore_aprs),
-> +};
-> +
-> +static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(unsigned long, id, host_ctxt, 0);
-> +	unsigned long ret = SMCCC_RET_NOT_SUPPORTED;
-> +	hcall_t hcall;
-> +
-> +	id -= KVM_HOST_SMCCC_ID(0);
-> +
-> +	if (unlikely(id >= ARRAY_SIZE(host_hcall)))
-> +		goto inval;
-> +
-> +	hcall = host_hcall[id];
-> +	if (unlikely(!hcall))
-> +		goto inval;
-> +
-> +	hcall = kimg_hyp_va(hcall);
-> +
-> +	hcall(host_ctxt);
-> +	ret = SMCCC_RET_SUCCESS;
-> +
-> +inval:
-> +	cpu_reg(host_ctxt, 0) = ret;
->  }
->  
->  void handle_trap(struct kvm_cpu_context *host_ctxt)
+>  static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
 >  {
->  	u64 esr = read_sysreg_el2(SYS_ESR);
-> -	unsigned long func_id;
->  
-> -	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
-> +	if (unlikely(ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64))
->  		hyp_panic();
->  
-> -	func_id = host_ctxt->regs.regs[0];
-> -	handle_host_hcall(func_id, host_ctxt);
-> +	handle_host_hcall(host_ctxt);
->  }
+> -	__kvm_enable_ssbs();
+> +	u64 tmp;
+> +
+> +	tmp = read_sysreg_el2(SYS_SCTLR);
+> +	tmp |= SCTLR_ELx_DSSBS;
+> +	write_sysreg_el2(tmp, SYS_SCTLR);
 
-I checked that the function handlers are the same as the cases in the switch
-statements. In kvm_asm.h there is no restriction regarding function ids not being
-consecutive numbers, but handle_host_hcall() checks that hcall is not NULL, so
-we're safe against that, or function ids disappearing in the future.
+This looks identical to me to the inline assembly version:
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
+Thanks,
+
+Alex
+
+>  }
+>  
+>  static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> index 88a25fc8fcd3..29305022bc04 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> @@ -33,14 +33,3 @@ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+>  	__sysreg_restore_user_state(ctxt);
+>  	__sysreg_restore_el2_return_state(ctxt);
+>  }
+> -
+> -void __kvm_enable_ssbs(void)
+> -{
+> -	u64 tmp;
+> -
+> -	asm volatile(
+> -	"mrs	%0, sctlr_el2\n"
+> -	"orr	%0, %0, %1\n"
+> -	"msr	sctlr_el2, %0"
+> -	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
+> -}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
