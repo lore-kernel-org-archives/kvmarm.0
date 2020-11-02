@@ -4,83 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF67AC00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 08:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E43ECC388F2
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 08:38:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11A48206DC
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 08:32:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E39A20756
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 08:38:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkhZZNX7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A48206DC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5YUJBbn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E39A20756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42CA84B5DD;
-	Mon,  2 Nov 2020 03:32:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3964E4B5E5;
+	Mon,  2 Nov 2020 03:38:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hOy22Q24Shmf; Mon,  2 Nov 2020 03:32:37 -0500 (EST)
+	with ESMTP id vlAKLIzHEaQP; Mon,  2 Nov 2020 03:38:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 106AE4B4E1;
-	Mon,  2 Nov 2020 03:32:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4A04B5E6;
+	Mon,  2 Nov 2020 03:38:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B734B4CF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 03:32:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A994B5E1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 03:38:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gg6M2SEQJ5Wh for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 03:32:35 -0500 (EST)
+ with ESMTP id P4RJl49bL7aG for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 03:38:47 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EED74B4AE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 03:32:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 018114B5DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 03:38:46 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604305954;
+ s=mimecast20190719; t=1604306326;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=6XaYFGBLZgVS1+RdypFGytLHii7nmMINHdQyncFkHJQ=;
- b=IkhZZNX711vR33X4tft813y1mFVXwpBkSmQ+mrTkY6xoXMfCIPwpFiC2KiYcJI00WKGQNz
- m3HeV9TdllArC/vpMicrcQdPxhiSdqovkdAvC+v9M+1nhNbxs3Rr3C8wCLXQsS+CNKMRpS
- ODFl+6mvAfxnzjkJe9OuBxqcXLoXfZ4=
+ bh=iKprBlRGMj1c6o4rrrCoX/rFjaOYaPOS8vcmwCUOrZI=;
+ b=N5YUJBbnZ5hlZDtM4FC4wdhUXsgBAi+fpA73fzINA7pDkM2owsu4eiiEbNIP3Y6QHVQx5C
+ gBBqCeBvC5gL6dOjVT541EXh7jAuTy6eUgDzUm1+IB1yqPAWk41XIAGztgzEmtplE46vrU
+ 4qDJ61Y7SZpWbYSeYYhk7N2LOvyTBhs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-WwX2ILL-MNWcFmlaGaeNYA-1; Mon, 02 Nov 2020 03:32:30 -0500
-X-MC-Unique: WwX2ILL-MNWcFmlaGaeNYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-129-p-ZdT5QJPvGRJvwdzpI1sg-1; Mon, 02 Nov 2020 03:38:43 -0500
+X-MC-Unique: p-ZdT5QJPvGRJvwdzpI1sg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DAD757057;
- Mon,  2 Nov 2020 08:32:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB8B66414D;
+ Mon,  2 Nov 2020 08:38:41 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.193.222])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E10FD5DA6A;
- Mon,  2 Nov 2020 08:32:27 +0000 (UTC)
-Date: Mon, 2 Nov 2020 09:32:25 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B8D1E1002C13;
+ Mon,  2 Nov 2020 08:38:36 +0000 (UTC)
+Date: Mon, 2 Nov 2020 09:38:33 +0100
 From: Andrew Jones <drjones@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Check RAZ visibility in ID register
- accessors
-Message-ID: <20201102083225.dncyprcessqbxiuu@kamzik.brq.redhat.com>
-References: <20201029201105.101910-1-drjones@redhat.com>
- <20201029201105.101910-3-drjones@redhat.com>
- <878sbmdzln.wl-maz@kernel.org>
+Subject: Re: [PATCH 3/4] KVM: selftests: Update aarch64 get-reg-list blessed
+ list
+Message-ID: <20201102083833.zjqrlmyvwfir2du4@kamzik.brq.redhat.com>
+References: <20201029201703.102716-1-drjones@redhat.com>
+ <20201029201703.102716-4-drjones@redhat.com>
+ <875z6qdy63.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <878sbmdzln.wl-maz@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: xu910121@sina.com, kvmarm@lists.cs.columbia.edu, Dave.Martin@arm.com
+In-Reply-To: <875z6qdy63.wl-maz@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, Dave.Martin@arm.com, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,138 +94,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Oct 31, 2020 at 06:23:00PM +0000, Marc Zyngier wrote:
-> On Thu, 29 Oct 2020 20:11:04 +0000,
+On Sat, Oct 31, 2020 at 06:53:56PM +0000, Marc Zyngier wrote:
+> On Thu, 29 Oct 2020 20:17:02 +0000,
 > Andrew Jones <drjones@redhat.com> wrote:
 > > 
-> > The instruction encodings of ID registers are preallocated. Until an
-> > encoding is assigned a purpose the register is RAZ. KVM's general ID
-> > register accessor functions already support both paths, RAZ or not.
-> > If for each ID register we can determine if it's RAZ or not, then all
-> > ID registers can build on the general functions. The register visibility
-> > function allows us to check whether a register should be completely
-> > hidden or not, extending it to also report when the register should
-> > be RAZ or not allows us to use it for ID registers as well.
+> > The new registers come from the following commits:
 > > 
-> > No functional change intended.
+> > commit 99adb567632b ("KVM: arm/arm64: Add save/restore support for
+> > firmware workaround state")
+> > 
+> > commit c773ae2b3476 ("KVM: arm64: Save/Restore guest DISR_EL1")
+> > 
+> > commit 03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset")
+> > 
+> > The last commit, which adds ARM64_SYS_REG(3, 3, 9, 12, 0) (PMCR_EL0),
+> > and was committed for v5.3, doesn't indicate in its commit message that
+> > enumerating it for save/restore was the plan, so doing so may have
+> > been by accident.
+> 
+> It definitely was.
+> 
+> > It's a good idea anyway, though, since the other PMU registers have
+> > been enumerated since v4.10.
+> 
+> Quite. The state of the PMU is pretty much unknown on restore until then.
+> 
 > > 
 > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 19 ++++++++++++++++---
-> >  arch/arm64/kvm/sys_regs.h | 20 ++++++++++++++++++++
-> >  2 files changed, 36 insertions(+), 3 deletions(-)
+> >  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index d24e66ee59b3..9f6151589460 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1171,7 +1171,9 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
-> >  			  struct sys_reg_params *p,
-> >  			  const struct sys_reg_desc *r)
-> >  {
-> > -	return __access_id_reg(vcpu, p, r, false);
-> > +	bool raz = sysreg_raz_from_guest(vcpu, r);
-> > +
-> > +	return __access_id_reg(vcpu, p, r, raz);
-> >  }
-> >  
-> >  static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
-> > @@ -1283,13 +1285,17 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> >  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> >  		      const struct kvm_one_reg *reg, void __user *uaddr)
-> >  {
-> > -	return __get_id_reg(vcpu, rd, uaddr, false);
-> > +	bool raz = sysreg_raz_from_user(vcpu, rd);
-> > +
-> > +	return __get_id_reg(vcpu, rd, uaddr, raz);
-> >  }
-> >  
-> >  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> >  		      const struct kvm_one_reg *reg, void __user *uaddr)
-> >  {
-> > -	return __set_id_reg(vcpu, rd, uaddr, false);
-> > +	bool raz = sysreg_raz_from_user(vcpu, rd);
-> > +
-> > +	return __set_id_reg(vcpu, rd, uaddr, raz);
-> >  }
-> >  
-> >  static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > @@ -1375,12 +1381,19 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >  	return false;
-> >  }
-> >  
-> > +static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> > +				  const struct sys_reg_desc *r)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
-> >  #define ID_SANITISED(name) {			\
-> >  	SYS_DESC(SYS_##name),			\
-> >  	.access	= access_id_reg,		\
-> >  	.get_user = get_id_reg,			\
-> >  	.set_user = set_id_reg,			\
-> > +	.visibility = id_visibility,		\
+> > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > index 3aeb3de780a1..3ff097f6886e 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > @@ -352,7 +352,8 @@ int main(int ac, char **av)
 > >  }
 > >  
 > >  /*
-> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> > index 5a6fc30f5989..d5add36c130a 100644
-> > --- a/arch/arm64/kvm/sys_regs.h
-> > +++ b/arch/arm64/kvm/sys_regs.h
-> > @@ -61,6 +61,8 @@ struct sys_reg_desc {
-> >  
-> >  #define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
-> >  #define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
-> > +#define REG_RAZ_USER		(1 << 2) /* RAZ from userspace ioctls */
-> > +#define REG_RAZ_GUEST		(1 << 3) /* RAZ from guest */
-> >
-> >  static __printf(2, 3)
-> >  inline void print_sys_reg_msg(const struct sys_reg_params *p,
-> > @@ -129,6 +131,24 @@ static inline bool sysreg_hidden_from_user(const struct kvm_vcpu *vcpu,
-> >  	return r->visibility(vcpu, r) & REG_HIDDEN_USER;
-> >  }
-> >  
-> > +static inline bool sysreg_raz_from_guest(const struct kvm_vcpu *vcpu,
-> > +					 const struct sys_reg_desc *r)
-> > +{
-> > +	if (likely(!r->visibility))
-> > +		return false;
-> > +
-> > +	return r->visibility(vcpu, r) & REG_RAZ_GUEST;
-> > +}
-> > +
-> > +static inline bool sysreg_raz_from_user(const struct kvm_vcpu *vcpu,
-> > +					const struct sys_reg_desc *r)
-> > +{
-> > +	if (likely(!r->visibility))
-> > +		return false;
-> > +
-> > +	return r->visibility(vcpu, r) & REG_RAZ_USER;
-> > +}
-> > +
-> >  static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
-> >  			      const struct sys_reg_desc *i2)
-> >  {
+> > - * The current blessed list comes from kernel version v4.15 with --core-reg-fixup
+> > + * The current blessed list was primed with the output of kernel version
+> > + * v4.15 with --core-reg-fixup and then later updated with new registers.
 > 
-> Is there actually a case for any ID register to have different
-> RAZ semantics between guest and userspace? I have the feeling that
-> we'd want them to be consistent at all times. Or did you have any
-> particular (and future) use case in mind?
+> Maybe have a reference to the last kernel version this was checked
+> against? Either here or in the commit message?
 
-I was just following the hidden pattern too closely. You're right
-that we'll probably only ever need a single RAZ flag. And, if we do
-ever need both, then we can always add another flag later.
-
-I'll respin this patch with just one flag.
-
-> 
-> Otherwise, looks good.
-> 
+Good idea. I'll put it in the comment in list form, encouraging the list
+to be continued as we add more.
 
 Thanks,
 drew
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
 
 _______________________________________________
 kvmarm mailing list
