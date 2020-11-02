@@ -4,67 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0976EC00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 388DEC4742C
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6EA8A223AB
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B606822268
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUFKYN6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA8A223AB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjswbo4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B606822268
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C2B14B4DE;
-	Mon,  2 Nov 2020 11:41:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 575E84B410;
+	Mon,  2 Nov 2020 11:41:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7qm+5OeKqSHa; Mon,  2 Nov 2020 11:41:11 -0500 (EST)
+	with ESMTP id v+XOw9MdicdA; Mon,  2 Nov 2020 11:41:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C714B461;
-	Mon,  2 Nov 2020 11:41:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 329F24B462;
+	Mon,  2 Nov 2020 11:41:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ADEE4B3B3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C9C64B410
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rhlf-U5efLEo for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 11:41:08 -0500 (EST)
+ with ESMTP id 2MFQYnY1mIJ9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 11:41:09 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D25C14B3F3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDBBF4B3F6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:08 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DDB54222B9;
- Mon,  2 Nov 2020 16:41:06 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0F05122275;
+ Mon,  2 Nov 2020 16:41:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604335267;
- bh=BJ2l4DSkz4y9V8f94u85OpZYHHp9SSM0jeiRHjoar9o=;
+ s=default; t=1604335268;
+ bh=UNw6Ku4J/fjF4d6VHoCQAwTDkVrbDAGVMgz0t9OIWZo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IUFKYN6ya7F7bktYpKAg2HFe6Qczk7CZKxcfI8hl7s+UUGFC2f/S8asPoXh100cZD
- R03Xg9Mnaczc+Iy6cmP8tyl7wWUTJLY/3cFC5+IOLB5hDthZraAf2eLNKmWOxm/u+K
- hY9a4Dk6Ly89nXReP5QimCTMxoviXRhsKUVyVWmw=
+ b=hjswbo4t7uRt5kJCdyVFk0DeBKy7s4ZEhpNlKCPtk/UxsBS52tpZ/AS13MjDlCgC2
+ MbbckGXyBCqLdwf/x5FmLphXK71JtBzlTT8UfaM+mQCy2OVlNmoCuw5A+gZg1MMpS+
+ w3DTGijfjjSaJLexGBjas0jjlKN2lfyemvkEkoCY=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kZctF-006jJf-4g; Mon, 02 Nov 2020 16:41:05 +0000
+ id 1kZctG-006jJf-A1; Mon, 02 Nov 2020 16:41:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 02/11] KVM: arm64: Move kvm_vcpu_trap_il_is32bit into
- kvm_skip_instr32()
-Date: Mon,  2 Nov 2020 16:40:36 +0000
-Message-Id: <20201102164045.264512-3-maz@kernel.org>
+Subject: [PATCH v2 04/11] KVM: arm64: Move PC rollback on SError to HYP
+Date: Mon,  2 Nov 2020 16:40:38 +0000
+Message-Id: <20201102164045.264512-5-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102164045.264512-1-maz@kernel.org>
 References: <20201102164045.264512-1-maz@kernel.org>
@@ -95,147 +94,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There is no need to feed the result of kvm_vcpu_trap_il_is32bit()
-to kvm_skip_instr(), as only AArch32 has a variable length ISA, and
-this helper can equally be called from kvm_skip_instr32(), reducing
-the complexity at all the call sites.
+Instead of handling the "PC rollback on SError during HVC" at EL1 (which
+requires disclosing PC to a potentially untrusted kernel), let's move
+this fixup to ... fixup_guest_exit(), which is where we do all fixups.
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+Isn't that neat?
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 8 ++++----
- arch/arm64/kvm/handle_exit.c         | 6 +++---
- arch/arm64/kvm/hyp/aarch32.c         | 4 ++--
- arch/arm64/kvm/mmio.c                | 2 +-
- arch/arm64/kvm/mmu.c                 | 2 +-
- arch/arm64/kvm/sys_regs.c            | 2 +-
- 6 files changed, 12 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/handle_exit.c            | 17 -----------------
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++++++++++++++
+ 2 files changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5ef2669ccd6c..0864f425547d 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -26,7 +26,7 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu);
- void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v);
- 
- bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
--void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr);
-+void kvm_skip_instr32(struct kvm_vcpu *vcpu);
- 
- void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
-@@ -472,10 +472,10 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
- 	return data;		/* Leave LE untouched */
- }
- 
--static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
-+static __always_inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_mode_is_32bit(vcpu)) {
--		kvm_skip_instr32(vcpu, is_wide_instr);
-+		kvm_skip_instr32(vcpu);
- 	} else {
- 		*vcpu_pc(vcpu) += 4;
- 		*vcpu_cpsr(vcpu) &= ~PSR_BTYPE_MASK;
-@@ -494,7 +494,7 @@ static __always_inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	vcpu_gp_regs(vcpu)->pstate = read_sysreg_el2(SYS_SPSR);
- 
--	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+	kvm_skip_instr(vcpu);
- 
- 	write_sysreg_el2(vcpu_gp_regs(vcpu)->pstate, SYS_SPSR);
- 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 79a720657c47..30bf8e22df54 100644
+index d4e00a864ee6..f79137ee4274 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -61,7 +61,7 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 * otherwise return to the same address...
- 	 */
- 	vcpu_set_reg(vcpu, 0, ~0UL);
--	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+	kvm_skip_instr(vcpu);
- 	return 1;
- }
- 
-@@ -100,7 +100,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- 		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	}
- 
--	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+	kvm_skip_instr(vcpu);
- 
- 	return 1;
- }
-@@ -221,7 +221,7 @@ static int handle_trap_exceptions(struct kvm_vcpu *vcpu)
- 	 * that fail their condition code check"
- 	 */
- 	if (!kvm_condition_valid(vcpu)) {
--		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+		kvm_skip_instr(vcpu);
- 		handled = 1;
- 	} else {
- 		exit_handle_fn exit_handler;
-diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
-index ae56d8a4b382..f98cbe2626a1 100644
---- a/arch/arm64/kvm/hyp/aarch32.c
-+++ b/arch/arm64/kvm/hyp/aarch32.c
-@@ -123,13 +123,13 @@ static void kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-  * kvm_skip_instr - skip a trapped instruction and proceed to the next
-  * @vcpu: The vcpu pointer
-  */
--void kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
-+void kvm_skip_instr32(struct kvm_vcpu *vcpu)
+@@ -241,23 +241,6 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
  {
- 	u32 pc = *vcpu_pc(vcpu);
- 	bool is_thumb;
+ 	struct kvm_run *run = vcpu->run;
  
- 	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
--	if (is_thumb && !is_wide_instr)
-+	if (is_thumb && !kvm_vcpu_trap_il_is32bit(vcpu))
- 		pc += 2;
- 	else
- 		pc += 4;
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 6a2826f1bf5e..7e8eb32ae7d2 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -115,7 +115,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
- 	 * The MMIO instruction is emulated and should not be re-executed
- 	 * in the guest.
- 	 */
--	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+	kvm_skip_instr(vcpu);
+-	if (ARM_SERROR_PENDING(exception_index)) {
+-		u8 esr_ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+-
+-		/*
+-		 * HVC already have an adjusted PC, which we need to
+-		 * correct in order to return to after having injected
+-		 * the SError.
+-		 *
+-		 * SMC, on the other hand, is *trapped*, meaning its
+-		 * preferred return address is the SMC itself.
+-		 */
+-		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64)
+-			*vcpu_pc(vcpu) -= 4;
+-
+-		return 1;
+-	}
+-
+ 	exception_index = ARM_EXCEPTION_CODE(exception_index);
  
- 	return 0;
- }
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 57972bdb213a..0bec07cf8d06 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1014,7 +1014,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		 * cautious, and skip the instruction.
- 		 */
- 		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
--			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+			kvm_skip_instr(vcpu);
- 			ret = 1;
- 			goto out_unlock;
- 		}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index fb12d3ef423a..1232a814ca7f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2199,7 +2199,7 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 	switch (exception_index) {
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 8b2328f62a07..84473574c2e7 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -411,6 +411,21 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
  
- 	/* Skip instruction if instructed so */
- 	if (likely(r->access(vcpu, params, r)))
--		kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+		kvm_skip_instr(vcpu);
- }
- 
- /*
++	if (ARM_SERROR_PENDING(*exit_code)) {
++		u8 esr_ec = kvm_vcpu_trap_get_class(vcpu);
++
++		/*
++		 * HVC already have an adjusted PC, which we need to
++		 * correct in order to return to after having injected
++		 * the SError.
++		 *
++		 * SMC, on the other hand, is *trapped*, meaning its
++		 * preferred return address is the SMC itself.
++		 */
++		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64)
++			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
++	}
++
+ 	/*
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
 -- 
 2.28.0
 
