@@ -2,61 +2,82 @@ Return-Path: <SRS0=lygO=EI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9936C388F2
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C03C2C4742C
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D487208B6
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:27:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D487208B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 22FF6223AB
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="RK3T0X4y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FF6223AB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9904B404;
-	Mon,  2 Nov 2020 11:27:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6932C4B470;
+	Mon,  2 Nov 2020 11:41:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rUTC6uAE695P; Mon,  2 Nov 2020 11:27:33 -0500 (EST)
+	with ESMTP id 2ECDqdmfz-V6; Mon,  2 Nov 2020 11:41:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BABD4B3EF;
-	Mon,  2 Nov 2020 11:27:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B109F4B415;
+	Mon,  2 Nov 2020 11:41:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF5AC4B3EF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:27:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 581054B3FE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BNUwIZZJCcOm for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 11:27:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E5314B3ED
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:27:30 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54BC931B;
- Mon,  2 Nov 2020 08:27:30 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 802183F719;
- Mon,  2 Nov 2020 08:27:29 -0800 (PST)
-Subject: Re: [PATCH 8/8] KVM: arm64: Avoid repetitive stack access on host EL1
- to EL2 exception
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20201026095116.72051-1-maz@kernel.org>
- <20201026095116.72051-9-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e4fa81b4-1071-e41c-7cc2-62c8116e28ba@arm.com>
-Date: Mon, 2 Nov 2020 16:28:39 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id QzBST-RcKMT8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 11:41:07 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5991A4B3B3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:07 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5229A222BA;
+ Mon,  2 Nov 2020 16:41:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604335266;
+ bh=LbFIUMvh/XxufxroOMxcM/bchWyuyq7+XF1PJEMLgS8=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=RK3T0X4yVX6/eJyxwqJSid6WzMcZDAf3cmXcoKfJPi6NgeLJym0ciXpl2GqYmzX13
+ frNKnTaiQu0EXja4bCZhUFXouIxZYLFGzNE4hzxFfHgRpS8A16fmbD3WV0vp95Kj32
+ W9lTB8xqYXH+fIFxQH4BDAkqUSoG2b6/7QNcUVfY=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kZctE-006jJf-IK; Mon, 02 Nov 2020 16:41:04 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v2 01/11] KVM: arm64: Don't adjust PC on SError during SMC trap
+Date: Mon,  2 Nov 2020 16:40:35 +0000
+Message-Id: <20201102164045.264512-2-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201102164045.264512-1-maz@kernel.org>
+References: <20201102164045.264512-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20201026095116.72051-9-maz@kernel.org>
-Content-Language: en-US
-Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com,
+ will@kernel.org, mark.rutland@arm.com, qperret@google.com, dbrazdil@google.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,69 +94,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On SMC trap, the prefered return address is set to that of the SMC
+instruction itself. It is thus wrong to try and roll it back when
+an SError occurs while trapping on SMC. It is still necessary on
+HVC though, as HVC doesn't cause a trap, and sets ELR to returning
+*after* the HVC.
 
-On 10/26/20 9:51 AM, Marc Zyngier wrote:
-> Registers x0/x1 get repeateadly pushed and poped during a host
-> HVC call. Instead, leave the registers on the stack, saving
-> a store instruction on the fast path for an add on the slow path.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/nvhe/host.S | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index e2d316d13180..7b69f9ff8da0 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -13,8 +13,6 @@
->  	.text
->  
->  SYM_FUNC_START(__host_exit)
-> -	stp	x0, x1, [sp, #-16]!
-> -
->  	get_host_ctxt	x0, x1
->  
->  	/* Store the host regs x2 and x3 */
-> @@ -99,13 +97,14 @@ SYM_FUNC_END(__hyp_do_panic)
->  	mrs	x0, esr_el2
->  	lsr	x0, x0, #ESR_ELx_EC_SHIFT
->  	cmp	x0, #ESR_ELx_EC_HVC64
-> -	ldp	x0, x1, [sp], #16
-> +	ldp	x0, x1, [sp]		// Don't fixup the stack yet
+It also became apparent that there is no 16bit encoding for an AArch32
+HVC instruction, meaning that the displacement is always 4 bytes,
+no matter what the ISA is. Take this opportunity to simplify it.
 
-If I understand get_host_ctxt correctly, it will clobber x0 and x1, and this is
-the first thing that __host_exit does. I think that the values of x0 and x1 are
-only needed in host_el1_sync_vect: x0 to compare with HVC_STUB_HCALL_NR below, and
-x1 for the call to __kvm_handle_stub_hvc. I was thinking that we can restore x0
-just before the comparison with HVC_STUB_HCALL_NR, after the first branch to
-__host_exit, to make it clear that it is not used by __host_exit. Not really
-important, but it might make the code a bit easier to understand (it looks a bit
-weird to me to have x0, x1 clobbered immediately after we restore them from the
-stack).
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/handle_exit.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Either way you prefer, the code looks correct to me: __host_exit assumes that x0
-and x1 are at the top of the stack when it saves them, and the ADD in
-host_el1_sync_vect (when the code doesn't branch to __host_exit) makes sure the
-stack pointer is as expected:
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 5d690d60ccad..79a720657c47 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -245,15 +245,15 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+ 		u8 esr_ec = ESR_ELx_EC(kvm_vcpu_get_esr(vcpu));
+ 
+ 		/*
+-		 * HVC/SMC already have an adjusted PC, which we need
+-		 * to correct in order to return to after having
+-		 * injected the SError.
++		 * HVC already have an adjusted PC, which we need to
++		 * correct in order to return to after having injected
++		 * the SError.
++		 *
++		 * SMC, on the other hand, is *trapped*, meaning its
++		 * preferred return address is the SMC itself.
+ 		 */
+-		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64 ||
+-		    esr_ec == ESR_ELx_EC_SMC32 || esr_ec == ESR_ELx_EC_SMC64) {
+-			u32 adj =  kvm_vcpu_trap_il_is32bit(vcpu) ? 4 : 2;
+-			*vcpu_pc(vcpu) -= adj;
+-		}
++		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64)
++			*vcpu_pc(vcpu) -= 4;
+ 
+ 		return 1;
+ 	}
+-- 
+2.28.0
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
-
->  	b.ne	__host_exit
->  
->  	/* Check for a stub HVC call */
->  	cmp	x0, #HVC_STUB_HCALL_NR
->  	b.hs	__host_exit
->  
-> +	add	sp, sp, #16
->  	/*
->  	 * Compute the idmap address of __kvm_handle_stub_hvc and
->  	 * jump there. Since we use kimage_voffset, do not use the
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
