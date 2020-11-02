@@ -4,66 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C95C2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B85CC55179
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C66F12225E
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D5862225E
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTalKTQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66F12225E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwRF+r1Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5862225E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3E64B5C8;
-	Mon,  2 Nov 2020 14:16:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1810D4B5F7;
+	Mon,  2 Nov 2020 14:16:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UgPLVvTm3et1; Mon,  2 Nov 2020 14:16:19 -0500 (EST)
+	with ESMTP id fEe4arKwSj1m; Mon,  2 Nov 2020 14:16:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D59C84B589;
-	Mon,  2 Nov 2020 14:16:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01FAE4B5F4;
+	Mon,  2 Nov 2020 14:16:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CAA64B4E0
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE7564B55F
  for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 14:16:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UjGSzn7nBo1u for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 8GGm6Nm5e8It for <kvmarm@lists.cs.columbia.edu>;
  Mon,  2 Nov 2020 14:16:17 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E71F4B4E1
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 398D84B4E5
  for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 14:16:17 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9C5642225E;
- Mon,  2 Nov 2020 19:16:15 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 445F222275;
+ Mon,  2 Nov 2020 19:16:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604344575;
- bh=ArWFBoK0fRQku7Ixro39jAGqWAPrMQvy0PpraNIOiA0=;
+ s=default; t=1604344576;
+ bh=9LeLkrQsFwr/CWyCUnFcQ5bVDi76kiR9hv/l2nTZdOY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=aTalKTQOzsoIcqJTNcdFWelDURIMQRP2hAwYF5ArRJ22GTesagAqw/3Kocidf0mhv
- eLhC745L7k0MGSpIflzdaY3KuAwcoo+9U94/qEug+/Ig5e6G13qwrkxJnnxm8K5vtq
- BwmIkKpNbsDkmdlfFc6IDS26QgppZHZeca+j8rNk=
+ b=hwRF+r1Z2QVa5gzOhydwm0zlEsfrEm5NWiSCpUdtvfj4pZsu7pF0/icDgjwhd/gGZ
+ fwPm8MnYduvE2MVLvR4vedTHC0LuRkqYVaVV+cWrCakvIWC9KQqdjDFiGzA2Na0zgS
+ Vm/vM7dlAKeXKitPQeWp7DQYqsuLHHr9zv+ZqqNo=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kZfJN-006nxn-Ls; Mon, 02 Nov 2020 19:16:13 +0000
+ id 1kZfJO-006nxn-Fj; Mon, 02 Nov 2020 19:16:14 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 1/8] KVM: arm64: Move AArch32 exceptions over to AArch64
- sysregs
-Date: Mon,  2 Nov 2020 19:16:02 +0000
-Message-Id: <20201102191609.265711-2-maz@kernel.org>
+Subject: [PATCH 3/8] KVM: arm64: Map AArch32 cp15 register to AArch64 sysregs
+Date: Mon,  2 Nov 2020 19:16:04 +0000
+Message-Id: <20201102191609.265711-4-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102191609.265711-1-maz@kernel.org>
 References: <20201102191609.265711-1-maz@kernel.org>
@@ -92,123 +91,192 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The use of the AArch32-specific accessors have always been a bit
-annoying on 64bit, and it is time for a change.
-
-Let's move the AArch32 exception injection over to the AArch64 encoding,
-which requires us to split the two halves of FAR_EL1 into DFAR and IFAR.
-This enables us to drop the preempt_disable() games on VHE, and to kill
-the last user of the vcpu_cp15() macro.
+Move all the cp15 registers over to their AArch64 counterpart.
+This requires the annotation of a few of them (such as the usual
+DFAR/IFAR vs FAR_EL1), and a new helper that generates mask/shift
+pairs for the various configurations.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/inject_fault.c     | 62 ++++++++++---------------------
- 2 files changed, 20 insertions(+), 43 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 107 +++++++++++++++++++++-----------------
+ 1 file changed, 58 insertions(+), 49 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7a1faf917f3c..a6778c39157d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -561,7 +561,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- #define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
- 
- #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
--#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
- 
- struct kvm_vm_stat {
- 	ulong remote_tlb_flush;
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index e2a2e48ca371..975f65ba6a8b 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -69,26 +69,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- #define DFSR_FSC_EXTABT_LPAE	0x10
- #define DFSR_FSC_EXTABT_nLPAE	0x08
- #define DFSR_LPAE		BIT(9)
--
--static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
--{
--	preempt_disable();
--	if (vcpu->arch.sysregs_loaded_on_cpu) {
--		kvm_arch_vcpu_put(vcpu);
--		return true;
--	}
--
--	preempt_enable();
--	return false;
--}
--
--static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
--{
--	if (loaded) {
--		kvm_arch_vcpu_load(vcpu, smp_processor_id());
--		preempt_enable();
--	}
--}
-+#define TTBCR_EAE		BIT(31)
- 
- static void inject_undef32(struct kvm_vcpu *vcpu)
- {
-@@ -100,39 +81,36 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
-  * Modelled after TakeDataAbortException() and TakePrefetchAbortException
-  * pseudocode.
-  */
--static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
--			 unsigned long addr)
-+static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- {
--	u32 *far, *fsr;
--	bool is_lpae;
--	bool loaded;
-+	u64 far;
-+	u32 fsr;
-+
-+	/* Give the guest an IMPLEMENTATION DEFINED exception */
-+	if (__vcpu_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
-+		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
-+	} else {
-+		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
-+		fsr = DFSR_FSC_EXTABT_nLPAE;
-+	}
- 
--	loaded = pre_fault_synchronize(vcpu);
-+	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
- 
- 	if (is_pabt) {
- 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
- 				     KVM_ARM64_PENDING_EXCEPTION);
--		far = &vcpu_cp15(vcpu, c6_IFAR);
--		fsr = &vcpu_cp15(vcpu, c5_IFSR);
-+		far &= GENMASK(31, 0);
-+		far |= (u64)addr << 32;
-+		vcpu_write_sys_reg(vcpu, fsr, IFSR32_EL2);
- 	} else { /* !iabt */
- 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
- 				     KVM_ARM64_PENDING_EXCEPTION);
--		far = &vcpu_cp15(vcpu, c6_DFAR);
--		fsr = &vcpu_cp15(vcpu, c5_DFSR);
--	}
--
--	*far = addr;
--
--	/* Give the guest an IMPLEMENTATION DEFINED exception */
--	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
--	if (is_lpae) {
--		*fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
--	} else {
--		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
--		*fsr = DFSR_FSC_EXTABT_nLPAE;
-+		far &= GENMASK(63, 32);
-+		far |= addr;
-+		vcpu_write_sys_reg(vcpu, fsr, ESR_EL1);
- 	}
- 
--	post_fault_synchronize(vcpu, loaded);
-+	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 26c7c25f8a6d..137818793a4a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -128,6 +128,24 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
- /**
++static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
++{
++	switch (r->aarch32_map) {
++	case AA32_LO:
++		*mask = GENMASK_ULL(31, 0);
++		*shift = 0;
++		break;
++	case AA32_HI:
++		*mask = GENMASK_ULL(63, 32);
++		*shift = 32;
++		break;
++	default:
++		*mask = GENMASK_ULL(63, 0);
++		*shift = 0;
++		break;
++	}
++}
++
+ /*
+  * Generic accessor for VM registers. Only called as long as HCR_TVM
+  * is set. If the guest enables the MMU, we stop trapping the VM
+@@ -138,26 +156,16 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  const struct sys_reg_desc *r)
+ {
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+-	u64 val;
+-	int reg = r->reg;
++	u64 val, mask, shift;
+ 
+ 	BUG_ON(!p->is_write);
+ 
+-	/* See the 32bit mapping in kvm_host.h */
+-	if (p->is_aarch32)
+-		reg = r->reg / 2;
++	get_access_mask(r, &mask, &shift);
+ 
+-	if (!p->is_aarch32 || !p->is_32bit) {
+-		val = p->regval;
+-	} else {
+-		val = vcpu_read_sys_reg(vcpu, reg);
+-		if (r->reg % 2)
+-			val = (p->regval << 32) | (u64)lower_32_bits(val);
+-		else
+-			val = ((u64)upper_32_bits(val) << 32) |
+-				lower_32_bits(p->regval);
+-	}
+-	vcpu_write_sys_reg(vcpu, val, reg);
++	val = vcpu_read_sys_reg(vcpu, r->reg);
++	val &= ~mask;
++	val |= (p->regval & (mask >> shift)) << shift;
++	vcpu_write_sys_reg(vcpu, val, r->reg);
+ 
+ 	kvm_toggle_cache(vcpu, was_enabled);
+ 	return true;
+@@ -167,17 +175,13 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
+ 			 struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+ {
++	u64 mask, shift;
++
+ 	if (p->is_write)
+ 		return ignore_write(vcpu, p);
+ 
+-	p->regval = vcpu_read_sys_reg(vcpu, ACTLR_EL1);
+-
+-	if (p->is_aarch32) {
+-		if (r->Op2 & 2)
+-			p->regval = upper_32_bits(p->regval);
+-		else
+-			p->regval = lower_32_bits(p->regval);
+-	}
++	get_access_mask(r, &mask, &shift);
++	p->regval = (vcpu_read_sys_reg(vcpu, r->reg) & mask) >> shift;
+ 
+ 	return true;
+ }
+@@ -1264,10 +1268,6 @@ static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	int reg = r->reg;
+ 
+-	/* See the 32bit mapping in kvm_host.h */
+-	if (p->is_aarch32)
+-		reg = r->reg / 2;
+-
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, reg);
+ 	else
+@@ -1919,19 +1919,24 @@ static const struct sys_reg_desc cp14_64_regs[] = {
+  */
+ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 0), CRm( 0), Op2( 1), access_ctr },
+-	{ Op1( 0), CRn( 1), CRm( 0), Op2( 0), access_vm_reg, NULL, c1_SCTLR },
+-	{ Op1( 0), CRn( 1), CRm( 0), Op2( 1), access_actlr },
+-	{ Op1( 0), CRn( 1), CRm( 0), Op2( 3), access_actlr },
+-	{ Op1( 0), CRn( 2), CRm( 0), Op2( 0), access_vm_reg, NULL, c2_TTBR0 },
+-	{ Op1( 0), CRn( 2), CRm( 0), Op2( 1), access_vm_reg, NULL, c2_TTBR1 },
+-	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, c2_TTBCR },
+-	{ Op1( 0), CRn( 3), CRm( 0), Op2( 0), access_vm_reg, NULL, c3_DACR },
+-	{ Op1( 0), CRn( 5), CRm( 0), Op2( 0), access_vm_reg, NULL, c5_DFSR },
+-	{ Op1( 0), CRn( 5), CRm( 0), Op2( 1), access_vm_reg, NULL, c5_IFSR },
+-	{ Op1( 0), CRn( 5), CRm( 1), Op2( 0), access_vm_reg, NULL, c5_ADFSR },
+-	{ Op1( 0), CRn( 5), CRm( 1), Op2( 1), access_vm_reg, NULL, c5_AIFSR },
+-	{ Op1( 0), CRn( 6), CRm( 0), Op2( 0), access_vm_reg, NULL, c6_DFAR },
+-	{ Op1( 0), CRn( 6), CRm( 0), Op2( 2), access_vm_reg, NULL, c6_IFAR },
++	{ Op1( 0), CRn( 1), CRm( 0), Op2( 0), access_vm_reg, NULL, SCTLR_EL1 },
++	/* ACTLR */
++	{ AA32(LO), Op1( 0), CRn( 1), CRm( 0), Op2( 1), access_actlr, NULL, ACTLR_EL1 },
++	/* ACTLR2 */
++	{ AA32(HI), Op1( 0), CRn( 1), CRm( 0), Op2( 3), access_actlr, NULL, ACTLR_EL1 },
++	{ Op1( 0), CRn( 2), CRm( 0), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
++	{ Op1( 0), CRn( 2), CRm( 0), Op2( 1), access_vm_reg, NULL, TTBR1_EL1 },
++	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, TCR_EL1 },
++	{ Op1( 0), CRn( 3), CRm( 0), Op2( 0), access_vm_reg, NULL, DACR32_EL2 },
++	/* DFSR */
++	{ Op1( 0), CRn( 5), CRm( 0), Op2( 0), access_vm_reg, NULL, ESR_EL1 },
++	{ Op1( 0), CRn( 5), CRm( 0), Op2( 1), access_vm_reg, NULL, IFSR32_EL2 },
++	{ Op1( 0), CRn( 5), CRm( 1), Op2( 0), access_vm_reg, NULL, AFSR0_EL1 },
++	{ Op1( 0), CRn( 5), CRm( 1), Op2( 1), access_vm_reg, NULL, AFSR1_EL1 },
++	/* DFAR */
++	{ AA32(LO), Op1( 0), CRn( 6), CRm( 0), Op2( 0), access_vm_reg, NULL, FAR_EL1 },
++	/* IFAR */
++	{ AA32(HI), Op1( 0), CRn( 6), CRm( 0), Op2( 2), access_vm_reg, NULL, FAR_EL1 },
+ 
+ 	/*
+ 	 * DC{C,I,CI}SW operations:
+@@ -1957,15 +1962,19 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
+ 
+-	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
+-	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
+-	{ Op1( 0), CRn(10), CRm( 3), Op2( 0), access_vm_reg, NULL, c10_AMAIR0 },
+-	{ Op1( 0), CRn(10), CRm( 3), Op2( 1), access_vm_reg, NULL, c10_AMAIR1 },
++	/* PRRR/MAIR0 */
++	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
++	/* NMRR/MAIR1 */
++	{ AA32(HI), Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, MAIR_EL1 },
++	/* AMAIR0 */
++	{ AA32(LO), Op1( 0), CRn(10), CRm( 3), Op2( 0), access_vm_reg, NULL, AMAIR_EL1 },
++	/* AMAIR1 */
++	{ AA32(HI), Op1( 0), CRn(10), CRm( 3), Op2( 1), access_vm_reg, NULL, AMAIR_EL1 },
+ 
+ 	/* ICC_SRE */
+ 	{ Op1( 0), CRn(12), CRm(12), Op2( 5), access_gic_sre },
+ 
+-	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
++	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, CONTEXTIDR_EL1 },
+ 
+ 	/* Arch Tmers */
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_TVAL), access_arch_timer },
+@@ -2040,14 +2049,14 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
+-	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, c0_CSSELR },
++	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, CSSELR_EL1 },
+ };
+ 
+ static const struct sys_reg_desc cp15_64_regs[] = {
+-	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, c2_TTBR0 },
++	{ Op1( 0), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR0_EL1 },
+ 	{ Op1( 0), CRn( 0), CRm( 9), Op2( 0), access_pmu_evcntr },
+ 	{ Op1( 0), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI1R */
+-	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, c2_TTBR1 },
++	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
+ 	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
+ 	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
+ 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
 -- 
 2.28.0
 
