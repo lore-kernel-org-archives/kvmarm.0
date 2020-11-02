@@ -7,76 +7,78 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E12CC00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 05:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B75BC00A89
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 05:30:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 58B57221FF
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 05:23:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91A5622268
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 05:30:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuoKOMzm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B57221FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYsF97dy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A5622268
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2AC84B56F;
-	Mon,  2 Nov 2020 00:23:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D55924B57E;
+	Mon,  2 Nov 2020 00:30:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Aw+Ct889Z5jc; Mon,  2 Nov 2020 00:23:47 -0500 (EST)
+	with ESMTP id ndrSSlPgmDMz; Mon,  2 Nov 2020 00:30:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 916144B571;
-	Mon,  2 Nov 2020 00:23:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF84D4B2DD;
+	Mon,  2 Nov 2020 00:30:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 775224B56B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 00:23:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15C944B2DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 00:30:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cxRVVlr4ug4m for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 00:23:45 -0500 (EST)
+ with ESMTP id 2EKhD3YDqDom for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 00:30:34 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 698234B485
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 00:23:45 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D6234B28D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 00:30:34 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604294625;
+ s=mimecast20190719; t=1604295034;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7UtcPEETWXjyYnC6APNrMia13qjWKApPL5wKeT1uE+4=;
- b=iuoKOMzmRbcRAHRVJfJrNzVOnDY4Eatgp+OqjyJ9T68LhsFYuK0cDvbCk/k3VRcXjfqUbf
- 6f+/ICm5RJr2BMEm4vkPAVR8XF4cXJ5qkBUPQpcTjW/X4T/Yvmeup9WAw32bOhGFnltbWt
- wCk7wgFyupnx2q7wWEDsl9bkwDAhQlM=
+ bh=3opAEbPbu0I7/3XGmfBEZuV1m7H7G6E2oolgvdqsY6c=;
+ b=ZYsF97dyw5YiJRSw3ekTrJpf3JIt6Ggn+tosXotvABAzU5mM5PIn31K716adU7BlxmOLta
+ AyRohEwfewUD/3KIGu8KbpbTcgv7vKRTUe0DRBUikN3lmAutj2+74sZ3/4/lL/nPhVfbGF
+ bmV6d8++198Q9sXMhWixOfszjnpcUQQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-C4hjzJfiM5WMewplTEfXqA-1; Mon, 02 Nov 2020 00:23:43 -0500
-X-MC-Unique: C4hjzJfiM5WMewplTEfXqA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-165-3DmDKEWtOQ6DE8PQoLvfcQ-1; Mon, 02 Nov 2020 00:30:32 -0500
+X-MC-Unique: 3DmDKEWtOQ6DE8PQoLvfcQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8DAC57203;
- Mon,  2 Nov 2020 05:23:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2461E1084C86;
+ Mon,  2 Nov 2020 05:30:31 +0000 (UTC)
 Received: from [10.64.54.160] (vpn2-54-160.bne.redhat.com [10.64.54.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E3D111A8AC;
- Mon,  2 Nov 2020 05:23:39 +0000 (UTC)
-Subject: Re: [PATCH 0/6] Support Asynchronous Page Fault
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 412475D9DD;
+ Mon,  2 Nov 2020 05:30:29 +0000 (UTC)
+Subject: Re: [PATCH 3/6] kvm/arm64: Export kvm_handle_user_mem_abort() with
+ prefault mode
 To: James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
 References: <20200818011319.91777-1-gshan@redhat.com>
- <4dcaea7a-a4d1-9bf3-eb95-ea9d8826ad99@arm.com>
+ <20200818011319.91777-4-gshan@redhat.com>
+ <43da773d-a218-ffb4-5648-19cc771c55e8@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <f78cd0d7-904b-5ebf-01d3-c1f165cb827f@redhat.com>
-Date: Mon, 2 Nov 2020 16:23:37 +1100
+Message-ID: <39ac2d90-098d-4ad8-5188-023730a3e2ac@redhat.com>
+Date: Mon, 2 Nov 2020 16:30:27 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <4dcaea7a-a4d1-9bf3-eb95-ea9d8826ad99@arm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <43da773d-a218-ffb4-5648-19cc771c55e8@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=gshan@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -103,67 +105,42 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi James,
 
 On 10/24/20 3:54 AM, James Morse wrote:
-> I think this series would benefit from being in smaller pieces. I got lost in patch 4 for
-> quite a while. Suggestion on where to do that in patch 4.
-> 
-
-Yes, I will split the patches into small ones for easier review
-in next revision. Thanks for your comments :)
-
-> 
 > On 18/08/2020 02:13, Gavin Shan wrote:
->> There are two stages of page fault. The guest kernel is responsible
->> for handling stage one page fault, while the host kernel is to take
->> care of the stage two page fault. When page fault is triggered because
->> of stage two page fault, the guest is suspended until the requested
->> memory (page) is populated. Sometimes, the cost to populate the requested
->> page isn't cheap and can take hundreds of milliseconds in extreme
->> cases. This impacts the overall guest's performance.
+>> This renames user_mem_abort() to kvm_handle_user_mem_abort(), and
+>> then exports it. The function will be used in asynchronous page fault
+>> to populate a page table entry once the corresponding page is populated
+>> from the backup device (e.g. swap partition):
+>>
+>>     * Parameter @fault_status is replace by @esr.
+>>     * Parameter @prefault is added
+>>
+>> As the @esr is passed as parameter, not fetched from vCPU struct. This
+>> also introduces the necessasry helpers in esr.h, to manupulate the @esr.
 > 
-> You really need to use postcopy live migration to justify these changes. Otherwise the
-> story here is "over-commited hosts suck", which I don't think anyone cares about.
+> (Nit: necessary, manipulate)
 > 
 
-Yes, I will use live migration as the justification in next revision :)
+Thanks for your comments. It will be fixed in next revision :)
 
 > 
->> This series introduces the feature (asynchronous page fault) to resolve
->> the issue and improve the guest's performance. It depends on the series
->> to support SDEI virtualization and refactoring SDEI client driver.
+>> The helpers defined in kvm_emulate.h reuses the newly added helper. This
+>> shouldn't cause functional changes.
 > 
-> SDEI gives you an NMI ... which you use to set a TIF flag. This can only work reliably for
-> user-space. So much so that you have code in the hypervisor to only deliver the NMI ...
-> when in user-space.
-> The only reason you would need an NMI is to interrupt interrupts-masked code. Linux can't
-> reschedule when this is the case.
+> user_mem_abort() is deep in the the guts of KVM's arch code. I don't think this should be
+> exported. It  must be called on the vcpu thread. It must be called under the VMs srcu
+> lock. There are also tricky interactions with whether the vcpu is loaded on this cpu or not...
 > 
-> I can only conclude, you really don't need an NMI here.
-> 
-> 
-> Why couldn't we use an IRQ here, it would be a lot simpler? ... the reason is the arm
-> architecture can't guarantee us that we take the irq when there is also a stage2 fault for
-> the first instruction.
-> I reckon we can work around this in the hypervisor:
-> https://lore.kernel.org/r/20201023165108.15061-1-james.morse@arm.com
-> 
-> 
-> My problem with SDEI is, you don't really need an NMI, and it creates extra in-kernel
-> state that has to be migrated. I think having this state in the kernel complicates the
-> user-space handling of SIGBUS_MCEERR_AO signals that don't get delivered to a vCPU thread.
+> I think it would be much simpler to always let the guest take the stage2-fault a second
+> time. This keeps the property that pages are only populate in response to a stage2 fault.
+> If the guest behaves, it will only schedule a task that accesses the page once its available.
 > 
 > 
 
-Currently, the asynchronous page fault is only supported for memory access in
-guest's userspace, but we needn't to be sticky to the use model in future. It
-means the asynchornous page fault could be supported for memory access in guest's
-kernel space where the interrupt can be disabled or masked. So NMI is needed and
-SDEI fits the use model very well as Paolo replied in another thread.
-
-About the feature to support SDEI virtualization, I thought there might be some
-use cases where the emulated devices need inject SDEI event to guest. However,
-I'm not too much familiar with the architecture yet. If it's required by the
-emulated devices, there are more more justifications to merge the code. However,
-the implementation itself isn't simple and I would say it's complicated.
+The function is called with SRCU hold in this patchset. However, it seems
+more reasonable to be called in vCPU thread. On the other hand, I'm worrying
+about the performance degradation. I will evaluate it in next revision and
+leave the function is called in vCPU thread if performance is acceptable.
+Otherwise, I would like to leave it as of being :)
 
 Thanks,
 Gavin
