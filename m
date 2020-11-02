@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 354BEC00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB8DC4742C
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:55:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B2CEA222B9
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:41:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3910522268
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 16:55:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMU9NdCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2CEA222B9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjDMZbaD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3910522268
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BEAA4B4BE;
-	Mon,  2 Nov 2020 11:41:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E174B0F3;
+	Mon,  2 Nov 2020 11:55:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IA8G7rbVAhfm; Mon,  2 Nov 2020 11:41:21 -0500 (EST)
+	with ESMTP id 2senO7oR6GAG; Mon,  2 Nov 2020 11:55:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C52404B424;
-	Mon,  2 Nov 2020 11:41:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AA064B208;
+	Mon,  2 Nov 2020 11:55:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 984BF4B40A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 073074B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:55:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QScq2uTxps5z for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 11:41:15 -0500 (EST)
+ with ESMTP id RpIKvgr9Y58m for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 11:55:20 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5389E4B469
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:41:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E4484B0F3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 11:55:20 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3EB56223BD;
- Mon,  2 Nov 2020 16:41:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3D49122258;
+ Mon,  2 Nov 2020 16:55:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604335270;
- bh=DDalEsVdhuQz4z5k9X3JiecV+0TpDk1pvcLDzfecXLA=;
+ s=default; t=1604336119;
+ bh=maAHa6V328gsuuBqlMGZ76egWW1uiDF978NF8bkszMg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YMU9NdCH2P7/4kQQqWnetyT8eBIOeetGLEMWDXjlpU0Ao3cx6XPTmmMLChudQkgqs
- QCrOEPVpP62Gex0xM4wwa4DNc0d1zZ/GUE6lW9K3iEwJzkk+2YJbpCrVZnnyieRVPt
- x+/csRDPQby7AMRTQTOgGGtH9k2X7MVEsvxKL6JA=
+ b=rjDMZbaDvFjip+iOo9NF8N51Gw3SgBYfT6Cxx5OtScL11cgwgtn/Pfi7ovG8trRK0
+ j0knCbgHEc+C2if2hm7d6epShAcE3YLokEchYlylcZpfhvjj+AZlFlA/EuKr30RFKv
+ 5U7TL6v/6X59Y1L6zMhfsVu2utyhm1PApZpLBFdA=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kZctI-006jJf-HB; Mon, 02 Nov 2020 16:41:08 +0000
+ id 1kZctJ-006jJf-LE; Mon, 02 Nov 2020 16:41:09 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 08/11] KVM: arm64: Inject AArch32 exceptions from HYP
-Date: Mon,  2 Nov 2020 16:40:42 +0000
-Message-Id: <20201102164045.264512-9-maz@kernel.org>
+Subject: [PATCH v2 10/11] KVM: arm64: Consolidate exception injection
+Date: Mon,  2 Nov 2020 16:40:44 +0000
+Message-Id: <20201102164045.264512-11-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201102164045.264512-1-maz@kernel.org>
 References: <20201102164045.264512-1-maz@kernel.org>
@@ -94,433 +94,253 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Similarly to what has been done for AArch64, move the AArch32 exception
-injection to HYP.
+Move the AArch32 exception injection code back into the inject_fault.c
+file, removing the need for a few non-static functions now that AArch32
+host support is a thing of the past.
 
-In order to not use the regmap selection code at EL2, simplify the code
-populating the target mode's LR register by useing the compatibility
-aliases for LR_abt and LR_und.
-
-We also introduce new accessors for SPSR_abt and SPSR_und, and
-move VBAR/SCTLR to using the AArch64 accessors (the use of the AArch32
-names was an ARMv7 leftover).
-
-Acked-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/aarch32.c       | 149 +-----------------------
- arch/arm64/kvm/hyp/exception.c | 200 +++++++++++++++++++++++++++++++--
- 2 files changed, 195 insertions(+), 154 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  3 -
+ arch/arm64/kvm/Makefile              |  2 +-
+ arch/arm64/kvm/aarch32.c             | 95 ----------------------------
+ arch/arm64/kvm/inject_fault.c        | 75 +++++++++++++++++++++-
+ 4 files changed, 73 insertions(+), 102 deletions(-)
+ delete mode 100644 arch/arm64/kvm/aarch32.c
 
-diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
-index 40a62a99fbf8..ad453b47c517 100644
---- a/arch/arm64/kvm/aarch32.c
-+++ b/arch/arm64/kvm/aarch32.c
-@@ -19,20 +19,6 @@
- #define DFSR_FSC_EXTABT_nLPAE	0x08
- #define DFSR_LPAE		BIT(9)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5d957d0e7b69..3105bb73f539 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -42,9 +42,6 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+-void kvm_inject_undef32(struct kvm_vcpu *vcpu);
+-void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+-void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
  
--/*
-- * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
-- */
--static const u8 return_offsets[8][2] = {
--	[0] = { 0, 0 },		/* Reset, unused */
--	[1] = { 4, 2 },		/* Undefined */
--	[2] = { 0, 0 },		/* SVC, unused */
--	[3] = { 4, 4 },		/* Prefetch abort */
--	[4] = { 8, 8 },		/* Data abort */
--	[5] = { 0, 0 },		/* HVC, unused */
--	[6] = { 4, 4 },		/* IRQ, unused */
--	[7] = { 4, 4 },		/* FIQ, unused */
--};
--
- static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
+ static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
  {
- 	preempt_disable();
-@@ -53,132 +39,10 @@ static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
- 	}
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 1504c81fbf5d..9b32a89a25c8 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 inject_fault.o regmap.o va_layout.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+-	 aarch32.o arch_timer.o \
++	 arch_timer.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
+deleted file mode 100644
+index ad453b47c517..000000000000
+--- a/arch/arm64/kvm/aarch32.c
++++ /dev/null
+@@ -1,95 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * (not much of an) Emulation layer for 32bit guests.
+- *
+- * Copyright (C) 2012,2013 - ARM Ltd
+- * Author: Marc Zyngier <marc.zyngier@arm.com>
+- *
+- * based on arch/arm/kvm/emulate.c
+- * Copyright (C) 2012 - Virtual Open Systems and Columbia University
+- * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+- */
+-
+-#include <linux/bits.h>
+-#include <linux/kvm_host.h>
+-#include <asm/kvm_emulate.h>
+-#include <asm/kvm_hyp.h>
+-
+-#define DFSR_FSC_EXTABT_LPAE	0x10
+-#define DFSR_FSC_EXTABT_nLPAE	0x08
+-#define DFSR_LPAE		BIT(9)
+-
+-static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
+-{
+-	preempt_disable();
+-	if (vcpu->arch.sysregs_loaded_on_cpu) {
+-		kvm_arch_vcpu_put(vcpu);
+-		return true;
+-	}
+-
+-	preempt_enable();
+-	return false;
+-}
+-
+-static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
+-{
+-	if (loaded) {
+-		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+-		preempt_enable();
+-	}
+-}
+-
+-void kvm_inject_undef32(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_UND |
+-			     KVM_ARM64_PENDING_EXCEPTION);
+-}
+-
+-/*
+- * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+- * pseudocode.
+- */
+-static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+-			 unsigned long addr)
+-{
+-	u32 *far, *fsr;
+-	bool is_lpae;
+-	bool loaded;
+-
+-	loaded = pre_fault_synchronize(vcpu);
+-
+-	if (is_pabt) {
+-		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
+-				     KVM_ARM64_PENDING_EXCEPTION);
+-		far = &vcpu_cp15(vcpu, c6_IFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_IFSR);
+-	} else { /* !iabt */
+-		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
+-				     KVM_ARM64_PENDING_EXCEPTION);
+-		far = &vcpu_cp15(vcpu, c6_DFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+-	}
+-
+-	*far = addr;
+-
+-	/* Give the guest an IMPLEMENTATION DEFINED exception */
+-	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-	if (is_lpae) {
+-		*fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
+-	} else {
+-		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
+-		*fsr = DFSR_FSC_EXTABT_nLPAE;
+-	}
+-
+-	post_fault_synchronize(vcpu, loaded);
+-}
+-
+-void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt32(vcpu, false, addr);
+-}
+-
+-void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr)
+-{
+-	inject_abt32(vcpu, true, addr);
+-}
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 8862431f8e3b..e2a2e48ca371 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -66,6 +66,75 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
  }
  
--/*
-- * When an exception is taken, most CPSR fields are left unchanged in the
-- * handler. However, some are explicitly overridden (e.g. M[4:0]).
-- *
-- * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
-- * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
-- * obsoleted by the ARMv7 virtualization extensions and is RES0.
-- *
-- * For the SPSR layout seen from AArch32, see:
-- * - ARM DDI 0406C.d, page B1-1148
-- * - ARM DDI 0487E.a, page G8-6264
-- *
-- * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
-- * - ARM DDI 0487E.a, page C5-426
-- *
-- * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
-- * MSB to LSB.
-- */
--static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
--{
--	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
--	unsigned long old, new;
--
--	old = *vcpu_cpsr(vcpu);
--	new = 0;
--
--	new |= (old & PSR_AA32_N_BIT);
--	new |= (old & PSR_AA32_Z_BIT);
--	new |= (old & PSR_AA32_C_BIT);
--	new |= (old & PSR_AA32_V_BIT);
--	new |= (old & PSR_AA32_Q_BIT);
--
--	// CPSR.IT[7:0] are set to zero upon any exception
--	// See ARM DDI 0487E.a, section G1.12.3
--	// See ARM DDI 0406C.d, section B1.8.3
--
--	new |= (old & PSR_AA32_DIT_BIT);
--
--	// CPSR.SSBS is set to SCTLR.DSSBS upon any exception
--	// See ARM DDI 0487E.a, page G8-6244
--	if (sctlr & BIT(31))
--		new |= PSR_AA32_SSBS_BIT;
--
--	// CPSR.PAN is unchanged unless SCTLR.SPAN == 0b0
--	// SCTLR.SPAN is RES1 when ARMv8.1-PAN is not implemented
--	// See ARM DDI 0487E.a, page G8-6246
--	new |= (old & PSR_AA32_PAN_BIT);
--	if (!(sctlr & BIT(23)))
--		new |= PSR_AA32_PAN_BIT;
--
--	// SS does not exist in AArch32, so ignore
--
--	// CPSR.IL is set to zero upon any exception
--	// See ARM DDI 0487E.a, page G1-5527
--
--	new |= (old & PSR_AA32_GE_MASK);
--
--	// CPSR.IT[7:0] are set to zero upon any exception
--	// See prior comment above
--
--	// CPSR.E is set to SCTLR.EE upon any exception
--	// See ARM DDI 0487E.a, page G8-6245
--	// See ARM DDI 0406C.d, page B4-1701
--	if (sctlr & BIT(25))
--		new |= PSR_AA32_E_BIT;
--
--	// CPSR.A is unchanged upon an exception to Undefined, Supervisor
--	// CPSR.A is set upon an exception to other modes
--	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
--	// See ARM DDI 0406C.d, page B1-1182
--	new |= (old & PSR_AA32_A_BIT);
--	if (mode != PSR_AA32_MODE_UND && mode != PSR_AA32_MODE_SVC)
--		new |= PSR_AA32_A_BIT;
--
--	// CPSR.I is set upon any exception
--	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
--	// See ARM DDI 0406C.d, page B1-1182
--	new |= PSR_AA32_I_BIT;
--
--	// CPSR.F is set upon an exception to FIQ
--	// CPSR.F is unchanged upon an exception to other modes
--	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
--	// See ARM DDI 0406C.d, page B1-1182
--	new |= (old & PSR_AA32_F_BIT);
--	if (mode == PSR_AA32_MODE_FIQ)
--		new |= PSR_AA32_F_BIT;
--
--	// CPSR.T is set to SCTLR.TE upon any exception
--	// See ARM DDI 0487E.a, page G8-5514
--	// See ARM DDI 0406C.d, page B1-1181
--	if (sctlr & BIT(30))
--		new |= PSR_AA32_T_BIT;
--
--	new |= mode;
--
--	return new;
--}
--
--static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
--{
--	unsigned long spsr = *vcpu_cpsr(vcpu);
--	bool is_thumb = (spsr & PSR_AA32_T_BIT);
--	u32 return_offset = return_offsets[vect_offset >> 2][is_thumb];
--	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
--
--	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
--
--	/* Note: These now point to the banked copies */
--	vcpu_write_spsr(vcpu, host_spsr_to_spsr32(spsr));
--	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
--
--	/* Branch to exception vector */
--	if (sctlr & (1 << 13))
--		vect_offset += 0xffff0000;
--	else /* always have security exceptions */
--		vect_offset += vcpu_cp15(vcpu, c12_VBAR);
--
--	*vcpu_pc(vcpu) = vect_offset;
--}
--
- void kvm_inject_undef32(struct kvm_vcpu *vcpu)
- {
--	bool loaded = pre_fault_synchronize(vcpu);
--
--	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
--	post_fault_synchronize(vcpu, loaded);
++#define DFSR_FSC_EXTABT_LPAE	0x10
++#define DFSR_FSC_EXTABT_nLPAE	0x08
++#define DFSR_LPAE		BIT(9)
++
++static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
++{
++	preempt_disable();
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		kvm_arch_vcpu_put(vcpu);
++		return true;
++	}
++
++	preempt_enable();
++	return false;
++}
++
++static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
++{
++	if (loaded) {
++		kvm_arch_vcpu_load(vcpu, smp_processor_id());
++		preempt_enable();
++	}
++}
++
++static void inject_undef32(struct kvm_vcpu *vcpu)
++{
 +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_UND |
 +			     KVM_ARM64_PENDING_EXCEPTION);
- }
- 
- /*
-@@ -188,7 +52,6 @@ void kvm_inject_undef32(struct kvm_vcpu *vcpu)
- static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 			 unsigned long addr)
- {
--	u32 vect_offset;
- 	u32 *far, *fsr;
- 	bool is_lpae;
- 	bool loaded;
-@@ -196,17 +59,17 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	loaded = pre_fault_synchronize(vcpu);
- 
- 	if (is_pabt) {
--		vect_offset = 12;
++}
++
++/*
++ * Modelled after TakeDataAbortException() and TakePrefetchAbortException
++ * pseudocode.
++ */
++static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
++			 unsigned long addr)
++{
++	u32 *far, *fsr;
++	bool is_lpae;
++	bool loaded;
++
++	loaded = pre_fault_synchronize(vcpu);
++
++	if (is_pabt) {
 +		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
 +				     KVM_ARM64_PENDING_EXCEPTION);
- 		far = &vcpu_cp15(vcpu, c6_IFAR);
- 		fsr = &vcpu_cp15(vcpu, c5_IFSR);
- 	} else { /* !iabt */
--		vect_offset = 16;
++		far = &vcpu_cp15(vcpu, c6_IFAR);
++		fsr = &vcpu_cp15(vcpu, c5_IFSR);
++	} else { /* !iabt */
 +		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
 +				     KVM_ARM64_PENDING_EXCEPTION);
- 		far = &vcpu_cp15(vcpu, c6_DFAR);
- 		fsr = &vcpu_cp15(vcpu, c5_DFSR);
- 	}
- 
--	prepare_fault32(vcpu, PSR_AA32_MODE_ABT, vect_offset);
--
- 	*far = addr;
- 
- 	/* Give the guest an IMPLEMENTATION DEFINED exception */
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 94d6d823424d..73629094f903 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -41,6 +41,22 @@ static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
- 	write_sysreg_el1(val, SYS_SPSR);
- }
- 
-+static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	if (has_vhe())
-+		write_sysreg(val, spsr_abt);
-+	else
-+		vcpu->arch.ctxt.spsr_abt = val;
-+}
-+
-+static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	if (has_vhe())
-+		write_sysreg(val, spsr_und);
-+	else
-+		vcpu->arch.ctxt.spsr_und = val;
-+}
-+
- /*
-  * This performs the exception entry at a given EL (@target_mode), stashing PC
-  * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-@@ -135,19 +151,181 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 	__vcpu_write_spsr(vcpu, old);
- }
- 
--void kvm_inject_exception(struct kvm_vcpu *vcpu)
-+/*
-+ * When an exception is taken, most CPSR fields are left unchanged in the
-+ * handler. However, some are explicitly overridden (e.g. M[4:0]).
-+ *
-+ * The SPSR/SPSR_ELx layouts differ, and the below is intended to work with
-+ * either format. Note: SPSR.J bit doesn't exist in SPSR_ELx, but this bit was
-+ * obsoleted by the ARMv7 virtualization extensions and is RES0.
-+ *
-+ * For the SPSR layout seen from AArch32, see:
-+ * - ARM DDI 0406C.d, page B1-1148
-+ * - ARM DDI 0487E.a, page G8-6264
-+ *
-+ * For the SPSR_ELx layout for AArch32 seen from AArch64, see:
-+ * - ARM DDI 0487E.a, page C5-426
-+ *
-+ * Here we manipulate the fields in order of the AArch32 SPSR_ELx layout, from
-+ * MSB to LSB.
-+ */
-+static unsigned long get_except32_cpsr(struct kvm_vcpu *vcpu, u32 mode)
-+{
-+	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+	unsigned long old, new;
-+
-+	old = *vcpu_cpsr(vcpu);
-+	new = 0;
-+
-+	new |= (old & PSR_AA32_N_BIT);
-+	new |= (old & PSR_AA32_Z_BIT);
-+	new |= (old & PSR_AA32_C_BIT);
-+	new |= (old & PSR_AA32_V_BIT);
-+	new |= (old & PSR_AA32_Q_BIT);
-+
-+	// CPSR.IT[7:0] are set to zero upon any exception
-+	// See ARM DDI 0487E.a, section G1.12.3
-+	// See ARM DDI 0406C.d, section B1.8.3
-+
-+	new |= (old & PSR_AA32_DIT_BIT);
-+
-+	// CPSR.SSBS is set to SCTLR.DSSBS upon any exception
-+	// See ARM DDI 0487E.a, page G8-6244
-+	if (sctlr & BIT(31))
-+		new |= PSR_AA32_SSBS_BIT;
-+
-+	// CPSR.PAN is unchanged unless SCTLR.SPAN == 0b0
-+	// SCTLR.SPAN is RES1 when ARMv8.1-PAN is not implemented
-+	// See ARM DDI 0487E.a, page G8-6246
-+	new |= (old & PSR_AA32_PAN_BIT);
-+	if (!(sctlr & BIT(23)))
-+		new |= PSR_AA32_PAN_BIT;
-+
-+	// SS does not exist in AArch32, so ignore
-+
-+	// CPSR.IL is set to zero upon any exception
-+	// See ARM DDI 0487E.a, page G1-5527
-+
-+	new |= (old & PSR_AA32_GE_MASK);
-+
-+	// CPSR.IT[7:0] are set to zero upon any exception
-+	// See prior comment above
-+
-+	// CPSR.E is set to SCTLR.EE upon any exception
-+	// See ARM DDI 0487E.a, page G8-6245
-+	// See ARM DDI 0406C.d, page B4-1701
-+	if (sctlr & BIT(25))
-+		new |= PSR_AA32_E_BIT;
-+
-+	// CPSR.A is unchanged upon an exception to Undefined, Supervisor
-+	// CPSR.A is set upon an exception to other modes
-+	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
-+	// See ARM DDI 0406C.d, page B1-1182
-+	new |= (old & PSR_AA32_A_BIT);
-+	if (mode != PSR_AA32_MODE_UND && mode != PSR_AA32_MODE_SVC)
-+		new |= PSR_AA32_A_BIT;
-+
-+	// CPSR.I is set upon any exception
-+	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
-+	// See ARM DDI 0406C.d, page B1-1182
-+	new |= PSR_AA32_I_BIT;
-+
-+	// CPSR.F is set upon an exception to FIQ
-+	// CPSR.F is unchanged upon an exception to other modes
-+	// See ARM DDI 0487E.a, pages G1-5515 to G1-5516
-+	// See ARM DDI 0406C.d, page B1-1182
-+	new |= (old & PSR_AA32_F_BIT);
-+	if (mode == PSR_AA32_MODE_FIQ)
-+		new |= PSR_AA32_F_BIT;
-+
-+	// CPSR.T is set to SCTLR.TE upon any exception
-+	// See ARM DDI 0487E.a, page G8-5514
-+	// See ARM DDI 0406C.d, page B1-1181
-+	if (sctlr & BIT(30))
-+		new |= PSR_AA32_T_BIT;
-+
-+	new |= mode;
-+
-+	return new;
-+}
-+
-+/*
-+ * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
-+ */
-+static const u8 return_offsets[8][2] = {
-+	[0] = { 0, 0 },		/* Reset, unused */
-+	[1] = { 4, 2 },		/* Undefined */
-+	[2] = { 0, 0 },		/* SVC, unused */
-+	[3] = { 4, 4 },		/* Prefetch abort */
-+	[4] = { 8, 8 },		/* Data abort */
-+	[5] = { 0, 0 },		/* HVC, unused */
-+	[6] = { 4, 4 },		/* IRQ, unused */
-+	[7] = { 4, 4 },		/* FIQ, unused */
-+};
-+
-+static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- {
--	switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
--	case (KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
--	      KVM_ARM64_EXCEPT_AA64_EL1):
--		enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	unsigned long spsr = *vcpu_cpsr(vcpu);
-+	bool is_thumb = (spsr & PSR_AA32_T_BIT);
-+	u32 sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+	u32 return_address;
-+
-+	*vcpu_cpsr(vcpu) = get_except32_cpsr(vcpu, mode);
-+	return_address   = *vcpu_pc(vcpu);
-+	return_address  += return_offsets[vect_offset >> 2][is_thumb];
-+
-+	/* KVM only enters the ABT and UND modes, so only deal with those */
-+	switch(mode) {
-+	case PSR_AA32_MODE_ABT:
-+		__vcpu_write_spsr_abt(vcpu, host_spsr_to_spsr32(spsr));
-+		vcpu_gp_regs(vcpu)->compat_lr_abt = return_address;
- 		break;
--	default:
--		/*
--		 * Only EL1_SYNC makes sense so far, EL2_{SYNC,IRQ}
--		 * will be implemented at some point. Everything
--		 * else gets silently ignored.
--		 */
-+
-+	case PSR_AA32_MODE_UND:
-+		__vcpu_write_spsr_und(vcpu, host_spsr_to_spsr32(spsr));
-+		vcpu_gp_regs(vcpu)->compat_lr_und = return_address;
- 		break;
- 	}
-+
-+	/* Branch to exception vector */
-+	if (sctlr & (1 << 13))
-+		vect_offset += 0xffff0000;
-+	else /* always have security exceptions */
-+		vect_offset += __vcpu_read_sys_reg(vcpu, VBAR_EL1);
-+
-+	*vcpu_pc(vcpu) = vect_offset;
-+}
-+
-+void kvm_inject_exception(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu_el1_is_32bit(vcpu)) {
-+		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
-+		case KVM_ARM64_EXCEPT_AA32_UND:
-+			enter_exception32(vcpu, PSR_AA32_MODE_UND, 4);
-+			break;
-+		case KVM_ARM64_EXCEPT_AA32_IABT:
-+			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 12);
-+			break;
-+		case KVM_ARM64_EXCEPT_AA32_DABT:
-+			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 16);
-+			break;
-+		default:
-+			/* Err... */
-+			break;
-+		}
-+	} else {
-+		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
-+		case (KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
-+		      KVM_ARM64_EXCEPT_AA64_EL1):
-+			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-+			break;
-+		default:
-+			/*
-+			 * Only EL1_SYNC makes sense so far, EL2_{SYNC,IRQ}
-+			 * will be implemented at some point. Everything
-+			 * else gets silently ignored.
-+			 */
-+			break;
-+		}
++		far = &vcpu_cp15(vcpu, c6_DFAR);
++		fsr = &vcpu_cp15(vcpu, c5_DFSR);
 +	}
++
++	*far = addr;
++
++	/* Give the guest an IMPLEMENTATION DEFINED exception */
++	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
++	if (is_lpae) {
++		*fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
++	} else {
++		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
++		*fsr = DFSR_FSC_EXTABT_nLPAE;
++	}
++
++	post_fault_synchronize(vcpu, loaded);
++}
++
+ /**
+  * kvm_inject_dabt - inject a data abort into the guest
+  * @vcpu: The VCPU to receive the data abort
+@@ -77,7 +146,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (vcpu_el1_is_32bit(vcpu))
+-		kvm_inject_dabt32(vcpu, addr);
++		inject_abt32(vcpu, false, addr);
+ 	else
+ 		inject_abt64(vcpu, false, addr);
+ }
+@@ -93,7 +162,7 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (vcpu_el1_is_32bit(vcpu))
+-		kvm_inject_pabt32(vcpu, addr);
++		inject_abt32(vcpu, true, addr);
+ 	else
+ 		inject_abt64(vcpu, true, addr);
+ }
+@@ -108,7 +177,7 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_el1_is_32bit(vcpu))
+-		kvm_inject_undef32(vcpu);
++		inject_undef32(vcpu);
+ 	else
+ 		inject_undef64(vcpu);
  }
 -- 
 2.28.0
