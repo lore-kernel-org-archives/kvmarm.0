@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987C4C388F2
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 11:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6825FC2D0A3
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 11:24:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2CDC2076E
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 11:18:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CDC2076E
+	by mail.kernel.org (Postfix) with ESMTP id B5A4122264
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 11:24:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5A4122264
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC5424B3CA;
-	Tue,  3 Nov 2020 06:18:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58944B326;
+	Tue,  3 Nov 2020 06:24:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vuAoLNz1W5Ff; Tue,  3 Nov 2020 06:18:26 -0500 (EST)
+	with ESMTP id I0sg9biaDK1P; Tue,  3 Nov 2020 06:24:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB0734B3C3;
-	Tue,  3 Nov 2020 06:18:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B930E4B31D;
+	Tue,  3 Nov 2020 06:24:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 455E14B3C3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 06:18:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 743C34B31D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 06:24:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B3sUfFx8GlUs for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Nov 2020 06:18:24 -0500 (EST)
+ with ESMTP id k3RynyNsN+6D for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Nov 2020 06:23:59 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4CF54B2AD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 06:18:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 383044B290
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 06:23:59 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6AB62101E;
- Tue,  3 Nov 2020 03:18:23 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D575D101E;
+ Tue,  3 Nov 2020 03:23:58 -0800 (PST)
 Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FEAE3F66E;
- Tue,  3 Nov 2020 03:18:22 -0800 (PST)
-Date: Tue, 3 Nov 2020 11:18:19 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 327A03F66E;
+ Tue,  3 Nov 2020 03:23:58 -0800 (PST)
+Date: Tue, 3 Nov 2020 11:23:54 +0000
 From: Dave Martin <Dave.Martin@arm.com>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Don't hide ID registers from userspace
-Message-ID: <20201103111816.GG6882@arm.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Check RAZ visibility in ID register
+ accessors
+Message-ID: <20201103112354.GH6882@arm.com>
 References: <20201102185037.49248-1-drjones@redhat.com>
- <20201102185037.49248-2-drjones@redhat.com>
+ <20201102185037.49248-3-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20201102185037.49248-2-drjones@redhat.com>
+In-Reply-To: <20201102185037.49248-3-drjones@redhat.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: maz@kernel.org, xu910121@sina.com, kvmarm@lists.cs.columbia.edu,
- stable@vger.kernel.org
+Cc: maz@kernel.org, xu910121@sina.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,70 +66,126 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCBOb3YgMDIsIDIwMjAgYXQgMDc6NTA6MzVQTSArMDEwMCwgQW5kcmV3IEpvbmVzIHdy
-b3RlOgo+IElEIHJlZ2lzdGVycyBhcmUgUkFaIHVudGlsIHRoZXkndmUgYmVlbiBhbGxvY2F0ZWQg
-YSBwdXJwb3NlLCBidXQKPiB0aGF0IGRvZXNuJ3QgbWVhbiB0aGV5IHNob3VsZCBiZSByZW1vdmVk
-IGZyb20gdGhlIEtWTV9HRVRfUkVHX0xJU1QKPiBsaXN0LiBTbyBmYXIgd2Ugb25seSBoYXZlIG9u
-ZSByZWdpc3RlciwgU1lTX0lEX0FBNjRaRlIwX0VMMSwgdGhhdAo+IGlzIGhpZGRlbiBmcm9tIHVz
-ZXJzcGFjZSB3aGVuIGl0cyBmdW5jdGlvbiBpcyBub3QgcHJlc2VudC4gUmVtb3ZpbmcKPiB0aGUg
-dXNlcnNwYWNlIHZpc2liaWxpdHkgY2hlY2tzIGlzIGVub3VnaCB0byByZWV4cG9zZSBpdCwgYXMg
-aXQKPiBhbHJlYWR5IGJlaGF2ZXMgYXMgUkFaIHdoZW4gdGhlIGZ1bmN0aW9uIGlzIG5vdCBwcmVz
-ZW50LgoKUGxlYWUgc3RhdGUgd2hhdCB0aGUgcGF0Y2ggZG9lcy4gIChUaGUgc3ViamVjdCBsaW5l
-IHNlcnZlcyBhcyBhIHN1bW1hcnkKb2YgdGhhdCwgYnV0IHRoZSBjb21taXQgbWVzc2FnZSBzaG91
-bGQgbWFrZSBzZW5zZSB3aXRob3V0IGl0LikKCkFsc28sIGhvdyBleGFjdGx5ICF2Y3B1X2hhc19z
-dmUoKSBjYXVzZXMgSURfQUE2NFpGUjBfRUwxIHRvIGJlaGF2ZSBhcwpSQVogd2l0aCB0aGlzIGNo
-YW5nZT8gIChJJ20gbm90IHNheWluZyBpdCBkb2Vzbid0LCBidXQgdGhlIGNvZGUgaXMgbm90CnRy
-aXZpYWwgdG8gZm9sbG93Li4uKQoKPiAKPiBGaXhlczogNzM0MzM3NjJmY2FlICgiS1ZNOiBhcm02
-NC9zdmU6IFN5c3RlbSByZWdpc3RlciBjb250ZXh0IHN3aXRjaCBhbmQgYWNjZXNzIHN1cHBvcnQi
-KQo+IENjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4gIyB2NS4yKwo+IFJlcG9ydGVkLWJ5OiDl
-vKDkuJzml60gPHh1OTEwMTIxQHNpbmEuY29tPgo+IFNpZ25lZC1vZmYtYnk6IEFuZHJldyBKb25l
-cyA8ZHJqb25lc0ByZWRoYXQuY29tPgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5j
-IHwgMTggKy0tLS0tLS0tLS0tLS0tLS0tCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigr
-KSwgMTcgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19y
-ZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4gaW5kZXggZmIxMmQzZWY0MjNhLi42
-ZmYwYzE1NTMxY2EgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+ICsr
-KyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPiBAQCAtMTE5NSwxNiArMTE5NSw2IEBAIHN0
-YXRpYyB1bnNpZ25lZCBpbnQgc3ZlX3Zpc2liaWxpdHkoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LAo+ICAJcmV0dXJuIFJFR19ISURERU5fVVNFUiB8IFJFR19ISURERU5fR1VFU1Q7Cj4gIH0K
-PiAgCj4gLS8qIFZpc2liaWxpdHkgb3ZlcnJpZGVzIGZvciBTVkUtc3BlY2lmaWMgSUQgcmVnaXN0
-ZXJzICovCj4gLXN0YXRpYyB1bnNpZ25lZCBpbnQgc3ZlX2lkX3Zpc2liaWxpdHkoY29uc3Qgc3Ry
-dWN0IGt2bV92Y3B1ICp2Y3B1LAo+IC0JCQkJICAgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVz
-YyAqcmQpCj4gLXsKPiAtCWlmICh2Y3B1X2hhc19zdmUodmNwdSkpCj4gLQkJcmV0dXJuIDA7Cj4g
-LQo+IC0JcmV0dXJuIFJFR19ISURERU5fVVNFUjsKCkluIGxpZ2h0IG9mIHRoaXMgY2hhbmdlLCBJ
-IHRoaW5rIHRoYXQgUkVHX0hJRERFTl9HVUVTVCBhbmQKUkVHX0hJRERFTl9VU0VSIGFyZSBhbHdh
-eXMgZWl0aGVyIGJvdGggc2V0IG9yIGJvdGggY2xlYXIuICBHaXZlbiB0aGUKZGlzY3Vzc2lvbiBv
-biB0aGlzIGlzc3VlLCBJJ20gdGhpbmtpbmcgaXQgcHJvYmFibHkgZG9lc24ndCBldmVuIG1ha2UK
-c2Vuc2UgZm9yIHRoZXNlIHRvIGJlIGluZGVwZW5kZW50ICg/KQoKSWYgUkVHX0hJRERFTl9VU0VS
-IGlzIHJlYWxseSByZWR1bmRhbnQsIEkgc3VnZ2VzdCBzdHJpcHBpbmcgaXQgb3V0IGFuZApzaW1w
-bGlmeWluZyB0aGUgY29kZSBhcHByb3ByaWF0ZWx5LgoKKEluIGVmZmVjdCwgSSB0aGluayB5b3Vy
-IFJBWiBmbGFnIHdpbGwgZG8gY29ycmVjdGx5IHdoYXQgUkVHX0hJRERFTl9VU0VSCndhcyB0cnlp
-bmcgdG8gYWNoaWV2ZS4pCgo+IC19Cj4gLQo+ICAvKiBHZW5lcmF0ZSB0aGUgZW11bGF0ZWQgSURf
-QUE2NFpGUjBfRUwxIHZhbHVlIGV4cG9zZWQgdG8gdGhlIGd1ZXN0ICovCj4gIHN0YXRpYyB1NjQg
-Z3Vlc3RfaWRfYWE2NHpmcjBfZWwxKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgewo+
-IEBAIC0xMjMxLDkgKzEyMjEsNiBAQCBzdGF0aWMgaW50IGdldF9pZF9hYTY0emZyMF9lbDEoc3Ry
-dWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICB7Cj4gIAl1NjQgdmFsOwo+ICAKPiAtCWlmIChXQVJOX09O
-KCF2Y3B1X2hhc19zdmUodmNwdSkpKQo+IC0JCXJldHVybiAtRU5PRU5UOwo+IC0KPiAgCXZhbCA9
-IGd1ZXN0X2lkX2FhNjR6ZnIwX2VsMSh2Y3B1KTsKPiAgCXJldHVybiByZWdfdG9fdXNlcih1YWRk
-ciwgJnZhbCwgcmVnLT5pZCk7Cj4gIH0KPiBAQCAtMTI0Niw5ICsxMjMzLDYgQEAgc3RhdGljIGlu
-dCBzZXRfaWRfYWE2NHpmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgCWludCBlcnI7
-Cj4gIAl1NjQgdmFsOwo+ICAKPiAtCWlmIChXQVJOX09OKCF2Y3B1X2hhc19zdmUodmNwdSkpKQo+
-IC0JCXJldHVybiAtRU5PRU5UOwo+IC0KPiAgCWVyciA9IHJlZ19mcm9tX3VzZXIoJnZhbCwgdWFk
-ZHIsIGlkKTsKPiAgCWlmIChlcnIpCj4gIAkJcmV0dXJuIGVycjsKPiBAQCAtMTUxOCw3ICsxNTAy
-LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mgc3lzX3JlZ19kZXNjc1tdID0g
-ewo+ICAJSURfU0FOSVRJU0VEKElEX0FBNjRQRlIxX0VMMSksCj4gIAlJRF9VTkFMTE9DQVRFRCg0
-LDIpLAo+ICAJSURfVU5BTExPQ0FURUQoNCwzKSwKPiAtCXsgU1lTX0RFU0MoU1lTX0lEX0FBNjRa
-RlIwX0VMMSksIGFjY2Vzc19pZF9hYTY0emZyMF9lbDEsIC5nZXRfdXNlciA9IGdldF9pZF9hYTY0
-emZyMF9lbDEsIC5zZXRfdXNlciA9IHNldF9pZF9hYTY0emZyMF9lbDEsIC52aXNpYmlsaXR5ID0g
-c3ZlX2lkX3Zpc2liaWxpdHkgfSwKPiArCXsgU1lTX0RFU0MoU1lTX0lEX0FBNjRaRlIwX0VMMSks
-IGFjY2Vzc19pZF9hYTY0emZyMF9lbDEsIC5nZXRfdXNlciA9IGdldF9pZF9hYTY0emZyMF9lbDEs
-IC5zZXRfdXNlciA9IHNldF9pZF9hYTY0emZyMF9lbDEsIH0sCj4gIAlJRF9VTkFMTE9DQVRFRCg0
-LDUpLAo+ICAJSURfVU5BTExPQ0FURUQoNCw2KSwKPiAgCUlEX1VOQUxMT0NBVEVEKDQsNyksCgpP
-dGhlcndpc2UgbG9va3MgcmVhc29uYWJsZS4KCkNoZWVycwotLS1EYXZlCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Mon, Nov 02, 2020 at 07:50:36PM +0100, Andrew Jones wrote:
+> The instruction encodings of ID registers are preallocated. Until an
+> encoding is assigned a purpose the register is RAZ. KVM's general ID
+> register accessor functions already support both paths, RAZ or not.
+> If for each ID register we can determine if it's RAZ or not, then all
+> ID registers can build on the general functions. The register visibility
+> function allows us to check whether a register should be completely
+> hidden or not, extending it to also report when the register should
+> be RAZ or not allows us to use it for ID registers as well.
+
+Nit: no statement of what the patch does.
+
+You might want to point out that the introduced REG_RAZ functionality is
+intentionally not used in this patch.
+
+> No functional change intended.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 19 ++++++++++++++++---
+>  arch/arm64/kvm/sys_regs.h | 10 ++++++++++
+>  2 files changed, 26 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 6ff0c15531ca..b8822a20b1ea 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1153,6 +1153,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  	return val;
+>  }
+>  
+> +static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> +				  const struct sys_reg_desc *r)
+> +{
+> +	return 0;
+> +}
+> +
+>  /* cpufeature ID register access trap handlers */
+>  
+>  static bool __access_id_reg(struct kvm_vcpu *vcpu,
+> @@ -1171,7 +1177,9 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
+>  			  struct sys_reg_params *p,
+>  			  const struct sys_reg_desc *r)
+>  {
+> -	return __access_id_reg(vcpu, p, r, false);
+> +	bool raz = sysreg_visible_as_raz(vcpu, r);
+> +
+> +	return __access_id_reg(vcpu, p, r, raz);
+>  }
+>  
+>  static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
+> @@ -1283,13 +1291,17 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
+>  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		      const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	return __get_id_reg(vcpu, rd, uaddr, false);
+> +	bool raz = sysreg_visible_as_raz(vcpu, rd);
+> +
+> +	return __get_id_reg(vcpu, rd, uaddr, raz);
+>  }
+>  
+>  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		      const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	return __set_id_reg(vcpu, rd, uaddr, false);
+> +	bool raz = sysreg_visible_as_raz(vcpu, rd);
+> +
+> +	return __set_id_reg(vcpu, rd, uaddr, raz);
+>  }
+>  
+>  static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> @@ -1381,6 +1393,7 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	.access	= access_id_reg,		\
+>  	.get_user = get_id_reg,			\
+>  	.set_user = set_id_reg,			\
+> +	.visibility = id_visibility,		\
+
+This is just the default for ID_SANITISED, right?
+
+>  }
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> index 5a6fc30f5989..9d3ef7cfa116 100644
+> --- a/arch/arm64/kvm/sys_regs.h
+> +++ b/arch/arm64/kvm/sys_regs.h
+> @@ -61,6 +61,7 @@ struct sys_reg_desc {
+>  
+>  #define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
+>  #define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
+> +#define REG_RAZ			(1 << 2) /* RAZ from userspace ioctls and guest */
+>  
+>  static __printf(2, 3)
+>  inline void print_sys_reg_msg(const struct sys_reg_params *p,
+> @@ -129,6 +130,15 @@ static inline bool sysreg_hidden_from_user(const struct kvm_vcpu *vcpu,
+>  	return r->visibility(vcpu, r) & REG_HIDDEN_USER;
+>  }
+>  
+> +static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
+> +					 const struct sys_reg_desc *r)
+> +{
+> +	if (likely(!r->visibility))
+> +		return false;
+> +
+> +	return r->visibility(vcpu, r) & REG_RAZ;
+> +}
+> +
+
+[...]
+
+Looks reasonable, I think.
+
+Cheers
+---Dave
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
