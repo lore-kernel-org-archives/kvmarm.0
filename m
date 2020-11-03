@@ -2,56 +2,58 @@ Return-Path: <SRS0=Iiz7=EJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EFDC2D0A3
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 18:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 335FAC2D0A3
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 18:29:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6A6AE20786
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 18:29:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6AE20786
+	by mail.kernel.org (Postfix) with ESMTP id 9E12120757
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 18:29:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E12120757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC3694B33C;
-	Tue,  3 Nov 2020 13:29:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E6704B31D;
+	Tue,  3 Nov 2020 13:29:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uqZavLQWfVnL; Tue,  3 Nov 2020 13:29:31 -0500 (EST)
+	with ESMTP id mVMHamrmzvkr; Tue,  3 Nov 2020 13:29:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 946204B5A5;
-	Tue,  3 Nov 2020 13:29:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B547D4B5BD;
+	Tue,  3 Nov 2020 13:29:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B4B4B33C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 13:29:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8A304B5AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 13:29:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A7mtad9WHmXI for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Nov 2020 13:29:28 -0500 (EST)
+ with ESMTP id hbSfWTcWGFZu for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Nov 2020 13:29:32 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B63C4B2F7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 13:29:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCCE54B2F7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2020 13:29:32 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1DE91474;
- Tue,  3 Nov 2020 10:29:27 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7272E147A;
+ Tue,  3 Nov 2020 10:29:32 -0800 (PST)
 Received: from [172.16.1.113] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DFAFD3F718;
- Tue,  3 Nov 2020 10:29:26 -0800 (PST)
-Subject: Re: [PATCH 0/8] KVM: arm64: Kill the copro array
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 619763F718;
+ Tue,  3 Nov 2020 10:29:31 -0800 (PST)
+Subject: Re: [PATCH 1/8] KVM: arm64: Move AArch32 exceptions over to AArch64
+ sysregs
 To: Marc Zyngier <maz@kernel.org>
 References: <20201102191609.265711-1-maz@kernel.org>
+ <20201102191609.265711-2-maz@kernel.org>
 From: James Morse <james.morse@arm.com>
-Message-ID: <d1d98b83-7d58-1ab4-f429-0f297071c34a@arm.com>
-Date: Tue, 3 Nov 2020 18:29:25 +0000
+Message-ID: <58942c6b-9cf2-a0d7-3ba5-2fc42aeef779@arm.com>
+Date: Tue, 3 Nov 2020 18:29:30 +0000
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201102191609.265711-1-maz@kernel.org>
+In-Reply-To: <20201102191609.265711-2-maz@kernel.org>
 Content-Language: en-GB
 Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -74,25 +76,52 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 02/11/2020 19:16, Marc Zyngier wrote:
-> Since the very beginning of KVM/arm64, we represented the system
-> register file using a dual view: on one side the AArch64 state, on the
-
-> other a bizarre mapping of the AArch64 state onto the Aarch64
-> registers.
-
-Now that would be bizarre!
-
-mapping of the AArch32 state onto the Aarch64 registers?
-
-
-> It was nice at the time as it allowed us to share some code with the
-> 32bit port, and to come up with some creative bugs. But is was always
-> a hack, and we are now in a position to simplify the whole thing.
+> The use of the AArch32-specific accessors have always been a bit
+> annoying on 64bit, and it is time for a change.
 > 
-> This series goes through the whole of the AArch32 cp14/15 register
-> file, and point each of them directly at their 64bit equivalent. For
-> the few cases where two 32bit registers share a 64bit counterpart, we
-> define which half of the register they map.
+> Let's move the AArch32 exception injection over to the AArch64 encoding,
+> which requires us to split the two halves of FAR_EL1 into DFAR and IFAR.
+> This enables us to drop the preempt_disable() games on VHE, and to kill
+> the last user of the vcpu_cp15() macro.
+
+Hurrah!
+
+
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index e2a2e48ca371..975f65ba6a8b 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -100,39 +81,36 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
+>   * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+>   * pseudocode.
+>   */
+> -static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+> -			 unsigned long addr)
+> +static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+>  {
+> -	u32 *far, *fsr;
+> -	bool is_lpae;
+> -	bool loaded;
+> +	u64 far;
+> +	u32 fsr;
+
+
+> +	/* Give the guest an IMPLEMENTATION DEFINED exception */
+> +	if (__vcpu_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
+
+With VHE, won't __vcpu_sys_reg() read the potentially stale copy in the sys_reg array?
+
+vcpu_read_sys_reg()?
+
+
+> +		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
+> +	} else {
+> +		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
+> +		fsr = DFSR_FSC_EXTABT_nLPAE;
+> +	}
+>  
+> -	loaded = pre_fault_synchronize(vcpu);
+> +	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
 
 
 Thanks,
