@@ -1,81 +1,77 @@
-Return-Path: <SRS0=lygO=EI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Iiz7=EJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B93C00A89
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5639C388F2
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 00:30:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6BAE122268
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Nov 2020 19:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EF4A2225E
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Nov 2020 00:30:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="07vQGTmM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BAE122268
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMbX9rQy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF4A2225E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC5BD4B57B;
-	Mon,  2 Nov 2020 14:16:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BD174B485;
+	Mon,  2 Nov 2020 19:30:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XwGW63Omnjih; Mon,  2 Nov 2020 14:16:29 -0500 (EST)
+	with ESMTP id ww9NtZOMD3Vu; Mon,  2 Nov 2020 19:30:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C29DC4B5E5;
-	Mon,  2 Nov 2020 14:16:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 094AC4B2C4;
+	Mon,  2 Nov 2020 19:30:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E6504B5A7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 14:16:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B54FD4B2AD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 19:30:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0OXQgQd6P45k for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2020 14:16:21 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 444214B591
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 14:16:19 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id P1kWT-+sEP-8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2020 19:30:22 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E69CF4B2B2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2020 19:30:22 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1604363422;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Hx0q/2DUI+smP9x1Al8IAirQNeaRux74kGkZ+Kr9VXc=;
+ b=QMbX9rQyah/goAQep/H44V3Trm+haEFDrGzeClA6OZ5TaBjM12/ruQvlJF88JM03CyNbxE
+ IilEPpfQRoUgG93C02kDWXfxsAYKPvC8CpRXZ5IMbCv+eqqa3ZWoVG9nsv5vAV1Pz9OHph
+ rwCBJqCJp/SjQ7lJ8y7JCWbZ4Iy71o4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-4UINqvzFPziXbesVPGcYhw-1; Mon, 02 Nov 2020 19:30:21 -0500
+X-MC-Unique: 4UINqvzFPziXbesVPGcYhw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 51900223FB;
- Mon,  2 Nov 2020 19:16:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604344578;
- bh=C4GctCoQeP0UtgS9icsWKNG04r7fIKZ7Rd5moRwXfkI=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=07vQGTmM/Yfvg+MJtrk/bz29xMyZBYg4qoMIU60b2Mg1QH4V94y7gVWCqjLu8bJhe
- zz2p0wfLXUdkwzo5ZMg0TFUzAo7nDnE6Gm9b+MnErFbfCAjoETYVhlO9Dy7e/AnSAW
- d/QYpZ/jiinJ3d4JEfLlWU3V9ZSaqilJ4gRFNECQ=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kZfJQ-006nxn-Il; Mon, 02 Nov 2020 19:16:16 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 8/8] KVM: arm64: Drop kvm_coproc.h
-Date: Mon,  2 Nov 2020 19:16:09 +0000
-Message-Id: <20201102191609.265711-9-maz@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201102191609.265711-1-maz@kernel.org>
-References: <20201102191609.265711-1-maz@kernel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEC04809DE5;
+ Tue,  3 Nov 2020 00:30:19 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-160.bne.redhat.com [10.64.54.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A0096CE4F;
+ Tue,  3 Nov 2020 00:30:12 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Fix build error in user_mem_abort()
+Date: Tue,  3 Nov 2020 11:30:09 +1100
+Message-Id: <20201103003009.32955-1-gshan@redhat.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: will@kernel.org, linux-kernel@vger.kernel.org, shan.gavin@gmail.com,
+ maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,180 +83,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_coproc.h used to serve as a compatibility layer for the files
-shared between the 32 and 64 bit ports.
-
-Another one bites the dust...
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_coproc.h | 38 -----------------------------
- arch/arm64/include/asm/kvm_host.h   | 17 +++++++++++++
- arch/arm64/kvm/arm.c                |  3 +--
- arch/arm64/kvm/guest.c              |  1 -
- arch/arm64/kvm/handle_exit.c        |  1 -
- arch/arm64/kvm/reset.c              |  1 -
- arch/arm64/kvm/sys_regs.c           |  1 -
- 7 files changed, 18 insertions(+), 44 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
-
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-deleted file mode 100644
-index d6bb40122fdb..000000000000
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/include/asm/kvm_coproc.h
-- * Copyright (C) 2012 Rusty Russell IBM Corporation
-- */
--
--#ifndef __ARM64_KVM_COPROC_H__
--#define __ARM64_KVM_COPROC_H__
--
--#include <linux/kvm_host.h>
--
--void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
--
--struct kvm_sys_reg_table {
--	const struct sys_reg_desc *table;
--	size_t num;
--};
--
--int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
--
--#define kvm_coproc_table_init kvm_sys_reg_table_init
--void kvm_sys_reg_table_init(void);
--
--struct kvm_one_reg;
--int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
--
--#endif /* __ARM64_KVM_COPROC_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c527f9567713..709f892f7a14 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -533,6 +533,12 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+
-+unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
-+int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
- 
-@@ -595,6 +601,17 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
- 
-+int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
-+
-+void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-+
-+void kvm_sys_reg_table_init(void);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..9d69d2bf6943 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -35,7 +35,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sections.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -1525,7 +1524,7 @@ static int init_subsystems(void)
- 		goto out;
- 
- 	kvm_perf_init();
--	kvm_coproc_table_init();
-+	kvm_sys_reg_table_init();
- 
- out:
- 	on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3f23f7478d2a..9bbd30e62799 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -24,7 +24,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index f79137ee4274..cebe39f3b1b6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -14,7 +14,6 @@
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f32490229a4c..74ce92a4988c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,7 +25,6 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/virt.h>
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2048e7e7bd7c..ed7d8d35c2d9 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -20,7 +20,6 @@
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
--- 
-2.28.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+VGhlIFBVRCBhbmQgUE1EIGFyZSBmb2xkZWQgaW50byBQR0Qgd2hlbiB0aGUgZm9sbG93aW5nIG9w
+dGlvbnMgYXJlCmVuYWJsZWQuIEluIHRoYXQgY2FzZSwgUFVEX1NISUZUIGlzIGVxdWFsIHRvIFBN
+RF9TSElGVCBhbmQgd2UgZmFpbAp0byBidWlsZCB3aXRoIHRoZSBpbmRpY2F0ZWQgZXJyb3JzOgoK
+ICAgQ09ORklHX0FSTTY0X1ZBX0JJVFNfNDI9eQogICBDT05GSUdfQVJNNjRfUEFHRV9TSElGVD0x
+NgogICBDT05GSUdfUEdUQUJMRV9MRVZFTFM9MwoKICAgYXJjaC9hcm02NC9rdm0vbW11LmM6IElu
+IGZ1bmN0aW9uIOKAmHVzZXJfbWVtX2Fib3J04oCZOgogICBhcmNoL2FybTY0L2t2bS9tbXUuYzo3
+OTg6MjogZXJyb3I6IGR1cGxpY2F0ZSBjYXNlIHZhbHVlCiAgICAgY2FzZSBQTURfU0hJRlQ6CiAg
+ICAgXn5+fgogICBhcmNoL2FybTY0L2t2bS9tbXUuYzo3OTE6Mjogbm90ZTogcHJldmlvdXNseSB1
+c2VkIGhlcmUKICAgICBjYXNlIFBVRF9TSElGVDoKICAgICBefn5+CgpUaGlzIGZpeGVzIHRoZSBp
+c3N1ZSBieSBza2lwcGluZyB0aGUgY2hlY2sgb24gUFVEIGh1Z2UgcGFnZSB3aGVuIFBVRAphbmQg
+UE1EIGFyZSBmb2xkZWQgaW50byBQR0QuCgpGaXhlczogMmY0MGM0NjAyMWJiYiAoIktWTTogYXJt
+NjQ6IFVzZSBmYWxsYmFjayBtYXBwaW5nIHNpemVzIGZvciBjb250aWd1b3VzIGh1Z2UgcGFnZSBz
+aXplcyIpClJlcG9ydGVkLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+ClNp
+Z25lZC1vZmYtYnk6IEdhdmluIFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+Ci0tLQogYXJjaC9hcm02
+NC9rdm0vbW11LmMgfCAyICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspCgpkaWZm
+IC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vbW11LmMgYi9hcmNoL2FybTY0L2t2bS9tbXUuYwppbmRl
+eCA1Nzk3MmJkYjIxM2EuLjFhMDFkYTlmZGM5OSAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0v
+bW11LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vbW11LmMKQEAgLTc4OCwxMCArNzg4LDEyIEBAIHN0
+YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBwaHlzX2FkZHJf
+dCBmYXVsdF9pcGEsCiAJfQogCiAJc3dpdGNoICh2bWFfc2hpZnQpIHsKKyNpZm5kZWYgX19QQUdF
+VEFCTEVfUE1EX0ZPTERFRAogCWNhc2UgUFVEX1NISUZUOgogCQlpZiAoZmF1bHRfc3VwcG9ydHNf
+c3RhZ2UyX2h1Z2VfbWFwcGluZyhtZW1zbG90LCBodmEsIFBVRF9TSVpFKSkKIAkJCWJyZWFrOwog
+CQlmYWxsdGhyb3VnaDsKKyNlbmRpZgogCWNhc2UgQ09OVF9QTURfU0hJRlQ6CiAJCXZtYV9zaGlm
+dCA9IFBNRF9TSElGVDsKIAkJZmFsbHRocm91Z2g7Ci0tIAoyLjIzLjAKCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
+YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
+YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
