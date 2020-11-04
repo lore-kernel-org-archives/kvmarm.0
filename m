@@ -5,79 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0442FC55179
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 599C2C4741F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 72E0A2075E
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE53C20780
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="TxsjGKaO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72E0A2075E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="PTFxrsxx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE53C20780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1603D4B7F5;
-	Wed,  4 Nov 2020 13:37:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 623AE4B7BE;
+	Wed,  4 Nov 2020 13:37:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QD4FiUYpd5EL; Wed,  4 Nov 2020 13:37:28 -0500 (EST)
+	with ESMTP id 7i607LNUeLBM; Wed,  4 Nov 2020 13:37:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C23384B804;
-	Wed,  4 Nov 2020 13:37:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBD084B7AD;
+	Wed,  4 Nov 2020 13:37:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAA084B712
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43E6F4B7BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ojXPbPxqOISx for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2020 13:37:26 -0500 (EST)
+ with ESMTP id FpnoX3NMcr8M for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2020 13:37:30 -0500 (EST)
 Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
  [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 998804B78E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:26 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id e2so3294412wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:37:26 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27EC24B781
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:29 -0500 (EST)
+Received: by mail-wm1-f68.google.com with SMTP id e2so3294509wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:37:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=psZfm56b4NnuZJ+WZzr2WmBKhp4myVTyKEGCmvNKJks=;
- b=TxsjGKaOrDUcyBdWwkVl6gVpEsI0EyVoMSnxLfzex2v4DhMMNQ7qag73+RtH3qli9m
- 9yQ++ZOWDsggJ77v/O9QRR0JOGzotQwiGgq5vkaOHRqeOlvpkASr5A7KUIAW9HwhxmuS
- BVnoC85IyuzhS/a4STCqYT1dZ1Y7Wg9T7rcygwQJOsBVZNs0kH8FUssM0Chk5q3yMAde
- MaqOnTx5bomYLOASp9DUrdOJABRdWc8bYOQt6H2J/IjVa5FIrJmQ9muxkBEl96AIelSN
- lYn0gfhjT8XS6RXfifKhx8z7JBPE3g7SfKipoAOkEdyZhXP7Or6UVO1TeJ3x7HG1SXGb
- /Wqg==
+ bh=4axi3BZMWI251/Z2i3b7o8wb6S4cFpifUi2vsGe+rz4=;
+ b=PTFxrsxxpSERkmBRu9fPY5EKuAOc5OMAk+oP0QxNUjwk1I4qOAxjjuDjwlbiIQiOi4
+ ENPQ8dyCyKiCtZYIUoXP4qNzgO1iQmho4X26GDMojC0ezu7o+eSB9bOWq4XwW/fs9VsO
+ GK+U7yFays8yxLyrBp6Ib20GJbzuKSQMyHfvfLWNZ2hziMNn+LNIYgMyU308/fzbV2UF
+ OHxgxnoPZgOGtvfH4FD78QPYcZo6KN3V9aMoEobtBl8VI6DoiYPHBWqXUbTXgtrG9Xbp
+ WcUVQDUTe6Bb2sVj3CdVNgiY1YkUaOtdTU0HThcbNldjcSi8LHR5ARyKviCnMhX0Jb7t
+ IyDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=psZfm56b4NnuZJ+WZzr2WmBKhp4myVTyKEGCmvNKJks=;
- b=EnqiXETMkmjGMyfTsKccuRiOdTFnybUohuo+FTo8oRAOaixji6fEuXTNmz8LQFr745
- QKTzDWkmcVsT+zbsRQl14YKfHrwCC9n8Lw/B0P8Qe8JEvXxQHkb3K4Y9/DAE9W2X+adB
- ZVMZfJMeYP/hWifkmAtVJYQuPKX3dhlXasW6+M5GkynE2sXoYKJQjdn64sLbq4vAUKuJ
- zh/GTrkJmjOiRjNGqBSgPLf7HJ742jnSWB58qfGgMpdUDBpA7FJkQdeI3s6qiw6aRTgN
- 3YequzVUGpl2gm5wY1umrSPNpF7bsXmQ0DxyQkN7lJqbbBzOGKvDp8+7MSXoHp/tYtMn
- zy4w==
-X-Gm-Message-State: AOAM532d3QRgg2LfWNnfcR4FltzJ6Woe4htmHY4tUBWThTjCSs2Lj6/0
- 3/twXiRjHU/S7LxyTvnZkDVB2U0JzkpLNTCs
-X-Google-Smtp-Source: ABdhPJwKl9g4CE++tDKZXsF8rk/tYeIOyDzjpQI7vYRHtBkW57iNk1cV2dnVQZY8ATbWn1yB9MRW3w==
-X-Received: by 2002:a7b:c453:: with SMTP id l19mr5898950wmi.2.1604515045200;
- Wed, 04 Nov 2020 10:37:25 -0800 (PST)
+ bh=4axi3BZMWI251/Z2i3b7o8wb6S4cFpifUi2vsGe+rz4=;
+ b=UdmTlb/+5m81TsouHblnMsIry5OgI2obXCHEaMEkunZ5ksytZQukf3JDiO3ze4D4dg
+ DYyqBGVDB1fYrrVEBBAmpu4XvfugfSwuaDfLlo3szxGrasiZj/QBx/Eamg0rhQ+Ge6cz
+ AZS+L4/90vIJjQ60IoO5DShKYh5r7OGq6iB+zg9MNUPrp6bO1B33vY2cj0ff2qJqh9+Y
+ 9a6WHzleTfov2a73B1694PufQ9NOoGvPq5hbxeoE8WdPSrNJSv3v0eHopSF+tkxBYvzt
+ P/gRTh231GM/mYf6fNsy/1xFWuRqPHWg4JF2ONLIyt58Y399fbcmZZDwRA8Dmw+Vrm0x
+ 9t8A==
+X-Gm-Message-State: AOAM530DzaioZA1/nfRYaoWQmlNrXV6wyFHhR9D78aYL0NrOR7taaZNB
+ 6Pdn3qcA3LCtOo3M1xxlD0U4WiiVEhY3o5Pz
+X-Google-Smtp-Source: ABdhPJyT68yOzbnYNGsOmY+iR0h6yG3pNS2GyT+gN1TQUnNhPh79E6sRyGypylEuZinN7xbmJFetAA==
+X-Received: by 2002:a1c:5545:: with SMTP id j66mr6336527wmb.31.1604515047599; 
+ Wed, 04 Nov 2020 10:37:27 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:c8d2:30f2:53c6:bc2])
- by smtp.gmail.com with ESMTPSA id u202sm3665680wmu.23.2020.11.04.10.37.23
+ by smtp.gmail.com with ESMTPSA id s11sm3661835wrm.56.2020.11.04.10.37.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 10:37:24 -0800 (PST)
+ Wed, 04 Nov 2020 10:37:26 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH 22/26] kvm: arm64: Intercept PSCI_CPU_ON host SMC calls
-Date: Wed,  4 Nov 2020 18:36:26 +0000
-Message-Id: <20201104183630.27513-23-dbrazdil@google.com>
+Subject: [RFC PATCH 23/26] kvm: arm64: Intercept host's CPU_SUSPEND PSCI SMCs
+Date: Wed,  4 Nov 2020 18:36:27 +0000
+Message-Id: <20201104183630.27513-24-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201104183630.27513-1-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
@@ -104,221 +105,175 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a handler of the CPU_ON PSCI call from host. When invoked, it
-looks up the logical CPU ID corresponding to the provided MPIDR and
-populates the state struct of the target CPU with the provided x0, pc.
-It then calls CPU_ON itself, with an entry point in hyp that initializes
-EL2 state before returning ERET to the provided PC in EL1.
+Add a handler of CPU_SUSPEND host PSCI SMCs. When invoked, it determines
+whether the requested power state loses context, ie. whether it is
+indistinguishable from a WHI or whether it is a deeper sleep state that
+behaves like a CPU_OFF+CPU_ON.
+
+If it's the former, it forwards the call to EL3 and returns to the host
+after waking up.
+
+If it's the latter, it saves r0,pc of the host into and makes the same
+call to EL3 with the hyp CPU entry point. When the core wakes up, EL2
+state is initialized before dropping back to EL1.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h |   1 +
- arch/arm64/kvm/arm.c             |   3 +
- arch/arm64/kvm/hyp/nvhe/psci.c   | 113 +++++++++++++++++++++++++++++++
- 3 files changed, 117 insertions(+)
+ arch/arm64/kvm/arm.c           |  2 ++
+ arch/arm64/kvm/hyp/nvhe/psci.c | 49 +++++++++++++++++++++++++++++++++-
+ drivers/firmware/psci/psci.c   |  9 -------
+ include/uapi/linux/psci.h      |  7 +++++
+ 4 files changed, 57 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index cf4c1d16c3e0..2d88a2dad4de 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -97,6 +97,7 @@ void deactivate_traps_vhe_put(void);
- u64 __guest_enter(struct kvm_vcpu *vcpu);
- 
- #ifdef __KVM_NVHE_HYPERVISOR__
-+asmlinkage void __noreturn kvm_host_psci_cpu_entry(void);
- void kvm_host_psci_cpu_init(void);
- bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
- #endif
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5b073806463e..166975999ead 100644
+index 166975999ead..6fbda652200b 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1334,6 +1334,7 @@ static int kvm_map_vectors(void)
- 
- static void cpu_init_hyp_mode(void)
+@@ -1521,9 +1521,11 @@ static void init_psci(void)
  {
-+	DECLARE_KVM_NVHE_SYM(kvm_host_psci_cpu_entry);
- 	struct kvm_nvhe_init_params *params = this_cpu_ptr_nvhe_sym(kvm_init_params);
- 	struct arm_smccc_res res;
+ 	extern u32 kvm_nvhe_sym(kvm_host_psci_version);
+ 	extern u32 kvm_nvhe_sym(kvm_host_psci_function_id)[PSCI_FN_MAX];
++	extern u32 kvm_nvhe_sym(kvm_host_psci_cpu_suspend_feature);
+ 	int cpu;
  
-@@ -1351,6 +1352,8 @@ static void cpu_init_hyp_mode(void)
- 	params->pgd_ptr = kvm_mmu_get_httbr();
- 	params->vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
- 	params->hyp_stack_ptr = kern_hyp_va(__this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE);
-+	params->psci_cpu_entry_fn = (unsigned long)kern_hyp_va(
-+		kvm_ksym_ref(CHOOSE_NVHE_SYM(kvm_host_psci_cpu_entry)));
+ 	kvm_nvhe_sym(kvm_host_psci_version) = psci_driver_version;
++	kvm_nvhe_sym(kvm_host_psci_cpu_suspend_feature) = psci_cpu_suspend_feature;
+ 	memcpy(kvm_nvhe_sym(kvm_host_psci_function_id),
+ 		psci_function_id, sizeof(psci_function_id));
  
- 	/*
- 	 * Flush the init params from the data cache because the struct will
 diff --git a/arch/arm64/kvm/hyp/nvhe/psci.c b/arch/arm64/kvm/hyp/nvhe/psci.c
-index 00dc0cab860c..42ee5effa827 100644
+index 42ee5effa827..4899c8319bb4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/psci.c
 +++ b/arch/arm64/kvm/hyp/nvhe/psci.c
-@@ -9,12 +9,15 @@
- #include <asm/kvm_mmu.h>
- #include <kvm/arm_hypercalls.h>
- #include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
- #include <linux/psci.h>
- #include <kvm/arm_psci.h>
- #include <uapi/linux/psci.h>
- 
- #include <nvhe/spinlock.h>
- 
-+#define INVALID_CPU_ID UINT_MAX
-+
+@@ -21,6 +21,7 @@
  /* Config options set by the host. */
  u32 kvm_host_psci_version = PSCI_VERSION(0, 0);
  u32 kvm_host_psci_function_id[PSCI_FN_MAX];
-@@ -24,6 +27,7 @@ s64 hyp_physvirt_offset;
++u32 kvm_host_psci_cpu_suspend_feature;
+ s64 hyp_physvirt_offset;
  
- static DEFINE_PER_CPU(hyp_spinlock_t, psci_cpu_lock);
- DEFINE_PER_CPU(enum kvm_nvhe_psci_state, psci_cpu_state);
-+static DEFINE_PER_CPU(struct vcpu_reset_state, psci_cpu_reset);
- 
- static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
- {
-@@ -79,6 +83,29 @@ static __noreturn unsigned long psci_forward_noreturn(struct kvm_cpu_context *ho
+ #define __hyp_pa(x) ((phys_addr_t)(x) + hyp_physvirt_offset)
+@@ -83,6 +84,20 @@ static __noreturn unsigned long psci_forward_noreturn(struct kvm_cpu_context *ho
  	hyp_panic(); /* unreachable */
  }
  
-+static unsigned int find_cpu_id(u64 mpidr)
++static bool psci_has_ext_power_state(void)
 +{
-+	int i;
-+
-+	if (mpidr != INVALID_HWID) {
-+		for (i = 0; i < NR_CPUS; i++) {
-+			if (cpu_logical_map(i) == mpidr)
-+				return i;
-+		}
-+	}
-+
-+	return INVALID_CPU_ID;
++	return kvm_host_psci_cpu_suspend_feature & PSCI_1_0_FEATURES_CPU_SUSPEND_PF_MASK;
 +}
 +
-+static phys_addr_t cpu_entry_pa(void)
++static bool psci_power_state_loses_context(u32 state)
 +{
-+	extern char __kvm_hyp_cpu_entry[];
-+	unsigned long kern_va;
++	const u32 mask = psci_has_ext_power_state() ?
++					PSCI_1_0_EXT_POWER_STATE_TYPE_MASK :
++					PSCI_0_2_POWER_STATE_TYPE_MASK;
 +
-+	asm volatile("ldr %0, =%1" : "=r" (kern_va) : "S" (__kvm_hyp_cpu_entry));
-+	return kern_va - kimage_voffset;
++	return state & mask;
++}
++
+ static unsigned int find_cpu_id(u64 mpidr)
+ {
+ 	int i;
+@@ -106,6 +121,34 @@ static phys_addr_t cpu_entry_pa(void)
+ 	return kern_va - kimage_voffset;
+ }
+ 
++static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
++{
++	u64 power_state = host_ctxt->regs.regs[1];
++	unsigned long pc = host_ctxt->regs.regs[2];
++	unsigned long r0 = host_ctxt->regs.regs[3];
++	hyp_spinlock_t *cpu_lock;
++	struct vcpu_reset_state	*cpu_reset;
++	struct kvm_nvhe_init_params *cpu_params;
++
++	if (!psci_power_state_loses_context(power_state)) {
++		/* This power state has the same semantics as WFI. */
++		return psci_call(PSCI_0_2_FN64_CPU_SUSPEND, 0, 0, 0);
++	}
++
++	cpu_lock = this_cpu_ptr(&psci_cpu_lock);
++	cpu_reset = this_cpu_ptr(&psci_cpu_reset);
++	cpu_params = this_cpu_ptr(&kvm_init_params);
++
++	/* Resuming from this state has the same semantics as CPU_ON. */
++	hyp_spin_lock(cpu_lock);
++	*cpu_reset = (struct vcpu_reset_state){
++		.pc = pc,
++		.r0 = r0,
++	};
++	hyp_spin_unlock(cpu_lock);
++	return psci_call(func_id, power_state, cpu_entry_pa(), __hyp_pa(cpu_params));
 +}
 +
  static int psci_cpu_off(u64 func_id, struct kvm_cpu_context *host_ctxt)
  {
  	hyp_spinlock_t *cpu_lock = this_cpu_ptr(&psci_cpu_lock);
-@@ -100,10 +127,76 @@ static int psci_cpu_off(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	return ret;
- }
+@@ -193,7 +236,9 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
  
-+static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
-+{
-+	u64 mpidr = host_ctxt->regs.regs[1] & MPIDR_HWID_BITMASK;
-+	unsigned long pc = host_ctxt->regs.regs[2];
-+	unsigned long r0 = host_ctxt->regs.regs[3];
-+	unsigned int cpu_id;
-+	hyp_spinlock_t *cpu_lock;
-+	enum kvm_nvhe_psci_state *cpu_power;
-+	struct vcpu_reset_state	*cpu_reset;
-+	struct kvm_nvhe_init_params *cpu_params;
-+	int ret;
-+
-+	/*
-+	 * Find the logical CPU ID for the given MPIDR. The search set is
-+	 * the set of CPUs that were online at the point of KVM initialization.
-+	 * Booting other CPUs is rejected because their cpufeatures were not
-+	 * checked against the finalized capabilities. This could be relaxed
-+	 * by doing the feature checks in hyp.
-+	 */
-+	cpu_id = find_cpu_id(mpidr);
-+	if (cpu_id == INVALID_CPU_ID)
-+		return PSCI_RET_INVALID_PARAMS;
-+
-+	cpu_lock = per_cpu_ptr(&psci_cpu_lock, cpu_id);
-+	cpu_power = per_cpu_ptr(&psci_cpu_state, cpu_id);
-+	cpu_reset = per_cpu_ptr(&psci_cpu_reset, cpu_id);
-+	cpu_params = per_cpu_ptr(&kvm_init_params, cpu_id);
-+
-+	do {
-+		hyp_spin_lock(cpu_lock);
-+
-+		if (*cpu_power != KVM_NVHE_PSCI_CPU_OFF) {
-+			if (kvm_host_psci_version == PSCI_VERSION(0, 1))
-+				ret = PSCI_RET_INVALID_PARAMS;
-+			else if (*cpu_power == KVM_NVHE_PSCI_CPU_ON)
-+				ret = PSCI_RET_ALREADY_ON;
-+			else
-+				ret = PSCI_RET_ON_PENDING;
-+			hyp_spin_unlock(cpu_lock);
-+			return ret;
-+		}
-+
-+		*cpu_reset = (struct vcpu_reset_state){
-+			.pc = pc,
-+			.r0 = r0,
-+		};
-+
-+		ret = psci_call(func_id, mpidr, cpu_entry_pa(), __hyp_pa(cpu_params));
-+
-+		if (ret == PSCI_RET_SUCCESS)
-+			*cpu_power = KVM_NVHE_PSCI_CPU_PENDING_ON;
-+
-+		hyp_spin_unlock(cpu_lock);
-+
-+		/*
-+		 * If recorded CPU state is OFF but EL3 reports that it's ON,
-+		 * we must have hit a race with CPU_OFF on the target core.
-+		 * Loop to try again.
-+		 */
-+	} while (ret == PSCI_RET_ALREADY_ON);
-+
-+	return ret;
-+}
-+
  static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
  {
- 	if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_OFF])
+-	if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_OFF])
++	if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_SUSPEND])
++		return psci_cpu_suspend(func_id, host_ctxt);
++	else if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_OFF])
  		return psci_cpu_off(func_id, host_ctxt);
-+	else if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_ON])
-+		return psci_cpu_on(func_id, host_ctxt);
- 	else if (func_id == kvm_host_psci_function_id[PSCI_FN_MIGRATE])
- 		return psci_forward(host_ctxt);
- 	else
-@@ -125,6 +218,8 @@ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_
+ 	else if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_ON])
+ 		return psci_cpu_on(func_id, host_ctxt);
+@@ -216,6 +261,8 @@ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_
+ 	case PSCI_0_2_FN_SYSTEM_RESET:
+ 		psci_forward_noreturn(host_ctxt);
  		unreachable();
++	case PSCI_0_2_FN64_CPU_SUSPEND:
++		return psci_cpu_suspend(func_id, host_ctxt);
  	case PSCI_0_2_FN_CPU_OFF:
  		return psci_cpu_off(func_id, host_ctxt);
-+	case PSCI_0_2_FN64_CPU_ON:
-+		return psci_cpu_on(func_id, host_ctxt);
- 	default:
- 		return PSCI_RET_NOT_SUPPORTED;
- 	}
-@@ -148,6 +243,24 @@ static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_
- 	}
- }
+ 	case PSCI_0_2_FN64_CPU_ON:
+diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+index b6ad237b1518..387e24409da7 100644
+--- a/drivers/firmware/psci/psci.c
++++ b/drivers/firmware/psci/psci.c
+@@ -62,15 +62,6 @@ static psci_fn *invoke_psci_fn;
  
-+void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
-+
-+asmlinkage void __noreturn kvm_host_psci_cpu_entry(void)
-+{
-+	hyp_spinlock_t *cpu_lock = this_cpu_ptr(&psci_cpu_lock);
-+	enum kvm_nvhe_psci_state *cpu_power = this_cpu_ptr(&psci_cpu_state);
-+	struct vcpu_reset_state	*cpu_reset = this_cpu_ptr(&psci_cpu_reset);
-+	struct kvm_cpu_context *host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-+
-+	hyp_spin_lock(cpu_lock);
-+	*cpu_power = KVM_NVHE_PSCI_CPU_ON;
-+	host_ctxt->regs.regs[0] = cpu_reset->r0;
-+	write_sysreg_el2(cpu_reset->pc, SYS_ELR);
-+	hyp_spin_unlock(cpu_lock);
-+
-+	__host_enter(host_ctxt);
-+}
-+
- bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt)
- {
- 	u64 func_id = get_psci_func_id(host_ctxt);
+ u32 psci_function_id[PSCI_FN_MAX];
+ 
+-#define PSCI_0_2_POWER_STATE_MASK		\
+-				(PSCI_0_2_POWER_STATE_ID_MASK | \
+-				PSCI_0_2_POWER_STATE_TYPE_MASK | \
+-				PSCI_0_2_POWER_STATE_AFFL_MASK)
+-
+-#define PSCI_1_0_EXT_POWER_STATE_MASK		\
+-				(PSCI_1_0_EXT_POWER_STATE_ID_MASK | \
+-				PSCI_1_0_EXT_POWER_STATE_TYPE_MASK)
+-
+ u32 psci_cpu_suspend_feature;
+ static bool psci_system_reset2_supported;
+ 
+diff --git a/include/uapi/linux/psci.h b/include/uapi/linux/psci.h
+index 0d52b8dbe8c2..df3d85ce86f7 100644
+--- a/include/uapi/linux/psci.h
++++ b/include/uapi/linux/psci.h
+@@ -65,6 +65,10 @@
+ #define PSCI_0_2_POWER_STATE_AFFL_SHIFT		24
+ #define PSCI_0_2_POWER_STATE_AFFL_MASK		\
+ 				(0x3 << PSCI_0_2_POWER_STATE_AFFL_SHIFT)
++#define PSCI_0_2_POWER_STATE_MASK					\
++				(PSCI_0_2_POWER_STATE_ID_MASK |		\
++				 PSCI_0_2_POWER_STATE_TYPE_MASK |	\
++				 PSCI_0_2_POWER_STATE_AFFL_MASK)
+ 
+ /* PSCI extended power state encoding for CPU_SUSPEND function */
+ #define PSCI_1_0_EXT_POWER_STATE_ID_MASK	0xfffffff
+@@ -72,6 +76,9 @@
+ #define PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT	30
+ #define PSCI_1_0_EXT_POWER_STATE_TYPE_MASK	\
+ 				(0x1 << PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT)
++#define PSCI_1_0_EXT_POWER_STATE_MASK					\
++				(PSCI_1_0_EXT_POWER_STATE_ID_MASK |	\
++				 PSCI_1_0_EXT_POWER_STATE_TYPE_MASK)
+ 
+ /* PSCI v0.2 affinity level state returned by AFFINITY_INFO */
+ #define PSCI_0_2_AFFINITY_LEVEL_ON		0
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
