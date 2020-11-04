@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E12DC5517A
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8F2C5517A
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C40E12083B
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFBCB2087D
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="h5c/xuFD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C40E12083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="n8+AMW9H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBCB2087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 614FD4B6DE;
-	Wed,  4 Nov 2020 13:36:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91CC34B79C;
+	Wed,  4 Nov 2020 13:36:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3zi79orS-vVj; Wed,  4 Nov 2020 13:36:50 -0500 (EST)
+	with ESMTP id o39YyDZoQjeL; Wed,  4 Nov 2020 13:36:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54C514B7B4;
-	Wed,  4 Nov 2020 13:36:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 866244B7B7;
+	Wed,  4 Nov 2020 13:36:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E4124B55A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DE4A4B6A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MbvDo8s337My for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2020 13:36:48 -0500 (EST)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3398F4B7B4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:48 -0500 (EST)
-Received: by mail-wr1-f68.google.com with SMTP id s9so23139612wro.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:36:48 -0800 (PST)
+ with ESMTP id 6yZkFQ+qltKy for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2020 13:36:51 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F98D4B7BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:50 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id x7so23173737wrl.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:36:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=selpDVExPrV+IgPEKGIlRfie/i9lgMV2qEZhs31ItAo=;
- b=h5c/xuFDGxhQNOOJxFYmZXPnLJyC4mt4eevQqa2BS/KDBE+R4+ZWYl3fiVp6+6GKml
- rdXluqt6BqUFOHQomC+HPz2nWSen/qcJZ0oTOtl2BKcUfsVXlAZy5wrHtufxBkAIWslB
- HCw8iLlb8kPY1W0YDvNIq7lH1izzFXSlNt9V7Ci06lt/x6qUvsjzXw6RN2ieTU+6G5qV
- /cCFrPXpeltx/hzuo9u7iu6TM54yUhX2W4sCEQjs+fR0UKJfMcmM+WiVu0qBnhnPuGND
- 9WjCSGx4PewL3YT53jbPkiQxHS63x1gGFZWbB7kh0Qe68aFM4yJTGc8g1TYn/PldTPi0
- 9YWw==
+ bh=DIjGlXFqYL9FyveOV16h0d1a4eeVc3TLm9h73PIyC8E=;
+ b=n8+AMW9H/IX3G8lz+cWGN1oavBIb5GbzZnNrEEdw+sYskA9ecY1TNAMYatbRQDl7uy
+ nU1UQSUawSlfFozbAg0rTLm5KbnI/FEYx0M9/Kn5+yGcBQ27q37523/Vo/IZipYdWuM5
+ tw2FvnITfYxX4SXKqgpbQ4G76gBTOOkXtvxJTq7PtsfksWo89S01idD1OfYzSABuoFpP
+ tVNb8gNrqGQGaUnf1bLkfw9v3P4dRzQICWnTURUB+lq5Xkz3zzjpXZlwLEPCy4VLihoo
+ HEPi9o45di5YZQ7BQ/ZFrvoqXPnp9eMfV01QMcXfdeK2mVslLC+QAWW2jN6+MIZX9BRl
+ qlGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=selpDVExPrV+IgPEKGIlRfie/i9lgMV2qEZhs31ItAo=;
- b=CdsXL5hiarcFTgAR19ZWBEhyb7XSvxw1KjWP0R8A/ppAEmpafKGbr0C++Ehir8j++O
- A0B5hZKpgEAfkYTagfygv0L5tT+Wpv9YBx/zvwNcdVc1V/79O6eH3ohr2tcmt1gltjEG
- QxmFOZMD2nD48yBAA3xI73/LjbGMGWa3wwhoCHzK9mDbsrhs2Mlh787K5Qlu0EHN6vmO
- 3M1ApHflWHIWTYQqE2welttrDUyJWxdNrS7MWWEq8nXn4eKc1erFgUd3hJH4E1tZdBH/
- 6ZboNNtwCv24IdgGolQjWEuIsh69oqwftzeCBTUkOLqYAvrg5o6YqkXB5jOKzofV/J2c
- OOMg==
-X-Gm-Message-State: AOAM533A4heu3eC+Puywmn5AH5NtJPGUYhuWZvyKF1KgCMOmmk5i88Il
- 1QsZWmSbefAhkG0wUSRdyIfbJwAj3I/Ghp9M
-X-Google-Smtp-Source: ABdhPJyfkHHLx4wrmP7Kl9DrEZuORHnz2YFNiH75/raVrsXNU+mtkObCRVRsUfShJ+nawpNDAnF/uA==
-X-Received: by 2002:adf:edcf:: with SMTP id v15mr31926989wro.291.1604515006429; 
- Wed, 04 Nov 2020 10:36:46 -0800 (PST)
+ bh=DIjGlXFqYL9FyveOV16h0d1a4eeVc3TLm9h73PIyC8E=;
+ b=qsjijwC6s/r8m9DUwryR26lNJkGY8h7I/I+5jhO/XAvi0uQIO/+hBarsUX0BpuVFwt
+ RzsNBTTHJvgVZIKIu3OiCqwMvniEie9OYys63cgow+q5LUOXF4KQpCnBbqH6UrqkWAog
+ nO7PZ3Viyi57NId1cREN/6b76Et6t6PN3pib0v1K9tMKzFtjJ2yLxsxFUrQcZVn/I67G
+ FiHhM+erqkaXtS5Vi6Fs0o4XE7QitYzBaO1CGwYNKX798VwZVbRrt62OogUhxHmot8QX
+ HRkgqsbatzrb/jqBXTKvK04x5n5baX83C8tRX03mEL6ucs9IC9lqXgq2DHpX0d7DEIFi
+ XknQ==
+X-Gm-Message-State: AOAM530AyXUasmw4RBKT+czqIPxtRPD0+poLAIEJgKhQs7QCnMT/RPsq
+ xmzo0EKu/pRH5t1vYwipLsb2zYaL1/p6LhdW
+X-Google-Smtp-Source: ABdhPJwq7DN+2FlZtGXRhvnGQBPP7XUYeccP8u2X/rHVvW5yiq4qao29DK8F1rl8NE0ItwSBLn89Eg==
+X-Received: by 2002:a5d:640d:: with SMTP id z13mr32595956wru.28.1604515009243; 
+ Wed, 04 Nov 2020 10:36:49 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:c8d2:30f2:53c6:bc2])
- by smtp.gmail.com with ESMTPSA id u15sm3719292wrm.77.2020.11.04.10.36.45
+ by smtp.gmail.com with ESMTPSA id h12sm3718613wrw.70.2020.11.04.10.36.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 10:36:45 -0800 (PST)
+ Wed, 04 Nov 2020 10:36:48 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH 04/26] arm64: Move MAIR_EL1_SET to asm/memory.h
-Date: Wed,  4 Nov 2020 18:36:08 +0000
-Message-Id: <20201104183630.27513-5-dbrazdil@google.com>
+Subject: [RFC PATCH 05/26] kvm: arm64: Initialize MAIR_EL2 using a constant
+Date: Wed,  4 Nov 2020 18:36:09 +0000
+Message-Id: <20201104183630.27513-6-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201104183630.27513-1-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
@@ -104,64 +104,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
-preparation for initializing MAIR_EL2 before MAIR_EL1, move the constant
-into a shared header file.
+MAIR_EL2 is currently initialized to the value of MAIR_EL1, which itself
+is set to a constant MAIR_EL1_SET.
+
+Initialize MAIR_EL2 to the MAIR_EL1_SET constant directly in preparation
+of allowing KVM to start CPU cores itself and not initializing itself
+before ERETing to EL1. In that case, MAIR_EL2 will be initialized before
+MAIR_EL1.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/memory.h | 13 +++++++++++++
- arch/arm64/mm/proc.S            | 13 -------------
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index cd61239bae8c..aca00737e771 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -152,6 +152,19 @@
- #define MT_S2_FWB_NORMAL	6
- #define MT_S2_FWB_DEVICE_nGnRE	1
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index b11a9d7db677..96e70f976ff5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -111,7 +111,7 @@ alternative_else_nop_endif
  
-+/*
-+ * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
-+ * changed during __cpu_setup to Normal Tagged if the system supports MTE.
-+ */
-+#define MAIR_EL1_SET							\
-+	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-+	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-+	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
-+
- #ifdef CONFIG_ARM64_4K_PAGES
- #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
- #else
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index 23c326a06b2d..25ff21b3a1c6 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -45,19 +45,6 @@
- #define TCR_KASAN_FLAGS 0
- #endif
+ 	msr	tcr_el2, x0
  
--/*
-- * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
-- * changed during __cpu_setup to Normal Tagged if the system supports MTE.
-- */
--#define MAIR_EL1_SET							\
--	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
--	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
--	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
--	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
--	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
--	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
--	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
--
- #ifdef CONFIG_CPU_PM
- /**
-  * cpu_do_suspend - save CPU registers context
+-	mrs	x0, mair_el1
++	mov_q	x0, MAIR_EL1_SET
+ 	msr	mair_el2, x0
+ 	isb
+ 
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
