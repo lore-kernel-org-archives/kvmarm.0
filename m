@@ -5,81 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC8FC56202
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6A8C5DF9D
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4D17421527
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60EA1208C7
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:36:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="pwS+yO9a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D17421527
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="Nx93E9yy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60EA1208C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E1C4B6D6;
-	Wed,  4 Nov 2020 13:36:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03D214B7A9;
+	Wed,  4 Nov 2020 13:36:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1Ogf6Stzdbtc; Wed,  4 Nov 2020 13:36:55 -0500 (EST)
+	with ESMTP id Xmr3mi+79F3P; Wed,  4 Nov 2020 13:36:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A61FA4B7B9;
-	Wed,  4 Nov 2020 13:36:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C547A4B7BE;
+	Wed,  4 Nov 2020 13:36:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BA014B7B8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCC5F4B7A8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xhofo1eyMrJm for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2020 13:36:52 -0500 (EST)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 781AC4B6A3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:52 -0500 (EST)
-Received: by mail-wm1-f67.google.com with SMTP id d142so3349807wmd.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:36:52 -0800 (PST)
+ with ESMTP id dvk5ImLpoRUQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2020 13:36:54 -0500 (EST)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ADE644B6A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:36:54 -0500 (EST)
+Received: by mail-wm1-f68.google.com with SMTP id k18so3265319wmj.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:36:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/4FeYdmn3iB0IXLNt/H1CXu0UQ9fwGLnFLDS+u9FzHI=;
- b=pwS+yO9awK8oUBpQAVkLJuj63BH/WHRSAh1203sKJMLPgu/Z7WrtlqDJagBVCYrBaf
- EOF4SKuIVhlxAqijYs3lo1YFAo8JMGNuT2vGkFPRX2iSDKwMvMACiSGWDwM6hRJ50W30
- rsJicMhiC6OYQ/2/CIUPbdAdRQpWJXMwejJYSsKhgwDaIDaZLSG1v9QGvqOLA1ErGg9d
- Iq0FStkmxGam8BquTREXKbmimi0koGzmcK9fr4eliQyQiNZJD/2xQZ2zt3TcJYss/+q2
- PU8oK7Fyq8/xDdNN+GYMONZ2wzMa7EPpgD5F7CCcwZhZwvFOGbR9o6UrjPcEJN2uVbhb
- VRzw==
+ bh=/Qa/ORiTczGU+wzc7d9QZzh5/niq1xeS+URCXTTt4r4=;
+ b=Nx93E9yyY//kvChBV3KCeNqvnYwrNO2ZgDrCYTrU0G3sLsnpH5B+kY1/8elaSaHdfw
+ HzA05rPUsQd+1O936ysg9hDnB+m7qGA0yA/fCbDjMEC24foxz3qejCDvvP/ogU38u4JJ
+ U6iOV2bgUjnGUl0/kwdbTGln1yZ07j3+9EkIC1wznpT5C9dGNpaUL7flUrUywhoeJxep
+ Wzq+coBb4Jkt0eRYX55seXPFpVc8OJBmMM9eXV/Na0tuwDnZ9llo+xBd+yflExNcQ+aW
+ KL1CYXtO82nsOaaPC8oRLdp3PKxgmvCy1VlOydEjqSsUUncvVeg2+lmyb57UYZffXHjz
+ fhig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/4FeYdmn3iB0IXLNt/H1CXu0UQ9fwGLnFLDS+u9FzHI=;
- b=Yro/f0oDDN42/IeUJb8dwjgKBCw3O2MSKhrLQ/RFuf5+gzR60O57m8DoaVEl3lIt0k
- 3PVrdoc/C/z+nEI4gR+kgZemPx7l+iVOW7oPHoq8V4MKXNprUuw7Qo/tZ/EUVKTtFiOJ
- u2bA9tBNvBZGF0pV/uiwMTMhjLZAF4f1Azr1z7zTqPmrBbH8S1hx1/07UBojiARPt0Ut
- 561jMlBuQ/aOVU6BZDnwz5SKHkyf4O8nvROm6+FiSVa5r1si2JLXDBuXxF1x4GnUkAlD
- 2XWf7nh4eKyBeCQDTVso8zrNBKLsCEUiCsHjPzdUoPcbRjKRY1Pr0T8Vv+1N74u6f5CE
- ky9A==
-X-Gm-Message-State: AOAM531XcOvijx1lfKTw7atXRw/zWKG4BMFD/bG9pzlO5SE4AK3FWCyp
- WQaFxVXHcVUbKnxlJI7qpYttI4e6kTpirHHU
-X-Google-Smtp-Source: ABdhPJx/hiCAz8Legoa47eblx4WAapjkBFpTOjmMETdF/oVexGY9XgUxpPgGgIkrhHQJMAw0LEe2bA==
-X-Received: by 2002:a05:600c:4147:: with SMTP id
- h7mr5966082wmm.186.1604515011165; 
- Wed, 04 Nov 2020 10:36:51 -0800 (PST)
+ bh=/Qa/ORiTczGU+wzc7d9QZzh5/niq1xeS+URCXTTt4r4=;
+ b=DDK/bRBgmrC04xS43P6iKC6XwBs5JCiOzOUDZHZcvqSszMPhC/V12CLrg9zkacFf7h
+ lJib0T+UIvPSH1Rog+njbya+WqdlmGv48uIval6AjauOC4WKzUw++GuZHKBDwTpHsPvi
+ qZ6Stc37FKyT1xM9/ZcgaVkkABPx0KgOqwfJmOTRzAAnlGz23XMpLKs0eBYcf2JWz1dy
+ /6yuepoDQNMPVL424k5EfYFnYYB6AgojOusJpVJidv+ljoBAa/SSNOK3mMQl+7NgcH1e
+ vjyy1JWsdXU9gsUGpcoRK6Mj1WOXOz+TrF9NpqudYmXj0jR+TKzgwn8Fw+ZTTMfX57Sp
+ M6gQ==
+X-Gm-Message-State: AOAM531VpNdSpsidqz/IGgZDkZPkIuHa3S3RobCIE0m2m45ROBh5nIx5
+ vBr1h2pgMRMD7WYQ4YyfNrW6O4NV9eO4vPuD
+X-Google-Smtp-Source: ABdhPJwP0oSnvZLNGQUvlE/1pKvC6M7nrsCqZGLWPZQiLMwgoxQ84TyR2rJEK0iBP/DF19+A8Bwokg==
+X-Received: by 2002:a7b:c11a:: with SMTP id w26mr5889073wmi.131.1604515013329; 
+ Wed, 04 Nov 2020 10:36:53 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:c8d2:30f2:53c6:bc2])
- by smtp.gmail.com with ESMTPSA id e25sm4070787wra.71.2020.11.04.10.36.49
+ by smtp.gmail.com with ESMTPSA id e7sm4290328wrm.6.2020.11.04.10.36.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 10:36:50 -0800 (PST)
+ Wed, 04 Nov 2020 10:36:52 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH 06/26] kvm: arm64: Add .hyp.data ELF section
-Date: Wed,  4 Nov 2020 18:36:10 +0000
-Message-Id: <20201104183630.27513-7-dbrazdil@google.com>
+Subject: [RFC PATCH 07/26] kvm: arm64: Support per_cpu_ptr in nVHE hyp code
+Date: Wed,  4 Nov 2020 18:36:11 +0000
+Message-Id: <20201104183630.27513-8-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201104183630.27513-1-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
@@ -106,94 +104,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add rules for renaming a .data ELF section in KVM nVHE object files to
-.hyp.data, linking it into the kernel and mapping it in hyp at runtime.
+When compiling with __KVM_NVHE_HYPERVISOR__ redefine per_cpu_offset() to
+__hyp_per_cpu_offset() which looks up the base of the nVHE per-CPU
+region of the given cpu and computes its offset from the
+.hyp.data..percpu section.
+
+This enables use of per_cpu_ptr() helpers in nVHE hyp code. Until now
+only this_cpu_ptr() was supported by setting TPIDR_EL2.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/sections.h |  1 +
- arch/arm64/kernel/vmlinux.lds.S   | 10 ++++++++++
- arch/arm64/kvm/arm.c              |  7 +++++++
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S |  3 +++
- 4 files changed, 21 insertions(+)
+ arch/arm64/include/asm/percpu.h  |  6 ++++++
+ arch/arm64/kernel/image-vars.h   |  3 +++
+ arch/arm64/kvm/hyp/nvhe/Makefile |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/percpu.c | 22 ++++++++++++++++++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/percpu.c
 
-diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-index 3994169985ef..255f76f592d7 100644
---- a/arch/arm64/include/asm/sections.h
-+++ b/arch/arm64/include/asm/sections.h
-@@ -11,6 +11,7 @@ extern char __alt_instructions[], __alt_instructions_end[];
- extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
- extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
- extern char __hyp_text_start[], __hyp_text_end[];
-+extern char __hyp_data_start[], __hyp_data_end[];
- extern char __idmap_text_start[], __idmap_text_end[];
- extern char __initdata_begin[], __initdata_end[];
- extern char __inittext_begin[], __inittext_end[];
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index 1bda604f4c70..a9a1612c084f 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -30,6 +30,13 @@ jiffies = jiffies_64;
- 	*(__kvm_ex_table)					\
- 	__stop___kvm_ex_table = .;
+diff --git a/arch/arm64/include/asm/percpu.h b/arch/arm64/include/asm/percpu.h
+index 1599e17379d8..8f1661603b78 100644
+--- a/arch/arm64/include/asm/percpu.h
++++ b/arch/arm64/include/asm/percpu.h
+@@ -239,6 +239,12 @@ PERCPU_RET_OP(add, add, ldadd)
+ #define this_cpu_cmpxchg_8(pcp, o, n)	\
+ 	_pcp_protect_return(cmpxchg_relaxed, pcp, o, n)
  
-+#define HYPERVISOR_DATA_SECTION					\
-+	HYP_SECTION_NAME(.data) : {				\
-+		__hyp_data_start = .;				\
-+		*(HYP_SECTION_NAME(.data))			\
-+		__hyp_data_end = .;				\
-+	}
++#ifdef __KVM_NVHE_HYPERVISOR__
++extern unsigned long __hyp_per_cpu_offset(unsigned int cpu);
++#define __per_cpu_offset
++#define per_cpu_offset(cpu)	__hyp_per_cpu_offset((cpu))
++#endif
 +
- #define HYPERVISOR_PERCPU_SECTION				\
- 	. = ALIGN(PAGE_SIZE);					\
- 	HYP_SECTION_NAME(.data..percpu) : {			\
-@@ -37,6 +44,7 @@ jiffies = jiffies_64;
- 	}
- #else /* CONFIG_KVM */
- #define HYPERVISOR_EXTABLE
-+#define HYPERVISOR_DATA_SECTION
- #define HYPERVISOR_PERCPU_SECTION
- #endif
+ #include <asm-generic/percpu.h>
  
-@@ -207,6 +215,8 @@ SECTIONS
- 		EXIT_DATA
- 	}
+ /* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its dependencies. */
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index c615b285ff5b..78a42a7cdb72 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -103,6 +103,9 @@ KVM_NVHE_ALIAS(gic_nonsecure_priorities);
+ KVM_NVHE_ALIAS(__start___kvm_ex_table);
+ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
  
-+	HYPERVISOR_DATA_SECTION
++/* Array containing bases of nVHE per-CPU memory regions. */
++KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
 +
- 	PERCPU_SECTION(L1_CACHE_BYTES)
- 	HYPERVISOR_PERCPU_SECTION
+ #endif /* CONFIG_KVM */
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..8bb9fffe2a8f 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1602,6 +1602,13 @@ static int init_hyp_mode(void)
- 		goto out_err;
- 	}
+ #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index ddde15fe85f2..c45f440cce51 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -6,7 +6,8 @@
+ asflags-y := -D__KVM_NVHE_HYPERVISOR__
+ ccflags-y := -D__KVM_NVHE_HYPERVISOR__
  
-+	err = create_hyp_mappings(kvm_ksym_ref(__hyp_data_start),
-+				  kvm_ksym_ref(__hyp_data_end), PAGE_HYP);
-+	if (err) {
-+		kvm_err("Cannot map hyp data section\n");
-+		goto out_err;
-+	}
+-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o hyp-main.o
++obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
++	 hyp-main.o percpu.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/percpu.c b/arch/arm64/kvm/hyp/nvhe/percpu.c
+new file mode 100644
+index 000000000000..5fd0c5696907
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/percpu.c
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2020 - Google LLC
++ * Author: David Brazdil <dbrazdil@google.com>
++ */
 +
- 	err = create_hyp_mappings(kvm_ksym_ref(__start_rodata),
- 				  kvm_ksym_ref(__end_rodata), PAGE_HYP_RO);
- 	if (err) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-index bb2d986ff696..bc1664d365a9 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-@@ -16,4 +16,7 @@ SECTIONS {
- 	HYP_SECTION_NAME(.data..percpu) : {
- 		PERCPU_INPUT(L1_CACHE_BYTES)
- 	}
++#include <asm/kvm_asm.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
 +
-+	/* Put after '.data..percpu' because its name matches the same regex. */
-+	HYP_SECTION(.data)
- }
++unsigned long __hyp_per_cpu_offset(unsigned int cpu)
++{
++	unsigned long *cpu_base_array;
++	unsigned long this_cpu_base;
++
++	if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
++		hyp_panic();
++
++	cpu_base_array = kern_hyp_va(&kvm_arm_hyp_percpu_base[0]);
++	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
++	return this_cpu_base - (unsigned long)&__per_cpu_start;
++}
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
