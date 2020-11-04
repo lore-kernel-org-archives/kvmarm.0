@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DA2C2D0A3
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890A0C55178
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BD47F20780
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0E8E20739
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 18:37:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="B4IhEM6i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD47F20780
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="il549hLI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0E8E20739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DD324B543;
-	Wed,  4 Nov 2020 13:37:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC884B7BA;
+	Wed,  4 Nov 2020 13:37:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xJNCf9978q9I; Wed,  4 Nov 2020 13:37:37 -0500 (EST)
+	with ESMTP id PQ8feyh3aonp; Wed,  4 Nov 2020 13:37:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374364B800;
-	Wed,  4 Nov 2020 13:37:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B9AF4B80B;
+	Wed,  4 Nov 2020 13:37:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C22C4B6E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB92D4B7BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RlPTizRcavdq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2020 13:37:34 -0500 (EST)
+ with ESMTP id vpDy1IDnUHsf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2020 13:37:36 -0500 (EST)
 Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
  [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B85724B781
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:33 -0500 (EST)
-Received: by mail-wr1-f66.google.com with SMTP id x7so23175755wrl.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:37:33 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9BCA4B7FE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 13:37:35 -0500 (EST)
+Received: by mail-wr1-f66.google.com with SMTP id c17so3798664wrc.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2020 10:37:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=iZCBnLMJdYcxZwBzQ3Sarf0ddb9E9I/tpQ6NvhqLTsI=;
- b=B4IhEM6i7eYAD2ymU3gP34oS4vn1E/wZkt1PdaiPM5/5CtTpRosOvwsKQKo0X96cCK
- 0+g8w1fiydBxSAvZustLDS0jWbYdNwVoVeSGiVp01VErE+3NmXu2Zguj4zhDd3RQwoNG
- en6FWwAw0dLaqo1BuTfum7Ta4FxBg0BjZWLF6bqxR53vkiKPlHv0os4fdHkCfVcSOUha
- CL9qYevzyEmHuWS9pBv5RwzPROVRKDWww8V+k967+KldgQKur4GRkaO8J8q5SOBxRSpK
- YvVewWO1VZib5H/HpCQ7HbmNXpRdZWPNttE3mKM8sUogeVrex2BX1GvjsLxVqnF1JotD
- ALOQ==
+ bh=HMYGIc+ZZLbnQbcx34p2ubDooBhnfGZkiSjL1q0xiNQ=;
+ b=il549hLIFQg0qGoV2QrtJtovxpI7mz6Lm9xqwFQAuBrKk0Z6AC8ta8m/IhticSSWAg
+ nunkDYzvs4sOKQEUNrHD/WF3I2uhhw/LMXkFntRbcYdyktGXJhujOyKn7jXnmAQUZjKX
+ HWqGa+gOsc0TyXjwlKX20YcgvfXtgqTp7D+0BzkajGuiEkOeV+lo+Wug+iAynKlmeoIF
+ fBs0MAQU3p+DN2M/yPDkSBwhSnnCxMkEh3Gygat3MvnDjwWQd21yPXJWRfdjbn8kXXgF
+ Ja1pWoR4q5WXTD7ryuVkLcK79AhJCwCunoJp8jfhSnsqvKNqPlNwzC4naVUk6tC/hjBw
+ D7Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=iZCBnLMJdYcxZwBzQ3Sarf0ddb9E9I/tpQ6NvhqLTsI=;
- b=TTPhjisvb7R2cQsCZfO5OMz5VA/OvRIzGR3MJdxvaA0ppTjqnLNyu5Q86EoiSFMYXv
- FNuO+GJKAzqc1UR80SDhJbz3HsxDxOfO/9SBHWS0ZirlFUdosGrUs35yuqx9qlC1G0mt
- itht5wDmL/xi95FbDLTnIOoCShBxQYSwNIKBwuu05B5Sfkx99CI9RQrt12ydrJWdRBrR
- /MYBaUbh5RTSxM3f25GF4rfe2CvJQePntO+co7x6RMLLJqGGhZcFSNdNwMhpJ/xnOlEV
- eJizmuOinwfzq0D4tWX+SM62t39JU2RdPg44KF9r0wo7sSnYQgfe/X6a716Bbx706gFd
- UKvQ==
-X-Gm-Message-State: AOAM533iCKnzkRFORkDjQAY3s7yuGmEL0VqxGHOzVpt983HcKyI8n2Xw
- rL1SGqrAE3i8Rl52SWKykmJ06KutSK1dq+Jg
-X-Google-Smtp-Source: ABdhPJwUdVDMguoQlzBKa3UHyXk6rhVG7P6EPtc5ja0S5UDbXD4NiQS5VqgFkkGyhfeVbjM4nCuCpA==
-X-Received: by 2002:adf:fe48:: with SMTP id m8mr33208177wrs.127.1604515052352; 
- Wed, 04 Nov 2020 10:37:32 -0800 (PST)
+ bh=HMYGIc+ZZLbnQbcx34p2ubDooBhnfGZkiSjL1q0xiNQ=;
+ b=HUU9K699aJgDRG/QwcVXN2PDHx/8Mn7h82gxA26sTbrOu/kuse5HSwZnvpw/OiFX2t
+ LymUFbqBzjgWsoNT+iw6PccUGZ1GicjlQCbmYP9cVpHcX9Ch5nSi1kBRIox12Dct8WG5
+ u2FbTNtZNqNc6TTkkzVWyR8jykaMPXIF/pivA0jIKSksevpJYmi5a8DL4hx+NyKDL6co
+ enqYU1vKs2SE7WarkLqAgrxb2ChACyZ092c6ggPmjq6d0z+3AsRGee1+kgbyXPxwlMrr
+ zkvWrhbqzyJRdBvT/+sujpYf6NrPXxAUVRO1LSVch57oZ3/hYvXrLkM0pgMmWfuW+fzs
+ Nw2Q==
+X-Gm-Message-State: AOAM531Y8fWI1YZH836Z1wrVGVzHvPfmcInUbSk84O2xjSmYbEylTxFs
+ 6KrqqZZ+Ge+c7+xEIW6B1DqX66tvzi065C/6
+X-Google-Smtp-Source: ABdhPJzPIMW7rJz/s7+my12k8/M0wSzNOf/au+3oC9aJIIDx/rVVLNmLVAtHZQ7yu1CygOZyQlw0UQ==
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr4973650wrs.364.1604515054453; 
+ Wed, 04 Nov 2020 10:37:34 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:c8d2:30f2:53c6:bc2])
- by smtp.gmail.com with ESMTPSA id r10sm3396829wmg.16.2020.11.04.10.37.30
+ by smtp.gmail.com with ESMTPSA id w11sm3705303wmg.36.2020.11.04.10.37.32
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Nov 2020 10:37:31 -0800 (PST)
+ Wed, 04 Nov 2020 10:37:33 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH 25/26] kvm: arm64: Trap host SMCs
-Date: Wed,  4 Nov 2020 18:36:29 +0000
-Message-Id: <20201104183630.27513-26-dbrazdil@google.com>
+Subject: [RFC PATCH 26/26] kvm: arm64: Fix EL2 mode availability checks
+Date: Wed,  4 Nov 2020 18:36:30 +0000
+Message-Id: <20201104183630.27513-27-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201104183630.27513-1-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
@@ -104,74 +104,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-While nVHE KVM is installed, start trapping all host SMCs. By default,
-these are simply forwarded to EL3, but PSCI SMCs are validated first.
+With nVHE hyp code interception host's PSCI CPU_ON/OFF/SUSPEND SMCs,
+from the host's perspective new CPUs start booting in EL1 while
+previously they would have booted in EL2. The kernel logic which keeps
+track of the mode CPUs were booted in needs to be adjusted to account
+for this fact.
 
-Create new constant HCR_HOST_NVHE_STUB_FLAGS with the old set of HCR
-flags to use before the nVHE vector is installed or when switching back
-to stub vector.
+Add a static key enabled if KVM nVHE initialization is successful.
 
-Extend HCR_HOST_NVHE_FLAGS to contain HCR_TSC. Set HCR_EL2 to it before
-installing nVHE vector.
+When the key is enabled, is_hyp_mode_available continues to report
+`true` because its users either treat it a check whether KVM will be /
+has been initialized, or whether stub HVCs can be made (eg. hibernate).
+
+is_hyp_mode_mismatched is changed to report `false` when the key is
+enabled. That's because all cores' modes matched at the point of KVM
+init and KVM will not allow cores not present at init to boot. That
+said, the function is never used after KVM is initialized.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h   | 3 ++-
- arch/arm64/kernel/head.S           | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S | 6 ++++++
- 3 files changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/virt.h | 16 ++++++++++++++++
+ arch/arm64/kvm/arm.c          |  5 +++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 64ce29378467..04b862955f32 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -79,7 +79,8 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW )
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
-+#define HCR_HOST_NVHE_STUB_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
-+#define HCR_HOST_NVHE_FLAGS (HCR_HOST_NVHE_STUB_FLAGS | HCR_TSC)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 6069be50baf9..597430b5f5aa 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -65,9 +65,18 @@ extern u32 __boot_cpu_mode[2];
+ void __hyp_set_vectors(phys_addr_t phys_vector_base);
+ void __hyp_reset_vectors(void);
  
- /* TCR_EL2 Registers bits */
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index e7270b63abed..ea17413a04e0 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -522,7 +522,7 @@ SYM_FUNC_START(el2_setup)
++DECLARE_STATIC_KEY_FALSE(kvm_nvhe_initialized);
++
+ /* Reports the availability of HYP mode */
+ static inline bool is_hyp_mode_available(void)
+ {
++	/*
++	 * If KVM nVHE is initialized, all CPUs must have been booted in EL2.
++	 * Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
++	 */
++	if (IS_ENABLED(CONFIG_KVM) && static_branch_unlikely(&kvm_nvhe_initialized))
++		return true;
++
+ 	return (__boot_cpu_mode[0] == BOOT_CPU_MODE_EL2 &&
+ 		__boot_cpu_mode[1] == BOOT_CPU_MODE_EL2);
+ }
+@@ -75,6 +84,13 @@ static inline bool is_hyp_mode_available(void)
+ /* Check if the bootloader has booted CPUs in different modes */
+ static inline bool is_hyp_mode_mismatched(void)
+ {
++	/*
++	 * If KVM nVHE is initialized, all CPUs must have been booted in EL2.
++	 * Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
++	 */
++	if (IS_ENABLED(CONFIG_KVM) && static_branch_unlikely(&kvm_nvhe_initialized))
++		return false;
++
+ 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+ }
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3dff6af69eca..e93956d6235d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -47,6 +47,8 @@
+ __asm__(".arch_extension	virt");
  #endif
  
- SYM_INNER_LABEL(el2_setup_nvhe, SYM_L_LOCAL)
--	mov_q	x0, HCR_HOST_NVHE_FLAGS
-+	mov_q	x0, HCR_HOST_NVHE_STUB_FLAGS
- 	msr	hcr_el2, x0
- 	isb
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index dd297a1a8f82..97684deba6c1 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -88,6 +88,10 @@ SYM_CODE_END(__kvm_hyp_init)
-  * x0: struct kvm_nvhe_init_params PA
-  */
- SYM_CODE_START(___kvm_hyp_init)
-+	mov_q	x1, HCR_HOST_NVHE_FLAGS
-+	msr	hcr_el2, x1
-+	isb
++DEFINE_STATIC_KEY_FALSE(kvm_nvhe_initialized);
 +
- 	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
- 	msr	tpidr_el2, x1
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
  
-@@ -220,6 +224,8 @@ reset:
- 	bic	x5, x5, x6		// Clear SCTL_M and etc
- 	pre_disable_mmu_workaround
- 	msr	sctlr_el2, x5
-+	mov_q	x5, HCR_HOST_NVHE_STUB_FLAGS
-+	msr	hcr_el2, x5
- 	isb
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+@@ -1841,6 +1843,9 @@ int kvm_arch_init(void *opaque)
+ 	if (err)
+ 		goto out_hyp;
  
- 	/* Install stub vectors */
++	if (!in_hyp_mode)
++		static_branch_enable(&kvm_nvhe_initialized);
++
+ 	if (in_hyp_mode)
+ 		kvm_info("VHE mode initialized successfully\n");
+ 	else
 -- 
 2.29.1.341.ge80a0c044ae-goog
 
