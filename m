@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9887C2D0A3
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 16:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8285C2D0A3
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 16:37:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 29802206DB
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 16:31:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29802206DB
+	by mail.kernel.org (Postfix) with ESMTP id 3252F2072E
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Nov 2020 16:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3252F2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C4FB4B7D0;
-	Wed,  4 Nov 2020 11:31:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71FBF4B77D;
+	Wed,  4 Nov 2020 11:36:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MC8gAaBbnz9b; Wed,  4 Nov 2020 11:31:16 -0500 (EST)
+	with ESMTP id 8If56bXinwdY; Wed,  4 Nov 2020 11:36:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21F894B75F;
-	Wed,  4 Nov 2020 11:31:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32DB04B793;
+	Wed,  4 Nov 2020 11:36:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6223D4B76F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 11:31:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 461194B760
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 11:36:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CLCa51x3T998 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2020 11:31:13 -0500 (EST)
+ with ESMTP id iZTrkLASsThH for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2020 11:36:56 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E04134B75F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 11:31:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 951F84B742
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2020 11:36:55 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F76A139F;
- Wed,  4 Nov 2020 08:31:12 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B184A139F;
+ Wed,  4 Nov 2020 08:36:54 -0800 (PST)
 Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF3F93F718;
- Wed,  4 Nov 2020 08:31:11 -0800 (PST)
-Date: Wed, 4 Nov 2020 16:31:08 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0BD183F718;
+ Wed,  4 Nov 2020 08:36:53 -0800 (PST)
+Date: Wed, 4 Nov 2020 16:36:50 +0000
 From: Dave Martin <Dave.Martin@arm.com>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 2/3] KVM: arm64: Check RAZ visibility in ID register
- accessors
-Message-ID: <20201104163107.GB6882@arm.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Remove AA64ZFR0_EL1 accessors
+Message-ID: <20201104163649.GC6882@arm.com>
 References: <20201102185037.49248-1-drjones@redhat.com>
- <20201102185037.49248-3-drjones@redhat.com>
- <20201103112354.GH6882@arm.com>
- <20201103133836.q2laxsosxevpkvgq@kamzik.brq.redhat.com>
+ <20201102185037.49248-4-drjones@redhat.com>
+ <20201103113208.GI6882@arm.com>
+ <20201103134640.6hs2ggz7sqn5o5me@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20201103133836.q2laxsosxevpkvgq@kamzik.brq.redhat.com>
+In-Reply-To: <20201103134640.6hs2ggz7sqn5o5me@kamzik.brq.redhat.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Cc: maz@kernel.org, xu910121@sina.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -73,135 +72,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 03, 2020 at 02:38:36PM +0100, Andrew Jones wrote:
-> On Tue, Nov 03, 2020 at 11:23:54AM +0000, Dave Martin wrote:
-> > On Mon, Nov 02, 2020 at 07:50:36PM +0100, Andrew Jones wrote:
-> > > The instruction encodings of ID registers are preallocated. Until an
-> > > encoding is assigned a purpose the register is RAZ. KVM's general ID
-> > > register accessor functions already support both paths, RAZ or not.
-> > > If for each ID register we can determine if it's RAZ or not, then all
-> > > ID registers can build on the general functions. The register visibility
-> > > function allows us to check whether a register should be completely
-> > > hidden or not, extending it to also report when the register should
-> > > be RAZ or not allows us to use it for ID registers as well.
-> > 
-> > Nit: no statement of what the patch does.
-> 
-> Hmm, I'm not sure what "...extending it to also report when the register
-> should be RAZ or not allows us to use it for ID registers as well." is
-> missing, other than spelling out that a new flag is being added for the
-> extension. Please provide a suggestion.
-
-Well, that's a subordinate clause, not a statement.  The containing
-sentence is a statement about the _implications_ of doing it, but
-nothing says that it is actually done.
-
-Often, a less condensed repeat of the subject line is enough, say,
-something like the following, as a separate paragraph at the end:
-
-	Check for RAZ visibility in the ID register accessor functions.
-
-(Or rather, there should be a concise statement in the commit message
-saying what the patch does, and the subject line should be a suitably
-condensed version of _that_.)
-
-You might want to add a simple statement of what is achieved:
-
-	This allows the RAZ case to be handled in a generic way
-	for all system registers.
-
-That makes the intention and value of the patch easy to spot, while the
-wordy paragraph is available for anyone who wants to understand the
-background and rationale in more detail.
-
-(This is just my view, but I think it's generally helpful to reviewers
-to follow this rough pattern -- it makes it easy to skip non-critical
-parts of the description and come back to them later on.  I might
-propose edits in submitting-patches.rst to make this clearer -- and if
-they are shot down in flames then I will shut up ;)
-
-> 
-> > 
-> > You might want to point out that the introduced REG_RAZ functionality is
-> > intentionally not used in this patch.
-> 
-> OK
-> 
-> > 
-> > > No functional change intended.
+On Tue, Nov 03, 2020 at 02:46:40PM +0100, Andrew Jones wrote:
+> On Tue, Nov 03, 2020 at 11:32:08AM +0000, Dave Martin wrote:
+> > On Mon, Nov 02, 2020 at 07:50:37PM +0100, Andrew Jones wrote:
+> > > The AA64ZFR0_EL1 accessors are just the general accessors with
+> > > its visibility function open-coded. It also skips the if-else
+> > > chain in read_id_reg, but there's no reason not to go there.
+> > > Indeed consolidating ID register accessors and removing lines
+> > > of code make it worthwhile.
 > > > 
+> > > No functional change intended.
+> > 
+> > Nit: No statement of what the patch does.
+> 
+> I can duplicate the summary in the commit message?
+
+Generally, yes, though there is the opportunity to restore the missing
+words and make a proper sentence out of it.  See my response to patch 2.
+
+> > 
 > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 19 ++++++++++++++++---
-> > >  arch/arm64/kvm/sys_regs.h | 10 ++++++++++
-> > >  2 files changed, 26 insertions(+), 3 deletions(-)
+> > >  arch/arm64/kvm/sys_regs.c | 61 +++++++--------------------------------
+> > >  1 file changed, 11 insertions(+), 50 deletions(-)
 > > > 
 > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 6ff0c15531ca..b8822a20b1ea 100644
+> > > index b8822a20b1ea..e2d6fb83280e 100644
 > > > --- a/arch/arm64/kvm/sys_regs.c
 > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -1153,6 +1153,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > >  	return val;
-> > >  }
-> > >  
-> > > +static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> > > +				  const struct sys_reg_desc *r)
-> > > +{
-> > > +	return 0;
-> > > +}
-> > > +
-> > >  /* cpufeature ID register access trap handlers */
-> > >  
-> > >  static bool __access_id_reg(struct kvm_vcpu *vcpu,
-> > > @@ -1171,7 +1177,9 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
-> > >  			  struct sys_reg_params *p,
-> > >  			  const struct sys_reg_desc *r)
+> > > @@ -1156,6 +1156,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> > >  				  const struct sys_reg_desc *r)
 > > >  {
-> > > -	return __access_id_reg(vcpu, p, r, false);
-> > > +	bool raz = sysreg_visible_as_raz(vcpu, r);
+> > > +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+> > > +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
 > > > +
-> > > +	return __access_id_reg(vcpu, p, r, raz);
-> > >  }
-> > >  
-> > >  static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
-> > > @@ -1283,13 +1291,17 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> > >  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > >  		      const struct kvm_one_reg *reg, void __user *uaddr)
-> > >  {
-> > > -	return __get_id_reg(vcpu, rd, uaddr, false);
-> > > +	bool raz = sysreg_visible_as_raz(vcpu, rd);
+> > > +	switch (id) {
+> > > +	case SYS_ID_AA64ZFR0_EL1:
+> > > +		if (!vcpu_has_sve(vcpu))
+> > > +			return REG_RAZ;
+> > > +		break;
+> > > +	}
 > > > +
-> > > +	return __get_id_reg(vcpu, rd, uaddr, raz);
-> > >  }
-> > >  
-> > >  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > >  		      const struct kvm_one_reg *reg, void __user *uaddr)
-> > >  {
-> > > -	return __set_id_reg(vcpu, rd, uaddr, false);
-> > > +	bool raz = sysreg_visible_as_raz(vcpu, rd);
-> > > +
-> > > +	return __set_id_reg(vcpu, rd, uaddr, raz);
-> > >  }
-> > >  
-> > >  static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > > @@ -1381,6 +1393,7 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> > >  	.access	= access_id_reg,		\
-> > >  	.get_user = get_id_reg,			\
-> > >  	.set_user = set_id_reg,			\
-> > > +	.visibility = id_visibility,		\
 > > 
-> > This is just the default for ID_SANITISED, right?
+> > This should work, but I'm not sure it's preferable to giving affected
+> > registers their own visibility check function.
+> > 
+> > Multiplexing all the ID regs through this one checker function will
+> > introduce a bit of overhead for always-non-RAZ ID regs, but I'd guess
+> > the impact is negligible given the other overheads on these paths.
 > 
-> The default was not to have a visibility function. Now it has one. It
-> still behaves the same way in this patch, though, because it just returns
-> zero.
+> Yes, my though was that a switch isn't going to generate much overhead
+> and consolidating the ID registers cleans things up a bit.
 
-Ack.
+Well, no.  I don't have a particularly strong view on this.
 
-Don't worry about this; again, I was halfway through remembering how the
-code in this file worked...
+The style of the code is being pulled in multiple directions in this
+file already, so this doesn't introduce a new inconsistency as such.
 
-[...]
+If the number of registers handled in here becomes large then we might
+want to review the situation again.
+
+> 
+> > 
+> > >  	return 0;
+> > >  }
+> > >  
+> > > @@ -1203,55 +1213,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+> > >  	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+> > >  }
+> > >  
+> > > -/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
+> > > -static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
+> > > -{
+> > > -	if (!vcpu_has_sve(vcpu))
+> > > -		return 0;
+> > > -
+> > > -	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
+> > > -}
+> > > -
+> > > -static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> > > -				   struct sys_reg_params *p,
+> > > -				   const struct sys_reg_desc *rd)
+> > > -{
+> > > -	if (p->is_write)
+> > > -		return write_to_read_only(vcpu, p, rd);
+> > > -
+> > > -	p->regval = guest_id_aa64zfr0_el1(vcpu);
+> > > -	return true;
+> > > -}
+> > > -
+> > > -static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> > > -		const struct sys_reg_desc *rd,
+> > > -		const struct kvm_one_reg *reg, void __user *uaddr)
+> > > -{
+> > > -	u64 val;
+> > > -
+> > > -	val = guest_id_aa64zfr0_el1(vcpu);
+> > > -	return reg_to_user(uaddr, &val, reg->id);
+> > > -}
+> > > -
+> > > -static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> > > -		const struct sys_reg_desc *rd,
+> > > -		const struct kvm_one_reg *reg, void __user *uaddr)
+> > > -{
+> > > -	const u64 id = sys_reg_to_index(rd);
+> > > -	int err;
+> > > -	u64 val;
+> > > -
+> > > -	err = reg_from_user(&val, uaddr, id);
+> > > -	if (err)
+> > > -		return err;
+> > > -
+> > > -	/* This is what we mean by invariant: you can't change it. */
+> > > -	if (val != guest_id_aa64zfr0_el1(vcpu))
+> > > -		return -EINVAL;
+> > > -
+> > > -	return 0;
+> > > -}
+> > > -
+> > >  /*
+> > >   * cpufeature ID register user accessors
+> > >   *
+> > > @@ -1515,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> > >  	ID_SANITISED(ID_AA64PFR1_EL1),
+> > >  	ID_UNALLOCATED(4,2),
+> > >  	ID_UNALLOCATED(4,3),
+> > > -	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, },
+> > > +	ID_SANITISED(ID_AA64ZFR0_EL1),
+> > 
+> > If keeping a dedicated helper, we could have a special macro for that, say
+> > 
+> > 	ID_SANITISED_VISIBILITY(ID_AA64ZFR0_EL1, id_aa64zfr0_el1_visibility)
+> 
+> I considered this first, but decided the switch, like read_id_reg's
+> if-else chain, is probably not going to introduce much overhead.
+
+Agreed.
+
+I don't have a real problem with this patch in its current form.
 
 Cheers
 ---Dave
