@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDEAC00A89
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6211DC388F7
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:53:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EBC982080D
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8714E2151B
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:53:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFLzxc0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC982080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrU9BPZM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8714E2151B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395064B73E;
-	Thu,  5 Nov 2020 04:47:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0339D4B618;
+	Thu,  5 Nov 2020 04:53:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4pBVoFMX4ZWa; Thu,  5 Nov 2020 04:47:16 -0500 (EST)
+	with ESMTP id r15FI4jsa7EF; Thu,  5 Nov 2020 04:53:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C3F4B5D8;
-	Thu,  5 Nov 2020 04:47:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5BF84B63C;
+	Thu,  5 Nov 2020 04:53:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7733F4B5D8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:47:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC444B606
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:53:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KnnrGkANA+t0 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 04:47:13 -0500 (EST)
+ with ESMTP id 0hLrkxQT-8o4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 04:53:10 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E20F4B5D7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:47:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABC9B4B5E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:53:10 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C8AAE2080D;
- Thu,  5 Nov 2020 09:47:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5CF892151B;
+ Thu,  5 Nov 2020 09:53:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604569632;
- bh=HHlnMYvribr6tXTc4dWdBjcjHKLjb6dHLifRUqDqwQQ=;
+ s=default; t=1604569989;
+ bh=05ML26Jp9zU6GACtn9aCiyu+oy90xRHx7TvqsEetQSw=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=EFLzxc0G4nItwOrjOMnnSewgHj9shosTzBoWlwDLKKI7KwDNQ7RaKW9TqsU/pIg+p
- uMsxcNdZQZJQo+Rj1yD1EmgjbipQWG6wClnZfll/W+huy0QRJr1y0deHb5k/8Mzl3/
- ECS9HsXAUOFDwEhdx2CSmDCDPi5yO0opgabFzzXQ=
+ b=CrU9BPZMhjG6XBnFZj7rwMjBVY+aLHNqx0Nlb1mA9Fiij/8DL/eyOM0r9e8D7jhlp
+ SpmPMVZC5KABurCvlqM34aJ3EEWWHuslRh8ARBAAoztEjDKBnd09P29s5J8TcPG1i/
+ lT5ExIn9lIegbNHrSwGiL+7NorLstJSACtsZuQGc=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kabrJ-007n9r-JG; Thu, 05 Nov 2020 09:47:09 +0000
+ id 1kabx5-007nE3-6I; Thu, 05 Nov 2020 09:53:07 +0000
 MIME-Version: 1.0
-Date: Thu, 05 Nov 2020 09:47:09 +0000
+Date: Thu, 05 Nov 2020 09:53:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [RFC PATCH 01/26] psci: Export configured PSCI version
-In-Reply-To: <20201104183630.27513-2-dbrazdil@google.com>
+Subject: Re: [RFC PATCH 02/26] psci: Export configured PSCI function IDs
+In-Reply-To: <20201104183630.27513-3-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
- <20201104183630.27513-2-dbrazdil@google.com>
+ <20201104183630.27513-3-dbrazdil@google.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <2265d2fed043ab79721c1014d6144558@kernel.org>
+Message-ID: <61384a4031c6a3419c55a8cdb8f9f0ab@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
@@ -100,111 +100,68 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2020-11-04 18:36, David Brazdil wrote:
-> The version of PSCI that the kernel should use to communicate with
-> firmware is typically obtained from probing PSCI_VERSION. However, that
-> doesn't work for PSCI v0.1 where the host gets the information from
-> DT/ACPI, or if PSCI is not supported / was disabled.
-> 
-> KVM's PSCI proxy for the host needs to be configured with the same
-> version used by the host driver. Expose the PSCI version used by the
-> host.
+> Function IDs used by PSCI are configurable for v0.1 via DT/APCI. If the
+> host is using PSCI v0.1, KVM's PSCI proxy needs to use the same IDs.
+> Expose the array holding the information.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  drivers/firmware/psci/psci.c | 6 ++++++
->  include/linux/psci.h         | 8 ++++++++
->  2 files changed, 14 insertions(+)
+>  drivers/firmware/psci/psci.c | 10 +---------
+>  include/linux/psci.h         | 10 ++++++++++
+>  2 files changed, 11 insertions(+), 9 deletions(-)
 > 
 > diff --git a/drivers/firmware/psci/psci.c 
 > b/drivers/firmware/psci/psci.c
-> index 00af99b6f97c..ff523bdbfe3f 100644
+> index ff523bdbfe3f..ffcb88f60e21 100644
 > --- a/drivers/firmware/psci/psci.c
 > +++ b/drivers/firmware/psci/psci.c
-> @@ -49,6 +49,8 @@ static int resident_cpu = -1;
->  struct psci_operations psci_ops;
->  static enum arm_smccc_conduit psci_conduit = SMCCC_CONDUIT_NONE;
+> @@ -60,15 +60,7 @@ typedef unsigned long (psci_fn)(unsigned long, 
+> unsigned long,
+>  				unsigned long, unsigned long);
+>  static psci_fn *invoke_psci_fn;
 > 
-> +int psci_driver_version = PSCI_VERSION(0, 0);
-> +
->  bool psci_tos_resident_on(int cpu)
->  {
->  	return cpu == resident_cpu;
-> @@ -461,6 +463,8 @@ static int __init psci_probe(void)
->  		return -EINVAL;
->  	}
+> -enum psci_function {
+> -	PSCI_FN_CPU_SUSPEND,
+> -	PSCI_FN_CPU_ON,
+> -	PSCI_FN_CPU_OFF,
+> -	PSCI_FN_MIGRATE,
+> -	PSCI_FN_MAX,
+> -};
+> -
+> -static u32 psci_function_id[PSCI_FN_MAX];
+> +u32 psci_function_id[PSCI_FN_MAX];
 > 
-> +	psci_driver_version = ver;
-> +
->  	psci_0_2_set_functions();
-> 
->  	psci_init_migrate();
-> @@ -514,6 +518,8 @@ static int __init psci_0_1_init(struct device_node 
-> *np)
-> 
->  	pr_info("Using PSCI v0.1 Function IDs from DT\n");
-> 
-> +	psci_driver_version = PSCI_VERSION(0, 1);
-> +
->  	if (!of_property_read_u32(np, "cpu_suspend", &id)) {
->  		psci_function_id[PSCI_FN_CPU_SUSPEND] = id;
->  		psci_ops.cpu_suspend = psci_cpu_suspend;
+>  #define PSCI_0_2_POWER_STATE_MASK		\
+>  				(PSCI_0_2_POWER_STATE_ID_MASK | \
 > diff --git a/include/linux/psci.h b/include/linux/psci.h
-> index 2a1bfb890e58..cb35b90d1746 100644
+> index cb35b90d1746..877d844ee6d9 100644
 > --- a/include/linux/psci.h
 > +++ b/include/linux/psci.h
-> @@ -21,6 +21,14 @@ bool psci_power_state_is_valid(u32 state);
->  int psci_set_osi_mode(bool enable);
->  bool psci_has_osi_support(void);
+> @@ -29,6 +29,16 @@ bool psci_has_osi_support(void);
+>   */
+>  extern int psci_driver_version;
 > 
-> +/**
-> + * The version of the PSCI specification followed by the driver.
-> + * This is equivalent to calling PSCI_VERSION except:
-> + *   (a) it also works for PSCI v0.1, which does not support 
-> PSCI_VERSION, and
-> + *   (b) it is set to v0.0 if the PSCI driver was not initialized.
-> + */
-> +extern int psci_driver_version;
+> +enum psci_function {
+> +	PSCI_FN_CPU_SUSPEND,
+> +	PSCI_FN_CPU_ON,
+> +	PSCI_FN_CPU_OFF,
+> +	PSCI_FN_MIGRATE,
+> +	PSCI_FN_MAX,
+> +};
 > +
->  struct psci_operations {
->  	u32 (*get_version)(void);
->  	int (*cpu_suspend)(u32 state, unsigned long entry_point);
+> +extern u32 psci_function_id[PSCI_FN_MAX];
 
-How about providing a get_version callback for pre-0.2 implementations
-instead? This would avoid exposing more symbols (psci_ops is already
-global).
+I am very reluctant to expose this array to the rest of the kernel.
+The temptation becomes huge for people to start writing to it
+from random drivers in order to route PSCI calls somewhere else.
+Consider exporting an accessor instead.
+
+Same thing for the following patch (there already are a couple of
+accessors for psci_cpu_suspend_feature, which you could make visible).
 
 Thanks,
 
          M.
-
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index 00af99b6f97c..b84454e12d92 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -500,6 +500,11 @@ static int __init psci_0_2_init(struct device_node 
-*np)
-  	return psci_probe();
-  }
-
-+static u32 psci_0_1_get_version(void)
-+{
-+	return PSCI_VERSION(0, 1);
-+}
-+
-  /*
-   * PSCI < v0.2 get PSCI Function IDs via DT.
-   */
-@@ -514,6 +519,8 @@ static int __init psci_0_1_init(struct device_node 
-*np)
-
-  	pr_info("Using PSCI v0.1 Function IDs from DT\n");
-
-+	psci_ops.get_version = psci_0_1_get_version;
-+
-  	if (!of_property_read_u32(np, "cpu_suspend", &id)) {
-  		psci_function_id[PSCI_FN_CPU_SUSPEND] = id;
-  		psci_ops.cpu_suspend = psci_cpu_suspend;
-
 -- 
 Jazz is not dead. It just smells funny...
 _______________________________________________
