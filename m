@@ -4,69 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA04C00A89
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A0DC00A89
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:30:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0325820756
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8468B2078E
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s0/mPv6J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0325820756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rplNhh2/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8468B2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 433804B502;
-	Thu,  5 Nov 2020 06:08:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D56D34B73C;
+	Thu,  5 Nov 2020 06:30:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fAXbeVsETNPS; Thu,  5 Nov 2020 06:08:48 -0500 (EST)
+	with ESMTP id 13DJe3vC3+fs; Thu,  5 Nov 2020 06:30:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B34D54B55A;
-	Thu,  5 Nov 2020 06:08:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 919DB4B742;
+	Thu,  5 Nov 2020 06:30:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAA774B55A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:08:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 470204B6B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:30:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oBx5wGK-EqqO for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 06:08:45 -0500 (EST)
+ with ESMTP id HJre2xcammfM for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 06:30:48 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F59E4B502
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:08:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2842A4B3CB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:30:48 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DC76D2072E;
- Thu,  5 Nov 2020 11:08:43 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C04C12083B;
+ Thu,  5 Nov 2020 11:30:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604574524;
- bh=3sUQ3ja2rj2uStC3OQabrdR0ZZMO2xkmRDD9nGypmls=;
+ s=default; t=1604575846;
+ bh=DHA+HMmRj/vljpoB6PI9AKkrWsALaL5kz7s/bPUod+g=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=s0/mPv6J5efk5VAAfbAzqZuUY+XMg/dc72UvmDXwVjd9/FXUVkSlXtaIh9i4EewIR
- xAboT+rU3ASTmQrXuEAmx1nJANjGc89lVfxmnu3rYnpMdRc7mrtvUXnlT2wYBGQI26
- /bwE1BpoOzqDmHpWu5EvDo7L24La7KLz43g5vQhQ=
+ b=rplNhh2/x15GoJw1yq2xcGLWRcSdakUzgWbwmTVznU3ZJVWM5SMdka+hUtwGF0iOi
+ w/AJEBkHKi6Dmq8uyEc0YHX7ZRCaxvDE8mzfYwCtLPilLZf7UCyj30N2hy9H0oW9cV
+ sVNJYhUUsD/oxcHj9ZgxnZc+rdEZHbB2longFGb0=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kad8B-007oEK-0r; Thu, 05 Nov 2020 11:08:41 +0000
+ id 1kadTY-007oYq-7R; Thu, 05 Nov 2020 11:30:44 +0000
 MIME-Version: 1.0
-Date: Thu, 05 Nov 2020 11:08:38 +0000
+Date: Thu, 05 Nov 2020 11:30:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [RFC PATCH 12/26] kvm: arm64: Add SMC handler in nVHE EL2
-In-Reply-To: <20201104183630.27513-13-dbrazdil@google.com>
+Subject: Re: [RFC PATCH 18/26] kvm: arm64: Intercept PSCI_CPU_OFF host SMC
+ calls
+In-Reply-To: <20201104183630.27513-19-dbrazdil@google.com>
 References: <20201104183630.27513-1-dbrazdil@google.com>
- <20201104183630.27513-13-dbrazdil@google.com>
+ <20201104183630.27513-19-dbrazdil@google.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <35d054aa819034831a04aa3332aceec2@kernel.org>
+Message-ID: <0ebade5427b2d9a020cd33da64cb9d13@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
@@ -100,76 +101,67 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2020-11-04 18:36, David Brazdil wrote:
-> Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
-> EL3 and propagate the result back to EL1. This is done in preparation
-> for validating host SMCs.
+> Add a handler of the CPU_OFF PSCI host SMC trapped in KVM nVHE hyp 
+> code.
+> When invoked, it changes the recorded state of the core to OFF before
+> forwarding the call to EL3. If the call fails, it changes the state 
+> back
+> to ON and returns the error to the host.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 36 ++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+>  arch/arm64/kvm/hyp/nvhe/psci.c | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 19332c20fcde..fffc2dc09a1f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -106,6 +106,38 @@ static void handle_host_hcall(struct
-> kvm_cpu_context *host_ctxt)
->  	host_ctxt->regs.regs[1] = ret;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/psci.c 
+> b/arch/arm64/kvm/hyp/nvhe/psci.c
+> index c3d0a6246c66..00dc0cab860c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/psci.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/psci.c
+> @@ -13,6 +13,8 @@
+>  #include <kvm/arm_psci.h>
+>  #include <uapi/linux/psci.h>
+> 
+> +#include <nvhe/spinlock.h>
+> +
+>  /* Config options set by the host. */
+>  u32 kvm_host_psci_version = PSCI_VERSION(0, 0);
+>  u32 kvm_host_psci_function_id[PSCI_FN_MAX];
+> @@ -20,6 +22,7 @@ s64 hyp_physvirt_offset;
+> 
+>  #define __hyp_pa(x) ((phys_addr_t)(x) + hyp_physvirt_offset)
+> 
+> +static DEFINE_PER_CPU(hyp_spinlock_t, psci_cpu_lock);
+>  DEFINE_PER_CPU(enum kvm_nvhe_psci_state, psci_cpu_state);
+> 
+>  static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
+> @@ -76,9 +79,32 @@ static __noreturn unsigned long
+> psci_forward_noreturn(struct kvm_cpu_context *ho
+>  	hyp_panic(); /* unreachable */
 >  }
 > 
-> +static void skip_host_instruction(void)
-> +{
-> +	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-> +}
-> +
-> +static void forward_host_smc(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_smc(host_ctxt->regs.regs[0], host_ctxt->regs.regs[1],
-> +			  host_ctxt->regs.regs[2], host_ctxt->regs.regs[3],
-> +			  host_ctxt->regs.regs[4], host_ctxt->regs.regs[5],
-> +			  host_ctxt->regs.regs[6], host_ctxt->regs.regs[7],
-> +			  &res);
-> +	host_ctxt->regs.regs[0] = res.a0;
-> +	host_ctxt->regs.regs[1] = res.a1;
-> +	host_ctxt->regs.regs[2] = res.a2;
-> +	host_ctxt->regs.regs[3] = res.a3;
-> +}
-> +
-> +static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	/*
-> +	 * Unlike HVC, the return address of an SMC is the instruction's PC.
-> +	 * Move the return address past the instruction.
-> +	 */
-> +	skip_host_instruction();
-> +
-> +	/* Forward SMC not handled in EL2 to EL3. */
-> +	forward_host_smc(host_ctxt);
-> +}
-> +
->  void handle_trap(struct kvm_cpu_context *host_ctxt)
->  {
->  	u64 esr = read_sysreg_el2(SYS_ESR);
-> @@ -114,6 +146,10 @@ void handle_trap(struct kvm_cpu_context 
+> +static int psci_cpu_off(u64 func_id, struct kvm_cpu_context 
 > *host_ctxt)
->  	case ESR_ELx_EC_HVC64:
->  		handle_host_hcall(host_ctxt);
->  		break;
-> +	case ESR_ELx_EC_SMC32:
+> +{
+> +	hyp_spinlock_t *cpu_lock = this_cpu_ptr(&psci_cpu_lock);
+> +	enum kvm_nvhe_psci_state *cpu_power = this_cpu_ptr(&psci_cpu_state);
+> +	u32 power_state = (u32)host_ctxt->regs.regs[1];
+> +	int ret;
+> +
+> +	/* Change the recorded state to OFF before forwarding the call. */
+> +	hyp_spin_lock(cpu_lock);
+> +	*cpu_power = KVM_NVHE_PSCI_CPU_OFF;
+> +	hyp_spin_unlock(cpu_lock);
 
-How is that even possible? Host EL1 is strictly 64bit, so SMC32 cannot 
-occur.
+So at this point, another CPU can observe the vcpu being "off", and 
+issue
+a PSCI_ON, which may result in an "already on". I'm not sure this is an
+actual issue, but it is worth documenting.
 
-> +	case ESR_ELx_EC_SMC64:
-> +		handle_host_smc(host_ctxt);
-> +		break;
->  	default:
->  		hyp_panic();
->  	}
+What is definitely missing is a rational about *why* we need to track 
+the
+state of the vcpus. I naively imagined that we could directly proxy the
+PSCI calls to EL3, only repainting PC for PSCI_ON.
 
 Thanks,
 
