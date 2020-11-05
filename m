@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9F0C4741F
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 12:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC95C00A89
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 12:57:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3881820A8B
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 12:57:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3881820A8B
+	by mail.kernel.org (Postfix) with ESMTP id 83E0D206DB
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 12:57:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E0D206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B63B34B772;
-	Thu,  5 Nov 2020 07:57:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BC394B7AD;
+	Thu,  5 Nov 2020 07:57:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id riRIcCr7vWZI; Thu,  5 Nov 2020 07:57:15 -0500 (EST)
+	with ESMTP id nZsJI8F7aKXi; Thu,  5 Nov 2020 07:57:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB1F4B7EE;
-	Thu,  5 Nov 2020 07:57:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1A74B7CB;
+	Thu,  5 Nov 2020 07:57:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 854E04B728
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 07:57:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 192984B79C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 07:57:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mZxRyPFhLnKp for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 07:57:13 -0500 (EST)
+ with ESMTP id FViSgq--+LfZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 07:57:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF574B727
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 07:57:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 093984B772
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 07:57:15 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E69AD142F;
- Thu,  5 Nov 2020 04:57:12 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C46E114BF;
+ Thu,  5 Nov 2020 04:57:14 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4869E3F73C;
- Thu,  5 Nov 2020 04:57:11 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2659D3F719;
+ Thu,  5 Nov 2020 04:57:13 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>
-Subject: [PATCH v2 4/5] arm64: Add support for SMCCC TRNG entropy source
-Date: Thu,  5 Nov 2020 12:56:55 +0000
-Message-Id: <20201105125656.25259-5-andre.przywara@arm.com>
+Subject: [PATCH v2 5/5] KVM: arm64: implement the TRNG hypervisor call
+Date: Thu,  5 Nov 2020 12:56:56 +0000
+Message-Id: <20201105125656.25259-6-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201105125656.25259-1-andre.przywara@arm.com>
 References: <20201105125656.25259-1-andre.przywara@arm.com>
@@ -72,116 +72,166 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ARM architected TRNG firmware interface, described in ARM spec
-DEN0098, defines an ARM SMCCC based interface to a true random number
-generator, provided by firmware.
-This can be discovered via the SMCCC >=v1.1 interface, and provides
-up to 192 bits of entropy per call.
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Hook this SMC call into arm64's arch_get_random_*() implementation,
-coming to the rescue when the CPU does not implement the ARM v8.5 RNG
-system registers.
+Provide a hypervisor implementation of the ARM architected TRNG firmware
+interface described in ARM spec DEN0098. All function IDs are implemented,
+including both 32-bit and 64-bit versions of the TRNG_RND service, which
+is the centerpiece of the API.
 
-For the detection, we piggy back on the PSCI/SMCCC discovery (which gives
-us the conduit to use (hvc/smc)), then try to call the
-ARM_SMCCC_TRNG_VERSION function, which returns -1 if this interface is
-not implemented.
+The API is backed by arch_get_unsigned_seed_long(), which is implemented
+in terms of RNDRRS currently, and will be alternatively backed by a SMC
+call to the secure firmware using same interface after a future patch.
+If neither are available, the kernel's entropy pool is used instead.
 
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/arm64/include/asm/archrandom.h | 53 ++++++++++++++++++++++++-----
- 1 file changed, 45 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 +
+ arch/arm64/kvm/Makefile           |  2 +-
+ arch/arm64/kvm/hypercalls.c       |  6 ++
+ arch/arm64/kvm/trng.c             | 91 +++++++++++++++++++++++++++++++
+ 4 files changed, 100 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/trng.c
 
-diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
-index abe07c21da8e..03744f688ca1 100644
---- a/arch/arm64/include/asm/archrandom.h
-+++ b/arch/arm64/include/asm/archrandom.h
-@@ -4,13 +4,24 @@
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 781d029b8aa8..615932bacf76 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -652,4 +652,6 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ #define kvm_arm_vcpu_sve_finalized(vcpu) \
+ 	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
  
- #ifdef CONFIG_ARCH_RANDOM
- 
++int kvm_trng_call(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 1504c81fbf5d..a510037e3270 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 inject_fault.o regmap.o va_layout.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+-	 aarch32.o arch_timer.o \
++	 aarch32.o arch_timer.o trng.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 25ea4ecb6449..ead21b98b620 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -71,6 +71,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		if (gpa != GPA_INVALID)
+ 			val = gpa;
+ 		break;
++	case ARM_SMCCC_TRNG_VERSION:
++	case ARM_SMCCC_TRNG_FEATURES:
++	case ARM_SMCCC_TRNG_GET_UUID:
++	case ARM_SMCCC_TRNG_RND32:
++	case ARM_SMCCC_TRNG_RND64:
++		return kvm_trng_call(vcpu);
+ 	default:
+ 		return kvm_psci_call(vcpu);
+ 	}
+diff --git a/arch/arm64/kvm/trng.c b/arch/arm64/kvm/trng.c
+new file mode 100644
+index 000000000000..5a27b2d99977
+--- /dev/null
++++ b/arch/arm64/kvm/trng.c
+@@ -0,0 +1,91 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2020 Arm Ltd.
++
 +#include <linux/arm-smccc.h>
- #include <linux/bug.h>
- #include <linux/kernel.h>
- #include <asm/cpufeature.h>
- 
-+#define ARM_SMCCC_TRNG_MIN_VERSION	0x10000UL
++#include <linux/kvm_host.h>
 +
-+extern bool smccc_trng_available;
++#include <asm/kvm_emulate.h>
 +
- static inline bool __init smccc_probe_trng(void)
- {
--	return false;
-+	struct arm_smccc_res res;
++#include <kvm/arm_hypercalls.h>
 +
-+	arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
-+	if ((s32)res.a0 < 0)
-+		return false;
++#define ARM_SMCCC_TRNG_VERSION_1_0	0x10000UL
 +
-+	return res.a0 >= ARM_SMCCC_TRNG_MIN_VERSION;
- }
- 
- static inline bool __arm64_rndr(unsigned long *v)
-@@ -43,26 +54,52 @@ static inline bool __must_check arch_get_random_int(unsigned int *v)
- 
- static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
- {
-+	struct arm_smccc_res res;
++#define TRNG_SUCCESS			0UL
++#define TRNG_NOT_SUPPORTED		((unsigned long)-1)
++#define TRNG_INVALID_PARAMETER		((unsigned long)-2)
++#define TRNG_NO_ENTROPY			((unsigned long)-3)
 +
- 	/*
- 	 * Only support the generic interface after we have detected
- 	 * the system wide capability, avoiding complexity with the
- 	 * cpufeature code and with potential scheduling between CPUs
- 	 * with and without the feature.
- 	 */
--	if (!cpus_have_const_cap(ARM64_HAS_RNG))
--		return false;
-+	if (cpus_have_const_cap(ARM64_HAS_RNG))
-+		return __arm64_rndr(v);
- 
--	return __arm64_rndr(v);
--}
-+	if (smccc_trng_available) {
-+		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
-+		if ((int)res.a0 < 0)
-+			return false;
- 
-+		*v = res.a3;
-+		return true;
++#define MAX_BITS32			96
++#define MAX_BITS64			192
++
++static const uuid_t arm_smc_trng_uuid __aligned(4) = UUID_INIT(
++	0x023534a2, 0xe0bc, 0x45ec, 0x95, 0xdd, 0x33, 0x34, 0xc1, 0xcc, 0x31, 0x89);
++
++static int kvm_trng_do_rnd(struct kvm_vcpu *vcpu, int size)
++{
++	u32 num_bits = smccc_get_arg1(vcpu);
++	u64 bits[3];
++	int i;
++
++	if (num_bits > 3 * size) {
++		smccc_set_retval(vcpu, TRNG_INVALID_PARAMETER, 0, 0, 0);
++		return 1;
 +	}
 +
-+	return false;
++	/* get as many bits as we need to fulfil the request */
++	for (i = 0; i < DIV_ROUND_UP(num_bits, 64); i++)
++		/* use the arm64 specific backend directly if one exists */
++		if (!arch_get_random_seed_long((unsigned long *)&bits[i]))
++			bits[i] = get_random_long();
++
++	if (num_bits % 64)
++		bits[i - 1] &= U64_MAX >> (64 - (num_bits % 64));
++
++	while (i < ARRAY_SIZE(bits))
++		bits[i++] = 0;
++
++	if (size == 32)
++		smccc_set_retval(vcpu, TRNG_SUCCESS, lower_32_bits(bits[1]),
++				 upper_32_bits(bits[0]), lower_32_bits(bits[0]));
++	else
++		smccc_set_retval(vcpu, TRNG_SUCCESS, bits[2], bits[1], bits[0]);
++
++	memzero_explicit(bits, sizeof(bits));
++	return 1;
 +}
- 
- static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
- {
-+	struct arm_smccc_res res;
- 	unsigned long val;
--	bool ok = arch_get_random_seed_long(&val);
- 
--	*v = val;
--	return ok;
-+	if (cpus_have_const_cap(ARM64_HAS_RNG)) {
-+		if (arch_get_random_seed_long(&val)) {
-+			*v = val;
-+			return true;
++
++int kvm_trng_call(struct kvm_vcpu *vcpu)
++{
++	const __le32 *u = (__le32 *)arm_smc_trng_uuid.b;
++	u32 func_id = smccc_get_function(vcpu);
++	unsigned long val = TRNG_NOT_SUPPORTED;
++	int size = 64;
++
++	switch (func_id) {
++	case ARM_SMCCC_TRNG_VERSION:
++		val = ARM_SMCCC_TRNG_VERSION_1_0;
++		break;
++	case ARM_SMCCC_TRNG_FEATURES:
++		switch (smccc_get_arg1(vcpu)) {
++		case ARM_SMCCC_TRNG_VERSION:
++		case ARM_SMCCC_TRNG_FEATURES:
++		case ARM_SMCCC_TRNG_GET_UUID:
++		case ARM_SMCCC_TRNG_RND32:
++		case ARM_SMCCC_TRNG_RND64:
++			val = TRNG_SUCCESS;
 +		}
-+		return false;
++		break;
++	case ARM_SMCCC_TRNG_GET_UUID:
++		smccc_set_retval(vcpu, le32_to_cpu(u[0]), le32_to_cpu(u[1]),
++				 le32_to_cpu(u[2]), le32_to_cpu(u[3]));
++		return 1;
++	case ARM_SMCCC_TRNG_RND32:
++		size = 32;
++		fallthrough;
++	case ARM_SMCCC_TRNG_RND64:
++		return kvm_trng_do_rnd(vcpu, size);
 +	}
 +
-+	if (smccc_trng_available) {
-+		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 32, &res);
-+		if ((int)res.a0 < 0)
-+			return false;
-+
-+		*v = res.a3 & GENMASK(31, 0);
-+		return true;
-+	}
-+
-+	return false;
- }
- 
- static inline bool __init __early_cpu_has_rndr(void)
++	smccc_set_retval(vcpu, val, 0, 0, 0);
++	return 1;
++}
 -- 
 2.17.1
 
