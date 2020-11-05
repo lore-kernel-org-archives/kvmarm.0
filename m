@@ -2,65 +2,70 @@ Return-Path: <SRS0=1Hfd=EL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9650DC55178
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 17:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC57C4742C
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 22:44:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB57D20709
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 17:57:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB57D20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 378B42078E
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 22:44:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2LiuAR1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 378B42078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EADB74B727;
-	Thu,  5 Nov 2020 12:57:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CD64B7F2;
+	Thu,  5 Nov 2020 17:44:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pUxE7l37fxPT; Thu,  5 Nov 2020 12:57:43 -0500 (EST)
+	with ESMTP id e2qlesztjA7C; Thu,  5 Nov 2020 17:44:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93C2D4B76B;
-	Thu,  5 Nov 2020 12:57:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F744B813;
+	Thu,  5 Nov 2020 17:44:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8A44B719
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 12:57:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 494774B7F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 17:44:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oWJFc8jbJrQl for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 12:57:39 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C21C64B727
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 12:57:39 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4144114BF;
- Thu,  5 Nov 2020 09:57:39 -0800 (PST)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9142B3F719;
- Thu,  5 Nov 2020 09:57:37 -0800 (PST)
-Subject: Re: [PATCH v2 3/5] ARM: implement support for SMCCC TRNG entropy
- source
-To: kernel test robot <lkp@intel.com>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
- Russell King <linux@armlinux.org.uk>
-References: <20201105125656.25259-4-andre.przywara@arm.com>
- <202011060104.RRRtFPOR-lkp@intel.com>
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Organization: ARM Ltd.
-Message-ID: <9b13b9c3-66a5-8dbb-868d-f826ae29a11a@arm.com>
-Date: Thu, 5 Nov 2020 17:56:32 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id nBOF+K2Heklt for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 17:44:50 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 015084B7E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 17:44:49 -0500 (EST)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id D44D920782;
+ Thu,  5 Nov 2020 22:44:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604616288;
+ bh=/Kd2xNCOmDzNtR70KzNcw4Z8JWC+xMw9qKRE7OK3bac=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=u2LiuAR18Ux0P973OaySkVkPpt3P6fwmSgZgTiPjIGvxuIjR/aMjDBUycHHzgJQ4l
+ fJkliNgpB1nPep4i9w/sV05yfNT9fK8E0BSbiMIkuv8OcRsI9JA7Xm02nHquIQX2Ns
+ 2P9jpMfDFBlkSHL1Dl9cuzF1cDPhALpC+Y7VSkaA=
+Date: Thu, 5 Nov 2020 22:44:43 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/3] KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2
+ from userspace
+Message-ID: <20201105224442.GD8842@willie-the-truck>
+References: <20201103171445.271195-1-maz@kernel.org>
+ <20201103171445.271195-2-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <202011060104.RRRtFPOR-lkp@intel.com>
-Content-Language: en-GB
-Cc: kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20201103171445.271195-2-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,77 +82,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 05/11/2020 17:15, kernel test robot wrote:
-> Hi Andre,
+On Tue, Nov 03, 2020 at 05:14:43PM +0000, Marc Zyngier wrote:
+> We now expose ID_AA64PFR0_EL1.CSV2=1 to guests running on hosts
+> that are immune to Spectre-v2, but that don't have this field set,
+> most likely because they predate the specification.
 > 
-> I love your patch! Yet something to improve:
+> However, this prevents the migration of guests that have started on
+> a host the doesn't fake this CSV2 setting to one that does, as KVM
+> rejects the write to ID_AA64PFR0_EL2 on the grounds that it isn't
+> what is already there.
 > 
-> [auto build test ERROR on linus/master]
-> [also build test ERROR on v5.10-rc2 next-20201105]
-> [cannot apply to arm64/for-next/core kvmarm/next arm-perf/for-next/perf]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
+> In order to fix this, allow userspace to set this field as long as
+> this doesn't result in a promising more than what is already there
+> (setting CSV2 to 0 is acceptable, but setting it to 1 when it is
+> already set to 0 isn't).
 > 
-> url:    https://github.com/0day-ci/linux/commits/Andre-Przywara/ARM-arm64-Add-SMCCC-TRNG-entropy-service/20201105-205934
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 4ef8451b332662d004df269d4cdeb7d9f31419b5
-> config: arm-randconfig-s031-20201105 (attached as .config)
-> compiler: arm-linux-gnueabi-gcc (GCC) 9.3.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # apt-get install sparse
->         # sparse version: v0.6.3-76-gf680124b-dirty
->         # https://github.com/0day-ci/linux/commit/1f0c18ec0b7aa0a67d7cdea2b1beb5e7b38c5f4b
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Andre-Przywara/ARM-arm64-Add-SMCCC-TRNG-entropy-service/20201105-205934
->         git checkout 1f0c18ec0b7aa0a67d7cdea2b1beb5e7b38c5f4b
->         # save the attached .config to linux build tree
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' ARCH=arm 
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All errors (new ones prefixed by >>):
-> 
->    arm-linux-gnueabi-ld: drivers/char/random.o: in function `arch_get_random_seed_long':
->>> arch/arm/include/asm/archrandom.h:48: undefined reference to `arm_smccc_1_1_get_conduit'
->>> arm-linux-gnueabi-ld: arch/arm/include/asm/archrandom.h:48: undefined reference to `smccc_trng_available'
-
-Found it, we should use "depends on HAVE_ARM_SMCCC_DISCOVERY" instead of
-HAVE_ARM_SMCCC, because only the former guarantees the build of smccc.c.
-Will fix it in the next version, (given we keep this arch random part).
-
-Thanks,
-Andre
-
-> 
-> vim +48 arch/arm/include/asm/archrandom.h
-> 
->     42	
->     43	static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
->     44	{
->     45		struct arm_smccc_res res;
->     46	
->     47		if (smccc_trng_available) {
->   > 48			arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND32, 8 * sizeof(*v), &res);
->     49	
->     50			if (res.a0 != 0)
->     51				return false;
->     52	
->     53			*v = res.a3;
->     54			return true;
->     55		}
->     56	
->     57		return false;
->     58	}
->     59	
-> 
+> Fixes: e1026237f9067 ("KVM: arm64: Set CSV2 for guests on hardware unaffected by Spectre-v2")
+> Reported-by: Peng Liang <liangpeng10@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/kvm/arm.c              | 16 +++++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 38 +++++++++++++++++++++++++++----
+>  3 files changed, 52 insertions(+), 4 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 781d029b8aa8..0cd9f0f75c13 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -118,6 +118,8 @@ struct kvm_arch {
+>  	 */
+>  	unsigned long *pmu_filter;
+>  	unsigned int pmuver;
+> +
+> +	u8 pfr0_csv2;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 5750ec34960e..c0ffb019ca8b 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -102,6 +102,20 @@ static int kvm_arm_default_max_vcpus(void)
+>  	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+>  }
+>  
+> +static void set_default_csv2(struct kvm *kvm)
+> +{
+> +	/*
+> +	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+> +	 * Although this is a per-CPU feature, we make it global because
+> +	 * asymmetric systems are just a nuisance.
+> +	 *
+> +	 * Userspace can override this as long as it doesn't promise
+> +	 * the impossible.
+> +	 */
+> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> +		kvm->arch.pfr0_csv2 = 1;
+> +}
+> +
+>  /**
+>   * kvm_arch_init_vm - initializes a VM data structure
+>   * @kvm:	pointer to the KVM struct
+> @@ -127,6 +141,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	/* The maximum number of VCPUs is limited by the host's GIC model */
+>  	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+>  
+> +	set_default_csv2(kvm);
+> +
+>  	return ret;
+>  out_free_stage2_pgd:
+>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index fb12d3ef423a..61789027b92b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1128,9 +1128,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		if (!vcpu_has_sve(vcpu))
+>  			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+>  		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+> -		if (!(val & (0xfUL << ID_AA64PFR0_CSV2_SHIFT)) &&
+> -		    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> -			val |= (1UL << ID_AA64PFR0_CSV2_SHIFT);
+> +		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
+> +		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
+>  	} else if (id == SYS_ID_AA64PFR1_EL1) {
+>  		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+>  	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+> @@ -1260,6 +1259,36 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd,
+> +			       const struct kvm_one_reg *reg, void __user *uaddr)
+> +{
+> +	const u64 id = sys_reg_to_index(rd);
+> +	int err;
+> +	u64 val;
+> +	u8 csv2;
+> +
+> +	err = reg_from_user(&val, uaddr, id);
+> +	if (err)
+> +		return err;
+> +
+> +	/*
+> +	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> +	 * it doesn't promise more than what is actually provided (the
+> +	 * guest could otherwise be covered in ectoplasmic residue).
+> +	 */
+> +	csv2 = FIELD_GET(0xfUL << ID_AA64PFR0_CSV2_SHIFT, val);
 
+cpuid_feature_extract_unsigned_field() instead?
+
+> +	if (csv2 > vcpu->kvm->arch.pfr0_csv2)
+> +		return -EINVAL;
+> +	vcpu->kvm->arch.pfr0_csv2 = csv2;
+> +
+> +	/* This is what we mean by invariant: you can't change it. */
+> +	if (val != read_id_reg(vcpu, rd, false))
+> +		return -EINVAL;
+
+I think it's quite confusing to return -EINVAL in the case that we have
+actually updated arch.pfr0_csv2, as it's indistinguishable from the case
+when csv2 was invalid and the field wasn't updated.
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
