@@ -2,75 +2,71 @@ Return-Path: <SRS0=1Hfd=EL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED57FC00A89
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC2CC00A89
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:12:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4ACDF2073A
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:10:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9668A2071A
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 09:12:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EnG9Jksp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ACDF2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HryRBPi3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9668A2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D900D4B3A1;
-	Thu,  5 Nov 2020 04:10:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02BE14B7D2;
+	Thu,  5 Nov 2020 04:12:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CWA1nnV6eTZb; Thu,  5 Nov 2020 04:10:43 -0500 (EST)
+	with ESMTP id VlXKxeccbqm5; Thu,  5 Nov 2020 04:12:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A43394B3CB;
-	Thu,  5 Nov 2020 04:10:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E72E44B7BE;
+	Thu,  5 Nov 2020 04:12:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 970F94B368
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:10:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F754B3A1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:12:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EDhm4Mv-8JRZ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 04:10:40 -0500 (EST)
+ with ESMTP id K0X8cglgGBZC for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 04:12:11 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9424B46C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:10:40 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5E7F4B368
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 04:12:11 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604567440;
+ s=mimecast20190719; t=1604567531;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xkAKI6q97gi5LKtTbF6NLVxDhxKqyQ7tUw1ltOTiADs=;
- b=EnG9JkspBw9+Von4X3vUrXacRJNCZBVzrrHWGGT7aLMWtoKCiaqz/WTqoeG1TjHVkHflFv
- 1lVFoIC3qejwgjpfWg+LHgHi3n5M+NEsME0SETza/qkPMHjmUNUGMLUH1lJ0CTRuoA5r6J
- 2tht3g6vge9/wyNBeD4B4hutDJZ5b5M=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=KJk57qFGnDBMFxFH3XJU98lSAGfOtWv+ZIi/vHNtQIU=;
+ b=HryRBPi3y50iliHMwYvQBy5GARJEHUiuAW9TVMMHgXO36z0ydYccpz2UR0ntMr0rsTW12D
+ foStXJZzB22hdAj8u4hitbiJC60X/23AzLHf4P2nzqLG7grONaphCVKxR69dd26/uASlBS
+ eNH2uxR4ZHVLEaD2zanDEO4UAKICEVY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-k4t2uT9oPCGgET8oYD5A5w-1; Thu, 05 Nov 2020 04:10:36 -0500
-X-MC-Unique: k4t2uT9oPCGgET8oYD5A5w-1
+ us-mta-19-e16BLnkoO-y8yscRGtB9VQ-1; Thu, 05 Nov 2020 04:10:27 -0500
+X-MC-Unique: e16BLnkoO-y8yscRGtB9VQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA923803F41;
- Thu,  5 Nov 2020 09:10:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4394E107ACF6;
+ Thu,  5 Nov 2020 09:10:26 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.193.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8185A60C17;
- Thu,  5 Nov 2020 09:10:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79D7860C17;
+ Thu,  5 Nov 2020 09:10:24 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 4/4] KVM: arm64: Remove AA64ZFR0_EL1 accessors
-Date: Thu,  5 Nov 2020 10:10:22 +0100
-Message-Id: <20201105091022.15373-5-drjones@redhat.com>
-In-Reply-To: <20201105091022.15373-1-drjones@redhat.com>
-References: <20201105091022.15373-1-drjones@redhat.com>
+Subject: [PATCH v3 0/4] KVM: arm64: Fix get-reg-list regression
+Date: Thu,  5 Nov 2020 10:10:18 +0100
+Message-Id: <20201105091022.15373-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
@@ -89,117 +85,37 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The AA64ZFR0_EL1 accessors are just the general accessors with
-its visibility function open-coded. It also skips the if-else
-chain in read_id_reg, but there's no reason not to go there.
-Indeed consolidating ID register accessors and removing lines
-of code make it worthwhile.
-
-Remove the AA64ZFR0_EL1 accessors, replacing them with the
-general accessors for sanitized ID registers.
-
-No functional change intended.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/kvm/sys_regs.c | 61 +++++++--------------------------------
- 1 file changed, 11 insertions(+), 50 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 47893b7e982f..d0868d0e8ff4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1156,6 +1156,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
- 				  const struct sys_reg_desc *r)
- {
-+	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-+			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-+
-+	switch (id) {
-+	case SYS_ID_AA64ZFR0_EL1:
-+		if (!vcpu_has_sve(vcpu))
-+			return REG_RAZ;
-+		break;
-+	}
-+
- 	return 0;
- }
- 
-@@ -1203,55 +1213,6 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- 	return REG_HIDDEN;
- }
- 
--/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
--static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
--{
--	if (!vcpu_has_sve(vcpu))
--		return 0;
--
--	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
--}
--
--static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
--				   struct sys_reg_params *p,
--				   const struct sys_reg_desc *rd)
--{
--	if (p->is_write)
--		return write_to_read_only(vcpu, p, rd);
--
--	p->regval = guest_id_aa64zfr0_el1(vcpu);
--	return true;
--}
--
--static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
--		const struct sys_reg_desc *rd,
--		const struct kvm_one_reg *reg, void __user *uaddr)
--{
--	u64 val;
--
--	val = guest_id_aa64zfr0_el1(vcpu);
--	return reg_to_user(uaddr, &val, reg->id);
--}
--
--static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
--		const struct sys_reg_desc *rd,
--		const struct kvm_one_reg *reg, void __user *uaddr)
--{
--	const u64 id = sys_reg_to_index(rd);
--	int err;
--	u64 val;
--
--	err = reg_from_user(&val, uaddr, id);
--	if (err)
--		return err;
--
--	/* This is what we mean by invariant: you can't change it. */
--	if (val != guest_id_aa64zfr0_el1(vcpu))
--		return -EINVAL;
--
--	return 0;
--}
--
- /*
-  * cpufeature ID register user accessors
-  *
-@@ -1515,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_SANITISED(ID_AA64PFR1_EL1),
- 	ID_UNALLOCATED(4,2),
- 	ID_UNALLOCATED(4,3),
--	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, },
-+	ID_SANITISED(ID_AA64ZFR0_EL1),
- 	ID_UNALLOCATED(4,5),
- 	ID_UNALLOCATED(4,6),
- 	ID_UNALLOCATED(4,7),
--- 
-2.26.2
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+5byg5Lic5petIDx4dTkxMDEyMUBzaW5hLmNvbT4gcmVwb3J0ZWQgYSByZWdyZXNzaW9uIHNlZW4g
+d2l0aCBDZW50T1MKd2hlbiBtaWdyYXRpbmcgZnJvbSBhbiBvbGQga2VybmVsIHRvIGEgbmV3IG9u
+ZS4gVGhlIHByb2JsZW0gd2FzCnRoYXQgUUVNVSByZWplY3RlZCB0aGUgbWlncmF0aW9uIHNpbmNl
+IEtWTV9HRVRfUkVHX0xJU1QgcmVwb3J0ZWQKYSByZWdpc3RlciB3YXMgbWlzc2luZyBvbiB0aGUg
+ZGVzdGluYXRpb24uIEV4dHJhIHJlZ2lzdGVycyBhcmUgT0sKb24gdGhlIGRlc3RpbmF0aW9uLCBi
+dXQgbm90IG1pc3Npbmcgb25lcy4gVGhlIHJlZ3Jlc3Npb24gcmVwcm9kdWNlcwp3aXRoIHVwc3Ry
+ZWFtIGtlcm5lbHMgd2hlbiBtaWdyYXRpbmcgZnJvbSBhIDQuMTUgb3IgbGF0ZXIga2VybmVsLAp1
+cCB0byBvbmUgd2l0aCBjb21taXQgNzM0MzM3NjJmY2FlICgiS1ZNOiBhcm02NC9zdmU6IFN5c3Rl
+bSByZWdpc3Rlcgpjb250ZXh0IHN3aXRjaCBhbmQgYWNjZXNzIHN1cHBvcnQiKSwgdG8gYSBrZXJu
+ZWwgdGhhdCBpbmNsdWRlcyB0aGF0CmNvbW1pdCwgZS5nLiB0aGUgbGF0ZXN0IG1haW5saW5lICg1
+LjEwLXJjMikuCgpUaGUgZmlyc3QgcGF0Y2ggb2YgdGhpcyBzZXJpZXMgaXMgdGhlIGZpeC4gVGhl
+IG5leHQgdHdvIHBhdGNoZXMsCndoaWNoIGRvbid0IGhhdmUgYW55IGludGVuZGVkIGZ1bmN0aW9u
+YWwgY2hhbmdlcywgYWxsb3cgSURfU0FOSVRJU0VECnRvIGJlIHVzZWQgZm9yIHJlZ2lzdGVycyB0
+aGF0IGZsaXAgYmV0d2VlbiBleHBvc2luZyBmZWF0dXJlcyBhbmQKYmVpbmcgUkFaLCB3aGljaCBh
+bGxvd3Mgc29tZSBjb2RlIHRvIGJlIHJlbW92ZWQuCgp2MzoKIC0gSW1wcm92ZSBjb21taXQgbWVz
+c2FnZXMgW0RhdmVdCiAtIEFkZCBuZXcgcGF0Y2ggdG8gY29uc29saWRhdGUgUkVHX0hJRERFTiog
+ZmxhZ3MgW0RhdmVdCgp2MjoKIC0gQ0Mgc3RhYmxlIFtNYXJjXQogLSBPbmx5IG9uZSBSQVogZmxh
+ZyBpcyBlbm91Z2ggW01hcmNdCiAtIE1vdmUgaWRfdmlzaWJpbGl0eSgpIHVwIGJ5IHJlYWRfaWRf
+cmVnKCkgc2luY2UgdGhleSdsbCBsaWtlbHkKICAgYmUgbWFpbnRhaW5lZCB0b2dldGhlciBbZHJl
+d10KCgpBbmRyZXcgSm9uZXMgKDQpOgogIEtWTTogYXJtNjQ6IERvbid0IGhpZGUgSUQgcmVnaXN0
+ZXJzIGZyb20gdXNlcnNwYWNlCiAgS1ZNOiBhcm02NDogQ29uc29saWRhdGUgUkVHX0hJRERFTl9H
+VUVTVC9VU0VSCiAgS1ZNOiBhcm02NDogQ2hlY2sgUkFaIHZpc2liaWxpdHkgaW4gSUQgcmVnaXN0
+ZXIgYWNjZXNzb3JzCiAgS1ZNOiBhcm02NDogUmVtb3ZlIEFBNjRaRlIwX0VMMSBhY2Nlc3NvcnMK
+CiBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIHwgMTA4ICsrKysrKysrKysrKy0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCiBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5oIHwgIDE2ICsrKy0tLQog
+MiBmaWxlcyBjaGFuZ2VkLCA0MSBpbnNlcnRpb25zKCspLCA4MyBkZWxldGlvbnMoLSkKCi0tIAoy
+LjI2LjIKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
